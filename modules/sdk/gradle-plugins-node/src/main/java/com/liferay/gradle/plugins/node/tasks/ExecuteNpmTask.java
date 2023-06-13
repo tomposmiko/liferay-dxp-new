@@ -166,6 +166,10 @@ public class ExecuteNpmTask extends ExecuteNodeScriptTask {
 	protected List<String> getCompleteArgs() {
 		List<String> completeArgs = super.getCompleteArgs();
 
+		if (NodePluginUtil.isYarnScriptFile(getScriptFile())) {
+			return completeArgs;
+		}
+
 		File cacheDir = getCacheDir();
 
 		if (cacheDir != null) {

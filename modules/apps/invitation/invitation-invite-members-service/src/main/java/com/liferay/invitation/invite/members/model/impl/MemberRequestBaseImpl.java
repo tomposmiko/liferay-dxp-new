@@ -32,8 +32,9 @@ import com.liferay.invitation.invite.members.service.MemberRequestLocalServiceUt
  * @generated
  */
 @ProviderType
-public abstract class MemberRequestBaseImpl extends MemberRequestModelImpl
-	implements MemberRequest {
+public abstract class MemberRequestBaseImpl
+	extends MemberRequestModelImpl implements MemberRequest {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class MemberRequestBaseImpl extends MemberRequestModelImpl
 			MemberRequestLocalServiceUtil.updateMemberRequest(this);
 		}
 	}
+
 }

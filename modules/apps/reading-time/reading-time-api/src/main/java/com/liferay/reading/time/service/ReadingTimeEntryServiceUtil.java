@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -35,6 +34,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 @ProviderType
 public class ReadingTimeEntryServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -42,10 +42,10 @@ public class ReadingTimeEntryServiceUtil {
 	 */
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
@@ -54,17 +54,22 @@ public class ReadingTimeEntryServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<ReadingTimeEntryService, ReadingTimeEntryService> _serviceTracker;
+	private static ServiceTracker
+		<ReadingTimeEntryService, ReadingTimeEntryService> _serviceTracker;
 
 	static {
 		Bundle bundle = FrameworkUtil.getBundle(ReadingTimeEntryService.class);
 
-		ServiceTracker<ReadingTimeEntryService, ReadingTimeEntryService> serviceTracker =
-			new ServiceTracker<ReadingTimeEntryService, ReadingTimeEntryService>(bundle.getBundleContext(),
-				ReadingTimeEntryService.class, null);
+		ServiceTracker<ReadingTimeEntryService, ReadingTimeEntryService>
+			serviceTracker =
+				new ServiceTracker
+					<ReadingTimeEntryService, ReadingTimeEntryService>(
+						bundle.getBundleContext(),
+						ReadingTimeEntryService.class, null);
 
 		serviceTracker.open();
 
 		_serviceTracker = serviceTracker;
 	}
+
 }

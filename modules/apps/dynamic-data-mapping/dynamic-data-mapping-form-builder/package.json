@@ -73,15 +73,16 @@
 		}
 	},
 	"dependencies": {
+		"@babel/cli": "^7.2.3",
 		"autobind-decorator": "^2.1.0",
 		"classnames": "^2.2.6",
-		"clay-alert": "^2.3.2",
-		"clay-checkbox": "^2.3.2",
-		"clay-dropdown": "^2.3.2",
-		"clay-icon": "^2.3.2",
-		"clay-management-toolbar": "^2.3.2",
-		"clay-modal": "^2.3.2",
-		"clay-radio": "^2.3.2",
+		"clay-alert": "2.11.1",
+		"clay-checkbox": "2.11.1",
+		"clay-dropdown": "2.11.1",
+		"clay-icon": "2.11.1",
+		"clay-management-toolbar": "2.11.1",
+		"clay-modal": "2.11.1",
+		"clay-radio": "2.11.1",
 		"isomorphic-fetch": "^2.2.1",
 		"metal-clipboard": "^2.0.1",
 		"metal-debounce": "^2.0.0",
@@ -96,26 +97,20 @@
 		"whatwg-fetch": "^3.0.0"
 	},
 	"devDependencies": {
-		"babel-cli": "^6.26.0",
-		"babel-core": "^6.26.3",
+		"@babel/plugin-proposal-class-properties": "^7.4.0",
+		"@babel/plugin-proposal-decorators": "^7.4.0",
+		"@babel/plugin-proposal-object-rest-spread": "^7.4.0",
+		"@babel/preset-env": "^7.4.2",
 		"babel-eslint": "^8.2.6",
-		"babel-plugin-transform-class-properties": "^6.24.1",
-		"babel-plugin-transform-decorators-legacy": "^1.3.5",
-		"babel-plugin-transform-object-rest-spread": "^6.26.0",
-		"babel-plugin-transform-runtime": "^6.23.0",
-		"babel-preset-env": "^1.7.0",
-		"babel-preset-metal-jsx": "^0.1.1",
 		"browser-sync": "^2.24.7",
-		"check-source-formatting": "^2.0.12",
+		"check-source-formatting": "^2.0.14",
 		"cross-env": "^5.2.0",
 		"cross-spawn": "^6.0.5",
 		"eslint": "^4.10.0",
 		"eslint-config-liferay": "^2.0.8",
 		"eslint-plugin-react": "^7.4.0",
-		"jest": "^23.6.0",
+		"jest": "^24.5.0",
 		"jest-fetch-mock": "^1.6.6",
-		"liferay-jest-junit-reporter": "1.0.0",
-		"liferay-npm-bundler": "^2.2.1",
 		"metal-jest-serializer": "^2.0.0",
 		"metal-tools-soy": "^6.0.0",
 		"opn-cli": "^3.1.0",
@@ -144,14 +139,16 @@
 		"setupFiles": [
 			"<rootDir>/test/metal/setup/setup.js"
 		],
-		"setupTestFrameworkScriptFile": "<rootDir>/test/metal/setup/setup_framework.js",
+		"setupFilesAfterEnv": [
+			"<rootDir>/test/metal/setup/setup_framework.js"
+		],
 		"snapshotSerializers": [
 			"metal-jest-serializer"
 		],
 		"testMatch": [
 			"<rootDir>/test/metal/js/**/*.js"
 		],
-		"testResultsProcessor": "./node_modules/liferay-jest-junit-reporter",
+		"testResultsProcessor": "liferay-jest-junit-reporter",
 		"testURL": "http://localhost",
 		"transformIgnorePatterns": [
 			"<rootDir>.*(node_modules)(?!.*metal.*).*$"
@@ -161,13 +158,13 @@
 	"scripts": {
 		"build": "npm run build-soy && npm run build-js && npm run bundler && npm run clean",
 		"build-js": "babel --source-maps -d classes/META-INF/resources src/main/resources/META-INF/resources",
-		"build-soy": "metalsoy --soyDeps \"./node_modules/com.liferay.frontend.taglib.clay/META-INF/resources/node_modules/**/src/*.soy\"",
+		"build-soy": "metalsoy --externalMsgFormat \"Liferay.Language.get('\\$2')\" --soyDeps \"../../../node_modules/+(clay-*|frontend-js-web)/src/**/*.soy\"",
 		"build-soy-tests": "npm run build-soy && metalsoy -s \"test/**/*.soy\" -d \"test\"",
 		"bundler": "liferay-npm-bundler",
 		"checkFormat": "npm run csf",
 		"clean": "npm run clean-soy",
 		"clean-soy": "rimraf \"src/**/*.soy.js\" \"test/**/*.soy.js\"",
-		"csf": "csf src/**/*.es.js src/**/*.soy test/**/*.es.js --fail-on-errors",
+		"csf": "csf src/**/*.es.js src/**/*.soy test/**/*.es.js",
 		"format": "npm run csf -- -i",
 		"start": "node watch.js",
 		"test": "npm run build-soy-tests && cross-env NODE_ENV=test jest --coverage && npm run clean",

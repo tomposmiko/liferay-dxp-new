@@ -29,13 +29,16 @@ import com.liferay.portal.kernel.util.Accessor;
  */
 @ImplementationClassName("com.liferay.chat.model.impl.StatusImpl")
 @ProviderType
-public interface Status extends StatusModel, PersistedModel {
+public interface Status extends PersistedModel, StatusModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.chat.model.impl.StatusImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<Status, Long> STATUS_ID_ACCESSOR = new Accessor<Status, Long>() {
+	public static final Accessor<Status, Long> STATUS_ID_ACCESSOR =
+		new Accessor<Status, Long>() {
+
 			@Override
 			public Long get(Status status) {
 				return status.getStatusId();
@@ -50,5 +53,7 @@ public interface Status extends StatusModel, PersistedModel {
 			public Class<Status> getTypeClass() {
 				return Status.class;
 			}
+
 		};
+
 }

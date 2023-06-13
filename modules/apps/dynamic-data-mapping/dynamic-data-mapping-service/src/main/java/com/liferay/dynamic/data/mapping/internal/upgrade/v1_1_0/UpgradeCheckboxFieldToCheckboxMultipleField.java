@@ -131,9 +131,7 @@ public class UpgradeCheckboxFieldToCheckboxMultipleField
 					ps2.addBatch();
 
 					ps3.setString(1, newDefinition);
-
 					ps3.setLong(2, structureId);
-
 					ps3.setString(3, version);
 
 					ps3.addBatch();

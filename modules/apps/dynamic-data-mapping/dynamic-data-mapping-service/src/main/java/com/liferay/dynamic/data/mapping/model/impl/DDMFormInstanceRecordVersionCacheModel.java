@@ -17,10 +17,8 @@ package com.liferay.dynamic.data.mapping.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class DDMFormInstanceRecordVersionCacheModel implements CacheModel<DDMFormInstanceRecordVersion>,
-	Externalizable {
+public class DDMFormInstanceRecordVersionCacheModel
+	implements CacheModel<DDMFormInstanceRecordVersion>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +48,14 @@ public class DDMFormInstanceRecordVersionCacheModel implements CacheModel<DDMFor
 			return false;
 		}
 
-		DDMFormInstanceRecordVersionCacheModel ddmFormInstanceRecordVersionCacheModel =
-			(DDMFormInstanceRecordVersionCacheModel)obj;
+		DDMFormInstanceRecordVersionCacheModel
+			ddmFormInstanceRecordVersionCacheModel =
+				(DDMFormInstanceRecordVersionCacheModel)obj;
 
-		if (formInstanceRecordVersionId == ddmFormInstanceRecordVersionCacheModel.formInstanceRecordVersionId) {
+		if (formInstanceRecordVersionId ==
+				ddmFormInstanceRecordVersionCacheModel.
+					formInstanceRecordVersionId) {
+
 			return true;
 		}
 
@@ -105,9 +108,11 @@ public class DDMFormInstanceRecordVersionCacheModel implements CacheModel<DDMFor
 
 	@Override
 	public DDMFormInstanceRecordVersion toEntityModel() {
-		DDMFormInstanceRecordVersionImpl ddmFormInstanceRecordVersionImpl = new DDMFormInstanceRecordVersionImpl();
+		DDMFormInstanceRecordVersionImpl ddmFormInstanceRecordVersionImpl =
+			new DDMFormInstanceRecordVersionImpl();
 
-		ddmFormInstanceRecordVersionImpl.setFormInstanceRecordVersionId(formInstanceRecordVersionId);
+		ddmFormInstanceRecordVersionImpl.setFormInstanceRecordVersionId(
+			formInstanceRecordVersionId);
 		ddmFormInstanceRecordVersionImpl.setGroupId(groupId);
 		ddmFormInstanceRecordVersionImpl.setCompanyId(companyId);
 		ddmFormInstanceRecordVersionImpl.setUserId(userId);
@@ -123,7 +128,8 @@ public class DDMFormInstanceRecordVersionCacheModel implements CacheModel<DDMFor
 			ddmFormInstanceRecordVersionImpl.setCreateDate(null);
 		}
 		else {
-			ddmFormInstanceRecordVersionImpl.setCreateDate(new Date(createDate));
+			ddmFormInstanceRecordVersionImpl.setCreateDate(
+				new Date(createDate));
 		}
 
 		ddmFormInstanceRecordVersionImpl.setFormInstanceId(formInstanceId);
@@ -132,10 +138,12 @@ public class DDMFormInstanceRecordVersionCacheModel implements CacheModel<DDMFor
 			ddmFormInstanceRecordVersionImpl.setFormInstanceVersion("");
 		}
 		else {
-			ddmFormInstanceRecordVersionImpl.setFormInstanceVersion(formInstanceVersion);
+			ddmFormInstanceRecordVersionImpl.setFormInstanceVersion(
+				formInstanceVersion);
 		}
 
-		ddmFormInstanceRecordVersionImpl.setFormInstanceRecordId(formInstanceRecordId);
+		ddmFormInstanceRecordVersionImpl.setFormInstanceRecordId(
+			formInstanceRecordId);
 
 		if (version == null) {
 			ddmFormInstanceRecordVersionImpl.setVersion("");
@@ -151,14 +159,16 @@ public class DDMFormInstanceRecordVersionCacheModel implements CacheModel<DDMFor
 			ddmFormInstanceRecordVersionImpl.setStatusByUserName("");
 		}
 		else {
-			ddmFormInstanceRecordVersionImpl.setStatusByUserName(statusByUserName);
+			ddmFormInstanceRecordVersionImpl.setStatusByUserName(
+				statusByUserName);
 		}
 
 		if (statusDate == Long.MIN_VALUE) {
 			ddmFormInstanceRecordVersionImpl.setStatusDate(null);
 		}
 		else {
-			ddmFormInstanceRecordVersionImpl.setStatusDate(new Date(statusDate));
+			ddmFormInstanceRecordVersionImpl.setStatusDate(
+				new Date(statusDate));
 		}
 
 		ddmFormInstanceRecordVersionImpl.setStorageId(storageId);
@@ -196,8 +206,7 @@ public class DDMFormInstanceRecordVersionCacheModel implements CacheModel<DDMFor
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(formInstanceRecordVersionId);
 
 		objectOutput.writeLong(groupId);
@@ -264,4 +273,5 @@ public class DDMFormInstanceRecordVersionCacheModel implements CacheModel<DDMFor
 	public String statusByUserName;
 	public long statusDate;
 	public long storageId;
+
 }

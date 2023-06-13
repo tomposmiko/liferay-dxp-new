@@ -34,6 +34,7 @@ import com.liferay.asset.service.AssetEntryUsageLocalService;
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.Staging;
+import com.liferay.info.provider.InfoListProviderTracker;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -143,8 +144,8 @@ public class AssetPublisherConfigurationAction
 			new AssetPublisherDisplayContext(
 				assetEntryActionRegistry, assetHelper, assetPublisherCustomizer,
 				assetPublisherHelper, assetPublisherWebConfiguration,
-				assetPublisherWebUtil, renderRequest, renderResponse,
-				renderRequest.getPreferences());
+				assetPublisherWebUtil, infoListProviderTracker, renderRequest,
+				renderResponse, renderRequest.getPreferences());
 
 		request.setAttribute(
 			AssetPublisherWebKeys.ASSET_PUBLISHER_DISPLAY_CONTEXT,
@@ -475,12 +476,12 @@ public class AssetPublisherConfigurationAction
 		String[] values = null;
 
 		if (name.equals("assetTags")) {
-			values = StringUtil.split(
-				ParamUtil.getString(actionRequest, "queryTagNames" + index));
+			values = ParamUtil.getStringValues(
+				actionRequest, "queryTagNames" + index);
 		}
 		else {
-			values = StringUtil.split(
-				ParamUtil.getString(actionRequest, "queryCategoryIds" + index));
+			values = ParamUtil.getStringValues(
+				actionRequest, "queryCategoryIds" + index);
 		}
 
 		return new AssetQueryRule(contains, andOperator, name, values);
@@ -850,6 +851,9 @@ public class AssetPublisherConfigurationAction
 
 	@Reference
 	protected GroupLocalService groupLocalService;
+
+	@Reference
+	protected InfoListProviderTracker infoListProviderTracker;
 
 	@Reference
 	protected ItemSelector itemSelector;

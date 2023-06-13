@@ -14,33 +14,59 @@
 
 package com.liferay.headless.form.resource.v1_0.test;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import com.liferay.headless.form.dto.v1_0.FormDocument;
-import com.liferay.headless.form.dto.v1_0.Options;
-import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.headless.form.resource.v1_0.FormDocumentResource;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Base64;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.odata.entity.EntityField;
+import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.test.rule.Inject;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
+
+import java.lang.reflect.InvocationTargetException;
 
 import java.net.URL;
+
+import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
+
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -50,88 +76,167 @@ import org.junit.Test;
 @Generated("")
 public abstract class BaseFormDocumentResourceTestCase {
 
+	@ClassRule
+	@Rule
+	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
+		new LiferayIntegrationTestRule();
+
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+	}
+
 	@Before
 	public void setUp() throws Exception {
+		irrelevantGroup = GroupTestUtil.addGroup();
 		testGroup = GroupTestUtil.addGroup();
 
-		_resourceURL = new URL(
-			"http://localhost:8080/o/headless-form/v1.0");
+		_resourceURL = new URL("http://localhost:8080/o/headless-form/v1.0");
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		GroupTestUtil.deleteGroup(irrelevantGroup);
 		GroupTestUtil.deleteGroup(testGroup);
 	}
 
 	@Test
 	public void testDeleteFormDocument() throws Exception {
-			Assert.assertTrue(true);
-	}
-	@Test
-	public void testGetFormDocument() throws Exception {
-			Assert.assertTrue(true);
-	}
+		FormDocument formDocument = testDeleteFormDocument_addFormDocument();
 
-	protected void assertResponseCode(int expectedResponseCode, Http.Response actualResponse) {
-		Assert.assertEquals(expectedResponseCode, actualResponse.getResponseCode());
+		assertResponseCode(
+			204, invokeDeleteFormDocumentResponse(formDocument.getId()));
+
+		assertResponseCode(
+			404, invokeGetFormDocumentResponse(formDocument.getId()));
 	}
 
-	protected boolean invokeDeleteFormDocument(
-				Long formDocumentId)
-			throws Exception {
+	protected FormDocument testDeleteFormDocument_addFormDocument()
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
 
-				options.setDelete(true);
+	protected void invokeDeleteFormDocument(Long formDocumentId)
+		throws Exception {
 
-			options.setLocation(_resourceURL + _toPath("/form-documents/{form-document-id}", formDocumentId));
+		Http.Options options = _createHttpOptions();
 
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), Boolean.class);
+		options.setDelete(true);
+
+		String location =
+			_resourceURL +
+				_toPath("/form-documents/{form-document-id}", formDocumentId);
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
 	}
 
 	protected Http.Response invokeDeleteFormDocumentResponse(
-				Long formDocumentId)
-			throws Exception {
+			Long formDocumentId)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-				options.setDelete(true);
+		options.setDelete(true);
 
-			options.setLocation(_resourceURL + _toPath("/form-documents/{form-document-id}", formDocumentId));
+		String location =
+			_resourceURL +
+				_toPath("/form-documents/{form-document-id}", formDocumentId);
 
-			HttpUtil.URLtoString(options);
+		options.setLocation(location);
 
-			return options.getResponse();
-	}
-	protected FormDocument invokeGetFormDocument(
-				Long formDocumentId)
-			throws Exception {
+		HttpUtil.URLtoByteArray(options);
 
-			Http.Options options = _createHttpOptions();
-
-			options.setLocation(_resourceURL + _toPath("/form-documents/{form-document-id}", formDocumentId));
-
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), FormDocumentImpl.class);
+		return options.getResponse();
 	}
 
-	protected Http.Response invokeGetFormDocumentResponse(
-				Long formDocumentId)
-			throws Exception {
+	@Test
+	public void testGetFormDocument() throws Exception {
+		FormDocument postFormDocument = testGetFormDocument_addFormDocument();
 
-			Http.Options options = _createHttpOptions();
+		FormDocument getFormDocument = invokeGetFormDocument(
+			postFormDocument.getId());
 
-			options.setLocation(_resourceURL + _toPath("/form-documents/{form-document-id}", formDocumentId));
-
-			HttpUtil.URLtoString(options);
-
-			return options.getResponse();
+		assertEquals(postFormDocument, getFormDocument);
+		assertValid(getFormDocument);
 	}
 
-	protected void assertEquals(FormDocument formDocument1, FormDocument formDocument2) {
-		Assert.assertTrue(formDocument1 + " does not equal " + formDocument2, equals(formDocument1, formDocument2));
+	protected FormDocument testGetFormDocument_addFormDocument()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
-	protected void assertEquals(List<FormDocument> formDocuments1, List<FormDocument> formDocuments2) {
+	protected FormDocument invokeGetFormDocument(Long formDocumentId)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL +
+				_toPath("/form-documents/{form-document-id}", formDocumentId);
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		try {
+			return _outputObjectMapper.readValue(string, FormDocument.class);
+		}
+		catch (Exception e) {
+			_log.error("Unable to process HTTP response: " + string, e);
+
+			throw e;
+		}
+	}
+
+	protected Http.Response invokeGetFormDocumentResponse(Long formDocumentId)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL +
+				_toPath("/form-documents/{form-document-id}", formDocumentId);
+
+		options.setLocation(location);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
+	}
+
+	protected void assertResponseCode(
+		int expectedResponseCode, Http.Response actualResponse) {
+
+		Assert.assertEquals(
+			expectedResponseCode, actualResponse.getResponseCode());
+	}
+
+	protected void assertEquals(
+		FormDocument formDocument1, FormDocument formDocument2) {
+
+		Assert.assertTrue(
+			formDocument1 + " does not equal " + formDocument2,
+			equals(formDocument1, formDocument2));
+	}
+
+	protected void assertEquals(
+		List<FormDocument> formDocuments1, List<FormDocument> formDocuments2) {
+
 		Assert.assertEquals(formDocuments1.size(), formDocuments2.size());
 
 		for (int i = 0; i < formDocuments1.size(); i++) {
@@ -139,234 +244,213 @@ public abstract class BaseFormDocumentResourceTestCase {
 			FormDocument formDocument2 = formDocuments2.get(i);
 
 			assertEquals(formDocument1, formDocument2);
-	}
+		}
 	}
 
-	protected boolean equals(FormDocument formDocument1, FormDocument formDocument2) {
+	protected void assertEqualsIgnoringOrder(
+		List<FormDocument> formDocuments1, List<FormDocument> formDocuments2) {
+
+		Assert.assertEquals(formDocuments1.size(), formDocuments2.size());
+
+		for (FormDocument formDocument1 : formDocuments1) {
+			boolean contains = false;
+
+			for (FormDocument formDocument2 : formDocuments2) {
+				if (equals(formDocument1, formDocument2)) {
+					contains = true;
+
+					break;
+				}
+			}
+
+			Assert.assertTrue(
+				formDocuments2 + " does not contain " + formDocument1,
+				contains);
+		}
+	}
+
+	protected void assertValid(FormDocument formDocument) {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected void assertValid(Page<FormDocument> page) {
+		boolean valid = false;
+
+		Collection<FormDocument> formDocuments = page.getItems();
+
+		int size = formDocuments.size();
+
+		if ((page.getLastPage() > 0) && (page.getPage() > 0) &&
+			(page.getPageSize() > 0) && (page.getTotalCount() > 0) &&
+			(size > 0)) {
+
+			valid = true;
+		}
+
+		Assert.assertTrue(valid);
+	}
+
+	protected boolean equals(
+		FormDocument formDocument1, FormDocument formDocument2) {
+
 		if (formDocument1 == formDocument2) {
 			return true;
-	}
+		}
 
 		return false;
 	}
 
-	protected FormDocument randomFormDocument() {
-		return new FormDocumentImpl() {
-			{
+	protected Collection<EntityField> getEntityFields() throws Exception {
+		if (!(_formDocumentResource instanceof EntityModelResource)) {
+			throw new UnsupportedOperationException(
+				"Resource is not an instance of EntityModelResource");
+		}
 
-						contentUrl = RandomTestUtil.randomString();
-						encodingFormat = RandomTestUtil.randomString();
-						fileExtension = RandomTestUtil.randomString();
-						id = RandomTestUtil.randomLong();
-						title = RandomTestUtil.randomString();
+		EntityModelResource entityModelResource =
+			(EntityModelResource)_formDocumentResource;
+
+		EntityModel entityModel = entityModelResource.getEntityModel(
+			new MultivaluedHashMap());
+
+		Map<String, EntityField> entityFieldsMap =
+			entityModel.getEntityFieldsMap();
+
+		return entityFieldsMap.values();
 	}
+
+	protected List<EntityField> getEntityFields(EntityField.Type type)
+		throws Exception {
+
+		Collection<EntityField> entityFields = getEntityFields();
+
+		Stream<EntityField> stream = entityFields.stream();
+
+		return stream.filter(
+			entityField -> Objects.equals(entityField.getType(), type)
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	protected String getFilterString(
+		EntityField entityField, String operator, FormDocument formDocument) {
+
+		StringBundler sb = new StringBundler();
+
+		String entityFieldName = entityField.getName();
+
+		sb.append(entityFieldName);
+
+		sb.append(" ");
+		sb.append(operator);
+		sb.append(" ");
+
+		if (entityFieldName.equals("contentUrl")) {
+			sb.append("'");
+			sb.append(String.valueOf(formDocument.getContentUrl()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("encodingFormat")) {
+			sb.append("'");
+			sb.append(String.valueOf(formDocument.getEncodingFormat()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("fileExtension")) {
+			sb.append("'");
+			sb.append(String.valueOf(formDocument.getFileExtension()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("id")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("sizeInBytes")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("title")) {
+			sb.append("'");
+			sb.append(String.valueOf(formDocument.getTitle()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		throw new IllegalArgumentException(
+			"Invalid entity field " + entityFieldName);
+	}
+
+	protected FormDocument randomFormDocument() {
+		return new FormDocument() {
+			{
+				contentUrl = RandomTestUtil.randomString();
+				encodingFormat = RandomTestUtil.randomString();
+				fileExtension = RandomTestUtil.randomString();
+				id = RandomTestUtil.randomLong();
+				title = RandomTestUtil.randomString();
+			}
 		};
 	}
 
+	protected FormDocument randomIrrelevantFormDocument() {
+		return randomFormDocument();
+	}
+
+	protected FormDocument randomPatchFormDocument() {
+		return randomFormDocument();
+	}
+
+	protected Group irrelevantGroup;
 	protected Group testGroup;
-
-	protected static class FormDocumentImpl implements FormDocument {
-
-	public String getContentUrl() {
-				return contentUrl;
-	}
-
-	public void setContentUrl(String contentUrl) {
-				this.contentUrl = contentUrl;
-	}
-
-	@JsonIgnore
-	public void setContentUrl(
-				UnsafeSupplier<String, Throwable> contentUrlUnsafeSupplier) {
-
-				try {
-					contentUrl = contentUrlUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String contentUrl;
-	public String getEncodingFormat() {
-				return encodingFormat;
-	}
-
-	public void setEncodingFormat(String encodingFormat) {
-				this.encodingFormat = encodingFormat;
-	}
-
-	@JsonIgnore
-	public void setEncodingFormat(
-				UnsafeSupplier<String, Throwable> encodingFormatUnsafeSupplier) {
-
-				try {
-					encodingFormat = encodingFormatUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String encodingFormat;
-	public String getFileExtension() {
-				return fileExtension;
-	}
-
-	public void setFileExtension(String fileExtension) {
-				this.fileExtension = fileExtension;
-	}
-
-	@JsonIgnore
-	public void setFileExtension(
-				UnsafeSupplier<String, Throwable> fileExtensionUnsafeSupplier) {
-
-				try {
-					fileExtension = fileExtensionUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String fileExtension;
-	public Long getId() {
-				return id;
-	}
-
-	public void setId(Long id) {
-				this.id = id;
-	}
-
-	@JsonIgnore
-	public void setId(
-				UnsafeSupplier<Long, Throwable> idUnsafeSupplier) {
-
-				try {
-					id = idUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Long id;
-	public Number getSizeInBytes() {
-				return sizeInBytes;
-	}
-
-	public void setSizeInBytes(Number sizeInBytes) {
-				this.sizeInBytes = sizeInBytes;
-	}
-
-	@JsonIgnore
-	public void setSizeInBytes(
-				UnsafeSupplier<Number, Throwable> sizeInBytesUnsafeSupplier) {
-
-				try {
-					sizeInBytes = sizeInBytesUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Number sizeInBytes;
-	public String getTitle() {
-				return title;
-	}
-
-	public void setTitle(String title) {
-				this.title = title;
-	}
-
-	@JsonIgnore
-	public void setTitle(
-				UnsafeSupplier<String, Throwable> titleUnsafeSupplier) {
-
-				try {
-					title = titleUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String title;
-
-	public String toString() {
-			StringBundler sb = new StringBundler();
-
-			sb.append("{");
-
-					sb.append("contentUrl=");
-
-				sb.append(contentUrl);
-					sb.append(", encodingFormat=");
-
-				sb.append(encodingFormat);
-					sb.append(", fileExtension=");
-
-				sb.append(fileExtension);
-					sb.append(", id=");
-
-				sb.append(id);
-					sb.append(", sizeInBytes=");
-
-				sb.append(sizeInBytes);
-					sb.append(", title=");
-
-				sb.append(title);
-
-			sb.append("}");
-
-			return sb.toString();
-	}
-
-	}
 
 	protected static class Page<T> {
 
-	public Collection<T> getItems() {
+		public Collection<T> getItems() {
 			return new ArrayList<>(items);
-	}
+		}
 
-	public int getItemsPerPage() {
-			return itemsPerPage;
-	}
+		public long getLastPage() {
+			return lastPage;
+		}
 
-	public int getLastPageNumber() {
-			return lastPageNumber;
-	}
+		public long getPage() {
+			return page;
+		}
 
-	public int getPageNumber() {
-			return pageNumber;
-	}
+		public long getPageSize() {
+			return pageSize;
+		}
 
-	public int getTotalCount() {
+		public long getTotalCount() {
 			return totalCount;
-	}
+		}
 
-	@JsonProperty
-	protected Collection<T> items;
+		@JsonProperty
+		protected Collection<T> items;
 
-	@JsonProperty
-	protected int itemsPerPage;
+		@JsonProperty
+		protected long lastPage;
 
-	@JsonProperty
-	protected int lastPageNumber;
+		@JsonProperty
+		protected long page;
 
-	@JsonProperty
-	protected int pageNumber;
+		@JsonProperty
+		protected long pageSize;
 
-	@JsonProperty
-	protected int totalCount;
+		@JsonProperty
+		protected long totalCount;
 
 	}
 
@@ -377,25 +461,74 @@ public abstract class BaseFormDocumentResourceTestCase {
 
 		String userNameAndPassword = "test@liferay.com:test";
 
-		String encodedUserNameAndPassword = Base64.encode(userNameAndPassword.getBytes());
+		String encodedUserNameAndPassword = Base64.encode(
+			userNameAndPassword.getBytes());
 
-		options.addHeader("Authorization", "Basic " + encodedUserNameAndPassword);
+		options.addHeader(
+			"Authorization", "Basic " + encodedUserNameAndPassword);
 
 		options.addHeader("Content-Type", "application/json");
 
 		return options;
 	}
 
-	private String _toPath(String template, Object value) {
-		return template.replaceFirst("\\{.*\\}", String.valueOf(value));
+	private String _toPath(String template, Object... values) {
+		if (ArrayUtil.isEmpty(values)) {
+			return template;
+		}
+
+		for (int i = 0; i < values.length; i++) {
+			template = template.replaceFirst(
+				"\\{.*?\\}", String.valueOf(values[i]));
+		}
+
+		return template;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		BaseFormDocumentResourceTestCase.class);
+
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
+	private static DateFormat _dateFormat;
 	private final static ObjectMapper _inputObjectMapper = new ObjectMapper() {
 		{
+			setFilterProvider(
+				new SimpleFilterProvider() {
+					{
+						addFilter(
+							"Liferay.Vulcan",
+							SimpleBeanPropertyFilter.serializeAll());
+					}
+				});
 			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-	}
+		}
 	};
-	private final static ObjectMapper _outputObjectMapper = new ObjectMapper();
+	private final static ObjectMapper _outputObjectMapper = new ObjectMapper() {
+		{
+			setFilterProvider(
+				new SimpleFilterProvider() {
+					{
+						addFilter(
+							"Liferay.Vulcan",
+							SimpleBeanPropertyFilter.serializeAll());
+					}
+				});
+		}
+	};
+
+	@Inject
+	private FormDocumentResource _formDocumentResource;
 
 	private URL _resourceURL;
 

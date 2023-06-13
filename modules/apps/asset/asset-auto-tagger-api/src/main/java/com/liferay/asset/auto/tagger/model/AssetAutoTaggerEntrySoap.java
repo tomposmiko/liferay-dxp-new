@@ -30,8 +30,10 @@ import java.util.List;
  */
 @ProviderType
 public class AssetAutoTaggerEntrySoap implements Serializable {
+
 	public static AssetAutoTaggerEntrySoap toSoapModel(
 		AssetAutoTaggerEntry model) {
+
 		AssetAutoTaggerEntrySoap soapModel = new AssetAutoTaggerEntrySoap();
 
 		soapModel.setAssetAutoTaggerEntryId(model.getAssetAutoTaggerEntryId());
@@ -47,7 +49,9 @@ public class AssetAutoTaggerEntrySoap implements Serializable {
 
 	public static AssetAutoTaggerEntrySoap[] toSoapModels(
 		AssetAutoTaggerEntry[] models) {
-		AssetAutoTaggerEntrySoap[] soapModels = new AssetAutoTaggerEntrySoap[models.length];
+
+		AssetAutoTaggerEntrySoap[] soapModels =
+			new AssetAutoTaggerEntrySoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -58,10 +62,12 @@ public class AssetAutoTaggerEntrySoap implements Serializable {
 
 	public static AssetAutoTaggerEntrySoap[][] toSoapModels(
 		AssetAutoTaggerEntry[][] models) {
+
 		AssetAutoTaggerEntrySoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new AssetAutoTaggerEntrySoap[models.length][models[0].length];
+			soapModels =
+				new AssetAutoTaggerEntrySoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new AssetAutoTaggerEntrySoap[0][0];
@@ -76,13 +82,16 @@ public class AssetAutoTaggerEntrySoap implements Serializable {
 
 	public static AssetAutoTaggerEntrySoap[] toSoapModels(
 		List<AssetAutoTaggerEntry> models) {
-		List<AssetAutoTaggerEntrySoap> soapModels = new ArrayList<AssetAutoTaggerEntrySoap>(models.size());
+
+		List<AssetAutoTaggerEntrySoap> soapModels =
+			new ArrayList<AssetAutoTaggerEntrySoap>(models.size());
 
 		for (AssetAutoTaggerEntry model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new AssetAutoTaggerEntrySoap[soapModels.size()]);
+		return soapModels.toArray(
+			new AssetAutoTaggerEntrySoap[soapModels.size()]);
 	}
 
 	public AssetAutoTaggerEntrySoap() {
@@ -159,4 +168,5 @@ public class AssetAutoTaggerEntrySoap implements Serializable {
 	private Date _modifiedDate;
 	private long _assetEntryId;
 	private long _assetTagId;
+
 }

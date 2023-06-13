@@ -38,19 +38,113 @@ definition {
 		}
 	}
 
+	@priority = "3"
+	test AssertGuestCannotSeeEmptySearchWidgets {
+		// Workaround: Remove assertions for Suggestions, Sort, Search Results, and Modified Facet portlets until LPS-92008 is fixed
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		SitePages.addPublicPage(pageName = "Search Page");
+
+		Navigator.gotoPage(pageName = "Search Page");
+
+		var portalURL = PropsUtil.get("portal.url");
+
+		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search-page");
+
+		SearchPortlets.addWidgets(searchPortletList = "Category Facet,Custom Facet,Folder Facet,Modified Facet,Search Bar,Search Insights,Search Options,Search Results,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet");
+
+		User.logoutPG();
+
+		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search-page");
+
+		for (var portletName : list "Category Facet,Custom Facet,Folder Facet,Search Insights,Search Options,Site Facet,Tag Facet,Type Facet,User Facet") {
+			Portlet.viewNoSpecificPG(portletName = "${portletName}");
+		}
+
+		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search");
+
+		for (var portletName : list "Category Facet,Custom Facet,Folder Facet,Modified Facet,Search Insights,Search Options,Search Results,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet") {
+			Portlet.viewNoSpecificPG(portletName = "${portletName}");
+		}
+	}
+
 	@priority = "4"
 	test AssertSearchInsightsExplain {
+		JSONWebcontent.addWebContent(
+			content = "WC Content",
+			groupName = "Guest",
+			title = "apple"
+		);
+
 		var portalURL = PropsUtil.get("portal.url");
 
 		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search");
 
 		Portlet.addPG(portletName = "Search Insights");
 
-		SearchPortlets.searchEmbedded(searchTerm = "test");
+		Portlet.gotoPortletOptions(
+			portletName = "Search Insights",
+			portletOption = "Configuration"
+		);
 
-		AssertTextPresent(locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_STRING_QUERY", value1 = "&quot;explain&quot;:true");
+		SelectFrame(locator1 = "IFrame#CONFIGURATION");
 
-		AssertTextPresent(locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_STRING_QUERY", value1 = "bucket");
+		AssertChecked(
+			locator1 = "Checkbox#ANY_CHECKBOX",
+			checkboxName = "Enable Score Explanation"
+		);
+
+		IFrame.closeFrame();
+
+		SearchPortlets.searchEmbedded(searchTerm = "apple");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_STRING_QUERY",
+			value1 = "&quot;explain&quot;:true"
+		);
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
+			value1 = "buckets"
+		);
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
+			value1 = "_explanation"
+		);
+
+		Portlet.gotoPortletOptions(
+			portletName = "Search Insights",
+			portletOption = "Configuration"
+		);
+
+		SelectFrame(locator1 = "IFrame#CONFIGURATION");
+
+		Uncheck(
+			locator1 = "Checkbox#ANY_CHECKBOX",
+			checkboxName = "Enable Score Explanation"
+		);
+
+		PortletEntry.save();
+
+		IFrame.closeFrame();
+
+		SearchPortlets.searchEmbedded(searchTerm = "apple");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_STRING_QUERY",
+			value1 = "&quot;explain&quot;:false"
+		);
+
+		AssertTextNotEquals.assertNotPartialText(
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
+			value1 = "_explanation"
+		);
 	}
 
 	@description = "This is a use case for LPS-90078."
@@ -100,7 +194,7 @@ definition {
 		property portal.acceptance = "true";
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -111,7 +205,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -164,7 +258,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -257,8 +351,11 @@ definition {
 		SearchResultPortlet.viewNoSearchResults(searchTerm = "Title1");
 	}
 
+	// Temporarily removing from search suite, see LRQA-47803
 	@priority = "4"
 	test SearchBlogsEntryCategory {
+		property portal.suite.search.engine = "disable";
+
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
@@ -277,7 +374,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -324,10 +421,10 @@ definition {
 		SearchResultPortlet.viewNoSearchResults(searchTerm = "Name1");
 	}
 
-	@ignore = "true"
+	// Temporarily removing from search suite, see LRQA-47803
 	@priority = "4"
 	test SearchBlogsEntryCategoryQuotes {
-		// Ignoring test until LPS-73326 is resolved
+		property portal.suite.search.engine = "disable";
 
 		Navigator.openURL();
 
@@ -347,7 +444,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -405,7 +502,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -524,6 +621,7 @@ definition {
 		);
 	}
 
+	// Temporarily removing from search suite, see LRQA-47803
 	@priority = "4"
 	test SearchBlogsEntryTag {
 		property portal.suite.search.engine = "disable";
@@ -531,7 +629,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -577,6 +675,7 @@ definition {
 		SearchResultPortlet.viewNoSearchResults(searchTerm = "name1");
 	}
 
+	// Temporarily removing from search suite, see LRQA-47803
 	@priority = "4"
 	test SearchBlogsEntryTagQuotes {
 		property portal.suite.search.engine = "disable";
@@ -584,7 +683,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -637,7 +736,7 @@ definition {
 	@priority = "4"
 	test SearchDeletedWebContent {
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -649,7 +748,7 @@ definition {
 		PortletEntry.publish();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -681,7 +780,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name 1");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -704,7 +803,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name 2");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media"
 		);
@@ -724,7 +823,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name 3");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -732,7 +831,7 @@ definition {
 		Blogs.addEntry(entryContent = "Blogs Entry Content", entryTitle = "Apple");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -785,7 +884,7 @@ definition {
 		property portal.acceptance = "true";
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media"
 		);
@@ -806,7 +905,7 @@ definition {
 		ProductMenu.gotoSite(site = "Test Site");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -857,6 +956,7 @@ definition {
 		);
 	}
 
+	// Temporarily removing from search suite, see LRQA-47803
 	@priority = "5"
 	test SearchDocumentsAndMediaDocument {
 		property portal.suite.search.engine = "disable";
@@ -865,7 +965,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media"
 		);
@@ -970,7 +1070,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -981,7 +1081,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -1139,7 +1239,7 @@ definition {
 		property portal.acceptance = "true";
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -1187,7 +1287,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -1237,7 +1337,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -1323,7 +1423,7 @@ definition {
 	@priority = "4"
 	test SearchWikiPage {
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -1393,28 +1493,12 @@ definition {
 			searchAssetTitle = "Wiki Page Title",
 			searchAssetType = "Wiki Page"
 		);
-
-		SearchPortlets.searchEmbedded(searchTerm = "Wiki1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Wiki1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Page1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Page1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Title1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Title1");
-
-		SearchPortlets.searchEmbedded(searchTerm = "Content1");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "Content1");
 	}
 
 	@priority = "4"
 	test SearchXSSAsset {
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -1452,6 +1536,8 @@ definition {
 	@description = "This is a use case for LPS-74299."
 	@priority = "3"
 	test ViewFacetPersistence {
+		property test.name.skip.portal.instance = "Search#ViewSearchResultDetails";
+
 		// Workaround for LPS-89026
 
 		ProductMenu.gotoPortlet(
@@ -1467,7 +1553,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -1582,7 +1668,7 @@ definition {
 		ProductMenu.gotoSite(site = "New Site");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -1623,7 +1709,7 @@ definition {
 		User.loginPG(password = "test", userEmailAddress = "userea@liferay.com");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Bookmarks"
 		);
@@ -1638,7 +1724,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Bookmarks"
 		);
@@ -1654,7 +1740,7 @@ definition {
 		User.loginPG(password = "test", userEmailAddress = "test@liferay.com");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -1974,7 +2060,7 @@ definition {
 	@priority = "5"
 	test ViewSearchResultDetails {
 		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "SearchUsecase#ViewSearchResultDetails";
+		property test.name.skip.portal.instance = "Search#ViewSearchResultDetails";
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
@@ -2014,7 +2100,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -2034,7 +2120,7 @@ definition {
 		Staging.activateStagingCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -2088,7 +2174,7 @@ definition {
 		Staging.publishToLive();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);

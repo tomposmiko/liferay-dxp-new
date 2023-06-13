@@ -118,7 +118,7 @@ definition {
 		Button.clickSave();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -168,7 +168,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -277,9 +277,5 @@ definition {
 			locator1 = "DDMSelectStructure#DDM_STRUCTURE_TABLE_DESCRIPTION",
 			value1 = "${structureDescription}"
 		);
-	}
-
-	macro viewTemplateValidation {
-		AssertConfirm(value1 = "Please add a template to render this structure.");
 	}
 }

@@ -33,8 +33,9 @@ import java.io.ObjectOutput;
  * @generated
  */
 @ProviderType
-public class LocalizedEntryCacheModel implements CacheModel<LocalizedEntry>,
-	Externalizable {
+public class LocalizedEntryCacheModel
+	implements CacheModel<LocalizedEntry>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -45,7 +46,8 @@ public class LocalizedEntryCacheModel implements CacheModel<LocalizedEntry>,
 			return false;
 		}
 
-		LocalizedEntryCacheModel localizedEntryCacheModel = (LocalizedEntryCacheModel)obj;
+		LocalizedEntryCacheModel localizedEntryCacheModel =
+			(LocalizedEntryCacheModel)obj;
 
 		if (localizedEntryId == localizedEntryCacheModel.localizedEntryId) {
 			return true;
@@ -98,8 +100,7 @@ public class LocalizedEntryCacheModel implements CacheModel<LocalizedEntry>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (defaultLanguageId == null) {
 			objectOutput.writeUTF("");
 		}
@@ -112,4 +113,5 @@ public class LocalizedEntryCacheModel implements CacheModel<LocalizedEntry>,
 
 	public String defaultLanguageId;
 	public long localizedEntryId;
+
 }

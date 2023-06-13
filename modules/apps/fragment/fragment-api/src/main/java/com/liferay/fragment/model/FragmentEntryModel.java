@@ -36,8 +36,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface FragmentEntryModel extends BaseModel<FragmentEntry>,
-	ShardedModel, StagedGroupedModel, WorkflowedModel {
+public interface FragmentEntryModel
+	extends BaseModel<FragmentEntry>, ShardedModel, StagedGroupedModel,
+			WorkflowedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -479,4 +481,5 @@ public interface FragmentEntryModel extends BaseModel<FragmentEntry>,
 	 */
 	@Override
 	public boolean isScheduled();
+
 }

@@ -90,7 +90,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 		<aui:input name="name" />
 
 		<div class="form-group">
-			<aui:input helpMessage="if-disabled-this-page-does-not-show-up-in-the-pages-hierarchy-menu" label='<%= selLayout.isPrivateLayout() ? "show-in-private-pages-hierarchy-menu" : "show-in-public-pages-hierarchy-menu" %>' name="showInMenu" type="toggle-switch" value="<%= !selLayout.isHidden() %>" />
+			<aui:input helpMessage="hidden-from-navigation-menu-widget-help-message" label="hidden-from-navigation-menu-widget" name="hidden" type="toggle-switch" value="<%= selLayout.isHidden() %>" />
 		</div>
 
 		<c:choose>
@@ -162,23 +162,38 @@ StringBuilder friendlyURLBase = new StringBuilder();
 	</liferay-util:include>
 </div>
 
-<aui:script>
+<aui:script require="metal-dom/src/dom as dom">
 	Liferay.Util.toggleBoxes('<portlet:namespace />layoutPrototypeLinkEnabled', '<portlet:namespace />layoutPrototypeMergeAlert');
 	Liferay.Util.toggleBoxes('<portlet:namespace />layoutPrototypeLinkEnabled', '<portlet:namespace />typeOptions', true);
-</aui:script>
 
-<aui:script sandbox="<%= true %>">
-	$('#<portlet:namespace />layoutPrototypeLinkEnabled').on(
-		'change',
-		function(event) {
-			var layoutPrototypeLinkChecked = event.currentTarget.checked;
+	var layoutPrototypeLinkEnabled = document.getElementById('<portlet:namespace />layoutPrototypeLinkEnabled');
 
-			$('.layout-prototype-info-message').toggleClass('hide', !layoutPrototypeLinkChecked);
+	if (layoutPrototypeLinkEnabled) {
+		layoutPrototypeLinkEnabled.addEventListener(
+			'change',
+			function(event) {
+				var layoutPrototypeLinkChecked = event.currentTarget.checked;
 
-			var propagatableFields = $('#<portlet:namespace />editLayoutFm .propagatable-field');
+				var layoutPrototypeInfoMessage = document.querySelector('.layout-prototype-info-message');
 
-			propagatableFields.prop('disabled', layoutPrototypeLinkChecked);
-			propagatableFields.toggleClass('disabled', layoutPrototypeLinkChecked);
-		}
-	);
+				if (layoutPrototypeInfoMessage) {
+					if (layoutPrototypeLinkChecked) {
+						layoutPrototypeInfoMessage.classList.remove('hide');
+					}
+					else {
+						layoutPrototypeInfoMessage.classList.add('hide');
+					}
+				}
+
+				var propagatableFields = document.querySelectorAll('#<portlet:namespace />editLayoutFm .propagatable-field');
+
+				Array.prototype.forEach.call(
+					propagatableFields,
+					function(field, index) {
+						Liferay.Util.toggleDisabled(field, layoutPrototypeLinkChecked);
+					}
+				);
+			}
+		);
+	}
 </aui:script>

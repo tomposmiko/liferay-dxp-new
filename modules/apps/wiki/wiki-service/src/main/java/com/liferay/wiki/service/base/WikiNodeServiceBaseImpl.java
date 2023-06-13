@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.service.persistence.GroupPersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
-
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.service.WikiNodeService;
 import com.liferay.wiki.service.persistence.WikiNodePersistence;
@@ -46,8 +45,10 @@ import javax.sql.DataSource;
  * @see com.liferay.wiki.service.impl.WikiNodeServiceImpl
  * @generated
  */
-public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
+public abstract class WikiNodeServiceBaseImpl
+	extends BaseServiceImpl
 	implements WikiNodeService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -59,7 +60,9 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the wiki node local service
 	 */
-	public com.liferay.wiki.service.WikiNodeLocalService getWikiNodeLocalService() {
+	public com.liferay.wiki.service.WikiNodeLocalService
+		getWikiNodeLocalService() {
+
 		return wikiNodeLocalService;
 	}
 
@@ -70,6 +73,7 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setWikiNodeLocalService(
 		com.liferay.wiki.service.WikiNodeLocalService wikiNodeLocalService) {
+
 		this.wikiNodeLocalService = wikiNodeLocalService;
 	}
 
@@ -105,7 +109,9 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param wikiNodePersistence the wiki node persistence
 	 */
-	public void setWikiNodePersistence(WikiNodePersistence wikiNodePersistence) {
+	public void setWikiNodePersistence(
+		WikiNodePersistence wikiNodePersistence) {
+
 		this.wikiNodePersistence = wikiNodePersistence;
 	}
 
@@ -114,7 +120,9 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -124,7 +132,9 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -133,7 +143,9 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the group local service
 	 */
-	public com.liferay.portal.kernel.service.GroupLocalService getGroupLocalService() {
+	public com.liferay.portal.kernel.service.GroupLocalService
+		getGroupLocalService() {
+
 		return groupLocalService;
 	}
 
@@ -144,6 +156,7 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setGroupLocalService(
 		com.liferay.portal.kernel.service.GroupLocalService groupLocalService) {
+
 		this.groupLocalService = groupLocalService;
 	}
 
@@ -163,6 +176,7 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setGroupService(
 		com.liferay.portal.kernel.service.GroupService groupService) {
+
 		this.groupService = groupService;
 	}
 
@@ -189,7 +203,9 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the resource local service
 	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService getResourceLocalService() {
+	public com.liferay.portal.kernel.service.ResourceLocalService
+		getResourceLocalService() {
+
 		return resourceLocalService;
 	}
 
@@ -199,7 +215,9 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 * @param resourceLocalService the resource local service
 	 */
 	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService) {
+		com.liferay.portal.kernel.service.ResourceLocalService
+			resourceLocalService) {
+
 		this.resourceLocalService = resourceLocalService;
 	}
 
@@ -208,7 +226,9 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
 		return userLocalService;
 	}
 
@@ -219,6 +239,7 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
 		this.userLocalService = userLocalService;
 	}
 
@@ -238,6 +259,7 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setUserService(
 		com.liferay.portal.kernel.service.UserService userService) {
+
 		this.userService = userService;
 	}
 
@@ -264,7 +286,9 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the wiki page local service
 	 */
-	public com.liferay.wiki.service.WikiPageLocalService getWikiPageLocalService() {
+	public com.liferay.wiki.service.WikiPageLocalService
+		getWikiPageLocalService() {
+
 		return wikiPageLocalService;
 	}
 
@@ -275,6 +299,7 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setWikiPageLocalService(
 		com.liferay.wiki.service.WikiPageLocalService wikiPageLocalService) {
+
 		this.wikiPageLocalService = wikiPageLocalService;
 	}
 
@@ -294,6 +319,7 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setWikiPageService(
 		com.liferay.wiki.service.WikiPageService wikiPageService) {
+
 		this.wikiPageService = wikiPageService;
 	}
 
@@ -311,7 +337,9 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param wikiPagePersistence the wiki page persistence
 	 */
-	public void setWikiPagePersistence(WikiPagePersistence wikiPagePersistence) {
+	public void setWikiPagePersistence(
+		WikiPagePersistence wikiPagePersistence) {
+
 		this.wikiPagePersistence = wikiPagePersistence;
 	}
 
@@ -371,8 +399,8 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -382,33 +410,66 @@ public abstract class WikiNodeServiceBaseImpl extends BaseServiceImpl
 	}
 
 	@BeanReference(type = com.liferay.wiki.service.WikiNodeLocalService.class)
-	protected com.liferay.wiki.service.WikiNodeLocalService wikiNodeLocalService;
+	protected com.liferay.wiki.service.WikiNodeLocalService
+		wikiNodeLocalService;
+
 	@BeanReference(type = WikiNodeService.class)
 	protected WikiNodeService wikiNodeService;
+
 	@BeanReference(type = WikiNodePersistence.class)
 	protected WikiNodePersistence wikiNodePersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.GroupLocalService.class)
-	protected com.liferay.portal.kernel.service.GroupLocalService groupLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.GroupService.class)
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.GroupLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.GroupLocalService
+		groupLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.GroupService.class
+	)
 	protected com.liferay.portal.kernel.service.GroupService groupService;
+
 	@ServiceReference(type = GroupPersistence.class)
 	protected GroupPersistence groupPersistence;
-	@ServiceReference(type = com.liferay.portal.kernel.service.ResourceLocalService.class)
-	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserService.class)
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ResourceLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserService.class
+	)
 	protected com.liferay.portal.kernel.service.UserService userService;
+
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
+
 	@BeanReference(type = com.liferay.wiki.service.WikiPageLocalService.class)
-	protected com.liferay.wiki.service.WikiPageLocalService wikiPageLocalService;
+	protected com.liferay.wiki.service.WikiPageLocalService
+		wikiPageLocalService;
+
 	@BeanReference(type = com.liferay.wiki.service.WikiPageService.class)
 	protected com.liferay.wiki.service.WikiPageService wikiPageService;
+
 	@BeanReference(type = WikiPagePersistence.class)
 	protected WikiPagePersistence wikiPagePersistence;
+
 	@BeanReference(type = WikiPageFinder.class)
 	protected WikiPageFinder wikiPageFinder;
+
 }

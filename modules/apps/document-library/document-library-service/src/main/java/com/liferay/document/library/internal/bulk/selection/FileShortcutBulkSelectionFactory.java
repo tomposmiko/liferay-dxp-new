@@ -16,6 +16,7 @@ package com.liferay.document.library.internal.bulk.selection;
 
 import com.liferay.bulk.selection.BulkSelection;
 import com.liferay.bulk.selection.BulkSelectionFactory;
+import com.liferay.document.library.internal.bulk.selection.util.BulkSelectionFactoryUtil;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.repository.RepositoryProvider;
@@ -46,39 +47,23 @@ public class FileShortcutBulkSelectionFactory
 	public BulkSelection<FileShortcut> create(
 		Map<String, String[]> parameterMap) {
 
+		if (BulkSelectionFactoryUtil.isSelectAll(parameterMap)) {
+			long repositoryId = BulkSelectionFactoryUtil.getRepositoryId(
+				parameterMap);
+			long folderId = BulkSelectionFactoryUtil.getFolderId(parameterMap);
+
+			return new FolderFileShortcutBulkSelection(
+				repositoryId, folderId, parameterMap, _resourceBundleLoader,
+				_language, _repositoryProvider, _dlAppService);
+		}
+
 		if (!parameterMap.containsKey("rowIdsDLFileShortcut")) {
 			return new EmptyBulkSelection<>();
 		}
 
 		String[] values = parameterMap.get("rowIdsDLFileShortcut");
 
-		if (values.length > 1) {
-			return _getFileShortcutSelection(values, parameterMap);
-		}
-
-		String value = values[0];
-
-		if (!value.startsWith("all:")) {
-			return _getFileShortcutSelection(values, parameterMap);
-		}
-
-		if (!parameterMap.containsKey("repositoryId")) {
-			throw new IllegalArgumentException();
-		}
-
-		String[] repositoryIds = parameterMap.get("repositoryId");
-
-		long repositoryId = GetterUtil.getLong(repositoryIds[0]);
-
-		if (repositoryId == 0) {
-			throw new IllegalArgumentException();
-		}
-
-		long folderId = GetterUtil.getLong(value.substring(4));
-
-		return new FolderFileShortcutBulkSelection(
-			repositoryId, folderId, parameterMap, _resourceBundleLoader,
-			_language, _repositoryProvider, _dlAppService);
+		return _getFileShortcutSelection(values, parameterMap);
 	}
 
 	private BulkSelection<FileShortcut> _getFileShortcutSelection(

@@ -14,40 +14,159 @@
 
 package com.liferay.headless.form.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface SuccessPage {
+@GraphQLName("SuccessPage")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "SuccessPage")
+public class SuccessPage {
 
-	public String getDescription();
+	public String getDescription() {
+		return description;
+	}
 
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	@JsonIgnore
 	public void setDescription(
-			String description);
+		UnsafeSupplier<String, Exception> descriptionUnsafeSupplier) {
 
-	public void setDescription(
-			UnsafeSupplier<String, Throwable>
-				descriptionUnsafeSupplier);
-	public String getHeadline();
+		try {
+			description = descriptionUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String description;
+
+	public String getHeadline() {
+		return headline;
+	}
+
+	public void setHeadline(String headline) {
+		this.headline = headline;
+	}
+
+	@JsonIgnore
 	public void setHeadline(
-			String headline);
+		UnsafeSupplier<String, Exception> headlineUnsafeSupplier) {
 
-	public void setHeadline(
-			UnsafeSupplier<String, Throwable>
-				headlineUnsafeSupplier);
-	public Long getId();
+		try {
+			headline = headlineUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String headline;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof SuccessPage)) {
+			return false;
+		}
+
+		SuccessPage successPage = (SuccessPage)object;
+
+		return Objects.equals(toString(), successPage.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"description\": ");
+
+		sb.append("\"");
+		sb.append(description);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"headline\": ");
+
+		sb.append("\"");
+		sb.append(headline);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

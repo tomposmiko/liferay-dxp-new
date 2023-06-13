@@ -17,10 +17,8 @@ package com.liferay.asset.list.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.list.model.AssetListEntry;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class AssetListEntryCacheModel implements CacheModel<AssetListEntry>,
-	Externalizable {
+public class AssetListEntryCacheModel
+	implements CacheModel<AssetListEntry>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class AssetListEntryCacheModel implements CacheModel<AssetListEntry>,
 			return false;
 		}
 
-		AssetListEntryCacheModel assetListEntryCacheModel = (AssetListEntryCacheModel)obj;
+		AssetListEntryCacheModel assetListEntryCacheModel =
+			(AssetListEntryCacheModel)obj;
 
 		if (assetListEntryId == assetListEntryCacheModel.assetListEntryId) {
 			return true;
@@ -83,12 +83,12 @@ public class AssetListEntryCacheModel implements CacheModel<AssetListEntry>,
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
+		sb.append(", assetListEntryKey=");
+		sb.append(assetListEntryKey);
 		sb.append(", title=");
 		sb.append(title);
 		sb.append(", type=");
 		sb.append(type);
-		sb.append(", typeSettings=");
-		sb.append(typeSettings);
 		sb.append(", lastPublishDate=");
 		sb.append(lastPublishDate);
 		sb.append("}");
@@ -133,6 +133,13 @@ public class AssetListEntryCacheModel implements CacheModel<AssetListEntry>,
 			assetListEntryImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
+		if (assetListEntryKey == null) {
+			assetListEntryImpl.setAssetListEntryKey("");
+		}
+		else {
+			assetListEntryImpl.setAssetListEntryKey(assetListEntryKey);
+		}
+
 		if (title == null) {
 			assetListEntryImpl.setTitle("");
 		}
@@ -141,13 +148,6 @@ public class AssetListEntryCacheModel implements CacheModel<AssetListEntry>,
 		}
 
 		assetListEntryImpl.setType(type);
-
-		if (typeSettings == null) {
-			assetListEntryImpl.setTypeSettings("");
-		}
-		else {
-			assetListEntryImpl.setTypeSettings(typeSettings);
-		}
 
 		if (lastPublishDate == Long.MIN_VALUE) {
 			assetListEntryImpl.setLastPublishDate(null);
@@ -175,16 +175,15 @@ public class AssetListEntryCacheModel implements CacheModel<AssetListEntry>,
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
+		assetListEntryKey = objectInput.readUTF();
 		title = objectInput.readUTF();
 
 		type = objectInput.readInt();
-		typeSettings = objectInput.readUTF();
 		lastPublishDate = objectInput.readLong();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -210,6 +209,13 @@ public class AssetListEntryCacheModel implements CacheModel<AssetListEntry>,
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
 
+		if (assetListEntryKey == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(assetListEntryKey);
+		}
+
 		if (title == null) {
 			objectOutput.writeUTF("");
 		}
@@ -218,14 +224,6 @@ public class AssetListEntryCacheModel implements CacheModel<AssetListEntry>,
 		}
 
 		objectOutput.writeInt(type);
-
-		if (typeSettings == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(typeSettings);
-		}
-
 		objectOutput.writeLong(lastPublishDate);
 	}
 
@@ -237,8 +235,9 @@ public class AssetListEntryCacheModel implements CacheModel<AssetListEntry>,
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
+	public String assetListEntryKey;
 	public String title;
 	public int type;
-	public String typeSettings;
 	public long lastPublishDate;
+
 }

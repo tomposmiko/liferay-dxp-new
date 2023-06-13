@@ -53,13 +53,6 @@ definition {
 
 			Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT_CONFIRM");
 
-			SelectFrame(
-				locator1 = "BlogsEntry#CONTENT_VIDEO",
-				key_service = "${videoService}"
-			);
-
-			SelectFrameTop();
-
 			AssertTextEquals(locator1 = "BlogsEntry#VIDEO_EMBED_HELP_MESSAGE", value1 = "Video playback is disabled during edit mode");
 		}
 	}
@@ -136,16 +129,6 @@ definition {
 
 	macro addSubtitle {
 		AlloyEditor.typeEditor(content = "${entrySubtitle}", editor = "subtitle");
-	}
-
-	macro addTag {
-		var key_tagName = "${tagName}";
-
-		Type(locator1 = "AssetCategorization#TAGS_FIELD", value1 = "${tagName}");
-
-		AssertClick(locator1 = "Button#ADD_TAGS", value1 = "Add");
-
-		AssertTextEquals(locator1 = "AssetCategorization#TAG", value1 = "${tagName}");
 	}
 
 	macro addTitle {
@@ -379,17 +362,21 @@ definition {
 	macro moveToRecycleBinCP {
 		var key_entryTitle = "${entryTitle}";
 
-		AssertTextEquals(
-			locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_TITLE",
-			value1 = "${entryTitle}"
-		);
+		Blogs.viewEntryTitle(entryTitle = "${entryTitle}");
 
 		Click(
 			locator1 = "LexiconList#LIST_ENTRY_ELLIPSIS",
 			key_listEntry = "${entryTitle}"
 		);
 
-		PortletEntry.clickMoveToRecycleBin();
+		ClickNoError(
+			locator1 = "MenuItem#DROPDOWN_MENU_ITEM",
+			key_menuItem = "Move to Recycle Bin"
+		);
+
+		AssertConfirm(
+			value1 = "Are you sure you want to move this to the Recycle Bin?"
+		);
 
 		Alert.viewSuccessMessage();
 	}
@@ -397,10 +384,7 @@ definition {
 	macro moveToRecycleBinDraftCP {
 		var key_entryTitle = "${entryTitle}";
 
-		AssertTextEquals(
-			locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_TITLE",
-			value1 = "${entryTitle}"
-		);
+		Blogs.viewEntryTitle(entryTitle = "${entryTitle}");
 
 		AssertTextEquals(
 			locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_STATUS",
@@ -412,7 +396,14 @@ definition {
 			key_listEntry = "${entryTitle}"
 		);
 
-		PortletEntry.clickMoveToRecycleBin();
+		ClickNoError(
+			locator1 = "MenuItem#DROPDOWN_MENU_ITEM",
+			key_menuItem = "Move to Recycle Bin"
+		);
+
+		AssertConfirm(
+			value1 = "Are you sure you want to move this to the Recycle Bin?"
+		);
 
 		Alert.viewSuccessMessage();
 	}
@@ -435,8 +426,6 @@ definition {
 			entryTitle = "${entryTitle}",
 			item = "Move to Recycle Bin"
 		);
-
-		Confirm();
 
 		AssertElementPresent(locator1 = "Message#SUCCESS");
 
@@ -582,10 +571,7 @@ definition {
 
 		Search.searchCP(searchTerm = "${entrySearchTerm}");
 
-		AssertTextEquals(
-			locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_TITLE",
-			value1 = "${entryTitle}"
-		);
+		Blogs.viewEntryTitle(entryTitle = "${entryTitle}");
 	}
 
 	macro searchNoCP {
@@ -599,7 +585,7 @@ definition {
 			value1 = "No entries were found."
 		);
 
-		AssertElementNotPresent(locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_TITLE");
+		Blogs.viewEntryNotPresent(entryTitle = "${entryTitle}");
 	}
 
 	macro selectFormattingStyle {
@@ -617,7 +603,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -745,8 +731,8 @@ definition {
 		}
 
 		if (isSet(entryExternalURL)) {
-			AssertClick.assertTextClickAtNoJavaScript(
-				locator1 = "BlogsEntry#CONTENT",
+			AssertClick(
+				locator1 = "BlogsEntry#CONTENT_LINK",
 				value1 = "${entryContent}"
 			);
 
@@ -780,7 +766,7 @@ definition {
 		BlogsNavigator.gotoEditCP(entryTitle = "${entryTitle}");
 
 		DoubleClick(
-			locator1 = "BlogsEntry#CONTENT_LINK",
+			locator1 = "BlogsEntry#CONTENT_LINK_IN_EDIT",
 			key_entryContent = "${entryContent}"
 		);
 
@@ -810,9 +796,11 @@ definition {
 		var key_assetContent = "${entryContent}";
 		var key_assetTitle = "${assetTitle}";
 
-		AssertClick(locator1 = "AP#ASSET_ABSTRACT_TITLE", value1 = "${entryTitle}");
+		AssetPublisherPortlet.clickAssetTitle(
+			assetTitle = "${entryTitle}"
+		);
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "APAsset#ASSET_TITLE_HEADER",
 			value1 = "${entryTitle}"
 		);
@@ -951,11 +939,15 @@ definition {
 			value1 = "${entryContent}"
 		);
 
+		AssetPublisherPortlet.clickAssetTitle(
+			assetTitle = "${entryTitle}"
+		);
+
 		AssertClick(locator1 = "AP#ASSET_ABSTRACT_TITLE", value1 = "${entryTitle}");
 
 		AssertVisible(locator1 = "Icon#SHARE");
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "APAsset#ASSET_TITLE_HEADER",
 			value1 = "${entryTitle}"
 		);
@@ -1073,7 +1065,7 @@ definition {
 			var key_tagName = "${tagName}";
 			var tagName = StringUtil.upperCase("${tagName}");
 
-			AssertClick.assertTextClickCaseInsensitive(locator1 = "BlogsEntry#TAG", value1 = "${tagName}");
+			AssertClick(locator1 = "BlogsEntry#TAG", value1 = "${tagName}");
 
 			AssertTextEquals.assertPartialText(
 				locator1 = "BlogsEntry#TAG_FILTER_TITLE",

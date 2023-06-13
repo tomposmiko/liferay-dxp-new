@@ -76,6 +76,7 @@ import java.time.format.FormatStyle;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -249,7 +250,11 @@ public class DDLExporterTest {
 
 		DDLRecordVersion recordVersion0 = record0.getRecordVersion();
 
-		ddmForm.getDDMFormFields().clear();
+		List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
+
+		ddmFormFields.clear();
+
+		ddmForm.setDDMFormFields(ddmFormFields);
 
 		ddmForm.addDDMFormField(
 			DDMFormTestUtil.createTextDDMFormField(

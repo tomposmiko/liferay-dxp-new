@@ -32,8 +32,9 @@ import com.liferay.sharing.service.SharingEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class SharingEntryBaseImpl extends SharingEntryModelImpl
-	implements SharingEntry {
+public abstract class SharingEntryBaseImpl
+	extends SharingEntryModelImpl implements SharingEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class SharingEntryBaseImpl extends SharingEntryModelImpl
 			SharingEntryLocalServiceUtil.updateSharingEntry(this);
 		}
 	}
+
 }

@@ -1,4 +1,5 @@
-import ClayCheckbox from 'clay-checkbox';
+import 'clay-checkbox';
+
 import Component from 'metal-component';
 import {Config} from 'metal-state';
 import Soy from 'metal-soy';
@@ -16,9 +17,29 @@ class PublishChangeList extends Component {
 	}
 
 	_handlePublishClick(event) {
-		if (this._publishChangeList()) {
-			this.refs.modal.visible = false;
-		}
+		this._publishChangeList();
+	}
+
+	_checkoutProduction() {
+		this.refs.modal.visible = false;
+
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+
+		let body = {
+			credentials: 'include',
+			headers,
+			method: 'POST'
+		};
+
+		fetch(this.urlCheckoutProduction, body)
+			.then(
+				response => {
+					if (response.status === 202) {
+						Liferay.Util.navigate(this.urlChangeListsHistory);
+					}
+				}
+			);
 	}
 
 	_publishChangeList() {
@@ -30,8 +51,6 @@ class PublishChangeList extends Component {
 			headers,
 			method: this.urlPublishChangeList.type
 		};
-
-		var success = false;
 
 		let url = this.urlPublishChangeList.href + '?userId=' + Liferay.ThemeDisplay.getUserId();
 
@@ -47,7 +66,7 @@ class PublishChangeList extends Component {
 							}
 						);
 
-						success = true;
+						this._checkoutProduction();
 					}
 					else if (response.status === 400) {
 						response.json()
@@ -62,8 +81,6 @@ class PublishChangeList extends Component {
 									);
 								}
 							);
-
-						success = false;
 					}
 				}
 			)
@@ -80,12 +97,8 @@ class PublishChangeList extends Component {
 							type: 'danger'
 						}
 					);
-
-					success = false;
 				}
 			);
-
-		return success;
 	}
 
 }
@@ -111,6 +124,10 @@ PublishChangeList.STATE = {
 	 * @type {String}
 	 */
 	spritemap: Config.string().required(),
+
+	urlChangeListsHistory: Config.string().required(),
+
+	urlCheckoutProduction: Config.string().required(),
 
 	urlPublishChangeList: Config.object()
 

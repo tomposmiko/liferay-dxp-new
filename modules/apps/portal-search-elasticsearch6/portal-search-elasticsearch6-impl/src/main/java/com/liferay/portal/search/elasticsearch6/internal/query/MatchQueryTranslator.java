@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.portal.kernel.search.generic.MatchQuery;
+import com.liferay.portal.search.query.MatchQuery;
 
 import org.elasticsearch.index.query.QueryBuilder;
 

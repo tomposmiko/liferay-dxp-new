@@ -7,13 +7,12 @@ import FragmentStyleEditors from '../fragment_processors/FragmentStyleEditors.es
 import {OPEN_MAPPING_FIELDS_DIALOG} from '../../actions/actions.es';
 
 /**
- * FragmentStyleEditor
+ * Creates a Fragment Style Editor component.
  */
 class FragmentStyleEditor extends State {
 
 	/**
 	 * @inheritDoc
-	 * @review
 	 */
 	constructor(...args) {
 		super(...args);
@@ -29,16 +28,16 @@ class FragmentStyleEditor extends State {
 	}
 
 	/**
-	 * Callback executed anytime type property is changed.
-	 * It updates the styleEditor begin used.
+	 * Callback executed when a type property changes. This updates the fragment
+	 * style editor being used.
 	 */
 	syncType() {
 		this._styleEditor = FragmentStyleEditors[this.type];
 	}
 
 	/**
-	 * Handle styled node click event
-	 * @param {Event} event
+	 * Handles click events for styled nodes.
+	 * @param {Event} event The node click.
 	 * @private
 	 */
 	_handleNodeClick(event) {
@@ -65,8 +64,8 @@ class FragmentStyleEditor extends State {
 	}
 
 	/**
-	 * Handles tooltip button click event.
-	 * @param {MouseEvent} event
+	 * Handles click events for tooltip buttons.
+	 * @param {MouseEvent} event The tooltip button click.
 	 */
 	_handleButtonClick(event) {
 		if (this._styleEditor) {
@@ -113,7 +112,7 @@ class FragmentStyleEditor extends State {
 	}
 
 	/**
-	 * Disposes style tooltip if any.
+	 * Disposes of the style tooltip if it exists.
 	 */
 	disposeStyleTooltip() {
 		if (this._tooltip) {
@@ -127,98 +126,87 @@ class FragmentStyleEditor extends State {
 
 /**
  * State definition.
- * @review
  * @static
  * @type {!Object}
  */
 FragmentStyleEditor.STATE = {
 
 	/**
-	 * CSS rules text
+	 * CSS rules text.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentStyleEditor
-	 * @review
 	 * @type {!string}
 	 */
 	cssText: Config.string().required(),
 
 	/**
-	 * Set of options that are sent to the editors.
+	 * Options that are sent to the editors.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentStyleEditor
-	 * @review
 	 * @type {!object}
 	 */
 	editorsOptions: Config.object().required(),
 
 	/**
-	 * FragmentEntryLink id
+	 * Fragment entry link ID.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentStyleEditor
-	 * @review
 	 * @type {!string}
 	 */
 	fragmentEntryLinkId: Config.string().required(),
 
 	/**
-	 * Node to instantiate style editor on
-	 * @default undefined
+	 * Node to instantiate the style editor on.
 	 * @instance
 	 * @memberOf FragmentStyleEditor
-	 * @review
 	 * @type {HTMLElement}
 	 */
 	node: Config.internal().object(),
 
 	/**
-	 * Portlet namespace
+	 * Portlet namespace.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentStyleEditor
-	 * @review
 	 * @type {!string}
 	 */
 	portletNamespace: Config.string().required(),
 
 	/**
-	 * CSS selector text
+	 * CSS selector text.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentStyleEditor
-	 * @review
 	 * @type {!string}
 	 */
 	selectorText: Config.string().required(),
 
 	/**
-	 * True if mapping is activated
+	 * If <code>true</code>, the mapping is activated.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentStyleEditor
-	 * @review
 	 * @type {!boolean}
 	 */
 	showMapping: Config.bool().required(),
 
 	/**
-	 * Store instance
+	 * Store instance.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentStyleEditor
-	 * @review
 	 * @type {Store}
 	 */
 	store: Config.instanceOf(Store),
 
 	/**
-	 * Style editor type
+	 * Style editor type.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentStyleEditor
-	 * @review
 	 * @type {!string}
 	 */
 	type: Config.string().required(),
@@ -228,7 +216,6 @@ FragmentStyleEditor.STATE = {
 	 * @default null
 	 * @instance
 	 * @memberOf FragmentStyleEditor
-	 * @review
 	 * @type {FragmentStyleEditors}
 	 */
 	_styleEditor: Config

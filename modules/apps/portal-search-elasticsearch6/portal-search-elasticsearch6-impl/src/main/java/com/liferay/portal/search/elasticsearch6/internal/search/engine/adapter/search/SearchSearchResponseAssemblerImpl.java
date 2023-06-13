@@ -14,27 +14,32 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.search;
 
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.aggregation.Aggregation;
 import com.liferay.portal.search.aggregation.AggregationResult;
 import com.liferay.portal.search.aggregation.AggregationResultTranslator;
 import com.liferay.portal.search.aggregation.AggregationResults;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregationResultTranslator;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.AggregationResultTranslatorFactory;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.ElasticsearchAggregationResultTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.ElasticsearchAggregationResultsTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.PipelineAggregationResultTranslatorFactory;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.pipeline.ElasticsearchPipelineAggregationResultTranslator;
+import com.liferay.portal.search.elasticsearch6.internal.hits.SearchHitsTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.search.response.SearchResponseTranslator;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.hits.SearchHitBuilderFactory;
+import com.liferay.portal.search.hits.SearchHits;
+import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregations;
 
 import org.osgi.service.component.annotations.Component;
@@ -43,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(immediate = true, service = SearchSearchResponseAssembler.class)
+@Component(service = SearchSearchResponseAssembler.class)
 public class SearchSearchResponseAssemblerImpl
 	implements AggregationResultTranslatorFactory,
 			   PipelineAggregationResultTranslatorFactory,
@@ -61,10 +66,10 @@ public class SearchSearchResponseAssemblerImpl
 
 		addAggregations(
 			searchResponse, searchSearchResponse, searchSearchRequest);
-
-		SearchHits searchHits = searchResponse.getHits();
-
-		searchSearchResponse.setCount(searchHits.totalHits);
+		setCount(searchResponse, searchSearchResponse);
+		setScrollId(searchResponse, searchSearchResponse);
+		setSearchHits(
+			searchResponse, searchSearchResponse, searchSearchRequest);
 
 		_searchResponseTranslator.populate(
 			searchSearchResponse, searchResponse, searchSearchRequest);
@@ -76,7 +81,10 @@ public class SearchSearchResponseAssemblerImpl
 			elasticsearchAggregation) {
 
 		return new ElasticsearchAggregationResultTranslator(
-			elasticsearchAggregation, _aggregationResults);
+			elasticsearchAggregation, _aggregationResults,
+			new SearchHitsTranslator(
+				_searchHitBuilderFactory, _searchHitsBuilderFactory,
+				_documentBuilderFactory));
 	}
 
 	@Override
@@ -134,6 +142,65 @@ public class SearchSearchResponseAssemblerImpl
 		_commonSearchResponseAssembler = commonSearchResponseAssembler;
 	}
 
+	protected void setCount(
+		SearchResponse searchResponse,
+		SearchSearchResponse searchSearchResponse) {
+
+		org.elasticsearch.search.SearchHits searchHits =
+			searchResponse.getHits();
+
+		searchSearchResponse.setCount(searchHits.totalHits);
+	}
+
+	@Reference(unbind = "-")
+	protected void setDocumentBuilderFactory(
+		DocumentBuilderFactory documentBuilderFactory) {
+
+		_documentBuilderFactory = documentBuilderFactory;
+	}
+
+	protected void setScrollId(
+		SearchResponse searchResponse,
+		SearchSearchResponse searchSearchResponse) {
+
+		if (Validator.isNotNull(searchResponse.getScrollId())) {
+			searchSearchResponse.setScrollId(searchResponse.getScrollId());
+		}
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchHitBuilderFactory(
+		SearchHitBuilderFactory searchHitBuilderFactory) {
+
+		_searchHitBuilderFactory = searchHitBuilderFactory;
+	}
+
+	protected void setSearchHits(
+		SearchResponse searchResponse,
+		SearchSearchResponse searchSearchResponse,
+		SearchSearchRequest searchSearchRequest) {
+
+		SearchHitsTranslator searchHitsTranslator = new SearchHitsTranslator(
+			_searchHitBuilderFactory, _searchHitsBuilderFactory,
+			_documentBuilderFactory);
+
+		org.elasticsearch.search.SearchHits elasticsearchSearchHits =
+			searchResponse.getHits();
+
+		SearchHits searchHits = searchHitsTranslator.translate(
+			elasticsearchSearchHits,
+			searchSearchRequest.getAlternateUidFieldName());
+
+		searchSearchResponse.setSearchHits(searchHits);
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchHitsBuilderFactory(
+		SearchHitsBuilderFactory searchHitsBuilderFactory) {
+
+		_searchHitsBuilderFactory = searchHitsBuilderFactory;
+	}
+
 	@Reference(unbind = "-")
 	protected void setSearchResponseTranslator(
 		SearchResponseTranslator searchResponseTranslator) {
@@ -143,6 +210,9 @@ public class SearchSearchResponseAssemblerImpl
 
 	private AggregationResults _aggregationResults;
 	private CommonSearchResponseAssembler _commonSearchResponseAssembler;
+	private DocumentBuilderFactory _documentBuilderFactory;
+	private SearchHitBuilderFactory _searchHitBuilderFactory;
+	private SearchHitsBuilderFactory _searchHitsBuilderFactory;
 	private SearchResponseTranslator _searchResponseTranslator;
 
 }

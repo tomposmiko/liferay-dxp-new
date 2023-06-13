@@ -219,12 +219,8 @@
 	</target>
 
 	<target name="validate-tld">
-		<schemavalidate classname="org.xmlresolver.tools.ResolvingXMLReader" classpathref="lib.classpath">
-			<fileset
-				dir="${project.dir}/util-taglib/src/META-INF"
-			>
-				<include name="*.tld" />
-			</fileset>
-		</schemavalidate>
+		<gradle-execute dir="${project.dir}/util-taglib" task="validateTLD">
+			<arg value="--info" />
+		</gradle-execute>
 	</target>
 </project>

@@ -1,11 +1,11 @@
-import {Config} from 'metal-state';
-import {EventHandler} from 'metal-events';
-import {makeFetch} from '../../util/fetch.es';
 import autobind from 'autobind-decorator';
 import Component from 'metal-jsx';
 import dom from 'metal-dom';
-import RuleEditor from '../../components/RuleEditor/index.es';
-import RuleList from '../../components/RuleList/index.es';
+import RuleEditor from '../../components/RuleEditor/RuleEditor.es';
+import RuleList from '../../components/RuleList/RuleList.es';
+import {Config} from 'metal-state';
+import {EventHandler} from 'metal-events';
+import {makeFetch} from '../../util/fetch.es';
 
 /**
  * Builder.

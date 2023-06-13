@@ -32,8 +32,9 @@ import com.liferay.portal.security.audit.storage.service.AuditEventLocalServiceU
  * @generated
  */
 @ProviderType
-public abstract class AuditEventBaseImpl extends AuditEventModelImpl
-	implements AuditEvent {
+public abstract class AuditEventBaseImpl
+	extends AuditEventModelImpl implements AuditEvent {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class AuditEventBaseImpl extends AuditEventModelImpl
 			AuditEventLocalServiceUtil.updateAuditEvent(this);
 		}
 	}
+
 }

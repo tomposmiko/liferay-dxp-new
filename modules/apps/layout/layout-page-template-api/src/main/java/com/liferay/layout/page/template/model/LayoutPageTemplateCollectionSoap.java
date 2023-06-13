@@ -30,12 +30,16 @@ import java.util.List;
  */
 @ProviderType
 public class LayoutPageTemplateCollectionSoap implements Serializable {
+
 	public static LayoutPageTemplateCollectionSoap toSoapModel(
 		LayoutPageTemplateCollection model) {
-		LayoutPageTemplateCollectionSoap soapModel = new LayoutPageTemplateCollectionSoap();
+
+		LayoutPageTemplateCollectionSoap soapModel =
+			new LayoutPageTemplateCollectionSoap();
 
 		soapModel.setUuid(model.getUuid());
-		soapModel.setLayoutPageTemplateCollectionId(model.getLayoutPageTemplateCollectionId());
+		soapModel.setLayoutPageTemplateCollectionId(
+			model.getLayoutPageTemplateCollectionId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
@@ -51,7 +55,9 @@ public class LayoutPageTemplateCollectionSoap implements Serializable {
 
 	public static LayoutPageTemplateCollectionSoap[] toSoapModels(
 		LayoutPageTemplateCollection[] models) {
-		LayoutPageTemplateCollectionSoap[] soapModels = new LayoutPageTemplateCollectionSoap[models.length];
+
+		LayoutPageTemplateCollectionSoap[] soapModels =
+			new LayoutPageTemplateCollectionSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -62,10 +68,12 @@ public class LayoutPageTemplateCollectionSoap implements Serializable {
 
 	public static LayoutPageTemplateCollectionSoap[][] toSoapModels(
 		LayoutPageTemplateCollection[][] models) {
+
 		LayoutPageTemplateCollectionSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new LayoutPageTemplateCollectionSoap[models.length][models[0].length];
+			soapModels = new LayoutPageTemplateCollectionSoap
+				[models.length][models[0].length];
 		}
 		else {
 			soapModels = new LayoutPageTemplateCollectionSoap[0][0];
@@ -80,13 +88,16 @@ public class LayoutPageTemplateCollectionSoap implements Serializable {
 
 	public static LayoutPageTemplateCollectionSoap[] toSoapModels(
 		List<LayoutPageTemplateCollection> models) {
-		List<LayoutPageTemplateCollectionSoap> soapModels = new ArrayList<LayoutPageTemplateCollectionSoap>(models.size());
+
+		List<LayoutPageTemplateCollectionSoap> soapModels =
+			new ArrayList<LayoutPageTemplateCollectionSoap>(models.size());
 
 		for (LayoutPageTemplateCollection model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new LayoutPageTemplateCollectionSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new LayoutPageTemplateCollectionSoap[soapModels.size()]);
 	}
 
 	public LayoutPageTemplateCollectionSoap() {
@@ -114,6 +125,7 @@ public class LayoutPageTemplateCollectionSoap implements Serializable {
 
 	public void setLayoutPageTemplateCollectionId(
 		long layoutPageTemplateCollectionId) {
+
 		_layoutPageTemplateCollectionId = layoutPageTemplateCollectionId;
 	}
 
@@ -200,4 +212,5 @@ public class LayoutPageTemplateCollectionSoap implements Serializable {
 	private String _name;
 	private String _description;
 	private Date _lastPublishDate;
+
 }

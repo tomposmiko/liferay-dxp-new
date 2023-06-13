@@ -16,7 +16,6 @@ package com.liferay.dynamic.data.mapping.service.persistence.impl;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructureLink;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureLinkPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 
@@ -24,7 +23,9 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class DDMStructureLinkFinderBaseImpl extends BasePersistenceImpl<DDMStructureLink> {
+public class DDMStructureLinkFinderBaseImpl
+	extends BasePersistenceImpl<DDMStructureLink> {
+
 	public DDMStructureLinkFinderBaseImpl() {
 		setModelClass(DDMStructureLink.class);
 	}
@@ -45,9 +46,11 @@ public class DDMStructureLinkFinderBaseImpl extends BasePersistenceImpl<DDMStruc
 	 */
 	public void setDDMStructureLinkPersistence(
 		DDMStructureLinkPersistence ddmStructureLinkPersistence) {
+
 		this.ddmStructureLinkPersistence = ddmStructureLinkPersistence;
 	}
 
 	@BeanReference(type = DDMStructureLinkPersistence.class)
 	protected DDMStructureLinkPersistence ddmStructureLinkPersistence;
+
 }

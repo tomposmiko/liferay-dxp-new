@@ -32,8 +32,9 @@ import com.liferay.portal.workflow.kaleo.service.KaleoNodeLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class KaleoNodeBaseImpl extends KaleoNodeModelImpl
-	implements KaleoNode {
+public abstract class KaleoNodeBaseImpl
+	extends KaleoNodeModelImpl implements KaleoNode {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class KaleoNodeBaseImpl extends KaleoNodeModelImpl
 			KaleoNodeLocalServiceUtil.updateKaleoNode(this);
 		}
 	}
+
 }

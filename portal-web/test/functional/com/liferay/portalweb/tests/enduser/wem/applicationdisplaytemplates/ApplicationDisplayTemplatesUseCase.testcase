@@ -21,7 +21,7 @@ definition {
 		Site.addBlankCP(siteName = "Test Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -400,7 +400,7 @@ definition {
 		Portlet.addPG(portletName = "Site Map");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -564,7 +564,7 @@ definition {
 
 	@priority = "5"
 	test ADTTagsNavigationPortlet {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 		property testray.component.names = "Content and Application Templates,Tags";
 
 		Navigator.openSiteURL(siteName = "Test Site Name");
@@ -574,7 +574,7 @@ definition {
 		Portlet.addPG(portletName = "Tags Navigation");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -694,9 +694,9 @@ definition {
 		Navigator.openSiteURL(siteName = "Test Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
-			portlet = "Application Display Templates"
+			portlet = "Widget Templates"
 		);
 
 		ApplicationDisplayTemplates.addCP(

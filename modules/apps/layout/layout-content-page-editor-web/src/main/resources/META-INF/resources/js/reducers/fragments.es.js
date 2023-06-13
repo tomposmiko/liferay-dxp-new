@@ -1,4 +1,4 @@
-import {ADD_FRAGMENT_ENTRY_LINK, MOVE_FRAGMENT_ENTRY_LINK, REMOVE_FRAGMENT_ENTRY_LINK, UPDATE_EDITABLE_VALUE} from '../actions/actions.es';
+import {ADD_FRAGMENT_ENTRY_LINK, CLEAR_FRAGMENT_EDITOR, DISABLE_FRAGMENT_EDITOR, ENABLE_FRAGMENT_EDITOR, MOVE_FRAGMENT_ENTRY_LINK, REMOVE_FRAGMENT_ENTRY_LINK, UPDATE_CONFIG_ATTRIBUTES, UPDATE_EDITABLE_VALUE} from '../actions/actions.es';
 import {add, remove, setIn, updateIn, updateLayoutData, updateWidgets} from '../utils/FragmentsEditorUpdateUtils.es';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../components/fragment_entry_link/FragmentEntryLinkContent.es';
 import {FRAGMENTS_EDITOR_ITEM_BORDERS, FRAGMENTS_EDITOR_ITEM_TYPES} from '../utils/constants';
@@ -167,6 +167,58 @@ function addFragmentEntryLinkReducer(state, actionType, payload) {
 			}
 		}
 	);
+}
+
+/**
+ * @param {object} state
+ * @param {string} actionType
+ * @param {object} payload
+ * @param {string} payload.itemId
+ * @return {object}
+ * @review
+ */
+function clearFragmentEditorReducer(state, actionType, payload) {
+	let nextState = state;
+
+	if (actionType === CLEAR_FRAGMENT_EDITOR) {
+		nextState = setIn(nextState, ['fragmentEditorClear'], payload.itemId);
+	}
+
+	return nextState;
+}
+
+/**
+ * @param {object} state
+ * @param {string} actionType
+ * @return {object}
+ * @review
+ */
+function disableFragmentEditorReducer(state, actionType) {
+	let nextState = state;
+
+	if (actionType === DISABLE_FRAGMENT_EDITOR) {
+		nextState = setIn(nextState, ['fragmentEditorEnabled'], null);
+	}
+
+	return nextState;
+}
+
+/**
+ * @param {object} state
+ * @param {string} actionType
+ * @param {object} payload
+ * @param {string} payload.itemId
+ * @return {object}
+ * @review
+ */
+function enableFragmentEditorReducer(state, actionType, payload) {
+	let nextState = state;
+
+	if (actionType === ENABLE_FRAGMENT_EDITOR) {
+		nextState = setIn(nextState, ['fragmentEditorEnabled'], payload.itemId);
+	}
+
+	return nextState;
 }
 
 /**
@@ -364,27 +416,48 @@ function updateEditableValueReducer(state, actionType, payload) {
 					editableId,
 					editableValue,
 					editableValueId,
-					editableValueSegmentId
+					editableValueSegmentsExperienceId
 				} = payload;
 
 				const {editableValues} = nextState.fragmentEntryLinks[payload.fragmentEntryLinkId];
 
-				const keysTreeArray = editableValueSegmentId ? [
+				const keysTreeArray = editableValueSegmentsExperienceId ? [
 					EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
 					editableId,
-					editableValueSegmentId,
-					editableValueId
+					editableValueSegmentsExperienceId
 				] : [
 					EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
-					editableId,
-					editableValueId
+					editableId
 				];
 
-				const nextEditableValues = setIn(
+				let nextEditableValues = setIn(
 					editableValues,
-					keysTreeArray,
+					[...keysTreeArray, editableValueId],
 					editableValue
 				);
+
+				if (editableValueId === 'mappedField') {
+					nextEditableValues = updateIn(
+						nextEditableValues,
+						keysTreeArray,
+						editableValue => {
+							const nextEditableValue = Object.assign({}, editableValue);
+
+							[
+								'config',
+								state.defaultSegmentsEntryId,
+								...Object.keys(state.availableLanguages),
+								...Object.keys(state.availableSegmentsEntries)
+							].forEach(
+								key => {
+									delete nextEditableValue[key];
+								}
+							);
+
+							return nextEditableValue;
+						}
+					);
+				}
 
 				const formData = new FormData();
 
@@ -415,6 +488,81 @@ function updateEditableValueReducer(state, actionType, payload) {
 								'editableValues'
 							],
 							nextEditableValues
+						);
+
+						resolve(nextState);
+					}
+				);
+			}
+			else {
+				resolve(nextState);
+			}
+		}
+	);
+}
+
+function updateFragmentEntryLinkConfigReducer(state, actionType, payload) {
+	let nextState = state;
+
+	return new Promise(
+		resolve => {
+			if (actionType === UPDATE_CONFIG_ATTRIBUTES) {
+				const {
+					config,
+					editableId,
+					fragmentEntryLinkId
+				} = payload;
+
+				let {editableValues} = nextState.fragmentEntryLinks[fragmentEntryLinkId];
+
+				Object.entries(config).forEach(
+					entry => {
+						const [key, value] = entry;
+
+						const keysTreeArray = [
+							EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
+							editableId,
+							'config',
+							key
+						];
+
+						editableValues = setIn(
+							editableValues,
+							keysTreeArray,
+							value
+						);
+					}
+				);
+
+				const formData = new FormData();
+
+				formData.append(
+					`${nextState.portletNamespace}fragmentEntryLinkId`,
+					fragmentEntryLinkId
+				);
+
+				formData.append(
+					`${nextState.portletNamespace}editableValues`,
+					JSON.stringify(editableValues)
+				);
+
+				fetch(
+					nextState.editFragmentEntryLinkURL,
+					{
+						body: formData,
+						credentials: 'include',
+						method: 'POST'
+					}
+				).then(
+					() => {
+						nextState = setIn(
+							nextState,
+							[
+								'fragmentEntryLinks',
+								fragmentEntryLinkId,
+								'editableValues'
+							],
+							editableValues
 						);
 
 						resolve(nextState);
@@ -479,36 +627,6 @@ function _addFragmentEntryLink(
 				};
 			}
 		);
-}
-
-/**
- * @param {string[]} fragmentEntryLinkIds
- * @param {string} targetFragmentEntryLinkId
- * @param {FRAGMENTS_EDITOR_ITEM_BORDERS} targetBorder
- * @return {number}
- * @review
- */
-function _getDropFragmentPosition(
-	fragmentEntryLinkIds,
-	targetFragmentEntryLinkId,
-	targetBorder
-) {
-	let position = fragmentEntryLinkIds.length;
-
-	const targetPosition = fragmentEntryLinkIds.indexOf(
-		targetFragmentEntryLinkId
-	);
-
-	if (targetPosition > -1 && targetBorder) {
-		if (targetBorder === FRAGMENTS_EDITOR_ITEM_BORDERS.top) {
-			position = targetPosition;
-		}
-		else {
-			position = targetPosition + 1;
-		}
-	}
-
-	return position;
 }
 
 /**
@@ -591,6 +709,36 @@ function _addSingleFragmentRow(layoutData, fragmentEntryLinkId, position) {
 	nextData = setIn(nextData, ['nextRowId'], nextRowId + 1);
 
 	return nextData;
+}
+
+/**
+ * @param {string[]} fragmentEntryLinkIds
+ * @param {string} targetFragmentEntryLinkId
+ * @param {FRAGMENTS_EDITOR_ITEM_BORDERS} targetBorder
+ * @return {number}
+ * @review
+ */
+function _getDropFragmentPosition(
+	fragmentEntryLinkIds,
+	targetFragmentEntryLinkId,
+	targetBorder
+) {
+	let position = fragmentEntryLinkIds.length;
+
+	const targetPosition = fragmentEntryLinkIds.indexOf(
+		targetFragmentEntryLinkId
+	);
+
+	if (targetPosition > -1 && targetBorder) {
+		if (targetBorder === FRAGMENTS_EDITOR_ITEM_BORDERS.top) {
+			position = targetPosition;
+		}
+		else {
+			position = targetPosition + 1;
+		}
+	}
+
+	return position;
 }
 
 /**
@@ -705,8 +853,12 @@ function _removeFragmentEntryLink(
 export {
 	addFragment,
 	addFragmentEntryLinkReducer,
+	clearFragmentEditorReducer,
+	disableFragmentEditorReducer,
+	enableFragmentEditorReducer,
 	getFragmentEntryLinkContent,
 	moveFragmentEntryLinkReducer,
 	removeFragmentEntryLinkReducer,
-	updateEditableValueReducer
+	updateEditableValueReducer,
+	updateFragmentEntryLinkConfigReducer
 };

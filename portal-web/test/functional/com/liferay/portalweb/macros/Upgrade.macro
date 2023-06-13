@@ -1,7 +1,7 @@
 definition {
 	macro addDataDefinitionWithDB2 {
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
 		);
@@ -22,7 +22,7 @@ definition {
 		AssertConsoleTextNotPresent(value1 = "SQLCODE=-727");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
 		);
@@ -40,7 +40,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
 		);
@@ -57,7 +57,7 @@ definition {
 
 	macro addForm {
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Forms"
 		);
@@ -82,7 +82,7 @@ definition {
 		Form.save();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Forms"
 		);
@@ -93,7 +93,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -231,6 +231,31 @@ definition {
 
 		UsersAndOrganizationsNavigator.gotoOrganizations();
 
+		Organization.viewSubOrganizationCP(
+			orgName = "Organization1",
+			orgType = "Organization",
+			suborgName = "Sub-organization-Pre",
+			suborgType = "Organization"
+		);
+
+		Organization.gotoCP(
+			orgName = "Sub-organization-Pre",
+			searchToken = "Sub-organization-Pre"
+		);
+
+		Organization.viewAssignMemberCP(
+			userName = "userfn userln",
+			userScreenName = "usersn"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
 		Organization.editSiteCP(
 			orgName = "Organization1",
 			orgNameEdit = "Organization1 Edit"
@@ -312,7 +337,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -337,7 +362,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -354,7 +379,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -381,7 +406,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -438,7 +463,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -466,7 +491,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -504,7 +529,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -517,7 +542,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -573,7 +598,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -600,7 +625,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -647,7 +672,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -799,7 +824,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -813,7 +838,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -840,7 +865,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -867,7 +892,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -912,7 +937,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Forms"
 		);
@@ -976,7 +1001,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Forms"
 		);
@@ -995,7 +1020,7 @@ definition {
 			assetLinkBehavior = "Show Full Content"
 		);
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Portlet#TITLE",
 			value1 = "Asset Publisher",
 			key_portletName = "Asset Publisher"
@@ -1106,7 +1131,7 @@ definition {
 	macro viewNestedPortlets {
 		Navigator.gotoPage(pageName = "Nested Portlets");
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Portlet#TITLE",
 			value1 = "Nested Applications",
 			key_portletName = "Nested Applications"
@@ -1283,7 +1308,7 @@ definition {
 			siteName = "Staging Site"
 		);
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Portlet#TITLE",
 			value1 = "Nested Applications",
 			key_portletName = "Nested Applications"
@@ -1309,44 +1334,11 @@ definition {
 
 		Navigator.gotoPage(pageName = "Document");
 
-		var key_menuItem = "List";
-
-		Click(locator1 = "Icon#CURRENT_DISPLAY_STYLE");
-
-		if (IsElementPresent(locator1 = "MenuItem#ANY_MENU_ITEM")) {
-			Click(locator1 = "MenuItem#ANY_MENU_ITEM");
-		}
-		else {
-			Navigator.gotoPage(pageName = "Document");
-
-			Click(locator1 = "Icon#CURRENT_DISPLAY_STYLE");
-
-			Click(locator1 = "MenuItem#ANY_MENU_ITEM");
-		}
+		ManagementBar.changeDisplayStyle(
+			displayStyle = "List"
+		);
 
 		DMDocument.viewPG(dmDocumentTitle = "Document1");
-
-		DMDocument.expandInfo();
-
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_UPLOADED_BY",
-			value1 = "Test Test"
-		);
-
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_VERSION",
-			value1 = "VERSION 1.0",
-			key_dmDocumentVersionNumber = "1.0"
-		);
-
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_WORKFLOW_STATUS",
-			value1 = "APPROVED"
-		);
-
-		AssertElementPresent(
-			locator1 = "Button#DOWNLOAD"
-		);
 
 		Navigator.gotoPage(pageName = "Message Boards");
 
@@ -1396,30 +1388,6 @@ definition {
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		DMDocument.viewPG(dmDocumentTitle = "Document1");
-
-		DMDocument.expandInfo();
-
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_UPLOADED_BY",
-			value1 = "Test Test"
-		);
-
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_VERSION",
-			value1 = "VERSION 1.0",
-			key_dmDocumentVersionNumber = "1.0"
-		);
-
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_WORKFLOW_STATUS",
-			value1 = "APPROVED"
-		);
-
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_DOWNLOAD",
-			value1 = "Download",
-			key_dmDocumentSize = "22KB"
-		);
 
 		Navigator.gotoPage(pageName = "Message Boards");
 

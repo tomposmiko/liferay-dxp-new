@@ -60,6 +60,10 @@ AUI.add(
 						value: []
 					},
 
+					showPublishAlert: {
+						value: false
+					},
+
 					translationManager: {
 					},
 
@@ -101,6 +105,15 @@ AUI.add(
 							instance._eventHandlers.push(
 								Liferay.on('RuleBuilderLoaded', A.bind('_onRuleBuilderLoaded', instance))
 							);
+						}
+
+						if (instance.get('showPublishAlert')) {
+							if (instance.get('published')) {
+								instance._showPublishAlert();
+							}
+							else {
+								instance._showUnpublishAlert()
+							}
 						}
 					},
 
@@ -730,7 +743,7 @@ AUI.add(
 						return window[instance.ns('nameEditor')];
 					},
 
-					_handlePublishAction: function() {
+					_showPublishAlert: function() {
 						var instance = this;
 
 						var publishMessage = Liferay.Language.get('the-form-was-published-successfully-access-it-with-this-url-x');
@@ -742,16 +755,12 @@ AUI.add(
 						publishMessage = publishMessage.replace(/\{0\}/gim, span);
 
 						instance._showAlert(publishMessage, 'success');
-
-						instance.one('#publish').html(Liferay.Language.get('unpublish-form'));
 					},
 
-					_handleUnpublishAction: function() {
+					_showUnpublishAlert: function() {
 						var instance = this;
 
 						instance._showAlert(Liferay.Language.get('the-form-was-unpublished-successfully'), 'success');
-
-						instance.one('#publish').html(Liferay.Language.get('publish-form'));
 					},
 
 					_hideFormBuilder: function() {
@@ -873,60 +882,21 @@ AUI.add(
 						);
 					},
 
-					_onPublishButtonClick: function() {
+					_onPublishButtonClick: function(event) {
 						var instance = this;
 
-						instance._autosave(
-							false,
-							function() {
-								var publishedValue = instance.get('published');
+						event.preventDefault();
 
-								var newPublishedValue = !publishedValue;
+						var publishButton = instance.one('#publish');
 
-								var payload = instance.ns(
-									{
-										formInstanceId: instance.byId('formInstanceId').val(),
-										published: newPublishedValue
-									}
-								);
+						publishButton.html(Liferay.Language.get('publishing'));
 
-								A.io.request(
-									Liferay.DDM.FormSettings.publishFormInstanceURL,
-									{
-										after: {
-											success: function(event, id, xhr) {
-												instance.set('published', newPublishedValue);
+						var editForm = instance.get('editForm');
 
-												instance.syncInputValues();
+						editForm.formNode.setAttribute('action', Liferay.DDM.FormSettings.publishFormInstanceURL)
 
-												var responseData = this.get('responseData');
+						instance.submitForm();
 
-												if (newPublishedValue) {
-													instance._handlePublishAction();
-												}
-												else {
-													instance._handleUnpublishAction();
-												}
-
-												instance._updateAutosaveBar(false, responseData.modifiedDate);
-											}
-										},
-										data: payload,
-										dataType: 'JSON',
-										method: 'POST',
-										on: {
-											failure: function(event, id, xhr) {
-												var sessionStatus = Liferay.Session.get('sessionState');
-
-												if (sessionStatus === 'expired' || xhr.status === 401) {
-													window.location.reload();
-												}
-											}
-										}
-									}
-								);
-							}
-						);
 					},
 
 					_onPublishIconClick: function() {

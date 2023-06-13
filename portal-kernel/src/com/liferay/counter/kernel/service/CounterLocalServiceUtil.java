@@ -17,7 +17,6 @@ package com.liferay.counter.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the local service utility for Counter. This utility wraps
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  */
 @ProviderType
 public class CounterLocalServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -43,10 +43,10 @@ public class CounterLocalServiceUtil {
 	}
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
@@ -77,14 +77,13 @@ public class CounterLocalServiceUtil {
 
 	public static CounterLocalService getService() {
 		if (_service == null) {
-			_service = (CounterLocalService)PortalBeanLocatorUtil.locate(CounterLocalService.class.getName());
-
-			ReferenceRegistry.registerReference(CounterLocalServiceUtil.class,
-				"_service");
+			_service = (CounterLocalService)PortalBeanLocatorUtil.locate(
+				CounterLocalService.class.getName());
 		}
 
 		return _service;
 	}
 
 	private static CounterLocalService _service;
+
 }

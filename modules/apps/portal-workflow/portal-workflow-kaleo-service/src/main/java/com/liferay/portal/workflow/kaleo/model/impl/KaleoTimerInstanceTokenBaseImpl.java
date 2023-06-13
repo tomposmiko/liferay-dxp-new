@@ -33,7 +33,9 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTimerInstanceTokenLocalSer
  */
 @ProviderType
 public abstract class KaleoTimerInstanceTokenBaseImpl
-	extends KaleoTimerInstanceTokenModelImpl implements KaleoTimerInstanceToken {
+	extends KaleoTimerInstanceTokenModelImpl
+	implements KaleoTimerInstanceToken {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -42,10 +44,13 @@ public abstract class KaleoTimerInstanceTokenBaseImpl
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			KaleoTimerInstanceTokenLocalServiceUtil.addKaleoTimerInstanceToken(this);
+			KaleoTimerInstanceTokenLocalServiceUtil.addKaleoTimerInstanceToken(
+				this);
 		}
 		else {
-			KaleoTimerInstanceTokenLocalServiceUtil.updateKaleoTimerInstanceToken(this);
+			KaleoTimerInstanceTokenLocalServiceUtil.
+				updateKaleoTimerInstanceToken(this);
 		}
 	}
+
 }

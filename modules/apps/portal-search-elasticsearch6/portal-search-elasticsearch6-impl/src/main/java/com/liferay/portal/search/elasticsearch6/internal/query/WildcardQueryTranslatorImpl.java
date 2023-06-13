@@ -14,8 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.portal.kernel.search.QueryTerm;
-import com.liferay.portal.kernel.search.WildcardQuery;
+import com.liferay.portal.search.query.WildcardQuery;
 
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -26,18 +25,16 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Miguel Angelo Caldas Gallindo
  */
-@Component(immediate = true, service = WildcardQueryTranslator.class)
+@Component(service = WildcardQueryTranslator.class)
 public class WildcardQueryTranslatorImpl implements WildcardQueryTranslator {
 
 	@Override
 	public QueryBuilder translate(WildcardQuery wildcardQuery) {
-		QueryTerm queryTerm = wildcardQuery.getQueryTerm();
-
 		WildcardQueryBuilder wildcardQueryBuilder = QueryBuilders.wildcardQuery(
-			queryTerm.getField(), queryTerm.getValue());
+			wildcardQuery.getField(), wildcardQuery.getValue());
 
-		if (!wildcardQuery.isDefaultBoost()) {
-			wildcardQueryBuilder.boost(wildcardQuery.getBoost());
+		if (wildcardQuery.getRewrite() != null) {
+			wildcardQueryBuilder.rewrite(wildcardQuery.getRewrite());
 		}
 
 		return wildcardQueryBuilder;

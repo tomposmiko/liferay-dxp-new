@@ -34,8 +34,9 @@ import com.liferay.portal.tools.service.builder.test.service.VersionedEntryLocal
  * @generated
  */
 @ProviderType
-public abstract class VersionedEntryBaseImpl extends VersionedEntryModelImpl
-	implements VersionedEntry {
+public abstract class VersionedEntryBaseImpl
+	extends VersionedEntryModelImpl implements VersionedEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -55,4 +56,5 @@ public abstract class VersionedEntryBaseImpl extends VersionedEntryModelImpl
 			}
 		}
 	}
+
 }

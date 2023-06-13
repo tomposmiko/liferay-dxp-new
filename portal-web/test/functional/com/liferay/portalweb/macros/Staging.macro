@@ -63,7 +63,7 @@ definition {
 				Click(locator1 = "SiteSettingsStaging#CONTENT_CHECKBOX");
 			}
 
-			for (var contentName : list "Application Display Template,Blogs,Bookmarks,Calendar,Documents and Media,Forms,Knowledge Base,Message Boards,Mobile Device Families,Polls,Web Content,Wiki") {
+			for (var contentName : list "Widget Template,Blogs,Bookmarks,Calendar,Documents and Media,Forms,Knowledge Base,Message Boards,Mobile Device Families,Polls,Web Content,Wiki") {
 				var key_contentName = "${contentName}";
 
 				Click(locator1 = "SiteSettingsStaging#CONTENT_CHECKBOX");
@@ -442,9 +442,9 @@ definition {
 		Navigator.gotoStagedView();
 
 		ProductMenu.gotoPortlet(
-			category = "Members",
+			category = "People",
 			panel = "Site Administration",
-			portlet = "Site Memberships"
+			portlet = "Memberships"
 		);
 
 		Site.assignUserAsMemberCP(
@@ -458,9 +458,9 @@ definition {
 		Navigator.gotoStagedView();
 
 		ProductMenu.gotoPortlet(
-			category = "Members",
+			category = "People",
 			panel = "Site Administration",
-			portlet = "Site Memberships"
+			portlet = "Memberships"
 		);
 
 		Site.assignSiteRoleCP(
@@ -740,10 +740,18 @@ definition {
 	macro publishCustomPublication {
 		LexiconEntry.gotoAdd();
 
-		AssertClickNoError(
-			locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON",
-			value1 = "Publish to Live"
-		);
+		if ("${remoteStaging}" == "true") {
+			AssertClickNoError(
+				locator1 = "Staging#STAGING_PUBLISH_TO_REMOTE_LIVE_BUTTON",
+				value1 = "Publish to Remote Live"
+			);
+		}
+		else {
+			AssertClickNoError(
+				locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON",
+				value1 = "Publish to Live"
+			);
+		}
 
 		Pause(locator1 = "30000");
 
@@ -780,6 +788,12 @@ definition {
 		LexiconEntry.gotoHeaderMenuItem(menuItem = "Staging");
 
 		SelectFrame(locator1 = "IFrame#CONFIGURATION_DIALOG");
+
+		if ("${replicateIndividualDeletions}" == "true") {
+			AssertVisible(locator1 = "Staging#STAGING_CONTENT_DELETIONS");
+
+			Click(locator1 = "Staging#REPLICATE_INDIVIDUAL_DELETIONS");
+		}
 
 		AssertClickNoError(
 			locator1 = "Staging#STAGING_PUBLISH_TO_LIVE_BUTTON",
@@ -926,7 +940,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		var siteID = "siteID";
@@ -1000,7 +1014,7 @@ definition {
 		var displayDateAMPM = StringUtil.replace("${displayDateAMPM}", "0", "AM");
 		var displayDateAMPM = StringUtil.replace("${displayDateAMPM}", "1", "PM");
 		var displayDateMinute = selenium.getAttribute("//input[contains(@id,'schedulerStartDateMinute')]@value");
-		var displayDateMinuteFuture = MathUtil.sum("${displayDateMinute}", "2");
+		var displayDateMinuteFuture = MathUtil.sum("${displayDateMinute}", "3");
 		var displayDateMinuteFutureLength = StringUtil.length("${displayDateMinuteFuture}");
 
 		if ("${displayDateMinuteFutureLength}" == "1") {

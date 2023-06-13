@@ -34,6 +34,7 @@ import com.liferay.asset.auto.tagger.service.AssetAutoTaggerEntryLocalServiceUti
 @ProviderType
 public abstract class AssetAutoTaggerEntryBaseImpl
 	extends AssetAutoTaggerEntryModelImpl implements AssetAutoTaggerEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -45,7 +46,9 @@ public abstract class AssetAutoTaggerEntryBaseImpl
 			AssetAutoTaggerEntryLocalServiceUtil.addAssetAutoTaggerEntry(this);
 		}
 		else {
-			AssetAutoTaggerEntryLocalServiceUtil.updateAssetAutoTaggerEntry(this);
+			AssetAutoTaggerEntryLocalServiceUtil.updateAssetAutoTaggerEntry(
+				this);
 		}
 	}
+
 }

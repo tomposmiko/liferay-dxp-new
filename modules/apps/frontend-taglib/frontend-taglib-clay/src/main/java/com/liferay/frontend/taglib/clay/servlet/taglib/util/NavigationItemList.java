@@ -14,18 +14,24 @@
 
 package com.liferay.frontend.taglib.clay.servlet.taglib.util;
 
+import com.liferay.petra.function.UnsafeConsumer;
+
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class NavigationItemList extends ArrayList<NavigationItem> {
 
-	public void add(Consumer<NavigationItem> consumer) {
+	public void add(UnsafeConsumer<NavigationItem, Exception> unsafeConsumer) {
 		NavigationItem navigationItem = new NavigationItem();
 
-		consumer.accept(navigationItem);
+		try {
+			unsafeConsumer.accept(navigationItem);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		add(navigationItem);
 	}

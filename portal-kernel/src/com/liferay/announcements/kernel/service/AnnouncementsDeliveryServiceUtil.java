@@ -17,7 +17,6 @@ package com.liferay.announcements.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the remote service utility for AnnouncementsDelivery. This utility wraps
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  */
 @ProviderType
 public class AnnouncementsDeliveryServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -40,41 +40,45 @@ public class AnnouncementsDeliveryServiceUtil {
 	 */
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.announcements.kernel.model.AnnouncementsDelivery updateDelivery(
-		long userId, String type, boolean email, boolean sms)
+	public static com.liferay.announcements.kernel.model.AnnouncementsDelivery
+			updateDelivery(long userId, String type, boolean email, boolean sms)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return getService().updateDelivery(userId, type, email, sms);
 	}
 
 	/**
-	* @deprecated As of Judson (7.1.x), replaced by {@link
-	#updateDelivery(long, String, boolean, boolean)}
-	*/
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 #updateDelivery(long, String, boolean, boolean)}
+	 */
 	@Deprecated
-	public static com.liferay.announcements.kernel.model.AnnouncementsDelivery updateDelivery(
-		long userId, String type, boolean email, boolean sms, boolean website)
+	public static com.liferay.announcements.kernel.model.AnnouncementsDelivery
+			updateDelivery(
+				long userId, String type, boolean email, boolean sms,
+				boolean website)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return getService().updateDelivery(userId, type, email, sms, website);
 	}
 
 	public static AnnouncementsDeliveryService getService() {
 		if (_service == null) {
-			_service = (AnnouncementsDeliveryService)PortalBeanLocatorUtil.locate(AnnouncementsDeliveryService.class.getName());
-
-			ReferenceRegistry.registerReference(AnnouncementsDeliveryServiceUtil.class,
-				"_service");
+			_service =
+				(AnnouncementsDeliveryService)PortalBeanLocatorUtil.locate(
+					AnnouncementsDeliveryService.class.getName());
 		}
 
 		return _service;
 	}
 
 	private static AnnouncementsDeliveryService _service;
+
 }

@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.AsyncPortletServletRequest;
 
@@ -167,10 +168,12 @@ public class I18nServlet extends HttpServlet {
 				String friendlyURL = path.substring(
 					friendlyURLIndices[0], friendlyURLIndices[1]);
 
-				siteGroup = GroupLocalServiceUtil.getFriendlyURLGroup(
-					GetterUtil.getLong(
-						request.getAttribute(WebKeys.COMPANY_ID)),
-					friendlyURL);
+				siteGroup = GroupLocalServiceUtil.fetchFriendlyURLGroup(
+					PortalInstances.getCompanyId(request), friendlyURL);
+
+				if (siteGroup == null) {
+					return null;
+				}
 
 				siteDefaultLocale = LanguageUtil.getLocale(
 					siteGroup.getGroupId(), i18nLanguageCode);

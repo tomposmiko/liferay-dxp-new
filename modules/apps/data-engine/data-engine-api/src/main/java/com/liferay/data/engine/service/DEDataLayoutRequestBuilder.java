@@ -21,14 +21,65 @@ import com.liferay.data.engine.model.DEDataLayout;
  */
 public class DEDataLayoutRequestBuilder {
 
+	public static DEDataLayoutCountRequest.Builder countBuilder() {
+		return new DEDataLayoutCountRequest.Builder();
+	}
+
+	public static DEDataLayoutDeleteRequest.Builder deleteBuilder() {
+		return new DEDataLayoutDeleteRequest.Builder();
+	}
+
+	public static DEDataLayoutDeleteModelPermissionsRequest.Builder
+		deleteModelPermissionsBuilder(
+			long companyId, long scopedGroupId, long deDataLayoutId,
+			boolean revokeDelete, boolean revokeUpdate, boolean revokeView,
+			String[] roleNames) {
+
+		return new DEDataLayoutDeleteModelPermissionsRequest.Builder(
+			companyId, scopedGroupId, deDataLayoutId, revokeDelete,
+			revokeUpdate, revokeView, roleNames);
+	}
+
+	public static DEDataLayoutDeletePermissionsRequest.Builder
+		deletePermissionsBuilder(
+			long companyId, long scopedGroupId, boolean revokeAddDataLayout,
+			boolean revokeDefinePermissions, String[] roleNames) {
+
+		return new DEDataLayoutDeletePermissionsRequest.Builder(
+			companyId, scopedGroupId, revokeAddDataLayout,
+			revokeDefinePermissions, roleNames);
+	}
+
 	public static DEDataLayoutGetRequest.Builder getBuilder() {
 		return new DEDataLayoutGetRequest.Builder();
+	}
+
+	public static DEDataLayoutListRequest.Builder listBuilder() {
+		return new DEDataLayoutListRequest.Builder();
 	}
 
 	public static DEDataLayoutSaveRequest.Builder saveBuilder(
 		DEDataLayout deDataLayout) {
 
 		return new DEDataLayoutSaveRequest.Builder(deDataLayout);
+	}
+
+	public static DEDataLayoutSaveModelPermissionsRequest.Builder
+		saveModelPermissionsBuilder(
+			long companyId, long groupId, long scopedUserId, long scopedGroupId,
+			long deDataLayoutId, String[] roleNames) {
+
+		return new DEDataLayoutSaveModelPermissionsRequest.Builder(
+			companyId, groupId, scopedUserId, scopedGroupId, deDataLayoutId,
+			roleNames);
+	}
+
+	public static DEDataLayoutSavePermissionsRequest.Builder
+		savePermissionsBuilder(
+			long companyId, long scopedGroupId, String[] roleNames) {
+
+		return new DEDataLayoutSavePermissionsRequest.Builder(
+			companyId, scopedGroupId, roleNames);
 	}
 
 }

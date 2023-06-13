@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
-
 import com.liferay.sharing.model.SharingEntry;
 import com.liferay.sharing.service.SharingEntryService;
 import com.liferay.sharing.service.persistence.SharingEntryFinder;
@@ -43,8 +42,10 @@ import javax.sql.DataSource;
  * @see com.liferay.sharing.service.impl.SharingEntryServiceImpl
  * @generated
  */
-public abstract class SharingEntryServiceBaseImpl extends BaseServiceImpl
+public abstract class SharingEntryServiceBaseImpl
+	extends BaseServiceImpl
 	implements SharingEntryService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -56,7 +57,9 @@ public abstract class SharingEntryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the sharing entry local service
 	 */
-	public com.liferay.sharing.service.SharingEntryLocalService getSharingEntryLocalService() {
+	public com.liferay.sharing.service.SharingEntryLocalService
+		getSharingEntryLocalService() {
+
 		return sharingEntryLocalService;
 	}
 
@@ -66,7 +69,9 @@ public abstract class SharingEntryServiceBaseImpl extends BaseServiceImpl
 	 * @param sharingEntryLocalService the sharing entry local service
 	 */
 	public void setSharingEntryLocalService(
-		com.liferay.sharing.service.SharingEntryLocalService sharingEntryLocalService) {
+		com.liferay.sharing.service.SharingEntryLocalService
+			sharingEntryLocalService) {
+
 		this.sharingEntryLocalService = sharingEntryLocalService;
 	}
 
@@ -84,7 +89,9 @@ public abstract class SharingEntryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @param sharingEntryService the sharing entry remote service
 	 */
-	public void setSharingEntryService(SharingEntryService sharingEntryService) {
+	public void setSharingEntryService(
+		SharingEntryService sharingEntryService) {
+
 		this.sharingEntryService = sharingEntryService;
 	}
 
@@ -104,6 +111,7 @@ public abstract class SharingEntryServiceBaseImpl extends BaseServiceImpl
 	 */
 	public void setSharingEntryPersistence(
 		SharingEntryPersistence sharingEntryPersistence) {
+
 		this.sharingEntryPersistence = sharingEntryPersistence;
 	}
 
@@ -130,7 +138,9 @@ public abstract class SharingEntryServiceBaseImpl extends BaseServiceImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -140,7 +150,9 @@ public abstract class SharingEntryServiceBaseImpl extends BaseServiceImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -182,8 +194,8 @@ public abstract class SharingEntryServiceBaseImpl extends BaseServiceImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -192,14 +204,25 @@ public abstract class SharingEntryServiceBaseImpl extends BaseServiceImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.sharing.service.SharingEntryLocalService.class)
-	protected com.liferay.sharing.service.SharingEntryLocalService sharingEntryLocalService;
+	@BeanReference(
+		type = com.liferay.sharing.service.SharingEntryLocalService.class
+	)
+	protected com.liferay.sharing.service.SharingEntryLocalService
+		sharingEntryLocalService;
+
 	@BeanReference(type = SharingEntryService.class)
 	protected SharingEntryService sharingEntryService;
+
 	@BeanReference(type = SharingEntryPersistence.class)
 	protected SharingEntryPersistence sharingEntryPersistence;
+
 	@BeanReference(type = SharingEntryFinder.class)
 	protected SharingEntryFinder sharingEntryFinder;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 }

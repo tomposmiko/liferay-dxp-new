@@ -1,9 +1,9 @@
 import '../FieldBase/FieldBase.es';
 import './TextRegister.soy.js';
-import {Config} from 'metal-state';
 import Component from 'metal-component';
 import Soy from 'metal-soy';
 import templates from './Text.soy.js';
+import {Config} from 'metal-state';
 
 class Text extends Component {
 	static STATE = {
@@ -25,6 +25,15 @@ class Text extends Component {
 		 */
 
 		displayStyle: Config.string().value('singleline'),
+
+		/**
+		 * @default undefined
+		 * @instance
+		 * @memberof Text
+		 * @type {?(string|undefined)}
+		 */
+
+		errorMessage: Config.string(),
 
 		/**
 		 * @default undefined
@@ -181,19 +190,43 @@ class Text extends Component {
 		}
 	}
 
+	_handleFieldBlurred(event) {
+		this.emit(
+			'fieldBlurred',
+			{
+				fieldInstance: this,
+				originalEvent: event,
+				value: event.target.value
+			}
+		);
+	}
+
 	_handleFieldChanged(event) {
 		this.setState(
 			{
 				value: event.target.value
 			},
-			() => this.emit(
-				'fieldEdited',
-				{
-					fieldInstance: this,
-					originalEvent: event,
-					value: event.target.value
-				}
-			)
+			() => {
+				this.emit(
+					'fieldEdited',
+					{
+						fieldInstance: this,
+						originalEvent: event,
+						value: event.target.value
+					}
+				);
+			}
+		);
+	}
+
+	_handleFieldFocused(event) {
+		this.emit(
+			'fieldFocused',
+			{
+				fieldInstance: this,
+				originalEvent: event,
+				value: event.target.value
+			}
 		);
 	}
 

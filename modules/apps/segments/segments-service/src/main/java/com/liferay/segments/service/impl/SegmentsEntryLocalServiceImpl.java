@@ -35,10 +35,12 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.segments.constants.SegmentsConstants;
+import com.liferay.segments.exception.RequiredSegmentsEntryException;
 import com.liferay.segments.exception.SegmentsEntryKeyException;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.service.base.SegmentsEntryLocalServiceBaseImpl;
@@ -151,6 +153,16 @@ public class SegmentsEntryLocalServiceImpl
 
 		// Segments entry
 
+		if (!GroupThreadLocal.isDeleteInProcess()) {
+			if (segmentsExperiencePersistence.countBySegmentsEntryId(
+					segmentsEntry.getSegmentsEntryId()) > 0) {
+
+				throw new RequiredSegmentsEntryException.
+					MustNotDeleteSegmentsEntryReferencedBySegmentsExperiences(
+						segmentsEntry.getSegmentsEntryId());
+			}
+		}
+
 		segmentsEntryPersistence.remove(segmentsEntry);
 
 		// Resources
@@ -158,7 +170,12 @@ public class SegmentsEntryLocalServiceImpl
 		resourceLocalService.deleteResource(
 			segmentsEntry, ResourceConstants.SCOPE_INDIVIDUAL);
 
-		// Segment rels
+		// Segments experiences
+
+		segmentsExperienceLocalService.deleteSegmentsEntrySegmentsExperiences(
+			segmentsEntry.getSegmentsEntryId());
+
+		// Segments rels
 
 		segmentsEntryRelLocalService.deleteSegmentsEntryRels(
 			segmentsEntry.getSegmentsEntryId());
@@ -193,15 +210,6 @@ public class SegmentsEntryLocalServiceImpl
 
 	@Override
 	public List<SegmentsEntry> getSegmentsEntries(
-		boolean active, String type, int start, int end,
-		OrderByComparator<SegmentsEntry> orderByComparator) {
-
-		return segmentsEntryPersistence.findByA_T(
-			active, type, start, end, orderByComparator);
-	}
-
-	@Override
-	public List<SegmentsEntry> getSegmentsEntries(
 		long groupId, boolean includeAncestorSegmentsEntries, int start,
 		int end, OrderByComparator<SegmentsEntry> orderByComparator) {
 
@@ -214,6 +222,17 @@ public class SegmentsEntryLocalServiceImpl
 			ArrayUtil.append(
 				PortalUtil.getAncestorSiteGroupIds(groupId), groupId),
 			start, end, orderByComparator);
+	}
+
+	@Override
+	public List<SegmentsEntry> getSegmentsEntries(
+		long groupId, boolean active, String type, int start, int end,
+		OrderByComparator<SegmentsEntry> orderByComparator) {
+
+		return segmentsEntryPersistence.findByG_A_T(
+			ArrayUtil.append(
+				PortalUtil.getAncestorSiteGroupIds(groupId), groupId),
+			active, type, start, end, orderByComparator);
 	}
 
 	@Override

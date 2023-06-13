@@ -15,7 +15,6 @@
 package com.liferay.site.navigation.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -33,21 +32,11 @@ import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
-
 import com.liferay.site.navigation.exception.NoSuchMenuItemException;
 import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 import com.liferay.site.navigation.service.SiteNavigationMenuItemLocalServiceUtil;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuItemPersistence;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuItemUtil;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
@@ -59,17 +48,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class SiteNavigationMenuItemPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
-				"com.liferay.site.navigation.service"));
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED, "com.liferay.site.navigation.service"));
 
 	@Before
 	public void setUp() {
@@ -82,7 +81,8 @@ public class SiteNavigationMenuItemPersistenceTest {
 
 	@After
 	public void tearDown() throws Exception {
-		Iterator<SiteNavigationMenuItem> iterator = _siteNavigationMenuItems.iterator();
+		Iterator<SiteNavigationMenuItem> iterator =
+			_siteNavigationMenuItems.iterator();
 
 		while (iterator.hasNext()) {
 			_persistence.remove(iterator.next());
@@ -104,11 +104,14 @@ public class SiteNavigationMenuItemPersistenceTest {
 
 	@Test
 	public void testRemove() throws Exception {
-		SiteNavigationMenuItem newSiteNavigationMenuItem = addSiteNavigationMenuItem();
+		SiteNavigationMenuItem newSiteNavigationMenuItem =
+			addSiteNavigationMenuItem();
 
 		_persistence.remove(newSiteNavigationMenuItem);
 
-		SiteNavigationMenuItem existingSiteNavigationMenuItem = _persistence.fetchByPrimaryKey(newSiteNavigationMenuItem.getPrimaryKey());
+		SiteNavigationMenuItem existingSiteNavigationMenuItem =
+			_persistence.fetchByPrimaryKey(
+				newSiteNavigationMenuItem.getPrimaryKey());
 
 		Assert.assertNull(existingSiteNavigationMenuItem);
 	}
@@ -122,7 +125,8 @@ public class SiteNavigationMenuItemPersistenceTest {
 	public void testUpdateExisting() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		SiteNavigationMenuItem newSiteNavigationMenuItem = _persistence.create(pk);
+		SiteNavigationMenuItem newSiteNavigationMenuItem = _persistence.create(
+			pk);
 
 		newSiteNavigationMenuItem.setUuid(RandomTestUtil.randomString());
 
@@ -138,56 +142,77 @@ public class SiteNavigationMenuItemPersistenceTest {
 
 		newSiteNavigationMenuItem.setModifiedDate(RandomTestUtil.nextDate());
 
-		newSiteNavigationMenuItem.setSiteNavigationMenuId(RandomTestUtil.nextLong());
+		newSiteNavigationMenuItem.setSiteNavigationMenuId(
+			RandomTestUtil.nextLong());
 
-		newSiteNavigationMenuItem.setParentSiteNavigationMenuItemId(RandomTestUtil.nextLong());
+		newSiteNavigationMenuItem.setParentSiteNavigationMenuItemId(
+			RandomTestUtil.nextLong());
 
 		newSiteNavigationMenuItem.setName(RandomTestUtil.randomString());
 
 		newSiteNavigationMenuItem.setType(RandomTestUtil.randomString());
 
-		newSiteNavigationMenuItem.setTypeSettings(RandomTestUtil.randomString());
+		newSiteNavigationMenuItem.setTypeSettings(
+			RandomTestUtil.randomString());
 
 		newSiteNavigationMenuItem.setOrder(RandomTestUtil.nextInt());
 
 		newSiteNavigationMenuItem.setLastPublishDate(RandomTestUtil.nextDate());
 
-		_siteNavigationMenuItems.add(_persistence.update(
-				newSiteNavigationMenuItem));
+		_siteNavigationMenuItems.add(
+			_persistence.update(newSiteNavigationMenuItem));
 
-		SiteNavigationMenuItem existingSiteNavigationMenuItem = _persistence.findByPrimaryKey(newSiteNavigationMenuItem.getPrimaryKey());
+		SiteNavigationMenuItem existingSiteNavigationMenuItem =
+			_persistence.findByPrimaryKey(
+				newSiteNavigationMenuItem.getPrimaryKey());
 
-		Assert.assertEquals(existingSiteNavigationMenuItem.getUuid(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getUuid(),
 			newSiteNavigationMenuItem.getUuid());
-		Assert.assertEquals(existingSiteNavigationMenuItem.getSiteNavigationMenuItemId(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getSiteNavigationMenuItemId(),
 			newSiteNavigationMenuItem.getSiteNavigationMenuItemId());
-		Assert.assertEquals(existingSiteNavigationMenuItem.getGroupId(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getGroupId(),
 			newSiteNavigationMenuItem.getGroupId());
-		Assert.assertEquals(existingSiteNavigationMenuItem.getCompanyId(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getCompanyId(),
 			newSiteNavigationMenuItem.getCompanyId());
-		Assert.assertEquals(existingSiteNavigationMenuItem.getUserId(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getUserId(),
 			newSiteNavigationMenuItem.getUserId());
-		Assert.assertEquals(existingSiteNavigationMenuItem.getUserName(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getUserName(),
 			newSiteNavigationMenuItem.getUserName());
-		Assert.assertEquals(Time.getShortTimestamp(
+		Assert.assertEquals(
+			Time.getShortTimestamp(
 				existingSiteNavigationMenuItem.getCreateDate()),
 			Time.getShortTimestamp(newSiteNavigationMenuItem.getCreateDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
+		Assert.assertEquals(
+			Time.getShortTimestamp(
 				existingSiteNavigationMenuItem.getModifiedDate()),
-			Time.getShortTimestamp(newSiteNavigationMenuItem.getModifiedDate()));
-		Assert.assertEquals(existingSiteNavigationMenuItem.getSiteNavigationMenuId(),
+			Time.getShortTimestamp(
+				newSiteNavigationMenuItem.getModifiedDate()));
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getSiteNavigationMenuId(),
 			newSiteNavigationMenuItem.getSiteNavigationMenuId());
-		Assert.assertEquals(existingSiteNavigationMenuItem.getParentSiteNavigationMenuItemId(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getParentSiteNavigationMenuItemId(),
 			newSiteNavigationMenuItem.getParentSiteNavigationMenuItemId());
-		Assert.assertEquals(existingSiteNavigationMenuItem.getName(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getName(),
 			newSiteNavigationMenuItem.getName());
-		Assert.assertEquals(existingSiteNavigationMenuItem.getType(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getType(),
 			newSiteNavigationMenuItem.getType());
-		Assert.assertEquals(existingSiteNavigationMenuItem.getTypeSettings(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getTypeSettings(),
 			newSiteNavigationMenuItem.getTypeSettings());
-		Assert.assertEquals(existingSiteNavigationMenuItem.getOrder(),
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem.getOrder(),
 			newSiteNavigationMenuItem.getOrder());
-		Assert.assertEquals(Time.getShortTimestamp(
+		Assert.assertEquals(
+			Time.getShortTimestamp(
 				existingSiteNavigationMenuItem.getLastPublishDate()),
 			Time.getShortTimestamp(
 				newSiteNavigationMenuItem.getLastPublishDate()));
@@ -228,17 +253,17 @@ public class SiteNavigationMenuItemPersistenceTest {
 	}
 
 	@Test
-	public void testCountByParentSiteNavigationMenuItemId()
-		throws Exception {
-		_persistence.countByParentSiteNavigationMenuItemId(RandomTestUtil.nextLong());
+	public void testCountByParentSiteNavigationMenuItemId() throws Exception {
+		_persistence.countByParentSiteNavigationMenuItemId(
+			RandomTestUtil.nextLong());
 
 		_persistence.countByParentSiteNavigationMenuItemId(0L);
 	}
 
 	@Test
 	public void testCountByS_P() throws Exception {
-		_persistence.countByS_P(RandomTestUtil.nextLong(),
-			RandomTestUtil.nextLong());
+		_persistence.countByS_P(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
 		_persistence.countByS_P(0L, 0L);
 	}
@@ -254,12 +279,15 @@ public class SiteNavigationMenuItemPersistenceTest {
 
 	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
-		SiteNavigationMenuItem newSiteNavigationMenuItem = addSiteNavigationMenuItem();
+		SiteNavigationMenuItem newSiteNavigationMenuItem =
+			addSiteNavigationMenuItem();
 
-		SiteNavigationMenuItem existingSiteNavigationMenuItem = _persistence.findByPrimaryKey(newSiteNavigationMenuItem.getPrimaryKey());
+		SiteNavigationMenuItem existingSiteNavigationMenuItem =
+			_persistence.findByPrimaryKey(
+				newSiteNavigationMenuItem.getPrimaryKey());
 
-		Assert.assertEquals(existingSiteNavigationMenuItem,
-			newSiteNavigationMenuItem);
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem, newSiteNavigationMenuItem);
 	}
 
 	@Test(expected = NoSuchMenuItemException.class)
@@ -271,34 +299,39 @@ public class SiteNavigationMenuItemPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<SiteNavigationMenuItem> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("SiteNavigationMenuItem",
-			"uuid", true, "siteNavigationMenuItemId", true, "groupId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "siteNavigationMenuId", true,
-			"parentSiteNavigationMenuItemId", true, "name", true, "type", true,
-			"order", true, "lastPublishDate", true);
+		return OrderByComparatorFactoryUtil.create(
+			"SiteNavigationMenuItem", "uuid", true, "siteNavigationMenuItemId",
+			true, "groupId", true, "companyId", true, "userId", true,
+			"userName", true, "createDate", true, "modifiedDate", true,
+			"siteNavigationMenuId", true, "parentSiteNavigationMenuItemId",
+			true, "name", true, "type", true, "order", true, "lastPublishDate",
+			true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
-		SiteNavigationMenuItem newSiteNavigationMenuItem = addSiteNavigationMenuItem();
+		SiteNavigationMenuItem newSiteNavigationMenuItem =
+			addSiteNavigationMenuItem();
 
-		SiteNavigationMenuItem existingSiteNavigationMenuItem = _persistence.fetchByPrimaryKey(newSiteNavigationMenuItem.getPrimaryKey());
+		SiteNavigationMenuItem existingSiteNavigationMenuItem =
+			_persistence.fetchByPrimaryKey(
+				newSiteNavigationMenuItem.getPrimaryKey());
 
-		Assert.assertEquals(existingSiteNavigationMenuItem,
-			newSiteNavigationMenuItem);
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem, newSiteNavigationMenuItem);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		SiteNavigationMenuItem missingSiteNavigationMenuItem = _persistence.fetchByPrimaryKey(pk);
+		SiteNavigationMenuItem missingSiteNavigationMenuItem =
+			_persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingSiteNavigationMenuItem);
 	}
@@ -306,21 +339,27 @@ public class SiteNavigationMenuItemPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
-		SiteNavigationMenuItem newSiteNavigationMenuItem1 = addSiteNavigationMenuItem();
-		SiteNavigationMenuItem newSiteNavigationMenuItem2 = addSiteNavigationMenuItem();
+
+		SiteNavigationMenuItem newSiteNavigationMenuItem1 =
+			addSiteNavigationMenuItem();
+		SiteNavigationMenuItem newSiteNavigationMenuItem2 =
+			addSiteNavigationMenuItem();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newSiteNavigationMenuItem1.getPrimaryKey());
 		primaryKeys.add(newSiteNavigationMenuItem2.getPrimaryKey());
 
-		Map<Serializable, SiteNavigationMenuItem> siteNavigationMenuItems = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, SiteNavigationMenuItem> siteNavigationMenuItems =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, siteNavigationMenuItems.size());
-		Assert.assertEquals(newSiteNavigationMenuItem1,
+		Assert.assertEquals(
+			newSiteNavigationMenuItem1,
 			siteNavigationMenuItems.get(
 				newSiteNavigationMenuItem1.getPrimaryKey()));
-		Assert.assertEquals(newSiteNavigationMenuItem2,
+		Assert.assertEquals(
+			newSiteNavigationMenuItem2,
 			siteNavigationMenuItems.get(
 				newSiteNavigationMenuItem2.getPrimaryKey()));
 	}
@@ -328,6 +367,7 @@ public class SiteNavigationMenuItemPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -337,7 +377,8 @@ public class SiteNavigationMenuItemPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, SiteNavigationMenuItem> siteNavigationMenuItems = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, SiteNavigationMenuItem> siteNavigationMenuItems =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(siteNavigationMenuItems.isEmpty());
 	}
@@ -345,7 +386,9 @@ public class SiteNavigationMenuItemPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
-		SiteNavigationMenuItem newSiteNavigationMenuItem = addSiteNavigationMenuItem();
+
+		SiteNavigationMenuItem newSiteNavigationMenuItem =
+			addSiteNavigationMenuItem();
 
 		long pk = RandomTestUtil.nextLong();
 
@@ -354,37 +397,41 @@ public class SiteNavigationMenuItemPersistenceTest {
 		primaryKeys.add(newSiteNavigationMenuItem.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, SiteNavigationMenuItem> siteNavigationMenuItems = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, SiteNavigationMenuItem> siteNavigationMenuItems =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, siteNavigationMenuItems.size());
-		Assert.assertEquals(newSiteNavigationMenuItem,
+		Assert.assertEquals(
+			newSiteNavigationMenuItem,
 			siteNavigationMenuItems.get(
 				newSiteNavigationMenuItem.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, SiteNavigationMenuItem> siteNavigationMenuItems = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, SiteNavigationMenuItem> siteNavigationMenuItems =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(siteNavigationMenuItems.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
-		SiteNavigationMenuItem newSiteNavigationMenuItem = addSiteNavigationMenuItem();
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
+		SiteNavigationMenuItem newSiteNavigationMenuItem =
+			addSiteNavigationMenuItem();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newSiteNavigationMenuItem.getPrimaryKey());
 
-		Map<Serializable, SiteNavigationMenuItem> siteNavigationMenuItems = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, SiteNavigationMenuItem> siteNavigationMenuItems =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, siteNavigationMenuItems.size());
-		Assert.assertEquals(newSiteNavigationMenuItem,
+		Assert.assertEquals(
+			newSiteNavigationMenuItem,
 			siteNavigationMenuItems.get(
 				newSiteNavigationMenuItem.getPrimaryKey()));
 	}
@@ -393,16 +440,22 @@ public class SiteNavigationMenuItemPersistenceTest {
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = SiteNavigationMenuItemLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			SiteNavigationMenuItemLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<SiteNavigationMenuItem>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod
+				<SiteNavigationMenuItem>() {
+
 				@Override
 				public void performAction(
 					SiteNavigationMenuItem siteNavigationMenuItem) {
+
 					Assert.assertNotNull(siteNavigationMenuItem);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -411,56 +464,62 @@ public class SiteNavigationMenuItemPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
-		SiteNavigationMenuItem newSiteNavigationMenuItem = addSiteNavigationMenuItem();
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
+		SiteNavigationMenuItem newSiteNavigationMenuItem =
+			addSiteNavigationMenuItem();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(SiteNavigationMenuItem.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			SiteNavigationMenuItem.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq(
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
 				"siteNavigationMenuItemId",
 				newSiteNavigationMenuItem.getSiteNavigationMenuItemId()));
 
-		List<SiteNavigationMenuItem> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<SiteNavigationMenuItem> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
 		SiteNavigationMenuItem existingSiteNavigationMenuItem = result.get(0);
 
-		Assert.assertEquals(existingSiteNavigationMenuItem,
-			newSiteNavigationMenuItem);
+		Assert.assertEquals(
+			existingSiteNavigationMenuItem, newSiteNavigationMenuItem);
 	}
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(SiteNavigationMenuItem.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			SiteNavigationMenuItem.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq(
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
 				"siteNavigationMenuItemId", RandomTestUtil.nextLong()));
 
-		List<SiteNavigationMenuItem> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<SiteNavigationMenuItem> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
-		SiteNavigationMenuItem newSiteNavigationMenuItem = addSiteNavigationMenuItem();
+	public void testDynamicQueryByProjectionExisting() throws Exception {
+		SiteNavigationMenuItem newSiteNavigationMenuItem =
+			addSiteNavigationMenuItem();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(SiteNavigationMenuItem.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			SiteNavigationMenuItem.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"siteNavigationMenuItemId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("siteNavigationMenuItemId"));
 
-		Object newSiteNavigationMenuItemId = newSiteNavigationMenuItem.getSiteNavigationMenuItemId();
+		Object newSiteNavigationMenuItemId =
+			newSiteNavigationMenuItem.getSiteNavigationMenuItemId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in(
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
 				"siteNavigationMenuItemId",
-				new Object[] { newSiteNavigationMenuItemId }));
+				new Object[] {newSiteNavigationMenuItemId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -468,21 +527,22 @@ public class SiteNavigationMenuItemPersistenceTest {
 
 		Object existingSiteNavigationMenuItemId = result.get(0);
 
-		Assert.assertEquals(existingSiteNavigationMenuItemId,
-			newSiteNavigationMenuItemId);
+		Assert.assertEquals(
+			existingSiteNavigationMenuItemId, newSiteNavigationMenuItemId);
 	}
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(SiteNavigationMenuItem.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			SiteNavigationMenuItem.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"siteNavigationMenuItemId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("siteNavigationMenuItemId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in(
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
 				"siteNavigationMenuItemId",
-				new Object[] { RandomTestUtil.nextLong() }));
+				new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -491,24 +551,31 @@ public class SiteNavigationMenuItemPersistenceTest {
 
 	@Test
 	public void testResetOriginalValues() throws Exception {
-		SiteNavigationMenuItem newSiteNavigationMenuItem = addSiteNavigationMenuItem();
+		SiteNavigationMenuItem newSiteNavigationMenuItem =
+			addSiteNavigationMenuItem();
 
 		_persistence.clearCache();
 
-		SiteNavigationMenuItem existingSiteNavigationMenuItem = _persistence.findByPrimaryKey(newSiteNavigationMenuItem.getPrimaryKey());
+		SiteNavigationMenuItem existingSiteNavigationMenuItem =
+			_persistence.findByPrimaryKey(
+				newSiteNavigationMenuItem.getPrimaryKey());
 
-		Assert.assertTrue(Objects.equals(
+		Assert.assertTrue(
+			Objects.equals(
 				existingSiteNavigationMenuItem.getUuid(),
-				ReflectionTestUtil.invoke(existingSiteNavigationMenuItem,
-					"getOriginalUuid", new Class<?>[0])));
-		Assert.assertEquals(Long.valueOf(
-				existingSiteNavigationMenuItem.getGroupId()),
-			ReflectionTestUtil.<Long>invoke(existingSiteNavigationMenuItem,
-				"getOriginalGroupId", new Class<?>[0]));
+				ReflectionTestUtil.invoke(
+					existingSiteNavigationMenuItem, "getOriginalUuid",
+					new Class<?>[0])));
+		Assert.assertEquals(
+			Long.valueOf(existingSiteNavigationMenuItem.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingSiteNavigationMenuItem, "getOriginalGroupId",
+				new Class<?>[0]));
 	}
 
 	protected SiteNavigationMenuItem addSiteNavigationMenuItem()
 		throws Exception {
+
 		long pk = RandomTestUtil.nextLong();
 
 		SiteNavigationMenuItem siteNavigationMenuItem = _persistence.create(pk);
@@ -527,9 +594,11 @@ public class SiteNavigationMenuItemPersistenceTest {
 
 		siteNavigationMenuItem.setModifiedDate(RandomTestUtil.nextDate());
 
-		siteNavigationMenuItem.setSiteNavigationMenuId(RandomTestUtil.nextLong());
+		siteNavigationMenuItem.setSiteNavigationMenuId(
+			RandomTestUtil.nextLong());
 
-		siteNavigationMenuItem.setParentSiteNavigationMenuItemId(RandomTestUtil.nextLong());
+		siteNavigationMenuItem.setParentSiteNavigationMenuItemId(
+			RandomTestUtil.nextLong());
 
 		siteNavigationMenuItem.setName(RandomTestUtil.randomString());
 
@@ -541,12 +610,15 @@ public class SiteNavigationMenuItemPersistenceTest {
 
 		siteNavigationMenuItem.setLastPublishDate(RandomTestUtil.nextDate());
 
-		_siteNavigationMenuItems.add(_persistence.update(siteNavigationMenuItem));
+		_siteNavigationMenuItems.add(
+			_persistence.update(siteNavigationMenuItem));
 
 		return siteNavigationMenuItem;
 	}
 
-	private List<SiteNavigationMenuItem> _siteNavigationMenuItems = new ArrayList<SiteNavigationMenuItem>();
+	private List<SiteNavigationMenuItem> _siteNavigationMenuItems =
+		new ArrayList<SiteNavigationMenuItem>();
 	private SiteNavigationMenuItemPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

@@ -12,13 +12,55 @@ import templates from './FloatingToolbar.soy';
 class FloatingToolbar extends Component {
 
 	/**
+	 * Aligns the given element to the anchor,
+	 * defaulting to BottomRight position and moving to
+	 * TopRight if it does not fit.
+	 * @param {HTMLElement|null} element
+	 * @param {HTMLElement|null} anchor
+	 * @param {number} preferedPosition
+	 * @param {number} fallbackPosition
+	 * @private
+	 * @return {number} Selected position
+	 * @review
+	 */
+	static _alignElement(element, anchor, preferedPosition, fallbackPosition) {
+		let position = -1;
+
+		if (element && anchor) {
+			const suggestedAlign = Align.suggestAlignBestRegion(
+				element,
+				anchor,
+				preferedPosition
+			);
+
+			position = suggestedAlign.position === preferedPosition ?
+				preferedPosition :
+				fallbackPosition;
+
+			Align.align(element, anchor, position, false);
+		}
+
+		return position;
+	}
+
+	/**
 	 * @inheritdoc
 	 * @review
 	 */
 	created() {
+		this._defaultButtonClicked = this._defaultButtonClicked.bind(this);
 		this._handleWindowResize = this._handleWindowResize.bind(this);
+		this._handleWindowScroll = this._handleWindowScroll.bind(this);
 
 		window.addEventListener('resize', this._handleWindowResize);
+		window.addEventListener('scroll', this._handleWindowScroll);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	attached() {
+		this.addListener('buttonClicked', this._defaultButtonClicked, true);
 	}
 
 	/**
@@ -27,6 +69,7 @@ class FloatingToolbar extends Component {
 	 */
 	disposed() {
 		window.removeEventListener('resize', this._handleWindowResize);
+		window.removeEventListener('scroll', this._handleWindowScroll);
 	}
 
 	/**
@@ -49,27 +92,21 @@ class FloatingToolbar extends Component {
 	 * @review
 	 */
 	syncSelectedPanelId(selectedPanelId) {
-		this._selectedPanel = this.panels.find(
-			panel => panel.panelId === selectedPanelId
+		this._selectedPanel = this.buttons.find(
+			button => button.panelId === selectedPanelId
 		);
 
 		return selectedPanelId;
 	}
 
 	/**
-	 * Handle panel button click
-	 * @param {MouseEvent} event Click event
+	 * Select or deselect panel. Default handler for button clicked event.
+	 * @param {Event} event
+	 * @param {Object} data
+	 * @private
 	 */
-	_handlePanelButtonClick(event) {
-		const {panelId = null} = event.delegateTarget.dataset;
-
-		this.emit(
-			'panelSelected',
-			event,
-			{
-				panelId
-			}
-		);
+	_defaultButtonClicked(event, data) {
+		const {panelId} = data;
 
 		if (!event.defaultPrevented) {
 			if (this.selectedPanelId === panelId) {
@@ -82,6 +119,23 @@ class FloatingToolbar extends Component {
 	}
 
 	/**
+	 * Handle panel button click
+	 * @param {MouseEvent} event Click event
+	 */
+	_handlePanelButtonClick(event) {
+		const {panelId = null, type} = event.delegateTarget.dataset;
+
+		this.emit(
+			'buttonClicked',
+			event,
+			{
+				panelId,
+				type
+			}
+		);
+	}
+
+	/**
 	 * @private
 	 * @review
 	 */
@@ -90,19 +144,49 @@ class FloatingToolbar extends Component {
 	}
 
 	/**
-	 * Aligns the floating panel to the anchorElement
+	 * @private
+	 * @review
+	 */
+	_handleWindowScroll() {
+		this._align();
+	}
+
+	/**
+	 * Aligns the FloatingToolbar to the anchorElement
 	 * @private
 	 * @review
 	 */
 	_align() {
-		if (this.element && this.anchorElement) {
-			Align.align(
-				this.element,
-				this.anchorElement,
-				Align.BottomRight,
-				false
-			);
-		}
+		requestAnimationFrame(
+			() => {
+				FloatingToolbar._alignElement(
+					this.refs.buttons,
+					this.anchorElement,
+					Align.BottomRight,
+					Align.TopRight
+				);
+
+				requestAnimationFrame(
+					() => {
+						this._alignPanel();
+					}
+				);
+			}
+		);
+	}
+
+	/**
+	 * Aligns the FloatingToolbar panel to the buttons
+	 * @private
+	 * @review
+	 */
+	_alignPanel() {
+		FloatingToolbar._alignElement(
+			this.refs.panel,
+			this.refs.buttons,
+			Align.BottomRight,
+			Align.TopRight
+		);
 	}
 
 }
@@ -141,6 +225,28 @@ FloatingToolbar.STATE = {
 		.required(),
 
 	/**
+	 * List of available buttons.
+	 * @default undefined
+	 * @instance
+	 * @memberOf FloatingToolbar
+	 * @review
+	 * @type {object[]}
+	 */
+	buttons: Config
+		.arrayOf(
+			Config.shapeOf(
+				{
+					icon: Config.string(),
+					id: Config.string(),
+					panelId: Config.string(),
+					title: Config.string(),
+					type: Config.string()
+				}
+			)
+		)
+		.required(),
+
+	/**
 	 * If true, once a panel has been selected it cannot be changed
 	 * until selectedPanelId is set manually to null.
 	 * @default false
@@ -152,26 +258,6 @@ FloatingToolbar.STATE = {
 	fixSelectedPanel: Config
 		.bool()
 		.value(false),
-
-	/**
-	 * List of available panels.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FloatingToolbar
-	 * @review
-	 * @type {object[]}
-	 */
-	panels: Config
-		.arrayOf(
-			Config.shapeOf(
-				{
-					icon: Config.string(),
-					panelId: Config.string(),
-					title: Config.string()
-				}
-			)
-		)
-		.required(),
 
 	/**
 	 * Selected panel ID.

@@ -35,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface AssetListEntryModel extends BaseModel<AssetListEntry>,
-	ShardedModel, StagedGroupedModel {
+public interface AssetListEntryModel
+	extends BaseModel<AssetListEntry>, ShardedModel, StagedGroupedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -202,6 +203,21 @@ public interface AssetListEntryModel extends BaseModel<AssetListEntry>,
 	public void setModifiedDate(Date modifiedDate);
 
 	/**
+	 * Returns the asset list entry key of this asset list entry.
+	 *
+	 * @return the asset list entry key of this asset list entry
+	 */
+	@AutoEscape
+	public String getAssetListEntryKey();
+
+	/**
+	 * Sets the asset list entry key of this asset list entry.
+	 *
+	 * @param assetListEntryKey the asset list entry key of this asset list entry
+	 */
+	public void setAssetListEntryKey(String assetListEntryKey);
+
+	/**
 	 * Returns the title of this asset list entry.
 	 *
 	 * @return the title of this asset list entry
@@ -231,21 +247,6 @@ public interface AssetListEntryModel extends BaseModel<AssetListEntry>,
 	public void setType(int type);
 
 	/**
-	 * Returns the type settings of this asset list entry.
-	 *
-	 * @return the type settings of this asset list entry
-	 */
-	@AutoEscape
-	public String getTypeSettings();
-
-	/**
-	 * Sets the type settings of this asset list entry.
-	 *
-	 * @param typeSettings the type settings of this asset list entry
-	 */
-	public void setTypeSettings(String typeSettings);
-
-	/**
 	 * Returns the last publish date of this asset list entry.
 	 *
 	 * @return the last publish date of this asset list entry
@@ -260,4 +261,5 @@ public interface AssetListEntryModel extends BaseModel<AssetListEntry>,
 	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate);
+
 }

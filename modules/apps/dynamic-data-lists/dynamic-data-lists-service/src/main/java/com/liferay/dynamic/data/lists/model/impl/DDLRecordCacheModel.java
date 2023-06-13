@@ -17,10 +17,8 @@ package com.liferay.dynamic.data.lists.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecord;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 
@@ -38,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class DDLRecordCacheModel implements CacheModel<DDLRecord>,
-	Externalizable, MVCCModel {
+public class DDLRecordCacheModel
+	implements CacheModel<DDLRecord>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -53,7 +52,8 @@ public class DDLRecordCacheModel implements CacheModel<DDLRecord>,
 		DDLRecordCacheModel ddlRecordCacheModel = (DDLRecordCacheModel)obj;
 
 		if ((recordId == ddlRecordCacheModel.recordId) &&
-				(mvccVersion == ddlRecordCacheModel.mvccVersion)) {
+			(mvccVersion == ddlRecordCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -229,8 +229,7 @@ public class DDLRecordCacheModel implements CacheModel<DDLRecord>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -306,4 +305,5 @@ public class DDLRecordCacheModel implements CacheModel<DDLRecord>,
 	public String version;
 	public int displayIndex;
 	public long lastPublishDate;
+
 }

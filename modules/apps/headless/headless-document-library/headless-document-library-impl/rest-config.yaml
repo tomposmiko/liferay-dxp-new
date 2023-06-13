@@ -5,4 +5,5 @@ application:
     className: "HeadlessDocumentLibraryApplication"
     name: "Liferay.Headless.Document.Library"
 author: "Javier Gamarra"
+clientDir: "../headless-document-library-client/src/main/java"
 testDir: "../headless-document-library-test/src/testIntegration/java"

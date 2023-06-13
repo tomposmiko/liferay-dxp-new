@@ -17,7 +17,6 @@ package com.liferay.journal.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.journal.service.JournalFeedServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -64,23 +63,28 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class JournalFeedServiceSoap {
-	public static com.liferay.journal.model.JournalFeedSoap addFeed(
-		long groupId, String feedId, boolean autoFeedId, String name,
-		String description, String ddmStructureKey, String ddmTemplateKey,
-		String ddmRendererTemplateKey, int delta, String orderByCol,
-		String orderByType, String targetLayoutFriendlyUrl,
-		String targetPortletId, String contentField, String feedType,
-		double feedVersion,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-		try {
-			com.liferay.journal.model.JournalFeed returnValue = JournalFeedServiceUtil.addFeed(groupId,
-					feedId, autoFeedId, name, description, ddmStructureKey,
-					ddmTemplateKey, ddmRendererTemplateKey, delta, orderByCol,
-					orderByType, targetLayoutFriendlyUrl, targetPortletId,
-					contentField, feedType, feedVersion, serviceContext);
 
-			return com.liferay.journal.model.JournalFeedSoap.toSoapModel(returnValue);
+	public static com.liferay.journal.model.JournalFeedSoap addFeed(
+			long groupId, String feedId, boolean autoFeedId, String name,
+			String description, String ddmStructureKey, String ddmTemplateKey,
+			String ddmRendererTemplateKey, int delta, String orderByCol,
+			String orderByType, String targetLayoutFriendlyUrl,
+			String targetPortletId, String contentField, String feedType,
+			double feedVersion,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.journal.model.JournalFeed returnValue =
+				JournalFeedServiceUtil.addFeed(
+					groupId, feedId, autoFeedId, name, description,
+					ddmStructureKey, ddmTemplateKey, ddmRendererTemplateKey,
+					delta, orderByCol, orderByType, targetLayoutFriendlyUrl,
+					targetPortletId, contentField, feedType, feedVersion,
+					serviceContext);
+
+			return com.liferay.journal.model.JournalFeedSoap.toSoapModel(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -102,6 +106,7 @@ public class JournalFeedServiceSoap {
 
 	public static void deleteFeed(long groupId, String feedId)
 		throws RemoteException {
+
 		try {
 			JournalFeedServiceUtil.deleteFeed(groupId, feedId);
 		}
@@ -114,10 +119,13 @@ public class JournalFeedServiceSoap {
 
 	public static com.liferay.journal.model.JournalFeedSoap getFeed(long feedId)
 		throws RemoteException {
-		try {
-			com.liferay.journal.model.JournalFeed returnValue = JournalFeedServiceUtil.getFeed(feedId);
 
-			return com.liferay.journal.model.JournalFeedSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.journal.model.JournalFeed returnValue =
+				JournalFeedServiceUtil.getFeed(feedId);
+
+			return com.liferay.journal.model.JournalFeedSoap.toSoapModel(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -127,12 +135,15 @@ public class JournalFeedServiceSoap {
 	}
 
 	public static com.liferay.journal.model.JournalFeedSoap getFeed(
-		long groupId, String feedId) throws RemoteException {
-		try {
-			com.liferay.journal.model.JournalFeed returnValue = JournalFeedServiceUtil.getFeed(groupId,
-					feedId);
+			long groupId, String feedId)
+		throws RemoteException {
 
-			return com.liferay.journal.model.JournalFeedSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.journal.model.JournalFeed returnValue =
+				JournalFeedServiceUtil.getFeed(groupId, feedId);
+
+			return com.liferay.journal.model.JournalFeedSoap.toSoapModel(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -142,22 +153,25 @@ public class JournalFeedServiceSoap {
 	}
 
 	public static com.liferay.journal.model.JournalFeedSoap updateFeed(
-		long groupId, String feedId, String name, String description,
-		String ddmStructureKey, String ddmTemplateKey,
-		String ddmRendererTemplateKey, int delta, String orderByCol,
-		String orderByType, String targetLayoutFriendlyUrl,
-		String targetPortletId, String contentField, String feedType,
-		double feedVersion,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			long groupId, String feedId, String name, String description,
+			String ddmStructureKey, String ddmTemplateKey,
+			String ddmRendererTemplateKey, int delta, String orderByCol,
+			String orderByType, String targetLayoutFriendlyUrl,
+			String targetPortletId, String contentField, String feedType,
+			double feedVersion,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
-		try {
-			com.liferay.journal.model.JournalFeed returnValue = JournalFeedServiceUtil.updateFeed(groupId,
-					feedId, name, description, ddmStructureKey, ddmTemplateKey,
-					ddmRendererTemplateKey, delta, orderByCol, orderByType,
-					targetLayoutFriendlyUrl, targetPortletId, contentField,
-					feedType, feedVersion, serviceContext);
 
-			return com.liferay.journal.model.JournalFeedSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.journal.model.JournalFeed returnValue =
+				JournalFeedServiceUtil.updateFeed(
+					groupId, feedId, name, description, ddmStructureKey,
+					ddmTemplateKey, ddmRendererTemplateKey, delta, orderByCol,
+					orderByType, targetLayoutFriendlyUrl, targetPortletId,
+					contentField, feedType, feedVersion, serviceContext);
+
+			return com.liferay.journal.model.JournalFeedSoap.toSoapModel(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -166,5 +180,7 @@ public class JournalFeedServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(JournalFeedServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		JournalFeedServiceSoap.class);
+
 }

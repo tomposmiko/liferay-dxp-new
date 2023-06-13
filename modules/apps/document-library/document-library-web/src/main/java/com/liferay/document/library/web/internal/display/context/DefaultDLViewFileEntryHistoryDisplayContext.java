@@ -65,6 +65,7 @@ public class DefaultDLViewFileEntryHistoryDisplayContext
 		menu.setMenuItems(_getMenuItems());
 		menu.setScroll(false);
 		menu.setShowWhenSingleIcon(true);
+		menu.setTriggerCssClass("component-action");
 
 		return menu;
 	}
@@ -87,8 +88,6 @@ public class DefaultDLViewFileEntryHistoryDisplayContext
 			_uiItemsBuilder.addDeleteVersionMenuItem(menuItems);
 
 			_uiItemsBuilder.addCompareToMenuItem(menuItems);
-
-			_uiItemsBuilder.addPublishMenuItem(menuItems, false);
 		}
 
 		return menuItems;

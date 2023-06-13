@@ -32,8 +32,9 @@ import com.liferay.blogs.service.BlogsStatsUserLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class BlogsStatsUserBaseImpl extends BlogsStatsUserModelImpl
-	implements BlogsStatsUser {
+public abstract class BlogsStatsUserBaseImpl
+	extends BlogsStatsUserModelImpl implements BlogsStatsUser {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class BlogsStatsUserBaseImpl extends BlogsStatsUserModelImpl
 			BlogsStatsUserLocalServiceUtil.updateBlogsStatsUser(this);
 		}
 	}
+
 }

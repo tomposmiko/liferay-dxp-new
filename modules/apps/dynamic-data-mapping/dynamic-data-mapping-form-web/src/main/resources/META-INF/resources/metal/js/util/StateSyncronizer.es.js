@@ -1,8 +1,8 @@
+import * as FormSupport from 'dynamic-data-mapping-form-builder/metal/js/components/Form/FormSupport.es';
+import Component from 'metal-jsx';
 import {Config} from 'metal-state';
 import {EventHandler} from 'metal-events';
 import {PagesVisitor} from 'dynamic-data-mapping-form-builder/metal/js/util/visitors.es';
-import Component from 'metal-jsx';
-import FormSupport from 'dynamic-data-mapping-form-builder/metal/js/components/Form/FormSupport.es';
 
 class StateSyncronizer extends Component {
 	static PROPS = {
@@ -82,18 +82,60 @@ class StateSyncronizer extends Component {
 
 		const visitor = new PagesVisitor(state.pages);
 
+		const pages = visitor.mapPages(
+			page => {
+				return {
+					...page,
+					description: page.localizedDescription,
+					title: page.localizedTitle
+				};
+			}
+		);
+
+		visitor.setPages(pages);
+
 		return JSON.stringify(
 			{
 				...state,
-				pages: visitor.mapPages(
-					page => {
-						return {
-							...page,
-							description: page.localizedDescription,
-							title: page.localizedTitle
-						};
+				pages: visitor.mapFields(
+					field => {
+						if (field.options) {
+							field = {
+								...field,
+								settingsContext: {
+									...field.settingsContext,
+									pages: this._filterEmptyOptions(field.settingsContext.pages)
+								}
+							};
+						}
+
+						return field;
 					}
 				)
+			}
+		);
+	}
+
+	_filterEmptyOptions(pages) {
+		const visitor = new PagesVisitor(pages);
+
+		return visitor.mapFields(
+			field => {
+				if (field.type === 'options') {
+					const {value} = field;
+					const newValue = {};
+
+					for (const locale in value) {
+						newValue[locale] = value[locale].filter(({value}) => value !== '');
+					}
+
+					field = {
+						...field,
+						value: newValue
+					};
+				}
+
+				return field;
 			}
 		);
 	}

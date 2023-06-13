@@ -21,9 +21,9 @@ import com.liferay.asset.list.model.AssetListEntryUsage;
 import com.liferay.asset.list.model.impl.AssetListEntryUsageImpl;
 import com.liferay.asset.list.model.impl.AssetListEntryUsageModelImpl;
 import com.liferay.asset.list.service.persistence.AssetListEntryUsagePersistence;
-
+import com.liferay.asset.list.service.persistence.impl.constants.AssetListPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
-
+import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -38,12 +39,12 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
@@ -51,10 +52,18 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The persistence implementation for the asset list entry usage service.
@@ -66,19 +75,26 @@ import java.util.Set;
  * @author Brian Wing Shun Chan
  * @generated
  */
+@Component(service = AssetListEntryUsagePersistence.class)
 @ProviderType
-public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<AssetListEntryUsage>
+public class AssetListEntryUsagePersistenceImpl
+	extends BasePersistenceImpl<AssetListEntryUsage>
 	implements AssetListEntryUsagePersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>AssetListEntryUsageUtil</code> to access the asset list entry usage persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = AssetListEntryUsageImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		AssetListEntryUsageImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -110,7 +126,9 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the range of matching asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findByUuid(String uuid, int start, int end) {
+	public List<AssetListEntryUsage> findByUuid(
+		String uuid, int start, int end) {
+
 		return findByUuid(uuid, start, end, null);
 	}
 
@@ -128,8 +146,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the ordered range of matching asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findByUuid(String uuid, int start,
-		int end, OrderByComparator<AssetListEntryUsage> orderByComparator) {
+	public List<AssetListEntryUsage> findByUuid(
+		String uuid, int start, int end,
+		OrderByComparator<AssetListEntryUsage> orderByComparator) {
+
 		return findByUuid(uuid, start, end, orderByComparator, true);
 	}
 
@@ -148,9 +168,11 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the ordered range of matching asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findByUuid(String uuid, int start,
-		int end, OrderByComparator<AssetListEntryUsage> orderByComparator,
+	public List<AssetListEntryUsage> findByUuid(
+		String uuid, int start, int end,
+		OrderByComparator<AssetListEntryUsage> orderByComparator,
 		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -158,21 +180,22 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] { uuid };
+			finderArgs = new Object[] {uuid};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid;
-			finderArgs = new Object[] { uuid, start, end, orderByComparator };
+			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<AssetListEntryUsage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AssetListEntryUsage>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<AssetListEntryUsage>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetListEntryUsage assetListEntryUsage : list) {
@@ -189,8 +212,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -210,11 +233,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(AssetListEntryUsageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -234,16 +256,16 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				}
 
 				if (!pagination) {
-					list = (List<AssetListEntryUsage>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<AssetListEntryUsage>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AssetListEntryUsage>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<AssetListEntryUsage>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -272,11 +294,13 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @throws NoSuchEntryUsageException if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage findByUuid_First(String uuid,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+	public AssetListEntryUsage findByUuid_First(
+			String uuid,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = fetchByUuid_First(uuid,
-				orderByComparator);
+
+		AssetListEntryUsage assetListEntryUsage = fetchByUuid_First(
+			uuid, orderByComparator);
 
 		if (assetListEntryUsage != null) {
 			return assetListEntryUsage;
@@ -302,10 +326,11 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the first matching asset list entry usage, or <code>null</code> if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage fetchByUuid_First(String uuid,
-		OrderByComparator<AssetListEntryUsage> orderByComparator) {
-		List<AssetListEntryUsage> list = findByUuid(uuid, 0, 1,
-				orderByComparator);
+	public AssetListEntryUsage fetchByUuid_First(
+		String uuid, OrderByComparator<AssetListEntryUsage> orderByComparator) {
+
+		List<AssetListEntryUsage> list = findByUuid(
+			uuid, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -323,11 +348,13 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @throws NoSuchEntryUsageException if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage findByUuid_Last(String uuid,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+	public AssetListEntryUsage findByUuid_Last(
+			String uuid,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = fetchByUuid_Last(uuid,
-				orderByComparator);
+
+		AssetListEntryUsage assetListEntryUsage = fetchByUuid_Last(
+			uuid, orderByComparator);
 
 		if (assetListEntryUsage != null) {
 			return assetListEntryUsage;
@@ -353,16 +380,17 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the last matching asset list entry usage, or <code>null</code> if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage fetchByUuid_Last(String uuid,
-		OrderByComparator<AssetListEntryUsage> orderByComparator) {
+	public AssetListEntryUsage fetchByUuid_Last(
+		String uuid, OrderByComparator<AssetListEntryUsage> orderByComparator) {
+
 		int count = countByUuid(uuid);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AssetListEntryUsage> list = findByUuid(uuid, count - 1, count,
-				orderByComparator);
+		List<AssetListEntryUsage> list = findByUuid(
+			uuid, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -382,12 +410,14 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public AssetListEntryUsage[] findByUuid_PrevAndNext(
-		long assetListEntryUsageId, String uuid,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+			long assetListEntryUsageId, String uuid,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
+
 		uuid = Objects.toString(uuid, "");
 
-		AssetListEntryUsage assetListEntryUsage = findByPrimaryKey(assetListEntryUsageId);
+		AssetListEntryUsage assetListEntryUsage = findByPrimaryKey(
+			assetListEntryUsageId);
 
 		Session session = null;
 
@@ -396,13 +426,13 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 			AssetListEntryUsage[] array = new AssetListEntryUsageImpl[3];
 
-			array[0] = getByUuid_PrevAndNext(session, assetListEntryUsage,
-					uuid, orderByComparator, true);
+			array[0] = getByUuid_PrevAndNext(
+				session, assetListEntryUsage, uuid, orderByComparator, true);
 
 			array[1] = assetListEntryUsage;
 
-			array[2] = getByUuid_PrevAndNext(session, assetListEntryUsage,
-					uuid, orderByComparator, false);
+			array[2] = getByUuid_PrevAndNext(
+				session, assetListEntryUsage, uuid, orderByComparator, false);
 
 			return array;
 		}
@@ -414,15 +444,16 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		}
 	}
 
-	protected AssetListEntryUsage getByUuid_PrevAndNext(Session session,
-		AssetListEntryUsage assetListEntryUsage, String uuid,
+	protected AssetListEntryUsage getByUuid_PrevAndNext(
+		Session session, AssetListEntryUsage assetListEntryUsage, String uuid,
 		OrderByComparator<AssetListEntryUsage> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -443,7 +474,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -515,8 +547,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					assetListEntryUsage)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						assetListEntryUsage)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -538,8 +572,9 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public void removeByUuid(String uuid) {
-		for (AssetListEntryUsage assetListEntryUsage : findByUuid(uuid,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (AssetListEntryUsage assetListEntryUsage :
+				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(assetListEntryUsage);
 		}
 	}
@@ -556,7 +591,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 		FinderPath finderPath = _finderPathCountByUuid;
 
-		Object[] finderArgs = new Object[] { uuid };
+		Object[] finderArgs = new Object[] {uuid};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -608,8 +643,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_UUID_2 = "assetListEntryUsage.uuid = ?";
-	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(assetListEntryUsage.uuid IS NULL OR assetListEntryUsage.uuid = '')";
+	private static final String _FINDER_COLUMN_UUID_UUID_2 =
+		"assetListEntryUsage.uuid = ?";
+
+	private static final String _FINDER_COLUMN_UUID_UUID_3 =
+		"(assetListEntryUsage.uuid IS NULL OR assetListEntryUsage.uuid = '')";
+
 	private FinderPath _finderPathFetchByUUID_G;
 	private FinderPath _finderPathCountByUUID_G;
 
@@ -624,6 +663,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	@Override
 	public AssetListEntryUsage findByUUID_G(String uuid, long groupId)
 		throws NoSuchEntryUsageException {
+
 		AssetListEntryUsage assetListEntryUsage = fetchByUUID_G(uuid, groupId);
 
 		if (assetListEntryUsage == null) {
@@ -670,24 +710,27 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the matching asset list entry usage, or <code>null</code> if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage fetchByUUID_G(String uuid, long groupId,
-		boolean retrieveFromCache) {
+	public AssetListEntryUsage fetchByUUID_G(
+		String uuid, long groupId, boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
-		Object[] finderArgs = new Object[] { uuid, groupId };
+		Object[] finderArgs = new Object[] {uuid, groupId};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(_finderPathFetchByUUID_G,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByUUID_G, finderArgs, this);
 		}
 
 		if (result instanceof AssetListEntryUsage) {
-			AssetListEntryUsage assetListEntryUsage = (AssetListEntryUsage)result;
+			AssetListEntryUsage assetListEntryUsage =
+				(AssetListEntryUsage)result;
 
 			if (!Objects.equals(uuid, assetListEntryUsage.getUuid()) ||
-					(groupId != assetListEntryUsage.getGroupId())) {
+				(groupId != assetListEntryUsage.getGroupId())) {
+
 				result = null;
 			}
 		}
@@ -730,8 +773,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				List<AssetListEntryUsage> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(_finderPathFetchByUUID_G, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByUUID_G, finderArgs, list);
 				}
 				else {
 					AssetListEntryUsage assetListEntryUsage = list.get(0);
@@ -769,6 +812,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	@Override
 	public AssetListEntryUsage removeByUUID_G(String uuid, long groupId)
 		throws NoSuchEntryUsageException {
+
 		AssetListEntryUsage assetListEntryUsage = findByUUID_G(uuid, groupId);
 
 		return remove(assetListEntryUsage);
@@ -787,7 +831,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 		FinderPath finderPath = _finderPathCountByUUID_G;
 
-		Object[] finderArgs = new Object[] { uuid, groupId };
+		Object[] finderArgs = new Object[] {uuid, groupId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -843,9 +887,15 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "assetListEntryUsage.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(assetListEntryUsage.uuid IS NULL OR assetListEntryUsage.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "assetListEntryUsage.groupId = ?";
+	private static final String _FINDER_COLUMN_UUID_G_UUID_2 =
+		"assetListEntryUsage.uuid = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_G_UUID_3 =
+		"(assetListEntryUsage.uuid IS NULL OR assetListEntryUsage.uuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 =
+		"assetListEntryUsage.groupId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -859,8 +909,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public List<AssetListEntryUsage> findByUuid_C(String uuid, long companyId) {
-		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByUuid_C(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -877,8 +927,9 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the range of matching asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findByUuid_C(String uuid, long companyId,
-		int start, int end) {
+	public List<AssetListEntryUsage> findByUuid_C(
+		String uuid, long companyId, int start, int end) {
+
 		return findByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -897,10 +948,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the ordered range of matching asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findByUuid_C(String uuid, long companyId,
-		int start, int end,
+	public List<AssetListEntryUsage> findByUuid_C(
+		String uuid, long companyId, int start, int end,
 		OrderByComparator<AssetListEntryUsage> orderByComparator) {
-		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
+
+		return findByUuid_C(
+			uuid, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -919,10 +972,11 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the ordered range of matching asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findByUuid_C(String uuid, long companyId,
-		int start, int end,
+	public List<AssetListEntryUsage> findByUuid_C(
+		String uuid, long companyId, int start, int end,
 		OrderByComparator<AssetListEntryUsage> orderByComparator,
 		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -930,30 +984,30 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] { uuid, companyId };
+			finderArgs = new Object[] {uuid, companyId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
-					uuid, companyId,
-					
-					start, end, orderByComparator
-				};
+				uuid, companyId, start, end, orderByComparator
+			};
 		}
 
 		List<AssetListEntryUsage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AssetListEntryUsage>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<AssetListEntryUsage>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetListEntryUsage assetListEntryUsage : list) {
 					if (!uuid.equals(assetListEntryUsage.getUuid()) ||
-							(companyId != assetListEntryUsage.getCompanyId())) {
+						(companyId != assetListEntryUsage.getCompanyId())) {
+
 						list = null;
 
 						break;
@@ -966,8 +1020,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -989,11 +1043,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(AssetListEntryUsageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1015,16 +1068,16 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<AssetListEntryUsage>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<AssetListEntryUsage>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AssetListEntryUsage>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<AssetListEntryUsage>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1054,11 +1107,13 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @throws NoSuchEntryUsageException if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage findByUuid_C_First(String uuid, long companyId,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+	public AssetListEntryUsage findByUuid_C_First(
+			String uuid, long companyId,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = fetchByUuid_C_First(uuid,
-				companyId, orderByComparator);
+
+		AssetListEntryUsage assetListEntryUsage = fetchByUuid_C_First(
+			uuid, companyId, orderByComparator);
 
 		if (assetListEntryUsage != null) {
 			return assetListEntryUsage;
@@ -1088,10 +1143,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the first matching asset list entry usage, or <code>null</code> if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage fetchByUuid_C_First(String uuid, long companyId,
+	public AssetListEntryUsage fetchByUuid_C_First(
+		String uuid, long companyId,
 		OrderByComparator<AssetListEntryUsage> orderByComparator) {
-		List<AssetListEntryUsage> list = findByUuid_C(uuid, companyId, 0, 1,
-				orderByComparator);
+
+		List<AssetListEntryUsage> list = findByUuid_C(
+			uuid, companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1110,11 +1167,13 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @throws NoSuchEntryUsageException if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage findByUuid_C_Last(String uuid, long companyId,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+	public AssetListEntryUsage findByUuid_C_Last(
+			String uuid, long companyId,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = fetchByUuid_C_Last(uuid,
-				companyId, orderByComparator);
+
+		AssetListEntryUsage assetListEntryUsage = fetchByUuid_C_Last(
+			uuid, companyId, orderByComparator);
 
 		if (assetListEntryUsage != null) {
 			return assetListEntryUsage;
@@ -1144,16 +1203,18 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the last matching asset list entry usage, or <code>null</code> if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage fetchByUuid_C_Last(String uuid, long companyId,
+	public AssetListEntryUsage fetchByUuid_C_Last(
+		String uuid, long companyId,
 		OrderByComparator<AssetListEntryUsage> orderByComparator) {
+
 		int count = countByUuid_C(uuid, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AssetListEntryUsage> list = findByUuid_C(uuid, companyId,
-				count - 1, count, orderByComparator);
+		List<AssetListEntryUsage> list = findByUuid_C(
+			uuid, companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1174,12 +1235,14 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public AssetListEntryUsage[] findByUuid_C_PrevAndNext(
-		long assetListEntryUsageId, String uuid, long companyId,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+			long assetListEntryUsageId, String uuid, long companyId,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
+
 		uuid = Objects.toString(uuid, "");
 
-		AssetListEntryUsage assetListEntryUsage = findByPrimaryKey(assetListEntryUsageId);
+		AssetListEntryUsage assetListEntryUsage = findByPrimaryKey(
+			assetListEntryUsageId);
 
 		Session session = null;
 
@@ -1188,13 +1251,15 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 			AssetListEntryUsage[] array = new AssetListEntryUsageImpl[3];
 
-			array[0] = getByUuid_C_PrevAndNext(session, assetListEntryUsage,
-					uuid, companyId, orderByComparator, true);
+			array[0] = getByUuid_C_PrevAndNext(
+				session, assetListEntryUsage, uuid, companyId,
+				orderByComparator, true);
 
 			array[1] = assetListEntryUsage;
 
-			array[2] = getByUuid_C_PrevAndNext(session, assetListEntryUsage,
-					uuid, companyId, orderByComparator, false);
+			array[2] = getByUuid_C_PrevAndNext(
+				session, assetListEntryUsage, uuid, companyId,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -1206,15 +1271,17 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		}
 	}
 
-	protected AssetListEntryUsage getByUuid_C_PrevAndNext(Session session,
-		AssetListEntryUsage assetListEntryUsage, String uuid, long companyId,
+	protected AssetListEntryUsage getByUuid_C_PrevAndNext(
+		Session session, AssetListEntryUsage assetListEntryUsage, String uuid,
+		long companyId,
 		OrderByComparator<AssetListEntryUsage> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1237,7 +1304,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1311,8 +1379,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					assetListEntryUsage)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						assetListEntryUsage)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1335,8 +1405,11 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public void removeByUuid_C(String uuid, long companyId) {
-		for (AssetListEntryUsage assetListEntryUsage : findByUuid_C(uuid,
-				companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (AssetListEntryUsage assetListEntryUsage :
+				findByUuid_C(
+					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(assetListEntryUsage);
 		}
 	}
@@ -1354,7 +1427,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		Object[] finderArgs = new Object[] { uuid, companyId };
+		Object[] finderArgs = new Object[] {uuid, companyId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1410,9 +1483,15 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "assetListEntryUsage.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(assetListEntryUsage.uuid IS NULL OR assetListEntryUsage.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "assetListEntryUsage.companyId = ?";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
+		"assetListEntryUsage.uuid = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
+		"(assetListEntryUsage.uuid IS NULL OR assetListEntryUsage.uuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
+		"assetListEntryUsage.companyId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByAssetListEntryId;
 	private FinderPath _finderPathWithoutPaginationFindByAssetListEntryId;
 	private FinderPath _finderPathCountByAssetListEntryId;
@@ -1426,8 +1505,9 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	@Override
 	public List<AssetListEntryUsage> findByAssetListEntryId(
 		long assetListEntryId) {
-		return findByAssetListEntryId(assetListEntryId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+
+		return findByAssetListEntryId(
+			assetListEntryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -1445,6 +1525,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	@Override
 	public List<AssetListEntryUsage> findByAssetListEntryId(
 		long assetListEntryId, int start, int end) {
+
 		return findByAssetListEntryId(assetListEntryId, start, end, null);
 	}
 
@@ -1465,8 +1546,9 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	public List<AssetListEntryUsage> findByAssetListEntryId(
 		long assetListEntryId, int start, int end,
 		OrderByComparator<AssetListEntryUsage> orderByComparator) {
-		return findByAssetListEntryId(assetListEntryId, start, end,
-			orderByComparator, true);
+
+		return findByAssetListEntryId(
+			assetListEntryId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -1488,34 +1570,36 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		long assetListEntryId, int start, int end,
 		OrderByComparator<AssetListEntryUsage> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByAssetListEntryId;
-			finderArgs = new Object[] { assetListEntryId };
+			finderArgs = new Object[] {assetListEntryId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByAssetListEntryId;
 			finderArgs = new Object[] {
-					assetListEntryId,
-					
-					start, end, orderByComparator
-				};
+				assetListEntryId, start, end, orderByComparator
+			};
 		}
 
 		List<AssetListEntryUsage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AssetListEntryUsage>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<AssetListEntryUsage>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetListEntryUsage assetListEntryUsage : list) {
-					if ((assetListEntryId != assetListEntryUsage.getAssetListEntryId())) {
+					if ((assetListEntryId !=
+							assetListEntryUsage.getAssetListEntryId())) {
+
 						list = null;
 
 						break;
@@ -1528,8 +1612,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1540,11 +1624,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 			query.append(_FINDER_COLUMN_ASSETLISTENTRYID_ASSETLISTENTRYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(AssetListEntryUsageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1562,16 +1645,16 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				qPos.add(assetListEntryId);
 
 				if (!pagination) {
-					list = (List<AssetListEntryUsage>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<AssetListEntryUsage>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AssetListEntryUsage>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<AssetListEntryUsage>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1601,11 +1684,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public AssetListEntryUsage findByAssetListEntryId_First(
-		long assetListEntryId,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+			long assetListEntryId,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = fetchByAssetListEntryId_First(assetListEntryId,
-				orderByComparator);
+
+		AssetListEntryUsage assetListEntryUsage = fetchByAssetListEntryId_First(
+			assetListEntryId, orderByComparator);
 
 		if (assetListEntryUsage != null) {
 			return assetListEntryUsage;
@@ -1634,8 +1718,9 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	public AssetListEntryUsage fetchByAssetListEntryId_First(
 		long assetListEntryId,
 		OrderByComparator<AssetListEntryUsage> orderByComparator) {
-		List<AssetListEntryUsage> list = findByAssetListEntryId(assetListEntryId,
-				0, 1, orderByComparator);
+
+		List<AssetListEntryUsage> list = findByAssetListEntryId(
+			assetListEntryId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1654,11 +1739,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public AssetListEntryUsage findByAssetListEntryId_Last(
-		long assetListEntryId,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+			long assetListEntryId,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = fetchByAssetListEntryId_Last(assetListEntryId,
-				orderByComparator);
+
+		AssetListEntryUsage assetListEntryUsage = fetchByAssetListEntryId_Last(
+			assetListEntryId, orderByComparator);
 
 		if (assetListEntryUsage != null) {
 			return assetListEntryUsage;
@@ -1687,14 +1773,15 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	public AssetListEntryUsage fetchByAssetListEntryId_Last(
 		long assetListEntryId,
 		OrderByComparator<AssetListEntryUsage> orderByComparator) {
+
 		int count = countByAssetListEntryId(assetListEntryId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AssetListEntryUsage> list = findByAssetListEntryId(assetListEntryId,
-				count - 1, count, orderByComparator);
+		List<AssetListEntryUsage> list = findByAssetListEntryId(
+			assetListEntryId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1714,10 +1801,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public AssetListEntryUsage[] findByAssetListEntryId_PrevAndNext(
-		long assetListEntryUsageId, long assetListEntryId,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+			long assetListEntryUsageId, long assetListEntryId,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = findByPrimaryKey(assetListEntryUsageId);
+
+		AssetListEntryUsage assetListEntryUsage = findByPrimaryKey(
+			assetListEntryUsageId);
 
 		Session session = null;
 
@@ -1726,15 +1815,15 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 			AssetListEntryUsage[] array = new AssetListEntryUsageImpl[3];
 
-			array[0] = getByAssetListEntryId_PrevAndNext(session,
-					assetListEntryUsage, assetListEntryId, orderByComparator,
-					true);
+			array[0] = getByAssetListEntryId_PrevAndNext(
+				session, assetListEntryUsage, assetListEntryId,
+				orderByComparator, true);
 
 			array[1] = assetListEntryUsage;
 
-			array[2] = getByAssetListEntryId_PrevAndNext(session,
-					assetListEntryUsage, assetListEntryId, orderByComparator,
-					false);
+			array[2] = getByAssetListEntryId_PrevAndNext(
+				session, assetListEntryUsage, assetListEntryId,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -1751,11 +1840,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		long assetListEntryId,
 		OrderByComparator<AssetListEntryUsage> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1767,7 +1857,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		query.append(_FINDER_COLUMN_ASSETLISTENTRYID_ASSETLISTENTRYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1837,8 +1928,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		qPos.add(assetListEntryId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					assetListEntryUsage)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						assetListEntryUsage)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1860,8 +1953,11 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public void removeByAssetListEntryId(long assetListEntryId) {
-		for (AssetListEntryUsage assetListEntryUsage : findByAssetListEntryId(
-				assetListEntryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (AssetListEntryUsage assetListEntryUsage :
+				findByAssetListEntryId(
+					assetListEntryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(assetListEntryUsage);
 		}
 	}
@@ -1876,7 +1972,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	public int countByAssetListEntryId(long assetListEntryId) {
 		FinderPath finderPath = _finderPathCountByAssetListEntryId;
 
-		Object[] finderArgs = new Object[] { assetListEntryId };
+		Object[] finderArgs = new Object[] {assetListEntryId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1917,8 +2013,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_ASSETLISTENTRYID_ASSETLISTENTRYID_2 =
-		"assetListEntryUsage.assetListEntryId = ?";
+	private static final String
+		_FINDER_COLUMN_ASSETLISTENTRYID_ASSETLISTENTRYID_2 =
+			"assetListEntryUsage.assetListEntryId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByA_C;
 	private FinderPath _finderPathWithoutPaginationFindByA_C;
 	private FinderPath _finderPathCountByA_C;
@@ -1931,10 +2029,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the matching asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findByA_C(long assetListEntryId,
-		long classNameId) {
-		return findByA_C(assetListEntryId, classNameId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<AssetListEntryUsage> findByA_C(
+		long assetListEntryId, long classNameId) {
+
+		return findByA_C(
+			assetListEntryId, classNameId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -1951,8 +2051,9 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the range of matching asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findByA_C(long assetListEntryId,
-		long classNameId, int start, int end) {
+	public List<AssetListEntryUsage> findByA_C(
+		long assetListEntryId, long classNameId, int start, int end) {
+
 		return findByA_C(assetListEntryId, classNameId, start, end, null);
 	}
 
@@ -1971,11 +2072,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the ordered range of matching asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findByA_C(long assetListEntryId,
-		long classNameId, int start, int end,
+	public List<AssetListEntryUsage> findByA_C(
+		long assetListEntryId, long classNameId, int start, int end,
 		OrderByComparator<AssetListEntryUsage> orderByComparator) {
-		return findByA_C(assetListEntryId, classNameId, start, end,
-			orderByComparator, true);
+
+		return findByA_C(
+			assetListEntryId, classNameId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -1994,39 +2096,41 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the ordered range of matching asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findByA_C(long assetListEntryId,
-		long classNameId, int start, int end,
+	public List<AssetListEntryUsage> findByA_C(
+		long assetListEntryId, long classNameId, int start, int end,
 		OrderByComparator<AssetListEntryUsage> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByA_C;
-			finderArgs = new Object[] { assetListEntryId, classNameId };
+			finderArgs = new Object[] {assetListEntryId, classNameId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByA_C;
 			finderArgs = new Object[] {
-					assetListEntryId, classNameId,
-					
-					start, end, orderByComparator
-				};
+				assetListEntryId, classNameId, start, end, orderByComparator
+			};
 		}
 
 		List<AssetListEntryUsage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AssetListEntryUsage>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<AssetListEntryUsage>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetListEntryUsage assetListEntryUsage : list) {
-					if ((assetListEntryId != assetListEntryUsage.getAssetListEntryId()) ||
-							(classNameId != assetListEntryUsage.getClassNameId())) {
+					if ((assetListEntryId !=
+							assetListEntryUsage.getAssetListEntryId()) ||
+						(classNameId != assetListEntryUsage.getClassNameId())) {
+
 						list = null;
 
 						break;
@@ -2039,8 +2143,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -2053,11 +2157,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 			query.append(_FINDER_COLUMN_A_C_CLASSNAMEID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(AssetListEntryUsageModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2077,16 +2180,16 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				qPos.add(classNameId);
 
 				if (!pagination) {
-					list = (List<AssetListEntryUsage>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<AssetListEntryUsage>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AssetListEntryUsage>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<AssetListEntryUsage>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2116,12 +2219,13 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @throws NoSuchEntryUsageException if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage findByA_C_First(long assetListEntryId,
-		long classNameId,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+	public AssetListEntryUsage findByA_C_First(
+			long assetListEntryId, long classNameId,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = fetchByA_C_First(assetListEntryId,
-				classNameId, orderByComparator);
+
+		AssetListEntryUsage assetListEntryUsage = fetchByA_C_First(
+			assetListEntryId, classNameId, orderByComparator);
 
 		if (assetListEntryUsage != null) {
 			return assetListEntryUsage;
@@ -2151,11 +2255,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the first matching asset list entry usage, or <code>null</code> if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage fetchByA_C_First(long assetListEntryId,
-		long classNameId,
+	public AssetListEntryUsage fetchByA_C_First(
+		long assetListEntryId, long classNameId,
 		OrderByComparator<AssetListEntryUsage> orderByComparator) {
-		List<AssetListEntryUsage> list = findByA_C(assetListEntryId,
-				classNameId, 0, 1, orderByComparator);
+
+		List<AssetListEntryUsage> list = findByA_C(
+			assetListEntryId, classNameId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2174,12 +2279,13 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @throws NoSuchEntryUsageException if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage findByA_C_Last(long assetListEntryId,
-		long classNameId,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+	public AssetListEntryUsage findByA_C_Last(
+			long assetListEntryId, long classNameId,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = fetchByA_C_Last(assetListEntryId,
-				classNameId, orderByComparator);
+
+		AssetListEntryUsage assetListEntryUsage = fetchByA_C_Last(
+			assetListEntryId, classNameId, orderByComparator);
 
 		if (assetListEntryUsage != null) {
 			return assetListEntryUsage;
@@ -2209,17 +2315,18 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the last matching asset list entry usage, or <code>null</code> if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage fetchByA_C_Last(long assetListEntryId,
-		long classNameId,
+	public AssetListEntryUsage fetchByA_C_Last(
+		long assetListEntryId, long classNameId,
 		OrderByComparator<AssetListEntryUsage> orderByComparator) {
+
 		int count = countByA_C(assetListEntryId, classNameId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<AssetListEntryUsage> list = findByA_C(assetListEntryId,
-				classNameId, count - 1, count, orderByComparator);
+		List<AssetListEntryUsage> list = findByA_C(
+			assetListEntryId, classNameId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2240,10 +2347,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public AssetListEntryUsage[] findByA_C_PrevAndNext(
-		long assetListEntryUsageId, long assetListEntryId, long classNameId,
-		OrderByComparator<AssetListEntryUsage> orderByComparator)
+			long assetListEntryUsageId, long assetListEntryId, long classNameId,
+			OrderByComparator<AssetListEntryUsage> orderByComparator)
 		throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = findByPrimaryKey(assetListEntryUsageId);
+
+		AssetListEntryUsage assetListEntryUsage = findByPrimaryKey(
+			assetListEntryUsageId);
 
 		Session session = null;
 
@@ -2252,13 +2361,15 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 			AssetListEntryUsage[] array = new AssetListEntryUsageImpl[3];
 
-			array[0] = getByA_C_PrevAndNext(session, assetListEntryUsage,
-					assetListEntryId, classNameId, orderByComparator, true);
+			array[0] = getByA_C_PrevAndNext(
+				session, assetListEntryUsage, assetListEntryId, classNameId,
+				orderByComparator, true);
 
 			array[1] = assetListEntryUsage;
 
-			array[2] = getByA_C_PrevAndNext(session, assetListEntryUsage,
-					assetListEntryId, classNameId, orderByComparator, false);
+			array[2] = getByA_C_PrevAndNext(
+				session, assetListEntryUsage, assetListEntryId, classNameId,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -2270,16 +2381,17 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		}
 	}
 
-	protected AssetListEntryUsage getByA_C_PrevAndNext(Session session,
-		AssetListEntryUsage assetListEntryUsage, long assetListEntryId,
-		long classNameId,
+	protected AssetListEntryUsage getByA_C_PrevAndNext(
+		Session session, AssetListEntryUsage assetListEntryUsage,
+		long assetListEntryId, long classNameId,
 		OrderByComparator<AssetListEntryUsage> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2293,7 +2405,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		query.append(_FINDER_COLUMN_A_C_CLASSNAMEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2365,8 +2478,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		qPos.add(classNameId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					assetListEntryUsage)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						assetListEntryUsage)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2389,9 +2504,11 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public void removeByA_C(long assetListEntryId, long classNameId) {
-		for (AssetListEntryUsage assetListEntryUsage : findByA_C(
-				assetListEntryId, classNameId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (AssetListEntryUsage assetListEntryUsage :
+				findByA_C(
+					assetListEntryId, classNameId, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(assetListEntryUsage);
 		}
 	}
@@ -2407,7 +2524,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	public int countByA_C(long assetListEntryId, long classNameId) {
 		FinderPath finderPath = _finderPathCountByA_C;
 
-		Object[] finderArgs = new Object[] { assetListEntryId, classNameId };
+		Object[] finderArgs = new Object[] {assetListEntryId, classNameId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2452,8 +2569,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_A_C_ASSETLISTENTRYID_2 = "assetListEntryUsage.assetListEntryId = ? AND ";
-	private static final String _FINDER_COLUMN_A_C_CLASSNAMEID_2 = "assetListEntryUsage.classNameId = ?";
+	private static final String _FINDER_COLUMN_A_C_ASSETLISTENTRYID_2 =
+		"assetListEntryUsage.assetListEntryId = ? AND ";
+
+	private static final String _FINDER_COLUMN_A_C_CLASSNAMEID_2 =
+		"assetListEntryUsage.classNameId = ?";
+
 	private FinderPath _finderPathFetchByC_C_P;
 	private FinderPath _finderPathCountByC_C_P;
 
@@ -2467,10 +2588,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @throws NoSuchEntryUsageException if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage findByC_C_P(long classNameId, long classPK,
-		String portletId) throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = fetchByC_C_P(classNameId,
-				classPK, portletId);
+	public AssetListEntryUsage findByC_C_P(
+			long classNameId, long classPK, String portletId)
+		throws NoSuchEntryUsageException {
+
+		AssetListEntryUsage assetListEntryUsage = fetchByC_C_P(
+			classNameId, classPK, portletId);
 
 		if (assetListEntryUsage == null) {
 			StringBundler msg = new StringBundler(8);
@@ -2507,8 +2630,9 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the matching asset list entry usage, or <code>null</code> if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage fetchByC_C_P(long classNameId, long classPK,
-		String portletId) {
+	public AssetListEntryUsage fetchByC_C_P(
+		long classNameId, long classPK, String portletId) {
+
 		return fetchByC_C_P(classNameId, classPK, portletId, true);
 	}
 
@@ -2522,26 +2646,30 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the matching asset list entry usage, or <code>null</code> if a matching asset list entry usage could not be found
 	 */
 	@Override
-	public AssetListEntryUsage fetchByC_C_P(long classNameId, long classPK,
-		String portletId, boolean retrieveFromCache) {
+	public AssetListEntryUsage fetchByC_C_P(
+		long classNameId, long classPK, String portletId,
+		boolean retrieveFromCache) {
+
 		portletId = Objects.toString(portletId, "");
 
-		Object[] finderArgs = new Object[] { classNameId, classPK, portletId };
+		Object[] finderArgs = new Object[] {classNameId, classPK, portletId};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(_finderPathFetchByC_C_P, finderArgs,
-					this);
+			result = finderCache.getResult(
+				_finderPathFetchByC_C_P, finderArgs, this);
 		}
 
 		if (result instanceof AssetListEntryUsage) {
-			AssetListEntryUsage assetListEntryUsage = (AssetListEntryUsage)result;
+			AssetListEntryUsage assetListEntryUsage =
+				(AssetListEntryUsage)result;
 
 			if ((classNameId != assetListEntryUsage.getClassNameId()) ||
-					(classPK != assetListEntryUsage.getClassPK()) ||
-					!Objects.equals(portletId,
-						assetListEntryUsage.getPortletId())) {
+				(classPK != assetListEntryUsage.getClassPK()) ||
+				!Objects.equals(
+					portletId, assetListEntryUsage.getPortletId())) {
+
 				result = null;
 			}
 		}
@@ -2588,8 +2716,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				List<AssetListEntryUsage> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(_finderPathFetchByC_C_P, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByC_C_P, finderArgs, list);
 				}
 				else {
 					AssetListEntryUsage assetListEntryUsage = list.get(0);
@@ -2626,10 +2754,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the asset list entry usage that was removed
 	 */
 	@Override
-	public AssetListEntryUsage removeByC_C_P(long classNameId, long classPK,
-		String portletId) throws NoSuchEntryUsageException {
-		AssetListEntryUsage assetListEntryUsage = findByC_C_P(classNameId,
-				classPK, portletId);
+	public AssetListEntryUsage removeByC_C_P(
+			long classNameId, long classPK, String portletId)
+		throws NoSuchEntryUsageException {
+
+		AssetListEntryUsage assetListEntryUsage = findByC_C_P(
+			classNameId, classPK, portletId);
 
 		return remove(assetListEntryUsage);
 	}
@@ -2648,7 +2778,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 		FinderPath finderPath = _finderPathCountByC_C_P;
 
-		Object[] finderArgs = new Object[] { classNameId, classPK, portletId };
+		Object[] finderArgs = new Object[] {classNameId, classPK, portletId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2708,17 +2838,29 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_C_P_CLASSNAMEID_2 = "assetListEntryUsage.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_C_C_P_CLASSPK_2 = "assetListEntryUsage.classPK = ? AND ";
-	private static final String _FINDER_COLUMN_C_C_P_PORTLETID_2 = "assetListEntryUsage.portletId = ?";
-	private static final String _FINDER_COLUMN_C_C_P_PORTLETID_3 = "(assetListEntryUsage.portletId IS NULL OR assetListEntryUsage.portletId = '')";
+	private static final String _FINDER_COLUMN_C_C_P_CLASSNAMEID_2 =
+		"assetListEntryUsage.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_P_CLASSPK_2 =
+		"assetListEntryUsage.classPK = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_P_PORTLETID_2 =
+		"assetListEntryUsage.portletId = ?";
+
+	private static final String _FINDER_COLUMN_C_C_P_PORTLETID_3 =
+		"(assetListEntryUsage.portletId IS NULL OR assetListEntryUsage.portletId = '')";
 
 	public AssetListEntryUsagePersistenceImpl() {
 		setModelClass(AssetListEntryUsage.class);
 
 		setModelImplClass(AssetListEntryUsageImpl.class);
 		setModelPKClass(long.class);
-		setEntityCacheEnabled(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED);
+
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
+		setDBColumnNames(dbColumnNames);
 	}
 
 	/**
@@ -2728,21 +2870,25 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public void cacheResult(AssetListEntryUsage assetListEntryUsage) {
-		entityCache.putResult(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-			AssetListEntryUsageImpl.class, assetListEntryUsage.getPrimaryKey(),
-			assetListEntryUsage);
+		entityCache.putResult(
+			entityCacheEnabled, AssetListEntryUsageImpl.class,
+			assetListEntryUsage.getPrimaryKey(), assetListEntryUsage);
 
-		finderCache.putResult(_finderPathFetchByUUID_G,
+		finderCache.putResult(
+			_finderPathFetchByUUID_G,
 			new Object[] {
 				assetListEntryUsage.getUuid(), assetListEntryUsage.getGroupId()
-			}, assetListEntryUsage);
+			},
+			assetListEntryUsage);
 
-		finderCache.putResult(_finderPathFetchByC_C_P,
+		finderCache.putResult(
+			_finderPathFetchByC_C_P,
 			new Object[] {
 				assetListEntryUsage.getClassNameId(),
 				assetListEntryUsage.getClassPK(),
 				assetListEntryUsage.getPortletId()
-			}, assetListEntryUsage);
+			},
+			assetListEntryUsage);
 
 		assetListEntryUsage.resetOriginalValues();
 	}
@@ -2756,9 +2902,9 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	public void cacheResult(List<AssetListEntryUsage> assetListEntryUsages) {
 		for (AssetListEntryUsage assetListEntryUsage : assetListEntryUsages) {
 			if (entityCache.getResult(
-						AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-						AssetListEntryUsageImpl.class,
-						assetListEntryUsage.getPrimaryKey()) == null) {
+					entityCacheEnabled, AssetListEntryUsageImpl.class,
+					assetListEntryUsage.getPrimaryKey()) == null) {
+
 				cacheResult(assetListEntryUsage);
 			}
 			else {
@@ -2792,14 +2938,15 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public void clearCache(AssetListEntryUsage assetListEntryUsage) {
-		entityCache.removeResult(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-			AssetListEntryUsageImpl.class, assetListEntryUsage.getPrimaryKey());
+		entityCache.removeResult(
+			entityCacheEnabled, AssetListEntryUsageImpl.class,
+			assetListEntryUsage.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((AssetListEntryUsageModelImpl)assetListEntryUsage,
-			true);
+		clearUniqueFindersCache(
+			(AssetListEntryUsageModelImpl)assetListEntryUsage, true);
 	}
 
 	@Override
@@ -2808,58 +2955,62 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (AssetListEntryUsage assetListEntryUsage : assetListEntryUsages) {
-			entityCache.removeResult(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
+			entityCache.removeResult(
+				entityCacheEnabled, AssetListEntryUsageImpl.class,
 				assetListEntryUsage.getPrimaryKey());
 
-			clearUniqueFindersCache((AssetListEntryUsageModelImpl)assetListEntryUsage,
-				true);
+			clearUniqueFindersCache(
+				(AssetListEntryUsageModelImpl)assetListEntryUsage, true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
 		AssetListEntryUsageModelImpl assetListEntryUsageModelImpl) {
-		Object[] args = new Object[] {
-				assetListEntryUsageModelImpl.getUuid(),
-				assetListEntryUsageModelImpl.getGroupId()
-			};
 
-		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1),
+		Object[] args = new Object[] {
+			assetListEntryUsageModelImpl.getUuid(),
+			assetListEntryUsageModelImpl.getGroupId()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByUUID_G, args, assetListEntryUsageModelImpl,
 			false);
-		finderCache.putResult(_finderPathFetchByUUID_G, args,
-			assetListEntryUsageModelImpl, false);
 
 		args = new Object[] {
-				assetListEntryUsageModelImpl.getClassNameId(),
-				assetListEntryUsageModelImpl.getClassPK(),
-				assetListEntryUsageModelImpl.getPortletId()
-			};
+			assetListEntryUsageModelImpl.getClassNameId(),
+			assetListEntryUsageModelImpl.getClassPK(),
+			assetListEntryUsageModelImpl.getPortletId()
+		};
 
-		finderCache.putResult(_finderPathCountByC_C_P, args, Long.valueOf(1),
-			false);
-		finderCache.putResult(_finderPathFetchByC_C_P, args,
-			assetListEntryUsageModelImpl, false);
+		finderCache.putResult(
+			_finderPathCountByC_C_P, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByC_C_P, args, assetListEntryUsageModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		AssetListEntryUsageModelImpl assetListEntryUsageModelImpl,
 		boolean clearCurrent) {
+
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					assetListEntryUsageModelImpl.getUuid(),
-					assetListEntryUsageModelImpl.getGroupId()
-				};
+				assetListEntryUsageModelImpl.getUuid(),
+				assetListEntryUsageModelImpl.getGroupId()
+			};
 
 			finderCache.removeResult(_finderPathCountByUUID_G, args);
 			finderCache.removeResult(_finderPathFetchByUUID_G, args);
 		}
 
 		if ((assetListEntryUsageModelImpl.getColumnBitmask() &
-				_finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
+			 _finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					assetListEntryUsageModelImpl.getOriginalUuid(),
-					assetListEntryUsageModelImpl.getOriginalGroupId()
-				};
+				assetListEntryUsageModelImpl.getOriginalUuid(),
+				assetListEntryUsageModelImpl.getOriginalGroupId()
+			};
 
 			finderCache.removeResult(_finderPathCountByUUID_G, args);
 			finderCache.removeResult(_finderPathFetchByUUID_G, args);
@@ -2867,22 +3018,23 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					assetListEntryUsageModelImpl.getClassNameId(),
-					assetListEntryUsageModelImpl.getClassPK(),
-					assetListEntryUsageModelImpl.getPortletId()
-				};
+				assetListEntryUsageModelImpl.getClassNameId(),
+				assetListEntryUsageModelImpl.getClassPK(),
+				assetListEntryUsageModelImpl.getPortletId()
+			};
 
 			finderCache.removeResult(_finderPathCountByC_C_P, args);
 			finderCache.removeResult(_finderPathFetchByC_C_P, args);
 		}
 
 		if ((assetListEntryUsageModelImpl.getColumnBitmask() &
-				_finderPathFetchByC_C_P.getColumnBitmask()) != 0) {
+			 _finderPathFetchByC_C_P.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					assetListEntryUsageModelImpl.getOriginalClassNameId(),
-					assetListEntryUsageModelImpl.getOriginalClassPK(),
-					assetListEntryUsageModelImpl.getOriginalPortletId()
-				};
+				assetListEntryUsageModelImpl.getOriginalClassNameId(),
+				assetListEntryUsageModelImpl.getOriginalClassPK(),
+				assetListEntryUsageModelImpl.getOriginalPortletId()
+			};
 
 			finderCache.removeResult(_finderPathCountByC_C_P, args);
 			finderCache.removeResult(_finderPathFetchByC_C_P, args);
@@ -2921,6 +3073,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	@Override
 	public AssetListEntryUsage remove(long assetListEntryUsageId)
 		throws NoSuchEntryUsageException {
+
 		return remove((Serializable)assetListEntryUsageId);
 	}
 
@@ -2934,21 +3087,23 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	@Override
 	public AssetListEntryUsage remove(Serializable primaryKey)
 		throws NoSuchEntryUsageException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			AssetListEntryUsage assetListEntryUsage = (AssetListEntryUsage)session.get(AssetListEntryUsageImpl.class,
-					primaryKey);
+			AssetListEntryUsage assetListEntryUsage =
+				(AssetListEntryUsage)session.get(
+					AssetListEntryUsageImpl.class, primaryKey);
 
 			if (assetListEntryUsage == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchEntryUsageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchEntryUsageException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(assetListEntryUsage);
@@ -2967,14 +3122,16 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	@Override
 	protected AssetListEntryUsage removeImpl(
 		AssetListEntryUsage assetListEntryUsage) {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			if (!session.contains(assetListEntryUsage)) {
-				assetListEntryUsage = (AssetListEntryUsage)session.get(AssetListEntryUsageImpl.class,
-						assetListEntryUsage.getPrimaryKeyObj());
+				assetListEntryUsage = (AssetListEntryUsage)session.get(
+					AssetListEntryUsageImpl.class,
+					assetListEntryUsage.getPrimaryKeyObj());
 			}
 
 			if (assetListEntryUsage != null) {
@@ -2998,25 +3155,28 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	@Override
 	public AssetListEntryUsage updateImpl(
 		AssetListEntryUsage assetListEntryUsage) {
+
 		boolean isNew = assetListEntryUsage.isNew();
 
 		if (!(assetListEntryUsage instanceof AssetListEntryUsageModelImpl)) {
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(assetListEntryUsage.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(assetListEntryUsage);
+				invocationHandler = ProxyUtil.getInvocationHandler(
+					assetListEntryUsage);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in assetListEntryUsage proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom AssetListEntryUsage implementation " +
-				assetListEntryUsage.getClass());
+					assetListEntryUsage.getClass());
 		}
 
-		AssetListEntryUsageModelImpl assetListEntryUsageModelImpl = (AssetListEntryUsageModelImpl)assetListEntryUsage;
+		AssetListEntryUsageModelImpl assetListEntryUsageModelImpl =
+			(AssetListEntryUsageModelImpl)assetListEntryUsage;
 
 		if (Validator.isNull(assetListEntryUsage.getUuid())) {
 			String uuid = PortalUUIDUtil.generate();
@@ -3024,7 +3184,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 			assetListEntryUsage.setUuid(uuid);
 		}
 
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -3033,8 +3194,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				assetListEntryUsage.setCreateDate(now);
 			}
 			else {
-				assetListEntryUsage.setCreateDate(serviceContext.getCreateDate(
-						now));
+				assetListEntryUsage.setCreateDate(
+					serviceContext.getCreateDate(now));
 			}
 		}
 
@@ -3043,8 +3204,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				assetListEntryUsage.setModifiedDate(now);
 			}
 			else {
-				assetListEntryUsage.setModifiedDate(serviceContext.getModifiedDate(
-						now));
+				assetListEntryUsage.setModifiedDate(
+					serviceContext.getModifiedDate(now));
 			}
 		}
 
@@ -3059,7 +3220,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				assetListEntryUsage.setNew(false);
 			}
 			else {
-				assetListEntryUsage = (AssetListEntryUsage)session.merge(assetListEntryUsage);
+				assetListEntryUsage = (AssetListEntryUsage)session.merge(
+					assetListEntryUsage);
 			}
 		}
 		catch (Exception e) {
@@ -3071,132 +3233,141 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
-		if (!AssetListEntryUsageModelImpl.COLUMN_BITMASK_ENABLED) {
+		if (!_columnBitmaskEnabled) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
-			Object[] args = new Object[] { assetListEntryUsageModelImpl.getUuid() };
+		else if (isNew) {
+			Object[] args = new Object[] {
+				assetListEntryUsageModelImpl.getUuid()
+			};
 
 			finderCache.removeResult(_finderPathCountByUuid, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-				args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByUuid, args);
 
 			args = new Object[] {
+				assetListEntryUsageModelImpl.getUuid(),
+				assetListEntryUsageModelImpl.getCompanyId()
+			};
+
+			finderCache.removeResult(_finderPathCountByUuid_C, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByUuid_C, args);
+
+			args = new Object[] {
+				assetListEntryUsageModelImpl.getAssetListEntryId()
+			};
+
+			finderCache.removeResult(_finderPathCountByAssetListEntryId, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByAssetListEntryId, args);
+
+			args = new Object[] {
+				assetListEntryUsageModelImpl.getAssetListEntryId(),
+				assetListEntryUsageModelImpl.getClassNameId()
+			};
+
+			finderCache.removeResult(_finderPathCountByA_C, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByA_C, args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((assetListEntryUsageModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					assetListEntryUsageModelImpl.getOriginalUuid()
+				};
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+
+				args = new Object[] {assetListEntryUsageModelImpl.getUuid()};
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+			}
+
+			if ((assetListEntryUsageModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					assetListEntryUsageModelImpl.getOriginalUuid(),
+					assetListEntryUsageModelImpl.getOriginalCompanyId()
+				};
+
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
+
+				args = new Object[] {
 					assetListEntryUsageModelImpl.getUuid(),
 					assetListEntryUsageModelImpl.getCompanyId()
 				};
 
-			finderCache.removeResult(_finderPathCountByUuid_C, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-				args);
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
+			}
 
-			args = new Object[] {
+			if ((assetListEntryUsageModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByAssetListEntryId.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					assetListEntryUsageModelImpl.getOriginalAssetListEntryId()
+				};
+
+				finderCache.removeResult(
+					_finderPathCountByAssetListEntryId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByAssetListEntryId, args);
+
+				args = new Object[] {
 					assetListEntryUsageModelImpl.getAssetListEntryId()
 				};
 
-			finderCache.removeResult(_finderPathCountByAssetListEntryId, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByAssetListEntryId,
-				args);
+				finderCache.removeResult(
+					_finderPathCountByAssetListEntryId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByAssetListEntryId, args);
+			}
 
-			args = new Object[] {
+			if ((assetListEntryUsageModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByA_C.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					assetListEntryUsageModelImpl.getOriginalAssetListEntryId(),
+					assetListEntryUsageModelImpl.getOriginalClassNameId()
+				};
+
+				finderCache.removeResult(_finderPathCountByA_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByA_C, args);
+
+				args = new Object[] {
 					assetListEntryUsageModelImpl.getAssetListEntryId(),
 					assetListEntryUsageModelImpl.getClassNameId()
 				};
 
-			finderCache.removeResult(_finderPathCountByA_C, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByA_C, args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((assetListEntryUsageModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUuid.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						assetListEntryUsageModelImpl.getOriginalUuid()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-					args);
-
-				args = new Object[] { assetListEntryUsageModelImpl.getUuid() };
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-					args);
-			}
-
-			if ((assetListEntryUsageModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						assetListEntryUsageModelImpl.getOriginalUuid(),
-						assetListEntryUsageModelImpl.getOriginalCompanyId()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-					args);
-
-				args = new Object[] {
-						assetListEntryUsageModelImpl.getUuid(),
-						assetListEntryUsageModelImpl.getCompanyId()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-					args);
-			}
-
-			if ((assetListEntryUsageModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByAssetListEntryId.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						assetListEntryUsageModelImpl.getOriginalAssetListEntryId()
-					};
-
-				finderCache.removeResult(_finderPathCountByAssetListEntryId,
-					args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByAssetListEntryId,
-					args);
-
-				args = new Object[] {
-						assetListEntryUsageModelImpl.getAssetListEntryId()
-					};
-
-				finderCache.removeResult(_finderPathCountByAssetListEntryId,
-					args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByAssetListEntryId,
-					args);
-			}
-
-			if ((assetListEntryUsageModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByA_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						assetListEntryUsageModelImpl.getOriginalAssetListEntryId(),
-						assetListEntryUsageModelImpl.getOriginalClassNameId()
-					};
-
 				finderCache.removeResult(_finderPathCountByA_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByA_C,
-					args);
-
-				args = new Object[] {
-						assetListEntryUsageModelImpl.getAssetListEntryId(),
-						assetListEntryUsageModelImpl.getClassNameId()
-					};
-
-				finderCache.removeResult(_finderPathCountByA_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByA_C,
-					args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByA_C, args);
 			}
 		}
 
-		entityCache.putResult(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-			AssetListEntryUsageImpl.class, assetListEntryUsage.getPrimaryKey(),
-			assetListEntryUsage, false);
+		entityCache.putResult(
+			entityCacheEnabled, AssetListEntryUsageImpl.class,
+			assetListEntryUsage.getPrimaryKey(), assetListEntryUsage, false);
 
 		clearUniqueFindersCache(assetListEntryUsageModelImpl, false);
 		cacheUniqueFindersCache(assetListEntryUsageModelImpl);
@@ -3216,6 +3387,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	@Override
 	public AssetListEntryUsage findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchEntryUsageException {
+
 		AssetListEntryUsage assetListEntryUsage = fetchByPrimaryKey(primaryKey);
 
 		if (assetListEntryUsage == null) {
@@ -3223,8 +3395,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchEntryUsageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchEntryUsageException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return assetListEntryUsage;
@@ -3240,6 +3412,7 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	@Override
 	public AssetListEntryUsage findByPrimaryKey(long assetListEntryUsageId)
 		throws NoSuchEntryUsageException {
+
 		return findByPrimaryKey((Serializable)assetListEntryUsageId);
 	}
 
@@ -3293,8 +3466,10 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the ordered range of asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findAll(int start, int end,
+	public List<AssetListEntryUsage> findAll(
+		int start, int end,
 		OrderByComparator<AssetListEntryUsage> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -3312,29 +3487,32 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 * @return the ordered range of asset list entry usages
 	 */
 	@Override
-	public List<AssetListEntryUsage> findAll(int start, int end,
+	public List<AssetListEntryUsage> findAll(
+		int start, int end,
 		OrderByComparator<AssetListEntryUsage> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<AssetListEntryUsage> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<AssetListEntryUsage>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<AssetListEntryUsage>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -3342,13 +3520,13 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_ASSETLISTENTRYUSAGE);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -3356,7 +3534,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				sql = _SQL_SELECT_ASSETLISTENTRYUSAGE;
 
 				if (pagination) {
-					sql = sql.concat(AssetListEntryUsageModelImpl.ORDER_BY_JPQL);
+					sql = sql.concat(
+						AssetListEntryUsageModelImpl.ORDER_BY_JPQL);
 				}
 			}
 
@@ -3368,16 +3547,16 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<AssetListEntryUsage>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<AssetListEntryUsage>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<AssetListEntryUsage>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<AssetListEntryUsage>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3415,8 +3594,8 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(_finderPathCountAll,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -3428,11 +3607,12 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -3472,175 +3652,224 @@ public class AssetListEntryUsagePersistenceImpl extends BasePersistenceImpl<Asse
 	/**
 	 * Initializes the asset list entry usage persistence.
 	 */
-	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+	@Activate
+	public void activate() {
+		AssetListEntryUsageModelImpl.setEntityCacheEnabled(entityCacheEnabled);
+		AssetListEntryUsageModelImpl.setFinderCacheEnabled(finderCacheEnabled);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-				new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathCountAll = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-				new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
 
-		_finderPathWithPaginationFindByUuid = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-				new String[] {
-					String.class.getName(),
-					
+		_finderPathCountAll = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathWithPaginationFindByUuid = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+			new String[] {
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+			new String[] {String.class.getName()},
+			AssetListEntryUsageModelImpl.UUID_COLUMN_BITMASK);
+
+		_finderPathCountByUuid = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+			new String[] {String.class.getName()});
+
+		_finderPathFetchByUUID_G = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByUUID_G",
+			new String[] {String.class.getName(), Long.class.getName()},
+			AssetListEntryUsageModelImpl.UUID_COLUMN_BITMASK |
+			AssetListEntryUsageModelImpl.GROUPID_COLUMN_BITMASK);
+
+		_finderPathCountByUUID_G = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
+			new String[] {String.class.getName(), Long.class.getName()});
+
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+			new String[] {
+				String.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-				new String[] { String.class.getName() },
-				AssetListEntryUsageModelImpl.UUID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			AssetListEntryUsageModelImpl.UUID_COLUMN_BITMASK |
+			AssetListEntryUsageModelImpl.COMPANYID_COLUMN_BITMASK);
 
-		_finderPathCountByUuid = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-				new String[] { String.class.getName() });
+		_finderPathCountByUuid_C = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()});
 
-		_finderPathFetchByUUID_G = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class, FINDER_CLASS_NAME_ENTITY,
-				"fetchByUUID_G",
-				new String[] { String.class.getName(), Long.class.getName() },
-				AssetListEntryUsageModelImpl.UUID_COLUMN_BITMASK |
-				AssetListEntryUsageModelImpl.GROUPID_COLUMN_BITMASK);
+		_finderPathWithPaginationFindByAssetListEntryId = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByAssetListEntryId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathCountByUUID_G = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
-				new String[] { String.class.getName(), Long.class.getName() });
+		_finderPathWithoutPaginationFindByAssetListEntryId = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByAssetListEntryId",
+			new String[] {Long.class.getName()},
+			AssetListEntryUsageModelImpl.ASSETLISTENTRYID_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-				new String[] {
-					String.class.getName(), Long.class.getName(),
-					
+		_finderPathCountByAssetListEntryId = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByAssetListEntryId", new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByA_C = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByA_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-				new String[] { String.class.getName(), Long.class.getName() },
-				AssetListEntryUsageModelImpl.UUID_COLUMN_BITMASK |
-				AssetListEntryUsageModelImpl.COMPANYID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByA_C = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByA_C",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			AssetListEntryUsageModelImpl.ASSETLISTENTRYID_COLUMN_BITMASK |
+			AssetListEntryUsageModelImpl.CLASSNAMEID_COLUMN_BITMASK);
 
-		_finderPathCountByUuid_C = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-				new String[] { String.class.getName(), Long.class.getName() });
+		_finderPathCountByA_C = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_C",
+			new String[] {Long.class.getName(), Long.class.getName()});
 
-		_finderPathWithPaginationFindByAssetListEntryId = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"findByAssetListEntryId",
-				new String[] {
-					Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+		_finderPathFetchByC_C_P = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled,
+			AssetListEntryUsageImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByC_C_P",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			},
+			AssetListEntryUsageModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			AssetListEntryUsageModelImpl.CLASSPK_COLUMN_BITMASK |
+			AssetListEntryUsageModelImpl.PORTLETID_COLUMN_BITMASK);
 
-		_finderPathWithoutPaginationFindByAssetListEntryId = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"findByAssetListEntryId",
-				new String[] { Long.class.getName() },
-				AssetListEntryUsageModelImpl.ASSETLISTENTRYID_COLUMN_BITMASK);
-
-		_finderPathCountByAssetListEntryId = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByAssetListEntryId", new String[] { Long.class.getName() });
-
-		_finderPathWithPaginationFindByA_C = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByA_C",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithoutPaginationFindByA_C = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByA_C",
-				new String[] { Long.class.getName(), Long.class.getName() },
-				AssetListEntryUsageModelImpl.ASSETLISTENTRYID_COLUMN_BITMASK |
-				AssetListEntryUsageModelImpl.CLASSNAMEID_COLUMN_BITMASK);
-
-		_finderPathCountByA_C = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_C",
-				new String[] { Long.class.getName(), Long.class.getName() });
-
-		_finderPathFetchByC_C_P = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED,
-				AssetListEntryUsageImpl.class, FINDER_CLASS_NAME_ENTITY,
-				"fetchByC_C_P",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					String.class.getName()
-				},
-				AssetListEntryUsageModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-				AssetListEntryUsageModelImpl.CLASSPK_COLUMN_BITMASK |
-				AssetListEntryUsageModelImpl.PORTLETID_COLUMN_BITMASK);
-
-		_finderPathCountByC_C_P = new FinderPath(AssetListEntryUsageModelImpl.ENTITY_CACHE_ENABLED,
-				AssetListEntryUsageModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_P",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					String.class.getName()
-				});
+		_finderPathCountByC_C_P = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_P",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			});
 	}
 
-	public void destroy() {
+	@Deactivate
+	public void deactivate() {
 		entityCache.removeCache(AssetListEntryUsageImpl.class.getName());
 		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
-	@ServiceReference(type = CompanyProviderWrapper.class)
+	@Override
+	@Reference(
+		target = AssetListPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setConfiguration(Configuration configuration) {
+		super.setConfiguration(configuration);
+
+		_columnBitmaskEnabled = GetterUtil.getBoolean(
+			configuration.get(
+				"value.object.column.bitmask.enabled.com.liferay.asset.list.model.AssetListEntryUsage"),
+			true);
+	}
+
+	@Override
+	@Reference(
+		target = AssetListPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setDataSource(DataSource dataSource) {
+		super.setDataSource(dataSource);
+	}
+
+	@Override
+	@Reference(
+		target = AssetListPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		super.setSessionFactory(sessionFactory);
+	}
+
+	private boolean _columnBitmaskEnabled;
+
+	@Reference(service = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-	@ServiceReference(type = EntityCache.class)
+
+	@Reference
 	protected EntityCache entityCache;
-	@ServiceReference(type = FinderCache.class)
+
+	@Reference
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_ASSETLISTENTRYUSAGE = "SELECT assetListEntryUsage FROM AssetListEntryUsage assetListEntryUsage";
-	private static final String _SQL_SELECT_ASSETLISTENTRYUSAGE_WHERE = "SELECT assetListEntryUsage FROM AssetListEntryUsage assetListEntryUsage WHERE ";
-	private static final String _SQL_COUNT_ASSETLISTENTRYUSAGE = "SELECT COUNT(assetListEntryUsage) FROM AssetListEntryUsage assetListEntryUsage";
-	private static final String _SQL_COUNT_ASSETLISTENTRYUSAGE_WHERE = "SELECT COUNT(assetListEntryUsage) FROM AssetListEntryUsage assetListEntryUsage WHERE ";
+
+	private static final String _SQL_SELECT_ASSETLISTENTRYUSAGE =
+		"SELECT assetListEntryUsage FROM AssetListEntryUsage assetListEntryUsage";
+
+	private static final String _SQL_SELECT_ASSETLISTENTRYUSAGE_WHERE =
+		"SELECT assetListEntryUsage FROM AssetListEntryUsage assetListEntryUsage WHERE ";
+
+	private static final String _SQL_COUNT_ASSETLISTENTRYUSAGE =
+		"SELECT COUNT(assetListEntryUsage) FROM AssetListEntryUsage assetListEntryUsage";
+
+	private static final String _SQL_COUNT_ASSETLISTENTRYUSAGE_WHERE =
+		"SELECT COUNT(assetListEntryUsage) FROM AssetListEntryUsage assetListEntryUsage WHERE ";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "assetListEntryUsage.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No AssetListEntryUsage exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No AssetListEntryUsage exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(AssetListEntryUsagePersistenceImpl.class);
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"uuid"
-			});
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No AssetListEntryUsage exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No AssetListEntryUsage exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetListEntryUsagePersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"uuid"});
+
 }

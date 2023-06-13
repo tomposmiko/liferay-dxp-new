@@ -17,7 +17,6 @@ package com.liferay.change.tracking.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.change.tracking.model.CTCollection;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -51,10 +50,13 @@ import java.util.List;
  * @generated
  */
 @ProviderType
-@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
-	PortalException.class, SystemException.class})
-public interface CTCollectionLocalService extends BaseLocalService,
-	PersistedModelLocalService {
+@Transactional(
+	isolation = Isolation.PORTAL,
+	rollbackFor = {PortalException.class, SystemException.class}
+)
+public interface CTCollectionLocalService
+	extends BaseLocalService, PersistedModelLocalService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -62,35 +64,51 @@ public interface CTCollectionLocalService extends BaseLocalService,
 	 */
 
 	/**
-	* Adds the ct collection to the database. Also notifies the appropriate model listeners.
-	*
-	* @param ctCollection the ct collection
-	* @return the ct collection that was added
-	*/
+	 * Adds the ct collection to the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param ctCollection the ct collection
+	 * @return the ct collection that was added
+	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public CTCollection addCTCollection(CTCollection ctCollection);
 
-	public CTCollection addCTCollection(long userId, String name,
-		String description, ServiceContext serviceContext)
+	public CTCollection addCTCollection(
+			long userId, String name, String description,
+			ServiceContext serviceContext)
 		throws PortalException;
 
-	public void addCTEntryCTCollection(long ctEntryId, CTCollection ctCollection);
+	public void addCTEntryAggregateCTCollection(
+		long ctEntryAggregateId, CTCollection ctCollection);
+
+	public void addCTEntryAggregateCTCollection(
+		long ctEntryAggregateId, long ctCollectionId);
+
+	public void addCTEntryAggregateCTCollections(
+		long ctEntryAggregateId, List<CTCollection> ctCollections);
+
+	public void addCTEntryAggregateCTCollections(
+		long ctEntryAggregateId, long[] ctCollectionIds);
+
+	public void addCTEntryCTCollection(
+		long ctEntryId, CTCollection ctCollection);
 
 	public void addCTEntryCTCollection(long ctEntryId, long ctCollectionId);
 
-	public void addCTEntryCTCollections(long ctEntryId,
-		List<CTCollection> ctCollections);
+	public void addCTEntryCTCollections(
+		long ctEntryId, List<CTCollection> ctCollections);
 
 	public void addCTEntryCTCollections(long ctEntryId, long[] ctCollectionIds);
+
+	public void clearCTEntryAggregateCTCollections(long ctEntryAggregateId);
 
 	public void clearCTEntryCTCollections(long ctEntryId);
 
 	/**
-	* Creates a new ct collection with the primary key. Does not add the ct collection to the database.
-	*
-	* @param ctCollectionId the primary key for the new ct collection
-	* @return the new ct collection
-	*/
+	 * Creates a new ct collection with the primary key. Does not add the ct collection to the database.
+	 *
+	 * @param ctCollectionId the primary key for the new ct collection
+	 * @return the new ct collection
+	 */
 	@Transactional(enabled = false)
 	public CTCollection createCTCollection(long ctCollectionId);
 
@@ -98,41 +116,53 @@ public interface CTCollectionLocalService extends BaseLocalService,
 		throws PortalException;
 
 	/**
-	* Deletes the ct collection from the database. Also notifies the appropriate model listeners.
-	*
-	* @param ctCollection the ct collection
-	* @return the ct collection that was removed
-	* @throws PortalException
-	*/
+	 * Deletes the ct collection from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param ctCollection the ct collection
+	 * @return the ct collection that was removed
+	 * @throws PortalException
+	 */
 	@Indexable(type = IndexableType.DELETE)
 	public CTCollection deleteCTCollection(CTCollection ctCollection)
 		throws PortalException;
 
 	/**
-	* Deletes the ct collection with the primary key from the database. Also notifies the appropriate model listeners.
-	*
-	* @param ctCollectionId the primary key of the ct collection
-	* @return the ct collection that was removed
-	* @throws PortalException if a ct collection with the primary key could not be found
-	*/
+	 * Deletes the ct collection with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param ctCollectionId the primary key of the ct collection
+	 * @return the ct collection that was removed
+	 * @throws PortalException if a ct collection with the primary key could not be found
+	 */
 	@Indexable(type = IndexableType.DELETE)
 	public CTCollection deleteCTCollection(long ctCollectionId)
 		throws PortalException;
 
-	public void deleteCTEntryCTCollection(long ctEntryId,
-		CTCollection ctCollection);
+	public void deleteCTEntryAggregateCTCollection(
+		long ctEntryAggregateId, CTCollection ctCollection);
+
+	public void deleteCTEntryAggregateCTCollection(
+		long ctEntryAggregateId, long ctCollectionId);
+
+	public void deleteCTEntryAggregateCTCollections(
+		long ctEntryAggregateId, List<CTCollection> ctCollections);
+
+	public void deleteCTEntryAggregateCTCollections(
+		long ctEntryAggregateId, long[] ctCollectionIds);
+
+	public void deleteCTEntryCTCollection(
+		long ctEntryId, CTCollection ctCollection);
 
 	public void deleteCTEntryCTCollection(long ctEntryId, long ctCollectionId);
 
-	public void deleteCTEntryCTCollections(long ctEntryId,
-		List<CTCollection> ctCollections);
+	public void deleteCTEntryCTCollections(
+		long ctEntryId, List<CTCollection> ctCollections);
 
-	public void deleteCTEntryCTCollections(long ctEntryId,
-		long[] ctCollectionIds);
+	public void deleteCTEntryCTCollections(
+		long ctEntryId, long[] ctCollectionIds);
 
 	/**
-	* @throws PortalException
-	*/
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
@@ -141,66 +171,67 @@ public interface CTCollectionLocalService extends BaseLocalService,
 	public DynamicQuery dynamicQuery();
 
 	/**
-	* Performs a dynamic query on the database and returns the matching rows.
-	*
-	* @param dynamicQuery the dynamic query
-	* @return the matching rows
-	*/
+	 * Performs a dynamic query on the database and returns the matching rows.
+	 *
+	 * @param dynamicQuery the dynamic query
+	 * @return the matching rows
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery);
 
 	/**
-	* Performs a dynamic query on the database and returns a range of the matching rows.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.change.tracking.model.impl.CTCollectionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
-	* </p>
-	*
-	* @param dynamicQuery the dynamic query
-	* @param start the lower bound of the range of model instances
-	* @param end the upper bound of the range of model instances (not inclusive)
-	* @return the range of matching rows
-	*/
+	 * Performs a dynamic query on the database and returns a range of the matching rows.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.change.tracking.model.impl.CTCollectionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param dynamicQuery the dynamic query
+	 * @param start the lower bound of the range of model instances
+	 * @param end the upper bound of the range of model instances (not inclusive)
+	 * @return the range of matching rows
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end);
 
 	/**
-	* Performs a dynamic query on the database and returns an ordered range of the matching rows.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.change.tracking.model.impl.CTCollectionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
-	* </p>
-	*
-	* @param dynamicQuery the dynamic query
-	* @param start the lower bound of the range of model instances
-	* @param end the upper bound of the range of model instances (not inclusive)
-	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	* @return the ordered range of matching rows
-	*/
+	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.change.tracking.model.impl.CTCollectionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param dynamicQuery the dynamic query
+	 * @param start the lower bound of the range of model instances
+	 * @param end the upper bound of the range of model instances (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching rows
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator);
 
 	/**
-	* Returns the number of rows matching the dynamic query.
-	*
-	* @param dynamicQuery the dynamic query
-	* @return the number of rows matching the dynamic query
-	*/
+	 * Returns the number of rows matching the dynamic query.
+	 *
+	 * @param dynamicQuery the dynamic query
+	 * @return the number of rows matching the dynamic query
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long dynamicQueryCount(DynamicQuery dynamicQuery);
 
 	/**
-	* Returns the number of rows matching the dynamic query.
-	*
-	* @param dynamicQuery the dynamic query
-	* @param projection the projection to apply to the query
-	* @return the number of rows matching the dynamic query
-	*/
+	 * Returns the number of rows matching the dynamic query.
+	 *
+	 * @param dynamicQuery the dynamic query
+	 * @param projection the projection to apply to the query
+	 * @return the number of rows matching the dynamic query
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CTCollection fetchCTCollection(long ctCollectionId);
@@ -212,62 +243,93 @@ public interface CTCollectionLocalService extends BaseLocalService,
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	/**
-	* Returns the ct collection with the primary key.
-	*
-	* @param ctCollectionId the primary key of the ct collection
-	* @return the ct collection
-	* @throws PortalException if a ct collection with the primary key could not be found
-	*/
+	 * Returns the ct collection with the primary key.
+	 *
+	 * @param ctCollectionId the primary key of the ct collection
+	 * @return the ct collection
+	 * @throws PortalException if a ct collection with the primary key could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CTCollection getCTCollection(long ctCollectionId)
 		throws PortalException;
 
 	/**
-	* Returns a range of all the ct collections.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.change.tracking.model.impl.CTCollectionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
-	* </p>
-	*
-	* @param start the lower bound of the range of ct collections
-	* @param end the upper bound of the range of ct collections (not inclusive)
-	* @return the range of ct collections
-	*/
+	 * Returns a range of all the ct collections.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.change.tracking.model.impl.CTCollectionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param start the lower bound of the range of ct collections
+	 * @param end the upper bound of the range of ct collections (not inclusive)
+	 * @return the range of ct collections
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CTCollection> getCTCollections(int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CTCollection> getCTCollections(long companyId,
-		QueryDefinition<CTCollection> queryDefinition);
+	public List<CTCollection> getCTCollections(
+		long companyId, QueryDefinition<CTCollection> queryDefinition);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CTCollection> getCTCollections(
+		long companyId, QueryDefinition<CTCollection> queryDefinition,
+		boolean includeProduction);
 
 	/**
-	* Returns the number of ct collections.
-	*
-	* @return the number of ct collections
-	*/
+	 * Returns the number of ct collections.
+	 *
+	 * @return the number of ct collections
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCTCollectionsCount();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CTCollection> getCTEntryAggregateCTCollections(
+		long ctEntryAggregateId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CTCollection> getCTEntryAggregateCTCollections(
+		long ctEntryAggregateId, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CTCollection> getCTEntryAggregateCTCollections(
+		long ctEntryAggregateId, int start, int end,
+		OrderByComparator<CTCollection> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getCTEntryAggregateCTCollectionsCount(long ctEntryAggregateId);
+
+	/**
+	 * Returns the ctEntryAggregateIds of the ct entry aggregates associated with the ct collection.
+	 *
+	 * @param ctCollectionId the ctCollectionId of the ct collection
+	 * @return long[] the ctEntryAggregateIds of ct entry aggregates associated with the ct collection
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long[] getCTEntryAggregatePrimaryKeys(long ctCollectionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CTCollection> getCTEntryCTCollections(long ctEntryId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CTCollection> getCTEntryCTCollections(long ctEntryId,
-		int start, int end);
+	public List<CTCollection> getCTEntryCTCollections(
+		long ctEntryId, int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CTCollection> getCTEntryCTCollections(long ctEntryId,
-		int start, int end, OrderByComparator<CTCollection> orderByComparator);
+	public List<CTCollection> getCTEntryCTCollections(
+		long ctEntryId, int start, int end,
+		OrderByComparator<CTCollection> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCTEntryCTCollectionsCount(long ctEntryId);
 
 	/**
-	* Returns the ctEntryIds of the ct entries associated with the ct collection.
-	*
-	* @param ctCollectionId the ctCollectionId of the ct collection
-	* @return long[] the ctEntryIds of ct entries associated with the ct collection
-	*/
+	 * Returns the ctEntryIds of the ct entries associated with the ct collection.
+	 *
+	 * @param ctCollectionId the ctCollectionId of the ct collection
+	 * @return long[] the ctEntryIds of ct entries associated with the ct collection
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long[] getCTEntryPrimaryKeys(long ctCollectionId);
 
@@ -275,10 +337,10 @@ public interface CTCollectionLocalService extends BaseLocalService,
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public String getOSGiServiceIdentifier();
 
 	@Override
@@ -287,22 +349,35 @@ public interface CTCollectionLocalService extends BaseLocalService,
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasCTEntryAggregateCTCollection(
+		long ctEntryAggregateId, long ctCollectionId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasCTEntryAggregateCTCollections(long ctEntryAggregateId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasCTEntryCTCollection(long ctEntryId, long ctCollectionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasCTEntryCTCollections(long ctEntryId);
 
+	public void setCTEntryAggregateCTCollections(
+		long ctEntryAggregateId, long[] ctCollectionIds);
+
 	public void setCTEntryCTCollections(long ctEntryId, long[] ctCollectionIds);
 
 	/**
-	* Updates the ct collection in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
-	*
-	* @param ctCollection the ct collection
-	* @return the ct collection that was updated
-	*/
+	 * Updates the ct collection in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * @param ctCollection the ct collection
+	 * @return the ct collection that was updated
+	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public CTCollection updateCTCollection(CTCollection ctCollection);
 
-	public CTCollection updateStatus(long userId, CTCollection ctCollection,
-		int status, ServiceContext serviceContext) throws PortalException;
+	public CTCollection updateStatus(
+			long userId, CTCollection ctCollection, int status,
+			ServiceContext serviceContext)
+		throws PortalException;
+
 }

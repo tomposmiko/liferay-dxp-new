@@ -1,9 +1,21 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
 import ClayIcon from '../shared/ClayIcon.es';
+import getCN from 'classnames';
+import PropTypes from 'prop-types';
+import React, {Component} from 'react';
 import {DragSource as dragSource} from 'react-dnd';
 import {DragTypes} from '../../utils/drag-types.es';
-import getCN from 'classnames';
+import {PROPERTY_TYPES} from '../../utils/constants.es';
+
+const TYPE_ICON_MAP = {
+	[PROPERTY_TYPES.BOOLEAN]: 'text',
+	[PROPERTY_TYPES.COLLECTION]: 'table',
+	[PROPERTY_TYPES.DATE]: 'date',
+	[PROPERTY_TYPES.DATE_TIME]: 'date',
+	[PROPERTY_TYPES.DOUBLE]: 'decimal',
+	[PROPERTY_TYPES.ID]: 'diagram',
+	[PROPERTY_TYPES.INTEGER]: 'integer',
+	[PROPERTY_TYPES.STRING]: 'text'
+};
 
 /**
  * Passes the required values to the drop target.
@@ -39,38 +51,6 @@ class CriteriaSidebarItem extends Component {
 		type: PropTypes.string
 	};
 
-	_getIcon(type) {
-		let returnValue;
-
-		switch (type) {
-		case 'boolean':
-			returnValue = 'text';
-			break;
-		case 'date':
-			returnValue = 'date';
-			break;
-		case 'date-time':
-			returnValue = 'date';
-			break;
-		case 'double':
-			returnValue = 'decimal';
-			break;
-		case 'id':
-			returnValue = 'diagram';
-			break;
-		case 'integer':
-			returnValue = 'integer';
-			break;
-		case 'string':
-			returnValue = 'text';
-			break;
-		default:
-			returnValue = 'text';
-		}
-
-		return returnValue;
-	}
-
 	render() {
 		const {
 			className,
@@ -94,7 +74,7 @@ class CriteriaSidebarItem extends Component {
 
 				<span className="criteria-sidebar-item-type sticker sticker-light">
 					<span className="inline-item">
-						<ClayIcon iconName={this._getIcon(type)} />
+						<ClayIcon iconName={TYPE_ICON_MAP[type] || 'text'} />
 					</span>
 				</span>
 

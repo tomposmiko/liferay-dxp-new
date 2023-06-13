@@ -23,6 +23,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -35,7 +36,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
@@ -88,7 +88,7 @@ public class FragmentManagementToolbarDisplayContext
 						dropdownItem -> {
 							dropdownItem.putData(
 								"action", "moveSelectedFragmentEntries");
-							dropdownItem.setIcon("change");
+							dropdownItem.setIcon("move-folder");
 							dropdownItem.setLabel(
 								LanguageUtil.get(request, "move"));
 							dropdownItem.setQuickAction(true);
@@ -210,8 +210,8 @@ public class FragmentManagementToolbarDisplayContext
 
 				addPrimaryDropdownItem(
 					_getAddFragmentEntryDropdownItem(
-						FragmentEntryTypeConstants.TYPE_ELEMENT,
-						FragmentEntryTypeConstants.TYPE_ELEMENT_LABEL));
+						FragmentEntryTypeConstants.TYPE_COMPONENT,
+						FragmentEntryTypeConstants.TYPE_COMPONENT_LABEL));
 			}
 		};
 	}
@@ -219,21 +219,6 @@ public class FragmentManagementToolbarDisplayContext
 	@Override
 	public String getDefaultEventHandler() {
 		return "FRAGMENT_ENTRIES_MANAGEMENT_TOOLBAR_DEFAULT_EVENT_HANDLER";
-	}
-
-	@Override
-	public List<DropdownItem> getFilterDropdownItems() {
-		return new DropdownItemList() {
-			{
-				addGroup(
-					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItems(
-							getFilterNavigationDropdownItems());
-						dropdownGroupItem.setLabel(
-							getFilterNavigationDropdownItemsLabel());
-					});
-			}
-		};
 	}
 
 	@Override
@@ -248,11 +233,11 @@ public class FragmentManagementToolbarDisplayContext
 						});
 				}
 
-				if (_fragmentDisplayContext.isNavigationElements()) {
+				if (_fragmentDisplayContext.isNavigationComponents()) {
 					add(
 						labelItem -> {
 							labelItem.setLabel(
-								LanguageUtil.get(request, "elements"));
+								LanguageUtil.get(request, "components"));
 						});
 				}
 			}
@@ -288,7 +273,7 @@ public class FragmentManagementToolbarDisplayContext
 
 	@Override
 	protected String[] getNavigationKeys() {
-		return new String[] {"all", "sections", "elements"};
+		return new String[] {"all", "sections", "components"};
 	}
 
 	@Override
@@ -296,8 +281,8 @@ public class FragmentManagementToolbarDisplayContext
 		return new String[] {"name", "create-date"};
 	}
 
-	private Consumer<DropdownItem> _getAddFragmentEntryDropdownItem(
-		int type, String label) {
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getAddFragmentEntryDropdownItem(int type, String label) {
 
 		return dropdownItem -> {
 			dropdownItem.putData("action", "addFragmentEntry");

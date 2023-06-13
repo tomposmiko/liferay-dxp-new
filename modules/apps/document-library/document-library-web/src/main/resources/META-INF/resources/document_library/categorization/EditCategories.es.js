@@ -1,11 +1,10 @@
 import 'clay-multi-select';
-import ClayButton from 'clay-button';
-import ClayRadio from 'clay-radio';
+import 'clay-radio';
 import Component from 'metal-component';
 import {Config} from 'metal-state';
 import Soy from 'metal-soy';
 import 'frontend-js-web/liferay/compat/modal/Modal.es';
-import InputCategoriesSelector from './InputCategoriesSelector.es';
+import 'asset-taglib/asset_categories_selector/AssetCategoriesSelector.es';
 import templates from './EditCategories.soy';
 
 /**
@@ -18,16 +17,14 @@ class EditCategories extends Component {
 	 * @inheritDoc
 	 */
 	attached() {
-		this._getCommonCategories();
-
-		this._bulkStatusComponent =	Liferay.component(this.portletNamespace + 'BulkStatus');
+		this._bulkStatusComponent =	Liferay.component(this.namespace + 'BulkStatus');
 	}
 
 	/**
 	 * Close the modal.
 	 */
 	close() {
-		this.refs.modal.visible = false;
+		this.showModal = false;
 	}
 
 	/**
@@ -36,15 +33,54 @@ class EditCategories extends Component {
 	created() {
 		this.append = true;
 		this.dataSource = [];
+		this.urlCategories = `/bulk-rest/v1.0/content-spaces/${this.groupIds[0]}/taxonomy-vocabularies/common`;
+
+		this._feedbackErrorClass = 'form-feedback-item';
+		this._requiredVocabularyErrorMarkupText = '<div class="' + this._feedbackErrorClass + '">' + Liferay.Language.get('this-field-is-required') + '</div>';
 	}
 
 	/**
 	 * Open the modal and get the
 	 * commont categories.
 	 */
-	open() {
-		this.refs.modal.visible = true;
+	open(fileEntries, selectAll, folderId) {
+		this.fileEntries = fileEntries;
+		this.selectAll = selectAll;
+		this.folderId = folderId;
+		this.showModal = true;
+
 		this._getCommonCategories();
+	}
+
+	/**
+	 * Checks if the vocabulary is empty or not.
+	 *
+	 * @param  {String} vocabularyId
+	 * @return {Boolean} true if it has a category, false if is empty.
+	 */
+	_checkRequiredVocabulary(vocabularyId) {
+		let inputNode = this._getVocabularyInputNode(vocabularyId);
+		let valid = true;
+
+		if (inputNode.value) {
+			inputNode.parentElement.classList.remove('has-error');
+		}
+		else {
+			inputNode.parentElement.classList.add('has-error');
+
+			let feedbackErrorNode = inputNode.parentElement.querySelector('.' + this._feedbackErrorClass);
+
+			if (!feedbackErrorNode) {
+				inputNode.parentElement.insertAdjacentHTML(
+					'beforeend',
+					this._requiredVocabularyErrorMarkupText
+				);
+			}
+
+			valid = false;
+		}
+
+		return valid;
 	}
 
 	/**
@@ -54,7 +90,7 @@ class EditCategories extends Component {
 	 * @param {Object} bodyData The body of the request
 	 * @param {Function} callback Callback function
 	 */
-	_fetchCategoriesRequest(url, bodyData, callback) {
+	_fetchCategoriesRequest(url, method, bodyData) {
 		let body = JSON.stringify(bodyData);
 
 		let headers = new Headers();
@@ -64,17 +100,12 @@ class EditCategories extends Component {
 			body,
 			credentials: 'include',
 			headers,
-			method: 'POST'
+			method
 		};
 
-		fetch(url, request)
+		return fetch(this.pathModule + url, request)
 			.then(
 				response => response.json()
-			)
-			.then(
-				response => {
-					callback(response);
-				}
 			)
 			.catch(
 				(xhr) => {
@@ -93,27 +124,23 @@ class EditCategories extends Component {
 	_getCommonCategories() {
 		this.loading = true;
 
-		let bodyData = {
-			repositoryId: this.repositoryId,
-			selection: this._getSelection()
-		};
+		let selection = this._getSelection();
 
-		this._fetchCategoriesRequest(
-			this.urlCategories,
-			bodyData,
-			response => {
-				if (response) {
+		Promise.all(
+			[
+				this._fetchCategoriesRequest(this.urlCategories, 'POST', selection),
+				this._fetchCategoriesRequest(this.urlSelectionDescription, 'POST', selection)
+			]
+		).then(
+			([responseCategories, responseDescription]) => {
+				if (responseCategories && responseDescription) {
 					this.loading = false;
-					this.description = response.description;
+					this.description = responseDescription.description;
 					this.multiple = (this.fileEntries.length > 1) || this.selectAll;
-					this.vocabularies = this._parseVocabularies(response.vocabularies);
+					this.vocabularies = this._parseVocabularies(responseCategories.items || []);
 				}
 			}
 		);
-	}
-
-	_getSelection() {
-		return this.selectAll ? ['all:' + this.folderId] : this.fileEntries;
 	}
 
 	/**
@@ -124,15 +151,54 @@ class EditCategories extends Component {
 	 */
 	_getFinalCategories() {
 		let finalCategories = [];
+		let inputElementName = this.namespace + this.hiddenInput;
 
 		this.vocabularies.forEach(
 			vocabulary => {
-				let categoryIds = vocabulary.categories.map(item => item.value);
-				finalCategories = finalCategories.concat(categoryIds);
+				let inputNode = document.getElementById(inputElementName + vocabulary.id);
+
+				if (inputNode.value) {
+					let categoryIds = inputNode.value.split(',').map(Number);
+					finalCategories = finalCategories.concat(categoryIds);
+				}
 			}
 		);
 
 		return finalCategories;
+	}
+
+	_getSelection() {
+		return {
+			documentIds: this.fileEntries,
+			selectionScope: {
+				folderId: this.folderId,
+				repositoryId: this.repositoryId,
+				selectAll: this.selectAll
+			}
+		};
+	}
+
+	/**
+	 * Gets the input where categories are saved for a vocabulary.
+	 *
+	 * @param  {String} vocabularyId [description]
+	 * @return {DOMElement} input node.
+	 */
+	_getVocabularyInputNode(vocabularyId) {
+		return document.getElementById(this.namespace + this.hiddenInput + vocabularyId);
+	}
+
+	/**
+	 * Checks if a required vocabulary has categories or not.
+	 *
+	 * @param  {Event} event
+	 */
+	_handleCategoriesChange(event) {
+		let vocabularyId = event.vocabularyId[0];
+
+		if (this._requiredVocabularies.includes(parseInt(vocabularyId, 10))) {
+			this._checkRequiredVocabulary(vocabularyId);
+		}
 	}
 
 	/**
@@ -153,6 +219,10 @@ class EditCategories extends Component {
 	 * @review
 	 */
 	_handleSaveBtnClick() {
+		if (!this._validateRequiredVocabularies()) {
+			return;
+		}
+
 		let finalCategories = this._getFinalCategories();
 
 		let addedCategories = [];
@@ -170,19 +240,17 @@ class EditCategories extends Component {
 			category => finalCategories.indexOf(category) == -1
 		);
 
-		let bodyData = {
-			append: this.append,
-			repositoryId: this.repositoryId,
-			selection: this._getSelection(),
-			toAddCategoryIds: addedCategories,
-			toRemoveCategoryIds: removedCategories
-		};
-
 		let instance = this;
 
 		this._fetchCategoriesRequest(
 			this.urlUpdateCategories,
-			bodyData,
+			this.append ? 'PATCH' : 'PUT',
+			{
+				documentBulkSelection: this._getSelection(),
+				taxonomyCategoryIdsToAdd: addedCategories,
+				taxonomyCategoryIdsToRemove: removedCategories
+			}
+		).then(
 			response => {
 				instance.close();
 
@@ -195,28 +263,36 @@ class EditCategories extends Component {
 
 	_parseVocabularies(vocabularies) {
 		let initialCategories = [];
+		let requiredVocabularies = [];
 		let vocabulariesList = [];
 
 		vocabularies.forEach(
 			vocabulary => {
-				let categories = this._parseCategories(vocabulary.categories);
+				let categories = this._parseCategories(vocabulary.taxonomyCategories || []);
+
+				let categoryIds = categories.map(item => item.value);
 
 				let obj = {
-					categories: categories,
-					id: vocabulary.vocabularyId,
-					multiValued: vocabulary.multiValued,
-					name: vocabulary.name
+					id: vocabulary.taxonomyVocabularyId.toString(),
+					required: vocabulary.required,
+					selectedCategoryIds: categoryIds.join(','),
+					selectedItems: categories,
+					singleSelect: !vocabulary.multiValued,
+					title: vocabulary.name
 				};
 
 				vocabulariesList.push(obj);
 
-				let categoryIds = categories.map(item => item.value);
+				if (vocabulary.required) {
+					requiredVocabularies.push(vocabulary.taxonomyVocabularyId);
+				}
 
 				initialCategories = initialCategories.concat(categoryIds);
 			}
 		);
 
 		this.initialCategories = initialCategories;
+		this._requiredVocabularies = requiredVocabularies;
 
 		return vocabulariesList;
 	}
@@ -235,8 +311,8 @@ class EditCategories extends Component {
 			categories.forEach(
 				item => {
 					let itemObj = {
-						'label': item.name,
-						'value': item.categoryId
+						'label': item.taxonomyCategoryName,
+						'value': item.taxonomyCategoryId
 					};
 
 					categoriesObjList.push(itemObj);
@@ -245,6 +321,23 @@ class EditCategories extends Component {
 		}
 
 		return categoriesObjList;
+	}
+
+	_validateRequiredVocabularies() {
+		let requiredVocabularies = this._requiredVocabularies;
+		let valid = true;
+
+		if (requiredVocabularies) {
+			requiredVocabularies.forEach(
+				vocabularyId => {
+					if (!this._checkRequiredVocabulary(vocabularyId)) {
+						valid = false;
+					}
+				}
+			);
+		}
+
+		return valid;
 	}
 }
 
@@ -274,7 +367,7 @@ EditCategories.STATE = {
 	 * @review
 	 * @type {List<String>}
 	 */
-	fileEntries: Config.array().required(),
+	fileEntries: Config.array(),
 
 	/**
 	 * Folder Id
@@ -284,7 +377,21 @@ EditCategories.STATE = {
 	 * @review
 	 * @type {String}
 	 */
-	folderId: Config.string().required(),
+	folderId: Config.string(),
+
+	/**
+	 * Group Ids.
+	 *
+	 * @type {List<String>}
+	 */
+	groupIds: Config.array().required(),
+
+	/**
+	* Hidden input name
+	*
+	* @type {String}
+	 */
+	hiddenInput: Config.string().value('assetCategoryIds_').internal(),
 
 	/**
 	 * Original categoryIds
@@ -323,7 +430,17 @@ EditCategories.STATE = {
 	 * @review
 	 * @type {string}
 	 */
-	portletNamespace: Config.string().required(),
+	namespace: Config.string().required(),
+
+	/**
+	 * PathModule
+	 *
+	 * @instance
+	 * @memberof EditTags
+	 * @review
+	 * @type {String}
+	 */
+	pathModule: Config.string().required(),
 
 	/**
 	 * RepositoryId
@@ -331,9 +448,9 @@ EditCategories.STATE = {
 	 * @instance
 	 * @memberof EditCategories
 	 * @review
-	 * @type {Number}
+	 * @type {String}
 	 */
-	repositoryId: Config.number().required(),
+	repositoryId: Config.string().required(),
 
 	/**
 	 * Flag that indicate if "select all" checkbox
@@ -351,6 +468,17 @@ EditCategories.STATE = {
 	 * @type {String}
 	 */
 	selectCategoriesUrl: Config.string().required(),
+
+	/**
+	 * Flag that indicate if the modal must
+	 * be shown.
+	 *
+	 * @instance
+	 * @memberof EditTags
+	 * @review
+	 * @type {Boolean}
+	 */
+	showModal: Config.bool().value(false).internal(),
 
 	/**
 	 * Path to images.
@@ -371,7 +499,18 @@ EditCategories.STATE = {
 	 * @review
 	 * @type {String}
 	 */
-	urlCategories: Config.string().required(),
+	urlCategories: Config.string(),
+
+	/**
+	 * Url to backend service that provides
+	 * the selection description.
+	 *
+	 * @instance
+	 * @memberof EditTags
+	 * @review
+	 * @type {String}
+	 */
+	urlSelectionDescription: Config.string().value('/bulk-rest/v1.0/bulk-selection'),
 
 	/**
 	 * Url to backend service that updates
@@ -382,7 +521,7 @@ EditCategories.STATE = {
 	 * @review
 	 * @type {String}
 	 */
-	urlUpdateCategories: Config.string().required(),
+	urlUpdateCategories: Config.string().value('/bulk-rest/v1.0/taxonomy-categories/batch'),
 
 	/**
 	 * List of vocabularies

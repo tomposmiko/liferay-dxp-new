@@ -15,6 +15,7 @@
 package com.liferay.headless.document.library.internal.odata.entity.v1_0;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -39,6 +40,9 @@ public class DocumentEntityModel implements EntityModel {
 	public DocumentEntityModel() {
 		_entityFieldsMap = Stream.of(
 			new CollectionEntityField(
+				new IntegerEntityField(
+					"taxonomyCategoryIds", locale -> "assetCategoryIds")),
+			new CollectionEntityField(
 				new StringEntityField(
 					"keywords", locale -> "assetTagNames.raw")),
 			new DateTimeEntityField(
@@ -50,7 +54,10 @@ public class DocumentEntityModel implements EntityModel {
 				locale -> Field.getSortableFieldName(Field.MODIFIED_DATE),
 				locale -> Field.MODIFIED_DATE),
 			new IdEntityField(
-				"encodingFormat", locale -> "mimeType",
+				"encodingFormat",
+				locale -> Field.getSortableFieldName(
+					StringBundler.concat(
+						"mimeType", StringPool.UNDERLINE, "String")),
 				mimeType -> {
 					String encodingFormat = String.valueOf(mimeType);
 
@@ -60,7 +67,11 @@ public class DocumentEntityModel implements EntityModel {
 			new IntegerEntityField("creatorId", locale -> Field.USER_ID),
 			new IntegerEntityField(
 				"sizeInBytes", locale -> Field.getSortableFieldName("size")),
-			new StringEntityField("fileExtension", locale -> "extension"),
+			new StringEntityField(
+				"fileExtension",
+				locale -> Field.getSortableFieldName(
+					StringBundler.concat(
+						"extension", StringPool.UNDERLINE, "String"))),
 			new StringEntityField(
 				"title",
 				locale -> Field.getSortableFieldName(

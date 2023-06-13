@@ -1,7 +1,27 @@
+import 'libs/odata-parser';
 import * as ODataUtil from 'utils/odata.es';
 import * as Utils from 'utils/utils.es';
 import {mockCriteria, mockCriteriaNested} from 'test/data';
-import 'libs/odata-parser';
+
+const properties = [
+	{
+		label: 'Cookies',
+		name: 'cookies',
+		type: 'collection'
+	}
+];
+
+function testConversionToAndFrom(testQuery, {properties, queryConjunction}) {
+	const translatedMap = ODataUtil.translateQueryToCriteria(testQuery);
+
+	const translatedString = ODataUtil.buildQueryString(
+		[translatedMap],
+		queryConjunction,
+		properties
+	);
+
+	expect(translatedString).toEqual(testQuery);
+}
 
 describe(
 	'odata-util',
@@ -142,11 +162,7 @@ describe(
 					() => {
 						const testQuery = '(firstName eq \'test\')';
 
-						const translatedMap = ODataUtil.translateQueryToCriteria(testQuery);
-
-						const translatedString = ODataUtil.buildQueryString([translatedMap]);
-
-						expect(translatedString).toEqual(testQuery);
+						testConversionToAndFrom(testQuery, {properties});
 					}
 				);
 
@@ -155,11 +171,7 @@ describe(
 					() => {
 						const testQuery = '((firstName eq \'test\' or firstName eq \'test\') and firstName eq \'test\')';
 
-						const translatedMap = ODataUtil.translateQueryToCriteria(testQuery);
-
-						const translatedString = ODataUtil.buildQueryString([translatedMap]);
-
-						expect(translatedString).toEqual(testQuery);
+						testConversionToAndFrom(testQuery, {properties});
 					}
 				);
 
@@ -181,11 +193,7 @@ describe(
 					() => {
 						const testQuery = '(firstName eq \'test\' and ((not (lastName eq \'foo\')) or (not (lastName eq \'bar\'))))';
 
-						const translatedMap = ODataUtil.translateQueryToCriteria(testQuery);
-
-						const translatedString = ODataUtil.buildQueryString([translatedMap]);
-
-						expect(translatedString).toEqual(testQuery);
+						testConversionToAndFrom(testQuery, {properties});
 					}
 				);
 
@@ -194,11 +202,7 @@ describe(
 					() => {
 						const testQuery = '(contains(firstName, \'test\'))';
 
-						const translatedMap = ODataUtil.translateQueryToCriteria(testQuery);
-
-						const translatedString = ODataUtil.buildQueryString([translatedMap]);
-
-						expect(translatedString).toEqual(testQuery);
+						testConversionToAndFrom(testQuery, {properties});
 					}
 				);
 
@@ -207,11 +211,7 @@ describe(
 					() => {
 						const testQuery = '(firstName eq \'test\' and (contains(lastName, \'foo\') or contains(lastName, \'bar\')))';
 
-						const translatedMap = ODataUtil.translateQueryToCriteria(testQuery);
-
-						const translatedString = ODataUtil.buildQueryString([translatedMap]);
-
-						expect(translatedString).toEqual(testQuery);
+						testConversionToAndFrom(testQuery, {properties});
 					}
 				);
 
@@ -220,11 +220,52 @@ describe(
 					() => {
 						const testQuery = '((not (contains(firstName, \'test\'))))';
 
-						const translatedMap = ODataUtil.translateQueryToCriteria(testQuery);
+						testConversionToAndFrom(testQuery, {properties});
+					}
+				);
 
-						const translatedString = ODataUtil.buildQueryString([translatedMap]);
+				it(
+					'should be able to translate a collection type query string with "contains" to map and back to string',
+					() => {
+						const testQuery = '(cookies/any(c:contains(c, \'keyTest=valueTest\')))';
 
-						expect(translatedString).toEqual(testQuery);
+						testConversionToAndFrom(testQuery, {properties});
+					}
+				);
+
+				it(
+					'should be able to translate a collection type query string with "not contains" to map and back to string',
+					() => {
+						const testQuery = '((not (cookies/any(c:contains(c, \'keyTest=valueTest\')))))';
+
+						testConversionToAndFrom(testQuery, {properties});
+					}
+				);
+
+				it(
+					'should be able to translate a collection type query string with "eq" to map and back to string',
+					() => {
+						const testQuery = '(cookies/any(c:c eq \'keyTest=valueTest\'))';
+
+						testConversionToAndFrom(testQuery, {properties});
+					}
+				);
+
+				it(
+					'should be able to translate a collection type query string with "not" to map and back to string',
+					() => {
+						const testQuery = '((not (cookies/any(c:c eq \'keyTest=valueTest\'))))';
+
+						testConversionToAndFrom(testQuery, {properties});
+					}
+				);
+
+				it(
+					'should be able to translate a nested and complex collection type query string to map and back to string',
+					() => {
+						const testQuery = '((not (cookies/any(c:c eq \'keyTest1=valueTest1\'))) and ((not (cookies/any(c:c eq \'keyTest2=valueTest2\'))) or (cookies/any(c:c eq \'keyTest3=valueTest3\') and cookies/any(c:c eq \'keyTest4=valueTest4\'))) and name eq \'test\')';
+
+						testConversionToAndFrom(testQuery, {properties});
 					}
 				);
 			}

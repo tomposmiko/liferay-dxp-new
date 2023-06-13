@@ -65,9 +65,7 @@ public class MBMessageModelIndexerWriterContributor
 				};
 
 				dynamicQuery.add(statusProperty.in(statuses));
-
 			});
-
 		batchIndexingActionable.setPerformActionMethod(
 			(MBMessage mbMessage) -> {
 				if (_log.isDebugEnabled()) {
@@ -86,7 +84,6 @@ public class MBMessageModelIndexerWriterContributor
 					modelIndexerWriterDocumentHelper.getDocument(mbMessage);
 
 				batchIndexingActionable.addDocuments(document);
-
 			});
 	}
 

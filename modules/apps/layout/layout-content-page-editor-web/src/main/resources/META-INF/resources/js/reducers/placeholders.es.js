@@ -1,19 +1,11 @@
-import {
-	CLEAR_ACTIVE_ITEM,
-	CLEAR_DROP_TARGET,
-	CLEAR_HOVERED_ITEM,
-	UPDATE_ACTIVE_ITEM,
-	UPDATE_DROP_TARGET,
-	UPDATE_HIGHLIGHT_MAPPING_STATUS,
-	UPDATE_HOVERED_ITEM
-} from '../actions/actions.es';
+import {CLEAR_ACTIVE_ITEM, CLEAR_DROP_TARGET, CLEAR_HOVERED_ITEM, UPDATE_ACTIVE_ITEM, UPDATE_DROP_TARGET, UPDATE_HOVERED_ITEM} from '../actions/actions.es';
 import {setIn} from '../utils/FragmentsEditorUpdateUtils.es';
 
 /**
  * Updates active element data with the information sent.
  * @param {!object} state
- * @param {UPDATE_ACTIVE_ITEM} actionType
- * @param {!object} payload
+ * @param {CLEAR_ACTIVE_ITEM|UPDATE_ACTIVE_ITEM} actionType
+ * @param {object} payload
  * @param {string} payload.activeItemId
  * @param {string} payload.activeItemType
  * @return {object}
@@ -38,7 +30,7 @@ function updateActiveItemReducer(state, actionType, payload) {
  * Updates drop target element with the information sent.
  * @param {!object} state
  * @param {CLEAR_DROP_TARGET|UPDATE_DROP_TARGET} actionType
- * @param {!object} payload
+ * @param {object} payload
  * @param {string} payload.dropTargetBorder
  * @param {string} payload.dropTargetItemId
  * @param {string} payload.dropTargetItemType
@@ -63,28 +55,10 @@ function updateDropTargetReducer(state, actionType, payload) {
 }
 
 /**
- * @param {!object} state
- * @param {!string} actionType
- * @param {object} payload
- * @param {bool} payload.highlightMapping
- * @return {object}
- * @review
- */
-function updateHighlightMappingReducer(state, actionType, payload) {
-	let nextState = state;
-
-	if (actionType === UPDATE_HIGHLIGHT_MAPPING_STATUS) {
-		nextState = setIn(nextState, ['highlightMapping'], Boolean(payload.highlightMapping));
-	}
-
-	return nextState;
-}
-
-/**
  * Updates hovered element data with the information sent.
  * @param {!object} state
- * @param {UPDATE_HOVERED_ITEM} actionType
- * @param {!object} payload
+ * @param {CLEAR_HOVERED_ITEM|UPDATE_HOVERED_ITEM} actionType
+ * @param {object} payload
  * @param {string} payload.hoveredItemId
  * @param {string} payload.hoveredItemType
  * @return {object}
@@ -108,6 +82,5 @@ function updateHoveredItemReducer(state, actionType, payload) {
 export {
 	updateActiveItemReducer,
 	updateDropTargetReducer,
-	updateHighlightMappingReducer,
 	updateHoveredItemReducer
 };

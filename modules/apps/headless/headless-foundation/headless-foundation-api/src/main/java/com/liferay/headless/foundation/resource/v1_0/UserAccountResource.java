@@ -16,6 +16,9 @@ package com.liferay.headless.foundation.resource.v1_0;
 
 import com.liferay.headless.foundation.dto.v1_0.UserAccount;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -32,30 +35,35 @@ import javax.annotation.Generated;
 @Generated("")
 public interface UserAccountResource {
 
-	public UserAccount getMyUserAccount(
-				Long myUserAccountId)
-			throws Exception;
+	public UserAccount getMyUserAccount(Long userAccountId) throws Exception;
+
 	public Page<UserAccount> getOrganizationUserAccountsPage(
-				Long organizationId,Pagination pagination)
-			throws Exception;
+			Long organizationId, String search, Filter filter,
+			Pagination pagination, Sort[] sorts)
+		throws Exception;
+
 	public Page<UserAccount> getUserAccountsPage(
-				String fullnamequery,Pagination pagination)
-			throws Exception;
-	public UserAccount postUserAccount(
-				UserAccount userAccount)
-			throws Exception;
-	public boolean deleteUserAccount(
-				Long userAccountId)
-			throws Exception;
-	public UserAccount getUserAccount(
-				Long userAccountId)
-			throws Exception;
+			String search, Filter filter, Pagination pagination, Sort[] sorts)
+		throws Exception;
+
+	public UserAccount postUserAccount(UserAccount userAccount)
+		throws Exception;
+
+	public UserAccount postUserAccount(MultipartBody multipartBody)
+		throws Exception;
+
+	public void deleteUserAccount(Long userAccountId) throws Exception;
+
+	public UserAccount getUserAccount(Long userAccountId) throws Exception;
+
 	public UserAccount putUserAccount(
-				Long userAccountId,UserAccount userAccount)
-			throws Exception;
+			Long userAccountId, UserAccount userAccount)
+		throws Exception;
+
 	public Page<UserAccount> getWebSiteUserAccountsPage(
-				Long webSiteId,Pagination pagination)
-			throws Exception;
+			Long webSiteId, String search, Filter filter, Pagination pagination,
+			Sort[] sorts)
+		throws Exception;
 
 	public void setContextCompany(Company contextCompany);
 

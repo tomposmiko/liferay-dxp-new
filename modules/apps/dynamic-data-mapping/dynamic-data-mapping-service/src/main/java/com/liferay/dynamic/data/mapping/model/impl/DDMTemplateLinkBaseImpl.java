@@ -32,8 +32,9 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateLinkLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DDMTemplateLinkBaseImpl extends DDMTemplateLinkModelImpl
-	implements DDMTemplateLink {
+public abstract class DDMTemplateLinkBaseImpl
+	extends DDMTemplateLinkModelImpl implements DDMTemplateLink {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class DDMTemplateLinkBaseImpl extends DDMTemplateLinkModelImpl
 			DDMTemplateLinkLocalServiceUtil.updateDDMTemplateLink(this);
 		}
 	}
+
 }

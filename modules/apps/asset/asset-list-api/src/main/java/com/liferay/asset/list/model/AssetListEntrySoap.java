@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class AssetListEntrySoap implements Serializable {
+
 	public static AssetListEntrySoap toSoapModel(AssetListEntry model) {
 		AssetListEntrySoap soapModel = new AssetListEntrySoap();
 
@@ -41,9 +42,9 @@ public class AssetListEntrySoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
+		soapModel.setAssetListEntryKey(model.getAssetListEntryKey());
 		soapModel.setTitle(model.getTitle());
 		soapModel.setType(model.getType());
-		soapModel.setTypeSettings(model.getTypeSettings());
 		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
@@ -59,11 +60,14 @@ public class AssetListEntrySoap implements Serializable {
 		return soapModels;
 	}
 
-	public static AssetListEntrySoap[][] toSoapModels(AssetListEntry[][] models) {
+	public static AssetListEntrySoap[][] toSoapModels(
+		AssetListEntry[][] models) {
+
 		AssetListEntrySoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new AssetListEntrySoap[models.length][models[0].length];
+			soapModels =
+				new AssetListEntrySoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new AssetListEntrySoap[0][0];
@@ -76,8 +80,11 @@ public class AssetListEntrySoap implements Serializable {
 		return soapModels;
 	}
 
-	public static AssetListEntrySoap[] toSoapModels(List<AssetListEntry> models) {
-		List<AssetListEntrySoap> soapModels = new ArrayList<AssetListEntrySoap>(models.size());
+	public static AssetListEntrySoap[] toSoapModels(
+		List<AssetListEntry> models) {
+
+		List<AssetListEntrySoap> soapModels = new ArrayList<AssetListEntrySoap>(
+			models.size());
 
 		for (AssetListEntry model : models) {
 			soapModels.add(toSoapModel(model));
@@ -161,6 +168,14 @@ public class AssetListEntrySoap implements Serializable {
 		_modifiedDate = modifiedDate;
 	}
 
+	public String getAssetListEntryKey() {
+		return _assetListEntryKey;
+	}
+
+	public void setAssetListEntryKey(String assetListEntryKey) {
+		_assetListEntryKey = assetListEntryKey;
+	}
+
 	public String getTitle() {
 		return _title;
 	}
@@ -175,14 +190,6 @@ public class AssetListEntrySoap implements Serializable {
 
 	public void setType(int type) {
 		_type = type;
-	}
-
-	public String getTypeSettings() {
-		return _typeSettings;
-	}
-
-	public void setTypeSettings(String typeSettings) {
-		_typeSettings = typeSettings;
 	}
 
 	public Date getLastPublishDate() {
@@ -201,8 +208,9 @@ public class AssetListEntrySoap implements Serializable {
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
+	private String _assetListEntryKey;
 	private String _title;
 	private int _type;
-	private String _typeSettings;
 	private Date _lastPublishDate;
+
 }

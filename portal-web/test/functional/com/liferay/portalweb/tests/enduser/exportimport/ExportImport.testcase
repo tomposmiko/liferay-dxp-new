@@ -33,7 +33,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -46,7 +46,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -93,6 +93,8 @@ definition {
 
 		Pause(locator1 = "3000");
 
+		var larFileName = LAR.getLarFileName();
+
 		LAR.downloadLar();
 
 		ProductMenu.gotoPortlet(
@@ -103,12 +105,12 @@ definition {
 
 		Site.addBlankCP(siteName = "Site Name");
 
-		LAR.importSiteCP(larFileName = "Export.Template", siteName = "Site Name");
+		LAR.importSiteCP(larFileName = "${larFileName}", siteName = "Site Name");
 
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -149,7 +151,7 @@ definition {
 			larFileName = "Edited Export Template Name"
 		);
 
-		var larFile = RegexUtil.replace("Edited Export Template Name", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
+		var larFileName = LAR.getLarFileName();
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "SitePagesExport#CURRENT_AND_PREVIOUS_STATUS",
@@ -160,12 +162,12 @@ definition {
 
 		Pause(locator1 = "5000");
 
-		LAR.importSiteCP(larFileName = "${larFile}", siteName = "Site Name");
+		LAR.importSiteCP(larFileName = "${larFileName}", siteName = "Site Name");
 
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -200,7 +202,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Page Fragments"
 		);
@@ -308,7 +310,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -318,7 +320,7 @@ definition {
 		ProductMenu.gotoSite(site = "Global");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
 		);
@@ -339,7 +341,7 @@ definition {
 		ProductMenu.gotoSite(site = "Global");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
 		);
@@ -370,7 +372,7 @@ definition {
 		ProductMenu.gotoSite(site = "Global");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
 		);
@@ -380,7 +382,7 @@ definition {
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
 		);
@@ -392,7 +394,7 @@ definition {
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
 		);
@@ -411,7 +413,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -428,7 +430,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -438,7 +440,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -451,7 +453,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -461,7 +463,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -471,7 +473,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -484,7 +486,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -497,7 +499,7 @@ definition {
 		property portal.acceptance = "true";
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -532,7 +534,7 @@ definition {
 		Site.addBlankCP(siteName = "Test Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -555,9 +557,9 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
-			portlet = "Application Display Templates"
+			portlet = "Widget Templates"
 		);
 
 		ApplicationDisplayTemplates.addCP(
@@ -566,7 +568,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -598,13 +600,7 @@ definition {
 
 		LAR.exportSuccess();
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -635,7 +631,7 @@ definition {
 		property testray.component.names = "Training";
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -657,13 +653,7 @@ definition {
 			value1 = "Successful"
 		);
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9k)]*", "1");
-
-		echo("lar file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -691,8 +681,6 @@ definition {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
-		User.firstLoginPG();
-
 		LAR.exportSiteCP();
 
 		var key_larFileName = "${larFileName}";
@@ -702,13 +690,7 @@ definition {
 			value1 = "Successful"
 		);
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("lar file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -732,7 +714,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -754,13 +736,7 @@ definition {
 			value1 = "Successful"
 		);
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -794,7 +770,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media"
 		);
@@ -808,7 +784,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -821,7 +797,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -832,7 +808,7 @@ definition {
 
 		Click(locator1 = "AlloyEditor#CONTENT_ADD_BUTTON");
 
-		Click(locator1 = "AlloyEditor#CONTENT_ADD_MENUBAR_IMAGE");
+		Click.clickNoMouseOver(locator1 = "AlloyEditor#CONTENT_ADD_MENUBAR_IMAGE");
 
 		ItemSelector.selectDMImage(
 			imageFileName = "DM Document Title",
@@ -850,18 +826,12 @@ definition {
 
 		LAR.exportSuccess();
 
-		var valueName = selenium.getText("//ul/li/div/h5");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media"
 		);
@@ -897,7 +867,7 @@ definition {
 		Site.addBlankCP(siteName = "Exported Site");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -946,6 +916,8 @@ definition {
 			webContentTitle = "Exported Article"
 		);
 
+		WebContent.closeSidebar();
+
 		DDLRecord.addRepeatableField(fieldName = "Separator");
 
 		DDLRecord.populateFieldText(
@@ -970,7 +942,7 @@ definition {
 		Site.addBlankCP(siteName = "Imported Site");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -1052,13 +1024,7 @@ definition {
 			exportTemplateName = "Export Template Name"
 		);
 
-		var valueName = selenium.getAttribute("//ul/li/div/h5//a@href");
-
-		echo("value name ${valueName}");
-
-		var larFileName = RegexUtil.replace("${valueName}", "http://localhost:8080/documents/portlet_file_entry/[0-9]*/([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
-
-		echo("file name ${larFileName}");
+		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
 
@@ -1081,7 +1047,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Bookmarks"
 		);

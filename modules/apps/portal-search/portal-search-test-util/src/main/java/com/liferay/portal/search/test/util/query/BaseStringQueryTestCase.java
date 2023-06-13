@@ -15,23 +15,26 @@
 package com.liferay.portal.search.test.util.query;
 
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.filter.TermFilter;
-import com.liferay.portal.kernel.search.generic.StringQuery;
-import com.liferay.portal.search.test.util.DocumentsAssert;
+import com.liferay.portal.search.document.Document;
+import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
+import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
+import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.hits.SearchHit;
+import com.liferay.portal.search.hits.SearchHits;
+import com.liferay.portal.search.query.StringQuery;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * @author Tibor Lipusz
- * @author André de Oliveira
+ * @author Michael C. Han
  */
 public abstract class BaseStringQueryTestCase extends BaseIndexingTestCase {
 
@@ -138,44 +141,115 @@ public abstract class BaseStringQueryTestCase extends BaseIndexingTestCase {
 		assertSearch("-bravo OR alpha", Arrays.asList("alpha charlie"));
 	}
 
+	@Test
+	public void testStringQuery() {
+		for (int i = 0; i < 10; i++) {
+			addDocument(
+				DocumentCreationHelpers.singleKeyword(
+					Field.USER_NAME, "SomeUser" + i));
+			addDocument(
+				DocumentCreationHelpers.singleKeyword(
+					Field.USER_NAME, "OtherUser" + i));
+			addDocument(
+				DocumentCreationHelpers.singleKeyword(
+					Field.USER_NAME, "Other" + i));
+		}
+
+		StringQuery stringQuery = queries.string("SomeUser* OR OtherUser* ");
+
+		stringQuery.setDefaultField(Field.USER_NAME);
+
+		assertSearch(
+			indexingTestHelper -> {
+				SearchEngineAdapter searchEngineAdapter =
+					getSearchEngineAdapter();
+
+				SearchSearchResponse searchSearchResponse =
+					searchEngineAdapter.execute(
+						new SearchSearchRequest() {
+							{
+								addSorts(sorts.field(Field.USER_NAME));
+								setIndexNames("_all");
+								setQuery(stringQuery);
+								setSize(30);
+							}
+						});
+
+				SearchHits searchHits = searchSearchResponse.getSearchHits();
+
+				Assert.assertEquals(
+					"Total hits", 20, searchHits.getTotalHits());
+
+				List<SearchHit> searchHitList = searchHits.getSearchHits();
+
+				Assert.assertEquals("Retrieved hits", 20, searchHitList.size());
+
+				searchHitList.forEach(
+					searchHit -> {
+						Document document = searchHit.getDocument();
+
+						String userName = document.getString(Field.USER_NAME);
+
+						Assert.assertTrue(
+							userName.startsWith("OtherUser") ||
+							userName.startsWith("SomeUser"));
+					});
+			});
+	}
+
 	protected void addDocuments(String... values) throws Exception {
 		addDocuments(
 			value -> DocumentCreationHelpers.singleText(_FIELD_NAME, value),
 			Arrays.asList(values));
 	}
 
-	protected void assertSearch(String queryString, List<String> expectedValues)
-		throws Exception {
+	protected void assertSearch(
+		String queryString, List<String> expectedValues) {
 
 		assertSearch(
 			indexingTestHelper -> {
-				indexingTestHelper.setFilter(
-					new TermFilter(
-						Field.ENTRY_CLASS_NAME, getEntryClassName()));
-				indexingTestHelper.setQuery(new StringQuery(queryString));
+				StringQuery stringQuery = queries.string(queryString);
 
-				indexingTestHelper.search();
+				stringQuery.setDefaultField(_FIELD_NAME);
 
-				indexingTestHelper.verify(
-					hits -> DocumentsAssert.assertValues(
-						indexingTestHelper.getQueryString(), hits.getDocs(),
-						_FIELD_NAME, expectedValues));
+				SearchSearchRequest searchSearchRequest =
+					new SearchSearchRequest();
+
+				searchSearchRequest.setIndexNames("_all");
+				searchSearchRequest.setQuery(stringQuery);
+				searchSearchRequest.setSize(30);
+
+				SearchEngineAdapter searchEngineAdapter =
+					getSearchEngineAdapter();
+
+				SearchSearchResponse searchSearchResponse =
+					searchEngineAdapter.execute(searchSearchRequest);
+
+				SearchHits searchHits = searchSearchResponse.getSearchHits();
+
+				Assert.assertEquals(
+					"Total hits", expectedValues.size(),
+					searchHits.getTotalHits());
+
+				List<SearchHit> searchHitList = searchHits.getSearchHits();
+
+				Assert.assertEquals(
+					"Retrieved hits", expectedValues.size(),
+					searchHitList.size());
+
+				List<String> actualValues = new ArrayList<>();
+
+				searchHitList.forEach(
+					searchHit -> {
+						Document document = searchHit.getDocument();
+
+						actualValues.add(document.getString(_FIELD_NAME));
+					});
+
+				Assert.assertEquals(
+					"Retrieved hits ->" + actualValues,
+					expectedValues.toString(), actualValues.toString());
 			});
-	}
-
-	protected Void doAssertSearch(String query, List<String> expectedValues)
-		throws Exception {
-
-		SearchContext searchContext = createSearchContext();
-
-		StringQuery stringQuery = new StringQuery(query);
-
-		Hits hits = search(searchContext, stringQuery);
-
-		DocumentsAssert.assertValues(
-			query, hits.getDocs(), _FIELD_NAME, expectedValues);
-
-		return null;
 	}
 
 	private static final String _FIELD_NAME = "title";

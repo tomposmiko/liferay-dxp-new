@@ -14,40 +14,161 @@
 
 package com.liferay.headless.collaboration.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface Image {
+@GraphQLName("Image")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "Image")
+public class Image {
 
-	public String getContentUrl();
+	public String getCaption() {
+		return caption;
+	}
 
+	public void setCaption(String caption) {
+		this.caption = caption;
+	}
+
+	@JsonIgnore
+	public void setCaption(
+		UnsafeSupplier<String, Exception> captionUnsafeSupplier) {
+
+		try {
+			caption = captionUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String caption;
+
+	public String getContentUrl() {
+		return contentUrl;
+	}
+
+	public void setContentUrl(String contentUrl) {
+		this.contentUrl = contentUrl;
+	}
+
+	@JsonIgnore
 	public void setContentUrl(
-			String contentUrl);
+		UnsafeSupplier<String, Exception> contentUrlUnsafeSupplier) {
 
-	public void setContentUrl(
-			UnsafeSupplier<String, Throwable>
-				contentUrlUnsafeSupplier);
-	public Long getImageId();
+		try {
+			contentUrl = contentUrlUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected String contentUrl;
+
+	public Long getImageId() {
+		return imageId;
+	}
+
+	public void setImageId(Long imageId) {
+		this.imageId = imageId;
+	}
+
+	@JsonIgnore
 	public void setImageId(
-			Long imageId);
+		UnsafeSupplier<Long, Exception> imageIdUnsafeSupplier) {
 
-	public void setImageId(
-			UnsafeSupplier<Long, Throwable>
-				imageIdUnsafeSupplier);
-	public String getName();
+		try {
+			imageId = imageIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setName(
-			String name);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	protected Long imageId;
 
-	public void setName(
-			UnsafeSupplier<String, Throwable>
-				nameUnsafeSupplier);
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Image)) {
+			return false;
+		}
+
+		Image image = (Image)object;
+
+		return Objects.equals(toString(), image.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"caption\": ");
+
+		sb.append("\"");
+		sb.append(caption);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"contentUrl\": ");
+
+		sb.append("\"");
+		sb.append(contentUrl);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"imageId\": ");
+
+		sb.append(imageId);
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

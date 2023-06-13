@@ -14,40 +14,157 @@
 
 package com.liferay.headless.foundation.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface WebUrl {
+@GraphQLName("WebUrl")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "WebUrl")
+public class WebUrl {
 
-	public Long getId();
+	public Long getId() {
+		return id;
+	}
 
-	public void setId(
-			Long id);
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public String getUrl();
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setUrl(
-			String url);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
 
-	public void setUrl(
-			UnsafeSupplier<String, Throwable>
-				urlUnsafeSupplier);
-	public String getUrlType();
+	public String getUrl() {
+		return url;
+	}
 
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	@JsonIgnore
+	public void setUrl(UnsafeSupplier<String, Exception> urlUnsafeSupplier) {
+		try {
+			url = urlUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String url;
+
+	public String getUrlType() {
+		return urlType;
+	}
+
+	public void setUrlType(String urlType) {
+		this.urlType = urlType;
+	}
+
+	@JsonIgnore
 	public void setUrlType(
-			String urlType);
+		UnsafeSupplier<String, Exception> urlTypeUnsafeSupplier) {
 
-	public void setUrlType(
-			UnsafeSupplier<String, Throwable>
-				urlTypeUnsafeSupplier);
+		try {
+			urlType = urlTypeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String urlType;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof WebUrl)) {
+			return false;
+		}
+
+		WebUrl webUrl = (WebUrl)object;
+
+		return Objects.equals(toString(), webUrl.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"url\": ");
+
+		sb.append("\"");
+		sb.append(url);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"urlType\": ");
+
+		sb.append("\"");
+		sb.append(urlType);
+		sb.append("\"");
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

@@ -51,6 +51,13 @@ public class DEDataRecordCollectionRequestBuilder {
 			deDataRecordId);
 	}
 
+	public static DEDataRecordCollectionExportRecordsRequest.Builder
+		exportRecordsBuilder(long deDataRecordCollectionId, String format) {
+
+		return new DEDataRecordCollectionExportRecordsRequest.Builder(
+			deDataRecordCollectionId, format);
+	}
+
 	public static DEDataRecordCollectionGetRequest.Builder getBuilder() {
 		return new DEDataRecordCollectionGetRequest.Builder();
 	}
@@ -60,6 +67,17 @@ public class DEDataRecordCollectionRequestBuilder {
 
 		return new DEDataRecordCollectionGetRecordRequest.Builder(
 			deDataRecordId);
+	}
+
+	public static DEDataRecordCollectionListRequest.Builder listBuilder() {
+		return new DEDataRecordCollectionListRequest.Builder();
+	}
+
+	public static DEDataRecordCollectionListRecordRequest.Builder
+		listRecordBuilder(long deDataRecordCollectionId) {
+
+		return new DEDataRecordCollectionListRecordRequest.Builder(
+			deDataRecordCollectionId);
 	}
 
 	public static DEDataRecordCollectionSaveRequest.Builder saveBuilder(
@@ -92,6 +110,10 @@ public class DEDataRecordCollectionRequestBuilder {
 
 		return new DEDataRecordCollectionSaveRecordRequest.Builder(
 			deDataRecord);
+	}
+
+	public static DEDataRecordCollectionSearchRequest.Builder searchBuilder() {
+		return new DEDataRecordCollectionSearchRequest.Builder();
 	}
 
 }

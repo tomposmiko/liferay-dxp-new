@@ -119,7 +119,7 @@ definition {
 			portletOption = "Export / Import"
 		);
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = "3000");
 	}
 
 	macro _gotoExportSite {
@@ -147,7 +147,7 @@ definition {
 	}
 
 	macro _importSite {
-		Pause(locator1 = "18000");
+		Pause(locator1 = "15000");
 
 		Click(locator1 = "Button#CONTINUE");
 
@@ -205,24 +205,20 @@ definition {
 
 		AssertElementPresent(locator1 = "Button#SELECT_FILE");
 
-		AssertClick(locator1 = "Button#SELECT_FILE", value1 = "Select File");
-
-		SikuliClick(locator1 = "OS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG");
-
 		if ("${uploadFrom}" == "dependencies") {
-			SikuliUploadCommonFile(
-				locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+			UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+				locator1 = "TextInput#FILE",
 				value1 = "${larFileName}"
 			);
 		}
 		else {
-			SikuliUploadTempFile(
-				locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+			UploadTempFile.uploadTempFileHiddenNoMouseOver(
+				locator1 = "TextInput#FILE",
 				value1 = "${larFileName}"
 			);
 		}
 
-		Pause(locator1 = "30000");
+		Pause(locator1 = "15000");
 
 		if ("${cannotImport}" == "true") {
 			AssertTextEquals(
@@ -305,28 +301,22 @@ definition {
 
 		Pause(locator1 = "5000");
 
-		AssertClick(locator1 = "Button#SELECT_FILE", value1 = "Select File");
-
-		Pause(locator1 = "13000");
-
-		SikuliClick(locator1 = "OS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG");
-
-		Pause(locator1 = "13000");
+		AssertElementPresent(locator1 = "Button#SELECT_FILE");
 
 		if ("${uploadFrom}" == "dependencies") {
-			SikuliUploadCommonFile(
-				locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+			UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+				locator1 = "TextInput#FILE",
 				value1 = "${larFileName}"
 			);
 		}
 		else {
-			SikuliUploadTempFile(
-				locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+			UploadTempFile.uploadTempFileHiddenNoMouseOver(
+				locator1 = "TextInput#FILE",
 				value1 = "${larFileName}"
 			);
 		}
 
-		Pause(locator1 = "190000");
+		Pause(locator1 = "15000");
 
 		if (isSet(importValidationMissingItem)) {
 			AssertTextEquals.assertPartialText(
@@ -424,6 +414,24 @@ definition {
 			uncheckSubContent = "${uncheckSubContent}",
 			uncheckSubSubContent = "${uncheckSubSubContent}"
 		);
+	}
+
+	macro deleteCurrentAndPreviousProcess {
+		if (isSet(deleteFromPortlet)) {
+			LAR._gotoExportImport();
+
+			SelectFrame(locator1 = "IFrame#CONFIGURATION_DIALOG");
+
+			Click(locator1 = "ExportImport#CURRENT_AND_PREVIOUS_TAB");
+		}
+
+		LexiconEntry.gotoEntryMenuItemNoError(menuItem = "Clear", rowEntry = "${larFileName}");
+
+		AssertConfirm(
+			value1 = "Are you sure you want to delete this? It will be deleted immediately."
+		);
+
+		Alert.viewSuccessMessage();
 	}
 
 	macro downloadLar {
@@ -528,11 +536,25 @@ definition {
 	}
 
 	macro filterCompletedProcesses {
-		Pause(locator1 = "5000");
+		Pause(locator1 = "3000");
 
 		Click(locator1 = "Dropdown#FILTER_AND_ORDER");
 
 		MenuItem.click(menuItem = "Completed");
+	}
+
+	macro getLarFileName {
+		var valueName = selenium.getAttribute("//ul/li/div/h2//a@href");
+
+		echo("value name ${valueName}");
+
+		var portalURL = PropsUtil.get("portal.url");
+
+		var larFileName = RegexUtil.replace("${valueName}", "${portalURL}/documents/portlet_file_entry/[0-9]*/([a-zA-z0-9_.-]*)[(0-9KB)]*", "1");
+
+		echo("lar file name ${larFileName}");
+
+		return "${larFileName}";
 	}
 
 	macro gotoExport {
@@ -593,6 +615,15 @@ definition {
 	macro openImportAdmin {
 		Navigator.openWithAppendToBaseURL(
 			urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_exportimport_web_portlet_ImportPortlet"
+		);
+	}
+
+	macro relaunchCurrentAndPreviousProcess {
+		LexiconEntry.gotoEntryMenuItem(menuItem = "Relaunch", rowEntry = "${larFileName}");
+
+		AssertTextEquals(
+			locator1 = "SitePagesExport#CURRENT_AND_PREVIOUS_STATUS",
+			value1 = "Successful"
 		);
 	}
 
@@ -692,7 +723,7 @@ definition {
 		}
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);

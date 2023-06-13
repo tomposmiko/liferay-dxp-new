@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class DDMTemplateSoap implements Serializable {
+
 	public static DDMTemplateSoap toSoapModel(DDMTemplate model) {
 		DDMTemplateSoap soapModel = new DDMTemplateSoap();
 
@@ -91,7 +92,8 @@ public class DDMTemplateSoap implements Serializable {
 	}
 
 	public static DDMTemplateSoap[] toSoapModels(List<DDMTemplate> models) {
-		List<DDMTemplateSoap> soapModels = new ArrayList<DDMTemplateSoap>(models.size());
+		List<DDMTemplateSoap> soapModels = new ArrayList<DDMTemplateSoap>(
+			models.size());
 
 		for (DDMTemplate model : models) {
 			soapModels.add(toSoapModel(model));
@@ -353,4 +355,5 @@ public class DDMTemplateSoap implements Serializable {
 	private long _smallImageId;
 	private String _smallImageURL;
 	private Date _lastPublishDate;
+
 }

@@ -1,15 +1,11 @@
-package ${configYAML.apiPackagePath}.internal.resource.${versionDirName};
+package ${configYAML.apiPackagePath}.internal.resource.${escapedVersion};
 
-<#compress>
-	<#list openAPIYAML.components.schemas?keys as schemaName>
-		import ${configYAML.apiPackagePath}.dto.${versionDirName}.${schemaName};
-		import ${configYAML.apiPackagePath}.internal.dto.${versionDirName}.${schemaName}Impl;
-	</#list>
-</#compress>
+<#list openAPIYAML.components.schemas?keys as schemaName>
+	import ${configYAML.apiPackagePath}.dto.${escapedVersion}.${schemaName};
+</#list>
 
-import ${configYAML.apiPackagePath}.resource.${versionDirName}.${schemaName}Resource;
+import ${configYAML.apiPackagePath}.resource.${escapedVersion}.${schemaName}Resource;
 
-import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Company;
@@ -23,12 +19,20 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.LocalDateTimeUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.net.URI;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Generated;
+
+import javax.validation.constraints.NotNull;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -44,7 +48,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -55,35 +59,40 @@ import javax.ws.rs.core.UriInfo;
 @Path("/${openAPIYAML.info.version}")
 public abstract class Base${schemaName}ResourceImpl implements ${schemaName}Resource {
 
-	<#list freeMarkerTool.getResourceJavaMethodSignatures(configYAML, openAPIYAML, schemaName, false) as javaMethodSignature>
+	<#list freeMarkerTool.getResourceJavaMethodSignatures(configYAML, openAPIYAML, schemaName) as javaMethodSignature>
 		@Override
 		${freeMarkerTool.getResourceMethodAnnotations(javaMethodSignature)}
-		public ${javaMethodSignature.returnType} ${javaMethodSignature.methodName}(
-				${freeMarkerTool.getResourceParameters(javaMethodSignature.javaParameters, true)})
-			throws Exception {
-
+		public ${javaMethodSignature.returnType} ${javaMethodSignature.methodName}(${freeMarkerTool.getResourceParameters(javaMethodSignature.javaMethodParameters, javaMethodSignature.operation, true)}) throws Exception {
 			<#if stringUtil.equals(javaMethodSignature.returnType, "boolean")>
 				return false;
-			<#elseif stringUtil.equals(javaMethodSignature.returnType, "String")>
+			<#elseif stringUtil.equals(javaMethodSignature.returnType, "java.lang.String")>
 				return StringPool.BLANK;
+			<#elseif stringUtil.equals(javaMethodSignature.returnType, "javax.ws.rs.core.Response")>
+				Response.ResponseBuilder responseBuilder = Response.ok();
+
+				return responseBuilder.build();
 			<#elseif javaMethodSignature.returnType?contains("Page<")>
 				return Page.of(Collections.emptyList());
-			<#elseif freeMarkerTool.hasHTTPMethod(javaMethodSignature, "patch")>
-				<#assign firstJavaParameter = javaMethodSignature.javaParameters[0] />
+			<#elseif freeMarkerTool.hasHTTPMethod(javaMethodSignature, "patch") && !javaMethodSignature.operation.requestBody.content?keys?seq_contains("multipart/form-data")>
+				<#assign firstJavaMethodParameter = javaMethodSignature.javaMethodParameters[0] />
 
-				${schemaName} existing${schemaName} = get${schemaName}(${firstJavaParameter.parameterName});
+				preparePatch(${schemaVarName});
 
-				<#list freeMarkerTool.getDTOJavaParameters(configYAML, openAPIYAML, schemaName, false) as javaParameter>
-					<#if !freeMarkerTool.isSchemaParameter(javaParameter, openAPIYAML)>
-						if (Validator.isNotNull(${schemaVarName}.get${javaParameter.parameterName?cap_first}())) {
-							existing${schemaName}.set${javaParameter.parameterName?cap_first}(${schemaVarName}.get${javaParameter.parameterName?cap_first}());
+				${schemaName} existing${schemaName} = get${schemaName}(${firstJavaMethodParameter.parameterName});
+
+				<#assign properties = freeMarkerTool.getDTOProperties(configYAML, openAPIYAML, schema) />
+
+				<#list properties?keys as propertyName>
+					<#if !freeMarkerTool.isDTOSchemaProperty(openAPIYAML, propertyName, schema) && !stringUtil.equals(propertyName, "id")>
+						if (Validator.isNotNull(${schemaVarName}.get${propertyName?cap_first}())) {
+							existing${schemaName}.set${propertyName?cap_first}(${schemaVarName}.get${propertyName?cap_first}());
 						}
 					</#if>
 				</#list>
 
-				return put${schemaName}(${firstJavaParameter.parameterName}, existing${schemaName});
-			<#else>
-				return new ${javaMethodSignature.returnType}Impl();
+				return put${schemaName}(${firstJavaMethodParameter.parameterName}, existing${schemaName});
+			<#elseif !stringUtil.equals(javaMethodSignature.returnType, "void")>
+				return new ${javaMethodSignature.returnType}();
 			</#if>
 		}
 	</#list>
@@ -92,24 +101,23 @@ public abstract class Base${schemaName}ResourceImpl implements ${schemaName}Reso
 		this.contextCompany = contextCompany;
 	}
 
-	protected String getJAXRSLink(String methodName, Object... values) {
-		URI baseURI = contextUriInfo.getBaseUri();
-
-		URI resourceURI = UriBuilder.fromResource(
-			Base${schemaName}ResourceImpl.class
-		).build();
-
-		URI methodURI = UriBuilder.fromMethod(
-			Base${schemaName}ResourceImpl.class, methodName
-		).build(
-			values
-		);
-
-		return baseURI.toString() + resourceURI.toString() + methodURI.toString();
+	protected void preparePatch(${schemaName} ${schemaVarName}) {
 	}
 
-	protected <T, R> List<R> transform(List<T> list, UnsafeFunction<T, R, Throwable> unsafeFunction) {
-		return TransformUtil.transform(list, unsafeFunction);
+	protected <T, R> List<R> transform(Collection<T> collection, UnsafeFunction<T, R, Exception> unsafeFunction) {
+		return TransformUtil.transform(collection, unsafeFunction);
+	}
+
+	protected <T, R> R[] transform(T[] array, UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
+		return TransformUtil.transform(array, unsafeFunction, clazz);
+	}
+
+	protected <T, R> R[] transformToArray(Collection<T> collection, UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
+		return TransformUtil.transformToArray(collection, unsafeFunction, clazz);
+	}
+
+	protected <T, R> List<R> transformToList(T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
+		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
 	@Context

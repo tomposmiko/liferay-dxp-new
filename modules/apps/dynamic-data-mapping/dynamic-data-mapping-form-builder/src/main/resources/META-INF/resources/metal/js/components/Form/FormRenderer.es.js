@@ -1,13 +1,13 @@
 import '../Page/PageRenderer.es';
 import '../SuccessPage/SuccessPage.es';
 import 'clay-button';
+import * as FormSupport from './FormSupport.es';
+import Component from 'metal-component';
+import Soy from 'metal-soy';
+import templates from './FormRenderer.soy.js';
 import {Config} from 'metal-state';
 import {DragDrop} from 'metal-drag-drop';
 import {pageStructure} from '../../util/config.es';
-import Component from 'metal-component';
-import FormSupport from './FormSupport.es';
-import Soy from 'metal-soy';
-import templates from './FormRenderer.soy.js';
 import {setValue} from '../../util/i18n.es';
 
 /**
@@ -339,6 +339,10 @@ class FormRenderer extends Component {
 		this.emit('pageReset');
 	}
 
+	_handleColumnResized(event) {
+		this.emit('columnResized', event);
+	}
+
 	_handleChangePage({delegateTarget: {dataset}}) {
 		const {pageIndex} = dataset;
 
@@ -350,7 +354,7 @@ class FormRenderer extends Component {
 		const {height} = source.getBoundingClientRect();
 		const {parentElement} = source;
 
-		parentElement.setAttribute('style', `height: ${height}px`);
+		parentElement.setAttribute('style', `height: ${height}px !important;`);
 		parentElement.classList.add('ddm-parent-dragging');
 	}
 
@@ -359,7 +363,7 @@ class FormRenderer extends Component {
 	 * @private
 	 */
 
-	_handleDragAndDropEnd(data) {
+	_handleDragAndDropEnd({source, target}) {
 		const lastParent = document.querySelector('.ddm-parent-dragging');
 
 		if (lastParent) {
@@ -367,17 +371,19 @@ class FormRenderer extends Component {
 			lastParent.removeAttribute('style');
 		}
 
-		if (data.target) {
+		if (target) {
 			const sourceIndex = FormSupport.getIndexes(
-				data.source.parentElement.parentElement
+				source.parentElement.parentElement
 			);
-			const targetIndex = FormSupport.getIndexes(data.target.parentElement);
+			const targetIndex = FormSupport.getIndexes(target.parentElement);
 
-			data.source.innerHTML = '';
+			source.innerHTML = '';
+
+			const addedToPlaceholder = ![...target.parentElement.parentElement.classList].includes('position-relative');
 
 			this._handleFieldMoved(
 				{
-					data,
+					addedToPlaceholder,
 					source: sourceIndex,
 					target: targetIndex
 				}
@@ -419,6 +425,15 @@ class FormRenderer extends Component {
 			'activePageUpdated',
 			index
 		);
+	}
+
+	/**
+	 * @param {!Object} event
+	 * @private
+	 */
+
+	_handleFieldBlurred(event) {
+		this.emit('fieldBlurred', event);
 	}
 
 	/**

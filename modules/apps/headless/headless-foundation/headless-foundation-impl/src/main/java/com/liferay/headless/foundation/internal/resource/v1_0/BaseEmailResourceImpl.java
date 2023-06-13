@@ -15,29 +15,29 @@
 package com.liferay.headless.foundation.internal.resource.v1_0;
 
 import com.liferay.headless.foundation.dto.v1_0.Email;
-import com.liferay.headless.foundation.internal.dto.v1_0.EmailImpl;
 import com.liferay.headless.foundation.resource.v1_0.EmailResource;
-import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Page;
-import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.net.URI;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Generated;
+
+import javax.validation.constraints.NotNull;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -50,49 +50,72 @@ public abstract class BaseEmailResourceImpl implements EmailResource {
 
 	@Override
 	@GET
-	@Path("/emails")
-	@Produces("application/json")
-	@RequiresScope("everything.read")
-	public Page<Email> getGenericParentEmailsPage(
-	@PathParam("generic-parent-id") Object genericParentId,@Context Pagination pagination)
-			throws Exception {
-
-				return Page.of(Collections.emptyList());
-	}
-	@Override
-	@GET
 	@Path("/emails/{email-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
-	public Email getEmail(
-	@PathParam("email-id") Long emailId)
-			throws Exception {
+	@Tags(value = {@Tag(name = "Email")})
+	public Email getEmail(@NotNull @PathParam("email-id") Long emailId)
+		throws Exception {
 
-				return new EmailImpl();
+		return new Email();
+	}
+
+	@Override
+	@GET
+	@Path("/organizations/{organization-id}/emails")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Email")})
+	public Page<Email> getOrganizationEmailsPage(
+			@NotNull @PathParam("organization-id") Long organizationId)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
+	}
+
+	@Override
+	@GET
+	@Path("/user-accounts/{user-account-id}/emails")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Email")})
+	public Page<Email> getUserAccountEmailsPage(
+			@NotNull @PathParam("user-account-id") Long userAccountId)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
 	}
 
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected String getJAXRSLink(String methodName, Object... values) {
-		URI baseURI = contextUriInfo.getBaseUri();
-
-		URI resourceURI = UriBuilder.fromResource(
-			BaseEmailResourceImpl.class
-		).build();
-
-		URI methodURI = UriBuilder.fromMethod(
-			BaseEmailResourceImpl.class, methodName
-		).build(
-			values
-		);
-
-		return baseURI.toString() + resourceURI.toString() + methodURI.toString();
+	protected void preparePatch(Email email) {
 	}
 
-	protected <T, R> List<R> transform(List<T> list, UnsafeFunction<T, R, Throwable> unsafeFunction) {
-		return TransformUtil.transform(list, unsafeFunction);
+	protected <T, R> List<R> transform(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transform(collection, unsafeFunction);
+	}
+
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
+
+		return TransformUtil.transform(array, unsafeFunction, clazz);
+	}
+
+	protected <T, R> R[] transformToArray(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
+
+		return TransformUtil.transformToArray(
+			collection, unsafeFunction, clazz);
+	}
+
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
 	@Context

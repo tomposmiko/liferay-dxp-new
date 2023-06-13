@@ -29,6 +29,7 @@ import java.util.List;
  */
 @ProviderType
 public class DDMStructureLinkSoap implements Serializable {
+
 	public static DDMStructureLinkSoap toSoapModel(DDMStructureLink model) {
 		DDMStructureLinkSoap soapModel = new DDMStructureLinkSoap();
 
@@ -41,8 +42,11 @@ public class DDMStructureLinkSoap implements Serializable {
 		return soapModel;
 	}
 
-	public static DDMStructureLinkSoap[] toSoapModels(DDMStructureLink[] models) {
-		DDMStructureLinkSoap[] soapModels = new DDMStructureLinkSoap[models.length];
+	public static DDMStructureLinkSoap[] toSoapModels(
+		DDMStructureLink[] models) {
+
+		DDMStructureLinkSoap[] soapModels =
+			new DDMStructureLinkSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -53,10 +57,12 @@ public class DDMStructureLinkSoap implements Serializable {
 
 	public static DDMStructureLinkSoap[][] toSoapModels(
 		DDMStructureLink[][] models) {
+
 		DDMStructureLinkSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new DDMStructureLinkSoap[models.length][models[0].length];
+			soapModels =
+				new DDMStructureLinkSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new DDMStructureLinkSoap[0][0];
@@ -71,7 +77,9 @@ public class DDMStructureLinkSoap implements Serializable {
 
 	public static DDMStructureLinkSoap[] toSoapModels(
 		List<DDMStructureLink> models) {
-		List<DDMStructureLinkSoap> soapModels = new ArrayList<DDMStructureLinkSoap>(models.size());
+
+		List<DDMStructureLinkSoap> soapModels =
+			new ArrayList<DDMStructureLinkSoap>(models.size());
 
 		for (DDMStructureLink model : models) {
 			soapModels.add(toSoapModel(model));
@@ -136,4 +144,5 @@ public class DDMStructureLinkSoap implements Serializable {
 	private long _classNameId;
 	private long _classPK;
 	private long _structureId;
+
 }

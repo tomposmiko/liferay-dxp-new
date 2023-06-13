@@ -17,10 +17,8 @@ package com.liferay.document.library.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.document.library.model.DLFileVersionPreview;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -35,8 +33,9 @@ import java.io.ObjectOutput;
  * @generated
  */
 @ProviderType
-public class DLFileVersionPreviewCacheModel implements CacheModel<DLFileVersionPreview>,
-	Externalizable {
+public class DLFileVersionPreviewCacheModel
+	implements CacheModel<DLFileVersionPreview>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -47,9 +46,12 @@ public class DLFileVersionPreviewCacheModel implements CacheModel<DLFileVersionP
 			return false;
 		}
 
-		DLFileVersionPreviewCacheModel dlFileVersionPreviewCacheModel = (DLFileVersionPreviewCacheModel)obj;
+		DLFileVersionPreviewCacheModel dlFileVersionPreviewCacheModel =
+			(DLFileVersionPreviewCacheModel)obj;
 
-		if (dlFileVersionPreviewId == dlFileVersionPreviewCacheModel.dlFileVersionPreviewId) {
+		if (dlFileVersionPreviewId ==
+				dlFileVersionPreviewCacheModel.dlFileVersionPreviewId) {
+
 			return true;
 		}
 
@@ -82,9 +84,11 @@ public class DLFileVersionPreviewCacheModel implements CacheModel<DLFileVersionP
 
 	@Override
 	public DLFileVersionPreview toEntityModel() {
-		DLFileVersionPreviewImpl dlFileVersionPreviewImpl = new DLFileVersionPreviewImpl();
+		DLFileVersionPreviewImpl dlFileVersionPreviewImpl =
+			new DLFileVersionPreviewImpl();
 
-		dlFileVersionPreviewImpl.setDlFileVersionPreviewId(dlFileVersionPreviewId);
+		dlFileVersionPreviewImpl.setDlFileVersionPreviewId(
+			dlFileVersionPreviewId);
 		dlFileVersionPreviewImpl.setGroupId(groupId);
 		dlFileVersionPreviewImpl.setFileEntryId(fileEntryId);
 		dlFileVersionPreviewImpl.setFileVersionId(fileVersionId);
@@ -109,8 +113,7 @@ public class DLFileVersionPreviewCacheModel implements CacheModel<DLFileVersionP
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(dlFileVersionPreviewId);
 
 		objectOutput.writeLong(groupId);
@@ -127,4 +130,5 @@ public class DLFileVersionPreviewCacheModel implements CacheModel<DLFileVersionP
 	public long fileEntryId;
 	public long fileVersionId;
 	public int previewStatus;
+
 }

@@ -32,8 +32,9 @@ import com.liferay.html.preview.service.HtmlPreviewEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class HtmlPreviewEntryBaseImpl extends HtmlPreviewEntryModelImpl
-	implements HtmlPreviewEntry {
+public abstract class HtmlPreviewEntryBaseImpl
+	extends HtmlPreviewEntryModelImpl implements HtmlPreviewEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class HtmlPreviewEntryBaseImpl extends HtmlPreviewEntryModelImpl
 			HtmlPreviewEntryLocalServiceUtil.updateHtmlPreviewEntry(this);
 		}
 	}
+
 }

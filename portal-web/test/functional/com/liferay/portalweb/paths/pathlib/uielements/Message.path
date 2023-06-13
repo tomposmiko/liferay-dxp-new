@@ -20,7 +20,7 @@
 </tr>
 <tr>
 	<td>CHECKOUT_SUCCESS</td>
-	<td>//div[contains(@class,'sidenav-content')]/div[contains(@class,'alert-success')]</td>
+	<td>//div[contains(@class,'content')]/div[contains(@class,'alert-success')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -326,11 +326,6 @@
 <tr>
 	<td>WARNING_SPECIFIC</td>
 	<td>//div[contains(@class,'alert') and (contains(@class,'alert-warning'))][contains(.,'${key_warningMessage}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>WEB_CONTENT_STATUS</td>
-	<td>//span[contains(@class,'workflow-status')]/span[3]</td>
 	<td></td>
 </tr>
 <tr>

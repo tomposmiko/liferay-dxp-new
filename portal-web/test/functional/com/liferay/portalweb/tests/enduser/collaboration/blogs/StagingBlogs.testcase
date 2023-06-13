@@ -18,7 +18,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -51,7 +51,7 @@ definition {
 	@priority = "5"
 	test PublishDraftViaSAP {
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -68,7 +68,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -100,7 +100,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -112,8 +112,8 @@ definition {
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "Cards");
 
-		Staging.publishViaSAP(
-			entry = "Blogs Entry Title",
+		Blogs.publishViaSAP(
+			entryTitle = "Blogs Entry Title",
 			confirmMessage = "Are you sure you want to publish to live?"
 		);
 
@@ -152,7 +152,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -187,7 +187,7 @@ definition {
 		ProductMenu.gotoLiveSite();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -202,7 +202,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -230,7 +230,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -250,7 +250,7 @@ definition {
 		ProductMenu.gotoLiveSite();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -301,7 +301,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -495,6 +495,8 @@ definition {
 			uploadFileName = "Document_1.jpg"
 		);
 
+		Navigator.gotoSitePage(pageName = "Staging Blogs Page", siteName = "Site Name");
+
 		BlogsNavigator.gotoEntryPG(
 			entryContent = "Blogs Entry Content 2",
 			entryTitle = "Blogs Entry Title 2"
@@ -506,8 +508,10 @@ definition {
 			entryTitle = "Blogs Entry Title 2"
 		);
 
+		Navigator.gotoSitePage(pageName = "Staging Blogs Page", siteName = "Site Name");
+
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Blogs Entry Content",
+			entryContent = "Blogs Entry Content 3",
 			entryTitle = "Blogs Entry Title 3"
 		);
 
@@ -532,6 +536,8 @@ definition {
 			uploadFileName = "Document_1.jpg"
 		);
 
+		Navigator.gotoSitePage(pageName = "Staging Blogs Page", siteName = "Site Name");
+
 		BlogsNavigator.gotoEntryPG(
 			entryContent = "Blogs Entry Content 2",
 			entryTitle = "Blogs Entry Title 2"
@@ -542,6 +548,8 @@ definition {
 			entryInlineImage = "Document_2.jpg",
 			entryTitle = "Blogs Entry Title 2"
 		);
+
+		Navigator.gotoSitePage(pageName = "Staging Blogs Page", siteName = "Site Name");
 
 		BlogsNavigator.gotoEntryPG(
 			entryContent = "Blogs Entry Content 3",

@@ -14,12 +14,10 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.portal.kernel.search.QueryTerm;
-import com.liferay.portal.kernel.search.TermQuery;
+import com.liferay.portal.search.query.TermQuery;
 
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -27,24 +25,13 @@ import org.osgi.service.component.annotations.Component;
  * @author André de Oliveira
  * @author Miguel Angelo Caldas Gallindo
  */
-@Component(immediate = true, service = TermQueryTranslator.class)
+@Component(service = TermQueryTranslator.class)
 public class TermQueryTranslatorImpl implements TermQueryTranslator {
 
 	@Override
 	public QueryBuilder translate(TermQuery termQuery) {
-		QueryTerm queryTerm = termQuery.getQueryTerm();
-
-		String field = queryTerm.getField();
-		String value = queryTerm.getValue();
-
-		TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery(
-			field, value);
-
-		if (!termQuery.isDefaultBoost()) {
-			termQueryBuilder.boost(termQuery.getBoost());
-		}
-
-		return termQueryBuilder;
+		return QueryBuilders.termQuery(
+			termQuery.getField(), termQuery.getValue());
 	}
 
 }

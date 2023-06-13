@@ -17,11 +17,11 @@ package com.liferay.portal.tools.service.builder.test.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
+import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.version.VersionedModel;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -41,8 +41,10 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public interface LVEntryModel extends BaseModel<LVEntry>, MVCCModel,
-	VersionedModel<LVEntryVersion> {
+public interface LVEntryModel
+	extends BaseModel<LVEntry>, MVCCModel, ShardedModel,
+			VersionedModel<LVEntryVersion> {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -140,6 +142,22 @@ public interface LVEntryModel extends BaseModel<LVEntry>, MVCCModel,
 	 * @param lvEntryId the lv entry ID of this lv entry
 	 */
 	public void setLvEntryId(long lvEntryId);
+
+	/**
+	 * Returns the company ID of this lv entry.
+	 *
+	 * @return the company ID of this lv entry
+	 */
+	@Override
+	public long getCompanyId();
+
+	/**
+	 * Sets the company ID of this lv entry.
+	 *
+	 * @param companyId the company ID of this lv entry
+	 */
+	@Override
+	public void setCompanyId(long companyId);
 
 	/**
 	 * Returns the group ID of this lv entry.
@@ -248,4 +266,5 @@ public interface LVEntryModel extends BaseModel<LVEntry>, MVCCModel,
 
 	@Override
 	public String toXmlString();
+
 }

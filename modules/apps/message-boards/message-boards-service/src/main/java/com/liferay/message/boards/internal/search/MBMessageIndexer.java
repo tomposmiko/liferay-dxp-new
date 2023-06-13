@@ -307,6 +307,7 @@ public class MBMessageIndexer
 			document.addKeyword("discussion", true);
 		}
 
+		document.addKeyword("parentMessageId", mbMessage.getParentMessageId());
 		document.addKeyword("threadId", mbMessage.getThreadId());
 
 		if (mbMessage.isDiscussion()) {

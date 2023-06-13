@@ -48,7 +48,7 @@ List<AssetRendererFactory<?>> classTypesAssetRendererFactories = new ArrayList<>
 	request.setAttribute("configuration.jsp-redirect", redirect);
 	%>
 
-	<liferay-ui:success key='<%= portletResource + "requestProcessed" %>' message="the-asset-list-was-created-successfully" />
+	<liferay-ui:success key='<%= portletResource + "requestProcessed" %>' message="the-content-set-was-created-successfully" />
 
 	<liferay-frontend:edit-form-body>
 		<liferay-frontend:form-navigator
@@ -95,12 +95,12 @@ List<AssetRendererFactory<?>> classTypesAssetRendererFactories = new ArrayList<>
 
 			modalCommands.openSimpleInputModal(
 				{
-					dialogTitle: '<liferay-ui:message key="asset-list-title" />',
+					dialogTitle: '<liferay-ui:message key="content-set-title" />',
 					formSubmitURL: '<liferay-portlet:actionURL name="/asset_publisher/add_asset_list" portletName="<%= portletResource %>"><portlet:param name="portletResource" value="<%= portletResource %>" /><portlet:param name="redirect" value="<%= currentURL %>" /></liferay-portlet:actionURL>',
 					mainFieldLabel: '<liferay-ui:message key="title" />',
 					mainFieldName: 'title',
 					mainFieldPlaceholder: '<liferay-ui:message key="title" />',
-					namespace: '<%= PortalUtil.getPortletNamespace(portletResource) %>',
+					namespace: '<%= PortalUtil.getPortletNamespace(HtmlUtil.escape(portletResource)) %>',
 					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg'
 				}
 			);
@@ -113,7 +113,7 @@ List<AssetRendererFactory<?>> classTypesAssetRendererFactories = new ArrayList<>
 		handleCreateAssetListLinkClick
 	);
 
-	function handleDestroyPortlet () {
+	function handleDestroyPortlet() {
 		createAssetListLinkClickHandler.removeListener();
 
 		Liferay.detach('destroyPortlet', handleDestroyPortlet);

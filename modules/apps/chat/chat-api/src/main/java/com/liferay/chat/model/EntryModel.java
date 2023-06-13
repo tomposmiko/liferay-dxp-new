@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.model.BaseModel;
  */
 @ProviderType
 public interface EntryModel extends BaseModel<Entry> {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -164,4 +165,5 @@ public interface EntryModel extends BaseModel<Entry> {
 	 * @param flag the flag of this entry
 	 */
 	public void setFlag(int flag);
+
 }

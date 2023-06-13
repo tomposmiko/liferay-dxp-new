@@ -15,7 +15,8 @@
 --%>
 
 <%@ page import="com.liferay.sharing.configuration.SharingConfiguration" %><%@
-page import="com.liferay.sharing.web.internal.constants.PortalSettingsSharingConstants" %>
+page import="com.liferay.sharing.web.internal.constants.PortalSettingsSharingConstants" %><%@
+page import="com.liferay.sharing.web.internal.constants.SharingWebKeys" %>
 
 <%@ page import="javax.portlet.ActionRequest" %>
 

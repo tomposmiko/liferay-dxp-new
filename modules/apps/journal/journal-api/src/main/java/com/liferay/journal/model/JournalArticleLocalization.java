@@ -26,31 +26,40 @@ import com.liferay.portal.kernel.util.Accessor;
  * @see JournalArticleLocalizationModel
  * @generated
  */
-@ImplementationClassName("com.liferay.journal.model.impl.JournalArticleLocalizationImpl")
+@ImplementationClassName(
+	"com.liferay.journal.model.impl.JournalArticleLocalizationImpl"
+)
 @ProviderType
 public interface JournalArticleLocalization
 	extends JournalArticleLocalizationModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.journal.model.impl.JournalArticleLocalizationImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<JournalArticleLocalization, Long> ARTICLE_LOCALIZATION_ID_ACCESSOR =
-		new Accessor<JournalArticleLocalization, Long>() {
-			@Override
-			public Long get(
-				JournalArticleLocalization journalArticleLocalization) {
-				return journalArticleLocalization.getArticleLocalizationId();
-			}
+	public static final Accessor<JournalArticleLocalization, Long>
+		ARTICLE_LOCALIZATION_ID_ACCESSOR =
+			new Accessor<JournalArticleLocalization, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(
+					JournalArticleLocalization journalArticleLocalization) {
 
-			@Override
-			public Class<JournalArticleLocalization> getTypeClass() {
-				return JournalArticleLocalization.class;
-			}
-		};
+					return journalArticleLocalization.
+						getArticleLocalizationId();
+				}
+
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<JournalArticleLocalization> getTypeClass() {
+					return JournalArticleLocalization.class;
+				}
+
+			};
+
 }

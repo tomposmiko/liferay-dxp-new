@@ -32,8 +32,9 @@ import com.liferay.knowledge.base.service.KBTemplateLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class KBTemplateBaseImpl extends KBTemplateModelImpl
-	implements KBTemplate {
+public abstract class KBTemplateBaseImpl
+	extends KBTemplateModelImpl implements KBTemplate {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class KBTemplateBaseImpl extends KBTemplateModelImpl
 			KBTemplateLocalServiceUtil.updateKBTemplate(this);
 		}
 	}
+
 }

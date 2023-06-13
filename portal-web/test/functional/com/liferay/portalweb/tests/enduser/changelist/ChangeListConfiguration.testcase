@@ -12,6 +12,10 @@ definition {
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
 	}
 
 	@description = "Enable and Disable Change List"
@@ -34,6 +38,44 @@ definition {
 		ChangeList.disableChangeList();
 
 		AssertElementPresent(locator1 = "ChangeListSettings#DISABLED_SAVE_AND_GO_TO_OVERVIEW_BUTTON");
+	}
+
+	@description = "Enable Change List and go to Overview"
+	@priority = "5"
+	test EnableChangeListAndGoToOverview {
+		ProductMenu.gotoPortlet(
+			category = "Change Lists",
+			panel = "Control Panel",
+			portlet = "Settings"
+		);
+
+		ChangeList.enableChangeList(
+			gotoOverview = "true"
+		);
+
+		AssertTextEquals(
+			locator1 = "ChangeList#OVERVIEW_PAGE_TITLE",
+			value1 = "Select Change List"
+		);
+
+		AssertElementPresent(
+			locator1 = "ChangeList#PRODUCTION_CARD_TITLE",
+			value1 = "Work on Production"
+		);
+
+		ChangeList.viewNoStagingMenuitemsNotAvailable();
+
+		ProductMenu.gotoPortlet(
+			category = "Change Lists",
+			panel = "Control Panel",
+			portlet = "Settings"
+		);
+
+		ChangeList.disableChangeList();
+
+		AssertElementPresent(locator1 = "ChangeListSettings#DISABLED_SAVE_AND_GO_TO_OVERVIEW_BUTTON");
+
+		AssertElementNotPresent(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
 	}
 
 	@description = "Check Supported Content Types"

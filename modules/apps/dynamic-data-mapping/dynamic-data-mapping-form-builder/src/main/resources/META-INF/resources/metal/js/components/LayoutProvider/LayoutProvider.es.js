@@ -1,13 +1,17 @@
+import * as FormSupport from '../Form/FormSupport.es';
+import autobind from 'autobind-decorator';
+import Component from 'metal-jsx';
 import {Config} from 'metal-state';
-import {FormSupport} from '../Form/index.es';
-import {pageStructure, rule} from '../../util/config.es';
+import {pageStructure, ruleStructure} from '../../util/config.es';
 import {PagesVisitor} from '../../util/visitors.es';
 import {setLocalizedValue} from '../../util/i18n.es';
-import {sub} from '../../util/strings.es';
-import Component from 'metal-jsx';
-import autobind from 'autobind-decorator';
-import {generateInstanceId} from '../../util/fieldSupport.es';
-import RulesSupport from '../RuleBuilder/RulesSupport.es';
+
+import handleColumnResized from './handlers/columnResizedHandler.es';
+import handleFieldAdded from './handlers/fieldAddedHandler.es';
+import handleFieldBlurred from './handlers/fieldBlurredHandler.es';
+import handleFieldDeleted from './handlers/fieldDeletedHandler.es';
+import handleFieldDuplicated from './handlers/fieldDuplicatedHandler.es';
+import handleFieldEdited from './handlers/fieldEditedHandler.es';
 
 /**
  * LayoutProvider listens to your children's events to
@@ -17,6 +21,7 @@ import RulesSupport from '../RuleBuilder/RulesSupport.es';
 
 class LayoutProvider extends Component {
 	static PROPS = {
+		editingLanguageId: Config.string(),
 
 		/**
 		 * @default undefined
@@ -49,7 +54,7 @@ class LayoutProvider extends Component {
 			}
 		),
 
-		rules: Config.arrayOf(rule),
+		rules: Config.arrayOf(ruleStructure),
 
 		/**
 		 * @default undefined
@@ -110,13 +115,21 @@ class LayoutProvider extends Component {
 		).value({}),
 
 		/**
+		 * @default en_US
+		 * @instance
+		 * @memberof LayoutProvider
+		 * @type {?string}
+		 */
+		locale: Config.string().value(themeDisplay.getLanguageId()),
+
+		/**
 		 * @default undefined
 		 * @instance
 		 * @memberof LayoutProvider
 		 * @type {?(array|undefined)}
 		 */
 
-		rules: Config.arrayOf(rule).valueFn('_rulesValueFn'),
+		rules: Config.arrayOf(ruleStructure).valueFn('_rulesValueFn'),
 
 		successPageSettings: Config.object().valueFn('_successPageSettingsValueFn')
 	};
@@ -127,6 +140,12 @@ class LayoutProvider extends Component {
 				activePage
 			}
 		);
+	}
+
+	_handleColumnResized({column, direction, source}) {
+		const {state} = this;
+
+		this.setState(handleColumnResized(state, source, column, direction));
 	}
 
 	/**
@@ -145,112 +164,16 @@ class LayoutProvider extends Component {
 	_handleFieldChangesCanceled() {
 		const {focusedField: {originalContext}} = this.state;
 
-		this._handleFieldEdited(originalContext);
-	}
-
-	/**
-	 * @param {!Object} payload
-	 * @private
-	 */
-
-	_handleFieldAdded({focusedField: {name, settingsContext, fieldName}, target}) {
-		const {pageIndex, rowIndex} = target;
-		const {editingLanguageId, spritemap} = this.props;
-		let {pages} = this.state;
-		let {columnIndex} = target;
-
-		const fieldProperties = {
-			...FormSupport.getFieldProperties(settingsContext, editingLanguageId),
-			fieldName,
-			instanceId: generateInstanceId(8),
-			name,
-			settingsContext,
-			spritemap,
-			type: name
-		};
-
-		if (FormSupport.rowHasFields(pages, pageIndex, rowIndex)) {
-			pages = FormSupport.addRow(pages, rowIndex, pageIndex);
-			columnIndex = 0;
-		}
-
-		this.setState(
-			{
-				focusedField: {
-					...fieldProperties,
-					columnIndex,
-					originalContext: fieldProperties,
-					pageIndex,
-					rowIndex
-				},
-				pages: FormSupport.addFieldToColumn(
-					pages,
-					pageIndex,
-					rowIndex,
-					columnIndex,
-					fieldProperties
-				)
-			}
-		);
-	}
-
-	_handleFieldBlurred() {
-		this.setState(
-			{
-				focusedField: {}
-			}
-		);
-	}
-
-	formatRules(pages) {
-		const visitor = new PagesVisitor(pages);
-
-		const rules = this.state.rules.map(
-			rule => {
-				const {actions, conditions} = rule;
-
-				conditions.forEach(
-					(condition, index) => {
-						let firstOperandFieldExists = false;
-						let secondOperandFieldExists = false;
-
-						const secondOperand = condition.operands[1];
-
-						visitor.mapFields(
-							({fieldName}) => {
-								if (condition.operands[0].value === fieldName) {
-									firstOperandFieldExists = true;
-								}
-
-								if (secondOperand && secondOperand.value === fieldName) {
-									secondOperandFieldExists = true;
-								}
-							}
-						);
-
-						if (condition.operands[0].value === 'user') {
-							firstOperandFieldExists = true;
-						}
-
-						if (!firstOperandFieldExists) {
-							RulesSupport.clearAllConditionFieldValues(condition);
-						}
-
-						if (!secondOperandFieldExists && secondOperand && secondOperand.type == 'field') {
-							RulesSupport.clearSecondOperandValue(condition);
-						}
+		Object.keys(originalContext).forEach(
+			propertyName => {
+				this._handleFieldEdited(
+					{
+						propertyName,
+						propertyValue: originalContext[propertyName]
 					}
 				);
-
-				return {
-					...rule,
-					actions: RulesSupport.syncActions(pages, actions),
-					conditions
-				};
 			}
 		);
-
-		return rules;
 	}
 
 	/**
@@ -258,31 +181,29 @@ class LayoutProvider extends Component {
 	 * @private
 	 */
 
-	_handleFieldDeleted({rowIndex, pageIndex, columnIndex}) {
-		const {pages} = this.state;
-		let newContext = FormSupport.removeFields(
-			pages,
-			pageIndex,
-			rowIndex,
-			columnIndex
-		);
+	_handleFieldAdded(event) {
+		this.setState(handleFieldAdded(this.props, this.state, event));
+	}
 
-		newContext = this._removeEmptyRow(
-			newContext,
-			{
-				columnIndex,
-				pageIndex,
-				rowIndex
-			}
-		);
+	_handleFieldBlurred(event) {
+		this.setState(handleFieldBlurred(this.state, event));
+	}
 
+	_handleSidebarFieldBlurred() {
 		this.setState(
 			{
-				focusedField: {},
-				pages: newContext,
-				rules: this.formatRules(newContext)
+				focusedField: {}
 			}
 		);
+	}
+
+	/**
+	 * @param {!Object} event
+	 * @private
+	 */
+
+	_handleFieldDeleted(event) {
+		this.setState(handleFieldDeleted(this.state, event));
 	}
 
 	/**
@@ -290,61 +211,8 @@ class LayoutProvider extends Component {
 	 * @private
 	 */
 
-	_handleFieldDuplicated({rowIndex, pageIndex, columnIndex}) {
-		const {pages} = this.state;
-		const field = FormSupport.getField(pages, pageIndex, rowIndex, columnIndex);
-		const label = sub(
-			Liferay.Language.get('copy-of-x'),
-			[field.label]
-		);
-		const newFieldName = FormSupport.generateFieldName(field.type);
-		const visitor = new PagesVisitor(field.settingsContext.pages);
-
-		const duplicatedField = {
-			...field,
-			fieldName: newFieldName,
-			label,
-			name: newFieldName,
-			settingsContext: {
-				...field.settingsContext,
-				pages: visitor.mapFields(
-					field => {
-						if (field.fieldName === 'name') {
-							field = {
-								...field,
-								value: newFieldName
-							};
-						}
-						else if (field.fieldName === 'label') {
-							field = {
-								...field,
-								value: label
-							};
-						}
-						return {
-							...field
-						};
-					}
-				)
-			}
-		};
-		const newRowIndex = rowIndex + 1;
-
-		const newPages = FormSupport.addRow(pages, newRowIndex, pageIndex);
-
-		FormSupport.addFieldToColumn(newPages, pageIndex, newRowIndex, columnIndex, duplicatedField);
-
-		this.setState(
-			{
-				focusedField: {
-					...duplicatedField,
-					columnIndex,
-					pageIndex,
-					rowIndex: newRowIndex
-				},
-				pages: newPages
-			}
-		);
+	_handleFieldDuplicated(event) {
+		this.setState(handleFieldDuplicated(this.state, event));
 	}
 
 	/**
@@ -353,22 +221,7 @@ class LayoutProvider extends Component {
 	 */
 
 	_handleFieldEdited(properties) {
-		const {focusedField, pages} = this.state;
-		const {fieldName} = focusedField;
-
-		this.setState(
-			{
-				focusedField: {
-					...focusedField,
-					...properties
-				},
-				pages: FormSupport.updateField(
-					pages,
-					fieldName,
-					properties
-				)
-			}
-		);
+		this.setState(handleFieldEdited(this.state, properties));
 	}
 
 	/**
@@ -376,9 +229,10 @@ class LayoutProvider extends Component {
 	 * @private
 	 */
 
-	_handleFieldMoved({target, source}) {
+	_handleFieldMoved({addedToPlaceholder, target, source}) {
 		let {pages} = this.state;
 		const {columnIndex, pageIndex, rowIndex} = source;
+
 		const column = FormSupport.getColumn(
 			pages,
 			pageIndex,
@@ -395,7 +249,15 @@ class LayoutProvider extends Component {
 			columnIndex
 		);
 
-		pages = FormSupport.addRow(pages, target.rowIndex, target.pageIndex, newRow);
+		if (target.rowIndex > pages[pageIndex].rows.length - 1) {
+			pages = FormSupport.addRow(pages, target.rowIndex, target.pageIndex, newRow);
+		}
+		else if (addedToPlaceholder) {
+			pages = FormSupport.addRow(pages, target.rowIndex, target.pageIndex, newRow);
+		}
+		else {
+			pages = FormSupport.addFieldToColumn(pages, target.pageIndex, target.rowIndex, target.columnIndex, fields[0]);
+		}
 
 		pages[pageIndex].rows = FormSupport.removeEmptyRows(pages, pageIndex);
 
@@ -565,23 +427,6 @@ class LayoutProvider extends Component {
 		return this.props.initialPaginationMode;
 	}
 
-	/**
-	 * @param {!Array} pages
-	 * @param {!Object} source
-	 * @private
-	 * @return {Object}
-	 */
-
-	_removeEmptyRow(pages, source) {
-		const {pageIndex, rowIndex} = source;
-
-		if (!FormSupport.rowHasFields(pages, pageIndex, rowIndex)) {
-			pages = FormSupport.removeRow(pages, pageIndex, rowIndex);
-		}
-
-		return pages;
-	}
-
 	_rulesValueFn() {
 		const {rules} = this.props;
 
@@ -651,12 +496,13 @@ class LayoutProvider extends Component {
 	}
 
 	render() {
-		const {children, spritemap} = this.props;
+		const {children, editingLanguageId, spritemap} = this.props;
 		const {activePage, focusedField, pages, paginationMode, rules, successPageSettings} = this.state;
 
 		if (children.length) {
 			const events = {
 				activePageUpdated: this._handleActivePageUpdated.bind(this),
+				columnResized: this._handleColumnResized.bind(this),
 				fieldAdded: this._handleFieldAdded.bind(this),
 				fieldBlurred: this._handleFieldBlurred.bind(this),
 				fieldChangesCanceled: this._handleFieldChangesCanceled.bind(this),
@@ -674,6 +520,7 @@ class LayoutProvider extends Component {
 				ruleAdded: this._handleRuleAdded.bind(this),
 				ruleDeleted: this._handleRuleDeleted.bind(this),
 				ruleSaved: this._handleRuleSaved.bind(this),
+				sidebarFieldBlurred: this._handleSidebarFieldBlurred.bind(this),
 				successPageChanged: this._handleSuccessPageChanged.bind(this)
 			};
 
@@ -685,6 +532,7 @@ class LayoutProvider extends Component {
 					{
 						...this.otherProps(),
 						activePage,
+						editingLanguageId,
 						events,
 						focusedField,
 						pages,

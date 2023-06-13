@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -64,13 +63,20 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class DDMFormInstanceVersionServiceSoap {
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap getFormInstanceVersion(
-		long ddmFormInstanceVersionId) throws RemoteException {
-		try {
-			com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion returnValue =
-				DDMFormInstanceVersionServiceUtil.getFormInstanceVersion(ddmFormInstanceVersionId);
 
-			return com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap.toSoapModel(returnValue);
+	public static
+		com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap
+				getFormInstanceVersion(long ddmFormInstanceVersionId)
+			throws RemoteException {
+
+		try {
+			com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion
+				returnValue =
+					DDMFormInstanceVersionServiceUtil.getFormInstanceVersion(
+						ddmFormInstanceVersionId);
+
+			return com.liferay.dynamic.data.mapping.model.
+				DDMFormInstanceVersionSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -79,16 +85,26 @@ public class DDMFormInstanceVersionServiceSoap {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap[] getFormInstanceVersions(
-		long ddmFormInstanceId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion> orderByComparator)
-		throws RemoteException {
-		try {
-			java.util.List<com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion> returnValue =
-				DDMFormInstanceVersionServiceUtil.getFormInstanceVersions(ddmFormInstanceId,
-					start, end, orderByComparator);
+	public static
+		com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap[]
+				getFormInstanceVersions(
+					long ddmFormInstanceId, int start, int end,
+					com.liferay.portal.kernel.util.OrderByComparator
+						<com.liferay.dynamic.data.mapping.model.
+							DDMFormInstanceVersion> orderByComparator)
+			throws RemoteException {
 
-			return com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap.toSoapModels(returnValue);
+		try {
+			java.util.List
+				<com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion>
+					returnValue =
+						DDMFormInstanceVersionServiceUtil.
+							getFormInstanceVersions(
+								ddmFormInstanceId, start, end,
+								orderByComparator);
+
+			return com.liferay.dynamic.data.mapping.model.
+				DDMFormInstanceVersionSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -99,8 +115,11 @@ public class DDMFormInstanceVersionServiceSoap {
 
 	public static int getFormInstanceVersionsCount(long ddmFormInstanceId)
 		throws RemoteException {
+
 		try {
-			int returnValue = DDMFormInstanceVersionServiceUtil.getFormInstanceVersionsCount(ddmFormInstanceId);
+			int returnValue =
+				DDMFormInstanceVersionServiceUtil.getFormInstanceVersionsCount(
+					ddmFormInstanceId);
 
 			return returnValue;
 		}
@@ -111,13 +130,19 @@ public class DDMFormInstanceVersionServiceSoap {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap getLatestFormInstanceVersion(
-		long ddmFormInstanceId) throws RemoteException {
-		try {
-			com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion returnValue =
-				DDMFormInstanceVersionServiceUtil.getLatestFormInstanceVersion(ddmFormInstanceId);
+	public static
+		com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap
+				getLatestFormInstanceVersion(long ddmFormInstanceId)
+			throws RemoteException {
 
-			return com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion
+				returnValue =
+					DDMFormInstanceVersionServiceUtil.
+						getLatestFormInstanceVersion(ddmFormInstanceId);
+
+			return com.liferay.dynamic.data.mapping.model.
+				DDMFormInstanceVersionSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -126,14 +151,19 @@ public class DDMFormInstanceVersionServiceSoap {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap getLatestFormInstanceVersion(
-		long ddmFormInstanceId, int status) throws RemoteException {
-		try {
-			com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion returnValue =
-				DDMFormInstanceVersionServiceUtil.getLatestFormInstanceVersion(ddmFormInstanceId,
-					status);
+	public static
+		com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap
+				getLatestFormInstanceVersion(long ddmFormInstanceId, int status)
+			throws RemoteException {
 
-			return com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersionSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion
+				returnValue =
+					DDMFormInstanceVersionServiceUtil.
+						getLatestFormInstanceVersion(ddmFormInstanceId, status);
+
+			return com.liferay.dynamic.data.mapping.model.
+				DDMFormInstanceVersionSoap.toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -142,5 +172,7 @@ public class DDMFormInstanceVersionServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DDMFormInstanceVersionServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		DDMFormInstanceVersionServiceSoap.class);
+
 }

@@ -19,7 +19,7 @@ import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.service.BookmarksFolderLocalServiceUtil;
 import com.liferay.bookmarks.service.BookmarksFolderServiceUtil;
-import com.liferay.bookmarks.util.test.BookmarksTestUtil;
+import com.liferay.bookmarks.test.util.BookmarksTestUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
@@ -134,7 +134,11 @@ public class BookmarksFolderServiceTest {
 			folder.getFolderId(), true, serviceContext);
 
 		long companyId = entry.getCompanyId();
-		long groupId = entry.getFolder().getGroupId();
+
+		BookmarksFolder entryFolder = entry.getFolder();
+
+		long groupId = entryFolder.getGroupId();
+
 		long folderId = entry.getFolderId();
 
 		String keywords = "test";

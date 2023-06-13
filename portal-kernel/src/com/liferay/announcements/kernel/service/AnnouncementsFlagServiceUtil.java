@@ -17,7 +17,6 @@ package com.liferay.announcements.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the remote service utility for AnnouncementsFlag. This utility wraps
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  */
 @ProviderType
 public class AnnouncementsFlagServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -40,39 +40,41 @@ public class AnnouncementsFlagServiceUtil {
 	 */
 	public static void addFlag(long entryId, int value)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		getService().addFlag(entryId, value);
 	}
 
 	public static void deleteFlag(long flagId)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		getService().deleteFlag(flagId);
 	}
 
-	public static com.liferay.announcements.kernel.model.AnnouncementsFlag getFlag(
-		long entryId, int value)
+	public static com.liferay.announcements.kernel.model.AnnouncementsFlag
+			getFlag(long entryId, int value)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return getService().getFlag(entryId, value);
 	}
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static AnnouncementsFlagService getService() {
 		if (_service == null) {
-			_service = (AnnouncementsFlagService)PortalBeanLocatorUtil.locate(AnnouncementsFlagService.class.getName());
-
-			ReferenceRegistry.registerReference(AnnouncementsFlagServiceUtil.class,
-				"_service");
+			_service = (AnnouncementsFlagService)PortalBeanLocatorUtil.locate(
+				AnnouncementsFlagService.class.getName());
 		}
 
 		return _service;
 	}
 
 	private static AnnouncementsFlagService _service;
+
 }

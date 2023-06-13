@@ -21,6 +21,9 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureVersionLocalService;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -29,6 +32,8 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
+
+import java.util.List;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -47,18 +52,24 @@ public class DDMStructureCTConfigurationRegistrar {
 			_builder.setContentType(
 				"Dynamic Data Mapping Structure"
 			).setContentTypeLanguageKey(
-				"dynamic-data-mapping"
+				"dynamic-data-mapping-structure"
 			).setEntityClasses(
 				DDMStructure.class, DDMStructureVersion.class
+			).setResourceEntitiesByCompanyIdFunction(
+				this::_fetchDDMStructures
 			).setResourceEntityByResourceEntityIdFunction(
 				_ddmStructureLocalService::fetchStructure
 			).setEntityIdsFromResourceEntityFunctions(
-				DDMStructure::getStructureKey,
+				DDMStructure::getStructureId,
 				this::_fetchLatestStructureVersionId
+			).setVersionEntitiesFromResourceEntityFunction(
+				ddmStructure ->
+					_ddmStructureVersionLocalService.getStructureVersions(
+						ddmStructure.getStructureId())
 			).setVersionEntityByVersionEntityIdFunction(
 				_ddmStructureVersionLocalService::fetchDDMStructureVersion
 			).setVersionEntityDetails(
-				CTFunctions.getFetchSiteNameFunction(),
+				null, CTFunctions.getFetchSiteNameFunction(),
 				ddmStructureVersion -> ddmStructureVersion.getName(
 					LocaleUtil.getMostRelevantLocale()),
 				DDMStructureVersion::getVersion
@@ -72,6 +83,16 @@ public class DDMStructureCTConfigurationRegistrar {
 				},
 				DDMStructureVersion::getStatus
 			).build());
+	}
+
+	private List<DDMStructure> _fetchDDMStructures(long companyId) {
+		DynamicQuery dynamicQuery = _ddmStructureLocalService.dynamicQuery();
+
+		Property companyIdProperty = PropertyFactoryUtil.forName("companyId");
+
+		dynamicQuery.add(companyIdProperty.eq(companyId));
+
+		return _ddmStructureLocalService.dynamicQuery(dynamicQuery);
 	}
 
 	private Serializable _fetchLatestStructureVersionId(

@@ -24,6 +24,7 @@ import com.liferay.document.library.kernel.versioning.VersioningStrategy;
 import com.liferay.document.library.preview.DLPreviewRenderer;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
 import com.liferay.document.library.preview.exception.DLFileEntryPreviewGenerationException;
+import com.liferay.document.library.preview.exception.DLFileEntryPreviewNotAvailableException;
 import com.liferay.document.library.preview.exception.DLPreviewGenerationInProcessException;
 import com.liferay.document.library.preview.exception.DLPreviewSizeException;
 import com.liferay.document.library.util.DLURLHelper;
@@ -175,12 +176,23 @@ public class DefaultDLViewFileVersionDisplayContext
 	}
 
 	@Override
+	public String getIconFileMimeType() {
+		if (_dlMimeTypeDisplayContext == null) {
+			return "document-default";
+		}
+
+		return _dlMimeTypeDisplayContext.getIconFileMimeType(
+			_fileVersion.getMimeType());
+	}
+
+	@Override
 	public Menu getMenu() throws PortalException {
 		Menu menu = new Menu();
 
 		menu.setDirection("left-side");
 		menu.setMarkupView("lexicon");
 		menu.setMenuItems(_getMenuItems());
+		menu.setMessage(LanguageUtil.get(_resourceBundle, "actions"));
 		menu.setScroll(false);
 		menu.setShowWhenSingleIcon(true);
 		menu.setTriggerCssClass("component-action");
@@ -198,13 +210,13 @@ public class DefaultDLViewFileVersionDisplayContext
 
 		_uiItemsBuilder.addEditToolbarItem(toolbarItems);
 
-		_uiItemsBuilder.addMoveToolbarItem(toolbarItems);
-
 		_uiItemsBuilder.addCheckoutToolbarItem(toolbarItems);
 
 		_uiItemsBuilder.addCancelCheckoutToolbarItem(toolbarItems);
 
 		_uiItemsBuilder.addCheckinToolbarItem(toolbarItems);
+
+		_uiItemsBuilder.addMoveToolbarItem(toolbarItems);
 
 		_uiItemsBuilder.addPermissionsToolbarItem(toolbarItems);
 
@@ -275,12 +287,16 @@ public class DefaultDLViewFileVersionDisplayContext
 			HttpServletRequest request, HttpServletResponse response)
 		throws IOException, ServletException {
 
+		Optional<DLPreviewRenderer> dlPreviewRendererOptional =
+			Optional.empty();
+
 		if (_dlPreviewRendererProvider != null) {
-			_renderPreview(
-				request, response,
+			dlPreviewRendererOptional =
 				_dlPreviewRendererProvider.
-					getThumbnailDLPreviewRendererOptional(_fileVersion));
+					getThumbnailDLPreviewRendererOptional(_fileVersion);
 		}
+
+		_renderPreview(request, response, dlPreviewRendererOptional);
 	}
 
 	@Override
@@ -288,12 +304,16 @@ public class DefaultDLViewFileVersionDisplayContext
 			HttpServletRequest request, HttpServletResponse response)
 		throws IOException, ServletException {
 
+		Optional<DLPreviewRenderer> dlPreviewRendererOptional =
+			Optional.empty();
+
 		if (_dlPreviewRendererProvider != null) {
-			_renderPreview(
-				request, response,
+			dlPreviewRendererOptional =
 				_dlPreviewRendererProvider.getPreviewDLPreviewRendererOptional(
-					_fileVersion));
+					_fileVersion);
 		}
+
+		_renderPreview(request, response, dlPreviewRendererOptional);
 	}
 
 	private DefaultDLViewFileVersionDisplayContext(
@@ -359,19 +379,25 @@ public class DefaultDLViewFileVersionDisplayContext
 		if (isActionsVisible()) {
 			_uiItemsBuilder.addDownloadMenuItem(menuItems);
 
-			_uiItemsBuilder.addOpenInMsOfficeMenuItem(menuItems);
-
 			_uiItemsBuilder.addViewOriginalFileMenuItem(menuItems);
+
+			_uiItemsBuilder.addOpenInMsOfficeMenuItem(menuItems);
 
 			_uiItemsBuilder.addEditMenuItem(menuItems);
 
-			_uiItemsBuilder.addMoveMenuItem(menuItems);
-
 			_uiItemsBuilder.addCheckoutMenuItem(menuItems);
+
+			_uiItemsBuilder.addCancelCheckoutMenuItem(menuItems);
 
 			_uiItemsBuilder.addCheckinMenuItem(menuItems);
 
-			_uiItemsBuilder.addCancelCheckoutMenuItem(menuItems);
+			_uiItemsBuilder.addMoveMenuItem(menuItems);
+
+			if (!menuItems.isEmpty()) {
+				MenuItem menuItem = menuItems.get(menuItems.size() - 1);
+
+				menuItem.setSeparator(true);
+			}
 
 			_uiItemsBuilder.addPermissionsMenuItem(menuItems);
 
@@ -388,39 +414,42 @@ public class DefaultDLViewFileVersionDisplayContext
 			Optional<DLPreviewRenderer> dlPreviewRendererOptional)
 		throws IOException, ServletException {
 
-		if (dlPreviewRendererOptional.isPresent()) {
+		try {
+			if (!dlPreviewRendererOptional.isPresent()) {
+				throw new DLFileEntryPreviewNotAvailableException();
+			}
+
 			DLPreviewRenderer dlPreviewRenderer =
 				dlPreviewRendererOptional.get();
 
-			try {
-				dlPreviewRenderer.render(request, response);
-			}
-			catch (Exception e) {
-				if (e instanceof DLFileEntryPreviewGenerationException ||
-					e instanceof DLPreviewGenerationInProcessException ||
-					e instanceof DLPreviewSizeException) {
+			dlPreviewRenderer.render(request, response);
+		}
+		catch (Exception e) {
+			if (e instanceof DLFileEntryPreviewGenerationException ||
+				e instanceof DLFileEntryPreviewNotAvailableException ||
+				e instanceof DLPreviewGenerationInProcessException ||
+				e instanceof DLPreviewSizeException) {
 
-					if (_log.isWarnEnabled()) {
-						_log.warn(e, e);
-					}
+				if (_log.isWarnEnabled()) {
+					_log.warn(e, e);
 				}
-				else {
-					_log.error(
-						"Unable to render preview for file version: " +
-							_fileVersion.getTitle(),
-						e);
-				}
-
-				JSPRenderer jspRenderer = new JSPRenderer(
-					"/document_library/view_file_entry_preview_error.jsp");
-
-				jspRenderer.setAttribute(
-					WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
-				jspRenderer.setAttribute(
-					DLWebKeys.DOCUMENT_LIBRARY_PREVIEW_EXCEPTION, e);
-
-				jspRenderer.render(request, response);
 			}
+			else {
+				_log.error(
+					"Unable to render preview for file version: " +
+						_fileVersion.getTitle(),
+					e);
+			}
+
+			JSPRenderer jspRenderer = new JSPRenderer(
+				"/document_library/view_file_entry_preview_error.jsp");
+
+			jspRenderer.setAttribute(
+				WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
+			jspRenderer.setAttribute(
+				DLWebKeys.DOCUMENT_LIBRARY_PREVIEW_EXCEPTION, e);
+
+			jspRenderer.render(request, response);
 		}
 	}
 

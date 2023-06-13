@@ -21,7 +21,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -237,7 +237,7 @@ definition {
 			scheduleTitleName = "Staging Schedule Title"
 		);
 
-		Pause(locator1 = "120000");
+		Pause(locator1 = "180000");
 
 		Navigator.gotoSitePage(pageName = "Staging Test Page", siteName = "Site Name");
 

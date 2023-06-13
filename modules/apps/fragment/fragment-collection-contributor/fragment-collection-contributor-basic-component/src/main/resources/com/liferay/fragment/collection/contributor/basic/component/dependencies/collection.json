@@ -1,0 +1,14 @@
+{
+	"fragments": [
+		"card",
+		"heading",
+		"image",
+		"line",
+		"link",
+		"primary-button",
+		"quote",
+		"secondary-button",
+		"text"
+	],
+	"name": "Basic Components"
+}

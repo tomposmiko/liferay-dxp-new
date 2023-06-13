@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class AppSoap implements Serializable {
+
 	public static AppSoap toSoapModel(App model) {
 		AppSoap soapModel = new AppSoap();
 
@@ -229,4 +230,5 @@ public class AppSoap implements Serializable {
 	private String _iconURL;
 	private String _version;
 	private boolean _required;
+
 }

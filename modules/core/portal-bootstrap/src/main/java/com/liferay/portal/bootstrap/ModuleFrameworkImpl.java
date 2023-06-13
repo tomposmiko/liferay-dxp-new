@@ -1730,6 +1730,14 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 					bundle.start();
 				}
 				catch (BundleException be) {
+					String message = be.getMessage();
+
+					if (message.endsWith(
+							"Bundle was filtered by a resolver hook.\n")) {
+
+						continue;
+					}
+
 					_log.error(
 						"Unable to start bundle " + bundle.getSymbolicName(),
 						be);

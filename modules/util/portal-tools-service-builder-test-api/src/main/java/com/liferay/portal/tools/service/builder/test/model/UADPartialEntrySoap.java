@@ -29,6 +29,7 @@ import java.util.List;
  */
 @ProviderType
 public class UADPartialEntrySoap implements Serializable {
+
 	public static UADPartialEntrySoap toSoapModel(UADPartialEntry model) {
 		UADPartialEntrySoap soapModel = new UADPartialEntrySoap();
 
@@ -41,7 +42,8 @@ public class UADPartialEntrySoap implements Serializable {
 	}
 
 	public static UADPartialEntrySoap[] toSoapModels(UADPartialEntry[] models) {
-		UADPartialEntrySoap[] soapModels = new UADPartialEntrySoap[models.length];
+		UADPartialEntrySoap[] soapModels =
+			new UADPartialEntrySoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -52,10 +54,12 @@ public class UADPartialEntrySoap implements Serializable {
 
 	public static UADPartialEntrySoap[][] toSoapModels(
 		UADPartialEntry[][] models) {
+
 		UADPartialEntrySoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new UADPartialEntrySoap[models.length][models[0].length];
+			soapModels =
+				new UADPartialEntrySoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new UADPartialEntrySoap[0][0];
@@ -70,7 +74,9 @@ public class UADPartialEntrySoap implements Serializable {
 
 	public static UADPartialEntrySoap[] toSoapModels(
 		List<UADPartialEntry> models) {
-		List<UADPartialEntrySoap> soapModels = new ArrayList<UADPartialEntrySoap>(models.size());
+
+		List<UADPartialEntrySoap> soapModels =
+			new ArrayList<UADPartialEntrySoap>(models.size());
 
 		for (UADPartialEntry model : models) {
 			soapModels.add(toSoapModel(model));
@@ -126,4 +132,5 @@ public class UADPartialEntrySoap implements Serializable {
 	private long _userId;
 	private String _userName;
 	private String _message;
+
 }

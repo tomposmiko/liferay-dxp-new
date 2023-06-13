@@ -1,8 +1,6 @@
 @import "bourbon";
 @import "mixins";
 
-@import "upper_tbar";
-
 .portlet-document-library, .portlet-document-library-display {
 	@import "document_library_preview";
 
@@ -64,10 +62,6 @@
 
 	.edit-tags .clay-multi-select {
 		margin-top: 1em;
-
-		.input-group-item-shrink {
-			display: none;
-		}
 	}
 
 	.document-container {
@@ -126,6 +120,14 @@
 	.modal .edit-categories, .modal .edit-tags {
 		.modal-content {
 			height: 445px;
+		}
+
+		&.modal-dialog-expanded .modal-content {
+			height: 575px;
+
+			.modal-body.inline-scroller {
+				max-height: 445px;
+			}
 		}
 
 		small {

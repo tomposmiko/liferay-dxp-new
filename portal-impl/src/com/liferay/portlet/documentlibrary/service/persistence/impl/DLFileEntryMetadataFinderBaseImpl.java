@@ -16,21 +16,30 @@ package com.liferay.portlet.documentlibrary.service.persistence.impl;
 
 import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
 import com.liferay.document.library.kernel.service.persistence.DLFileEntryMetadataPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class DLFileEntryMetadataFinderBaseImpl extends BasePersistenceImpl<DLFileEntryMetadata> {
+public class DLFileEntryMetadataFinderBaseImpl
+	extends BasePersistenceImpl<DLFileEntryMetadata> {
+
 	public DLFileEntryMetadataFinderBaseImpl() {
 		setModelClass(DLFileEntryMetadata.class);
+
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
+		setDBColumnNames(dbColumnNames);
 	}
 
 	@Override
@@ -54,10 +63,14 @@ public class DLFileEntryMetadataFinderBaseImpl extends BasePersistenceImpl<DLFil
 	 */
 	public void setDLFileEntryMetadataPersistence(
 		DLFileEntryMetadataPersistence dlFileEntryMetadataPersistence) {
+
 		this.dlFileEntryMetadataPersistence = dlFileEntryMetadataPersistence;
 	}
 
 	@BeanReference(type = DLFileEntryMetadataPersistence.class)
 	protected DLFileEntryMetadataPersistence dlFileEntryMetadataPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(DLFileEntryMetadataFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFileEntryMetadataFinderBaseImpl.class);
+
 }

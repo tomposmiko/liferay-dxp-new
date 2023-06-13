@@ -21,9 +21,7 @@ import com.liferay.chat.model.Entry;
 import com.liferay.chat.model.impl.EntryImpl;
 import com.liferay.chat.model.impl.EntryModelImpl;
 import com.liferay.chat.service.persistence.EntryPersistence;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -58,18 +56,23 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
-	implements EntryPersistence {
+public class EntryPersistenceImpl
+	extends BasePersistenceImpl<Entry> implements EntryPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>EntryUtil</code> to access the entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = EntryImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		EntryImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -85,8 +88,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public List<Entry> findByCreateDate(long createDate) {
-		return findByCreateDate(createDate, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByCreateDate(
+			createDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -120,9 +123,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByCreateDate(long createDate, int start, int end,
+	public List<Entry> findByCreateDate(
+		long createDate, int start, int end,
 		OrderByComparator<Entry> orderByComparator) {
-		return findByCreateDate(createDate, start, end, orderByComparator, true);
+
+		return findByCreateDate(
+			createDate, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -140,28 +146,33 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByCreateDate(long createDate, int start, int end,
+	public List<Entry> findByCreateDate(
+		long createDate, int start, int end,
 		OrderByComparator<Entry> orderByComparator, boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByCreateDate;
-			finderArgs = new Object[] { createDate };
+			finderArgs = new Object[] {createDate};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByCreateDate;
-			finderArgs = new Object[] { createDate, start, end, orderByComparator };
+			finderArgs = new Object[] {
+				createDate, start, end, orderByComparator
+			};
 		}
 
 		List<Entry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Entry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -178,8 +189,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -190,11 +201,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			query.append(_FINDER_COLUMN_CREATEDATE_CREATEDATE_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(EntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -212,16 +222,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				qPos.add(createDate);
 
 				if (!pagination) {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -250,8 +260,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByCreateDate_First(long createDate,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry findByCreateDate_First(
+			long createDate, OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = fetchByCreateDate_First(createDate, orderByComparator);
 
 		if (entry != null) {
@@ -278,9 +290,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the first matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByCreateDate_First(long createDate,
-		OrderByComparator<Entry> orderByComparator) {
-		List<Entry> list = findByCreateDate(createDate, 0, 1, orderByComparator);
+	public Entry fetchByCreateDate_First(
+		long createDate, OrderByComparator<Entry> orderByComparator) {
+
+		List<Entry> list = findByCreateDate(
+			createDate, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -298,8 +312,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByCreateDate_Last(long createDate,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry findByCreateDate_Last(
+			long createDate, OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = fetchByCreateDate_Last(createDate, orderByComparator);
 
 		if (entry != null) {
@@ -326,16 +342,17 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the last matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByCreateDate_Last(long createDate,
-		OrderByComparator<Entry> orderByComparator) {
+	public Entry fetchByCreateDate_Last(
+		long createDate, OrderByComparator<Entry> orderByComparator) {
+
 		int count = countByCreateDate(createDate);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Entry> list = findByCreateDate(createDate, count - 1, count,
-				orderByComparator);
+		List<Entry> list = findByCreateDate(
+			createDate, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -354,8 +371,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a entry with the primary key could not be found
 	 */
 	@Override
-	public Entry[] findByCreateDate_PrevAndNext(long entryId, long createDate,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry[] findByCreateDate_PrevAndNext(
+			long entryId, long createDate,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -365,13 +385,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 			Entry[] array = new EntryImpl[3];
 
-			array[0] = getByCreateDate_PrevAndNext(session, entry, createDate,
-					orderByComparator, true);
+			array[0] = getByCreateDate_PrevAndNext(
+				session, entry, createDate, orderByComparator, true);
 
 			array[1] = entry;
 
-			array[2] = getByCreateDate_PrevAndNext(session, entry, createDate,
-					orderByComparator, false);
+			array[2] = getByCreateDate_PrevAndNext(
+				session, entry, createDate, orderByComparator, false);
 
 			return array;
 		}
@@ -383,14 +403,15 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 	}
 
-	protected Entry getByCreateDate_PrevAndNext(Session session, Entry entry,
-		long createDate, OrderByComparator<Entry> orderByComparator,
-		boolean previous) {
+	protected Entry getByCreateDate_PrevAndNext(
+		Session session, Entry entry, long createDate,
+		OrderByComparator<Entry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -402,7 +423,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		query.append(_FINDER_COLUMN_CREATEDATE_CREATEDATE_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -472,8 +494,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		qPos.add(createDate);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					entry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(entry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -495,8 +518,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public void removeByCreateDate(long createDate) {
-		for (Entry entry : findByCreateDate(createDate, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Entry entry :
+				findByCreateDate(
+					createDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(entry);
 		}
 	}
@@ -511,7 +536,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	public int countByCreateDate(long createDate) {
 		FinderPath finderPath = _finderPathCountByCreateDate;
 
-		Object[] finderArgs = new Object[] { createDate };
+		Object[] finderArgs = new Object[] {createDate};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -552,7 +577,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_CREATEDATE_CREATEDATE_2 = "entry.createDate = ?";
+	private static final String _FINDER_COLUMN_CREATEDATE_CREATEDATE_2 =
+		"entry.createDate = ?";
+
 	private FinderPath _finderPathWithPaginationFindByFromUserId;
 	private FinderPath _finderPathWithoutPaginationFindByFromUserId;
 	private FinderPath _finderPathCountByFromUserId;
@@ -565,8 +592,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public List<Entry> findByFromUserId(long fromUserId) {
-		return findByFromUserId(fromUserId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByFromUserId(
+			fromUserId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -600,9 +627,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByFromUserId(long fromUserId, int start, int end,
+	public List<Entry> findByFromUserId(
+		long fromUserId, int start, int end,
 		OrderByComparator<Entry> orderByComparator) {
-		return findByFromUserId(fromUserId, start, end, orderByComparator, true);
+
+		return findByFromUserId(
+			fromUserId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -620,28 +650,33 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByFromUserId(long fromUserId, int start, int end,
+	public List<Entry> findByFromUserId(
+		long fromUserId, int start, int end,
 		OrderByComparator<Entry> orderByComparator, boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByFromUserId;
-			finderArgs = new Object[] { fromUserId };
+			finderArgs = new Object[] {fromUserId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByFromUserId;
-			finderArgs = new Object[] { fromUserId, start, end, orderByComparator };
+			finderArgs = new Object[] {
+				fromUserId, start, end, orderByComparator
+			};
 		}
 
 		List<Entry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Entry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -658,8 +693,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -670,11 +705,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			query.append(_FINDER_COLUMN_FROMUSERID_FROMUSERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(EntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -692,16 +726,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				qPos.add(fromUserId);
 
 				if (!pagination) {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -730,8 +764,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByFromUserId_First(long fromUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry findByFromUserId_First(
+			long fromUserId, OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = fetchByFromUserId_First(fromUserId, orderByComparator);
 
 		if (entry != null) {
@@ -758,9 +794,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the first matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByFromUserId_First(long fromUserId,
-		OrderByComparator<Entry> orderByComparator) {
-		List<Entry> list = findByFromUserId(fromUserId, 0, 1, orderByComparator);
+	public Entry fetchByFromUserId_First(
+		long fromUserId, OrderByComparator<Entry> orderByComparator) {
+
+		List<Entry> list = findByFromUserId(
+			fromUserId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -778,8 +816,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByFromUserId_Last(long fromUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry findByFromUserId_Last(
+			long fromUserId, OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = fetchByFromUserId_Last(fromUserId, orderByComparator);
 
 		if (entry != null) {
@@ -806,16 +846,17 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the last matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByFromUserId_Last(long fromUserId,
-		OrderByComparator<Entry> orderByComparator) {
+	public Entry fetchByFromUserId_Last(
+		long fromUserId, OrderByComparator<Entry> orderByComparator) {
+
 		int count = countByFromUserId(fromUserId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Entry> list = findByFromUserId(fromUserId, count - 1, count,
-				orderByComparator);
+		List<Entry> list = findByFromUserId(
+			fromUserId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -834,8 +875,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a entry with the primary key could not be found
 	 */
 	@Override
-	public Entry[] findByFromUserId_PrevAndNext(long entryId, long fromUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry[] findByFromUserId_PrevAndNext(
+			long entryId, long fromUserId,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -845,13 +889,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 			Entry[] array = new EntryImpl[3];
 
-			array[0] = getByFromUserId_PrevAndNext(session, entry, fromUserId,
-					orderByComparator, true);
+			array[0] = getByFromUserId_PrevAndNext(
+				session, entry, fromUserId, orderByComparator, true);
 
 			array[1] = entry;
 
-			array[2] = getByFromUserId_PrevAndNext(session, entry, fromUserId,
-					orderByComparator, false);
+			array[2] = getByFromUserId_PrevAndNext(
+				session, entry, fromUserId, orderByComparator, false);
 
 			return array;
 		}
@@ -863,14 +907,15 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 	}
 
-	protected Entry getByFromUserId_PrevAndNext(Session session, Entry entry,
-		long fromUserId, OrderByComparator<Entry> orderByComparator,
-		boolean previous) {
+	protected Entry getByFromUserId_PrevAndNext(
+		Session session, Entry entry, long fromUserId,
+		OrderByComparator<Entry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -882,7 +927,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		query.append(_FINDER_COLUMN_FROMUSERID_FROMUSERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -952,8 +998,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		qPos.add(fromUserId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					entry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(entry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -975,8 +1022,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public void removeByFromUserId(long fromUserId) {
-		for (Entry entry : findByFromUserId(fromUserId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Entry entry :
+				findByFromUserId(
+					fromUserId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(entry);
 		}
 	}
@@ -991,7 +1040,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	public int countByFromUserId(long fromUserId) {
 		FinderPath finderPath = _finderPathCountByFromUserId;
 
-		Object[] finderArgs = new Object[] { fromUserId };
+		Object[] finderArgs = new Object[] {fromUserId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1032,7 +1081,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_FROMUSERID_FROMUSERID_2 = "entry.fromUserId = ?";
+	private static final String _FINDER_COLUMN_FROMUSERID_FROMUSERID_2 =
+		"entry.fromUserId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByToUserId;
 	private FinderPath _finderPathWithoutPaginationFindByToUserId;
 	private FinderPath _finderPathCountByToUserId;
@@ -1045,8 +1096,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public List<Entry> findByToUserId(long toUserId) {
-		return findByToUserId(toUserId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByToUserId(
+			toUserId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -1080,8 +1131,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByToUserId(long toUserId, int start, int end,
+	public List<Entry> findByToUserId(
+		long toUserId, int start, int end,
 		OrderByComparator<Entry> orderByComparator) {
+
 		return findByToUserId(toUserId, start, end, orderByComparator, true);
 	}
 
@@ -1100,28 +1153,31 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByToUserId(long toUserId, int start, int end,
+	public List<Entry> findByToUserId(
+		long toUserId, int start, int end,
 		OrderByComparator<Entry> orderByComparator, boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByToUserId;
-			finderArgs = new Object[] { toUserId };
+			finderArgs = new Object[] {toUserId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByToUserId;
-			finderArgs = new Object[] { toUserId, start, end, orderByComparator };
+			finderArgs = new Object[] {toUserId, start, end, orderByComparator};
 		}
 
 		List<Entry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Entry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -1138,8 +1194,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1150,11 +1206,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			query.append(_FINDER_COLUMN_TOUSERID_TOUSERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(EntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1172,16 +1227,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				qPos.add(toUserId);
 
 				if (!pagination) {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1210,8 +1265,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByToUserId_First(long toUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry findByToUserId_First(
+			long toUserId, OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = fetchByToUserId_First(toUserId, orderByComparator);
 
 		if (entry != null) {
@@ -1238,8 +1295,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the first matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByToUserId_First(long toUserId,
-		OrderByComparator<Entry> orderByComparator) {
+	public Entry fetchByToUserId_First(
+		long toUserId, OrderByComparator<Entry> orderByComparator) {
+
 		List<Entry> list = findByToUserId(toUserId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -1258,8 +1316,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByToUserId_Last(long toUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry findByToUserId_Last(
+			long toUserId, OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = fetchByToUserId_Last(toUserId, orderByComparator);
 
 		if (entry != null) {
@@ -1286,16 +1346,17 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the last matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByToUserId_Last(long toUserId,
-		OrderByComparator<Entry> orderByComparator) {
+	public Entry fetchByToUserId_Last(
+		long toUserId, OrderByComparator<Entry> orderByComparator) {
+
 		int count = countByToUserId(toUserId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Entry> list = findByToUserId(toUserId, count - 1, count,
-				orderByComparator);
+		List<Entry> list = findByToUserId(
+			toUserId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1314,8 +1375,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a entry with the primary key could not be found
 	 */
 	@Override
-	public Entry[] findByToUserId_PrevAndNext(long entryId, long toUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry[] findByToUserId_PrevAndNext(
+			long entryId, long toUserId,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -1325,13 +1389,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 			Entry[] array = new EntryImpl[3];
 
-			array[0] = getByToUserId_PrevAndNext(session, entry, toUserId,
-					orderByComparator, true);
+			array[0] = getByToUserId_PrevAndNext(
+				session, entry, toUserId, orderByComparator, true);
 
 			array[1] = entry;
 
-			array[2] = getByToUserId_PrevAndNext(session, entry, toUserId,
-					orderByComparator, false);
+			array[2] = getByToUserId_PrevAndNext(
+				session, entry, toUserId, orderByComparator, false);
 
 			return array;
 		}
@@ -1343,14 +1407,15 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 	}
 
-	protected Entry getByToUserId_PrevAndNext(Session session, Entry entry,
-		long toUserId, OrderByComparator<Entry> orderByComparator,
-		boolean previous) {
+	protected Entry getByToUserId_PrevAndNext(
+		Session session, Entry entry, long toUserId,
+		OrderByComparator<Entry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1362,7 +1427,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		query.append(_FINDER_COLUMN_TOUSERID_TOUSERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1432,8 +1498,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		qPos.add(toUserId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					entry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(entry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1455,8 +1522,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public void removeByToUserId(long toUserId) {
-		for (Entry entry : findByToUserId(toUserId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Entry entry :
+				findByToUserId(
+					toUserId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(entry);
 		}
 	}
@@ -1471,7 +1540,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	public int countByToUserId(long toUserId) {
 		FinderPath finderPath = _finderPathCountByToUserId;
 
-		Object[] finderArgs = new Object[] { toUserId };
+		Object[] finderArgs = new Object[] {toUserId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1512,7 +1581,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_TOUSERID_TOUSERID_2 = "entry.toUserId = ?";
+	private static final String _FINDER_COLUMN_TOUSERID_TOUSERID_2 =
+		"entry.toUserId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByC_F;
 	private FinderPath _finderPathWithoutPaginationFindByC_F;
 	private FinderPath _finderPathCountByC_F;
@@ -1526,8 +1597,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public List<Entry> findByC_F(long createDate, long fromUserId) {
-		return findByC_F(createDate, fromUserId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByC_F(
+			createDate, fromUserId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -1544,8 +1615,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the range of matching entries
 	 */
 	@Override
-	public List<Entry> findByC_F(long createDate, long fromUserId, int start,
-		int end) {
+	public List<Entry> findByC_F(
+		long createDate, long fromUserId, int start, int end) {
+
 		return findByC_F(createDate, fromUserId, start, end, null);
 	}
 
@@ -1564,10 +1636,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByC_F(long createDate, long fromUserId, int start,
-		int end, OrderByComparator<Entry> orderByComparator) {
-		return findByC_F(createDate, fromUserId, start, end, orderByComparator,
-			true);
+	public List<Entry> findByC_F(
+		long createDate, long fromUserId, int start, int end,
+		OrderByComparator<Entry> orderByComparator) {
+
+		return findByC_F(
+			createDate, fromUserId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -1586,38 +1660,39 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByC_F(long createDate, long fromUserId, int start,
-		int end, OrderByComparator<Entry> orderByComparator,
-		boolean retrieveFromCache) {
+	public List<Entry> findByC_F(
+		long createDate, long fromUserId, int start, int end,
+		OrderByComparator<Entry> orderByComparator, boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_F;
-			finderArgs = new Object[] { createDate, fromUserId };
+			finderArgs = new Object[] {createDate, fromUserId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_F;
 			finderArgs = new Object[] {
-					createDate, fromUserId,
-					
-					start, end, orderByComparator
-				};
+				createDate, fromUserId, start, end, orderByComparator
+			};
 		}
 
 		List<Entry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Entry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
 					if ((createDate != entry.getCreateDate()) ||
-							(fromUserId != entry.getFromUserId())) {
+						(fromUserId != entry.getFromUserId())) {
+
 						list = null;
 
 						break;
@@ -1630,8 +1705,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1644,11 +1719,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			query.append(_FINDER_COLUMN_C_F_FROMUSERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(EntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1668,16 +1742,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				qPos.add(fromUserId);
 
 				if (!pagination) {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1707,9 +1781,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByC_F_First(long createDate, long fromUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
-		Entry entry = fetchByC_F_First(createDate, fromUserId, orderByComparator);
+	public Entry findByC_F_First(
+			long createDate, long fromUserId,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
+		Entry entry = fetchByC_F_First(
+			createDate, fromUserId, orderByComparator);
 
 		if (entry != null) {
 			return entry;
@@ -1739,10 +1817,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the first matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByC_F_First(long createDate, long fromUserId,
+	public Entry fetchByC_F_First(
+		long createDate, long fromUserId,
 		OrderByComparator<Entry> orderByComparator) {
-		List<Entry> list = findByC_F(createDate, fromUserId, 0, 1,
-				orderByComparator);
+
+		List<Entry> list = findByC_F(
+			createDate, fromUserId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1761,9 +1841,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByC_F_Last(long createDate, long fromUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
-		Entry entry = fetchByC_F_Last(createDate, fromUserId, orderByComparator);
+	public Entry findByC_F_Last(
+			long createDate, long fromUserId,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
+		Entry entry = fetchByC_F_Last(
+			createDate, fromUserId, orderByComparator);
 
 		if (entry != null) {
 			return entry;
@@ -1793,16 +1877,18 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the last matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByC_F_Last(long createDate, long fromUserId,
+	public Entry fetchByC_F_Last(
+		long createDate, long fromUserId,
 		OrderByComparator<Entry> orderByComparator) {
+
 		int count = countByC_F(createDate, fromUserId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Entry> list = findByC_F(createDate, fromUserId, count - 1, count,
-				orderByComparator);
+		List<Entry> list = findByC_F(
+			createDate, fromUserId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1822,9 +1908,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a entry with the primary key could not be found
 	 */
 	@Override
-	public Entry[] findByC_F_PrevAndNext(long entryId, long createDate,
-		long fromUserId, OrderByComparator<Entry> orderByComparator)
+	public Entry[] findByC_F_PrevAndNext(
+			long entryId, long createDate, long fromUserId,
+			OrderByComparator<Entry> orderByComparator)
 		throws NoSuchEntryException {
+
 		Entry entry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -1834,13 +1922,15 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 			Entry[] array = new EntryImpl[3];
 
-			array[0] = getByC_F_PrevAndNext(session, entry, createDate,
-					fromUserId, orderByComparator, true);
+			array[0] = getByC_F_PrevAndNext(
+				session, entry, createDate, fromUserId, orderByComparator,
+				true);
 
 			array[1] = entry;
 
-			array[2] = getByC_F_PrevAndNext(session, entry, createDate,
-					fromUserId, orderByComparator, false);
+			array[2] = getByC_F_PrevAndNext(
+				session, entry, createDate, fromUserId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -1852,14 +1942,15 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 	}
 
-	protected Entry getByC_F_PrevAndNext(Session session, Entry entry,
-		long createDate, long fromUserId,
+	protected Entry getByC_F_PrevAndNext(
+		Session session, Entry entry, long createDate, long fromUserId,
 		OrderByComparator<Entry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1873,7 +1964,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		query.append(_FINDER_COLUMN_C_F_FROMUSERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1945,8 +2037,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		qPos.add(fromUserId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					entry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(entry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1969,8 +2062,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public void removeByC_F(long createDate, long fromUserId) {
-		for (Entry entry : findByC_F(createDate, fromUserId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Entry entry :
+				findByC_F(
+					createDate, fromUserId, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(entry);
 		}
 	}
@@ -1986,7 +2082,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	public int countByC_F(long createDate, long fromUserId) {
 		FinderPath finderPath = _finderPathCountByC_F;
 
-		Object[] finderArgs = new Object[] { createDate, fromUserId };
+		Object[] finderArgs = new Object[] {createDate, fromUserId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2031,8 +2127,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_F_CREATEDATE_2 = "entry.createDate = ? AND ";
-	private static final String _FINDER_COLUMN_C_F_FROMUSERID_2 = "entry.fromUserId = ?";
+	private static final String _FINDER_COLUMN_C_F_CREATEDATE_2 =
+		"entry.createDate = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_F_FROMUSERID_2 =
+		"entry.fromUserId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByC_T;
 	private FinderPath _finderPathWithoutPaginationFindByC_T;
 	private FinderPath _finderPathCountByC_T;
@@ -2046,8 +2146,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public List<Entry> findByC_T(long createDate, long toUserId) {
-		return findByC_T(createDate, toUserId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByC_T(
+			createDate, toUserId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -2064,8 +2164,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the range of matching entries
 	 */
 	@Override
-	public List<Entry> findByC_T(long createDate, long toUserId, int start,
-		int end) {
+	public List<Entry> findByC_T(
+		long createDate, long toUserId, int start, int end) {
+
 		return findByC_T(createDate, toUserId, start, end, null);
 	}
 
@@ -2084,10 +2185,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByC_T(long createDate, long toUserId, int start,
-		int end, OrderByComparator<Entry> orderByComparator) {
-		return findByC_T(createDate, toUserId, start, end, orderByComparator,
-			true);
+	public List<Entry> findByC_T(
+		long createDate, long toUserId, int start, int end,
+		OrderByComparator<Entry> orderByComparator) {
+
+		return findByC_T(
+			createDate, toUserId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -2106,38 +2209,39 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByC_T(long createDate, long toUserId, int start,
-		int end, OrderByComparator<Entry> orderByComparator,
-		boolean retrieveFromCache) {
+	public List<Entry> findByC_T(
+		long createDate, long toUserId, int start, int end,
+		OrderByComparator<Entry> orderByComparator, boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_T;
-			finderArgs = new Object[] { createDate, toUserId };
+			finderArgs = new Object[] {createDate, toUserId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_T;
 			finderArgs = new Object[] {
-					createDate, toUserId,
-					
-					start, end, orderByComparator
-				};
+				createDate, toUserId, start, end, orderByComparator
+			};
 		}
 
 		List<Entry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Entry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
 					if ((createDate != entry.getCreateDate()) ||
-							(toUserId != entry.getToUserId())) {
+						(toUserId != entry.getToUserId())) {
+
 						list = null;
 
 						break;
@@ -2150,8 +2254,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -2164,11 +2268,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			query.append(_FINDER_COLUMN_C_T_TOUSERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(EntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2188,16 +2291,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				qPos.add(toUserId);
 
 				if (!pagination) {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2227,8 +2330,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByC_T_First(long createDate, long toUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry findByC_T_First(
+			long createDate, long toUserId,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = fetchByC_T_First(createDate, toUserId, orderByComparator);
 
 		if (entry != null) {
@@ -2259,10 +2365,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the first matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByC_T_First(long createDate, long toUserId,
+	public Entry fetchByC_T_First(
+		long createDate, long toUserId,
 		OrderByComparator<Entry> orderByComparator) {
-		List<Entry> list = findByC_T(createDate, toUserId, 0, 1,
-				orderByComparator);
+
+		List<Entry> list = findByC_T(
+			createDate, toUserId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2281,8 +2389,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByC_T_Last(long createDate, long toUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry findByC_T_Last(
+			long createDate, long toUserId,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = fetchByC_T_Last(createDate, toUserId, orderByComparator);
 
 		if (entry != null) {
@@ -2313,16 +2424,18 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the last matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByC_T_Last(long createDate, long toUserId,
+	public Entry fetchByC_T_Last(
+		long createDate, long toUserId,
 		OrderByComparator<Entry> orderByComparator) {
+
 		int count = countByC_T(createDate, toUserId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Entry> list = findByC_T(createDate, toUserId, count - 1, count,
-				orderByComparator);
+		List<Entry> list = findByC_T(
+			createDate, toUserId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2342,9 +2455,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a entry with the primary key could not be found
 	 */
 	@Override
-	public Entry[] findByC_T_PrevAndNext(long entryId, long createDate,
-		long toUserId, OrderByComparator<Entry> orderByComparator)
+	public Entry[] findByC_T_PrevAndNext(
+			long entryId, long createDate, long toUserId,
+			OrderByComparator<Entry> orderByComparator)
 		throws NoSuchEntryException {
+
 		Entry entry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -2354,13 +2469,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 			Entry[] array = new EntryImpl[3];
 
-			array[0] = getByC_T_PrevAndNext(session, entry, createDate,
-					toUserId, orderByComparator, true);
+			array[0] = getByC_T_PrevAndNext(
+				session, entry, createDate, toUserId, orderByComparator, true);
 
 			array[1] = entry;
 
-			array[2] = getByC_T_PrevAndNext(session, entry, createDate,
-					toUserId, orderByComparator, false);
+			array[2] = getByC_T_PrevAndNext(
+				session, entry, createDate, toUserId, orderByComparator, false);
 
 			return array;
 		}
@@ -2372,14 +2487,15 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 	}
 
-	protected Entry getByC_T_PrevAndNext(Session session, Entry entry,
-		long createDate, long toUserId,
+	protected Entry getByC_T_PrevAndNext(
+		Session session, Entry entry, long createDate, long toUserId,
 		OrderByComparator<Entry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2393,7 +2509,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		query.append(_FINDER_COLUMN_C_T_TOUSERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2465,8 +2582,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		qPos.add(toUserId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					entry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(entry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2489,8 +2607,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public void removeByC_T(long createDate, long toUserId) {
-		for (Entry entry : findByC_T(createDate, toUserId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Entry entry :
+				findByC_T(
+					createDate, toUserId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(entry);
 		}
 	}
@@ -2506,7 +2627,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	public int countByC_T(long createDate, long toUserId) {
 		FinderPath finderPath = _finderPathCountByC_T;
 
-		Object[] finderArgs = new Object[] { createDate, toUserId };
+		Object[] finderArgs = new Object[] {createDate, toUserId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2551,8 +2672,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_T_CREATEDATE_2 = "entry.createDate = ? AND ";
-	private static final String _FINDER_COLUMN_C_T_TOUSERID_2 = "entry.toUserId = ?";
+	private static final String _FINDER_COLUMN_C_T_CREATEDATE_2 =
+		"entry.createDate = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_T_TOUSERID_2 =
+		"entry.toUserId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByF_T;
 	private FinderPath _finderPathWithoutPaginationFindByF_T;
 	private FinderPath _finderPathCountByF_T;
@@ -2566,8 +2691,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public List<Entry> findByF_T(long fromUserId, long toUserId) {
-		return findByF_T(fromUserId, toUserId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByF_T(
+			fromUserId, toUserId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -2584,8 +2709,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the range of matching entries
 	 */
 	@Override
-	public List<Entry> findByF_T(long fromUserId, long toUserId, int start,
-		int end) {
+	public List<Entry> findByF_T(
+		long fromUserId, long toUserId, int start, int end) {
+
 		return findByF_T(fromUserId, toUserId, start, end, null);
 	}
 
@@ -2604,10 +2730,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByF_T(long fromUserId, long toUserId, int start,
-		int end, OrderByComparator<Entry> orderByComparator) {
-		return findByF_T(fromUserId, toUserId, start, end, orderByComparator,
-			true);
+	public List<Entry> findByF_T(
+		long fromUserId, long toUserId, int start, int end,
+		OrderByComparator<Entry> orderByComparator) {
+
+		return findByF_T(
+			fromUserId, toUserId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -2626,38 +2754,39 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByF_T(long fromUserId, long toUserId, int start,
-		int end, OrderByComparator<Entry> orderByComparator,
-		boolean retrieveFromCache) {
+	public List<Entry> findByF_T(
+		long fromUserId, long toUserId, int start, int end,
+		OrderByComparator<Entry> orderByComparator, boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByF_T;
-			finderArgs = new Object[] { fromUserId, toUserId };
+			finderArgs = new Object[] {fromUserId, toUserId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByF_T;
 			finderArgs = new Object[] {
-					fromUserId, toUserId,
-					
-					start, end, orderByComparator
-				};
+				fromUserId, toUserId, start, end, orderByComparator
+			};
 		}
 
 		List<Entry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Entry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
 					if ((fromUserId != entry.getFromUserId()) ||
-							(toUserId != entry.getToUserId())) {
+						(toUserId != entry.getToUserId())) {
+
 						list = null;
 
 						break;
@@ -2670,8 +2799,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -2684,11 +2813,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			query.append(_FINDER_COLUMN_F_T_TOUSERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(EntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2708,16 +2836,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				qPos.add(toUserId);
 
 				if (!pagination) {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2747,8 +2875,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByF_T_First(long fromUserId, long toUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry findByF_T_First(
+			long fromUserId, long toUserId,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = fetchByF_T_First(fromUserId, toUserId, orderByComparator);
 
 		if (entry != null) {
@@ -2779,10 +2910,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the first matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByF_T_First(long fromUserId, long toUserId,
+	public Entry fetchByF_T_First(
+		long fromUserId, long toUserId,
 		OrderByComparator<Entry> orderByComparator) {
-		List<Entry> list = findByF_T(fromUserId, toUserId, 0, 1,
-				orderByComparator);
+
+		List<Entry> list = findByF_T(
+			fromUserId, toUserId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2801,8 +2934,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByF_T_Last(long fromUserId, long toUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry findByF_T_Last(
+			long fromUserId, long toUserId,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = fetchByF_T_Last(fromUserId, toUserId, orderByComparator);
 
 		if (entry != null) {
@@ -2833,16 +2969,18 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the last matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByF_T_Last(long fromUserId, long toUserId,
+	public Entry fetchByF_T_Last(
+		long fromUserId, long toUserId,
 		OrderByComparator<Entry> orderByComparator) {
+
 		int count = countByF_T(fromUserId, toUserId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Entry> list = findByF_T(fromUserId, toUserId, count - 1, count,
-				orderByComparator);
+		List<Entry> list = findByF_T(
+			fromUserId, toUserId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2862,9 +3000,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a entry with the primary key could not be found
 	 */
 	@Override
-	public Entry[] findByF_T_PrevAndNext(long entryId, long fromUserId,
-		long toUserId, OrderByComparator<Entry> orderByComparator)
+	public Entry[] findByF_T_PrevAndNext(
+			long entryId, long fromUserId, long toUserId,
+			OrderByComparator<Entry> orderByComparator)
 		throws NoSuchEntryException {
+
 		Entry entry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -2874,13 +3014,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 			Entry[] array = new EntryImpl[3];
 
-			array[0] = getByF_T_PrevAndNext(session, entry, fromUserId,
-					toUserId, orderByComparator, true);
+			array[0] = getByF_T_PrevAndNext(
+				session, entry, fromUserId, toUserId, orderByComparator, true);
 
 			array[1] = entry;
 
-			array[2] = getByF_T_PrevAndNext(session, entry, fromUserId,
-					toUserId, orderByComparator, false);
+			array[2] = getByF_T_PrevAndNext(
+				session, entry, fromUserId, toUserId, orderByComparator, false);
 
 			return array;
 		}
@@ -2892,14 +3032,15 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 	}
 
-	protected Entry getByF_T_PrevAndNext(Session session, Entry entry,
-		long fromUserId, long toUserId,
+	protected Entry getByF_T_PrevAndNext(
+		Session session, Entry entry, long fromUserId, long toUserId,
 		OrderByComparator<Entry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2913,7 +3054,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		query.append(_FINDER_COLUMN_F_T_TOUSERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2985,8 +3127,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		qPos.add(toUserId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					entry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(entry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3009,8 +3152,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public void removeByF_T(long fromUserId, long toUserId) {
-		for (Entry entry : findByF_T(fromUserId, toUserId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Entry entry :
+				findByF_T(
+					fromUserId, toUserId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(entry);
 		}
 	}
@@ -3026,7 +3172,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	public int countByF_T(long fromUserId, long toUserId) {
 		FinderPath finderPath = _finderPathCountByF_T;
 
-		Object[] finderArgs = new Object[] { fromUserId, toUserId };
+		Object[] finderArgs = new Object[] {fromUserId, toUserId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -3071,8 +3217,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_F_T_FROMUSERID_2 = "entry.fromUserId = ? AND ";
-	private static final String _FINDER_COLUMN_F_T_TOUSERID_2 = "entry.toUserId = ?";
+	private static final String _FINDER_COLUMN_F_T_FROMUSERID_2 =
+		"entry.fromUserId = ? AND ";
+
+	private static final String _FINDER_COLUMN_F_T_TOUSERID_2 =
+		"entry.toUserId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByC_F_T;
 	private FinderPath _finderPathWithoutPaginationFindByC_F_T;
 	private FinderPath _finderPathCountByC_F_T;
@@ -3086,9 +3236,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the matching entries
 	 */
 	@Override
-	public List<Entry> findByC_F_T(long createDate, long fromUserId,
-		long toUserId) {
-		return findByC_F_T(createDate, fromUserId, toUserId, QueryUtil.ALL_POS,
+	public List<Entry> findByC_F_T(
+		long createDate, long fromUserId, long toUserId) {
+
+		return findByC_F_T(
+			createDate, fromUserId, toUserId, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
 	}
 
@@ -3107,8 +3259,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the range of matching entries
 	 */
 	@Override
-	public List<Entry> findByC_F_T(long createDate, long fromUserId,
-		long toUserId, int start, int end) {
+	public List<Entry> findByC_F_T(
+		long createDate, long fromUserId, long toUserId, int start, int end) {
+
 		return findByC_F_T(createDate, fromUserId, toUserId, start, end, null);
 	}
 
@@ -3128,11 +3281,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByC_F_T(long createDate, long fromUserId,
-		long toUserId, int start, int end,
+	public List<Entry> findByC_F_T(
+		long createDate, long fromUserId, long toUserId, int start, int end,
 		OrderByComparator<Entry> orderByComparator) {
-		return findByC_F_T(createDate, fromUserId, toUserId, start, end,
-			orderByComparator, true);
+
+		return findByC_F_T(
+			createDate, fromUserId, toUserId, start, end, orderByComparator,
+			true);
 	}
 
 	/**
@@ -3152,39 +3307,40 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByC_F_T(long createDate, long fromUserId,
-		long toUserId, int start, int end,
+	public List<Entry> findByC_F_T(
+		long createDate, long fromUserId, long toUserId, int start, int end,
 		OrderByComparator<Entry> orderByComparator, boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_F_T;
-			finderArgs = new Object[] { createDate, fromUserId, toUserId };
+			finderArgs = new Object[] {createDate, fromUserId, toUserId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_F_T;
 			finderArgs = new Object[] {
-					createDate, fromUserId, toUserId,
-					
-					start, end, orderByComparator
-				};
+				createDate, fromUserId, toUserId, start, end, orderByComparator
+			};
 		}
 
 		List<Entry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Entry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
 					if ((createDate != entry.getCreateDate()) ||
-							(fromUserId != entry.getFromUserId()) ||
-							(toUserId != entry.getToUserId())) {
+						(fromUserId != entry.getFromUserId()) ||
+						(toUserId != entry.getToUserId())) {
+
 						list = null;
 
 						break;
@@ -3197,8 +3353,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -3213,11 +3369,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			query.append(_FINDER_COLUMN_C_F_T_TOUSERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(EntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3239,16 +3394,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				qPos.add(toUserId);
 
 				if (!pagination) {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3279,11 +3434,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByC_F_T_First(long createDate, long fromUserId,
-		long toUserId, OrderByComparator<Entry> orderByComparator)
+	public Entry findByC_F_T_First(
+			long createDate, long fromUserId, long toUserId,
+			OrderByComparator<Entry> orderByComparator)
 		throws NoSuchEntryException {
-		Entry entry = fetchByC_F_T_First(createDate, fromUserId, toUserId,
-				orderByComparator);
+
+		Entry entry = fetchByC_F_T_First(
+			createDate, fromUserId, toUserId, orderByComparator);
 
 		if (entry != null) {
 			return entry;
@@ -3317,10 +3474,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the first matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByC_F_T_First(long createDate, long fromUserId,
-		long toUserId, OrderByComparator<Entry> orderByComparator) {
-		List<Entry> list = findByC_F_T(createDate, fromUserId, toUserId, 0, 1,
-				orderByComparator);
+	public Entry fetchByC_F_T_First(
+		long createDate, long fromUserId, long toUserId,
+		OrderByComparator<Entry> orderByComparator) {
+
+		List<Entry> list = findByC_F_T(
+			createDate, fromUserId, toUserId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3340,11 +3499,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByC_F_T_Last(long createDate, long fromUserId,
-		long toUserId, OrderByComparator<Entry> orderByComparator)
+	public Entry findByC_F_T_Last(
+			long createDate, long fromUserId, long toUserId,
+			OrderByComparator<Entry> orderByComparator)
 		throws NoSuchEntryException {
-		Entry entry = fetchByC_F_T_Last(createDate, fromUserId, toUserId,
-				orderByComparator);
+
+		Entry entry = fetchByC_F_T_Last(
+			createDate, fromUserId, toUserId, orderByComparator);
 
 		if (entry != null) {
 			return entry;
@@ -3378,16 +3539,19 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the last matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByC_F_T_Last(long createDate, long fromUserId,
-		long toUserId, OrderByComparator<Entry> orderByComparator) {
+	public Entry fetchByC_F_T_Last(
+		long createDate, long fromUserId, long toUserId,
+		OrderByComparator<Entry> orderByComparator) {
+
 		int count = countByC_F_T(createDate, fromUserId, toUserId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Entry> list = findByC_F_T(createDate, fromUserId, toUserId,
-				count - 1, count, orderByComparator);
+		List<Entry> list = findByC_F_T(
+			createDate, fromUserId, toUserId, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3408,9 +3572,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a entry with the primary key could not be found
 	 */
 	@Override
-	public Entry[] findByC_F_T_PrevAndNext(long entryId, long createDate,
-		long fromUserId, long toUserId,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry[] findByC_F_T_PrevAndNext(
+			long entryId, long createDate, long fromUserId, long toUserId,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		Entry entry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -3420,13 +3586,15 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 			Entry[] array = new EntryImpl[3];
 
-			array[0] = getByC_F_T_PrevAndNext(session, entry, createDate,
-					fromUserId, toUserId, orderByComparator, true);
+			array[0] = getByC_F_T_PrevAndNext(
+				session, entry, createDate, fromUserId, toUserId,
+				orderByComparator, true);
 
 			array[1] = entry;
 
-			array[2] = getByC_F_T_PrevAndNext(session, entry, createDate,
-					fromUserId, toUserId, orderByComparator, false);
+			array[2] = getByC_F_T_PrevAndNext(
+				session, entry, createDate, fromUserId, toUserId,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -3438,14 +3606,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 	}
 
-	protected Entry getByC_F_T_PrevAndNext(Session session, Entry entry,
-		long createDate, long fromUserId, long toUserId,
-		OrderByComparator<Entry> orderByComparator, boolean previous) {
+	protected Entry getByC_F_T_PrevAndNext(
+		Session session, Entry entry, long createDate, long fromUserId,
+		long toUserId, OrderByComparator<Entry> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3461,7 +3631,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		query.append(_FINDER_COLUMN_C_F_T_TOUSERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3535,8 +3706,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		qPos.add(toUserId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					entry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(entry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3560,8 +3732,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public void removeByC_F_T(long createDate, long fromUserId, long toUserId) {
-		for (Entry entry : findByC_F_T(createDate, fromUserId, toUserId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (Entry entry :
+				findByC_F_T(
+					createDate, fromUserId, toUserId, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(entry);
 		}
 	}
@@ -3578,7 +3753,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	public int countByC_F_T(long createDate, long fromUserId, long toUserId) {
 		FinderPath finderPath = _finderPathCountByC_F_T;
 
-		Object[] finderArgs = new Object[] { createDate, fromUserId, toUserId };
+		Object[] finderArgs = new Object[] {createDate, fromUserId, toUserId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -3627,9 +3802,15 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_F_T_CREATEDATE_2 = "entry.createDate = ? AND ";
-	private static final String _FINDER_COLUMN_C_F_T_FROMUSERID_2 = "entry.fromUserId = ? AND ";
-	private static final String _FINDER_COLUMN_C_F_T_TOUSERID_2 = "entry.toUserId = ?";
+	private static final String _FINDER_COLUMN_C_F_T_CREATEDATE_2 =
+		"entry.createDate = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_F_T_FROMUSERID_2 =
+		"entry.fromUserId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_F_T_TOUSERID_2 =
+		"entry.toUserId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByF_T_C;
 	private FinderPath _finderPathWithoutPaginationFindByF_T_C;
 	private FinderPath _finderPathCountByF_T_C;
@@ -3643,10 +3824,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the matching entries
 	 */
 	@Override
-	public List<Entry> findByF_T_C(long fromUserId, long toUserId,
-		String content) {
-		return findByF_T_C(fromUserId, toUserId, content, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<Entry> findByF_T_C(
+		long fromUserId, long toUserId, String content) {
+
+		return findByF_T_C(
+			fromUserId, toUserId, content, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -3664,8 +3847,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the range of matching entries
 	 */
 	@Override
-	public List<Entry> findByF_T_C(long fromUserId, long toUserId,
-		String content, int start, int end) {
+	public List<Entry> findByF_T_C(
+		long fromUserId, long toUserId, String content, int start, int end) {
+
 		return findByF_T_C(fromUserId, toUserId, content, start, end, null);
 	}
 
@@ -3685,11 +3869,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByF_T_C(long fromUserId, long toUserId,
-		String content, int start, int end,
+	public List<Entry> findByF_T_C(
+		long fromUserId, long toUserId, String content, int start, int end,
 		OrderByComparator<Entry> orderByComparator) {
-		return findByF_T_C(fromUserId, toUserId, content, start, end,
-			orderByComparator, true);
+
+		return findByF_T_C(
+			fromUserId, toUserId, content, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -3709,9 +3894,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of matching entries
 	 */
 	@Override
-	public List<Entry> findByF_T_C(long fromUserId, long toUserId,
-		String content, int start, int end,
+	public List<Entry> findByF_T_C(
+		long fromUserId, long toUserId, String content, int start, int end,
 		OrderByComparator<Entry> orderByComparator, boolean retrieveFromCache) {
+
 		content = Objects.toString(content, "");
 
 		boolean pagination = true;
@@ -3719,31 +3905,31 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByF_T_C;
-			finderArgs = new Object[] { fromUserId, toUserId, content };
+			finderArgs = new Object[] {fromUserId, toUserId, content};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByF_T_C;
 			finderArgs = new Object[] {
-					fromUserId, toUserId, content,
-					
-					start, end, orderByComparator
-				};
+				fromUserId, toUserId, content, start, end, orderByComparator
+			};
 		}
 
 		List<Entry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Entry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
 					if ((fromUserId != entry.getFromUserId()) ||
-							(toUserId != entry.getToUserId()) ||
-							!content.equals(entry.getContent())) {
+						(toUserId != entry.getToUserId()) ||
+						!content.equals(entry.getContent())) {
+
 						list = null;
 
 						break;
@@ -3756,8 +3942,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -3781,11 +3967,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(EntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3809,16 +3994,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				}
 
 				if (!pagination) {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3849,11 +4034,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByF_T_C_First(long fromUserId, long toUserId,
-		String content, OrderByComparator<Entry> orderByComparator)
+	public Entry findByF_T_C_First(
+			long fromUserId, long toUserId, String content,
+			OrderByComparator<Entry> orderByComparator)
 		throws NoSuchEntryException {
-		Entry entry = fetchByF_T_C_First(fromUserId, toUserId, content,
-				orderByComparator);
+
+		Entry entry = fetchByF_T_C_First(
+			fromUserId, toUserId, content, orderByComparator);
 
 		if (entry != null) {
 			return entry;
@@ -3887,10 +4074,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the first matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByF_T_C_First(long fromUserId, long toUserId,
-		String content, OrderByComparator<Entry> orderByComparator) {
-		List<Entry> list = findByF_T_C(fromUserId, toUserId, content, 0, 1,
-				orderByComparator);
+	public Entry fetchByF_T_C_First(
+		long fromUserId, long toUserId, String content,
+		OrderByComparator<Entry> orderByComparator) {
+
+		List<Entry> list = findByF_T_C(
+			fromUserId, toUserId, content, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3910,11 +4099,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a matching entry could not be found
 	 */
 	@Override
-	public Entry findByF_T_C_Last(long fromUserId, long toUserId,
-		String content, OrderByComparator<Entry> orderByComparator)
+	public Entry findByF_T_C_Last(
+			long fromUserId, long toUserId, String content,
+			OrderByComparator<Entry> orderByComparator)
 		throws NoSuchEntryException {
-		Entry entry = fetchByF_T_C_Last(fromUserId, toUserId, content,
-				orderByComparator);
+
+		Entry entry = fetchByF_T_C_Last(
+			fromUserId, toUserId, content, orderByComparator);
 
 		if (entry != null) {
 			return entry;
@@ -3948,16 +4139,18 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the last matching entry, or <code>null</code> if a matching entry could not be found
 	 */
 	@Override
-	public Entry fetchByF_T_C_Last(long fromUserId, long toUserId,
-		String content, OrderByComparator<Entry> orderByComparator) {
+	public Entry fetchByF_T_C_Last(
+		long fromUserId, long toUserId, String content,
+		OrderByComparator<Entry> orderByComparator) {
+
 		int count = countByF_T_C(fromUserId, toUserId, content);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Entry> list = findByF_T_C(fromUserId, toUserId, content,
-				count - 1, count, orderByComparator);
+		List<Entry> list = findByF_T_C(
+			fromUserId, toUserId, content, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3978,9 +4171,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @throws NoSuchEntryException if a entry with the primary key could not be found
 	 */
 	@Override
-	public Entry[] findByF_T_C_PrevAndNext(long entryId, long fromUserId,
-		long toUserId, String content,
-		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+	public Entry[] findByF_T_C_PrevAndNext(
+			long entryId, long fromUserId, long toUserId, String content,
+			OrderByComparator<Entry> orderByComparator)
+		throws NoSuchEntryException {
+
 		content = Objects.toString(content, "");
 
 		Entry entry = findByPrimaryKey(entryId);
@@ -3992,13 +4187,15 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 			Entry[] array = new EntryImpl[3];
 
-			array[0] = getByF_T_C_PrevAndNext(session, entry, fromUserId,
-					toUserId, content, orderByComparator, true);
+			array[0] = getByF_T_C_PrevAndNext(
+				session, entry, fromUserId, toUserId, content,
+				orderByComparator, true);
 
 			array[1] = entry;
 
-			array[2] = getByF_T_C_PrevAndNext(session, entry, fromUserId,
-					toUserId, content, orderByComparator, false);
+			array[2] = getByF_T_C_PrevAndNext(
+				session, entry, fromUserId, toUserId, content,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -4010,14 +4207,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 	}
 
-	protected Entry getByF_T_C_PrevAndNext(Session session, Entry entry,
-		long fromUserId, long toUserId, String content,
-		OrderByComparator<Entry> orderByComparator, boolean previous) {
+	protected Entry getByF_T_C_PrevAndNext(
+		Session session, Entry entry, long fromUserId, long toUserId,
+		String content, OrderByComparator<Entry> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -4042,7 +4241,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4118,8 +4318,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					entry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(entry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4143,8 +4344,11 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public void removeByF_T_C(long fromUserId, long toUserId, String content) {
-		for (Entry entry : findByF_T_C(fromUserId, toUserId, content,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (Entry entry :
+				findByF_T_C(
+					fromUserId, toUserId, content, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(entry);
 		}
 	}
@@ -4163,7 +4367,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 		FinderPath finderPath = _finderPathCountByF_T_C;
 
-		Object[] finderArgs = new Object[] { fromUserId, toUserId, content };
+		Object[] finderArgs = new Object[] {fromUserId, toUserId, content};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -4223,10 +4427,17 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_F_T_C_FROMUSERID_2 = "entry.fromUserId = ? AND ";
-	private static final String _FINDER_COLUMN_F_T_C_TOUSERID_2 = "entry.toUserId = ? AND ";
-	private static final String _FINDER_COLUMN_F_T_C_CONTENT_2 = "entry.content = ?";
-	private static final String _FINDER_COLUMN_F_T_C_CONTENT_3 = "(entry.content IS NULL OR entry.content = '')";
+	private static final String _FINDER_COLUMN_F_T_C_FROMUSERID_2 =
+		"entry.fromUserId = ? AND ";
+
+	private static final String _FINDER_COLUMN_F_T_C_TOUSERID_2 =
+		"entry.toUserId = ? AND ";
+
+	private static final String _FINDER_COLUMN_F_T_C_CONTENT_2 =
+		"entry.content = ?";
+
+	private static final String _FINDER_COLUMN_F_T_C_CONTENT_3 =
+		"(entry.content IS NULL OR entry.content = '')";
 
 	public EntryPersistenceImpl() {
 		setModelClass(Entry.class);
@@ -4243,8 +4454,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public void cacheResult(Entry entry) {
-		entityCache.putResult(EntryModelImpl.ENTITY_CACHE_ENABLED,
-			EntryImpl.class, entry.getPrimaryKey(), entry);
+		entityCache.putResult(
+			EntryModelImpl.ENTITY_CACHE_ENABLED, EntryImpl.class,
+			entry.getPrimaryKey(), entry);
 
 		entry.resetOriginalValues();
 	}
@@ -4257,8 +4469,10 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	@Override
 	public void cacheResult(List<Entry> entries) {
 		for (Entry entry : entries) {
-			if (entityCache.getResult(EntryModelImpl.ENTITY_CACHE_ENABLED,
-						EntryImpl.class, entry.getPrimaryKey()) == null) {
+			if (entityCache.getResult(
+					EntryModelImpl.ENTITY_CACHE_ENABLED, EntryImpl.class,
+					entry.getPrimaryKey()) == null) {
+
 				cacheResult(entry);
 			}
 			else {
@@ -4292,8 +4506,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public void clearCache(Entry entry) {
-		entityCache.removeResult(EntryModelImpl.ENTITY_CACHE_ENABLED,
-			EntryImpl.class, entry.getPrimaryKey());
+		entityCache.removeResult(
+			EntryModelImpl.ENTITY_CACHE_ENABLED, EntryImpl.class,
+			entry.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -4305,8 +4520,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Entry entry : entries) {
-			entityCache.removeResult(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryImpl.class, entry.getPrimaryKey());
+			entityCache.removeResult(
+				EntryModelImpl.ENTITY_CACHE_ENABLED, EntryImpl.class,
+				entry.getPrimaryKey());
 		}
 	}
 
@@ -4359,8 +4575,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchEntryException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(entry);
@@ -4384,8 +4600,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			session = openSession();
 
 			if (!session.contains(entry)) {
-				entry = (Entry)session.get(EntryImpl.class,
-						entry.getPrimaryKeyObj());
+				entry = (Entry)session.get(
+					EntryImpl.class, entry.getPrimaryKeyObj());
 			}
 
 			if (entry != null) {
@@ -4418,12 +4634,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in entry proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom Entry implementation " +
-				entry.getClass());
+					entry.getClass());
 		}
 
 		EntryModelImpl entryModelImpl = (EntryModelImpl)entry;
@@ -4454,235 +4670,248 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 		if (!EntryModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
-			Object[] args = new Object[] { entryModelImpl.getCreateDate() };
+		else if (isNew) {
+			Object[] args = new Object[] {entryModelImpl.getCreateDate()};
 
 			finderCache.removeResult(_finderPathCountByCreateDate, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByCreateDate,
-				args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByCreateDate, args);
 
-			args = new Object[] { entryModelImpl.getFromUserId() };
+			args = new Object[] {entryModelImpl.getFromUserId()};
 
 			finderCache.removeResult(_finderPathCountByFromUserId, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByFromUserId,
-				args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByFromUserId, args);
 
-			args = new Object[] { entryModelImpl.getToUserId() };
+			args = new Object[] {entryModelImpl.getToUserId()};
 
 			finderCache.removeResult(_finderPathCountByToUserId, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByToUserId,
-				args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByToUserId, args);
 
 			args = new Object[] {
+				entryModelImpl.getCreateDate(), entryModelImpl.getFromUserId()
+			};
+
+			finderCache.removeResult(_finderPathCountByC_F, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByC_F, args);
+
+			args = new Object[] {
+				entryModelImpl.getCreateDate(), entryModelImpl.getToUserId()
+			};
+
+			finderCache.removeResult(_finderPathCountByC_T, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByC_T, args);
+
+			args = new Object[] {
+				entryModelImpl.getFromUserId(), entryModelImpl.getToUserId()
+			};
+
+			finderCache.removeResult(_finderPathCountByF_T, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByF_T, args);
+
+			args = new Object[] {
+				entryModelImpl.getCreateDate(), entryModelImpl.getFromUserId(),
+				entryModelImpl.getToUserId()
+			};
+
+			finderCache.removeResult(_finderPathCountByC_F_T, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByC_F_T, args);
+
+			args = new Object[] {
+				entryModelImpl.getFromUserId(), entryModelImpl.getToUserId(),
+				entryModelImpl.getContent()
+			};
+
+			finderCache.removeResult(_finderPathCountByF_T_C, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByF_T_C, args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((entryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByCreateDate.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					entryModelImpl.getOriginalCreateDate()
+				};
+
+				finderCache.removeResult(_finderPathCountByCreateDate, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByCreateDate, args);
+
+				args = new Object[] {entryModelImpl.getCreateDate()};
+
+				finderCache.removeResult(_finderPathCountByCreateDate, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByCreateDate, args);
+			}
+
+			if ((entryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByFromUserId.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					entryModelImpl.getOriginalFromUserId()
+				};
+
+				finderCache.removeResult(_finderPathCountByFromUserId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByFromUserId, args);
+
+				args = new Object[] {entryModelImpl.getFromUserId()};
+
+				finderCache.removeResult(_finderPathCountByFromUserId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByFromUserId, args);
+			}
+
+			if ((entryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByToUserId.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					entryModelImpl.getOriginalToUserId()
+				};
+
+				finderCache.removeResult(_finderPathCountByToUserId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByToUserId, args);
+
+				args = new Object[] {entryModelImpl.getToUserId()};
+
+				finderCache.removeResult(_finderPathCountByToUserId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByToUserId, args);
+			}
+
+			if ((entryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByC_F.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					entryModelImpl.getOriginalCreateDate(),
+					entryModelImpl.getOriginalFromUserId()
+				};
+
+				finderCache.removeResult(_finderPathCountByC_F, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC_F, args);
+
+				args = new Object[] {
 					entryModelImpl.getCreateDate(),
 					entryModelImpl.getFromUserId()
 				};
 
-			finderCache.removeResult(_finderPathCountByC_F, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByC_F, args);
+				finderCache.removeResult(_finderPathCountByC_F, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC_F, args);
+			}
 
-			args = new Object[] {
+			if ((entryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByC_T.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					entryModelImpl.getOriginalCreateDate(),
+					entryModelImpl.getOriginalToUserId()
+				};
+
+				finderCache.removeResult(_finderPathCountByC_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC_T, args);
+
+				args = new Object[] {
 					entryModelImpl.getCreateDate(), entryModelImpl.getToUserId()
 				};
 
-			finderCache.removeResult(_finderPathCountByC_T, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByC_T, args);
+				finderCache.removeResult(_finderPathCountByC_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC_T, args);
+			}
 
-			args = new Object[] {
+			if ((entryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByF_T.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					entryModelImpl.getOriginalFromUserId(),
+					entryModelImpl.getOriginalToUserId()
+				};
+
+				finderCache.removeResult(_finderPathCountByF_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByF_T, args);
+
+				args = new Object[] {
 					entryModelImpl.getFromUserId(), entryModelImpl.getToUserId()
 				};
 
-			finderCache.removeResult(_finderPathCountByF_T, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByF_T, args);
+				finderCache.removeResult(_finderPathCountByF_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByF_T, args);
+			}
 
-			args = new Object[] {
+			if ((entryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByC_F_T.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					entryModelImpl.getOriginalCreateDate(),
+					entryModelImpl.getOriginalFromUserId(),
+					entryModelImpl.getOriginalToUserId()
+				};
+
+				finderCache.removeResult(_finderPathCountByC_F_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC_F_T, args);
+
+				args = new Object[] {
 					entryModelImpl.getCreateDate(),
 					entryModelImpl.getFromUserId(), entryModelImpl.getToUserId()
 				};
 
-			finderCache.removeResult(_finderPathCountByC_F_T, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByC_F_T,
-				args);
+				finderCache.removeResult(_finderPathCountByC_F_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByC_F_T, args);
+			}
 
-			args = new Object[] {
-					entryModelImpl.getFromUserId(), entryModelImpl.getToUserId(),
-					entryModelImpl.getContent()
+			if ((entryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByF_T_C.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					entryModelImpl.getOriginalFromUserId(),
+					entryModelImpl.getOriginalToUserId(),
+					entryModelImpl.getOriginalContent()
 				};
 
-			finderCache.removeResult(_finderPathCountByF_T_C, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByF_T_C,
-				args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((entryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByCreateDate.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						entryModelImpl.getOriginalCreateDate()
-					};
-
-				finderCache.removeResult(_finderPathCountByCreateDate, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByCreateDate,
-					args);
-
-				args = new Object[] { entryModelImpl.getCreateDate() };
-
-				finderCache.removeResult(_finderPathCountByCreateDate, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByCreateDate,
-					args);
-			}
-
-			if ((entryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByFromUserId.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						entryModelImpl.getOriginalFromUserId()
-					};
-
-				finderCache.removeResult(_finderPathCountByFromUserId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByFromUserId,
-					args);
-
-				args = new Object[] { entryModelImpl.getFromUserId() };
-
-				finderCache.removeResult(_finderPathCountByFromUserId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByFromUserId,
-					args);
-			}
-
-			if ((entryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByToUserId.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						entryModelImpl.getOriginalToUserId()
-					};
-
-				finderCache.removeResult(_finderPathCountByToUserId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByToUserId,
-					args);
-
-				args = new Object[] { entryModelImpl.getToUserId() };
-
-				finderCache.removeResult(_finderPathCountByToUserId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByToUserId,
-					args);
-			}
-
-			if ((entryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByC_F.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						entryModelImpl.getOriginalCreateDate(),
-						entryModelImpl.getOriginalFromUserId()
-					};
-
-				finderCache.removeResult(_finderPathCountByC_F, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByC_F,
-					args);
+				finderCache.removeResult(_finderPathCountByF_T_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByF_T_C, args);
 
 				args = new Object[] {
-						entryModelImpl.getCreateDate(),
-						entryModelImpl.getFromUserId()
-					};
-
-				finderCache.removeResult(_finderPathCountByC_F, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByC_F,
-					args);
-			}
-
-			if ((entryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByC_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						entryModelImpl.getOriginalCreateDate(),
-						entryModelImpl.getOriginalToUserId()
-					};
-
-				finderCache.removeResult(_finderPathCountByC_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByC_T,
-					args);
-
-				args = new Object[] {
-						entryModelImpl.getCreateDate(),
-						entryModelImpl.getToUserId()
-					};
-
-				finderCache.removeResult(_finderPathCountByC_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByC_T,
-					args);
-			}
-
-			if ((entryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByF_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						entryModelImpl.getOriginalFromUserId(),
-						entryModelImpl.getOriginalToUserId()
-					};
-
-				finderCache.removeResult(_finderPathCountByF_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByF_T,
-					args);
-
-				args = new Object[] {
-						entryModelImpl.getFromUserId(),
-						entryModelImpl.getToUserId()
-					};
-
-				finderCache.removeResult(_finderPathCountByF_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByF_T,
-					args);
-			}
-
-			if ((entryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByC_F_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						entryModelImpl.getOriginalCreateDate(),
-						entryModelImpl.getOriginalFromUserId(),
-						entryModelImpl.getOriginalToUserId()
-					};
-
-				finderCache.removeResult(_finderPathCountByC_F_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByC_F_T,
-					args);
-
-				args = new Object[] {
-						entryModelImpl.getCreateDate(),
-						entryModelImpl.getFromUserId(),
-						entryModelImpl.getToUserId()
-					};
-
-				finderCache.removeResult(_finderPathCountByC_F_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByC_F_T,
-					args);
-			}
-
-			if ((entryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByF_T_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						entryModelImpl.getOriginalFromUserId(),
-						entryModelImpl.getOriginalToUserId(),
-						entryModelImpl.getOriginalContent()
-					};
+					entryModelImpl.getFromUserId(),
+					entryModelImpl.getToUserId(), entryModelImpl.getContent()
+				};
 
 				finderCache.removeResult(_finderPathCountByF_T_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByF_T_C,
-					args);
-
-				args = new Object[] {
-						entryModelImpl.getFromUserId(),
-						entryModelImpl.getToUserId(),
-						entryModelImpl.getContent()
-					};
-
-				finderCache.removeResult(_finderPathCountByF_T_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByF_T_C,
-					args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByF_T_C, args);
 			}
 		}
 
-		entityCache.putResult(EntryModelImpl.ENTITY_CACHE_ENABLED,
-			EntryImpl.class, entry.getPrimaryKey(), entry, false);
+		entityCache.putResult(
+			EntryModelImpl.ENTITY_CACHE_ENABLED, EntryImpl.class,
+			entry.getPrimaryKey(), entry, false);
 
 		entry.resetOriginalValues();
 
@@ -4699,6 +4928,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	@Override
 	public Entry findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchEntryException {
+
 		Entry entry = fetchByPrimaryKey(primaryKey);
 
 		if (entry == null) {
@@ -4706,8 +4936,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchEntryException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return entry;
@@ -4775,8 +5005,9 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of entries
 	 */
 	@Override
-	public List<Entry> findAll(int start, int end,
-		OrderByComparator<Entry> orderByComparator) {
+	public List<Entry> findAll(
+		int start, int end, OrderByComparator<Entry> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -4794,28 +5025,31 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * @return the ordered range of entries
 	 */
 	@Override
-	public List<Entry> findAll(int start, int end,
-		OrderByComparator<Entry> orderByComparator, boolean retrieveFromCache) {
+	public List<Entry> findAll(
+		int start, int end, OrderByComparator<Entry> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<Entry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Entry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -4823,13 +5057,13 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_ENTRY);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -4849,16 +5083,16 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Entry>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Entry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -4896,8 +5130,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(_finderPathCountAll,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -4909,11 +5143,12 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -4949,212 +5184,224 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 * Initializes the entry persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-				new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
 
-		_finderPathCountAll = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-				new String[0]);
+		_finderPathCountAll = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
 
-		_finderPathWithPaginationFindByCreateDate = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCreateDate",
-				new String[] {
-					Long.class.getName(),
-					
+		_finderPathWithPaginationFindByCreateDate = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCreateDate",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByCreateDate = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCreateDate",
+			new String[] {Long.class.getName()},
+			EntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+
+		_finderPathCountByCreateDate = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCreateDate",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByFromUserId = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFromUserId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByFromUserId = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFromUserId",
+			new String[] {Long.class.getName()},
+			EntryModelImpl.FROMUSERID_COLUMN_BITMASK |
+			EntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+
+		_finderPathCountByFromUserId = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFromUserId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByToUserId = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByToUserId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByToUserId = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByToUserId",
+			new String[] {Long.class.getName()},
+			EntryModelImpl.TOUSERID_COLUMN_BITMASK |
+			EntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+
+		_finderPathCountByToUserId = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByToUserId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByC_F = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_F",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByCreateDate = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCreateDate",
-				new String[] { Long.class.getName() },
-				EntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByC_F = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_F",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			EntryModelImpl.CREATEDATE_COLUMN_BITMASK |
+			EntryModelImpl.FROMUSERID_COLUMN_BITMASK);
 
-		_finderPathCountByCreateDate = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCreateDate",
-				new String[] { Long.class.getName() });
+		_finderPathCountByC_F = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_F",
+			new String[] {Long.class.getName(), Long.class.getName()});
 
-		_finderPathWithPaginationFindByFromUserId = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFromUserId",
-				new String[] {
-					Long.class.getName(),
-					
+		_finderPathWithPaginationFindByC_T = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByFromUserId = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFromUserId",
-				new String[] { Long.class.getName() },
-				EntryModelImpl.FROMUSERID_COLUMN_BITMASK |
-				EntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByC_T = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_T",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			EntryModelImpl.CREATEDATE_COLUMN_BITMASK |
+			EntryModelImpl.TOUSERID_COLUMN_BITMASK);
 
-		_finderPathCountByFromUserId = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFromUserId",
-				new String[] { Long.class.getName() });
+		_finderPathCountByC_T = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_T",
+			new String[] {Long.class.getName(), Long.class.getName()});
 
-		_finderPathWithPaginationFindByToUserId = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByToUserId",
-				new String[] {
-					Long.class.getName(),
-					
+		_finderPathWithPaginationFindByF_T = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByF_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByToUserId = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByToUserId",
-				new String[] { Long.class.getName() },
-				EntryModelImpl.TOUSERID_COLUMN_BITMASK |
-				EntryModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByF_T = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByF_T",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			EntryModelImpl.FROMUSERID_COLUMN_BITMASK |
+			EntryModelImpl.TOUSERID_COLUMN_BITMASK |
+			EntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByToUserId = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByToUserId",
-				new String[] { Long.class.getName() });
+		_finderPathCountByF_T = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_T",
+			new String[] {Long.class.getName(), Long.class.getName()});
 
-		_finderPathWithPaginationFindByC_F = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_F",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+		_finderPathWithPaginationFindByC_F_T = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_F_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByC_F = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_F",
-				new String[] { Long.class.getName(), Long.class.getName() },
-				EntryModelImpl.CREATEDATE_COLUMN_BITMASK |
-				EntryModelImpl.FROMUSERID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByC_F_T = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_F_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			},
+			EntryModelImpl.CREATEDATE_COLUMN_BITMASK |
+			EntryModelImpl.FROMUSERID_COLUMN_BITMASK |
+			EntryModelImpl.TOUSERID_COLUMN_BITMASK);
 
-		_finderPathCountByC_F = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_F",
-				new String[] { Long.class.getName(), Long.class.getName() });
+		_finderPathCountByC_F_T = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_F_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			});
 
-		_finderPathWithPaginationFindByC_T = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+		_finderPathWithPaginationFindByF_T_C = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByF_T_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByC_T = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_T",
-				new String[] { Long.class.getName(), Long.class.getName() },
-				EntryModelImpl.CREATEDATE_COLUMN_BITMASK |
-				EntryModelImpl.TOUSERID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByF_T_C = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByF_T_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			},
+			EntryModelImpl.FROMUSERID_COLUMN_BITMASK |
+			EntryModelImpl.TOUSERID_COLUMN_BITMASK |
+			EntryModelImpl.CONTENT_COLUMN_BITMASK |
+			EntryModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByC_T = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_T",
-				new String[] { Long.class.getName(), Long.class.getName() });
-
-		_finderPathWithPaginationFindByF_T = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByF_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithoutPaginationFindByF_T = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByF_T",
-				new String[] { Long.class.getName(), Long.class.getName() },
-				EntryModelImpl.FROMUSERID_COLUMN_BITMASK |
-				EntryModelImpl.TOUSERID_COLUMN_BITMASK |
-				EntryModelImpl.CREATEDATE_COLUMN_BITMASK);
-
-		_finderPathCountByF_T = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_T",
-				new String[] { Long.class.getName(), Long.class.getName() });
-
-		_finderPathWithPaginationFindByC_F_T = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_F_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithoutPaginationFindByC_F_T = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_F_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName()
-				},
-				EntryModelImpl.CREATEDATE_COLUMN_BITMASK |
-				EntryModelImpl.FROMUSERID_COLUMN_BITMASK |
-				EntryModelImpl.TOUSERID_COLUMN_BITMASK);
-
-		_finderPathCountByC_F_T = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_F_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName()
-				});
-
-		_finderPathWithPaginationFindByF_T_C = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByF_T_C",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					String.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithoutPaginationFindByF_T_C = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, EntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByF_T_C",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					String.class.getName()
-				},
-				EntryModelImpl.FROMUSERID_COLUMN_BITMASK |
-				EntryModelImpl.TOUSERID_COLUMN_BITMASK |
-				EntryModelImpl.CONTENT_COLUMN_BITMASK |
-				EntryModelImpl.CREATEDATE_COLUMN_BITMASK);
-
-		_finderPathCountByF_T_C = new FinderPath(EntryModelImpl.ENTITY_CACHE_ENABLED,
-				EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_T_C",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					String.class.getName()
-				});
+		_finderPathCountByF_T_C = new FinderPath(
+			EntryModelImpl.ENTITY_CACHE_ENABLED,
+			EntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_T_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			});
 	}
 
 	public void destroy() {
@@ -5166,14 +5413,31 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
+
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_ENTRY = "SELECT entry FROM Entry entry";
-	private static final String _SQL_SELECT_ENTRY_WHERE = "SELECT entry FROM Entry entry WHERE ";
-	private static final String _SQL_COUNT_ENTRY = "SELECT COUNT(entry) FROM Entry entry";
-	private static final String _SQL_COUNT_ENTRY_WHERE = "SELECT COUNT(entry) FROM Entry entry WHERE ";
+
+	private static final String _SQL_SELECT_ENTRY =
+		"SELECT entry FROM Entry entry";
+
+	private static final String _SQL_SELECT_ENTRY_WHERE =
+		"SELECT entry FROM Entry entry WHERE ";
+
+	private static final String _SQL_COUNT_ENTRY =
+		"SELECT COUNT(entry) FROM Entry entry";
+
+	private static final String _SQL_COUNT_ENTRY_WHERE =
+		"SELECT COUNT(entry) FROM Entry entry WHERE ";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "entry.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Entry exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Entry exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(EntryPersistenceImpl.class);
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No Entry exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No Entry exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		EntryPersistenceImpl.class);
+
 }

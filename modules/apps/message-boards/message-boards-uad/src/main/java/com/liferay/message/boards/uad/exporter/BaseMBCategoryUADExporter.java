@@ -17,11 +17,8 @@ package com.liferay.message.boards.uad.exporter;
 import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.service.MBCategoryLocalService;
 import com.liferay.message.boards.uad.constants.MBUADConstants;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
-
 import com.liferay.user.associated.data.exporter.DynamicQueryUADExporter;
 
 import org.osgi.service.component.annotations.Reference;
@@ -38,7 +35,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public abstract class BaseMBCategoryUADExporter extends DynamicQueryUADExporter<MBCategory> {
+public abstract class BaseMBCategoryUADExporter
+	extends DynamicQueryUADExporter<MBCategory> {
+
 	@Override
 	public Class<MBCategory> getTypeClass() {
 		return MBCategory.class;
@@ -98,4 +97,5 @@ public abstract class BaseMBCategoryUADExporter extends DynamicQueryUADExporter<
 
 	@Reference
 	protected MBCategoryLocalService mbCategoryLocalService;
+
 }

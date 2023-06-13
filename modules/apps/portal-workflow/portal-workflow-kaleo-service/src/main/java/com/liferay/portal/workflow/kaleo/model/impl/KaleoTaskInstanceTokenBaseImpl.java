@@ -34,6 +34,7 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalServ
 @ProviderType
 public abstract class KaleoTaskInstanceTokenBaseImpl
 	extends KaleoTaskInstanceTokenModelImpl implements KaleoTaskInstanceToken {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -42,10 +43,13 @@ public abstract class KaleoTaskInstanceTokenBaseImpl
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			KaleoTaskInstanceTokenLocalServiceUtil.addKaleoTaskInstanceToken(this);
+			KaleoTaskInstanceTokenLocalServiceUtil.addKaleoTaskInstanceToken(
+				this);
 		}
 		else {
-			KaleoTaskInstanceTokenLocalServiceUtil.updateKaleoTaskInstanceToken(this);
+			KaleoTaskInstanceTokenLocalServiceUtil.updateKaleoTaskInstanceToken(
+				this);
 		}
 	}
+
 }

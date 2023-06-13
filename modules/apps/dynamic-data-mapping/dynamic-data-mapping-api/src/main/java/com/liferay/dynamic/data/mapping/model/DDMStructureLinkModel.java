@@ -32,8 +32,9 @@ import com.liferay.portal.kernel.model.ShardedModel;
  * @generated
  */
 @ProviderType
-public interface DDMStructureLinkModel extends AttachedModel,
-	BaseModel<DDMStructureLink>, ShardedModel {
+public interface DDMStructureLinkModel
+	extends AttachedModel, BaseModel<DDMStructureLink>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -139,4 +140,5 @@ public interface DDMStructureLinkModel extends AttachedModel,
 	 * @param structureId the structure ID of this ddm structure link
 	 */
 	public void setStructureId(long structureId);
+
 }

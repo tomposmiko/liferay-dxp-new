@@ -21,16 +21,36 @@ Exception exception = (Exception)request.getAttribute(DLWebKeys.DOCUMENT_LIBRARY
 FileVersion fileVersion = (FileVersion)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_VERSION);
 %>
 
-<div class="alert alert-info">
-	<c:choose>
-		<c:when test="<%= exception instanceof DLPreviewSizeException %>">
-			<liferay-ui:message key="file-is-too-large-for-preview-or-thumbnail-generation" />
-		</c:when>
-		<c:when test="<%= exception instanceof DLPreviewGenerationInProcessException %>">
-			<liferay-ui:message key="generating-preview-will-take-a-few-minutes" />
-		</c:when>
-		<c:otherwise>
-			<liferay-ui:message arguments="<%= fileVersion.getTitle() %>" key="cannot-generate-preview-for-x" />
-		</c:otherwise>
-	</c:choose>
-</div>
+<c:choose>
+	<c:when test="<%= exception instanceof DLPreviewSizeException %>">
+		<div class="preview-file-error-container">
+			<h3><liferay-ui:message key="file-too-big-to-preview" /></h3>
+
+			<p class="text-secondary">
+				<liferay-ui:message key="file-exceeds-size-limit-to-preview-download-to-view-it" />
+			</p>
+
+			<clay:link
+				buttonStyle="secondary"
+				href="<%= DLURLHelperUtil.getDownloadURL(fileVersion.getFileEntry(), fileVersion, themeDisplay, StringPool.BLANK) %>"
+				label='<%= LanguageUtil.get(resourceBundle, "download") %>'
+				title='<%= LanguageUtil.get(resourceBundle, "download") + " (" + TextFormatter.formatStorageSize(fileVersion.getSize(), locale) + ")" %>'
+			/>
+		</div>
+	</c:when>
+	<c:when test="<%= exception instanceof DLPreviewGenerationInProcessException %>">
+		<clay:alert
+			message='<%= LanguageUtil.get(resourceBundle, "generating-preview-will-take-a-few-minutes") %>'
+			title='<%= LanguageUtil.get(request, "info") + ":" %>'
+		/>
+	</c:when>
+	<c:otherwise>
+		<div class="preview-file-error-container">
+			<h3><liferay-ui:message key="no-preview-available" /></h3>
+
+			<p class="text-secondary">
+				<liferay-ui:message key="hmm-looks-like-this-item-doesnt-have-a-preview-we-can-show-you" />
+			</p>
+		</div>
+	</c:otherwise>
+</c:choose>

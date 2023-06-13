@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutFriendlyURLComposite;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
+import com.liferay.portal.kernel.portlet.LayoutFriendlyURLSeparatorComposite;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -90,8 +91,22 @@ public class DisplayPageFriendlyURLResolver implements FriendlyURLResolver {
 			Map<String, Object> requestContext)
 		throws PortalException {
 
-		String urlTitle = friendlyURL.substring(
+		String initialURL = friendlyURL.substring(
 			JournalArticleConstants.CANONICAL_URL_SEPARATOR.length());
+
+		int i = initialURL.lastIndexOf(StringPool.FORWARD_SLASH);
+
+		String urlTitle = initialURL;
+
+		String ddmTemplateKey = null;
+
+		if (i > 0) {
+			urlTitle = initialURL.substring(0, i);
+			ddmTemplateKey = initialURL.substring(i + 1);
+
+			friendlyURL =
+				JournalArticleConstants.CANONICAL_URL_SEPARATOR + urlTitle;
+		}
 
 		String normalizedUrlTitle =
 			FriendlyURLNormalizerUtil.normalizeWithEncoding(urlTitle);
@@ -148,7 +163,7 @@ public class DisplayPageFriendlyURLResolver implements FriendlyURLResolver {
 
 		return _getBasicLayoutURL(
 			groupId, privateLayout, mainPath, friendlyURL, params,
-			requestContext, urlTitle, journalArticle);
+			requestContext, urlTitle, ddmTemplateKey, journalArticle);
 	}
 
 	@Override
@@ -162,6 +177,37 @@ public class DisplayPageFriendlyURLResolver implements FriendlyURLResolver {
 			groupId, privateLayout, friendlyURL);
 
 		return new LayoutFriendlyURLComposite(layout, friendlyURL);
+	}
+
+	@Override
+	public LayoutFriendlyURLSeparatorComposite
+			getLayoutFriendlyURLSeparatorComposite(
+				long companyId, long groupId, boolean privateLayout,
+				String friendlyURL, Map<String, String[]> params,
+				Map<String, Object> requestContext)
+		throws PortalException {
+
+		String urlTitle = friendlyURL.substring(
+			JournalArticleConstants.CANONICAL_URL_SEPARATOR.length());
+
+		int i = urlTitle.lastIndexOf(StringPool.FORWARD_SLASH);
+
+		if (i > 0) {
+			friendlyURL = friendlyURL.substring(
+				0,
+				JournalArticleConstants.CANONICAL_URL_SEPARATOR.length() + i);
+		}
+
+		LayoutFriendlyURLComposite layoutFriendlyURLComposite =
+			getLayoutFriendlyURLComposite(
+				companyId, groupId, privateLayout, friendlyURL, params,
+				requestContext);
+
+		LayoutFriendlyURLSeparatorComposite newLayoutFriendlyURLComposite =
+			new LayoutFriendlyURLSeparatorComposite(
+				layoutFriendlyURLComposite, Portal.FRIENDLY_URL_SEPARATOR);
+
+		return newLayoutFriendlyURLComposite;
 	}
 
 	@Override
@@ -262,7 +308,7 @@ public class DisplayPageFriendlyURLResolver implements FriendlyURLResolver {
 			long groupId, boolean privateLayout, String mainPath,
 			String friendlyURL, Map<String, String[]> params,
 			Map<String, Object> requestContext, String urlTitle,
-			JournalArticle journalArticle)
+			String ddmTemplateKey, JournalArticle journalArticle)
 		throws PortalException {
 
 		Layout layout = getJournalArticleLayout(
@@ -330,6 +376,11 @@ public class DisplayPageFriendlyURLResolver implements FriendlyURLResolver {
 		Locale locale = _portal.getLocale(request);
 
 		actualParams.put(namespace + "urlTitle", new String[] {urlTitle});
+
+		if (Validator.isNotNull(ddmTemplateKey)) {
+			actualParams.put(
+				namespace + "ddmTemplateKey", new String[] {ddmTemplateKey});
+		}
 
 		FriendlyURLEntryLocalization friendlyURLEntryLocalization =
 			_friendlyURLEntryLocalService.fetchFriendlyURLEntryLocalization(

@@ -27,7 +27,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -69,7 +69,7 @@ definition {
 		property content.targeting.release = "true";
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -289,7 +289,7 @@ definition {
 		property content.targeting.release = "true";
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -366,7 +366,7 @@ definition {
 		property content.targeting.release = "true";
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -429,8 +429,9 @@ definition {
 
 		CustomFields.addCP(
 			customFieldName = "Usercustomfield",
-			customFieldType = "Text Field - Indexed",
-			resourceName = "User"
+			customFieldType = "Text Field",
+			resourceName = "User",
+			searchable = "true"
 		);
 
 		ProductMenu.gotoSite(site = "Site Name");
@@ -1327,8 +1328,9 @@ definition {
 
 		CustomFields.addCP(
 			customFieldName = "Usercustomfield",
-			customFieldType = "Text Field - Indexed",
-			resourceName = "User"
+			customFieldType = "Text Field",
+			resourceName = "User",
+			searchable = "true"
 		);
 
 		ProductMenu.gotoSite(site = "Site Name");

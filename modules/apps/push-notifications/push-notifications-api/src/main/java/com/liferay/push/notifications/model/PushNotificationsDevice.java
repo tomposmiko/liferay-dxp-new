@@ -27,30 +27,40 @@ import com.liferay.portal.kernel.util.Accessor;
  * @see PushNotificationsDeviceModel
  * @generated
  */
-@ImplementationClassName("com.liferay.push.notifications.model.impl.PushNotificationsDeviceImpl")
+@ImplementationClassName(
+	"com.liferay.push.notifications.model.impl.PushNotificationsDeviceImpl"
+)
 @ProviderType
-public interface PushNotificationsDevice extends PushNotificationsDeviceModel,
-	PersistedModel {
+public interface PushNotificationsDevice
+	extends PersistedModel, PushNotificationsDeviceModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.push.notifications.model.impl.PushNotificationsDeviceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<PushNotificationsDevice, Long> PUSH_NOTIFICATIONS_DEVICE_ID_ACCESSOR =
-		new Accessor<PushNotificationsDevice, Long>() {
-			@Override
-			public Long get(PushNotificationsDevice pushNotificationsDevice) {
-				return pushNotificationsDevice.getPushNotificationsDeviceId();
-			}
+	public static final Accessor<PushNotificationsDevice, Long>
+		PUSH_NOTIFICATIONS_DEVICE_ID_ACCESSOR =
+			new Accessor<PushNotificationsDevice, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(
+					PushNotificationsDevice pushNotificationsDevice) {
 
-			@Override
-			public Class<PushNotificationsDevice> getTypeClass() {
-				return PushNotificationsDevice.class;
-			}
-		};
+					return pushNotificationsDevice.
+						getPushNotificationsDeviceId();
+				}
+
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<PushNotificationsDevice> getTypeClass() {
+					return PushNotificationsDevice.class;
+				}
+
+			};
+
 }

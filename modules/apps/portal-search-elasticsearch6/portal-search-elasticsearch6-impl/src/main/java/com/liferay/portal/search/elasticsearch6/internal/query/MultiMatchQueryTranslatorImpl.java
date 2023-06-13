@@ -14,11 +14,11 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.search.generic.MultiMatchQuery;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.query.MultiMatchQuery;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
@@ -32,15 +32,18 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(immediate = true, service = MultiMatchQueryTranslator.class)
+@Component(service = MultiMatchQueryTranslator.class)
 public class MultiMatchQueryTranslatorImpl
 	extends BaseMatchQueryTranslatorImpl implements MultiMatchQueryTranslator {
 
 	@Override
 	public QueryBuilder translate(MultiMatchQuery multiMatchQuery) {
+		Set<String> fields = multiMatchQuery.getFields();
+
 		MultiMatchQueryBuilder multiMatchQueryBuilder =
 			QueryBuilders.multiMatchQuery(
-				multiMatchQuery.getValue(), StringPool.EMPTY_ARRAY);
+				multiMatchQuery.getValue(),
+				fields.toArray(new String[fields.size()]));
 
 		if (Validator.isNotNull(multiMatchQuery.getAnalyzer())) {
 			multiMatchQueryBuilder.analyzer(multiMatchQuery.getAnalyzer());
@@ -53,20 +56,7 @@ public class MultiMatchQueryTranslatorImpl
 
 		Map<String, Float> fieldBoosts = multiMatchQuery.getFieldsBoosts();
 
-		for (String field : multiMatchQuery.getFields()) {
-			Float fieldBoost = null;
-
-			if (fieldBoosts != null) {
-				fieldBoost = fieldBoosts.get(field);
-			}
-
-			if (fieldBoost != null) {
-				multiMatchQueryBuilder.field(field, fieldBoost);
-			}
-			else {
-				multiMatchQueryBuilder.field(field);
-			}
-		}
+		fieldBoosts.forEach(multiMatchQueryBuilder::field);
 
 		if (multiMatchQuery.getFuzziness() != null) {
 			multiMatchQueryBuilder.fuzziness(
@@ -120,10 +110,6 @@ public class MultiMatchQueryTranslatorImpl
 
 			multiMatchQueryBuilder.zeroTermsQuery(
 				multiMatchQueryBuilderZeroTermsQuery);
-		}
-
-		if (!multiMatchQuery.isDefaultBoost()) {
-			multiMatchQueryBuilder.boost(multiMatchQuery.getBoost());
 		}
 
 		if (multiMatchQuery.isLenient() != null) {

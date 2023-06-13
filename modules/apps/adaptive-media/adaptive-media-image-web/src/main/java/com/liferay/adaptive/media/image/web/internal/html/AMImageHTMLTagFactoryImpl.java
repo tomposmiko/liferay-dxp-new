@@ -65,13 +65,6 @@ public class AMImageHTMLTagFactoryImpl implements AMImageHTMLTagFactory {
 		return sb.toString();
 	}
 
-	@Reference(unbind = "-")
-	protected void setMediaQueryProvider(
-		MediaQueryProvider mediaQueryProvider) {
-
-		_mediaQueryProvider = mediaQueryProvider;
-	}
-
 	private Optional<String> _getMediaQueryString(MediaQuery mediaQuery) {
 		List<Condition> conditions = mediaQuery.getConditions();
 
@@ -111,7 +104,6 @@ public class AMImageHTMLTagFactoryImpl implements AMImageHTMLTagFactory {
 				sb.append("\" srcset=\"");
 				sb.append(mediaQuery.getSrc());
 				sb.append("\" />");
-
 			});
 
 		return sb.toString();
@@ -132,6 +124,7 @@ public class AMImageHTMLTagFactoryImpl implements AMImageHTMLTagFactory {
 		);
 	}
 
+	@Reference
 	private MediaQueryProvider _mediaQueryProvider;
 
 }

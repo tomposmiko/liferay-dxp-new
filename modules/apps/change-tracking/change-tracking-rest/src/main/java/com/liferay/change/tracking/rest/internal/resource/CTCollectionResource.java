@@ -15,6 +15,7 @@
 package com.liferay.change.tracking.rest.internal.resource;
 
 import com.liferay.change.tracking.CTEngineManager;
+import com.liferay.change.tracking.CTManager;
 import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
@@ -177,7 +178,7 @@ public class CTCollectionResource {
 			CTJaxRsUtil.getUser(userId);
 
 			Optional<CTCollection> activeCTCollectionOptional =
-				_ctEngineManager.getActiveCTCollectionOptional(userId);
+				_ctManager.getActiveCTCollectionOptional(userId);
 
 			activeCTCollectionOptional.ifPresent(ctCollections::add);
 		}
@@ -198,7 +199,7 @@ public class CTCollectionResource {
 		else if (_TYPE_ALL.equals(type)) {
 			CTJaxRsUtil.checkCompany(companyId);
 
-			ctCollections = _ctEngineManager.getCTCollections(
+			ctCollections = _ctEngineManager.getNonproductionCTCollections(
 				companyId, _getQueryDefinition(limit, sort));
 		}
 		else {
@@ -207,9 +208,9 @@ public class CTCollectionResource {
 					". The valid options are: all, active and production.");
 		}
 
-		Stream<CTCollection> ctCollectionStream = ctCollections.stream();
+		Stream<CTCollection> ctCollectionsStream = ctCollections.stream();
 
-		return ctCollectionStream.map(
+		return ctCollectionsStream.map(
 			this::_getCTCollectionModel
 		).collect(
 			Collectors.toList()
@@ -244,9 +245,9 @@ public class CTCollectionResource {
 		List<CTEntry> ctEntries = _ctEngineManager.getCTEntries(
 			ctCollection.getCtCollectionId());
 
-		Stream<CTEntry> ctEntryStream = ctEntries.stream();
+		Stream<CTEntry> ctEntriesStream = ctEntries.stream();
 
-		Map<Integer, Long> ctEntriesChangeTypes = ctEntryStream.collect(
+		Map<Integer, Long> ctEntriesChangeTypes = ctEntriesStream.collect(
 			Collectors.groupingBy(
 				CTEntry::getChangeType, Collectors.counting()));
 
@@ -307,5 +308,8 @@ public class CTCollectionResource {
 
 	@Reference
 	private CTEngineManager _ctEngineManager;
+
+	@Reference
+	private CTManager _ctManager;
 
 }

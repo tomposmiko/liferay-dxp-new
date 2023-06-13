@@ -1,11 +1,7 @@
 import {EventHandler} from 'metal-events';
+import {FLOATING_TOOLBAR_BUTTONS} from '../../utils/constants';
 import {object} from 'metal';
 
-/**
- * Enter key keycode
- * @review
- * @type {number}
- */
 const KEY_ENTER = 13;
 
 let _destroyedCallback = null;
@@ -34,6 +30,20 @@ function destroy() {
 		_destroyedCallback();
 		_destroyedCallback = null;
 	}
+}
+
+/**
+ * @param {object} editableValues
+ * @return {object[]} Floating toolbar panels
+ */
+function getFloatingToolbarButtons(editableValues) {
+	return editableValues.mappedField || editableValues.fieldId ? [
+		FLOATING_TOOLBAR_BUTTONS.textProperties,
+		FLOATING_TOOLBAR_BUTTONS.map
+	] : [
+		FLOATING_TOOLBAR_BUTTONS.edit,
+		FLOATING_TOOLBAR_BUTTONS.map
+	];
 }
 
 /**
@@ -136,6 +146,15 @@ function init(
 }
 
 /**
+ * @param {string} content editableField's original HTML
+ * @param {string} value Translated/segmented value
+ * @return {string} Transformed content
+ */
+function render(content, value) {
+	return value;
+}
+
+/**
  * Returns a configuration object for a AlloyEditor instance.
  * @param {HTMLElement} editableElement
  * @param {string} portletNamespace
@@ -187,10 +206,18 @@ function _handleNativeEditorKey(event) {
 	}
 }
 
-export {destroy, getActiveEditableElement, init};
+export {
+	destroy,
+	getActiveEditableElement,
+	getFloatingToolbarButtons,
+	init,
+	render
+};
 
 export default {
 	destroy,
 	getActiveEditableElement,
-	init
+	getFloatingToolbarButtons,
+	init,
+	render
 };

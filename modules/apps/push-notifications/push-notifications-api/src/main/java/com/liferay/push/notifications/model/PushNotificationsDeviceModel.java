@@ -34,8 +34,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface PushNotificationsDeviceModel extends BaseModel<PushNotificationsDevice>,
-	ShardedModel {
+public interface PushNotificationsDeviceModel
+	extends BaseModel<PushNotificationsDevice>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -157,4 +158,5 @@ public interface PushNotificationsDeviceModel extends BaseModel<PushNotification
 	 * @param token the token of this push notifications device
 	 */
 	public void setToken(String token);
+
 }

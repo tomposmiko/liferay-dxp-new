@@ -1,12 +1,13 @@
 import 'clay-button';
 import 'clay-dropdown';
+import Component from 'metal-component';
+import dom from 'metal-dom';
+import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 import {EventHandler} from 'metal-events';
-import Component from 'metal-component';
-import Soy from 'metal-soy';
-import dom from 'metal-dom';
 
 import templates from './RuleList.soy.js';
+import {getFieldProperty} from '../LayoutProvider/util/fields.es';
 import {PagesVisitor} from '../../util/visitors.es';
 
 /**
@@ -172,11 +173,11 @@ class RuleList extends Component {
 						return {
 							...rule,
 							actions: rule.actions.map(
-								actionItem => {
+								action => {
 									return {
-										...actionItem,
-										label: this._getFieldLabel(actionItem.target),
-										target: this._getFieldLabel(actionItem.target)
+										...action,
+										label: this._getFieldLabel(action.target),
+										target: this._getFieldLabel(action.target)
 									};
 								}
 							),
@@ -188,17 +189,16 @@ class RuleList extends Component {
 											(operand, index) => {
 												let {label} = operand;
 
-												if (operand.type === 'field') {
-													label = this._getFieldLabel(operand.value);
-												}
-												else if (index == 1 && condition.operands[0].type === 'user' && roles.length) {
+												label = this._getOperandLabel(condition.operands, index);
+
+												if (index == 1 && condition.operands[0].type === 'user' && roles.length) {
 													label = roles.find(role => role.id === operand.value).label;
 												}
 
 												return {
 													...operand,
 													label,
-													value: this._setOperandValue(operand)
+													value: this._getOperandLabel(condition.operands, index)
 												};
 											}
 										)
@@ -211,22 +211,6 @@ class RuleList extends Component {
 			),
 			rulesCardOptions: this._getRulesCardOptions()
 		};
-	}
-
-	_formatActions(actions) {
-		actions.forEach(
-			action => {
-				action.label = this._getFieldLabel(action.target);
-
-				const expression = action.expression;
-
-				if (expression) {
-					action.expression = expression.replace(/\[|\]/g, '');
-				}
-			}
-		);
-
-		return actions;
 	}
 
 	_formatRules(rules) {
@@ -294,25 +278,47 @@ class RuleList extends Component {
 		return dataProvider.find(data => data.uuid == id).label;
 	}
 
-	/**
-	 * Find a field label based on fieldName
-	 * @param {string} fieldName
-	 * @return {string} the field label
-	 */
-
 	_getFieldLabel(fieldName) {
+		const pages = this.pages;
+
+		return getFieldProperty(pages, fieldName, 'label');
+	}
+
+	_getFieldType(fieldName) {
+		const pages = this.pages;
+
+		return getFieldProperty(pages, fieldName, 'type');
+	}
+
+	_getOptionLabel(fieldName, optionValue) {
 		const pages = this.pages;
 
 		let fieldLabel = null;
 
-		if (pages && fieldName) {
+		if (pages && optionValue) {
 			const visitor = new PagesVisitor(pages);
 
-			const field = visitor.findField(field => field.fieldName == fieldName);
+			visitor.findField(
+				field => {
+					let found = false;
 
-			if (field) {
-				fieldLabel = field.label;
-			}
+					if (field.fieldName === fieldName && field.options) {
+						field.options.some(
+							option => {
+								if (option.value == optionValue) {
+									fieldLabel = option.label;
+
+									found = true;
+								}
+
+								return found;
+							}
+						);
+					}
+
+					return found;
+				}
+			);
 		}
 
 		return fieldLabel;
@@ -410,21 +416,31 @@ class RuleList extends Component {
 		return rules;
 	}
 
-	_setOperandValue(operand) {
-		let field = '';
+	_getOperandLabel(operands, index) {
+		let label = '';
+		const operand = operands[index];
 
 		if (operand.type === 'field') {
-			field = this._getFieldLabel(operand.value);
+			label = this._getFieldLabel(operand.value);
+		}
+		else if (operand.type === 'user') {
+			label = Liferay.Language.get('user');
+		}
+		else if (operand.type !== 'field') {
+			const fieldType = this._getFieldType(operands[0].value);
+
+			if (fieldType == 'select' || fieldType === 'radio') {
+				label = this._getOptionLabel(operands[0].value, operand.value);
+			}
+			else {
+				label = operand.value;
+			}
 		}
 		else {
-			field = operand.value;
+			label = operand.value;
 		}
 
-		if ((field != '') && (typeof (field) == 'undefined')) {
-			field = operand.value;
-		}
-
-		return field;
+		return label;
 	}
 }
 

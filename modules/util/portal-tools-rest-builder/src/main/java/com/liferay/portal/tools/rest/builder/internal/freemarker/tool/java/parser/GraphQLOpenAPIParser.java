@@ -14,32 +14,37 @@
 
 package com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.parser;
 
+import com.liferay.portal.kernel.util.CamelCaseUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaMethodParameter;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaMethodSignature;
-import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaParameter;
-import com.liferay.portal.tools.rest.builder.internal.util.CamelCaseUtil;
+import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.parser.util.OpenAPIParserUtil;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.yaml.config.ConfigYAML;
 import com.liferay.portal.vulcan.yaml.openapi.Components;
 import com.liferay.portal.vulcan.yaml.openapi.OpenAPIYAML;
 import com.liferay.portal.vulcan.yaml.openapi.Operation;
 import com.liferay.portal.vulcan.yaml.openapi.Parameter;
-import com.liferay.portal.vulcan.yaml.openapi.PathItem;
 import com.liferay.portal.vulcan.yaml.openapi.Schema;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 /**
  * @author Peter Shin
  */
-public class GraphQLOpenAPIParser extends BaseOpenAPIParser {
+public class GraphQLOpenAPIParser {
 
 	public static List<JavaMethodSignature> getJavaMethodSignatures(
-		ConfigYAML configYAML, OpenAPIYAML openAPIYAML, String type,
-		boolean fullyQualifiedNames) {
+		ConfigYAML configYAML, OpenAPIYAML openAPIYAML,
+		Predicate<Operation> predicate) {
 
 		List<JavaMethodSignature> javaMethodSignatures = new ArrayList<>();
 
@@ -49,15 +54,11 @@ public class GraphQLOpenAPIParser extends BaseOpenAPIParser {
 
 		for (String schemaName : schemas.keySet()) {
 			javaMethodSignatures.addAll(
-				_getJavaMethodSignatures(openAPIYAML, schemaName, type));
+				_getJavaMethodSignatures(
+					configYAML, openAPIYAML, predicate, schemaName));
 		}
 
-		if (!fullyQualifiedNames) {
-			return javaMethodSignatures;
-		}
-
-		return toFullyQualifiedJavaMethodSignatures(
-			configYAML, javaMethodSignatures, openAPIYAML);
+		return javaMethodSignatures;
 	}
 
 	public static String getMethodAnnotations(
@@ -65,9 +66,8 @@ public class GraphQLOpenAPIParser extends BaseOpenAPIParser {
 
 		Set<String> methodAnnotations = new TreeSet<>();
 
-		methodAnnotations.add("@GraphQLInvokeDetached");
-
-		String httpMethod = getHTTPMethod(javaMethodSignature.getOperation());
+		String httpMethod = OpenAPIParserUtil.getHTTPMethod(
+			javaMethodSignature.getOperation());
 
 		if (Objects.equals(httpMethod, "get") ||
 			Objects.equals(httpMethod, "post")) {
@@ -75,22 +75,37 @@ public class GraphQLOpenAPIParser extends BaseOpenAPIParser {
 			methodAnnotations.add("@GraphQLField");
 		}
 
-		return merge(methodAnnotations, '\n');
+		methodAnnotations.add("@GraphQLInvokeDetached");
+
+		String methodAnnotation = _getMethodAnnotationGraphQLName(
+			javaMethodSignature);
+
+		if (methodAnnotation != null) {
+			methodAnnotations.add(methodAnnotation);
+		}
+
+		return StringUtil.merge(methodAnnotations, "\n");
 	}
 
 	public static String getParameters(
-		List<JavaParameter> javaParameters, boolean annotation) {
+		List<JavaMethodParameter> javaMethodParameters, Operation operation,
+		boolean annotation) {
 
 		StringBuilder sb = new StringBuilder();
 
-		for (JavaParameter javaParameter : javaParameters) {
+		for (JavaMethodParameter javaMethodParameter : javaMethodParameters) {
 			String parameterAnnotation = null;
 
 			if (annotation) {
-				parameterAnnotation = _getParameterAnnotation(javaParameter);
+				parameterAnnotation = _getParameterAnnotation(
+					javaMethodParameter, operation);
 			}
 
-			sb.append(getParameter(javaParameter, parameterAnnotation));
+			String parameter = OpenAPIParserUtil.getParameter(
+				javaMethodParameter, parameterAnnotation);
+
+			sb.append(parameter);
+
 			sb.append(',');
 		}
 
@@ -101,79 +116,121 @@ public class GraphQLOpenAPIParser extends BaseOpenAPIParser {
 		return sb.toString();
 	}
 
+	private static List<JavaMethodParameter> _getJavaMethodParameters(
+		JavaMethodSignature resourceJavaMethodSignature) {
+
+		List<JavaMethodParameter> javaMethodParameters = new ArrayList<>();
+
+		for (JavaMethodParameter javaMethodParameter :
+				resourceJavaMethodSignature.getJavaMethodParameters()) {
+
+			String parameterType = javaMethodParameter.getParameterType();
+
+			if (Objects.equals(parameterType, Pagination.class.getName())) {
+				javaMethodParameters.add(
+					new JavaMethodParameter("pageSize", int.class.getName()));
+
+				javaMethodParameters.add(
+					new JavaMethodParameter("page", int.class.getName()));
+			}
+			else {
+				javaMethodParameters.add(javaMethodParameter);
+			}
+		}
+
+		return javaMethodParameters;
+	}
+
 	private static List<JavaMethodSignature> _getJavaMethodSignatures(
-		OpenAPIYAML openAPIYAML, String schemaName, String type) {
+		ConfigYAML configYAML, OpenAPIYAML openAPIYAML,
+		Predicate<Operation> predicate, String schemaName) {
 
 		List<JavaMethodSignature> javaMethodSignatures = new ArrayList<>();
 
-		Map<String, PathItem> pathItems = openAPIYAML.getPathItems();
+		List<JavaMethodSignature> resourceJavaMethodSignatures =
+			ResourceOpenAPIParser.getJavaMethodSignatures(
+				configYAML, openAPIYAML, schemaName);
 
-		for (Map.Entry<String, PathItem> entry : pathItems.entrySet()) {
-			String path = entry.getKey();
-			PathItem pathItem = entry.getValue();
+		for (JavaMethodSignature resourceJavaMethodSignature :
+				resourceJavaMethodSignatures) {
 
-			visitOperations(
-				pathItem,
-				operation -> {
-					if (!_isTypeMethod(operation, type)) {
-						return;
-					}
+			Operation operation = resourceJavaMethodSignature.getOperation();
 
-					String returnType = getReturnType(openAPIYAML, operation);
-					List<String> tags = operation.getTags();
+			if (!predicate.test(operation)) {
+				continue;
+			}
 
-					if (!isSchemaMethod(schemaName, tags, returnType)) {
-						return;
-					}
+			String returnType = resourceJavaMethodSignature.getReturnType();
 
-					String methodName = getMethodName(
-						operation, path, returnType, schemaName);
+			if (returnType.startsWith(Page.class.getName() + "<")) {
+				String pageClassName = Page.class.getName();
 
-					if (returnType.startsWith("Page<")) {
-						returnType = "Collection<".concat(
-							returnType.substring(5));
-					}
+				String className = returnType.substring(
+					pageClassName.length() + 1, returnType.length() - 1);
 
-					javaMethodSignatures.add(
-						new JavaMethodSignature(
-							path, pathItem, operation, schemaName,
-							_getJavaParameters(operation), methodName,
-							returnType));
-				});
+				StringBuilder sb = new StringBuilder();
+
+				sb.append(Collection.class.getName());
+				sb.append("<");
+				sb.append(className);
+				sb.append(">");
+
+				returnType = sb.toString();
+			}
+
+			List<JavaMethodParameter> javaMethodParameters =
+				_getJavaMethodParameters(resourceJavaMethodSignature);
+
+			javaMethodSignatures.add(
+				new JavaMethodSignature(
+					resourceJavaMethodSignature.getPath(),
+					resourceJavaMethodSignature.getPathItem(), operation,
+					resourceJavaMethodSignature.getRequestBodyMediaTypes(),
+					resourceJavaMethodSignature.getSchemaName(),
+					javaMethodParameters,
+					resourceJavaMethodSignature.getMethodName(), returnType));
 		}
 
 		return javaMethodSignatures;
 	}
 
-	private static List<JavaParameter> _getJavaParameters(Operation operation) {
-		List<JavaParameter> javaParameters = new ArrayList<>();
+	private static String _getMethodAnnotationGraphQLName(
+		JavaMethodSignature javaMethodSignature) {
 
-		for (JavaParameter javaParameter : getJavaParameters(operation)) {
-			String parameterType = javaParameter.getParameterType();
+		Set<String> requestBodyMediaTypes =
+			javaMethodSignature.getRequestBodyMediaTypes();
 
-			if (Objects.equals(parameterType, "Pagination")) {
-				javaParameters.add(
-					new JavaParameter(operation, "pageSize", "int"));
+		if (requestBodyMediaTypes.isEmpty() ||
+			requestBodyMediaTypes.contains("application/json")) {
 
-				javaParameters.add(new JavaParameter(operation, "page", "int"));
-			}
-			else {
-				javaParameters.add(javaParameter);
-			}
+			return null;
 		}
 
-		return javaParameters;
+		List<JavaMethodParameter> javaMethodParameters =
+			javaMethodSignature.getJavaMethodParameters();
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(javaMethodSignature.getMethodName());
+
+		for (JavaMethodParameter javaMethodParameter : javaMethodParameters) {
+			String parameterName = javaMethodParameter.getParameterName();
+
+			sb.append(StringUtil.upperCaseFirstLetter(parameterName));
+		}
+
+		return "@GraphQLName(\"" + sb.toString() + "\")";
 	}
 
-	private static String _getParameterAnnotation(JavaParameter javaParameter) {
-		Operation operation = javaParameter.getOperation();
+	private static String _getParameterAnnotation(
+		JavaMethodParameter javaMethodParameter, Operation operation) {
 
 		for (Parameter parameter : operation.getParameters()) {
 			String parameterName = CamelCaseUtil.toCamelCase(
-				parameter.getName(), false);
+				parameter.getName());
 
 			if (!Objects.equals(
-					parameterName, javaParameter.getParameterName())) {
+					parameterName, javaMethodParameter.getParameterName())) {
 
 				continue;
 			}
@@ -194,28 +251,22 @@ public class GraphQLOpenAPIParser extends BaseOpenAPIParser {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("@GraphQLName(\"");
-		sb.append(javaParameter.getParameterType());
+
+		String name = javaMethodParameter.getParameterType();
+
+		if (name.startsWith("[")) {
+			name = OpenAPIParserUtil.getElementClassName(name) + "[]";
+		}
+
+		if (name.lastIndexOf('.') != -1) {
+			name = name.substring(name.lastIndexOf(".") + 1);
+		}
+
+		sb.append(name);
+
 		sb.append("\")");
 
 		return sb.toString();
-	}
-
-	private static boolean _isTypeMethod(Operation operation, String type) {
-		String httpMethod = getHTTPMethod(operation);
-
-		if (Objects.equals(type, "mutation") &&
-			!Objects.equals(httpMethod, "get")) {
-
-			return true;
-		}
-
-		if (Objects.equals(type, "query") &&
-			Objects.equals(httpMethod, "get")) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 }

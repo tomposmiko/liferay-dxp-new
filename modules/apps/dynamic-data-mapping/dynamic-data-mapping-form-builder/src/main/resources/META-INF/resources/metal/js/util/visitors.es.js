@@ -2,7 +2,7 @@ const identity = value => value;
 
 class PagesVisitor {
 	constructor(pages) {
-		this._pages = [...pages];
+		this.setPages(pages);
 	}
 
 	_map(pageMapper, rowMapper, columnMapper, fieldFn) {
@@ -49,6 +49,36 @@ class PagesVisitor {
 		this._pages = null;
 	}
 
+	/**
+	 * Find a field based on the fieldName property
+	 * @param {string} fieldName
+	 * @returns {object} a form field
+	 */
+	findField(condition) {
+		let conditionField;
+
+		this._map(
+			identity,
+			identity,
+			identity,
+			(fields, ...args) => {
+				const field = fields.find(
+					(field, fieldIndex) => {
+						condition(field, fieldIndex, ...args);
+
+						return condition(field, fieldIndex, ...args);
+					}
+				);
+
+				if (field) {
+					conditionField = field;
+				}
+			}
+		);
+
+		return conditionField;
+	}
+
 	mapFields(mapper) {
 		return this._map(
 			identity,
@@ -81,35 +111,82 @@ class PagesVisitor {
 		return this._map(identity, identity, mapper, identity);
 	}
 
-	/**
-	 * Find a field based on the fieldName property
-	 * @param {string} fieldName
-	 * @returns {object} a form field
-	 */
-	findField(condition) {
-		let conditionField;
-
-		this._map(
-			identity,
-			identity,
-			identity,
-			(fields, ...args) => {
-				const field = fields.find(
-					(field, fieldIndex) => {
-						condition(field, fieldIndex, ...args);
-
-						return condition(field, fieldIndex, ...args);
-					}
-				);
-
-				if (field) {
-					conditionField = field;
-				}
-			}
-		);
-
-		return conditionField;
+	setPages(pages) {
+		this._pages = [...pages];
 	}
 }
 
-export {PagesVisitor};
+class RulesVisitor {
+	constructor(rules) {
+		this.setRules(rules);
+	}
+
+	containsField(fieldName) {
+		return this._rules.some(
+			rule => {
+				const actionsResult = rule.actions.some(
+					({target}) => {
+						return target === fieldName;
+					}
+				);
+
+				const conditionsResult = rule.conditions.some(
+					condition => {
+						return condition.operands.some(
+							({type, value}) => {
+								return type === 'field' && value === fieldName;
+							}
+						);
+					}
+				);
+
+				return actionsResult || conditionsResult;
+			}
+		);
+	}
+
+	containsFieldExpression(fieldName) {
+		return this._rules.some(
+			rule => {
+				return rule.actions.some(
+					({action, expression}) => {
+						return action === 'calculate' && expression.includes(fieldName);
+					}
+				);
+			}
+		);
+	}
+
+	mapActions(actionMapper) {
+		return this._rules.map(
+			rule => {
+				return {
+					...rule,
+					actions: rule.actions.map(actionMapper)
+				};
+			}
+		);
+	}
+
+	mapConditions(conditionMapper) {
+		return this._rules.map(
+			rule => {
+				return {
+					...rule,
+					conditions: rule.conditions.map(conditionMapper)
+				};
+			}
+		);
+	}
+
+	setRules(rules) {
+		this._rules = [...rules];
+	}
+
+	dispose() {
+		this._rules = null;
+	}
+
+}
+
+export {PagesVisitor, RulesVisitor};

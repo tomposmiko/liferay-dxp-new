@@ -18,12 +18,9 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.change.tracking.model.CTProcess;
 import com.liferay.change.tracking.model.CTProcessModel;
-
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CacheModel;
@@ -59,23 +56,24 @@ import java.util.function.Function;
  * @generated
  */
 @ProviderType
-public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
-	implements CTProcessModel {
+public class CTProcessModelImpl
+	extends BaseModelImpl<CTProcess> implements CTProcessModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a ct process model instance should use the <code>CTProcess</code> interface instead.
 	 */
 	public static final String TABLE_NAME = "CTProcess";
+
 	public static final Object[][] TABLE_COLUMNS = {
-			{ "ctProcessId", Types.BIGINT },
-			{ "companyId", Types.BIGINT },
-			{ "userId", Types.BIGINT },
-			{ "createDate", Types.TIMESTAMP },
-			{ "ctCollectionId", Types.BIGINT },
-			{ "backgroundTaskId", Types.BIGINT }
-		};
-	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
+		{"ctProcessId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"createDate", Types.TIMESTAMP},
+		{"ctCollectionId", Types.BIGINT}, {"backgroundTaskId", Types.BIGINT}
+	};
+
+	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
+		new HashMap<String, Integer>();
 
 	static {
 		TABLE_COLUMNS_MAP.put("ctProcessId", Types.BIGINT);
@@ -86,28 +84,49 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 		TABLE_COLUMNS_MAP.put("backgroundTaskId", Types.BIGINT);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table CTProcess (ctProcessId LONG not null primary key,companyId LONG,userId LONG,createDate DATE null,ctCollectionId LONG,backgroundTaskId LONG)";
+	public static final String TABLE_SQL_CREATE =
+		"create table CTProcess (ctProcessId LONG not null primary key,companyId LONG,userId LONG,createDate DATE null,ctCollectionId LONG,backgroundTaskId LONG)";
+
 	public static final String TABLE_SQL_DROP = "drop table CTProcess";
-	public static final String ORDER_BY_JPQL = " ORDER BY ctProcess.ctProcessId ASC";
-	public static final String ORDER_BY_SQL = " ORDER BY CTProcess.ctProcessId ASC";
+
+	public static final String ORDER_BY_JPQL =
+		" ORDER BY ctProcess.ctProcessId ASC";
+
+	public static final String ORDER_BY_SQL =
+		" ORDER BY CTProcess.ctProcessId ASC";
+
 	public static final String DATA_SOURCE = "liferayDataSource";
+
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
+
 	public static final String TX_MANAGER = "liferayTransactionManager";
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.change.tracking.service.util.ServiceProps.get(
-				"value.object.entity.cache.enabled.com.liferay.change.tracking.model.CTProcess"),
-			true);
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.change.tracking.service.util.ServiceProps.get(
-				"value.object.finder.cache.enabled.com.liferay.change.tracking.model.CTProcess"),
-			true);
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.change.tracking.service.util.ServiceProps.get(
-				"value.object.column.bitmask.enabled.com.liferay.change.tracking.model.CTProcess"),
-			true);
+
+	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(
+		com.liferay.change.tracking.service.util.ServiceProps.get(
+			"value.object.entity.cache.enabled.com.liferay.change.tracking.model.CTProcess"),
+		true);
+
+	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(
+		com.liferay.change.tracking.service.util.ServiceProps.get(
+			"value.object.finder.cache.enabled.com.liferay.change.tracking.model.CTProcess"),
+		true);
+
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(
+		com.liferay.change.tracking.service.util.ServiceProps.get(
+			"value.object.column.bitmask.enabled.com.liferay.change.tracking.model.CTProcess"),
+		true);
+
 	public static final long COMPANYID_COLUMN_BITMASK = 1L;
+
 	public static final long CTCOLLECTIONID_COLUMN_BITMASK = 2L;
+
 	public static final long USERID_COLUMN_BITMASK = 4L;
+
 	public static final long CTPROCESSID_COLUMN_BITMASK = 8L;
-	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.change.tracking.service.util.ServiceProps.get(
-				"lock.expiration.time.com.liferay.change.tracking.model.CTProcess"));
+
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
+		com.liferay.change.tracking.service.util.ServiceProps.get(
+			"lock.expiration.time.com.liferay.change.tracking.model.CTProcess"));
 
 	public CTProcessModelImpl() {
 	}
@@ -146,14 +165,18 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		Map<String, Function<CTProcess, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		for (Map.Entry<String, Function<CTProcess, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<CTProcess, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<CTProcess, Object> attributeGetterFunction = entry.getValue();
+			Function<CTProcess, Object> attributeGetterFunction =
+				entry.getValue();
 
-			attributes.put(attributeName,
-				attributeGetterFunction.apply((CTProcess)this));
+			attributes.put(
+				attributeName, attributeGetterFunction.apply((CTProcess)this));
 		}
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
@@ -164,52 +187,74 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Map<String, BiConsumer<CTProcess, Object>> attributeSetterBiConsumers = getAttributeSetterBiConsumers();
+		Map<String, BiConsumer<CTProcess, Object>> attributeSetterBiConsumers =
+			getAttributeSetterBiConsumers();
 
 		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
 			String attributeName = entry.getKey();
 
-			BiConsumer<CTProcess, Object> attributeSetterBiConsumer = attributeSetterBiConsumers.get(attributeName);
+			BiConsumer<CTProcess, Object> attributeSetterBiConsumer =
+				attributeSetterBiConsumers.get(attributeName);
 
 			if (attributeSetterBiConsumer != null) {
-				attributeSetterBiConsumer.accept((CTProcess)this,
-					entry.getValue());
+				attributeSetterBiConsumer.accept(
+					(CTProcess)this, entry.getValue());
 			}
 		}
 	}
 
-	public Map<String, Function<CTProcess, Object>> getAttributeGetterFunctions() {
+	public Map<String, Function<CTProcess, Object>>
+		getAttributeGetterFunctions() {
+
 		return _attributeGetterFunctions;
 	}
 
-	public Map<String, BiConsumer<CTProcess, Object>> getAttributeSetterBiConsumers() {
+	public Map<String, BiConsumer<CTProcess, Object>>
+		getAttributeSetterBiConsumers() {
+
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<CTProcess, Object>> _attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CTProcess, Object>> _attributeSetterBiConsumers;
+	private static final Map<String, Function<CTProcess, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CTProcess, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
-		Map<String, Function<CTProcess, Object>> attributeGetterFunctions = new LinkedHashMap<String, Function<CTProcess, Object>>();
-		Map<String, BiConsumer<CTProcess, ?>> attributeSetterBiConsumers = new LinkedHashMap<String, BiConsumer<CTProcess, ?>>();
-
+		Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CTProcess, Object>>();
+		Map<String, BiConsumer<CTProcess, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CTProcess, ?>>();
 
 		attributeGetterFunctions.put("ctProcessId", CTProcess::getCtProcessId);
-		attributeSetterBiConsumers.put("ctProcessId", (BiConsumer<CTProcess, Long>)CTProcess::setCtProcessId);
+		attributeSetterBiConsumers.put(
+			"ctProcessId",
+			(BiConsumer<CTProcess, Long>)CTProcess::setCtProcessId);
 		attributeGetterFunctions.put("companyId", CTProcess::getCompanyId);
-		attributeSetterBiConsumers.put("companyId", (BiConsumer<CTProcess, Long>)CTProcess::setCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<CTProcess, Long>)CTProcess::setCompanyId);
 		attributeGetterFunctions.put("userId", CTProcess::getUserId);
-		attributeSetterBiConsumers.put("userId", (BiConsumer<CTProcess, Long>)CTProcess::setUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<CTProcess, Long>)CTProcess::setUserId);
 		attributeGetterFunctions.put("createDate", CTProcess::getCreateDate);
-		attributeSetterBiConsumers.put("createDate", (BiConsumer<CTProcess, Date>)CTProcess::setCreateDate);
-		attributeGetterFunctions.put("ctCollectionId", CTProcess::getCtCollectionId);
-		attributeSetterBiConsumers.put("ctCollectionId", (BiConsumer<CTProcess, Long>)CTProcess::setCtCollectionId);
-		attributeGetterFunctions.put("backgroundTaskId", CTProcess::getBackgroundTaskId);
-		attributeSetterBiConsumers.put("backgroundTaskId", (BiConsumer<CTProcess, Long>)CTProcess::setBackgroundTaskId);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<CTProcess, Date>)CTProcess::setCreateDate);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTProcess::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<CTProcess, Long>)CTProcess::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"backgroundTaskId", CTProcess::getBackgroundTaskId);
+		attributeSetterBiConsumers.put(
+			"backgroundTaskId",
+			(BiConsumer<CTProcess, Long>)CTProcess::setBackgroundTaskId);
 
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(attributeGetterFunctions);
-		_attributeSetterBiConsumers = Collections.unmodifiableMap((Map)attributeSetterBiConsumers);
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -330,8 +375,8 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-			CTProcess.class.getName(), getPrimaryKey());
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(
+			getCompanyId(), CTProcess.class.getName(), getPrimaryKey());
 	}
 
 	@Override
@@ -344,8 +389,9 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 	@Override
 	public CTProcess toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = (CTProcess)ProxyUtil.newProxyInstance(_classLoader,
-					_escapedModelInterfaces, new AutoEscapeBeanHandler(this));
+			_escapedModel = (CTProcess)ProxyUtil.newProxyInstance(
+				_classLoader, _escapedModelInterfaces,
+				new AutoEscapeBeanHandler(this));
 		}
 
 		return _escapedModel;
@@ -431,7 +477,8 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 
 		ctProcessModelImpl._setOriginalUserId = false;
 
-		ctProcessModelImpl._originalCtCollectionId = ctProcessModelImpl._ctCollectionId;
+		ctProcessModelImpl._originalCtCollectionId =
+			ctProcessModelImpl._ctCollectionId;
 
 		ctProcessModelImpl._setOriginalCtCollectionId = false;
 
@@ -466,16 +513,20 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 
 	@Override
 	public String toString() {
-		Map<String, Function<CTProcess, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((4 * attributeGetterFunctions.size()) +
-				2);
+		StringBundler sb = new StringBundler(
+			4 * attributeGetterFunctions.size() + 2);
 
 		sb.append("{");
 
-		for (Map.Entry<String, Function<CTProcess, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<CTProcess, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<CTProcess, Object> attributeGetterFunction = entry.getValue();
+			Function<CTProcess, Object> attributeGetterFunction =
+				entry.getValue();
 
 			sb.append(attributeName);
 			sb.append("=");
@@ -494,18 +545,22 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 
 	@Override
 	public String toXmlString() {
-		Map<String, Function<CTProcess, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((5 * attributeGetterFunctions.size()) +
-				4);
+		StringBundler sb = new StringBundler(
+			5 * attributeGetterFunctions.size() + 4);
 
 		sb.append("<model><model-name>");
 		sb.append(getModelClassName());
 		sb.append("</model-name>");
 
-		for (Map.Entry<String, Function<CTProcess, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<CTProcess, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<CTProcess, Object> attributeGetterFunction = entry.getValue();
+			Function<CTProcess, Object> attributeGetterFunction =
+				entry.getValue();
 
 			sb.append("<column><column-name>");
 			sb.append(attributeName);
@@ -519,10 +574,12 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader = CTProcess.class.getClassLoader();
+	private static final ClassLoader _classLoader =
+		CTProcess.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			CTProcess.class, ModelWrapper.class
-		};
+		CTProcess.class, ModelWrapper.class
+	};
+
 	private long _ctProcessId;
 	private long _companyId;
 	private long _originalCompanyId;
@@ -537,4 +594,5 @@ public class CTProcessModelImpl extends BaseModelImpl<CTProcess>
 	private long _backgroundTaskId;
 	private long _columnBitmask;
 	private CTProcess _escapedModel;
+
 }

@@ -40,8 +40,10 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public interface DDLRecordSetVersionModel extends BaseModel<DDLRecordSetVersion>,
-	LocalizedModel, MVCCModel, ShardedModel, WorkflowedModel {
+public interface DDLRecordSetVersionModel
+	extends BaseModel<DDLRecordSetVersion>, LocalizedModel, MVCCModel,
+			ShardedModel, WorkflowedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -386,8 +388,8 @@ public interface DDLRecordSetVersionModel extends BaseModel<DDLRecordSetVersion>
 	 * @param locale the locale of the language
 	 * @param defaultLocale the default locale
 	 */
-	public void setDescription(String description, Locale locale,
-		Locale defaultLocale);
+	public void setDescription(
+		String description, Locale locale, Locale defaultLocale);
 
 	public void setDescriptionCurrentLanguageId(String languageId);
 
@@ -404,8 +406,8 @@ public interface DDLRecordSetVersionModel extends BaseModel<DDLRecordSetVersion>
 	 * @param descriptionMap the locales and localized descriptions of this ddl record set version
 	 * @param defaultLocale the default locale
 	 */
-	public void setDescriptionMap(Map<Locale, String> descriptionMap,
-		Locale defaultLocale);
+	public void setDescriptionMap(
+		Map<Locale, String> descriptionMap, Locale defaultLocale);
 
 	/**
 	 * Returns the settings of this ddl record set version.
@@ -594,4 +596,5 @@ public interface DDLRecordSetVersionModel extends BaseModel<DDLRecordSetVersion>
 	@Override
 	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
 		throws LocaleException;
+
 }

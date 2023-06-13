@@ -16,7 +16,9 @@ package com.liferay.portal.search.searcher;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.search.aggregation.AggregationResult;
+import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.stats.StatsResponse;
 
 import java.util.Map;
@@ -47,6 +49,10 @@ public interface SearchResponseBuilder {
 	 */
 	public SearchResponse build();
 
+	public SearchResponseBuilder hits(Hits hits);
+
+	public SearchResponseBuilder request(SearchRequest searchRequest);
+
 	/**
 	 * Sets the request string submitted to the search engine.
 	 *
@@ -66,6 +72,8 @@ public interface SearchResponseBuilder {
 	 * @review
 	 */
 	public SearchResponseBuilder responseString(String responseString);
+
+	public SearchResponseBuilder searchHits(SearchHits searchHits);
 
 	/**
 	 * Sets the map containg the metrics aggregations computed by the search

@@ -24,9 +24,9 @@ definition {
 		}
 
 		task ("Add a display page with fragments mapped to Basic Web Content") {
-			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-			DisplayPagesAdmin.addDisplayPage(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.addDisplayPage(displayPageName = "Display Page Name");
 
 			PageEditor.addFragment(
 				collectionName = "Collection Name",
@@ -38,26 +38,28 @@ definition {
 				fragmentName = "Rich Text"
 			);
 
-			PageEditorMapping.selectAssetType(
-				assetType = "Web Content Article",
+			PageEditorMapping.selectContentType(
+				contentType = "Web Content Article",
 				subType = "Basic Web Content"
 			);
 
-			PageEditorMapping.mapEditableTextToAsset(
+			PageEditorMapping.mapEditableTextToField(
+				field = "Title",
 				fragmentName = "Title",
 				id = "title",
-				itemName = "Title"
+				source = "Basic Web Content (Default)"
 			);
 
-			PageEditorMapping.mapEditableTextToAsset(
+			PageEditorMapping.mapEditableTextToField(
+				field = "Content",
 				fragmentName = "Rich Text",
 				id = "rich-text",
-				itemName = "Content"
+				source = "Basic Web Content (Default)"
 			);
 
 			Button.clickPublish();
 
-			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 		}
 	}
 
@@ -87,8 +89,10 @@ definition {
 
 			WebContent.editDisplayPage(
 				pageName = "Display Page Name",
-				pageType = "Display Pages"
+				pageType = "Display Page Templates"
 			);
+
+			PortletEntry.publish();
 		}
 
 		task ("View the web content through the display page") {
@@ -122,11 +126,11 @@ definition {
 		}
 
 		task ("Configure the display page settings so the header and footer do not appear") {
-			DisplayPagesAdmin.openDisplayPagesAdmin(
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(
 				siteURLKey = "test-site-name"
 			);
 
-			DisplayPagesAdmin.gotoDisplayPageEllipsisItem(
+			DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
 				displayPageName = "Display Page Name",
 				item = "Configure"
 			);
@@ -194,8 +198,10 @@ definition {
 
 			WebContent.editDisplayPage(
 				pageName = "Display Page Name",
-				pageType = "Display Pages"
+				pageType = "Display Page Templates"
 			);
+
+			PortletEntry.publish();
 		}
 
 		task ("View the web content through the display page") {
@@ -215,11 +221,11 @@ definition {
 		}
 
 		task ("Change the display page theme from Classic to Fjord") {
-			DisplayPagesAdmin.openDisplayPagesAdmin(
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(
 				siteURLKey = "test-site-name"
 			);
 
-			DisplayPagesAdmin.gotoDisplayPageEllipsisItem(
+			DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
 				displayPageName = "Display Page Name",
 				item = "Configure"
 			);
@@ -258,11 +264,141 @@ definition {
 		}
 	}
 
+	@description = "This is a test for LPS-90999. A user has access to edit a display page while viewing the article through its display page."
+	@priority = "5"
+	test EditDisplayPageWhenViewingInDisplayPage {
+		task ("Mark the display page as default") {
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+		}
+
+		task ("Add a web content article") {
+			WebContent.openWebContentAdmin(siteURLKey = "test-site-name");
+
+			WebContentNavigator.gotoAddCP();
+
+			WebContent.addCP(
+				webContentContent = "Webcontent Content",
+				webContentTitle = "Webcontent Title"
+			);
+
+			PortletEntry.publish();
+		}
+
+		task ("View the web content article through its friendly URL") {
+			Navigator.openWithAppendToBaseURL(
+				urlAppend = "web/test-site-name/-/webcontent-title"
+			);
+		}
+
+		task ("Click the pencil icon > Edit Display Page Template") {
+			DisplayPageTemplate.clickPencilItem(
+				item = "Edit Display Page Template"
+			);
+		}
+
+		task ("Edit the display page by adding a Static Text fragment to the display page") {
+			PageEditor.addFragment(
+				collectionName = "Collection Name",
+				fragmentName = "Static Text"
+			);
+
+			Button.clickPublish();
+		}
+
+		task ("View the web content article through its friendly URL") {
+			Navigator.openWithAppendToBaseURL(
+				urlAppend = "web/test-site-name/-/webcontent-title"
+			);
+		}
+
+		task ("Assert the web content article displays with the additional Content fragment in the staging site") {
+			AssertVisible(
+				locator1 = "Fragment#FRAGMENT",
+				key_content = "Webcontent Title",
+				key_fragmentClass = "header",
+				key_position = "1"
+			);
+
+			AssertVisible(
+				locator1 = "Fragment#FRAGMENT",
+				key_content = "Webcontent Content",
+				key_fragmentClass = "rich-text",
+				key_position = "2"
+			);
+
+			AssertVisible(
+				locator1 = "Fragment#FRAGMENT",
+				key_content = "This is static text.",
+				key_fragmentClass = "static-text",
+				key_position = "3"
+			);
+		}
+	}
+
+	@description = "This is a test for LPS-90999. A user has access to edit the web content article while viewing the article through its display page."
+	@priority = "5"
+	test EditWebContentWhenViewingInDisplayPage {
+		task ("Mark the display page as default") {
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+		}
+
+		task ("Add a web content article") {
+			WebContent.openWebContentAdmin(siteURLKey = "test-site-name");
+
+			WebContentNavigator.gotoAddCP();
+
+			WebContent.addCP(
+				webContentContent = "Webcontent Content",
+				webContentTitle = "Webcontent Title"
+			);
+
+			PortletEntry.publish();
+		}
+
+		task ("View the web content article through its friendly URL") {
+			Navigator.openWithAppendToBaseURL(
+				urlAppend = "web/test-site-name/-/webcontent-title"
+			);
+		}
+
+		task ("Click the pencil icon > Edit Webcontent Title") {
+			DisplayPageTemplate.clickPencilItem(
+				item = "Edit Webcontent Title"
+			);
+		}
+
+		task ("Edit the web content article") {
+			Click(locator1 = "TextInput#TITLE");
+
+			PortletEntry.inputTitle(title = "Webcontent Title Edit");
+
+			AlloyEditor.addContent(content = "Webcontent Content Edit");
+
+			Button.clickPublish();
+		}
+
+		task ("Assert the new version of the web content article displays through the display page") {
+			AssertVisible(
+				locator1 = "Fragment#FRAGMENT",
+				key_content = "Webcontent Title Edit",
+				key_fragmentClass = "header",
+				key_position = "1"
+			);
+
+			AssertVisible(
+				locator1 = "Fragment#FRAGMENT",
+				key_content = "Webcontent Content Edit",
+				key_fragmentClass = "rich-text",
+				key_position = "2"
+			);
+		}
+	}
+
 	@description = "This is a test for LPS-86221. A user can preview a draft status web content article within its display page."
 	@priority = "5"
 	test PreviewDraftWebContent {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a draft status web content article") {
@@ -317,7 +453,7 @@ definition {
 	@priority = "5"
 	test PreviewPendingWebContent {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Configure Web Content Article workflow to Single Approver") {
@@ -383,7 +519,7 @@ definition {
 	@priority = "5"
 	test PreviewPublishedWebContent {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a web content article") {
@@ -436,7 +572,7 @@ definition {
 	@priority = "5"
 	test ViewDisplayPageMarkedAsDefault {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a web content article") {
@@ -448,7 +584,23 @@ definition {
 				webContentContent = "Webcontent Content",
 				webContentTitle = "Webcontent Title"
 			);
+		}
 
+		task ("Assert the display page is selected by default") {
+			Panel.expandPanel(panel = "Display Page");
+
+			AssertSelectedLabel(
+				locator1 = "WCEditWebContent#DISPLAY_PAGE_SELECT",
+				value1 = "Default Display Page"
+			);
+
+			AssertTextEquals(
+				locator1 = "WCEditWebContent#DISPLAY_PAGE_DEFAULT_SELECTION",
+				value1 = "Display Page Name"
+			);
+		}
+
+		task ("Publish the web content article") {
 			PortletEntry.publish();
 		}
 
@@ -512,8 +664,10 @@ definition {
 
 			WebContent.editDisplayPage(
 				pageName = "Display Page Name",
-				pageType = "Display Pages"
+				pageType = "Display Page Templates"
 			);
+
+			PortletEntry.publish();
 		}
 
 		task ("View page source of the web content article's friendly URL page") {
@@ -546,8 +700,10 @@ definition {
 
 			WebContent.editDisplayPage(
 				pageName = "Display Page Name",
-				pageType = "Display Pages"
+				pageType = "Display Page Templates"
 			);
+
+			PortletEntry.publish();
 		}
 
 		task ("Add a widget page to the site") {
@@ -575,7 +731,9 @@ definition {
 				key_assetTitle = "Webcontent Title"
 			);
 
-			Click(locator1 = "AP#ASSET_ABSTRACT_TITLE", key_assetTitle = "Webcontent Title");
+			AssetPublisherPortlet.clickAssetTitle(
+				assetTitle = "Webcontent Title"
+			);
 		}
 
 		task ("Assert the Asset Publisher widget brings the user to view the web content article through the display page") {
@@ -610,8 +768,10 @@ definition {
 
 			WebContent.editDisplayPage(
 				pageName = "Display Page Name",
-				pageType = "Display Pages"
+				pageType = "Display Page Templates"
 			);
+
+			PortletEntry.publish();
 		}
 
 		task ("Navigate to the web content article's friendly URL") {
@@ -641,11 +801,11 @@ definition {
 	@priority = "5"
 	test ViewNonDefaultDisplayPage {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a second display page that is mapped to Basic Web Content") {
-			DisplayPagesAdmin.addDisplayPage(displayPageName = "Non-Default Display Page");
+			DisplayPageTemplatesAdmin.addDisplayPage(displayPageName = "Non-Default Display Page");
 
 			PageEditor.addFragment(
 				collectionName = "Collection Name",
@@ -657,21 +817,23 @@ definition {
 				fragmentName = "Title"
 			);
 
-			PageEditorMapping.selectAssetType(
-				assetType = "Web Content Article",
+			PageEditorMapping.selectContentType(
+				contentType = "Web Content Article",
 				subType = "Basic Web Content"
 			);
 
-			PageEditorMapping.mapEditableTextToAsset(
+			PageEditorMapping.mapEditableTextToField(
+				field = "Content",
 				fragmentName = "Rich Text",
 				id = "rich-text",
-				itemName = "Content"
+				source = "Basic Web Content (Default)"
 			);
 
-			PageEditorMapping.mapEditableTextToAsset(
+			PageEditorMapping.mapEditableTextToField(
+				field = "Title",
 				fragmentName = "Title",
 				id = "title",
-				itemName = "Title"
+				source = "Basic Web Content (Default)"
 			);
 
 			Button.clickPublish();
@@ -689,8 +851,10 @@ definition {
 
 			WebContent.editDisplayPage(
 				pageName = "Non-Default Display Page",
-				pageType = "Display Pages"
+				pageType = "Display Page Templates"
 			);
+
+			PortletEntry.publish();
 		}
 
 		task ("Navigate to the web content article's friendly URL") {
@@ -720,7 +884,7 @@ definition {
 	@priority = "4"
 	test ViewNoSelectedDisplayPage {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a web content article that has no display page selected") {
@@ -735,7 +899,10 @@ definition {
 
 			Panel.expandPanel(panel = "Display Page");
 
-			Click(locator1 = "WCSelectDisplayPage#NONE");
+			Select(
+				locator1 = "WCEditWebContent#DISPLAY_PAGE_SELECT",
+				value1 = "No Display Page"
+			);
 
 			PortletEntry.publish();
 		}
@@ -775,7 +942,9 @@ definition {
 				key_assetTitle = "Webcontent Title"
 			);
 
-			Click(locator1 = "AP#ASSET_ABSTRACT_TITLE", key_assetTitle = "Webcontent Title");
+			AssetPublisherPortlet.clickAssetTitle(
+				assetTitle = "Webcontent Title"
+			);
 		}
 
 		task ("Assert a default generic template instead of the default display page is used to display the web content article") {

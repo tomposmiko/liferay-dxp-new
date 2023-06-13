@@ -15,7 +15,6 @@
 package com.liferay.portal.security.service.access.policy.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -39,15 +38,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -58,16 +48,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class SAPEntryPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.portal.security.service.access.policy.service"));
 
 	@Before
@@ -107,7 +108,8 @@ public class SAPEntryPersistenceTest {
 
 		_persistence.remove(newSAPEntry);
 
-		SAPEntry existingSAPEntry = _persistence.fetchByPrimaryKey(newSAPEntry.getPrimaryKey());
+		SAPEntry existingSAPEntry = _persistence.fetchByPrimaryKey(
+			newSAPEntry.getPrimaryKey());
 
 		Assert.assertNull(existingSAPEntry);
 	}
@@ -147,31 +149,35 @@ public class SAPEntryPersistenceTest {
 
 		_sapEntries.add(_persistence.update(newSAPEntry));
 
-		SAPEntry existingSAPEntry = _persistence.findByPrimaryKey(newSAPEntry.getPrimaryKey());
+		SAPEntry existingSAPEntry = _persistence.findByPrimaryKey(
+			newSAPEntry.getPrimaryKey());
 
 		Assert.assertEquals(existingSAPEntry.getUuid(), newSAPEntry.getUuid());
-		Assert.assertEquals(existingSAPEntry.getSapEntryId(),
-			newSAPEntry.getSapEntryId());
-		Assert.assertEquals(existingSAPEntry.getCompanyId(),
-			newSAPEntry.getCompanyId());
-		Assert.assertEquals(existingSAPEntry.getUserId(),
-			newSAPEntry.getUserId());
-		Assert.assertEquals(existingSAPEntry.getUserName(),
-			newSAPEntry.getUserName());
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingSAPEntry.getCreateDate()),
+		Assert.assertEquals(
+			existingSAPEntry.getSapEntryId(), newSAPEntry.getSapEntryId());
+		Assert.assertEquals(
+			existingSAPEntry.getCompanyId(), newSAPEntry.getCompanyId());
+		Assert.assertEquals(
+			existingSAPEntry.getUserId(), newSAPEntry.getUserId());
+		Assert.assertEquals(
+			existingSAPEntry.getUserName(), newSAPEntry.getUserName());
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingSAPEntry.getCreateDate()),
 			Time.getShortTimestamp(newSAPEntry.getCreateDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingSAPEntry.getModifiedDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingSAPEntry.getModifiedDate()),
 			Time.getShortTimestamp(newSAPEntry.getModifiedDate()));
-		Assert.assertEquals(existingSAPEntry.getAllowedServiceSignatures(),
+		Assert.assertEquals(
+			existingSAPEntry.getAllowedServiceSignatures(),
 			newSAPEntry.getAllowedServiceSignatures());
-		Assert.assertEquals(existingSAPEntry.isDefaultSAPEntry(),
+		Assert.assertEquals(
+			existingSAPEntry.isDefaultSAPEntry(),
 			newSAPEntry.isDefaultSAPEntry());
-		Assert.assertEquals(existingSAPEntry.isEnabled(),
-			newSAPEntry.isEnabled());
+		Assert.assertEquals(
+			existingSAPEntry.isEnabled(), newSAPEntry.isEnabled());
 		Assert.assertEquals(existingSAPEntry.getName(), newSAPEntry.getName());
-		Assert.assertEquals(existingSAPEntry.getTitle(), newSAPEntry.getTitle());
+		Assert.assertEquals(
+			existingSAPEntry.getTitle(), newSAPEntry.getTitle());
 	}
 
 	@Test
@@ -201,8 +207,8 @@ public class SAPEntryPersistenceTest {
 
 	@Test
 	public void testCountByC_D() throws Exception {
-		_persistence.countByC_D(RandomTestUtil.nextLong(),
-			RandomTestUtil.randomBoolean());
+		_persistence.countByC_D(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
 
 		_persistence.countByC_D(0L, RandomTestUtil.randomBoolean());
 	}
@@ -220,7 +226,8 @@ public class SAPEntryPersistenceTest {
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		SAPEntry newSAPEntry = addSAPEntry();
 
-		SAPEntry existingSAPEntry = _persistence.findByPrimaryKey(newSAPEntry.getPrimaryKey());
+		SAPEntry existingSAPEntry = _persistence.findByPrimaryKey(
+			newSAPEntry.getPrimaryKey());
 
 		Assert.assertEquals(existingSAPEntry, newSAPEntry);
 	}
@@ -234,23 +241,25 @@ public class SAPEntryPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<SAPEntry> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("SAPEntry", "uuid", true,
-			"sapEntryId", true, "companyId", true, "userId", true, "userName",
-			true, "createDate", true, "modifiedDate", true,
-			"allowedServiceSignatures", true, "defaultSAPEntry", true,
-			"enabled", true, "name", true, "title", true);
+		return OrderByComparatorFactoryUtil.create(
+			"SAPEntry", "uuid", true, "sapEntryId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "allowedServiceSignatures", true,
+			"defaultSAPEntry", true, "enabled", true, "name", true, "title",
+			true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		SAPEntry newSAPEntry = addSAPEntry();
 
-		SAPEntry existingSAPEntry = _persistence.fetchByPrimaryKey(newSAPEntry.getPrimaryKey());
+		SAPEntry existingSAPEntry = _persistence.fetchByPrimaryKey(
+			newSAPEntry.getPrimaryKey());
 
 		Assert.assertEquals(existingSAPEntry, newSAPEntry);
 	}
@@ -267,6 +276,7 @@ public class SAPEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		SAPEntry newSAPEntry1 = addSAPEntry();
 		SAPEntry newSAPEntry2 = addSAPEntry();
 
@@ -275,18 +285,20 @@ public class SAPEntryPersistenceTest {
 		primaryKeys.add(newSAPEntry1.getPrimaryKey());
 		primaryKeys.add(newSAPEntry2.getPrimaryKey());
 
-		Map<Serializable, SAPEntry> sapEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, SAPEntry> sapEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, sapEntries.size());
-		Assert.assertEquals(newSAPEntry1,
-			sapEntries.get(newSAPEntry1.getPrimaryKey()));
-		Assert.assertEquals(newSAPEntry2,
-			sapEntries.get(newSAPEntry2.getPrimaryKey()));
+		Assert.assertEquals(
+			newSAPEntry1, sapEntries.get(newSAPEntry1.getPrimaryKey()));
+		Assert.assertEquals(
+			newSAPEntry2, sapEntries.get(newSAPEntry2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -296,7 +308,8 @@ public class SAPEntryPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, SAPEntry> sapEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, SAPEntry> sapEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(sapEntries.isEmpty());
 	}
@@ -304,6 +317,7 @@ public class SAPEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		SAPEntry newSAPEntry = addSAPEntry();
 
 		long pk = RandomTestUtil.nextLong();
@@ -313,52 +327,57 @@ public class SAPEntryPersistenceTest {
 		primaryKeys.add(newSAPEntry.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, SAPEntry> sapEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, SAPEntry> sapEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, sapEntries.size());
-		Assert.assertEquals(newSAPEntry,
-			sapEntries.get(newSAPEntry.getPrimaryKey()));
+		Assert.assertEquals(
+			newSAPEntry, sapEntries.get(newSAPEntry.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, SAPEntry> sapEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, SAPEntry> sapEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(sapEntries.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		SAPEntry newSAPEntry = addSAPEntry();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newSAPEntry.getPrimaryKey());
 
-		Map<Serializable, SAPEntry> sapEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, SAPEntry> sapEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, sapEntries.size());
-		Assert.assertEquals(newSAPEntry,
-			sapEntries.get(newSAPEntry.getPrimaryKey()));
+		Assert.assertEquals(
+			newSAPEntry, sapEntries.get(newSAPEntry.getPrimaryKey()));
 	}
 
 	@Test
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = SAPEntryLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			SAPEntryLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<SAPEntry>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<SAPEntry>() {
+
 				@Override
 				public void performAction(SAPEntry sapEntry) {
 					Assert.assertNotNull(sapEntry);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -367,15 +386,15 @@ public class SAPEntryPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		SAPEntry newSAPEntry = addSAPEntry();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(SAPEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			SAPEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("sapEntryId",
-				newSAPEntry.getSapEntryId()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"sapEntryId", newSAPEntry.getSapEntryId()));
 
 		List<SAPEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -388,11 +407,12 @@ public class SAPEntryPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(SAPEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			SAPEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("sapEntryId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"sapEntryId", RandomTestUtil.nextLong()));
 
 		List<SAPEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -400,19 +420,20 @@ public class SAPEntryPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		SAPEntry newSAPEntry = addSAPEntry();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(SAPEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			SAPEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property("sapEntryId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("sapEntryId"));
 
 		Object newSapEntryId = newSAPEntry.getSapEntryId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("sapEntryId",
-				new Object[] { newSapEntryId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"sapEntryId", new Object[] {newSapEntryId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -425,13 +446,15 @@ public class SAPEntryPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(SAPEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			SAPEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property("sapEntryId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("sapEntryId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("sapEntryId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"sapEntryId", new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -444,14 +467,18 @@ public class SAPEntryPersistenceTest {
 
 		_persistence.clearCache();
 
-		SAPEntry existingSAPEntry = _persistence.findByPrimaryKey(newSAPEntry.getPrimaryKey());
+		SAPEntry existingSAPEntry = _persistence.findByPrimaryKey(
+			newSAPEntry.getPrimaryKey());
 
-		Assert.assertEquals(Long.valueOf(existingSAPEntry.getCompanyId()),
-			ReflectionTestUtil.<Long>invoke(existingSAPEntry,
-				"getOriginalCompanyId", new Class<?>[0]));
-		Assert.assertTrue(Objects.equals(existingSAPEntry.getName(),
-				ReflectionTestUtil.invoke(existingSAPEntry, "getOriginalName",
-					new Class<?>[0])));
+		Assert.assertEquals(
+			Long.valueOf(existingSAPEntry.getCompanyId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingSAPEntry, "getOriginalCompanyId", new Class<?>[0]));
+		Assert.assertTrue(
+			Objects.equals(
+				existingSAPEntry.getName(),
+				ReflectionTestUtil.invoke(
+					existingSAPEntry, "getOriginalName", new Class<?>[0])));
 	}
 
 	protected SAPEntry addSAPEntry() throws Exception {
@@ -489,4 +516,5 @@ public class SAPEntryPersistenceTest {
 	private List<SAPEntry> _sapEntries = new ArrayList<SAPEntry>();
 	private SAPEntryPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

@@ -117,7 +117,7 @@ definition {
 		UserGroup.gotoAddPageCP(userGroupName = "UG UserGroup Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -275,7 +275,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -285,9 +285,9 @@ definition {
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Members",
+			category = "People",
 			panel = "Site Administration",
-			portlet = "Site Memberships"
+			portlet = "Memberships"
 		);
 
 		Site.addAllMembersCP(siteName = "Site Name");
@@ -295,9 +295,9 @@ definition {
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Members",
+			category = "People",
 			panel = "Site Administration",
-			portlet = "Site Memberships"
+			portlet = "Memberships"
 		);
 
 		Site.assignUserGroupAsMemberCP(
@@ -308,16 +308,16 @@ definition {
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Members",
+			category = "People",
 			panel = "Site Administration",
-			portlet = "Site Memberships"
+			portlet = "Memberships"
 		);
 
 		Navigator.gotoNavItem(navItem = "User Groups");
 
-		Site.assignSiteRoleCP(
-			resourceName = "UG UserGroup Name",
-			roleTitle = "Site Owner"
+		Site.assignSiteRoleToUserGroup(
+			roleName = "Site Owner",
+			userGroupName = "UG UserGroup Name"
 		);
 
 		User.logoutPG();
@@ -327,9 +327,9 @@ definition {
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Members",
+			category = "People",
 			panel = "Site Administration",
-			portlet = "Site Memberships"
+			portlet = "Memberships"
 		);
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "table");
@@ -357,9 +357,9 @@ definition {
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Members",
+			category = "People",
 			panel = "Site Administration",
-			portlet = "Site Memberships"
+			portlet = "Memberships"
 		);
 
 		Site.removeSiteRolesSiteOwnerUserGroupsCP(userGroupName = "UG UserGroup Name");

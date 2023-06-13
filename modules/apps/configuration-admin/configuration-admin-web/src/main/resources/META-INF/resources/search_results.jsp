@@ -23,6 +23,8 @@ ConfigurationEntryRetriever configurationEntryRetriever = (ConfigurationEntryRet
 ConfigurationModelIterator configurationModelIterator = (ConfigurationModelIterator)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_MODEL_ITERATOR);
 ResourceBundleLoaderProvider resourceBundleLoaderProvider = (ResourceBundleLoaderProvider)request.getAttribute(ConfigurationAdminWebKeys.RESOURCE_BUNDLE_LOADER_PROVIDER);
 
+ConfigurationScopeDisplayContext configurationScopeDisplayContext = new ConfigurationScopeDisplayContext(renderRequest);
+
 PortletURL portletURL = renderResponse.createRenderURL();
 
 if (redirect == null) {
@@ -111,13 +113,13 @@ renderResponse.setTitle(LanguageUtil.get(request, "search-results"));
 				String category = null;
 
 				if (configurationCategory != null) {
-					categorySection = LanguageUtil.get(request, "category-section." + configurationCategory.getCategorySection());
-
-					ConfigurationCategoryMenuDisplay configurationCategoryMenuDisplay = configurationEntryRetriever.getConfigurationCategoryMenuDisplay(configurationCategory.getCategoryKey(), themeDisplay.getLanguageId());
+					ConfigurationCategoryMenuDisplay configurationCategoryMenuDisplay = configurationEntryRetriever.getConfigurationCategoryMenuDisplay(configurationCategory.getCategoryKey(), themeDisplay.getLanguageId(), configurationScopeDisplayContext.getScope(), configurationScopeDisplayContext.getScopePK());
 
 					ConfigurationCategoryDisplay configurationCategoryDisplay = configurationCategoryMenuDisplay.getConfigurationCategoryDisplay();
 
 					category = HtmlUtil.escape(configurationCategoryDisplay.getCategoryLabel(locale));
+
+					categorySection = configurationCategoryDisplay.getSectionLabel(locale);
 				}
 				else {
 					categorySection = LanguageUtil.get(request, "other");
@@ -187,16 +189,18 @@ renderResponse.setTitle(LanguageUtil.get(request, "search-results"));
 									url="<%= deleteConfigActionURL %>"
 								/>
 
-								<portlet:resourceURL id="export" var="exportURL">
-									<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
-									<portlet:param name="pid" value="<%= configurationModel.getID() %>" />
-								</portlet:resourceURL>
+								<c:if test="<%= ExtendedObjectClassDefinition.Scope.SYSTEM.equals(configurationScopeDisplayContext.getScope()) %>">
+									<portlet:resourceURL id="export" var="exportURL">
+										<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
+										<portlet:param name="pid" value="<%= configurationModel.getID() %>" />
+									</portlet:resourceURL>
 
-								<liferay-ui:icon
-									message="export"
-									method="get"
-									url="<%= exportURL %>"
-								/>
+									<liferay-ui:icon
+										message="export"
+										method="get"
+										url="<%= exportURL %>"
+									/>
+								</c:if>
 							</c:if>
 						</c:otherwise>
 					</c:choose>

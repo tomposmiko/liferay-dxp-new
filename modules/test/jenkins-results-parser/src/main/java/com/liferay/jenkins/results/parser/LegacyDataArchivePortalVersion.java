@@ -15,7 +15,6 @@
 package com.liferay.jenkins.results.parser;
 
 import java.io.File;
-import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,10 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
 
 /**
  * @author Michael Hashimoto
@@ -85,25 +80,20 @@ public class LegacyDataArchivePortalVersion {
 	}
 
 	private List<String> _getDataArchiveTypes() {
-		Set<String> dataArchiveTypeSet = new HashSet<>();
+		Properties testProperties = JenkinsResultsParserUtil.getProperties(
+			new File(_portalVersionTestDirectory, "test.properties"));
 
-		try {
-			List<File> testcaseFiles = JenkinsResultsParserUtil.findFiles(
-				_portalVersionTestDirectory, ".*\\.testcase");
+		if (!testProperties.containsKey(
+				"test.case.available.property.values[data.archive.type]")) {
 
-			for (File testcaseFile : testcaseFiles) {
-				Document document = Dom4JUtil.parse(
-					JenkinsResultsParserUtil.read(testcaseFile));
-
-				Element rootElement = document.getRootElement();
-
-				dataArchiveTypeSet.addAll(
-					_getPoshiPropertyValues(rootElement, "data.archive.type"));
-			}
+			return Collections.emptyList();
 		}
-		catch (DocumentException | IOException e) {
-			throw new RuntimeException(e);
-		}
+
+		String dataArchiveTypeString = testProperties.getProperty(
+			"test.case.available.property.values[data.archive.type]");
+
+		Set<String> dataArchiveTypeSet = new HashSet<>(
+			Arrays.asList(dataArchiveTypeString.split(",")));
 
 		List<String> dataArchiveTypes = new ArrayList<>(dataArchiveTypeSet);
 
@@ -159,36 +149,6 @@ public class LegacyDataArchivePortalVersion {
 		}
 
 		return legacyDataArchiveTypes;
-	}
-
-	private Set<String> _getPoshiPropertyValues(
-		Element element, String targetPoshiPropertyName) {
-
-		Set<String> poshiPropertyValues = new HashSet<>();
-
-		List<Element> childElements = element.elements();
-
-		if (childElements.isEmpty()) {
-			return poshiPropertyValues;
-		}
-
-		for (Element childElement : childElements) {
-			String childElementName = childElement.getName();
-
-			if (childElementName.equals("property")) {
-				String poshiPropertyName = childElement.attributeValue("name");
-
-				if (poshiPropertyName.equals(targetPoshiPropertyName)) {
-					poshiPropertyValues.add(
-						childElement.attributeValue("value"));
-				}
-			}
-
-			poshiPropertyValues.addAll(
-				_getPoshiPropertyValues(childElement, targetPoshiPropertyName));
-		}
-
-		return poshiPropertyValues;
 	}
 
 	private final List<String> _dataArchiveTypes;

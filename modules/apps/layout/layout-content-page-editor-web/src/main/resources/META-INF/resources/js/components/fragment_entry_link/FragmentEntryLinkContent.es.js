@@ -1,4 +1,4 @@
-import {addClasses, contains, removeClasses} from 'metal-dom';
+import {contains} from 'metal-dom';
 import Component from 'metal-component';
 import {Config} from 'metal-state';
 import {isFunction, isObject} from 'metal';
@@ -9,30 +9,28 @@ import FragmentStyleEditor from './FragmentStyleEditor.es';
 import MetalStore from '../../store/store.es';
 import {setIn} from '../../utils/FragmentsEditorUpdateUtils.es';
 import {shouldUpdateOnChangeProperties} from '../../utils/FragmentsEditorComponentUtils.es';
+import {prefixSegmentsExperienceId} from '../../utils/prefixSegmentsExperienceId.es';
 import templates from './FragmentEntryLinkContent.soy';
 import {UPDATE_EDITABLE_VALUE} from '../../actions/actions.es';
 
 const EDITABLE_FRAGMENT_ENTRY_PROCESSOR = 'com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor';
 
 /**
- * FragmentEntryLinkContent
+ * Creates a Fragment Entry Link Content component.
  * @review
  */
 class FragmentEntryLinkContent extends Component {
 
 	/**
 	 * @inheritDoc
-	 * @review
 	 */
 	created() {
 		this._handleOpenStyleTooltip = this._handleOpenStyleTooltip.bind(this);
 		this._handleStyleChanged = this._handleStyleChanged.bind(this);
-		this._updateEditableStatus = this._updateEditableStatus.bind(this);
 	}
 
 	/**
 	 * @inheritDoc
-	 * @review
 	 */
 	disposed() {
 		this._destroyEditables();
@@ -40,7 +38,6 @@ class FragmentEntryLinkContent extends Component {
 
 	/**
 	 * @inheritDoc
-	 * @review
 	 */
 	prepareStateForRender(state) {
 		return setIn(
@@ -52,7 +49,6 @@ class FragmentEntryLinkContent extends Component {
 
 	/**
 	 * @inheritDoc
-	 * @review
 	 */
 	rendered() {
 		if (this.content) {
@@ -71,7 +67,7 @@ class FragmentEntryLinkContent extends Component {
 			[
 				'content',
 				'languageId',
-				'segmentId',
+				'segmentsExperienceId',
 				'selectedMappingTypes',
 				'showMapping'
 			]
@@ -79,10 +75,9 @@ class FragmentEntryLinkContent extends Component {
 	}
 
 	/**
-	 * Handle content changed
+	 * Renders the content if it is changed.
 	 * @inheritDoc
-	 * @param {string} newContent
-	 * @review
+	 * @param {string} newContent The new content to render.
 	 */
 	syncContent(newContent) {
 		if (newContent && (newContent !== this.content)) {
@@ -91,65 +86,44 @@ class FragmentEntryLinkContent extends Component {
 	}
 
 	/**
-	 * Handle editableValues changed
+	 * Handles changes to editable values.
 	 * @inheritDoc
-	 * @param {object} newEditableValues
-	 * @review
+	 * @param {object} newEditableValues The updated values.
+	 * @param {object} oldEditableValues The original values.
 	 */
-	syncEditableValues(newEditableValues) {
-		if (this._editables) {
-			this._editables.forEach(
-				editable => {
-					const editableValues = (
-						newEditableValues[EDITABLE_FRAGMENT_ENTRY_PROCESSOR] &&
-						newEditableValues[EDITABLE_FRAGMENT_ENTRY_PROCESSOR][editable.editableId]
-					) ?
-						newEditableValues[EDITABLE_FRAGMENT_ENTRY_PROCESSOR][editable.editableId] :
-						{
-							defaultValue: editable.content
-						};
+	syncEditableValues(newEditableValues, oldEditableValues) {
+		if (newEditableValues !== oldEditableValues) {
+			if (this._editables) {
+				this._editables.forEach(
+					editable => {
+						const editableValues = (
+							newEditableValues[EDITABLE_FRAGMENT_ENTRY_PROCESSOR] &&
+							newEditableValues[EDITABLE_FRAGMENT_ENTRY_PROCESSOR][editable.editableId]
+						) ?
+							newEditableValues[EDITABLE_FRAGMENT_ENTRY_PROCESSOR][editable.editableId] :
+							{
+								defaultValue: editable.content
+							};
 
-					editable.editableValues = editableValues;
+						editable.editableValues = editableValues;
+					}
+				);
+			}
+
+			this._update(
+				{
+					defaultLanguageId: this.defaultLanguageId,
+					defaultSegmentsExperienceId: this.defaultSegmentsExperienceId,
+					languageId: this.languageId,
+					segmentsExperienceId: this.segmentsExperienceId,
+					updateFunctions: []
 				}
 			);
 		}
-
-		this._update(
-			{
-				defaultLanguageId: this.defaultLanguageId,
-				defaultSegmentId: this.defaultSegmentId,
-				languageId: this.languageId,
-				segmentId: this.segmentId,
-				updateFunctions: [this._updateEditableStatus]
-			}
-		);
 	}
 
 	/**
-	 * Callback executed when languageId property has changed
-	 * @inheritDoc
-	 * @review
-	 */
-	syncLanguageId(newLanguageId) {
-		if (this.content && (newLanguageId !== this.languageId)) {
-			this._renderContent(this.content);
-		}
-	}
-
-	/**
-	 * Callback executed when languageId property has changed
-	 * @inheritDoc
-	 * @review
-	 */
-	syncSegmentId(newSegmentId) {
-		if (this.content && (newSegmentId !== this.segmentId)) {
-			this._renderContent(this.content);
-		}
-	}
-
-	/**
-	 * Propagate store to editables when it's loaded
-	 * @review
+	 * Propagates the store to editable fields when it's loaded.
 	 */
 	syncStore() {
 		if (this._editables) {
@@ -162,8 +136,8 @@ class FragmentEntryLinkContent extends Component {
 	}
 
 	/**
-	 * Create instantes of FragmentStyleEditor for each element styled with
-	 * background image.
+	 * Create instances of a Fragment Style Editor for each element styled with
+	 * a background image.
 	 */
 	_createBackgroundImageStyleEditors() {
 		if (this._backgroundImageStyleEditors) {
@@ -212,7 +186,7 @@ class FragmentEntryLinkContent extends Component {
 	}
 
 	/**
-	 * Create instances of FragmentEditableField for each editable.
+	 * Creates instances of a fragment editable field for each editable.
 	 */
 	_createEditables() {
 		this._destroyEditables();
@@ -234,26 +208,17 @@ class FragmentEntryLinkContent extends Component {
 				return new FragmentEditableField(
 					{
 						content: editable.innerHTML,
-						defaultLanguageId: this.defaultLanguageId,
-						defaultSegmentId: this.defaultSegmentId,
 						editableId: editable.id,
 						editableValues,
 						element: editable,
-
-						events: {
-							mapButtonClicked: this._handleMapButtonClick
-						},
-
 						fragmentEntryLinkId: this.fragmentEntryLinkId,
-						languageId: this.languageId,
-						portletNamespace: this.portletNamespace,
 
 						processorsOptions: {
 							defaultEditorConfiguration,
 							imageSelectorURL: this.imageSelectorURL
 						},
 
-						segmentId: this.segmentId,
+						segmentsExperienceId: this.segmentsExperienceId,
 						showMapping: this.showMapping,
 						store: this.store,
 						type: editable.getAttribute('type')
@@ -263,8 +228,6 @@ class FragmentEntryLinkContent extends Component {
 		);
 	}
 
-	/**
-	 */
 	_createStyles() {
 		const elements = [];
 
@@ -295,7 +258,7 @@ class FragmentEntryLinkContent extends Component {
 	}
 
 	/**
-	 * Destroy existing FragmentEditableField instances.
+	 * Destroys existing fragment editable field instances.
 	 */
 	_destroyEditables() {
 		if (this._editables) {
@@ -324,23 +287,24 @@ class FragmentEntryLinkContent extends Component {
 	 * @param {Object} event
 	 */
 	_handleStyleChanged(event) {
+		const editableValueSegmentsExperienceId = prefixSegmentsExperienceId(this.segmentsExperienceId) || prefixSegmentsExperienceId(this.defaultSegmentsExperienceId);
+
 		this.store.dispatchAction(
 			UPDATE_EDITABLE_VALUE,
 			{
 				editableId: event.name,
 				editableValue: event.value,
 				editableValueId: this.languageId,
-				editableValueSegmentId: this.segmentId || this.defaultSegmentId,
+				editableValueSegmentsExperienceId,
 				fragmentEntryLinkId: this.fragmentEntryLinkId
 			}
 		);
 	}
 
 	/**
-	 * Renders the FragmentEntryLink content parsing with AUI
+	 * Parses and renders the fragment entry link content with AUI.
 	 * @param {string} content
 	 * @private
-	 * @review
 	 */
 	_renderContent(content) {
 		if (content && this.refs.content) {
@@ -360,10 +324,10 @@ class FragmentEntryLinkContent extends Component {
 					this._update(
 						{
 							defaultLanguageId: this.defaultLanguageId,
-							defaultSegmentId: this.defaultSegmentId,
+							defaultSegmentsExperienceId: this.defaultSegmentsExperienceId,
 							languageId: this.languageId,
-							segmentId: this.segmentId,
-							updateFunctions: [this._updateEditableStatus]
+							segmentsExperienceId: this.segmentsExperienceId,
+							updateFunctions: []
 						}
 					);
 				}
@@ -372,21 +336,20 @@ class FragmentEntryLinkContent extends Component {
 	}
 
 	/**
-	 * Runs a set of update functions through the collection of editable values
-	 * inside this fragment entry link.
-	 * @param {string} languageId The current language id
-	 * @param {string} defaultLanguageId The default language id
-	 * @param {Array<Function>} updateFunctions The set of update functions to execute for each
-	 * 	editable value
+	 * Runs a set of update functions through the editable values inside this
+	 * fragment entry link.
+	 * @param {string} languageId The current language ID.
+	 * @param {string} defaultLanguageId The default language ID.
+	 * @param {Array<Function>} updateFunctions The set of update functions to
+	 * execute for each editable value.
 	 * @private
-	 * @review
 	 */
 	_update(
 		{
 			defaultLanguageId,
-			defaultSegmentId,
+			defaultSegmentsExperienceId,
 			languageId,
-			segmentId,
+			segmentsExperienceId,
 			updateFunctions
 		}
 	) {
@@ -395,9 +358,9 @@ class FragmentEntryLinkContent extends Component {
 		Object.keys(editableValues).forEach(
 			editableId => {
 				const editableValue = editableValues[editableId];
-				const segmentedEditableValue = segmentId && editableValue[segmentId] || editableValue[defaultSegmentId];
+				const segmentedEditableValue = segmentsExperienceId && editableValue[segmentsExperienceId] || editableValue[defaultSegmentsExperienceId];
 
-				const defaultSegmentedEditableValue = editableValue[defaultSegmentId];
+				const defaultSegmentedEditableValue = editableValue[defaultSegmentsExperienceId];
 
 				const defaultValue = (segmentedEditableValue && segmentedEditableValue[defaultLanguageId]) ||
 					defaultSegmentedEditableValue && defaultSegmentedEditableValue[defaultLanguageId] ||
@@ -417,52 +380,20 @@ class FragmentEntryLinkContent extends Component {
 		);
 	}
 
-	/**
-	 * Flags a DOM editable section as translated or untranslated compared to
-	 * the stored default value for that same editable id.
-	 * @param {string} editableId The editable id
-	 * @param {string} value The value for the editable section
-	 * @param {string} defaultValue
-	 * @param {string} mappedField
-	 * @private
-	 * @review
-	 */
-	_updateEditableStatus(editableId, value, defaultValue, mappedField) {
-		const element = this.element.querySelector(`lfr-editable[id="${editableId}"]`);
-
-		if (element) {
-			removeClasses(
-				element,
-				'mapped',
-				'translated',
-				'unmapped',
-				'untranslated'
-			);
-
-			const mapped = Boolean(mappedField);
-			const translated = Boolean(!mappedField && value);
-
-			addClasses(element, mapped ? 'mapped' : 'unmapped');
-			addClasses(element, translated ? 'translated' : 'untranslated');
-		}
-	}
-
 }
 
 /**
  * State definition.
- * @review
  * @static
  * @type {!Object}
  */
 FragmentEntryLinkContent.STATE = {
 
 	/**
-	 * Fragment content to be rendered
+	 * Fragment content to be rendered.
 	 * @default ''
 	 * @instance
 	 * @memberOf FragmentEntryLink
-	 * @review
 	 * @type {string}
 	 */
 	content: Config.any()
@@ -478,84 +409,76 @@ FragmentEntryLinkContent.STATE = {
 	 * @default {}
 	 * @instance
 	 * @memberOf FragmentEntryLink
-	 * @review
 	 * @type {object}
 	 */
 	defaultEditorConfigurations: Config.object().value({}),
 
 	/**
-	 * Default language id.
+	 * Default language ID for the editor.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentsEditor
-	 * @review
 	 * @type {!string}
 	 */
 	defaultLanguageId: Config.string().required(),
 
 	/**
-	 * Default segment id.
+	 * Default segment ID for the editor.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentsEditor
-	 * @review
 	 * @type {!string}
 	 */
-	defaultSegmentId: Config.string().required(),
+	defaultSegmentsExperienceId: Config.string(),
 
 	/**
-	 * Editable values that should be used instead of the default ones
-	 * inside editable fields.
+	 * Editable values that should be used instead of the default ones inside
+	 * editable fields.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentEntryLink
-	 * @review
 	 * @type {!Object}
 	 */
 	editableValues: Config.object().required(),
 
 	/**
-	 * FragmentEntryLink id
+	 * Fragment entry link ID.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentEntryLinkContent
-	 * @review
 	 * @type {!string}
 	 */
 	fragmentEntryLinkId: Config.string().required(),
 
 	/**
-	 * Image selector url
+	 * URL for the image selector.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentEntryLink
-	 * @review
 	 * @type {!string}
 	 */
 	imageSelectorURL: Config.string().required(),
 
 	/**
-	 * Currently selected language id.
+	 * Currently selected language ID.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentsEditor
-	 * @review
 	 * @type {!string}
 	 */
 	languageId: Config.string().required(),
 
 	/**
-	 * Currently selected segment id.
+	 * Currently selected segment ID.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentsEditor
-	 * @review
 	 * @type {!string}
 	 */
-	segmentId: Config.string(),
+	segmentsExperienceId: Config.string(),
 
 	/**
-	 * Selected mapping type label
+	 * Currently selected mapping type label.
 	 * @default {}
 	 * @instance
 	 * @memberOf FragmentEntryLink
@@ -591,31 +514,28 @@ FragmentEntryLinkContent.STATE = {
 		.value({}),
 
 	/**
-	 * If true, asset mapping is enabled
+	 * If <code>true</code>, the asset mapping is enabled.
 	 * @default false
 	 * @instance
 	 * @memberOf FragmentEntryLink
-	 * @review
 	 * @type {bool}
 	 */
 	showMapping: Config.bool().value(false),
 
 	/**
-	 * Store instance
+	 * Store instance.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentEntryLink
-	 * @review
 	 * @type {MetalStore}
 	 */
 	store: Config.instanceOf(MetalStore),
 
 	/**
-	 * Portlet namespace needed for prefixing Alloy Editor instances
+	 * Portlet namespace required for prefixing AlloyEditor instances.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentEntryLink
-	 * @review
 	 * @type {!string}
 	 */
 	portletNamespace: Config.string().required()

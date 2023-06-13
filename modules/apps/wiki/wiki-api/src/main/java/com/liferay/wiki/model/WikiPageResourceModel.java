@@ -32,8 +32,9 @@ import com.liferay.portal.kernel.model.ShardedModel;
  * @generated
  */
 @ProviderType
-public interface WikiPageResourceModel extends BaseModel<WikiPageResource>,
-	ShardedModel {
+public interface WikiPageResourceModel
+	extends BaseModel<WikiPageResource>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -141,4 +142,5 @@ public interface WikiPageResourceModel extends BaseModel<WikiPageResource>,
 	 * @param title the title of this wiki page resource
 	 */
 	public void setTitle(String title);
+
 }

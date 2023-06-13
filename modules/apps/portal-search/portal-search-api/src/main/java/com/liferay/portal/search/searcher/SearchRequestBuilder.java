@@ -16,10 +16,15 @@ package com.liferay.portal.search.searcher;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.search.Query;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.search.aggregation.Aggregation;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
+import com.liferay.portal.search.query.Query;
+import com.liferay.portal.search.sort.Sort;
 import com.liferay.portal.search.stats.StatsRequest;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Builds a search request to be used when performing a search.
@@ -55,6 +60,8 @@ public interface SearchRequestBuilder {
 	 */
 	public SearchRequest build();
 
+	public SearchRequestBuilder entryClassNames(String... entryClassNames);
+
 	/**
 	 * Enables explanation for each hit on how its score was computed.
 	 *
@@ -76,6 +83,10 @@ public interface SearchRequestBuilder {
 	public SearchRequestBuilder includeResponseString(
 		boolean includeResponseString);
 
+	public SearchRequestBuilder modelIndexerClasses(Class<?>... classes);
+
+	public SearchRequestBuilder query(Query query);
+
 	/**
 	 * Provides a secondary query to reorder the top documents returned.
 	 *
@@ -85,6 +96,8 @@ public interface SearchRequestBuilder {
 	 * @review
 	 */
 	public SearchRequestBuilder rescoreQuery(Query rescoreQuery);
+
+	public SearchRequestBuilder sorts(Sort... sorts);
 
 	/**
 	 * Provides a map of field names and the metric aggregations that are to be
@@ -97,5 +110,17 @@ public interface SearchRequestBuilder {
 	 * @review
 	 */
 	public SearchRequestBuilder statsRequests(StatsRequest... statsRequests);
+
+	public SearchRequestBuilder withFacetContext(
+		Consumer<FacetContext> facetContextConsumer);
+
+	public <T> T withFacetContextGet(
+		Function<FacetContext, T> facetContextFunction);
+
+	public SearchRequestBuilder withSearchContext(
+		Consumer<SearchContext> searchContextConsumer);
+
+	public <T> T withSearchContextGet(
+		Function<SearchContext, T> searchContextFunction);
 
 }

@@ -32,8 +32,9 @@ import com.liferay.external.data.source.test.service.TestEntityLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class TestEntityBaseImpl extends TestEntityModelImpl
-	implements TestEntity {
+public abstract class TestEntityBaseImpl
+	extends TestEntityModelImpl implements TestEntity {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class TestEntityBaseImpl extends TestEntityModelImpl
 			TestEntityLocalServiceUtil.updateTestEntity(this);
 		}
 	}
+
 }

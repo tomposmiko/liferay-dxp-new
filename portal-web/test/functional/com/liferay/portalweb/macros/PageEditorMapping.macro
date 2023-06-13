@@ -6,6 +6,8 @@ definition {
 	}
 
 	macro mapEditableTextToAsset {
+		PageEditor.gotoTab(tabName = "Mapping");
+
 		MouseOver.mouseOverNotVisible(
 			locator1 = "Fragment#EDITABLE_FIELD",
 			key_fragmentName = "${fragmentName}",
@@ -27,6 +29,34 @@ definition {
 		);
 	}
 
+	macro mapEditableTextToField {
+		Click(
+			locator1 = "PageEditor#CONTENT_PAGE_DISABLED_HEADER"
+		);
+
+		Click(
+			locator1 = "Fragment#EDITABLE_FIELD",
+			key_fragmentName = "${fragmentName}",
+			key_id = "${id}"
+		);
+
+		Click(
+			locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_MAP_BUTTON"
+		);
+
+		Select(
+			locator1 = "Select#GENERIC_SELECT_FIELD",
+			value1 = "${source}",
+			key_fieldLabel = "Source"
+		);
+
+		Select(
+			locator1 = "Select#GENERIC_SELECT_FIELD",
+			value1 = "${field}",
+			key_fieldLabel = "Field"
+		);
+	}
+
 	macro selectAssetType {
 		PageEditor.gotoTab(tabName = "Mapping");
 
@@ -44,6 +74,24 @@ definition {
 			locator1 = "Select#GENERIC_SELECT_FIELD",
 			value1 = "${assetType}",
 			key_fieldLabel = "Asset Type"
+		);
+
+		Select(
+			locator1 = "Select#GENERIC_SELECT_FIELD",
+			value1 = "${subType}",
+			key_fieldLabel = "Subtype"
+		);
+
+		Button.clickSave();
+	}
+
+	macro selectContentType {
+		PageEditor.gotoTab(tabName = "Mapping");
+
+		Select(
+			locator1 = "Select#GENERIC_SELECT_FIELD",
+			value1 = "${contentType}",
+			key_fieldLabel = "Content Type"
 		);
 
 		Select(

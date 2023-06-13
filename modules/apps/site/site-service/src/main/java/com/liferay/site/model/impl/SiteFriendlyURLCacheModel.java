@@ -18,9 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
-
 import com.liferay.site.model.SiteFriendlyURL;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class SiteFriendlyURLCacheModel implements CacheModel<SiteFriendlyURL>,
-	Externalizable {
+public class SiteFriendlyURLCacheModel
+	implements CacheModel<SiteFriendlyURL>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class SiteFriendlyURLCacheModel implements CacheModel<SiteFriendlyURL>,
 			return false;
 		}
 
-		SiteFriendlyURLCacheModel siteFriendlyURLCacheModel = (SiteFriendlyURLCacheModel)obj;
+		SiteFriendlyURLCacheModel siteFriendlyURLCacheModel =
+			(SiteFriendlyURLCacheModel)obj;
 
 		if (siteFriendlyURLId == siteFriendlyURLCacheModel.siteFriendlyURLId) {
 			return true;
@@ -178,8 +178,7 @@ public class SiteFriendlyURLCacheModel implements CacheModel<SiteFriendlyURL>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -233,4 +232,5 @@ public class SiteFriendlyURLCacheModel implements CacheModel<SiteFriendlyURL>,
 	public String friendlyURL;
 	public String languageId;
 	public long lastPublishDate;
+
 }

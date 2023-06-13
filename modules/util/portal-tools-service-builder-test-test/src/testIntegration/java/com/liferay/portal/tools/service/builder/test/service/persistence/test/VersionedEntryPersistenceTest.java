@@ -15,7 +15,6 @@
 package com.liferay.portal.tools.service.builder.test.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -38,15 +37,6 @@ import com.liferay.portal.tools.service.builder.test.service.VersionedEntryLocal
 import com.liferay.portal.tools.service.builder.test.service.persistence.VersionedEntryPersistence;
 import com.liferay.portal.tools.service.builder.test.service.persistence.VersionedEntryUtil;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -56,16 +46,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class VersionedEntryPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.portal.tools.service.builder.test.service"));
 
 	@Before
@@ -105,7 +106,8 @@ public class VersionedEntryPersistenceTest {
 
 		_persistence.remove(newVersionedEntry);
 
-		VersionedEntry existingVersionedEntry = _persistence.fetchByPrimaryKey(newVersionedEntry.getPrimaryKey());
+		VersionedEntry existingVersionedEntry = _persistence.fetchByPrimaryKey(
+			newVersionedEntry.getPrimaryKey());
 
 		Assert.assertNull(existingVersionedEntry);
 	}
@@ -129,15 +131,19 @@ public class VersionedEntryPersistenceTest {
 
 		_versionedEntries.add(_persistence.update(newVersionedEntry));
 
-		VersionedEntry existingVersionedEntry = _persistence.findByPrimaryKey(newVersionedEntry.getPrimaryKey());
+		VersionedEntry existingVersionedEntry = _persistence.findByPrimaryKey(
+			newVersionedEntry.getPrimaryKey());
 
-		Assert.assertEquals(existingVersionedEntry.getMvccVersion(),
+		Assert.assertEquals(
+			existingVersionedEntry.getMvccVersion(),
 			newVersionedEntry.getMvccVersion());
-		Assert.assertEquals(existingVersionedEntry.getHeadId(),
-			newVersionedEntry.getHeadId());
-		Assert.assertEquals(existingVersionedEntry.getVersionedEntryId(),
+		Assert.assertEquals(
+			existingVersionedEntry.getHeadId(), newVersionedEntry.getHeadId());
+		Assert.assertEquals(
+			existingVersionedEntry.getVersionedEntryId(),
 			newVersionedEntry.getVersionedEntryId());
-		Assert.assertEquals(existingVersionedEntry.getGroupId(),
+		Assert.assertEquals(
+			existingVersionedEntry.getGroupId(),
 			newVersionedEntry.getGroupId());
 	}
 
@@ -146,6 +152,14 @@ public class VersionedEntryPersistenceTest {
 		_persistence.countByGroupId(RandomTestUtil.nextLong());
 
 		_persistence.countByGroupId(0L);
+	}
+
+	@Test
+	public void testCountByGroupId_Head() throws Exception {
+		_persistence.countByGroupId_Head(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
+
+		_persistence.countByGroupId_Head(0L, RandomTestUtil.randomBoolean());
 	}
 
 	@Test
@@ -159,7 +173,8 @@ public class VersionedEntryPersistenceTest {
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		VersionedEntry newVersionedEntry = addVersionedEntry();
 
-		VersionedEntry existingVersionedEntry = _persistence.findByPrimaryKey(newVersionedEntry.getPrimaryKey());
+		VersionedEntry existingVersionedEntry = _persistence.findByPrimaryKey(
+			newVersionedEntry.getPrimaryKey());
 
 		Assert.assertEquals(existingVersionedEntry, newVersionedEntry);
 	}
@@ -173,21 +188,22 @@ public class VersionedEntryPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<VersionedEntry> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("VersionedEntry",
-			"mvccVersion", true, "headId", true, "versionedEntryId", true,
-			"groupId", true);
+		return OrderByComparatorFactoryUtil.create(
+			"VersionedEntry", "mvccVersion", true, "headId", true,
+			"versionedEntryId", true, "groupId", true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		VersionedEntry newVersionedEntry = addVersionedEntry();
 
-		VersionedEntry existingVersionedEntry = _persistence.fetchByPrimaryKey(newVersionedEntry.getPrimaryKey());
+		VersionedEntry existingVersionedEntry = _persistence.fetchByPrimaryKey(
+			newVersionedEntry.getPrimaryKey());
 
 		Assert.assertEquals(existingVersionedEntry, newVersionedEntry);
 	}
@@ -196,7 +212,8 @@ public class VersionedEntryPersistenceTest {
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		VersionedEntry missingVersionedEntry = _persistence.fetchByPrimaryKey(pk);
+		VersionedEntry missingVersionedEntry = _persistence.fetchByPrimaryKey(
+			pk);
 
 		Assert.assertNull(missingVersionedEntry);
 	}
@@ -204,6 +221,7 @@ public class VersionedEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		VersionedEntry newVersionedEntry1 = addVersionedEntry();
 		VersionedEntry newVersionedEntry2 = addVersionedEntry();
 
@@ -212,18 +230,22 @@ public class VersionedEntryPersistenceTest {
 		primaryKeys.add(newVersionedEntry1.getPrimaryKey());
 		primaryKeys.add(newVersionedEntry2.getPrimaryKey());
 
-		Map<Serializable, VersionedEntry> versionedEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, VersionedEntry> versionedEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, versionedEntries.size());
-		Assert.assertEquals(newVersionedEntry1,
+		Assert.assertEquals(
+			newVersionedEntry1,
 			versionedEntries.get(newVersionedEntry1.getPrimaryKey()));
-		Assert.assertEquals(newVersionedEntry2,
+		Assert.assertEquals(
+			newVersionedEntry2,
 			versionedEntries.get(newVersionedEntry2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -233,7 +255,8 @@ public class VersionedEntryPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, VersionedEntry> versionedEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, VersionedEntry> versionedEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(versionedEntries.isEmpty());
 	}
@@ -241,6 +264,7 @@ public class VersionedEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		VersionedEntry newVersionedEntry = addVersionedEntry();
 
 		long pk = RandomTestUtil.nextLong();
@@ -250,36 +274,39 @@ public class VersionedEntryPersistenceTest {
 		primaryKeys.add(newVersionedEntry.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, VersionedEntry> versionedEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, VersionedEntry> versionedEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, versionedEntries.size());
-		Assert.assertEquals(newVersionedEntry,
+		Assert.assertEquals(
+			newVersionedEntry,
 			versionedEntries.get(newVersionedEntry.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, VersionedEntry> versionedEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, VersionedEntry> versionedEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(versionedEntries.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		VersionedEntry newVersionedEntry = addVersionedEntry();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newVersionedEntry.getPrimaryKey());
 
-		Map<Serializable, VersionedEntry> versionedEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, VersionedEntry> versionedEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, versionedEntries.size());
-		Assert.assertEquals(newVersionedEntry,
+		Assert.assertEquals(
+			newVersionedEntry,
 			versionedEntries.get(newVersionedEntry.getPrimaryKey()));
 	}
 
@@ -287,15 +314,19 @@ public class VersionedEntryPersistenceTest {
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = VersionedEntryLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			VersionedEntryLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<VersionedEntry>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<VersionedEntry>() {
+
 				@Override
 				public void performAction(VersionedEntry versionedEntry) {
 					Assert.assertNotNull(versionedEntry);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -304,17 +335,18 @@ public class VersionedEntryPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		VersionedEntry newVersionedEntry = addVersionedEntry();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(VersionedEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			VersionedEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("versionedEntryId",
-				newVersionedEntry.getVersionedEntryId()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"versionedEntryId", newVersionedEntry.getVersionedEntryId()));
 
-		List<VersionedEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<VersionedEntry> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
@@ -325,32 +357,34 @@ public class VersionedEntryPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(VersionedEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			VersionedEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("versionedEntryId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"versionedEntryId", RandomTestUtil.nextLong()));
 
-		List<VersionedEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<VersionedEntry> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		VersionedEntry newVersionedEntry = addVersionedEntry();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(VersionedEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			VersionedEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"versionedEntryId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("versionedEntryId"));
 
 		Object newVersionedEntryId = newVersionedEntry.getVersionedEntryId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("versionedEntryId",
-				new Object[] { newVersionedEntryId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"versionedEntryId", new Object[] {newVersionedEntryId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -363,14 +397,15 @@ public class VersionedEntryPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(VersionedEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			VersionedEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"versionedEntryId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("versionedEntryId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("versionedEntryId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"versionedEntryId", new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -383,11 +418,13 @@ public class VersionedEntryPersistenceTest {
 
 		_persistence.clearCache();
 
-		VersionedEntry existingVersionedEntry = _persistence.findByPrimaryKey(newVersionedEntry.getPrimaryKey());
+		VersionedEntry existingVersionedEntry = _persistence.findByPrimaryKey(
+			newVersionedEntry.getPrimaryKey());
 
-		Assert.assertEquals(Long.valueOf(existingVersionedEntry.getHeadId()),
-			ReflectionTestUtil.<Long>invoke(existingVersionedEntry,
-				"getOriginalHeadId", new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingVersionedEntry.getHeadId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingVersionedEntry, "getOriginalHeadId", new Class<?>[0]));
 	}
 
 	protected VersionedEntry addVersionedEntry() throws Exception {
@@ -406,7 +443,9 @@ public class VersionedEntryPersistenceTest {
 		return versionedEntry;
 	}
 
-	private List<VersionedEntry> _versionedEntries = new ArrayList<VersionedEntry>();
+	private List<VersionedEntry> _versionedEntries =
+		new ArrayList<VersionedEntry>();
 	private VersionedEntryPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

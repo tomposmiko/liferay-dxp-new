@@ -20,12 +20,12 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
-import com.liferay.layout.constants.LayoutConstants;
+import com.liferay.layout.admin.web.internal.constants.LayoutAdminWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
 import com.liferay.layout.page.template.util.comparator.LayoutPageTemplateCollectionNameComparator;
+import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.layout.util.comparator.LayoutCreateDateComparator;
 import com.liferay.layout.util.comparator.LayoutLeftPlidComparator;
 import com.liferay.petra.string.StringBundler;
@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
@@ -52,6 +53,8 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetBranchLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
@@ -81,6 +84,7 @@ import com.liferay.taglib.security.PermissionsURLTag;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -110,6 +114,10 @@ public class LayoutsAdminDisplayContext {
 
 		_groupDisplayContextHelper = new GroupDisplayContextHelper(_request);
 
+		_layoutCopyHelper =
+			(LayoutCopyHelper)_liferayPortletRequest.getAttribute(
+				LayoutAdminWebKeys.LAYOUT_COPY_HELPER);
+
 		_liferayPortletRequest.setAttribute(
 			WebKeys.LAYOUT_DESCRIPTIONS, getLayoutDescriptions());
 	}
@@ -119,23 +127,21 @@ public class LayoutsAdminDisplayContext {
 			{
 				if (isShowPublicPages()) {
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.setHref(
-									getSelectLayoutPageTemplateEntryURL(false));
-								dropdownItem.setLabel(
-									LanguageUtil.get(_request, "public-page"));
-							}));
+						dropdownItem -> {
+							dropdownItem.setHref(
+								getSelectLayoutPageTemplateEntryURL(false));
+							dropdownItem.setLabel(
+								LanguageUtil.get(_request, "public-page"));
+						});
 				}
 
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setHref(
-								getSelectLayoutPageTemplateEntryURL(true));
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "private-page"));
-						}));
+					dropdownItem -> {
+						dropdownItem.setHref(
+							getSelectLayoutPageTemplateEntryURL(true));
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "private-page"));
+					});
 			}
 		};
 	}
@@ -168,7 +174,7 @@ public class LayoutsAdminDisplayContext {
 			_request, "layoutPageTemplateEntryId");
 
 		portletURL.setParameter(
-			"TypeSettingsProperties--layoutPageTemplateEntryId--",
+			"layoutPageTemplateEntryId",
 			String.valueOf(layoutPageTemplateEntryId));
 
 		if (layoutPageTemplateEntryId > 0) {
@@ -346,17 +352,39 @@ public class LayoutsAdminDisplayContext {
 		return _displayStyle;
 	}
 
-	public String getEditLayoutURL(Layout layout) throws PortalException {
-		if (!Objects.equals(
-				layout.getType(), LayoutConstants.LAYOUT_TYPE_CONTENT)) {
-
+	public String getEditLayoutURL(Layout layout) throws Exception {
+		if (!Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT)) {
 			return StringPool.BLANK;
 		}
 
-		String layoutFullURL = PortalUtil.getLayoutFullURL(
-			layout, _themeDisplay);
+		Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
+			PortalUtil.getClassNameId(Layout.class), layout.getPlid());
 
-		return HttpUtil.setParameter(layoutFullURL, "p_l_mode", Constants.EDIT);
+		if (draftLayout == null) {
+			ServiceContext serviceContext = ServiceContextFactory.getInstance(
+				_request);
+
+			draftLayout = LayoutLocalServiceUtil.addLayout(
+				layout.getUserId(), layout.getGroupId(),
+				layout.isPrivateLayout(), layout.getParentLayoutId(),
+				PortalUtil.getClassNameId(Layout.class), layout.getPlid(),
+				layout.getNameMap(), layout.getTitleMap(),
+				layout.getDescriptionMap(), layout.getKeywordsMap(),
+				layout.getRobotsMap(), layout.getType(),
+				layout.getTypeSettings(), true, true, Collections.emptyMap(),
+				serviceContext);
+
+			_layoutCopyHelper.copyLayout(layout, draftLayout);
+		}
+
+		String layoutFullURL = PortalUtil.getLayoutFullURL(
+			draftLayout, _themeDisplay);
+
+		layoutFullURL = HttpUtil.setParameter(
+			layoutFullURL, "p_l_mode", Constants.EDIT);
+
+		return HttpUtil.setParameter(
+			layoutFullURL, "p_l_back_url", _themeDisplay.getURLCurrent());
 	}
 
 	public String getFirstColumnConfigureLayoutURL(boolean privatePages) {
@@ -543,6 +571,26 @@ public class LayoutsAdminDisplayContext {
 					_request, layoutTypeResourceBundle,
 					"layout.types." + layout.getType()));
 
+			if (Objects.equals(
+					layout.getType(), LayoutConstants.TYPE_CONTENT)) {
+
+				Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
+					PortalUtil.getClassNameId(Layout.class), layout.getPlid());
+
+				Date modifiedDate = draftLayout.getModifiedDate();
+
+				Date publishDate = layout.getPublishDate();
+
+				if (publishDate == null) {
+					publishDate = modifiedDate;
+				}
+
+				layoutJSONObject.put("draft", modifiedDate.after(publishDate));
+			}
+			else {
+				layoutJSONObject.put("draft", false);
+			}
+
 			layoutJSONObject.put(
 				"homePage",
 				_getHomePagePlid(privateLayout) == layout.getPlid());
@@ -633,15 +681,21 @@ public class LayoutsAdminDisplayContext {
 			layoutsCount = LayoutLocalServiceUtil.getLayoutsCount(
 				getSelGroup(), isPrivateLayout(), getKeywords(),
 				new String[] {
-					LayoutConstants.LAYOUT_TYPE_CONTENT,
-					LayoutConstants.TYPE_PORTLET
+					LayoutConstants.TYPE_CONTENT, LayoutConstants.TYPE_EMBEDDED,
+					LayoutConstants.TYPE_LINK_TO_LAYOUT,
+					LayoutConstants.TYPE_FULL_PAGE_APPLICATION,
+					LayoutConstants.TYPE_PANEL, LayoutConstants.TYPE_PORTLET,
+					LayoutConstants.TYPE_URL
 				});
 
 			layouts = LayoutLocalServiceUtil.getLayouts(
 				getSelGroupId(), isPrivateLayout(), getKeywords(),
 				new String[] {
-					LayoutConstants.LAYOUT_TYPE_CONTENT,
-					LayoutConstants.TYPE_PORTLET
+					LayoutConstants.TYPE_CONTENT, LayoutConstants.TYPE_EMBEDDED,
+					LayoutConstants.TYPE_LINK_TO_LAYOUT,
+					LayoutConstants.TYPE_FULL_PAGE_APPLICATION,
+					LayoutConstants.TYPE_PANEL, LayoutConstants.TYPE_PORTLET,
+					LayoutConstants.TYPE_URL
 				},
 				layoutsSearchContainer.getStart(),
 				layoutsSearchContainer.getEnd(),
@@ -740,11 +794,14 @@ public class LayoutsAdminDisplayContext {
 					add(
 						navigationItem -> {
 							navigationItem.setActive(
-								Objects.equals(getTabs1(), "display-pages"));
+								Objects.equals(
+									getTabs1(), "display-page-templates"));
 							navigationItem.setHref(
-								getPortletURL(), "tabs1", "display-pages");
+								getPortletURL(), "tabs1",
+								"display-page-templates");
 							navigationItem.setLabel(
-								LanguageUtil.get(_request, "display-pages"));
+								LanguageUtil.get(
+									_request, "display-page-templates"));
 						});
 				}
 			}
@@ -1086,7 +1143,13 @@ public class LayoutsAdminDisplayContext {
 	}
 
 	public String getViewLayoutURL(Layout layout) throws PortalException {
-		return PortalUtil.getLayoutFullURL(layout, _themeDisplay);
+		String layoutFullURL = PortalUtil.getLayoutFullURL(
+			layout, _themeDisplay);
+
+		layoutFullURL = HttpUtil.setParameter(
+			layoutFullURL, "p_l_back_url", _themeDisplay.getURLCurrent());
+
+		return layoutFullURL;
 	}
 
 	public boolean hasLayouts() {
@@ -1113,14 +1176,6 @@ public class LayoutsAdminDisplayContext {
 		return _firstColumn;
 	}
 
-	public boolean isFlattenedView() {
-		if (Objects.equals(getDisplayStyle(), "list") || isSearch()) {
-			return true;
-		}
-
-		return false;
-	}
-
 	public boolean isPagesTab() {
 		if (Objects.equals(getTabs1(), "pages")) {
 			return true;
@@ -1136,9 +1191,7 @@ public class LayoutsAdminDisplayContext {
 
 		Group selGroup = getSelGroup();
 
-		if (selGroup.isLayoutSetPrototype() ||
-			selGroup.isLayoutSetPrototype()) {
-
+		if (selGroup.isLayoutSetPrototype()) {
 			_privateLayout = true;
 
 			return _privateLayout;
@@ -1667,6 +1720,7 @@ public class LayoutsAdminDisplayContext {
 	private Long _homePagePlid;
 	private String _homePageTitle;
 	private String _keywords;
+	private final LayoutCopyHelper _layoutCopyHelper;
 	private List<LayoutDescription> _layoutDescriptions;
 	private Long _layoutId;
 	private SearchContainer _layoutsSearchContainer;

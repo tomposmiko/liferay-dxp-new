@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.dynamic.data.mapping.model.DDMTemplateLink;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLinkLocalService;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMTemplateLinkPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -63,8 +62,9 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class DDMTemplateLinkLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements DDMTemplateLinkLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements DDMTemplateLinkLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -108,6 +108,7 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	@Override
 	public DDMTemplateLink deleteDDMTemplateLink(long templateLinkId)
 		throws PortalException {
+
 		return ddmTemplateLinkPersistence.remove(templateLinkId);
 	}
 
@@ -121,6 +122,7 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	@Override
 	public DDMTemplateLink deleteDDMTemplateLink(
 		DDMTemplateLink ddmTemplateLink) {
+
 		return ddmTemplateLinkPersistence.remove(ddmTemplateLink);
 	}
 
@@ -128,8 +130,8 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(DDMTemplateLink.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			DDMTemplateLink.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -156,10 +158,11 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return ddmTemplateLinkPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return ddmTemplateLinkPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -176,10 +179,12 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return ddmTemplateLinkPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return ddmTemplateLinkPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -201,10 +206,11 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return ddmTemplateLinkPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return ddmTemplateLinkPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
@@ -222,12 +228,14 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	@Override
 	public DDMTemplateLink getDDMTemplateLink(long templateLinkId)
 		throws PortalException {
+
 		return ddmTemplateLinkPersistence.findByPrimaryKey(templateLinkId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(ddmTemplateLinkLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -239,10 +247,14 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(ddmTemplateLinkLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			ddmTemplateLinkLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(DDMTemplateLink.class);
 
@@ -254,6 +266,7 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
+
 		actionableDynamicQuery.setBaseLocalService(ddmTemplateLinkLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDMTemplateLink.class);
@@ -267,12 +280,15 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return ddmTemplateLinkLocalService.deleteDDMTemplateLink((DDMTemplateLink)persistedModel);
+
+		return ddmTemplateLinkLocalService.deleteDDMTemplateLink(
+			(DDMTemplateLink)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return ddmTemplateLinkPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -312,6 +328,7 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	@Override
 	public DDMTemplateLink updateDDMTemplateLink(
 		DDMTemplateLink ddmTemplateLink) {
+
 		return ddmTemplateLinkPersistence.update(ddmTemplateLink);
 	}
 
@@ -331,6 +348,7 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	 */
 	public void setDDMTemplateLinkLocalService(
 		DDMTemplateLinkLocalService ddmTemplateLinkLocalService) {
+
 		this.ddmTemplateLinkLocalService = ddmTemplateLinkLocalService;
 	}
 
@@ -350,6 +368,7 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	 */
 	public void setDDMTemplateLinkPersistence(
 		DDMTemplateLinkPersistence ddmTemplateLinkPersistence) {
+
 		this.ddmTemplateLinkPersistence = ddmTemplateLinkPersistence;
 	}
 
@@ -358,7 +377,9 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -368,12 +389,15 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.dynamic.data.mapping.model.DDMTemplateLink",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.dynamic.data.mapping.model.DDMTemplateLink",
 			ddmTemplateLinkLocalService);
 	}
 
@@ -414,8 +438,8 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -426,10 +450,18 @@ public abstract class DDMTemplateLinkLocalServiceBaseImpl
 
 	@BeanReference(type = DDMTemplateLinkLocalService.class)
 	protected DDMTemplateLinkLocalService ddmTemplateLinkLocalService;
+
 	@BeanReference(type = DDMTemplateLinkPersistence.class)
 	protected DDMTemplateLinkPersistence ddmTemplateLinkPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

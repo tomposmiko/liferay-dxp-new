@@ -17,10 +17,8 @@ package com.liferay.microblogs.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.microblogs.model.MicroblogsEntry;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class MicroblogsEntryCacheModel implements CacheModel<MicroblogsEntry>,
-	Externalizable {
+public class MicroblogsEntryCacheModel
+	implements CacheModel<MicroblogsEntry>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class MicroblogsEntryCacheModel implements CacheModel<MicroblogsEntry>,
 			return false;
 		}
 
-		MicroblogsEntryCacheModel microblogsEntryCacheModel = (MicroblogsEntryCacheModel)obj;
+		MicroblogsEntryCacheModel microblogsEntryCacheModel =
+			(MicroblogsEntryCacheModel)obj;
 
 		if (microblogsEntryId == microblogsEntryCacheModel.microblogsEntryId) {
 			return true;
@@ -168,8 +168,7 @@ public class MicroblogsEntryCacheModel implements CacheModel<MicroblogsEntry>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(microblogsEntryId);
 
 		objectOutput.writeLong(companyId);
@@ -216,4 +215,5 @@ public class MicroblogsEntryCacheModel implements CacheModel<MicroblogsEntry>,
 	public int type;
 	public long parentMicroblogsEntryId;
 	public int socialRelationType;
+
 }

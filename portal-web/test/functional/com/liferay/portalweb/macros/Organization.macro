@@ -120,6 +120,8 @@ definition {
 
 		Type(locator1 = "TextInput#NAME", value1 = "${orgName}");
 
+		ScrollWebElementIntoView(locator1 = "Button#SAVE");
+
 		Button.clickSave();
 
 		if ("${organizationName}" == "Duplicate") {
@@ -476,7 +478,7 @@ definition {
 	}
 
 	macro gotoIdentificationCP {
-		AssertClick(locator1 = "NavTab#IDENTIFICATION", value1 = "Identification");
+		Navigator.gotoNavTab(navTab = "Identification");
 
 		if (isSet(panel)) {
 			Panel.expandPanel(panel = "${panel}");

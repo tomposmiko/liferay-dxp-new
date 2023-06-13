@@ -17,21 +17,23 @@ package com.liferay.layout.type.controller.asset.display.internal.controller;
 import com.liferay.asset.display.contributor.AssetDisplayContributorTracker;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.item.selector.ItemSelector;
-import com.liferay.layout.constants.LayoutConstants;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.model.impl.BaseLayoutTypeControllerImpl;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.servlet.TransferHeadersHelperUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
@@ -49,7 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = "layout.type=" + LayoutConstants.LAYOUT_TYPE_ASSET_DISPLAY,
+	property = "layout.type=" + LayoutConstants.TYPE_ASSET_DISPLAY,
 	service = LayoutTypeController.class
 )
 public class AssetDisplayLayoutTypeController
@@ -125,8 +127,7 @@ public class AssetDisplayLayoutTypeController
 
 		try {
 			LayoutPageTemplateEntry layoutPageTemplateEntry =
-				_layoutPageTemplateEntryLocalService.
-					fetchLayoutPageTemplateEntryByPlid(layout.getPlid());
+				_fetchLayoutPageTemplateEntry(layout);
 
 			if (layoutPageTemplateEntry != null) {
 				request.setAttribute(
@@ -218,6 +219,28 @@ public class AssetDisplayLayoutTypeController
 		this.servletContext = servletContext;
 	}
 
+	private LayoutPageTemplateEntry _fetchLayoutPageTemplateEntry(
+		Layout layout) {
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.
+				fetchLayoutPageTemplateEntryByPlid(layout.getPlid());
+
+		if (layoutPageTemplateEntry != null) {
+			return layoutPageTemplateEntry;
+		}
+
+		if (layout.getClassNameId() == _portal.getClassNameId(Layout.class)) {
+			Layout publishedLayout = _layoutLocalService.fetchLayout(
+				layout.getClassPK());
+
+			return _layoutPageTemplateEntryLocalService.
+				fetchLayoutPageTemplateEntryByPlid(publishedLayout.getPlid());
+		}
+
+		return null;
+	}
+
 	private static final String _EDIT_PAGE = "/layout/edit/asset_display.jsp";
 
 	private static final String _URL =
@@ -237,7 +260,13 @@ public class AssetDisplayLayoutTypeController
 	private ItemSelector _itemSelector;
 
 	@Reference
+	private LayoutLocalService _layoutLocalService;
+
+	@Reference
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
+
+	@Reference
+	private Portal _portal;
 
 }

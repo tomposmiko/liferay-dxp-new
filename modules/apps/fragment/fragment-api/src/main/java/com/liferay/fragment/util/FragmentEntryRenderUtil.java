@@ -14,6 +14,7 @@
 
 package com.liferay.fragment.util;
 
+import com.liferay.asset.display.contributor.util.ContentAccessorUtil;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -144,8 +145,9 @@ public class FragmentEntryRenderUtil {
 
 	public static String renderFragmentEntryLink(
 			FragmentEntryLink fragmentEntryLink, String mode,
-			Map<String, Object> parameterMap, Locale locale, long[] segmentsIds,
-			HttpServletRequest request, HttpServletResponse response)
+			Map<String, Object> parameterMap, Locale locale,
+			long[] segmentsExperienceIds, HttpServletRequest request,
+			HttpServletResponse response)
 		throws PortalException {
 
 		FragmentEntryProcessorRegistry fragmentEntryProcessorRegistry =
@@ -156,13 +158,17 @@ public class FragmentEntryRenderUtil {
 
 		String html =
 			fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
-				fragmentEntryLink, mode, locale, segmentsIds);
+				fragmentEntryLink, mode, locale, segmentsExperienceIds);
 
-		if ((request != null) && Validator.isNotNull(html)) {
+		if ((request != null) && (response != null) &&
+			Validator.isNotNull(html)) {
+
 			html = _processTemplate(html, parameterMap, request, response);
 		}
 
-		if (Validator.isNotNull(css)) {
+		if ((request != null) && (response != null) &&
+			Validator.isNotNull(css)) {
+
 			css = _processTemplate(css, parameterMap, request, response);
 		}
 
@@ -202,6 +208,8 @@ public class FragmentEntryRenderUtil {
 		if (MapUtil.isNotEmpty(parameterMap)) {
 			template.putAll(parameterMap);
 		}
+
+		template.put("contentAccessorUtil", ContentAccessorUtil.getInstance());
 
 		template.prepare(request);
 

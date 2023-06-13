@@ -30,13 +30,15 @@ import com.liferay.portal.kernel.util.Accessor;
 @ImplementationClassName("com.liferay.fragment.model.impl.FragmentEntryImpl")
 @ProviderType
 public interface FragmentEntry extends FragmentEntryModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.fragment.model.impl.FragmentEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<FragmentEntry, Long> FRAGMENT_ENTRY_ID_ACCESSOR =
-		new Accessor<FragmentEntry, Long>() {
+	public static final Accessor<FragmentEntry, Long>
+		FRAGMENT_ENTRY_ID_ACCESSOR = new Accessor<FragmentEntry, Long>() {
+
 			@Override
 			public Long get(FragmentEntry fragmentEntry) {
 				return fragmentEntry.getFragmentEntryId();
@@ -51,6 +53,7 @@ public interface FragmentEntry extends FragmentEntryModel, PersistedModel {
 			public Class<FragmentEntry> getTypeClass() {
 				return FragmentEntry.class;
 			}
+
 		};
 
 	public String getContent();
@@ -63,8 +66,9 @@ public interface FragmentEntry extends FragmentEntryModel, PersistedModel {
 	public int getUsageCount();
 
 	public void populateZipWriter(
-		com.liferay.portal.kernel.zip.ZipWriter zipWriter, String path)
+			com.liferay.portal.kernel.zip.ZipWriter zipWriter, String path)
 		throws Exception;
 
 	public void setImagePreviewURL(String imagePreviewURL);
+
 }

@@ -16,6 +16,7 @@ package com.liferay.journal.web.internal.portlet;
 
 import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
+import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
 import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
@@ -60,6 +61,7 @@ import com.liferay.journal.exception.NoSuchArticleException;
 import com.liferay.journal.exception.NoSuchFeedException;
 import com.liferay.journal.exception.NoSuchFolderException;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalFeed;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.model.JournalFolderConstants;
@@ -84,6 +86,7 @@ import com.liferay.portal.kernel.diff.CompareVersionsException;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
@@ -109,6 +112,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -474,6 +478,10 @@ public class JournalPortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
+		renderRequest.setAttribute(
+			AssetDisplayPageFriendlyURLProvider.class.getName(),
+			_assetDisplayPageFriendlyURLProvider);
+
 		renderRequest.setAttribute(TrashWebKeys.TRASH_HELPER, _trashHelper);
 
 		String path = getPath(renderRequest, renderResponse);
@@ -520,6 +528,10 @@ public class JournalPortlet extends MVCPortlet {
 	public void serveResource(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortletException {
+
+		resourceRequest.setAttribute(
+			AssetDisplayPageFriendlyURLProvider.class.getName(),
+			_assetDisplayPageFriendlyURLProvider);
 
 		resourceRequest.setAttribute(
 			DDMTemplateHelper.class.getName(), _ddmTemplateHelper);
@@ -682,6 +694,9 @@ public class JournalPortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		UploadException uploadException =
 			(UploadException)actionRequest.getAttribute(
 				WebKeys.UPLOAD_EXCEPTION);
@@ -719,24 +734,13 @@ public class JournalPortlet extends MVCPortlet {
 		long classNameId = ParamUtil.getLong(
 			uploadPortletRequest, "classNameId");
 		long classPK = ParamUtil.getLong(uploadPortletRequest, "classPK");
-
 		String articleId = ParamUtil.getString(
 			uploadPortletRequest, "articleId");
-
 		boolean autoArticleId = ParamUtil.getBoolean(
 			uploadPortletRequest, "autoArticleId");
 		double version = ParamUtil.getDouble(uploadPortletRequest, "version");
-
 		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "titleMapAsXML");
-		Map<Locale, String> descriptionMap =
-			LocalizationUtil.getLocalizationMap(
-				actionRequest, "descriptionMapAsXML");
-		Map<Locale, String> friendlyURLMap =
-			LocalizationUtil.getLocalizationMap(actionRequest, "friendlyURL");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			JournalArticle.class.getName(), uploadPortletRequest);
 
 		String ddmStructureKey = ParamUtil.getString(
 			uploadPortletRequest, "ddmStructureKey");
@@ -746,10 +750,33 @@ public class JournalPortlet extends MVCPortlet {
 			_portal.getClassNameId(JournalArticle.class), ddmStructureKey,
 			true);
 
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			JournalArticle.class.getName(), uploadPortletRequest);
+
 		Fields fields = DDMUtil.getFields(
 			ddmStructure.getStructureId(), serviceContext);
 
 		String content = _journalConverter.getContent(ddmStructure, fields);
+
+		if ((classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT) &&
+			_isEmpty(titleMap)) {
+
+			Locale articleDefaultLocale = LocaleUtil.fromLanguageId(
+				LocalizationUtil.getDefaultLanguageId(content));
+
+			titleMap.put(
+				articleDefaultLocale,
+				LanguageUtil.format(
+					_portal.getHttpServletRequest(actionRequest), "untitled-x",
+					HtmlUtil.escape(
+						ddmStructure.getName(themeDisplay.getLocale()))));
+		}
+
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(
+				actionRequest, "descriptionMapAsXML");
+		Map<Locale, String> friendlyURLMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "friendlyURL");
 
 		String ddmTemplateKey = ParamUtil.getString(
 			uploadPortletRequest, "ddmTemplateKey");
@@ -767,7 +794,21 @@ public class JournalPortlet extends MVCPortlet {
 			Layout targetLayout = _journalHelper.getArticleLayout(
 				layoutUuid, groupId);
 
-			if ((assetDisplayPageId != 0) || (targetLayout == null)) {
+			JournalArticle latestArticle = _journalArticleService.fetchArticle(
+				groupId, articleId);
+
+			if ((displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC) &&
+				(targetLayout == null) && (latestArticle != null) &&
+				Validator.isNotNull(latestArticle.getLayoutUuid())) {
+
+				Layout latestTargetLayout = _journalHelper.getArticleLayout(
+					latestArticle.getLayoutUuid(), groupId);
+
+				if (latestTargetLayout == null) {
+					layoutUuid = latestArticle.getLayoutUuid();
+				}
+			}
+			else if ((assetDisplayPageId != 0) || (targetLayout == null)) {
 				layoutUuid = null;
 			}
 		}
@@ -844,11 +885,21 @@ public class JournalPortlet extends MVCPortlet {
 		boolean indexable = ParamUtil.getBoolean(
 			uploadPortletRequest, "indexable");
 
-		boolean smallImage = ParamUtil.getBoolean(
-			uploadPortletRequest, "smallImage");
-		String smallImageURL = ParamUtil.getString(
-			uploadPortletRequest, "smallImageURL");
-		File smallFile = uploadPortletRequest.getFile("smallFile");
+		String smallImageSource = ParamUtil.getString(
+			uploadPortletRequest, "smallImageSource", "none");
+
+		boolean smallImage = !Objects.equals(smallImageSource, "none");
+
+		String smallImageURL = StringPool.BLANK;
+		File smallFile = null;
+
+		if (Objects.equals(smallImageSource, "url")) {
+			smallImageURL = ParamUtil.getString(
+				uploadPortletRequest, "smallImageURL");
+		}
+		else if (Objects.equals(smallImageSource, "file")) {
+			smallFile = uploadPortletRequest.getFile("smallFile");
+		}
 
 		String articleURL = ParamUtil.getString(
 			uploadPortletRequest, "articleURL");
@@ -944,9 +995,6 @@ public class JournalPortlet extends MVCPortlet {
 		}
 
 		// Asset display page
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
 
 		_updateAssetDisplayPage(
 			themeDisplay.getUserId(), groupId, article, assetDisplayPageId,
@@ -1500,6 +1548,20 @@ public class JournalPortlet extends MVCPortlet {
 			portletResource, articleId, true);
 	}
 
+	private boolean _isEmpty(Map<Locale, String> map) {
+		if (MapUtil.isEmpty(map)) {
+			return true;
+		}
+
+		for (String value : map.values()) {
+			if (Validator.isNotNull(value)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private void _updateAssetDisplayPage(
 			long userId, long groupId, JournalArticle article,
 			long layoutPageTemplateEntryId, int displayPageType,
@@ -1547,6 +1609,10 @@ public class JournalPortlet extends MVCPortlet {
 	@Reference
 	private AssetDisplayPageEntryLocalService
 		_assetDisplayPageEntryLocalService;
+
+	@Reference
+	private AssetDisplayPageFriendlyURLProvider
+		_assetDisplayPageFriendlyURLProvider;
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;

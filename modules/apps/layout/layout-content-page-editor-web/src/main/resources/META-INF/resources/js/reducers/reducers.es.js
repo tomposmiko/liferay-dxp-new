@@ -1,12 +1,13 @@
-import {addFragmentEntryLinkReducer, moveFragmentEntryLinkReducer, removeFragmentEntryLinkReducer, updateEditableValueReducer} from './fragments.es';
+import {addFragmentEntryLinkReducer, clearFragmentEditorReducer, disableFragmentEditorReducer, enableFragmentEditorReducer, moveFragmentEntryLinkReducer, removeFragmentEntryLinkReducer, updateEditableValueReducer, updateFragmentEntryLinkConfigReducer} from './fragments.es';
+import {addMappingAssetEntry} from './mapping.es';
 import {addPortletReducer} from './portlets.es';
-import {addSectionReducer, moveSectionReducer, removeSectionReducer, updateSectionConfigReducer} from './sections.es';
+import {addSectionReducer, moveSectionReducer, removeSectionReducer, updateSectionColumnsNumberReducer, updateSectionColumnsReducer, updateSectionConfigReducer} from './sections.es';
+import {createSegmentsExperienceReducer, deleteSegmentsExperienceReducer, editSegmentsExperienceReducer, selectSegmentsExperienceReducer, updateSegmentsExperiencePriorityReducer} from './segmentsExperiences.es';
 import {hideFragmentsEditorSidebarReducer, toggleFragmentsEditorSidebarReducer} from './sidebar.es';
 import {hideMappingDialogReducer, hideMappingTypeDialogReducer, openAssetTypeDialogReducer, openMappingFieldsDialogReducer, selectMappeableTypeReducer} from './dialogs.es';
 import {languageIdReducer, translationStatusReducer} from './translations.es';
 import {saveChangesReducer} from './changes.es';
-import {segmentIdReducer} from './segments.es';
-import {updateActiveItemReducer, updateDropTargetReducer, updateHighlightMappingReducer, updateHoveredItemReducer} from './placeholders.es';
+import {updateActiveItemReducer, updateDropTargetReducer, updateHoveredItemReducer} from './placeholders.es';
 
 /**
  * List of reducers
@@ -14,8 +15,12 @@ import {updateActiveItemReducer, updateDropTargetReducer, updateHighlightMapping
  */
 const reducers = [
 	addFragmentEntryLinkReducer,
+	addMappingAssetEntry,
 	addPortletReducer,
 	addSectionReducer,
+	clearFragmentEditorReducer,
+	disableFragmentEditorReducer,
+	enableFragmentEditorReducer,
 	hideFragmentsEditorSidebarReducer,
 	hideMappingDialogReducer,
 	hideMappingTypeDialogReducer,
@@ -28,14 +33,20 @@ const reducers = [
 	removeSectionReducer,
 	saveChangesReducer,
 	selectMappeableTypeReducer,
-	segmentIdReducer,
+	selectSegmentsExperienceReducer,
+	createSegmentsExperienceReducer,
+	deleteSegmentsExperienceReducer,
+	editSegmentsExperienceReducer,
+	updateSegmentsExperiencePriorityReducer,
 	toggleFragmentsEditorSidebarReducer,
 	translationStatusReducer,
 	updateActiveItemReducer,
 	updateDropTargetReducer,
 	updateEditableValueReducer,
-	updateHighlightMappingReducer,
+	updateFragmentEntryLinkConfigReducer,
 	updateHoveredItemReducer,
+	updateSectionColumnsNumberReducer,
+	updateSectionColumnsReducer,
 	updateSectionConfigReducer
 ];
 

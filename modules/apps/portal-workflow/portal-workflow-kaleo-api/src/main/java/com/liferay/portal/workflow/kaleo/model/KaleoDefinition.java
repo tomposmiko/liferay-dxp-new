@@ -27,16 +27,20 @@ import com.liferay.portal.kernel.util.Accessor;
  * @see KaleoDefinitionModel
  * @generated
  */
-@ImplementationClassName("com.liferay.portal.workflow.kaleo.model.impl.KaleoDefinitionImpl")
+@ImplementationClassName(
+	"com.liferay.portal.workflow.kaleo.model.impl.KaleoDefinitionImpl"
+)
 @ProviderType
 public interface KaleoDefinition extends KaleoDefinitionModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.workflow.kaleo.model.impl.KaleoDefinitionImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<KaleoDefinition, Long> KALEO_DEFINITION_ID_ACCESSOR =
-		new Accessor<KaleoDefinition, Long>() {
+	public static final Accessor<KaleoDefinition, Long>
+		KALEO_DEFINITION_ID_ACCESSOR = new Accessor<KaleoDefinition, Long>() {
+
 			@Override
 			public Long get(KaleoDefinition kaleoDefinition) {
 				return kaleoDefinition.getKaleoDefinitionId();
@@ -51,8 +55,10 @@ public interface KaleoDefinition extends KaleoDefinitionModel, PersistedModel {
 			public Class<KaleoDefinition> getTypeClass() {
 				return KaleoDefinition.class;
 			}
+
 		};
 
 	public java.util.List<KaleoDefinitionVersion> getKaleoDefinitionVersions()
 		throws com.liferay.portal.kernel.exception.PortalException;
+
 }

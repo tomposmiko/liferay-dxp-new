@@ -21,9 +21,9 @@ import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.impl.BookmarksEntryImpl;
 import com.liferay.bookmarks.model.impl.BookmarksEntryModelImpl;
 import com.liferay.bookmarks.service.persistence.BookmarksEntryPersistence;
-
+import com.liferay.bookmarks.service.persistence.impl.constants.BookmarksPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
-
+import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
@@ -41,13 +42,13 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
@@ -56,10 +57,18 @@ import java.lang.reflect.InvocationHandler;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The persistence implementation for the bookmarks entry service.
@@ -71,19 +80,26 @@ import java.util.Set;
  * @author Brian Wing Shun Chan
  * @generated
  */
+@Component(service = BookmarksEntryPersistence.class)
 @ProviderType
-public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<BookmarksEntry>
+public class BookmarksEntryPersistenceImpl
+	extends BasePersistenceImpl<BookmarksEntry>
 	implements BookmarksEntryPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>BookmarksEntryUtil</code> to access the bookmarks entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = BookmarksEntryImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		BookmarksEntryImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -133,8 +149,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByUuid(String uuid, int start, int end,
+	public List<BookmarksEntry> findByUuid(
+		String uuid, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		return findByUuid(uuid, start, end, orderByComparator, true);
 	}
 
@@ -153,9 +171,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByUuid(String uuid, int start, int end,
+	public List<BookmarksEntry> findByUuid(
+		String uuid, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -163,21 +183,22 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] { uuid };
+			finderArgs = new Object[] {uuid};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid;
-			finderArgs = new Object[] { uuid, start, end, orderByComparator };
+			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -194,8 +215,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -215,11 +236,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -239,16 +259,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				}
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -277,11 +297,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByUuid_First(String uuid,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByUuid_First(
+			String uuid, OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByUuid_First(uuid,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByUuid_First(
+			uuid, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -307,8 +328,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByUuid_First(String uuid,
-		OrderByComparator<BookmarksEntry> orderByComparator) {
+	public BookmarksEntry fetchByUuid_First(
+		String uuid, OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		List<BookmarksEntry> list = findByUuid(uuid, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -327,10 +349,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByUuid_Last(String uuid,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByUuid_Last(
+			String uuid, OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByUuid_Last(uuid, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByUuid_Last(
+			uuid, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -356,16 +380,17 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByUuid_Last(String uuid,
-		OrderByComparator<BookmarksEntry> orderByComparator) {
+	public BookmarksEntry fetchByUuid_Last(
+		String uuid, OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByUuid(uuid);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByUuid(uuid, count - 1, count,
-				orderByComparator);
+		List<BookmarksEntry> list = findByUuid(
+			uuid, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -384,9 +409,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByUuid_PrevAndNext(long entryId, String uuid,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByUuid_PrevAndNext(
+			long entryId, String uuid,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		uuid = Objects.toString(uuid, "");
 
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
@@ -398,13 +425,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByUuid_PrevAndNext(session, bookmarksEntry, uuid,
-					orderByComparator, true);
+			array[0] = getByUuid_PrevAndNext(
+				session, bookmarksEntry, uuid, orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByUuid_PrevAndNext(session, bookmarksEntry, uuid,
-					orderByComparator, false);
+			array[2] = getByUuid_PrevAndNext(
+				session, bookmarksEntry, uuid, orderByComparator, false);
 
 			return array;
 		}
@@ -416,14 +443,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByUuid_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, String uuid,
+	protected BookmarksEntry getByUuid_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, String uuid,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -444,7 +472,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -516,8 +545,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -539,8 +570,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByUuid(String uuid) {
-		for (BookmarksEntry bookmarksEntry : findByUuid(uuid,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -557,7 +589,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		FinderPath finderPath = _finderPathCountByUuid;
 
-		Object[] finderArgs = new Object[] { uuid };
+		Object[] finderArgs = new Object[] {uuid};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -609,8 +641,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_UUID_2 = "bookmarksEntry.uuid = ?";
-	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(bookmarksEntry.uuid IS NULL OR bookmarksEntry.uuid = '')";
+	private static final String _FINDER_COLUMN_UUID_UUID_2 =
+		"bookmarksEntry.uuid = ?";
+
+	private static final String _FINDER_COLUMN_UUID_UUID_3 =
+		"(bookmarksEntry.uuid IS NULL OR bookmarksEntry.uuid = '')";
+
 	private FinderPath _finderPathFetchByUUID_G;
 	private FinderPath _finderPathCountByUUID_G;
 
@@ -625,6 +661,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	@Override
 	public BookmarksEntry findByUUID_G(String uuid, long groupId)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = fetchByUUID_G(uuid, groupId);
 
 		if (bookmarksEntry == null) {
@@ -671,24 +708,26 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByUUID_G(String uuid, long groupId,
-		boolean retrieveFromCache) {
+	public BookmarksEntry fetchByUUID_G(
+		String uuid, long groupId, boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
-		Object[] finderArgs = new Object[] { uuid, groupId };
+		Object[] finderArgs = new Object[] {uuid, groupId};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(_finderPathFetchByUUID_G,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByUUID_G, finderArgs, this);
 		}
 
 		if (result instanceof BookmarksEntry) {
 			BookmarksEntry bookmarksEntry = (BookmarksEntry)result;
 
 			if (!Objects.equals(uuid, bookmarksEntry.getUuid()) ||
-					(groupId != bookmarksEntry.getGroupId())) {
+				(groupId != bookmarksEntry.getGroupId())) {
+
 				result = null;
 			}
 		}
@@ -731,8 +770,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				List<BookmarksEntry> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(_finderPathFetchByUUID_G, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByUUID_G, finderArgs, list);
 				}
 				else {
 					BookmarksEntry bookmarksEntry = list.get(0);
@@ -770,6 +809,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	@Override
 	public BookmarksEntry removeByUUID_G(String uuid, long groupId)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByUUID_G(uuid, groupId);
 
 		return remove(bookmarksEntry);
@@ -788,7 +828,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		FinderPath finderPath = _finderPathCountByUUID_G;
 
-		Object[] finderArgs = new Object[] { uuid, groupId };
+		Object[] finderArgs = new Object[] {uuid, groupId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -844,9 +884,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "bookmarksEntry.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(bookmarksEntry.uuid IS NULL OR bookmarksEntry.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "bookmarksEntry.groupId = ?";
+	private static final String _FINDER_COLUMN_UUID_G_UUID_2 =
+		"bookmarksEntry.uuid = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_G_UUID_3 =
+		"(bookmarksEntry.uuid IS NULL OR bookmarksEntry.uuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 =
+		"bookmarksEntry.groupId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -860,8 +906,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public List<BookmarksEntry> findByUuid_C(String uuid, long companyId) {
-		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByUuid_C(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -878,8 +924,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByUuid_C(String uuid, long companyId,
-		int start, int end) {
+	public List<BookmarksEntry> findByUuid_C(
+		String uuid, long companyId, int start, int end) {
+
 		return findByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -898,9 +945,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByUuid_C(String uuid, long companyId,
-		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
+	public List<BookmarksEntry> findByUuid_C(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		return findByUuid_C(
+			uuid, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -919,10 +969,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByUuid_C(String uuid, long companyId,
-		int start, int end,
+	public List<BookmarksEntry> findByUuid_C(
+		String uuid, long companyId, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -930,30 +981,30 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] { uuid, companyId };
+			finderArgs = new Object[] {uuid, companyId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
-					uuid, companyId,
-					
-					start, end, orderByComparator
-				};
+				uuid, companyId, start, end, orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if (!uuid.equals(bookmarksEntry.getUuid()) ||
-							(companyId != bookmarksEntry.getCompanyId())) {
+						(companyId != bookmarksEntry.getCompanyId())) {
+
 						list = null;
 
 						break;
@@ -966,8 +1017,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -989,11 +1040,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1015,16 +1065,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1054,11 +1104,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByUuid_C_First(String uuid, long companyId,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByUuid_C_First(
+			String uuid, long companyId,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByUuid_C_First(uuid, companyId,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByUuid_C_First(
+			uuid, companyId, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -1088,10 +1140,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByUuid_C_First(String uuid, long companyId,
+	public BookmarksEntry fetchByUuid_C_First(
+		String uuid, long companyId,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByUuid_C(uuid, companyId, 0, 1,
-				orderByComparator);
+
+		List<BookmarksEntry> list = findByUuid_C(
+			uuid, companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1110,11 +1164,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByUuid_C_Last(String uuid, long companyId,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByUuid_C_Last(
+			String uuid, long companyId,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByUuid_C_Last(uuid, companyId,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByUuid_C_Last(
+			uuid, companyId, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -1144,16 +1200,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByUuid_C_Last(String uuid, long companyId,
+	public BookmarksEntry fetchByUuid_C_Last(
+		String uuid, long companyId,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByUuid_C(uuid, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByUuid_C(uuid, companyId, count - 1,
-				count, orderByComparator);
+		List<BookmarksEntry> list = findByUuid_C(
+			uuid, companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1173,9 +1231,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByUuid_C_PrevAndNext(long entryId, String uuid,
-		long companyId, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByUuid_C_PrevAndNext(
+			long entryId, String uuid, long companyId,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		uuid = Objects.toString(uuid, "");
 
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
@@ -1187,13 +1247,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByUuid_C_PrevAndNext(session, bookmarksEntry, uuid,
-					companyId, orderByComparator, true);
+			array[0] = getByUuid_C_PrevAndNext(
+				session, bookmarksEntry, uuid, companyId, orderByComparator,
+				true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByUuid_C_PrevAndNext(session, bookmarksEntry, uuid,
-					companyId, orderByComparator, false);
+			array[2] = getByUuid_C_PrevAndNext(
+				session, bookmarksEntry, uuid, companyId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -1205,14 +1267,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByUuid_C_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, String uuid, long companyId,
-		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+	protected BookmarksEntry getByUuid_C_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, String uuid,
+		long companyId, OrderByComparator<BookmarksEntry> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1235,7 +1299,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1309,8 +1374,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1333,8 +1400,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByUuid_C(String uuid, long companyId) {
-		for (BookmarksEntry bookmarksEntry : findByUuid_C(uuid, companyId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByUuid_C(
+					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -1352,7 +1422,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		Object[] finderArgs = new Object[] { uuid, companyId };
+		Object[] finderArgs = new Object[] {uuid, companyId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1408,9 +1478,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "bookmarksEntry.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(bookmarksEntry.uuid IS NULL OR bookmarksEntry.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "bookmarksEntry.companyId = ?";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
+		"bookmarksEntry.uuid = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
+		"(bookmarksEntry.uuid IS NULL OR bookmarksEntry.uuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
+		"bookmarksEntry.companyId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByCompanyId;
 	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
 	private FinderPath _finderPathCountByCompanyId;
@@ -1423,8 +1499,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public List<BookmarksEntry> findByCompanyId(long companyId) {
-		return findByCompanyId(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByCompanyId(
+			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -1440,8 +1516,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByCompanyId(long companyId, int start,
-		int end) {
+	public List<BookmarksEntry> findByCompanyId(
+		long companyId, int start, int end) {
+
 		return findByCompanyId(companyId, start, end, null);
 	}
 
@@ -1459,8 +1536,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByCompanyId(long companyId, int start,
-		int end, OrderByComparator<BookmarksEntry> orderByComparator) {
+	public List<BookmarksEntry> findByCompanyId(
+		long companyId, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		return findByCompanyId(companyId, start, end, orderByComparator, true);
 	}
 
@@ -1479,29 +1558,34 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByCompanyId(long companyId, int start,
-		int end, OrderByComparator<BookmarksEntry> orderByComparator,
+	public List<BookmarksEntry> findByCompanyId(
+		long companyId, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByCompanyId;
-			finderArgs = new Object[] { companyId };
+			finderArgs = new Object[] {companyId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
-			finderArgs = new Object[] { companyId, start, end, orderByComparator };
+			finderArgs = new Object[] {
+				companyId, start, end, orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -1518,8 +1602,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1530,11 +1614,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1552,16 +1635,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1590,11 +1673,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByCompanyId_First(long companyId,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByCompanyId_First(
+			long companyId, OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByCompanyId_First(companyId,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByCompanyId_First(
+			companyId, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -1620,10 +1704,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByCompanyId_First(long companyId,
-		OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByCompanyId(companyId, 0, 1,
-				orderByComparator);
+	public BookmarksEntry fetchByCompanyId_First(
+		long companyId, OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		List<BookmarksEntry> list = findByCompanyId(
+			companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1641,11 +1726,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByCompanyId_Last(long companyId,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByCompanyId_Last(
+			long companyId, OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByCompanyId_Last(companyId,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByCompanyId_Last(
+			companyId, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -1671,16 +1757,17 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByCompanyId_Last(long companyId,
-		OrderByComparator<BookmarksEntry> orderByComparator) {
+	public BookmarksEntry fetchByCompanyId_Last(
+		long companyId, OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByCompanyId(companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByCompanyId(companyId, count - 1,
-				count, orderByComparator);
+		List<BookmarksEntry> list = findByCompanyId(
+			companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1699,9 +1786,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByCompanyId_PrevAndNext(long entryId,
-		long companyId, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByCompanyId_PrevAndNext(
+			long entryId, long companyId,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -1711,13 +1800,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByCompanyId_PrevAndNext(session, bookmarksEntry,
-					companyId, orderByComparator, true);
+			array[0] = getByCompanyId_PrevAndNext(
+				session, bookmarksEntry, companyId, orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByCompanyId_PrevAndNext(session, bookmarksEntry,
-					companyId, orderByComparator, false);
+			array[2] = getByCompanyId_PrevAndNext(
+				session, bookmarksEntry, companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -1729,14 +1818,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByCompanyId_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long companyId,
+	protected BookmarksEntry getByCompanyId_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long companyId,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1748,7 +1838,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1818,8 +1909,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1841,8 +1934,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByCompanyId(long companyId) {
-		for (BookmarksEntry bookmarksEntry : findByCompanyId(companyId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByCompanyId(
+					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -1857,7 +1952,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	public int countByCompanyId(long companyId) {
 		FinderPath finderPath = _finderPathCountByCompanyId;
 
-		Object[] finderArgs = new Object[] { companyId };
+		Object[] finderArgs = new Object[] {companyId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1898,7 +1993,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "bookmarksEntry.companyId = ?";
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
+		"bookmarksEntry.companyId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_F;
 	private FinderPath _finderPathWithoutPaginationFindByG_F;
 	private FinderPath _finderPathCountByG_F;
@@ -1913,8 +2010,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public List<BookmarksEntry> findByG_F(long groupId, long folderId) {
-		return findByG_F(groupId, folderId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByG_F(
+			groupId, folderId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -1931,8 +2028,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F(long groupId, long folderId,
-		int start, int end) {
+	public List<BookmarksEntry> findByG_F(
+		long groupId, long folderId, int start, int end) {
+
 		return findByG_F(groupId, folderId, start, end, null);
 	}
 
@@ -1951,9 +2049,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F(long groupId, long folderId,
-		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_F(groupId, folderId, start, end, orderByComparator, true);
+	public List<BookmarksEntry> findByG_F(
+		long groupId, long folderId, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		return findByG_F(
+			groupId, folderId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -1972,39 +2073,40 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F(long groupId, long folderId,
-		int start, int end,
+	public List<BookmarksEntry> findByG_F(
+		long groupId, long folderId, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_F;
-			finderArgs = new Object[] { groupId, folderId };
+			finderArgs = new Object[] {groupId, folderId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_F;
 			finderArgs = new Object[] {
-					groupId, folderId,
-					
-					start, end, orderByComparator
-				};
+				groupId, folderId, start, end, orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							(folderId != bookmarksEntry.getFolderId())) {
+						(folderId != bookmarksEntry.getFolderId())) {
+
 						list = null;
 
 						break;
@@ -2017,8 +2119,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -2031,11 +2133,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_G_F_FOLDERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2055,16 +2156,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(folderId);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2094,11 +2195,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_F_First(long groupId, long folderId,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_F_First(
+			long groupId, long folderId,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_F_First(groupId, folderId,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_F_First(
+			groupId, folderId, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -2128,10 +2231,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_F_First(long groupId, long folderId,
+	public BookmarksEntry fetchByG_F_First(
+		long groupId, long folderId,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByG_F(groupId, folderId, 0, 1,
-				orderByComparator);
+
+		List<BookmarksEntry> list = findByG_F(
+			groupId, folderId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2150,11 +2255,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_F_Last(long groupId, long folderId,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_F_Last(
+			long groupId, long folderId,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_F_Last(groupId, folderId,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_F_Last(
+			groupId, folderId, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -2184,16 +2291,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_F_Last(long groupId, long folderId,
+	public BookmarksEntry fetchByG_F_Last(
+		long groupId, long folderId,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByG_F(groupId, folderId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByG_F(groupId, folderId, count - 1,
-				count, orderByComparator);
+		List<BookmarksEntry> list = findByG_F(
+			groupId, folderId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2213,9 +2322,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByG_F_PrevAndNext(long entryId, long groupId,
-		long folderId, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByG_F_PrevAndNext(
+			long entryId, long groupId, long folderId,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -2225,13 +2336,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByG_F_PrevAndNext(session, bookmarksEntry, groupId,
-					folderId, orderByComparator, true);
+			array[0] = getByG_F_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, orderByComparator,
+				true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByG_F_PrevAndNext(session, bookmarksEntry, groupId,
-					folderId, orderByComparator, false);
+			array[2] = getByG_F_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -2243,14 +2356,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByG_F_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long folderId,
-		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+	protected BookmarksEntry getByG_F_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long folderId, OrderByComparator<BookmarksEntry> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2264,7 +2379,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_F_FOLDERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2336,8 +2452,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(folderId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2361,8 +2479,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public List<BookmarksEntry> filterFindByG_F(long groupId, long folderId) {
-		return filterFindByG_F(groupId, folderId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return filterFindByG_F(
+			groupId, folderId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -2379,8 +2497,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F(long groupId, long folderId,
-		int start, int end) {
+	public List<BookmarksEntry> filterFindByG_F(
+		long groupId, long folderId, int start, int end) {
+
 		return filterFindByG_F(groupId, folderId, start, end, null);
 	}
 
@@ -2399,8 +2518,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F(long groupId, long folderId,
-		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator) {
+	public List<BookmarksEntry> filterFindByG_F(
+		long groupId, long folderId, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByG_F(groupId, folderId, start, end, orderByComparator);
 		}
@@ -2408,8 +2529,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(5);
@@ -2419,7 +2540,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_F_GROUPID_2);
@@ -2427,17 +2549,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_F_FOLDERID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -2449,9 +2572,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -2473,8 +2596,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(folderId);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -2495,13 +2618,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] filterFindByG_F_PrevAndNext(long entryId,
-		long groupId, long folderId,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] filterFindByG_F_PrevAndNext(
+			long entryId, long groupId, long folderId,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_F_PrevAndNext(entryId, groupId, folderId,
-				orderByComparator);
+			return findByG_F_PrevAndNext(
+				entryId, groupId, folderId, orderByComparator);
 		}
 
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
@@ -2513,13 +2637,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = filterGetByG_F_PrevAndNext(session, bookmarksEntry,
-					groupId, folderId, orderByComparator, true);
+			array[0] = filterGetByG_F_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, orderByComparator,
+				true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = filterGetByG_F_PrevAndNext(session, bookmarksEntry,
-					groupId, folderId, orderByComparator, false);
+			array[2] = filterGetByG_F_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -2531,14 +2657,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry filterGetByG_F_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long folderId,
-		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+	protected BookmarksEntry filterGetByG_F_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long folderId, OrderByComparator<BookmarksEntry> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2549,7 +2677,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_F_GROUPID_2);
@@ -2557,11 +2686,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_F_FOLDERID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2569,12 +2700,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -2601,12 +2736,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -2636,9 +2773,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -2659,8 +2796,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(folderId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2683,9 +2822,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F(long groupId, long[] folderIds) {
-		return filterFindByG_F(groupId, folderIds, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> filterFindByG_F(
+		long groupId, long[] folderIds) {
+
+		return filterFindByG_F(
+			groupId, folderIds, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -2702,8 +2843,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F(long groupId, long[] folderIds,
-		int start, int end) {
+	public List<BookmarksEntry> filterFindByG_F(
+		long groupId, long[] folderIds, int start, int end) {
+
 		return filterFindByG_F(groupId, folderIds, start, end, null);
 	}
 
@@ -2722,8 +2864,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F(long groupId, long[] folderIds,
-		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator) {
+	public List<BookmarksEntry> filterFindByG_F(
+		long groupId, long[] folderIds, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByG_F(groupId, folderIds, start, end, orderByComparator);
 		}
@@ -2743,7 +2887,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_F_GROUPID_2);
@@ -2760,21 +2905,23 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(")");
 		}
 
-		query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)),
+		query.setStringAt(
+			removeConjunction(query.stringAt(query.index() - 1)),
 			query.index() - 1);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -2786,9 +2933,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -2808,8 +2955,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(groupId);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -2832,8 +2979,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public List<BookmarksEntry> findByG_F(long groupId, long[] folderIds) {
-		return findByG_F(groupId, folderIds, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByG_F(
+			groupId, folderIds, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -2850,8 +2997,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F(long groupId, long[] folderIds,
-		int start, int end) {
+	public List<BookmarksEntry> findByG_F(
+		long groupId, long[] folderIds, int start, int end) {
+
 		return findByG_F(groupId, folderIds, start, end, null);
 	}
 
@@ -2870,9 +3018,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F(long groupId, long[] folderIds,
-		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_F(groupId, folderIds, start, end, orderByComparator, true);
+	public List<BookmarksEntry> findByG_F(
+		long groupId, long[] folderIds, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		return findByG_F(
+			groupId, folderIds, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -2891,10 +3042,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F(long groupId, long[] folderIds,
-		int start, int end,
+	public List<BookmarksEntry> findByG_F(
+		long groupId, long[] folderIds, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		if (folderIds == null) {
 			folderIds = new long[0];
 		}
@@ -2905,37 +3057,38 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 
 		if (folderIds.length == 1) {
-			return findByG_F(groupId, folderIds[0], start, end,
-				orderByComparator);
+			return findByG_F(
+				groupId, folderIds[0], start, end, orderByComparator);
 		}
 
 		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
-			finderArgs = new Object[] { groupId, StringUtil.merge(folderIds) };
+			finderArgs = new Object[] {groupId, StringUtil.merge(folderIds)};
 		}
 		else {
 			finderArgs = new Object[] {
-					groupId, StringUtil.merge(folderIds),
-					
-					start, end, orderByComparator
-				};
+				groupId, StringUtil.merge(folderIds), start, end,
+				orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(_finderPathWithPaginationFindByG_F,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				_finderPathWithPaginationFindByG_F, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							!ArrayUtil.contains(folderIds,
-								bookmarksEntry.getFolderId())) {
+						!ArrayUtil.contains(
+							folderIds, bookmarksEntry.getFolderId())) {
+
 						list = null;
 
 						break;
@@ -2963,15 +3116,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				query.append(")");
 			}
 
-			query.setStringAt(removeConjunction(query.stringAt(query.index() -
-						1)), query.index() - 1);
+			query.setStringAt(
+				removeConjunction(query.stringAt(query.index() - 1)),
+				query.index() - 1);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2989,26 +3142,26 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(groupId);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
 
-				finderCache.putResult(_finderPathWithPaginationFindByG_F,
-					finderArgs, list);
+				finderCache.putResult(
+					_finderPathWithPaginationFindByG_F, finderArgs, list);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathWithPaginationFindByG_F,
-					finderArgs);
+				finderCache.removeResult(
+					_finderPathWithPaginationFindByG_F, finderArgs);
 
 				throw processException(e);
 			}
@@ -3028,8 +3181,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByG_F(long groupId, long folderId) {
-		for (BookmarksEntry bookmarksEntry : findByG_F(groupId, folderId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByG_F(
+					groupId, folderId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -3045,7 +3201,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	public int countByG_F(long groupId, long folderId) {
 		FinderPath finderPath = _finderPathCountByG_F;
 
-		Object[] finderArgs = new Object[] { groupId, folderId };
+		Object[] finderArgs = new Object[] {groupId, folderId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -3108,10 +3264,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			Arrays.sort(folderIds);
 		}
 
-		Object[] finderArgs = new Object[] { groupId, StringUtil.merge(folderIds) };
+		Object[] finderArgs = new Object[] {
+			groupId, StringUtil.merge(folderIds)
+		};
 
-		Long count = (Long)finderCache.getResult(_finderPathWithPaginationCountByG_F,
-				finderArgs, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathWithPaginationCountByG_F, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler();
@@ -3132,8 +3290,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				query.append(")");
 			}
 
-			query.setStringAt(removeConjunction(query.stringAt(query.index() -
-						1)), query.index() - 1);
+			query.setStringAt(
+				removeConjunction(query.stringAt(query.index() - 1)),
+				query.index() - 1);
 
 			String sql = query.toString();
 
@@ -3150,12 +3309,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathWithPaginationCountByG_F,
-					finderArgs, count);
+				finderCache.putResult(
+					_finderPathWithPaginationCountByG_F, finderArgs, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathWithPaginationCountByG_F,
-					finderArgs);
+				finderCache.removeResult(
+					_finderPathWithPaginationCountByG_F, finderArgs);
 
 				throw processException(e);
 			}
@@ -3188,9 +3347,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_F_FOLDERID_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -3199,8 +3358,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -3260,12 +3419,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(")");
 		}
 
-		query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)),
+		query.setStringAt(
+			removeConjunction(query.stringAt(query.index() - 1)),
 			query.index() - 1);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -3274,8 +3434,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -3293,9 +3453,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_F_GROUPID_2 = "bookmarksEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_F_FOLDERID_2 = "bookmarksEntry.folderId = ?";
-	private static final String _FINDER_COLUMN_G_F_FOLDERID_7 = "bookmarksEntry.folderId IN (";
+	private static final String _FINDER_COLUMN_G_F_GROUPID_2 =
+		"bookmarksEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_F_FOLDERID_2 =
+		"bookmarksEntry.folderId = ?";
+
+	private static final String _FINDER_COLUMN_G_F_FOLDERID_7 =
+		"bookmarksEntry.folderId IN (";
+
 	private FinderPath _finderPathWithPaginationFindByG_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_S;
 	private FinderPath _finderPathCountByG_S;
@@ -3309,8 +3475,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public List<BookmarksEntry> findByG_S(long groupId, int status) {
-		return findByG_S(groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByG_S(
+			groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -3327,8 +3493,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_S(long groupId, int status, int start,
-		int end) {
+	public List<BookmarksEntry> findByG_S(
+		long groupId, int status, int start, int end) {
+
 		return findByG_S(groupId, status, start, end, null);
 	}
 
@@ -3347,8 +3514,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_S(long groupId, int status, int start,
-		int end, OrderByComparator<BookmarksEntry> orderByComparator) {
+	public List<BookmarksEntry> findByG_S(
+		long groupId, int status, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		return findByG_S(groupId, status, start, end, orderByComparator, true);
 	}
 
@@ -3368,38 +3537,40 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_S(long groupId, int status, int start,
-		int end, OrderByComparator<BookmarksEntry> orderByComparator,
+	public List<BookmarksEntry> findByG_S(
+		long groupId, int status, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_S;
-			finderArgs = new Object[] { groupId, status };
+			finderArgs = new Object[] {groupId, status};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_S;
 			finderArgs = new Object[] {
-					groupId, status,
-					
-					start, end, orderByComparator
-				};
+				groupId, status, start, end, orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							(status != bookmarksEntry.getStatus())) {
+						(status != bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -3412,8 +3583,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -3426,11 +3597,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_G_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3450,16 +3620,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3489,11 +3659,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_S_First(long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_S_First(
+			long groupId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_S_First(groupId, status,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_S_First(
+			groupId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -3523,10 +3695,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_S_First(long groupId, int status,
+	public BookmarksEntry fetchByG_S_First(
+		long groupId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByG_S(groupId, status, 0, 1,
-				orderByComparator);
+
+		List<BookmarksEntry> list = findByG_S(
+			groupId, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3545,11 +3719,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_S_Last(long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_S_Last(
+			long groupId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_S_Last(groupId, status,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_S_Last(
+			groupId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -3579,16 +3755,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_S_Last(long groupId, int status,
+	public BookmarksEntry fetchByG_S_Last(
+		long groupId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByG_S(groupId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByG_S(groupId, status, count - 1,
-				count, orderByComparator);
+		List<BookmarksEntry> list = findByG_S(
+			groupId, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3608,9 +3786,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByG_S_PrevAndNext(long entryId, long groupId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByG_S_PrevAndNext(
+			long entryId, long groupId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -3620,13 +3800,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByG_S_PrevAndNext(session, bookmarksEntry, groupId,
-					status, orderByComparator, true);
+			array[0] = getByG_S_PrevAndNext(
+				session, bookmarksEntry, groupId, status, orderByComparator,
+				true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByG_S_PrevAndNext(session, bookmarksEntry, groupId,
-					status, orderByComparator, false);
+			array[2] = getByG_S_PrevAndNext(
+				session, bookmarksEntry, groupId, status, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -3638,14 +3820,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByG_S_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+	protected BookmarksEntry getByG_S_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		int status, OrderByComparator<BookmarksEntry> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3659,7 +3843,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3731,8 +3916,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3756,8 +3943,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public List<BookmarksEntry> filterFindByG_S(long groupId, int status) {
-		return filterFindByG_S(groupId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return filterFindByG_S(
+			groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -3774,8 +3961,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_S(long groupId, int status,
-		int start, int end) {
+	public List<BookmarksEntry> filterFindByG_S(
+		long groupId, int status, int start, int end) {
+
 		return filterFindByG_S(groupId, status, start, end, null);
 	}
 
@@ -3794,8 +3982,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_S(long groupId, int status,
-		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator) {
+	public List<BookmarksEntry> filterFindByG_S(
+		long groupId, int status, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByG_S(groupId, status, start, end, orderByComparator);
 		}
@@ -3803,8 +3993,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(5);
@@ -3814,7 +4004,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_S_GROUPID_2);
@@ -3822,17 +4013,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -3844,9 +4036,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -3868,8 +4060,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(status);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -3890,13 +4082,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] filterFindByG_S_PrevAndNext(long entryId,
-		long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] filterFindByG_S_PrevAndNext(
+			long entryId, long groupId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_S_PrevAndNext(entryId, groupId, status,
-				orderByComparator);
+			return findByG_S_PrevAndNext(
+				entryId, groupId, status, orderByComparator);
 		}
 
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
@@ -3908,13 +4101,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = filterGetByG_S_PrevAndNext(session, bookmarksEntry,
-					groupId, status, orderByComparator, true);
+			array[0] = filterGetByG_S_PrevAndNext(
+				session, bookmarksEntry, groupId, status, orderByComparator,
+				true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = filterGetByG_S_PrevAndNext(session, bookmarksEntry,
-					groupId, status, orderByComparator, false);
+			array[2] = filterGetByG_S_PrevAndNext(
+				session, bookmarksEntry, groupId, status, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -3926,14 +4121,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry filterGetByG_S_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+	protected BookmarksEntry filterGetByG_S_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		int status, OrderByComparator<BookmarksEntry> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3944,7 +4141,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_S_GROUPID_2);
@@ -3952,11 +4150,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3964,12 +4164,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -3996,12 +4200,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -4031,9 +4237,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -4054,8 +4260,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4078,8 +4286,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByG_S(long groupId, int status) {
-		for (BookmarksEntry bookmarksEntry : findByG_S(groupId, status,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByG_S(
+					groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -4095,7 +4306,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	public int countByG_S(long groupId, int status) {
 		FinderPath finderPath = _finderPathCountByG_S;
 
-		Object[] finderArgs = new Object[] { groupId, status };
+		Object[] finderArgs = new Object[] {groupId, status};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -4161,9 +4372,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -4172,8 +4383,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -4193,8 +4404,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_S_GROUPID_2 = "bookmarksEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_S_STATUS_2 = "bookmarksEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_S_GROUPID_2 =
+		"bookmarksEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_S_STATUS_2 =
+		"bookmarksEntry.status = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_NotS;
 	private FinderPath _finderPathWithPaginationCountByG_NotS;
 
@@ -4207,8 +4422,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public List<BookmarksEntry> findByG_NotS(long groupId, int status) {
-		return findByG_NotS(groupId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByG_NotS(
+			groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -4225,8 +4440,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_NotS(long groupId, int status,
-		int start, int end) {
+	public List<BookmarksEntry> findByG_NotS(
+		long groupId, int status, int start, int end) {
+
 		return findByG_NotS(groupId, status, start, end, null);
 	}
 
@@ -4245,9 +4461,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_NotS(long groupId, int status,
-		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_NotS(groupId, status, start, end, orderByComparator, true);
+	public List<BookmarksEntry> findByG_NotS(
+		long groupId, int status, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		return findByG_NotS(
+			groupId, status, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -4266,27 +4485,31 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_NotS(long groupId, int status,
-		int start, int end,
+	public List<BookmarksEntry> findByG_NotS(
+		long groupId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_NotS;
-		finderArgs = new Object[] { groupId, status, start, end, orderByComparator };
+		finderArgs = new Object[] {
+			groupId, status, start, end, orderByComparator
+		};
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							(status == bookmarksEntry.getStatus())) {
+						(status == bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -4299,8 +4522,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -4313,11 +4536,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_G_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4337,16 +4559,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -4376,11 +4598,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_NotS_First(long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_NotS_First(
+			long groupId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_NotS_First(groupId, status,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_NotS_First(
+			groupId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -4410,10 +4634,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_NotS_First(long groupId, int status,
+	public BookmarksEntry fetchByG_NotS_First(
+		long groupId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByG_NotS(groupId, status, 0, 1,
-				orderByComparator);
+
+		List<BookmarksEntry> list = findByG_NotS(
+			groupId, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -4432,11 +4658,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_NotS_Last(long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_NotS_Last(
+			long groupId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_NotS_Last(groupId, status,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_NotS_Last(
+			groupId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -4466,16 +4694,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_NotS_Last(long groupId, int status,
+	public BookmarksEntry fetchByG_NotS_Last(
+		long groupId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByG_NotS(groupId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByG_NotS(groupId, status, count - 1,
-				count, orderByComparator);
+		List<BookmarksEntry> list = findByG_NotS(
+			groupId, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -4495,10 +4725,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByG_NotS_PrevAndNext(long entryId,
-		long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByG_NotS_PrevAndNext(
+			long entryId, long groupId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -4508,13 +4739,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByG_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, status, orderByComparator, true);
+			array[0] = getByG_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, status, orderByComparator,
+				true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByG_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, status, orderByComparator, false);
+			array[2] = getByG_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, status, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -4526,14 +4759,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByG_NotS_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+	protected BookmarksEntry getByG_NotS_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		int status, OrderByComparator<BookmarksEntry> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -4547,7 +4782,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4619,8 +4855,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4644,8 +4882,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public List<BookmarksEntry> filterFindByG_NotS(long groupId, int status) {
-		return filterFindByG_NotS(groupId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return filterFindByG_NotS(
+			groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -4662,8 +4900,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_NotS(long groupId, int status,
-		int start, int end) {
+	public List<BookmarksEntry> filterFindByG_NotS(
+		long groupId, int status, int start, int end) {
+
 		return filterFindByG_NotS(groupId, status, start, end, null);
 	}
 
@@ -4682,8 +4921,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_NotS(long groupId, int status,
-		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator) {
+	public List<BookmarksEntry> filterFindByG_NotS(
+		long groupId, int status, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByG_NotS(groupId, status, start, end, orderByComparator);
 		}
@@ -4691,8 +4932,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(5);
@@ -4702,7 +4943,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_NOTS_GROUPID_2);
@@ -4710,17 +4952,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -4732,9 +4975,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -4756,8 +4999,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(status);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -4778,13 +5021,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] filterFindByG_NotS_PrevAndNext(long entryId,
-		long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] filterFindByG_NotS_PrevAndNext(
+			long entryId, long groupId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_NotS_PrevAndNext(entryId, groupId, status,
-				orderByComparator);
+			return findByG_NotS_PrevAndNext(
+				entryId, groupId, status, orderByComparator);
 		}
 
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
@@ -4796,13 +5040,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = filterGetByG_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, status, orderByComparator, true);
+			array[0] = filterGetByG_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, status, orderByComparator,
+				true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = filterGetByG_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, status, orderByComparator, false);
+			array[2] = filterGetByG_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, status, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -4814,14 +5060,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry filterGetByG_NotS_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+	protected BookmarksEntry filterGetByG_NotS_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		int status, OrderByComparator<BookmarksEntry> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -4832,7 +5080,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_NOTS_GROUPID_2);
@@ -4840,11 +5089,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4852,12 +5103,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -4884,12 +5139,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -4919,9 +5176,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -4942,8 +5199,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4966,8 +5225,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByG_NotS(long groupId, int status) {
-		for (BookmarksEntry bookmarksEntry : findByG_NotS(groupId, status,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByG_NotS(
+					groupId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -4983,7 +5245,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	public int countByG_NotS(long groupId, int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByG_NotS;
 
-		Object[] finderArgs = new Object[] { groupId, status };
+		Object[] finderArgs = new Object[] {groupId, status};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -5049,9 +5311,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_NOTS_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -5060,8 +5322,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -5081,8 +5343,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_NOTS_GROUPID_2 = "bookmarksEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_NOTS_STATUS_2 = "bookmarksEntry.status != ?";
+	private static final String _FINDER_COLUMN_G_NOTS_GROUPID_2 =
+		"bookmarksEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_NOTS_STATUS_2 =
+		"bookmarksEntry.status != ?";
+
 	private FinderPath _finderPathWithPaginationFindByC_NotS;
 	private FinderPath _finderPathWithPaginationCountByC_NotS;
 
@@ -5095,8 +5361,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public List<BookmarksEntry> findByC_NotS(long companyId, int status) {
-		return findByC_NotS(companyId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByC_NotS(
+			companyId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -5113,8 +5379,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByC_NotS(long companyId, int status,
-		int start, int end) {
+	public List<BookmarksEntry> findByC_NotS(
+		long companyId, int status, int start, int end) {
+
 		return findByC_NotS(companyId, status, start, end, null);
 	}
 
@@ -5133,10 +5400,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByC_NotS(long companyId, int status,
-		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByC_NotS(companyId, status, start, end, orderByComparator,
-			true);
+	public List<BookmarksEntry> findByC_NotS(
+		long companyId, int status, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		return findByC_NotS(
+			companyId, status, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -5155,31 +5424,31 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByC_NotS(long companyId, int status,
-		int start, int end,
+	public List<BookmarksEntry> findByC_NotS(
+		long companyId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByC_NotS;
 		finderArgs = new Object[] {
-				companyId, status,
-				
-				start, end, orderByComparator
-			};
+			companyId, status, start, end, orderByComparator
+		};
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((companyId != bookmarksEntry.getCompanyId()) ||
-							(status == bookmarksEntry.getStatus())) {
+						(status == bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -5192,8 +5461,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -5206,11 +5475,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_C_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -5230,16 +5498,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -5269,11 +5537,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByC_NotS_First(long companyId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByC_NotS_First(
+			long companyId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByC_NotS_First(companyId, status,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByC_NotS_First(
+			companyId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -5303,10 +5573,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByC_NotS_First(long companyId, int status,
+	public BookmarksEntry fetchByC_NotS_First(
+		long companyId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByC_NotS(companyId, status, 0, 1,
-				orderByComparator);
+
+		List<BookmarksEntry> list = findByC_NotS(
+			companyId, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5325,11 +5597,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByC_NotS_Last(long companyId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByC_NotS_Last(
+			long companyId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByC_NotS_Last(companyId, status,
-				orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByC_NotS_Last(
+			companyId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -5359,16 +5633,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByC_NotS_Last(long companyId, int status,
+	public BookmarksEntry fetchByC_NotS_Last(
+		long companyId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByC_NotS(companyId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByC_NotS(companyId, status, count - 1,
-				count, orderByComparator);
+		List<BookmarksEntry> list = findByC_NotS(
+			companyId, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5388,10 +5664,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByC_NotS_PrevAndNext(long entryId,
-		long companyId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByC_NotS_PrevAndNext(
+			long entryId, long companyId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -5401,13 +5678,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByC_NotS_PrevAndNext(session, bookmarksEntry,
-					companyId, status, orderByComparator, true);
+			array[0] = getByC_NotS_PrevAndNext(
+				session, bookmarksEntry, companyId, status, orderByComparator,
+				true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByC_NotS_PrevAndNext(session, bookmarksEntry,
-					companyId, status, orderByComparator, false);
+			array[2] = getByC_NotS_PrevAndNext(
+				session, bookmarksEntry, companyId, status, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -5419,14 +5698,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByC_NotS_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long companyId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+	protected BookmarksEntry getByC_NotS_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long companyId,
+		int status, OrderByComparator<BookmarksEntry> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -5440,7 +5721,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_C_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -5512,8 +5794,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -5536,8 +5820,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByC_NotS(long companyId, int status) {
-		for (BookmarksEntry bookmarksEntry : findByC_NotS(companyId, status,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByC_NotS(
+					companyId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -5553,7 +5840,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	public int countByC_NotS(long companyId, int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByC_NotS;
 
-		Object[] finderArgs = new Object[] { companyId, status };
+		Object[] finderArgs = new Object[] {companyId, status};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -5598,8 +5885,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_NOTS_COMPANYID_2 = "bookmarksEntry.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_NOTS_STATUS_2 = "bookmarksEntry.status != ?";
+	private static final String _FINDER_COLUMN_C_NOTS_COMPANYID_2 =
+		"bookmarksEntry.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_NOTS_STATUS_2 =
+		"bookmarksEntry.status != ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_U_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_U_S;
 	private FinderPath _finderPathCountByG_U_S;
@@ -5613,10 +5904,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_S(long groupId, long userId,
-		int status) {
-		return findByG_U_S(groupId, userId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> findByG_U_S(
+		long groupId, long userId, int status) {
+
+		return findByG_U_S(
+			groupId, userId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -5634,8 +5927,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_S(long groupId, long userId,
-		int status, int start, int end) {
+	public List<BookmarksEntry> findByG_U_S(
+		long groupId, long userId, int status, int start, int end) {
+
 		return findByG_U_S(groupId, userId, status, start, end, null);
 	}
 
@@ -5655,11 +5949,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_S(long groupId, long userId,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_U_S(
+		long groupId, long userId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_U_S(groupId, userId, status, start, end,
-			orderByComparator, true);
+
+		return findByG_U_S(
+			groupId, userId, status, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -5679,40 +5974,41 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_S(long groupId, long userId,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_U_S(
+		long groupId, long userId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_U_S;
-			finderArgs = new Object[] { groupId, userId, status };
+			finderArgs = new Object[] {groupId, userId, status};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_U_S;
 			finderArgs = new Object[] {
-					groupId, userId, status,
-					
-					start, end, orderByComparator
-				};
+				groupId, userId, status, start, end, orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							(userId != bookmarksEntry.getUserId()) ||
-							(status != bookmarksEntry.getStatus())) {
+						(userId != bookmarksEntry.getUserId()) ||
+						(status != bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -5725,8 +6021,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -5741,11 +6037,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_G_U_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -5767,16 +6062,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -5807,11 +6102,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_U_S_First(long groupId, long userId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_U_S_First(
+			long groupId, long userId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_U_S_First(groupId, userId,
-				status, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_U_S_First(
+			groupId, userId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -5845,10 +6142,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_U_S_First(long groupId, long userId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByG_U_S(groupId, userId, status, 0, 1,
-				orderByComparator);
+	public BookmarksEntry fetchByG_U_S_First(
+		long groupId, long userId, int status,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		List<BookmarksEntry> list = findByG_U_S(
+			groupId, userId, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5868,11 +6167,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_U_S_Last(long groupId, long userId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_U_S_Last(
+			long groupId, long userId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_U_S_Last(groupId, userId,
-				status, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_U_S_Last(
+			groupId, userId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -5906,16 +6207,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_U_S_Last(long groupId, long userId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator) {
+	public BookmarksEntry fetchByG_U_S_Last(
+		long groupId, long userId, int status,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByG_U_S(groupId, userId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByG_U_S(groupId, userId, status,
-				count - 1, count, orderByComparator);
+		List<BookmarksEntry> list = findByG_U_S(
+			groupId, userId, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5936,10 +6239,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByG_U_S_PrevAndNext(long entryId, long groupId,
-		long userId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByG_U_S_PrevAndNext(
+			long entryId, long groupId, long userId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -5949,13 +6253,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByG_U_S_PrevAndNext(session, bookmarksEntry, groupId,
-					userId, status, orderByComparator, true);
+			array[0] = getByG_U_S_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, status,
+				orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByG_U_S_PrevAndNext(session, bookmarksEntry, groupId,
-					userId, status, orderByComparator, false);
+			array[2] = getByG_U_S_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -5967,14 +6273,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByG_U_S_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long userId, int status,
+	protected BookmarksEntry getByG_U_S_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long userId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -5990,7 +6298,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_U_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -6064,8 +6373,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -6089,10 +6400,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_S(long groupId, long userId,
-		int status) {
-		return filterFindByG_U_S(groupId, userId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> filterFindByG_U_S(
+		long groupId, long userId, int status) {
+
+		return filterFindByG_U_S(
+			groupId, userId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -6110,8 +6423,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_S(long groupId, long userId,
-		int status, int start, int end) {
+	public List<BookmarksEntry> filterFindByG_U_S(
+		long groupId, long userId, int status, int start, int end) {
+
 		return filterFindByG_U_S(groupId, userId, status, start, end, null);
 	}
 
@@ -6131,19 +6445,20 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_S(long groupId, long userId,
-		int status, int start, int end,
+	public List<BookmarksEntry> filterFindByG_U_S(
+		long groupId, long userId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_S(groupId, userId, status, start, end,
-				orderByComparator);
+			return findByG_U_S(
+				groupId, userId, status, start, end, orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -6153,7 +6468,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_S_GROUPID_2);
@@ -6163,17 +6479,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_U_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -6185,9 +6502,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -6211,8 +6528,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(status);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -6234,13 +6551,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] filterFindByG_U_S_PrevAndNext(long entryId,
-		long groupId, long userId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] filterFindByG_U_S_PrevAndNext(
+			long entryId, long groupId, long userId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_S_PrevAndNext(entryId, groupId, userId, status,
-				orderByComparator);
+			return findByG_U_S_PrevAndNext(
+				entryId, groupId, userId, status, orderByComparator);
 		}
 
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
@@ -6252,13 +6570,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = filterGetByG_U_S_PrevAndNext(session, bookmarksEntry,
-					groupId, userId, status, orderByComparator, true);
+			array[0] = filterGetByG_U_S_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, status,
+				orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = filterGetByG_U_S_PrevAndNext(session, bookmarksEntry,
-					groupId, userId, status, orderByComparator, false);
+			array[2] = filterGetByG_U_S_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -6270,14 +6590,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry filterGetByG_U_S_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long userId, int status,
+	protected BookmarksEntry filterGetByG_U_S_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long userId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -6288,7 +6610,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_S_GROUPID_2);
@@ -6298,11 +6621,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_U_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -6310,12 +6635,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -6342,12 +6671,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -6377,9 +6708,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -6402,8 +6733,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -6427,8 +6760,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByG_U_S(long groupId, long userId, int status) {
-		for (BookmarksEntry bookmarksEntry : findByG_U_S(groupId, userId,
-				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByG_U_S(
+					groupId, userId, status, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -6445,7 +6781,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	public int countByG_U_S(long groupId, long userId, int status) {
 		FinderPath finderPath = _finderPathCountByG_U_S;
 
-		Object[] finderArgs = new Object[] { groupId, userId, status };
+		Object[] finderArgs = new Object[] {groupId, userId, status};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -6518,9 +6854,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_U_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -6529,8 +6865,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -6552,9 +6888,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_U_S_GROUPID_2 = "bookmarksEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_U_S_USERID_2 = "bookmarksEntry.userId = ? AND ";
-	private static final String _FINDER_COLUMN_G_U_S_STATUS_2 = "bookmarksEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_U_S_GROUPID_2 =
+		"bookmarksEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_U_S_USERID_2 =
+		"bookmarksEntry.userId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_U_S_STATUS_2 =
+		"bookmarksEntry.status = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_U_NotS;
 	private FinderPath _finderPathWithPaginationCountByG_U_NotS;
 
@@ -6567,10 +6909,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_NotS(long groupId, long userId,
-		int status) {
-		return findByG_U_NotS(groupId, userId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> findByG_U_NotS(
+		long groupId, long userId, int status) {
+
+		return findByG_U_NotS(
+			groupId, userId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -6588,8 +6932,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_NotS(long groupId, long userId,
-		int status, int start, int end) {
+	public List<BookmarksEntry> findByG_U_NotS(
+		long groupId, long userId, int status, int start, int end) {
+
 		return findByG_U_NotS(groupId, userId, status, start, end, null);
 	}
 
@@ -6609,11 +6954,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_NotS(long groupId, long userId,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_U_NotS(
+		long groupId, long userId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_U_NotS(groupId, userId, status, start, end,
-			orderByComparator, true);
+
+		return findByG_U_NotS(
+			groupId, userId, status, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -6633,32 +6979,32 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_NotS(long groupId, long userId,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_U_NotS(
+		long groupId, long userId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_U_NotS;
 		finderArgs = new Object[] {
-				groupId, userId, status,
-				
-				start, end, orderByComparator
-			};
+			groupId, userId, status, start, end, orderByComparator
+		};
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							(userId != bookmarksEntry.getUserId()) ||
-							(status == bookmarksEntry.getStatus())) {
+						(userId != bookmarksEntry.getUserId()) ||
+						(status == bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -6671,8 +7017,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -6687,11 +7033,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_G_U_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6713,16 +7058,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -6753,11 +7098,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_U_NotS_First(long groupId, long userId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_U_NotS_First(
+			long groupId, long userId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_U_NotS_First(groupId, userId,
-				status, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_U_NotS_First(
+			groupId, userId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -6791,10 +7138,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_U_NotS_First(long groupId, long userId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByG_U_NotS(groupId, userId, status, 0,
-				1, orderByComparator);
+	public BookmarksEntry fetchByG_U_NotS_First(
+		long groupId, long userId, int status,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		List<BookmarksEntry> list = findByG_U_NotS(
+			groupId, userId, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6814,11 +7163,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_U_NotS_Last(long groupId, long userId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_U_NotS_Last(
+			long groupId, long userId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_U_NotS_Last(groupId, userId,
-				status, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_U_NotS_Last(
+			groupId, userId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -6852,16 +7203,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_U_NotS_Last(long groupId, long userId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator) {
+	public BookmarksEntry fetchByG_U_NotS_Last(
+		long groupId, long userId, int status,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByG_U_NotS(groupId, userId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByG_U_NotS(groupId, userId, status,
-				count - 1, count, orderByComparator);
+		List<BookmarksEntry> list = findByG_U_NotS(
+			groupId, userId, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6882,10 +7235,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByG_U_NotS_PrevAndNext(long entryId,
-		long groupId, long userId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByG_U_NotS_PrevAndNext(
+			long entryId, long groupId, long userId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -6895,13 +7249,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByG_U_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, userId, status, orderByComparator, true);
+			array[0] = getByG_U_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, status,
+				orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByG_U_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, userId, status, orderByComparator, false);
+			array[2] = getByG_U_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -6913,14 +7269,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByG_U_NotS_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long userId, int status,
+	protected BookmarksEntry getByG_U_NotS_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long userId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -6936,7 +7294,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_U_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -7010,8 +7369,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -7035,10 +7396,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_NotS(long groupId, long userId,
-		int status) {
-		return filterFindByG_U_NotS(groupId, userId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> filterFindByG_U_NotS(
+		long groupId, long userId, int status) {
+
+		return filterFindByG_U_NotS(
+			groupId, userId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -7056,8 +7419,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_NotS(long groupId, long userId,
-		int status, int start, int end) {
+	public List<BookmarksEntry> filterFindByG_U_NotS(
+		long groupId, long userId, int status, int start, int end) {
+
 		return filterFindByG_U_NotS(groupId, userId, status, start, end, null);
 	}
 
@@ -7077,19 +7441,20 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_NotS(long groupId, long userId,
-		int status, int start, int end,
+	public List<BookmarksEntry> filterFindByG_U_NotS(
+		long groupId, long userId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_NotS(groupId, userId, status, start, end,
-				orderByComparator);
+			return findByG_U_NotS(
+				groupId, userId, status, start, end, orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -7099,7 +7464,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_NOTS_GROUPID_2);
@@ -7109,17 +7475,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_U_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -7131,9 +7498,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -7157,8 +7524,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(status);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -7180,13 +7547,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] filterFindByG_U_NotS_PrevAndNext(long entryId,
-		long groupId, long userId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] filterFindByG_U_NotS_PrevAndNext(
+			long entryId, long groupId, long userId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_NotS_PrevAndNext(entryId, groupId, userId, status,
-				orderByComparator);
+			return findByG_U_NotS_PrevAndNext(
+				entryId, groupId, userId, status, orderByComparator);
 		}
 
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
@@ -7198,13 +7566,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = filterGetByG_U_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, userId, status, orderByComparator, true);
+			array[0] = filterGetByG_U_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, status,
+				orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = filterGetByG_U_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, userId, status, orderByComparator, false);
+			array[2] = filterGetByG_U_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -7216,14 +7586,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry filterGetByG_U_NotS_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long userId, int status,
+	protected BookmarksEntry filterGetByG_U_NotS_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long userId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -7234,7 +7606,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_NOTS_GROUPID_2);
@@ -7244,11 +7617,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_U_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -7256,12 +7631,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -7288,12 +7667,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -7323,9 +7704,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -7348,8 +7729,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -7373,8 +7756,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByG_U_NotS(long groupId, long userId, int status) {
-		for (BookmarksEntry bookmarksEntry : findByG_U_NotS(groupId, userId,
-				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByG_U_NotS(
+					groupId, userId, status, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -7391,7 +7777,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	public int countByG_U_NotS(long groupId, long userId, int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByG_U_NotS;
 
-		Object[] finderArgs = new Object[] { groupId, userId, status };
+		Object[] finderArgs = new Object[] {groupId, userId, status};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -7464,9 +7850,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_U_NOTS_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -7475,8 +7861,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -7498,9 +7884,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_U_NOTS_GROUPID_2 = "bookmarksEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_U_NOTS_USERID_2 = "bookmarksEntry.userId = ? AND ";
-	private static final String _FINDER_COLUMN_G_U_NOTS_STATUS_2 = "bookmarksEntry.status != ?";
+	private static final String _FINDER_COLUMN_G_U_NOTS_GROUPID_2 =
+		"bookmarksEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_U_NOTS_USERID_2 =
+		"bookmarksEntry.userId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_U_NOTS_STATUS_2 =
+		"bookmarksEntry.status != ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_F_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_F_S;
 	private FinderPath _finderPathCountByG_F_S;
@@ -7515,10 +7907,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_S(long groupId, long folderId,
-		int status) {
-		return findByG_F_S(groupId, folderId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> findByG_F_S(
+		long groupId, long folderId, int status) {
+
+		return findByG_F_S(
+			groupId, folderId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -7536,8 +7930,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_S(long groupId, long folderId,
-		int status, int start, int end) {
+	public List<BookmarksEntry> findByG_F_S(
+		long groupId, long folderId, int status, int start, int end) {
+
 		return findByG_F_S(groupId, folderId, status, start, end, null);
 	}
 
@@ -7557,11 +7952,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_S(long groupId, long folderId,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_F_S(
+		long groupId, long folderId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_F_S(groupId, folderId, status, start, end,
-			orderByComparator, true);
+
+		return findByG_F_S(
+			groupId, folderId, status, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -7581,40 +7977,41 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_S(long groupId, long folderId,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_F_S(
+		long groupId, long folderId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_F_S;
-			finderArgs = new Object[] { groupId, folderId, status };
+			finderArgs = new Object[] {groupId, folderId, status};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_F_S;
 			finderArgs = new Object[] {
-					groupId, folderId, status,
-					
-					start, end, orderByComparator
-				};
+				groupId, folderId, status, start, end, orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							(folderId != bookmarksEntry.getFolderId()) ||
-							(status != bookmarksEntry.getStatus())) {
+						(folderId != bookmarksEntry.getFolderId()) ||
+						(status != bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -7627,8 +8024,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -7643,11 +8040,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_G_F_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -7669,16 +8065,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -7709,11 +8105,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_F_S_First(long groupId, long folderId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_F_S_First(
+			long groupId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_F_S_First(groupId, folderId,
-				status, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_F_S_First(
+			groupId, folderId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -7747,10 +8145,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_F_S_First(long groupId, long folderId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByG_F_S(groupId, folderId, status, 0,
-				1, orderByComparator);
+	public BookmarksEntry fetchByG_F_S_First(
+		long groupId, long folderId, int status,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		List<BookmarksEntry> list = findByG_F_S(
+			groupId, folderId, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -7770,11 +8170,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_F_S_Last(long groupId, long folderId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_F_S_Last(
+			long groupId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_F_S_Last(groupId, folderId,
-				status, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_F_S_Last(
+			groupId, folderId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -7808,16 +8210,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_F_S_Last(long groupId, long folderId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator) {
+	public BookmarksEntry fetchByG_F_S_Last(
+		long groupId, long folderId, int status,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByG_F_S(groupId, folderId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByG_F_S(groupId, folderId, status,
-				count - 1, count, orderByComparator);
+		List<BookmarksEntry> list = findByG_F_S(
+			groupId, folderId, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -7838,10 +8242,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByG_F_S_PrevAndNext(long entryId, long groupId,
-		long folderId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByG_F_S_PrevAndNext(
+			long entryId, long groupId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -7851,13 +8256,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByG_F_S_PrevAndNext(session, bookmarksEntry, groupId,
-					folderId, status, orderByComparator, true);
+			array[0] = getByG_F_S_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, status,
+				orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByG_F_S_PrevAndNext(session, bookmarksEntry, groupId,
-					folderId, status, orderByComparator, false);
+			array[2] = getByG_F_S_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -7869,14 +8276,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByG_F_S_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long folderId, int status,
+	protected BookmarksEntry getByG_F_S_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long folderId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -7892,7 +8301,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_F_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -7966,8 +8376,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -7991,10 +8403,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_S(long groupId, long folderId,
-		int status) {
-		return filterFindByG_F_S(groupId, folderId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> filterFindByG_F_S(
+		long groupId, long folderId, int status) {
+
+		return filterFindByG_F_S(
+			groupId, folderId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -8012,8 +8426,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_S(long groupId, long folderId,
-		int status, int start, int end) {
+	public List<BookmarksEntry> filterFindByG_F_S(
+		long groupId, long folderId, int status, int start, int end) {
+
 		return filterFindByG_F_S(groupId, folderId, status, start, end, null);
 	}
 
@@ -8033,19 +8448,20 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_S(long groupId, long folderId,
-		int status, int start, int end,
+	public List<BookmarksEntry> filterFindByG_F_S(
+		long groupId, long folderId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_F_S(groupId, folderId, status, start, end,
-				orderByComparator);
+			return findByG_F_S(
+				groupId, folderId, status, start, end, orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -8055,7 +8471,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_F_S_GROUPID_2);
@@ -8065,17 +8482,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_F_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -8087,9 +8505,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -8113,8 +8531,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(status);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -8136,13 +8554,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] filterFindByG_F_S_PrevAndNext(long entryId,
-		long groupId, long folderId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] filterFindByG_F_S_PrevAndNext(
+			long entryId, long groupId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_F_S_PrevAndNext(entryId, groupId, folderId, status,
-				orderByComparator);
+			return findByG_F_S_PrevAndNext(
+				entryId, groupId, folderId, status, orderByComparator);
 		}
 
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
@@ -8154,13 +8573,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = filterGetByG_F_S_PrevAndNext(session, bookmarksEntry,
-					groupId, folderId, status, orderByComparator, true);
+			array[0] = filterGetByG_F_S_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, status,
+				orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = filterGetByG_F_S_PrevAndNext(session, bookmarksEntry,
-					groupId, folderId, status, orderByComparator, false);
+			array[2] = filterGetByG_F_S_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -8172,14 +8593,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry filterGetByG_F_S_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long folderId, int status,
+	protected BookmarksEntry filterGetByG_F_S_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long folderId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -8190,7 +8613,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_F_S_GROUPID_2);
@@ -8200,11 +8624,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_F_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -8212,12 +8638,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -8244,12 +8674,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -8279,9 +8711,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -8304,8 +8736,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -8329,10 +8763,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_S(long groupId,
-		long[] folderIds, int status) {
-		return filterFindByG_F_S(groupId, folderIds, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> filterFindByG_F_S(
+		long groupId, long[] folderIds, int status) {
+
+		return filterFindByG_F_S(
+			groupId, folderIds, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -8350,8 +8786,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_S(long groupId,
-		long[] folderIds, int status, int start, int end) {
+	public List<BookmarksEntry> filterFindByG_F_S(
+		long groupId, long[] folderIds, int status, int start, int end) {
+
 		return filterFindByG_F_S(groupId, folderIds, status, start, end, null);
 	}
 
@@ -8371,12 +8808,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_S(long groupId,
-		long[] folderIds, int status, int start, int end,
+	public List<BookmarksEntry> filterFindByG_F_S(
+		long groupId, long[] folderIds, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_F_S(groupId, folderIds, status, start, end,
-				orderByComparator);
+			return findByG_F_S(
+				groupId, folderIds, status, start, end, orderByComparator);
 		}
 
 		if (folderIds == null) {
@@ -8394,7 +8832,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_F_S_GROUPID_2);
@@ -8415,21 +8854,23 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_F_S_STATUS_2);
 
-		query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)),
+		query.setStringAt(
+			removeConjunction(query.stringAt(query.index() - 1)),
 			query.index() - 1);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -8441,9 +8882,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -8465,8 +8906,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(status);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -8489,10 +8930,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_S(long groupId, long[] folderIds,
-		int status) {
-		return findByG_F_S(groupId, folderIds, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> findByG_F_S(
+		long groupId, long[] folderIds, int status) {
+
+		return findByG_F_S(
+			groupId, folderIds, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -8510,8 +8953,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_S(long groupId, long[] folderIds,
-		int status, int start, int end) {
+	public List<BookmarksEntry> findByG_F_S(
+		long groupId, long[] folderIds, int status, int start, int end) {
+
 		return findByG_F_S(groupId, folderIds, status, start, end, null);
 	}
 
@@ -8531,11 +8975,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_S(long groupId, long[] folderIds,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_F_S(
+		long groupId, long[] folderIds, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_F_S(groupId, folderIds, status, start, end,
-			orderByComparator, true);
+
+		return findByG_F_S(
+			groupId, folderIds, status, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -8555,10 +9000,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_S(long groupId, long[] folderIds,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_F_S(
+		long groupId, long[] folderIds, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		if (folderIds == null) {
 			folderIds = new long[0];
 		}
@@ -8569,40 +9015,41 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 
 		if (folderIds.length == 1) {
-			return findByG_F_S(groupId, folderIds[0], status, start, end,
-				orderByComparator);
+			return findByG_F_S(
+				groupId, folderIds[0], status, start, end, orderByComparator);
 		}
 
 		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderArgs = new Object[] {
-					groupId, StringUtil.merge(folderIds), status
-				};
+				groupId, StringUtil.merge(folderIds), status
+			};
 		}
 		else {
 			finderArgs = new Object[] {
-					groupId, StringUtil.merge(folderIds), status,
-					
-					start, end, orderByComparator
-				};
+				groupId, StringUtil.merge(folderIds), status, start, end,
+				orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(_finderPathWithPaginationFindByG_F_S,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				_finderPathWithPaginationFindByG_F_S, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							!ArrayUtil.contains(folderIds,
-								bookmarksEntry.getFolderId()) ||
-							(status != bookmarksEntry.getStatus())) {
+						!ArrayUtil.contains(
+							folderIds, bookmarksEntry.getFolderId()) ||
+						(status != bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -8634,15 +9081,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			query.append(_FINDER_COLUMN_G_F_S_STATUS_2);
 
-			query.setStringAt(removeConjunction(query.stringAt(query.index() -
-						1)), query.index() - 1);
+			query.setStringAt(
+				removeConjunction(query.stringAt(query.index() - 1)),
+				query.index() - 1);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -8662,26 +9109,26 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
 
-				finderCache.putResult(_finderPathWithPaginationFindByG_F_S,
-					finderArgs, list);
+				finderCache.putResult(
+					_finderPathWithPaginationFindByG_F_S, finderArgs, list);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathWithPaginationFindByG_F_S,
-					finderArgs);
+				finderCache.removeResult(
+					_finderPathWithPaginationFindByG_F_S, finderArgs);
 
 				throw processException(e);
 			}
@@ -8702,8 +9149,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByG_F_S(long groupId, long folderId, int status) {
-		for (BookmarksEntry bookmarksEntry : findByG_F_S(groupId, folderId,
-				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByG_F_S(
+					groupId, folderId, status, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -8720,7 +9170,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	public int countByG_F_S(long groupId, long folderId, int status) {
 		FinderPath finderPath = _finderPathCountByG_F_S;
 
-		Object[] finderArgs = new Object[] { groupId, folderId, status };
+		Object[] finderArgs = new Object[] {groupId, folderId, status};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -8789,11 +9239,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 
 		Object[] finderArgs = new Object[] {
-				groupId, StringUtil.merge(folderIds), status
-			};
+			groupId, StringUtil.merge(folderIds), status
+		};
 
-		Long count = (Long)finderCache.getResult(_finderPathWithPaginationCountByG_F_S,
-				finderArgs, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathWithPaginationCountByG_F_S, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler();
@@ -8818,8 +9268,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			query.append(_FINDER_COLUMN_G_F_S_STATUS_2);
 
-			query.setStringAt(removeConjunction(query.stringAt(query.index() -
-						1)), query.index() - 1);
+			query.setStringAt(
+				removeConjunction(query.stringAt(query.index() - 1)),
+				query.index() - 1);
 
 			String sql = query.toString();
 
@@ -8838,12 +9289,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathWithPaginationCountByG_F_S,
-					finderArgs, count);
+				finderCache.putResult(
+					_finderPathWithPaginationCountByG_F_S, finderArgs, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathWithPaginationCountByG_F_S,
-					finderArgs);
+				finderCache.removeResult(
+					_finderPathWithPaginationCountByG_F_S, finderArgs);
 
 				throw processException(e);
 			}
@@ -8879,9 +9330,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_F_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -8890,8 +9341,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -8958,12 +9409,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_F_S_STATUS_2);
 
-		query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)),
+		query.setStringAt(
+			removeConjunction(query.stringAt(query.index() - 1)),
 			query.index() - 1);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -8972,8 +9424,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -8993,10 +9445,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_F_S_GROUPID_2 = "bookmarksEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_F_S_FOLDERID_2 = "bookmarksEntry.folderId = ? AND ";
-	private static final String _FINDER_COLUMN_G_F_S_FOLDERID_7 = "bookmarksEntry.folderId IN (";
-	private static final String _FINDER_COLUMN_G_F_S_STATUS_2 = "bookmarksEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_F_S_GROUPID_2 =
+		"bookmarksEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_F_S_FOLDERID_2 =
+		"bookmarksEntry.folderId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_F_S_FOLDERID_7 =
+		"bookmarksEntry.folderId IN (";
+
+	private static final String _FINDER_COLUMN_G_F_S_STATUS_2 =
+		"bookmarksEntry.status = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_F_NotS;
 	private FinderPath _finderPathWithPaginationCountByG_F_NotS;
 
@@ -9009,10 +9469,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_NotS(long groupId, long folderId,
-		int status) {
-		return findByG_F_NotS(groupId, folderId, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> findByG_F_NotS(
+		long groupId, long folderId, int status) {
+
+		return findByG_F_NotS(
+			groupId, folderId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -9030,8 +9492,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_NotS(long groupId, long folderId,
-		int status, int start, int end) {
+	public List<BookmarksEntry> findByG_F_NotS(
+		long groupId, long folderId, int status, int start, int end) {
+
 		return findByG_F_NotS(groupId, folderId, status, start, end, null);
 	}
 
@@ -9051,11 +9514,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_NotS(long groupId, long folderId,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_F_NotS(
+		long groupId, long folderId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_F_NotS(groupId, folderId, status, start, end,
-			orderByComparator, true);
+
+		return findByG_F_NotS(
+			groupId, folderId, status, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -9075,32 +9539,32 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_NotS(long groupId, long folderId,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_F_NotS(
+		long groupId, long folderId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		finderPath = _finderPathWithPaginationFindByG_F_NotS;
 		finderArgs = new Object[] {
-				groupId, folderId, status,
-				
-				start, end, orderByComparator
-			};
+			groupId, folderId, status, start, end, orderByComparator
+		};
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							(folderId != bookmarksEntry.getFolderId()) ||
-							(status == bookmarksEntry.getStatus())) {
+						(folderId != bookmarksEntry.getFolderId()) ||
+						(status == bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -9113,8 +9577,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -9129,11 +9593,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_G_F_NOTS_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -9155,16 +9618,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -9195,11 +9658,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_F_NotS_First(long groupId, long folderId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_F_NotS_First(
+			long groupId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_F_NotS_First(groupId,
-				folderId, status, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_F_NotS_First(
+			groupId, folderId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -9233,10 +9698,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_F_NotS_First(long groupId, long folderId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByG_F_NotS(groupId, folderId, status,
-				0, 1, orderByComparator);
+	public BookmarksEntry fetchByG_F_NotS_First(
+		long groupId, long folderId, int status,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		List<BookmarksEntry> list = findByG_F_NotS(
+			groupId, folderId, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -9256,11 +9723,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_F_NotS_Last(long groupId, long folderId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_F_NotS_Last(
+			long groupId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_F_NotS_Last(groupId, folderId,
-				status, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_F_NotS_Last(
+			groupId, folderId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -9294,16 +9763,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_F_NotS_Last(long groupId, long folderId,
-		int status, OrderByComparator<BookmarksEntry> orderByComparator) {
+	public BookmarksEntry fetchByG_F_NotS_Last(
+		long groupId, long folderId, int status,
+		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByG_F_NotS(groupId, folderId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByG_F_NotS(groupId, folderId, status,
-				count - 1, count, orderByComparator);
+		List<BookmarksEntry> list = findByG_F_NotS(
+			groupId, folderId, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -9324,10 +9795,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByG_F_NotS_PrevAndNext(long entryId,
-		long groupId, long folderId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByG_F_NotS_PrevAndNext(
+			long entryId, long groupId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -9337,13 +9809,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByG_F_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, folderId, status, orderByComparator, true);
+			array[0] = getByG_F_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, status,
+				orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByG_F_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, folderId, status, orderByComparator, false);
+			array[2] = getByG_F_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -9355,14 +9829,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByG_F_NotS_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long folderId, int status,
+	protected BookmarksEntry getByG_F_NotS_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long folderId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -9378,7 +9854,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_F_NOTS_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -9452,8 +9929,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -9477,10 +9956,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_NotS(long groupId,
-		long folderId, int status) {
-		return filterFindByG_F_NotS(groupId, folderId, status,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> filterFindByG_F_NotS(
+		long groupId, long folderId, int status) {
+
+		return filterFindByG_F_NotS(
+			groupId, folderId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -9498,9 +9979,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_NotS(long groupId,
-		long folderId, int status, int start, int end) {
-		return filterFindByG_F_NotS(groupId, folderId, status, start, end, null);
+	public List<BookmarksEntry> filterFindByG_F_NotS(
+		long groupId, long folderId, int status, int start, int end) {
+
+		return filterFindByG_F_NotS(
+			groupId, folderId, status, start, end, null);
 	}
 
 	/**
@@ -9519,19 +10002,20 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_NotS(long groupId,
-		long folderId, int status, int start, int end,
+	public List<BookmarksEntry> filterFindByG_F_NotS(
+		long groupId, long folderId, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_F_NotS(groupId, folderId, status, start, end,
-				orderByComparator);
+			return findByG_F_NotS(
+				groupId, folderId, status, start, end, orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -9541,7 +10025,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_F_NOTS_GROUPID_2);
@@ -9551,17 +10036,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_F_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -9573,9 +10059,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -9599,8 +10085,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(status);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -9622,13 +10108,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] filterFindByG_F_NotS_PrevAndNext(long entryId,
-		long groupId, long folderId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] filterFindByG_F_NotS_PrevAndNext(
+			long entryId, long groupId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_F_NotS_PrevAndNext(entryId, groupId, folderId,
-				status, orderByComparator);
+			return findByG_F_NotS_PrevAndNext(
+				entryId, groupId, folderId, status, orderByComparator);
 		}
 
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
@@ -9640,13 +10127,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = filterGetByG_F_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, folderId, status, orderByComparator, true);
+			array[0] = filterGetByG_F_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, status,
+				orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = filterGetByG_F_NotS_PrevAndNext(session, bookmarksEntry,
-					groupId, folderId, status, orderByComparator, false);
+			array[2] = filterGetByG_F_NotS_PrevAndNext(
+				session, bookmarksEntry, groupId, folderId, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -9658,14 +10147,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry filterGetByG_F_NotS_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long folderId, int status,
+	protected BookmarksEntry filterGetByG_F_NotS_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long folderId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -9676,7 +10167,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_F_NOTS_GROUPID_2);
@@ -9686,11 +10178,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_F_NOTS_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -9698,12 +10192,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -9730,12 +10228,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -9765,9 +10265,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -9790,8 +10290,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -9815,10 +10317,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_NotS(long groupId,
-		long[] folderIds, int status) {
-		return filterFindByG_F_NotS(groupId, folderIds, status,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> filterFindByG_F_NotS(
+		long groupId, long[] folderIds, int status) {
+
+		return filterFindByG_F_NotS(
+			groupId, folderIds, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -9836,9 +10340,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_NotS(long groupId,
-		long[] folderIds, int status, int start, int end) {
-		return filterFindByG_F_NotS(groupId, folderIds, status, start, end, null);
+	public List<BookmarksEntry> filterFindByG_F_NotS(
+		long groupId, long[] folderIds, int status, int start, int end) {
+
+		return filterFindByG_F_NotS(
+			groupId, folderIds, status, start, end, null);
 	}
 
 	/**
@@ -9857,12 +10363,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_F_NotS(long groupId,
-		long[] folderIds, int status, int start, int end,
+	public List<BookmarksEntry> filterFindByG_F_NotS(
+		long groupId, long[] folderIds, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_F_NotS(groupId, folderIds, status, start, end,
-				orderByComparator);
+			return findByG_F_NotS(
+				groupId, folderIds, status, start, end, orderByComparator);
 		}
 
 		if (folderIds == null) {
@@ -9880,7 +10387,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_F_NOTS_GROUPID_2);
@@ -9901,21 +10409,23 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_F_NOTS_STATUS_2);
 
-		query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)),
+		query.setStringAt(
+			removeConjunction(query.stringAt(query.index() - 1)),
 			query.index() - 1);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -9927,9 +10437,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -9951,8 +10461,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(status);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -9975,10 +10485,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_NotS(long groupId, long[] folderIds,
-		int status) {
-		return findByG_F_NotS(groupId, folderIds, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> findByG_F_NotS(
+		long groupId, long[] folderIds, int status) {
+
+		return findByG_F_NotS(
+			groupId, folderIds, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -9996,8 +10508,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_NotS(long groupId, long[] folderIds,
-		int status, int start, int end) {
+	public List<BookmarksEntry> findByG_F_NotS(
+		long groupId, long[] folderIds, int status, int start, int end) {
+
 		return findByG_F_NotS(groupId, folderIds, status, start, end, null);
 	}
 
@@ -10017,11 +10530,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_NotS(long groupId, long[] folderIds,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_F_NotS(
+		long groupId, long[] folderIds, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_F_NotS(groupId, folderIds, status, start, end,
-			orderByComparator, true);
+
+		return findByG_F_NotS(
+			groupId, folderIds, status, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -10041,10 +10555,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_F_NotS(long groupId, long[] folderIds,
-		int status, int start, int end,
+	public List<BookmarksEntry> findByG_F_NotS(
+		long groupId, long[] folderIds, int status, int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		if (folderIds == null) {
 			folderIds = new long[0];
 		}
@@ -10055,40 +10570,41 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 
 		if (folderIds.length == 1) {
-			return findByG_F_NotS(groupId, folderIds[0], status, start, end,
-				orderByComparator);
+			return findByG_F_NotS(
+				groupId, folderIds[0], status, start, end, orderByComparator);
 		}
 
 		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderArgs = new Object[] {
-					groupId, StringUtil.merge(folderIds), status
-				};
+				groupId, StringUtil.merge(folderIds), status
+			};
 		}
 		else {
 			finderArgs = new Object[] {
-					groupId, StringUtil.merge(folderIds), status,
-					
-					start, end, orderByComparator
-				};
+				groupId, StringUtil.merge(folderIds), status, start, end,
+				orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(_finderPathWithPaginationFindByG_F_NotS,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				_finderPathWithPaginationFindByG_F_NotS, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							!ArrayUtil.contains(folderIds,
-								bookmarksEntry.getFolderId()) ||
-							(status == bookmarksEntry.getStatus())) {
+						!ArrayUtil.contains(
+							folderIds, bookmarksEntry.getFolderId()) ||
+						(status == bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -10120,15 +10636,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			query.append(_FINDER_COLUMN_G_F_NOTS_STATUS_2);
 
-			query.setStringAt(removeConjunction(query.stringAt(query.index() -
-						1)), query.index() - 1);
+			query.setStringAt(
+				removeConjunction(query.stringAt(query.index() - 1)),
+				query.index() - 1);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -10148,26 +10664,26 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
 
-				finderCache.putResult(_finderPathWithPaginationFindByG_F_NotS,
-					finderArgs, list);
+				finderCache.putResult(
+					_finderPathWithPaginationFindByG_F_NotS, finderArgs, list);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathWithPaginationFindByG_F_NotS,
-					finderArgs);
+				finderCache.removeResult(
+					_finderPathWithPaginationFindByG_F_NotS, finderArgs);
 
 				throw processException(e);
 			}
@@ -10188,8 +10704,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void removeByG_F_NotS(long groupId, long folderId, int status) {
-		for (BookmarksEntry bookmarksEntry : findByG_F_NotS(groupId, folderId,
-				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (BookmarksEntry bookmarksEntry :
+				findByG_F_NotS(
+					groupId, folderId, status, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -10206,7 +10725,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	public int countByG_F_NotS(long groupId, long folderId, int status) {
 		FinderPath finderPath = _finderPathWithPaginationCountByG_F_NotS;
 
-		Object[] finderArgs = new Object[] { groupId, folderId, status };
+		Object[] finderArgs = new Object[] {groupId, folderId, status};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -10275,11 +10794,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 
 		Object[] finderArgs = new Object[] {
-				groupId, StringUtil.merge(folderIds), status
-			};
+			groupId, StringUtil.merge(folderIds), status
+		};
 
-		Long count = (Long)finderCache.getResult(_finderPathWithPaginationCountByG_F_NotS,
-				finderArgs, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathWithPaginationCountByG_F_NotS, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler();
@@ -10304,8 +10823,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			query.append(_FINDER_COLUMN_G_F_NOTS_STATUS_2);
 
-			query.setStringAt(removeConjunction(query.stringAt(query.index() -
-						1)), query.index() - 1);
+			query.setStringAt(
+				removeConjunction(query.stringAt(query.index() - 1)),
+				query.index() - 1);
 
 			String sql = query.toString();
 
@@ -10324,12 +10844,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathWithPaginationCountByG_F_NotS,
-					finderArgs, count);
+				finderCache.putResult(
+					_finderPathWithPaginationCountByG_F_NotS, finderArgs,
+					count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathWithPaginationCountByG_F_NotS,
-					finderArgs);
+				finderCache.removeResult(
+					_finderPathWithPaginationCountByG_F_NotS, finderArgs);
 
 				throw processException(e);
 			}
@@ -10365,9 +10886,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_F_NOTS_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -10376,8 +10897,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -10408,7 +10929,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the number of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_F_NotS(long groupId, long[] folderIds, int status) {
+	public int filterCountByG_F_NotS(
+		long groupId, long[] folderIds, int status) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_F_NotS(groupId, folderIds, status);
 		}
@@ -10444,12 +10967,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_F_NOTS_STATUS_2);
 
-		query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)),
+		query.setStringAt(
+			removeConjunction(query.stringAt(query.index() - 1)),
 			query.index() - 1);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -10458,8 +10982,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -10479,10 +11003,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_F_NOTS_GROUPID_2 = "bookmarksEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_F_NOTS_FOLDERID_2 = "bookmarksEntry.folderId = ? AND ";
-	private static final String _FINDER_COLUMN_G_F_NOTS_FOLDERID_7 = "bookmarksEntry.folderId IN (";
-	private static final String _FINDER_COLUMN_G_F_NOTS_STATUS_2 = "bookmarksEntry.status != ?";
+	private static final String _FINDER_COLUMN_G_F_NOTS_GROUPID_2 =
+		"bookmarksEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_F_NOTS_FOLDERID_2 =
+		"bookmarksEntry.folderId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_F_NOTS_FOLDERID_7 =
+		"bookmarksEntry.folderId IN (";
+
+	private static final String _FINDER_COLUMN_G_F_NOTS_STATUS_2 =
+		"bookmarksEntry.status != ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_U_F_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_U_F_S;
 	private FinderPath _finderPathCountByG_U_F_S;
@@ -10498,10 +11030,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_F_S(long groupId, long userId,
-		long folderId, int status) {
-		return findByG_U_F_S(groupId, userId, folderId, status,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> findByG_U_F_S(
+		long groupId, long userId, long folderId, int status) {
+
+		return findByG_U_F_S(
+			groupId, userId, folderId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -10520,9 +11054,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_F_S(long groupId, long userId,
-		long folderId, int status, int start, int end) {
-		return findByG_U_F_S(groupId, userId, folderId, status, start, end, null);
+	public List<BookmarksEntry> findByG_U_F_S(
+		long groupId, long userId, long folderId, int status, int start,
+		int end) {
+
+		return findByG_U_F_S(
+			groupId, userId, folderId, status, start, end, null);
 	}
 
 	/**
@@ -10542,11 +11079,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_F_S(long groupId, long userId,
-		long folderId, int status, int start, int end,
-		OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_U_F_S(groupId, userId, folderId, status, start, end,
-			orderByComparator, true);
+	public List<BookmarksEntry> findByG_U_F_S(
+		long groupId, long userId, long folderId, int status, int start,
+		int end, OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		return findByG_U_F_S(
+			groupId, userId, folderId, status, start, end, orderByComparator,
+			true);
 	}
 
 	/**
@@ -10567,41 +11106,42 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_F_S(long groupId, long userId,
-		long folderId, int status, int start, int end,
-		OrderByComparator<BookmarksEntry> orderByComparator,
+	public List<BookmarksEntry> findByG_U_F_S(
+		long groupId, long userId, long folderId, int status, int start,
+		int end, OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_U_F_S;
-			finderArgs = new Object[] { groupId, userId, folderId, status };
+			finderArgs = new Object[] {groupId, userId, folderId, status};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_U_F_S;
 			finderArgs = new Object[] {
-					groupId, userId, folderId, status,
-					
-					start, end, orderByComparator
-				};
+				groupId, userId, folderId, status, start, end, orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							(userId != bookmarksEntry.getUserId()) ||
-							(folderId != bookmarksEntry.getFolderId()) ||
-							(status != bookmarksEntry.getStatus())) {
+						(userId != bookmarksEntry.getUserId()) ||
+						(folderId != bookmarksEntry.getFolderId()) ||
+						(status != bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -10614,8 +11154,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					6 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -10632,11 +11172,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FINDER_COLUMN_G_U_F_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -10660,16 +11199,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -10701,12 +11240,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_U_F_S_First(long groupId, long userId,
-		long folderId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_U_F_S_First(
+			long groupId, long userId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_U_F_S_First(groupId, userId,
-				folderId, status, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_U_F_S_First(
+			groupId, userId, folderId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -10744,11 +11284,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the first matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_U_F_S_First(long groupId, long userId,
-		long folderId, int status,
+	public BookmarksEntry fetchByG_U_F_S_First(
+		long groupId, long userId, long folderId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
-		List<BookmarksEntry> list = findByG_U_F_S(groupId, userId, folderId,
-				status, 0, 1, orderByComparator);
+
+		List<BookmarksEntry> list = findByG_U_F_S(
+			groupId, userId, folderId, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -10769,12 +11310,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry findByG_U_F_S_Last(long groupId, long userId,
-		long folderId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry findByG_U_F_S_Last(
+			long groupId, long userId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
-		BookmarksEntry bookmarksEntry = fetchByG_U_F_S_Last(groupId, userId,
-				folderId, status, orderByComparator);
+
+		BookmarksEntry bookmarksEntry = fetchByG_U_F_S_Last(
+			groupId, userId, folderId, status, orderByComparator);
 
 		if (bookmarksEntry != null) {
 			return bookmarksEntry;
@@ -10812,17 +11354,19 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the last matching bookmarks entry, or <code>null</code> if a matching bookmarks entry could not be found
 	 */
 	@Override
-	public BookmarksEntry fetchByG_U_F_S_Last(long groupId, long userId,
-		long folderId, int status,
+	public BookmarksEntry fetchByG_U_F_S_Last(
+		long groupId, long userId, long folderId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		int count = countByG_U_F_S(groupId, userId, folderId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<BookmarksEntry> list = findByG_U_F_S(groupId, userId, folderId,
-				status, count - 1, count, orderByComparator);
+		List<BookmarksEntry> list = findByG_U_F_S(
+			groupId, userId, folderId, status, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -10844,10 +11388,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] findByG_U_F_S_PrevAndNext(long entryId,
-		long groupId, long userId, long folderId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] findByG_U_F_S_PrevAndNext(
+			long entryId, long groupId, long userId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -10857,13 +11402,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = getByG_U_F_S_PrevAndNext(session, bookmarksEntry,
-					groupId, userId, folderId, status, orderByComparator, true);
+			array[0] = getByG_U_F_S_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, folderId, status,
+				orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = getByG_U_F_S_PrevAndNext(session, bookmarksEntry,
-					groupId, userId, folderId, status, orderByComparator, false);
+			array[2] = getByG_U_F_S_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, folderId, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -10875,15 +11422,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry getByG_U_F_S_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long userId,
-		long folderId, int status,
+	protected BookmarksEntry getByG_U_F_S_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long userId, long folderId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -10901,7 +11449,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_U_F_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -10977,8 +11526,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -11003,10 +11554,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_F_S(long groupId, long userId,
-		long folderId, int status) {
-		return filterFindByG_U_F_S(groupId, userId, folderId, status,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> filterFindByG_U_F_S(
+		long groupId, long userId, long folderId, int status) {
+
+		return filterFindByG_U_F_S(
+			groupId, userId, folderId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -11025,10 +11578,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_F_S(long groupId, long userId,
-		long folderId, int status, int start, int end) {
-		return filterFindByG_U_F_S(groupId, userId, folderId, status, start,
-			end, null);
+	public List<BookmarksEntry> filterFindByG_U_F_S(
+		long groupId, long userId, long folderId, int status, int start,
+		int end) {
+
+		return filterFindByG_U_F_S(
+			groupId, userId, folderId, status, start, end, null);
 	}
 
 	/**
@@ -11048,19 +11603,21 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_F_S(long groupId, long userId,
-		long folderId, int status, int start, int end,
-		OrderByComparator<BookmarksEntry> orderByComparator) {
+	public List<BookmarksEntry> filterFindByG_U_F_S(
+		long groupId, long userId, long folderId, int status, int start,
+		int end, OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_F_S(groupId, userId, folderId, status, start, end,
+			return findByG_U_F_S(
+				groupId, userId, folderId, status, start, end,
 				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -11070,7 +11627,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_F_S_GROUPID_2);
@@ -11082,17 +11640,18 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_U_F_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -11104,9 +11663,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -11132,8 +11691,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(status);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -11156,13 +11715,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @throws NoSuchEntryException if a bookmarks entry with the primary key could not be found
 	 */
 	@Override
-	public BookmarksEntry[] filterFindByG_U_F_S_PrevAndNext(long entryId,
-		long groupId, long userId, long folderId, int status,
-		OrderByComparator<BookmarksEntry> orderByComparator)
+	public BookmarksEntry[] filterFindByG_U_F_S_PrevAndNext(
+			long entryId, long groupId, long userId, long folderId, int status,
+			OrderByComparator<BookmarksEntry> orderByComparator)
 		throws NoSuchEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_F_S_PrevAndNext(entryId, groupId, userId,
-				folderId, status, orderByComparator);
+			return findByG_U_F_S_PrevAndNext(
+				entryId, groupId, userId, folderId, status, orderByComparator);
 		}
 
 		BookmarksEntry bookmarksEntry = findByPrimaryKey(entryId);
@@ -11174,13 +11734,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			BookmarksEntry[] array = new BookmarksEntryImpl[3];
 
-			array[0] = filterGetByG_U_F_S_PrevAndNext(session, bookmarksEntry,
-					groupId, userId, folderId, status, orderByComparator, true);
+			array[0] = filterGetByG_U_F_S_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, folderId, status,
+				orderByComparator, true);
 
 			array[1] = bookmarksEntry;
 
-			array[2] = filterGetByG_U_F_S_PrevAndNext(session, bookmarksEntry,
-					groupId, userId, folderId, status, orderByComparator, false);
+			array[2] = filterGetByG_U_F_S_PrevAndNext(
+				session, bookmarksEntry, groupId, userId, folderId, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -11192,15 +11754,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	protected BookmarksEntry filterGetByG_U_F_S_PrevAndNext(Session session,
-		BookmarksEntry bookmarksEntry, long groupId, long userId,
-		long folderId, int status,
+	protected BookmarksEntry filterGetByG_U_F_S_PrevAndNext(
+		Session session, BookmarksEntry bookmarksEntry, long groupId,
+		long userId, long folderId, int status,
 		OrderByComparator<BookmarksEntry> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(8 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -11211,7 +11774,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_F_S_GROUPID_2);
@@ -11223,11 +11787,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		query.append(_FINDER_COLUMN_G_U_F_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -11235,12 +11801,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -11267,12 +11837,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -11302,9 +11874,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -11329,8 +11901,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					bookmarksEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						bookmarksEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -11355,10 +11929,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_F_S(long groupId, long userId,
-		long[] folderIds, int status) {
-		return filterFindByG_U_F_S(groupId, userId, folderIds, status,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> filterFindByG_U_F_S(
+		long groupId, long userId, long[] folderIds, int status) {
+
+		return filterFindByG_U_F_S(
+			groupId, userId, folderIds, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -11377,10 +11953,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_F_S(long groupId, long userId,
-		long[] folderIds, int status, int start, int end) {
-		return filterFindByG_U_F_S(groupId, userId, folderIds, status, start,
-			end, null);
+	public List<BookmarksEntry> filterFindByG_U_F_S(
+		long groupId, long userId, long[] folderIds, int status, int start,
+		int end) {
+
+		return filterFindByG_U_F_S(
+			groupId, userId, folderIds, status, start, end, null);
 	}
 
 	/**
@@ -11400,12 +11978,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public List<BookmarksEntry> filterFindByG_U_F_S(long groupId, long userId,
-		long[] folderIds, int status, int start, int end,
-		OrderByComparator<BookmarksEntry> orderByComparator) {
+	public List<BookmarksEntry> filterFindByG_U_F_S(
+		long groupId, long userId, long[] folderIds, int status, int start,
+		int end, OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_U_F_S(groupId, userId, folderIds, status, start,
-				end, orderByComparator);
+			return findByG_U_F_S(
+				groupId, userId, folderIds, status, start, end,
+				orderByComparator);
 		}
 
 		if (folderIds == null) {
@@ -11423,7 +12003,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_U_F_S_GROUPID_2);
@@ -11446,21 +12027,23 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_U_F_S_STATUS_2);
 
-		query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)),
+		query.setStringAt(
+			removeConjunction(query.stringAt(query.index() - 1)),
 			query.index() - 1);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -11472,9 +12055,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -11498,8 +12081,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			qPos.add(status);
 
-			return (List<BookmarksEntry>)QueryUtil.list(q, getDialect(), start,
-				end);
+			return (List<BookmarksEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -11523,10 +12106,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_F_S(long groupId, long userId,
-		long[] folderIds, int status) {
-		return findByG_U_F_S(groupId, userId, folderIds, status,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<BookmarksEntry> findByG_U_F_S(
+		long groupId, long userId, long[] folderIds, int status) {
+
+		return findByG_U_F_S(
+			groupId, userId, folderIds, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -11545,10 +12130,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_F_S(long groupId, long userId,
-		long[] folderIds, int status, int start, int end) {
-		return findByG_U_F_S(groupId, userId, folderIds, status, start, end,
-			null);
+	public List<BookmarksEntry> findByG_U_F_S(
+		long groupId, long userId, long[] folderIds, int status, int start,
+		int end) {
+
+		return findByG_U_F_S(
+			groupId, userId, folderIds, status, start, end, null);
 	}
 
 	/**
@@ -11568,11 +12155,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_F_S(long groupId, long userId,
-		long[] folderIds, int status, int start, int end,
-		OrderByComparator<BookmarksEntry> orderByComparator) {
-		return findByG_U_F_S(groupId, userId, folderIds, status, start, end,
-			orderByComparator, true);
+	public List<BookmarksEntry> findByG_U_F_S(
+		long groupId, long userId, long[] folderIds, int status, int start,
+		int end, OrderByComparator<BookmarksEntry> orderByComparator) {
+
+		return findByG_U_F_S(
+			groupId, userId, folderIds, status, start, end, orderByComparator,
+			true);
 	}
 
 	/**
@@ -11593,10 +12182,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of matching bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findByG_U_F_S(long groupId, long userId,
-		long[] folderIds, int status, int start, int end,
-		OrderByComparator<BookmarksEntry> orderByComparator,
+	public List<BookmarksEntry> findByG_U_F_S(
+		long groupId, long userId, long[] folderIds, int status, int start,
+		int end, OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		if (folderIds == null) {
 			folderIds = new long[0];
 		}
@@ -11607,41 +12197,43 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 
 		if (folderIds.length == 1) {
-			return findByG_U_F_S(groupId, userId, folderIds[0], status, start,
-				end, orderByComparator);
+			return findByG_U_F_S(
+				groupId, userId, folderIds[0], status, start, end,
+				orderByComparator);
 		}
 
 		boolean pagination = true;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderArgs = new Object[] {
-					groupId, userId, StringUtil.merge(folderIds), status
-				};
+				groupId, userId, StringUtil.merge(folderIds), status
+			};
 		}
 		else {
 			finderArgs = new Object[] {
-					groupId, userId, StringUtil.merge(folderIds), status,
-					
-					start, end, orderByComparator
-				};
+				groupId, userId, StringUtil.merge(folderIds), status, start,
+				end, orderByComparator
+			};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(_finderPathWithPaginationFindByG_U_F_S,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				_finderPathWithPaginationFindByG_U_F_S, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
 					if ((groupId != bookmarksEntry.getGroupId()) ||
-							(userId != bookmarksEntry.getUserId()) ||
-							!ArrayUtil.contains(folderIds,
-								bookmarksEntry.getFolderId()) ||
-							(status != bookmarksEntry.getStatus())) {
+						(userId != bookmarksEntry.getUserId()) ||
+						!ArrayUtil.contains(
+							folderIds, bookmarksEntry.getFolderId()) ||
+						(status != bookmarksEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -11675,15 +12267,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			query.append(_FINDER_COLUMN_G_U_F_S_STATUS_2);
 
-			query.setStringAt(removeConjunction(query.stringAt(query.index() -
-						1)), query.index() - 1);
+			query.setStringAt(
+				removeConjunction(query.stringAt(query.index() - 1)),
+				query.index() - 1);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(BookmarksEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -11705,26 +12297,26 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
 
-				finderCache.putResult(_finderPathWithPaginationFindByG_U_F_S,
-					finderArgs, list);
+				finderCache.putResult(
+					_finderPathWithPaginationFindByG_U_F_S, finderArgs, list);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathWithPaginationFindByG_U_F_S,
-					finderArgs);
+				finderCache.removeResult(
+					_finderPathWithPaginationFindByG_U_F_S, finderArgs);
 
 				throw processException(e);
 			}
@@ -11745,10 +12337,14 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_U_F_S(long groupId, long userId, long folderId,
-		int status) {
-		for (BookmarksEntry bookmarksEntry : findByG_U_F_S(groupId, userId,
-				folderId, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByG_U_F_S(
+		long groupId, long userId, long folderId, int status) {
+
+		for (BookmarksEntry bookmarksEntry :
+				findByG_U_F_S(
+					groupId, userId, folderId, status, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(bookmarksEntry);
 		}
 	}
@@ -11763,11 +12359,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the number of matching bookmarks entries
 	 */
 	@Override
-	public int countByG_U_F_S(long groupId, long userId, long folderId,
-		int status) {
+	public int countByG_U_F_S(
+		long groupId, long userId, long folderId, int status) {
+
 		FinderPath finderPath = _finderPathCountByG_U_F_S;
 
-		Object[] finderArgs = new Object[] { groupId, userId, folderId, status };
+		Object[] finderArgs = new Object[] {groupId, userId, folderId, status};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -11830,8 +12427,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the number of matching bookmarks entries
 	 */
 	@Override
-	public int countByG_U_F_S(long groupId, long userId, long[] folderIds,
-		int status) {
+	public int countByG_U_F_S(
+		long groupId, long userId, long[] folderIds, int status) {
+
 		if (folderIds == null) {
 			folderIds = new long[0];
 		}
@@ -11842,11 +12440,11 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 
 		Object[] finderArgs = new Object[] {
-				groupId, userId, StringUtil.merge(folderIds), status
-			};
+			groupId, userId, StringUtil.merge(folderIds), status
+		};
 
-		Long count = (Long)finderCache.getResult(_finderPathWithPaginationCountByG_U_F_S,
-				finderArgs, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathWithPaginationCountByG_U_F_S, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler();
@@ -11873,8 +12471,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			query.append(_FINDER_COLUMN_G_U_F_S_STATUS_2);
 
-			query.setStringAt(removeConjunction(query.stringAt(query.index() -
-						1)), query.index() - 1);
+			query.setStringAt(
+				removeConjunction(query.stringAt(query.index() - 1)),
+				query.index() - 1);
 
 			String sql = query.toString();
 
@@ -11895,12 +12494,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathWithPaginationCountByG_U_F_S,
-					finderArgs, count);
+				finderCache.putResult(
+					_finderPathWithPaginationCountByG_U_F_S, finderArgs, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathWithPaginationCountByG_U_F_S,
-					finderArgs);
+				finderCache.removeResult(
+					_finderPathWithPaginationCountByG_U_F_S, finderArgs);
 
 				throw processException(e);
 			}
@@ -11922,8 +12521,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the number of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_U_F_S(long groupId, long userId, long folderId,
-		int status) {
+	public int filterCountByG_U_F_S(
+		long groupId, long userId, long folderId, int status) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_U_F_S(groupId, userId, folderId, status);
 		}
@@ -11940,9 +12540,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_U_F_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -11951,8 +12551,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -11986,8 +12586,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the number of matching bookmarks entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_U_F_S(long groupId, long userId,
-		long[] folderIds, int status) {
+	public int filterCountByG_U_F_S(
+		long groupId, long userId, long[] folderIds, int status) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_U_F_S(groupId, userId, folderIds, status);
 		}
@@ -12025,12 +12626,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		query.append(_FINDER_COLUMN_G_U_F_S_STATUS_2);
 
-		query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)),
+		query.setStringAt(
+			removeConjunction(query.stringAt(query.index() - 1)),
 			query.index() - 1);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				BookmarksEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), BookmarksEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -12039,8 +12641,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -12062,18 +12664,32 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_U_F_S_GROUPID_2 = "bookmarksEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_U_F_S_USERID_2 = "bookmarksEntry.userId = ? AND ";
-	private static final String _FINDER_COLUMN_G_U_F_S_FOLDERID_2 = "bookmarksEntry.folderId = ? AND ";
-	private static final String _FINDER_COLUMN_G_U_F_S_FOLDERID_7 = "bookmarksEntry.folderId IN (";
-	private static final String _FINDER_COLUMN_G_U_F_S_STATUS_2 = "bookmarksEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_U_F_S_GROUPID_2 =
+		"bookmarksEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_U_F_S_USERID_2 =
+		"bookmarksEntry.userId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_U_F_S_FOLDERID_2 =
+		"bookmarksEntry.folderId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_U_F_S_FOLDERID_7 =
+		"bookmarksEntry.folderId IN (";
+
+	private static final String _FINDER_COLUMN_G_U_F_S_STATUS_2 =
+		"bookmarksEntry.status = ?";
 
 	public BookmarksEntryPersistenceImpl() {
 		setModelClass(BookmarksEntry.class);
 
 		setModelImplClass(BookmarksEntryImpl.class);
 		setModelPKClass(long.class);
-		setEntityCacheEnabled(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED);
+
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
+		setDBColumnNames(dbColumnNames);
 	}
 
 	/**
@@ -12083,12 +12699,15 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void cacheResult(BookmarksEntry bookmarksEntry) {
-		entityCache.putResult(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BookmarksEntryImpl.class, bookmarksEntry.getPrimaryKey(),
-			bookmarksEntry);
+		entityCache.putResult(
+			entityCacheEnabled, BookmarksEntryImpl.class,
+			bookmarksEntry.getPrimaryKey(), bookmarksEntry);
 
-		finderCache.putResult(_finderPathFetchByUUID_G,
-			new Object[] { bookmarksEntry.getUuid(), bookmarksEntry.getGroupId() },
+		finderCache.putResult(
+			_finderPathFetchByUUID_G,
+			new Object[] {
+				bookmarksEntry.getUuid(), bookmarksEntry.getGroupId()
+			},
 			bookmarksEntry);
 
 		bookmarksEntry.resetOriginalValues();
@@ -12103,8 +12722,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	public void cacheResult(List<BookmarksEntry> bookmarksEntries) {
 		for (BookmarksEntry bookmarksEntry : bookmarksEntries) {
 			if (entityCache.getResult(
-						BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-						BookmarksEntryImpl.class, bookmarksEntry.getPrimaryKey()) == null) {
+					entityCacheEnabled, BookmarksEntryImpl.class,
+					bookmarksEntry.getPrimaryKey()) == null) {
+
 				cacheResult(bookmarksEntry);
 			}
 			else {
@@ -12138,8 +12758,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public void clearCache(BookmarksEntry bookmarksEntry) {
-		entityCache.removeResult(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BookmarksEntryImpl.class, bookmarksEntry.getPrimaryKey());
+		entityCache.removeResult(
+			entityCacheEnabled, BookmarksEntryImpl.class,
+			bookmarksEntry.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -12153,45 +12774,49 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (BookmarksEntry bookmarksEntry : bookmarksEntries) {
-			entityCache.removeResult(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryImpl.class, bookmarksEntry.getPrimaryKey());
+			entityCache.removeResult(
+				entityCacheEnabled, BookmarksEntryImpl.class,
+				bookmarksEntry.getPrimaryKey());
 
-			clearUniqueFindersCache((BookmarksEntryModelImpl)bookmarksEntry,
-				true);
+			clearUniqueFindersCache(
+				(BookmarksEntryModelImpl)bookmarksEntry, true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
 		BookmarksEntryModelImpl bookmarksEntryModelImpl) {
-		Object[] args = new Object[] {
-				bookmarksEntryModelImpl.getUuid(),
-				bookmarksEntryModelImpl.getGroupId()
-			};
 
-		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1),
-			false);
-		finderCache.putResult(_finderPathFetchByUUID_G, args,
-			bookmarksEntryModelImpl, false);
+		Object[] args = new Object[] {
+			bookmarksEntryModelImpl.getUuid(),
+			bookmarksEntryModelImpl.getGroupId()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByUUID_G, args, bookmarksEntryModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		BookmarksEntryModelImpl bookmarksEntryModelImpl, boolean clearCurrent) {
+
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					bookmarksEntryModelImpl.getUuid(),
-					bookmarksEntryModelImpl.getGroupId()
-				};
+				bookmarksEntryModelImpl.getUuid(),
+				bookmarksEntryModelImpl.getGroupId()
+			};
 
 			finderCache.removeResult(_finderPathCountByUUID_G, args);
 			finderCache.removeResult(_finderPathFetchByUUID_G, args);
 		}
 
 		if ((bookmarksEntryModelImpl.getColumnBitmask() &
-				_finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
+			 _finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					bookmarksEntryModelImpl.getOriginalUuid(),
-					bookmarksEntryModelImpl.getOriginalGroupId()
-				};
+				bookmarksEntryModelImpl.getOriginalUuid(),
+				bookmarksEntryModelImpl.getOriginalGroupId()
+			};
 
 			finderCache.removeResult(_finderPathCountByUUID_G, args);
 			finderCache.removeResult(_finderPathFetchByUUID_G, args);
@@ -12242,21 +12867,22 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	@Override
 	public BookmarksEntry remove(Serializable primaryKey)
 		throws NoSuchEntryException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			BookmarksEntry bookmarksEntry = (BookmarksEntry)session.get(BookmarksEntryImpl.class,
-					primaryKey);
+			BookmarksEntry bookmarksEntry = (BookmarksEntry)session.get(
+				BookmarksEntryImpl.class, primaryKey);
 
 			if (bookmarksEntry == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchEntryException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(bookmarksEntry);
@@ -12280,8 +12906,9 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			session = openSession();
 
 			if (!session.contains(bookmarksEntry)) {
-				bookmarksEntry = (BookmarksEntry)session.get(BookmarksEntryImpl.class,
-						bookmarksEntry.getPrimaryKeyObj());
+				bookmarksEntry = (BookmarksEntry)session.get(
+					BookmarksEntryImpl.class,
+					bookmarksEntry.getPrimaryKeyObj());
 			}
 
 			if (bookmarksEntry != null) {
@@ -12310,19 +12937,21 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(bookmarksEntry.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(bookmarksEntry);
+				invocationHandler = ProxyUtil.getInvocationHandler(
+					bookmarksEntry);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in bookmarksEntry proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom BookmarksEntry implementation " +
-				bookmarksEntry.getClass());
+					bookmarksEntry.getClass());
 		}
 
-		BookmarksEntryModelImpl bookmarksEntryModelImpl = (BookmarksEntryModelImpl)bookmarksEntry;
+		BookmarksEntryModelImpl bookmarksEntryModelImpl =
+			(BookmarksEntryModelImpl)bookmarksEntry;
 
 		if (Validator.isNull(bookmarksEntry.getUuid())) {
 			String uuid = PortalUUIDUtil.generate();
@@ -12330,7 +12959,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			bookmarksEntry.setUuid(uuid);
 		}
 
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -12348,8 +12978,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				bookmarksEntry.setModifiedDate(now);
 			}
 			else {
-				bookmarksEntry.setModifiedDate(serviceContext.getModifiedDate(
-						now));
+				bookmarksEntry.setModifiedDate(
+					serviceContext.getModifiedDate(now));
 			}
 		}
 
@@ -12376,257 +13006,273 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
-		if (!BookmarksEntryModelImpl.COLUMN_BITMASK_ENABLED) {
+		if (!_columnBitmaskEnabled) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
-			Object[] args = new Object[] { bookmarksEntryModelImpl.getUuid() };
+		else if (isNew) {
+			Object[] args = new Object[] {bookmarksEntryModelImpl.getUuid()};
 
 			finderCache.removeResult(_finderPathCountByUuid, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-				args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByUuid, args);
 
 			args = new Object[] {
+				bookmarksEntryModelImpl.getUuid(),
+				bookmarksEntryModelImpl.getCompanyId()
+			};
+
+			finderCache.removeResult(_finderPathCountByUuid_C, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByUuid_C, args);
+
+			args = new Object[] {bookmarksEntryModelImpl.getCompanyId()};
+
+			finderCache.removeResult(_finderPathCountByCompanyId, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByCompanyId, args);
+
+			args = new Object[] {
+				bookmarksEntryModelImpl.getGroupId(),
+				bookmarksEntryModelImpl.getFolderId()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_F, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_F, args);
+
+			args = new Object[] {
+				bookmarksEntryModelImpl.getGroupId(),
+				bookmarksEntryModelImpl.getStatus()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_S, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_S, args);
+
+			args = new Object[] {
+				bookmarksEntryModelImpl.getGroupId(),
+				bookmarksEntryModelImpl.getUserId(),
+				bookmarksEntryModelImpl.getStatus()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_U_S, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_U_S, args);
+
+			args = new Object[] {
+				bookmarksEntryModelImpl.getGroupId(),
+				bookmarksEntryModelImpl.getFolderId(),
+				bookmarksEntryModelImpl.getStatus()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_F_S, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_F_S, args);
+
+			args = new Object[] {
+				bookmarksEntryModelImpl.getGroupId(),
+				bookmarksEntryModelImpl.getUserId(),
+				bookmarksEntryModelImpl.getFolderId(),
+				bookmarksEntryModelImpl.getStatus()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_U_F_S, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_U_F_S, args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((bookmarksEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					bookmarksEntryModelImpl.getOriginalUuid()
+				};
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+
+				args = new Object[] {bookmarksEntryModelImpl.getUuid()};
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+			}
+
+			if ((bookmarksEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					bookmarksEntryModelImpl.getOriginalUuid(),
+					bookmarksEntryModelImpl.getOriginalCompanyId()
+				};
+
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
+
+				args = new Object[] {
 					bookmarksEntryModelImpl.getUuid(),
 					bookmarksEntryModelImpl.getCompanyId()
 				};
 
-			finderCache.removeResult(_finderPathCountByUuid_C, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-				args);
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
+			}
 
-			args = new Object[] { bookmarksEntryModelImpl.getCompanyId() };
+			if ((bookmarksEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByCompanyId.
+					 getColumnBitmask()) != 0) {
 
-			finderCache.removeResult(_finderPathCountByCompanyId, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
-				args);
+				Object[] args = new Object[] {
+					bookmarksEntryModelImpl.getOriginalCompanyId()
+				};
 
-			args = new Object[] {
+				finderCache.removeResult(_finderPathCountByCompanyId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByCompanyId, args);
+
+				args = new Object[] {bookmarksEntryModelImpl.getCompanyId()};
+
+				finderCache.removeResult(_finderPathCountByCompanyId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByCompanyId, args);
+			}
+
+			if ((bookmarksEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_F.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					bookmarksEntryModelImpl.getOriginalGroupId(),
+					bookmarksEntryModelImpl.getOriginalFolderId()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_F, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_F, args);
+
+				args = new Object[] {
 					bookmarksEntryModelImpl.getGroupId(),
 					bookmarksEntryModelImpl.getFolderId()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_F, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_F, args);
+				finderCache.removeResult(_finderPathCountByG_F, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_F, args);
+			}
 
-			args = new Object[] {
+			if ((bookmarksEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_S.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					bookmarksEntryModelImpl.getOriginalGroupId(),
+					bookmarksEntryModelImpl.getOriginalStatus()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_S, args);
+
+				args = new Object[] {
 					bookmarksEntryModelImpl.getGroupId(),
 					bookmarksEntryModelImpl.getStatus()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_S, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_S, args);
+				finderCache.removeResult(_finderPathCountByG_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_S, args);
+			}
 
-			args = new Object[] {
+			if ((bookmarksEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_U_S.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					bookmarksEntryModelImpl.getOriginalGroupId(),
+					bookmarksEntryModelImpl.getOriginalUserId(),
+					bookmarksEntryModelImpl.getOriginalStatus()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_U_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_U_S, args);
+
+				args = new Object[] {
 					bookmarksEntryModelImpl.getGroupId(),
 					bookmarksEntryModelImpl.getUserId(),
 					bookmarksEntryModelImpl.getStatus()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_U_S, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_S,
-				args);
+				finderCache.removeResult(_finderPathCountByG_U_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_U_S, args);
+			}
 
-			args = new Object[] {
+			if ((bookmarksEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_F_S.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					bookmarksEntryModelImpl.getOriginalGroupId(),
+					bookmarksEntryModelImpl.getOriginalFolderId(),
+					bookmarksEntryModelImpl.getOriginalStatus()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_F_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_F_S, args);
+
+				args = new Object[] {
 					bookmarksEntryModelImpl.getGroupId(),
 					bookmarksEntryModelImpl.getFolderId(),
 					bookmarksEntryModelImpl.getStatus()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_F_S, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_F_S,
-				args);
+				finderCache.removeResult(_finderPathCountByG_F_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_F_S, args);
+			}
 
-			args = new Object[] {
+			if ((bookmarksEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_U_F_S.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					bookmarksEntryModelImpl.getOriginalGroupId(),
+					bookmarksEntryModelImpl.getOriginalUserId(),
+					bookmarksEntryModelImpl.getOriginalFolderId(),
+					bookmarksEntryModelImpl.getOriginalStatus()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_U_F_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_U_F_S, args);
+
+				args = new Object[] {
 					bookmarksEntryModelImpl.getGroupId(),
 					bookmarksEntryModelImpl.getUserId(),
 					bookmarksEntryModelImpl.getFolderId(),
 					bookmarksEntryModelImpl.getStatus()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_U_F_S, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_F_S,
-				args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((bookmarksEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUuid.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						bookmarksEntryModelImpl.getOriginalUuid()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-					args);
-
-				args = new Object[] { bookmarksEntryModelImpl.getUuid() };
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-					args);
-			}
-
-			if ((bookmarksEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						bookmarksEntryModelImpl.getOriginalUuid(),
-						bookmarksEntryModelImpl.getOriginalCompanyId()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-					args);
-
-				args = new Object[] {
-						bookmarksEntryModelImpl.getUuid(),
-						bookmarksEntryModelImpl.getCompanyId()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-					args);
-			}
-
-			if ((bookmarksEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByCompanyId.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						bookmarksEntryModelImpl.getOriginalCompanyId()
-					};
-
-				finderCache.removeResult(_finderPathCountByCompanyId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
-					args);
-
-				args = new Object[] { bookmarksEntryModelImpl.getCompanyId() };
-
-				finderCache.removeResult(_finderPathCountByCompanyId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByCompanyId,
-					args);
-			}
-
-			if ((bookmarksEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_F.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						bookmarksEntryModelImpl.getOriginalGroupId(),
-						bookmarksEntryModelImpl.getOriginalFolderId()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_F, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_F,
-					args);
-
-				args = new Object[] {
-						bookmarksEntryModelImpl.getGroupId(),
-						bookmarksEntryModelImpl.getFolderId()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_F, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_F,
-					args);
-			}
-
-			if ((bookmarksEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_S.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						bookmarksEntryModelImpl.getOriginalGroupId(),
-						bookmarksEntryModelImpl.getOriginalStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_S,
-					args);
-
-				args = new Object[] {
-						bookmarksEntryModelImpl.getGroupId(),
-						bookmarksEntryModelImpl.getStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_S,
-					args);
-			}
-
-			if ((bookmarksEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_U_S.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						bookmarksEntryModelImpl.getOriginalGroupId(),
-						bookmarksEntryModelImpl.getOriginalUserId(),
-						bookmarksEntryModelImpl.getOriginalStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_U_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_S,
-					args);
-
-				args = new Object[] {
-						bookmarksEntryModelImpl.getGroupId(),
-						bookmarksEntryModelImpl.getUserId(),
-						bookmarksEntryModelImpl.getStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_U_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_S,
-					args);
-			}
-
-			if ((bookmarksEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_F_S.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						bookmarksEntryModelImpl.getOriginalGroupId(),
-						bookmarksEntryModelImpl.getOriginalFolderId(),
-						bookmarksEntryModelImpl.getOriginalStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_F_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_F_S,
-					args);
-
-				args = new Object[] {
-						bookmarksEntryModelImpl.getGroupId(),
-						bookmarksEntryModelImpl.getFolderId(),
-						bookmarksEntryModelImpl.getStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_F_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_F_S,
-					args);
-			}
-
-			if ((bookmarksEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_U_F_S.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						bookmarksEntryModelImpl.getOriginalGroupId(),
-						bookmarksEntryModelImpl.getOriginalUserId(),
-						bookmarksEntryModelImpl.getOriginalFolderId(),
-						bookmarksEntryModelImpl.getOriginalStatus()
-					};
-
 				finderCache.removeResult(_finderPathCountByG_U_F_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_F_S,
-					args);
-
-				args = new Object[] {
-						bookmarksEntryModelImpl.getGroupId(),
-						bookmarksEntryModelImpl.getUserId(),
-						bookmarksEntryModelImpl.getFolderId(),
-						bookmarksEntryModelImpl.getStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_U_F_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_U_F_S,
-					args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_U_F_S, args);
 			}
 		}
 
-		entityCache.putResult(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-			BookmarksEntryImpl.class, bookmarksEntry.getPrimaryKey(),
-			bookmarksEntry, false);
+		entityCache.putResult(
+			entityCacheEnabled, BookmarksEntryImpl.class,
+			bookmarksEntry.getPrimaryKey(), bookmarksEntry, false);
 
 		clearUniqueFindersCache(bookmarksEntryModelImpl, false);
 		cacheUniqueFindersCache(bookmarksEntryModelImpl);
@@ -12646,6 +13292,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	@Override
 	public BookmarksEntry findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchEntryException {
+
 		BookmarksEntry bookmarksEntry = fetchByPrimaryKey(primaryKey);
 
 		if (bookmarksEntry == null) {
@@ -12653,8 +13300,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchEntryException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return bookmarksEntry;
@@ -12670,6 +13317,7 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	@Override
 	public BookmarksEntry findByPrimaryKey(long entryId)
 		throws NoSuchEntryException {
+
 		return findByPrimaryKey((Serializable)entryId);
 	}
 
@@ -12723,8 +13371,10 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findAll(int start, int end,
+	public List<BookmarksEntry> findAll(
+		int start, int end,
 		OrderByComparator<BookmarksEntry> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -12742,29 +13392,31 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 * @return the ordered range of bookmarks entries
 	 */
 	@Override
-	public List<BookmarksEntry> findAll(int start, int end,
-		OrderByComparator<BookmarksEntry> orderByComparator,
+	public List<BookmarksEntry> findAll(
+		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<BookmarksEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<BookmarksEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<BookmarksEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -12772,13 +13424,13 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_BOOKMARKSENTRY);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -12798,16 +13450,16 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<BookmarksEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<BookmarksEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -12845,8 +13497,8 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(_finderPathCountAll,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -12858,11 +13510,12 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -12902,390 +13555,419 @@ public class BookmarksEntryPersistenceImpl extends BasePersistenceImpl<Bookmarks
 	/**
 	 * Initializes the bookmarks entry persistence.
 	 */
-	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+	@Activate
+	public void activate() {
+		BookmarksEntryModelImpl.setEntityCacheEnabled(entityCacheEnabled);
+		BookmarksEntryModelImpl.setFinderCacheEnabled(finderCacheEnabled);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-				new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathCountAll = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-				new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
 
-		_finderPathWithPaginationFindByUuid = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-				new String[] {
-					String.class.getName(),
-					
+		_finderPathCountAll = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
+
+		_finderPathWithPaginationFindByUuid = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+			new String[] {
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+			new String[] {String.class.getName()},
+			BookmarksEntryModelImpl.UUID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
+
+		_finderPathCountByUuid = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+			new String[] {String.class.getName()});
+
+		_finderPathFetchByUUID_G = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
+			new String[] {String.class.getName(), Long.class.getName()},
+			BookmarksEntryModelImpl.UUID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK);
+
+		_finderPathCountByUUID_G = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
+			new String[] {String.class.getName(), Long.class.getName()});
+
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+			new String[] {
+				String.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-				new String[] { String.class.getName() },
-				BookmarksEntryModelImpl.UUID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			BookmarksEntryModelImpl.UUID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByUuid = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-				new String[] { String.class.getName() });
+		_finderPathCountByUuid_C = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()});
 
-		_finderPathFetchByUUID_G = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class, FINDER_CLASS_NAME_ENTITY,
-				"fetchByUUID_G",
-				new String[] { String.class.getName(), Long.class.getName() },
-				BookmarksEntryModelImpl.UUID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK);
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathCountByUUID_G = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
-				new String[] { String.class.getName(), Long.class.getName() });
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+			new String[] {Long.class.getName()},
+			BookmarksEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-				new String[] {
-					String.class.getName(), Long.class.getName(),
-					
+		_finderPathCountByCompanyId = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByG_F = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_F",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-				new String[] { String.class.getName(), Long.class.getName() },
-				BookmarksEntryModelImpl.UUID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_F = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_F",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByUuid_C = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-				new String[] { String.class.getName(), Long.class.getName() });
+		_finderPathCountByG_F = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_F",
+			new String[] {Long.class.getName(), Long.class.getName()});
 
-		_finderPathWithPaginationFindByCompanyId = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
-				new String[] {
-					Long.class.getName(),
-					
+		_finderPathWithPaginationCountByG_F = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_F",
+			new String[] {Long.class.getName(), Long.class.getName()});
+
+		_finderPathWithPaginationFindByG_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_S",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
-				new String[] { Long.class.getName() },
-				BookmarksEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_S",
+			new String[] {Long.class.getName(), Integer.class.getName()},
+			BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.STATUS_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByCompanyId = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
-				new String[] { Long.class.getName() });
+		_finderPathCountByG_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
+			new String[] {Long.class.getName(), Integer.class.getName()});
 
-		_finderPathWithPaginationFindByG_F = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_F",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					
+		_finderPathWithPaginationFindByG_NotS = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_NotS",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_F = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_F",
-				new String[] { Long.class.getName(), Long.class.getName() },
-				BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithPaginationCountByG_NotS = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_NotS",
+			new String[] {Long.class.getName(), Integer.class.getName()});
 
-		_finderPathCountByG_F = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_F",
-				new String[] { Long.class.getName(), Long.class.getName() });
-
-		_finderPathWithPaginationCountByG_F = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_F",
-				new String[] { Long.class.getName(), Long.class.getName() });
-
-		_finderPathWithPaginationFindByG_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_S",
-				new String[] {
-					Long.class.getName(), Integer.class.getName(),
-					
+		_finderPathWithPaginationFindByC_NotS = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_NotS",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_S",
-				new String[] { Long.class.getName(), Integer.class.getName() },
-				BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.STATUS_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithPaginationCountByC_NotS = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_NotS",
+			new String[] {Long.class.getName(), Integer.class.getName()});
 
-		_finderPathCountByG_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
-				new String[] { Long.class.getName(), Integer.class.getName() });
-
-		_finderPathWithPaginationFindByG_NotS = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_NotS",
-				new String[] {
-					Long.class.getName(), Integer.class.getName(),
-					
+		_finderPathWithPaginationFindByG_U_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithPaginationCountByG_NotS = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_NotS",
-				new String[] { Long.class.getName(), Integer.class.getName() });
+		_finderPathWithoutPaginationFindByG_U_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			},
+			BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.USERID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.STATUS_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByC_NotS = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_NotS",
-				new String[] {
-					Long.class.getName(), Integer.class.getName(),
-					
+		_finderPathCountByG_U_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
+
+		_finderPathWithPaginationFindByG_U_NotS = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_NotS",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithPaginationCountByC_NotS = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_NotS",
-				new String[] { Long.class.getName(), Integer.class.getName() });
+		_finderPathWithPaginationCountByG_U_NotS = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_NotS",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
 
-		_finderPathWithPaginationFindByG_U_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName(),
-					
+		_finderPathWithPaginationFindByG_F_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_F_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_U_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				},
-				BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.USERID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.STATUS_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_F_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_F_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			},
+			BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.STATUS_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByG_U_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				});
+		_finderPathCountByG_F_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_F_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
 
-		_finderPathWithPaginationFindByG_U_NotS = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_NotS",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName(),
-					
+		_finderPathWithPaginationCountByG_F_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_F_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
+
+		_finderPathWithPaginationFindByG_F_NotS = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_F_NotS",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithPaginationCountByG_U_NotS = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_NotS",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				});
+		_finderPathWithPaginationCountByG_F_NotS = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_F_NotS",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
 
-		_finderPathWithPaginationFindByG_F_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_F_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName(),
-					
+		_finderPathWithPaginationFindByG_U_F_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_F_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_F_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_F_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				},
-				BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.STATUS_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_U_F_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, BookmarksEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_F_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName()
+			},
+			BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.USERID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.STATUS_COLUMN_BITMASK |
+			BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByG_F_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_F_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				});
+		_finderPathCountByG_U_F_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_F_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName()
+			});
 
-		_finderPathWithPaginationCountByG_F_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_F_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				});
-
-		_finderPathWithPaginationFindByG_F_NotS = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_F_NotS",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithPaginationCountByG_F_NotS = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_F_NotS",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				});
-
-		_finderPathWithPaginationFindByG_U_F_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_F_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Integer.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithoutPaginationFindByG_U_F_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED,
-				BookmarksEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_F_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Integer.class.getName()
-				},
-				BookmarksEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.USERID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.FOLDERID_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.STATUS_COLUMN_BITMASK |
-				BookmarksEntryModelImpl.NAME_COLUMN_BITMASK);
-
-		_finderPathCountByG_U_F_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_F_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Integer.class.getName()
-				});
-
-		_finderPathWithPaginationCountByG_U_F_S = new FinderPath(BookmarksEntryModelImpl.ENTITY_CACHE_ENABLED,
-				BookmarksEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_F_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Integer.class.getName()
-				});
+		_finderPathWithPaginationCountByG_U_F_S = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_F_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName()
+			});
 	}
 
-	public void destroy() {
+	@Deactivate
+	public void deactivate() {
 		entityCache.removeCache(BookmarksEntryImpl.class.getName());
 		finderCache.removeCache(FINDER_CLASS_NAME_ENTITY);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
-	@ServiceReference(type = CompanyProviderWrapper.class)
+	@Override
+	@Reference(
+		target = BookmarksPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setConfiguration(Configuration configuration) {
+		super.setConfiguration(configuration);
+
+		_columnBitmaskEnabled = GetterUtil.getBoolean(
+			configuration.get(
+				"value.object.column.bitmask.enabled.com.liferay.bookmarks.model.BookmarksEntry"),
+			true);
+	}
+
+	@Override
+	@Reference(
+		target = BookmarksPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setDataSource(DataSource dataSource) {
+		super.setDataSource(dataSource);
+	}
+
+	@Override
+	@Reference(
+		target = BookmarksPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		super.setSessionFactory(sessionFactory);
+	}
+
+	private boolean _columnBitmaskEnabled;
+
+	@Reference(service = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-	@ServiceReference(type = EntityCache.class)
+
+	@Reference
 	protected EntityCache entityCache;
-	@ServiceReference(type = FinderCache.class)
+
+	@Reference
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_BOOKMARKSENTRY = "SELECT bookmarksEntry FROM BookmarksEntry bookmarksEntry";
-	private static final String _SQL_SELECT_BOOKMARKSENTRY_WHERE = "SELECT bookmarksEntry FROM BookmarksEntry bookmarksEntry WHERE ";
-	private static final String _SQL_COUNT_BOOKMARKSENTRY = "SELECT COUNT(bookmarksEntry) FROM BookmarksEntry bookmarksEntry";
-	private static final String _SQL_COUNT_BOOKMARKSENTRY_WHERE = "SELECT COUNT(bookmarksEntry) FROM BookmarksEntry bookmarksEntry WHERE ";
-	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "bookmarksEntry.entryId";
-	private static final String _FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE = "SELECT DISTINCT {bookmarksEntry.*} FROM BookmarksEntry bookmarksEntry WHERE ";
-	private static final String _FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1 =
-		"SELECT {BookmarksEntry.*} FROM (SELECT DISTINCT bookmarksEntry.entryId FROM BookmarksEntry bookmarksEntry WHERE ";
-	private static final String _FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2 =
-		") TEMP_TABLE INNER JOIN BookmarksEntry ON TEMP_TABLE.entryId = BookmarksEntry.entryId";
-	private static final String _FILTER_SQL_COUNT_BOOKMARKSENTRY_WHERE = "SELECT COUNT(DISTINCT bookmarksEntry.entryId) AS COUNT_VALUE FROM BookmarksEntry bookmarksEntry WHERE ";
+
+	private static final String _SQL_SELECT_BOOKMARKSENTRY =
+		"SELECT bookmarksEntry FROM BookmarksEntry bookmarksEntry";
+
+	private static final String _SQL_SELECT_BOOKMARKSENTRY_WHERE =
+		"SELECT bookmarksEntry FROM BookmarksEntry bookmarksEntry WHERE ";
+
+	private static final String _SQL_COUNT_BOOKMARKSENTRY =
+		"SELECT COUNT(bookmarksEntry) FROM BookmarksEntry bookmarksEntry";
+
+	private static final String _SQL_COUNT_BOOKMARKSENTRY_WHERE =
+		"SELECT COUNT(bookmarksEntry) FROM BookmarksEntry bookmarksEntry WHERE ";
+
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN =
+		"bookmarksEntry.entryId";
+
+	private static final String _FILTER_SQL_SELECT_BOOKMARKSENTRY_WHERE =
+		"SELECT DISTINCT {bookmarksEntry.*} FROM BookmarksEntry bookmarksEntry WHERE ";
+
+	private static final String
+		_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_1 =
+			"SELECT {BookmarksEntry.*} FROM (SELECT DISTINCT bookmarksEntry.entryId FROM BookmarksEntry bookmarksEntry WHERE ";
+
+	private static final String
+		_FILTER_SQL_SELECT_BOOKMARKSENTRY_NO_INLINE_DISTINCT_WHERE_2 =
+			") TEMP_TABLE INNER JOIN BookmarksEntry ON TEMP_TABLE.entryId = BookmarksEntry.entryId";
+
+	private static final String _FILTER_SQL_COUNT_BOOKMARKSENTRY_WHERE =
+		"SELECT COUNT(DISTINCT bookmarksEntry.entryId) AS COUNT_VALUE FROM BookmarksEntry bookmarksEntry WHERE ";
+
 	private static final String _FILTER_ENTITY_ALIAS = "bookmarksEntry";
+
 	private static final String _FILTER_ENTITY_TABLE = "BookmarksEntry";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "bookmarksEntry.";
+
 	private static final String _ORDER_BY_ENTITY_TABLE = "BookmarksEntry.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No BookmarksEntry exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No BookmarksEntry exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(BookmarksEntryPersistenceImpl.class);
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"uuid"
-			});
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No BookmarksEntry exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No BookmarksEntry exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BookmarksEntryPersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"uuid"});
+
 }

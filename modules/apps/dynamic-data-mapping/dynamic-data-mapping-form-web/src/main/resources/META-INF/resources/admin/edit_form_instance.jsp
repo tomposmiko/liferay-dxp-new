@@ -135,7 +135,9 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 			</aui:button-row>
 		</div>
 
-		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="publishFormInstance" var="publishFormInstanceURL" />
+		<portlet:actionURL name="publishFormInstance" var="publishFormInstanceURL">
+			<portlet:param name="mvcRenderCommandName" value="/admin/edit_form_instance" />
+		</portlet:actionURL>
 
 		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="saveFormInstance" var="autoSaveFormInstanceURL" />
 
@@ -235,6 +237,7 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 								published: !!<%= ddmFormAdminDisplayContext.isFormPublished() %>,
 								publishFormInstanceURL: '<%= publishFormInstanceURL.toString() %>',
 								ruleBuilder: Liferay.component('<portlet:namespace />ruleBuilder'),
+								showPublishAlert: <%= ddmFormAdminDisplayContext.isShowPublishAlert() %>,
 								translationManager: Liferay.component('<portlet:namespace />translationManager')
 							}
 						)

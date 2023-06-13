@@ -17,26 +17,35 @@ package com.liferay.blogs.service.persistence.impl;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
 import com.liferay.blogs.service.persistence.impl.constants.BlogsPersistenceConstants;
-
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 
-import org.osgi.service.component.annotations.Reference;
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
  * @generated
  */
-public abstract class BlogsEntryFinderBaseImpl extends BasePersistenceImpl<BlogsEntry> {
+public abstract class BlogsEntryFinderBaseImpl
+	extends BasePersistenceImpl<BlogsEntry> {
+
 	public BlogsEntryFinderBaseImpl() {
 		setModelClass(BlogsEntry.class);
+
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
+		setDBColumnNames(dbColumnNames);
 	}
 
 	@Override
@@ -45,24 +54,36 @@ public abstract class BlogsEntryFinderBaseImpl extends BasePersistenceImpl<Blogs
 	}
 
 	@Override
-	@Reference(target = BlogsPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER, unbind = "-")
+	@Reference(
+		target = BlogsPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
 	public void setConfiguration(Configuration configuration) {
 		super.setConfiguration(configuration);
 	}
 
 	@Override
-	@Reference(target = BlogsPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER, unbind = "-")
+	@Reference(
+		target = BlogsPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
 	public void setDataSource(DataSource dataSource) {
 		super.setDataSource(dataSource);
 	}
 
 	@Override
-	@Reference(target = BlogsPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER, unbind = "-")
+	@Reference(
+		target = BlogsPersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
+		unbind = "-"
+	)
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		super.setSessionFactory(sessionFactory);
 	}
 
 	@Reference
 	protected BlogsEntryPersistence blogsEntryPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(BlogsEntryFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BlogsEntryFinderBaseImpl.class);
+
 }

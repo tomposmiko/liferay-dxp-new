@@ -32,8 +32,9 @@ import com.liferay.mobile.device.rules.service.MDRRuleGroupLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class MDRRuleGroupBaseImpl extends MDRRuleGroupModelImpl
-	implements MDRRuleGroup {
+public abstract class MDRRuleGroupBaseImpl
+	extends MDRRuleGroupModelImpl implements MDRRuleGroup {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class MDRRuleGroupBaseImpl extends MDRRuleGroupModelImpl
 			MDRRuleGroupLocalServiceUtil.updateMDRRuleGroup(this);
 		}
 	}
+
 }

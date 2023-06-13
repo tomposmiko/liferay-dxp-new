@@ -35,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface MessageModel extends AuditedModel, BaseModel<Message>,
-	ShardedModel {
+public interface MessageModel
+	extends AuditedModel, BaseModel<Message>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -372,4 +373,5 @@ public interface MessageModel extends AuditedModel, BaseModel<Message>,
 	 * @param contentType the content type of this message
 	 */
 	public void setContentType(String contentType);
+
 }

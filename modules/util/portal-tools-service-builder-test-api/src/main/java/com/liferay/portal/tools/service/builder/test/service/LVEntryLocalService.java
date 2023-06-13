@@ -54,25 +54,44 @@ import java.util.Map;
  * @see LVEntryLocalServiceUtil
  * @generated
  */
-@OSGiBeanProperties(property =  {
-	"model.class.name=com.liferay.portal.tools.service.builder.test.model.LVEntry", "version.model.class.name=com.liferay.portal.tools.service.builder.test.model.LVEntryVersion"})
+@OSGiBeanProperties(
+	property = {
+		"model.class.name=com.liferay.portal.tools.service.builder.test.model.LVEntry",
+		"version.model.class.name=com.liferay.portal.tools.service.builder.test.model.LVEntryVersion"
+	}
+)
 @ProviderType
-@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
-	PortalException.class, SystemException.class})
-public interface LVEntryLocalService extends BaseLocalService,
-	PersistedModelLocalService, VersionService<LVEntry, LVEntryVersion> {
+@Transactional(
+	isolation = Isolation.PORTAL,
+	rollbackFor = {PortalException.class, SystemException.class}
+)
+public interface LVEntryLocalService
+	extends BaseLocalService, PersistedModelLocalService,
+			VersionService<LVEntry, LVEntryVersion> {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LVEntryLocalServiceUtil} to access the lv entry local service. Add custom service methods to <code>com.liferay.portal.tools.service.builder.test.service.impl.LVEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public void addBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, List<LVEntry> lvEntries);
+
+	public void addBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, long[] lvEntryIds);
+
+	public void addBigDecimalEntryLVEntry(
+		long bigDecimalEntryId, long lvEntryId);
+
+	public void addBigDecimalEntryLVEntry(
+		long bigDecimalEntryId, LVEntry lvEntry);
 
 	/**
-	* Adds the lv entry to the database. Also notifies the appropriate model listeners.
-	*
-	* @param lvEntry the lv entry
-	* @return the lv entry that was added
-	*/
+	 * Adds the lv entry to the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param lvEntry the lv entry
+	 * @return the lv entry that was added
+	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public LVEntry addLVEntry(LVEntry lvEntry);
 
@@ -81,11 +100,13 @@ public interface LVEntryLocalService extends BaseLocalService,
 	public LVEntry checkout(LVEntry publishedLVEntry, int version)
 		throws PortalException;
 
+	public void clearBigDecimalEntryLVEntries(long bigDecimalEntryId);
+
 	/**
-	* Creates a new lv entry. Does not add the lv entry to the database.
-	*
-	* @return the new lv entry
-	*/
+	 * Creates a new lv entry. Does not add the lv entry to the database.
+	 *
+	 * @return the new lv entry
+	 */
 	@Transactional(enabled = false)
 	@Override
 	public LVEntry create();
@@ -94,32 +115,44 @@ public interface LVEntryLocalService extends BaseLocalService,
 	@Override
 	public LVEntry delete(LVEntry publishedLVEntry) throws PortalException;
 
+	public void deleteBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, List<LVEntry> lvEntries);
+
+	public void deleteBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, long[] lvEntryIds);
+
+	public void deleteBigDecimalEntryLVEntry(
+		long bigDecimalEntryId, long lvEntryId);
+
+	public void deleteBigDecimalEntryLVEntry(
+		long bigDecimalEntryId, LVEntry lvEntry);
+
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public LVEntry deleteDraft(LVEntry draftLVEntry) throws PortalException;
 
 	/**
-	* Deletes the lv entry with the primary key from the database. Also notifies the appropriate model listeners.
-	*
-	* @param lvEntryId the primary key of the lv entry
-	* @return the lv entry that was removed
-	* @throws PortalException if a lv entry with the primary key could not be found
-	*/
+	 * Deletes the lv entry with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param lvEntryId the primary key of the lv entry
+	 * @return the lv entry that was removed
+	 * @throws PortalException if a lv entry with the primary key could not be found
+	 */
 	@Indexable(type = IndexableType.DELETE)
 	public LVEntry deleteLVEntry(long lvEntryId) throws PortalException;
 
 	/**
-	* Deletes the lv entry from the database. Also notifies the appropriate model listeners.
-	*
-	* @param lvEntry the lv entry
-	* @return the lv entry that was removed
-	*/
+	 * Deletes the lv entry from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param lvEntry the lv entry
+	 * @return the lv entry that was removed
+	 */
 	@Indexable(type = IndexableType.DELETE)
 	public LVEntry deleteLVEntry(LVEntry lvEntry);
 
 	/**
-	* @throws PortalException
-	*/
+	 * @throws PortalException
+	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
@@ -132,66 +165,67 @@ public interface LVEntryLocalService extends BaseLocalService,
 	public DynamicQuery dynamicQuery();
 
 	/**
-	* Performs a dynamic query on the database and returns the matching rows.
-	*
-	* @param dynamicQuery the dynamic query
-	* @return the matching rows
-	*/
+	 * Performs a dynamic query on the database and returns the matching rows.
+	 *
+	 * @param dynamicQuery the dynamic query
+	 * @return the matching rows
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery);
 
 	/**
-	* Performs a dynamic query on the database and returns a range of the matching rows.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.tools.service.builder.test.model.impl.LVEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
-	* </p>
-	*
-	* @param dynamicQuery the dynamic query
-	* @param start the lower bound of the range of model instances
-	* @param end the upper bound of the range of model instances (not inclusive)
-	* @return the range of matching rows
-	*/
+	 * Performs a dynamic query on the database and returns a range of the matching rows.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.tools.service.builder.test.model.impl.LVEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param dynamicQuery the dynamic query
+	 * @param start the lower bound of the range of model instances
+	 * @param end the upper bound of the range of model instances (not inclusive)
+	 * @return the range of matching rows
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end);
 
 	/**
-	* Performs a dynamic query on the database and returns an ordered range of the matching rows.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.tools.service.builder.test.model.impl.LVEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
-	* </p>
-	*
-	* @param dynamicQuery the dynamic query
-	* @param start the lower bound of the range of model instances
-	* @param end the upper bound of the range of model instances (not inclusive)
-	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	* @return the ordered range of matching rows
-	*/
+	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.tools.service.builder.test.model.impl.LVEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param dynamicQuery the dynamic query
+	 * @param start the lower bound of the range of model instances
+	 * @param end the upper bound of the range of model instances (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching rows
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator);
 
 	/**
-	* Returns the number of rows matching the dynamic query.
-	*
-	* @param dynamicQuery the dynamic query
-	* @return the number of rows matching the dynamic query
-	*/
+	 * Returns the number of rows matching the dynamic query.
+	 *
+	 * @param dynamicQuery the dynamic query
+	 * @return the number of rows matching the dynamic query
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long dynamicQueryCount(DynamicQuery dynamicQuery);
 
 	/**
-	* Returns the number of rows matching the dynamic query.
-	*
-	* @param dynamicQuery the dynamic query
-	* @param projection the projection to apply to the query
-	* @return the number of rows matching the dynamic query
-	*/
+	 * Returns the number of rows matching the dynamic query.
+	 *
+	 * @param dynamicQuery the dynamic query
+	 * @param projection the projection to apply to the query
+	 * @return the number of rows matching the dynamic query
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection);
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -209,8 +243,8 @@ public interface LVEntryLocalService extends BaseLocalService,
 	public LVEntry fetchLVEntry(long lvEntryId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public LVEntryLocalization fetchLVEntryLocalization(long lvEntryId,
-		String languageId);
+	public LVEntryLocalization fetchLVEntryLocalization(
+		long lvEntryId, String languageId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public LVEntryLocalizationVersion fetchLVEntryLocalizationVersion(
@@ -227,6 +261,30 @@ public interface LVEntryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<LVEntry> getBigDecimalEntryLVEntries(long bigDecimalEntryId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<LVEntry> getBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<LVEntry> getBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, int start, int end,
+		OrderByComparator<LVEntry> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getBigDecimalEntryLVEntriesCount(long bigDecimalEntryId);
+
+	/**
+	 * Returns the bigDecimalEntryIds of the big decimal entries associated with the lv entry.
+	 *
+	 * @param lvEntryId the lvEntryId of the lv entry
+	 * @return long[] the bigDecimalEntryIds of big decimal entries associated with the lv entry
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long[] getBigDecimalEntryPrimaryKeys(long lvEntryId);
+
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public LVEntry getDraft(long primaryKey) throws PortalException;
@@ -239,40 +297,41 @@ public interface LVEntryLocalService extends BaseLocalService,
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
-	* Returns a range of all the lv entries.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.tools.service.builder.test.model.impl.LVEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
-	* </p>
-	*
-	* @param start the lower bound of the range of lv entries
-	* @param end the upper bound of the range of lv entries (not inclusive)
-	* @return the range of lv entries
-	*/
+	 * Returns a range of all the lv entries.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.tools.service.builder.test.model.impl.LVEntryModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param start the lower bound of the range of lv entries
+	 * @param end the upper bound of the range of lv entries (not inclusive)
+	 * @return the range of lv entries
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<LVEntry> getLVEntries(int start, int end);
 
 	/**
-	* Returns the number of lv entries.
-	*
-	* @return the number of lv entries
-	*/
+	 * Returns the number of lv entries.
+	 *
+	 * @return the number of lv entries
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getLVEntriesCount();
 
 	/**
-	* Returns the lv entry with the primary key.
-	*
-	* @param lvEntryId the primary key of the lv entry
-	* @return the lv entry
-	* @throws PortalException if a lv entry with the primary key could not be found
-	*/
+	 * Returns the lv entry with the primary key.
+	 *
+	 * @param lvEntryId the primary key of the lv entry
+	 * @return the lv entry
+	 * @throws PortalException if a lv entry with the primary key could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public LVEntry getLVEntry(long lvEntryId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public LVEntryLocalization getLVEntryLocalization(long lvEntryId,
-		String languageId) throws PortalException;
+	public LVEntryLocalization getLVEntryLocalization(
+			long lvEntryId, String languageId)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<LVEntryLocalization> getLVEntryLocalizations(long lvEntryId);
@@ -283,13 +342,14 @@ public interface LVEntryLocalService extends BaseLocalService,
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<LVEntryLocalizationVersion> getLVEntryLocalizationVersions(
-		long lvEntryId, String languageId) throws PortalException;
+			long lvEntryId, String languageId)
+		throws PortalException;
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public String getOSGiServiceIdentifier();
 
 	@Override
@@ -306,6 +366,13 @@ public interface LVEntryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<LVEntryVersion> getVersions(LVEntry lvEntry);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasBigDecimalEntryLVEntries(long bigDecimalEntryId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasBigDecimalEntryLVEntry(
+		long bigDecimalEntryId, long lvEntryId);
+
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public LVEntry publishDraft(LVEntry draftLVEntry) throws PortalException;
@@ -313,6 +380,9 @@ public interface LVEntryLocalService extends BaseLocalService,
 	@Override
 	public void registerListener(
 		VersionServiceListener<LVEntry, LVEntryVersion> versionServiceListener);
+
+	public void setBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, long[] lvEntryIds);
 
 	@Override
 	public void unregisterListener(
@@ -323,20 +393,22 @@ public interface LVEntryLocalService extends BaseLocalService,
 	public LVEntry updateDraft(LVEntry draftLVEntry) throws PortalException;
 
 	/**
-	* Updates the lv entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
-	*
-	* @param lvEntry the lv entry
-	* @return the lv entry that was updated
-	*/
+	 * Updates the lv entry in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	 *
+	 * @param lvEntry the lv entry
+	 * @return the lv entry that was updated
+	 */
 	@Indexable(type = IndexableType.REINDEX)
-	public LVEntry updateLVEntry(LVEntry draftLVEntry)
-		throws PortalException;
+	public LVEntry updateLVEntry(LVEntry draftLVEntry) throws PortalException;
 
-	public LVEntryLocalization updateLVEntryLocalization(LVEntry draftLVEntry,
-		String languageId, String title, String content)
+	public LVEntryLocalization updateLVEntryLocalization(
+			LVEntry draftLVEntry, String languageId, String title,
+			String content)
 		throws PortalException;
 
 	public List<LVEntryLocalization> updateLVEntryLocalizations(
-		LVEntry draftLVEntry, Map<String, String> titleMap,
-		Map<String, String> contentMap) throws PortalException;
+			LVEntry draftLVEntry, Map<String, String> titleMap,
+			Map<String, String> contentMap)
+		throws PortalException;
+
 }

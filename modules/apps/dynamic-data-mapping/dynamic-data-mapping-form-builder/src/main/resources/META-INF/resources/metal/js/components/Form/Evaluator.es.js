@@ -1,9 +1,9 @@
+import autobind from 'autobind-decorator';
+import Component from 'metal-jsx';
 import {Config} from 'metal-state';
 import {convertToSearchParams, makeFetch} from '../../util/fetch.es';
 import {debounce} from 'metal-debounce';
 import {PagesVisitor} from '../../util/visitors.es';
-import autobind from 'autobind-decorator';
-import Component from 'metal-jsx';
 
 const WithEvaluator = ChildComponent => {
 
@@ -14,6 +14,7 @@ const WithEvaluator = ChildComponent => {
 
 	class Evaluator extends Component {
 		static PROPS = {
+			editingLanguageId: Config.string(),
 
 			/**
 			 * @instance
@@ -82,7 +83,7 @@ const WithEvaluator = ChildComponent => {
 		_mergePages(sourcePages, newPages) {
 			const visitor = new PagesVisitor(sourcePages);
 
-			return visitor.mapFields(
+			const settingsContext = visitor.mapFields(
 				(field, fieldIndex, columnIndex, rowIndex, pageIndex) => {
 					const currentField = newPages[pageIndex].rows[rowIndex].columns[columnIndex].fields[fieldIndex];
 
@@ -90,18 +91,11 @@ const WithEvaluator = ChildComponent => {
 						currentField.visible = true;
 					}
 
-					return {
-						...field,
-						dataType: currentField.dataType,
-						errorMessage: currentField.errorMessage,
-						options: currentField.options,
-						readOnly: currentField.readOnly,
-						required: currentField.required,
-						valid: currentField.valid,
-						visible: currentField.visible
-					};
+					return currentField;
 				}
 			);
+
+			return settingsContext;
 		}
 
 		/**
@@ -118,38 +112,41 @@ const WithEvaluator = ChildComponent => {
 		 * @private
 		 */
 
-		_processEvaluation({fieldName}) {
-			const {fieldType, formContext, url} = this.props;
-			const {pages} = this.state;
+		_processEvaluation(fieldInstance) {
+			if (!fieldInstance.isDisposed() && !this.isDisposed()) {
+				const {fieldName} = fieldInstance;
+				const {fieldType, formContext, url} = this.props;
+				const {pages} = this.state;
 
-			makeFetch(
-				{
-					body: convertToSearchParams(
-						{
-							languageId: themeDisplay.getLanguageId(),
-							newField: '',
-							p_auth: Liferay.authToken,
-							portletNamespace: '',
-							serializedFormContext: JSON.stringify(formContext),
-							trigger: fieldName,
-							type: fieldType
-						}
-					),
-					url
-				}
-			).then(
-				newPages => {
-					const mergedPages = this._mergePages(pages, newPages);
+				makeFetch(
+					{
+						body: convertToSearchParams(
+							{
+								languageId: themeDisplay.getLanguageId(),
+								newField: '',
+								p_auth: Liferay.authToken,
+								portletNamespace: '',
+								serializedFormContext: JSON.stringify(formContext),
+								trigger: fieldName,
+								type: fieldType
+							}
+						),
+						url
+					}
+				).then(
+					newPages => {
+						const mergedPages = this._mergePages(pages, newPages);
 
-					this.emit('evaluated', mergedPages);
+						this.emit('evaluated', mergedPages);
 
-					this.setState(
-						{
-							pages: mergedPages
-						}
-					);
-				}
-			);
+						this.setState(
+							{
+								pages: mergedPages
+							}
+						);
+					}
+				);
+			}
 		}
 
 		/**
@@ -159,14 +156,16 @@ const WithEvaluator = ChildComponent => {
 
 		render() {
 			const {pages} = this.state;
-			const events = {
-				fieldEdited: this._handleFieldEdited
-			};
+			const {editingLanguageId, events} = this.props;
 
 			return (
 				<ChildComponent
 					{...this.props}
-					events={events}
+					editingLanguageId={editingLanguageId}
+					events={{
+						...events,
+						fieldEdited: this._handleFieldEdited
+					}}
 					pages={pages}
 				/>
 			);

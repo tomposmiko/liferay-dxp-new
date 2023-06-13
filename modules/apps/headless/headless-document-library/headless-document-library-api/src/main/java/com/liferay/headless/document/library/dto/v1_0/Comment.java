@@ -14,74 +14,259 @@
 
 package com.liferay.headless.document.library.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.validation.constraints.NotEmpty;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface Comment {
+@GraphQLName("Comment")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "Comment")
+public class Comment {
 
-	public Comment[] getComments();
+	public Creator getCreator() {
+		return creator;
+	}
 
-	public void setComments(
-			Comment[] comments);
+	public void setCreator(Creator creator) {
+		this.creator = creator;
+	}
 
-	public void setComments(
-			UnsafeSupplier<Comment[], Throwable>
-				commentsUnsafeSupplier);
-	public Creator getCreator();
-
+	@JsonIgnore
 	public void setCreator(
-			Creator creator);
+		UnsafeSupplier<Creator, Exception> creatorUnsafeSupplier) {
 
-	public void setCreator(
-			UnsafeSupplier<Creator, Throwable>
-				creatorUnsafeSupplier);
-	public Date getDateCreated();
+		try {
+			creator = creatorUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Creator creator;
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	@JsonIgnore
 	public void setDateCreated(
-			Date dateCreated);
+		UnsafeSupplier<Date, Exception> dateCreatedUnsafeSupplier) {
 
-	public void setDateCreated(
-			UnsafeSupplier<Date, Throwable>
-				dateCreatedUnsafeSupplier);
-	public Date getDateModified();
+		try {
+			dateCreated = dateCreatedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Date dateCreated;
+
+	public Date getDateModified() {
+		return dateModified;
+	}
+
+	public void setDateModified(Date dateModified) {
+		this.dateModified = dateModified;
+	}
+
+	@JsonIgnore
 	public void setDateModified(
-			Date dateModified);
+		UnsafeSupplier<Date, Exception> dateModifiedUnsafeSupplier) {
 
-	public void setDateModified(
-			UnsafeSupplier<Date, Throwable>
-				dateModifiedUnsafeSupplier);
-	public Boolean getHasComments();
+		try {
+			dateModified = dateModifiedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setHasComments(
-			Boolean hasComments);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Date dateModified;
 
-	public void setHasComments(
-			UnsafeSupplier<Boolean, Throwable>
-				hasCommentsUnsafeSupplier);
-	public Long getId();
+	public Long getId() {
+		return id;
+	}
 
-	public void setId(
-			Long id);
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public String getText();
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setText(
-			String text);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
 
-	public void setText(
-			UnsafeSupplier<String, Throwable>
-				textUnsafeSupplier);
+	public Number getNumberOfComments() {
+		return numberOfComments;
+	}
+
+	public void setNumberOfComments(Number numberOfComments) {
+		this.numberOfComments = numberOfComments;
+	}
+
+	@JsonIgnore
+	public void setNumberOfComments(
+		UnsafeSupplier<Number, Exception> numberOfCommentsUnsafeSupplier) {
+
+		try {
+			numberOfComments = numberOfCommentsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Number numberOfComments;
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	@JsonIgnore
+	public void setText(UnsafeSupplier<String, Exception> textUnsafeSupplier) {
+		try {
+			text = textUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@NotEmpty
+	protected String text;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Comment)) {
+			return false;
+		}
+
+		Comment comment = (Comment)object;
+
+		return Objects.equals(toString(), comment.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"creator\": ");
+
+		sb.append(creator);
+		sb.append(", ");
+
+		sb.append("\"dateCreated\": ");
+
+		sb.append("\"");
+		sb.append(dateCreated);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"dateModified\": ");
+
+		sb.append("\"");
+		sb.append(dateModified);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"numberOfComments\": ");
+
+		sb.append(numberOfComments);
+		sb.append(", ");
+
+		sb.append("\"text\": ");
+
+		sb.append("\"");
+		sb.append(text);
+		sb.append("\"");
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

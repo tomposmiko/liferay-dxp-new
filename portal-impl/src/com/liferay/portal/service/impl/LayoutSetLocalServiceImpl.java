@@ -69,21 +69,17 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 
 		Date now = new Date();
 
-		long layoutSetId = counterLocalService.increment();
+		LayoutSet draftLayoutSet = create();
 
-		LayoutSet layoutSet = layoutSetPersistence.create(layoutSetId);
+		draftLayoutSet.setGroupId(groupId);
+		draftLayoutSet.setCompanyId(group.getCompanyId());
+		draftLayoutSet.setCreateDate(now);
+		draftLayoutSet.setModifiedDate(now);
+		draftLayoutSet.setPrivateLayout(privateLayout);
 
-		layoutSet.setGroupId(groupId);
-		layoutSet.setCompanyId(group.getCompanyId());
-		layoutSet.setCreateDate(now);
-		layoutSet.setModifiedDate(now);
-		layoutSet.setPrivateLayout(privateLayout);
+		draftLayoutSet = initLayoutSet(draftLayoutSet);
 
-		layoutSet = initLayoutSet(layoutSet);
-
-		layoutSetPersistence.update(layoutSet);
-
-		return layoutSet;
+		return publishDraft(draftLayoutSet);
 	}
 
 	@Override
@@ -93,8 +89,8 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 
 		Group group = groupPersistence.findByPrimaryKey(groupId);
 
-		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
-			groupId, privateLayout);
+		LayoutSet layoutSet = layoutSetPersistence.findByG_P_Head(
+			groupId, privateLayout, true);
 
 		// Layouts
 
@@ -125,14 +121,16 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 		if (!group.isStagingGroup() && group.isOrganization() &&
 			group.isSite()) {
 
-			layoutSet = initLayoutSet(layoutSet);
+			LayoutSet draftLayoutSet = getDraft(layoutSet);
 
-			layoutSet.setLogoId(layoutSet.getLogoId());
+			draftLayoutSet = initLayoutSet(draftLayoutSet);
 
-			layoutSetPersistence.update(layoutSet);
+			draftLayoutSet.setLogoId(layoutSet.getLogoId());
+
+			layoutSet = publishDraft(draftLayoutSet);
 		}
 		else {
-			layoutSetPersistence.removeByG_P(groupId, privateLayout);
+			layoutSetPersistence.removeByG_P_Head(groupId, privateLayout, true);
 		}
 
 		// Virtual host
@@ -153,7 +151,8 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 
 	@Override
 	public LayoutSet fetchLayoutSet(long groupId, boolean privateLayout) {
-		return layoutSetPersistence.fetchByG_P(groupId, privateLayout);
+		return layoutSetPersistence.fetchByG_P_Head(
+			groupId, privateLayout, true);
 	}
 
 	@Override
@@ -176,14 +175,16 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 	public LayoutSet fetchLayoutSetByLogoId(boolean privateLayout, long logoId)
 		throws PortalException {
 
-		return layoutSetPersistence.fetchByP_L(privateLayout, logoId);
+		return layoutSetPersistence.fetchByP_L_Head(
+			privateLayout, logoId, true);
 	}
 
 	@Override
 	public LayoutSet getLayoutSet(long groupId, boolean privateLayout)
 		throws PortalException {
 
-		return layoutSetPersistence.findByG_P(groupId, privateLayout);
+		return layoutSetPersistence.findByG_P_Head(
+			groupId, privateLayout, true);
 	}
 
 	@Override
@@ -210,8 +211,15 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 	public List<LayoutSet> getLayoutSetsByLayoutSetPrototypeUuid(
 		String layoutSetPrototypeUuid) {
 
-		return layoutSetPersistence.findByLayoutSetPrototypeUuid(
-			layoutSetPrototypeUuid);
+		return layoutSetPersistence.findByLayoutSetPrototypeUuid_Head(
+			layoutSetPrototypeUuid, true);
+	}
+
+	@Override
+	public LayoutSet updateLayoutSet(LayoutSet layoutSet)
+		throws PortalException {
+
+		return publishDraft(getDraft(layoutSet));
 	}
 
 	/**
@@ -231,8 +239,8 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 			String layoutSetPrototypeUuid)
 		throws PortalException {
 
-		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
-			groupId, privateLayout);
+		LayoutSet layoutSet = layoutSetPersistence.findByG_P_Head(
+			groupId, privateLayout, true);
 
 		LayoutSetBranch layoutSetBranch = _getLayoutSetBranch(layoutSet);
 
@@ -245,11 +253,13 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 				layoutSetPrototypeLinkEnabled = false;
 			}
 
-			layoutSet.setLayoutSetPrototypeUuid(layoutSetPrototypeUuid);
-			layoutSet.setLayoutSetPrototypeLinkEnabled(
+			LayoutSet draftLayoutSet = getDraft(layoutSet);
+
+			draftLayoutSet.setLayoutSetPrototypeUuid(layoutSetPrototypeUuid);
+			draftLayoutSet.setLayoutSetPrototypeLinkEnabled(
 				layoutSetPrototypeLinkEnabled);
 
-			layoutSetPersistence.update(layoutSet);
+			publishDraft(draftLayoutSet);
 
 			return;
 		}
@@ -279,17 +289,20 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 			long groupId, boolean privateLayout, boolean logo, byte[] bytes)
 		throws PortalException {
 
-		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
-			groupId, privateLayout);
+		LayoutSet layoutSet = layoutSetPersistence.findByG_P_Head(
+			groupId, privateLayout, true);
 
 		LayoutSetBranch layoutSetBranch = _getLayoutSetBranch(layoutSet);
 
 		if (layoutSetBranch == null) {
-			layoutSet.setModifiedDate(new Date());
+			LayoutSet draftLayoutSet = getDraft(layoutSet);
 
-			PortalUtil.updateImageId(layoutSet, logo, bytes, "logoId", 0, 0, 0);
+			draftLayoutSet.setModifiedDate(new Date());
 
-			return layoutSetPersistence.update(layoutSet);
+			PortalUtil.updateImageId(
+				draftLayoutSet, logo, bytes, "logoId", 0, 0, 0);
+
+			return publishDraft(draftLayoutSet);
 		}
 
 		layoutSetBranch.setModifiedDate(new Date());
@@ -351,8 +364,8 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 			String colorSchemeId, String css)
 		throws PortalException {
 
-		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
-			groupId, privateLayout);
+		LayoutSet layoutSet = layoutSetPersistence.findByG_P_Head(
+			groupId, privateLayout, true);
 
 		if (Validator.isNull(themeId)) {
 			themeId = ThemeFactoryUtil.getDefaultRegularThemeId(
@@ -367,24 +380,28 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 		LayoutSetBranch layoutSetBranch = _getLayoutSetBranch(layoutSet);
 
 		if (layoutSetBranch == null) {
-			layoutSet.setModifiedDate(new Date());
-			layoutSet.setThemeId(themeId);
-			layoutSet.setColorSchemeId(colorSchemeId);
-			layoutSet.setCss(css);
+			LayoutSet draftLayoutSet = getDraft(layoutSet);
 
-			layoutSetPersistence.update(layoutSet);
+			draftLayoutSet.setModifiedDate(new Date());
+			draftLayoutSet.setThemeId(themeId);
+			draftLayoutSet.setColorSchemeId(colorSchemeId);
+			draftLayoutSet.setCss(css);
+
+			layoutSet = publishDraft(draftLayoutSet);
 
 			if (PrefsPropsUtil.getBoolean(
 					PropsKeys.THEME_SYNC_ON_GROUP,
 					PropsValues.THEME_SYNC_ON_GROUP)) {
 
-				LayoutSet otherLayoutSet = layoutSetPersistence.findByG_P(
-					layoutSet.getGroupId(), layoutSet.isPrivateLayout());
+				LayoutSet otherLayoutSet = layoutSetPersistence.findByG_P_Head(
+					layoutSet.getGroupId(), layoutSet.isPrivateLayout(), true);
 
-				otherLayoutSet.setThemeId(themeId);
-				otherLayoutSet.setColorSchemeId(colorSchemeId);
+				LayoutSet otherDraftLayoutSet = getDraft(otherLayoutSet);
 
-				layoutSetPersistence.update(otherLayoutSet);
+				otherDraftLayoutSet.setThemeId(themeId);
+				otherDraftLayoutSet.setColorSchemeId(colorSchemeId);
+
+				publishDraft(otherDraftLayoutSet);
 			}
 
 			return layoutSet;
@@ -413,17 +430,18 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 	public LayoutSet updatePageCount(long groupId, boolean privateLayout)
 		throws PortalException {
 
-		int pageCount = layoutPersistence.countByG_P(groupId, privateLayout);
+		int pageCount = layoutPersistence.countByG_P_Head(
+			groupId, privateLayout, true);
 
-		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
-			groupId, privateLayout);
+		LayoutSet layoutSet = layoutSetPersistence.findByG_P_Head(
+			groupId, privateLayout, true);
 
-		layoutSet.setModifiedDate(new Date());
-		layoutSet.setPageCount(pageCount);
+		LayoutSet draftLayoutSet = getDraft(layoutSet);
 
-		layoutSetPersistence.update(layoutSet);
+		draftLayoutSet.setModifiedDate(new Date());
+		draftLayoutSet.setPageCount(pageCount);
 
-		return layoutSet;
+		return publishDraft(draftLayoutSet);
 	}
 
 	@Override
@@ -435,22 +453,22 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 
 		settingsProperties.fastLoad(settings);
 
-		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
-			groupId, privateLayout);
+		LayoutSet layoutSet = layoutSetPersistence.findByG_P_Head(
+			groupId, privateLayout, true);
 
 		LayoutSetBranch layoutSetBranch = _getLayoutSetBranch(layoutSet);
 
 		if (layoutSetBranch == null) {
-			layoutSet.setModifiedDate(new Date());
+			LayoutSet draftLayoutSet = getDraft(layoutSet);
+
+			draftLayoutSet.setModifiedDate(new Date());
 
 			validateSettings(
-				layoutSet.getSettingsProperties(), settingsProperties);
+				draftLayoutSet.getSettingsProperties(), settingsProperties);
 
-			layoutSet.setSettingsProperties(settingsProperties);
+			draftLayoutSet.setSettingsProperties(settingsProperties);
 
-			layoutSetPersistence.update(layoutSet);
-
-			return layoutSet;
+			return publishDraft(draftLayoutSet);
 		}
 
 		layoutSetBranch.setModifiedDate(new Date());
@@ -479,8 +497,8 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 			throw new LayoutSetVirtualHostException();
 		}
 
-		LayoutSet layoutSet = layoutSetPersistence.findByG_P(
-			groupId, privateLayout);
+		LayoutSet layoutSet = layoutSetPersistence.findByG_P_Head(
+			groupId, privateLayout, true);
 
 		if (Validator.isNotNull(virtualHostname)) {
 			VirtualHost virtualHost = virtualHostPersistence.fetchByHostname(

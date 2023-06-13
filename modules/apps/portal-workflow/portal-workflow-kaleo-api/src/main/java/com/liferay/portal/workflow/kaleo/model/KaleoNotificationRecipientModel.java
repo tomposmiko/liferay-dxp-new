@@ -36,8 +36,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface KaleoNotificationRecipientModel extends BaseModel<KaleoNotificationRecipient>,
-	GroupedModel, MVCCModel, ShardedModel {
+public interface KaleoNotificationRecipientModel
+	extends BaseModel<KaleoNotificationRecipient>, GroupedModel, MVCCModel,
+			ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -347,4 +349,5 @@ public interface KaleoNotificationRecipientModel extends BaseModel<KaleoNotifica
 	 * @param notificationReceptionType the notification reception type of this kaleo notification recipient
 	 */
 	public void setNotificationReceptionType(String notificationReceptionType);
+
 }

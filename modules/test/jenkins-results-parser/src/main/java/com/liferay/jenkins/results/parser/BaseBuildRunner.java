@@ -17,7 +17,12 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * @author Michael Hashimoto
@@ -71,7 +76,58 @@ public abstract class BaseBuildRunner<T extends BuildData, S extends Workspace>
 		return _job;
 	}
 
+	protected List<JSONObject> getPreviousBuildJSONObjects() {
+		if (_previousBuildJSONObjects != null) {
+			return _previousBuildJSONObjects;
+		}
+
+		_previousBuildJSONObjects = new ArrayList<>();
+
+		BuildData buildData = getBuildData();
+
+		try {
+			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
+				JenkinsResultsParserUtil.getLocalURL(buildData.getJobURL()) +
+					"api/json");
+
+			JSONArray buildsJSONArray = jsonObject.getJSONArray("builds");
+
+			for (int i = 0; i < buildsJSONArray.length(); i++) {
+				JSONObject buildJSONObject = buildsJSONArray.getJSONObject(i);
+
+				_previousBuildJSONObjects.add(
+					JenkinsResultsParserUtil.toJSONObject(
+						JenkinsResultsParserUtil.getLocalURL(
+							buildJSONObject.getString("url") + "api/json")));
+			}
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+
+		return _previousBuildJSONObjects;
+	}
+
 	protected abstract void initWorkspace();
+
+	protected void keepLogs(boolean keepLogs) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("def job = Jenkins.instance.getItemByFullName(\"");
+		sb.append(_buildData.getJobName());
+		sb.append("\"); ");
+
+		sb.append("def build = job.getBuildByNumber(");
+		sb.append(_buildData.getBuildNumber());
+		sb.append("); ");
+
+		sb.append("build.keepLog(");
+		sb.append(keepLogs);
+		sb.append(");");
+
+		JenkinsResultsParserUtil.executeJenkinsScript(
+			_buildData.getMasterHostname(), "script=" + sb.toString());
+	}
 
 	protected void publishToUserContentDir(File file) {
 		if (!JenkinsResultsParserUtil.isCINode()) {
@@ -106,7 +162,7 @@ public abstract class BaseBuildRunner<T extends BuildData, S extends Workspace>
 
 				String command = JenkinsResultsParserUtil.combine(
 					"time rsync -Ipqrs --chmod=go=rx --timeout=1200 ",
-					file.getCanonicalPath(), " ",
+					JenkinsResultsParserUtil.getCanonicalPath(file), " ",
 					_buildData.getTopLevelMasterHostname(), "::usercontent/",
 					userContentRelativePath);
 
@@ -155,31 +211,14 @@ public abstract class BaseBuildRunner<T extends BuildData, S extends Workspace>
 	}
 
 	protected void updateBuildDescription() {
-		String buildDescription = _buildData.getBuildDescription();
-
-		buildDescription = buildDescription.replaceAll("\"", "\\\\\"");
-		buildDescription = buildDescription.replaceAll("\'", "\\\\\'");
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("def job = Jenkins.instance.getItemByFullName(\"");
-		sb.append(_buildData.getJobName());
-		sb.append("\"); ");
-
-		sb.append("def build = job.getBuildByNumber(");
-		sb.append(_buildData.getBuildNumber());
-		sb.append("); ");
-
-		sb.append("build.description = \"");
-		sb.append(buildDescription);
-		sb.append("\";");
-
-		JenkinsResultsParserUtil.executeJenkinsScript(
-			_buildData.getMasterHostname(), "script=" + sb.toString());
+		JenkinsResultsParserUtil.updateBuildDescription(
+			_buildData.getBuildDescription(), _buildData.getBuildNumber(),
+			_buildData.getJobName(), _buildData.getMasterHostname());
 	}
 
 	private final T _buildData;
 	private final Job _job;
+	private List<JSONObject> _previousBuildJSONObjects;
 	private S _workspace;
 
 }

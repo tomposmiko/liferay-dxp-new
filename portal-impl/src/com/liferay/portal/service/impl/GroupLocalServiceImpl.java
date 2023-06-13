@@ -1396,12 +1396,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	@Override
 	@Transactional(enabled = false)
 	public Group fetchGroup(long companyId, String groupKey) {
-		Group group = _systemGroupsMap.get(
-			StringUtil.toHexString(
-				companyId
-			).concat(
-				groupKey
-			));
+		String companyIdHexString = StringUtil.toHexString(companyId);
+
+		Group group = _systemGroupsMap.get(companyIdHexString.concat(groupKey));
 
 		if (group != null) {
 			return group;
@@ -1657,12 +1654,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	public Group getGroup(long companyId, String groupKey)
 		throws PortalException {
 
-		Group group = _systemGroupsMap.get(
-			StringUtil.toHexString(
-				companyId
-			).concat(
-				groupKey
-			));
+		String companyIdHexString = StringUtil.toHexString(companyId);
+
+		Group group = _systemGroupsMap.get(companyIdHexString.concat(groupKey));
 
 		if (group != null) {
 			return group;
@@ -4637,7 +4631,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 						}
 					}
 
-					friendlyURL = friendlyURL + CharPool.DASH + ++i;
+					if (StringUtil.endsWith(friendlyURL, CharPool.DASH)) {
+						friendlyURL = friendlyURL + ++i;
+					}
+					else {
+						friendlyURL = friendlyURL + CharPool.DASH + ++i;
+					}
 				}
 				else if (type == GroupFriendlyURLException.ENDS_WITH_DASH) {
 					friendlyURL = StringUtil.replaceLast(
@@ -5026,29 +5025,6 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			}
 		}
 
-		String screenName = friendlyURL.substring(1);
-
-		User user = userPersistence.fetchByC_SN(companyId, screenName);
-
-		if (user != null) {
-			long userClassNameId = classNameLocalService.getClassNameId(
-				User.class);
-
-			if ((classNameId == userClassNameId) &&
-				(classPK == user.getUserId())) {
-			}
-			else {
-				GroupFriendlyURLException gfurle =
-					new GroupFriendlyURLException(
-						GroupFriendlyURLException.DUPLICATE);
-
-				gfurle.setDuplicateClassPK(user.getUserId());
-				gfurle.setDuplicateClassName(User.class.getName());
-
-				throw gfurle;
-			}
-		}
-
 		if (StringUtil.count(friendlyURL, CharPool.SLASH) > 1) {
 			throw new GroupFriendlyURLException(
 				GroupFriendlyURLException.TOO_DEEP);
@@ -5057,6 +5033,13 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		if (StringUtil.endsWith(friendlyURL, CharPool.DASH)) {
 			throw new GroupFriendlyURLException(
 				GroupFriendlyURLException.ENDS_WITH_DASH);
+		}
+
+		if (StringUtil.equals(friendlyURL, "/.") ||
+			StringUtil.equals(friendlyURL, "/..")) {
+
+			throw new GroupFriendlyURLException(
+				GroupFriendlyURLException.INVALID_CHARACTERS);
 		}
 	}
 

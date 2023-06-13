@@ -30,14 +30,17 @@ import com.liferay.portal.kernel.util.Accessor;
  */
 @ImplementationClassName("com.liferay.bookmarks.model.impl.BookmarksFolderImpl")
 @ProviderType
-public interface BookmarksFolder extends BookmarksFolderModel, PersistedModel,
-	TreeModel {
+public interface BookmarksFolder
+	extends BookmarksFolderModel, PersistedModel, TreeModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.bookmarks.model.impl.BookmarksFolderImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<BookmarksFolder, Long> FOLDER_ID_ACCESSOR = new Accessor<BookmarksFolder, Long>() {
+	public static final Accessor<BookmarksFolder, Long> FOLDER_ID_ACCESSOR =
+		new Accessor<BookmarksFolder, Long>() {
+
 			@Override
 			public Long get(BookmarksFolder bookmarksFolder) {
 				return bookmarksFolder.getFolderId();
@@ -52,6 +55,7 @@ public interface BookmarksFolder extends BookmarksFolderModel, PersistedModel,
 			public Class<BookmarksFolder> getTypeClass() {
 				return BookmarksFolder.class;
 			}
+
 		};
 
 	public java.util.List<Long> getAncestorFolderIds()
@@ -64,4 +68,5 @@ public interface BookmarksFolder extends BookmarksFolderModel, PersistedModel,
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public boolean isRoot();
+
 }

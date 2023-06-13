@@ -17,10 +17,8 @@ package com.liferay.message.boards.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.message.boards.model.MBThread;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,7 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class MBThreadCacheModel implements CacheModel<MBThread>, Externalizable {
+public class MBThreadCacheModel
+	implements CacheModel<MBThread>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -250,8 +250,7 @@ public class MBThreadCacheModel implements CacheModel<MBThread>, Externalizable 
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -339,4 +338,5 @@ public class MBThreadCacheModel implements CacheModel<MBThread>, Externalizable 
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+
 }

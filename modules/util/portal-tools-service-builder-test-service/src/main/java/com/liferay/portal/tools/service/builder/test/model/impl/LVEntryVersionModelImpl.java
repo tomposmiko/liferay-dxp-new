@@ -18,12 +18,10 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
-
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
-import com.liferay.portal.kernel.model.version.VersionedModelInvocationHandler;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -33,8 +31,6 @@ import com.liferay.portal.tools.service.builder.test.model.LVEntryVersion;
 import com.liferay.portal.tools.service.builder.test.model.LVEntryVersionModel;
 
 import java.io.Serializable;
-
-import java.lang.reflect.Method;
 
 import java.sql.Types;
 
@@ -57,24 +53,25 @@ import java.util.function.Function;
  * @generated
  */
 @ProviderType
-public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
-	implements LVEntryVersionModel {
+public class LVEntryVersionModelImpl
+	extends BaseModelImpl<LVEntryVersion> implements LVEntryVersionModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a lv entry version model instance should use the <code>LVEntryVersion</code> interface instead.
 	 */
 	public static final String TABLE_NAME = "LVEntryVersion";
+
 	public static final Object[][] TABLE_COLUMNS = {
-			{ "lvEntryVersionId", Types.BIGINT },
-			{ "version", Types.INTEGER },
-			{ "uuid_", Types.VARCHAR },
-			{ "defaultLanguageId", Types.VARCHAR },
-			{ "lvEntryId", Types.BIGINT },
-			{ "groupId", Types.BIGINT },
-			{ "uniqueGroupKey", Types.VARCHAR }
-		};
-	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
+		{"lvEntryVersionId", Types.BIGINT}, {"version", Types.INTEGER},
+		{"uuid_", Types.VARCHAR}, {"defaultLanguageId", Types.VARCHAR},
+		{"lvEntryId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"groupId", Types.BIGINT}, {"uniqueGroupKey", Types.VARCHAR}
+	};
+
+	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
+		new HashMap<String, Integer>();
 
 	static {
 		TABLE_COLUMNS_MAP.put("lvEntryVersionId", Types.BIGINT);
@@ -82,32 +79,82 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("defaultLanguageId", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("lvEntryId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uniqueGroupKey", Types.VARCHAR);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table LVEntryVersion (lvEntryVersionId LONG not null primary key,version INTEGER,uuid_ VARCHAR(75) null,defaultLanguageId VARCHAR(75) null,lvEntryId LONG,groupId LONG,uniqueGroupKey VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE =
+		"create table LVEntryVersion (lvEntryVersionId LONG not null primary key,version INTEGER,uuid_ VARCHAR(75) null,defaultLanguageId VARCHAR(75) null,lvEntryId LONG,companyId LONG,groupId LONG,uniqueGroupKey VARCHAR(75) null)";
+
 	public static final String TABLE_SQL_DROP = "drop table LVEntryVersion";
-	public static final String ORDER_BY_JPQL = " ORDER BY lvEntryVersion.version DESC";
-	public static final String ORDER_BY_SQL = " ORDER BY LVEntryVersion.version DESC";
+
+	public static final String ORDER_BY_JPQL =
+		" ORDER BY lvEntryVersion.version DESC";
+
+	public static final String ORDER_BY_SQL =
+		" ORDER BY LVEntryVersion.version DESC";
+
 	public static final String DATA_SOURCE = "liferayDataSource";
+
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
+
 	public static final String TX_MANAGER = "liferayTransactionManager";
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.tools.service.builder.test.service.util.ServiceProps.get(
+
+	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(
+		com.liferay.portal.tools.service.builder.test.service.util.ServiceProps.
+			get(
 				"value.object.entity.cache.enabled.com.liferay.portal.tools.service.builder.test.model.LVEntryVersion"),
-			true);
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.tools.service.builder.test.service.util.ServiceProps.get(
+		true);
+
+	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(
+		com.liferay.portal.tools.service.builder.test.service.util.ServiceProps.
+			get(
 				"value.object.finder.cache.enabled.com.liferay.portal.tools.service.builder.test.model.LVEntryVersion"),
-			true);
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.tools.service.builder.test.service.util.ServiceProps.get(
+		true);
+
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(
+		com.liferay.portal.tools.service.builder.test.service.util.ServiceProps.
+			get(
 				"value.object.column.bitmask.enabled.com.liferay.portal.tools.service.builder.test.model.LVEntryVersion"),
-			true);
-	public static final long GROUPID_COLUMN_BITMASK = 1L;
-	public static final long LVENTRYID_COLUMN_BITMASK = 2L;
-	public static final long UNIQUEGROUPKEY_COLUMN_BITMASK = 4L;
-	public static final long UUID_COLUMN_BITMASK = 8L;
-	public static final long VERSION_COLUMN_BITMASK = 16L;
-	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.tools.service.builder.test.service.util.ServiceProps.get(
+		true);
+
+	public static final long COMPANYID_COLUMN_BITMASK = 1L;
+
+	public static final long GROUPID_COLUMN_BITMASK = 2L;
+
+	public static final long LVENTRYID_COLUMN_BITMASK = 4L;
+
+	public static final long UNIQUEGROUPKEY_COLUMN_BITMASK = 8L;
+
+	public static final long UUID_COLUMN_BITMASK = 16L;
+
+	public static final long VERSION_COLUMN_BITMASK = 32L;
+
+	public static final String MAPPING_TABLE_BIGDECIMALENTRIES_LVENTRIES_NAME =
+		"BigDecimalEntries_LVEntries";
+
+	public static final Object[][]
+		MAPPING_TABLE_BIGDECIMALENTRIES_LVENTRIES_COLUMNS = {
+			{"companyId", Types.BIGINT}, {"bigDecimalEntryId", Types.BIGINT},
+			{"lvEntryId", Types.BIGINT}
+		};
+
+	public static final String
+		MAPPING_TABLE_BIGDECIMALENTRIES_LVENTRIES_SQL_CREATE =
+			"create table BigDecimalEntries_LVEntries (companyId LONG not null,bigDecimalEntryId LONG not null,lvEntryId LONG not null,primary key (bigDecimalEntryId, lvEntryId))";
+
+	public static final boolean
+		FINDER_CACHE_ENABLED_BIGDECIMALENTRIES_LVENTRIES =
+			GetterUtil.getBoolean(
+				com.liferay.portal.tools.service.builder.test.service.util.
+					ServiceProps.get(
+						"value.object.finder.cache.enabled.BigDecimalEntries_LVEntries"),
+				true);
+
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
+		com.liferay.portal.tools.service.builder.test.service.util.ServiceProps.
+			get(
 				"lock.expiration.time.com.liferay.portal.tools.service.builder.test.model.LVEntryVersion"));
 
 	public LVEntryVersionModelImpl() {
@@ -147,13 +194,18 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		Map<String, Function<LVEntryVersion, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<LVEntryVersion, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		for (Map.Entry<String, Function<LVEntryVersion, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<LVEntryVersion, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<LVEntryVersion, Object> attributeGetterFunction = entry.getValue();
+			Function<LVEntryVersion, Object> attributeGetterFunction =
+				entry.getValue();
 
-			attributes.put(attributeName,
+			attributes.put(
+				attributeName,
 				attributeGetterFunction.apply((LVEntryVersion)this));
 		}
 
@@ -165,36 +217,44 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Map<String, BiConsumer<LVEntryVersion, Object>> attributeSetterBiConsumers =
-			getAttributeSetterBiConsumers();
+		Map<String, BiConsumer<LVEntryVersion, Object>>
+			attributeSetterBiConsumers = getAttributeSetterBiConsumers();
 
 		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
 			String attributeName = entry.getKey();
 
-			BiConsumer<LVEntryVersion, Object> attributeSetterBiConsumer = attributeSetterBiConsumers.get(attributeName);
+			BiConsumer<LVEntryVersion, Object> attributeSetterBiConsumer =
+				attributeSetterBiConsumers.get(attributeName);
 
 			if (attributeSetterBiConsumer != null) {
-				attributeSetterBiConsumer.accept((LVEntryVersion)this,
-					entry.getValue());
+				attributeSetterBiConsumer.accept(
+					(LVEntryVersion)this, entry.getValue());
 			}
 		}
 	}
 
-	public Map<String, Function<LVEntryVersion, Object>> getAttributeGetterFunctions() {
+	public Map<String, Function<LVEntryVersion, Object>>
+		getAttributeGetterFunctions() {
+
 		return _attributeGetterFunctions;
 	}
 
-	public Map<String, BiConsumer<LVEntryVersion, Object>> getAttributeSetterBiConsumers() {
+	public Map<String, BiConsumer<LVEntryVersion, Object>>
+		getAttributeSetterBiConsumers() {
+
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<LVEntryVersion, Object>> _attributeGetterFunctions;
-	private static final Map<String, BiConsumer<LVEntryVersion, Object>> _attributeSetterBiConsumers;
+	private static final Map<String, Function<LVEntryVersion, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<LVEntryVersion, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
-		Map<String, Function<LVEntryVersion, Object>> attributeGetterFunctions = new LinkedHashMap<String, Function<LVEntryVersion, Object>>();
-		Map<String, BiConsumer<LVEntryVersion, ?>> attributeSetterBiConsumers = new LinkedHashMap<String, BiConsumer<LVEntryVersion, ?>>();
-
+		Map<String, Function<LVEntryVersion, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<LVEntryVersion, Object>>();
+		Map<String, BiConsumer<LVEntryVersion, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<LVEntryVersion, ?>>();
 
 		attributeGetterFunctions.put(
 			"lvEntryVersionId",
@@ -211,7 +271,9 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 			new BiConsumer<LVEntryVersion, Object>() {
 
 				@Override
-				public void accept(LVEntryVersion lvEntryVersion, Object lvEntryVersionId) {
+				public void accept(
+					LVEntryVersion lvEntryVersion, Object lvEntryVersionId) {
+
 					lvEntryVersion.setLvEntryVersionId((Long)lvEntryVersionId);
 				}
 
@@ -231,7 +293,9 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 			new BiConsumer<LVEntryVersion, Object>() {
 
 				@Override
-				public void accept(LVEntryVersion lvEntryVersion, Object version) {
+				public void accept(
+					LVEntryVersion lvEntryVersion, Object version) {
+
 					lvEntryVersion.setVersion((Integer)version);
 				}
 
@@ -271,8 +335,11 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 			new BiConsumer<LVEntryVersion, Object>() {
 
 				@Override
-				public void accept(LVEntryVersion lvEntryVersion, Object defaultLanguageId) {
-					lvEntryVersion.setDefaultLanguageId((String)defaultLanguageId);
+				public void accept(
+					LVEntryVersion lvEntryVersion, Object defaultLanguageId) {
+
+					lvEntryVersion.setDefaultLanguageId(
+						(String)defaultLanguageId);
 				}
 
 			});
@@ -291,8 +358,32 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 			new BiConsumer<LVEntryVersion, Object>() {
 
 				@Override
-				public void accept(LVEntryVersion lvEntryVersion, Object lvEntryId) {
+				public void accept(
+					LVEntryVersion lvEntryVersion, Object lvEntryId) {
+
 					lvEntryVersion.setLvEntryId((Long)lvEntryId);
+				}
+
+			});
+		attributeGetterFunctions.put(
+			"companyId",
+			new Function<LVEntryVersion, Object>() {
+
+				@Override
+				public Object apply(LVEntryVersion lvEntryVersion) {
+					return lvEntryVersion.getCompanyId();
+				}
+
+			});
+		attributeSetterBiConsumers.put(
+			"companyId",
+			new BiConsumer<LVEntryVersion, Object>() {
+
+				@Override
+				public void accept(
+					LVEntryVersion lvEntryVersion, Object companyId) {
+
+					lvEntryVersion.setCompanyId((Long)companyId);
 				}
 
 			});
@@ -311,7 +402,9 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 			new BiConsumer<LVEntryVersion, Object>() {
 
 				@Override
-				public void accept(LVEntryVersion lvEntryVersion, Object groupId) {
+				public void accept(
+					LVEntryVersion lvEntryVersion, Object groupId) {
+
 					lvEntryVersion.setGroupId((Long)groupId);
 				}
 
@@ -331,15 +424,18 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 			new BiConsumer<LVEntryVersion, Object>() {
 
 				@Override
-				public void accept(LVEntryVersion lvEntryVersion, Object uniqueGroupKey) {
+				public void accept(
+					LVEntryVersion lvEntryVersion, Object uniqueGroupKey) {
+
 					lvEntryVersion.setUniqueGroupKey((String)uniqueGroupKey);
 				}
 
 			});
 
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(attributeGetterFunctions);
-		_attributeSetterBiConsumers = Collections.unmodifiableMap((Map)attributeSetterBiConsumers);
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -351,6 +447,7 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 	public void populateVersionedModel(LVEntry lvEntry) {
 		lvEntry.setUuid(getUuid());
 		lvEntry.setDefaultLanguageId(getDefaultLanguageId());
+		lvEntry.setCompanyId(getCompanyId());
 		lvEntry.setGroupId(getGroupId());
 		lvEntry.setUniqueGroupKey(getUniqueGroupKey());
 	}
@@ -362,14 +459,14 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 
 	@Override
 	public LVEntry toVersionedModel() {
-		if (_lvEntry == null) {
-			_lvEntry = (LVEntry)ProxyUtil.newProxyInstance(_classLoader,
-					_versionedModelInterfaces,
-					new VersionedModelInvocationHandler(this,
-						_versionedModelMethodsMap));
-		}
+		LVEntry lvEntry = new LVEntryImpl();
 
-		return _lvEntry;
+		lvEntry.setPrimaryKey(getVersionedModelId());
+		lvEntry.setHeadId(-getVersionedModelId());
+
+		populateVersionedModel(lvEntry);
+
+		return lvEntry;
 	}
 
 	@Override
@@ -467,6 +564,28 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 	}
 
 	@Override
+	public long getCompanyId() {
+		return _companyId;
+	}
+
+	@Override
+	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
+		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
+	}
+
+	@Override
 	public long getGroupId() {
 		return _groupId;
 	}
@@ -519,8 +638,8 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-			LVEntryVersion.class.getName(), getPrimaryKey());
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(
+			getCompanyId(), LVEntryVersion.class.getName(), getPrimaryKey());
 	}
 
 	@Override
@@ -533,8 +652,9 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 	@Override
 	public LVEntryVersion toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = (LVEntryVersion)ProxyUtil.newProxyInstance(_classLoader,
-					_escapedModelInterfaces, new AutoEscapeBeanHandler(this));
+			_escapedModel = (LVEntryVersion)ProxyUtil.newProxyInstance(
+				_classLoader, _escapedModelInterfaces,
+				new AutoEscapeBeanHandler(this));
 		}
 
 		return _escapedModel;
@@ -549,6 +669,7 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 		lvEntryVersionImpl.setUuid(getUuid());
 		lvEntryVersionImpl.setDefaultLanguageId(getDefaultLanguageId());
 		lvEntryVersionImpl.setLvEntryId(getLvEntryId());
+		lvEntryVersionImpl.setCompanyId(getCompanyId());
 		lvEntryVersionImpl.setGroupId(getGroupId());
 		lvEntryVersionImpl.setUniqueGroupKey(getUniqueGroupKey());
 
@@ -621,28 +742,38 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 	public void resetOriginalValues() {
 		LVEntryVersionModelImpl lvEntryVersionModelImpl = this;
 
-		lvEntryVersionModelImpl._originalVersion = lvEntryVersionModelImpl._version;
+		lvEntryVersionModelImpl._originalVersion =
+			lvEntryVersionModelImpl._version;
 
 		lvEntryVersionModelImpl._setOriginalVersion = false;
 
 		lvEntryVersionModelImpl._originalUuid = lvEntryVersionModelImpl._uuid;
 
-		lvEntryVersionModelImpl._originalLvEntryId = lvEntryVersionModelImpl._lvEntryId;
+		lvEntryVersionModelImpl._originalLvEntryId =
+			lvEntryVersionModelImpl._lvEntryId;
 
 		lvEntryVersionModelImpl._setOriginalLvEntryId = false;
 
-		lvEntryVersionModelImpl._originalGroupId = lvEntryVersionModelImpl._groupId;
+		lvEntryVersionModelImpl._originalCompanyId =
+			lvEntryVersionModelImpl._companyId;
+
+		lvEntryVersionModelImpl._setOriginalCompanyId = false;
+
+		lvEntryVersionModelImpl._originalGroupId =
+			lvEntryVersionModelImpl._groupId;
 
 		lvEntryVersionModelImpl._setOriginalGroupId = false;
 
-		lvEntryVersionModelImpl._originalUniqueGroupKey = lvEntryVersionModelImpl._uniqueGroupKey;
+		lvEntryVersionModelImpl._originalUniqueGroupKey =
+			lvEntryVersionModelImpl._uniqueGroupKey;
 
 		lvEntryVersionModelImpl._columnBitmask = 0;
 	}
 
 	@Override
 	public CacheModel<LVEntryVersion> toCacheModel() {
-		LVEntryVersionCacheModel lvEntryVersionCacheModel = new LVEntryVersionCacheModel();
+		LVEntryVersionCacheModel lvEntryVersionCacheModel =
+			new LVEntryVersionCacheModel();
 
 		lvEntryVersionCacheModel.lvEntryVersionId = getLvEntryVersionId();
 
@@ -666,6 +797,8 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 
 		lvEntryVersionCacheModel.lvEntryId = getLvEntryId();
 
+		lvEntryVersionCacheModel.companyId = getCompanyId();
+
 		lvEntryVersionCacheModel.groupId = getGroupId();
 
 		lvEntryVersionCacheModel.uniqueGroupKey = getUniqueGroupKey();
@@ -681,16 +814,20 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 
 	@Override
 	public String toString() {
-		Map<String, Function<LVEntryVersion, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<LVEntryVersion, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((4 * attributeGetterFunctions.size()) +
-				2);
+		StringBundler sb = new StringBundler(
+			4 * attributeGetterFunctions.size() + 2);
 
 		sb.append("{");
 
-		for (Map.Entry<String, Function<LVEntryVersion, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<LVEntryVersion, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<LVEntryVersion, Object> attributeGetterFunction = entry.getValue();
+			Function<LVEntryVersion, Object> attributeGetterFunction =
+				entry.getValue();
 
 			sb.append(attributeName);
 			sb.append("=");
@@ -709,18 +846,22 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 
 	@Override
 	public String toXmlString() {
-		Map<String, Function<LVEntryVersion, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<LVEntryVersion, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((5 * attributeGetterFunctions.size()) +
-				4);
+		StringBundler sb = new StringBundler(
+			5 * attributeGetterFunctions.size() + 4);
 
 		sb.append("<model><model-name>");
 		sb.append(getModelClassName());
 		sb.append("</model-name>");
 
-		for (Map.Entry<String, Function<LVEntryVersion, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<LVEntryVersion, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<LVEntryVersion, Object> attributeGetterFunction = entry.getValue();
+			Function<LVEntryVersion, Object> attributeGetterFunction =
+				entry.getValue();
 
 			sb.append("<column><column-name>");
 			sb.append(attributeName);
@@ -734,45 +875,12 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader = LVEntryVersion.class.getClassLoader();
+	private static final ClassLoader _classLoader =
+		LVEntryVersion.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			LVEntryVersion.class, ModelWrapper.class
-		};
-	private static final Map<Method, Method> _versionedModelMethodsMap = new HashMap<Method, Method>();
-	private static final Class<?>[] _versionedModelInterfaces = new Class<?>[] {
-			LVEntry.class
-		};
+		LVEntryVersion.class, ModelWrapper.class
+	};
 
-	static {
-		try {
-			_versionedModelMethodsMap.put(LVEntry.class.getMethod(
-					"getPrimaryKey"),
-				LVEntryVersion.class.getMethod("getVersionedModelId"));
-
-			_versionedModelMethodsMap.put(LVEntry.class.getMethod("getUuid"),
-				LVEntryVersion.class.getMethod("getUuid"));
-
-			_versionedModelMethodsMap.put(LVEntry.class.getMethod(
-					"getDefaultLanguageId"),
-				LVEntryVersion.class.getMethod("getDefaultLanguageId"));
-
-			_versionedModelMethodsMap.put(LVEntry.class.getMethod(
-					"getLvEntryId"),
-				LVEntryVersion.class.getMethod("getLvEntryId"));
-
-			_versionedModelMethodsMap.put(LVEntry.class.getMethod("getGroupId"),
-				LVEntryVersion.class.getMethod("getGroupId"));
-
-			_versionedModelMethodsMap.put(LVEntry.class.getMethod(
-					"getUniqueGroupKey"),
-				LVEntryVersion.class.getMethod("getUniqueGroupKey"));
-		}
-		catch (ReflectiveOperationException roe) {
-			throw new ExceptionInInitializerError(roe);
-		}
-	}
-
-	private volatile LVEntry _lvEntry;
 	private long _lvEntryVersionId;
 	private int _version;
 	private int _originalVersion;
@@ -783,6 +891,9 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 	private long _lvEntryId;
 	private long _originalLvEntryId;
 	private boolean _setOriginalLvEntryId;
+	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _groupId;
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;
@@ -790,4 +901,5 @@ public class LVEntryVersionModelImpl extends BaseModelImpl<LVEntryVersion>
 	private String _originalUniqueGroupKey;
 	private long _columnBitmask;
 	private LVEntryVersion _escapedModel;
+
 }

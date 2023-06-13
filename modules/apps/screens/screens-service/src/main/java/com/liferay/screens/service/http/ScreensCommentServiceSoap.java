@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import com.liferay.screens.service.ScreensCommentServiceUtil;
 
 import java.rmi.RemoteException;
@@ -53,11 +52,13 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class ScreensCommentServiceSoap {
+
 	public static String addComment(String className, long classPK, String body)
 		throws RemoteException {
+
 		try {
-			com.liferay.portal.kernel.json.JSONObject returnValue = ScreensCommentServiceUtil.addComment(className,
-					classPK, body);
+			com.liferay.portal.kernel.json.JSONObject returnValue =
+				ScreensCommentServiceUtil.addComment(className, classPK, body);
 
 			return returnValue.toString();
 		}
@@ -70,7 +71,8 @@ public class ScreensCommentServiceSoap {
 
 	public static String getComment(long commentId) throws RemoteException {
 		try {
-			com.liferay.portal.kernel.json.JSONObject returnValue = ScreensCommentServiceUtil.getComment(commentId);
+			com.liferay.portal.kernel.json.JSONObject returnValue =
+				ScreensCommentServiceUtil.getComment(commentId);
 
 			return returnValue.toString();
 		}
@@ -81,11 +83,14 @@ public class ScreensCommentServiceSoap {
 		}
 	}
 
-	public static String getComments(String className, long classPK, int start,
-		int end) throws RemoteException {
+	public static String getComments(
+			String className, long classPK, int start, int end)
+		throws RemoteException {
+
 		try {
-			com.liferay.portal.kernel.json.JSONArray returnValue = ScreensCommentServiceUtil.getComments(className,
-					classPK, start, end);
+			com.liferay.portal.kernel.json.JSONArray returnValue =
+				ScreensCommentServiceUtil.getComments(
+					className, classPK, start, end);
 
 			return returnValue.toString();
 		}
@@ -98,9 +103,10 @@ public class ScreensCommentServiceSoap {
 
 	public static int getCommentsCount(String className, long classPK)
 		throws RemoteException {
+
 		try {
-			int returnValue = ScreensCommentServiceUtil.getCommentsCount(className,
-					classPK);
+			int returnValue = ScreensCommentServiceUtil.getCommentsCount(
+				className, classPK);
 
 			return returnValue;
 		}
@@ -113,9 +119,10 @@ public class ScreensCommentServiceSoap {
 
 	public static String updateComment(long commentId, String body)
 		throws RemoteException {
+
 		try {
-			com.liferay.portal.kernel.json.JSONObject returnValue = ScreensCommentServiceUtil.updateComment(commentId,
-					body);
+			com.liferay.portal.kernel.json.JSONObject returnValue =
+				ScreensCommentServiceUtil.updateComment(commentId, body);
 
 			return returnValue.toString();
 		}
@@ -126,5 +133,7 @@ public class ScreensCommentServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ScreensCommentServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		ScreensCommentServiceSoap.class);
+
 }

@@ -140,7 +140,9 @@ if (!isFormPublished && isFormSaved) {
 	</div>
 </div>
 
-<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="publishFormInstance" var="publishFormInstanceURL" />
+<portlet:actionURL name="publishFormInstance" var="publishFormInstanceURL">
+	<portlet:param name="mvcRenderCommandName" value="/admin/edit_form_instance" />
+</portlet:actionURL>
 
 <liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="saveFormInstance" var="autoSaveFormInstanceURL" />
 
@@ -202,6 +204,7 @@ if (!isFormPublished && isFormSaved) {
 							rolesURL: '<%= rolesURL %>',
 							rules: <%= serializedDDMFormRules %>,
 							saved: <%= formInstance != null %>,
+							showPublishAlert: <%= ddmFormAdminDisplayContext.isShowPublishAlert() %>,
 							spritemap: Liferay.DDM.FormSettings.spritemap,
 							strings: Liferay.DDM.FormSettings.strings
 						},
@@ -249,4 +252,76 @@ if (!isFormPublished && isFormSaved) {
 			}
 		);
 	}
+</aui:script>
+
+<aui:script use="aui-base">
+	Liferay.namespace('FormPortlet').destroySettings = function() {
+		var settingsNode = A.one('#<portlet:namespace />settingsModal');
+
+		if (settingsNode) {
+			Liferay.Util.getWindow('<portlet:namespace />settingsModal').destroy();
+		}
+	};
+
+	Liferay.namespace('DDM').openSettings = function() {
+		Liferay.Util.openWindow(
+			{
+				dialog: {
+					cssClass: 'ddm-form-settings-modal',
+					height: 700,
+					resizable: false,
+					'toolbars.footer': [
+						{
+							cssClass: 'btn-link',
+							label: '<liferay-ui:message key="cancel" />',
+							on: {
+								click: function() {
+									Liferay.Util.getWindow('<portlet:namespace />settingsModal').hide();
+								}
+							}
+						},
+						{
+							cssClass: 'btn-primary',
+							label: '<liferay-ui:message key="done" />',
+							on: {
+								click: function() {
+									var ddmForm = Liferay.component('settingsDDMForm');
+
+									ddmForm.validate(
+										function(hasErrors) {
+											if (!hasErrors) {
+												Liferay.Util.getWindow('<portlet:namespace />settingsModal').hide();
+											}
+										}
+									);
+								}
+							}
+						}
+					],
+					width: 720
+				},
+				id: '<portlet:namespace />settingsModal',
+				title: '<liferay-ui:message key="form-settings" />'
+			},
+			function(dialogWindow) {
+				var bodyNode = dialogWindow.bodyNode;
+
+				var settingsNode = A.one('#<portlet:namespace />settings');
+
+				settingsNode.show();
+
+				bodyNode.append(settingsNode);
+			}
+		);
+	};
+
+	var clearPortletHandlers = function(event) {
+		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
+			Liferay.namespace('FormPortlet').destroySettings();
+
+			Liferay.detach('destroyPortlet', clearPortletHandlers);
+		}
+	};
+
+	Liferay.on('destroyPortlet', clearPortletHandlers);
 </aui:script>

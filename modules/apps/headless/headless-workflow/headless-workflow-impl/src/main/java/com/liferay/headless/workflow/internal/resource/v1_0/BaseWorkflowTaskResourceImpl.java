@@ -14,10 +14,11 @@
 
 package com.liferay.headless.workflow.internal.resource.v1_0;
 
+import com.liferay.headless.workflow.dto.v1_0.ChangeTransition;
 import com.liferay.headless.workflow.dto.v1_0.WorkflowTask;
-import com.liferay.headless.workflow.internal.dto.v1_0.WorkflowTaskImpl;
+import com.liferay.headless.workflow.dto.v1_0.WorkflowTaskAssignToMe;
+import com.liferay.headless.workflow.dto.v1_0.WorkflowTaskAssignToUser;
 import com.liferay.headless.workflow.resource.v1_0.WorkflowTaskResource;
-import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -25,12 +26,19 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.net.URI;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Generated;
+
+import javax.validation.constraints.NotNull;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -39,7 +47,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -48,112 +55,165 @@ import javax.ws.rs.core.UriInfo;
  */
 @Generated("")
 @Path("/v1.0")
-public abstract class BaseWorkflowTaskResourceImpl implements WorkflowTaskResource {
+public abstract class BaseWorkflowTaskResourceImpl
+	implements WorkflowTaskResource {
 
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
+		}
+	)
 	@Path("/roles/{role-id}/workflow-tasks")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public Page<WorkflowTask> getRoleWorkflowTasksPage(
-	@PathParam("role-id") Long roleId,@Context Pagination pagination)
-			throws Exception {
+			@NotNull @PathParam("role-id") Long roleId,
+			@Context Pagination pagination)
+		throws Exception {
 
-				return Page.of(Collections.emptyList());
+		return Page.of(Collections.emptyList());
 	}
+
 	@Override
 	@GET
-	@Path("/workflow-tasks")
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
+		}
+	)
+	@Path("/workflow-tasks/assigned-to-me")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
-	public Page<WorkflowTask> getWorkflowTasksPage(
-	@Context Pagination pagination)
-			throws Exception {
+	@Tags(value = {@Tag(name = "WorkflowTask")})
+	public Page<WorkflowTask> getWorkflowTasksAssignedToMePage(
+			@Context Pagination pagination)
+		throws Exception {
 
-				return Page.of(Collections.emptyList());
+		return Page.of(Collections.emptyList());
 	}
+
+	@Override
+	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
+		}
+	)
+	@Path("/workflow-tasks/assigned-to-my-roles")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "WorkflowTask")})
+	public Page<WorkflowTask> getWorkflowTasksAssignedToMyRolesPage(
+			@Context Pagination pagination)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
+	}
+
 	@Override
 	@GET
 	@Path("/workflow-tasks/{workflow-task-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public WorkflowTask getWorkflowTask(
-	@PathParam("workflow-task-id") Long workflowTaskId)
-			throws Exception {
+			@NotNull @PathParam("workflow-task-id") Long workflowTaskId)
+		throws Exception {
 
-				return new WorkflowTaskImpl();
+		return new WorkflowTask();
 	}
+
 	@Override
 	@Consumes("application/json")
 	@POST
 	@Path("/workflow-tasks/{workflow-task-id}/assign-to-me")
 	@Produces("application/json")
-	@RequiresScope("everything.write")
+	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public WorkflowTask postWorkflowTaskAssignToMe(
-	@PathParam("workflow-task-id") Long workflowTaskId,WorkflowTask workflowTask)
-			throws Exception {
+			@NotNull @PathParam("workflow-task-id") Long workflowTaskId,
+			WorkflowTaskAssignToMe workflowTaskAssignToMe)
+		throws Exception {
 
-				return new WorkflowTaskImpl();
+		return new WorkflowTask();
 	}
+
 	@Override
 	@Consumes("application/json")
 	@POST
 	@Path("/workflow-tasks/{workflow-task-id}/assign-to-user")
 	@Produces("application/json")
-	@RequiresScope("everything.write")
+	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public WorkflowTask postWorkflowTaskAssignToUser(
-	@PathParam("workflow-task-id") Long workflowTaskId,WorkflowTask workflowTask)
-			throws Exception {
+			@NotNull @PathParam("workflow-task-id") Long workflowTaskId,
+			WorkflowTaskAssignToUser workflowTaskAssignToUser)
+		throws Exception {
 
-				return new WorkflowTaskImpl();
+		return new WorkflowTask();
 	}
+
 	@Override
 	@Consumes("application/json")
 	@POST
 	@Path("/workflow-tasks/{workflow-task-id}/change-transition")
 	@Produces("application/json")
-	@RequiresScope("everything.write")
+	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public WorkflowTask postWorkflowTaskChangeTransition(
-	@PathParam("workflow-task-id") Long workflowTaskId,WorkflowTask workflowTask)
-			throws Exception {
+			@NotNull @PathParam("workflow-task-id") Long workflowTaskId,
+			ChangeTransition changeTransition)
+		throws Exception {
 
-				return new WorkflowTaskImpl();
+		return new WorkflowTask();
 	}
+
 	@Override
 	@Consumes("application/json")
 	@POST
 	@Path("/workflow-tasks/{workflow-task-id}/update-due-date")
 	@Produces("application/json")
-	@RequiresScope("everything.write")
+	@Tags(value = {@Tag(name = "WorkflowTask")})
 	public WorkflowTask postWorkflowTaskUpdateDueDate(
-	@PathParam("workflow-task-id") Long workflowTaskId,WorkflowTask workflowTask)
-			throws Exception {
+			@NotNull @PathParam("workflow-task-id") Long workflowTaskId,
+			WorkflowTaskAssignToMe workflowTaskAssignToMe)
+		throws Exception {
 
-				return new WorkflowTaskImpl();
+		return new WorkflowTask();
 	}
 
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected String getJAXRSLink(String methodName, Object... values) {
-		URI baseURI = contextUriInfo.getBaseUri();
-
-		URI resourceURI = UriBuilder.fromResource(
-			BaseWorkflowTaskResourceImpl.class
-		).build();
-
-		URI methodURI = UriBuilder.fromMethod(
-			BaseWorkflowTaskResourceImpl.class, methodName
-		).build(
-			values
-		);
-
-		return baseURI.toString() + resourceURI.toString() + methodURI.toString();
+	protected void preparePatch(WorkflowTask workflowTask) {
 	}
 
-	protected <T, R> List<R> transform(List<T> list, UnsafeFunction<T, R, Throwable> unsafeFunction) {
-		return TransformUtil.transform(list, unsafeFunction);
+	protected <T, R> List<R> transform(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transform(collection, unsafeFunction);
+	}
+
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
+
+		return TransformUtil.transform(array, unsafeFunction, clazz);
+	}
+
+	protected <T, R> R[] transformToArray(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
+
+		return TransformUtil.transformToArray(
+			collection, unsafeFunction, clazz);
+	}
+
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
 	@Context

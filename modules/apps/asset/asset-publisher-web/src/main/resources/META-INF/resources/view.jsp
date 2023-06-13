@@ -33,8 +33,8 @@ if (assetPublisherDisplayContext.isEnableTagBasedNavigation() && !assetPublisher
 				</portlet:actionURL>
 
 				<liferay-ui:icon
-					icon="start"
 					label="<%= true %>"
+					linkCssClass="btn btn-secondary btn-sm mb-4"
 					markupView="lexicon"
 					message="unsubscribe"
 					url="<%= unsubscribeURL %>"
@@ -46,8 +46,8 @@ if (assetPublisherDisplayContext.isEnableTagBasedNavigation() && !assetPublisher
 				</portlet:actionURL>
 
 				<liferay-ui:icon
-					icon="start-o"
 					label="<%= true %>"
+					linkCssClass="btn btn-secondary btn-sm mb-4"
 					markupView="lexicon"
 					message="subscribe"
 					url="<%= subscribeURL %>"
@@ -74,15 +74,8 @@ if (assetPublisherDisplayContext.isEnableTagBasedNavigation() && !assetPublisher
 
 <c:choose>
 	<c:when test="<%= ListUtil.isNotEmpty(assetPublisherDisplayContext.getAssetEntryResults()) %>">
-
-		<%
-		if (StringUtil.startsWith(assetPublisherDisplayContext.getDisplayStyle(), PortletDisplayTemplateManager.DISPLAY_STYLE_PREFIX)) {
-			assetPublisherDisplayContext.setDisplayStyle(assetPublisherDisplayContext.getDefaultDisplayStyle());
-		}
-		%>
-
 		<c:choose>
-			<c:when test="<%= ArrayUtil.contains(assetPublisherDisplayContext.getDisplayStyles(), assetPublisherDisplayContext.getDisplayStyle()) %>">
+			<c:when test="<%= ArrayUtil.contains(assetPublisherDisplayContext.getDisplayStyles(), assetPublisherDisplayContext.getDisplayStyle()) || StringUtil.startsWith(assetPublisherDisplayContext.getDisplayStyle(), PortletDisplayTemplateManager.DISPLAY_STYLE_PREFIX) %>">
 				<liferay-util:include page="/view_asset_entry_list.jsp" servletContext="<%= application %>" />
 			</c:when>
 			<c:otherwise>
@@ -118,7 +111,7 @@ if (assetPublisherDisplayContext.isEnableTagBasedNavigation() && !assetPublisher
 						</div>
 
 						<div>
-							<aui:a href="javascript:;" onClick="<%= portletDisplay.getURLConfigurationJS() %>"><liferay-ui:message key="select-an-asset-list-to-make-it-visible" /></aui:a>
+							<aui:a href="javascript:;" onClick="<%= portletDisplay.getURLConfigurationJS() %>"><liferay-ui:message key="select-a-content-set-to-make-it-visible" /></aui:a>
 						</div>
 					</c:when>
 					<c:when test="<%= !portletName.equals(AssetPublisherPortletKeys.RELATED_ASSETS) %>">

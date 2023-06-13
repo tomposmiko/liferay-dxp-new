@@ -55,6 +55,8 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author Jorge Ferrer
  * @author Sergio González
@@ -188,6 +190,37 @@ public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 
 	@Override
 	public PortletURL getURLEdit(
+			HttpServletRequest request, WindowState windowState,
+			PortletURL redirectURL)
+		throws Exception {
+
+		String redirect = null;
+
+		if (redirectURL != null) {
+			redirect = redirectURL.toString();
+		}
+
+		return getURLEdit(request, windowState, redirect);
+	}
+
+	@Override
+	public PortletURL getURLEdit(
+			HttpServletRequest request, WindowState windowState,
+			String redirect)
+		throws Exception {
+
+		LiferayPortletURL editPortletURL = (LiferayPortletURL)getURLEdit(
+			request);
+
+		if (editPortletURL == null) {
+			return null;
+		}
+
+		return _getURLEdit(editPortletURL, request, windowState, redirect);
+	}
+
+	@Override
+	public PortletURL getURLEdit(
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
@@ -202,6 +235,24 @@ public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 			WindowState windowState, PortletURL redirectURL)
 		throws Exception {
 
+		String redirect = null;
+
+		if (redirectURL != null) {
+			redirect = redirectURL.toString();
+		}
+
+		return getURLEdit(
+			liferayPortletRequest, liferayPortletResponse, windowState,
+			redirect);
+	}
+
+	@Override
+	public PortletURL getURLEdit(
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse,
+			WindowState windowState, String redirect)
+		throws Exception {
+
 		LiferayPortletURL editPortletURL = (LiferayPortletURL)getURLEdit(
 			liferayPortletRequest, liferayPortletResponse);
 
@@ -209,43 +260,10 @@ public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 			return null;
 		}
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+		HttpServletRequest request = PortalUtil.getHttpServletRequest(
+			liferayPortletRequest);
 
-		Group group = themeDisplay.getScopeGroup();
-
-		if (group.isLayout()) {
-			Layout layout = themeDisplay.getLayout();
-
-			group = layout.getGroup();
-		}
-
-		if (group.hasStagingGroup() && _STAGING_LIVE_GROUP_LOCKING_ENABLED) {
-			return null;
-		}
-
-		editPortletURL.setParameter("redirect", redirectURL.toString());
-
-		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
-
-		String portletResource = ParamUtil.getString(
-			liferayPortletRequest, "portletResource", portletDisplay.getId());
-
-		if (Validator.isNotNull(portletResource)) {
-			editPortletURL.setParameter(
-				"referringPortletResource", portletResource);
-		}
-		else {
-			editPortletURL.setParameter(
-				"referringPortletResource", portletDisplay.getId());
-		}
-
-		editPortletURL.setPortletMode(PortletMode.VIEW);
-		editPortletURL.setRefererPlid(themeDisplay.getPlid());
-		editPortletURL.setWindowState(windowState);
-
-		return editPortletURL;
+		return _getURLEdit(editPortletURL, request, windowState, redirect);
 	}
 
 	@Override
@@ -427,6 +445,51 @@ public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 		sb.append(primaryKeyParameterValue);
 
 		return PortalUtil.addPreservedParameters(themeDisplay, sb.toString());
+	}
+
+	private PortletURL _getURLEdit(
+			LiferayPortletURL editPortletURL, HttpServletRequest request,
+			WindowState windowState, String redirect)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Group group = themeDisplay.getScopeGroup();
+
+		if (group.isLayout()) {
+			Layout layout = themeDisplay.getLayout();
+
+			group = layout.getGroup();
+		}
+
+		if (group.hasStagingGroup() && _STAGING_LIVE_GROUP_LOCKING_ENABLED) {
+			return null;
+		}
+
+		if (Validator.isNotNull(redirect)) {
+			editPortletURL.setParameter("redirect", redirect);
+		}
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		String portletResource = ParamUtil.getString(
+			request, "portletResource", portletDisplay.getId());
+
+		if (Validator.isNotNull(portletResource)) {
+			editPortletURL.setParameter(
+				"referringPortletResource", portletResource);
+		}
+		else {
+			editPortletURL.setParameter(
+				"referringPortletResource", portletDisplay.getId());
+		}
+
+		editPortletURL.setPortletMode(PortletMode.VIEW);
+		editPortletURL.setRefererPlid(themeDisplay.getPlid());
+		editPortletURL.setWindowState(windowState);
+
+		return editPortletURL;
 	}
 
 	private static final String[] _AVAILABLE_LANGUAGE_IDS = new String[0];

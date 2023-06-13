@@ -62,8 +62,9 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class UADPartialEntryLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements UADPartialEntryLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements UADPartialEntryLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -107,6 +108,7 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	@Override
 	public UADPartialEntry deleteUADPartialEntry(long uadPartialEntryId)
 		throws PortalException {
+
 		return uadPartialEntryPersistence.remove(uadPartialEntryId);
 	}
 
@@ -120,6 +122,7 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	@Override
 	public UADPartialEntry deleteUADPartialEntry(
 		UADPartialEntry uadPartialEntry) {
+
 		return uadPartialEntryPersistence.remove(uadPartialEntry);
 	}
 
@@ -127,8 +130,8 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(UADPartialEntry.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			UADPartialEntry.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -155,10 +158,11 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return uadPartialEntryPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return uadPartialEntryPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -175,10 +179,12 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return uadPartialEntryPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return uadPartialEntryPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -200,10 +206,11 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return uadPartialEntryPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return uadPartialEntryPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
@@ -221,12 +228,14 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	@Override
 	public UADPartialEntry getUADPartialEntry(long uadPartialEntryId)
 		throws PortalException {
+
 		return uadPartialEntryPersistence.findByPrimaryKey(uadPartialEntryId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(uadPartialEntryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -238,10 +247,14 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(uadPartialEntryLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			uadPartialEntryLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(UADPartialEntry.class);
 
@@ -253,6 +266,7 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
+
 		actionableDynamicQuery.setBaseLocalService(uadPartialEntryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(UADPartialEntry.class);
@@ -266,12 +280,15 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return uadPartialEntryLocalService.deleteUADPartialEntry((UADPartialEntry)persistedModel);
+
+		return uadPartialEntryLocalService.deleteUADPartialEntry(
+			(UADPartialEntry)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return uadPartialEntryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -311,6 +328,7 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	@Override
 	public UADPartialEntry updateUADPartialEntry(
 		UADPartialEntry uadPartialEntry) {
+
 		return uadPartialEntryPersistence.update(uadPartialEntry);
 	}
 
@@ -330,6 +348,7 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	 */
 	public void setUADPartialEntryLocalService(
 		UADPartialEntryLocalService uadPartialEntryLocalService) {
+
 		this.uadPartialEntryLocalService = uadPartialEntryLocalService;
 	}
 
@@ -349,6 +368,7 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	 */
 	public void setUADPartialEntryPersistence(
 		UADPartialEntryPersistence uadPartialEntryPersistence) {
+
 		this.uadPartialEntryPersistence = uadPartialEntryPersistence;
 	}
 
@@ -357,7 +377,9 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -367,12 +389,15 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.portal.tools.service.builder.test.model.UADPartialEntry",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.portal.tools.service.builder.test.model.UADPartialEntry",
 			uadPartialEntryLocalService);
 	}
 
@@ -413,8 +438,8 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -425,10 +450,18 @@ public abstract class UADPartialEntryLocalServiceBaseImpl
 
 	@BeanReference(type = UADPartialEntryLocalService.class)
 	protected UADPartialEntryLocalService uadPartialEntryLocalService;
+
 	@BeanReference(type = UADPartialEntryPersistence.class)
 	protected UADPartialEntryPersistence uadPartialEntryPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

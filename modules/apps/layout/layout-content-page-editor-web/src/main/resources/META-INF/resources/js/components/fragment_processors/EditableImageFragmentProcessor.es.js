@@ -1,10 +1,5 @@
-/**
- * Possible types that can be returned by the image selector
- */
-const RETURN_TYPES = {
-	fileEntryItemSelector: 'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType',
-	url: 'URL'
-};
+import {FLOATING_TOOLBAR_BUTTONS} from '../../utils/constants';
+import {openImageSelector} from '../../utils/FragmentsEditorDialogUtils';
 
 /**
  * Handle item selector image changes and propagate them with an
@@ -39,6 +34,20 @@ function destroy() {
 }
 
 /**
+ * @param {object} editableValues
+ * @return {object[]} Floating toolbar panels
+ */
+function getFloatingToolbarButtons(editableValues) {
+	return editableValues.mappedField ? [
+		FLOATING_TOOLBAR_BUTTONS.imageLink,
+		FLOATING_TOOLBAR_BUTTONS.map
+	] : [
+		FLOATING_TOOLBAR_BUTTONS.imageProperties,
+		FLOATING_TOOLBAR_BUTTONS.map
+	];
+}
+
+/**
  * Show the image selector dialog and calls the given callback when an
  * image is selected.
  * @param {HTMLElement} editableElement
@@ -60,75 +69,44 @@ function init(
 	const {imageSelectorURL} = options;
 
 	openImageSelector(
-		imageSelectorURL,
-		portletNamespace,
-		url => {
-			_handleImageEditorChange(
-				url,
-				editableElement,
-				fragmentEntryLinkId,
-				changedCallback
-			);
-		},
-		destroyedCallback
-	);
-}
-
-/**
- * @param {string} imageSelectorURL
- * @param {string} portletNamespace
- * @param {function} callback
- * @param {function} destroyedCallback
- */
-function openImageSelector(imageSelectorURL, portletNamespace, callback, destroyedCallback) {
-	const eventName = `${portletNamespace}selectImage`;
-	const title = Liferay.Language.get('select');
-
-	AUI().use(
-		'liferay-item-selector-dialog',
-		A => {
-			const itemSelectorDialog = new A.LiferayItemSelectorDialog(
-				{
-					eventName,
-					on: {
-						selectedItemChange: changeEvent => {
-							const selectedItem = changeEvent.newVal || {};
-
-							const {returnType, value} = selectedItem;
-							let selectedImageURL = '';
-
-							if (returnType === RETURN_TYPES.url) {
-								selectedImageURL = value;
-							}
-
-							if (returnType === RETURN_TYPES.fileEntryItemSelector) {
-								selectedImageURL = JSON.parse(value).url;
-							}
-
-							if (selectedImageURL) {
-								callback(selectedImageURL);
-							}
-						},
-
-						visibleChange: change => {
-							if ((change.newVal === false) && destroyedCallback) {
-								destroyedCallback();
-							}
-						}
-					},
-					title,
-					url: imageSelectorURL
-				}
-			);
-
-			itemSelectorDialog.open();
+		{
+			callback: url => {
+				_handleImageEditorChange(
+					url,
+					editableElement,
+					fragmentEntryLinkId,
+					changedCallback
+				);
+			},
+			destroyedCallback,
+			imageSelectorURL,
+			portletNamespace
 		}
 	);
 }
 
-export {destroy, init, openImageSelector};
+/**
+ * @param {string} content editableField's original HTML
+ * @param {string} value Translated/segmented value
+ * @return {string} Transformed content
+ */
+function render(content, value) {
+	const wrapper = document.createElement('div');
+
+	wrapper.innerHTML = content;
+
+	const image = wrapper.querySelector('img');
+
+	if (image) {
+		image.src = value;
+	}
+
+	return wrapper.innerHTML;
+}
 
 export default {
 	destroy,
-	init
+	getFloatingToolbarButtons,
+	init,
+	render
 };

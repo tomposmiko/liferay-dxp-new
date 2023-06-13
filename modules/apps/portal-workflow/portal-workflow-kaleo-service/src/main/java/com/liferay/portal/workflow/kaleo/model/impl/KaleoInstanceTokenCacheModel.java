@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
@@ -37,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class KaleoInstanceTokenCacheModel implements CacheModel<KaleoInstanceToken>,
-	Externalizable, MVCCModel {
+public class KaleoInstanceTokenCacheModel
+	implements CacheModel<KaleoInstanceToken>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +49,13 @@ public class KaleoInstanceTokenCacheModel implements CacheModel<KaleoInstanceTok
 			return false;
 		}
 
-		KaleoInstanceTokenCacheModel kaleoInstanceTokenCacheModel = (KaleoInstanceTokenCacheModel)obj;
+		KaleoInstanceTokenCacheModel kaleoInstanceTokenCacheModel =
+			(KaleoInstanceTokenCacheModel)obj;
 
-		if ((kaleoInstanceTokenId == kaleoInstanceTokenCacheModel.kaleoInstanceTokenId) &&
-				(mvccVersion == kaleoInstanceTokenCacheModel.mvccVersion)) {
+		if ((kaleoInstanceTokenId ==
+				kaleoInstanceTokenCacheModel.kaleoInstanceTokenId) &&
+			(mvccVersion == kaleoInstanceTokenCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -121,7 +124,8 @@ public class KaleoInstanceTokenCacheModel implements CacheModel<KaleoInstanceTok
 
 	@Override
 	public KaleoInstanceToken toEntityModel() {
-		KaleoInstanceTokenImpl kaleoInstanceTokenImpl = new KaleoInstanceTokenImpl();
+		KaleoInstanceTokenImpl kaleoInstanceTokenImpl =
+			new KaleoInstanceTokenImpl();
 
 		kaleoInstanceTokenImpl.setMvccVersion(mvccVersion);
 		kaleoInstanceTokenImpl.setKaleoInstanceTokenId(kaleoInstanceTokenId);
@@ -150,16 +154,19 @@ public class KaleoInstanceTokenCacheModel implements CacheModel<KaleoInstanceTok
 			kaleoInstanceTokenImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		kaleoInstanceTokenImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		kaleoInstanceTokenImpl.setKaleoDefinitionVersionId(
+			kaleoDefinitionVersionId);
 		kaleoInstanceTokenImpl.setKaleoInstanceId(kaleoInstanceId);
-		kaleoInstanceTokenImpl.setParentKaleoInstanceTokenId(parentKaleoInstanceTokenId);
+		kaleoInstanceTokenImpl.setParentKaleoInstanceTokenId(
+			parentKaleoInstanceTokenId);
 		kaleoInstanceTokenImpl.setCurrentKaleoNodeId(currentKaleoNodeId);
 
 		if (currentKaleoNodeName == null) {
 			kaleoInstanceTokenImpl.setCurrentKaleoNodeName("");
 		}
 		else {
-			kaleoInstanceTokenImpl.setCurrentKaleoNodeName(currentKaleoNodeName);
+			kaleoInstanceTokenImpl.setCurrentKaleoNodeName(
+				currentKaleoNodeName);
 		}
 
 		if (className == null) {
@@ -216,8 +223,7 @@ public class KaleoInstanceTokenCacheModel implements CacheModel<KaleoInstanceTok
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(kaleoInstanceTokenId);
@@ -283,4 +289,5 @@ public class KaleoInstanceTokenCacheModel implements CacheModel<KaleoInstanceTok
 	public long classPK;
 	public boolean completed;
 	public long completionDate;
+
 }

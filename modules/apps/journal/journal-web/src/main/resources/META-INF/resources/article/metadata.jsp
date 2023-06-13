@@ -60,38 +60,34 @@ if (article != null) {
 DDMStructure ddmStructure = journalEditArticleDisplayContext.getDDMStructure();
 %>
 
-<div class="metadata">
-	<aui:field-wrapper>
-		<liferay-asset:asset-categories-selector
-			className="<%= JournalArticle.class.getName() %>"
-			classPK="<%= classPK %>"
-			classTypePK="<%= ddmStructure.getStructureId() %>"
-			ignoreRequestValue="<%= journalEditArticleDisplayContext.isChangeStructure() %>"
-		/>
-	</aui:field-wrapper>
-
-	<aui:field-wrapper>
-		<liferay-asset:asset-tags-selector
-			className="<%= JournalArticle.class.getName() %>"
-			classPK="<%= classPK %>"
-			ignoreRequestValue="<%= journalEditArticleDisplayContext.isChangeStructure() %>"
-		/>
-	</aui:field-wrapper>
-
-	<aui:field-wrapper label="priority">
-		<aui:input label="" name="assetPriority" type="text" value="<%= priority %>">
-			<aui:validator name="number" />
-
-			<aui:validator name="min">[0]</aui:validator>
-		</aui:input>
-	</aui:field-wrapper>
-
-	<c:if test="<%= CustomAttributesUtil.hasCustomAttributes(company.getCompanyId(), JournalArticle.class.getName(), classPK, null) %>">
-		<liferay-expando:custom-attribute-list
-			className="<%= JournalArticle.class.getName() %>"
-			classPK="<%= (article != null) ? article.getPrimaryKey() : 0 %>"
-			editable="<%= true %>"
-			label="<%= true %>"
-		/>
-	</c:if>
+<div class="pb-3">
+	<liferay-asset:asset-categories-selector
+		className="<%= JournalArticle.class.getName() %>"
+		classPK="<%= classPK %>"
+		classTypePK="<%= ddmStructure.getStructureId() %>"
+		ignoreRequestValue="<%= journalEditArticleDisplayContext.isChangeStructure() %>"
+	/>
 </div>
+
+<div class="pb-3">
+	<liferay-asset:asset-tags-selector
+		className="<%= JournalArticle.class.getName() %>"
+		classPK="<%= classPK %>"
+		ignoreRequestValue="<%= journalEditArticleDisplayContext.isChangeStructure() %>"
+	/>
+</div>
+
+<aui:input cssClass="form-control-sm" label="priority" name="assetPriority" type="text" value="<%= priority %>" wrapperCssClass="mb-3">
+	<aui:validator name="number" />
+
+	<aui:validator name="min">[0]</aui:validator>
+</aui:input>
+
+<c:if test="<%= CustomAttributesUtil.hasCustomAttributes(company.getCompanyId(), JournalArticle.class.getName(), classPK, null) %>">
+	<liferay-expando:custom-attribute-list
+		className="<%= JournalArticle.class.getName() %>"
+		classPK="<%= (article != null) ? article.getPrimaryKey() : 0 %>"
+		editable="<%= true %>"
+		label="<%= true %>"
+	/>
+</c:if>

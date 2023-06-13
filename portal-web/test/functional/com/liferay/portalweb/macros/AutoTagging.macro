@@ -30,22 +30,18 @@ definition {
 		}
 
 		else if ("${disableAutoTaggingFor}" == "Instance Settings") {
-			ProductMenu.gotoPortlet(
-				category = "Configuration",
-				panel = "Control Panel",
-				portlet = "Instance Settings"
-			);
+			PortalSettings.gotoPortalSettings();
 
 			Navigator.gotoNavTab(navTab = "Asset Auto Tagging");
 
 			Uncheck(locator1 = "Checkbox#ENABLE_AUTO_TAGGING");
 		}
 
-		else if ("${disableAutoTaggingFor}" == "Site Settings") {
+		else if ("${disableAutoTaggingFor}" == "Settings") {
 			ProductMenu.gotoPortlet(
 				category = "Configuration",
 				panel = "Site Administration",
-				portlet = "Site Settings"
+				portlet = "Settings"
 			);
 
 			Panel.expandPanel(panel = "Asset Auto Tagging");
@@ -80,22 +76,18 @@ definition {
 		}
 
 		else if ("${enableAutoTaggingFor}" == "Instance Settings") {
-			ProductMenu.gotoPortlet(
-				category = "Configuration",
-				panel = "Control Panel",
-				portlet = "Instance Settings"
-			);
+			PortalSettings.gotoPortalSettings();
 
 			Navigator.gotoNavTab(navTab = "Asset Auto Tagging");
 
 			Check(locator1 = "Checkbox#ENABLE_AUTO_TAGGING");
 		}
 
-		else if ("${enableAutoTaggingFor}" == "Site Settings") {
+		else if ("${enableAutoTaggingFor}" == "Settings") {
 			ProductMenu.gotoPortlet(
 				category = "Configuration",
 				panel = "Site Administration",
-				portlet = "Site Settings"
+				portlet = "Settings"
 			);
 
 			Panel.expandPanel(panel = "Asset Auto Tagging");

@@ -96,12 +96,12 @@
 								</table>
 
 								{if $totalCount > $maxItems}
-									<div class="mt-3 text-center text-info">
+									<div class="mt-3 text-center">
 										{$totalCount - $maxItems} {msg desc=""}results-more-refine-keywords{/msg}
 									</div>
 
 									<div class="text-center">
-										<a href="{$_viewInPageAdministrationURL}">
+										<a class="text-primary" href="{$_viewInPageAdministrationURL}">
 											{msg desc=""}view-in-page-administration{/msg}
 										</a>
 									</div>

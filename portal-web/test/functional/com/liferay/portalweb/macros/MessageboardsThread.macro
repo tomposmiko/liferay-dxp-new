@@ -29,12 +29,12 @@ definition {
 
 		Panel.expandPanel(panel = "Attachments");
 
-		AssertClick(locator1 = "Button#SELECT_FILES", value1 = "Select Files");
+		AssertElementPresent(locator1 = "Button#SELECT_FILES");
 
 		var key_attachmentFileName = "${mbAttachmentFile}";
 
-		SikuliUploadCommonFile(
-			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
 			value1 = "${mbAttachmentFile}"
 		);
 
@@ -50,12 +50,12 @@ definition {
 
 		Panel.expandPanel(panel = "Attachments");
 
-		AssertClick(locator1 = "Button#SELECT_FILES", value1 = "Select Files");
+		AssertElementPresent(locator1 = "Button#SELECT_FILES");
 
 		var key_attachmentFileName = "${mbThreadAttachment}";
 
-		SikuliUploadCommonFile(
-			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
 			value1 = "${mbThreadAttachment}"
 		);
 
@@ -126,12 +126,12 @@ definition {
 
 		Panel.expandPanel(panel = "Attachments");
 
-		AssertClick(locator1 = "Button#SELECT_FILES", value1 = "Select Files");
+		AssertElementPresent(locator1 = "Button#SELECT_FILES");
 
 		var key_attachmentFileName = "${mbThreadAttachment}";
 
-		SikuliUploadCommonFile(
-			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
 			value1 = "${mbThreadAttachment}"
 		);
 
@@ -632,12 +632,12 @@ definition {
 			AssertClick(locator1 = "Panel#ENTRY_ATTACHMENTS", value1 = "Attachments");
 		}
 
-		AssertClick(locator1 = "Button#SELECT_FILES", value1 = "Select Files");
+		AssertElementPresent(locator1 = "Button#SELECT_FILES");
 
 		var key_attachmentFileName = "${mbThreadAttachment}";
 
-		SikuliUploadCommonFile(
-			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
 			value1 = "${mbThreadAttachment}"
 		);
 
@@ -752,7 +752,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Message Boards"
 		);
@@ -1208,11 +1208,13 @@ definition {
 			value1 = "${threadBody}"
 		);
 
-		AssertClick(locator1 = "AP#ASSET_ABSTRACT_TITLE", value1 = "${threadSubject}");
+		AssetPublisherPortlet.clickAssetTitle(
+			assetTitle = "${threadSubject}"
+		);
 
 		AssertVisible(locator1 = "Icon#SHARE");
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "APAsset#ASSET_TITLE_HEADER",
 			value1 = "${threadSubject}"
 		);
@@ -1567,10 +1569,6 @@ definition {
 
 		AssertElementPresent(
 			locator1 = "MessageBoardsStatistics#TOP_POSTERS_AUTHOR_LAST_POST_DATE"
-		);
-
-		AssertElementPresent(
-			locator1 = "MessageBoardsStatistics#TOP_POSTERS_AUTHOR_ICON"
 		);
 	}
 

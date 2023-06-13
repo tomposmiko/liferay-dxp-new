@@ -141,17 +141,20 @@ public class SegmentsEntryProviderImpl implements SegmentsEntryProvider {
 	}
 
 	@Override
-	public long[] getSegmentsEntryIds(String className, long classPK) {
-		return getSegmentsEntryIds(className, classPK, null);
+	public long[] getSegmentsEntryIds(
+		long groupId, String className, long classPK) {
+
+		return getSegmentsEntryIds(groupId, className, classPK, null);
 	}
 
 	@Override
 	public long[] getSegmentsEntryIds(
-		String className, long classPK, Context context) {
+		long groupId, String className, long classPK, Context context) {
 
 		List<SegmentsEntry> segmentsEntries =
 			_segmentsEntryLocalService.getSegmentsEntries(
-				true, className, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+				groupId, true, className, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				null);
 
 		if (segmentsEntries.isEmpty()) {
 			return new long[0];
@@ -164,14 +167,6 @@ public class SegmentsEntryProviderImpl implements SegmentsEntryProvider {
 				className, classPK, context, segmentsEntry)
 		).sorted(
 			(segmentsEntry1, segmentsEntry2) -> {
-				if (segmentsEntry1.isDefaultSegment()) {
-					return 1;
-				}
-
-				if (segmentsEntry2.isDefaultSegment()) {
-					return -1;
-				}
-
 				Date modifiedDate = segmentsEntry2.getModifiedDate();
 
 				return modifiedDate.compareTo(segmentsEntry1.getModifiedDate());
@@ -229,10 +224,6 @@ public class SegmentsEntryProviderImpl implements SegmentsEntryProvider {
 	private boolean _isMember(
 		String className, long classPK, Context context,
 		SegmentsEntry segmentsEntry) {
-
-		if (segmentsEntry.isDefaultSegment()) {
-			return true;
-		}
 
 		if (_segmentsEntryRelLocalService.hasSegmentsEntryRel(
 				segmentsEntry.getSegmentsEntryId(),
@@ -297,10 +288,11 @@ public class SegmentsEntryProviderImpl implements SegmentsEntryProvider {
 			boolean matchesModel = false;
 
 			try {
-				if (oDataRetriever.getResultsCount(
-						segmentsEntry.getCompanyId(), sb.toString(),
-						Locale.getDefault()) > 0) {
+				int count = oDataRetriever.getResultsCount(
+					segmentsEntry.getCompanyId(), sb.toString(),
+					Locale.getDefault());
 
+				if (count > 0) {
 					matchesModel = true;
 				}
 			}

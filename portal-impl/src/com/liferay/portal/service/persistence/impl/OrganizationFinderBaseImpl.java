@@ -21,15 +21,27 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.service.persistence.OrganizationPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class OrganizationFinderBaseImpl extends BasePersistenceImpl<Organization> {
+public class OrganizationFinderBaseImpl
+	extends BasePersistenceImpl<Organization> {
+
 	public OrganizationFinderBaseImpl() {
 		setModelClass(Organization.class);
+
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("type", "type_");
+		dbColumnNames.put("groups", "groups_");
+
+		setDBColumnNames(dbColumnNames);
 	}
 
 	@Override
@@ -53,10 +65,14 @@ public class OrganizationFinderBaseImpl extends BasePersistenceImpl<Organization
 	 */
 	public void setOrganizationPersistence(
 		OrganizationPersistence organizationPersistence) {
+
 		this.organizationPersistence = organizationPersistence;
 	}
 
 	@BeanReference(type = OrganizationPersistence.class)
 	protected OrganizationPersistence organizationPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(OrganizationFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		OrganizationFinderBaseImpl.class);
+
 }

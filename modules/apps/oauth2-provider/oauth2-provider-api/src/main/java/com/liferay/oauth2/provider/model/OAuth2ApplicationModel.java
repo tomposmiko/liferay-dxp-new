@@ -35,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface OAuth2ApplicationModel extends AuditedModel,
-	BaseModel<OAuth2Application>, ShardedModel {
+public interface OAuth2ApplicationModel
+	extends AuditedModel, BaseModel<OAuth2Application>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -345,4 +346,5 @@ public interface OAuth2ApplicationModel extends AuditedModel,
 	 * @param redirectURIs the redirect ur is of this o auth2 application
 	 */
 	public void setRedirectURIs(String redirectURIs);
+
 }

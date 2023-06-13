@@ -23,7 +23,9 @@ import com.liferay.portal.workflow.kaleo.service.persistence.KaleoTaskInstanceTo
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class KaleoTaskInstanceTokenFinderBaseImpl extends BasePersistenceImpl<KaleoTaskInstanceToken> {
+public class KaleoTaskInstanceTokenFinderBaseImpl
+	extends BasePersistenceImpl<KaleoTaskInstanceToken> {
+
 	public KaleoTaskInstanceTokenFinderBaseImpl() {
 		setModelClass(KaleoTaskInstanceToken.class);
 	}
@@ -33,7 +35,9 @@ public class KaleoTaskInstanceTokenFinderBaseImpl extends BasePersistenceImpl<Ka
 	 *
 	 * @return the kaleo task instance token persistence
 	 */
-	public KaleoTaskInstanceTokenPersistence getKaleoTaskInstanceTokenPersistence() {
+	public KaleoTaskInstanceTokenPersistence
+		getKaleoTaskInstanceTokenPersistence() {
+
 		return kaleoTaskInstanceTokenPersistence;
 	}
 
@@ -44,9 +48,13 @@ public class KaleoTaskInstanceTokenFinderBaseImpl extends BasePersistenceImpl<Ka
 	 */
 	public void setKaleoTaskInstanceTokenPersistence(
 		KaleoTaskInstanceTokenPersistence kaleoTaskInstanceTokenPersistence) {
-		this.kaleoTaskInstanceTokenPersistence = kaleoTaskInstanceTokenPersistence;
+
+		this.kaleoTaskInstanceTokenPersistence =
+			kaleoTaskInstanceTokenPersistence;
 	}
 
 	@BeanReference(type = KaleoTaskInstanceTokenPersistence.class)
-	protected KaleoTaskInstanceTokenPersistence kaleoTaskInstanceTokenPersistence;
+	protected KaleoTaskInstanceTokenPersistence
+		kaleoTaskInstanceTokenPersistence;
+
 }

@@ -20,8 +20,10 @@ import com.liferay.asset.display.page.service.base.AssetDisplayPageEntryLocalSer
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -31,15 +33,21 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Eudaldo Alonso
  */
+@Component(
+	property = "model.class.name=com.liferay.asset.display.page.model.AssetDisplayPageEntry",
+	service = AopService.class
+)
 public class AssetDisplayPageEntryLocalServiceImpl
 	extends AssetDisplayPageEntryLocalServiceBaseImpl {
 
@@ -164,8 +172,20 @@ public class AssetDisplayPageEntryLocalServiceImpl
 			AssetRendererFactoryRegistryUtil.
 				getAssetRendererFactoryByClassNameId(classNameId);
 
-		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
-			_portal.getClassName(classNameId), classPK);
+		AssetEntry assetEntry = null;
+
+		if (assetRendererFactory != null) {
+			assetEntry = assetRendererFactory.getAssetEntry(
+				_portal.getClassName(classNameId), classPK);
+		}
+		else {
+			assetEntry = _assetEntryLocalService.fetchEntry(
+				classNameId, classPK);
+		}
+
+		if (assetEntry == null) {
+			return LayoutConstants.DEFAULT_PLID;
+		}
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry = Optional.ofNullable(
 			_layoutPageTemplateEntryService.fetchLayoutPageTemplateEntry(
@@ -196,13 +216,16 @@ public class AssetDisplayPageEntryLocalServiceImpl
 		return LayoutConstants.DEFAULT_PLID;
 	}
 
-	@ServiceReference(type = LayoutLocalService.class)
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
 	private LayoutLocalService _layoutLocalService;
 
-	@ServiceReference(type = LayoutPageTemplateEntryService.class)
+	@Reference
 	private LayoutPageTemplateEntryService _layoutPageTemplateEntryService;
 
-	@ServiceReference(type = Portal.class)
+	@Reference
 	private Portal _portal;
 
 }

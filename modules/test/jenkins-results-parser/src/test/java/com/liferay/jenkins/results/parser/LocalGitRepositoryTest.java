@@ -15,7 +15,6 @@
 package com.liferay.jenkins.results.parser;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.json.JSONObject;
 
@@ -33,14 +32,16 @@ public class LocalGitRepositoryTest extends GitRepositoryTest {
 		File directory = localGitRepository.getDirectory();
 
 		try {
-			if (!REPOSITORY_DIR.equals(directory.getCanonicalPath())) {
+			if (!REPOSITORY_DIR.equals(
+					JenkinsResultsParserUtil.getCanonicalPath(directory))) {
+
 				errorCollector.addError(
 					new Throwable(
 						"The repository directorydirectory should be " +
 							REPOSITORY_DIR));
 			}
 		}
-		catch (IOException ioe) {
+		catch (RuntimeException re) {
 			errorCollector.addError(
 				new Throwable(
 					"The repository directory should be " + REPOSITORY_DIR));

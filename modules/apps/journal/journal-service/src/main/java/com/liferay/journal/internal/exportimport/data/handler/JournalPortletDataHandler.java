@@ -34,7 +34,6 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.kernel.staging.StagingConstants;
-import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
 import com.liferay.journal.constants.JournalConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
@@ -386,20 +385,6 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 			}
 
 			_journalContent.clearCache();
-
-			// Friendy URLs
-
-			Element friendlyURLEntriesElement =
-				portletDataContext.getImportDataGroupElement(
-					FriendlyURLEntry.class);
-
-			List<Element> friendlyURLEntryElements =
-				friendlyURLEntriesElement.elements();
-
-			for (Element friendlyURLEntryElement : friendlyURLEntryElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, friendlyURLEntryElement);
-			}
 		}
 
 		return portletPreferences;

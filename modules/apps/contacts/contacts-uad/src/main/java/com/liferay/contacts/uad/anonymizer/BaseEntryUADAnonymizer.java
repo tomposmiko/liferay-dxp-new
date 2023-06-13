@@ -17,11 +17,9 @@ package com.liferay.contacts.uad.anonymizer;
 import com.liferay.contacts.model.Entry;
 import com.liferay.contacts.service.EntryLocalService;
 import com.liferay.contacts.uad.constants.ContactsUADConstants;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
-
 import com.liferay.user.associated.data.anonymizer.DynamicQueryUADAnonymizer;
 
 import org.osgi.service.component.annotations.Reference;
@@ -38,10 +36,13 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public abstract class BaseEntryUADAnonymizer extends DynamicQueryUADAnonymizer<Entry> {
+public abstract class BaseEntryUADAnonymizer
+	extends DynamicQueryUADAnonymizer<Entry> {
+
 	@Override
 	public void autoAnonymize(Entry entry, long userId, User anonymousUser)
 		throws PortalException {
+
 		if (entry.getUserId() == userId) {
 			entry.setUserId(anonymousUser.getUserId());
 			entry.setUserName(anonymousUser.getFullName());
@@ -72,4 +73,5 @@ public abstract class BaseEntryUADAnonymizer extends DynamicQueryUADAnonymizer<E
 
 	@Reference
 	protected EntryLocalService entryLocalService;
+
 }

@@ -34,6 +34,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface CTProcessModel extends BaseModel<CTProcess>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -153,4 +154,5 @@ public interface CTProcessModel extends BaseModel<CTProcess>, ShardedModel {
 	 * @param backgroundTaskId the background task ID of this ct process
 	 */
 	public void setBackgroundTaskId(long backgroundTaskId);
+
 }

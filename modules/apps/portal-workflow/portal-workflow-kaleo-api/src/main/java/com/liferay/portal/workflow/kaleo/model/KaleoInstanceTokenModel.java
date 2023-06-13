@@ -36,8 +36,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface KaleoInstanceTokenModel extends BaseModel<KaleoInstanceToken>,
-	GroupedModel, MVCCModel, ShardedModel {
+public interface KaleoInstanceTokenModel
+	extends BaseModel<KaleoInstanceToken>, GroupedModel, MVCCModel,
+			ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -335,4 +337,5 @@ public interface KaleoInstanceTokenModel extends BaseModel<KaleoInstanceToken>,
 	 * @param completionDate the completion date of this kaleo instance token
 	 */
 	public void setCompletionDate(Date completionDate);
+
 }

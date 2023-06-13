@@ -118,16 +118,24 @@ definition {
 
 		Navigator.openURL();
 
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "Bookmarks"
+		);
+
+		Bookmark.addCP(
+			bookmarkName = "Test Bookmark Name",
+			bookmarkURL = "https://www.liferay.com"
+		);
+
+		Navigator.openURL();
+
 		Portlet.addPG(portletName = "Bookmarks");
 
 		Navigator.openURL();
 
 		RelatedAssets.gotoBookmarksSelectionPG(assetType = "Bookmarks Entry");
-
-		Bookmark.addRelatedAssetBookmarksEntryPG(
-			bookmarkName = "Test Bookmark Name",
-			bookmarkURL = "http://www.liferay.com"
-		);
 
 		AssertElementNotPresent(locator1 = "//body[.='XSS']");
 
@@ -151,12 +159,13 @@ definition {
 
 		CustomFields.addCP(
 			customFieldName = '''<script>alert(123);</script>''',
-			customFieldType = "Localized Text",
+			customFieldType = "Text Field",
+			localization = "true",
 			resourceName = "Documents Folder"
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media"
 		);
@@ -209,7 +218,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		Site.editGoogleAnalyticsIDCP(
@@ -235,11 +244,7 @@ definition {
 	@description = "This is a use case for LPS-59198."
 	@priority = "3"
 	test ViewLDAP {
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Instance Settings"
-		);
+		PortalSettings.gotoPortalSettings();
 
 		PortalSettingsNavigator.gotoLDAP();
 
@@ -263,7 +268,7 @@ definition {
 		var portalURL = PropsUtil.get("portal.url");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -292,7 +297,7 @@ definition {
 	@priority = "4"
 	test ViewLookAndFeel {
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -321,28 +326,27 @@ definition {
 
 	@description = "This is a use case for LPS-42750."
 	@priority = "3"
-	test ViewMobileDeviceRules {
-		// LRQA-42888
-
+	test ViewMobileDeviceFamilies {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
 			portlet = "Mobile Device Families"
 		);
 
-		MobileDevice.addDeviceFamilyCP(
-			deviceFamilyName = '''<script>alert(123);</script>'''
-		);
+		MobileDevice.addDeviceFamilyCP(deviceFamilyName = '''<script>alert(123);</script>''');
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
 
-		SitePages.gotoPageMenuItem(menuItem = "Configure", pageName = "Welcome");
+		SitePages.gotoPageMenuItem(
+			menuItem = "Configure",
+			pageName = "Welcome"
+		);
 
 		Navigator.gotoNavTab(navTab = "Advanced");
 
@@ -350,9 +354,7 @@ definition {
 
 		Page.disableMobileDeviceRulesAreInheritedFromPublicPages();
 
-		Page.selectMobileDeviceFamily(
-			deviceFamilyName = '''<script>alert(123);</script>'''
-		);
+		Page.selectMobileDeviceFamily(deviceFamilyName = '''<script>alert(123);</script>''');
 
 		AssertElementNotPresent(locator1 = "//body[.='123']");
 
@@ -373,7 +375,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
@@ -393,18 +395,12 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);
 
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
-
-		BlogsEntry.moveToRecycleBinCP(
-			assetType = "Blogs Entry",
-			entryContent = "Blogs Entry Content",
-			entryTitle = "${entryTitle}"
-		);
+		BlogsNavigator.moveToRecycleBinCP(entryTitle = "${entryTitle}");
 
 		Navigator.openURL();
 
@@ -566,7 +562,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -628,7 +624,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -646,7 +642,7 @@ definition {
 		WebContentNavigator.gotoEditCP(webContentTitle = "WebContent Title");
 
 
-		WebContent.addSmallImageViaURL(imageSourceURL = '''<img src="http://url.to.file.which/not.exist" onerror=alert(123);>''');
+		WebContent.addFeaturedImageFromURL(imageSourceURL = '''<img src="http://url.to.file.which/not.exist" onerror=alert(123);>''');
 
 		PortletEntry.publish();
 
@@ -654,7 +650,7 @@ definition {
 
 		AssertAlertNotPresent();
 	}
-	
+
 	@priority = "5"
 	test ViewWiki {
 		Navigator.openURL();
@@ -674,7 +670,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Wiki"
 		);

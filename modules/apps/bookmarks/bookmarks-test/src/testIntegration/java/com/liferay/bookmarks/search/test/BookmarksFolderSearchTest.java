@@ -19,7 +19,7 @@ import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.bookmarks.service.BookmarksFolderLocalServiceUtil;
 import com.liferay.bookmarks.service.BookmarksFolderServiceUtil;
-import com.liferay.bookmarks.util.test.BookmarksTestUtil;
+import com.liferay.bookmarks.test.util.BookmarksTestUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -96,6 +96,12 @@ public class BookmarksFolderSearchTest extends BaseSearchTestCase {
 	@Override
 	@Test
 	public void testSearchComments() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testSearchCommentsByKeywords() throws Exception {
 	}
 
 	@Ignore

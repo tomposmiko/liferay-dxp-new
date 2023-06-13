@@ -132,7 +132,15 @@ public class AcceptLanguageContextProviderTest {
 			new MockMessage(
 				new AcceptLanguageMockHttpServletRequest(user, Locale.JAPAN)));
 
-		Assert.assertEquals(Locale.JAPAN, acceptLanguage.getPreferredLocale());
+		// One partial locale
+
+		acceptLanguage = _contextProvider.createContext(
+			new MockMessage(
+				new AcceptLanguageMockHttpServletRequest(
+					user, new Locale("pt", ""))));
+
+		Assert.assertEquals(
+			LocaleUtil.BRAZIL, acceptLanguage.getPreferredLocale());
 
 		// Three locales
 
@@ -168,7 +176,7 @@ public class AcceptLanguageContextProviderTest {
 		catch (Exception e) {
 			Assert.assertEquals(ClientErrorException.class, e.getClass());
 			Assert.assertEquals(
-				"The preferred locale: es_ES is not available",
+				"No available locale matches the accepted languages: es-ES",
 				e.getMessage());
 		}
 	}

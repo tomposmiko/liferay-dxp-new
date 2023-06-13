@@ -18,12 +18,9 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.document.library.sync.model.DLSyncEvent;
 import com.liferay.document.library.sync.model.DLSyncEventModel;
-
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
@@ -55,23 +52,24 @@ import java.util.function.Function;
  * @generated
  */
 @ProviderType
-public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
-	implements DLSyncEventModel {
+public class DLSyncEventModelImpl
+	extends BaseModelImpl<DLSyncEvent> implements DLSyncEventModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a dl sync event model instance should use the <code>DLSyncEvent</code> interface instead.
 	 */
 	public static final String TABLE_NAME = "DLSyncEvent";
+
 	public static final Object[][] TABLE_COLUMNS = {
-			{ "syncEventId", Types.BIGINT },
-			{ "companyId", Types.BIGINT },
-			{ "modifiedTime", Types.BIGINT },
-			{ "event", Types.VARCHAR },
-			{ "type_", Types.VARCHAR },
-			{ "typePK", Types.BIGINT }
-		};
-	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
+		{"syncEventId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"modifiedTime", Types.BIGINT}, {"event", Types.VARCHAR},
+		{"type_", Types.VARCHAR}, {"typePK", Types.BIGINT}
+	};
+
+	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
+		new HashMap<String, Integer>();
 
 	static {
 		TABLE_COLUMNS_MAP.put("syncEventId", Types.BIGINT);
@@ -82,26 +80,45 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 		TABLE_COLUMNS_MAP.put("typePK", Types.BIGINT);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table DLSyncEvent (syncEventId LONG not null primary key,companyId LONG,modifiedTime LONG,event VARCHAR(75) null,type_ VARCHAR(75) null,typePK LONG)";
+	public static final String TABLE_SQL_CREATE =
+		"create table DLSyncEvent (syncEventId LONG not null primary key,companyId LONG,modifiedTime LONG,event VARCHAR(75) null,type_ VARCHAR(75) null,typePK LONG)";
+
 	public static final String TABLE_SQL_DROP = "drop table DLSyncEvent";
-	public static final String ORDER_BY_JPQL = " ORDER BY dlSyncEvent.modifiedTime ASC";
-	public static final String ORDER_BY_SQL = " ORDER BY DLSyncEvent.modifiedTime ASC";
+
+	public static final String ORDER_BY_JPQL =
+		" ORDER BY dlSyncEvent.modifiedTime ASC";
+
+	public static final String ORDER_BY_SQL =
+		" ORDER BY DLSyncEvent.modifiedTime ASC";
+
 	public static final String DATA_SOURCE = "liferayDataSource";
+
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
+
 	public static final String TX_MANAGER = "liferayTransactionManager";
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.document.library.sync.service.util.ServiceProps.get(
-				"value.object.entity.cache.enabled.com.liferay.document.library.sync.model.DLSyncEvent"),
-			true);
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.document.library.sync.service.util.ServiceProps.get(
-				"value.object.finder.cache.enabled.com.liferay.document.library.sync.model.DLSyncEvent"),
-			true);
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.document.library.sync.service.util.ServiceProps.get(
-				"value.object.column.bitmask.enabled.com.liferay.document.library.sync.model.DLSyncEvent"),
-			true);
+
+	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(
+		com.liferay.document.library.sync.service.util.ServiceProps.get(
+			"value.object.entity.cache.enabled.com.liferay.document.library.sync.model.DLSyncEvent"),
+		true);
+
+	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(
+		com.liferay.document.library.sync.service.util.ServiceProps.get(
+			"value.object.finder.cache.enabled.com.liferay.document.library.sync.model.DLSyncEvent"),
+		true);
+
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(
+		com.liferay.document.library.sync.service.util.ServiceProps.get(
+			"value.object.column.bitmask.enabled.com.liferay.document.library.sync.model.DLSyncEvent"),
+		true);
+
 	public static final long MODIFIEDTIME_COLUMN_BITMASK = 1L;
+
 	public static final long TYPEPK_COLUMN_BITMASK = 2L;
-	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.document.library.sync.service.util.ServiceProps.get(
-				"lock.expiration.time.com.liferay.document.library.sync.model.DLSyncEvent"));
+
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
+		com.liferay.document.library.sync.service.util.ServiceProps.get(
+			"lock.expiration.time.com.liferay.document.library.sync.model.DLSyncEvent"));
 
 	public DLSyncEventModelImpl() {
 	}
@@ -140,13 +157,18 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		for (Map.Entry<String, Function<DLSyncEvent, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<DLSyncEvent, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<DLSyncEvent, Object> attributeGetterFunction = entry.getValue();
+			Function<DLSyncEvent, Object> attributeGetterFunction =
+				entry.getValue();
 
-			attributes.put(attributeName,
+			attributes.put(
+				attributeName,
 				attributeGetterFunction.apply((DLSyncEvent)this));
 		}
 
@@ -158,52 +180,73 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Map<String, BiConsumer<DLSyncEvent, Object>> attributeSetterBiConsumers = getAttributeSetterBiConsumers();
+		Map<String, BiConsumer<DLSyncEvent, Object>>
+			attributeSetterBiConsumers = getAttributeSetterBiConsumers();
 
 		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
 			String attributeName = entry.getKey();
 
-			BiConsumer<DLSyncEvent, Object> attributeSetterBiConsumer = attributeSetterBiConsumers.get(attributeName);
+			BiConsumer<DLSyncEvent, Object> attributeSetterBiConsumer =
+				attributeSetterBiConsumers.get(attributeName);
 
 			if (attributeSetterBiConsumer != null) {
-				attributeSetterBiConsumer.accept((DLSyncEvent)this,
-					entry.getValue());
+				attributeSetterBiConsumer.accept(
+					(DLSyncEvent)this, entry.getValue());
 			}
 		}
 	}
 
-	public Map<String, Function<DLSyncEvent, Object>> getAttributeGetterFunctions() {
+	public Map<String, Function<DLSyncEvent, Object>>
+		getAttributeGetterFunctions() {
+
 		return _attributeGetterFunctions;
 	}
 
-	public Map<String, BiConsumer<DLSyncEvent, Object>> getAttributeSetterBiConsumers() {
+	public Map<String, BiConsumer<DLSyncEvent, Object>>
+		getAttributeSetterBiConsumers() {
+
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<DLSyncEvent, Object>> _attributeGetterFunctions;
-	private static final Map<String, BiConsumer<DLSyncEvent, Object>> _attributeSetterBiConsumers;
+	private static final Map<String, Function<DLSyncEvent, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DLSyncEvent, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
-		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions = new LinkedHashMap<String, Function<DLSyncEvent, Object>>();
-		Map<String, BiConsumer<DLSyncEvent, ?>> attributeSetterBiConsumers = new LinkedHashMap<String, BiConsumer<DLSyncEvent, ?>>();
+		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DLSyncEvent, Object>>();
+		Map<String, BiConsumer<DLSyncEvent, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<DLSyncEvent, ?>>();
 
-
-		attributeGetterFunctions.put("syncEventId", DLSyncEvent::getSyncEventId);
-		attributeSetterBiConsumers.put("syncEventId", (BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setSyncEventId);
+		attributeGetterFunctions.put(
+			"syncEventId", DLSyncEvent::getSyncEventId);
+		attributeSetterBiConsumers.put(
+			"syncEventId",
+			(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setSyncEventId);
 		attributeGetterFunctions.put("companyId", DLSyncEvent::getCompanyId);
-		attributeSetterBiConsumers.put("companyId", (BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setCompanyId);
-		attributeGetterFunctions.put("modifiedTime", DLSyncEvent::getModifiedTime);
-		attributeSetterBiConsumers.put("modifiedTime", (BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setModifiedTime);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setCompanyId);
+		attributeGetterFunctions.put(
+			"modifiedTime", DLSyncEvent::getModifiedTime);
+		attributeSetterBiConsumers.put(
+			"modifiedTime",
+			(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setModifiedTime);
 		attributeGetterFunctions.put("event", DLSyncEvent::getEvent);
-		attributeSetterBiConsumers.put("event", (BiConsumer<DLSyncEvent, String>)DLSyncEvent::setEvent);
+		attributeSetterBiConsumers.put(
+			"event", (BiConsumer<DLSyncEvent, String>)DLSyncEvent::setEvent);
 		attributeGetterFunctions.put("type", DLSyncEvent::getType);
-		attributeSetterBiConsumers.put("type", (BiConsumer<DLSyncEvent, String>)DLSyncEvent::setType);
+		attributeSetterBiConsumers.put(
+			"type", (BiConsumer<DLSyncEvent, String>)DLSyncEvent::setType);
 		attributeGetterFunctions.put("typePK", DLSyncEvent::getTypePK);
-		attributeSetterBiConsumers.put("typePK", (BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setTypePK);
+		attributeSetterBiConsumers.put(
+			"typePK", (BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setTypePK);
 
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(attributeGetterFunctions);
-		_attributeSetterBiConsumers = Collections.unmodifiableMap((Map)attributeSetterBiConsumers);
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -306,8 +349,8 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-			DLSyncEvent.class.getName(), getPrimaryKey());
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(
+			getCompanyId(), DLSyncEvent.class.getName(), getPrimaryKey());
 	}
 
 	@Override
@@ -320,8 +363,9 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 	@Override
 	public DLSyncEvent toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = (DLSyncEvent)ProxyUtil.newProxyInstance(_classLoader,
-					_escapedModelInterfaces, new AutoEscapeBeanHandler(this));
+			_escapedModel = (DLSyncEvent)ProxyUtil.newProxyInstance(
+				_classLoader, _escapedModelInterfaces,
+				new AutoEscapeBeanHandler(this));
 		}
 
 		return _escapedModel;
@@ -405,7 +449,8 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 	public void resetOriginalValues() {
 		DLSyncEventModelImpl dlSyncEventModelImpl = this;
 
-		dlSyncEventModelImpl._originalModifiedTime = dlSyncEventModelImpl._modifiedTime;
+		dlSyncEventModelImpl._originalModifiedTime =
+			dlSyncEventModelImpl._modifiedTime;
 
 		dlSyncEventModelImpl._setOriginalModifiedTime = false;
 
@@ -418,7 +463,8 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 
 	@Override
 	public CacheModel<DLSyncEvent> toCacheModel() {
-		DLSyncEventCacheModel dlSyncEventCacheModel = new DLSyncEventCacheModel();
+		DLSyncEventCacheModel dlSyncEventCacheModel =
+			new DLSyncEventCacheModel();
 
 		dlSyncEventCacheModel.syncEventId = getSyncEventId();
 
@@ -449,16 +495,20 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 
 	@Override
 	public String toString() {
-		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((4 * attributeGetterFunctions.size()) +
-				2);
+		StringBundler sb = new StringBundler(
+			4 * attributeGetterFunctions.size() + 2);
 
 		sb.append("{");
 
-		for (Map.Entry<String, Function<DLSyncEvent, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<DLSyncEvent, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<DLSyncEvent, Object> attributeGetterFunction = entry.getValue();
+			Function<DLSyncEvent, Object> attributeGetterFunction =
+				entry.getValue();
 
 			sb.append(attributeName);
 			sb.append("=");
@@ -477,18 +527,22 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 
 	@Override
 	public String toXmlString() {
-		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((5 * attributeGetterFunctions.size()) +
-				4);
+		StringBundler sb = new StringBundler(
+			5 * attributeGetterFunctions.size() + 4);
 
 		sb.append("<model><model-name>");
 		sb.append(getModelClassName());
 		sb.append("</model-name>");
 
-		for (Map.Entry<String, Function<DLSyncEvent, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<DLSyncEvent, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<DLSyncEvent, Object> attributeGetterFunction = entry.getValue();
+			Function<DLSyncEvent, Object> attributeGetterFunction =
+				entry.getValue();
 
 			sb.append("<column><column-name>");
 			sb.append(attributeName);
@@ -502,10 +556,12 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader = DLSyncEvent.class.getClassLoader();
+	private static final ClassLoader _classLoader =
+		DLSyncEvent.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			DLSyncEvent.class, ModelWrapper.class
-		};
+		DLSyncEvent.class, ModelWrapper.class
+	};
+
 	private long _syncEventId;
 	private long _companyId;
 	private long _modifiedTime;
@@ -518,4 +574,5 @@ public class DLSyncEventModelImpl extends BaseModelImpl<DLSyncEvent>
 	private boolean _setOriginalTypePK;
 	private long _columnBitmask;
 	private DLSyncEvent _escapedModel;
+
 }

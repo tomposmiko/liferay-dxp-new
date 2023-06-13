@@ -1,3 +1,4 @@
+import '../libs/odata-parser.js';
 import {
 	CONJUNCTIONS,
 	FUNCTIONAL_OPERATORS,
@@ -7,7 +8,6 @@ import {
 	RELATIONAL_OPERATORS
 } from './constants.es';
 import {generateGroupId} from './utils.es';
-import '../libs/odata-parser.js';
 
 const OPERATORS = {
 	...FUNCTIONAL_OPERATORS,
@@ -19,14 +19,19 @@ const oDataFilterFn = window.oDataParser.filter;
 const EXPRESSION_TYPES = {
 	AND: 'AndExpression',
 	BOOL_PAREN: 'BoolParenExpression',
+	COMMON: 'CommonExpression',
 	EQUALS: 'EqualsExpression',
+	FIRST_MEMBER: 'FirstMemberExpression',
 	GREATER_OR_EQUALS: 'GreaterOrEqualsExpression',
 	GREATER_THAN: 'GreaterThanExpression',
 	LESSER_OR_EQUALS: 'LesserOrEqualsExpression',
 	LESSER_THAN: 'LesserThanExpression',
+	MEMBER: 'MemberExpression',
 	METHOD_CALL: 'MethodCallExpression',
 	NOT: 'NotExpression',
-	OR: 'OrExpression'
+	OR: 'OrExpression',
+	PAREN: 'ParenExpression',
+	PROPERTY_PATH: 'PropertyPathExpression'
 };
 
 /**
@@ -99,6 +104,7 @@ function valueParser(value, type) {
 	case PROPERTY_TYPES.DOUBLE:
 		parsedValue = value;
 		break;
+	case PROPERTY_TYPES.COLLECTION:
 	case PROPERTY_TYPES.STRING:
 	default:
 		parsedValue = `'${value}'`;
@@ -110,10 +116,13 @@ function valueParser(value, type) {
 
 /**
  * Recursively traverses the criteria object to build an oData filter query
- * string.
- * @param {object} criteria
- * @param {string} queryConjunction
- * @param {array} properties
+ * string. Properties is required to parse the correctly with or without quotes
+ * and formatting the query differently for certain types like collection.
+ * @param {object} criteria The criteria object.
+ * @param {string} queryConjunction The conjunction name value to be used in the
+ * query.
+ * @param {array} properties The list of property objects. See
+ * ContributorBuilder for valid property object shape.
  * @returns An OData query string built from the criteria object.
  */
 function buildQueryString(criteria, queryConjunction, properties) {
@@ -145,14 +154,28 @@ function buildQueryString(criteria, queryConjunction, properties) {
 					const parsedValue = valueParser(value, type);
 
 					if (isValueType(RELATIONAL_OPERATORS, operatorName)) {
-						queryString = queryString.concat(
-							`${propertyName} ${operatorName} ${parsedValue}`
-						);
+						if (type === PROPERTY_TYPES.COLLECTION) {
+							queryString = queryString.concat(
+								`${propertyName}/any(c:c ${operatorName} ${parsedValue})`
+							);
+						}
+						else {
+							queryString = queryString.concat(
+								`${propertyName} ${operatorName} ${parsedValue}`
+							);
+						}
 					}
 					else if (isValueType(FUNCTIONAL_OPERATORS, operatorName)) {
-						queryString = queryString.concat(
-							`${operatorName}(${propertyName}, ${parsedValue})`
-						);
+						if (type === PROPERTY_TYPES.COLLECTION) {
+							queryString = queryString.concat(
+								`${propertyName}/any(c:${operatorName}(c, ${parsedValue}))`
+							);
+						}
+						else {
+							queryString = queryString.concat(
+								`${operatorName}(${propertyName}, ${parsedValue})`
+							);
+						}
 					}
 					else if (isValueType(NOT_OPERATORS, operatorName)) {
 						const baseOperator = operatorName.replace(/not-/g, '');
@@ -243,6 +266,9 @@ const getNextNonGroupExpression = oDataASTNode => {
 
 /**
  * Returns the next expression in the syntax tree that is not a grouping.
+ * Also ignoring Common, Paren, Member, and FirstMember expressions for property
+ * path expression types like `cookies/any(c:c eq 'key=value')` since the
+ * expressions' value are the same for a collection query.
  * @param {object} oDataASTNode
  * @returns String value of the internal name of the next expression.
  */
@@ -257,7 +283,11 @@ const getNextOperatorExpression = oDataASTNode => {
 
 	if (type === EXPRESSION_TYPES.BOOL_PAREN ||
 		type === EXPRESSION_TYPES.AND ||
-		type === EXPRESSION_TYPES.OR
+		type === EXPRESSION_TYPES.OR ||
+		type === EXPRESSION_TYPES.COMMON ||
+		type === EXPRESSION_TYPES.FIRST_MEMBER ||
+		type === EXPRESSION_TYPES.MEMBER ||
+		type === EXPRESSION_TYPES.PAREN
 	) {
 		returnValue = getNextOperatorExpression(nextNode);
 	}
@@ -392,6 +422,9 @@ function toCriteria(context) {
 	if (oDataASTNode.type === EXPRESSION_TYPES.NOT) {
 		criterion = transformNotNode(context);
 	}
+	else if (oDataASTNode.type === EXPRESSION_TYPES.COMMON) {
+		criterion = transformCommonNode(context);
+	}
 	else if (oDataASTNode.type === EXPRESSION_TYPES.METHOD_CALL) {
 		criterion = transformFunctionalNode(context);
 	}
@@ -406,6 +439,40 @@ function toCriteria(context) {
 	}
 
 	return criterion;
+}
+
+/**
+ * Transform an operator expression node into a criterion for the criteria
+ * builder.
+ * @param {object} oDataASTNode
+ * @returns An array containing the object representation of a collection
+ * criterion.
+ */
+function transformCommonNode({oDataASTNode}) {
+	const nextNodeExpression = getNextOperatorExpression(oDataASTNode);
+
+	const anyExpression = nextNodeExpression.value.next.value;
+
+	const methodExpression = anyExpression.value.predicate.value;
+
+	const methodExpressionName = getExpressionName(methodExpression);
+
+	let value;
+
+	if (methodExpressionName == OPERATORS.CONTAINS) {
+		value = removeQuotes(methodExpression.value.parameters[1].raw);
+	}
+	else if (methodExpressionName == OPERATORS.EQ) {
+		value = removeQuotes(methodExpression.value.right.raw);
+	}
+
+	return [
+		{
+			operatorName: methodExpressionName,
+			propertyName: nextNodeExpression.value.current.raw,
+			value
+		}
+	];
 }
 
 /**
@@ -516,6 +583,32 @@ function transformNotNode({oDataASTNode}) {
 				value: removeQuotes(nextNodeExpression.value.right.raw)
 			}
 		];
+	}
+	else if (nextNodeExpression.type == EXPRESSION_TYPES.PROPERTY_PATH) {
+		const anyExpression = nextNodeExpression.value.next.value;
+
+		const methodExpression = anyExpression.value.predicate.value;
+
+		const methodExpressionName = getExpressionName(methodExpression);
+
+		if (methodExpressionName == OPERATORS.CONTAINS) {
+			returnValue = [
+				{
+					operatorName: NOT_OPERATORS.NOT_CONTAINS,
+					propertyName: nextNodeExpression.value.current.raw,
+					value: removeQuotes(methodExpression.value.parameters[1].raw)
+				}
+			];
+		}
+		else if (methodExpressionName == OPERATORS.EQ) {
+			returnValue = [
+				{
+					operatorName: NOT_OPERATORS.NOT_EQ,
+					propertyName: nextNodeExpression.value.current.raw,
+					value: removeQuotes(methodExpression.value.right.raw)
+				}
+			];
+		}
 	}
 
 	return returnValue;

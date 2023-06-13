@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the remote service utility for Permission. This utility wraps
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  */
 @ProviderType
 public class PermissionServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -40,48 +40,50 @@ public class PermissionServiceUtil {
 	 */
 
 	/**
-	* Checks to see if the group has permission to the service.
-	*
-	* @param groupId the primary key of the group
-	* @param name the service name
-	* @param primKey the primary key of the service
-	*/
+	 * Checks to see if the group has permission to the service.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param name the service name
+	 * @param primKey the primary key of the service
+	 */
 	public static void checkPermission(long groupId, String name, long primKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		getService().checkPermission(groupId, name, primKey);
 	}
 
 	/**
-	* Checks to see if the group has permission to the service.
-	*
-	* @param groupId the primary key of the group
-	* @param name the service name
-	* @param primKey the primary key of the service
-	*/
-	public static void checkPermission(long groupId, String name, String primKey)
+	 * Checks to see if the group has permission to the service.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param name the service name
+	 * @param primKey the primary key of the service
+	 */
+	public static void checkPermission(
+			long groupId, String name, String primKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		getService().checkPermission(groupId, name, primKey);
 	}
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static PermissionService getService() {
 		if (_service == null) {
-			_service = (PermissionService)PortalBeanLocatorUtil.locate(PermissionService.class.getName());
-
-			ReferenceRegistry.registerReference(PermissionServiceUtil.class,
-				"_service");
+			_service = (PermissionService)PortalBeanLocatorUtil.locate(
+				PermissionService.class.getName());
 		}
 
 		return _service;
 	}
 
 	private static PermissionService _service;
+
 }

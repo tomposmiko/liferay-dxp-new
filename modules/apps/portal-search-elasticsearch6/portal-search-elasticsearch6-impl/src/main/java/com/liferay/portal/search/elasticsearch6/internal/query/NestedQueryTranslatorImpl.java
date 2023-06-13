@@ -14,13 +14,12 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.portal.kernel.search.Query;
-import com.liferay.portal.kernel.search.generic.NestedQuery;
-import com.liferay.portal.kernel.search.query.QueryVisitor;
+import com.liferay.portal.search.query.NestedQuery;
+import com.liferay.portal.search.query.Query;
+import com.liferay.portal.search.query.QueryVisitor;
 
 import org.apache.lucene.search.join.ScoreMode;
 
-import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 
@@ -29,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(immediate = true, service = NestedQueryTranslator.class)
+@Component(service = NestedQueryTranslator.class)
 public class NestedQueryTranslatorImpl implements NestedQueryTranslator {
 
 	@Override
@@ -40,14 +39,8 @@ public class NestedQueryTranslatorImpl implements NestedQueryTranslator {
 
 		QueryBuilder queryBuilder = query.accept(queryVisitor);
 
-		NestedQueryBuilder nestedQueryBuilder = QueryBuilders.nestedQuery(
+		return QueryBuilders.nestedQuery(
 			nestedQuery.getPath(), queryBuilder, ScoreMode.Total);
-
-		if (!nestedQuery.isDefaultBoost()) {
-			nestedQueryBuilder.boost(nestedQuery.getBoost());
-		}
-
-		return nestedQueryBuilder;
 	}
 
 }

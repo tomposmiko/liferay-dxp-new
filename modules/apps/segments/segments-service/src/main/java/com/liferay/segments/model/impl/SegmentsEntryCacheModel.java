@@ -18,9 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
-
 import com.liferay.segments.model.SegmentsEntry;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class SegmentsEntryCacheModel implements CacheModel<SegmentsEntry>,
-	Externalizable {
+public class SegmentsEntryCacheModel
+	implements CacheModel<SegmentsEntry>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class SegmentsEntryCacheModel implements CacheModel<SegmentsEntry>,
 			return false;
 		}
 
-		SegmentsEntryCacheModel segmentsEntryCacheModel = (SegmentsEntryCacheModel)obj;
+		SegmentsEntryCacheModel segmentsEntryCacheModel =
+			(SegmentsEntryCacheModel)obj;
 
 		if (segmentsEntryId == segmentsEntryCacheModel.segmentsEntryId) {
 			return true;
@@ -202,8 +202,7 @@ public class SegmentsEntryCacheModel implements CacheModel<SegmentsEntry>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(segmentsEntryId);
 
 		objectOutput.writeLong(groupId);
@@ -281,4 +280,5 @@ public class SegmentsEntryCacheModel implements CacheModel<SegmentsEntry>,
 	public String key;
 	public String source;
 	public String type;
+
 }

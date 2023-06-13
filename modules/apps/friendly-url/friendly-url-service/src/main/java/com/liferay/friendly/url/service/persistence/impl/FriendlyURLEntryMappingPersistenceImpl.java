@@ -21,9 +21,7 @@ import com.liferay.friendly.url.model.FriendlyURLEntryMapping;
 import com.liferay.friendly.url.model.impl.FriendlyURLEntryMappingImpl;
 import com.liferay.friendly.url.model.impl.FriendlyURLEntryMappingModelImpl;
 import com.liferay.friendly.url.service.persistence.FriendlyURLEntryMappingPersistence;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -57,18 +55,24 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<FriendlyURLEntryMapping>
+public class FriendlyURLEntryMappingPersistenceImpl
+	extends BasePersistenceImpl<FriendlyURLEntryMapping>
 	implements FriendlyURLEntryMappingPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>FriendlyURLEntryMappingUtil</code> to access the friendly url entry mapping persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = FriendlyURLEntryMappingImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		FriendlyURLEntryMappingImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -86,8 +90,9 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public FriendlyURLEntryMapping findByC_C(long classNameId, long classPK)
 		throws NoSuchFriendlyURLEntryMappingException {
-		FriendlyURLEntryMapping friendlyURLEntryMapping = fetchByC_C(classNameId,
-				classPK);
+
+		FriendlyURLEntryMapping friendlyURLEntryMapping = fetchByC_C(
+			classNameId, classPK);
 
 		if (friendlyURLEntryMapping == null) {
 			StringBundler msg = new StringBundler(6);
@@ -133,22 +138,25 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching friendly url entry mapping, or <code>null</code> if a matching friendly url entry mapping could not be found
 	 */
 	@Override
-	public FriendlyURLEntryMapping fetchByC_C(long classNameId, long classPK,
-		boolean retrieveFromCache) {
-		Object[] finderArgs = new Object[] { classNameId, classPK };
+	public FriendlyURLEntryMapping fetchByC_C(
+		long classNameId, long classPK, boolean retrieveFromCache) {
+
+		Object[] finderArgs = new Object[] {classNameId, classPK};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(_finderPathFetchByC_C, finderArgs,
-					this);
+			result = finderCache.getResult(
+				_finderPathFetchByC_C, finderArgs, this);
 		}
 
 		if (result instanceof FriendlyURLEntryMapping) {
-			FriendlyURLEntryMapping friendlyURLEntryMapping = (FriendlyURLEntryMapping)result;
+			FriendlyURLEntryMapping friendlyURLEntryMapping =
+				(FriendlyURLEntryMapping)result;
 
 			if ((classNameId != friendlyURLEntryMapping.getClassNameId()) ||
-					(classPK != friendlyURLEntryMapping.getClassPK())) {
+				(classPK != friendlyURLEntryMapping.getClassPK())) {
+
 				result = null;
 			}
 		}
@@ -180,11 +188,12 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 				List<FriendlyURLEntryMapping> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(_finderPathFetchByC_C, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByC_C, finderArgs, list);
 				}
 				else {
-					FriendlyURLEntryMapping friendlyURLEntryMapping = list.get(0);
+					FriendlyURLEntryMapping friendlyURLEntryMapping = list.get(
+						0);
 
 					result = friendlyURLEntryMapping;
 
@@ -219,8 +228,9 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public FriendlyURLEntryMapping removeByC_C(long classNameId, long classPK)
 		throws NoSuchFriendlyURLEntryMappingException {
-		FriendlyURLEntryMapping friendlyURLEntryMapping = findByC_C(classNameId,
-				classPK);
+
+		FriendlyURLEntryMapping friendlyURLEntryMapping = findByC_C(
+			classNameId, classPK);
 
 		return remove(friendlyURLEntryMapping);
 	}
@@ -236,7 +246,7 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	public int countByC_C(long classNameId, long classPK) {
 		FinderPath finderPath = _finderPathCountByC_C;
 
-		Object[] finderArgs = new Object[] { classNameId, classPK };
+		Object[] finderArgs = new Object[] {classNameId, classPK};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -281,15 +291,19 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_C_CLASSNAMEID_2 = "friendlyURLEntryMapping.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_C_C_CLASSPK_2 = "friendlyURLEntryMapping.classPK = ?";
+	private static final String _FINDER_COLUMN_C_C_CLASSNAMEID_2 =
+		"friendlyURLEntryMapping.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_CLASSPK_2 =
+		"friendlyURLEntryMapping.classPK = ?";
 
 	public FriendlyURLEntryMappingPersistenceImpl() {
 		setModelClass(FriendlyURLEntryMapping.class);
 
 		setModelImplClass(FriendlyURLEntryMappingImpl.class);
 		setModelPKClass(long.class);
-		setEntityCacheEnabled(FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED);
+		setEntityCacheEnabled(
+			FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**
@@ -299,15 +313,18 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void cacheResult(FriendlyURLEntryMapping friendlyURLEntryMapping) {
-		entityCache.putResult(FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(
+			FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
 			FriendlyURLEntryMappingImpl.class,
 			friendlyURLEntryMapping.getPrimaryKey(), friendlyURLEntryMapping);
 
-		finderCache.putResult(_finderPathFetchByC_C,
+		finderCache.putResult(
+			_finderPathFetchByC_C,
 			new Object[] {
 				friendlyURLEntryMapping.getClassNameId(),
 				friendlyURLEntryMapping.getClassPK()
-			}, friendlyURLEntryMapping);
+			},
+			friendlyURLEntryMapping);
 
 		friendlyURLEntryMapping.resetOriginalValues();
 	}
@@ -320,11 +337,15 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public void cacheResult(
 		List<FriendlyURLEntryMapping> friendlyURLEntryMappings) {
-		for (FriendlyURLEntryMapping friendlyURLEntryMapping : friendlyURLEntryMappings) {
+
+		for (FriendlyURLEntryMapping friendlyURLEntryMapping :
+				friendlyURLEntryMappings) {
+
 			if (entityCache.getResult(
-						FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
-						FriendlyURLEntryMappingImpl.class,
-						friendlyURLEntryMapping.getPrimaryKey()) == null) {
+					FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
+					FriendlyURLEntryMappingImpl.class,
+					friendlyURLEntryMapping.getPrimaryKey()) == null) {
+
 				cacheResult(friendlyURLEntryMapping);
 			}
 			else {
@@ -358,65 +379,75 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void clearCache(FriendlyURLEntryMapping friendlyURLEntryMapping) {
-		entityCache.removeResult(FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.removeResult(
+			FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
 			FriendlyURLEntryMappingImpl.class,
 			friendlyURLEntryMapping.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((FriendlyURLEntryMappingModelImpl)friendlyURLEntryMapping,
-			true);
+		clearUniqueFindersCache(
+			(FriendlyURLEntryMappingModelImpl)friendlyURLEntryMapping, true);
 	}
 
 	@Override
 	public void clearCache(
 		List<FriendlyURLEntryMapping> friendlyURLEntryMappings) {
+
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		for (FriendlyURLEntryMapping friendlyURLEntryMapping : friendlyURLEntryMappings) {
-			entityCache.removeResult(FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
+		for (FriendlyURLEntryMapping friendlyURLEntryMapping :
+				friendlyURLEntryMappings) {
+
+			entityCache.removeResult(
+				FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
 				FriendlyURLEntryMappingImpl.class,
 				friendlyURLEntryMapping.getPrimaryKey());
 
-			clearUniqueFindersCache((FriendlyURLEntryMappingModelImpl)friendlyURLEntryMapping,
+			clearUniqueFindersCache(
+				(FriendlyURLEntryMappingModelImpl)friendlyURLEntryMapping,
 				true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
 		FriendlyURLEntryMappingModelImpl friendlyURLEntryMappingModelImpl) {
-		Object[] args = new Object[] {
-				friendlyURLEntryMappingModelImpl.getClassNameId(),
-				friendlyURLEntryMappingModelImpl.getClassPK()
-			};
 
-		finderCache.putResult(_finderPathCountByC_C, args, Long.valueOf(1),
+		Object[] args = new Object[] {
+			friendlyURLEntryMappingModelImpl.getClassNameId(),
+			friendlyURLEntryMappingModelImpl.getClassPK()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByC_C, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByC_C, args, friendlyURLEntryMappingModelImpl,
 			false);
-		finderCache.putResult(_finderPathFetchByC_C, args,
-			friendlyURLEntryMappingModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		FriendlyURLEntryMappingModelImpl friendlyURLEntryMappingModelImpl,
 		boolean clearCurrent) {
+
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					friendlyURLEntryMappingModelImpl.getClassNameId(),
-					friendlyURLEntryMappingModelImpl.getClassPK()
-				};
+				friendlyURLEntryMappingModelImpl.getClassNameId(),
+				friendlyURLEntryMappingModelImpl.getClassPK()
+			};
 
 			finderCache.removeResult(_finderPathCountByC_C, args);
 			finderCache.removeResult(_finderPathFetchByC_C, args);
 		}
 
 		if ((friendlyURLEntryMappingModelImpl.getColumnBitmask() &
-				_finderPathFetchByC_C.getColumnBitmask()) != 0) {
+			 _finderPathFetchByC_C.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					friendlyURLEntryMappingModelImpl.getOriginalClassNameId(),
-					friendlyURLEntryMappingModelImpl.getOriginalClassPK()
-				};
+				friendlyURLEntryMappingModelImpl.getOriginalClassNameId(),
+				friendlyURLEntryMappingModelImpl.getOriginalClassPK()
+			};
 
 			finderCache.removeResult(_finderPathCountByC_C, args);
 			finderCache.removeResult(_finderPathFetchByC_C, args);
@@ -431,7 +462,8 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public FriendlyURLEntryMapping create(long friendlyURLEntryMappingId) {
-		FriendlyURLEntryMapping friendlyURLEntryMapping = new FriendlyURLEntryMappingImpl();
+		FriendlyURLEntryMapping friendlyURLEntryMapping =
+			new FriendlyURLEntryMappingImpl();
 
 		friendlyURLEntryMapping.setNew(true);
 		friendlyURLEntryMapping.setPrimaryKey(friendlyURLEntryMappingId);
@@ -449,6 +481,7 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public FriendlyURLEntryMapping remove(long friendlyURLEntryMappingId)
 		throws NoSuchFriendlyURLEntryMappingException {
+
 		return remove((Serializable)friendlyURLEntryMappingId);
 	}
 
@@ -462,21 +495,23 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public FriendlyURLEntryMapping remove(Serializable primaryKey)
 		throws NoSuchFriendlyURLEntryMappingException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			FriendlyURLEntryMapping friendlyURLEntryMapping = (FriendlyURLEntryMapping)session.get(FriendlyURLEntryMappingImpl.class,
-					primaryKey);
+			FriendlyURLEntryMapping friendlyURLEntryMapping =
+				(FriendlyURLEntryMapping)session.get(
+					FriendlyURLEntryMappingImpl.class, primaryKey);
 
 			if (friendlyURLEntryMapping == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchFriendlyURLEntryMappingException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchFriendlyURLEntryMappingException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(friendlyURLEntryMapping);
@@ -495,14 +530,16 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	protected FriendlyURLEntryMapping removeImpl(
 		FriendlyURLEntryMapping friendlyURLEntryMapping) {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			if (!session.contains(friendlyURLEntryMapping)) {
-				friendlyURLEntryMapping = (FriendlyURLEntryMapping)session.get(FriendlyURLEntryMappingImpl.class,
-						friendlyURLEntryMapping.getPrimaryKeyObj());
+				friendlyURLEntryMapping = (FriendlyURLEntryMapping)session.get(
+					FriendlyURLEntryMappingImpl.class,
+					friendlyURLEntryMapping.getPrimaryKeyObj());
 			}
 
 			if (friendlyURLEntryMapping != null) {
@@ -526,25 +563,30 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public FriendlyURLEntryMapping updateImpl(
 		FriendlyURLEntryMapping friendlyURLEntryMapping) {
+
 		boolean isNew = friendlyURLEntryMapping.isNew();
 
-		if (!(friendlyURLEntryMapping instanceof FriendlyURLEntryMappingModelImpl)) {
+		if (!(friendlyURLEntryMapping instanceof
+				FriendlyURLEntryMappingModelImpl)) {
+
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(friendlyURLEntryMapping.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(friendlyURLEntryMapping);
+				invocationHandler = ProxyUtil.getInvocationHandler(
+					friendlyURLEntryMapping);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in friendlyURLEntryMapping proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom FriendlyURLEntryMapping implementation " +
-				friendlyURLEntryMapping.getClass());
+					friendlyURLEntryMapping.getClass());
 		}
 
-		FriendlyURLEntryMappingModelImpl friendlyURLEntryMappingModelImpl = (FriendlyURLEntryMappingModelImpl)friendlyURLEntryMapping;
+		FriendlyURLEntryMappingModelImpl friendlyURLEntryMappingModelImpl =
+			(FriendlyURLEntryMappingModelImpl)friendlyURLEntryMapping;
 
 		Session session = null;
 
@@ -557,7 +599,9 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 				friendlyURLEntryMapping.setNew(false);
 			}
 			else {
-				friendlyURLEntryMapping = (FriendlyURLEntryMapping)session.merge(friendlyURLEntryMapping);
+				friendlyURLEntryMapping =
+					(FriendlyURLEntryMapping)session.merge(
+						friendlyURLEntryMapping);
 			}
 		}
 		catch (Exception e) {
@@ -572,14 +616,14 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 		if (!FriendlyURLEntryMappingModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
+		else if (isNew) {
 			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
-				FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
 		}
 
-		entityCache.putResult(FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(
+			FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
 			FriendlyURLEntryMappingImpl.class,
 			friendlyURLEntryMapping.getPrimaryKey(), friendlyURLEntryMapping,
 			false);
@@ -602,15 +646,17 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public FriendlyURLEntryMapping findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchFriendlyURLEntryMappingException {
-		FriendlyURLEntryMapping friendlyURLEntryMapping = fetchByPrimaryKey(primaryKey);
+
+		FriendlyURLEntryMapping friendlyURLEntryMapping = fetchByPrimaryKey(
+			primaryKey);
 
 		if (friendlyURLEntryMapping == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchFriendlyURLEntryMappingException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchFriendlyURLEntryMappingException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return friendlyURLEntryMapping;
@@ -625,8 +671,9 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public FriendlyURLEntryMapping findByPrimaryKey(
-		long friendlyURLEntryMappingId)
+			long friendlyURLEntryMappingId)
 		throws NoSuchFriendlyURLEntryMappingException {
+
 		return findByPrimaryKey((Serializable)friendlyURLEntryMappingId);
 	}
 
@@ -639,6 +686,7 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public FriendlyURLEntryMapping fetchByPrimaryKey(
 		long friendlyURLEntryMappingId) {
+
 		return fetchByPrimaryKey((Serializable)friendlyURLEntryMappingId);
 	}
 
@@ -681,8 +729,10 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of friendly url entry mappings
 	 */
 	@Override
-	public List<FriendlyURLEntryMapping> findAll(int start, int end,
+	public List<FriendlyURLEntryMapping> findAll(
+		int start, int end,
 		OrderByComparator<FriendlyURLEntryMapping> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -700,29 +750,32 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of friendly url entry mappings
 	 */
 	@Override
-	public List<FriendlyURLEntryMapping> findAll(int start, int end,
+	public List<FriendlyURLEntryMapping> findAll(
+		int start, int end,
 		OrderByComparator<FriendlyURLEntryMapping> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<FriendlyURLEntryMapping> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<FriendlyURLEntryMapping>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<FriendlyURLEntryMapping>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -730,13 +783,13 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_FRIENDLYURLENTRYMAPPING);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -744,7 +797,8 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 				sql = _SQL_SELECT_FRIENDLYURLENTRYMAPPING;
 
 				if (pagination) {
-					sql = sql.concat(FriendlyURLEntryMappingModelImpl.ORDER_BY_JPQL);
+					sql = sql.concat(
+						FriendlyURLEntryMappingModelImpl.ORDER_BY_JPQL);
 				}
 			}
 
@@ -756,16 +810,16 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<FriendlyURLEntryMapping>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<FriendlyURLEntryMapping>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<FriendlyURLEntryMapping>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<FriendlyURLEntryMapping>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -803,8 +857,8 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(_finderPathCountAll,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -812,15 +866,17 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(_SQL_COUNT_FRIENDLYURLENTRYMAPPING);
+				Query q = session.createQuery(
+					_SQL_COUNT_FRIENDLYURLENTRYMAPPING);
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -856,35 +912,39 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 	 * Initializes the friendly url entry mapping persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
-				FriendlyURLEntryMappingModelImpl.FINDER_CACHE_ENABLED,
-				FriendlyURLEntryMappingImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(
+			FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
+			FriendlyURLEntryMappingModelImpl.FINDER_CACHE_ENABLED,
+			FriendlyURLEntryMappingImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
-				FriendlyURLEntryMappingModelImpl.FINDER_CACHE_ENABLED,
-				FriendlyURLEntryMappingImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-				new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
+			FriendlyURLEntryMappingModelImpl.FINDER_CACHE_ENABLED,
+			FriendlyURLEntryMappingImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
 
-		_finderPathCountAll = new FinderPath(FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
-				FriendlyURLEntryMappingModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countAll", new String[0]);
+		_finderPathCountAll = new FinderPath(
+			FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
+			FriendlyURLEntryMappingModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
 
-		_finderPathFetchByC_C = new FinderPath(FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
-				FriendlyURLEntryMappingModelImpl.FINDER_CACHE_ENABLED,
-				FriendlyURLEntryMappingImpl.class, FINDER_CLASS_NAME_ENTITY,
-				"fetchByC_C",
-				new String[] { Long.class.getName(), Long.class.getName() },
-				FriendlyURLEntryMappingModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-				FriendlyURLEntryMappingModelImpl.CLASSPK_COLUMN_BITMASK);
+		_finderPathFetchByC_C = new FinderPath(
+			FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
+			FriendlyURLEntryMappingModelImpl.FINDER_CACHE_ENABLED,
+			FriendlyURLEntryMappingImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByC_C",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			FriendlyURLEntryMappingModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			FriendlyURLEntryMappingModelImpl.CLASSPK_COLUMN_BITMASK);
 
-		_finderPathCountByC_C = new FinderPath(FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
-				FriendlyURLEntryMappingModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByC_C",
-				new String[] { Long.class.getName(), Long.class.getName() });
+		_finderPathCountByC_C = new FinderPath(
+			FriendlyURLEntryMappingModelImpl.ENTITY_CACHE_ENABLED,
+			FriendlyURLEntryMappingModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
+			new String[] {Long.class.getName(), Long.class.getName()});
 	}
 
 	public void destroy() {
@@ -896,14 +956,32 @@ public class FriendlyURLEntryMappingPersistenceImpl extends BasePersistenceImpl<
 
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
+
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_FRIENDLYURLENTRYMAPPING = "SELECT friendlyURLEntryMapping FROM FriendlyURLEntryMapping friendlyURLEntryMapping";
-	private static final String _SQL_SELECT_FRIENDLYURLENTRYMAPPING_WHERE = "SELECT friendlyURLEntryMapping FROM FriendlyURLEntryMapping friendlyURLEntryMapping WHERE ";
-	private static final String _SQL_COUNT_FRIENDLYURLENTRYMAPPING = "SELECT COUNT(friendlyURLEntryMapping) FROM FriendlyURLEntryMapping friendlyURLEntryMapping";
-	private static final String _SQL_COUNT_FRIENDLYURLENTRYMAPPING_WHERE = "SELECT COUNT(friendlyURLEntryMapping) FROM FriendlyURLEntryMapping friendlyURLEntryMapping WHERE ";
-	private static final String _ORDER_BY_ENTITY_ALIAS = "friendlyURLEntryMapping.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No FriendlyURLEntryMapping exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No FriendlyURLEntryMapping exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(FriendlyURLEntryMappingPersistenceImpl.class);
+
+	private static final String _SQL_SELECT_FRIENDLYURLENTRYMAPPING =
+		"SELECT friendlyURLEntryMapping FROM FriendlyURLEntryMapping friendlyURLEntryMapping";
+
+	private static final String _SQL_SELECT_FRIENDLYURLENTRYMAPPING_WHERE =
+		"SELECT friendlyURLEntryMapping FROM FriendlyURLEntryMapping friendlyURLEntryMapping WHERE ";
+
+	private static final String _SQL_COUNT_FRIENDLYURLENTRYMAPPING =
+		"SELECT COUNT(friendlyURLEntryMapping) FROM FriendlyURLEntryMapping friendlyURLEntryMapping";
+
+	private static final String _SQL_COUNT_FRIENDLYURLENTRYMAPPING_WHERE =
+		"SELECT COUNT(friendlyURLEntryMapping) FROM FriendlyURLEntryMapping friendlyURLEntryMapping WHERE ";
+
+	private static final String _ORDER_BY_ENTITY_ALIAS =
+		"friendlyURLEntryMapping.";
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No FriendlyURLEntryMapping exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No FriendlyURLEntryMapping exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		FriendlyURLEntryMappingPersistenceImpl.class);
+
 }

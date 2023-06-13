@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class BookmarksFolderSoap implements Serializable {
+
 	public static BookmarksFolderSoap toSoapModel(BookmarksFolder model) {
 		BookmarksFolderSoap soapModel = new BookmarksFolderSoap();
 
@@ -55,7 +56,8 @@ public class BookmarksFolderSoap implements Serializable {
 	}
 
 	public static BookmarksFolderSoap[] toSoapModels(BookmarksFolder[] models) {
-		BookmarksFolderSoap[] soapModels = new BookmarksFolderSoap[models.length];
+		BookmarksFolderSoap[] soapModels =
+			new BookmarksFolderSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -66,10 +68,12 @@ public class BookmarksFolderSoap implements Serializable {
 
 	public static BookmarksFolderSoap[][] toSoapModels(
 		BookmarksFolder[][] models) {
+
 		BookmarksFolderSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new BookmarksFolderSoap[models.length][models[0].length];
+			soapModels =
+				new BookmarksFolderSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new BookmarksFolderSoap[0][0];
@@ -84,7 +88,9 @@ public class BookmarksFolderSoap implements Serializable {
 
 	public static BookmarksFolderSoap[] toSoapModels(
 		List<BookmarksFolder> models) {
-		List<BookmarksFolderSoap> soapModels = new ArrayList<BookmarksFolderSoap>(models.size());
+
+		List<BookmarksFolderSoap> soapModels =
+			new ArrayList<BookmarksFolderSoap>(models.size());
 
 		for (BookmarksFolder model : models) {
 			soapModels.add(toSoapModel(model));
@@ -257,4 +263,5 @@ public class BookmarksFolderSoap implements Serializable {
 	private long _statusByUserId;
 	private String _statusByUserName;
 	private Date _statusDate;
+
 }

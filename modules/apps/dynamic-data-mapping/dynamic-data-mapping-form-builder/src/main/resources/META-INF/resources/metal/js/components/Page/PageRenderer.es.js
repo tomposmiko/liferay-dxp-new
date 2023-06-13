@@ -1,15 +1,17 @@
 import 'clay-button';
 import 'clay-dropdown';
 import 'clay-modal';
-import {Config} from 'metal-state';
-import {dom} from 'metal-dom';
-import {pageStructure} from '../../util/config.es';
-import {sub} from '../../util/strings.es';
+import * as FormSupport from '../Form/FormSupport.es';
 import Component from 'metal-component';
 import core from 'metal';
-import FormSupport from '../Form/FormSupport.es';
+import Position from 'metal-position';
 import Soy from 'metal-soy';
 import templates from './PageRenderer.soy.js';
+import {Config} from 'metal-state';
+import {dom} from 'metal-dom';
+import {Drag} from 'metal-drag-drop';
+import {pageStructure} from '../../util/config.es';
+import {sub} from '../../util/strings.es';
 
 class PageRenderer extends Component {
 	static STATE = {
@@ -21,6 +23,13 @@ class PageRenderer extends Component {
 		 */
 
 		activePage: Config.number().value(0),
+
+		/**
+		 * @instance
+		 * @memberof FormPage
+		 * @type {?boolean}
+		 */
+		editable: Config.bool().value(false),
 
 		/**
 		 * @instance
@@ -103,6 +112,21 @@ class PageRenderer extends Component {
 		this.titlePlaceholder = this._getTitlePlaceholder();
 	}
 
+	/**
+	 * Remember to destroy the dragDrop instance when the component is disposed
+	 */
+	attached() {
+		if (this.editable) {
+			this._bindLayoutBuilder();
+		}
+	}
+
+	disposed() {
+		if (this._dragAndDrop) {
+			this._dragAndDrop.dispose();
+		}
+	}
+
 	prepareStateForRender(states) {
 		return {
 			...states,
@@ -110,8 +134,76 @@ class PageRenderer extends Component {
 		};
 	}
 
-	willReceiveState() {
+	willReceiveState(nextState) {
 		this.titlePlaceholder = this._getTitlePlaceholder();
+
+		if (nextState.page && this.editable) {
+			this._dragAndDrop.setState(
+				{
+					targets: '.ddm-resize-drop'
+				}
+			);
+		}
+
+		return nextState;
+	}
+
+	_bindLayoutBuilder() {
+		this._dragAndDrop = new Drag(
+			{
+				axis: 'x',
+				sources: '.ddm-resize-handle',
+				useShim: true
+			}
+		);
+
+		this._dragAndDrop.on(Drag.Events.START, this._handleDragStartEvent.bind(this));
+		this._dragAndDrop.on(Drag.Events.DRAG, this._handleDragEvent.bind(this));
+	}
+
+	_handleDragStartEvent() {
+		this._lastResizeColumn = -1;
+	}
+
+	_handleDragEvent(event) {
+		const columnNodes = Object.keys(this.refs)
+			.filter(key => key.indexOf('resizeColumn') === 0)
+			.map(key => this.refs[key]);
+		const {source, x} = event;
+
+		let distance = Infinity;
+		let nearest;
+
+		columnNodes.forEach(
+			node => {
+				const region = Position.getRegion(node);
+
+				const currentDistance = Math.abs(x - region.left);
+
+				if (currentDistance < distance) {
+					distance = currentDistance;
+					nearest = node;
+				}
+			}
+		);
+
+		if (nearest) {
+			const column = Number(nearest.dataset.resizeColumn);
+			const direction = source.classList.contains('ddm-resize-handle-left') ? 'left' : 'right';
+
+			if (this._lastResizeColumn !== column) {
+				this._lastResizeColumn = column;
+
+				this.emit(
+					'columnResized',
+					{
+						column,
+						direction,
+						source
+					}
+				);
+			}
+		}
 	}
 
 	/**
@@ -148,7 +240,16 @@ class PageRenderer extends Component {
 	}
 
 	/**
-	 * @param {!Object} data
+	 * @param {!Object} event
+	 * @private
+	 */
+
+	_handleFieldBlurred(event) {
+		this.emit('fieldBlurred', event);
+	}
+
+	/**
+	 * @param {!Object} event
 	 * @private
 	 */
 
@@ -168,18 +269,6 @@ class PageRenderer extends Component {
 
 		this.emit('deleteButtonClicked', index);
 	}
-
-	/**
-	 * @param {!Event} event
-	 * @private
-	 */
-
-	_handleOnClickResize() {}
-
-	/**
-	 * @param {!Object} event
-	 * @private
-	 */
 
 	_handlePageDescriptionChanged(event) {
 		const {page} = this;

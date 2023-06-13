@@ -32,8 +32,9 @@ import com.liferay.portal.background.task.service.BackgroundTaskLocalServiceUtil
  * @generated
  */
 @ProviderType
-public abstract class BackgroundTaskBaseImpl extends BackgroundTaskModelImpl
-	implements BackgroundTask {
+public abstract class BackgroundTaskBaseImpl
+	extends BackgroundTaskModelImpl implements BackgroundTask {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class BackgroundTaskBaseImpl extends BackgroundTaskModelImpl
 			BackgroundTaskLocalServiceUtil.updateBackgroundTask(this);
 		}
 	}
+
 }

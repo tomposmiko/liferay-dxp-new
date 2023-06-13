@@ -30,12 +30,15 @@ import com.liferay.portal.kernel.util.Accessor;
 @ImplementationClassName("com.liferay.contacts.model.impl.EntryImpl")
 @ProviderType
 public interface Entry extends EntryModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.contacts.model.impl.EntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<Entry, Long> ENTRY_ID_ACCESSOR = new Accessor<Entry, Long>() {
+	public static final Accessor<Entry, Long> ENTRY_ID_ACCESSOR =
+		new Accessor<Entry, Long>() {
+
 			@Override
 			public Long get(Entry entry) {
 				return entry.getEntryId();
@@ -50,5 +53,7 @@ public interface Entry extends EntryModel, PersistedModel {
 			public Class<Entry> getTypeClass() {
 				return Entry.class;
 			}
+
 		};
+
 }

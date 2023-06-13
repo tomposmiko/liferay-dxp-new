@@ -45,7 +45,7 @@ definition {
 		PortletEntry.save();
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -86,7 +86,7 @@ definition {
 		property testray.component.names = "Site Localization";
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -98,7 +98,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		Site.configureCurrentLanguagesCP(
@@ -107,11 +107,7 @@ definition {
 			displaySettings = "Display Settings"
 		);
 
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Instance Settings"
-		);
+		PortalSettings.gotoPortalSettings();
 
 		PortalSettings.configureCurrentLanguagesCP(
 			currentPortalLanguages = "Arabic (Saudi Arabia),Czech (Czech Republic),French (France)",
@@ -128,7 +124,7 @@ definition {
 		var portalURL = PropsUtil.get("portal.url");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -165,7 +161,7 @@ definition {
 		var portalURL = PropsUtil.get("portal.url");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -202,7 +198,7 @@ definition {
 		var portalURL = PropsUtil.get("portal.url");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -325,7 +321,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -341,7 +337,7 @@ definition {
 		Site.addBlankCP(siteName = "Site2 Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -353,7 +349,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		Site.configureCurrentLanguagesCP(
@@ -365,7 +361,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		Site.configureCurrentLanguagesCP(defaultSiteLanguage = "Spanish (Spain)");
@@ -455,7 +451,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -477,7 +473,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		Site.configureCurrentLanguagesCP(
@@ -546,7 +542,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuración",
 			panel = "Site Administration",
-			portlet = "Ajustes del sitio"
+			portlet = "Configuración del sitio web"
 		);
 
 		Site.configureCurrentLanguagesCP(
@@ -583,7 +579,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuración",
 			panel = "Site Administration",
-			portlet = "Ajustes del sitio"
+			portlet = "Configuración del sitio web"
 		);
 
 		Site.configureCurrentLanguagesCP(
@@ -622,7 +618,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -699,7 +695,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		Site.configureCurrentLanguagesCP(
@@ -713,7 +709,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		Site.viewSiteClonedFromSiteTemplateCP(
@@ -779,7 +775,7 @@ definition {
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -812,7 +808,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		Site.configureCurrentLanguagesCP(
@@ -831,7 +827,7 @@ definition {
 		Site.addBlankCP(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -841,7 +837,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		Site.configureCurrentLanguagesCP(
@@ -857,24 +853,34 @@ definition {
 
 		AssertLocation(value1 = "${portalURL}/fr/web/site-name/language-page");
 
-		AssertTextEquals(locator1 = "UserBar#USER_SIGN_IN", value1 = "Sign In");
+		AssertTextNotPresent(value1 = "The requested resource could not be found.");
+
+		AssertTextEquals(
+			locator1 = "Home#PAGE",
+			value1 = "Language Page",
+			key_pageName = "Language Page"
+		);
 
 		Navigator.openSpecificURL(url = "${portalURL}/fr");
 
-		AssertLocation(value1 = "${portalURL}/fr/web/guest/home");
+		AssertTextNotPresent(value1 = "The requested resource could not be found.");
 
-		AssertTextEquals(locator1 = "UserBar#USER_SIGN_IN", value1 = "Sign In");
+		AssertTextEquals(
+			locator1 = "Home#PAGE",
+			value1 = "Welcome",
+			key_pageName = "Welcome"
+		);
 
 		User.loginPG(specificURL = "${portalURL}/fr");
 
-		AssertLocation(value1 = "${portalURL}/web/guest/home");
+		AssertLocation(value1 = "${portalURL}/web/guest");
 
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		Site.addVirtualHostsURLCP(
@@ -890,7 +896,13 @@ definition {
 			sitePageURL = "http://www.able.com:8080/fr/"
 		);
 
-		AssertTextEquals(locator1 = "UserBar#USER_SIGN_IN", value1 = "Sign In");
+		AssertTextNotPresent(value1 = "The requested resource could not be found.");
+
+		AssertTextEquals(
+			locator1 = "Home#PAGE",
+			value1 = "Language Page",
+			key_pageName = "Language Page"
+		);
 	}
 
 	@priority = "5"
@@ -899,11 +911,7 @@ definition {
 		property test.name.skip.portal.instance = "LocalizationWithSites#ViewSiteLocalizationAfterDeletingOriginalLocale";
 		property testray.component.names = "Site Localization";
 
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Instance Settings"
-		);
+		PortalSettings.gotoPortalSettings();
 
 		PortalSettings.viewDefaultLanguageCP(
 			defaultPortalLanguage = "English (United States)"
@@ -924,7 +932,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);

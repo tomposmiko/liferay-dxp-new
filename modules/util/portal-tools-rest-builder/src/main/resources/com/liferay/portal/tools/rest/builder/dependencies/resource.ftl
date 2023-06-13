@@ -1,10 +1,8 @@
-package ${configYAML.apiPackagePath}.resource.${versionDirName};
+package ${configYAML.apiPackagePath}.resource.${escapedVersion};
 
-<#compress>
-	<#list openAPIYAML.components.schemas?keys as schemaName>
-		import ${configYAML.apiPackagePath}.dto.${versionDirName}.${schemaName};
-	</#list>
-</#compress>
+<#list openAPIYAML.components.schemas?keys as schemaName>
+	import ${configYAML.apiPackagePath}.dto.${escapedVersion}.${schemaName};
+</#list>
 
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.search.Sort;
@@ -17,6 +15,8 @@ import java.util.Date;
 
 import javax.annotation.Generated;
 
+import javax.ws.rs.core.Response;
+
 /**
  * To access this resource, run:
  *
@@ -28,10 +28,8 @@ import javax.annotation.Generated;
 @Generated("")
 public interface ${schemaName}Resource {
 
-	<#list freeMarkerTool.getResourceJavaMethodSignatures(configYAML, openAPIYAML, schemaName, false) as javaMethodSignature>
-		public ${javaMethodSignature.returnType} ${javaMethodSignature.methodName}(
-				${freeMarkerTool.getResourceParameters(javaMethodSignature.javaParameters, false)})
-			throws Exception;
+	<#list freeMarkerTool.getResourceJavaMethodSignatures(configYAML, openAPIYAML, schemaName) as javaMethodSignature>
+		public ${javaMethodSignature.returnType} ${javaMethodSignature.methodName}(${freeMarkerTool.getResourceParameters(javaMethodSignature.javaMethodParameters, javaMethodSignature.operation, false)}) throws Exception;
 	</#list>
 
 	public void setContextCompany(Company contextCompany);

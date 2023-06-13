@@ -1016,6 +1016,18 @@ public class DLImpl implements DL {
 	}
 
 	@Override
+	public boolean hasViewInContextGroupLayout(ThemeDisplay themeDisplay) {
+		PortletLayoutFinder.Result result = _getPortletLayoutFinderResult(
+			themeDisplay);
+
+		if (result == null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
 	public boolean hasWorkflowDefinitionLink(
 			long companyId, long groupId, long folderId, long fileEntryTypeId)
 		throws Exception {
@@ -1214,24 +1226,12 @@ public class DLImpl implements DL {
 		String portletId = PortletProviderUtil.getPortletId(
 			FileEntry.class.getName(), PortletProvider.Action.VIEW);
 
-		for (PortletLayoutFinder portletLayoutFinder : _serviceTrackerList) {
-			try {
-				PortletLayoutFinder.Result result = portletLayoutFinder.find(
-					themeDisplay, themeDisplay.getSiteGroupId());
+		PortletLayoutFinder.Result result = _getPortletLayoutFinderResult(
+			themeDisplay);
 
-				portletId = result.getPortletId();
-				plid = result.getPlid();
-
-				break;
-			}
-			catch (PortalException pe) {
-
-				// LPS-52675
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(pe, pe);
-				}
-			}
+		if (result != null) {
+			portletId = result.getPortletId();
+			plid = result.getPlid();
 		}
 
 		if ((plid == controlPanelPlid) ||
@@ -1283,6 +1283,28 @@ public class DLImpl implements DL {
 		for (String extension : extensions) {
 			_genericNames.put(extension, genericName);
 		}
+	}
+
+	private PortletLayoutFinder.Result _getPortletLayoutFinderResult(
+		ThemeDisplay themeDisplay) {
+
+		for (PortletLayoutFinder portletLayoutFinder : _serviceTrackerList) {
+			try {
+				PortletLayoutFinder.Result result = portletLayoutFinder.find(
+					themeDisplay, themeDisplay.getSiteGroupId());
+
+				if (result != null) {
+					return result;
+				}
+			}
+			catch (PortalException pe) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(pe, pe);
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private static final String _DEFAULT_FILE_ICON = "page";

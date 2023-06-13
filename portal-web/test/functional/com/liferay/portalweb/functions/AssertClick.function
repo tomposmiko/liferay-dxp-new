@@ -26,6 +26,18 @@ definition {
 		selenium.assertLiferayErrors();
 	}
 
+	function assertPartialTextClickAtNoMouseOver {
+		WaitForSPARefresh();
+
+		AssertTextEquals.assertPartialText();
+
+		selenium.clickAt();
+
+		selenium.assertJavaScriptErrors();
+
+		selenium.assertLiferayErrors();
+	}
+
 	function assertTextClickAt {
 		WaitForSPARefresh();
 
@@ -82,10 +94,10 @@ definition {
 		selenium.waitForElementPresent("xpath=(//script)[last()]");
 	}
 
-	function assertTextClickCaseInsensitive {
+	function assertTextClickCaseSensitive {
 		WaitForSPARefresh();
 
-		AssertTextEquals.assertTextCaseInsensitive();
+		AssertTextEquals.assertTextCaseSensitive();
 
 		selenium.mouseOver();
 

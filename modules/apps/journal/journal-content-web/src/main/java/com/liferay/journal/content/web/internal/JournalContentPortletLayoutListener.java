@@ -162,24 +162,23 @@ public class JournalContentPortletLayoutListener
 		try {
 			Layout layout = _layoutLocalService.getLayout(plid);
 
+			_assetEntryUsageLocalService.deleteAssetEntryUsages(
+				_portal.getClassNameId(Layout.class), plid, portletId);
+
+			_journalContentSearchLocalService.deleteArticleContentSearch(
+				layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getLayoutId(), portletId);
+
 			JournalArticle article = _getArticle(layout, portletId);
 
-			if (article == null) {
-				_assetEntryUsageLocalService.deleteAssetEntryUsages(
-					_portal.getClassNameId(Layout.class), plid, portletId);
+			if (article != null) {
+				_addAssetEntryUsage(layout, portletId, article);
 
-				_journalContentSearchLocalService.deleteArticleContentSearch(
+				_journalContentSearchLocalService.updateContentSearch(
 					layout.getGroupId(), layout.isPrivateLayout(),
-					layout.getLayoutId(), portletId);
-
-				return;
+					layout.getLayoutId(), portletId, article.getArticleId(),
+					true);
 			}
-
-			_addAssetEntryUsage(layout, portletId, article);
-
-			_journalContentSearchLocalService.updateContentSearch(
-				layout.getGroupId(), layout.isPrivateLayout(),
-				layout.getLayoutId(), portletId, article.getArticleId(), true);
 		}
 		catch (Exception e) {
 			throw new PortletLayoutListenerException(e);

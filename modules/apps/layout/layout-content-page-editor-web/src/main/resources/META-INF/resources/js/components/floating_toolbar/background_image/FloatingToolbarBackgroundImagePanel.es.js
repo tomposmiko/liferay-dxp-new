@@ -4,7 +4,7 @@ import Soy from 'metal-soy';
 
 import './FloatingToolbarBackgroundImagePanelDelegateTemplate.soy';
 import {getConnectedComponent} from '../../../store/ConnectedComponent.es';
-import {openImageSelector} from '../../fragment_processors/EditableImageFragmentProcessor.es';
+import {openImageSelector} from '../../../utils/FragmentsEditorDialogUtils';
 import templates from './FloatingToolbarBackgroundImagePanel.soy';
 import {UPDATE_LAST_SAVE_DATE, UPDATE_SAVING_CHANGES_STATUS, UPDATE_SECTION_CONFIG, UPDATE_TRANSLATION_STATUS} from '../../../actions/actions.es';
 
@@ -20,9 +20,11 @@ class FloatingToolbarBackgroundImagePanel extends Component {
 	 */
 	_handleSelectButtonClick() {
 		openImageSelector(
-			this.imageSelectorURL,
-			this.portletNamespace,
-			url => this._updateSectionBackgroundImage(url)
+			{
+				callback: url => this._updateSectionBackgroundImage(url),
+				imageSelectorURL: this.imageSelectorURL,
+				portletNamespace: this.portletNamespace
+			}
 		);
 	}
 

@@ -32,8 +32,9 @@ import com.liferay.adaptive.media.image.service.AMImageEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class AMImageEntryBaseImpl extends AMImageEntryModelImpl
-	implements AMImageEntry {
+public abstract class AMImageEntryBaseImpl
+	extends AMImageEntryModelImpl implements AMImageEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class AMImageEntryBaseImpl extends AMImageEntryModelImpl
 			AMImageEntryLocalServiceUtil.updateAMImageEntry(this);
 		}
 	}
+
 }

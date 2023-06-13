@@ -14,10 +14,10 @@
 
 package com.liferay.journal.web.asset;
 
+import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.BaseAssetRendererFactory;
-import com.liferay.asset.kernel.model.BaseDDMStructureClassTypeReader;
 import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
@@ -148,7 +148,7 @@ public class JournalArticleAssetRendererFactory
 
 	@Override
 	public ClassTypeReader getClassTypeReader() {
-		return new BaseDDMStructureClassTypeReader(getClassName());
+		return new JournalArticleClassTypeReader(getClassName());
 	}
 
 	@Override
@@ -251,13 +251,6 @@ public class JournalArticleAssetRendererFactory
 			permissionChecker, classPK, actionId);
 	}
 
-	@Reference(unbind = "-")
-	public void setFieldsToDDMFormValuesConverter(
-		FieldsToDDMFormValuesConverter fieldsToDDMFormValuesConverter) {
-
-		_fieldsToDDMFormValuesConverter = fieldsToDDMFormValuesConverter;
-	}
-
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.journal.web)", unbind = "-"
 	)
@@ -271,6 +264,8 @@ public class JournalArticleAssetRendererFactory
 		JournalArticleAssetRenderer journalArticleAssetRenderer =
 			new JournalArticleAssetRenderer(article);
 
+		journalArticleAssetRenderer.setAssetDisplayPageFriendlyURLProvider(
+			_assetDisplayPageFriendlyURLProvider);
 		journalArticleAssetRenderer.setFieldsToDDMFormValuesConverter(
 			_fieldsToDDMFormValuesConverter);
 		journalArticleAssetRenderer.setJournalContent(_journalContent);
@@ -280,38 +275,11 @@ public class JournalArticleAssetRendererFactory
 		return journalArticleAssetRenderer;
 	}
 
-	@Reference(unbind = "-")
-	protected void setDDMStructureLocalService(
-		DDMStructureLocalService ddmStructureLocalService) {
+	@Reference
+	private AssetDisplayPageFriendlyURLProvider
+		_assetDisplayPageFriendlyURLProvider;
 
-		_ddmStructureLocalService = ddmStructureLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setJournalArticleLocalService(
-		JournalArticleLocalService journalArticleLocalService) {
-
-		_journalArticleLocalService = journalArticleLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setJournalArticleResourceLocalService(
-		JournalArticleResourceLocalService journalArticleResourceLocalService) {
-
-		_journalArticleResourceLocalService =
-			journalArticleResourceLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setJournalContent(JournalContent journalContent) {
-		_journalContent = journalContent;
-	}
-
-	@Reference(unbind = "-")
-	protected void setJournalConverter(JournalConverter journalConverter) {
-		_journalConverter = journalConverter;
-	}
-
+	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference(
@@ -320,7 +288,10 @@ public class JournalArticleAssetRendererFactory
 	private ModelResourcePermission<DDMStructure>
 		_ddmStructureModelResourcePermission;
 
+	@Reference
 	private FieldsToDDMFormValuesConverter _fieldsToDDMFormValuesConverter;
+
+	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
 
 	@Reference(
@@ -329,9 +300,14 @@ public class JournalArticleAssetRendererFactory
 	private ModelResourcePermission<JournalArticle>
 		_journalArticleModelResourcePermission;
 
+	@Reference
 	private JournalArticleResourceLocalService
 		_journalArticleResourceLocalService;
+
+	@Reference
 	private JournalContent _journalContent;
+
+	@Reference
 	private JournalConverter _journalConverter;
 
 	@Reference

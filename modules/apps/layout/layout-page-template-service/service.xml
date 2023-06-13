@@ -246,6 +246,7 @@
 
 		<!-- References -->
 
+		<reference entity="LayoutPageTemplateEntry" package-path="com.liferay.layout.page.template" />
 		<reference entity="User" package-path="com.liferay.portal" />
 	</entity>
 	<exceptions>

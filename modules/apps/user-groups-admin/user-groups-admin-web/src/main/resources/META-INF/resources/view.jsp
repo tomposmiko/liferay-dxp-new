@@ -95,7 +95,9 @@ PortletURL portletURL = viewUserGroupsManagementToolbarDisplayContext.getPortlet
 	<%@ include file="/view_flat_user_groups.jspf" %>
 </aui:form>
 
-<aui:script>
+<aui:script require="metal-uri/src/Uri">
+	const Uri = metalUriSrcUri.default;
+
 	function <portlet:namespace />deleteUserGroups() {
 		<portlet:namespace />doDeleteUserGroup(
 			'<%= UserGroup.class.getName() %>',
@@ -103,7 +105,7 @@ PortletURL portletURL = viewUserGroupsManagementToolbarDisplayContext.getPortlet
 		);
 	}
 
-	function <portlet:namespace />doDeleteUserGroup(className, ids) {
+	window.<portlet:namespace />doDeleteUserGroup = function(className, ids) {
 		var status = <%= WorkflowConstants.STATUS_INACTIVE %>;
 
 		<portlet:namespace />getUsersCount(
@@ -150,34 +152,54 @@ PortletURL portletURL = viewUserGroupsManagementToolbarDisplayContext.getPortlet
 				}
 			}
 		);
-	}
+	};
 
 	function <portlet:namespace />doDeleteUserGroups(userGroupIds) {
-		var form = AUI.$(document.<portlet:namespace />fm);
+		var form = document.<portlet:namespace />fm;
 
-		form.attr('method', 'post');
-		form.fm('deleteUserGroupIds').val(userGroupIds);
-		form.fm('redirect').val('<portlet:renderURL><portlet:param name="mvcPath" value="/view.jsp" /></portlet:renderURL>');
-
-		var p_p_lifecycle = document.<portlet:namespace />fm.p_p_lifecycle;
+		var p_p_lifecycle = form.p_p_lifecycle;
 
 		if (p_p_lifecycle) {
 			p_p_lifecycle.value = '1';
 		}
 
-		submitForm(form, '<portlet:actionURL name="deleteUserGroups" />');
-	}
+		<portlet:renderURL var="userGroupsRenderURL">
+			<portlet:param name="mvcPath" value="/view.jsp" />
+		</portlet:renderURL>
 
-	function <portlet:namespace />getUsersCount(className, ids, status, callback) {
-		AUI.$.ajax(
-			'<%= themeDisplay.getPathMain() %>/user_groups_admin/get_users_count',
+		Liferay.Util.postForm(
+			form,
 			{
 				data: {
-					className: className,
-					ids: ids,
-					status: status
+					deleteUserGroupIds: userGroupIds,
+					redirect: '<%= userGroupsRenderURL %>'
 				},
-				success: callback
+				url: '<portlet:actionURL name="deleteUserGroups" />'
+			}
+		);
+	}
+
+	<liferay-portlet:resourceURL id="/users_admin/get_users_count" portletName="<%= UsersAdminPortletKeys.USERS_ADMIN %>" var="getUsersCountResourceURL" />
+
+	function <portlet:namespace />getUsersCount(className, ids, status, callback) {
+		const url = new Uri('<%= getUsersCountResourceURL %>');
+
+		url.setParameterValue('className', className);
+		url.setParameterValue('ids', ids);
+		url.setParameterValue('status', status);
+
+		fetch(
+			url.toString(),
+			{
+				credentials: 'include'
+			}
+		).then(
+			function(response) {
+				return response.text();
+			}
+		).then(
+			function(response) {
+				callback(response);
 			}
 		);
 	}

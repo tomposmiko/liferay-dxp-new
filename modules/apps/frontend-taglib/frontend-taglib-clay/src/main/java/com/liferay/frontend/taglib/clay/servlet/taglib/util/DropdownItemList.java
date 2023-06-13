@@ -14,51 +14,85 @@
 
 package com.liferay.frontend.taglib.clay.servlet.taglib.util;
 
+import com.liferay.petra.function.UnsafeConsumer;
+
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class DropdownItemList extends ArrayList<DropdownItem> {
 
-	public void add(Consumer<DropdownItem> consumer) {
+	public void add(UnsafeConsumer<DropdownItem, Exception> unsafeConsumer) {
 		DropdownItem dropdownItem = new DropdownItem();
 
-		consumer.accept(dropdownItem);
+		try {
+			unsafeConsumer.accept(dropdownItem);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		add(dropdownItem);
 	}
 
-	public void addCheckbox(Consumer<DropdownCheckboxItem> consumer) {
+	public void addCheckbox(
+		UnsafeConsumer<DropdownCheckboxItem, Exception> unsafeConsumer) {
+
 		DropdownCheckboxItem dropdownCheckboxItem = new DropdownCheckboxItem();
 
-		consumer.accept(dropdownCheckboxItem);
+		try {
+			unsafeConsumer.accept(dropdownCheckboxItem);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		add(dropdownCheckboxItem);
 	}
 
-	public void addGroup(Consumer<DropdownGroupItem> consumer) {
+	public void addGroup(
+		UnsafeConsumer<DropdownGroupItem, Exception> unsafeConsumer) {
+
 		DropdownGroupItem dropdownGroupItem = new DropdownGroupItem();
 
-		consumer.accept(dropdownGroupItem);
+		try {
+			unsafeConsumer.accept(dropdownGroupItem);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		add(dropdownGroupItem);
 	}
 
-	public void addRadio(Consumer<DropdownRadioItem> consumer) {
+	public void addRadio(
+		UnsafeConsumer<DropdownRadioItem, Exception> unsafeConsumer) {
+
 		DropdownRadioItem dropdownRadioItem = new DropdownRadioItem();
 
-		consumer.accept(dropdownRadioItem);
+		try {
+			unsafeConsumer.accept(dropdownRadioItem);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		add(dropdownRadioItem);
 	}
 
-	public void addRadioGroup(Consumer<DropdownRadioGroupItem> consumer) {
+	public void addRadioGroup(
+		UnsafeConsumer<DropdownRadioGroupItem, Exception> unsafeConsumer) {
+
 		DropdownRadioGroupItem dropdownRadioGroupItem =
 			new DropdownRadioGroupItem();
 
-		consumer.accept(dropdownRadioGroupItem);
+		try {
+			unsafeConsumer.accept(dropdownRadioGroupItem);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		add(dropdownRadioGroupItem);
 	}

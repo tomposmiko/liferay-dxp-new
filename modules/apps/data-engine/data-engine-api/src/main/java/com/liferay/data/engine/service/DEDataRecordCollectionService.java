@@ -80,6 +80,19 @@ public interface DEDataRecordCollectionService {
 		throws DEDataRecordCollectionException;
 
 	/**
+	 * Export the list of records of a data record collection.
+	 *
+	 * @param deDataRecordCollectionExportRecordsRequest
+	 * @return {@DEDataRecordCollectionExportResponse}
+	 * @throws DEDataRecordCollectionException
+	 * @review
+	 */
+	public DEDataRecordCollectionExportRecordsResponse execute(
+			DEDataRecordCollectionExportRecordsRequest
+				deDataRecordCollectionExportRecordsRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
 	 * Get a {@link DEDataRecord} from the database corresponding to the
 	 * ID passed as a parameter on the request.
 	 * @param DEDataRecordCollectionGetRecordRequest request to get a
@@ -97,14 +110,43 @@ public interface DEDataRecordCollectionService {
 	 * Retrieves a {@link DEDataRecordCollection } from the database corresponding to the
 	 * ID passed as a parameter on the request.
 	 *
-	 * @param deDataRecordCollectionDeleteRequest request to retrieve
+	 * @param deDataRecordCollectionGetRequest request to retrieve
 	 * a {@link DEDataRecordCollection }
-	 * @return {@link DEDataRecordCollectionDeleteResponse } Response
-	 * of the delete request
+	 * @return {@link DEDataRecordCollectionGetResponse } Response
+	 * of the get request
 	 * @review
 	 */
 	public DEDataRecordCollectionGetResponse execute(
 			DEDataRecordCollectionGetRequest deDataRecordCollectionGetRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
+	 * List all the {@link DEDataRecord} from the database related to the
+	 * {@link DEDataRecordCollection} ID passed as a parameter on the request.
+	 *
+	 * @param DEDataRecordCollectionListRecordRequest request to list
+	 * {@link DEDataRecord}
+	 * @return {@link DEDataRecordCollectionListRecordResponse} Response
+	 * of the list request
+	 * @review
+	 */
+	public DEDataRecordCollectionListRecordResponse execute(
+			DEDataRecordCollectionListRecordRequest
+				deDataRecordCollectionListRecordRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
+	 * List {@link DEDataRecordCollection} from the database corresponding to the
+	 * group ID passed as a parameter on the request.
+	 *
+	 * @param deDataRecordCollectionListRequest request to list
+	 * {@link DEDataRecordCollection}
+	 * @return {@link DEDataRecordCollectionListResponse } Response
+	 * of the list request
+	 * @review
+	 */
+	public DEDataRecordCollectionListResponse execute(
+			DEDataRecordCollectionListRequest deDataRecordCollectionListRequest)
 		throws DEDataRecordCollectionException;
 
 	/**
@@ -140,6 +182,20 @@ public interface DEDataRecordCollectionService {
 
 	public DEDataRecordCollectionSaveResponse execute(
 			DEDataRecordCollectionSaveRequest deDataRecordCollectionSaveRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
+	 * Execute the Search Request to get a list of data collection filtered by
+	 * keywords and a range for pagination
+	 *
+	 * @param deDataRecordCollectionSearchRequest
+	 * @return {@link DEDataDefinitionSearchResponse}
+	 * @throws DEDataRecordCollectionException
+	 * @review
+	 */
+	public DEDataRecordCollectionSearchResponse execute(
+			DEDataRecordCollectionSearchRequest
+				deDataRecordCollectionSearchRequest)
 		throws DEDataRecordCollectionException;
 
 }

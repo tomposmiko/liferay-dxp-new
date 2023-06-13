@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.WildcardMode;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -46,8 +45,6 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.messaging.async.Async;
-import com.liferay.portal.kernel.model.UserConstants;
-import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.RepositoryProviderUtil;
 import com.liferay.portal.kernel.repository.capabilities.RepositoryEventTriggerCapability;
@@ -217,20 +214,7 @@ public class DLAppHelperLocalServiceImpl
 			return;
 		}
 
-		// File shortcuts
-
-		dlFileShortcutLocalService.deleteFileShortcuts(
-			fileEntry.getFileEntryId());
-
-		// Asset
-
-		assetEntryLocalService.deleteEntry(
-			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());
-
-		// Ratings
-
-		ratingsStatsLocalService.deleteStats(
-			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());
+		_deleteFileEntry(fileEntry.getFileEntryId());
 	}
 
 	@Override
@@ -249,17 +233,15 @@ public class DLAppHelperLocalServiceImpl
 	public void deleteRepositoryFileEntries(long repositoryId)
 		throws PortalException {
 
-		LocalRepository localRepository =
-			RepositoryProviderUtil.getLocalRepository(repositoryId);
+		ActionableDynamicQuery actionableDynamicQuery =
+			dlFileEntryLocalService.getActionableDynamicQuery();
 
-		List<FileEntry> fileEntries = localRepository.getRepositoryFileEntries(
-			UserConstants.USER_ID_DEFAULT,
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
-
-		for (FileEntry fileEntry : fileEntries) {
-			deleteFileEntry(fileEntry);
-		}
+		actionableDynamicQuery.setAddCriteriaMethod(
+			dynamicQuery -> dynamicQuery.add(
+				RestrictionsFactoryUtil.eq("repositoryId", repositoryId)));
+		actionableDynamicQuery.setPerformActionMethod(
+			(DLFileEntry dlFileEntry) -> _deleteFileEntry(
+				dlFileEntry.getFileEntryId()));
 	}
 
 	@Override
@@ -2009,6 +1991,23 @@ public class DLAppHelperLocalServiceImpl
 
 	@BeanReference(type = DLAppService.class)
 	protected DLAppService dlAppService;
+
+	private void _deleteFileEntry(long fileEntryId) throws PortalException {
+
+		// File shortcuts
+
+		dlFileShortcutLocalService.deleteFileShortcuts(fileEntryId);
+
+		// Asset
+
+		assetEntryLocalService.deleteEntry(
+			DLFileEntryConstants.getClassName(), fileEntryId);
+
+		// Ratings
+
+		ratingsStatsLocalService.deleteStats(
+			DLFileEntryConstants.getClassName(), fileEntryId);
+	}
 
 	/**
 	 * @see com.liferay.document.library.sync.constants.DLSyncConstants

@@ -24,7 +24,7 @@ definition {
 		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -81,7 +81,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -180,7 +180,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -249,14 +249,19 @@ definition {
 			portlet = "My Workflow Tasks"
 		);
 
-		Navigator.gotoNavTab(navTab = "Assigned to Me");
+		var key_tab = "Assigned to Me";
+
+		AssertClick.assertPartialTextClickAt(
+			locator1 = "NavTab#NAV_TABS",
+			value1 = "Assigned to Me"
+		);
 
 		Workflow.viewCompletedTasksTaskNotPresentCP(workflowAssetTitle = "${pageName}");
 
 		ProductMenu.gotoSite(site = "${siteName}");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);

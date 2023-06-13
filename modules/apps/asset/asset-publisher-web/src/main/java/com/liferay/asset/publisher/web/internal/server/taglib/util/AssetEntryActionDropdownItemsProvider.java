@@ -18,21 +18,19 @@ import com.liferay.asset.kernel.action.AssetEntryAction;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
 
-import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -66,22 +64,14 @@ public class AssetEntryActionDropdownItemsProvider {
 
 				if (editAssetEntryURL != null) {
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.putData(
-									"action", "editAssetEntry");
-								dropdownItem.putData(
-									"editAssetEntryURL",
-									editAssetEntryURL.toString());
-								dropdownItem.putData(
-									"title",
-									LanguageUtil.format(
-										_request, "edit-x",
-										_assetRenderer.getTitle(
-											_themeDisplay.getLocale())));
-								dropdownItem.setLabel(
-									LanguageUtil.get(_request, "edit"));
-							}));
+						dropdownItem -> {
+							dropdownItem.setIcon("pencil");
+							dropdownItem.putData(
+								"useDialog", Boolean.FALSE.toString());
+							dropdownItem.setHref(editAssetEntryURL.toString());
+							dropdownItem.setLabel(
+								LanguageUtil.get(_request, "edit"));
+						});
 				}
 
 				if (ListUtil.isNotEmpty(_assetEntryActions)) {
@@ -104,17 +94,19 @@ public class AssetEntryActionDropdownItemsProvider {
 							_themeDisplay.getLocale());
 
 						add(
-							SafeConsumer.ignore(
-								dropdownItem -> {
-									dropdownItem.putData(
-										"action", "assetEntryAction");
-									dropdownItem.putData(
-										"assetEntryActionURL",
-										assetEntryAction.getDialogURL(
-											_request, _assetRenderer));
-									dropdownItem.putData("title", title);
-									dropdownItem.setLabel(title);
-								}));
+							dropdownItem -> {
+								dropdownItem.setHref(
+									assetEntryAction.getDialogURL(
+										_request, _assetRenderer));
+								dropdownItem.setIcon(
+									assetEntryAction.getIcon());
+								dropdownItem.putData(
+									"destroyOnHide", Boolean.TRUE.toString());
+								dropdownItem.putData(
+									"useDialog", Boolean.TRUE.toString());
+								dropdownItem.putData("title", title);
+								dropdownItem.setLabel(title);
+							});
 					}
 				}
 			}
@@ -136,28 +128,15 @@ public class AssetEntryActionDropdownItemsProvider {
 				return null;
 			}
 
-			PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
+			String redirect = _themeDisplay.getURLCurrent();
 
-			PortletURL redirectURL =
-				_liferayPortletResponse.createLiferayPortletURL(
-					_themeDisplay.getPlid(), portletDisplay.getId(),
-					PortletRequest.RENDER_PHASE, false);
-
-			redirectURL.setParameter("mvcPath", "/add_asset_redirect.jsp");
-
-			if (_fullContentRedirect != null) {
-				redirectURL.setParameter("redirect", _fullContentRedirect);
+			if (Validator.isNotNull(_fullContentRedirect)) {
+				redirect = _fullContentRedirect;
 			}
-			else {
-				redirectURL.setParameter(
-					"redirect", _themeDisplay.getURLCurrent());
-			}
-
-			redirectURL.setWindowState(LiferayWindowState.POP_UP);
 
 			PortletURL editAssetEntryURL = _assetRenderer.getURLEdit(
 				_liferayPortletRequest, _liferayPortletResponse,
-				LiferayWindowState.POP_UP, redirectURL);
+				LiferayWindowState.NORMAL, redirect);
 
 			if (editAssetEntryURL == null) {
 				return null;
@@ -165,8 +144,6 @@ public class AssetEntryActionDropdownItemsProvider {
 
 			editAssetEntryURL.setParameter(
 				"hideDefaultSuccessMessage", Boolean.TRUE.toString());
-			editAssetEntryURL.setParameter(
-				"showHeader", Boolean.FALSE.toString());
 
 			return editAssetEntryURL;
 		}

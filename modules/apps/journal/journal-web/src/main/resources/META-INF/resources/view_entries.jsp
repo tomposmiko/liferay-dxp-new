@@ -17,6 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+JournalManagementToolbarDisplayContext journalManagementToolbarDisplayContext = (JournalManagementToolbarDisplayContext)request.getAttribute("view.jsp-journalManagementToolbarDisplayContext");
+
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 %>
 
@@ -51,7 +53,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 				<%
 				Map<String, Object> rowData = new HashMap<String, Object>();
 
-				rowData.put("actions", journalManagementToolbarlDisplayContext.getAvailableActions(curArticle));
+				rowData.put("actions", journalManagementToolbarDisplayContext.getAvailableActions(curArticle));
 				rowData.put("draggable", JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.DELETE) || JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.UPDATE));
 
 				String title = curArticle.getTitle(locale);
@@ -101,15 +103,15 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 							String modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - createDate.getTime(), true);
 							%>
 
-							<h6 class="text-default">
+							<span class="text-default">
 								<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(curArticle.getUserName()), modifiedDateDescription} %>" key="x-modified-x-ago" />
-							</h6>
+							</span>
 
-							<h5>
+							<h2 class="h5">
 								<aui:a href="<%= editURL %>">
 									<%= HtmlUtil.escape(title) %>
 								</aui:a>
-							</h5>
+							</h2>
 
 							<c:if test="<%= journalDisplayContext.isSearch() %>">
 								<h5>
@@ -117,7 +119,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 								</h5>
 							</c:if>
 
-							<h6 class="text-default">
+							<span class="text-default">
 								<c:if test="<%= !curArticle.isApproved() && curArticle.hasApprovedVersion() %>">
 									<span class="label label-success text-uppercase">
 										<liferay-ui:message key="approved" />
@@ -127,7 +129,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 								<span class="label label-<%= LabelItem.getStyleFromWorkflowStatus(curArticle.getStatus()) %> text-uppercase">
 									<liferay-ui:message key="<%= WorkflowConstants.getStatusLabel(curArticle.getStatus()) %>" />
 								</span>
-							</h6>
+							</span>
 						</liferay-ui:search-container-column-text>
 
 						<liferay-ui:search-container-column-text>
@@ -145,7 +147,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 
 						<liferay-ui:search-container-column-text>
 							<clay:vertical-card
-								verticalCard="<%= new JournalArticleVerticalCard(curArticle, renderRequest, renderResponse, searchContainer.getRowChecker(), trashHelper) %>"
+								verticalCard="<%= new JournalArticleVerticalCard(curArticle, renderRequest, renderResponse, searchContainer.getRowChecker(), assetDisplayPageFriendlyURLProvider, trashHelper) %>"
 							/>
 						</liferay-ui:search-container-column-text>
 					</c:when>
@@ -169,6 +171,20 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 							name="description"
 							value="<%= StringUtil.shorten(HtmlUtil.stripHtml(curArticle.getDescription(locale)), 200) %>"
 						/>
+
+						<c:if test="<%= journalDisplayContext.isChangeListColumnVisible() %>">
+							<liferay-ui:search-container-column-text
+								cssClass="check-circle-center progress-success table-cell-expand table-cell-minw-50 table-column-text-center"
+								name="change-list"
+							>
+								<c:if test="<%= journalDisplayContext.isJournalArticleInChangeList(curArticle) %>">
+									<liferay-ui:icon
+										icon="check-circle"
+										markupView="lexicon"
+									/>
+								</c:if>
+							</liferay-ui:search-container-column-text>
+						</c:if>
 
 						<c:if test="<%= journalDisplayContext.isSearch() %>">
 							<liferay-ui:search-container-column-text
@@ -231,7 +247,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 				<%
 				Map<String, Object> rowData = new HashMap<String, Object>();
 
-				rowData.put("actions", journalManagementToolbarlDisplayContext.getAvailableActions(curFolder));
+				rowData.put("actions", journalManagementToolbarDisplayContext.getAvailableActions(curFolder));
 				rowData.put("draggable", JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE));
 				rowData.put("folder", true);
 				rowData.put("folder-id", curFolder.getFolderId());
@@ -264,19 +280,19 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 							String createDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - createDate.getTime(), true);
 							%>
 
-							<h6 class="text-default">
+							<span class="text-default">
 								<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(curFolder.getUserName()), createDateDescription} %>" key="x-modified-x-ago" />
-							</h6>
+							</span>
 
-							<h5>
+							<h2 class="h5">
 								<aui:a href="<%= rowURL.toString() %>">
 									<%= HtmlUtil.escape(curFolder.getName()) %>
 								</aui:a>
-							</h5>
+							</h2>
 
-							<h6 class="text-default">
+							<span class="text-default">
 								<aui:workflow-status markupView="lexicon" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= curFolder.getStatus() %>" />
-							</h6>
+							</span>
 						</liferay-ui:search-container-column-text>
 
 						<liferay-ui:search-container-column-text>

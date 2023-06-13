@@ -1,20 +1,17 @@
-import React, {Component} from 'react';
-import {PropTypes} from 'prop-types';
+import BooleanInput from '../inputs/BooleanInput.es';
 import ClayButton from '../shared/ClayButton.es';
 import ClayIcon from '../shared/ClayIcon.es';
 import ClaySelect from '../shared/ClaySelect.es';
-import DecimalInput from '../inputs/DecimalInput.es';
+import CollectionInput from '../inputs/CollectionInput.es';
 import DateInput from '../inputs/DateInput.es';
 import DateTimeInput from '../inputs/DateTimeInput.es';
-import BooleanInput from '../inputs/BooleanInput.es';
-import SelectEntityInput from '../inputs/SelectEntityInput.es';
+import DecimalInput from '../inputs/DecimalInput.es';
+import getCN from 'classnames';
 import IntegerInput from '../inputs/IntegerInput.es';
+import React, {Component} from 'react';
+import SelectEntityInput from '../inputs/SelectEntityInput.es';
 import StringInput from '../inputs/StringInput.es';
 import ThemeContext from '../../ThemeContext.es';
-import {DragSource as dragSource, DropTarget as dropTarget} from 'react-dnd';
-import {DragTypes} from '../../utils/drag-types.es';
-import {PROPERTY_TYPES} from '../../utils/constants.es';
-import getCN from 'classnames';
 import {
 	createNewGroup,
 	dateToInternationalHuman,
@@ -22,6 +19,10 @@ import {
 	objectToFormData,
 	sub
 } from '../../utils/utils.es';
+import {DragSource as dragSource, DropTarget as dropTarget} from 'react-dnd';
+import {DragTypes} from '../../utils/drag-types.es';
+import {PROPERTY_TYPES} from '../../utils/constants.es';
+import {PropTypes} from 'prop-types';
 
 const acceptedDragTypes = [
 	DragTypes.CRITERIA_ROW,
@@ -223,7 +224,7 @@ class CriteriaRow extends Component {
 		value,
 		type
 	) => {
-		const parsedValue = (type === PROPERTY_TYPES.DATE ||  type === PROPERTY_TYPES.DATE_TIME) ?
+		const parsedValue = (type === PROPERTY_TYPES.DATE || type === PROPERTY_TYPES.DATE_TIME) ?
 			dateToInternationalHuman(value) :
 			value;
 
@@ -294,7 +295,15 @@ class CriteriaRow extends Component {
 		);
 	};
 
-	_handleTypedInputChange = (value, type) => {
+	/**
+	 * Updates the criteria with a criterion value change. The param 'value'
+	 * will only be an array when selecting multiple entities (see
+	 * {@link SelectEntityInput.es.js}). And in the case of an array, a new
+	 * group with multiple criterion rows will be created.
+	 * @param {Array|object} value The properties or list of objects with
+	 * properties to update.
+	 */
+	_handleTypedInputChange = value => {
 		const {criterion, onChange} = this.props;
 
 		if (Array.isArray(value)) {
@@ -311,8 +320,7 @@ class CriteriaRow extends Component {
 			onChange(
 				{
 					...criterion,
-					type,
-					value
+					...value
 				}
 			);
 		}
@@ -321,6 +329,7 @@ class CriteriaRow extends Component {
 	_renderValueInput = (selectedProperty, value) => {
 		const inputComponentsMap = {
 			[PROPERTY_TYPES.BOOLEAN]: BooleanInput,
+			[PROPERTY_TYPES.COLLECTION]: CollectionInput,
 			[PROPERTY_TYPES.DATE]: DateInput,
 			[PROPERTY_TYPES.DATE_TIME]: DateTimeInput,
 			[PROPERTY_TYPES.DOUBLE]: DecimalInput,

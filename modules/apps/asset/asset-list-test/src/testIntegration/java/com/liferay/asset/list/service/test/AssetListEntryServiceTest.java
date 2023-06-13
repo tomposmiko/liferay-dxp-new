@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -89,15 +90,16 @@ public class AssetListEntryServiceTest {
 			ServiceContextTestUtil.getServiceContext(
 				_group.getGroupId(), TestPropsValues.getUserId());
 
-		AssetListEntryAssetEntryRelLocalServiceUtil.
-			addAssetListEntryAssetEntryRel(
-				assetListEntry.getAssetListEntryId(), assetEntry.getEntryId(),
-				1, serviceContext);
+		long segmentsEntryId = RandomTestUtil.nextLong();
 
 		AssetListEntryAssetEntryRelLocalServiceUtil.
 			addAssetListEntryAssetEntryRel(
-				assetListEntry.getAssetListEntryId(), assetEntry.getEntryId(),
-				serviceContext);
+				assetListEntry.getAssetListEntryId(), segmentsEntryId,
+				assetEntry.getEntryId(), 1, serviceContext);
+		AssetListEntryAssetEntryRelLocalServiceUtil.
+			addAssetListEntryAssetEntryRel(
+				assetListEntry.getAssetListEntryId(), segmentsEntryId,
+				assetEntry.getEntryId(), serviceContext);
 	}
 
 	@Test(expected = AssetListEntryTitleException.class)
@@ -115,6 +117,14 @@ public class AssetListEntryServiceTest {
 		_addAssetListEntry("Asset List Title");
 
 		_addAssetListEntry("Asset List Title");
+	}
+
+	@Test
+	public void testAssetListEntryKey() throws PortalException {
+		AssetListEntry assetListEntry = _addAssetListEntry("Asset List Title");
+
+		Assert.assertEquals(
+			"asset-list-title", assetListEntry.getAssetListEntryKey());
 	}
 
 	@Test

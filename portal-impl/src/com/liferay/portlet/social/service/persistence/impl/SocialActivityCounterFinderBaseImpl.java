@@ -18,19 +18,28 @@ import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
-
 import com.liferay.social.kernel.model.SocialActivityCounter;
 import com.liferay.social.kernel.service.persistence.SocialActivityCounterPersistence;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class SocialActivityCounterFinderBaseImpl extends BasePersistenceImpl<SocialActivityCounter> {
+public class SocialActivityCounterFinderBaseImpl
+	extends BasePersistenceImpl<SocialActivityCounter> {
+
 	public SocialActivityCounterFinderBaseImpl() {
 		setModelClass(SocialActivityCounter.class);
+
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("active", "active_");
+
+		setDBColumnNames(dbColumnNames);
 	}
 
 	@Override
@@ -43,7 +52,9 @@ public class SocialActivityCounterFinderBaseImpl extends BasePersistenceImpl<Soc
 	 *
 	 * @return the social activity counter persistence
 	 */
-	public SocialActivityCounterPersistence getSocialActivityCounterPersistence() {
+	public SocialActivityCounterPersistence
+		getSocialActivityCounterPersistence() {
+
 		return socialActivityCounterPersistence;
 	}
 
@@ -54,10 +65,15 @@ public class SocialActivityCounterFinderBaseImpl extends BasePersistenceImpl<Soc
 	 */
 	public void setSocialActivityCounterPersistence(
 		SocialActivityCounterPersistence socialActivityCounterPersistence) {
-		this.socialActivityCounterPersistence = socialActivityCounterPersistence;
+
+		this.socialActivityCounterPersistence =
+			socialActivityCounterPersistence;
 	}
 
 	@BeanReference(type = SocialActivityCounterPersistence.class)
 	protected SocialActivityCounterPersistence socialActivityCounterPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(SocialActivityCounterFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SocialActivityCounterFinderBaseImpl.class);
+
 }

@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -35,6 +34,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 @ProviderType
 public class UADPartialEntryServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -42,10 +42,10 @@ public class UADPartialEntryServiceUtil {
 	 */
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
@@ -54,17 +54,22 @@ public class UADPartialEntryServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<UADPartialEntryService, UADPartialEntryService> _serviceTracker;
+	private static ServiceTracker
+		<UADPartialEntryService, UADPartialEntryService> _serviceTracker;
 
 	static {
 		Bundle bundle = FrameworkUtil.getBundle(UADPartialEntryService.class);
 
-		ServiceTracker<UADPartialEntryService, UADPartialEntryService> serviceTracker =
-			new ServiceTracker<UADPartialEntryService, UADPartialEntryService>(bundle.getBundleContext(),
-				UADPartialEntryService.class, null);
+		ServiceTracker<UADPartialEntryService, UADPartialEntryService>
+			serviceTracker =
+				new ServiceTracker
+					<UADPartialEntryService, UADPartialEntryService>(
+						bundle.getBundleContext(), UADPartialEntryService.class,
+						null);
 
 		serviceTracker.open();
 
 		_serviceTracker = serviceTracker;
 	}
+
 }

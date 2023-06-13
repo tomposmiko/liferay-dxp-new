@@ -17,7 +17,6 @@ package com.liferay.portal.tools.service.builder.test.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -39,9 +38,11 @@ import java.util.Objects;
 @ProviderType
 public class LocalizedEntryLocalizationWrapper
 	implements LocalizedEntryLocalization,
-		ModelWrapper<LocalizedEntryLocalization> {
+			   ModelWrapper<LocalizedEntryLocalization> {
+
 	public LocalizedEntryLocalizationWrapper(
 		LocalizedEntryLocalization localizedEntryLocalization) {
+
 		_localizedEntryLocalization = localizedEntryLocalization;
 	}
 
@@ -60,8 +61,8 @@ public class LocalizedEntryLocalizationWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("localizedEntryLocalizationId",
-			getLocalizedEntryLocalizationId());
+		attributes.put(
+			"localizedEntryLocalizationId", getLocalizedEntryLocalizationId());
 		attributes.put("localizedEntryId", getLocalizedEntryId());
 		attributes.put("languageId", getLanguageId());
 		attributes.put("title", getTitle());
@@ -79,7 +80,7 @@ public class LocalizedEntryLocalizationWrapper
 		}
 
 		Long localizedEntryLocalizationId = (Long)attributes.get(
-				"localizedEntryLocalizationId");
+			"localizedEntryLocalizationId");
 
 		if (localizedEntryLocalizationId != null) {
 			setLocalizedEntryLocalizationId(localizedEntryLocalizationId);
@@ -112,19 +113,23 @@ public class LocalizedEntryLocalizationWrapper
 
 	@Override
 	public Object clone() {
-		return new LocalizedEntryLocalizationWrapper((LocalizedEntryLocalization)_localizedEntryLocalization.clone());
+		return new LocalizedEntryLocalizationWrapper(
+			(LocalizedEntryLocalization)_localizedEntryLocalization.clone());
 	}
 
 	@Override
-	public int compareTo(LocalizedEntryLocalization localizedEntryLocalization) {
-		return _localizedEntryLocalization.compareTo(localizedEntryLocalization);
+	public int compareTo(
+		LocalizedEntryLocalization localizedEntryLocalization) {
+
+		return _localizedEntryLocalization.compareTo(
+			localizedEntryLocalization);
 	}
 
 	/**
-	* Returns the content of this localized entry localization.
-	*
-	* @return the content of this localized entry localization
-	*/
+	 * Returns the content of this localized entry localization.
+	 *
+	 * @return the content of this localized entry localization
+	 */
 	@Override
 	public String getContent() {
 		return _localizedEntryLocalization.getContent();
@@ -136,50 +141,50 @@ public class LocalizedEntryLocalizationWrapper
 	}
 
 	/**
-	* Returns the language ID of this localized entry localization.
-	*
-	* @return the language ID of this localized entry localization
-	*/
+	 * Returns the language ID of this localized entry localization.
+	 *
+	 * @return the language ID of this localized entry localization
+	 */
 	@Override
 	public String getLanguageId() {
 		return _localizedEntryLocalization.getLanguageId();
 	}
 
 	/**
-	* Returns the localized entry ID of this localized entry localization.
-	*
-	* @return the localized entry ID of this localized entry localization
-	*/
+	 * Returns the localized entry ID of this localized entry localization.
+	 *
+	 * @return the localized entry ID of this localized entry localization
+	 */
 	@Override
 	public long getLocalizedEntryId() {
 		return _localizedEntryLocalization.getLocalizedEntryId();
 	}
 
 	/**
-	* Returns the localized entry localization ID of this localized entry localization.
-	*
-	* @return the localized entry localization ID of this localized entry localization
-	*/
+	 * Returns the localized entry localization ID of this localized entry localization.
+	 *
+	 * @return the localized entry localization ID of this localized entry localization
+	 */
 	@Override
 	public long getLocalizedEntryLocalizationId() {
 		return _localizedEntryLocalization.getLocalizedEntryLocalizationId();
 	}
 
 	/**
-	* Returns the mvcc version of this localized entry localization.
-	*
-	* @return the mvcc version of this localized entry localization
-	*/
+	 * Returns the mvcc version of this localized entry localization.
+	 *
+	 * @return the mvcc version of this localized entry localization
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _localizedEntryLocalization.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this localized entry localization.
-	*
-	* @return the primary key of this localized entry localization
-	*/
+	 * Returns the primary key of this localized entry localization.
+	 *
+	 * @return the primary key of this localized entry localization
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _localizedEntryLocalization.getPrimaryKey();
@@ -191,10 +196,10 @@ public class LocalizedEntryLocalizationWrapper
 	}
 
 	/**
-	* Returns the title of this localized entry localization.
-	*
-	* @return the title of this localized entry localization
-	*/
+	 * Returns the title of this localized entry localization.
+	 *
+	 * @return the title of this localized entry localization
+	 */
 	@Override
 	public String getTitle() {
 		return _localizedEntryLocalization.getTitle();
@@ -226,10 +231,10 @@ public class LocalizedEntryLocalizationWrapper
 	}
 
 	/**
-	* Sets the content of this localized entry localization.
-	*
-	* @param content the content of this localized entry localization
-	*/
+	 * Sets the content of this localized entry localization.
+	 *
+	 * @param content the content of this localized entry localization
+	 */
 	@Override
 	public void setContent(String content) {
 		_localizedEntryLocalization.setContent(content);
@@ -238,6 +243,7 @@ public class LocalizedEntryLocalizationWrapper
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_localizedEntryLocalization.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -252,41 +258,43 @@ public class LocalizedEntryLocalizationWrapper
 	}
 
 	/**
-	* Sets the language ID of this localized entry localization.
-	*
-	* @param languageId the language ID of this localized entry localization
-	*/
+	 * Sets the language ID of this localized entry localization.
+	 *
+	 * @param languageId the language ID of this localized entry localization
+	 */
 	@Override
 	public void setLanguageId(String languageId) {
 		_localizedEntryLocalization.setLanguageId(languageId);
 	}
 
 	/**
-	* Sets the localized entry ID of this localized entry localization.
-	*
-	* @param localizedEntryId the localized entry ID of this localized entry localization
-	*/
+	 * Sets the localized entry ID of this localized entry localization.
+	 *
+	 * @param localizedEntryId the localized entry ID of this localized entry localization
+	 */
 	@Override
 	public void setLocalizedEntryId(long localizedEntryId) {
 		_localizedEntryLocalization.setLocalizedEntryId(localizedEntryId);
 	}
 
 	/**
-	* Sets the localized entry localization ID of this localized entry localization.
-	*
-	* @param localizedEntryLocalizationId the localized entry localization ID of this localized entry localization
-	*/
+	 * Sets the localized entry localization ID of this localized entry localization.
+	 *
+	 * @param localizedEntryLocalizationId the localized entry localization ID of this localized entry localization
+	 */
 	@Override
 	public void setLocalizedEntryLocalizationId(
 		long localizedEntryLocalizationId) {
-		_localizedEntryLocalization.setLocalizedEntryLocalizationId(localizedEntryLocalizationId);
+
+		_localizedEntryLocalization.setLocalizedEntryLocalizationId(
+			localizedEntryLocalizationId);
 	}
 
 	/**
-	* Sets the mvcc version of this localized entry localization.
-	*
-	* @param mvccVersion the mvcc version of this localized entry localization
-	*/
+	 * Sets the mvcc version of this localized entry localization.
+	 *
+	 * @param mvccVersion the mvcc version of this localized entry localization
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_localizedEntryLocalization.setMvccVersion(mvccVersion);
@@ -298,10 +306,10 @@ public class LocalizedEntryLocalizationWrapper
 	}
 
 	/**
-	* Sets the primary key of this localized entry localization.
-	*
-	* @param primaryKey the primary key of this localized entry localization
-	*/
+	 * Sets the primary key of this localized entry localization.
+	 *
+	 * @param primaryKey the primary key of this localized entry localization
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_localizedEntryLocalization.setPrimaryKey(primaryKey);
@@ -313,23 +321,26 @@ public class LocalizedEntryLocalizationWrapper
 	}
 
 	/**
-	* Sets the title of this localized entry localization.
-	*
-	* @param title the title of this localized entry localization
-	*/
+	 * Sets the title of this localized entry localization.
+	 *
+	 * @param title the title of this localized entry localization
+	 */
 	@Override
 	public void setTitle(String title) {
 		_localizedEntryLocalization.setTitle(title);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<LocalizedEntryLocalization> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel
+		<LocalizedEntryLocalization> toCacheModel() {
+
 		return _localizedEntryLocalization.toCacheModel();
 	}
 
 	@Override
 	public LocalizedEntryLocalization toEscapedModel() {
-		return new LocalizedEntryLocalizationWrapper(_localizedEntryLocalization.toEscapedModel());
+		return new LocalizedEntryLocalizationWrapper(
+			_localizedEntryLocalization.toEscapedModel());
 	}
 
 	@Override
@@ -339,7 +350,8 @@ public class LocalizedEntryLocalizationWrapper
 
 	@Override
 	public LocalizedEntryLocalization toUnescapedModel() {
-		return new LocalizedEntryLocalizationWrapper(_localizedEntryLocalization.toUnescapedModel());
+		return new LocalizedEntryLocalizationWrapper(
+			_localizedEntryLocalization.toUnescapedModel());
 	}
 
 	@Override
@@ -357,10 +369,14 @@ public class LocalizedEntryLocalizationWrapper
 			return false;
 		}
 
-		LocalizedEntryLocalizationWrapper localizedEntryLocalizationWrapper = (LocalizedEntryLocalizationWrapper)obj;
+		LocalizedEntryLocalizationWrapper localizedEntryLocalizationWrapper =
+			(LocalizedEntryLocalizationWrapper)obj;
 
-		if (Objects.equals(_localizedEntryLocalization,
-					localizedEntryLocalizationWrapper._localizedEntryLocalization)) {
+		if (Objects.equals(
+				_localizedEntryLocalization,
+				localizedEntryLocalizationWrapper.
+					_localizedEntryLocalization)) {
+
 			return true;
 		}
 
@@ -388,4 +404,5 @@ public class LocalizedEntryLocalizationWrapper
 	}
 
 	private final LocalizedEntryLocalization _localizedEntryLocalization;
+
 }

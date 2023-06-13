@@ -34,7 +34,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface SyncDLObjectModel extends BaseModel<SyncDLObject>, ShardedModel {
+public interface SyncDLObjectModel
+	extends BaseModel<SyncDLObject>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -491,4 +493,5 @@ public interface SyncDLObjectModel extends BaseModel<SyncDLObject>, ShardedModel
 	 * @param typeUuid the type uuid of this sync dl object
 	 */
 	public void setTypeUuid(String typeUuid);
+
 }

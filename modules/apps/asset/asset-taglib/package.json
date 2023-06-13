@@ -1,16 +1,14 @@
 {
 	"dependencies": {
-		"clay-multi-select": "^2.8.3",
+		"clay-multi-select": "2.11.1",
 		"metal-component": "^2.16.7",
+		"metal-dom": "^2.16.7",
 		"metal-soy": "^2.16.7",
 		"metal-state": "^2.16.7"
 	},
-	"devDependencies": {
-		"liferay-npm-scripts": "1.2.0"
-	},
 	"name": "asset-taglib",
 	"scripts": {
-		"build": "liferay-npm-scripts build --bundler --soy",
+		"build": "liferay-npm-scripts build --bridge --bundler --soy",
 		"csf": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},

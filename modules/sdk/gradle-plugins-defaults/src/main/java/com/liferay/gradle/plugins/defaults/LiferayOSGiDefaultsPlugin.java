@@ -208,6 +208,7 @@ import org.gradle.api.tasks.TaskOutputs;
 import org.gradle.api.tasks.Upload;
 import org.gradle.api.tasks.VerificationTask;
 import org.gradle.api.tasks.bundling.Jar;
+import org.gradle.api.tasks.bundling.Zip;
 import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.api.tasks.javadoc.Javadoc;
@@ -255,6 +256,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 	public static final String DEPLOY_APP_SERVER_LIB_TASK_NAME =
 		"deployAppServerLib";
 
+	public static final String DEPLOY_CONFIGS_TASK_NAME = "deployConfigs";
+
 	public static final String DEPLOY_DEPENDENCIES_TASK_NAME =
 		"deployDependencies";
 
@@ -297,6 +300,9 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 	public static final String UPDATE_FILE_VERSIONS_TASK_NAME =
 		"updateFileVersions";
+
+	public static final String ZIP_ZIPPABLE_RESOURCES_TASK_NAME =
+		"zipZippableResources";
 
 	@Override
 	public void apply(final Project project) {
@@ -408,8 +414,11 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 		_addTaskCopyLibs(project);
 
+		Copy deployConfigsTask = _addTaskDeployConfigs(
+			project, liferayExtension);
 		Copy deployDependenciesTask = _addTaskDeployDependencies(
 			project, liferayExtension);
+		Task zipZippableResourcesTask = _addTaskZipZippableResources(project);
 
 		if (deployToAppServerLibs) {
 			_addTaskAlias(
@@ -450,8 +459,9 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		_configureProject(project);
 		GradlePluginsDefaultsUtil.configureRepositories(project, portalRootDir);
 		_configureSourceSetMain(project);
-		_configureTaskDeploy(project, deployDependenciesTask);
-		_configureTaskJar(jar, testProject);
+		_configureTaskDeploy(
+			project, deployConfigsTask, deployDependenciesTask);
+		_configureTaskJar(jar, zipZippableResourcesTask, testProject);
 		_configureTaskJavadoc(project, portalRootDir);
 		_configureTaskTest(project);
 		_configureTaskTestIntegration(project);
@@ -832,6 +842,44 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			project, JavaPlugin.CLASSES_TASK_NAME);
 
 		classesTask.dependsOn(copy);
+
+		return copy;
+	}
+
+	private Copy _addTaskDeployConfigs(
+		Project project, final LiferayExtension liferayExtension) {
+
+		final Copy copy = GradleUtil.addTask(
+			project, DEPLOY_CONFIGS_TASK_NAME, Copy.class);
+
+		GradleUtil.setProperty(
+			copy, LiferayOSGiPlugin.AUTO_CLEAN_PROPERTY_NAME, false);
+
+		copy.from("configs");
+		copy.into(
+			new Callable<File>() {
+
+				@Override
+				public File call() throws Exception {
+					return new File(
+						liferayExtension.getLiferayHome(), "osgi/configs");
+				}
+
+			});
+
+		copy.setDescription("Deploys additional configuration files.");
+
+		TaskOutputs taskOutputs = copy.getOutputs();
+
+		taskOutputs.upToDateWhen(
+			new Spec<Task>() {
+
+				@Override
+				public boolean isSatisfiedBy(Task task) {
+					return false;
+				}
+
+			});
 
 		return copy;
 	}
@@ -1568,6 +1616,53 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			IncrementVersionClosure.MICRO_INCREMENT);
 
 		return replaceRegexTask;
+	}
+
+	private Zip _addTaskZipDirectory(
+		Project project, String taskName, File dir, File destinationDir) {
+
+		Zip zip = GradleUtil.addTask(project, taskName, Zip.class);
+
+		zip.from(dir);
+		zip.setArchiveName(dir.getName() + ".zip");
+		zip.setDestinationDir(destinationDir);
+
+		zip.setDescription(
+			"Assembles " + project.relativePath(zip.getArchivePath()) +
+				" with the contents of the " + project.relativePath(dir) +
+					" directory.");
+
+		return zip;
+	}
+
+	private Task _addTaskZipZippableResources(Project project) {
+		Task task = project.task(ZIP_ZIPPABLE_RESOURCES_TASK_NAME);
+
+		File zippableResourcesDir = project.file("src/main/zippableResources");
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Assembles Zip files from the subdirectories of ");
+		sb.append(project.relativePath(zippableResourcesDir));
+		sb.append('.');
+
+		task.setDescription(sb.toString());
+
+		File[] dirs = FileUtil.getDirectories(zippableResourcesDir);
+
+		if (dirs != null) {
+			for (File dir : dirs) {
+				String taskName = GradleUtil.getTaskName(
+					ZIP_ZIPPABLE_RESOURCES_TASK_NAME, dir);
+
+				Zip zip = _addTaskZipDirectory(
+					project, taskName, dir, project.file("classes"));
+
+				task.dependsOn(zip);
+			}
+		}
+
+		return task;
 	}
 
 	private void _applyConfigScripts(Project project) {
@@ -3078,11 +3173,12 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 	}
 
 	private void _configureTaskDeploy(
-		Project project, Copy deployDepenciesTask) {
+		Project project, Copy deployConfigsTask, Copy deployDepenciesTask) {
 
 		final Task deployTask = GradleUtil.getTask(
 			project, LiferayBasePlugin.DEPLOY_TASK_NAME);
 
+		deployTask.finalizedBy(deployConfigsTask);
 		deployTask.finalizedBy(deployDepenciesTask);
 
 		GradleUtil.withPlugin(
@@ -3149,7 +3245,11 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		}
 	}
 
-	private void _configureTaskJar(Jar jar, boolean testProject) {
+	private void _configureTaskJar(
+		Jar jar, Task zipZippableResourcesTask, boolean testProject) {
+
+		jar.dependsOn(zipZippableResourcesTask);
+
 		if (testProject) {
 			jar.dependsOn(JavaPlugin.TEST_CLASSES_TASK_NAME);
 
@@ -3608,7 +3708,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			"excludes",
 			Arrays.asList(
 				"**/bin/", "**/build/", "**/classes/", "**/node_modules/",
-				"**/test-classes/", "**/tmp/"));
+				"**/node_modules_cache/", "**/test-classes/", "**/tmp/"));
 		args.put(
 			"includes",
 			Arrays.asList("**/*.gradle", "**/sdk/*/README.markdown"));

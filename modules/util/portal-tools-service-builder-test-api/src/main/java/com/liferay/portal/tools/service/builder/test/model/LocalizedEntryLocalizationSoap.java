@@ -29,12 +29,16 @@ import java.util.List;
  */
 @ProviderType
 public class LocalizedEntryLocalizationSoap implements Serializable {
+
 	public static LocalizedEntryLocalizationSoap toSoapModel(
 		LocalizedEntryLocalization model) {
-		LocalizedEntryLocalizationSoap soapModel = new LocalizedEntryLocalizationSoap();
+
+		LocalizedEntryLocalizationSoap soapModel =
+			new LocalizedEntryLocalizationSoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
-		soapModel.setLocalizedEntryLocalizationId(model.getLocalizedEntryLocalizationId());
+		soapModel.setLocalizedEntryLocalizationId(
+			model.getLocalizedEntryLocalizationId());
 		soapModel.setLocalizedEntryId(model.getLocalizedEntryId());
 		soapModel.setLanguageId(model.getLanguageId());
 		soapModel.setTitle(model.getTitle());
@@ -45,7 +49,9 @@ public class LocalizedEntryLocalizationSoap implements Serializable {
 
 	public static LocalizedEntryLocalizationSoap[] toSoapModels(
 		LocalizedEntryLocalization[] models) {
-		LocalizedEntryLocalizationSoap[] soapModels = new LocalizedEntryLocalizationSoap[models.length];
+
+		LocalizedEntryLocalizationSoap[] soapModels =
+			new LocalizedEntryLocalizationSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -56,10 +62,13 @@ public class LocalizedEntryLocalizationSoap implements Serializable {
 
 	public static LocalizedEntryLocalizationSoap[][] toSoapModels(
 		LocalizedEntryLocalization[][] models) {
+
 		LocalizedEntryLocalizationSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new LocalizedEntryLocalizationSoap[models.length][models[0].length];
+			soapModels =
+				new LocalizedEntryLocalizationSoap
+					[models.length][models[0].length];
 		}
 		else {
 			soapModels = new LocalizedEntryLocalizationSoap[0][0];
@@ -74,13 +83,16 @@ public class LocalizedEntryLocalizationSoap implements Serializable {
 
 	public static LocalizedEntryLocalizationSoap[] toSoapModels(
 		List<LocalizedEntryLocalization> models) {
-		List<LocalizedEntryLocalizationSoap> soapModels = new ArrayList<LocalizedEntryLocalizationSoap>(models.size());
+
+		List<LocalizedEntryLocalizationSoap> soapModels =
+			new ArrayList<LocalizedEntryLocalizationSoap>(models.size());
 
 		for (LocalizedEntryLocalization model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new LocalizedEntryLocalizationSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new LocalizedEntryLocalizationSoap[soapModels.size()]);
 	}
 
 	public LocalizedEntryLocalizationSoap() {
@@ -108,6 +120,7 @@ public class LocalizedEntryLocalizationSoap implements Serializable {
 
 	public void setLocalizedEntryLocalizationId(
 		long localizedEntryLocalizationId) {
+
 		_localizedEntryLocalizationId = localizedEntryLocalizationId;
 	}
 
@@ -149,4 +162,5 @@ public class LocalizedEntryLocalizationSoap implements Serializable {
 	private String _languageId;
 	private String _title;
 	private String _content;
+
 }

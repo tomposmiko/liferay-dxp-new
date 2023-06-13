@@ -90,11 +90,6 @@ import java.util.Set;
 public class ResourcePermissionLocalServiceImpl
 	extends ResourcePermissionLocalServiceBaseImpl {
 
-	/**
-	 * @see com.liferay.portal.verify.VerifyPermission#fixOrganizationRolePermissions
-	 */
-	public static final String[] EMPTY_ACTION_IDS = {null};
-
 	@Override
 	public void addModelResourcePermissions(
 			AuditedModel auditedModel, ServiceContext serviceContext)
@@ -1024,11 +1019,11 @@ public class ResourcePermissionLocalServiceImpl
 
 		// See LPS-47464
 
-		if (resourcePermissionPersistence.countByC_N_S_P(
-				individualResource.getCompanyId(), individualResource.getName(),
-				individualResource.getScope(),
-				individualResource.getPrimKey()) < 1) {
+		int count = resourcePermissionPersistence.countByC_N_S_P(
+			individualResource.getCompanyId(), individualResource.getName(),
+			individualResource.getScope(), individualResource.getPrimKey());
 
+		if (count < 1) {
 			StringBundler sb = new StringBundler(9);
 
 			sb.append("{companyId=");

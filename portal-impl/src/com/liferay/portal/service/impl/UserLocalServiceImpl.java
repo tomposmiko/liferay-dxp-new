@@ -173,7 +173,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.mail.internet.InternetAddress;
@@ -4118,8 +4117,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 */
 	@Override
 	public void unsetGroupUsers(
-			final long groupId, final long[] userIds,
-			ServiceContext serviceContext)
+			long groupId, long[] userIds, ServiceContext serviceContext)
 		throws PortalException {
 
 		userGroupRoleLocalService.deleteUserGroupRoles(
@@ -4131,10 +4129,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		reindex(userIds);
 
-		Callable<Void> callable = new Callable<Void>() {
-
-			@Override
-			public Void call() throws Exception {
+		TransactionCommitCallbackUtil.registerCallback(
+			() -> {
 				Message message = new Message();
 
 				message.put("groupId", groupId);
@@ -4144,11 +4140,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					DestinationNames.SUBSCRIPTION_CLEAN_UP, message);
 
 				return null;
-			}
-
-		};
-
-		TransactionCommitCallbackUtil.registerCallback(callable);
+			});
 	}
 
 	/**
@@ -4158,8 +4150,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param userIds the primary keys of the users
 	 */
 	@Override
-	public void unsetOrganizationUsers(
-			long organizationId, final long[] userIds)
+	public void unsetOrganizationUsers(long organizationId, long[] userIds)
 		throws PortalException {
 
 		Organization organization = organizationPersistence.findByPrimaryKey(
@@ -4174,10 +4165,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		reindex(userIds);
 
-		Callable<Void> callable = new Callable<Void>() {
-
-			@Override
-			public Void call() throws Exception {
+		TransactionCommitCallbackUtil.registerCallback(
+			() -> {
 				Message message = new Message();
 
 				message.put("groupId", group.getGroupId());
@@ -4187,11 +4176,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					DestinationNames.SUBSCRIPTION_CLEAN_UP, message);
 
 				return null;
-			}
-
-		};
-
-		TransactionCommitCallbackUtil.registerCallback(callable);
+			});
 	}
 
 	/**
@@ -4550,7 +4535,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			indexingEnabled = serviceContext.isIndexingEnabled();
 		}
 
-		updateGroups(userId, newGroupIds, serviceContext, indexingEnabled);
+		updateGroups(userId, newGroupIds, indexingEnabled);
 	}
 
 	/**
@@ -5527,7 +5512,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		List<UserGroupRole> previousUserGroupRoles =
 			userGroupRolePersistence.findByUserId(userId);
 
-		updateGroups(userId, groupIds, serviceContext, false);
+		updateGroups(userId, groupIds, false);
 		updateOrganizations(userId, organizationIds, false);
 
 		// Roles
@@ -5695,7 +5680,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					user.getCompanyId(), emailAddress) != null) {
 
 				throw new UserEmailAddressException.MustNotBeDuplicate(
-					user.getUserId(), emailAddress);
+					user.getCompanyId(), user.getUserId(), emailAddress);
 			}
 
 			setEmailAddress(
@@ -6644,28 +6629,108 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		passwordTrackerLocalService.trackPassword(user.getUserId(), oldEncPwd);
 	}
 
+	protected void unsetUserGroups(long userId, long[] groupIds)
+		throws PortalException {
+
+		List<UserGroupRole> userGroupRoles =
+			userGroupRolePersistence.findByUserId(userId);
+
+		for (UserGroupRole userGroupRole : userGroupRoles) {
+			if (ArrayUtil.contains(groupIds, userGroupRole.getGroupId())) {
+				Role role = rolePersistence.findByPrimaryKey(
+					userGroupRole.getRoleId());
+
+				if (role.getType() == RoleConstants.TYPE_SITE) {
+					userGroupRolePersistence.remove(userGroupRole);
+				}
+			}
+		}
+
+		List<Team> oldTeams = userPersistence.getTeams(userId);
+
+		List<Team> removedFromTeams = new ArrayList<>();
+
+		for (Team team : oldTeams) {
+			if (ArrayUtil.contains(groupIds, team.getGroupId())) {
+				removedFromTeams.add(team);
+			}
+		}
+
+		if (!removedFromTeams.isEmpty()) {
+			userPersistence.removeTeams(userId, removedFromTeams);
+		}
+
+		userPersistence.removeGroups(userId, groupIds);
+
+		TransactionCommitCallbackUtil.registerCallback(
+			() -> {
+				Message message = new Message();
+
+				message.put("groupIds", groupIds);
+				message.put("userId", userId);
+
+				MessageBusUtil.sendMessage(
+					DestinationNames.SUBSCRIPTION_CLEAN_UP, message);
+
+				return null;
+			});
+	}
+
+	protected void unsetUserOrganizations(long userId, long[] organizationIds)
+		throws PortalException {
+
+		long[] groupIds = new long[organizationIds.length];
+
+		for (int i = 0; i < organizationIds.length; i++) {
+			Organization organization =
+				organizationPersistence.findByPrimaryKey(organizationIds[i]);
+
+			groupIds[i] = organization.getGroupId();
+		}
+
+		userGroupRoleLocalService.deleteUserGroupRoles(userId, groupIds);
+
+		organizationLocalService.deleteUserOrganizations(
+			userId, organizationIds);
+
+		reindex(userId);
+
+		TransactionCommitCallbackUtil.registerCallback(
+			() -> {
+				Message message = new Message();
+
+				message.put("groupIds", groupIds);
+				message.put("userId", userId);
+
+				MessageBusUtil.sendMessage(
+					DestinationNames.SUBSCRIPTION_CLEAN_UP, message);
+
+				return null;
+			});
+	}
+
 	protected void updateGroups(
-			long userId, long[] newGroupIds, ServiceContext serviceContext,
-			boolean indexingEnabled)
+			long userId, long[] newGroupIds, boolean indexingEnabled)
 		throws PortalException {
 
 		if (newGroupIds == null) {
 			return;
 		}
 
-		long[] oldGroupIds = getGroupPrimaryKeys(userId);
-
-		for (long oldGroupId : oldGroupIds) {
-			if (!ArrayUtil.contains(newGroupIds, oldGroupId)) {
-				userLocalService.unsetGroupUsers(
-					oldGroupId, new long[] {userId}, serviceContext);
-			}
-		}
+		List<Long> oldGroupIds = ListUtil.toList(getGroupPrimaryKeys(userId));
 
 		for (long newGroupId : newGroupIds) {
-			if (!ArrayUtil.contains(oldGroupIds, newGroupId)) {
-				userLocalService.addGroupUsers(newGroupId, new long[] {userId});
-			}
+			oldGroupIds.remove(newGroupId);
+		}
+
+		if (!oldGroupIds.isEmpty()) {
+			unsetUserGroups(userId, ArrayUtil.toLongArray(oldGroupIds));
+		}
+
+		userPersistence.setGroups(userId, newGroupIds);
+
+		for (long newGroupId : newGroupIds) {
+			addDefaultRolesAndTeams(newGroupId, new long[] {userId});
 		}
 
 		if (indexingEnabled) {
@@ -6681,19 +6746,19 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			return;
 		}
 
-		long[] oldOrganizationIds = getOrganizationPrimaryKeys(userId);
-
-		for (long oldOrganizationId : oldOrganizationIds) {
-			if (!ArrayUtil.contains(newOrganizationIds, oldOrganizationId)) {
-				unsetOrganizationUsers(oldOrganizationId, new long[] {userId});
-			}
-		}
+		List<Long> oldOrganizationIds = ListUtil.toList(
+			getOrganizationPrimaryKeys(userId));
 
 		for (long newOrganizationId : newOrganizationIds) {
-			if (!ArrayUtil.contains(oldOrganizationIds, newOrganizationId)) {
-				addOrganizationUsers(newOrganizationId, new long[] {userId});
-			}
+			oldOrganizationIds.remove(newOrganizationId);
 		}
+
+		if (!oldOrganizationIds.isEmpty()) {
+			unsetUserOrganizations(
+				userId, ArrayUtil.toLongArray(oldOrganizationIds));
+		}
+
+		userPersistence.setOrganizations(userId, newOrganizationIds);
 
 		if (indexingEnabled) {
 			reindex(userId);
@@ -6799,7 +6864,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			if ((user != null) && (user.getUserId() != userId)) {
 				throw new UserEmailAddressException.MustNotBeDuplicate(
-					userId, emailAddress);
+					companyId, emailAddress);
 			}
 		}
 
@@ -6845,7 +6910,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 						user.getCompanyId(), emailAddress) != null) {
 
 					throw new UserEmailAddressException.MustNotBeDuplicate(
-						userId, emailAddress);
+						user.getCompanyId(), userId, emailAddress);
 				}
 			}
 
@@ -6933,7 +6998,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					user.getCompanyId(), emailAddress1) != null) {
 
 				throw new UserEmailAddressException.MustNotBeDuplicate(
-					user.getUserId(), emailAddress1);
+					user.getCompanyId(), user.getUserId(), emailAddress1);
 			}
 		}
 	}
@@ -7126,7 +7191,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			user = doCheckLockout(user, passwordPolicy);
 
-			user = doCheckPasswordExpired(user, passwordPolicy);
+			if (!PasswordModificationThreadLocal.isPasswordModified()) {
+				user = doCheckPasswordExpired(user, passwordPolicy);
+			}
 		}
 
 		return user;

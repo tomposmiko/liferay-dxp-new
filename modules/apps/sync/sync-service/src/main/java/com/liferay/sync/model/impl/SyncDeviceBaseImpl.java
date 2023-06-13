@@ -32,8 +32,9 @@ import com.liferay.sync.service.SyncDeviceLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class SyncDeviceBaseImpl extends SyncDeviceModelImpl
-	implements SyncDevice {
+public abstract class SyncDeviceBaseImpl
+	extends SyncDeviceModelImpl implements SyncDevice {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class SyncDeviceBaseImpl extends SyncDeviceModelImpl
 			SyncDeviceLocalServiceUtil.updateSyncDevice(this);
 		}
 	}
+
 }

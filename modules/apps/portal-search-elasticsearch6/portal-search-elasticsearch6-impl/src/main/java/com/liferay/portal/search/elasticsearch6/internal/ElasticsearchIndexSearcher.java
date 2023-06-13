@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.search.IndexSearcher;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.suggest.QuerySuggester;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -80,9 +79,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 	}
 
 	@Override
-	public Hits search(SearchContext searchContext, Query query)
-		throws SearchException {
-
+	public Hits search(SearchContext searchContext, Query query) {
 		StopWatch stopWatch = new StopWatch();
 
 		stopWatch.start();
@@ -129,6 +126,9 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 				populateResponse(searchSearchResponse, searchResponseBuilder);
 
+				searchResponseBuilder.searchHits(
+					searchSearchResponse.getSearchHits());
+
 				hits = searchSearchResponse.getHits();
 
 				Document[] documents = hits.getDocs();
@@ -148,15 +148,13 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 			return hits;
 		}
-		catch (Exception e) {
-			if (!handle(e)) {
+		catch (RuntimeException re) {
+			if (!handle(re)) {
 				if (_logExceptionsOnly) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(e, e);
-					}
+					_log.error(re, re);
 				}
 				else {
-					throw new SearchException(e.getMessage(), e);
+					throw re;
 				}
 			}
 
@@ -175,9 +173,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 	}
 
 	@Override
-	public long searchCount(SearchContext searchContext, Query query)
-		throws SearchException {
-
+	public long searchCount(SearchContext searchContext, Query query) {
 		StopWatch stopWatch = new StopWatch();
 
 		stopWatch.start();
@@ -202,15 +198,13 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 			return countSearchResponse.getCount();
 		}
-		catch (Exception e) {
-			if (!handle(e)) {
+		catch (RuntimeException re) {
+			if (!handle(re)) {
 				if (_logExceptionsOnly) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(e, e);
-					}
+					_log.error(re, re);
 				}
 				else {
-					throw new SearchException(e.getMessage(), e);
+					throw re;
 				}
 			}
 
@@ -316,6 +310,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		searchSearchRequest.setStart(start);
 
 		searchSearchRequest.setSorts(searchContext.getSorts());
+		searchSearchRequest.setSorts(searchRequest.getSorts());
 		searchSearchRequest.setStats(searchContext.getStats());
 		searchSearchRequest.setStatsRequests(searchRequest.getStatsRequests());
 
@@ -401,6 +396,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		baseSearchRequest.setExplain(searchRequest.isExplain());
 		baseSearchRequest.setIncludeResponseString(
 			searchRequest.isIncludeResponseString());
+		baseSearchRequest.setQuery(searchRequest.getQuery());
 		baseSearchRequest.setRescoreQuery(searchRequest.getRescoreQuery());
 		baseSearchRequest.setStatsRequests(searchRequest.getStatsRequests());
 

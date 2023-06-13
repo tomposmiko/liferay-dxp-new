@@ -32,8 +32,9 @@ import com.liferay.message.boards.service.MBDiscussionLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class MBDiscussionBaseImpl extends MBDiscussionModelImpl
-	implements MBDiscussion {
+public abstract class MBDiscussionBaseImpl
+	extends MBDiscussionModelImpl implements MBDiscussion {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class MBDiscussionBaseImpl extends MBDiscussionModelImpl
 			MBDiscussionLocalServiceUtil.updateMBDiscussion(this);
 		}
 	}
+
 }

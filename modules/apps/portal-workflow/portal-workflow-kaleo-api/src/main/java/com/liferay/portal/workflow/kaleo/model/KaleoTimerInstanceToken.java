@@ -27,32 +27,41 @@ import com.liferay.portal.kernel.util.Accessor;
  * @see KaleoTimerInstanceTokenModel
  * @generated
  */
-@ImplementationClassName("com.liferay.portal.workflow.kaleo.model.impl.KaleoTimerInstanceTokenImpl")
+@ImplementationClassName(
+	"com.liferay.portal.workflow.kaleo.model.impl.KaleoTimerInstanceTokenImpl"
+)
 @ProviderType
-public interface KaleoTimerInstanceToken extends KaleoTimerInstanceTokenModel,
-	PersistedModel {
+public interface KaleoTimerInstanceToken
+	extends KaleoTimerInstanceTokenModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.workflow.kaleo.model.impl.KaleoTimerInstanceTokenImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<KaleoTimerInstanceToken, Long> KALEO_TIMER_INSTANCE_TOKEN_ID_ACCESSOR =
-		new Accessor<KaleoTimerInstanceToken, Long>() {
-			@Override
-			public Long get(KaleoTimerInstanceToken kaleoTimerInstanceToken) {
-				return kaleoTimerInstanceToken.getKaleoTimerInstanceTokenId();
-			}
+	public static final Accessor<KaleoTimerInstanceToken, Long>
+		KALEO_TIMER_INSTANCE_TOKEN_ID_ACCESSOR =
+			new Accessor<KaleoTimerInstanceToken, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(
+					KaleoTimerInstanceToken kaleoTimerInstanceToken) {
 
-			@Override
-			public Class<KaleoTimerInstanceToken> getTypeClass() {
-				return KaleoTimerInstanceToken.class;
-			}
-		};
+					return kaleoTimerInstanceToken.
+						getKaleoTimerInstanceTokenId();
+				}
+
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<KaleoTimerInstanceToken> getTypeClass() {
+					return KaleoTimerInstanceToken.class;
+				}
+
+			};
 
 	public KaleoInstanceToken getKaleoInstanceToken()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -61,4 +70,5 @@ public interface KaleoTimerInstanceToken extends KaleoTimerInstanceTokenModel,
 
 	public KaleoTimer getKaleoTimer()
 		throws com.liferay.portal.kernel.exception.PortalException;
+
 }

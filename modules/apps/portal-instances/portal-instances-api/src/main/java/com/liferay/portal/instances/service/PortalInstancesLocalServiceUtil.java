@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -35,6 +34,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 @ProviderType
 public class PortalInstancesLocalServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -46,6 +46,7 @@ public class PortalInstancesLocalServiceUtil {
 
 	public static long getCompanyId(
 		javax.servlet.http.HttpServletRequest request) {
+
 		return getService().getCompanyId(request);
 	}
 
@@ -62,10 +63,10 @@ public class PortalInstancesLocalServiceUtil {
 	}
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
@@ -76,6 +77,7 @@ public class PortalInstancesLocalServiceUtil {
 
 	public static void initializePortalInstance(
 		javax.servlet.ServletContext servletContext, String webId) {
+
 		getService().initializePortalInstance(servletContext, webId);
 	}
 
@@ -115,17 +117,24 @@ public class PortalInstancesLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<PortalInstancesLocalService, PortalInstancesLocalService> _serviceTracker;
+	private static ServiceTracker
+		<PortalInstancesLocalService, PortalInstancesLocalService>
+			_serviceTracker;
 
 	static {
-		Bundle bundle = FrameworkUtil.getBundle(PortalInstancesLocalService.class);
+		Bundle bundle = FrameworkUtil.getBundle(
+			PortalInstancesLocalService.class);
 
-		ServiceTracker<PortalInstancesLocalService, PortalInstancesLocalService> serviceTracker =
-			new ServiceTracker<PortalInstancesLocalService, PortalInstancesLocalService>(bundle.getBundleContext(),
-				PortalInstancesLocalService.class, null);
+		ServiceTracker<PortalInstancesLocalService, PortalInstancesLocalService>
+			serviceTracker =
+				new ServiceTracker
+					<PortalInstancesLocalService, PortalInstancesLocalService>(
+						bundle.getBundleContext(),
+						PortalInstancesLocalService.class, null);
 
 		serviceTracker.open();
 
 		_serviceTracker = serviceTracker;
 	}
+
 }

@@ -5,4 +5,5 @@ application:
     className: "HeadlessWorkflowApplication"
     name: "Liferay.Headless.Workflow"
 author: "Javier Gamarra"
+clientDir: "../headless-workflow-client/src/main/java"
 testDir: "../headless-workflow-test/src/testIntegration/java"

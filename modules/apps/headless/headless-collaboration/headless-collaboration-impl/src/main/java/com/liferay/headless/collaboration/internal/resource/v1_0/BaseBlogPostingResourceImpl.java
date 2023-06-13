@@ -15,9 +15,7 @@
 package com.liferay.headless.collaboration.internal.resource.v1_0;
 
 import com.liferay.headless.collaboration.dto.v1_0.BlogPosting;
-import com.liferay.headless.collaboration.internal.dto.v1_0.BlogPostingImpl;
 import com.liferay.headless.collaboration.resource.v1_0.BlogPostingResource;
-import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.search.Sort;
@@ -28,12 +26,19 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.net.URI;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Generated;
+
+import javax.validation.constraints.NotNull;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -44,8 +49,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -54,151 +59,195 @@ import javax.ws.rs.core.UriInfo;
  */
 @Generated("")
 @Path("/v1.0")
-public abstract class BaseBlogPostingResourceImpl implements BlogPostingResource {
+public abstract class BaseBlogPostingResourceImpl
+	implements BlogPostingResource {
 
 	@Override
 	@DELETE
 	@Path("/blog-postings/{blog-posting-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
-	public boolean deleteBlogPosting(
-	@PathParam("blog-posting-id") Long blogPostingId)
-			throws Exception {
-
-				return false;
+	@Tags(value = {@Tag(name = "BlogPosting")})
+	public void deleteBlogPosting(
+			@NotNull @PathParam("blog-posting-id") Long blogPostingId)
+		throws Exception {
 	}
+
 	@Override
 	@GET
 	@Path("/blog-postings/{blog-posting-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "BlogPosting")})
 	public BlogPosting getBlogPosting(
-	@PathParam("blog-posting-id") Long blogPostingId)
-			throws Exception {
+			@NotNull @PathParam("blog-posting-id") Long blogPostingId)
+		throws Exception {
 
-				return new BlogPostingImpl();
+		return new BlogPosting();
 	}
+
 	@Override
 	@Consumes("application/json")
 	@PATCH
 	@Path("/blog-postings/{blog-posting-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "BlogPosting")})
 	public BlogPosting patchBlogPosting(
-	@PathParam("blog-posting-id") Long blogPostingId,BlogPosting blogPosting)
-			throws Exception {
+			@NotNull @PathParam("blog-posting-id") Long blogPostingId,
+			BlogPosting blogPosting)
+		throws Exception {
 
-				BlogPosting existingBlogPosting = getBlogPosting(blogPostingId);
+		preparePatch(blogPosting);
 
-						if (Validator.isNotNull(blogPosting.getAlternativeHeadline())) {
-							existingBlogPosting.setAlternativeHeadline(blogPosting.getAlternativeHeadline());
-	}
-						if (Validator.isNotNull(blogPosting.getArticleBody())) {
-							existingBlogPosting.setArticleBody(blogPosting.getArticleBody());
-	}
-						if (Validator.isNotNull(blogPosting.getCaption())) {
-							existingBlogPosting.setCaption(blogPosting.getCaption());
-	}
-						if (Validator.isNotNull(blogPosting.getCategoryIds())) {
-							existingBlogPosting.setCategoryIds(blogPosting.getCategoryIds());
-	}
-						if (Validator.isNotNull(blogPosting.getContentSpace())) {
-							existingBlogPosting.setContentSpace(blogPosting.getContentSpace());
-	}
-						if (Validator.isNotNull(blogPosting.getDateCreated())) {
-							existingBlogPosting.setDateCreated(blogPosting.getDateCreated());
-	}
-						if (Validator.isNotNull(blogPosting.getDateModified())) {
-							existingBlogPosting.setDateModified(blogPosting.getDateModified());
-	}
-						if (Validator.isNotNull(blogPosting.getDatePublished())) {
-							existingBlogPosting.setDatePublished(blogPosting.getDatePublished());
-	}
-						if (Validator.isNotNull(blogPosting.getDescription())) {
-							existingBlogPosting.setDescription(blogPosting.getDescription());
-	}
-						if (Validator.isNotNull(blogPosting.getEncodingFormat())) {
-							existingBlogPosting.setEncodingFormat(blogPosting.getEncodingFormat());
-	}
-						if (Validator.isNotNull(blogPosting.getFriendlyUrlPath())) {
-							existingBlogPosting.setFriendlyUrlPath(blogPosting.getFriendlyUrlPath());
-	}
-						if (Validator.isNotNull(blogPosting.getHasComments())) {
-							existingBlogPosting.setHasComments(blogPosting.getHasComments());
-	}
-						if (Validator.isNotNull(blogPosting.getHeadline())) {
-							existingBlogPosting.setHeadline(blogPosting.getHeadline());
-	}
-						if (Validator.isNotNull(blogPosting.getId())) {
-							existingBlogPosting.setId(blogPosting.getId());
-	}
-						if (Validator.isNotNull(blogPosting.getImageId())) {
-							existingBlogPosting.setImageId(blogPosting.getImageId());
-	}
-						if (Validator.isNotNull(blogPosting.getKeywords())) {
-							existingBlogPosting.setKeywords(blogPosting.getKeywords());
+		BlogPosting existingBlogPosting = getBlogPosting(blogPostingId);
+
+		if (Validator.isNotNull(blogPosting.getAlternativeHeadline())) {
+			existingBlogPosting.setAlternativeHeadline(
+				blogPosting.getAlternativeHeadline());
+		}
+
+		if (Validator.isNotNull(blogPosting.getArticleBody())) {
+			existingBlogPosting.setArticleBody(blogPosting.getArticleBody());
+		}
+
+		if (Validator.isNotNull(blogPosting.getContentSpaceId())) {
+			existingBlogPosting.setContentSpaceId(
+				blogPosting.getContentSpaceId());
+		}
+
+		if (Validator.isNotNull(blogPosting.getDateCreated())) {
+			existingBlogPosting.setDateCreated(blogPosting.getDateCreated());
+		}
+
+		if (Validator.isNotNull(blogPosting.getDateModified())) {
+			existingBlogPosting.setDateModified(blogPosting.getDateModified());
+		}
+
+		if (Validator.isNotNull(blogPosting.getDatePublished())) {
+			existingBlogPosting.setDatePublished(
+				blogPosting.getDatePublished());
+		}
+
+		if (Validator.isNotNull(blogPosting.getDescription())) {
+			existingBlogPosting.setDescription(blogPosting.getDescription());
+		}
+
+		if (Validator.isNotNull(blogPosting.getEncodingFormat())) {
+			existingBlogPosting.setEncodingFormat(
+				blogPosting.getEncodingFormat());
+		}
+
+		if (Validator.isNotNull(blogPosting.getFriendlyUrlPath())) {
+			existingBlogPosting.setFriendlyUrlPath(
+				blogPosting.getFriendlyUrlPath());
+		}
+
+		if (Validator.isNotNull(blogPosting.getHeadline())) {
+			existingBlogPosting.setHeadline(blogPosting.getHeadline());
+		}
+
+		if (Validator.isNotNull(blogPosting.getKeywords())) {
+			existingBlogPosting.setKeywords(blogPosting.getKeywords());
+		}
+
+		if (Validator.isNotNull(blogPosting.getNumberOfComments())) {
+			existingBlogPosting.setNumberOfComments(
+				blogPosting.getNumberOfComments());
+		}
+
+		if (Validator.isNotNull(blogPosting.getTaxonomyCategoryIds())) {
+			existingBlogPosting.setTaxonomyCategoryIds(
+				blogPosting.getTaxonomyCategoryIds());
+		}
+
+		if (Validator.isNotNull(blogPosting.getViewableBy())) {
+			existingBlogPosting.setViewableBy(blogPosting.getViewableBy());
+		}
+
+		return putBlogPosting(blogPostingId, existingBlogPosting);
 	}
 
-				return putBlogPosting(blogPostingId, existingBlogPosting);
-	}
 	@Override
 	@Consumes("application/json")
 	@PUT
 	@Path("/blog-postings/{blog-posting-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "BlogPosting")})
 	public BlogPosting putBlogPosting(
-	@PathParam("blog-posting-id") Long blogPostingId,BlogPosting blogPosting)
-			throws Exception {
+			@NotNull @PathParam("blog-posting-id") Long blogPostingId,
+			BlogPosting blogPosting)
+		throws Exception {
 
-				return new BlogPostingImpl();
+		return new BlogPosting();
 	}
+
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "filter"),
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
+			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+		}
+	)
 	@Path("/content-spaces/{content-space-id}/blog-postings")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "BlogPosting")})
 	public Page<BlogPosting> getContentSpaceBlogPostingsPage(
-	@PathParam("content-space-id") Long contentSpaceId,@Context Filter filter,@Context Pagination pagination,@Context Sort[] sorts)
-			throws Exception {
+			@NotNull @PathParam("content-space-id") Long contentSpaceId,
+			@QueryParam("search") String search, @Context Filter filter,
+			@Context Pagination pagination, @Context Sort[] sorts)
+		throws Exception {
 
-				return Page.of(Collections.emptyList());
+		return Page.of(Collections.emptyList());
 	}
+
 	@Override
 	@Consumes("application/json")
 	@POST
 	@Path("/content-spaces/{content-space-id}/blog-postings")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "BlogPosting")})
 	public BlogPosting postContentSpaceBlogPosting(
-	@PathParam("content-space-id") Long contentSpaceId,BlogPosting blogPosting)
-			throws Exception {
+			@NotNull @PathParam("content-space-id") Long contentSpaceId,
+			BlogPosting blogPosting)
+		throws Exception {
 
-				return new BlogPostingImpl();
+		return new BlogPosting();
 	}
 
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected String getJAXRSLink(String methodName, Object... values) {
-		URI baseURI = contextUriInfo.getBaseUri();
-
-		URI resourceURI = UriBuilder.fromResource(
-			BaseBlogPostingResourceImpl.class
-		).build();
-
-		URI methodURI = UriBuilder.fromMethod(
-			BaseBlogPostingResourceImpl.class, methodName
-		).build(
-			values
-		);
-
-		return baseURI.toString() + resourceURI.toString() + methodURI.toString();
+	protected void preparePatch(BlogPosting blogPosting) {
 	}
 
-	protected <T, R> List<R> transform(List<T> list, UnsafeFunction<T, R, Throwable> unsafeFunction) {
-		return TransformUtil.transform(list, unsafeFunction);
+	protected <T, R> List<R> transform(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transform(collection, unsafeFunction);
+	}
+
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
+
+		return TransformUtil.transform(array, unsafeFunction, clazz);
+	}
+
+	protected <T, R> R[] transformToArray(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
+
+		return TransformUtil.transformToArray(
+			collection, unsafeFunction, clazz);
+	}
+
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
 	@Context

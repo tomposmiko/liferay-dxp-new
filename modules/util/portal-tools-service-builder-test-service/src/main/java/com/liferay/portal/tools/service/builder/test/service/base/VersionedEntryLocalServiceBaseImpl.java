@@ -69,9 +69,10 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class VersionedEntryLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements VersionedEntryLocalService,
-		IdentifiableOSGiService,
-		VersionService<VersionedEntry, VersionedEntryVersion> {
+	extends BaseLocalServiceImpl
+	implements VersionedEntryLocalService, IdentifiableOSGiService,
+			   VersionService<VersionedEntry, VersionedEntryVersion> {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -100,9 +101,11 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Override
 	@Transactional(enabled = false)
 	public VersionedEntry create() {
-		long primaryKey = counterLocalService.increment(VersionedEntry.class.getName());
+		long primaryKey = counterLocalService.increment(
+			VersionedEntry.class.getName());
 
-		VersionedEntry draftVersionedEntry = versionedEntryPersistence.create(primaryKey);
+		VersionedEntry draftVersionedEntry = versionedEntryPersistence.create(
+			primaryKey);
 
 		draftVersionedEntry.setHeadId(primaryKey);
 
@@ -120,7 +123,9 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Override
 	public VersionedEntry deleteVersionedEntry(long versionedEntryId)
 		throws PortalException {
-		VersionedEntry versionedEntry = versionedEntryPersistence.fetchByPrimaryKey(versionedEntryId);
+
+		VersionedEntry versionedEntry =
+			versionedEntryPersistence.fetchByPrimaryKey(versionedEntryId);
 
 		if (versionedEntry != null) {
 			delete(versionedEntry);
@@ -152,8 +157,8 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(VersionedEntry.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			VersionedEntry.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -180,10 +185,11 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return versionedEntryPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return versionedEntryPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -200,10 +206,12 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return versionedEntryPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return versionedEntryPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -225,10 +233,11 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return versionedEntryPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return versionedEntryPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
@@ -246,12 +255,14 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Override
 	public VersionedEntry getVersionedEntry(long versionedEntryId)
 		throws PortalException {
+
 		return versionedEntryPersistence.findByPrimaryKey(versionedEntryId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(versionedEntryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -263,10 +274,14 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(versionedEntryLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			versionedEntryLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(VersionedEntry.class);
 
@@ -278,6 +293,7 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
+
 		actionableDynamicQuery.setBaseLocalService(versionedEntryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(VersionedEntry.class);
@@ -291,12 +307,15 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return versionedEntryLocalService.deleteVersionedEntry((VersionedEntry)persistedModel);
+
+		return versionedEntryLocalService.deleteVersionedEntry(
+			(VersionedEntry)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return versionedEntryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -335,7 +354,9 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public VersionedEntry updateVersionedEntry(
-		VersionedEntry draftVersionedEntry) throws PortalException {
+			VersionedEntry draftVersionedEntry)
+		throws PortalException {
+
 		return updateDraft(draftVersionedEntry);
 	}
 
@@ -355,6 +376,7 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	 */
 	public void setVersionedEntryLocalService(
 		VersionedEntryLocalService versionedEntryLocalService) {
+
 		this.versionedEntryLocalService = versionedEntryLocalService;
 	}
 
@@ -374,6 +396,7 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	 */
 	public void setVersionedEntryPersistence(
 		VersionedEntryPersistence versionedEntryPersistence) {
+
 		this.versionedEntryPersistence = versionedEntryPersistence;
 	}
 
@@ -382,7 +405,9 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -392,7 +417,9 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -401,7 +428,9 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	 *
 	 * @return the versioned entry version persistence
 	 */
-	public VersionedEntryVersionPersistence getVersionedEntryVersionPersistence() {
+	public VersionedEntryVersionPersistence
+		getVersionedEntryVersionPersistence() {
+
 		return versionedEntryVersionPersistence;
 	}
 
@@ -412,11 +441,14 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	 */
 	public void setVersionedEntryVersionPersistence(
 		VersionedEntryVersionPersistence versionedEntryVersionPersistence) {
-		this.versionedEntryVersionPersistence = versionedEntryVersionPersistence;
+
+		this.versionedEntryVersionPersistence =
+			versionedEntryVersionPersistence;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.portal.tools.service.builder.test.model.VersionedEntry",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.portal.tools.service.builder.test.model.VersionedEntry",
 			versionedEntryLocalService);
 	}
 
@@ -427,32 +459,39 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public VersionedEntry checkout(VersionedEntry publishedVersionedEntry,
-		int version) throws PortalException {
+	public VersionedEntry checkout(
+			VersionedEntry publishedVersionedEntry, int version)
+		throws PortalException {
+
 		if (!publishedVersionedEntry.isHead()) {
 			throw new IllegalArgumentException(
 				"Unable to checkout with unpublished changes " +
-				publishedVersionedEntry.getHeadId());
+					publishedVersionedEntry.getHeadId());
 		}
 
-		VersionedEntry draftVersionedEntry = versionedEntryPersistence.fetchByHeadId(publishedVersionedEntry.getPrimaryKey());
+		VersionedEntry draftVersionedEntry =
+			versionedEntryPersistence.fetchByHeadId(
+				publishedVersionedEntry.getPrimaryKey());
 
 		if (draftVersionedEntry != null) {
 			throw new IllegalArgumentException(
 				"Unable to checkout with unpublished changes " +
-				publishedVersionedEntry.getPrimaryKey());
+					publishedVersionedEntry.getPrimaryKey());
 		}
 
-		VersionedEntryVersion versionedEntryVersion = getVersion(publishedVersionedEntry,
-				version);
+		VersionedEntryVersion versionedEntryVersion = getVersion(
+			publishedVersionedEntry, version);
 
 		draftVersionedEntry = _createDraft(publishedVersionedEntry);
 
 		versionedEntryVersion.populateVersionedModel(draftVersionedEntry);
 
-		draftVersionedEntry = versionedEntryPersistence.update(draftVersionedEntry);
+		draftVersionedEntry = versionedEntryPersistence.update(
+			draftVersionedEntry);
 
-		for (VersionServiceListener<VersionedEntry, VersionedEntryVersion> versionServiceListener : _versionServiceListeners) {
+		for (VersionServiceListener<VersionedEntry, VersionedEntryVersion>
+				versionServiceListener : _versionServiceListeners) {
+
 			versionServiceListener.afterCheckout(draftVersionedEntry, version);
 		}
 
@@ -463,25 +502,32 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Override
 	public VersionedEntry delete(VersionedEntry publishedVersionedEntry)
 		throws PortalException {
+
 		if (!publishedVersionedEntry.isHead()) {
-			throw new IllegalArgumentException("VersionedEntry is a draft " +
-				publishedVersionedEntry.getPrimaryKey());
+			throw new IllegalArgumentException(
+				"VersionedEntry is a draft " +
+					publishedVersionedEntry.getPrimaryKey());
 		}
 
-		VersionedEntry draftVersionedEntry = versionedEntryPersistence.fetchByHeadId(publishedVersionedEntry.getPrimaryKey());
+		VersionedEntry draftVersionedEntry =
+			versionedEntryPersistence.fetchByHeadId(
+				publishedVersionedEntry.getPrimaryKey());
 
 		if (draftVersionedEntry != null) {
 			deleteDraft(draftVersionedEntry);
 		}
 
-		for (VersionedEntryVersion versionedEntryVersion : getVersions(
-				publishedVersionedEntry)) {
+		for (VersionedEntryVersion versionedEntryVersion :
+				getVersions(publishedVersionedEntry)) {
+
 			versionedEntryVersionPersistence.remove(versionedEntryVersion);
 		}
 
 		versionedEntryPersistence.remove(publishedVersionedEntry);
 
-		for (VersionServiceListener<VersionedEntry, VersionedEntryVersion> versionServiceListener : _versionServiceListeners) {
+		for (VersionServiceListener<VersionedEntry, VersionedEntryVersion>
+				versionServiceListener : _versionServiceListeners) {
+
 			versionServiceListener.afterDelete(publishedVersionedEntry);
 		}
 
@@ -492,14 +538,18 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Override
 	public VersionedEntry deleteDraft(VersionedEntry draftVersionedEntry)
 		throws PortalException {
+
 		if (draftVersionedEntry.isHead()) {
-			throw new IllegalArgumentException("VersionedEntry is not a draft " +
-				draftVersionedEntry.getPrimaryKey());
+			throw new IllegalArgumentException(
+				"VersionedEntry is not a draft " +
+					draftVersionedEntry.getPrimaryKey());
 		}
 
 		versionedEntryPersistence.remove(draftVersionedEntry);
 
-		for (VersionServiceListener<VersionedEntry, VersionedEntryVersion> versionServiceListener : _versionServiceListeners) {
+		for (VersionServiceListener<VersionedEntry, VersionedEntryVersion>
+				versionServiceListener : _versionServiceListeners) {
+
 			versionServiceListener.afterDeleteDraft(draftVersionedEntry);
 		}
 
@@ -508,19 +558,27 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 
 	@Override
 	public VersionedEntryVersion deleteVersion(
-		VersionedEntryVersion versionedEntryVersion) throws PortalException {
-		VersionedEntryVersion latestVersionedEntryVersion = versionedEntryVersionPersistence.findByVersionedEntryId_First(versionedEntryVersion.getVersionedModelId(),
-				null);
+			VersionedEntryVersion versionedEntryVersion)
+		throws PortalException {
 
-		if (latestVersionedEntryVersion.getVersion() == versionedEntryVersion.getVersion()) {
+		VersionedEntryVersion latestVersionedEntryVersion =
+			versionedEntryVersionPersistence.findByVersionedEntryId_First(
+				versionedEntryVersion.getVersionedModelId(), null);
+
+		if (latestVersionedEntryVersion.getVersion() ==
+				versionedEntryVersion.getVersion()) {
+
 			throw new IllegalArgumentException(
 				"Unable to delete latest version " +
-				versionedEntryVersion.getVersion());
+					versionedEntryVersion.getVersion());
 		}
 
-		versionedEntryVersion = versionedEntryVersionPersistence.remove(versionedEntryVersion);
+		versionedEntryVersion = versionedEntryVersionPersistence.remove(
+			versionedEntryVersion);
 
-		for (VersionServiceListener<VersionedEntry, VersionedEntryVersion> versionServiceListener : _versionServiceListeners) {
+		for (VersionServiceListener<VersionedEntry, VersionedEntryVersion>
+				versionServiceListener : _versionServiceListeners) {
+
 			versionServiceListener.afterDeleteVersion(versionedEntryVersion);
 		}
 
@@ -530,7 +588,8 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Override
 	public VersionedEntry fetchDraft(VersionedEntry versionedEntry) {
 		if (versionedEntry.isHead()) {
-			return versionedEntryPersistence.fetchByHeadId(versionedEntry.getPrimaryKey());
+			return versionedEntryPersistence.fetchByHeadId(
+				versionedEntry.getPrimaryKey());
 		}
 
 		return versionedEntry;
@@ -544,14 +603,15 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Override
 	public VersionedEntryVersion fetchLatestVersion(
 		VersionedEntry versionedEntry) {
+
 		long primaryKey = versionedEntry.getHeadId();
 
 		if (versionedEntry.isHead()) {
 			primaryKey = versionedEntry.getPrimaryKey();
 		}
 
-		return versionedEntryVersionPersistence.fetchByVersionedEntryId_First(primaryKey,
-			null);
+		return versionedEntryVersionPersistence.fetchByVersionedEntryId_First(
+			primaryKey, null);
 	}
 
 	@Override
@@ -564,15 +624,18 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 			return null;
 		}
 
-		return versionedEntryPersistence.fetchByPrimaryKey(versionedEntry.getHeadId());
+		return versionedEntryPersistence.fetchByPrimaryKey(
+			versionedEntry.getHeadId());
 	}
 
 	@Override
 	public VersionedEntry fetchPublished(long primaryKey) {
-		VersionedEntry versionedEntry = versionedEntryPersistence.fetchByPrimaryKey(primaryKey);
+		VersionedEntry versionedEntry =
+			versionedEntryPersistence.fetchByPrimaryKey(primaryKey);
 
 		if ((versionedEntry == null) ||
-				(versionedEntry.getHeadId() == versionedEntry.getPrimaryKey())) {
+			(versionedEntry.getHeadId() == versionedEntry.getPrimaryKey())) {
+
 			return null;
 		}
 
@@ -582,15 +645,18 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Override
 	public VersionedEntry getDraft(VersionedEntry versionedEntry)
 		throws PortalException {
+
 		if (!versionedEntry.isHead()) {
 			return versionedEntry;
 		}
 
-		VersionedEntry draftVersionedEntry = versionedEntryPersistence.fetchByHeadId(versionedEntry.getPrimaryKey());
+		VersionedEntry draftVersionedEntry =
+			versionedEntryPersistence.fetchByHeadId(
+				versionedEntry.getPrimaryKey());
 
 		if (draftVersionedEntry == null) {
-			draftVersionedEntry = versionedEntryLocalService.updateDraft(_createDraft(
-						versionedEntry));
+			draftVersionedEntry = versionedEntryLocalService.updateDraft(
+				_createDraft(versionedEntry));
 		}
 
 		return draftVersionedEntry;
@@ -598,34 +664,39 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 
 	@Override
 	public VersionedEntry getDraft(long primaryKey) throws PortalException {
-		VersionedEntry draftVersionedEntry = versionedEntryPersistence.fetchByHeadId(primaryKey);
+		VersionedEntry draftVersionedEntry =
+			versionedEntryPersistence.fetchByHeadId(primaryKey);
 
 		if (draftVersionedEntry == null) {
-			VersionedEntry versionedEntry = versionedEntryPersistence.findByPrimaryKey(primaryKey);
+			VersionedEntry versionedEntry =
+				versionedEntryPersistence.findByPrimaryKey(primaryKey);
 
-			draftVersionedEntry = versionedEntryLocalService.updateDraft(_createDraft(
-						versionedEntry));
+			draftVersionedEntry = versionedEntryLocalService.updateDraft(
+				_createDraft(versionedEntry));
 		}
 
 		return draftVersionedEntry;
 	}
 
 	@Override
-	public VersionedEntryVersion getVersion(VersionedEntry versionedEntry,
-		int version) throws PortalException {
+	public VersionedEntryVersion getVersion(
+			VersionedEntry versionedEntry, int version)
+		throws PortalException {
+
 		long primaryKey = versionedEntry.getHeadId();
 
 		if (versionedEntry.isHead()) {
 			primaryKey = versionedEntry.getPrimaryKey();
 		}
 
-		return versionedEntryVersionPersistence.findByVersionedEntryId_Version(primaryKey,
-			version);
+		return versionedEntryVersionPersistence.findByVersionedEntryId_Version(
+			primaryKey, version);
 	}
 
 	@Override
 	public List<VersionedEntryVersion> getVersions(
 		VersionedEntry versionedEntry) {
+
 		long primaryKey = versionedEntry.getPrimaryKey();
 
 		if (!versionedEntry.isHead()) {
@@ -636,41 +707,51 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 			primaryKey = versionedEntry.getHeadId();
 		}
 
-		return versionedEntryVersionPersistence.findByVersionedEntryId(primaryKey);
+		return versionedEntryVersionPersistence.findByVersionedEntryId(
+			primaryKey);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public VersionedEntry publishDraft(VersionedEntry draftVersionedEntry)
 		throws PortalException {
+
 		if (draftVersionedEntry.isHead()) {
-			throw new IllegalArgumentException("Can only publish drafts " +
-				draftVersionedEntry.getPrimaryKey());
+			throw new IllegalArgumentException(
+				"Can only publish drafts " +
+					draftVersionedEntry.getPrimaryKey());
 		}
 
 		VersionedEntry headVersionedEntry = null;
 
 		int version = 1;
 
-		if (draftVersionedEntry.getHeadId() == draftVersionedEntry.getPrimaryKey()) {
+		if (draftVersionedEntry.getHeadId() ==
+				draftVersionedEntry.getPrimaryKey()) {
+
 			headVersionedEntry = create();
 
 			draftVersionedEntry.setHeadId(headVersionedEntry.getPrimaryKey());
 		}
 		else {
-			headVersionedEntry = versionedEntryPersistence.findByPrimaryKey(draftVersionedEntry.getHeadId());
+			headVersionedEntry = versionedEntryPersistence.findByPrimaryKey(
+				draftVersionedEntry.getHeadId());
 
-			VersionedEntryVersion latestVersionedEntryVersion = versionedEntryVersionPersistence.findByVersionedEntryId_First(draftVersionedEntry.getHeadId(),
-					null);
+			VersionedEntryVersion latestVersionedEntryVersion =
+				versionedEntryVersionPersistence.findByVersionedEntryId_First(
+					draftVersionedEntry.getHeadId(), null);
 
 			version = latestVersionedEntryVersion.getVersion() + 1;
 		}
 
-		VersionedEntryVersion versionedEntryVersion = versionedEntryVersionPersistence.create(counterLocalService.increment(
+		VersionedEntryVersion versionedEntryVersion =
+			versionedEntryVersionPersistence.create(
+				counterLocalService.increment(
 					VersionedEntryVersion.class.getName()));
 
 		versionedEntryVersion.setVersion(version);
-		versionedEntryVersion.setVersionedModelId(headVersionedEntry.getPrimaryKey());
+		versionedEntryVersion.setVersionedModelId(
+			headVersionedEntry.getPrimaryKey());
 
 		draftVersionedEntry.populateVersionModel(versionedEntryVersion);
 
@@ -680,11 +761,14 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 
 		headVersionedEntry.setHeadId(-headVersionedEntry.getPrimaryKey());
 
-		headVersionedEntry = versionedEntryPersistence.update(headVersionedEntry);
+		headVersionedEntry = versionedEntryPersistence.update(
+			headVersionedEntry);
 
-		for (VersionServiceListener<VersionedEntry, VersionedEntryVersion> versionServiceListener : _versionServiceListeners) {
-			versionServiceListener.afterPublishDraft(draftVersionedEntry,
-				version);
+		for (VersionServiceListener<VersionedEntry, VersionedEntryVersion>
+				versionServiceListener : _versionServiceListeners) {
+
+			versionServiceListener.afterPublishDraft(
+				draftVersionedEntry, version);
 		}
 
 		deleteDraft(draftVersionedEntry);
@@ -694,13 +778,17 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 
 	@Override
 	public void registerListener(
-		VersionServiceListener<VersionedEntry, VersionedEntryVersion> versionServiceListener) {
+		VersionServiceListener<VersionedEntry, VersionedEntryVersion>
+			versionServiceListener) {
+
 		_versionServiceListeners.add(versionServiceListener);
 	}
 
 	@Override
 	public void unregisterListener(
-		VersionServiceListener<VersionedEntry, VersionedEntryVersion> versionServiceListener) {
+		VersionServiceListener<VersionedEntry, VersionedEntryVersion>
+			versionServiceListener) {
+
 		_versionServiceListeners.remove(versionServiceListener);
 	}
 
@@ -708,22 +796,31 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 	@Override
 	public VersionedEntry updateDraft(VersionedEntry draftVersionedEntry)
 		throws PortalException {
+
 		if (draftVersionedEntry.isHead()) {
-			throw new IllegalArgumentException("Can only update draft entries " +
-				draftVersionedEntry.getPrimaryKey());
+			throw new IllegalArgumentException(
+				"Can only update draft entries " +
+					draftVersionedEntry.getPrimaryKey());
 		}
 
-		VersionedEntry previousVersionedEntry = versionedEntryPersistence.fetchByPrimaryKey(draftVersionedEntry.getPrimaryKey());
+		VersionedEntry previousVersionedEntry =
+			versionedEntryPersistence.fetchByPrimaryKey(
+				draftVersionedEntry.getPrimaryKey());
 
-		draftVersionedEntry = versionedEntryPersistence.update(draftVersionedEntry);
+		draftVersionedEntry = versionedEntryPersistence.update(
+			draftVersionedEntry);
 
 		if (previousVersionedEntry == null) {
-			for (VersionServiceListener<VersionedEntry, VersionedEntryVersion> versionServiceListener : _versionServiceListeners) {
+			for (VersionServiceListener<VersionedEntry, VersionedEntryVersion>
+					versionServiceListener : _versionServiceListeners) {
+
 				versionServiceListener.afterCreateDraft(draftVersionedEntry);
 			}
 		}
 		else {
-			for (VersionServiceListener<VersionedEntry, VersionedEntryVersion> versionServiceListener : _versionServiceListeners) {
+			for (VersionServiceListener<VersionedEntry, VersionedEntryVersion>
+					versionServiceListener : _versionServiceListeners) {
+
 				versionServiceListener.afterUpdateDraft(draftVersionedEntry);
 			}
 		}
@@ -733,6 +830,7 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 
 	private VersionedEntry _createDraft(VersionedEntry publishedVersionedEntry)
 		throws PortalException {
+
 		VersionedEntry draftVersionedEntry = create();
 
 		draftVersionedEntry.setHeadId(publishedVersionedEntry.getPrimaryKey());
@@ -743,8 +841,13 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 		return draftVersionedEntry;
 	}
 
-	private final Set<VersionServiceListener<VersionedEntry, VersionedEntryVersion>> _versionServiceListeners =
-		Collections.newSetFromMap(new ConcurrentHashMap<VersionServiceListener<VersionedEntry, VersionedEntryVersion>, Boolean>());
+	private final Set
+		<VersionServiceListener<VersionedEntry, VersionedEntryVersion>>
+			_versionServiceListeners = Collections.newSetFromMap(
+				new ConcurrentHashMap
+					<VersionServiceListener
+						<VersionedEntry, VersionedEntryVersion>,
+					 Boolean>());
 
 	/**
 	 * Returns the OSGi service identifier.
@@ -778,8 +881,8 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -790,12 +893,21 @@ public abstract class VersionedEntryLocalServiceBaseImpl
 
 	@BeanReference(type = VersionedEntryLocalService.class)
 	protected VersionedEntryLocalService versionedEntryLocalService;
+
 	@BeanReference(type = VersionedEntryPersistence.class)
 	protected VersionedEntryPersistence versionedEntryPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@BeanReference(type = VersionedEntryVersionPersistence.class)
 	protected VersionedEntryVersionPersistence versionedEntryVersionPersistence;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

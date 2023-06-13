@@ -17,7 +17,6 @@ package com.liferay.portal.tools.service.builder.test.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -37,8 +36,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class VersionedEntryWrapper implements VersionedEntry,
-	ModelWrapper<VersionedEntry> {
+public class VersionedEntryWrapper
+	implements VersionedEntry, ModelWrapper<VersionedEntry> {
+
 	public VersionedEntryWrapper(VersionedEntry versionedEntry) {
 		_versionedEntry = versionedEntry;
 	}
@@ -94,7 +94,8 @@ public class VersionedEntryWrapper implements VersionedEntry,
 
 	@Override
 	public Object clone() {
-		return new VersionedEntryWrapper((VersionedEntry)_versionedEntry.clone());
+		return new VersionedEntryWrapper(
+			(VersionedEntry)_versionedEntry.clone());
 	}
 
 	@Override
@@ -108,40 +109,40 @@ public class VersionedEntryWrapper implements VersionedEntry,
 	}
 
 	/**
-	* Returns the group ID of this versioned entry.
-	*
-	* @return the group ID of this versioned entry
-	*/
+	 * Returns the group ID of this versioned entry.
+	 *
+	 * @return the group ID of this versioned entry
+	 */
 	@Override
 	public long getGroupId() {
 		return _versionedEntry.getGroupId();
 	}
 
 	/**
-	* Returns the head ID of this versioned entry.
-	*
-	* @return the head ID of this versioned entry
-	*/
+	 * Returns the head ID of this versioned entry.
+	 *
+	 * @return the head ID of this versioned entry
+	 */
 	@Override
 	public long getHeadId() {
 		return _versionedEntry.getHeadId();
 	}
 
 	/**
-	* Returns the mvcc version of this versioned entry.
-	*
-	* @return the mvcc version of this versioned entry
-	*/
+	 * Returns the mvcc version of this versioned entry.
+	 *
+	 * @return the mvcc version of this versioned entry
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _versionedEntry.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this versioned entry.
-	*
-	* @return the primary key of this versioned entry
-	*/
+	 * Returns the primary key of this versioned entry.
+	 *
+	 * @return the primary key of this versioned entry
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _versionedEntry.getPrimaryKey();
@@ -153,10 +154,10 @@ public class VersionedEntryWrapper implements VersionedEntry,
 	}
 
 	/**
-	* Returns the versioned entry ID of this versioned entry.
-	*
-	* @return the versioned entry ID of this versioned entry
-	*/
+	 * Returns the versioned entry ID of this versioned entry.
+	 *
+	 * @return the versioned entry ID of this versioned entry
+	 */
 	@Override
 	public long getVersionedEntryId() {
 		return _versionedEntry.getVersionedEntryId();
@@ -195,6 +196,7 @@ public class VersionedEntryWrapper implements VersionedEntry,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_versionedEntry.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -209,30 +211,30 @@ public class VersionedEntryWrapper implements VersionedEntry,
 	}
 
 	/**
-	* Sets the group ID of this versioned entry.
-	*
-	* @param groupId the group ID of this versioned entry
-	*/
+	 * Sets the group ID of this versioned entry.
+	 *
+	 * @param groupId the group ID of this versioned entry
+	 */
 	@Override
 	public void setGroupId(long groupId) {
 		_versionedEntry.setGroupId(groupId);
 	}
 
 	/**
-	* Sets the head ID of this versioned entry.
-	*
-	* @param headId the head ID of this versioned entry
-	*/
+	 * Sets the head ID of this versioned entry.
+	 *
+	 * @param headId the head ID of this versioned entry
+	 */
 	@Override
 	public void setHeadId(long headId) {
 		_versionedEntry.setHeadId(headId);
 	}
 
 	/**
-	* Sets the mvcc version of this versioned entry.
-	*
-	* @param mvccVersion the mvcc version of this versioned entry
-	*/
+	 * Sets the mvcc version of this versioned entry.
+	 *
+	 * @param mvccVersion the mvcc version of this versioned entry
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_versionedEntry.setMvccVersion(mvccVersion);
@@ -244,10 +246,10 @@ public class VersionedEntryWrapper implements VersionedEntry,
 	}
 
 	/**
-	* Sets the primary key of this versioned entry.
-	*
-	* @param primaryKey the primary key of this versioned entry
-	*/
+	 * Sets the primary key of this versioned entry.
+	 *
+	 * @param primaryKey the primary key of this versioned entry
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_versionedEntry.setPrimaryKey(primaryKey);
@@ -259,17 +261,19 @@ public class VersionedEntryWrapper implements VersionedEntry,
 	}
 
 	/**
-	* Sets the versioned entry ID of this versioned entry.
-	*
-	* @param versionedEntryId the versioned entry ID of this versioned entry
-	*/
+	 * Sets the versioned entry ID of this versioned entry.
+	 *
+	 * @param versionedEntryId the versioned entry ID of this versioned entry
+	 */
 	@Override
 	public void setVersionedEntryId(long versionedEntryId) {
 		_versionedEntry.setVersionedEntryId(versionedEntryId);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<VersionedEntry> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<VersionedEntry>
+		toCacheModel() {
+
 		return _versionedEntry.toCacheModel();
 	}
 
@@ -303,10 +307,12 @@ public class VersionedEntryWrapper implements VersionedEntry,
 			return false;
 		}
 
-		VersionedEntryWrapper versionedEntryWrapper = (VersionedEntryWrapper)obj;
+		VersionedEntryWrapper versionedEntryWrapper =
+			(VersionedEntryWrapper)obj;
 
-		if (Objects.equals(_versionedEntry,
-					versionedEntryWrapper._versionedEntry)) {
+		if (Objects.equals(
+				_versionedEntry, versionedEntryWrapper._versionedEntry)) {
+
 			return true;
 		}
 
@@ -321,6 +327,7 @@ public class VersionedEntryWrapper implements VersionedEntry,
 	@Override
 	public void populateVersionModel(
 		VersionedEntryVersion versionedEntryVersion) {
+
 		_versionedEntry.populateVersionModel(versionedEntryVersion);
 	}
 
@@ -345,4 +352,5 @@ public class VersionedEntryWrapper implements VersionedEntry,
 	}
 
 	private final VersionedEntry _versionedEntry;
+
 }

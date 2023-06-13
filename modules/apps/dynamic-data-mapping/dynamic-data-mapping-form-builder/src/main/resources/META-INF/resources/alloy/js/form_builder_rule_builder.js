@@ -3,6 +3,8 @@ AUI.add(
 	function(A) {
 		var Lang = A.Lang;
 
+		var AArray = A.Array;
+
 		var SoyTemplateUtil = Liferay.DDM.SoyTemplateUtil;
 
 		var ACTION_TRUNCATE = '<span class="text-truncate">{content}</span>';
@@ -123,10 +125,12 @@ AUI.add(
 									function(condition) {
 										condition.operands.forEach(
 											function(operand) {
-												operand.label = instance._getFieldLabel(operand.value);
-
 												if (!operand.label) {
-													operand.label = operand.value;
+													operand.label = instance._getFieldLabel(operand.value);
+
+													if (!operand.label) {
+														operand.label = operand.value;
+													}
 												}
 											}
 										);
@@ -475,8 +479,22 @@ AUI.add(
 						var fieldLabel;
 
 						for (var index in fields) {
-							if (fields[index].value === fieldValue) {
-								fieldLabel = fields[index].label;
+							var field = fields[index];
+
+							if (field.type === 'checkbox_multiple' || field.type === 'radio' || field.type === 'select') {
+								var option = AArray.find(
+									field.options,
+									function(item) {
+										return item.value === fieldValue;
+									});
+
+								if (option) {
+									fieldLabel = option.label;
+								}
+							}
+
+							if (!fieldLabel && (field.value === fieldValue)) {
+								fieldLabel = field.label;
 							}
 						}
 

@@ -17,10 +17,8 @@ package com.liferay.adaptive.media.image.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.adaptive.media.image.model.AMImageEntry;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class AMImageEntryCacheModel implements CacheModel<AMImageEntry>,
-	Externalizable {
+public class AMImageEntryCacheModel
+	implements CacheModel<AMImageEntry>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class AMImageEntryCacheModel implements CacheModel<AMImageEntry>,
 			return false;
 		}
 
-		AMImageEntryCacheModel amImageEntryCacheModel = (AMImageEntryCacheModel)obj;
+		AMImageEntryCacheModel amImageEntryCacheModel =
+			(AMImageEntryCacheModel)obj;
 
 		if (amImageEntryId == amImageEntryCacheModel.amImageEntryId) {
 			return true;
@@ -164,8 +164,7 @@ public class AMImageEntryCacheModel implements CacheModel<AMImageEntry>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -214,4 +213,5 @@ public class AMImageEntryCacheModel implements CacheModel<AMImageEntry>,
 	public int height;
 	public int width;
 	public long size;
+
 }

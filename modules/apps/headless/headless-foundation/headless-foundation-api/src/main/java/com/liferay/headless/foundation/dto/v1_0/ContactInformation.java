@@ -14,128 +14,451 @@
 
 package com.liferay.headless.foundation.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface ContactInformation {
+@GraphQLName("ContactInformation")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "ContactInformation")
+public class ContactInformation {
 
-	public PostalAddress[] getAddress();
+	public Email[] getEmails() {
+		return emails;
+	}
 
-	public void setAddress(
-			PostalAddress[] address);
+	public void setEmails(Email[] emails) {
+		this.emails = emails;
+	}
 
-	public void setAddress(
-			UnsafeSupplier<PostalAddress[], Throwable>
-				addressUnsafeSupplier);
-	public Long[] getAddressIds();
+	@JsonIgnore
+	public void setEmails(
+		UnsafeSupplier<Email[], Exception> emailsUnsafeSupplier) {
 
-	public void setAddressIds(
-			Long[] addressIds);
+		try {
+			emails = emailsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setAddressIds(
-			UnsafeSupplier<Long[], Throwable>
-				addressIdsUnsafeSupplier);
-	public Email[] getEmail();
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Email[] emails;
 
-	public void setEmail(
-			Email[] email);
+	public String getFacebook() {
+		return facebook;
+	}
 
-	public void setEmail(
-			UnsafeSupplier<Email[], Throwable>
-				emailUnsafeSupplier);
-	public Long[] getEmailIds();
+	public void setFacebook(String facebook) {
+		this.facebook = facebook;
+	}
 
-	public void setEmailIds(
-			Long[] emailIds);
-
-	public void setEmailIds(
-			UnsafeSupplier<Long[], Throwable>
-				emailIdsUnsafeSupplier);
-	public String getFacebook();
-
+	@JsonIgnore
 	public void setFacebook(
-			String facebook);
+		UnsafeSupplier<String, Exception> facebookUnsafeSupplier) {
 
-	public void setFacebook(
-			UnsafeSupplier<String, Throwable>
-				facebookUnsafeSupplier);
-	public Long getId();
+		try {
+			facebook = facebookUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String facebook;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public String getJabber();
+	public Long getId() {
+		return id;
+	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	public String getJabber() {
+		return jabber;
+	}
+
+	public void setJabber(String jabber) {
+		this.jabber = jabber;
+	}
+
+	@JsonIgnore
 	public void setJabber(
-			String jabber);
+		UnsafeSupplier<String, Exception> jabberUnsafeSupplier) {
 
-	public void setJabber(
-			UnsafeSupplier<String, Throwable>
-				jabberUnsafeSupplier);
-	public String getSkype();
+		try {
+			jabber = jabberUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String jabber;
+
+	public PostalAddress[] getPostalAddresses() {
+		return postalAddresses;
+	}
+
+	public void setPostalAddresses(PostalAddress[] postalAddresses) {
+		this.postalAddresses = postalAddresses;
+	}
+
+	@JsonIgnore
+	public void setPostalAddresses(
+		UnsafeSupplier<PostalAddress[], Exception>
+			postalAddressesUnsafeSupplier) {
+
+		try {
+			postalAddresses = postalAddressesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected PostalAddress[] postalAddresses;
+
+	public String getSkype() {
+		return skype;
+	}
+
+	public void setSkype(String skype) {
+		this.skype = skype;
+	}
+
+	@JsonIgnore
 	public void setSkype(
-			String skype);
+		UnsafeSupplier<String, Exception> skypeUnsafeSupplier) {
 
-	public void setSkype(
-			UnsafeSupplier<String, Throwable>
-				skypeUnsafeSupplier);
-	public String getSms();
+		try {
+			skype = skypeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setSms(
-			String sms);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String skype;
 
-	public void setSms(
-			UnsafeSupplier<String, Throwable>
-				smsUnsafeSupplier);
-	public Phone[] getTelephone();
+	public String getSms() {
+		return sms;
+	}
 
-	public void setTelephone(
-			Phone[] telephone);
+	public void setSms(String sms) {
+		this.sms = sms;
+	}
 
-	public void setTelephone(
-			UnsafeSupplier<Phone[], Throwable>
-				telephoneUnsafeSupplier);
-	public Long[] getTelephoneIds();
+	@JsonIgnore
+	public void setSms(UnsafeSupplier<String, Exception> smsUnsafeSupplier) {
+		try {
+			sms = smsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setTelephoneIds(
-			Long[] telephoneIds);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String sms;
 
-	public void setTelephoneIds(
-			UnsafeSupplier<Long[], Throwable>
-				telephoneIdsUnsafeSupplier);
-	public String getTwitter();
+	public Phone[] getTelephones() {
+		return telephones;
+	}
 
+	public void setTelephones(Phone[] telephones) {
+		this.telephones = telephones;
+	}
+
+	@JsonIgnore
+	public void setTelephones(
+		UnsafeSupplier<Phone[], Exception> telephonesUnsafeSupplier) {
+
+		try {
+			telephones = telephonesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Phone[] telephones;
+
+	public String getTwitter() {
+		return twitter;
+	}
+
+	public void setTwitter(String twitter) {
+		this.twitter = twitter;
+	}
+
+	@JsonIgnore
 	public void setTwitter(
-			String twitter);
+		UnsafeSupplier<String, Exception> twitterUnsafeSupplier) {
 
-	public void setTwitter(
-			UnsafeSupplier<String, Throwable>
-				twitterUnsafeSupplier);
-	public WebUrl[] getWebUrl();
+		try {
+			twitter = twitterUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setWebUrl(
-			WebUrl[] webUrl);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String twitter;
 
-	public void setWebUrl(
-			UnsafeSupplier<WebUrl[], Throwable>
-				webUrlUnsafeSupplier);
-	public Long[] getWebUrlIds();
+	public WebUrl[] getWebUrls() {
+		return webUrls;
+	}
 
-	public void setWebUrlIds(
-			Long[] webUrlIds);
+	public void setWebUrls(WebUrl[] webUrls) {
+		this.webUrls = webUrls;
+	}
 
-	public void setWebUrlIds(
-			UnsafeSupplier<Long[], Throwable>
-				webUrlIdsUnsafeSupplier);
+	@JsonIgnore
+	public void setWebUrls(
+		UnsafeSupplier<WebUrl[], Exception> webUrlsUnsafeSupplier) {
+
+		try {
+			webUrls = webUrlsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected WebUrl[] webUrls;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof ContactInformation)) {
+			return false;
+		}
+
+		ContactInformation contactInformation = (ContactInformation)object;
+
+		return Objects.equals(toString(), contactInformation.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"emails\": ");
+
+		if (emails == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < emails.length; i++) {
+				sb.append(emails[i]);
+
+				if ((i + 1) < emails.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"facebook\": ");
+
+		sb.append("\"");
+		sb.append(facebook);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"jabber\": ");
+
+		sb.append("\"");
+		sb.append(jabber);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"postalAddresses\": ");
+
+		if (postalAddresses == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < postalAddresses.length; i++) {
+				sb.append(postalAddresses[i]);
+
+				if ((i + 1) < postalAddresses.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"skype\": ");
+
+		sb.append("\"");
+		sb.append(skype);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"sms\": ");
+
+		sb.append("\"");
+		sb.append(sms);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"telephones\": ");
+
+		if (telephones == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < telephones.length; i++) {
+				sb.append(telephones[i]);
+
+				if ((i + 1) < telephones.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"twitter\": ");
+
+		sb.append("\"");
+		sb.append(twitter);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"webUrls\": ");
+
+		if (webUrls == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < webUrls.length; i++) {
+				sb.append(webUrls[i]);
+
+				if ((i + 1) < webUrls.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

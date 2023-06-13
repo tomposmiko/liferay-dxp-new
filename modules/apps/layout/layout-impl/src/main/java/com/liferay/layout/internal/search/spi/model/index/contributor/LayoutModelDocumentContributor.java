@@ -20,20 +20,23 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
-import com.liferay.segments.constants.SegmentsConstants;
-import com.liferay.segments.model.SegmentsEntry;
-import com.liferay.segments.service.SegmentsEntryLocalService;
+import com.liferay.segments.model.SegmentsExperience;
+import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,6 +59,10 @@ public class LayoutModelDocumentContributor
 
 	@Override
 	public void contribute(Document document, Layout layout) {
+		if (layout.isSystem()) {
+			return;
+		}
+
 		document.addUID(CLASS_NAME, layout.getPlid());
 		document.addText(
 			Field.DEFAULT_LANGUAGE_ID, layout.getDefaultLanguageId());
@@ -90,21 +97,31 @@ public class LayoutModelDocumentContributor
 			ServiceContextThreadLocal.getServiceContext();
 
 		if (serviceContext != null) {
-			request = serviceContext.getRequest();
+			request = DynamicServletRequest.addQueryString(
+				serviceContext.getRequest(), "p_l_id=" + layout.getPlid(),
+				false);
 			response = serviceContext.getResponse();
 		}
 
-		long[] segmentsIds = _getSegmentIds(layout.getGroupId());
+		long[] segmentsExperienceIds = _getSegmentsExperienceIds(
+			layout.getGroupId(),
+			_classNameLocalService.getClassNameId(Layout.class.getName()),
+			layout.getPrimaryKey());
 
-		for (String languageId : layout.getAvailableLanguageIds()) {
-			Locale locale = LocaleUtil.fromLanguageId(languageId);
+		Set<Locale> locales = LanguageUtil.getAvailableLocales(
+			layout.getGroupId());
 
+		for (Locale locale : locales) {
 			try {
+				if ((request == null) || (response == null)) {
+					break;
+				}
+
 				String content =
 					LayoutPageTemplateStructureRenderUtil.renderLayoutContent(
 						request, response, layoutPageTemplateStructure,
 						FragmentEntryLinkConstants.VIEW, new HashMap<>(),
-						locale, segmentsIds);
+						locale, segmentsExperienceIds);
 
 				document.addText(
 					Field.getLocalizedName(locale, Field.CONTENT), content);
@@ -115,17 +132,25 @@ public class LayoutModelDocumentContributor
 		}
 	}
 
-	private long[] _getSegmentIds(long groupId) {
-		SegmentsEntry segmentsEntry =
-			_segmentsEntryLocalService.fetchSegmentsEntry(
-				groupId, SegmentsConstants.KEY_DEFAULT, true);
+	private long[] _getSegmentsExperienceIds(
+		long groupId, long classNameId, long classPK) {
 
-		if (segmentsEntry != null) {
-			return new long[] {segmentsEntry.getSegmentsEntryId()};
+		try {
+			SegmentsExperience defaultSegmentsExperience =
+				_segmentsExperienceLocalService.getDefaultSegmentsExperience(
+					groupId, classNameId, classPK);
+
+			return new long[] {
+				defaultSegmentsExperience.getSegmentsExperienceId()
+			};
 		}
-
-		return new long[0];
+		catch (PortalException pe) {
+			throw new SystemException(pe);
+		}
 	}
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
 	private LayoutPageTemplateStructureLocalService
@@ -135,6 +160,6 @@ public class LayoutModelDocumentContributor
 	private Portal _portal;
 
 	@Reference
-	private SegmentsEntryLocalService _segmentsEntryLocalService;
+	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 }

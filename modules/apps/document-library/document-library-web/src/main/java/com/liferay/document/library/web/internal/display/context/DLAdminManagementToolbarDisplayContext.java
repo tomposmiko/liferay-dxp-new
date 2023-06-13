@@ -24,7 +24,6 @@ import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
-import com.liferay.document.library.portlet.toolbar.contributor.DLPortletToolbarContributor;
 import com.liferay.document.library.web.internal.constants.DLWebKeys;
 import com.liferay.document.library.web.internal.display.context.logic.DLPortletInstanceSettingsHelper;
 import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
@@ -37,7 +36,6 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -48,6 +46,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.portlet.toolbar.contributor.PortletToolbarContributor;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -135,99 +134,96 @@ public class DLAdminManagementToolbarDisplayContext {
 
 				if (stagedActions) {
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.putData("action", "download");
-								dropdownItem.setIcon("download");
-								dropdownItem.setLabel(
-									LanguageUtil.get(_request, "download"));
-								dropdownItem.setQuickAction(true);
-							}));
+						dropdownItem -> {
+							dropdownItem.putData("action", "download");
+							dropdownItem.setIcon("download");
+							dropdownItem.setLabel(
+								LanguageUtil.get(_request, "download"));
+							dropdownItem.setQuickAction(true);
+						});
 				}
 
 				User user = _themeDisplay.getUser();
 
 				if (stagedActions && !user.isDefaultUser()) {
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.putData("action", "move");
-								dropdownItem.setIcon("change");
-								dropdownItem.setLabel(
-									LanguageUtil.get(_request, "move"));
-								dropdownItem.setQuickAction(true);
-							}));
+						dropdownItem -> {
+							dropdownItem.putData("action", "move");
+							dropdownItem.setIcon("move-folder");
+							dropdownItem.setLabel(
+								LanguageUtil.get(_request, "move"));
+							dropdownItem.setQuickAction(true);
+						});
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.putData("action", "editTags");
-								dropdownItem.setIcon("tag");
-								dropdownItem.setLabel(
-									LanguageUtil.get(_request, "edit-tags"));
-								dropdownItem.setQuickAction(true);
-							}));
+						dropdownItem -> {
+							dropdownItem.putData("action", "editTags");
+							dropdownItem.putData(
+								"enableOnBulk", Boolean.TRUE.toString());
+							dropdownItem.setIcon("tag");
+							dropdownItem.setLabel(
+								LanguageUtil.get(_request, "edit-tags"));
+							dropdownItem.setQuickAction(true);
+						});
 
 					if (_hasValidAssetVocabularies) {
 						add(
-							SafeConsumer.ignore(
-								dropdownItem -> {
-									dropdownItem.putData(
-										"action", "editCategories");
-									dropdownItem.setIcon("categories");
-									dropdownItem.setLabel(
-										LanguageUtil.get(
-											_request, "edit-categories"));
-									dropdownItem.setQuickAction(true);
-								}));
+							dropdownItem -> {
+								dropdownItem.putData(
+									"action", "editCategories");
+								dropdownItem.putData(
+									"enableOnBulk", Boolean.TRUE.toString());
+								dropdownItem.setIcon("categories");
+								dropdownItem.setLabel(
+									LanguageUtil.get(
+										_request, "edit-categories"));
+								dropdownItem.setQuickAction(true);
+							});
 					}
 				}
 
 				if (!user.isDefaultUser()) {
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.putData("action", "deleteEntries");
+						dropdownItem -> {
+							dropdownItem.putData("action", "deleteEntries");
 
-								if (_dlTrashUtil.isTrashEnabled(
-										scopeGroup.getGroupId(),
-										_getRepositoryId())) {
+							if (_dlTrashUtil.isTrashEnabled(
+									scopeGroup.getGroupId(),
+									_getRepositoryId())) {
 
-									dropdownItem.setIcon("trash");
-									dropdownItem.setLabel(
-										LanguageUtil.get(
-											_request, "move-to-recycle-bin"));
-								}
-								else {
-									dropdownItem.setIcon("times");
-									dropdownItem.setLabel(
-										LanguageUtil.get(_request, "delete"));
-								}
+								dropdownItem.setIcon("trash");
+								dropdownItem.setLabel(
+									LanguageUtil.get(
+										_request, "move-to-recycle-bin"));
+							}
+							else {
+								dropdownItem.setIcon("times");
+								dropdownItem.setLabel(
+									LanguageUtil.get(_request, "delete"));
+							}
 
-								dropdownItem.setQuickAction(true);
-							}));
+							dropdownItem.setQuickAction(true);
+						});
 				}
 
 				if (stagedActions && !user.isDefaultUser()) {
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.putData("action", "checkin");
-								dropdownItem.setIcon("unlock");
-								dropdownItem.setLabel(
-									LanguageUtil.get(_request, "checkin"));
-								dropdownItem.setQuickAction(false);
-							}));
+						dropdownItem -> {
+							dropdownItem.putData("action", "checkin");
+							dropdownItem.setIcon("unlock");
+							dropdownItem.setLabel(
+								LanguageUtil.get(_request, "checkin"));
+							dropdownItem.setQuickAction(false);
+						});
 
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.putData("action", "checkout");
-								dropdownItem.setIcon("lock");
-								dropdownItem.setLabel(
-									LanguageUtil.get(
-										_request, "checkout[document]"));
-								dropdownItem.setQuickAction(false);
-							}));
+						dropdownItem -> {
+							dropdownItem.putData("action", "checkout");
+							dropdownItem.setIcon("lock");
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_request, "checkout[document]"));
+							dropdownItem.setQuickAction(false);
+						});
 				}
 			}
 		};
@@ -324,8 +320,8 @@ public class DLAdminManagementToolbarDisplayContext {
 			return null;
 		}
 
-		DLPortletToolbarContributor dlPortletToolbarContributor =
-			(DLPortletToolbarContributor)_request.getAttribute(
+		PortletToolbarContributor dlPortletToolbarContributor =
+			(PortletToolbarContributor)_request.getAttribute(
 				DLWebKeys.DOCUMENT_LIBRARY_PORTLET_TOOLBAR_CONTRIBUTOR);
 
 		List<Menu> menus = dlPortletToolbarContributor.getPortletTitleMenus(
@@ -346,6 +342,7 @@ public class DLAdminManagementToolbarDisplayContext {
 					dropdownItem -> {
 						dropdownItem.setHref(urlMenuItem.getURL());
 						dropdownItem.setLabel(urlMenuItem.getLabel());
+						dropdownItem.setSeparator(urlMenuItem.hasSeparator());
 					});
 			}
 		}
@@ -361,24 +358,20 @@ public class DLAdminManagementToolbarDisplayContext {
 		return new DropdownItemList() {
 			{
 				addGroup(
-					SafeConsumer.ignore(
-						dropdownGroupItem -> {
-							dropdownGroupItem.setDropdownItems(
-								_getFilterNavigationDropdownItems());
-							dropdownGroupItem.setLabel(
-								LanguageUtil.get(
-									_request, "filter-by-navigation"));
-						}));
+					dropdownGroupItem -> {
+						dropdownGroupItem.setDropdownItems(
+							_getFilterNavigationDropdownItems());
+						dropdownGroupItem.setLabel(
+							LanguageUtil.get(_request, "filter-by-navigation"));
+					});
 
-				if (!_isNavigationRecent()) {
-					addGroup(
-						dropdownGroupItem -> {
-							dropdownGroupItem.setDropdownItems(
-								_getOrderByDropdownItems());
-							dropdownGroupItem.setLabel(
-								LanguageUtil.get(_request, "order-by"));
-						});
-				}
+				addGroup(
+					dropdownGroupItem -> {
+						dropdownGroupItem.setDropdownItems(
+							_getOrderByDropdownItems());
+						dropdownGroupItem.setLabel(
+							LanguageUtil.get(_request, "order-by"));
+					});
 			}
 		};
 	}
@@ -390,75 +383,66 @@ public class DLAdminManagementToolbarDisplayContext {
 
 				if (fileEntryTypeId != -1) {
 					add(
-						SafeConsumer.ignore(
-							labelItem -> {
-								PortletURL removeLabelURL =
-									PortletURLUtil.clone(
-										_currentURLObj,
-										_liferayPortletResponse);
+						labelItem -> {
+							PortletURL removeLabelURL = PortletURLUtil.clone(
+								_currentURLObj, _liferayPortletResponse);
 
-								removeLabelURL.setParameter(
-									"fileEntryTypeId", (String)null);
+							removeLabelURL.setParameter(
+								"fileEntryTypeId", (String)null);
 
-								labelItem.putData(
-									"removeLabelURL",
-									removeLabelURL.toString());
+							labelItem.putData(
+								"removeLabelURL", removeLabelURL.toString());
 
-								labelItem.setCloseable(true);
+							labelItem.setCloseable(true);
 
-								String fileEntryTypeName = LanguageUtil.get(
-									_request, "basic-document");
+							String fileEntryTypeName = LanguageUtil.get(
+								_request, "basic-document");
 
-								if (fileEntryTypeId !=
-										DLFileEntryTypeConstants.
-											FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT) {
+							if (fileEntryTypeId !=
+									DLFileEntryTypeConstants.
+										FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT) {
 
-									DLFileEntryType fileEntryType =
-										DLFileEntryTypeLocalServiceUtil.
-											getFileEntryType(fileEntryTypeId);
+								DLFileEntryType fileEntryType =
+									DLFileEntryTypeLocalServiceUtil.
+										getFileEntryType(fileEntryTypeId);
 
-									fileEntryTypeName = fileEntryType.getName(
-										_request.getLocale());
-								}
+								fileEntryTypeName = fileEntryType.getName(
+									_request.getLocale());
+							}
 
-								String label = String.format(
-									"%s: %s",
-									LanguageUtil.get(_request, "document-type"),
-									fileEntryTypeName);
+							String label = String.format(
+								"%s: %s",
+								LanguageUtil.get(_request, "document-type"),
+								fileEntryTypeName);
 
-								labelItem.setLabel(label);
-							}));
+							labelItem.setLabel(label);
+						});
 				}
 
 				String navigation = _getNavigation();
 
 				if (navigation.equals("mine")) {
 					add(
-						SafeConsumer.ignore(
-							labelItem -> {
-								PortletURL removeLabelURL =
-									PortletURLUtil.clone(
-										_currentURLObj,
-										_liferayPortletResponse);
+						labelItem -> {
+							PortletURL removeLabelURL = PortletURLUtil.clone(
+								_currentURLObj, _liferayPortletResponse);
 
-								removeLabelURL.setParameter(
-									"navigation", (String)null);
+							removeLabelURL.setParameter(
+								"navigation", (String)null);
 
-								labelItem.putData(
-									"removeLabelURL",
-									removeLabelURL.toString());
+							labelItem.putData(
+								"removeLabelURL", removeLabelURL.toString());
 
-								labelItem.setCloseable(true);
+							labelItem.setCloseable(true);
 
-								User user = _themeDisplay.getUser();
+							User user = _themeDisplay.getUser();
 
-								String label = String.format(
-									"%s: %s",
-									LanguageUtil.get(_request, "owner"),
-									user.getFullName());
+							String label = String.format(
+								"%s: %s", LanguageUtil.get(_request, "owner"),
+								user.getFullName());
 
-								labelItem.setLabel(label);
-							}));
+							labelItem.setLabel(label);
+						});
 				}
 			}
 		};
@@ -594,10 +578,12 @@ public class DLAdminManagementToolbarDisplayContext {
 
 	public boolean isDisabled() {
 		try {
-			if (DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(
+			int count =
+				DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(
 					_getRepositoryId(), _getFolderId(),
-					WorkflowConstants.STATUS_ANY, true) <= 0) {
+					WorkflowConstants.STATUS_ANY, true);
 
+			if (count <= 0) {
 				return true;
 			}
 
@@ -671,111 +657,82 @@ public class DLAdminManagementToolbarDisplayContext {
 		return new DropdownItemList() {
 			{
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setActive(
-								navigation.equals("home") &&
-								(fileEntryTypeId == -1));
+					dropdownItem -> {
+						dropdownItem.setActive(
+							navigation.equals("home") &&
+							(fileEntryTypeId == -1));
 
-							PortletURL viewAllDocumentsURL =
-								PortletURLUtil.clone(
-									_currentURLObj, _liferayPortletResponse);
+						PortletURL viewAllDocumentsURL = PortletURLUtil.clone(
+							_currentURLObj, _liferayPortletResponse);
 
-							viewAllDocumentsURL.setParameter(
-								"mvcRenderCommandName",
-								"/document_library/view");
-							viewAllDocumentsURL.setParameter(
-								"navigation", "home");
-							viewAllDocumentsURL.setParameter(
-								"browseBy", (String)null);
-							viewAllDocumentsURL.setParameter(
-								"fileEntryTypeId", (String)null);
+						viewAllDocumentsURL.setParameter(
+							"mvcRenderCommandName", "/document_library/view");
+						viewAllDocumentsURL.setParameter("navigation", "home");
+						viewAllDocumentsURL.setParameter(
+							"browseBy", (String)null);
+						viewAllDocumentsURL.setParameter(
+							"fileEntryTypeId", (String)null);
 
-							dropdownItem.setHref(viewAllDocumentsURL);
+						dropdownItem.setHref(viewAllDocumentsURL);
 
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "all"));
-						}));
-
-				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setActive(navigation.equals("recent"));
-
-							PortletURL viewRecentDocumentsURL =
-								PortletURLUtil.clone(
-									_currentURLObj, _liferayPortletResponse);
-
-							viewRecentDocumentsURL.setParameter(
-								"mvcRenderCommandName",
-								"/document_library/view");
-							viewRecentDocumentsURL.setParameter(
-								"navigation", "recent");
-
-							dropdownItem.setHref(viewRecentDocumentsURL);
-
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "recent"));
-						}));
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "all"));
+					});
 
 				if (_themeDisplay.isSignedIn()) {
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.setActive(
-									navigation.equals("mine"));
+						dropdownItem -> {
+							dropdownItem.setActive(navigation.equals("mine"));
 
-								PortletURL viewMyDocumentsURL =
-									PortletURLUtil.clone(
-										_currentURLObj,
-										_liferayPortletResponse);
+							PortletURL viewMyDocumentsURL =
+								PortletURLUtil.clone(
+									_currentURLObj, _liferayPortletResponse);
 
-								viewMyDocumentsURL.setParameter(
-									"mvcRenderCommandName",
-									"/document_library/view");
-								viewMyDocumentsURL.setParameter(
-									"navigation", "mine");
+							viewMyDocumentsURL.setParameter(
+								"mvcRenderCommandName",
+								"/document_library/view");
+							viewMyDocumentsURL.setParameter(
+								"navigation", "mine");
 
-								dropdownItem.setHref(viewMyDocumentsURL);
+							dropdownItem.setHref(viewMyDocumentsURL);
 
-								dropdownItem.setLabel(
-									LanguageUtil.get(_request, "mine"));
-							}));
+							dropdownItem.setLabel(
+								LanguageUtil.get(_request, "mine"));
+						});
 				}
 
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setActive(fileEntryTypeId != -1);
+					dropdownItem -> {
+						dropdownItem.setActive(fileEntryTypeId != -1);
 
-							dropdownItem.putData(
-								"action", "openDocumentTypesSelector");
+						dropdownItem.putData(
+							"action", "openDocumentTypesSelector");
 
-							String label = LanguageUtil.get(
-								_request, "document-type");
+						String label = LanguageUtil.get(
+							_request, "document-type");
 
-							if (fileEntryTypeId != -1) {
-								String fileEntryTypeName = LanguageUtil.get(
-									_request, "basic-document");
+						if (fileEntryTypeId != -1) {
+							String fileEntryTypeName = LanguageUtil.get(
+								_request, "basic-document");
 
-								if (fileEntryTypeId !=
-										DLFileEntryTypeConstants.
-											FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT) {
+							if (fileEntryTypeId !=
+									DLFileEntryTypeConstants.
+										FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT) {
 
-									DLFileEntryType fileEntryType =
-										DLFileEntryTypeLocalServiceUtil.
-											getFileEntryType(fileEntryTypeId);
+								DLFileEntryType fileEntryType =
+									DLFileEntryTypeLocalServiceUtil.
+										getFileEntryType(fileEntryTypeId);
 
-									fileEntryTypeName = fileEntryType.getName(
-										_request.getLocale());
-								}
-
-								label = String.format(
-									"%s: %s", label, fileEntryTypeName);
+								fileEntryTypeName = fileEntryType.getName(
+									_request.getLocale());
 							}
 
-							dropdownItem.setLabel(label);
-						}));
+							label = String.format(
+								"%s: %s", label, fileEntryTypeName);
+						}
+
+						dropdownItem.setLabel(label);
+					});
 			}
 		};
 	}
@@ -817,17 +774,16 @@ public class DLAdminManagementToolbarDisplayContext {
 					String orderByCol = orderByColEntry.getKey();
 
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.setActive(
-									orderByCol.equals(_getOrderByCol()));
-								dropdownItem.setHref(
-									_getCurrentSortingURL(), "orderByCol",
-									orderByCol);
-								dropdownItem.setLabel(
-									LanguageUtil.get(
-										_request, orderByColEntry.getValue()));
-							}));
+						dropdownItem -> {
+							dropdownItem.setActive(
+								orderByCol.equals(_getOrderByCol()));
+							dropdownItem.setHref(
+								_getCurrentSortingURL(), "orderByCol",
+								orderByCol);
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_request, orderByColEntry.getValue()));
+						});
 				}
 			}
 		};
@@ -870,14 +826,6 @@ public class DLAdminManagementToolbarDisplayContext {
 
 				return false;
 			});
-	}
-
-	private boolean _isNavigationRecent() {
-		if (Objects.equals(_getNavigation(), "recent")) {
-			return true;
-		}
-
-		return false;
 	}
 
 	private boolean _isSearch() {

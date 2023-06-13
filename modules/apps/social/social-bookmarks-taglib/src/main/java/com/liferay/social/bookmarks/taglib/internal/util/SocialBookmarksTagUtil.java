@@ -47,23 +47,25 @@ public class SocialBookmarksTagUtil {
 					SocialBookmark socialBookmark =
 						SocialBookmarksRegistryUtil.getSocialBookmark(type);
 
-					if (socialBookmark != null) {
-						add(
-							dropdownItem -> {
-								dropdownItem.putData("action", "post");
-								dropdownItem.putData("className", className);
-								dropdownItem.putData(
-									"classPK", String.valueOf(classPK));
-								dropdownItem.putData(
-									"postURL",
-									socialBookmark.getPostURL(title, url));
-								dropdownItem.putData("type", type);
-								dropdownItem.putData("url", url);
-								dropdownItem.setHref("#");
-								dropdownItem.setLabel(
-									socialBookmark.getName(locale));
-							});
+					if (socialBookmark == null) {
+						continue;
 					}
+
+					add(
+						dropdownItem -> {
+							dropdownItem.putData("action", "post");
+							dropdownItem.putData("className", className);
+							dropdownItem.putData(
+								"classPK", String.valueOf(classPK));
+							dropdownItem.putData(
+								"postURL",
+								socialBookmark.getPostURL(title, url));
+							dropdownItem.putData("type", type);
+							dropdownItem.putData("url", url);
+							dropdownItem.setHref("#");
+							dropdownItem.setLabel(
+								socialBookmark.getName(locale));
+						});
 				}
 			}
 		};

@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the remote service utility for ClassName. This utility wraps
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  */
 @ProviderType
 public class ClassNameServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -40,33 +40,34 @@ public class ClassNameServiceUtil {
 	 */
 	public static com.liferay.portal.kernel.model.ClassName fetchByClassNameId(
 		long classNameId) {
+
 		return getService().fetchByClassNameId(classNameId);
 	}
 
 	public static com.liferay.portal.kernel.model.ClassName fetchClassName(
 		String value) {
+
 		return getService().fetchClassName(value);
 	}
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static ClassNameService getService() {
 		if (_service == null) {
-			_service = (ClassNameService)PortalBeanLocatorUtil.locate(ClassNameService.class.getName());
-
-			ReferenceRegistry.registerReference(ClassNameServiceUtil.class,
-				"_service");
+			_service = (ClassNameService)PortalBeanLocatorUtil.locate(
+				ClassNameService.class.getName());
 		}
 
 		return _service;
 	}
 
 	private static ClassNameService _service;
+
 }

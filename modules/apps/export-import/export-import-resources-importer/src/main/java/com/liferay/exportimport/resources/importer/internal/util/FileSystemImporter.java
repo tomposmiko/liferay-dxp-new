@@ -247,9 +247,7 @@ public class FileSystemImporter extends BaseImporter {
 		catch (PortalException pe) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Unable to import application display template " +
-						file.getName(),
-					pe);
+					"Unable to import widget template " + file.getName(), pe);
 			}
 
 			throw pe;
@@ -1778,7 +1776,7 @@ public class FileSystemImporter extends BaseImporter {
 		return content;
 	}
 
-	protected void resetLayoutColumns(Layout layout) {
+	protected void resetLayoutColumns(Layout layout) throws PortalException {
 		UnicodeProperties typeSettings = layout.getTypeSettingsProperties();
 
 		Set<Map.Entry<String, String>> set = typeSettings.entrySet();

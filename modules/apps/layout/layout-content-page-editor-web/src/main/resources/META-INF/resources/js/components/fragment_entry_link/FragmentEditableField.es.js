@@ -1,24 +1,24 @@
-import Component from 'metal-component';
 import {Config} from 'metal-state';
-import {object} from 'metal';
+import PortletBase from 'frontend-js-web/liferay/PortletBase.es';
 import Soy from 'metal-soy';
 
+import '../floating_toolbar/image_properties/FloatingToolbarImagePropertiesPanel.es';
+import '../floating_toolbar/link/FloatingToolbarLinkPanel.es';
+import '../floating_toolbar/mapping/FloatingToolbarMappingPanel.es';
+import '../floating_toolbar/text_properties/FloatingToolbarTextPropertiesPanel.es';
 import './FragmentEditableFieldTooltip.es';
 
-import {CLEAR_ACTIVE_ITEM, OPEN_MAPPING_FIELDS_DIALOG, UPDATE_ACTIVE_ITEM, UPDATE_EDITABLE_VALUE, UPDATE_HOVERED_ITEM, UPDATE_LAST_SAVE_DATE, UPDATE_SAVING_CHANGES_STATUS, UPDATE_TRANSLATION_STATUS} from '../../actions/actions.es';
-import {FRAGMENTS_EDITOR_ITEM_TYPES} from '../../utils/constants';
-import {getActiveEditableElement} from '../fragment_processors/EditableTextFragmentProcessor.es';
+import {CLEAR_FRAGMENT_EDITOR, DISABLE_FRAGMENT_EDITOR, ENABLE_FRAGMENT_EDITOR, OPEN_ASSET_TYPE_DIALOG, UPDATE_CONFIG_ATTRIBUTES, UPDATE_EDITABLE_VALUE, UPDATE_LAST_SAVE_DATE, UPDATE_SAVING_CHANGES_STATUS, UPDATE_TRANSLATION_STATUS} from '../../actions/actions.es';
+import {EDITABLE_FIELD_CONFIG_KEYS, FLOATING_TOOLBAR_BUTTONS, FRAGMENTS_EDITOR_ITEM_TYPES} from '../../utils/constants';
+import {prefixSegmentsExperienceId} from '../../utils/prefixSegmentsExperienceId.es';
 import {getConnectedComponent} from '../../store/ConnectedComponent.es';
+import {getItemPath, itemIsInPath} from '../../utils/FragmentsEditorGetUtils.es';
 import {setIn} from '../../utils/FragmentsEditorUpdateUtils.es';
-import {Store} from '../../store/store.es';
+import {shouldUpdateOnChangeProperties, shouldUpdatePureComponent} from '../../utils/FragmentsEditorComponentUtils.es';
+import FloatingToolbar from '../floating_toolbar/FloatingToolbar.es';
 import FragmentProcessors from '../fragment_processors/FragmentProcessors.es';
 import templates from './FragmentEditableField.soy';
 
-/**
- * Default key used for translated values when there is no languageId
- * @review
- * @type {!string}
- */
 const DEFAULT_LANGUAGE_ID_KEY = 'defaultValue';
 
 /**
@@ -29,40 +29,77 @@ const DEFAULT_LANGUAGE_ID_KEY = 'defaultValue';
 const SAVE_CHANGES_DELAY = 1500;
 
 /**
- * Buttons rendered inside the tooltip
- * @review
- */
-const TOOLTIP_BUTTONS = {
-	edit: {
-		id: 'edit',
-		label: Liferay.Language.get('edit')
-	},
-
-	map: {
-		id: 'map',
-		label: Liferay.Language.get('map[relational]')
-	},
-
-	selectImage: {
-		id: 'selectImage',
-		label: Liferay.Language.get('select-image')
-	}
-};
-
-/**
  * FragmentEditableField
  */
-class FragmentEditableField extends Component {
+class FragmentEditableField extends PortletBase {
 
 	/**
-	 * Adds item types to state
-	 * @param {Object} _state
+	 * Checks if the given editable should be highlighted
+	 * @param {string} activeItemId
+	 * @param {string} activeItemType
+	 * @param {string} hoveredItemId
+	 * @param {string} hoveredItemType
+	 * @param {object} structure
 	 * @private
-	 * @return {Object}
-	 * @static
+	 * @return {boolean}
+	 * @review
 	 */
-	static _addItemTypesToState(_state) {
-		return setIn(_state, ['itemTypes'], FRAGMENTS_EDITOR_ITEM_TYPES);
+	static _isHighlighted(
+		activeItemId,
+		activeItemType,
+		fragmentEntryLinkId,
+		hoveredItemId,
+		hoveredItemType,
+		structure
+	) {
+		const fragmentInActivePath = itemIsInPath(
+			getItemPath(activeItemId, activeItemType, structure),
+			fragmentEntryLinkId,
+			FRAGMENTS_EDITOR_ITEM_TYPES.fragment
+		) && activeItemType !== FRAGMENTS_EDITOR_ITEM_TYPES.editable;
+
+		const fragmentInHoveredPath = itemIsInPath(
+			getItemPath(hoveredItemId, hoveredItemType, structure),
+			fragmentEntryLinkId,
+			FRAGMENTS_EDITOR_ITEM_TYPES.fragment
+		);
+
+		return (fragmentInActivePath || fragmentInHoveredPath);
+	}
+
+	/**
+	 * Checks if the given editable is mapped
+	 * @param {object} editableValues
+	 * @private
+	 * @return {boolean}
+	 * @review
+	 */
+	static _isMapped(editableValues) {
+		return Boolean(
+			editableValues.mappedField ||
+			(
+				editableValues.classNameId &&
+				editableValues.classPK &&
+				editableValues.fieldId
+			)
+		);
+	}
+
+	/**
+	 * Checks if the given editable is mapped to an asset entry
+	 * @param {object} editableValues
+	 * @private
+	 * @return {boolean}
+	 * @review
+	 */
+	static _isMappedToAssetEntry(editableValues) {
+		return Boolean(
+			(
+				editableValues.classNameId &&
+				editableValues.classPK &&
+				editableValues.fieldId
+			)
+		);
 	}
 
 	/**
@@ -74,6 +111,7 @@ class FragmentEditableField extends Component {
 		this._handleBeforeUnload = this._handleBeforeUnload.bind(this);
 		this._handleEditableChanged = this._handleEditableChanged.bind(this);
 		this._handleEditableDestroyed = this._handleEditableDestroyed.bind(this);
+		this._handleFloatingToolbarButtonClicked = this._handleFloatingToolbarButtonClicked.bind(this);
 
 		this._beforeNavigateHandler = Liferay.on(
 			'beforeNavigate',
@@ -91,6 +129,9 @@ class FragmentEditableField extends Component {
 		clearTimeout(this._saveChangesTimeout);
 
 		this._destroyProcessors();
+		this._disposeFloatingToolbar();
+
+		this._beforeNavigateHandler.detach();
 
 		window.removeEventListener('beforeunload', this._handleBeforeUnload);
 	}
@@ -101,47 +142,55 @@ class FragmentEditableField extends Component {
 	 * @returns {object}
 	 */
 	prepareStateForRender(state) {
-		const defaultSegmentedContent = this.editableValues[this.defaultSegmentId] ||
-			{};
-		const segmentedContent = this.editableValues[this.segmentId] ||
-			defaultSegmentedContent ||
-			{};
+		const defaultSegmentsExperienceId = prefixSegmentsExperienceId(this.defaultSegmentsExperienceId);
+		const segmentsExperienceId = prefixSegmentsExperienceId(this.segmentsExperienceId);
 
-		const translatedContent = segmentedContent[this.languageId] ||
-			defaultSegmentedContent[this.languageId] ||
-			segmentedContent[this.defaultLanguageId] ||
-			this.editableValues.defaultValue;
+		const segmentedValue = this.editableValues[segmentsExperienceId] ||
+			this.editableValues[defaultSegmentsExperienceId] ||
+			this.editableValues;
 
-		let content = Soy.toIncDom(translatedContent || this.content);
+		const translatedValue = segmentedValue[this.languageId] ||
+			segmentedValue[this.defaultLanguageId];
 
-		if (this.type === 'image' && translatedContent) {
-			const tempContent = document.createElement('div');
-
-			tempContent.innerHTML = this.content;
-
-			const tempImage = tempContent.querySelector('img');
-
-			if (tempImage) {
-				tempImage.src = translatedContent;
-			}
-
-			content = Soy.toIncDom(tempContent.innerHTML);
-		}
-
-		const _tooltipButtons = this._getTooltipButtons(
-			this.type
+		const mapped = FragmentEditableField._isMapped(
+			this.editableValues
 		);
 
-		const nextState = FragmentEditableField._addItemTypesToState(state);
+		let value = mapped ?
+			(this._mappedFieldValue || this.editableValues.defaultValue) :
+			(translatedValue || this.editableValues.defaultValue);
 
-		return object.mixin(
-			{},
-			nextState,
-			{
-				content,
-				_tooltipButtons
-			}
+		const processor = FragmentProcessors[this.type] || FragmentProcessors.fallback;
+
+		const content = Soy.toIncDom(
+			processor.render(
+				this.content,
+				value,
+				this.editableValues
+			)
 		);
+
+		const highlighted = FragmentEditableField._isHighlighted(
+			state.activeItemId,
+			state.activeItemType,
+			state.fragmentEntryLinkId,
+			state.hoveredItemId,
+			state.hoveredItemType,
+			state.layoutData.structure
+		);
+		const itemId = this._getItemId();
+		const translated = !mapped && Boolean(segmentedValue[this.languageId]);
+
+		let nextState = state;
+
+		nextState = setIn(nextState, ['_highlighted'], highlighted);
+		nextState = setIn(nextState, ['_mapped'], mapped);
+		nextState = setIn(nextState, ['_translated'], translated);
+		nextState = setIn(nextState, ['content'], content);
+		nextState = setIn(nextState, ['itemId'], itemId);
+		nextState = setIn(nextState, ['itemTypes'], FRAGMENTS_EDITOR_ITEM_TYPES);
+
+		return nextState;
 	}
 
 	/**
@@ -149,24 +198,114 @@ class FragmentEditableField extends Component {
 	 * @review
 	 */
 	rendered() {
-		if (this._showEditor) {
-			this._showEditor = false;
-			this._enableEditor();
-		}
+		if ((this._getItemId() === this.activeItemId) &&
+			(this.activeItemType === FRAGMENTS_EDITOR_ITEM_TYPES.editable)) {
 
-		if (this.refs.editable !== this._tooltipAlignElement) {
-			this._tooltipAlignElement = this.refs.editable;
+			this._createFloatingToolbar();
+		}
+		else {
+			this._disposeFloatingToolbar();
 		}
 	}
 
 	/**
 	 * @inheritDoc
-	 * @param {{_showTooltip: bool}} changes
 	 * @return {boolean}
 	 * @review
 	 */
 	shouldUpdate(changes) {
-		return Boolean(changes._showTooltip);
+		return this._editing ?
+			shouldUpdateOnChangeProperties(changes, ['languageId', 'segmentsExperienceId']) :
+			shouldUpdatePureComponent(changes);
+	}
+
+	/**
+	 * Handle editableValues changed
+	 * @inheritDoc
+	 * @review
+	 */
+	syncEditableValues() {
+		this._loadMappedFieldLabel();
+		this._updateMappedFieldValue();
+	}
+
+	/**
+	 * @inheritDoc
+	 * @param {!Object} newVal
+	 * @review
+	 */
+	syncFragmentEditorClear(newVal) {
+		if (newVal === this._getItemId()) {
+			this._handleEditableChanged('');
+
+			this.store.dispatchAction(
+				CLEAR_FRAGMENT_EDITOR,
+				{
+					itemId: ''
+				}
+			);
+		}
+	}
+
+	/**
+	 * @inheritDoc
+	 * @param {!Object} newVal
+	 * @review
+	 */
+	syncFragmentEditorEnabled(newVal) {
+		if (newVal === this._getItemId()) {
+			this._enableEditor();
+
+			this._disposeFloatingToolbar();
+		}
+	}
+
+	/**
+	 * Handle getAssetFieldValueURL changed
+	 * @inheritDoc
+	 * @review
+	 */
+	syncGetAssetFieldValueURL() {
+		this._updateMappedFieldValue();
+	}
+
+	/**
+	 * Creates a new instance of FloatingToolbar
+	 * @private
+	 * @review
+	 */
+	_createFloatingToolbar() {
+		const processor = FragmentProcessors[this.type] || FragmentProcessors.fallback;
+
+		const config = {
+			anchorElement: this.element,
+			buttons: processor.getFloatingToolbarButtons(this.editableValues),
+			classes:
+				this.editableValues.mappedField ||
+				this.editableValues.fieldId ?
+					'fragments-editor__floating-toolbar--mapped-field' :
+					'',
+			events: {
+				buttonClicked: this._handleFloatingToolbarButtonClicked
+			},
+			item: {
+				editableId: this.editableId,
+				editableValues: this.editableValues,
+				fragmentEntryLinkId: this.fragmentEntryLinkId,
+				type: this.type
+			},
+			itemId: this._getItemId(),
+			itemType: FRAGMENTS_EDITOR_ITEM_TYPES.editable,
+			portalElement: document.body,
+			store: this.store
+		};
+
+		if (this._floatingToolbar) {
+			this._floatingToolbar.setState(config);
+		}
+		else {
+			this._floatingToolbar = new FloatingToolbar(config);
+		}
 	}
 
 	/**
@@ -178,6 +317,19 @@ class FragmentEditableField extends Component {
 		Object.values(FragmentProcessors).forEach(
 			fragmentProcessor => fragmentProcessor.destroy()
 		);
+	}
+
+	/**
+	 * Disposes an existing instance of FloatingToolbar
+	 * @private
+	 * @review
+	 */
+	_disposeFloatingToolbar() {
+		if (this._floatingToolbar) {
+			this._floatingToolbar.dispose();
+
+			this._floatingToolbar = null;
+		}
 	}
 
 	/**
@@ -202,27 +354,13 @@ class FragmentEditableField extends Component {
 	}
 
 	/**
-	 * Get the list of buttons that should be rendered inside the tooltip
-	 * @param {string} editableType
 	 * @private
-	 * @return {object}
+	 * @return {string} Valid FragmentsEditor itemId for it's
+	 * 	fragmentEntryLinkId and editableId
 	 * @review
 	 */
-	_getTooltipButtons(editableType) {
-		const _tooltipButtons = [];
-
-		if (this.showMapping) {
-			_tooltipButtons.push(TOOLTIP_BUTTONS.map);
-		}
-
-		if (editableType === 'image') {
-			_tooltipButtons.push(TOOLTIP_BUTTONS.selectImage);
-		}
-		else {
-			_tooltipButtons.push(TOOLTIP_BUTTONS.edit);
-		}
-
-		return _tooltipButtons;
+	_getItemId() {
+		return `${this.fragmentEntryLinkId}-${this.editableId}`;
 	}
 
 	/**
@@ -238,14 +376,6 @@ class FragmentEditableField extends Component {
 			if (!confirm(msg)) {
 				event.originalEvent.preventDefault();
 			}
-		}
-		else {
-			if (this._beforeNavigateHandler) {
-				this._beforeNavigateHandler.detach();
-				this._beforeNavigateHandler = null;
-			}
-
-			this._destroyProcessors();
 		}
 	}
 
@@ -267,44 +397,26 @@ class FragmentEditableField extends Component {
 
 	/**
 	 * Handle editable click event
-	 * @param {Event} event
 	 * @private
+	 * @review
 	 */
-	_handleEditableClick(event) {
-		event.preventDefault();
-		event.stopPropagation();
-
-		if (!this._editing) {
-			this.store.dispatchAction(
-				UPDATE_ACTIVE_ITEM,
-				{
-					activeItemId: this.editableId,
-					activeItemType: FRAGMENTS_EDITOR_ITEM_TYPES.editable
-				}
-			);
+	_handleEditableClick() {
+		if (this._preventEditableClick) {
+			this._preventEditableClick = false;
 		}
-
-		if (this._tooltipLabel) {
-			this._showTooltip = false;
-			this._tooltipLabel = '';
+		else {
+			this._disposeFloatingToolbar();
+			this._enableEditor();
 		}
+	}
 
-		if (
-			(this.showMapping && !this._editing) ||
-			(getActiveEditableElement() !== this.refs.editable)
-		) {
-			if (this.showMapping) {
-				this._showTooltip = !this._showTooltip;
-			}
-			else {
-				this._showTooltip = false;
-				this._enableEditor();
-			}
-
-			if (!this._showTooltip) {
-				this._handleEditableMouseEnter();
-			}
-		}
+	/**
+	 * Handle editable focus event
+	 * @private
+	 * @review
+	 */
+	_handleEditableFocus() {
+		this._preventEditableClick = true;
 	}
 
 	/**
@@ -314,66 +426,10 @@ class FragmentEditableField extends Component {
 	 */
 	_handleEditableDestroyed() {
 		this._editing = false;
-	}
 
-	/**
-	 * Callback executed when an editable lose the focus
-	 * @private
-	 * @review
-	 */
-	_handleEditableFocusOut() {
-		requestAnimationFrame(
-			() => {
-				this.store.dispatchAction(CLEAR_ACTIVE_ITEM);
-			}
+		this.store.dispatchAction(
+			DISABLE_FRAGMENT_EDITOR
 		);
-	}
-
-	/**
-	 * Callback executed when cursor enters editable element
-	 * @private
-	 * @review
-	 */
-	_handleEditableHoverStart(event) {
-		event.stopPropagation();
-
-		if (this.store) {
-			this.store.dispatchAction(
-				UPDATE_HOVERED_ITEM,
-				{
-					hoveredItemId: this.editableId,
-					hoveredItemType: FRAGMENTS_EDITOR_ITEM_TYPES.editable
-				}
-			);
-		}
-	}
-
-	/**
-	 * Callback executed when cursor enters editable element
-	 * @private
-	 * @review
-	 */
-	_handleEditableMouseEnter() {
-		if (
-			!this._editing &&
-			this.editableValues.mappedField &&
-			!this._showTooltip
-		) {
-			this._showTooltip = true;
-			this._tooltipLabel = this.editableValues.mappedField;
-		}
-	}
-
-	/**
-	 * Callback executed when cursor leaves editable element
-	 * @private
-	 * @review
-	 */
-	_handleEditableMouseLeave() {
-		if (this._tooltipLabel && !this._editing) {
-			this._showTooltip = false;
-			this._tooltipLabel = '';
-		}
 	}
 
 	/**
@@ -395,43 +451,88 @@ class FragmentEditableField extends Component {
 	}
 
 	/**
-	 * Handle clicks outside tooltip element
+	 * Callback executed when an floating toolbar button is clicked
+	 * @param {Event} event
+	 * @param {Object} data
 	 * @private
-	 * @review
 	 */
-	_handleOutsideTooltipClick() {
-		this._showTooltip = false;
+	_handleFloatingToolbarButtonClicked(event, data) {
+		const {panelId, type} = data;
+
+		if (type === 'editor') {
+			this.store.dispatchAction(
+				ENABLE_FRAGMENT_EDITOR,
+				{
+					itemId: this._getItemId()
+				}
+			);
+		}
+		else if (type === 'panel' &&
+			panelId === FLOATING_TOOLBAR_BUTTONS.map.panelId &&
+			this.mappingFieldsURL &&
+			!this.selectedMappingTypes.type) {
+
+			event.preventDefault();
+
+			this.store.dispatchAction(OPEN_ASSET_TYPE_DIALOG);
+		}
 	}
 
 	/**
-	 * Handle tooltip button click event
-	 * @param {{buttonId: string}} event
+	 * Load mapped field label
 	 * @private
 	 * @review
 	 */
-	_handleTooltipButtonClick(event) {
-		const {buttonId} = event;
+	_loadMappedFieldLabel() {
+		let promise;
+		let mappedFieldId;
 
-		if (
-			buttonId === TOOLTIP_BUTTONS.edit.id ||
-			buttonId === TOOLTIP_BUTTONS.selectImage.id
-		) {
-			this._showEditor = true;
+		if (this.editableValues.mappedField &&
+			this.selectedMappingTypes.type) {
+
+			const data = {
+				classNameId: this.selectedMappingTypes.type.id
+			};
+
+			if (this.selectedMappingTypes.subtype) {
+				data.classTypeId = this.selectedMappingTypes.subtype.id;
+			}
+
+			mappedFieldId = this.editableValues.mappedField;
+			promise = this.fetch(this.mappingFieldsURL, data);
 		}
-		else if (buttonId === TOOLTIP_BUTTONS.map.id) {
-			this.store
-				.dispatchAction(
-					OPEN_MAPPING_FIELDS_DIALOG,
-					{
-						editableId: this.editableId,
-						editableType: this.type,
-						fragmentEntryLinkId: this.fragmentEntryLinkId,
-						mappedFieldId: this.editableValues.mappedField || ''
+		else if (this.editableValues.classNameId &&
+			this.editableValues.classPK &&
+			this.editableValues.fieldId &&
+			this.getAssetMappingFieldsURL) {
+
+			mappedFieldId = this.editableValues.fieldId;
+			promise = this.fetch(
+				this.getAssetMappingFieldsURL,
+				{
+					classNameId: this.editableValues.classNameId,
+					classPK: this.editableValues.classPK
+				}
+			);
+		}
+
+		if (promise) {
+			promise
+				.then(
+					response => response.json()
+				)
+				.then(
+					response => {
+						const field = response.find(
+							field => field.key === mappedFieldId
+						);
+
+						if (field) {
+							this._mappedFieldLabel = field.label;
+						}
 					}
 				);
 		}
-
-		this._showTooltip = false;
 	}
 
 	/**
@@ -440,6 +541,7 @@ class FragmentEditableField extends Component {
 	 */
 	_saveChanges(newValue) {
 		this._unsavedChanges = false;
+		const editableValueSegmentsExperienceId = prefixSegmentsExperienceId(this.segmentsExperienceId) || prefixSegmentsExperienceId(this.defaultSegmentsExperienceId);
 
 		this.store
 			.dispatchAction(
@@ -454,14 +556,24 @@ class FragmentEditableField extends Component {
 					editableId: this.editableId,
 					editableValue: newValue,
 					editableValueId: this.languageId || DEFAULT_LANGUAGE_ID_KEY,
-					editableValueSegmentId: this.segmentId || this.defaultSegmentId,
+					editableValueSegmentsExperienceId,
+					fragmentEntryLinkId: this.fragmentEntryLinkId
+				}
+			)
+			.dispatchAction(
+				UPDATE_CONFIG_ATTRIBUTES,
+				{
+					config: {
+						[EDITABLE_FIELD_CONFIG_KEYS.imageSource]: newValue
+					},
+					editableId: this.editableId,
 					fragmentEntryLinkId: this.fragmentEntryLinkId
 				}
 			)
 			.dispatchAction(
 				UPDATE_TRANSLATION_STATUS,
 				{
-					segmentId: this.segmentId || this.defaultSegmentId
+					segmentsExperienceId: this.segmentsExperienceId || this.defaultSegmentsExperienceId
 				}
 			)
 			.dispatchAction(
@@ -476,6 +588,34 @@ class FragmentEditableField extends Component {
 					savingChanges: false
 				}
 			);
+	}
+
+	/**
+	 * Updates mapped field value
+	 * @private
+	 * @review
+	 */
+	_updateMappedFieldValue() {
+		if (this.getAssetFieldValueURL &&
+			FragmentEditableField._isMappedToAssetEntry(this.editableValues)) {
+
+			this.fetch(
+				this.getAssetFieldValueURL,
+				{
+					classNameId: this.editableValues.classNameId,
+					classPK: this.editableValues.classPK,
+					fieldId: this.editableValues.fieldId
+				}
+			)
+				.then(
+					response => response.json()
+				)
+				.then(
+					response => {
+						this._mappedFieldValue = response.fieldValue;
+					}
+				);
+		}
 	}
 
 }
@@ -496,27 +636,9 @@ FragmentEditableField.STATE = {
 	 * @review
 	 * @type {!string}
 	 */
-	content: Config.string().required(),
-
-	/**
-	 * Default language id.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentsEditor
-	 * @review
-	 * @type {!string}
-	 */
-	defaultLanguageId: Config.string().required(),
-
-	/**
-	 * Default segment id.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentsEditor
-	 * @review
-	 * @type {!string}
-	 */
-	defaultSegmentId: Config.string().required(),
+	content: Config
+		.string()
+		.required(),
 
 	/**
 	 * Editable ID
@@ -526,7 +648,9 @@ FragmentEditableField.STATE = {
 	 * @review
 	 * @type {!string}
 	 */
-	editableId: Config.string().required(),
+	editableId: Config
+		.string()
+		.required(),
 
 	/**
 	 * Editable values
@@ -536,7 +660,9 @@ FragmentEditableField.STATE = {
 	 * @review
 	 * @type {!object}
 	 */
-	editableValues: Config.object().required(),
+	editableValues: Config
+		.object()
+		.required(),
 
 	/**
 	 * FragmentEntryLink id
@@ -546,37 +672,9 @@ FragmentEditableField.STATE = {
 	 * @review
 	 * @type {!string}
 	 */
-	fragmentEntryLinkId: Config.string().required(),
-
-	/**
-	 * Currently selected language id.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentsEditor
-	 * @review
-	 * @type {!string}
-	 */
-	languageId: Config.string().required(),
-
-	/**
-	 * Currently selected segment id.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentsEditor
-	 * @review
-	 * @type {!string}
-	 */
-	segmentId: Config.string(),
-
-	/**
-	 * Portlet namespace
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentEditableField
-	 * @review
-	 * @type {!string}
-	 */
-	portletNamespace: Config.string().required(),
+	fragmentEntryLinkId: Config
+		.string()
+		.required(),
 
 	/**
 	 * Set of options that are sent to the processors.
@@ -586,7 +684,9 @@ FragmentEditableField.STATE = {
 	 * @review
 	 * @type {!object}
 	 */
-	processorsOptions: Config.object().required(),
+	processorsOptions: Config
+		.object()
+		.required(),
 
 	/**
 	 * Editable type
@@ -596,27 +696,19 @@ FragmentEditableField.STATE = {
 	 * @review
 	 * @type {!string}
 	 */
-	type: Config.string().required(),
+	type: Config.oneOf(['html', 'image', 'link', 'rich-text', 'text']).required(),
 
 	/**
-	 * True if mapping is activated
-	 * @default undefined
+	 * Internal FloatingToolbar instance.
+	 * @default null
 	 * @instance
 	 * @memberOf FragmentEditableField
 	 * @review
-	 * @type {!boolean}
+	 * @type {object|null}
 	 */
-	showMapping: Config.bool().required(),
-
-	/**
-	 * Store instance
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentEditableField
-	 * @review
-	 * @type {Store}
-	 */
-	store: Config.instanceOf(Store),
+	_floatingToolbar: Config
+		.internal()
+		.value(null),
 
 	/**
 	 * Flag indicating if the editable editor is active.
@@ -633,6 +725,42 @@ FragmentEditableField.STATE = {
 		.value(false),
 
 	/**
+	 * Translated label of the mapped field
+	 * @instance
+	 * @memberOf FragmentEditableField
+	 * @private
+	 * @review
+	 * @type {string}
+	 */
+	_mappedFieldLabel: Config
+		.internal()
+		.string(),
+
+	/**
+	 * Mapped asset field value
+	 * @instance
+	 * @memberOf FragmentEditableField
+	 * @private
+	 * @review
+	 * @type {string}
+	 */
+	_mappedFieldValue: Config
+		.internal()
+		.string(),
+
+	/**
+	 * Prevent editable click effect
+	 * @instance
+	 * @memberOf FragmentEditableField
+	 * @private
+	 * @review
+	 * @type {boolean}
+	 */
+	_preventEditableClick: Config
+		.bool()
+		.value(),
+
+	/**
 	 * Id of the timeout to save changes
 	 * @default undefined
 	 * @instance
@@ -642,80 +770,6 @@ FragmentEditableField.STATE = {
 	 */
 
 	_saveChangesTimeout: Config.number().internal(),
-
-	/**
-	 * Flag indicating if the editable editor should be enabled.
-	 * @default false
-	 * @instance
-	 * @memberOf FragmentEditableField
-	 * @private
-	 * @review
-	 * @type {boolean}
-	 */
-	_showEditor: Config
-		.internal()
-		.bool()
-		.value(false),
-
-	/**
-	 * Flag indicating if the click tooltip should be visible.
-	 * @default false
-	 * @instance
-	 * @memberOf FragmentEditableField
-	 * @private
-	 * @review
-	 * @type {boolean}
-	 */
-	_showTooltip: Config
-		.internal()
-		.bool()
-		.value(false),
-
-	/**
-	 * Reference element used for aligning the tooltip
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentEditableField
-	 * @review
-	 * @type {HTMLElement}
-	 */
-	_tooltipAlignElement: Config.internal().object(),
-
-	/**
-	 * List of buttons rendered inside the tooltip
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentEditableField
-	 * @review
-	 * @type {Array<{
-	 *   id: !string,
-	 *   label: !string
-	 * }>}
-	 */
-	_tooltipButtons: Config
-		.internal()
-		.arrayOf(
-			Config.shapeOf(
-				{
-					id: Config.string().required(),
-					label: Config.string().required()
-				}
-			)
-		),
-
-	/**
-	 * Label shown inside editable's tooltip instead of action buttons
-	 * @default ''
-	 * @instance
-	 * @memberOf FragmentEditableField
-	 * @private
-	 * @review
-	 * @type {string}
-	 */
-	_tooltipLabel: Config
-		.internal()
-		.string()
-		.value(''),
 
 	/**
 	 * Flag indicating if there are unsaved changes
@@ -736,7 +790,21 @@ const ConnectedFragmentEditableField = getConnectedComponent(
 	FragmentEditableField,
 	[
 		'activeItemId',
-		'activeItemType'
+		'activeItemType',
+		'defaultLanguageId',
+		'defaultSegmentsExperienceId',
+		'fragmentEditorClear',
+		'fragmentEditorEnabled',
+		'getAssetFieldValueURL',
+		'getAssetMappingFieldsURL',
+		'hoveredItemId',
+		'hoveredItemType',
+		'languageId',
+		'layoutData',
+		'mappingFieldsURL',
+		'portletNamespace',
+		'segmentsExperienceId',
+		'selectedMappingTypes'
 	]
 );
 

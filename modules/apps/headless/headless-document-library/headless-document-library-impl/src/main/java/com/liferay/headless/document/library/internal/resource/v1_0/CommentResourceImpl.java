@@ -16,19 +16,20 @@ package com.liferay.headless.document.library.internal.resource.v1_0;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLFileEntryService;
+import com.liferay.headless.common.spi.resource.SPICommentResource;
 import com.liferay.headless.document.library.dto.v1_0.Comment;
 import com.liferay.headless.document.library.internal.dto.v1_0.util.CommentUtil;
 import com.liferay.headless.document.library.resource.v1_0.CommentResource;
 import com.liferay.portal.kernel.comment.CommentManager;
-import com.liferay.portal.kernel.comment.DiscussionPermission;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.util.Collections;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -41,49 +42,101 @@ import org.osgi.service.component.annotations.ServiceScope;
 	properties = "OSGI-INF/liferay/rest/v1_0/comment.properties",
 	scope = ServiceScope.PROTOTYPE, service = CommentResource.class
 )
-public class CommentResourceImpl extends BaseCommentResourceImpl {
+public class CommentResourceImpl
+	extends BaseCommentResourceImpl implements EntityModelResource {
+
+	@Override
+	public void deleteComment(Long commentId) throws Exception {
+		SPICommentResource<Comment> spiCommentResource =
+			_getSPICommentResource();
+
+		spiCommentResource.deleteComment(commentId);
+	}
+
+	@Override
+	public Comment getComment(Long commentId) throws Exception {
+		SPICommentResource<Comment> spiCommentResource =
+			_getSPICommentResource();
+
+		return spiCommentResource.getComment(commentId);
+	}
+
+	@Override
+	public Page<Comment> getCommentCommentsPage(
+			Long commentId, String search, Filter filter, Pagination pagination,
+			Sort[] sorts)
+		throws Exception {
+
+		SPICommentResource<Comment> spiCommentResource =
+			_getSPICommentResource();
+
+		return spiCommentResource.getCommentCommentsPage(
+			commentId, search, filter, pagination, sorts);
+	}
 
 	@Override
 	public Page<Comment> getDocumentCommentsPage(
-			Long fileEntryId, Pagination pagination)
+			Long documentId, String search, Filter filter,
+			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
-		DLFileEntry dlFileEntry = _dlFileEntryService.getFileEntry(fileEntryId);
+		SPICommentResource<Comment> spiCommentResource =
+			_getSPICommentResource();
 
-		int count = _commentManager.getRootCommentsCount(
-			dlFileEntry.getModelClassName(), fileEntryId,
-			WorkflowConstants.STATUS_APPROVED);
+		DLFileEntry dlFileEntry = _dlFileEntryService.getFileEntry(documentId);
 
-		if (count == 0) {
-			return Page.of(Collections.emptyList());
-		}
-
-		_checkViewPermission(
-			dlFileEntry.getGroupId(), dlFileEntry.getModelClassName(),
-			fileEntryId);
-
-		return Page.of(
-			transform(
-				_commentManager.getRootComments(
-					dlFileEntry.getModelClassName(), fileEntryId,
-					WorkflowConstants.STATUS_APPROVED,
-					pagination.getStartPosition(), pagination.getEndPosition()),
-				comment -> CommentUtil.toComment(comment, _portal)),
-			pagination, count);
+		return spiCommentResource.getEntityCommentsPage(
+			dlFileEntry.getGroupId(), documentId, search, filter, pagination,
+			sorts);
 	}
 
-	private void _checkViewPermission(
-			long groupId, String className, long classPK)
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
+		SPICommentResource<Comment> spiCommentResource =
+			_getSPICommentResource();
+
+		return spiCommentResource.getEntityModel(multivaluedMap);
+	}
+
+	@Override
+	public Comment postCommentComment(Long parentCommentId, Comment comment)
 		throws Exception {
 
-		PermissionChecker permissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
+		SPICommentResource<Comment> spiCommentResource =
+			_getSPICommentResource();
 
-		DiscussionPermission discussionPermission =
-			_commentManager.getDiscussionPermission(permissionChecker);
+		return spiCommentResource.postCommentComment(
+			parentCommentId, comment.getText());
+	}
 
-		discussionPermission.checkViewPermission(
-			permissionChecker.getCompanyId(), groupId, className, classPK);
+	@Override
+	public Comment postDocumentComment(Long documentId, Comment comment)
+		throws Exception {
+
+		SPICommentResource<Comment> spiCommentResource =
+			_getSPICommentResource();
+
+		DLFileEntry fileEntry = _dlFileEntryService.getFileEntry(documentId);
+
+		return spiCommentResource.postEntityComment(
+			fileEntry.getGroupId(), documentId, comment.getText());
+	}
+
+	@Override
+	public Comment putComment(Long commentId, Comment comment)
+		throws Exception {
+
+		SPICommentResource<Comment> spiCommentResource =
+			_getSPICommentResource();
+
+		return spiCommentResource.putComment(commentId, comment.getText());
+	}
+
+	private SPICommentResource<Comment> _getSPICommentResource() {
+		return new SPICommentResource<>(
+			DLFileEntry.class.getName(), _commentManager, contextCompany,
+			comment -> CommentUtil.toComment(
+				comment, _commentManager, _portal));
 	}
 
 	@Reference

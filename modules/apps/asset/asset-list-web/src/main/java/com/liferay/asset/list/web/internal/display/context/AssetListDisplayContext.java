@@ -25,6 +25,7 @@ import com.liferay.asset.list.util.AssetListPortletUtil;
 import com.liferay.asset.list.web.internal.security.permission.resource.AssetListPermission;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -38,9 +39,9 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.segments.constants.SegmentsConstants;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
@@ -72,12 +73,12 @@ public class AssetListDisplayContext {
 		return new DropdownItemList() {
 			{
 				add(
-					_getAddAssetListEntryDropdownItem(
+					_getAddAssetListEntryDropdownItemUnsafeConsumer(
 						AssetListEntryTypeConstants.TYPE_MANUAL_LABEL,
 						"manual-selection",
 						AssetListEntryTypeConstants.TYPE_MANUAL));
 				add(
-					_getAddAssetListEntryDropdownItem(
+					_getAddAssetListEntryDropdownItemUnsafeConsumer(
 						AssetListEntryTypeConstants.TYPE_DYNAMIC_LABEL,
 						"dynamic-selection",
 						AssetListEntryTypeConstants.TYPE_DYNAMIC));
@@ -96,11 +97,13 @@ public class AssetListDisplayContext {
 
 		AssetListEntry assetListEntry = getAssetListEntry();
 
-		List<AssetEntry> assetEntries = assetListEntry.getAssetEntries();
+		List<AssetEntry> assetEntries = assetListEntry.getAssetEntries(
+			getSegmentsEntryId());
 
 		searchContainer.setResults(assetEntries);
 
-		int totalCount = assetListEntry.getAssetEntriesCount();
+		int totalCount = assetListEntry.getAssetEntriesCount(
+			getSegmentsEntryId());
 
 		searchContainer.setTotal(totalCount);
 
@@ -128,7 +131,7 @@ public class AssetListDisplayContext {
 
 		SearchContainer assetListEntriesSearchContainer = new SearchContainer(
 			_renderRequest, _renderResponse.createRenderURL(), null,
-			"there-are-no-asset-lists");
+			"there-are-no-content-sets");
 
 		assetListEntriesSearchContainer.setRowChecker(
 			new EmptyOnClickRowChecker(_renderResponse));
@@ -206,12 +209,12 @@ public class AssetListDisplayContext {
 		if (getAssetListEntryType() ==
 				AssetListEntryTypeConstants.TYPE_DYNAMIC) {
 
-			title = "new-dynamic-asset-list";
+			title = "new-dynamic-content-set";
 		}
 		else if (getAssetListEntryType() ==
 					AssetListEntryTypeConstants.TYPE_MANUAL) {
 
-			title = "new-manual-asset-list";
+			title = "new-manual-content-set";
 		}
 
 		return LanguageUtil.get(_request, title);
@@ -317,6 +320,18 @@ public class AssetListDisplayContext {
 		return portletURL;
 	}
 
+	public long getSegmentsEntryId() {
+		if (_segmentsEntryId != null) {
+			return _segmentsEntryId;
+		}
+
+		_segmentsEntryId = ParamUtil.getLong(
+			_request, "segmentsEntryId",
+			SegmentsConstants.SEGMENTS_ENTRY_ID_DEFAULT);
+
+		return _segmentsEntryId;
+	}
+
 	public boolean isShowAddAssetListEntryAction() {
 		return AssetListPermission.contains(
 			_themeDisplay.getPermissionChecker(),
@@ -324,8 +339,9 @@ public class AssetListDisplayContext {
 			AssetListActionKeys.ADD_ASSET_LIST_ENTRY);
 	}
 
-	private Consumer<DropdownItem> _getAddAssetListEntryDropdownItem(
-		String title, String label, int type) {
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getAddAssetListEntryDropdownItemUnsafeConsumer(
+			String title, String label, int type) {
 
 		return dropdownItem -> {
 			dropdownItem.putData("action", "addAssetListEntry");
@@ -348,7 +364,7 @@ public class AssetListDisplayContext {
 	}
 
 	private String _getAddAssetListTitle(String title) {
-		return LanguageUtil.format(_request, "add-x-asset-list", title, true);
+		return LanguageUtil.format(_request, "add-x-content-set", title, true);
 	}
 
 	private String _getKeywords() {
@@ -393,6 +409,7 @@ public class AssetListDisplayContext {
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private final HttpServletRequest _request;
+	private Long _segmentsEntryId;
 	private final ThemeDisplay _themeDisplay;
 
 }

@@ -32,8 +32,9 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTransitionLocalServiceUtil
  * @generated
  */
 @ProviderType
-public abstract class KaleoTransitionBaseImpl extends KaleoTransitionModelImpl
-	implements KaleoTransition {
+public abstract class KaleoTransitionBaseImpl
+	extends KaleoTransitionModelImpl implements KaleoTransition {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class KaleoTransitionBaseImpl extends KaleoTransitionModelImpl
 			KaleoTransitionLocalServiceUtil.updateKaleoTransition(this);
 		}
 	}
+
 }

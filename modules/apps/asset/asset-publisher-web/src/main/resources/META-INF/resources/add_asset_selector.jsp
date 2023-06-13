@@ -16,6 +16,16 @@
 
 <%@ include file="/init.jsp" %>
 
+<%
+String redirect = ParamUtil.getString(request, "redirect");
+
+if (Validator.isNull(redirect)) {
+	PortletURL portletURL = renderResponse.createRenderURL();
+
+	redirect = portletURL.toString();
+}
+%>
+
 <div class="container-fluid-1280">
 	<aui:fieldset-group markupView="lexicon">
 		<aui:fieldset>
@@ -89,6 +99,8 @@
 
 	<aui:button-row>
 		<aui:button onClick='<%= renderResponse.getNamespace() + "addAssetEntry();" %>' primary="<%= true %>" value="add" />
+
+		<aui:button href="<%= redirect %>" type="cancel" />
 	</aui:button-row>
 </div>
 
@@ -107,9 +119,6 @@
 		var title = selectedOption.attr('data-title');
 		var url = selectedOption.attr('data-url');
 
-		var dialog = Liferay.Util.getWindow();
-
-		dialog.iframe.set('uri', url);
-		dialog.titleNode.html(title);
+		Liferay.Util.navigate(url);
 	}
 </aui:script>

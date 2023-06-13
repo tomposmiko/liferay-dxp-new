@@ -19,8 +19,21 @@
 <%
 AssetRenderer<?> assetRenderer = (AssetRenderer<?>)request.getAttribute(WebKeys.ASSET_RENDERER);
 int abstractLength = GetterUtil.getInteger(request.getAttribute(WebKeys.ASSET_ENTRY_ABSTRACT_LENGTH));
-
-String summary = StringUtil.shorten(assetRenderer.getSummary(renderRequest, renderResponse), abstractLength);
 %>
 
-<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(summary)) %>
+<div class="asset-summary">
+
+	<%
+	String imagePreviewURL = assetRenderer.getURLImagePreview(renderRequest);
+	%>
+
+	<c:if test="<%= Validator.isNotNull(imagePreviewURL) %>">
+		<div class="aspect-ratio aspect-ratio-8-to-3 aspect-ratio-bg-cover cover-image mb-3" style="background-image: url(<%= imagePreviewURL %>)"></div>
+	</c:if>
+
+	<%
+	String summary = StringUtil.shorten(assetRenderer.getSummary(renderRequest, renderResponse), abstractLength);
+	%>
+
+	<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(summary)) %>
+</div>

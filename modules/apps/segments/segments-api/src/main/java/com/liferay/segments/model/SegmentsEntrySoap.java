@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class SegmentsEntrySoap implements Serializable {
+
 	public static SegmentsEntrySoap toSoapModel(SegmentsEntry model) {
 		SegmentsEntrySoap soapModel = new SegmentsEntrySoap();
 
@@ -79,7 +80,8 @@ public class SegmentsEntrySoap implements Serializable {
 	}
 
 	public static SegmentsEntrySoap[] toSoapModels(List<SegmentsEntry> models) {
-		List<SegmentsEntrySoap> soapModels = new ArrayList<SegmentsEntrySoap>(models.size());
+		List<SegmentsEntrySoap> soapModels = new ArrayList<SegmentsEntrySoap>(
+			models.size());
 
 		for (SegmentsEntry model : models) {
 			soapModels.add(toSoapModel(model));
@@ -229,4 +231,5 @@ public class SegmentsEntrySoap implements Serializable {
 	private String _key;
 	private String _source;
 	private String _type;
+
 }

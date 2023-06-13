@@ -470,6 +470,7 @@ public class PortalImpl implements Portal {
 
 		// Portal layout
 
+		_reservedParams.add("p_l_back_url");
 		_reservedParams.add("p_l_id");
 		_reservedParams.add("p_l_mode");
 		_reservedParams.add("p_l_reset");
@@ -907,6 +908,21 @@ public class PortalImpl implements Portal {
 
 				String[] values = actionRequest.getParameterValues(param);
 
+				if (values == null) {
+					values = new String[0];
+				}
+				else {
+					values = ArrayUtil.filter(
+						values,
+						s -> {
+							if (s == null) {
+								return false;
+							}
+
+							return true;
+						});
+				}
+
 				actionResponse.setRenderParameter(param, values);
 			}
 		}
@@ -1122,20 +1138,18 @@ public class PortalImpl implements Portal {
 
 			long companyId = PortalInstances.getCompanyId(request);
 
-			Collection<FriendlyURLResolver> friendlyURLResolvers =
-				FriendlyURLResolverRegistryUtil.
-					getFriendlyURLResolversAsCollection();
+			for (String urlSeparator :
+					FriendlyURLResolverRegistryUtil.getURLSeparators()) {
 
-			for (FriendlyURLResolver friendlyURLResolver :
-					friendlyURLResolvers) {
-
-				if (!friendlyURL.startsWith(
-						friendlyURLResolver.getURLSeparator())) {
-
+				if (!friendlyURL.startsWith(urlSeparator)) {
 					continue;
 				}
 
 				try {
+					FriendlyURLResolver friendlyURLResolver =
+						FriendlyURLResolverRegistryUtil.getFriendlyURLResolver(
+							urlSeparator);
+
 					actualURL = friendlyURLResolver.getActualURL(
 						companyId, groupId, privateLayout, mainPath,
 						friendlyURL, params, requestContext);
@@ -3016,20 +3030,18 @@ public class PortalImpl implements Portal {
 
 			long companyId = PortalInstances.getCompanyId(request);
 
-			Collection<FriendlyURLResolver> friendlyURLResolvers =
-				FriendlyURLResolverRegistryUtil.
-					getFriendlyURLResolversAsCollection();
+			for (String urlSeparator :
+					FriendlyURLResolverRegistryUtil.getURLSeparators()) {
 
-			for (FriendlyURLResolver friendlyURLResolver :
-					friendlyURLResolvers) {
-
-				if (!friendlyURL.startsWith(
-						friendlyURLResolver.getURLSeparator())) {
-
+				if (!friendlyURL.startsWith(urlSeparator)) {
 					continue;
 				}
 
 				try {
+					FriendlyURLResolver friendlyURLResolver =
+						FriendlyURLResolverRegistryUtil.getFriendlyURLResolver(
+							urlSeparator);
+
 					layoutFriendlyURLSeparatorComposite =
 						friendlyURLResolver.
 							getLayoutFriendlyURLSeparatorComposite(
@@ -7954,22 +7966,24 @@ public class PortalImpl implements Portal {
 			return 0;
 		}
 
-		long doAsUserId = 0;
+		long doAsUserId = GetterUtil.getLong(doAsUserIdString);
 
-		try {
-			Company company = getCompany(request);
+		if (doAsUserId == 0) {
+			try {
+				Company company = getCompany(request);
 
-			doAsUserId = GetterUtil.getLong(
-				Encryptor.decrypt(company.getKeyObj(), doAsUserIdString));
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to impersonate " + doAsUserIdString +
-						" because the string cannot be decrypted");
+				doAsUserId = GetterUtil.getLong(
+					Encryptor.decrypt(company.getKeyObj(), doAsUserIdString));
 			}
+			catch (Exception e) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Unable to impersonate " + doAsUserIdString +
+							" because the string cannot be decrypted");
+				}
 
-			return 0;
+				return 0;
+			}
 		}
 
 		if (_log.isDebugEnabled()) {

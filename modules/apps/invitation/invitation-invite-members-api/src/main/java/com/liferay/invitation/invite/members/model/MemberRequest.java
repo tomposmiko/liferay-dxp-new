@@ -27,16 +27,20 @@ import com.liferay.portal.kernel.util.Accessor;
  * @see MemberRequestModel
  * @generated
  */
-@ImplementationClassName("com.liferay.invitation.invite.members.model.impl.MemberRequestImpl")
+@ImplementationClassName(
+	"com.liferay.invitation.invite.members.model.impl.MemberRequestImpl"
+)
 @ProviderType
 public interface MemberRequest extends MemberRequestModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.invitation.invite.members.model.impl.MemberRequestImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<MemberRequest, Long> MEMBER_REQUEST_ID_ACCESSOR =
-		new Accessor<MemberRequest, Long>() {
+	public static final Accessor<MemberRequest, Long>
+		MEMBER_REQUEST_ID_ACCESSOR = new Accessor<MemberRequest, Long>() {
+
 			@Override
 			public Long get(MemberRequest memberRequest) {
 				return memberRequest.getMemberRequestId();
@@ -51,5 +55,7 @@ public interface MemberRequest extends MemberRequestModel, PersistedModel {
 			public Class<MemberRequest> getTypeClass() {
 				return MemberRequest.class;
 			}
+
 		};
+
 }

@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class WikiPageSoap implements Serializable {
+
 	public static WikiPageSoap toSoapModel(WikiPage model) {
 		WikiPageSoap soapModel = new WikiPageSoap();
 
@@ -89,7 +90,8 @@ public class WikiPageSoap implements Serializable {
 	}
 
 	public static WikiPageSoap[] toSoapModels(List<WikiPage> models) {
-		List<WikiPageSoap> soapModels = new ArrayList<WikiPageSoap>(models.size());
+		List<WikiPageSoap> soapModels = new ArrayList<WikiPageSoap>(
+			models.size());
 
 		for (WikiPage model : models) {
 			soapModels.add(toSoapModel(model));
@@ -333,4 +335,5 @@ public class WikiPageSoap implements Serializable {
 	private long _statusByUserId;
 	private String _statusByUserName;
 	private Date _statusDate;
+
 }

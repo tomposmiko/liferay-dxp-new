@@ -19,17 +19,13 @@ import com.liferay.asset.kernel.exception.DuplicateTagException;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetTagService;
 import com.liferay.headless.foundation.dto.v1_0.Keyword;
-import com.liferay.headless.foundation.internal.dto.v1_0.KeywordImpl;
 import com.liferay.headless.foundation.internal.dto.v1_0.util.CreatorUtil;
 import com.liferay.headless.foundation.internal.odata.entity.v1_0.KeywordEntityModel;
 import com.liferay.headless.foundation.resource.v1_0.KeywordResource;
-import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.IndexerRegistry;
-import com.liferay.portal.kernel.search.SearchResultPermissionFilterFactory;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -40,10 +36,8 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
@@ -55,50 +49,36 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/keyword.properties",
-	scope = ServiceScope.PROTOTYPE,
-	service = {EntityModelResource.class, KeywordResource.class}
+	scope = ServiceScope.PROTOTYPE, service = KeywordResource.class
 )
 public class KeywordResourceImpl
 	extends BaseKeywordResourceImpl implements EntityModelResource {
 
 	@Override
-	public boolean deleteKeyword(Long keywordId) throws Exception {
+	public void deleteKeyword(Long keywordId) throws Exception {
 		_assetTagService.deleteTag(keywordId);
-
-		return true;
 	}
 
 	@Override
 	public Page<Keyword> getContentSpaceKeywordsPage(
-			Long contentSpaceId, Filter filter, Pagination pagination,
-			Sort[] sorts)
+			Long contentSpaceId, String search, Filter filter,
+			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
-		List<AssetTag> assetTags = new ArrayList<>();
-
-		Hits hits = SearchUtil.getHits(
-			filter, _indexerRegistry.nullSafeGetIndexer(AssetTag.class),
-			pagination,
+		return SearchUtil.search(
 			booleanQuery -> {
 			},
+			filter, AssetTag.class, search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
-				Field.ASSET_TAG_IDS),
+				Field.ENTRY_CLASS_PK),
 			searchContext -> {
 				searchContext.setCompanyId(contextCompany.getCompanyId());
 				searchContext.setGroupIds(new long[] {contentSpaceId});
 			},
-			_searchResultPermissionFilterFactory, sorts);
-
-		for (Document document : hits.getDocs()) {
-			AssetTag assetTag = _assetTagService.getTag(
-				GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)));
-
-			assetTags.add(assetTag);
-		}
-
-		return Page.of(
-			transform(assetTags, this::_toKeyword), pagination,
-			assetTags.size());
+			document -> _toKeyword(
+				_assetTagService.getTag(
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))),
+			sorts);
 	}
 
 	@Override
@@ -115,16 +95,17 @@ public class KeywordResourceImpl
 	public Keyword postContentSpaceKeyword(Long contentSpaceId, Keyword keyword)
 		throws Exception {
 
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setAddGroupPermissions(true);
-		serviceContext.setAddGuestPermissions(true);
-		serviceContext.setScopeGroupId(contentSpaceId);
-
 		try {
 			return _toKeyword(
 				_assetTagService.addTag(
-					contentSpaceId, keyword.getName(), serviceContext));
+					contentSpaceId, keyword.getName(),
+					new ServiceContext() {
+						{
+							setAddGroupPermissions(true);
+							setAddGuestPermissions(true);
+							setScopeGroupId(contentSpaceId);
+						}
+					}));
 		}
 		catch (AssetTagNameException atne) {
 			throw new ClientErrorException(
@@ -134,6 +115,10 @@ public class KeywordResourceImpl
 			throw new ClientErrorException(
 				"A tag with the name " + keyword.getName() + " already exists",
 				422, dte);
+		}
+		catch (PrincipalException.MustHavePermission mh) {
+			throw new ForbiddenException(
+				"You do not have permissions to create a keyword", mh);
 		}
 	}
 
@@ -154,20 +139,35 @@ public class KeywordResourceImpl
 				"A tag with the name " + keyword.getName() + " already exists",
 				422, dte);
 		}
+		catch (PrincipalException.MustHavePermission mh) {
+			throw new ForbiddenException(
+				"You do not have permissions to update keyword: " +
+					keyword.getName(),
+				mh);
+		}
 	}
 
 	private Keyword _toKeyword(AssetTag assetTag) throws Exception {
-		return new KeywordImpl() {
+		return new Keyword() {
 			{
-				contentSpace = assetTag.getGroupId();
-				creator = CreatorUtil.toCreator(
-					_portal,
-					_userLocalService.getUserById(assetTag.getUserId()));
+				contentSpaceId = assetTag.getGroupId();
 				dateCreated = assetTag.getCreateDate();
 				dateModified = assetTag.getModifiedDate();
 				id = assetTag.getTagId();
 				keywordUsageCount = assetTag.getAssetCount();
 				name = assetTag.getName();
+
+				setCreator(
+					() -> {
+						if (assetTag.getUserId() != 0) {
+							return CreatorUtil.toCreator(
+								_portal,
+								_userLocalService.getUserById(
+									assetTag.getUserId()));
+						}
+
+						return null;
+					});
 			}
 		};
 	}
@@ -178,14 +178,7 @@ public class KeywordResourceImpl
 	private AssetTagService _assetTagService;
 
 	@Reference
-	private IndexerRegistry _indexerRegistry;
-
-	@Reference
 	private Portal _portal;
-
-	@Reference
-	private SearchResultPermissionFilterFactory
-		_searchResultPermissionFilterFactory;
 
 	@Reference
 	private UserLocalService _userLocalService;

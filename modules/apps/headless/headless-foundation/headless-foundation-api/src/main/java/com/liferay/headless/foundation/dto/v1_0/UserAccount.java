@@ -14,186 +14,916 @@
 
 package com.liferay.headless.foundation.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.validation.constraints.NotEmpty;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface UserAccount {
+@GraphQLName("UserAccount")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "UserAccount")
+public class UserAccount {
 
-	public String getAdditionalName();
+	public String getAdditionalName() {
+		return additionalName;
+	}
 
+	public void setAdditionalName(String additionalName) {
+		this.additionalName = additionalName;
+	}
+
+	@JsonIgnore
 	public void setAdditionalName(
-			String additionalName);
+		UnsafeSupplier<String, Exception> additionalNameUnsafeSupplier) {
 
-	public void setAdditionalName(
-			UnsafeSupplier<String, Throwable>
-				additionalNameUnsafeSupplier);
-	public String getAlternateName();
+		try {
+			additionalName = additionalNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String additionalName;
+
+	public String getAlternateName() {
+		return alternateName;
+	}
+
+	public void setAlternateName(String alternateName) {
+		this.alternateName = alternateName;
+	}
+
+	@JsonIgnore
 	public void setAlternateName(
-			String alternateName);
+		UnsafeSupplier<String, Exception> alternateNameUnsafeSupplier) {
 
-	public void setAlternateName(
-			UnsafeSupplier<String, Throwable>
-				alternateNameUnsafeSupplier);
-	public Date getBirthDate();
+		try {
+			alternateName = alternateNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String alternateName;
+
+	public Date getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	@JsonIgnore
 	public void setBirthDate(
-			Date birthDate);
+		UnsafeSupplier<Date, Exception> birthDateUnsafeSupplier) {
 
-	public void setBirthDate(
-			UnsafeSupplier<Date, Throwable>
-				birthDateUnsafeSupplier);
-	public ContactInformation getContactInformation();
+		try {
+			birthDate = birthDateUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Date birthDate;
+
+	@Schema(description = "https://www.schema.org/ContactInformation")
+	public ContactInformation getContactInformation() {
+		return contactInformation;
+	}
+
+	public void setContactInformation(ContactInformation contactInformation) {
+		this.contactInformation = contactInformation;
+	}
+
+	@JsonIgnore
 	public void setContactInformation(
-			ContactInformation contactInformation);
+		UnsafeSupplier<ContactInformation, Exception>
+			contactInformationUnsafeSupplier) {
 
-	public void setContactInformation(
-			UnsafeSupplier<ContactInformation, Throwable>
-				contactInformationUnsafeSupplier);
-	public String getDashboardURL();
+		try {
+			contactInformation = contactInformationUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected ContactInformation contactInformation;
+
+	public String getDashboardURL() {
+		return dashboardURL;
+	}
+
+	public void setDashboardURL(String dashboardURL) {
+		this.dashboardURL = dashboardURL;
+	}
+
+	@JsonIgnore
 	public void setDashboardURL(
-			String dashboardURL);
+		UnsafeSupplier<String, Exception> dashboardURLUnsafeSupplier) {
 
-	public void setDashboardURL(
-			UnsafeSupplier<String, Throwable>
-				dashboardURLUnsafeSupplier);
-	public String getEmail();
+		try {
+			dashboardURL = dashboardURLUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String dashboardURL;
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	@JsonIgnore
 	public void setEmail(
-			String email);
+		UnsafeSupplier<String, Exception> emailUnsafeSupplier) {
 
-	public void setEmail(
-			UnsafeSupplier<String, Throwable>
-				emailUnsafeSupplier);
-	public String getFamilyName();
+		try {
+			email = emailUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@NotEmpty
+	protected String email;
+
+	public String getFamilyName() {
+		return familyName;
+	}
+
+	public void setFamilyName(String familyName) {
+		this.familyName = familyName;
+	}
+
+	@JsonIgnore
 	public void setFamilyName(
-			String familyName);
+		UnsafeSupplier<String, Exception> familyNameUnsafeSupplier) {
 
-	public void setFamilyName(
-			UnsafeSupplier<String, Throwable>
-				familyNameUnsafeSupplier);
-	public String getGivenName();
+		try {
+			familyName = familyNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@NotEmpty
+	protected String familyName;
+
+	public String getGivenName() {
+		return givenName;
+	}
+
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
+	}
+
+	@JsonIgnore
 	public void setGivenName(
-			String givenName);
+		UnsafeSupplier<String, Exception> givenNameUnsafeSupplier) {
 
-	public void setGivenName(
-			UnsafeSupplier<String, Throwable>
-				givenNameUnsafeSupplier);
-	public String getHonorificPrefix();
+		try {
+			givenName = givenNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@NotEmpty
+	protected String givenName;
+
+	public String getHonorificPrefix() {
+		return honorificPrefix;
+	}
+
+	public void setHonorificPrefix(String honorificPrefix) {
+		this.honorificPrefix = honorificPrefix;
+	}
+
+	@JsonIgnore
 	public void setHonorificPrefix(
-			String honorificPrefix);
+		UnsafeSupplier<String, Exception> honorificPrefixUnsafeSupplier) {
 
-	public void setHonorificPrefix(
-			UnsafeSupplier<String, Throwable>
-				honorificPrefixUnsafeSupplier);
-	public String getHonorificSuffix();
+		try {
+			honorificPrefix = honorificPrefixUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String honorificPrefix;
+
+	public String getHonorificSuffix() {
+		return honorificSuffix;
+	}
+
+	public void setHonorificSuffix(String honorificSuffix) {
+		this.honorificSuffix = honorificSuffix;
+	}
+
+	@JsonIgnore
 	public void setHonorificSuffix(
-			String honorificSuffix);
+		UnsafeSupplier<String, Exception> honorificSuffixUnsafeSupplier) {
 
-	public void setHonorificSuffix(
-			UnsafeSupplier<String, Throwable>
-				honorificSuffixUnsafeSupplier);
-	public Long getId();
+		try {
+			honorificSuffix = honorificSuffixUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String honorificSuffix;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public String getImage();
+	public Long getId() {
+		return id;
+	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	@JsonIgnore
 	public void setImage(
-			String image);
+		UnsafeSupplier<String, Exception> imageUnsafeSupplier) {
 
-	public void setImage(
-			UnsafeSupplier<String, Throwable>
-				imageUnsafeSupplier);
-	public String getJobTitle();
+		try {
+			image = imageUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String image;
+
+	public String getJobTitle() {
+		return jobTitle;
+	}
+
+	public void setJobTitle(String jobTitle) {
+		this.jobTitle = jobTitle;
+	}
+
+	@JsonIgnore
 	public void setJobTitle(
-			String jobTitle);
+		UnsafeSupplier<String, Exception> jobTitleUnsafeSupplier) {
 
-	public void setJobTitle(
-			UnsafeSupplier<String, Throwable>
-				jobTitleUnsafeSupplier);
-	public Organization[] getMyOrganizations();
+		try {
+			jobTitle = jobTitleUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String jobTitle;
+
+	public String[] getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(String[] keywords) {
+		this.keywords = keywords;
+	}
+
+	@JsonIgnore
+	public void setKeywords(
+		UnsafeSupplier<String[], Exception> keywordsUnsafeSupplier) {
+
+		try {
+			keywords = keywordsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String[] keywords;
+
+	public Organization[] getMyOrganizations() {
+		return myOrganizations;
+	}
+
+	public void setMyOrganizations(Organization[] myOrganizations) {
+		this.myOrganizations = myOrganizations;
+	}
+
+	@JsonIgnore
 	public void setMyOrganizations(
-			Organization[] myOrganizations);
+		UnsafeSupplier<Organization[], Exception>
+			myOrganizationsUnsafeSupplier) {
 
-	public void setMyOrganizations(
-			UnsafeSupplier<Organization[], Throwable>
-				myOrganizationsUnsafeSupplier);
-	public Long[] getMyOrganizationsIds();
+		try {
+			myOrganizations = myOrganizationsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Organization[] myOrganizations;
+
+	public Long[] getMyOrganizationsIds() {
+		return myOrganizationsIds;
+	}
+
+	public void setMyOrganizationsIds(Long[] myOrganizationsIds) {
+		this.myOrganizationsIds = myOrganizationsIds;
+	}
+
+	@JsonIgnore
 	public void setMyOrganizationsIds(
-			Long[] myOrganizationsIds);
+		UnsafeSupplier<Long[], Exception> myOrganizationsIdsUnsafeSupplier) {
 
-	public void setMyOrganizationsIds(
-			UnsafeSupplier<Long[], Throwable>
-				myOrganizationsIdsUnsafeSupplier);
-	public String getName();
+		try {
+			myOrganizationsIds = myOrganizationsIdsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setName(
-			String name);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	protected Long[] myOrganizationsIds;
 
-	public void setName(
-			UnsafeSupplier<String, Throwable>
-				nameUnsafeSupplier);
-	public String getProfileURL();
+	public String getName() {
+		return name;
+	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@JsonIgnore
+	public void setName(UnsafeSupplier<String, Exception> nameUnsafeSupplier) {
+		try {
+			name = nameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String name;
+
+	public String getProfileURL() {
+		return profileURL;
+	}
+
+	public void setProfileURL(String profileURL) {
+		this.profileURL = profileURL;
+	}
+
+	@JsonIgnore
 	public void setProfileURL(
-			String profileURL);
+		UnsafeSupplier<String, Exception> profileURLUnsafeSupplier) {
 
-	public void setProfileURL(
-			UnsafeSupplier<String, Throwable>
-				profileURLUnsafeSupplier);
-	public Role[] getRoles();
+		try {
+			profileURL = profileURLUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String profileURL;
+
+	public Role[] getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Role[] roles) {
+		this.roles = roles;
+	}
+
+	@JsonIgnore
 	public void setRoles(
-			Role[] roles);
+		UnsafeSupplier<Role[], Exception> rolesUnsafeSupplier) {
 
-	public void setRoles(
-			UnsafeSupplier<Role[], Throwable>
-				rolesUnsafeSupplier);
-	public Long[] getRolesIds();
+		try {
+			roles = rolesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Role[] roles;
+
+	public Long[] getRolesIds() {
+		return rolesIds;
+	}
+
+	public void setRolesIds(Long[] rolesIds) {
+		this.rolesIds = rolesIds;
+	}
+
+	@JsonIgnore
 	public void setRolesIds(
-			Long[] rolesIds);
+		UnsafeSupplier<Long[], Exception> rolesIdsUnsafeSupplier) {
 
-	public void setRolesIds(
-			UnsafeSupplier<Long[], Throwable>
-				rolesIdsUnsafeSupplier);
-	public String[] getTasksAssignedToMe();
+		try {
+			rolesIds = rolesIdsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	protected Long[] rolesIds;
+
+	public String[] getTasksAssignedToMe() {
+		return tasksAssignedToMe;
+	}
+
+	public void setTasksAssignedToMe(String[] tasksAssignedToMe) {
+		this.tasksAssignedToMe = tasksAssignedToMe;
+	}
+
+	@JsonIgnore
 	public void setTasksAssignedToMe(
-			String[] tasksAssignedToMe);
+		UnsafeSupplier<String[], Exception> tasksAssignedToMeUnsafeSupplier) {
 
-	public void setTasksAssignedToMe(
-			UnsafeSupplier<String[], Throwable>
-				tasksAssignedToMeUnsafeSupplier);
-	public String[] getTasksAssignedToMyRoles();
+		try {
+			tasksAssignedToMe = tasksAssignedToMeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String[] tasksAssignedToMe;
+
+	public String[] getTasksAssignedToMyRoles() {
+		return tasksAssignedToMyRoles;
+	}
+
+	public void setTasksAssignedToMyRoles(String[] tasksAssignedToMyRoles) {
+		this.tasksAssignedToMyRoles = tasksAssignedToMyRoles;
+	}
+
+	@JsonIgnore
 	public void setTasksAssignedToMyRoles(
-			String[] tasksAssignedToMyRoles);
+		UnsafeSupplier<String[], Exception>
+			tasksAssignedToMyRolesUnsafeSupplier) {
 
-	public void setTasksAssignedToMyRoles(
-			UnsafeSupplier<String[], Throwable>
-				tasksAssignedToMyRolesUnsafeSupplier);
+		try {
+			tasksAssignedToMyRoles = tasksAssignedToMyRolesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String[] tasksAssignedToMyRoles;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof UserAccount)) {
+			return false;
+		}
+
+		UserAccount userAccount = (UserAccount)object;
+
+		return Objects.equals(toString(), userAccount.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"additionalName\": ");
+
+		sb.append("\"");
+		sb.append(additionalName);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"alternateName\": ");
+
+		sb.append("\"");
+		sb.append(alternateName);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"birthDate\": ");
+
+		sb.append("\"");
+		sb.append(birthDate);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"contactInformation\": ");
+
+		sb.append(contactInformation);
+		sb.append(", ");
+
+		sb.append("\"dashboardURL\": ");
+
+		sb.append("\"");
+		sb.append(dashboardURL);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"email\": ");
+
+		sb.append("\"");
+		sb.append(email);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"familyName\": ");
+
+		sb.append("\"");
+		sb.append(familyName);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"givenName\": ");
+
+		sb.append("\"");
+		sb.append(givenName);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"honorificPrefix\": ");
+
+		sb.append("\"");
+		sb.append(honorificPrefix);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"honorificSuffix\": ");
+
+		sb.append("\"");
+		sb.append(honorificSuffix);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"image\": ");
+
+		sb.append("\"");
+		sb.append(image);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"jobTitle\": ");
+
+		sb.append("\"");
+		sb.append(jobTitle);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"keywords\": ");
+
+		if (keywords == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < keywords.length; i++) {
+				sb.append("\"");
+				sb.append(keywords[i]);
+				sb.append("\"");
+
+				if ((i + 1) < keywords.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"myOrganizations\": ");
+
+		if (myOrganizations == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < myOrganizations.length; i++) {
+				sb.append(myOrganizations[i]);
+
+				if ((i + 1) < myOrganizations.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"myOrganizationsIds\": ");
+
+		if (myOrganizationsIds == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < myOrganizationsIds.length; i++) {
+				sb.append(myOrganizationsIds[i]);
+
+				if ((i + 1) < myOrganizationsIds.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"name\": ");
+
+		sb.append("\"");
+		sb.append(name);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"profileURL\": ");
+
+		sb.append("\"");
+		sb.append(profileURL);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"roles\": ");
+
+		if (roles == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < roles.length; i++) {
+				sb.append(roles[i]);
+
+				if ((i + 1) < roles.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"rolesIds\": ");
+
+		if (rolesIds == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < rolesIds.length; i++) {
+				sb.append(rolesIds[i]);
+
+				if ((i + 1) < rolesIds.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"tasksAssignedToMe\": ");
+
+		if (tasksAssignedToMe == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < tasksAssignedToMe.length; i++) {
+				sb.append("\"");
+				sb.append(tasksAssignedToMe[i]);
+				sb.append("\"");
+
+				if ((i + 1) < tasksAssignedToMe.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"tasksAssignedToMyRoles\": ");
+
+		if (tasksAssignedToMyRoles == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < tasksAssignedToMyRoles.length; i++) {
+				sb.append("\"");
+				sb.append(tasksAssignedToMyRoles[i]);
+				sb.append("\"");
+
+				if ((i + 1) < tasksAssignedToMyRoles.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

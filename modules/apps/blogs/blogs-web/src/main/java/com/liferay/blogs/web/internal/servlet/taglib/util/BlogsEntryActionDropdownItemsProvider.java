@@ -18,14 +18,11 @@ import com.liferay.blogs.constants.BlogsPortletKeys;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.web.internal.security.permission.resource.BlogsEntryPermission;
 import com.liferay.blogs.web.internal.util.BlogsEntryUtil;
-import com.liferay.exportimport.changeset.Changeset;
-import com.liferay.exportimport.changeset.ChangesetManager;
-import com.liferay.exportimport.changeset.ChangesetManagerUtil;
-import com.liferay.exportimport.changeset.constants.ChangesetPortletKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -34,7 +31,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
@@ -48,11 +44,9 @@ import com.liferay.trash.TrashHelper;
 
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionURL;
-import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -82,26 +76,26 @@ public class BlogsEntryActionDropdownItemsProvider {
 		return new DropdownItemList() {
 			{
 				if (_hasUpdatePermission()) {
-					add(_getEditEntryActionConsumer());
+					add(_getEditEntryActionUnsafeConsumer());
 				}
 
 				if (_hasPermissionsPermission()) {
-					add(_getPermissionsActionConsumer());
+					add(_getPermissionsActionUnsafeConsumer());
 				}
 
 				if (_hasDeletePermission()) {
 					if (_isTrashEnabled()) {
-						add(_getMoveEntryToTrashActionConsumer());
+						add(_getMoveEntryToTrashActionUnsafeConsumer());
 					}
 					else {
-						add(_getDeleteEntryActionConsumer());
+						add(_getDeleteEntryActionUnsafeConsumer());
 					}
 				}
 
 				if (_isShowPublishMenuItem() &&
 					_hasExportImportPortletInfoPermission()) {
 
-					add(_getPublishToLiveEntryActionConsumer());
+					add(_getPublishToLiveEntryActionUnsafeConsumer());
 				}
 			}
 		};
@@ -168,7 +162,9 @@ public class BlogsEntryActionDropdownItemsProvider {
 		}
 	}
 
-	private Consumer<DropdownItem> _getDeleteEntryActionConsumer() {
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getDeleteEntryActionUnsafeConsumer() {
+
 		ActionURL deleteURL = _renderResponse.createActionURL();
 
 		deleteURL.setParameter(ActionRequest.ACTION_NAME, "/blogs/edit_entry");
@@ -184,7 +180,9 @@ public class BlogsEntryActionDropdownItemsProvider {
 		};
 	}
 
-	private Consumer<DropdownItem> _getEditEntryActionConsumer() {
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getEditEntryActionUnsafeConsumer() {
+
 		return dropdownItem -> {
 			dropdownItem.setHref(
 				_renderResponse.createRenderURL(), "mvcRenderCommandName",
@@ -197,7 +195,9 @@ public class BlogsEntryActionDropdownItemsProvider {
 		};
 	}
 
-	private Consumer<DropdownItem> _getMoveEntryToTrashActionConsumer() {
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getMoveEntryToTrashActionUnsafeConsumer() {
+
 		ActionURL moveToTrashURL = _renderResponse.createActionURL();
 
 		moveToTrashURL.setParameter(
@@ -215,7 +215,9 @@ public class BlogsEntryActionDropdownItemsProvider {
 		};
 	}
 
-	private Consumer<DropdownItem> _getPermissionsActionConsumer() {
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getPermissionsActionUnsafeConsumer() {
+
 		return dropdownItem -> {
 			dropdownItem.putData("action", "permissions");
 			dropdownItem.putData("permissionsURL", _getPermissionsURL());
@@ -236,43 +238,22 @@ public class BlogsEntryActionDropdownItemsProvider {
 		}
 	}
 
-	private Consumer<DropdownItem> _getPublishToLiveEntryActionConsumer() {
-		StagedModelDataHandler<?> stagedModelDataHandler =
-			StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
-				BlogsEntry.class.getName());
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getPublishToLiveEntryActionUnsafeConsumer() {
 
-		Changeset.RawBuilder rawBuilder = Changeset.createRaw();
+		PortletURL publishEntryURL = _renderResponse.createActionURL();
 
-		Changeset changeset = rawBuilder.addStagedModel(
-			stagedModelDataHandler.fetchStagedModelByUuidAndGroupId(
-				_blogsEntry.getUuid(), _blogsEntry.getGroupId())
-		).build();
-
-		ChangesetManager changesetManager =
-			ChangesetManagerUtil.getChangesetManager();
-
-		changesetManager.addChangeset(changeset);
-
-		PortletURL portletURL = PortletURLFactoryUtil.create(
-			_request, ChangesetPortletKeys.CHANGESET,
-			PortletRequest.ACTION_PHASE);
-
-		portletURL.setParameter(
-			ActionRequest.ACTION_NAME, "exportImportChangeset");
-		portletURL.setParameter(
-			"mvcRenderCommandName", "exportImportChangeset");
-		portletURL.setParameter("cmd", Constants.PUBLISH);
-		portletURL.setParameter(
-			"backURL", PortalUtil.getCurrentCompleteURL(_request));
-		portletURL.setParameter(
-			"groupId", String.valueOf(_blogsEntry.getGroupId()));
-		portletURL.setParameter("changesetUuid", changeset.getUuid());
-		portletURL.setParameter("portletId", BlogsPortletKeys.BLOGS_ADMIN);
+		publishEntryURL.setParameter(
+			ActionRequest.ACTION_NAME, "/blogs/publish_entry");
+		publishEntryURL.setParameter("backURL", _getRedirectURL());
+		publishEntryURL.setParameter(
+			"entryId", String.valueOf(_blogsEntry.getEntryId()));
 
 		return dropdownItem -> {
 			dropdownItem.putData("action", "publishToLive");
-			dropdownItem.putData("permissionsURL", portletURL.toString());
-			dropdownItem.setLabel("publish-to-live");
+			dropdownItem.putData("publishEntryURL", publishEntryURL.toString());
+			dropdownItem.setLabel(
+				LanguageUtil.get(_request, "publish-to-live"));
 		};
 	}
 

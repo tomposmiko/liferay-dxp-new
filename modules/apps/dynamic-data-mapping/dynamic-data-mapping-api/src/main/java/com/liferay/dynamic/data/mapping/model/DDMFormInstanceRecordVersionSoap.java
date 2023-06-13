@@ -30,11 +30,15 @@ import java.util.List;
  */
 @ProviderType
 public class DDMFormInstanceRecordVersionSoap implements Serializable {
+
 	public static DDMFormInstanceRecordVersionSoap toSoapModel(
 		DDMFormInstanceRecordVersion model) {
-		DDMFormInstanceRecordVersionSoap soapModel = new DDMFormInstanceRecordVersionSoap();
 
-		soapModel.setFormInstanceRecordVersionId(model.getFormInstanceRecordVersionId());
+		DDMFormInstanceRecordVersionSoap soapModel =
+			new DDMFormInstanceRecordVersionSoap();
+
+		soapModel.setFormInstanceRecordVersionId(
+			model.getFormInstanceRecordVersionId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
@@ -55,7 +59,9 @@ public class DDMFormInstanceRecordVersionSoap implements Serializable {
 
 	public static DDMFormInstanceRecordVersionSoap[] toSoapModels(
 		DDMFormInstanceRecordVersion[] models) {
-		DDMFormInstanceRecordVersionSoap[] soapModels = new DDMFormInstanceRecordVersionSoap[models.length];
+
+		DDMFormInstanceRecordVersionSoap[] soapModels =
+			new DDMFormInstanceRecordVersionSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -66,10 +72,12 @@ public class DDMFormInstanceRecordVersionSoap implements Serializable {
 
 	public static DDMFormInstanceRecordVersionSoap[][] toSoapModels(
 		DDMFormInstanceRecordVersion[][] models) {
+
 		DDMFormInstanceRecordVersionSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new DDMFormInstanceRecordVersionSoap[models.length][models[0].length];
+			soapModels = new DDMFormInstanceRecordVersionSoap
+				[models.length][models[0].length];
 		}
 		else {
 			soapModels = new DDMFormInstanceRecordVersionSoap[0][0];
@@ -84,13 +92,16 @@ public class DDMFormInstanceRecordVersionSoap implements Serializable {
 
 	public static DDMFormInstanceRecordVersionSoap[] toSoapModels(
 		List<DDMFormInstanceRecordVersion> models) {
-		List<DDMFormInstanceRecordVersionSoap> soapModels = new ArrayList<DDMFormInstanceRecordVersionSoap>(models.size());
+
+		List<DDMFormInstanceRecordVersionSoap> soapModels =
+			new ArrayList<DDMFormInstanceRecordVersionSoap>(models.size());
 
 		for (DDMFormInstanceRecordVersion model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new DDMFormInstanceRecordVersionSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new DDMFormInstanceRecordVersionSoap[soapModels.size()]);
 	}
 
 	public DDMFormInstanceRecordVersionSoap() {
@@ -108,7 +119,9 @@ public class DDMFormInstanceRecordVersionSoap implements Serializable {
 		return _formInstanceRecordVersionId;
 	}
 
-	public void setFormInstanceRecordVersionId(long formInstanceRecordVersionId) {
+	public void setFormInstanceRecordVersionId(
+		long formInstanceRecordVersionId) {
+
 		_formInstanceRecordVersionId = formInstanceRecordVersionId;
 	}
 
@@ -239,4 +252,5 @@ public class DDMFormInstanceRecordVersionSoap implements Serializable {
 	private String _statusByUserName;
 	private Date _statusDate;
 	private long _storageId;
+
 }

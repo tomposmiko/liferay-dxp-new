@@ -14,8 +14,6 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.portal.search.elasticsearch6.internal.filter.ElasticsearchFilterTranslatorFixture;
-
 /**
  * @author Michael C. Han
  */
@@ -24,30 +22,52 @@ public class ElasticsearchQueryTranslatorFixture {
 	public ElasticsearchQueryTranslatorFixture() {
 		_elasticsearchQueryTranslator = new ElasticsearchQueryTranslator() {
 			{
-				booleanQueryTranslator = new BooleanQueryTranslatorImpl() {
-					{
-						ElasticsearchFilterTranslatorFixture
-							elasticsearchFilterTranslatorFixture =
-								new ElasticsearchFilterTranslatorFixture();
-
-						filterTranslator =
-							elasticsearchFilterTranslatorFixture.
-								getElasticsearchFilterTranslator();
-					}
-				};
-
-				disMaxQueryTranslator = new DisMaxQueryTranslatorImpl();
-				fuzzyQueryTranslator = new FuzzyQueryTranslatorImpl();
-				matchAllQueryTranslator = new MatchAllQueryTranslatorImpl();
-				matchQueryTranslator = new MatchQueryTranslatorImpl();
-				moreLikeThisQueryTranslator =
-					new MoreLikeThisQueryTranslatorImpl();
-				multiMatchQueryTranslator = new MultiMatchQueryTranslatorImpl();
-				nestedQueryTranslator = new NestedQueryTranslatorImpl();
-				stringQueryTranslator = new StringQueryTranslatorImpl();
-				termQueryTranslator = new TermQueryTranslatorImpl();
-				termRangeQueryTranslator = new TermRangeQueryTranslatorImpl();
-				wildcardQueryTranslator = new WildcardQueryTranslatorImpl();
+				setBooleanQueryTranslator(new BooleanQueryTranslatorImpl());
+				setBoostingQueryTranslator(new BoostingQueryTranslatorImpl());
+				setCommonTermsQueryTranslator(
+					new CommonTermsQueryTranslatorImpl());
+				setConstantScoreQueryTranslator(
+					new ConstantScoreQueryTranslatorImpl());
+				setDateRangeTermQueryTranslator(
+					new DateRangeTermQueryTranslatorImpl());
+				setDisMaxQueryTranslator(new DisMaxQueryTranslatorImpl());
+				setExistsQueryTranslator(new ExistsQueryTranslatorImpl());
+				setFunctionScoreQueryTranslator(
+					new FunctionScoreQueryTranslatorImpl());
+				setFuzzyQueryTranslator(new FuzzyQueryTranslatorImpl());
+				setGeoBoundingBoxQueryTranslator(
+					new GeoBoundingBoxQueryTranslatorImpl());
+				setGeoDistanceQueryTranslator(
+					new GeoDistanceQueryTranslatorImpl());
+				setGeoDistanceRangeQueryTranslator(
+					new GeoDistanceRangeQueryTranslatorImpl());
+				setGeoPolygonQueryTranslator(
+					new GeoPolygonQueryTranslatorImpl());
+				setGeoShapeQueryTranslator(new GeoShapeQueryTranslatorImpl());
+				setIdsQueryTranslator(new IdsQueryTranslatorImpl());
+				setMatchAllQueryTranslator(new MatchAllQueryTranslatorImpl());
+				setMatchPhraseQueryTranslator(
+					new MatchPhraseQueryTranslatorImpl());
+				setMatchPhrasePrefixQueryTranslator(
+					new MatchPhrasePrefixQueryTranslatorImpl());
+				setMatchQueryTranslator(new MatchQueryTranslatorImpl());
+				setMoreLikeThisQueryTranslator(
+					new MoreLikeThisQueryTranslatorImpl());
+				setMultiMatchQueryTranslator(
+					new MultiMatchQueryTranslatorImpl());
+				setNestedQueryTranslator(new NestedQueryTranslatorImpl());
+				setPercolateQueryTranslator(new PercolateQueryTranslatorImpl());
+				setPrefixQueryTranslator(new PrefixQueryTranslatorImpl());
+				setRangeTermQueryTranslator(new RangeTermQueryTranslatorImpl());
+				setRegexQueryTranslator(new RegexQueryTranslatorImpl());
+				setScriptQueryTranslator(new ScriptQueryTranslatorImpl());
+				setSimpleQueryStringQueryTranslator(
+					new SimpleStringQueryTranslatorImpl());
+				setStringQueryTranslator(new StringQueryTranslatorImpl());
+				setTermQueryTranslator(new TermQueryTranslatorImpl());
+				setTermsQueryTranslator(new TermsQueryTranslatorImpl());
+				setTermsSetQueryTranslator(new TermsSetQueryTranslatorImpl());
+				setWildcardQueryTranslator(new WildcardQueryTranslatorImpl());
 			}
 		};
 	}

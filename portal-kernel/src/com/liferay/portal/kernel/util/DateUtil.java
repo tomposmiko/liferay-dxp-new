@@ -214,6 +214,14 @@ public class DateUtil {
 			pattern, TimeZoneUtil.getTimeZone(StringPool.UTC));
 	}
 
+	public static int getYear(Date date) {
+		Calendar cal = Calendar.getInstance();
+
+		cal.setTime(date);
+
+		return cal.get(Calendar.YEAR);
+	}
+
 	public static boolean isFormatAmPm(Locale locale) {
 		Boolean formatAmPm = _formatAmPmMap.get(locale);
 

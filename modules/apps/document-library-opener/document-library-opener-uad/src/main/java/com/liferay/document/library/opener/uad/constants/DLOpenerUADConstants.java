@@ -19,6 +19,8 @@ package com.liferay.document.library.opener.uad.constants;
  * @generated
  */
 public class DLOpenerUADConstants {
-	public static final String[] USER_ID_FIELD_NAMES_DL_OPENER_FILE_ENTRY_REFERENCE =
-		{ "userId" };
+
+	public static final String[]
+		USER_ID_FIELD_NAMES_DL_OPENER_FILE_ENTRY_REFERENCE = {"userId"};
+
 }

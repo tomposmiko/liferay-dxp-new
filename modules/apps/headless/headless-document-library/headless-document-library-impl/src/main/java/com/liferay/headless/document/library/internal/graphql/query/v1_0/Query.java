@@ -17,9 +17,13 @@ package com.liferay.headless.document.library.internal.graphql.query.v1_0;
 import com.liferay.headless.document.library.dto.v1_0.Comment;
 import com.liferay.headless.document.library.dto.v1_0.Document;
 import com.liferay.headless.document.library.dto.v1_0.Folder;
+import com.liferay.headless.document.library.dto.v1_0.Rating;
 import com.liferay.headless.document.library.resource.v1_0.CommentResource;
 import com.liferay.headless.document.library.resource.v1_0.DocumentResource;
 import com.liferay.headless.document.library.resource.v1_0.FolderResource;
+import com.liferay.headless.document.library.resource.v1_0.RatingResource;
+import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -35,9 +39,7 @@ import java.util.Collection;
 
 import javax.annotation.Generated;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.service.component.ComponentServiceObjects;
 
 /**
  * @author Javier Gamarra
@@ -46,205 +48,292 @@ import org.osgi.util.tracker.ServiceTracker;
 @Generated("")
 public class Query {
 
+	public static void setCommentResourceComponentServiceObjects(
+		ComponentServiceObjects<CommentResource>
+			commentResourceComponentServiceObjects) {
+
+		_commentResourceComponentServiceObjects =
+			commentResourceComponentServiceObjects;
+	}
+
+	public static void setDocumentResourceComponentServiceObjects(
+		ComponentServiceObjects<DocumentResource>
+			documentResourceComponentServiceObjects) {
+
+		_documentResourceComponentServiceObjects =
+			documentResourceComponentServiceObjects;
+	}
+
+	public static void setFolderResourceComponentServiceObjects(
+		ComponentServiceObjects<FolderResource>
+			folderResourceComponentServiceObjects) {
+
+		_folderResourceComponentServiceObjects =
+			folderResourceComponentServiceObjects;
+	}
+
+	public static void setRatingResourceComponentServiceObjects(
+		ComponentServiceObjects<RatingResource>
+			ratingResourceComponentServiceObjects) {
+
+		_ratingResourceComponentServiceObjects =
+			ratingResourceComponentServiceObjects;
+	}
+
 	@GraphQLField
 	@GraphQLInvokeDetached
-	public Comment getComment(
-	@GraphQLName("comment-id") Long commentId)
-			throws Exception {
+	public Comment getComment(@GraphQLName("comment-id") Long commentId)
+		throws Exception {
 
-				CommentResource commentResource = _getCommentResource();
-
-				commentResource.setContextCompany(
-					CompanyLocalServiceUtil.getCompany(CompanyThreadLocal.getCompanyId()));
-
-				return commentResource.getComment(
-					commentId);
+		return _applyComponentServiceObjects(
+			_commentResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			commentResource -> commentResource.getComment(commentId));
 	}
 
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Collection<Comment> getCommentCommentsPage(
-	@GraphQLName("comment-id") Long commentId,@GraphQLName("pageSize") int pageSize,@GraphQLName("page") int page)
-			throws Exception {
+			@GraphQLName("comment-id") Long commentId,
+			@GraphQLName("search") String search,
+			@GraphQLName("filter") Filter filter,
+			@GraphQLName("pageSize") int pageSize,
+			@GraphQLName("page") int page, @GraphQLName("Sort[]") Sort[] sorts)
+		throws Exception {
 
-				CommentResource commentResource = _getCommentResource();
-
-				commentResource.setContextCompany(
-					CompanyLocalServiceUtil.getCompany(CompanyThreadLocal.getCompanyId()));
-
+		return _applyComponentServiceObjects(
+			_commentResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			commentResource -> {
 				Page paginationPage = commentResource.getCommentCommentsPage(
-					commentId,Pagination.of(pageSize, page));
+					commentId, search, filter, Pagination.of(pageSize, page),
+					sorts);
 
 				return paginationPage.getItems();
+			});
 	}
 
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Collection<Comment> getDocumentCommentsPage(
-	@GraphQLName("document-id") Long documentId,@GraphQLName("pageSize") int pageSize,@GraphQLName("page") int page)
-			throws Exception {
+			@GraphQLName("document-id") Long documentId,
+			@GraphQLName("search") String search,
+			@GraphQLName("filter") Filter filter,
+			@GraphQLName("pageSize") int pageSize,
+			@GraphQLName("page") int page, @GraphQLName("Sort[]") Sort[] sorts)
+		throws Exception {
 
-				CommentResource commentResource = _getCommentResource();
-
-				commentResource.setContextCompany(
-					CompanyLocalServiceUtil.getCompany(CompanyThreadLocal.getCompanyId()));
-
+		return _applyComponentServiceObjects(
+			_commentResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			commentResource -> {
 				Page paginationPage = commentResource.getDocumentCommentsPage(
-					documentId,Pagination.of(pageSize, page));
+					documentId, search, filter, Pagination.of(pageSize, page),
+					sorts);
 
 				return paginationPage.getItems();
+			});
 	}
 
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Collection<Document> getContentSpaceDocumentsPage(
-	@GraphQLName("content-space-id") Long contentSpaceId,@GraphQLName("filter") Filter filter,@GraphQLName("pageSize") int pageSize,@GraphQLName("page") int page,@GraphQLName("Sort[]") Sort[] sorts)
-			throws Exception {
+			@GraphQLName("content-space-id") Long contentSpaceId,
+			@GraphQLName("flatten") Boolean flatten,
+			@GraphQLName("search") String search,
+			@GraphQLName("filter") Filter filter,
+			@GraphQLName("pageSize") int pageSize,
+			@GraphQLName("page") int page, @GraphQLName("Sort[]") Sort[] sorts)
+		throws Exception {
 
-				DocumentResource documentResource = _getDocumentResource();
-
-				documentResource.setContextCompany(
-					CompanyLocalServiceUtil.getCompany(CompanyThreadLocal.getCompanyId()));
-
-				Page paginationPage = documentResource.getContentSpaceDocumentsPage(
-					contentSpaceId,filter,Pagination.of(pageSize, page),sorts);
+		return _applyComponentServiceObjects(
+			_documentResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			documentResource -> {
+				Page paginationPage =
+					documentResource.getContentSpaceDocumentsPage(
+						contentSpaceId, flatten, search, filter,
+						Pagination.of(pageSize, page), sorts);
 
 				return paginationPage.getItems();
+			});
 	}
 
 	@GraphQLField
 	@GraphQLInvokeDetached
-	public Document getDocument(
-	@GraphQLName("document-id") Long documentId)
-			throws Exception {
+	public Document getDocument(@GraphQLName("document-id") Long documentId)
+		throws Exception {
 
-				DocumentResource documentResource = _getDocumentResource();
-
-				documentResource.setContextCompany(
-					CompanyLocalServiceUtil.getCompany(CompanyThreadLocal.getCompanyId()));
-
-				return documentResource.getDocument(
-					documentId);
+		return _applyComponentServiceObjects(
+			_documentResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			documentResource -> documentResource.getDocument(documentId));
 	}
 
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Collection<Document> getFolderDocumentsPage(
-	@GraphQLName("folder-id") Long folderId,@GraphQLName("filter") Filter filter,@GraphQLName("pageSize") int pageSize,@GraphQLName("page") int page,@GraphQLName("Sort[]") Sort[] sorts)
-			throws Exception {
+			@GraphQLName("folder-id") Long folderId,
+			@GraphQLName("search") String search,
+			@GraphQLName("filter") Filter filter,
+			@GraphQLName("pageSize") int pageSize,
+			@GraphQLName("page") int page, @GraphQLName("Sort[]") Sort[] sorts)
+		throws Exception {
 
-				DocumentResource documentResource = _getDocumentResource();
-
-				documentResource.setContextCompany(
-					CompanyLocalServiceUtil.getCompany(CompanyThreadLocal.getCompanyId()));
-
+		return _applyComponentServiceObjects(
+			_documentResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			documentResource -> {
 				Page paginationPage = documentResource.getFolderDocumentsPage(
-					folderId,filter,Pagination.of(pageSize, page),sorts);
+					folderId, search, filter, Pagination.of(pageSize, page),
+					sorts);
 
 				return paginationPage.getItems();
+			});
 	}
 
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Collection<Folder> getContentSpaceFoldersPage(
-	@GraphQLName("content-space-id") Long contentSpaceId,@GraphQLName("pageSize") int pageSize,@GraphQLName("page") int page)
-			throws Exception {
+			@GraphQLName("content-space-id") Long contentSpaceId,
+			@GraphQLName("flatten") Boolean flatten,
+			@GraphQLName("search") String search,
+			@GraphQLName("filter") Filter filter,
+			@GraphQLName("pageSize") int pageSize,
+			@GraphQLName("page") int page, @GraphQLName("Sort[]") Sort[] sorts)
+		throws Exception {
 
-				FolderResource folderResource = _getFolderResource();
-
-				folderResource.setContextCompany(
-					CompanyLocalServiceUtil.getCompany(CompanyThreadLocal.getCompanyId()));
-
+		return _applyComponentServiceObjects(
+			_folderResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			folderResource -> {
 				Page paginationPage = folderResource.getContentSpaceFoldersPage(
-					contentSpaceId,Pagination.of(pageSize, page));
+					contentSpaceId, flatten, search, filter,
+					Pagination.of(pageSize, page), sorts);
 
 				return paginationPage.getItems();
+			});
 	}
 
 	@GraphQLField
 	@GraphQLInvokeDetached
-	public Folder getFolder(
-	@GraphQLName("folder-id") Long folderId)
-			throws Exception {
+	public Folder getFolder(@GraphQLName("folder-id") Long folderId)
+		throws Exception {
 
-				FolderResource folderResource = _getFolderResource();
-
-				folderResource.setContextCompany(
-					CompanyLocalServiceUtil.getCompany(CompanyThreadLocal.getCompanyId()));
-
-				return folderResource.getFolder(
-					folderId);
+		return _applyComponentServiceObjects(
+			_folderResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			folderResource -> folderResource.getFolder(folderId));
 	}
 
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Collection<Folder> getFolderFoldersPage(
-	@GraphQLName("folder-id") Long folderId,@GraphQLName("pageSize") int pageSize,@GraphQLName("page") int page)
-			throws Exception {
+			@GraphQLName("folder-id") Long folderId,
+			@GraphQLName("search") String search,
+			@GraphQLName("filter") Filter filter,
+			@GraphQLName("pageSize") int pageSize,
+			@GraphQLName("page") int page, @GraphQLName("Sort[]") Sort[] sorts)
+		throws Exception {
 
-				FolderResource folderResource = _getFolderResource();
-
-				folderResource.setContextCompany(
-					CompanyLocalServiceUtil.getCompany(CompanyThreadLocal.getCompanyId()));
-
+		return _applyComponentServiceObjects(
+			_folderResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			folderResource -> {
 				Page paginationPage = folderResource.getFolderFoldersPage(
-					folderId,Pagination.of(pageSize, page));
+					folderId, search, filter, Pagination.of(pageSize, page),
+					sorts);
 
 				return paginationPage.getItems();
+			});
 	}
 
-	private static CommentResource _getCommentResource() {
-			return _commentResourceServiceTracker.getService();
+	@GraphQLField
+	@GraphQLInvokeDetached
+	public Collection<Rating> getDocumentRatingsPage(
+			@GraphQLName("document-id") Long documentId)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_ratingResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			ratingResource -> {
+				Page paginationPage = ratingResource.getDocumentRatingsPage(
+					documentId);
+
+				return paginationPage.getItems();
+			});
 	}
 
-	private static final ServiceTracker<CommentResource, CommentResource>
-			_commentResourceServiceTracker;
-	private static DocumentResource _getDocumentResource() {
-			return _documentResourceServiceTracker.getService();
+	@GraphQLField
+	@GraphQLInvokeDetached
+	public Rating getRating(@GraphQLName("rating-id") Long ratingId)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_ratingResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			ratingResource -> ratingResource.getRating(ratingId));
 	}
 
-	private static final ServiceTracker<DocumentResource, DocumentResource>
-			_documentResourceServiceTracker;
-	private static FolderResource _getFolderResource() {
-			return _folderResourceServiceTracker.getService();
+	private <T, R, E1 extends Throwable, E2 extends Throwable> R
+			_applyComponentServiceObjects(
+				ComponentServiceObjects<T> componentServiceObjects,
+				UnsafeConsumer<T, E1> unsafeConsumer,
+				UnsafeFunction<T, R, E2> unsafeFunction)
+		throws E1, E2 {
+
+		T resource = componentServiceObjects.getService();
+
+		try {
+			unsafeConsumer.accept(resource);
+
+			return unsafeFunction.apply(resource);
+		}
+		finally {
+			componentServiceObjects.ungetService(resource);
+		}
 	}
 
-	private static final ServiceTracker<FolderResource, FolderResource>
-			_folderResourceServiceTracker;
+	private void _populateResourceContext(CommentResource commentResource)
+		throws Exception {
 
-		static {
-			Bundle bundle = FrameworkUtil.getBundle(Query.class);
-
-				ServiceTracker<CommentResource, CommentResource>
-					commentResourceServiceTracker =
-						new ServiceTracker<>(
-							bundle.getBundleContext(),
-							CommentResource.class, null);
-
-				commentResourceServiceTracker.open();
-
-				_commentResourceServiceTracker =
-					commentResourceServiceTracker;
-				ServiceTracker<DocumentResource, DocumentResource>
-					documentResourceServiceTracker =
-						new ServiceTracker<>(
-							bundle.getBundleContext(),
-							DocumentResource.class, null);
-
-				documentResourceServiceTracker.open();
-
-				_documentResourceServiceTracker =
-					documentResourceServiceTracker;
-				ServiceTracker<FolderResource, FolderResource>
-					folderResourceServiceTracker =
-						new ServiceTracker<>(
-							bundle.getBundleContext(),
-							FolderResource.class, null);
-
-				folderResourceServiceTracker.open();
-
-				_folderResourceServiceTracker =
-					folderResourceServiceTracker;
+		commentResource.setContextCompany(
+			CompanyLocalServiceUtil.getCompany(
+				CompanyThreadLocal.getCompanyId()));
 	}
+
+	private void _populateResourceContext(DocumentResource documentResource)
+		throws Exception {
+
+		documentResource.setContextCompany(
+			CompanyLocalServiceUtil.getCompany(
+				CompanyThreadLocal.getCompanyId()));
+	}
+
+	private void _populateResourceContext(FolderResource folderResource)
+		throws Exception {
+
+		folderResource.setContextCompany(
+			CompanyLocalServiceUtil.getCompany(
+				CompanyThreadLocal.getCompanyId()));
+	}
+
+	private void _populateResourceContext(RatingResource ratingResource)
+		throws Exception {
+
+		ratingResource.setContextCompany(
+			CompanyLocalServiceUtil.getCompany(
+				CompanyThreadLocal.getCompanyId()));
+	}
+
+	private static ComponentServiceObjects<CommentResource>
+		_commentResourceComponentServiceObjects;
+	private static ComponentServiceObjects<DocumentResource>
+		_documentResourceComponentServiceObjects;
+	private static ComponentServiceObjects<FolderResource>
+		_folderResourceComponentServiceObjects;
+	private static ComponentServiceObjects<RatingResource>
+		_ratingResourceComponentServiceObjects;
 
 }

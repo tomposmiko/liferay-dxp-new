@@ -15,6 +15,8 @@
 package com.liferay.fragment.entry.processor.editable.parser;
 
 import com.liferay.fragment.exception.FragmentEntryContentException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 
 import org.jsoup.nodes.Element;
 
@@ -24,6 +26,10 @@ import org.jsoup.nodes.Element;
  * @author Pavel Savinov
  */
 public interface EditableElementParser {
+
+	public default JSONObject getAttributes(Element element) {
+		return JSONFactoryUtil.createJSONObject();
+	}
 
 	public String getFieldTemplate();
 
@@ -40,6 +46,21 @@ public interface EditableElementParser {
 	 * @param value New element value
 	 */
 	public void replace(Element element, String value);
+
+	/**
+	 * Replaces editable element value with the provided one and apply the
+	 * configuration values
+	 *
+	 * @param element Editable element to replace
+	 * @param value New element value
+	 * @param configJSONObject Configuration values
+	 * @review
+	 */
+	public default void replace(
+		Element element, String value, JSONObject configJSONObject) {
+
+		replace(element, value);
+	}
 
 	/**
 	 * Validates editable element

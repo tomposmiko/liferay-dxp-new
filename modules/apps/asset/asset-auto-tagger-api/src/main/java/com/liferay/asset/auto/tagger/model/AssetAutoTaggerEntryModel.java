@@ -33,8 +33,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface AssetAutoTaggerEntryModel extends BaseModel<AssetAutoTaggerEntry>,
-	ShardedModel {
+public interface AssetAutoTaggerEntryModel
+	extends BaseModel<AssetAutoTaggerEntry>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -154,4 +155,5 @@ public interface AssetAutoTaggerEntryModel extends BaseModel<AssetAutoTaggerEntr
 	 * @param assetTagId the asset tag ID of this asset auto tagger entry
 	 */
 	public void setAssetTagId(long assetTagId);
+
 }

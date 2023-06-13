@@ -22,10 +22,14 @@ import aQute.bnd.annotation.ProviderType;
  */
 @ProviderType
 public interface KBArticleFinder {
-	public int countByUrlTitle(long groupId, String kbFolderUrlTitle,
-		String kbArticleUrlTitle, int[] status);
 
-	public java.util.List<com.liferay.knowledge.base.model.KBArticle> findByUrlTitle(
+	public int countByUrlTitle(
 		long groupId, String kbFolderUrlTitle, String kbArticleUrlTitle,
-		int[] status, int start, int end);
+		int[] status);
+
+	public java.util.List<com.liferay.knowledge.base.model.KBArticle>
+		findByUrlTitle(
+			long groupId, String kbFolderUrlTitle, String kbArticleUrlTitle,
+			int[] status, int start, int end);
+
 }

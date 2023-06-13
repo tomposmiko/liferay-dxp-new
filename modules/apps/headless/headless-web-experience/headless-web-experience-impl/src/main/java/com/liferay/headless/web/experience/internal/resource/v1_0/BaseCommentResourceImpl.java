@@ -15,29 +15,41 @@
 package com.liferay.headless.web.experience.internal.resource.v1_0;
 
 import com.liferay.headless.web.experience.dto.v1_0.Comment;
-import com.liferay.headless.web.experience.internal.dto.v1_0.CommentImpl;
 import com.liferay.headless.web.experience.resource.v1_0.CommentResource;
-import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.net.URI;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Generated;
 
+import javax.validation.constraints.NotNull;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -49,61 +61,145 @@ import javax.ws.rs.core.UriInfo;
 public abstract class BaseCommentResourceImpl implements CommentResource {
 
 	@Override
+	@DELETE
+	@Path("/comments/{comment-id}")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Comment")})
+	public void deleteComment(@NotNull @PathParam("comment-id") Long commentId)
+		throws Exception {
+	}
+
+	@Override
 	@GET
 	@Path("/comments/{comment-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
-	public Comment getComment(
-	@PathParam("comment-id") Long commentId)
-			throws Exception {
+	@Tags(value = {@Tag(name = "Comment")})
+	public Comment getComment(@NotNull @PathParam("comment-id") Long commentId)
+		throws Exception {
 
-				return new CommentImpl();
+		return new Comment();
 	}
+
+	@Override
+	@Consumes("application/json")
+	@PUT
+	@Path("/comments/{comment-id}")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Comment")})
+	public Comment putComment(
+			@NotNull @PathParam("comment-id") Long commentId, Comment comment)
+		throws Exception {
+
+		return new Comment();
+	}
+
 	@Override
 	@GET
+	@Operation(description = "retrieve the child comments of a comment thread")
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "filter"),
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
+			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+		}
+	)
 	@Path("/comments/{comment-id}/comments")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "Comment")})
 	public Page<Comment> getCommentCommentsPage(
-	@PathParam("comment-id") Long commentId,@Context Pagination pagination)
-			throws Exception {
+			@NotNull @PathParam("comment-id") Long commentId,
+			@QueryParam("search") String search, @Context Filter filter,
+			@Context Pagination pagination, @Context Sort[] sorts)
+		throws Exception {
 
-				return Page.of(Collections.emptyList());
+		return Page.of(Collections.emptyList());
 	}
+
+	@Override
+	@Consumes("application/json")
+	@POST
+	@Path("/comments/{comment-id}/comments")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Comment")})
+	public Comment postCommentComment(
+			@NotNull @PathParam("comment-id") Long commentId, Comment comment)
+		throws Exception {
+
+		return new Comment();
+	}
+
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "filter"),
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
+			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+		}
+	)
 	@Path("/structured-contents/{structured-content-id}/comments")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "Comment")})
 	public Page<Comment> getStructuredContentCommentsPage(
-	@PathParam("structured-content-id") Long structuredContentId,@Context Pagination pagination)
-			throws Exception {
+			@NotNull @PathParam("structured-content-id") Long
+				structuredContentId,
+			@QueryParam("search") String search, @Context Filter filter,
+			@Context Pagination pagination, @Context Sort[] sorts)
+		throws Exception {
 
-				return Page.of(Collections.emptyList());
+		return Page.of(Collections.emptyList());
+	}
+
+	@Override
+	@Consumes("application/json")
+	@POST
+	@Path("/structured-contents/{structured-content-id}/comments")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Comment")})
+	public Comment postStructuredContentComment(
+			@NotNull @PathParam("structured-content-id") Long
+				structuredContentId,
+			Comment comment)
+		throws Exception {
+
+		return new Comment();
 	}
 
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected String getJAXRSLink(String methodName, Object... values) {
-		URI baseURI = contextUriInfo.getBaseUri();
-
-		URI resourceURI = UriBuilder.fromResource(
-			BaseCommentResourceImpl.class
-		).build();
-
-		URI methodURI = UriBuilder.fromMethod(
-			BaseCommentResourceImpl.class, methodName
-		).build(
-			values
-		);
-
-		return baseURI.toString() + resourceURI.toString() + methodURI.toString();
+	protected void preparePatch(Comment comment) {
 	}
 
-	protected <T, R> List<R> transform(List<T> list, UnsafeFunction<T, R, Throwable> unsafeFunction) {
-		return TransformUtil.transform(list, unsafeFunction);
+	protected <T, R> List<R> transform(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transform(collection, unsafeFunction);
+	}
+
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
+
+		return TransformUtil.transform(array, unsafeFunction, clazz);
+	}
+
+	protected <T, R> R[] transformToArray(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
+
+		return TransformUtil.transformToArray(
+			collection, unsafeFunction, clazz);
+	}
+
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
 	@Context

@@ -19,8 +19,14 @@ import antlr.CommonHiddenStreamToken;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
+import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.tools.ImportsFormatter;
+import com.liferay.portal.tools.JavaImportsFormatter;
+import com.liferay.portal.tools.ToolsUtil;
 import com.liferay.portal.tools.java.parser.util.DetailASTUtil;
 import com.liferay.portal.tools.java.parser.util.FileUtil;
 import com.liferay.portal.tools.java.parser.util.JavaParserUtil;
@@ -34,23 +40,55 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import java.io.File;
 import java.io.IOException;
 
-import java.nio.charset.StandardCharsets;
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Hugo Huijser
  */
 public class JavaParser {
 
-	public static boolean parse(File file, int maxLineLength)
+	public static String parse(File file, int maxLineLength)
+		throws CheckstyleException, IOException {
+
+		return parse(file, maxLineLength, true);
+	}
+
+	public static String parse(File file, int maxLineLength, boolean writeFile)
+		throws CheckstyleException, IOException {
+
+		return parse(file, FileUtil.read(file), maxLineLength, writeFile);
+	}
+
+	public static String parse(File file, String content, int maxLineLength)
+		throws CheckstyleException, IOException {
+
+		return parse(file, content, maxLineLength, true);
+	}
+
+	public static String parse(
+			File file, String content, int maxLineLength, boolean writeFile)
 		throws CheckstyleException, IOException {
 
 		_maxLineLength = maxLineLength;
 
-		return _parse(file, false);
+		ImportsFormatter importsFormatter = new JavaImportsFormatter();
+
+		String newContent = importsFormatter.format(
+			_trimContent(content), ToolsUtil.getPackagePath(file),
+			StringUtil.replaceLast(file.getName(), ".java", StringPool.BLANK));
+
+		newContent = _parse(file, newContent);
+
+		if (writeFile && !newContent.equals(content)) {
+			FileUtil.write(file, newContent);
+		}
+
+		return newContent;
 	}
 
 	private static ParsedJavaClass _addClosingJavaTerm(
@@ -86,9 +124,191 @@ public class JavaParser {
 		return parsedJavaClass;
 	}
 
-	private static ParsedJavaClass _addJavaTerm(
-		ParsedJavaClass parsedJavaClass, DetailAST detailAST, JavaTerm javaTerm,
+	private static ContentModifications _addCommentContentModifications(
+		ContentModifications contentModifications,
+		ParsedJavaTerm parsedJavaTerm, String indent,
 		FileContents fileContents) {
+
+		CommonHiddenStreamToken precedingCommentToken =
+			parsedJavaTerm.getPrecedingCommentToken();
+
+		if (precedingCommentToken == null) {
+			return contentModifications;
+		}
+
+		String expectedCommentIndent = indent;
+
+		String trimmedJavaTermContent = StringUtil.trim(
+			parsedJavaTerm.getContent());
+
+		if (trimmedJavaTermContent.startsWith("}") ||
+			trimmedJavaTermContent.startsWith(")")) {
+
+			expectedCommentIndent += "\t";
+		}
+
+		while (true) {
+			if (precedingCommentToken == null) {
+				return contentModifications;
+			}
+
+			String line = fileContents.getLine(
+				precedingCommentToken.getLine() - 1);
+
+			if (!_isAtLineStart(line, precedingCommentToken.getColumn() - 1)) {
+				return contentModifications;
+			}
+
+			String actualCommentIndent = _getIndent(line);
+
+			if (!actualCommentIndent.equals(expectedCommentIndent)) {
+				contentModifications.addReplaceContent(
+					expectedCommentIndent + StringUtil.trim(line),
+					precedingCommentToken.getLine());
+			}
+
+			if (precedingCommentToken.getType() ==
+					TokenTypes.SINGLE_LINE_COMMENT) {
+
+				precedingCommentToken = precedingCommentToken.getHiddenBefore();
+
+				continue;
+			}
+
+			String text = precedingCommentToken.getText();
+
+			boolean javadoc = false;
+
+			if (StringUtil.startsWith(StringUtil.trim(text), CharPool.STAR)) {
+				javadoc = true;
+			}
+			else if (actualCommentIndent.equals(expectedCommentIndent)) {
+				precedingCommentToken = precedingCommentToken.getHiddenBefore();
+
+				continue;
+			}
+
+			int end =
+				precedingCommentToken.getLine() + StringUtil.count(text, "\n");
+
+			for (int i = precedingCommentToken.getLine() + 1; i <= end; i++) {
+				line = fileContents.getLine(i - 1);
+
+				if (javadoc) {
+					String actualIndent = _getIndent(line);
+
+					if (!actualIndent.equals(
+							expectedCommentIndent + StringPool.SPACE)) {
+
+						contentModifications.addReplaceContent(
+							expectedCommentIndent + StringPool.SPACE +
+								StringUtil.trim(line),
+							i);
+					}
+				}
+				else if (line.startsWith(actualCommentIndent)) {
+					contentModifications.addReplaceContent(
+						StringUtil.replaceFirst(
+							line, actualCommentIndent, expectedCommentIndent),
+						i);
+				}
+			}
+
+			precedingCommentToken = precedingCommentToken.getHiddenBefore();
+		}
+	}
+
+	private static ContentModifications _addContentModifications(
+		ContentModifications contentModifications,
+		ParsedJavaTerm parsedJavaTerm, FileContents fileContents) {
+
+		if (parsedJavaTerm.getContent() == null) {
+			return contentModifications;
+		}
+
+		Position endPosition = parsedJavaTerm.getEndPosition();
+
+		int endLineNumber = endPosition.getLineNumber();
+
+		String endLine = fileContents.getLine(endLineNumber - 1);
+
+		if (!_isAtLineEnd(endLine, endPosition.getLinePosition())) {
+			return contentModifications;
+		}
+
+		int followingLineAction = parsedJavaTerm.getFollowingLineAction();
+
+		if (followingLineAction != ParsedJavaTerm.NO_ACTION_REQUIRED) {
+			String trimmedFollowingLine = StringUtil.trim(
+				fileContents.getLine(endLineNumber));
+
+			if ((followingLineAction ==
+					ParsedJavaTerm.DOUBLE_LINE_BREAK_REQUIRED) &&
+				Validator.isNotNull(trimmedFollowingLine)) {
+
+				contentModifications.addInsertLineBreakLineNumber(
+					endLineNumber + 1);
+			}
+			else if ((followingLineAction ==
+						ParsedJavaTerm.SINGLE_LINE_BREAK_REQUIRED) &&
+					 Validator.isNull(trimmedFollowingLine)) {
+
+				contentModifications.addRemoveLineLineNumber(endLineNumber + 1);
+			}
+		}
+
+		String expectedJavaTermContent = parsedJavaTerm.getContent();
+
+		Position startPosition = parsedJavaTerm.getStartPosition();
+
+		int startLineNumber = startPosition.getLineNumber();
+
+		String actualJavaTermContent = _getContent(
+			fileContents, startLineNumber, endLineNumber);
+
+		if (!actualJavaTermContent.startsWith(expectedJavaTermContent) &&
+			!_isExcludedJavaTerm(parsedJavaTerm) &&
+			(!actualJavaTermContent.contains("\n\n") ||
+			 !Objects.equals(
+				 parsedJavaTerm.getClassName(),
+				 JavaTryStatement.class.getName()))) {
+
+			contentModifications.addReplaceContent(
+				parsedJavaTerm.getContent(), startPosition.getLineNumber(),
+				endPosition.getLineNumber());
+		}
+
+		int precedingLineAction = parsedJavaTerm.getPrecedingLineAction();
+
+		if (precedingLineAction != ParsedJavaTerm.NO_ACTION_REQUIRED) {
+			String trimmedPrecedingLine = StringUtil.trim(
+				fileContents.getLine(startLineNumber - 2));
+
+			if ((precedingLineAction ==
+					ParsedJavaTerm.DOUBLE_LINE_BREAK_REQUIRED) &&
+				Validator.isNotNull(trimmedPrecedingLine)) {
+
+				contentModifications.addInsertLineBreakLineNumber(
+					startLineNumber);
+			}
+			else if ((precedingLineAction ==
+						ParsedJavaTerm.SINGLE_LINE_BREAK_REQUIRED) &&
+					 Validator.isNull(trimmedPrecedingLine)) {
+
+				contentModifications.addRemoveLineLineNumber(
+					startLineNumber - 1);
+			}
+		}
+
+		return _addCommentContentModifications(
+			contentModifications, parsedJavaTerm,
+			_getIndent(expectedJavaTermContent), fileContents);
+	}
+
+	private static ParsedJavaClass _addJavaTerm(
+			ParsedJavaClass parsedJavaClass, DetailAST detailAST,
+			JavaTerm javaTerm, FileContents fileContents)
+		throws IOException {
 
 		if (javaTerm == null) {
 			return parsedJavaClass;
@@ -110,88 +330,125 @@ public class JavaParser {
 
 		String expectedIndent = _getExpectedIndent(detailAST, fileContents);
 
-		String content = javaTerm.toString(
+		String javaTermContent = javaTerm.toString(
 			expectedIndent, StringPool.BLANK, _maxLineLength);
 
-		if (!content.contains(BaseJavaTerm.CODE_BLOCK)) {
-			Position endPosition = null;
+		if (javaTermContent.contains(
+				"\n" + JavaClassCall.NESTED_CODE_BLOCK + "\n") ||
+			javaTermContent.contains(
+				"\n" + JavaEnumConstantDefinition.NESTED_CODE_BLOCK + "\n") ||
+			javaTermContent.contains(
+				"\n" + JavaLambdaExpression.NESTED_CODE_BLOCK + "\n")) {
 
-			if (detailAST.getType() == TokenTypes.ENUM_CONSTANT_DEF) {
-				endPosition = DetailASTUtil.getEndPosition(
-					_getLastEnumConstantDefinitionDetailAST(detailAST),
-					fileContents);
-			}
-			else {
-				endPosition = DetailASTUtil.getEndPosition(
-					detailAST, fileContents);
-			}
-
-			parsedJavaClass.addJavaTerm(
-				content, startPosition, endPosition, className);
-
-			return parsedJavaClass;
+			return _addJavaTermWithNestedCodeBlocks(
+				parsedJavaClass, detailAST, javaTermContent, className,
+				startPosition, fileContents);
 		}
 
-		String[] parts = _getParts(
-			content, "\n" + BaseJavaTerm.CODE_BLOCK + "\n");
+		Position endPosition = null;
+
+		if (detailAST.getType() == TokenTypes.ENUM_CONSTANT_DEF) {
+			endPosition = DetailASTUtil.getEndPosition(
+				_getLastEnumConstantDefinitionDetailAST(detailAST),
+				fileContents);
+		}
+		else {
+			endPosition = DetailASTUtil.getEndPosition(detailAST, fileContents);
+		}
+
+		parsedJavaClass.addJavaTerm(
+			javaTermContent, startPosition, endPosition, className);
+
+		return parsedJavaClass;
+	}
+
+	private static ParsedJavaClass _addJavaTermWithNestedCodeBlocks(
+			ParsedJavaClass parsedJavaClass, DetailAST detailAST,
+			String javaTermContent, String className, Position startPosition,
+			FileContents fileContents)
+		throws IOException {
+
+		String followingNestedCodeBlockClassName = null;
+		String precedingNestedCodeBlockClassName = null;
 
 		List<Position> curlyBracePositionList = _getCurlyBracePositionList(
 			new ArrayList<>(), detailAST);
 
 		Collections.sort(curlyBracePositionList);
 
-		for (int i = 0; i < parts.length; i++) {
-			Position partStartPosition = null;
+		int count = 0;
 
-			if (i == 0) {
-				partStartPosition = startPosition;
-			}
-			else {
-				partStartPosition = curlyBracePositionList.get((i * 2) - 1);
-			}
+		StringBundler sb = new StringBundler();
 
-			Position partEndPosition = null;
+		try (UnsyncBufferedReader unsyncBufferedReader =
+				new UnsyncBufferedReader(
+					new UnsyncStringReader(javaTermContent))) {
 
-			if (i == (parts.length - 1)) {
-				partEndPosition = DetailASTUtil.getEndPosition(
-					detailAST, fileContents);
-			}
-			else {
-				partEndPosition = curlyBracePositionList.get(i * 2);
-			}
+			String line = null;
 
-			parsedJavaClass.addJavaTerm(
-				parts[i], partStartPosition, partEndPosition, className);
+			while ((line = unsyncBufferedReader.readLine()) != null) {
+				if (line.equals(JavaClassCall.NESTED_CODE_BLOCK)) {
+					followingNestedCodeBlockClassName =
+						JavaClassCall.class.getName();
+				}
+				else if (line.equals(
+							JavaEnumConstantDefinition.NESTED_CODE_BLOCK)) {
+
+					followingNestedCodeBlockClassName =
+						JavaEnumConstantDefinition.class.getName();
+				}
+				else if (line.equals(JavaLambdaExpression.NESTED_CODE_BLOCK)) {
+					followingNestedCodeBlockClassName =
+						JavaLambdaExpression.class.getName();
+				}
+				else {
+					sb.append(line);
+					sb.append("\n");
+
+					continue;
+				}
+
+				sb.setIndex(sb.index() - 1);
+
+				Position partStartPosition = null;
+
+				if (count == 0) {
+					partStartPosition = startPosition;
+				}
+				else {
+					partStartPosition = curlyBracePositionList.get(
+						(count * 2) - 1);
+				}
+
+				Position partEndPosition = curlyBracePositionList.get(
+					count * 2);
+
+				parsedJavaClass.addJavaTerm(
+					sb.toString(), partStartPosition, partEndPosition,
+					className, precedingNestedCodeBlockClassName,
+					followingNestedCodeBlockClassName);
+
+				sb.setIndex(0);
+
+				precedingNestedCodeBlockClassName =
+					followingNestedCodeBlockClassName;
+
+				count++;
+			}
 		}
+
+		sb.setIndex(sb.index() - 1);
+
+		Position partEndPosition = DetailASTUtil.getEndPosition(
+			detailAST, fileContents);
+		Position partStartPosition = curlyBracePositionList.get(
+			(count * 2) - 1);
+
+		parsedJavaClass.addJavaTerm(
+			sb.toString(), partStartPosition, partEndPosition, className,
+			precedingNestedCodeBlockClassName, null);
 
 		return parsedJavaClass;
-	}
-
-	private static String _fixCommentIndent(
-		String content, FileContents fileContents,
-		CommonHiddenStreamToken commentToken, String actualIndent,
-		String expectedIndent) {
-
-		content = _fixIndent(
-			content, commentToken.getLine(), actualIndent, expectedIndent);
-
-		if (commentToken.getType() == TokenTypes.SINGLE_LINE_COMMENT) {
-			return content;
-		}
-
-		int end =
-			commentToken.getLine() +
-				StringUtil.count(commentToken.getText(), "\n");
-
-		for (int i = commentToken.getLine() + 1; i <= end; i++) {
-			String line = fileContents.getLine(i - 1);
-
-			if (line.startsWith(actualIndent)) {
-				content = _fixIndent(content, i, actualIndent, expectedIndent);
-			}
-		}
-
-		return content;
 	}
 
 	private static String _fixContent(
@@ -207,14 +464,71 @@ public class JavaParser {
 			content, content.substring(x, y), javaTermContent, x - 1);
 	}
 
-	private static String _fixIndent(
-		String content, int lineNumber, String actualIndent,
-		String expectedIndent) {
+	private static String _fixIncorrectStartOrEndPositions(
+		String content, ParsedJavaClass parsedJavaClass,
+		FileContents fileContents) {
 
-		int x = _getLineStartPos(content, lineNumber);
+		ParsedJavaTerm parsedJavaTerm = parsedJavaClass.getLastParsedJavaTerm();
 
-		return StringUtil.replaceFirst(
-			content, actualIndent, expectedIndent, x);
+		while (true) {
+			if (parsedJavaTerm == null) {
+				return content;
+			}
+
+			if (parsedJavaTerm.containsCommentToken() ||
+				(parsedJavaTerm.getContent() == null)) {
+
+				parsedJavaTerm = parsedJavaTerm.getPreviousParsedJavaTerm();
+
+				continue;
+			}
+
+			Position startPosition = parsedJavaTerm.getStartPosition();
+
+			int startLineNumber = startPosition.getLineNumber();
+
+			if (!_isAtLineStart(
+					fileContents.getLine(startLineNumber - 1),
+					startPosition.getLinePosition())) {
+
+				int lineStartPos = _getLineStartPos(
+					content, startPosition.getLineNumber());
+
+				content = StringUtil.insert(
+					content, "\n",
+					lineStartPos + startPosition.getLinePosition());
+
+				parsedJavaTerm = parsedJavaTerm.getPreviousParsedJavaTerm();
+
+				continue;
+			}
+
+			Position endPosition = parsedJavaTerm.getEndPosition();
+
+			int endLineNumber = endPosition.getLineNumber();
+
+			String endLine = fileContents.getLine(endLineNumber - 1);
+
+			int endLinePosition = endPosition.getLinePosition();
+
+			if (!_isAtLineEnd(endLine, endLinePosition)) {
+				String remainder = StringUtil.trim(
+					endLine.substring(endLinePosition));
+
+				if (Validator.isNull(remainder)) {
+					content = _trimLine(content, endLine, endLineNumber);
+				}
+				else if (remainder.startsWith("//") ||
+						 remainder.startsWith("/*")) {
+
+					content = _fixContent(
+						content, parsedJavaTerm.getContent(), startPosition,
+						endPosition);
+				}
+			}
+
+			parsedJavaTerm = parsedJavaTerm.getPreviousParsedJavaTerm();
+		}
 	}
 
 	private static String _getContent(
@@ -349,14 +663,21 @@ public class JavaParser {
 				parentDetailAST = parentDetailAST.getParent();
 
 				if (parentDetailAST.getType() == TokenTypes.LAMBDA) {
-					String expectedIndent = _getExpectedIndent(
-						parentDetailAST, fileContents);
+					int lambdaLineNumber = parentDetailAST.getLineNo();
+
+					DetailAST firstChildDetailAST =
+						parentDetailAST.getFirstChild();
+
+					if (firstChildDetailAST.getType() == TokenTypes.LPAREN) {
+						lambdaLineNumber = firstChildDetailAST.getLineNo();
+					}
 
 					String actualIndent = StringUtil.removeChar(
-						_getIndent(
-							fileContents.getLine(
-								parentDetailAST.getLineNo() - 1)),
+						_getIndent(fileContents.getLine(lambdaLineNumber - 1)),
 						CharPool.SPACE);
+
+					String expectedIndent = _getExpectedIndent(
+						parentDetailAST, fileContents);
 
 					if (actualIndent.startsWith(expectedIndent)) {
 						indent += StringUtil.replaceFirst(
@@ -441,6 +762,22 @@ public class JavaParser {
 		return lastEnumConstantDefinitionDetailAST;
 	}
 
+	private static List<String> _getLines(String s) throws IOException {
+		List<String> lines = new ArrayList<>();
+
+		try (UnsyncBufferedReader unsyncBufferedReader =
+				new UnsyncBufferedReader(new UnsyncStringReader(s))) {
+
+			String line = null;
+
+			while ((line = unsyncBufferedReader.readLine()) != null) {
+				lines.add(line);
+			}
+		}
+
+		return lines;
+	}
+
 	private static int _getLineStartPos(String content, int lineNumber) {
 		if (lineNumber <= 0) {
 			return -1;
@@ -464,7 +801,8 @@ public class JavaParser {
 	}
 
 	private static ParsedJavaClass _getParsedJavaClass(
-		DetailAST rootDetailAST, FileContents fileContents) {
+			DetailAST rootDetailAST, FileContents fileContents)
+		throws IOException {
 
 		ParsedJavaClass parsedJavaClass = _walk(
 			new ParsedJavaClass(), rootDetailAST, fileContents);
@@ -472,28 +810,6 @@ public class JavaParser {
 		parsedJavaClass.processCommentTokens();
 
 		return parsedJavaClass;
-	}
-
-	private static String[] _getParts(String s, String delimeter) {
-		List<String> parts = new ArrayList<>();
-
-		int x = 0;
-
-		int y = s.indexOf(delimeter, x);
-
-		while (y != -1) {
-			parts.add(s.substring(x, y));
-
-			x = y + delimeter.length();
-
-			y = s.indexOf(delimeter, x);
-		}
-
-		if (x < s.length()) {
-			parts.add(s.substring(x));
-		}
-
-		return parts.toArray(new String[parts.size()]);
 	}
 
 	private static boolean _isAtLineEnd(String line, int x) {
@@ -512,11 +828,36 @@ public class JavaParser {
 		return false;
 	}
 
-	private static boolean _parse(File file, boolean modified)
+	private static boolean _isExcludedJavaTerm(ParsedJavaTerm parsedJavaTerm) {
+		CommonHiddenStreamToken precedingCommentToken =
+			parsedJavaTerm.getPrecedingCommentToken();
+
+		while (true) {
+			if (precedingCommentToken == null) {
+				return false;
+			}
+
+			if (precedingCommentToken.getType() ==
+					TokenTypes.SINGLE_LINE_COMMENT) {
+
+				if (StringUtil.startsWith(
+						StringUtil.trim(precedingCommentToken.getText()),
+						"Skip JavaParser")) {
+
+					return true;
+				}
+			}
+
+			precedingCommentToken = precedingCommentToken.getHiddenBefore();
+		}
+	}
+
+	private static String _parse(File file, String content)
 		throws CheckstyleException, IOException {
 
-		FileText fileText = new FileText(
-			file.getAbsoluteFile(), StandardCharsets.UTF_8.name());
+		List<String> lines = _getLines(content);
+
+		FileText fileText = new FileText(file, lines);
 
 		FileContents fileContents = new FileContents(fileText);
 
@@ -526,215 +867,81 @@ public class JavaParser {
 		ParsedJavaClass parsedJavaClass = _getParsedJavaClass(
 			rootDetailAST, fileContents);
 
-		String content = FileUtil.read(file);
-
-		String newContent = _parseContent(
+		String newContent = _fixIncorrectStartOrEndPositions(
 			content, parsedJavaClass, fileContents);
 
 		if (!newContent.equals(content)) {
-			FileUtil.write(file, newContent);
-
-			return _parse(file, true);
+			return _parse(file, newContent);
 		}
 
-		return modified;
+		newContent = _parseContent(parsedJavaClass, fileContents, lines);
+
+		if (!newContent.equals(content)) {
+			return _parse(file, newContent);
+		}
+
+		return newContent;
 	}
 
 	private static String _parseContent(
-		ParsedJavaTerm parsedJavaTerm, String content,
-		FileContents fileContents) {
+		ParsedJavaClass parsedJavaClass, FileContents fileContents,
+		List<String> lines) {
 
-		if (parsedJavaTerm.getContent() == null) {
-			return content;
-		}
-
-		Position startPosition = parsedJavaTerm.getStartPosition();
-
-		int startLineNumber = startPosition.getLineNumber();
-
-		if (!_isAtLineStart(
-				fileContents.getLine(startLineNumber - 1),
-				startPosition.getLinePosition())) {
-
-			int lineStartPos = _getLineStartPos(
-				content, startPosition.getLineNumber());
-
-			return StringUtil.insert(
-				content, "\n", lineStartPos + startPosition.getLinePosition());
-		}
-
-		Position endPosition = parsedJavaTerm.getEndPosition();
-
-		int endLineNumber = endPosition.getLineNumber();
-
-		String endLine = fileContents.getLine(endLineNumber - 1);
-
-		int endLinePosition = endPosition.getLinePosition();
-
-		if (!_isAtLineEnd(endLine, endLinePosition)) {
-			String remainder = StringUtil.trim(
-				endLine.substring(endLinePosition));
-
-			if (Validator.isNull(remainder)) {
-				return _trimLine(content, endLine, endLineNumber);
-			}
-
-			if (remainder.startsWith("//") || remainder.startsWith("/*")) {
-				return _fixContent(
-					content, parsedJavaTerm.getContent(), startPosition,
-					endPosition);
-			}
-
-			return content;
-		}
-
-		int followingLineAction = parsedJavaTerm.getFollowingLineAction();
-
-		if (followingLineAction != ParsedJavaTerm.NO_ACTION_REQUIRED) {
-			String trimmedFollowingLine = StringUtil.trim(
-				fileContents.getLine(endLineNumber));
-
-			if ((followingLineAction ==
-					ParsedJavaTerm.DOUBLE_LINE_BREAK_REQUIRED) &&
-				Validator.isNotNull(trimmedFollowingLine)) {
-
-				return StringUtil.insert(
-					content, "\n",
-					_getLineStartPos(content, endLineNumber + 1));
-			}
-
-			if ((followingLineAction ==
-					ParsedJavaTerm.SINGLE_LINE_BREAK_REQUIRED) &&
-				Validator.isNull(trimmedFollowingLine)) {
-
-				return _removeLine(content, endLineNumber + 1);
-			}
-		}
-
-		int precedingLineAction = parsedJavaTerm.getPrecedingLineAction();
-
-		if (precedingLineAction != ParsedJavaTerm.NO_ACTION_REQUIRED) {
-			String trimmedPrecedingLine = StringUtil.trim(
-				fileContents.getLine(startLineNumber - 2));
-
-			if ((precedingLineAction ==
-					ParsedJavaTerm.DOUBLE_LINE_BREAK_REQUIRED) &&
-				Validator.isNotNull(trimmedPrecedingLine)) {
-
-				return StringUtil.insert(
-					content, "\n", _getLineStartPos(content, startLineNumber));
-			}
-
-			if ((precedingLineAction ==
-					ParsedJavaTerm.SINGLE_LINE_BREAK_REQUIRED) &&
-				Validator.isNull(trimmedPrecedingLine)) {
-
-				return _removeLine(content, startLineNumber - 1);
-			}
-		}
-
-		String actualIndent = _getIndent(
-			fileContents.getLine(startPosition.getLineNumber() - 1));
-
-		String expectedJavaTermContent = parsedJavaTerm.getContent();
-
-		String expectedIndent = _getIndent(expectedJavaTermContent);
-
-		if (!actualIndent.equals(expectedIndent)) {
-			return _fixIndent(
-				content, startPosition.getLineNumber(), actualIndent,
-				expectedIndent);
-		}
-
-		String actualJavaTermContent = _getContent(
-			fileContents, startLineNumber, endLineNumber);
-
-		if (!actualJavaTermContent.contains(expectedJavaTermContent) &&
-			!actualJavaTermContent.contains("\n\n")) {
-
-			return _fixContent(
-				content, parsedJavaTerm.getContent(), startPosition,
-				endPosition);
-		}
-
-		CommonHiddenStreamToken precedingCommentToken =
-			parsedJavaTerm.getPrecedingCommentToken();
-
-		if (precedingCommentToken == null) {
-			return content;
-		}
-
-		String expectedCommentIndent = expectedIndent;
-
-		String trimmedJavaTermContent = StringUtil.trim(
-			expectedJavaTermContent);
-
-		if (trimmedJavaTermContent.startsWith("}") ||
-			trimmedJavaTermContent.startsWith(")")) {
-
-			expectedCommentIndent += "\t";
-		}
-
-		while (true) {
-			if (precedingCommentToken == null) {
-				break;
-			}
-
-			int lineNumber = precedingCommentToken.getLine();
-
-			if ((lineNumber > 1) &&
-				StringUtil.startsWith(
-					StringUtil.trim(precedingCommentToken.getText()), "*") &&
-				Validator.isNotNull(
-					StringUtil.trim(fileContents.getLine(lineNumber - 2)))) {
-
-				return StringUtil.insert(
-					content, "\n", _getLineStartPos(content, lineNumber));
-			}
-
-			String line = fileContents.getLine(
-				precedingCommentToken.getLine() - 1);
-
-			if (!_isAtLineStart(line, precedingCommentToken.getColumn() - 1)) {
-				break;
-			}
-
-			String actualCommentIndent = _getIndent(line);
-
-			if (!actualCommentIndent.equals(expectedCommentIndent)) {
-				return _fixCommentIndent(
-					content, fileContents, precedingCommentToken,
-					actualCommentIndent, expectedCommentIndent);
-			}
-
-			precedingCommentToken = precedingCommentToken.getHiddenBefore();
-		}
-
-		return content;
-	}
-
-	private static String _parseContent(
-		String content, ParsedJavaClass parsedJavaClass,
-		FileContents fileContents) {
+		ContentModifications contentModifications = new ContentModifications();
 
 		ParsedJavaTerm parsedJavaTerm = parsedJavaClass.getLastParsedJavaTerm();
 
 		while (true) {
 			if (parsedJavaTerm == null) {
-				return StringUtil.replace(content, "\n\n\n", "\n\n");
+				break;
 			}
 
 			if (!parsedJavaTerm.containsCommentToken()) {
-				content = _parseContent(parsedJavaTerm, content, fileContents);
+				contentModifications = _addContentModifications(
+					contentModifications, parsedJavaTerm, fileContents);
 			}
 
 			parsedJavaTerm = parsedJavaTerm.getPreviousParsedJavaTerm();
 		}
+
+		StringBundler sb = new StringBundler();
+
+		for (int i = 0; i < lines.size(); i++) {
+			if (contentModifications.isRemoveLineLineNumber(i + 1)) {
+				continue;
+			}
+
+			if (contentModifications.isInsertLineLineNumber(i + 1)) {
+				sb.append("\n");
+			}
+
+			Tuple replaceContentTuple =
+				contentModifications.getReplaceContentTuple(i + 1);
+
+			if (replaceContentTuple == null) {
+				sb.append(lines.get(i));
+				sb.append("\n");
+
+				continue;
+			}
+
+			sb.append((String)replaceContentTuple.getObject(0));
+			sb.append("\n");
+
+			i = (int)replaceContentTuple.getObject(1) - 1;
+		}
+
+		if (sb.index() > 0) {
+			sb.setIndex(sb.index() - 1);
+		}
+
+		return sb.toString();
 	}
 
 	private static ParsedJavaClass _parseDetailAST(
-		ParsedJavaClass parsedJavaClass, DetailAST detailAST,
-		FileContents fileContents) {
+			ParsedJavaClass parsedJavaClass, DetailAST detailAST,
+			FileContents fileContents)
+		throws IOException {
 
 		if (detailAST == null) {
 			return parsedJavaClass;
@@ -855,13 +1062,33 @@ public class JavaParser {
 		return parsedJavaClass;
 	}
 
-	private static String _removeLine(String content, int lineNumber) {
-		int x = _getLineStartPos(content, lineNumber);
+	private static String _trimContent(String content) throws IOException {
+		StringBundler sb = new StringBundler();
 
-		int y = content.indexOf(CharPool.NEW_LINE, x);
+		try (UnsyncBufferedReader unsyncBufferedReader =
+				new UnsyncBufferedReader(new UnsyncStringReader(content))) {
 
-		return StringUtil.replaceFirst(
-			content, content.substring(x, y + 1), StringPool.BLANK, x);
+			String line = null;
+
+			while ((line = unsyncBufferedReader.readLine()) != null) {
+				sb.append(StringUtil.trimTrailing(line));
+				sb.append("\n");
+			}
+		}
+
+		if (sb.index() > 0) {
+			sb.setIndex(sb.index() - 1);
+		}
+
+		String newContent = sb.toString();
+
+		while (true) {
+			if (!newContent.contains("\n\n\n")) {
+				return newContent;
+			}
+
+			newContent = StringUtil.replace(newContent, "\n\n\n", "\n\n");
+		}
 	}
 
 	private static String _trimLine(
@@ -874,8 +1101,9 @@ public class JavaParser {
 	}
 
 	private static ParsedJavaClass _walk(
-		ParsedJavaClass parsedJavaClass, DetailAST detailAST,
-		FileContents fileContents) {
+			ParsedJavaClass parsedJavaClass, DetailAST detailAST,
+			FileContents fileContents)
+		throws IOException {
 
 		if (detailAST == null) {
 			return parsedJavaClass;
@@ -927,5 +1155,45 @@ public class JavaParser {
 	}
 
 	private static int _maxLineLength;
+
+	private static class ContentModifications {
+
+		public void addInsertLineBreakLineNumber(int lineNumber) {
+			_insertLineBreakLineNumbers.add(lineNumber);
+		}
+
+		public void addRemoveLineLineNumber(int lineNumber) {
+			_removeLineLineNumbers.add(lineNumber);
+		}
+
+		public void addReplaceContent(String content, int lineNumber) {
+			_replaceContentMap.put(lineNumber, new Tuple(content, lineNumber));
+		}
+
+		public void addReplaceContent(
+			String content, int startlineNumber, int endLineNumber) {
+
+			_replaceContentMap.put(
+				startlineNumber, new Tuple(content, endLineNumber));
+		}
+
+		public Tuple getReplaceContentTuple(int lineNumber) {
+			return _replaceContentMap.get(lineNumber);
+		}
+
+		public boolean isInsertLineLineNumber(int lineNumber) {
+			return _insertLineBreakLineNumbers.contains(lineNumber);
+		}
+
+		public boolean isRemoveLineLineNumber(int lineNumber) {
+			return _removeLineLineNumbers.contains(lineNumber);
+		}
+
+		private final List<Integer> _insertLineBreakLineNumbers =
+			new ArrayList<>();
+		private final List<Integer> _removeLineLineNumbers = new ArrayList<>();
+		private final Map<Integer, Tuple> _replaceContentMap = new HashMap<>();
+
+	}
 
 }

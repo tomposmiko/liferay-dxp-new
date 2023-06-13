@@ -20,16 +20,13 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.headless.web.experience.dto.v1_0.ContentStructure;
-import com.liferay.headless.web.experience.dto.v1_0.Fields;
-import com.liferay.headless.web.experience.dto.v1_0.Options;
-import com.liferay.headless.web.experience.internal.dto.v1_0.ContentStructureImpl;
-import com.liferay.headless.web.experience.internal.dto.v1_0.FieldsImpl;
-import com.liferay.headless.web.experience.internal.dto.v1_0.OptionsImpl;
+import com.liferay.headless.web.experience.dto.v1_0.ContentStructureField;
+import com.liferay.headless.web.experience.dto.v1_0.Option;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -50,11 +47,16 @@ public class ContentStructureUtil {
 			return null;
 		}
 
-		return new ContentStructureImpl() {
+		return new ContentStructure() {
 			{
 				availableLanguages = LocaleUtil.toW3cLanguageIds(
 					ddmStructure.getAvailableLanguageIds());
-				contentSpace = ddmStructure.getGroupId();
+				contentSpaceId = ddmStructure.getGroupId();
+				contentStructureFields = TransformUtil.transformToArray(
+					ddmStructure.getRootFieldNames(),
+					fieldName -> _toContentStructureField(
+						ddmStructure.getDDMFormField(fieldName), locale),
+					ContentStructureField.class);
 				creator = CreatorUtil.toCreator(
 					portal,
 					userLocalService.getUserById(ddmStructure.getUserId()));
@@ -63,20 +65,6 @@ public class ContentStructureUtil {
 				description = ddmStructure.getDescription(locale);
 				id = ddmStructure.getStructureId();
 				name = ddmStructure.getName(locale);
-
-				setFields(
-					() -> {
-						List<DDMFormField> ddmFormFields =
-							ddmStructure.getDDMFormFields(true);
-
-						Stream<DDMFormField> stream = ddmFormFields.stream();
-
-						return stream.map(
-							ddmFormField -> _toFields(ddmFormField, locale)
-						).toArray(
-							Fields[]::new
-						);
-					});
 			}
 		};
 	}
@@ -115,13 +103,20 @@ public class ContentStructureUtil {
 		return null;
 	}
 
-	private static Fields _toFields(DDMFormField ddmFormField, Locale locale) {
-		return new FieldsImpl() {
+	private static ContentStructureField _toContentStructureField(
+		DDMFormField ddmFormField, Locale locale) {
+
+		return new ContentStructureField() {
 			{
 				label = _toString(ddmFormField.getLabel(), locale);
 				localizable = ddmFormField.isLocalizable();
 				multiple = ddmFormField.isMultiple();
 				name = ddmFormField.getName();
+				nestedContentStructureFields = TransformUtil.transformToArray(
+					ddmFormField.getNestedDDMFormFields(),
+					ddmFormField -> _toContentStructureField(
+						ddmFormField, locale),
+					ContentStructureField.class);
 				predefinedValue = _toString(
 					ddmFormField.getPredefinedValue(), locale);
 				repeatable = ddmFormField.isRepeatable();
@@ -135,29 +130,26 @@ public class ContentStructureUtil {
 				setMultiple(ddmFormField.isMultiple());
 				setName(ddmFormField.getName());
 				setOptions(
-					() -> {
-						return Optional.ofNullable(
-							ddmFormField.getDDMFormFieldOptions()
-						).map(
-							DDMFormFieldOptions::getOptions
-						).map(
-							Map::entrySet
-						).map(
-							Set::stream
-						).orElseGet(
-							Stream::empty
-						).map(
-							entry -> new OptionsImpl() {
-								{
-									setLabel(
-										_toString(entry.getValue(), locale));
-									setValue(entry.getKey());
-								}
+					() -> Optional.ofNullable(
+						ddmFormField.getDDMFormFieldOptions()
+					).map(
+						DDMFormFieldOptions::getOptions
+					).map(
+						Map::entrySet
+					).map(
+						Set::stream
+					).orElseGet(
+						Stream::empty
+					).map(
+						entry -> new Option() {
+							{
+								setLabel(_toString(entry.getValue(), locale));
+								setValue(entry.getKey());
 							}
-						).toArray(
-							Options[]::new
-						);
-					});
+						}
+					).toArray(
+						Option[]::new
+					));
 			}
 		};
 	}

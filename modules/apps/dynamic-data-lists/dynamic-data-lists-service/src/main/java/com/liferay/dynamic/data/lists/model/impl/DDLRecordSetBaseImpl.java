@@ -32,8 +32,9 @@ import com.liferay.dynamic.data.lists.service.DDLRecordSetLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DDLRecordSetBaseImpl extends DDLRecordSetModelImpl
-	implements DDLRecordSet {
+public abstract class DDLRecordSetBaseImpl
+	extends DDLRecordSetModelImpl implements DDLRecordSet {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class DDLRecordSetBaseImpl extends DDLRecordSetModelImpl
 			DDLRecordSetLocalServiceUtil.updateDDLRecordSet(this);
 		}
 	}
+
 }

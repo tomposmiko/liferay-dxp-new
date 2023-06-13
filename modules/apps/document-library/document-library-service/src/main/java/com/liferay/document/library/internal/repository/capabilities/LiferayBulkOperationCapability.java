@@ -87,7 +87,7 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 			_dlFolderServiceAdapter.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setAddCriteriaMethod(
-			new RepositoryModelAddCriteriaMethod(filter));
+			new RepositoryModelAddCriteriaMethod(filter, true));
 		actionableDynamicQuery.setPerformActionMethod(
 			new FolderPerformActionMethod(repositoryModelOperation));
 
@@ -119,6 +119,10 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 		public void performAction(DLFileEntry dlFileEntry)
 			throws PortalException {
 
+			if (dlFileEntry.isInTrash()) {
+				return;
+			}
+
 			FileEntry fileEntry = new LiferayFileEntry(dlFileEntry);
 
 			fileEntry.execute(_repositoryModelOperation);
@@ -139,7 +143,7 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 
 		@Override
 		public void performAction(DLFolder dlFolder) throws PortalException {
-			if (dlFolder.isMountPoint()) {
+			if (dlFolder.isMountPoint() || dlFolder.isInTrash()) {
 				return;
 			}
 
@@ -156,7 +160,14 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 		implements ActionableDynamicQuery.AddCriteriaMethod {
 
 		public RepositoryModelAddCriteriaMethod(Filter<?> filter) {
+			this(filter, false);
+		}
+
+		public RepositoryModelAddCriteriaMethod(
+			Filter<?> filter, boolean folder) {
+
 			_filter = filter;
+			_folder = folder;
 		}
 
 		@Override
@@ -178,6 +189,10 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 			if (fieldName == null) {
 				throw new UnsupportedOperationException(
 					"Unsupported field " + field.getName());
+			}
+
+			if (_folder && fieldName.equals("folderId")) {
+				fieldName = "parentFolderId";
 			}
 
 			Operator operator = _filter.getOperator();
@@ -202,6 +217,7 @@ public class LiferayBulkOperationCapability implements BulkOperationCapability {
 		}
 
 		private final Filter<?> _filter;
+		private boolean _folder;
 
 	}
 

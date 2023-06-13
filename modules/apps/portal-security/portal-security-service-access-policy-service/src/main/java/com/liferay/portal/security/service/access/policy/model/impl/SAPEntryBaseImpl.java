@@ -32,8 +32,9 @@ import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalSe
  * @generated
  */
 @ProviderType
-public abstract class SAPEntryBaseImpl extends SAPEntryModelImpl
-	implements SAPEntry {
+public abstract class SAPEntryBaseImpl
+	extends SAPEntryModelImpl implements SAPEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class SAPEntryBaseImpl extends SAPEntryModelImpl
 			SAPEntryLocalServiceUtil.updateSAPEntry(this);
 		}
 	}
+
 }

@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.tools.service.builder.test.model.UADPartialEntry;
 import com.liferay.portal.tools.service.builder.test.service.UADPartialEntryLocalService;
 import com.liferay.portal.tools.service.builder.test.uad.constants.SBTestUADConstants;
-
 import com.liferay.user.associated.data.exporter.DynamicQueryUADExporter;
 
 import org.osgi.service.component.annotations.Reference;
@@ -38,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class BaseUADPartialEntryUADExporter
 	extends DynamicQueryUADExporter<UADPartialEntry> {
+
 	@Override
 	public Class<UADPartialEntry> getTypeClass() {
 		return UADPartialEntry.class;
@@ -86,4 +86,5 @@ public abstract class BaseUADPartialEntryUADExporter
 
 	@Reference
 	protected UADPartialEntryLocalService uadPartialEntryLocalService;
+
 }

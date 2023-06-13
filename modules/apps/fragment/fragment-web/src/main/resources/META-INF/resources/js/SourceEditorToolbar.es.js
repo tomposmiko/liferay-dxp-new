@@ -6,8 +6,7 @@ import AceEditor from './AceEditor.es';
 import templates from './SourceEditorToolbar.soy';
 
 /**
- * Component that creates an instance of Source Editor toolbar.
- * @review
+ * Creates a Source Editor Toolbar component.
  */
 
 class SourceEditorToolbar extends Component {
@@ -15,7 +14,6 @@ class SourceEditorToolbar extends Component {
 	/**
 	 * @inheritDoc
 	 */
-
 	created() {
 		this._updateSyntaxLabel(this.syntax);
 	}
@@ -23,7 +21,6 @@ class SourceEditorToolbar extends Component {
 	/**
 	 * @inheritDoc
 	 */
-
 	willReceiveState(changes) {
 		if (changes.syntax) {
 			this._updateSyntaxLabel(changes.syntax);
@@ -31,21 +28,18 @@ class SourceEditorToolbar extends Component {
 	}
 
 	/**
-	 * Updates _syntaxLabel attribute mapping the given syntax
+	 * Updates the <code>_syntaxLabel</code> attribute mapping with the given syntax.
 	 * @param {!string} syntax
 	 * @private
 	 */
-
 	_updateSyntaxLabel(syntax) {
 		this._syntaxLabel = SourceEditorToolbar.SYNTAX_LABEL[syntax] || syntax;
 	}
 }
 
 /**
- * Labels associated to the editor syntax that will be shown
- * to the user.
+ * Editor labels to display to the user.
  */
-
 SourceEditorToolbar.SYNTAX_LABEL = {
 	[AceEditor.SYNTAX.css]: 'CSS',
 	[AceEditor.SYNTAX.html]: 'HTML',
@@ -54,11 +48,9 @@ SourceEditorToolbar.SYNTAX_LABEL = {
 
 /**
  * State definition.
- * @review
  * @static
  * @type {!Object}
  */
-
 SourceEditorToolbar.STATE = {
 
 	/**
@@ -66,10 +58,8 @@ SourceEditorToolbar.STATE = {
 	 * @default undefined
 	 * @instance
 	 * @memberOf SourceEditorToolbar
-	 * @review
 	 * @type {!string}
 	 */
-
 	syntax: Config.oneOf(Object.values(AceEditor.SYNTAX)).required(),
 
 	/**
@@ -78,10 +68,8 @@ SourceEditorToolbar.STATE = {
 	 * @instance
 	 * @memberOf SourceEditorToolbar
 	 * @private
-	 * @review
 	 * @type {string}
 	 */
-
 	_syntaxLabel: Config.string()
 		.internal()
 		.value('')

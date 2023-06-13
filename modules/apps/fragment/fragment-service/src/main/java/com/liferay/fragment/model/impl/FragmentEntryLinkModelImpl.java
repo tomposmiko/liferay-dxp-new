@@ -18,14 +18,10 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.model.FragmentEntryLinkModel;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CacheModel;
@@ -63,37 +59,32 @@ import java.util.function.Function;
  * @generated
  */
 @ProviderType
-public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
-	implements FragmentEntryLinkModel {
+public class FragmentEntryLinkModelImpl
+	extends BaseModelImpl<FragmentEntryLink> implements FragmentEntryLinkModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a fragment entry link model instance should use the <code>FragmentEntryLink</code> interface instead.
 	 */
 	public static final String TABLE_NAME = "FragmentEntryLink";
+
 	public static final Object[][] TABLE_COLUMNS = {
-			{ "uuid_", Types.VARCHAR },
-			{ "fragmentEntryLinkId", Types.BIGINT },
-			{ "groupId", Types.BIGINT },
-			{ "companyId", Types.BIGINT },
-			{ "userId", Types.BIGINT },
-			{ "userName", Types.VARCHAR },
-			{ "createDate", Types.TIMESTAMP },
-			{ "modifiedDate", Types.TIMESTAMP },
-			{ "originalFragmentEntryLinkId", Types.BIGINT },
-			{ "fragmentEntryId", Types.BIGINT },
-			{ "classNameId", Types.BIGINT },
-			{ "classPK", Types.BIGINT },
-			{ "css", Types.VARCHAR },
-			{ "html", Types.VARCHAR },
-			{ "js", Types.VARCHAR },
-			{ "editableValues", Types.VARCHAR },
-			{ "position", Types.INTEGER },
-			{ "lastPropagationDate", Types.TIMESTAMP },
-			{ "namespace", Types.VARCHAR },
-			{ "lastPublishDate", Types.TIMESTAMP }
-		};
-	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
+		{"uuid_", Types.VARCHAR}, {"fragmentEntryLinkId", Types.BIGINT},
+		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"originalFragmentEntryLinkId", Types.BIGINT},
+		{"fragmentEntryId", Types.BIGINT}, {"classNameId", Types.BIGINT},
+		{"classPK", Types.BIGINT}, {"css", Types.VARCHAR},
+		{"html", Types.VARCHAR}, {"js", Types.VARCHAR},
+		{"editableValues", Types.VARCHAR}, {"position", Types.INTEGER},
+		{"lastPropagationDate", Types.TIMESTAMP}, {"namespace", Types.VARCHAR},
+		{"lastPublishDate", Types.TIMESTAMP}
+	};
+
+	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
+		new HashMap<String, Integer>();
 
 	static {
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
@@ -118,31 +109,55 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 		TABLE_COLUMNS_MAP.put("lastPublishDate", Types.TIMESTAMP);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table FragmentEntryLink (uuid_ VARCHAR(75) null,fragmentEntryLinkId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,originalFragmentEntryLinkId LONG,fragmentEntryId LONG,classNameId LONG,classPK LONG,css STRING null,html STRING null,js STRING null,editableValues STRING null,position INTEGER,lastPropagationDate DATE null,namespace VARCHAR(75) null,lastPublishDate DATE null)";
+	public static final String TABLE_SQL_CREATE =
+		"create table FragmentEntryLink (uuid_ VARCHAR(75) null,fragmentEntryLinkId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,originalFragmentEntryLinkId LONG,fragmentEntryId LONG,classNameId LONG,classPK LONG,css STRING null,html STRING null,js STRING null,editableValues STRING null,position INTEGER,lastPropagationDate DATE null,namespace VARCHAR(75) null,lastPublishDate DATE null)";
+
 	public static final String TABLE_SQL_DROP = "drop table FragmentEntryLink";
-	public static final String ORDER_BY_JPQL = " ORDER BY fragmentEntryLink.classNameId ASC, fragmentEntryLink.classPK ASC, fragmentEntryLink.position ASC";
-	public static final String ORDER_BY_SQL = " ORDER BY FragmentEntryLink.classNameId ASC, FragmentEntryLink.classPK ASC, FragmentEntryLink.position ASC";
+
+	public static final String ORDER_BY_JPQL =
+		" ORDER BY fragmentEntryLink.classNameId ASC, fragmentEntryLink.classPK ASC, fragmentEntryLink.position ASC";
+
+	public static final String ORDER_BY_SQL =
+		" ORDER BY FragmentEntryLink.classNameId ASC, FragmentEntryLink.classPK ASC, FragmentEntryLink.position ASC";
+
 	public static final String DATA_SOURCE = "liferayDataSource";
+
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
+
 	public static final String TX_MANAGER = "liferayTransactionManager";
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.fragment.service.util.ServiceProps.get(
-				"value.object.entity.cache.enabled.com.liferay.fragment.model.FragmentEntryLink"),
-			true);
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.fragment.service.util.ServiceProps.get(
-				"value.object.finder.cache.enabled.com.liferay.fragment.model.FragmentEntryLink"),
-			true);
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.fragment.service.util.ServiceProps.get(
-				"value.object.column.bitmask.enabled.com.liferay.fragment.model.FragmentEntryLink"),
-			true);
+
+	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(
+		com.liferay.fragment.service.util.ServiceProps.get(
+			"value.object.entity.cache.enabled.com.liferay.fragment.model.FragmentEntryLink"),
+		true);
+
+	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(
+		com.liferay.fragment.service.util.ServiceProps.get(
+			"value.object.finder.cache.enabled.com.liferay.fragment.model.FragmentEntryLink"),
+		true);
+
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(
+		com.liferay.fragment.service.util.ServiceProps.get(
+			"value.object.column.bitmask.enabled.com.liferay.fragment.model.FragmentEntryLink"),
+		true);
+
 	public static final long CLASSNAMEID_COLUMN_BITMASK = 1L;
+
 	public static final long CLASSPK_COLUMN_BITMASK = 2L;
+
 	public static final long COMPANYID_COLUMN_BITMASK = 4L;
+
 	public static final long FRAGMENTENTRYID_COLUMN_BITMASK = 8L;
+
 	public static final long GROUPID_COLUMN_BITMASK = 16L;
+
 	public static final long UUID_COLUMN_BITMASK = 32L;
+
 	public static final long POSITION_COLUMN_BITMASK = 64L;
-	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.fragment.service.util.ServiceProps.get(
-				"lock.expiration.time.com.liferay.fragment.model.FragmentEntryLink"));
+
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
+		com.liferay.fragment.service.util.ServiceProps.get(
+			"lock.expiration.time.com.liferay.fragment.model.FragmentEntryLink"));
 
 	public FragmentEntryLinkModelImpl() {
 	}
@@ -181,14 +196,18 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		Map<String, Function<FragmentEntryLink, Object>> attributeGetterFunctions =
-			getAttributeGetterFunctions();
+		Map<String, Function<FragmentEntryLink, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
 
-		for (Map.Entry<String, Function<FragmentEntryLink, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<FragmentEntryLink, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<FragmentEntryLink, Object> attributeGetterFunction = entry.getValue();
+			Function<FragmentEntryLink, Object> attributeGetterFunction =
+				entry.getValue();
 
-			attributes.put(attributeName,
+			attributes.put(
+				attributeName,
 				attributeGetterFunction.apply((FragmentEntryLink)this));
 		}
 
@@ -200,83 +219,160 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Map<String, BiConsumer<FragmentEntryLink, Object>> attributeSetterBiConsumers =
-			getAttributeSetterBiConsumers();
+		Map<String, BiConsumer<FragmentEntryLink, Object>>
+			attributeSetterBiConsumers = getAttributeSetterBiConsumers();
 
 		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
 			String attributeName = entry.getKey();
 
-			BiConsumer<FragmentEntryLink, Object> attributeSetterBiConsumer = attributeSetterBiConsumers.get(attributeName);
+			BiConsumer<FragmentEntryLink, Object> attributeSetterBiConsumer =
+				attributeSetterBiConsumers.get(attributeName);
 
 			if (attributeSetterBiConsumer != null) {
-				attributeSetterBiConsumer.accept((FragmentEntryLink)this,
-					entry.getValue());
+				attributeSetterBiConsumer.accept(
+					(FragmentEntryLink)this, entry.getValue());
 			}
 		}
 	}
 
-	public Map<String, Function<FragmentEntryLink, Object>> getAttributeGetterFunctions() {
+	public Map<String, Function<FragmentEntryLink, Object>>
+		getAttributeGetterFunctions() {
+
 		return _attributeGetterFunctions;
 	}
 
-	public Map<String, BiConsumer<FragmentEntryLink, Object>> getAttributeSetterBiConsumers() {
+	public Map<String, BiConsumer<FragmentEntryLink, Object>>
+		getAttributeSetterBiConsumers() {
+
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<FragmentEntryLink, Object>> _attributeGetterFunctions;
-	private static final Map<String, BiConsumer<FragmentEntryLink, Object>> _attributeSetterBiConsumers;
+	private static final Map<String, Function<FragmentEntryLink, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<FragmentEntryLink, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
-		Map<String, Function<FragmentEntryLink, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<FragmentEntryLink, Object>>();
-		Map<String, BiConsumer<FragmentEntryLink, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<FragmentEntryLink, ?>>();
-
+		Map<String, Function<FragmentEntryLink, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<FragmentEntryLink, Object>>();
+		Map<String, BiConsumer<FragmentEntryLink, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<FragmentEntryLink, ?>>();
 
 		attributeGetterFunctions.put("uuid", FragmentEntryLink::getUuid);
-		attributeSetterBiConsumers.put("uuid", (BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setUuid);
-		attributeGetterFunctions.put("fragmentEntryLinkId", FragmentEntryLink::getFragmentEntryLinkId);
-		attributeSetterBiConsumers.put("fragmentEntryLinkId", (BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setFragmentEntryLinkId);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setUuid);
+		attributeGetterFunctions.put(
+			"fragmentEntryLinkId", FragmentEntryLink::getFragmentEntryLinkId);
+		attributeSetterBiConsumers.put(
+			"fragmentEntryLinkId",
+			(BiConsumer<FragmentEntryLink, Long>)
+				FragmentEntryLink::setFragmentEntryLinkId);
 		attributeGetterFunctions.put("groupId", FragmentEntryLink::getGroupId);
-		attributeSetterBiConsumers.put("groupId", (BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setGroupId);
-		attributeGetterFunctions.put("companyId", FragmentEntryLink::getCompanyId);
-		attributeSetterBiConsumers.put("companyId", (BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setCompanyId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", FragmentEntryLink::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<FragmentEntryLink, Long>)
+				FragmentEntryLink::setCompanyId);
 		attributeGetterFunctions.put("userId", FragmentEntryLink::getUserId);
-		attributeSetterBiConsumers.put("userId", (BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setUserId);
-		attributeGetterFunctions.put("userName", FragmentEntryLink::getUserName);
-		attributeSetterBiConsumers.put("userName", (BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setUserName);
-		attributeGetterFunctions.put("createDate", FragmentEntryLink::getCreateDate);
-		attributeSetterBiConsumers.put("createDate", (BiConsumer<FragmentEntryLink, Date>)FragmentEntryLink::setCreateDate);
-		attributeGetterFunctions.put("modifiedDate", FragmentEntryLink::getModifiedDate);
-		attributeSetterBiConsumers.put("modifiedDate", (BiConsumer<FragmentEntryLink, Date>)FragmentEntryLink::setModifiedDate);
-		attributeGetterFunctions.put("originalFragmentEntryLinkId", FragmentEntryLink::getOriginalFragmentEntryLinkId);
-		attributeSetterBiConsumers.put("originalFragmentEntryLinkId", (BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setOriginalFragmentEntryLinkId);
-		attributeGetterFunctions.put("fragmentEntryId", FragmentEntryLink::getFragmentEntryId);
-		attributeSetterBiConsumers.put("fragmentEntryId", (BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setFragmentEntryId);
-		attributeGetterFunctions.put("classNameId", FragmentEntryLink::getClassNameId);
-		attributeSetterBiConsumers.put("classNameId", (BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setClassNameId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setUserId);
+		attributeGetterFunctions.put(
+			"userName", FragmentEntryLink::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<FragmentEntryLink, String>)
+				FragmentEntryLink::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", FragmentEntryLink::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<FragmentEntryLink, Date>)
+				FragmentEntryLink::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", FragmentEntryLink::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<FragmentEntryLink, Date>)
+				FragmentEntryLink::setModifiedDate);
+		attributeGetterFunctions.put(
+			"originalFragmentEntryLinkId",
+			FragmentEntryLink::getOriginalFragmentEntryLinkId);
+		attributeSetterBiConsumers.put(
+			"originalFragmentEntryLinkId",
+			(BiConsumer<FragmentEntryLink, Long>)
+				FragmentEntryLink::setOriginalFragmentEntryLinkId);
+		attributeGetterFunctions.put(
+			"fragmentEntryId", FragmentEntryLink::getFragmentEntryId);
+		attributeSetterBiConsumers.put(
+			"fragmentEntryId",
+			(BiConsumer<FragmentEntryLink, Long>)
+				FragmentEntryLink::setFragmentEntryId);
+		attributeGetterFunctions.put(
+			"classNameId", FragmentEntryLink::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<FragmentEntryLink, Long>)
+				FragmentEntryLink::setClassNameId);
 		attributeGetterFunctions.put("classPK", FragmentEntryLink::getClassPK);
-		attributeSetterBiConsumers.put("classPK", (BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK",
+			(BiConsumer<FragmentEntryLink, Long>)FragmentEntryLink::setClassPK);
 		attributeGetterFunctions.put("css", FragmentEntryLink::getCss);
-		attributeSetterBiConsumers.put("css", (BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setCss);
+		attributeSetterBiConsumers.put(
+			"css",
+			(BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setCss);
 		attributeGetterFunctions.put("html", FragmentEntryLink::getHtml);
-		attributeSetterBiConsumers.put("html", (BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setHtml);
+		attributeSetterBiConsumers.put(
+			"html",
+			(BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setHtml);
 		attributeGetterFunctions.put("js", FragmentEntryLink::getJs);
-		attributeSetterBiConsumers.put("js", (BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setJs);
-		attributeGetterFunctions.put("editableValues", FragmentEntryLink::getEditableValues);
-		attributeSetterBiConsumers.put("editableValues", (BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setEditableValues);
-		attributeGetterFunctions.put("position", FragmentEntryLink::getPosition);
-		attributeSetterBiConsumers.put("position", (BiConsumer<FragmentEntryLink, Integer>)FragmentEntryLink::setPosition);
-		attributeGetterFunctions.put("lastPropagationDate", FragmentEntryLink::getLastPropagationDate);
-		attributeSetterBiConsumers.put("lastPropagationDate", (BiConsumer<FragmentEntryLink, Date>)FragmentEntryLink::setLastPropagationDate);
-		attributeGetterFunctions.put("namespace", FragmentEntryLink::getNamespace);
-		attributeSetterBiConsumers.put("namespace", (BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setNamespace);
-		attributeGetterFunctions.put("lastPublishDate", FragmentEntryLink::getLastPublishDate);
-		attributeSetterBiConsumers.put("lastPublishDate", (BiConsumer<FragmentEntryLink, Date>)FragmentEntryLink::setLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"js",
+			(BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setJs);
+		attributeGetterFunctions.put(
+			"editableValues", FragmentEntryLink::getEditableValues);
+		attributeSetterBiConsumers.put(
+			"editableValues",
+			(BiConsumer<FragmentEntryLink, String>)
+				FragmentEntryLink::setEditableValues);
+		attributeGetterFunctions.put(
+			"position", FragmentEntryLink::getPosition);
+		attributeSetterBiConsumers.put(
+			"position",
+			(BiConsumer<FragmentEntryLink, Integer>)
+				FragmentEntryLink::setPosition);
+		attributeGetterFunctions.put(
+			"lastPropagationDate", FragmentEntryLink::getLastPropagationDate);
+		attributeSetterBiConsumers.put(
+			"lastPropagationDate",
+			(BiConsumer<FragmentEntryLink, Date>)
+				FragmentEntryLink::setLastPropagationDate);
+		attributeGetterFunctions.put(
+			"namespace", FragmentEntryLink::getNamespace);
+		attributeSetterBiConsumers.put(
+			"namespace",
+			(BiConsumer<FragmentEntryLink, String>)
+				FragmentEntryLink::setNamespace);
+		attributeGetterFunctions.put(
+			"lastPublishDate", FragmentEntryLink::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<FragmentEntryLink, Date>)
+				FragmentEntryLink::setLastPublishDate);
 
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(attributeGetterFunctions);
-		_attributeSetterBiConsumers = Collections.unmodifiableMap((Map)attributeSetterBiConsumers);
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -431,7 +527,9 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 	}
 
 	@Override
-	public void setOriginalFragmentEntryLinkId(long originalFragmentEntryLinkId) {
+	public void setOriginalFragmentEntryLinkId(
+		long originalFragmentEntryLinkId) {
+
 		_originalFragmentEntryLinkId = originalFragmentEntryLinkId;
 	}
 
@@ -630,8 +728,9 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return new StagedModelType(PortalUtil.getClassNameId(
-				FragmentEntryLink.class.getName()), getClassNameId());
+		return new StagedModelType(
+			PortalUtil.getClassNameId(FragmentEntryLink.class.getName()),
+			getClassNameId());
 	}
 
 	public long getColumnBitmask() {
@@ -640,8 +739,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-			FragmentEntryLink.class.getName(), getPrimaryKey());
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(
+			getCompanyId(), FragmentEntryLink.class.getName(), getPrimaryKey());
 	}
 
 	@Override
@@ -654,8 +753,9 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 	@Override
 	public FragmentEntryLink toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = (FragmentEntryLink)ProxyUtil.newProxyInstance(_classLoader,
-					_escapedModelInterfaces, new AutoEscapeBeanHandler(this));
+			_escapedModel = (FragmentEntryLink)ProxyUtil.newProxyInstance(
+				_classLoader, _escapedModelInterfaces,
+				new AutoEscapeBeanHandler(this));
 		}
 
 		return _escapedModel;
@@ -663,7 +763,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 
 	@Override
 	public Object clone() {
-		FragmentEntryLinkImpl fragmentEntryLinkImpl = new FragmentEntryLinkImpl();
+		FragmentEntryLinkImpl fragmentEntryLinkImpl =
+			new FragmentEntryLinkImpl();
 
 		fragmentEntryLinkImpl.setUuid(getUuid());
 		fragmentEntryLinkImpl.setFragmentEntryLinkId(getFragmentEntryLinkId());
@@ -673,7 +774,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 		fragmentEntryLinkImpl.setUserName(getUserName());
 		fragmentEntryLinkImpl.setCreateDate(getCreateDate());
 		fragmentEntryLinkImpl.setModifiedDate(getModifiedDate());
-		fragmentEntryLinkImpl.setOriginalFragmentEntryLinkId(getOriginalFragmentEntryLinkId());
+		fragmentEntryLinkImpl.setOriginalFragmentEntryLinkId(
+			getOriginalFragmentEntryLinkId());
 		fragmentEntryLinkImpl.setFragmentEntryId(getFragmentEntryId());
 		fragmentEntryLinkImpl.setClassNameId(getClassNameId());
 		fragmentEntryLinkImpl.setClassPK(getClassPK());
@@ -781,27 +883,33 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 	public void resetOriginalValues() {
 		FragmentEntryLinkModelImpl fragmentEntryLinkModelImpl = this;
 
-		fragmentEntryLinkModelImpl._originalUuid = fragmentEntryLinkModelImpl._uuid;
+		fragmentEntryLinkModelImpl._originalUuid =
+			fragmentEntryLinkModelImpl._uuid;
 
-		fragmentEntryLinkModelImpl._originalGroupId = fragmentEntryLinkModelImpl._groupId;
+		fragmentEntryLinkModelImpl._originalGroupId =
+			fragmentEntryLinkModelImpl._groupId;
 
 		fragmentEntryLinkModelImpl._setOriginalGroupId = false;
 
-		fragmentEntryLinkModelImpl._originalCompanyId = fragmentEntryLinkModelImpl._companyId;
+		fragmentEntryLinkModelImpl._originalCompanyId =
+			fragmentEntryLinkModelImpl._companyId;
 
 		fragmentEntryLinkModelImpl._setOriginalCompanyId = false;
 
 		fragmentEntryLinkModelImpl._setModifiedDate = false;
 
-		fragmentEntryLinkModelImpl._originalFragmentEntryId = fragmentEntryLinkModelImpl._fragmentEntryId;
+		fragmentEntryLinkModelImpl._originalFragmentEntryId =
+			fragmentEntryLinkModelImpl._fragmentEntryId;
 
 		fragmentEntryLinkModelImpl._setOriginalFragmentEntryId = false;
 
-		fragmentEntryLinkModelImpl._originalClassNameId = fragmentEntryLinkModelImpl._classNameId;
+		fragmentEntryLinkModelImpl._originalClassNameId =
+			fragmentEntryLinkModelImpl._classNameId;
 
 		fragmentEntryLinkModelImpl._setOriginalClassNameId = false;
 
-		fragmentEntryLinkModelImpl._originalClassPK = fragmentEntryLinkModelImpl._classPK;
+		fragmentEntryLinkModelImpl._originalClassPK =
+			fragmentEntryLinkModelImpl._classPK;
 
 		fragmentEntryLinkModelImpl._setOriginalClassPK = false;
 
@@ -810,7 +918,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 
 	@Override
 	public CacheModel<FragmentEntryLink> toCacheModel() {
-		FragmentEntryLinkCacheModel fragmentEntryLinkCacheModel = new FragmentEntryLinkCacheModel();
+		FragmentEntryLinkCacheModel fragmentEntryLinkCacheModel =
+			new FragmentEntryLinkCacheModel();
 
 		fragmentEntryLinkCacheModel.uuid = getUuid();
 
@@ -820,7 +929,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 			fragmentEntryLinkCacheModel.uuid = null;
 		}
 
-		fragmentEntryLinkCacheModel.fragmentEntryLinkId = getFragmentEntryLinkId();
+		fragmentEntryLinkCacheModel.fragmentEntryLinkId =
+			getFragmentEntryLinkId();
 
 		fragmentEntryLinkCacheModel.groupId = getGroupId();
 
@@ -854,7 +964,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 			fragmentEntryLinkCacheModel.modifiedDate = Long.MIN_VALUE;
 		}
 
-		fragmentEntryLinkCacheModel.originalFragmentEntryLinkId = getOriginalFragmentEntryLinkId();
+		fragmentEntryLinkCacheModel.originalFragmentEntryLinkId =
+			getOriginalFragmentEntryLinkId();
 
 		fragmentEntryLinkCacheModel.fragmentEntryId = getFragmentEntryId();
 
@@ -899,7 +1010,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 		Date lastPropagationDate = getLastPropagationDate();
 
 		if (lastPropagationDate != null) {
-			fragmentEntryLinkCacheModel.lastPropagationDate = lastPropagationDate.getTime();
+			fragmentEntryLinkCacheModel.lastPropagationDate =
+				lastPropagationDate.getTime();
 		}
 		else {
 			fragmentEntryLinkCacheModel.lastPropagationDate = Long.MIN_VALUE;
@@ -916,7 +1028,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 		Date lastPublishDate = getLastPublishDate();
 
 		if (lastPublishDate != null) {
-			fragmentEntryLinkCacheModel.lastPublishDate = lastPublishDate.getTime();
+			fragmentEntryLinkCacheModel.lastPublishDate =
+				lastPublishDate.getTime();
 		}
 		else {
 			fragmentEntryLinkCacheModel.lastPublishDate = Long.MIN_VALUE;
@@ -927,17 +1040,20 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 
 	@Override
 	public String toString() {
-		Map<String, Function<FragmentEntryLink, Object>> attributeGetterFunctions =
-			getAttributeGetterFunctions();
+		Map<String, Function<FragmentEntryLink, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((4 * attributeGetterFunctions.size()) +
-				2);
+		StringBundler sb = new StringBundler(
+			4 * attributeGetterFunctions.size() + 2);
 
 		sb.append("{");
 
-		for (Map.Entry<String, Function<FragmentEntryLink, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<FragmentEntryLink, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<FragmentEntryLink, Object> attributeGetterFunction = entry.getValue();
+			Function<FragmentEntryLink, Object> attributeGetterFunction =
+				entry.getValue();
 
 			sb.append(attributeName);
 			sb.append("=");
@@ -956,19 +1072,22 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 
 	@Override
 	public String toXmlString() {
-		Map<String, Function<FragmentEntryLink, Object>> attributeGetterFunctions =
-			getAttributeGetterFunctions();
+		Map<String, Function<FragmentEntryLink, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((5 * attributeGetterFunctions.size()) +
-				4);
+		StringBundler sb = new StringBundler(
+			5 * attributeGetterFunctions.size() + 4);
 
 		sb.append("<model><model-name>");
 		sb.append(getModelClassName());
 		sb.append("</model-name>");
 
-		for (Map.Entry<String, Function<FragmentEntryLink, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<FragmentEntryLink, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<FragmentEntryLink, Object> attributeGetterFunction = entry.getValue();
+			Function<FragmentEntryLink, Object> attributeGetterFunction =
+				entry.getValue();
 
 			sb.append("<column><column-name>");
 			sb.append(attributeName);
@@ -982,10 +1101,12 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader = FragmentEntryLink.class.getClassLoader();
+	private static final ClassLoader _classLoader =
+		FragmentEntryLink.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			FragmentEntryLink.class, ModelWrapper.class
-		};
+		FragmentEntryLink.class, ModelWrapper.class
+	};
+
 	private String _uuid;
 	private String _originalUuid;
 	private long _fragmentEntryLinkId;
@@ -1020,4 +1141,5 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 	private Date _lastPublishDate;
 	private long _columnBitmask;
 	private FragmentEntryLink _escapedModel;
+
 }

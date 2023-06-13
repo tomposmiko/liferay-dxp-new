@@ -238,6 +238,8 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 
 			ServiceContext serviceContext = new ServiceContext();
 
+			serviceContext.setAddGuestPermissions(true);
+
 			Group group = _groupLocalService.getCompanyGroup(
 				company.getCompanyId());
 

@@ -24,7 +24,6 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
-import com.liferay.journal.constants.JournalContentPortletKeys;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.constants.JournalWebKeys;
 import com.liferay.journal.content.asset.addon.entry.ContentMetadataAssetAddonEntry;
@@ -441,7 +440,7 @@ public class JournalContentDisplayContext {
 
 		Group scopeGroup = themeDisplay.getScopeGroup();
 
-		if (!scopeGroup.isStaged() ||
+		if (scopeGroup.isStaged() &&
 			!scopeGroup.isInStagingPortlet(JournalPortletKeys.JOURNAL)) {
 
 			groupId = scopeGroup.getLiveGroupId();
@@ -595,6 +594,9 @@ public class JournalContentDisplayContext {
 	}
 
 	public String getURLEdit() {
+		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		try {
 			AssetRendererFactory<JournalArticle> assetRendererFactory =
 				AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
@@ -606,31 +608,12 @@ public class JournalContentDisplayContext {
 				assetRendererFactory.getAssetRenderer(
 					article, AssetRendererFactory.TYPE_LATEST_APPROVED);
 
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)_portletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			PortletURL redirectURL = PortletURLFactoryUtil.create(
-				_portletRequest, JournalContentPortletKeys.JOURNAL_CONTENT,
-				PortletRequest.RENDER_PHASE);
-
-			redirectURL.setParameter(
-				"mvcPath", "/update_journal_article_redirect.jsp");
-
-			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
-
-			redirectURL.setParameter(
-				"referringPortletResource", portletDisplay.getId());
-
-			redirectURL.setWindowState(LiferayWindowState.POP_UP);
-
 			PortletURL portletURL = latestArticleAssetRenderer.getURLEdit(
 				PortalUtil.getLiferayPortletRequest(_portletRequest), null,
-				LiferayWindowState.POP_UP, redirectURL);
+				LiferayWindowState.NORMAL, themeDisplay.getURLCurrent());
 
 			portletURL.setParameter(
 				"hideDefaultSuccessMessage", Boolean.TRUE.toString());
-			portletURL.setParameter("showHeader", Boolean.FALSE.toString());
 
 			return portletURL.toString();
 		}
@@ -651,32 +634,54 @@ public class JournalContentDisplayContext {
 		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		PortletURL portletURL = PortletURLFactoryUtil.create(
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
 			_portletRequest, JournalPortletKeys.JOURNAL,
 			PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter("mvcPath", "/edit_ddm_template.jsp");
-
-		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
-
-		PortletURL redirectURL = PortletURLFactoryUtil.create(
-			_portletRequest, portletDisplay.getId(),
-			PortletRequest.RENDER_PHASE);
-
-		redirectURL.setParameter(
-			"mvcPath", "/update_journal_article_redirect.jsp");
-		redirectURL.setParameter(
-			"referringPortletResource", portletDisplay.getId());
-		redirectURL.setWindowState(LiferayWindowState.POP_UP);
-
-		portletURL.setParameter("redirect", redirectURL.toString());
+		portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
 
 		portletURL.setParameter(
 			"ddmTemplateId", String.valueOf(ddmTemplate.getTemplateId()));
 		portletURL.setPortletMode(PortletMode.VIEW);
-		portletURL.setWindowState(LiferayWindowState.POP_UP);
 
 		return portletURL.toString();
+	}
+
+	public String getURLViewHistory() {
+		try {
+			JournalArticle article = getArticle();
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)_portletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			PortletURL portletURL = PortletURLFactoryUtil.create(
+				_portletRequest, JournalPortletKeys.JOURNAL,
+				PortletRequest.RENDER_PHASE);
+
+			portletURL.setParameter("mvcPath", "/view_article_history.jsp");
+
+			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+			portletURL.setParameter(
+				"referringPortletResource", portletDisplay.getId());
+
+			portletURL.setParameter("articleId", article.getArticleId());
+
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+			portletURL.setParameter(
+				"hideDefaultSuccessMessage", Boolean.TRUE.toString());
+			portletURL.setParameter("showHeader", Boolean.TRUE.toString());
+
+			return portletURL.toString();
+		}
+		catch (Exception e) {
+			_log.error("Unable to get view history URL", e);
+
+			return StringPool.BLANK;
+		}
 	}
 
 	public boolean hasRestorePermission() throws PortalException {

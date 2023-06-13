@@ -14,13 +14,32 @@
 
 package com.liferay.headless.collaboration.internal.resource.v1_0;
 
+import com.liferay.blogs.service.BlogsEntryService;
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.headless.collaboration.dto.v1_0.BlogPostingImage;
-import com.liferay.headless.collaboration.internal.dto.v1_0.BlogPostingImageImpl;
+import com.liferay.headless.collaboration.internal.odata.entity.v1_0.BlogPostingImageEntityModel;
 import com.liferay.headless.collaboration.resource.v1_0.BlogPostingImageResource;
+import com.liferay.headless.common.spi.service.context.ServiceContextUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.vulcan.multipart.BinaryFile;
+import com.liferay.portal.vulcan.multipart.MultipartBody;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
+import com.liferay.portal.vulcan.util.SearchUtil;
+
+import java.util.Optional;
+
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -34,31 +53,114 @@ import org.osgi.service.component.annotations.ServiceScope;
 	scope = ServiceScope.PROTOTYPE, service = BlogPostingImageResource.class
 )
 public class BlogPostingImageResourceImpl
-	extends BaseBlogPostingImageResourceImpl {
+	extends BaseBlogPostingImageResourceImpl implements EntityModelResource {
 
 	@Override
-	public boolean deleteImageObject(Long imageObjectId) throws Exception {
-		_dlAppService.deleteFileEntry(imageObjectId);
-
-		return true;
-	}
-
-	@Override
-	public BlogPostingImage getImageObject(Long imageObjectId)
+	public void deleteBlogPostingImage(Long blogPostingImageId)
 		throws Exception {
 
-		FileEntry fileEntry = _dlAppService.getFileEntry(imageObjectId);
+		FileEntry fileEntry = _getFileEntry(blogPostingImageId);
 
-		return _toBlogPostingImage(fileEntry, fileEntry.getFileVersion());
+		_dlAppService.deleteFileEntry(fileEntry.getFileEntryId());
 	}
 
-	private BlogPostingImage _toBlogPostingImage(
-		FileEntry fileEntry, FileVersion fileVersion) {
+	@Override
+	public BlogPostingImage getBlogPostingImage(Long blogPostingImageId)
+		throws Exception {
 
-		return new BlogPostingImageImpl() {
+		FileEntry fileEntry = _getFileEntry(blogPostingImageId);
+
+		return _toBlogPostingImage(fileEntry);
+	}
+
+	@Override
+	public Page<BlogPostingImage> getContentSpaceBlogPostingImagesPage(
+			Long contentSpaceId, String search, Filter filter,
+			Pagination pagination, Sort[] sorts)
+		throws Exception {
+
+		Folder folder = _blogsEntryService.addAttachmentsFolder(contentSpaceId);
+
+		return SearchUtil.search(
+			booleanQuery -> {
+			},
+			filter, DLFileEntry.class, search, pagination,
+			queryConfig -> queryConfig.setSelectedFieldNames(
+				Field.ENTRY_CLASS_PK),
+			searchContext -> {
+				searchContext.setCompanyId(contextCompany.getCompanyId());
+				searchContext.setFolderIds(new long[] {folder.getFolderId()});
+			},
+			document -> _toBlogPostingImage(
+				_dlAppService.getFileEntry(
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))),
+			sorts);
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
+		return _entityModel;
+	}
+
+	@Override
+	public BlogPostingImage postContentSpaceBlogPostingImage(
+			Long contentSpaceId, MultipartBody multipartBody)
+		throws Exception {
+
+		Folder folder = _blogsEntryService.addAttachmentsFolder(contentSpaceId);
+
+		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
+
+		if (binaryFile == null) {
+			throw new BadRequestException("No file found in body");
+		}
+
+		Optional<BlogPostingImage> blogPostingImageOptional =
+			multipartBody.getValueAsInstanceOptional(
+				"blogPostingImage", BlogPostingImage.class);
+
+		FileEntry fileEntry = _dlAppService.addFileEntry(
+			contentSpaceId, folder.getFolderId(), binaryFile.getFileName(),
+			binaryFile.getContentType(),
+			blogPostingImageOptional.map(
+				BlogPostingImage::getTitle
+			).orElse(
+				binaryFile.getFileName()
+			),
+			null, null, binaryFile.getInputStream(), binaryFile.getSize(),
+			ServiceContextUtil.createServiceContext(
+				contentSpaceId,
+				blogPostingImageOptional.map(
+					BlogPostingImage::getViewableByAsString
+				).orElse(
+					BlogPostingImage.ViewableBy.ANYONE.getValue()
+				)));
+
+		return _toBlogPostingImage(fileEntry);
+	}
+
+	private FileEntry _getFileEntry(Long fileEntryId) throws Exception {
+		FileEntry fileEntry = _dlAppService.getFileEntry(fileEntryId);
+
+		Folder folder = _blogsEntryService.addAttachmentsFolder(
+			fileEntry.getGroupId());
+
+		if (fileEntry.getFolderId() != folder.getFolderId()) {
+			throw new BadRequestException(
+				fileEntryId +
+					" does not correspond to a valid BlogPostingImage");
+		}
+
+		return fileEntry;
+	}
+
+	private BlogPostingImage _toBlogPostingImage(FileEntry fileEntry)
+		throws Exception {
+
+		return new BlogPostingImage() {
 			{
 				contentUrl = _dlURLHelper.getPreviewURL(
-					fileEntry, fileVersion, null, "");
+					fileEntry, fileEntry.getFileVersion(), null, "");
 				encodingFormat = fileEntry.getMimeType();
 				fileExtension = fileEntry.getExtension();
 				id = fileEntry.getFileEntryId();
@@ -67,6 +169,12 @@ public class BlogPostingImageResourceImpl
 			}
 		};
 	}
+
+	private static final EntityModel _entityModel =
+		new BlogPostingImageEntityModel();
+
+	@Reference
+	private BlogsEntryService _blogsEntryService;
 
 	@Reference
 	private DLAppService _dlAppService;

@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.HttpPrincipal;
@@ -54,16 +53,19 @@ import com.liferay.portal.kernel.util.MethodKey;
  */
 @ProviderType
 public class DDMTemplateVersionServiceHttp {
-	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersion getLatestTemplateVersion(
-		HttpPrincipal httpPrincipal, long templateId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMTemplateVersionServiceUtil.class,
-					"getLatestTemplateVersion",
-					_getLatestTemplateVersionParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					templateId);
+	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersion
+			getLatestTemplateVersion(
+				HttpPrincipal httpPrincipal, long templateId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMTemplateVersionServiceUtil.class, "getLatestTemplateVersion",
+				_getLatestTemplateVersionParameterTypes0);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, templateId);
 
 			Object returnObj = null;
 
@@ -71,14 +73,19 @@ public class DDMTemplateVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMTemplateVersion)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.DDMTemplateVersion)
+				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -87,15 +94,18 @@ public class DDMTemplateVersionServiceHttp {
 		}
 	}
 
-	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersion getTemplateVersion(
-		HttpPrincipal httpPrincipal, long templateVersionId)
+	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersion
+			getTemplateVersion(
+				HttpPrincipal httpPrincipal, long templateVersionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMTemplateVersionServiceUtil.class,
-					"getTemplateVersion", _getTemplateVersionParameterTypes1);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					templateVersionId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMTemplateVersionServiceUtil.class, "getTemplateVersion",
+				_getTemplateVersionParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, templateVersionId);
 
 			Object returnObj = null;
 
@@ -103,14 +113,19 @@ public class DDMTemplateVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.mapping.model.DDMTemplateVersion)returnObj;
+			return (com.liferay.dynamic.data.mapping.model.DDMTemplateVersion)
+				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -119,16 +134,23 @@ public class DDMTemplateVersionServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion> getTemplateVersions(
-		HttpPrincipal httpPrincipal, long templateId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion> orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMTemplateVersionServiceUtil.class,
-					"getTemplateVersions", _getTemplateVersionsParameterTypes2);
+	public static java.util.List
+		<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion>
+				getTemplateVersions(
+					HttpPrincipal httpPrincipal, long templateId, int start,
+					int end,
+					com.liferay.portal.kernel.util.OrderByComparator
+						<com.liferay.dynamic.data.mapping.model.
+							DDMTemplateVersion> orderByComparator)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					templateId, start, end, orderByComparator);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMTemplateVersionServiceUtil.class, "getTemplateVersions",
+				_getTemplateVersionsParameterTypes2);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, templateId, start, end, orderByComparator);
 
 			Object returnObj = null;
 
@@ -136,14 +158,20 @@ public class DDMTemplateVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (java.util.List<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion>)returnObj;
+			return (java.util.List
+				<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion>)
+					returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -152,16 +180,17 @@ public class DDMTemplateVersionServiceHttp {
 		}
 	}
 
-	public static int getTemplateVersionsCount(HttpPrincipal httpPrincipal,
-		long templateId)
+	public static int getTemplateVersionsCount(
+			HttpPrincipal httpPrincipal, long templateId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDMTemplateVersionServiceUtil.class,
-					"getTemplateVersionsCount",
-					_getTemplateVersionsCountParameterTypes3);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					templateId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDMTemplateVersionServiceUtil.class, "getTemplateVersionsCount",
+				_getTemplateVersionsCountParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, templateId);
 
 			Object returnObj = null;
 
@@ -169,11 +198,15 @@ public class DDMTemplateVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return ((Integer)returnObj).intValue();
@@ -185,18 +218,19 @@ public class DDMTemplateVersionServiceHttp {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DDMTemplateVersionServiceHttp.class);
-	private static final Class<?>[] _getLatestTemplateVersionParameterTypes0 = new Class[] {
-			long.class
-		};
-	private static final Class<?>[] _getTemplateVersionParameterTypes1 = new Class[] {
-			long.class
-		};
-	private static final Class<?>[] _getTemplateVersionsParameterTypes2 = new Class[] {
+	private static Log _log = LogFactoryUtil.getLog(
+		DDMTemplateVersionServiceHttp.class);
+
+	private static final Class<?>[] _getLatestTemplateVersionParameterTypes0 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getTemplateVersionParameterTypes1 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getTemplateVersionsParameterTypes2 =
+		new Class[] {
 			long.class, int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getTemplateVersionsCountParameterTypes3 = new Class[] {
-			long.class
-		};
+	private static final Class<?>[] _getTemplateVersionsCountParameterTypes3 =
+		new Class[] {long.class};
+
 }

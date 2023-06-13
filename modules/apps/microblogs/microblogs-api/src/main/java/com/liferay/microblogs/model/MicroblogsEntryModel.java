@@ -35,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface MicroblogsEntryModel extends AuditedModel,
-	BaseModel<MicroblogsEntry>, ShardedModel {
+public interface MicroblogsEntryModel
+	extends AuditedModel, BaseModel<MicroblogsEntry>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -252,4 +253,5 @@ public interface MicroblogsEntryModel extends AuditedModel,
 	 * @param socialRelationType the social relation type of this microblogs entry
 	 */
 	public void setSocialRelationType(int socialRelationType);
+
 }

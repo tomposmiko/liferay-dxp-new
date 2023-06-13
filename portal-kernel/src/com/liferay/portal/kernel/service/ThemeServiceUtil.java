@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the remote service utility for Theme. This utility wraps
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  */
 @ProviderType
 public class ThemeServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -40,16 +40,17 @@ public class ThemeServiceUtil {
 	 */
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static java.util.List<com.liferay.portal.kernel.model.Theme> getThemes(
-		long companyId) {
+	public static java.util.List<com.liferay.portal.kernel.model.Theme>
+		getThemes(long companyId) {
+
 		return getService().getThemes(companyId);
 	}
 
@@ -59,14 +60,13 @@ public class ThemeServiceUtil {
 
 	public static ThemeService getService() {
 		if (_service == null) {
-			_service = (ThemeService)PortalBeanLocatorUtil.locate(ThemeService.class.getName());
-
-			ReferenceRegistry.registerReference(ThemeServiceUtil.class,
-				"_service");
+			_service = (ThemeService)PortalBeanLocatorUtil.locate(
+				ThemeService.class.getName());
 		}
 
 		return _service;
 	}
 
 	private static ThemeService _service;
+
 }

@@ -32,8 +32,9 @@ import com.liferay.asset.tag.stats.service.AssetTagStatsLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class AssetTagStatsBaseImpl extends AssetTagStatsModelImpl
-	implements AssetTagStats {
+public abstract class AssetTagStatsBaseImpl
+	extends AssetTagStatsModelImpl implements AssetTagStats {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class AssetTagStatsBaseImpl extends AssetTagStatsModelImpl
 			AssetTagStatsLocalServiceUtil.updateAssetTagStats(this);
 		}
 	}
+
 }

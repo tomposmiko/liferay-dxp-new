@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -42,12 +41,20 @@ import java.util.List;
  */
 @AccessControlled
 @JSONWebService
-@OSGiBeanProperties(property =  {
-	"json.web.service.context.name=ddm", "json.web.service.context.path=DDMFormInstanceVersion"}, service = DDMFormInstanceVersionService.class)
+@OSGiBeanProperties(
+	property = {
+		"json.web.service.context.name=ddm",
+		"json.web.service.context.path=DDMFormInstanceVersion"
+	},
+	service = DDMFormInstanceVersionService.class
+)
 @ProviderType
-@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
-	PortalException.class, SystemException.class})
+@Transactional(
+	isolation = Isolation.PORTAL,
+	rollbackFor = {PortalException.class, SystemException.class}
+)
 public interface DDMFormInstanceVersionService extends BaseService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -55,12 +62,13 @@ public interface DDMFormInstanceVersionService extends BaseService {
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMFormInstanceVersion getFormInstanceVersion(
-		long ddmFormInstanceVersionId) throws PortalException;
+			long ddmFormInstanceVersionId)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMFormInstanceVersion> getFormInstanceVersions(
-		long ddmFormInstanceId, int start, int end,
-		OrderByComparator<DDMFormInstanceVersion> orderByComparator)
+			long ddmFormInstanceId, int start, int end,
+			OrderByComparator<DDMFormInstanceVersion> orderByComparator)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -69,16 +77,19 @@ public interface DDMFormInstanceVersionService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMFormInstanceVersion getLatestFormInstanceVersion(
-		long ddmFormInstanceId) throws PortalException;
+			long ddmFormInstanceId)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMFormInstanceVersion getLatestFormInstanceVersion(
-		long ddmFormInstanceId, int status) throws PortalException;
+			long ddmFormInstanceId, int status)
+		throws PortalException;
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public String getOSGiServiceIdentifier();
+
 }

@@ -35,6 +35,61 @@ public class GitUtil {
 
 	public static final long TIMEOUT = 30 * 1000;
 
+	public static void clone(String remoteURL, File workingDirectory) {
+		String command = JenkinsResultsParserUtil.combine(
+			"git clone ", remoteURL, " ",
+			JenkinsResultsParserUtil.getCanonicalPath(workingDirectory));
+
+		Process process = null;
+
+		try {
+			process = JenkinsResultsParserUtil.executeBashCommands(command);
+		}
+		catch (IOException | TimeoutException e) {
+			throw new RuntimeException("Unable to clone " + remoteURL, e);
+		}
+
+		if ((process != null) && (process.exitValue() != 0)) {
+			String errorString = null;
+
+			try {
+				errorString = JenkinsResultsParserUtil.readInputStream(
+					process.getErrorStream());
+			}
+			catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
+
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to clone ", remoteURL, "\n", errorString));
+		}
+	}
+
+	public static String getDefaultBranchName(File workingDirectory) {
+		ExecutionResult executionResult = executeBashCommands(
+			MAX_RETRIES, RETRY_DELAY, TIMEOUT, workingDirectory,
+			JenkinsResultsParserUtil.combine(
+				"git remote show origin | grep \"HEAD branch\" | ",
+				"cut -d \":\" -f 2"));
+
+		if (executionResult.getExitValue() != 0) {
+			System.out.println(executionResult.getStandardError());
+
+			return null;
+		}
+
+		String defaultBranchName = executionResult.getStandardOut();
+
+		defaultBranchName = defaultBranchName.trim();
+
+		if (defaultBranchName.isEmpty()) {
+			return null;
+		}
+
+		return defaultBranchName;
+	}
+
 	public static RemoteGitBranch getRemoteGitBranch(
 		String remoteGitBranchName, File workingDirectory, String remoteURL) {
 

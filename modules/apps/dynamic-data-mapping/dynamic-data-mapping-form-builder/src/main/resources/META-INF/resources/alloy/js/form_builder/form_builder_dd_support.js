@@ -107,16 +107,18 @@ AUI.add(
 							function(cols, indexRow) {
 								cols.forEach(
 									function(col, indexCol) {
-										if (fieldColumnStart._node.id == col._node.id) {
+										var colId = col.get('node').attr('id');
+
+										var fieldColumnStartId = fieldColumnStart.attr('id');
+
+										if (fieldColumnStartId === colId) {
 											positions.positionRowStart = indexRow;
 											positions.positionColumnStart = indexCol;
 										}
-									}
-								);
 
-								cols.forEach(
-									function(col, indexCol) {
-										if (fieldColumnEnd._node.id == col._node.id) {
+										var fieldColumnEndId = fieldColumnEnd.attr('id');
+
+										if (fieldColumnEndId === colId) {
 											positions.positionRowEnd = indexRow;
 											positions.positionColumnEnd = indexCol;
 										}

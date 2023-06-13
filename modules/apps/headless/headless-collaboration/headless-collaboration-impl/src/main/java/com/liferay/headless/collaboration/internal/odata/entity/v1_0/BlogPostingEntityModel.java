@@ -37,7 +37,7 @@ public class BlogPostingEntityModel implements EntityModel {
 		_entityFieldsMap = Stream.of(
 			new CollectionEntityField(
 				new IntegerEntityField(
-					"categoryIds", locale -> "assetCategoryIds")),
+					"taxonomyCategoryIds", locale -> "assetCategoryIds")),
 			new DateTimeEntityField(
 				"dateCreated",
 				locale -> Field.getSortableFieldName(Field.CREATE_DATE),
@@ -48,7 +48,7 @@ public class BlogPostingEntityModel implements EntityModel {
 				locale -> Field.MODIFIED_DATE),
 			new IntegerEntityField("creatorId", locale -> Field.USER_ID),
 			new StringEntityField(
-				Field.TITLE, locale -> Field.getSortableFieldName(Field.TITLE))
+				"headline", locale -> Field.getSortableFieldName(Field.TITLE))
 		).collect(
 			Collectors.toMap(EntityField::getName, Function.identity())
 		);

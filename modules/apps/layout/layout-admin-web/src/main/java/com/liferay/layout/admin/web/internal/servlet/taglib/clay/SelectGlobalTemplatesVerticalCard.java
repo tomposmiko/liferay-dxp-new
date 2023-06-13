@@ -18,11 +18,13 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.soy.VerticalCard;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.portlet.PortletURL;
+import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 /**
@@ -32,9 +34,10 @@ public class SelectGlobalTemplatesVerticalCard implements VerticalCard {
 
 	public SelectGlobalTemplatesVerticalCard(
 		LayoutPageTemplateEntry layoutPageTemplateEntry,
-		RenderResponse renderResponse) {
+		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		_layoutPageTemplateEntry = layoutPageTemplateEntry;
+		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 	}
 
@@ -47,6 +50,21 @@ public class SelectGlobalTemplatesVerticalCard implements VerticalCard {
 
 			addLayoutURL.setParameter(
 				"mvcRenderCommandName", "/layout/add_layout");
+
+			String redirect = ParamUtil.getString(_renderRequest, "redirect");
+
+			addLayoutURL.setParameter("backURL", redirect);
+
+			long selPlid = ParamUtil.getLong(_renderRequest, "selPlid");
+
+			addLayoutURL.setParameter("selPlid", String.valueOf(selPlid));
+
+			boolean privateLayout = ParamUtil.getBoolean(
+				_renderRequest, "privateLayout");
+
+			addLayoutURL.setParameter(
+				"privateLayout", String.valueOf(privateLayout));
+
 			addLayoutURL.setParameter(
 				"layoutPageTemplateEntryId",
 				String.valueOf(
@@ -55,7 +73,6 @@ public class SelectGlobalTemplatesVerticalCard implements VerticalCard {
 				"layoutPrototypeId",
 				String.valueOf(
 					_layoutPageTemplateEntry.getLayoutPrototypeId()));
-
 			addLayoutURL.setWindowState(LiferayWindowState.POP_UP);
 
 			data.put("add-layout-url", addLayoutURL.toString());
@@ -68,7 +85,8 @@ public class SelectGlobalTemplatesVerticalCard implements VerticalCard {
 
 	@Override
 	public String getElementClasses() {
-		return "add-layout-action-option";
+		return "add-layout-action-option card-interactive " +
+			"card-interactive-primary";
 	}
 
 	@Override
@@ -87,6 +105,7 @@ public class SelectGlobalTemplatesVerticalCard implements VerticalCard {
 	}
 
 	private final LayoutPageTemplateEntry _layoutPageTemplateEntry;
+	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 
 }

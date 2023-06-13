@@ -2,15 +2,17 @@
 
 {template .render}
 	{@param spritemap: string}
+	{@param? _handleColumnResized: any}
 	{@param? _handleChangePage: any}
 	{@param? _handleDeleteButtonClicked: any}
 	{@param? _handleDuplicateButtonClicked: any}
 	{@param? _handleExpandedChanged: any}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleFieldClicked: any}
 	{@param? _handleFieldEdited: any}
+	{@param? _handlePageSettingsClicked: any}
 	{@param? _handlePaginationLeftClicked: any}
 	{@param? _handlePaginationRightClicked: any}
-	{@param? _handlePageSettingsClicked: any}
 	{@param? _handleSuccesPageChanged: any}
 	{@param? _handleUpdatePage: any}
 	{@param? activePage: number}
@@ -28,15 +30,17 @@
 	{let $total: length($pages) /}
 
 	{delcall FormRenderer.pages variant="$contentRenderer"}
+		{param _handleColumnResized: $_handleColumnResized /}
 		{param _handleChangePage: $_handleChangePage /}
 		{param _handleDeleteButtonClicked: $_handleDeleteButtonClicked /}
 		{param _handleDuplicateButtonClicked: $_handleDuplicateButtonClicked /}
 		{param _handleExpandedChanged: $_handleExpandedChanged /}
+		{param _handleFieldBlurred: $_handleFieldBlurred /}
 		{param _handleFieldClicked: $_handleFieldClicked /}
 		{param _handleFieldEdited: $_handleFieldEdited /}
+		{param _handlePageSettingsClicked: $_handlePageSettingsClicked /}
 		{param _handlePaginationLeftClicked: $_handlePaginationLeftClicked /}
 		{param _handlePaginationRightClicked: $_handlePaginationRightClicked /}
-		{param _handlePageSettingsClicked: $_handlePageSettingsClicked /}
 		{param _handleSuccesPageChanged: $_handleSuccesPageChanged /}
 		{param _handleUpdatePage: $_handleUpdatePage /}
 		{param activePage: $activePage /}
@@ -56,15 +60,17 @@
 
 {deltemplate FormRenderer.pages variant="'grid'"}
 	{@param spritemap: string}
+	{@param? _handleColumnResized: any}
 	{@param? _handleChangePage: any}
 	{@param? _handleDeleteButtonClicked: any}
 	{@param? _handleDuplicateButtonClicked: any}
 	{@param? _handleExpandedChanged: any}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleFieldClicked: any}
 	{@param? _handleFieldEdited: any}
+	{@param? _handlePageSettingsClicked: any}
 	{@param? _handlePaginationLeftClicked: any}
 	{@param? _handlePaginationRightClicked: any}
-	{@param? _handlePageSettingsClicked: any}
 	{@param? _handleSuccesPageChanged: any}
 	{@param? _handleUpdatePage: any}
 	{@param? activePage: number}
@@ -84,9 +90,10 @@
 			{delcall FormRenderer.paginationContainer}
 				{param _handleChangePage: $_handleChangePage /}
 				{param _handleExpandedChanged: $_handleExpandedChanged /}
+				{param _handleFieldBlurred: $_handleFieldBlurred /}
+				{param _handlePageSettingsClicked: $_handlePageSettingsClicked /}
 				{param _handlePaginationLeftClicked: $_handlePaginationLeftClicked /}
 				{param _handlePaginationRightClicked: $_handlePaginationRightClicked /}
-				{param _handlePageSettingsClicked: $_handlePageSettingsClicked /}
 				{param activePage: $activePage /}
 				{param defaultPageTitle: $defaultPageTitle /}
 				{param dropdownExpanded: $dropdownExpanded /}
@@ -115,7 +122,10 @@
 					{param editable: $editable /}
 					{param events: [
 						'deleteButtonClicked': $_handleDeleteButtonClicked,
+						'columnResized': $_handleColumnResized,
+						'deleteFieldClicked': $_handleDeleteButtonClicked,
 						'duplicateButtonClicked': $_handleDuplicateButtonClicked,
+						'fieldBlurred': $_handleFieldBlurred,
 						'fieldClicked': $_handleFieldClicked,
 						'fieldEdited': $_handleFieldEdited,
 						'updatePage': $_handleUpdatePage
@@ -351,6 +361,7 @@
 
 {deltemplate FormRenderer.pages variant="'list'"}
 	{@param spritemap: string}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleDeleteButtonClicked: any}
 	{@param? _handleDuplicateButtonClicked: any}
 	{@param? _handleFieldEdited: any}
@@ -370,6 +381,7 @@
 				{param events: [
 					'deleteButtonClicked': $_handleDeleteButtonClicked,
 					'duplicateButtonClicked': $_handleDuplicateButtonClicked,
+					'fieldBlurred': $_handleFieldBlurred,
 					'fieldEdited': $_handleFieldEdited,
 					'updatePage': $_handleUpdatePage
 				] /}

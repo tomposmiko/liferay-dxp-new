@@ -36,6 +36,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface LockModel extends BaseModel<Lock>, MVCCModel, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -253,4 +254,5 @@ public interface LockModel extends BaseModel<Lock>, MVCCModel, ShardedModel {
 	 * @param expirationDate the expiration date of this lock
 	 */
 	public void setExpirationDate(Date expirationDate);
+
 }

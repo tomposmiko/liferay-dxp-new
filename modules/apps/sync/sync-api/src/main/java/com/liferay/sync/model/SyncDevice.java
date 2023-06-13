@@ -29,13 +29,16 @@ import com.liferay.portal.kernel.util.Accessor;
  */
 @ImplementationClassName("com.liferay.sync.model.impl.SyncDeviceImpl")
 @ProviderType
-public interface SyncDevice extends SyncDeviceModel, PersistedModel {
+public interface SyncDevice extends PersistedModel, SyncDeviceModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.sync.model.impl.SyncDeviceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<SyncDevice, Long> SYNC_DEVICE_ID_ACCESSOR = new Accessor<SyncDevice, Long>() {
+	public static final Accessor<SyncDevice, Long> SYNC_DEVICE_ID_ACCESSOR =
+		new Accessor<SyncDevice, Long>() {
+
 			@Override
 			public Long get(SyncDevice syncDevice) {
 				return syncDevice.getSyncDeviceId();
@@ -50,6 +53,7 @@ public interface SyncDevice extends SyncDeviceModel, PersistedModel {
 			public Class<SyncDevice> getTypeClass() {
 				return SyncDevice.class;
 			}
+
 		};
 
 	public void checkStatus()
@@ -60,4 +64,5 @@ public interface SyncDevice extends SyncDeviceModel, PersistedModel {
 	public boolean isSupported();
 
 	public boolean supports(int featureSet);
+
 }

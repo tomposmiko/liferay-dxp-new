@@ -32,8 +32,9 @@ import com.liferay.knowledge.base.service.KBFolderLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class KBFolderBaseImpl extends KBFolderModelImpl
-	implements KBFolder {
+public abstract class KBFolderBaseImpl
+	extends KBFolderModelImpl implements KBFolder {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class KBFolderBaseImpl extends KBFolderModelImpl
 			KBFolderLocalServiceUtil.updateKBFolder(this);
 		}
 	}
+
 }

@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.model.ShardedModel;
  */
 @ProviderType
 public interface AttachmentModel extends BaseModel<Attachment>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -196,4 +197,5 @@ public interface AttachmentModel extends BaseModel<Attachment>, ShardedModel {
 	 * @param size the size of this attachment
 	 */
 	public void setSize(long size);
+
 }

@@ -35,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface SiteFriendlyURLModel extends BaseModel<SiteFriendlyURL>,
-	ShardedModel, StagedGroupedModel {
+public interface SiteFriendlyURLModel
+	extends BaseModel<SiteFriendlyURL>, ShardedModel, StagedGroupedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -246,4 +247,5 @@ public interface SiteFriendlyURLModel extends BaseModel<SiteFriendlyURL>,
 	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate);
+
 }

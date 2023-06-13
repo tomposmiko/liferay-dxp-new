@@ -16,10 +16,12 @@
 		<check name="BNDBundleCheck" />
 		<check name="BNDCapabilityCheck" />
 		<check name="BNDDefinitionKeysCheck" />
+		<check name="BNDDeprecatedAppBNDsCheck" />
 		<check name="BNDImportsCheck">
 			<property name="enabled" value="false" />
 		</check>
 		<check name="BNDLineBreaksCheck" />
+		<check name="BNDMultipleAppBNDsCheck" />
 		<check name="BNDRangeCheck" />
 		<check name="BNDSchemaVersionCheck" />
 		<check name="BNDStylingCheck" />
@@ -47,6 +49,7 @@
 	</source-processor>
 	<source-processor name="ConfigSourceProcessor">
 		<check name="ConfigDefinitionKeysCheck" />
+		<check name="WhitespaceCheck" />
 	</source-processor>
 	<source-processor name="CQLSourceProcessor">
 		<check name="CQLKeywordCheck" />
@@ -133,7 +136,6 @@
 		<check name="JavaBooleanStatementCheck" />
 		<check name="JavaBooleanUsageCheck" />
 		<check name="JavaCollatorUtilCheck" />
-		<check name="JavaCombineLinesCheck" />
 		<check name="JavaComponentAnnotationsCheck">
 			<property name="checkConfigurationPolicyAttribute" value="false" />
 			<property name="checkMismatchedServiceAttribute" value="false" />
@@ -172,7 +174,6 @@
 		<check name="JavaJSPDynamicIncludeCheck">
 			<property name="enabled" value="false" />
 		</check>
-		<check name="JavaLineBreakCheck" />
 		<check name="JavaLocalSensitiveComparisonCheck" />
 		<check name="JavaLongLinesCheck" />
 		<check name="JavaMetaAnnotationsCheck" />
@@ -185,7 +186,6 @@
 		<check name="JavaReturnStatementCheck" />
 		<check name="JavaSeeAnnotationCheck" />
 		<check name="JavaServiceImplCheck" />
-		<check name="JavaSignatureStylingCheck" />
 		<check name="JavaStaticBlockCheck" />
 		<check name="JavaStaticImportsCheck" />
 		<check name="JavaStaticVariableDependencyCheck">
@@ -201,7 +201,6 @@
 		<check name="JavaTermMetadataLineBreakCheck" />
 		<check name="JavaTermOrderCheck" />
 		<check name="JavaTermStylingCheck" />
-		<check name="JavaWhitespaceCheck" />
 		<check name="MethodCallsOrderCheck" />
 		<check name="PrimitiveWrapperInstantiationCheck" />
 		<check name="PrincipalExceptionCheck" />
@@ -275,6 +274,7 @@
 		<check name="JavaStringBundlerInitialCapacityCheck" />
 		<check name="JavaSwitchCheck" />
 		<check name="JavaSystemEventAnnotationCheck" />
+		<check name="JavaTaglibMethodCheck" />
 		<check name="JavaTestMethodAnnotationsCheck" />
 		<check name="JavaUnsafeCastingCheck" />
 		<check name="JavaUpgradeClassCheck" />

@@ -1,5 +1,7 @@
 definition {
 	macro expandPanel {
+		Portlet.waitForForm();
+
 		var key_panel = "${panel}";
 
 		AssertVisible(
@@ -8,7 +10,7 @@ definition {
 		);
 
 		if ((IsElementPresent(locator1 = "Panel#PANEL_COLLAPSED")) && (IsVisible(locator1 = "Panel#PANEL_COLLAPSED"))) {
-			AssertClick.assertTextClickCaseInsensitive(
+			AssertClick(
 				locator1 = "Panel#PANEL_COLLAPSED",
 				value1 = "${panel}"
 			);

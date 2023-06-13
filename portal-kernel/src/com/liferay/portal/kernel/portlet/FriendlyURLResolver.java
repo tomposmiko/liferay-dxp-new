@@ -53,12 +53,25 @@ public interface FriendlyURLResolver {
 				requestContext);
 
 		LayoutFriendlyURLSeparatorComposite newLayoutFriendlyURLComposite =
-			new LayoutFriendlyURLSeparatorComposite(
-				layoutFriendlyURLComposite, getURLSeparator());
+			null;
+
+		String[] urlSeparators = getURLSeparators();
+
+		for (String urlSeparator : urlSeparators) {
+			if (friendlyURL.startsWith(urlSeparator)) {
+				newLayoutFriendlyURLComposite =
+					new LayoutFriendlyURLSeparatorComposite(
+						layoutFriendlyURLComposite, urlSeparator);
+			}
+		}
 
 		return newLayoutFriendlyURLComposite;
 	}
 
 	public String getURLSeparator();
+
+	public default String[] getURLSeparators() {
+		return new String[] {getURLSeparator()};
+	}
 
 }

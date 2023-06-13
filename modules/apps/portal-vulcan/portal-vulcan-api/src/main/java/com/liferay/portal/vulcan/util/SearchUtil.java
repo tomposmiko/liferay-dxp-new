@@ -14,110 +14,130 @@
 
 package com.liferay.portal.vulcan.util;
 
+import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.portal.kernel.search.BooleanClause;
+import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
+import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.IndexSearcherHelperUtil;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.Query;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.SearchException;
-import com.liferay.portal.kernel.search.SearchResultPermissionFilter;
-import com.liferay.portal.kernel.search.SearchResultPermissionFilterFactory;
-import com.liferay.portal.kernel.search.SearchResultPermissionFilterSearcher;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.search.generic.MatchAllQuery;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class SearchUtil {
 
-	public static Hits getHits(
-			Filter filter, Indexer<?> indexer, Pagination pagination,
-			Consumer<BooleanQuery> booleanQueryConsumer,
-			Consumer<QueryConfig> queryConfigConsumer,
-			Consumer<SearchContext> searchContextConsumer,
-			SearchResultPermissionFilterFactory
-				searchResultPermissionFilterFactory,
+	public static <T> Page<T> search(
+			UnsafeConsumer<BooleanQuery, Exception> booleanQueryUnsafeConsumer,
+			Filter filter, Class<?> indexerClass, String keywords,
+			Pagination pagination,
+			UnsafeConsumer<QueryConfig, Exception> queryConfigUnsafeConsumer,
+			UnsafeConsumer<SearchContext, Exception>
+				searchContextUnsafeConsumer,
+			UnsafeFunction<Document, T, Exception> transformUnsafeFunction,
 			Sort[] sorts)
-		throws SearchException {
+		throws Exception {
+
+		if (sorts == null) {
+			sorts = new Sort[] {
+				new Sort(Field.ENTRY_CLASS_PK, Sort.LONG_TYPE, false)
+			};
+		}
+
+		List<T> items = new ArrayList<>();
+
+		Indexer<?> indexer = IndexerRegistryUtil.getIndexer(indexerClass);
+
+		SearchContext searchContext = _createSearchContext(
+			_getBooleanClause(booleanQueryUnsafeConsumer, filter), keywords,
+			pagination, queryConfigUnsafeConsumer, sorts);
+
+		searchContextUnsafeConsumer.accept(searchContext);
+
+		Hits hits = indexer.search(searchContext);
+
+		for (Document document : hits.getDocs()) {
+			T item = transformUnsafeFunction.apply(document);
+
+			if (item != null) {
+				items.add(item);
+			}
+		}
+
+		return Page.of(items, pagination, indexer.searchCount(searchContext));
+	}
+
+	private static SearchContext _createSearchContext(
+			BooleanClause<?> booleanClause, String keywords,
+			Pagination pagination,
+			UnsafeConsumer<QueryConfig, Exception> queryConfigUnsafeConsumer,
+			Sort[] sorts)
+		throws Exception {
+
+		SearchContext searchContext = new SearchContext();
+
+		searchContext.setBooleanClauses(new BooleanClause[] {booleanClause});
+		searchContext.setEnd(pagination.getEndPosition());
+		searchContext.setKeywords(keywords);
+		searchContext.setSorts(sorts);
+		searchContext.setStart(pagination.getStartPosition());
 
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
-		SearchContext searchContext = _createSearchContext(
-			pagination, permissionChecker, queryConfigConsumer,
-			searchContextConsumer, sorts);
-
-		Query query = _getQuery(
-			filter, indexer, booleanQueryConsumer, searchContext);
-
-		SearchResultPermissionFilter searchResultPermissionFilter =
-			searchResultPermissionFilterFactory.create(
-				new SearchResultPermissionFilterSearcher() {
-
-					public Hits search(SearchContext searchContext)
-						throws SearchException {
-
-						return IndexSearcherHelperUtil.search(
-							searchContext, query);
-					}
-
-				},
-				permissionChecker);
-
-		return searchResultPermissionFilter.search(searchContext);
-	}
-
-	private static SearchContext _createSearchContext(
-		Pagination pagination, PermissionChecker permissionChecker,
-		Consumer<QueryConfig> queryConfigConsumer,
-		Consumer<SearchContext> searchContextConsumer, Sort[] sorts) {
-
-		SearchContext searchContext = new SearchContext();
-
-		searchContext.setEnd(pagination.getEndPosition());
-		searchContext.setSorts(sorts);
-		searchContext.setStart(pagination.getStartPosition());
 		searchContext.setUserId(permissionChecker.getUserId());
-
-		searchContextConsumer.accept(searchContext);
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
 
 		queryConfig.setHighlightEnabled(false);
 		queryConfig.setScoreEnabled(false);
 
-		queryConfigConsumer.accept(queryConfig);
+		queryConfigUnsafeConsumer.accept(queryConfig);
 
 		return searchContext;
 	}
 
-	private static Query _getQuery(
-			Filter filter, Indexer<?> indexer,
-			Consumer<BooleanQuery> booleanQueryConsumer,
-			SearchContext searchContext)
-		throws SearchException {
+	private static BooleanClause<?> _getBooleanClause(
+			UnsafeConsumer<BooleanQuery, Exception> booleanQueryUnsafeConsumer,
+			Filter filter)
+		throws Exception {
 
-		BooleanQuery booleanQuery = indexer.getFullQuery(searchContext);
+		BooleanQuery booleanQuery = new BooleanQueryImpl() {
+			{
+				add(new MatchAllQuery(), BooleanClauseOccur.MUST);
 
-		if (filter != null) {
-			BooleanFilter booleanFilter = booleanQuery.getPreBooleanFilter();
+				BooleanFilter booleanFilter = new BooleanFilter();
 
-			booleanFilter.add(filter, BooleanClauseOccur.MUST);
-		}
+				if (filter != null) {
+					booleanFilter.add(filter, BooleanClauseOccur.MUST);
+				}
 
-		booleanQueryConsumer.accept(booleanQuery);
+				setPreBooleanFilter(booleanFilter);
+			}
+		};
 
-		return booleanQuery;
+		booleanQueryUnsafeConsumer.accept(booleanQuery);
+
+		return BooleanClauseFactoryUtil.create(
+			booleanQuery, BooleanClauseOccur.MUST.getName());
 	}
 
 }

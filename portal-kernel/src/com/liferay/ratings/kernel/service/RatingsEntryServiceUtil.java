@@ -17,7 +17,6 @@ package com.liferay.ratings.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the remote service utility for RatingsEntry. This utility wraps
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  */
 @ProviderType
 public class RatingsEntryServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -40,34 +40,35 @@ public class RatingsEntryServiceUtil {
 	 */
 	public static void deleteEntry(String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		getService().deleteEntry(className, classPK);
 	}
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static com.liferay.ratings.kernel.model.RatingsEntry updateEntry(
-		String className, long classPK, double score)
+			String className, long classPK, double score)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return getService().updateEntry(className, classPK, score);
 	}
 
 	public static RatingsEntryService getService() {
 		if (_service == null) {
-			_service = (RatingsEntryService)PortalBeanLocatorUtil.locate(RatingsEntryService.class.getName());
-
-			ReferenceRegistry.registerReference(RatingsEntryServiceUtil.class,
-				"_service");
+			_service = (RatingsEntryService)PortalBeanLocatorUtil.locate(
+				RatingsEntryService.class.getName());
 		}
 
 		return _service;
 	}
 
 	private static RatingsEntryService _service;
+
 }

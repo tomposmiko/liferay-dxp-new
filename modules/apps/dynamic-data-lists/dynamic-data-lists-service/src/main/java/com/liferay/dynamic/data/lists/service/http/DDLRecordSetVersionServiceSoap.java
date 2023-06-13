@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.lists.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.service.DDLRecordSetVersionServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -64,46 +63,64 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class DDLRecordSetVersionServiceSoap {
-	public static com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap getLatestRecordSetVersion(
-		long recordSetId) throws RemoteException {
-		try {
-			com.liferay.dynamic.data.lists.model.DDLRecordSetVersion returnValue =
-				DDLRecordSetVersionServiceUtil.getLatestRecordSetVersion(recordSetId);
 
-			return com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap getRecordSetVersion(
-		long recordSetVersionId) throws RemoteException {
-		try {
-			com.liferay.dynamic.data.lists.model.DDLRecordSetVersion returnValue =
-				DDLRecordSetVersionServiceUtil.getRecordSetVersion(recordSetVersionId);
-
-			return com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap[] getRecordSetVersions(
-		long recordSetId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.lists.model.DDLRecordSetVersion> orderByComparator)
+	public static com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap
+			getLatestRecordSetVersion(long recordSetId)
 		throws RemoteException {
-		try {
-			java.util.List<com.liferay.dynamic.data.lists.model.DDLRecordSetVersion> returnValue =
-				DDLRecordSetVersionServiceUtil.getRecordSetVersions(recordSetId,
-					start, end, orderByComparator);
 
-			return com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap.toSoapModels(returnValue);
+		try {
+			com.liferay.dynamic.data.lists.model.DDLRecordSetVersion
+				returnValue =
+					DDLRecordSetVersionServiceUtil.getLatestRecordSetVersion(
+						recordSetId);
+
+			return com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap
+			getRecordSetVersion(long recordSetVersionId)
+		throws RemoteException {
+
+		try {
+			com.liferay.dynamic.data.lists.model.DDLRecordSetVersion
+				returnValue =
+					DDLRecordSetVersionServiceUtil.getRecordSetVersion(
+						recordSetVersionId);
+
+			return com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap[]
+			getRecordSetVersions(
+				long recordSetId, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.dynamic.data.lists.model.DDLRecordSetVersion>
+						orderByComparator)
+		throws RemoteException {
+
+		try {
+			java.util.List
+				<com.liferay.dynamic.data.lists.model.DDLRecordSetVersion>
+					returnValue =
+						DDLRecordSetVersionServiceUtil.getRecordSetVersions(
+							recordSetId, start, end, orderByComparator);
+
+			return com.liferay.dynamic.data.lists.model.DDLRecordSetVersionSoap.
+				toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -114,8 +131,11 @@ public class DDLRecordSetVersionServiceSoap {
 
 	public static int getRecordSetVersionsCount(long recordSetId)
 		throws RemoteException {
+
 		try {
-			int returnValue = DDLRecordSetVersionServiceUtil.getRecordSetVersionsCount(recordSetId);
+			int returnValue =
+				DDLRecordSetVersionServiceUtil.getRecordSetVersionsCount(
+					recordSetId);
 
 			return returnValue;
 		}
@@ -126,5 +146,7 @@ public class DDLRecordSetVersionServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DDLRecordSetVersionServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		DDLRecordSetVersionServiceSoap.class);
+
 }

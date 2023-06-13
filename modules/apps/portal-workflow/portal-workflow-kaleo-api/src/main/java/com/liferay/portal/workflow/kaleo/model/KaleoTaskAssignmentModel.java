@@ -36,8 +36,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface KaleoTaskAssignmentModel extends BaseModel<KaleoTaskAssignment>,
-	GroupedModel, MVCCModel, ShardedModel {
+public interface KaleoTaskAssignmentModel
+	extends BaseModel<KaleoTaskAssignment>, GroupedModel, MVCCModel,
+			ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -347,4 +349,5 @@ public interface KaleoTaskAssignmentModel extends BaseModel<KaleoTaskAssignment>
 	 */
 	public void setAssigneeScriptRequiredContexts(
 		String assigneeScriptRequiredContexts);
+
 }

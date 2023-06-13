@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -35,6 +34,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 @ProviderType
 public class SyncDeviceServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -42,23 +42,25 @@ public class SyncDeviceServiceUtil {
 	 */
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static com.liferay.sync.model.SyncDevice registerSyncDevice(
-		String type, long buildNumber, int featureSet, String uuid)
+			String type, long buildNumber, int featureSet, String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .registerSyncDevice(type, buildNumber, featureSet, uuid);
+
+		return getService().registerSyncDevice(
+			type, buildNumber, featureSet, uuid);
 	}
 
 	public static void unregisterSyncDevice(String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		getService().unregisterSyncDevice(uuid);
 	}
 
@@ -66,16 +68,19 @@ public class SyncDeviceServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<SyncDeviceService, SyncDeviceService> _serviceTracker;
+	private static ServiceTracker<SyncDeviceService, SyncDeviceService>
+		_serviceTracker;
 
 	static {
 		Bundle bundle = FrameworkUtil.getBundle(SyncDeviceService.class);
 
-		ServiceTracker<SyncDeviceService, SyncDeviceService> serviceTracker = new ServiceTracker<SyncDeviceService, SyncDeviceService>(bundle.getBundleContext(),
-				SyncDeviceService.class, null);
+		ServiceTracker<SyncDeviceService, SyncDeviceService> serviceTracker =
+			new ServiceTracker<SyncDeviceService, SyncDeviceService>(
+				bundle.getBundleContext(), SyncDeviceService.class, null);
 
 		serviceTracker.open();
 
 		_serviceTracker = serviceTracker;
 	}
+
 }

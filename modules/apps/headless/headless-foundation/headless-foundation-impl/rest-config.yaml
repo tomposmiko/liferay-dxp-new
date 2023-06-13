@@ -5,4 +5,5 @@ application:
     className: "HeadlessFoundationApplication"
     name: "Liferay.Headless.Foundation"
 author: "Javier Gamarra"
+clientDir: "../headless-foundation-client/src/main/java"
 testDir: "../headless-foundation-test/src/testIntegration/java"

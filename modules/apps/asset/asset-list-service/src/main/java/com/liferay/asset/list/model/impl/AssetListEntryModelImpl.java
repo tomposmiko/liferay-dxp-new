@@ -19,14 +19,10 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.model.AssetListEntryModel;
 import com.liferay.asset.list.model.AssetListEntrySoap;
-
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
@@ -67,29 +63,27 @@ import java.util.function.Function;
  */
 @JSON(strict = true)
 @ProviderType
-public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
-	implements AssetListEntryModel {
+public class AssetListEntryModelImpl
+	extends BaseModelImpl<AssetListEntry> implements AssetListEntryModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a asset list entry model instance should use the <code>AssetListEntry</code> interface instead.
 	 */
 	public static final String TABLE_NAME = "AssetListEntry";
+
 	public static final Object[][] TABLE_COLUMNS = {
-			{ "uuid_", Types.VARCHAR },
-			{ "assetListEntryId", Types.BIGINT },
-			{ "groupId", Types.BIGINT },
-			{ "companyId", Types.BIGINT },
-			{ "userId", Types.BIGINT },
-			{ "userName", Types.VARCHAR },
-			{ "createDate", Types.TIMESTAMP },
-			{ "modifiedDate", Types.TIMESTAMP },
-			{ "title", Types.VARCHAR },
-			{ "type_", Types.INTEGER },
-			{ "typeSettings", Types.CLOB },
-			{ "lastPublishDate", Types.TIMESTAMP }
-		};
-	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
+		{"uuid_", Types.VARCHAR}, {"assetListEntryId", Types.BIGINT},
+		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"assetListEntryKey", Types.VARCHAR}, {"title", Types.VARCHAR},
+		{"type_", Types.INTEGER}, {"lastPublishDate", Types.TIMESTAMP}
+	};
+
+	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
+		new HashMap<String, Integer>();
 
 	static {
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
@@ -100,34 +94,50 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
+		TABLE_COLUMNS_MAP.put("assetListEntryKey", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("title", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("type_", Types.INTEGER);
-		TABLE_COLUMNS_MAP.put("typeSettings", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("lastPublishDate", Types.TIMESTAMP);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table AssetListEntry (uuid_ VARCHAR(75) null,assetListEntryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title VARCHAR(75) null,type_ INTEGER,typeSettings TEXT null,lastPublishDate DATE null)";
+	public static final String TABLE_SQL_CREATE =
+		"create table AssetListEntry (uuid_ VARCHAR(75) null,assetListEntryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,assetListEntryKey VARCHAR(75) null,title VARCHAR(75) null,type_ INTEGER,lastPublishDate DATE null)";
+
 	public static final String TABLE_SQL_DROP = "drop table AssetListEntry";
-	public static final String ORDER_BY_JPQL = " ORDER BY assetListEntry.assetListEntryId ASC";
-	public static final String ORDER_BY_SQL = " ORDER BY AssetListEntry.assetListEntryId ASC";
+
+	public static final String ORDER_BY_JPQL =
+		" ORDER BY assetListEntry.assetListEntryId ASC";
+
+	public static final String ORDER_BY_SQL =
+		" ORDER BY AssetListEntry.assetListEntryId ASC";
+
 	public static final String DATA_SOURCE = "liferayDataSource";
+
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
+
 	public static final String TX_MANAGER = "liferayTransactionManager";
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.asset.list.service.util.ServiceProps.get(
-				"value.object.entity.cache.enabled.com.liferay.asset.list.model.AssetListEntry"),
-			true);
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.asset.list.service.util.ServiceProps.get(
-				"value.object.finder.cache.enabled.com.liferay.asset.list.model.AssetListEntry"),
-			true);
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.asset.list.service.util.ServiceProps.get(
-				"value.object.column.bitmask.enabled.com.liferay.asset.list.model.AssetListEntry"),
-			true);
-	public static final long COMPANYID_COLUMN_BITMASK = 1L;
-	public static final long GROUPID_COLUMN_BITMASK = 2L;
-	public static final long TITLE_COLUMN_BITMASK = 4L;
-	public static final long TYPE_COLUMN_BITMASK = 8L;
-	public static final long UUID_COLUMN_BITMASK = 16L;
-	public static final long ASSETLISTENTRYID_COLUMN_BITMASK = 32L;
+
+	public static final long ASSETLISTENTRYKEY_COLUMN_BITMASK = 1L;
+
+	public static final long COMPANYID_COLUMN_BITMASK = 2L;
+
+	public static final long GROUPID_COLUMN_BITMASK = 4L;
+
+	public static final long TITLE_COLUMN_BITMASK = 8L;
+
+	public static final long TYPE_COLUMN_BITMASK = 16L;
+
+	public static final long UUID_COLUMN_BITMASK = 32L;
+
+	public static final long ASSETLISTENTRYID_COLUMN_BITMASK = 64L;
+
+	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
+		_entityCacheEnabled = entityCacheEnabled;
+	}
+
+	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+		_finderCacheEnabled = finderCacheEnabled;
+	}
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -150,9 +160,9 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 		model.setUserName(soapModel.getUserName());
 		model.setCreateDate(soapModel.getCreateDate());
 		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setAssetListEntryKey(soapModel.getAssetListEntryKey());
 		model.setTitle(soapModel.getTitle());
 		model.setType(soapModel.getType());
-		model.setTypeSettings(soapModel.getTypeSettings());
 		model.setLastPublishDate(soapModel.getLastPublishDate());
 
 		return model;
@@ -164,12 +174,15 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 	 * @param soapModels the soap model instances to convert
 	 * @return the normal model instances
 	 */
-	public static List<AssetListEntry> toModels(AssetListEntrySoap[] soapModels) {
+	public static List<AssetListEntry> toModels(
+		AssetListEntrySoap[] soapModels) {
+
 		if (soapModels == null) {
 			return null;
 		}
 
-		List<AssetListEntry> models = new ArrayList<AssetListEntry>(soapModels.length);
+		List<AssetListEntry> models = new ArrayList<AssetListEntry>(
+			soapModels.length);
 
 		for (AssetListEntrySoap soapModel : soapModels) {
 			models.add(toModel(soapModel));
@@ -177,9 +190,6 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 		return models;
 	}
-
-	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.asset.list.service.util.ServiceProps.get(
-				"lock.expiration.time.com.liferay.asset.list.model.AssetListEntry"));
 
 	public AssetListEntryModelImpl() {
 	}
@@ -218,13 +228,18 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		Map<String, Function<AssetListEntry, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<AssetListEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		for (Map.Entry<String, Function<AssetListEntry, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<AssetListEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<AssetListEntry, Object> attributeGetterFunction = entry.getValue();
+			Function<AssetListEntry, Object> attributeGetterFunction =
+				entry.getValue();
 
-			attributes.put(attributeName,
+			attributes.put(
+				attributeName,
 				attributeGetterFunction.apply((AssetListEntry)this));
 		}
 
@@ -236,65 +251,106 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Map<String, BiConsumer<AssetListEntry, Object>> attributeSetterBiConsumers =
-			getAttributeSetterBiConsumers();
+		Map<String, BiConsumer<AssetListEntry, Object>>
+			attributeSetterBiConsumers = getAttributeSetterBiConsumers();
 
 		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
 			String attributeName = entry.getKey();
 
-			BiConsumer<AssetListEntry, Object> attributeSetterBiConsumer = attributeSetterBiConsumers.get(attributeName);
+			BiConsumer<AssetListEntry, Object> attributeSetterBiConsumer =
+				attributeSetterBiConsumers.get(attributeName);
 
 			if (attributeSetterBiConsumer != null) {
-				attributeSetterBiConsumer.accept((AssetListEntry)this,
-					entry.getValue());
+				attributeSetterBiConsumer.accept(
+					(AssetListEntry)this, entry.getValue());
 			}
 		}
 	}
 
-	public Map<String, Function<AssetListEntry, Object>> getAttributeGetterFunctions() {
+	public Map<String, Function<AssetListEntry, Object>>
+		getAttributeGetterFunctions() {
+
 		return _attributeGetterFunctions;
 	}
 
-	public Map<String, BiConsumer<AssetListEntry, Object>> getAttributeSetterBiConsumers() {
+	public Map<String, BiConsumer<AssetListEntry, Object>>
+		getAttributeSetterBiConsumers() {
+
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<AssetListEntry, Object>> _attributeGetterFunctions;
-	private static final Map<String, BiConsumer<AssetListEntry, Object>> _attributeSetterBiConsumers;
+	private static final Map<String, Function<AssetListEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AssetListEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
-		Map<String, Function<AssetListEntry, Object>> attributeGetterFunctions = new LinkedHashMap<String, Function<AssetListEntry, Object>>();
-		Map<String, BiConsumer<AssetListEntry, ?>> attributeSetterBiConsumers = new LinkedHashMap<String, BiConsumer<AssetListEntry, ?>>();
-
+		Map<String, Function<AssetListEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AssetListEntry, Object>>();
+		Map<String, BiConsumer<AssetListEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<AssetListEntry, ?>>();
 
 		attributeGetterFunctions.put("uuid", AssetListEntry::getUuid);
-		attributeSetterBiConsumers.put("uuid", (BiConsumer<AssetListEntry, String>)AssetListEntry::setUuid);
-		attributeGetterFunctions.put("assetListEntryId", AssetListEntry::getAssetListEntryId);
-		attributeSetterBiConsumers.put("assetListEntryId", (BiConsumer<AssetListEntry, Long>)AssetListEntry::setAssetListEntryId);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<AssetListEntry, String>)AssetListEntry::setUuid);
+		attributeGetterFunctions.put(
+			"assetListEntryId", AssetListEntry::getAssetListEntryId);
+		attributeSetterBiConsumers.put(
+			"assetListEntryId",
+			(BiConsumer<AssetListEntry, Long>)
+				AssetListEntry::setAssetListEntryId);
 		attributeGetterFunctions.put("groupId", AssetListEntry::getGroupId);
-		attributeSetterBiConsumers.put("groupId", (BiConsumer<AssetListEntry, Long>)AssetListEntry::setGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<AssetListEntry, Long>)AssetListEntry::setGroupId);
 		attributeGetterFunctions.put("companyId", AssetListEntry::getCompanyId);
-		attributeSetterBiConsumers.put("companyId", (BiConsumer<AssetListEntry, Long>)AssetListEntry::setCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<AssetListEntry, Long>)AssetListEntry::setCompanyId);
 		attributeGetterFunctions.put("userId", AssetListEntry::getUserId);
-		attributeSetterBiConsumers.put("userId", (BiConsumer<AssetListEntry, Long>)AssetListEntry::setUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<AssetListEntry, Long>)AssetListEntry::setUserId);
 		attributeGetterFunctions.put("userName", AssetListEntry::getUserName);
-		attributeSetterBiConsumers.put("userName", (BiConsumer<AssetListEntry, String>)AssetListEntry::setUserName);
-		attributeGetterFunctions.put("createDate", AssetListEntry::getCreateDate);
-		attributeSetterBiConsumers.put("createDate", (BiConsumer<AssetListEntry, Date>)AssetListEntry::setCreateDate);
-		attributeGetterFunctions.put("modifiedDate", AssetListEntry::getModifiedDate);
-		attributeSetterBiConsumers.put("modifiedDate", (BiConsumer<AssetListEntry, Date>)AssetListEntry::setModifiedDate);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<AssetListEntry, String>)AssetListEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", AssetListEntry::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<AssetListEntry, Date>)AssetListEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AssetListEntry::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<AssetListEntry, Date>)AssetListEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"assetListEntryKey", AssetListEntry::getAssetListEntryKey);
+		attributeSetterBiConsumers.put(
+			"assetListEntryKey",
+			(BiConsumer<AssetListEntry, String>)
+				AssetListEntry::setAssetListEntryKey);
 		attributeGetterFunctions.put("title", AssetListEntry::getTitle);
-		attributeSetterBiConsumers.put("title", (BiConsumer<AssetListEntry, String>)AssetListEntry::setTitle);
+		attributeSetterBiConsumers.put(
+			"title",
+			(BiConsumer<AssetListEntry, String>)AssetListEntry::setTitle);
 		attributeGetterFunctions.put("type", AssetListEntry::getType);
-		attributeSetterBiConsumers.put("type", (BiConsumer<AssetListEntry, Integer>)AssetListEntry::setType);
-		attributeGetterFunctions.put("typeSettings", AssetListEntry::getTypeSettings);
-		attributeSetterBiConsumers.put("typeSettings", (BiConsumer<AssetListEntry, String>)AssetListEntry::setTypeSettings);
-		attributeGetterFunctions.put("lastPublishDate", AssetListEntry::getLastPublishDate);
-		attributeSetterBiConsumers.put("lastPublishDate", (BiConsumer<AssetListEntry, Date>)AssetListEntry::setLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"type",
+			(BiConsumer<AssetListEntry, Integer>)AssetListEntry::setType);
+		attributeGetterFunctions.put(
+			"lastPublishDate", AssetListEntry::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<AssetListEntry, Date>)
+				AssetListEntry::setLastPublishDate);
 
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(attributeGetterFunctions);
-		_attributeSetterBiConsumers = Collections.unmodifiableMap((Map)attributeSetterBiConsumers);
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -453,6 +509,32 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 	@JSON
 	@Override
+	public String getAssetListEntryKey() {
+		if (_assetListEntryKey == null) {
+			return "";
+		}
+		else {
+			return _assetListEntryKey;
+		}
+	}
+
+	@Override
+	public void setAssetListEntryKey(String assetListEntryKey) {
+		_columnBitmask |= ASSETLISTENTRYKEY_COLUMN_BITMASK;
+
+		if (_originalAssetListEntryKey == null) {
+			_originalAssetListEntryKey = _assetListEntryKey;
+		}
+
+		_assetListEntryKey = assetListEntryKey;
+	}
+
+	public String getOriginalAssetListEntryKey() {
+		return GetterUtil.getString(_originalAssetListEntryKey);
+	}
+
+	@JSON
+	@Override
 	public String getTitle() {
 		if (_title == null) {
 			return "";
@@ -502,22 +584,6 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 	@JSON
 	@Override
-	public String getTypeSettings() {
-		if (_typeSettings == null) {
-			return "";
-		}
-		else {
-			return _typeSettings;
-		}
-	}
-
-	@Override
-	public void setTypeSettings(String typeSettings) {
-		_typeSettings = typeSettings;
-	}
-
-	@JSON
-	@Override
 	public Date getLastPublishDate() {
 		return _lastPublishDate;
 	}
@@ -529,8 +595,8 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return new StagedModelType(PortalUtil.getClassNameId(
-				AssetListEntry.class.getName()));
+		return new StagedModelType(
+			PortalUtil.getClassNameId(AssetListEntry.class.getName()));
 	}
 
 	public long getColumnBitmask() {
@@ -539,8 +605,8 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-			AssetListEntry.class.getName(), getPrimaryKey());
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(
+			getCompanyId(), AssetListEntry.class.getName(), getPrimaryKey());
 	}
 
 	@Override
@@ -553,8 +619,9 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 	@Override
 	public AssetListEntry toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = (AssetListEntry)ProxyUtil.newProxyInstance(_classLoader,
-					_escapedModelInterfaces, new AutoEscapeBeanHandler(this));
+			_escapedModel = (AssetListEntry)ProxyUtil.newProxyInstance(
+				_classLoader, _escapedModelInterfaces,
+				new AutoEscapeBeanHandler(this));
 		}
 
 		return _escapedModel;
@@ -572,9 +639,9 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 		assetListEntryImpl.setUserName(getUserName());
 		assetListEntryImpl.setCreateDate(getCreateDate());
 		assetListEntryImpl.setModifiedDate(getModifiedDate());
+		assetListEntryImpl.setAssetListEntryKey(getAssetListEntryKey());
 		assetListEntryImpl.setTitle(getTitle());
 		assetListEntryImpl.setType(getType());
-		assetListEntryImpl.setTypeSettings(getTypeSettings());
 		assetListEntryImpl.setLastPublishDate(getLastPublishDate());
 
 		assetListEntryImpl.resetOriginalValues();
@@ -626,12 +693,12 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return ENTITY_CACHE_ENABLED;
+		return _entityCacheEnabled;
 	}
 
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return FINDER_CACHE_ENABLED;
+		return _finderCacheEnabled;
 	}
 
 	@Override
@@ -640,15 +707,20 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 		assetListEntryModelImpl._originalUuid = assetListEntryModelImpl._uuid;
 
-		assetListEntryModelImpl._originalGroupId = assetListEntryModelImpl._groupId;
+		assetListEntryModelImpl._originalGroupId =
+			assetListEntryModelImpl._groupId;
 
 		assetListEntryModelImpl._setOriginalGroupId = false;
 
-		assetListEntryModelImpl._originalCompanyId = assetListEntryModelImpl._companyId;
+		assetListEntryModelImpl._originalCompanyId =
+			assetListEntryModelImpl._companyId;
 
 		assetListEntryModelImpl._setOriginalCompanyId = false;
 
 		assetListEntryModelImpl._setModifiedDate = false;
+
+		assetListEntryModelImpl._originalAssetListEntryKey =
+			assetListEntryModelImpl._assetListEntryKey;
 
 		assetListEntryModelImpl._originalTitle = assetListEntryModelImpl._title;
 
@@ -661,7 +733,8 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 	@Override
 	public CacheModel<AssetListEntry> toCacheModel() {
-		AssetListEntryCacheModel assetListEntryCacheModel = new AssetListEntryCacheModel();
+		AssetListEntryCacheModel assetListEntryCacheModel =
+			new AssetListEntryCacheModel();
 
 		assetListEntryCacheModel.uuid = getUuid();
 
@@ -705,6 +778,14 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 			assetListEntryCacheModel.modifiedDate = Long.MIN_VALUE;
 		}
 
+		assetListEntryCacheModel.assetListEntryKey = getAssetListEntryKey();
+
+		String assetListEntryKey = assetListEntryCacheModel.assetListEntryKey;
+
+		if ((assetListEntryKey != null) && (assetListEntryKey.length() == 0)) {
+			assetListEntryCacheModel.assetListEntryKey = null;
+		}
+
 		assetListEntryCacheModel.title = getTitle();
 
 		String title = assetListEntryCacheModel.title;
@@ -715,18 +796,11 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 		assetListEntryCacheModel.type = getType();
 
-		assetListEntryCacheModel.typeSettings = getTypeSettings();
-
-		String typeSettings = assetListEntryCacheModel.typeSettings;
-
-		if ((typeSettings != null) && (typeSettings.length() == 0)) {
-			assetListEntryCacheModel.typeSettings = null;
-		}
-
 		Date lastPublishDate = getLastPublishDate();
 
 		if (lastPublishDate != null) {
-			assetListEntryCacheModel.lastPublishDate = lastPublishDate.getTime();
+			assetListEntryCacheModel.lastPublishDate =
+				lastPublishDate.getTime();
 		}
 		else {
 			assetListEntryCacheModel.lastPublishDate = Long.MIN_VALUE;
@@ -737,16 +811,20 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 	@Override
 	public String toString() {
-		Map<String, Function<AssetListEntry, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<AssetListEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((4 * attributeGetterFunctions.size()) +
-				2);
+		StringBundler sb = new StringBundler(
+			4 * attributeGetterFunctions.size() + 2);
 
 		sb.append("{");
 
-		for (Map.Entry<String, Function<AssetListEntry, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<AssetListEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<AssetListEntry, Object> attributeGetterFunction = entry.getValue();
+			Function<AssetListEntry, Object> attributeGetterFunction =
+				entry.getValue();
 
 			sb.append(attributeName);
 			sb.append("=");
@@ -765,18 +843,22 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 
 	@Override
 	public String toXmlString() {
-		Map<String, Function<AssetListEntry, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<AssetListEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((5 * attributeGetterFunctions.size()) +
-				4);
+		StringBundler sb = new StringBundler(
+			5 * attributeGetterFunctions.size() + 4);
 
 		sb.append("<model><model-name>");
 		sb.append(getModelClassName());
 		sb.append("</model-name>");
 
-		for (Map.Entry<String, Function<AssetListEntry, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<AssetListEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<AssetListEntry, Object> attributeGetterFunction = entry.getValue();
+			Function<AssetListEntry, Object> attributeGetterFunction =
+				entry.getValue();
 
 			sb.append("<column><column-name>");
 			sb.append(attributeName);
@@ -790,10 +872,14 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader = AssetListEntry.class.getClassLoader();
+	private static final ClassLoader _classLoader =
+		AssetListEntry.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			AssetListEntry.class, ModelWrapper.class
-		};
+		AssetListEntry.class, ModelWrapper.class
+	};
+	private static boolean _entityCacheEnabled;
+	private static boolean _finderCacheEnabled;
+
 	private String _uuid;
 	private String _originalUuid;
 	private long _assetListEntryId;
@@ -808,13 +894,15 @@ public class AssetListEntryModelImpl extends BaseModelImpl<AssetListEntry>
 	private Date _createDate;
 	private Date _modifiedDate;
 	private boolean _setModifiedDate;
+	private String _assetListEntryKey;
+	private String _originalAssetListEntryKey;
 	private String _title;
 	private String _originalTitle;
 	private int _type;
 	private int _originalType;
 	private boolean _setOriginalType;
-	private String _typeSettings;
 	private Date _lastPublishDate;
 	private long _columnBitmask;
 	private AssetListEntry _escapedModel;
+
 }

@@ -21,11 +21,9 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.message.boards.model.MBMailingList;
 import com.liferay.message.boards.service.MBMailingListLocalService;
 import com.liferay.message.boards.service.persistence.MBMailingListPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -70,8 +68,9 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class MBMailingListLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements MBMailingListLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements MBMailingListLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -115,6 +114,7 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	@Override
 	public MBMailingList deleteMBMailingList(long mailingListId)
 		throws PortalException {
+
 		return mbMailingListPersistence.remove(mailingListId);
 	}
 
@@ -134,8 +134,8 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(MBMailingList.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			MBMailingList.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -162,10 +162,11 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return mbMailingListPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return mbMailingListPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -182,10 +183,12 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return mbMailingListPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return mbMailingListPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -207,10 +210,11 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return mbMailingListPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return mbMailingListPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
@@ -226,8 +230,9 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	 * @return the matching message boards mailing list, or <code>null</code> if a matching message boards mailing list could not be found
 	 */
 	@Override
-	public MBMailingList fetchMBMailingListByUuidAndGroupId(String uuid,
-		long groupId) {
+	public MBMailingList fetchMBMailingListByUuidAndGroupId(
+		String uuid, long groupId) {
+
 		return mbMailingListPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
@@ -241,12 +246,14 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	@Override
 	public MBMailingList getMBMailingList(long mailingListId)
 		throws PortalException {
+
 		return mbMailingListPersistence.findByPrimaryKey(mailingListId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(mbMailingListLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -258,10 +265,14 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(mbMailingListLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			mbMailingListLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(MBMailingList.class);
 
@@ -273,6 +284,7 @@ public abstract class MBMailingListLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
+
 		actionableDynamicQuery.setBaseLocalService(mbMailingListLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(MBMailingList.class);
@@ -283,49 +295,64 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		final PortletDataContext portletDataContext) {
-		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+
+		final ExportActionableDynamicQuery exportActionableDynamicQuery =
+			new ExportActionableDynamicQuery() {
+
 				@Override
 				public long performCount() throws PortalException {
-					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+					ManifestSummary manifestSummary =
+						portletDataContext.getManifestSummary();
 
 					StagedModelType stagedModelType = getStagedModelType();
 
 					long modelAdditionCount = super.performCount();
 
-					manifestSummary.addModelAdditionCount(stagedModelType,
-						modelAdditionCount);
+					manifestSummary.addModelAdditionCount(
+						stagedModelType, modelAdditionCount);
 
-					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
-							stagedModelType);
+					long modelDeletionCount =
+						ExportImportHelperUtil.getModelDeletionCount(
+							portletDataContext, stagedModelType);
 
-					manifestSummary.addModelDeletionCount(stagedModelType,
-						modelDeletionCount);
+					manifestSummary.addModelDeletionCount(
+						stagedModelType, modelDeletionCount);
 
 					return modelAdditionCount;
 				}
+
 			};
 
 		initActionableDynamicQuery(exportActionableDynamicQuery);
 
-		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+		exportActionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
+
 				@Override
 				public void addCriteria(DynamicQuery dynamicQuery) {
-					portletDataContext.addDateRangeCriteria(dynamicQuery,
-						"modifiedDate");
+					portletDataContext.addDateRangeCriteria(
+						dynamicQuery, "modifiedDate");
 				}
+
 			});
 
-		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+		exportActionableDynamicQuery.setCompanyId(
+			portletDataContext.getCompanyId());
 
-		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<MBMailingList>() {
+		exportActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<MBMailingList>() {
+
 				@Override
 				public void performAction(MBMailingList mbMailingList)
 					throws PortalException {
-					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
-						mbMailingList);
+
+					StagedModelDataHandlerUtil.exportStagedModel(
+						portletDataContext, mbMailingList);
 				}
+
 			});
-		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+		exportActionableDynamicQuery.setStagedModelType(
+			new StagedModelType(
 				PortalUtil.getClassNameId(MBMailingList.class.getName())));
 
 		return exportActionableDynamicQuery;
@@ -337,12 +364,15 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return mbMailingListLocalService.deleteMBMailingList((MBMailingList)persistedModel);
+
+		return mbMailingListLocalService.deleteMBMailingList(
+			(MBMailingList)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return mbMailingListPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -356,6 +386,7 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	@Override
 	public List<MBMailingList> getMBMailingListsByUuidAndCompanyId(
 		String uuid, long companyId) {
+
 		return mbMailingListPersistence.findByUuid_C(uuid, companyId);
 	}
 
@@ -373,8 +404,9 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	public List<MBMailingList> getMBMailingListsByUuidAndCompanyId(
 		String uuid, long companyId, int start, int end,
 		OrderByComparator<MBMailingList> orderByComparator) {
-		return mbMailingListPersistence.findByUuid_C(uuid, companyId, start,
-			end, orderByComparator);
+
+		return mbMailingListPersistence.findByUuid_C(
+			uuid, companyId, start, end, orderByComparator);
 	}
 
 	/**
@@ -386,8 +418,10 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	 * @throws PortalException if a matching message boards mailing list could not be found
 	 */
 	@Override
-	public MBMailingList getMBMailingListByUuidAndGroupId(String uuid,
-		long groupId) throws PortalException {
+	public MBMailingList getMBMailingListByUuidAndGroupId(
+			String uuid, long groupId)
+		throws PortalException {
+
 		return mbMailingListPersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -445,6 +479,7 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	 */
 	public void setMBMailingListLocalService(
 		MBMailingListLocalService mbMailingListLocalService) {
+
 		this.mbMailingListLocalService = mbMailingListLocalService;
 	}
 
@@ -464,6 +499,7 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	 */
 	public void setMBMailingListPersistence(
 		MBMailingListPersistence mbMailingListPersistence) {
+
 		this.mbMailingListPersistence = mbMailingListPersistence;
 	}
 
@@ -472,7 +508,9 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -482,12 +520,15 @@ public abstract class MBMailingListLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.message.boards.model.MBMailingList",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.message.boards.model.MBMailingList",
 			mbMailingListLocalService);
 	}
 
@@ -528,8 +569,8 @@ public abstract class MBMailingListLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -540,10 +581,18 @@ public abstract class MBMailingListLocalServiceBaseImpl
 
 	@BeanReference(type = MBMailingListLocalService.class)
 	protected MBMailingListLocalService mbMailingListLocalService;
+
 	@BeanReference(type = MBMailingListPersistence.class)
 	protected MBMailingListPersistence mbMailingListPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

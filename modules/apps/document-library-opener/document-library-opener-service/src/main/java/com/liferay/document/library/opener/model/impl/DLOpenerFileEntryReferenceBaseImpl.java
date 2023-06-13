@@ -35,6 +35,7 @@ import com.liferay.document.library.opener.service.DLOpenerFileEntryReferenceLoc
 public abstract class DLOpenerFileEntryReferenceBaseImpl
 	extends DLOpenerFileEntryReferenceModelImpl
 	implements DLOpenerFileEntryReference {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -43,10 +44,13 @@ public abstract class DLOpenerFileEntryReferenceBaseImpl
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			DLOpenerFileEntryReferenceLocalServiceUtil.addDLOpenerFileEntryReference(this);
+			DLOpenerFileEntryReferenceLocalServiceUtil.
+				addDLOpenerFileEntryReference(this);
 		}
 		else {
-			DLOpenerFileEntryReferenceLocalServiceUtil.updateDLOpenerFileEntryReference(this);
+			DLOpenerFileEntryReferenceLocalServiceUtil.
+				updateDLOpenerFileEntryReference(this);
 		}
 	}
+
 }

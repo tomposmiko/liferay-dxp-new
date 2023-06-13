@@ -33,8 +33,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface BlogsStatsUserModel extends BaseModel<BlogsStatsUser>,
-	ShardedModel {
+public interface BlogsStatsUserModel
+	extends BaseModel<BlogsStatsUser>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -210,4 +211,5 @@ public interface BlogsStatsUserModel extends BaseModel<BlogsStatsUser>,
 	 * @param ratingsAverageScore the ratings average score of this blogs stats user
 	 */
 	public void setRatingsAverageScore(double ratingsAverageScore);
+
 }

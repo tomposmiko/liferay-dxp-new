@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class KaleoConditionSoap implements Serializable {
+
 	public static KaleoConditionSoap toSoapModel(KaleoCondition model) {
 		KaleoConditionSoap soapModel = new KaleoConditionSoap();
 
@@ -41,7 +42,8 @@ public class KaleoConditionSoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
-		soapModel.setKaleoDefinitionVersionId(model.getKaleoDefinitionVersionId());
+		soapModel.setKaleoDefinitionVersionId(
+			model.getKaleoDefinitionVersionId());
 		soapModel.setKaleoNodeId(model.getKaleoNodeId());
 		soapModel.setScript(model.getScript());
 		soapModel.setScriptLanguage(model.getScriptLanguage());
@@ -60,11 +62,14 @@ public class KaleoConditionSoap implements Serializable {
 		return soapModels;
 	}
 
-	public static KaleoConditionSoap[][] toSoapModels(KaleoCondition[][] models) {
+	public static KaleoConditionSoap[][] toSoapModels(
+		KaleoCondition[][] models) {
+
 		KaleoConditionSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new KaleoConditionSoap[models.length][models[0].length];
+			soapModels =
+				new KaleoConditionSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new KaleoConditionSoap[0][0];
@@ -77,8 +82,11 @@ public class KaleoConditionSoap implements Serializable {
 		return soapModels;
 	}
 
-	public static KaleoConditionSoap[] toSoapModels(List<KaleoCondition> models) {
-		List<KaleoConditionSoap> soapModels = new ArrayList<KaleoConditionSoap>(models.size());
+	public static KaleoConditionSoap[] toSoapModels(
+		List<KaleoCondition> models) {
+
+		List<KaleoConditionSoap> soapModels = new ArrayList<KaleoConditionSoap>(
+			models.size());
 
 		for (KaleoCondition model : models) {
 			soapModels.add(toSoapModel(model));
@@ -215,4 +223,5 @@ public class KaleoConditionSoap implements Serializable {
 	private String _script;
 	private String _scriptLanguage;
 	private String _scriptRequiredContexts;
+
 }

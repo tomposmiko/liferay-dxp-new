@@ -17,7 +17,6 @@ package com.liferay.portal.tools.service.builder.test.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -37,8 +36,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class LVEntryLocalizationWrapper implements LVEntryLocalization,
-	ModelWrapper<LVEntryLocalization> {
+public class LVEntryLocalizationWrapper
+	implements LVEntryLocalization, ModelWrapper<LVEntryLocalization> {
+
 	public LVEntryLocalizationWrapper(LVEntryLocalization lvEntryLocalization) {
 		_lvEntryLocalization = lvEntryLocalization;
 	}
@@ -60,6 +60,7 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("headId", getHeadId());
 		attributes.put("lvEntryLocalizationId", getLvEntryLocalizationId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("lvEntryId", getLvEntryId());
 		attributes.put("languageId", getLanguageId());
 		attributes.put("title", getTitle());
@@ -83,10 +84,16 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 		}
 
 		Long lvEntryLocalizationId = (Long)attributes.get(
-				"lvEntryLocalizationId");
+			"lvEntryLocalizationId");
 
 		if (lvEntryLocalizationId != null) {
 			setLvEntryLocalizationId(lvEntryLocalizationId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 
 		Long lvEntryId = (Long)attributes.get("lvEntryId");
@@ -116,7 +123,8 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 
 	@Override
 	public Object clone() {
-		return new LVEntryLocalizationWrapper((LVEntryLocalization)_lvEntryLocalization.clone());
+		return new LVEntryLocalizationWrapper(
+			(LVEntryLocalization)_lvEntryLocalization.clone());
 	}
 
 	@Override
@@ -125,10 +133,20 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 	}
 
 	/**
-	* Returns the content of this lv entry localization.
-	*
-	* @return the content of this lv entry localization
-	*/
+	 * Returns the company ID of this lv entry localization.
+	 *
+	 * @return the company ID of this lv entry localization
+	 */
+	@Override
+	public long getCompanyId() {
+		return _lvEntryLocalization.getCompanyId();
+	}
+
+	/**
+	 * Returns the content of this lv entry localization.
+	 *
+	 * @return the content of this lv entry localization
+	 */
 	@Override
 	public String getContent() {
 		return _lvEntryLocalization.getContent();
@@ -140,60 +158,60 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 	}
 
 	/**
-	* Returns the head ID of this lv entry localization.
-	*
-	* @return the head ID of this lv entry localization
-	*/
+	 * Returns the head ID of this lv entry localization.
+	 *
+	 * @return the head ID of this lv entry localization
+	 */
 	@Override
 	public long getHeadId() {
 		return _lvEntryLocalization.getHeadId();
 	}
 
 	/**
-	* Returns the language ID of this lv entry localization.
-	*
-	* @return the language ID of this lv entry localization
-	*/
+	 * Returns the language ID of this lv entry localization.
+	 *
+	 * @return the language ID of this lv entry localization
+	 */
 	@Override
 	public String getLanguageId() {
 		return _lvEntryLocalization.getLanguageId();
 	}
 
 	/**
-	* Returns the lv entry ID of this lv entry localization.
-	*
-	* @return the lv entry ID of this lv entry localization
-	*/
+	 * Returns the lv entry ID of this lv entry localization.
+	 *
+	 * @return the lv entry ID of this lv entry localization
+	 */
 	@Override
 	public long getLvEntryId() {
 		return _lvEntryLocalization.getLvEntryId();
 	}
 
 	/**
-	* Returns the lv entry localization ID of this lv entry localization.
-	*
-	* @return the lv entry localization ID of this lv entry localization
-	*/
+	 * Returns the lv entry localization ID of this lv entry localization.
+	 *
+	 * @return the lv entry localization ID of this lv entry localization
+	 */
 	@Override
 	public long getLvEntryLocalizationId() {
 		return _lvEntryLocalization.getLvEntryLocalizationId();
 	}
 
 	/**
-	* Returns the mvcc version of this lv entry localization.
-	*
-	* @return the mvcc version of this lv entry localization
-	*/
+	 * Returns the mvcc version of this lv entry localization.
+	 *
+	 * @return the mvcc version of this lv entry localization
+	 */
 	@Override
 	public long getMvccVersion() {
 		return _lvEntryLocalization.getMvccVersion();
 	}
 
 	/**
-	* Returns the primary key of this lv entry localization.
-	*
-	* @return the primary key of this lv entry localization
-	*/
+	 * Returns the primary key of this lv entry localization.
+	 *
+	 * @return the primary key of this lv entry localization
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _lvEntryLocalization.getPrimaryKey();
@@ -205,10 +223,10 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 	}
 
 	/**
-	* Returns the title of this lv entry localization.
-	*
-	* @return the title of this lv entry localization
-	*/
+	 * Returns the title of this lv entry localization.
+	 *
+	 * @return the title of this lv entry localization
+	 */
 	@Override
 	public String getTitle() {
 		return _lvEntryLocalization.getTitle();
@@ -240,10 +258,20 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 	}
 
 	/**
-	* Sets the content of this lv entry localization.
-	*
-	* @param content the content of this lv entry localization
-	*/
+	 * Sets the company ID of this lv entry localization.
+	 *
+	 * @param companyId the company ID of this lv entry localization
+	 */
+	@Override
+	public void setCompanyId(long companyId) {
+		_lvEntryLocalization.setCompanyId(companyId);
+	}
+
+	/**
+	 * Sets the content of this lv entry localization.
+	 *
+	 * @param content the content of this lv entry localization
+	 */
 	@Override
 	public void setContent(String content) {
 		_lvEntryLocalization.setContent(content);
@@ -252,6 +280,7 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_lvEntryLocalization.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -266,50 +295,50 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 	}
 
 	/**
-	* Sets the head ID of this lv entry localization.
-	*
-	* @param headId the head ID of this lv entry localization
-	*/
+	 * Sets the head ID of this lv entry localization.
+	 *
+	 * @param headId the head ID of this lv entry localization
+	 */
 	@Override
 	public void setHeadId(long headId) {
 		_lvEntryLocalization.setHeadId(headId);
 	}
 
 	/**
-	* Sets the language ID of this lv entry localization.
-	*
-	* @param languageId the language ID of this lv entry localization
-	*/
+	 * Sets the language ID of this lv entry localization.
+	 *
+	 * @param languageId the language ID of this lv entry localization
+	 */
 	@Override
 	public void setLanguageId(String languageId) {
 		_lvEntryLocalization.setLanguageId(languageId);
 	}
 
 	/**
-	* Sets the lv entry ID of this lv entry localization.
-	*
-	* @param lvEntryId the lv entry ID of this lv entry localization
-	*/
+	 * Sets the lv entry ID of this lv entry localization.
+	 *
+	 * @param lvEntryId the lv entry ID of this lv entry localization
+	 */
 	@Override
 	public void setLvEntryId(long lvEntryId) {
 		_lvEntryLocalization.setLvEntryId(lvEntryId);
 	}
 
 	/**
-	* Sets the lv entry localization ID of this lv entry localization.
-	*
-	* @param lvEntryLocalizationId the lv entry localization ID of this lv entry localization
-	*/
+	 * Sets the lv entry localization ID of this lv entry localization.
+	 *
+	 * @param lvEntryLocalizationId the lv entry localization ID of this lv entry localization
+	 */
 	@Override
 	public void setLvEntryLocalizationId(long lvEntryLocalizationId) {
 		_lvEntryLocalization.setLvEntryLocalizationId(lvEntryLocalizationId);
 	}
 
 	/**
-	* Sets the mvcc version of this lv entry localization.
-	*
-	* @param mvccVersion the mvcc version of this lv entry localization
-	*/
+	 * Sets the mvcc version of this lv entry localization.
+	 *
+	 * @param mvccVersion the mvcc version of this lv entry localization
+	 */
 	@Override
 	public void setMvccVersion(long mvccVersion) {
 		_lvEntryLocalization.setMvccVersion(mvccVersion);
@@ -321,10 +350,10 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 	}
 
 	/**
-	* Sets the primary key of this lv entry localization.
-	*
-	* @param primaryKey the primary key of this lv entry localization
-	*/
+	 * Sets the primary key of this lv entry localization.
+	 *
+	 * @param primaryKey the primary key of this lv entry localization
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_lvEntryLocalization.setPrimaryKey(primaryKey);
@@ -336,23 +365,26 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 	}
 
 	/**
-	* Sets the title of this lv entry localization.
-	*
-	* @param title the title of this lv entry localization
-	*/
+	 * Sets the title of this lv entry localization.
+	 *
+	 * @param title the title of this lv entry localization
+	 */
 	@Override
 	public void setTitle(String title) {
 		_lvEntryLocalization.setTitle(title);
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<LVEntryLocalization> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<LVEntryLocalization>
+		toCacheModel() {
+
 		return _lvEntryLocalization.toCacheModel();
 	}
 
 	@Override
 	public LVEntryLocalization toEscapedModel() {
-		return new LVEntryLocalizationWrapper(_lvEntryLocalization.toEscapedModel());
+		return new LVEntryLocalizationWrapper(
+			_lvEntryLocalization.toEscapedModel());
 	}
 
 	@Override
@@ -362,7 +394,8 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 
 	@Override
 	public LVEntryLocalization toUnescapedModel() {
-		return new LVEntryLocalizationWrapper(_lvEntryLocalization.toUnescapedModel());
+		return new LVEntryLocalizationWrapper(
+			_lvEntryLocalization.toUnescapedModel());
 	}
 
 	@Override
@@ -380,10 +413,13 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 			return false;
 		}
 
-		LVEntryLocalizationWrapper lvEntryLocalizationWrapper = (LVEntryLocalizationWrapper)obj;
+		LVEntryLocalizationWrapper lvEntryLocalizationWrapper =
+			(LVEntryLocalizationWrapper)obj;
 
-		if (Objects.equals(_lvEntryLocalization,
-					lvEntryLocalizationWrapper._lvEntryLocalization)) {
+		if (Objects.equals(
+				_lvEntryLocalization,
+				lvEntryLocalizationWrapper._lvEntryLocalization)) {
+
 			return true;
 		}
 
@@ -398,6 +434,7 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 	@Override
 	public void populateVersionModel(
 		LVEntryLocalizationVersion lvEntryLocalizationVersion) {
+
 		_lvEntryLocalization.populateVersionModel(lvEntryLocalizationVersion);
 	}
 
@@ -422,4 +459,5 @@ public class LVEntryLocalizationWrapper implements LVEntryLocalization,
 	}
 
 	private final LVEntryLocalization _lvEntryLocalization;
+
 }

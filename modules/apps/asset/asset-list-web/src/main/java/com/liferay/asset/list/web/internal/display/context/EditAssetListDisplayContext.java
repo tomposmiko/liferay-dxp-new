@@ -25,11 +25,15 @@ import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
+import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.constants.AssetListFormConstants;
 import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.constants.AssetListWebKeys;
+import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryAssetEntryRelLocalServiceUtil;
+import com.liferay.asset.list.service.AssetListEntryLocalServiceUtil;
 import com.liferay.asset.util.comparator.AssetRendererFactoryTypeNameComparator;
+import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.petra.string.StringPool;
@@ -60,6 +64,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.segments.constants.SegmentsConstants;
 import com.liferay.site.item.selector.criteria.SiteItemSelectorReturnType;
 import com.liferay.site.item.selector.criterion.SiteItemSelectorCriterion;
 
@@ -68,9 +73,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletMode;
 import javax.portlet.PortletRequest;
@@ -97,6 +104,26 @@ public class EditAssetListDisplayContext {
 			WebKeys.THEME_DISPLAY);
 	}
 
+	public String encodeName(
+		long ddmStructureId, String fieldName, Locale locale) {
+
+		DDMIndexer ddmIndexer = (DDMIndexer)_request.getAttribute(
+			AssetListWebKeys.DDM_INDEXER);
+
+		return ddmIndexer.encodeName(ddmStructureId, fieldName, locale);
+	}
+
+	public AssetListEntry getAssetListEntry() {
+		if (_assetListEntry != null) {
+			return _assetListEntry;
+		}
+
+		_assetListEntry = AssetListEntryLocalServiceUtil.fetchAssetListEntry(
+			getAssetListEntryId());
+
+		return _assetListEntry;
+	}
+
 	public long getAssetListEntryId() {
 		if (_assetListEntryId != null) {
 			return _assetListEntryId;
@@ -105,6 +132,25 @@ public class EditAssetListDisplayContext {
 		_assetListEntryId = ParamUtil.getLong(_request, "assetListEntryId");
 
 		return _assetListEntryId;
+	}
+
+	public int getAssetListEntryType() {
+		if (_assetListEntryType != null) {
+			return _assetListEntryType;
+		}
+
+		AssetListEntry assetListEntry = getAssetListEntry();
+
+		int assetListEntryType = ParamUtil.getInteger(
+			_request, "assetListEntryType");
+
+		if (assetListEntry != null) {
+			assetListEntryType = assetListEntry.getType();
+		}
+
+		_assetListEntryType = assetListEntryType;
+
+		return _assetListEntryType;
 	}
 
 	public JSONArray getAutoFieldRulesJSONArray() {
@@ -163,28 +209,44 @@ public class EditAssetListDisplayContext {
 
 				queryValues = _filterAssetTagNames(
 					_themeDisplay.getScopeGroupId(), queryValues);
+
+				List<Map<String, String>> selectedItems = new ArrayList<>();
+
+				String[] tagNames = StringUtil.split(
+					queryValues, StringPool.COMMA);
+
+				for (String tagName : tagNames) {
+					Map<String, String> item = new HashMap<>();
+
+					item.put("label", tagName);
+					item.put("value", tagName);
+
+					selectedItems.add(item);
+				}
+
+				ruleJSONObject.put("selectedItems", selectedItems);
 			}
 			else {
 				queryValues = ParamUtil.getString(
 					_request, "queryCategoryIds" + queryLogicIndex,
 					queryValues);
 
-				JSONArray categoryIdsTitles = JSONFactoryUtil.createJSONArray();
+				List<HashMap<String, Object>> selectedItems = new ArrayList<>();
 
 				List<AssetCategory> categories = _filterAssetCategories(
 					GetterUtil.getLongValues(queryValues.split(",")));
 
 				for (AssetCategory category : categories) {
-					categoryIdsTitles.put(
-						category.getTitle(_themeDisplay.getLocale()));
+					HashMap<String, Object> selectedCategory = new HashMap<>();
+
+					selectedCategory.put(
+						"label", category.getTitle(_themeDisplay.getLocale()));
+					selectedCategory.put("value", category.getCategoryId());
+
+					selectedItems.add(selectedCategory);
 				}
 
-				List<Long> categoryIds = ListUtil.toList(
-					categories, AssetCategory.CATEGORY_ID_ACCESSOR);
-
-				queryValues = StringUtil.merge(categoryIds, ",");
-
-				ruleJSONObject.put("categoryIdsTitles", categoryIdsTitles);
+				ruleJSONObject.put("selectedItems", selectedItems);
 			}
 
 			if (Validator.isNull(queryValues)) {
@@ -560,7 +622,17 @@ public class EditAssetListDisplayContext {
 			_portletRequest, AssetListPortletKeys.ASSET_LIST,
 			PortletRequest.RENDER_PHASE);
 
-		portletURL.setParameter("mvcPath", "/edit_asset_list_entry.jsp");
+		if (getAssetListEntryType() ==
+				AssetListEntryTypeConstants.TYPE_DYNAMIC) {
+
+			portletURL.setParameter(
+				"mvcPath", "/edit_asset_list_entry_dynamic.jsp");
+		}
+		else {
+			portletURL.setParameter(
+				"mvcPath", "/edit_asset_list_entry_manual.jsp");
+		}
+
 		portletURL.setParameter(
 			"assetListEntryId", String.valueOf(getAssetListEntryId()));
 
@@ -630,17 +702,40 @@ public class EditAssetListDisplayContext {
 
 		searchContainer.setTotal(
 			AssetListEntryAssetEntryRelLocalServiceUtil.
-				getAssetListEntryAssetEntryRelsCount(getAssetListEntryId()));
+				getAssetListEntryAssetEntryRelsCount(
+					getAssetListEntryId(), getSegmentsEntryId()));
 
 		searchContainer.setResults(
 			AssetListEntryAssetEntryRelLocalServiceUtil.
 				getAssetListEntryAssetEntryRels(
-					getAssetListEntryId(), searchContainer.getStart(),
-					searchContainer.getEnd()));
+					getAssetListEntryId(), getSegmentsEntryId(),
+					searchContainer.getStart(), searchContainer.getEnd()));
 
 		_searchContainer = searchContainer;
 
 		return _searchContainer;
+	}
+
+	public long getSegmentsEntryId() {
+		if (_segmentsEntryId != null) {
+			return _segmentsEntryId;
+		}
+
+		_segmentsEntryId = ParamUtil.getLong(
+			_request, "segmentsEntryId",
+			SegmentsConstants.SEGMENTS_ENTRY_ID_DEFAULT);
+
+		return _segmentsEntryId;
+	}
+
+	public long[] getSelectedGroupIds() throws PortalException {
+		List<Group> selectedGroups = getSelectedGroups();
+
+		Stream<Group> stream = selectedGroups.stream();
+
+		return stream.mapToLong(
+			Group::getGroupId
+		).toArray();
 	}
 
 	public List<Group> getSelectedGroups() throws PortalException {
@@ -686,12 +781,12 @@ public class EditAssetListDisplayContext {
 		return null;
 	}
 
-	public String getVocabularyIds() {
+	public List<Long> getVocabularyIds() {
 		List<AssetVocabulary> vocabularies =
 			AssetVocabularyServiceUtil.getGroupsVocabularies(
 				new long[] {_themeDisplay.getScopeGroupId()});
 
-		return ListUtil.toString(
+		return ListUtil.toList(
 			vocabularies, AssetVocabulary.VOCABULARY_ID_ACCESSOR);
 	}
 
@@ -837,7 +932,9 @@ public class EditAssetListDisplayContext {
 	}
 
 	private Boolean _anyAssetType;
+	private AssetListEntry _assetListEntry;
 	private Long _assetListEntryId;
+	private Integer _assetListEntryType;
 	private long[] _availableClassNameIds;
 	private long[] _classNameIds;
 	private long[] _classTypeIds;
@@ -856,6 +953,7 @@ public class EditAssetListDisplayContext {
 	private long[] _referencedModelsGroupIds;
 	private final HttpServletRequest _request;
 	private SearchContainer _searchContainer;
+	private Long _segmentsEntryId;
 	private Boolean _subtypeFieldsFilterEnabled;
 	private final ThemeDisplay _themeDisplay;
 

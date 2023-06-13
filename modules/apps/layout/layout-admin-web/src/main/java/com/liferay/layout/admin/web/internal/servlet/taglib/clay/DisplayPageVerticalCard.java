@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -114,17 +115,28 @@ public class DisplayPageVerticalCard
 
 				Group layoutPrototypeGroup = layoutPrototype.getGroup();
 
-				return layoutPrototypeGroup.getDisplayURL(_themeDisplay, true);
+				String layoutFullURL = layoutPrototypeGroup.getDisplayURL(
+					_themeDisplay, true);
+
+				return HttpUtil.setParameter(
+					layoutFullURL, "p_l_back_url",
+					_themeDisplay.getURLCurrent());
 			}
 
 			Layout layout = LayoutLocalServiceUtil.fetchLayout(
 				_layoutPageTemplateEntry.getPlid());
 
+			Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
+				PortalUtil.getClassNameId(Layout.class), layout.getPlid());
+
 			String layoutFullURL = PortalUtil.getLayoutFullURL(
-				layout, _themeDisplay);
+				draftLayout, _themeDisplay);
+
+			layoutFullURL = HttpUtil.setParameter(
+				layoutFullURL, "p_l_mode", Constants.EDIT);
 
 			return HttpUtil.setParameter(
-				layoutFullURL, "p_l_mode", Constants.EDIT);
+				layoutFullURL, "p_l_back_url", _themeDisplay.getURLCurrent());
 		}
 		catch (Exception e) {
 		}
@@ -194,7 +206,7 @@ public class DisplayPageVerticalCard
 
 	@Override
 	public String getTitle() {
-		return _layoutPageTemplateEntry.getName();
+		return HtmlUtil.escape(_layoutPageTemplateEntry.getName());
 	}
 
 	private String _getSubtypeLabel() throws PortalException {

@@ -16,9 +16,9 @@ package com.liferay.layout.admin.web.internal.portlet.action;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
-import com.liferay.layout.constants.LayoutConstants;
 import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -98,8 +98,7 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 		Map<Locale, String> robotsMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "robots");
 		String type = ParamUtil.getString(uploadPortletRequest, "type");
-		boolean showInMenu = ParamUtil.getBoolean(
-			uploadPortletRequest, "showInMenu");
+		boolean hidden = ParamUtil.getBoolean(uploadPortletRequest, "hidden");
 		Map<Locale, String> friendlyURLMap =
 			LocalizationUtil.getLocalizationMap(actionRequest, "friendlyURL");
 		boolean deleteLogo = ParamUtil.getBoolean(actionRequest, "deleteLogo");
@@ -124,7 +123,7 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 		String currentType = layout.getType();
 
 		if (StringUtil.equals(
-				currentType, LayoutConstants.LAYOUT_TYPE_ASSET_DISPLAY)) {
+				currentType, LayoutConstants.TYPE_ASSET_DISPLAY)) {
 
 			serviceContext.setAttribute(
 				"layout.instanceable.allowed", Boolean.TRUE);
@@ -133,8 +132,7 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 		layout = _layoutService.updateLayout(
 			groupId, privateLayout, layoutId, layout.getParentLayoutId(),
 			nameMap, titleMap, descriptionMap, keywordsMap, robotsMap, type,
-			!showInMenu, friendlyURLMap, !deleteLogo, iconBytes,
-			serviceContext);
+			hidden, friendlyURLMap, !deleteLogo, iconBytes, serviceContext);
 
 		themeDisplay.clearLayoutFriendlyURL(layout);
 

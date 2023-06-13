@@ -46,12 +46,12 @@ definition {
 		Type(locator1 = "TextInput#SAML_NAME_FIELD", value1 = "${spNameID}");
 
 		Type(
-			locator1 = "CPSAMLAdminAddServiceProvider#SERVICE_PROVIDER_ENTITY_ID_FIELD",
+			locator1 = "CPSAMLAdminServiceProviderConnections#SERVICE_PROVIDER_CONNECTION_ENTITY_ID_FIELD",
 			value1 = "${spEntityID}"
 		);
 
 		Check(
-			locator1 = "CPSAMLAdminAddServiceProvider#SERVICE_PROVIDER_ENABLED_CHECKBOX"
+			locator1 = "CPSAMLAdminServiceProviderConnections#SERVICE_PROVIDER_CONNECTION_ENABLED_CHECKBOX"
 		);
 
 		Type(
@@ -64,7 +64,7 @@ definition {
 		}
 
 		Type(
-			locator1 = "CPSAMLAdminAddServiceProvider#SERVICE_PROVIDER_NAME_IDENTIFIER_ATTRIBUTE_NAME_FIELD",
+			locator1 = "CPSAMLAdminServiceProviderConnections#SERVICE_PROVIDER_CONNECTION_NAME_IDENTIFIER_ATTRIBUTE_NAME_FIELD",
 			value1 = "${nameIdentifierAttributeName}"
 		);
 
@@ -77,11 +77,11 @@ definition {
 
 		if (isSet(attributes)) {
 			Check(
-				locator1 = "CPSAMLAdminIdentityProviderConnection#IDENTITY_PROVIDER_CONNECTION_ATTRIBUTE_ENABLE"
+				locator1 = "CPSAMLAdminServiceProviderConnections#SERVICE_PROVIDER_CONNECTION_ATTRIBUTE_ENABLE"
 			);
 
 			Type(
-				locator1 = "CPSAMLAdminIdentityProviderConnection#IDENTITY_PROVIDER_CONNECTION_ATTRIBUTE_TEXTAREA",
+				locator1 = "CPSAMLAdminServiceProviderConnections#SERVICE_PROVIDER_CONNECTION_ATTRIBUTE_TEXTAREA",
 				value1 = "${attributes}"
 			);
 		}
@@ -90,13 +90,54 @@ definition {
 	}
 
 	macro configureIdentityProvider {
-		Check(
-			locator1 = "CPSAMLAdminIdentityProvider#IDENTITY_PROVIDER_SIGN_METADATA_CHECKBOX"
+		if ("${signMetadata}" == "disable") {
+			Uncheck(
+				locator1 = "CPSAMLAdminIdentityProvider#IDENTITY_PROVIDER_SIGN_METADATA_CHECKBOX"
+			);
+		}
+		else {
+			Check(
+				locator1 = "CPSAMLAdminIdentityProvider#IDENTITY_PROVIDER_SIGN_METADATA_CHECKBOX"
+			);
+		}
+
+		if ("${authnRequestSignatureRequired}" == "disable") {
+			Uncheck(
+				locator1 = "CPSAMLAdminIdentityProvider#IDENTITY_PROVIDER_AUTHN_REQUEST_SIGNATURE_REQUIRED_CHECKBOX"
+			);
+		}
+		else {
+			Check(
+				locator1 = "CPSAMLAdminIdentityProvider#IDENTITY_PROVIDER_AUTHN_REQUEST_SIGNATURE_REQUIRED_CHECKBOX"
+			);
+		}
+
+		PortletEntry.save();
+	}
+
+	macro configureIdentityProviderConnection {
+		Click.waitForMenuToggleJSClick(
+			locator1 = "CPSAMLAdminIdentityProviderConnection#IDENTITY_PROVIDER_CONNECTION_ACTION_BUTTON",
+			key_idpNameID = "${idpNameID}"
 		);
 
-		Check(
-			locator1 = "CPSAMLAdminIdentityProvider#IDENTITY_PROVIDER_AUTH_REQUEST_SIGNATURE_REQUIRED_CHECKBOX"
-		);
+		MenuItem.click(menuItem = "Edit");
+
+		if ("${forceAuthn}" == "enable") {
+			Check(
+				locator1 = "CPSAMLAdminIdentityProviderConnection#IDENTITY_PROVIDER_CONNECTION_FORCE_AUTHN_CHECKBOX"
+			);
+		}
+
+		PortletEntry.save();
+	}
+
+	macro configureServiceProvider {
+		if ("${signAuthnRequests}" == "disable") {
+			Uncheck(
+				locator1 = "CPSAMLAdminServiceProvider#SERVICE_PROVIDER_SIGN_AUTHN_REQUESTS_CHECKBOX"
+			);
+		}
 
 		PortletEntry.save();
 	}

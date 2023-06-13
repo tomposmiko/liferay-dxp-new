@@ -18,6 +18,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 
 import java.io.IOException;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
@@ -30,55 +31,56 @@ import org.junit.runner.RunWith;
  * @author Matthew Tambara
  */
 @RunWith(Arquillian.class)
-public class BeforeAfterTestItem {
+public class BeforeAfterTestItem extends BaseBeforeAfterTestItem {
 
 	public static void assertAndTearDown() throws IOException {
-		List<String> lines = _testItemHelper.read();
+		Assert.assertEquals(_lines, testItemHelper.read());
+	}
 
-		Assert.assertEquals(lines.toString(), 10, lines.size());
-		Assert.assertEquals(lines.toString(), "setUp2", lines.get(0));
-		Assert.assertEquals(lines.toString(), "setUp1", lines.get(1));
-		Assert.assertEquals(lines.toString(), "test1", lines.get(2));
-		Assert.assertEquals(lines.toString(), "tearDown1", lines.get(3));
-		Assert.assertEquals(lines.toString(), "tearDown2", lines.get(4));
-		Assert.assertEquals(lines.toString(), "setUp2", lines.get(5));
-		Assert.assertEquals(lines.toString(), "setUp1", lines.get(6));
-		Assert.assertEquals(lines.toString(), "test2", lines.get(7));
-		Assert.assertEquals(lines.toString(), "tearDown1", lines.get(8));
-		Assert.assertEquals(lines.toString(), "tearDown2", lines.get(9));
+	@Before
+	public static void setUpOverridden() throws IOException {
+		testItemHelper.write("setUpOverriddenChild");
+	}
+
+	@After
+	public static void tearDownOverridden() throws IOException {
+		testItemHelper.write("tearDownOverriddenChild");
 	}
 
 	@Before
 	public void setUp1() throws IOException {
-		_testItemHelper.write("setUp1");
+		testItemHelper.write("setUp1");
 	}
 
 	@Before
 	public void setUp2() throws IOException {
-		_testItemHelper.write("setUp2");
+		testItemHelper.write("setUp2");
 	}
 
 	@After
 	public void tearDown1() throws IOException {
-		_testItemHelper.write("tearDown1");
+		testItemHelper.write("tearDown1");
 	}
 
 	@After
 	public void tearDown2() throws IOException {
-		_testItemHelper.write("tearDown2");
+		testItemHelper.write("tearDown2");
 	}
 
 	@Test
 	public void test1() throws IOException {
-		_testItemHelper.write("test1");
+		testItemHelper.write("test1");
 	}
 
 	@Test
 	public void test2() throws IOException {
-		_testItemHelper.write("test2");
+		testItemHelper.write("test2");
 	}
 
-	private static final TestItemHelper _testItemHelper = new TestItemHelper(
-		BeforeAfterTestItem.class);
+	private static final List<String> _lines = Arrays.asList(
+		"setUpBase", "setUpOverriddenChild", "setUp2", "setUp1", "test1",
+		"tearDown1", "tearDown2", "tearDownOverriddenChild", "tearDownBase",
+		"setUpBase", "setUpOverriddenChild", "setUp2", "setUp1", "test2",
+		"tearDown1", "tearDown2", "tearDownOverriddenChild", "tearDownBase");
 
 }

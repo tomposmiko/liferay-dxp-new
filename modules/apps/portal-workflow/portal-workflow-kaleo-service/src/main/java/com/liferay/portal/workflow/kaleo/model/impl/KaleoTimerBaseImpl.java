@@ -32,8 +32,9 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTimerLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class KaleoTimerBaseImpl extends KaleoTimerModelImpl
-	implements KaleoTimer {
+public abstract class KaleoTimerBaseImpl
+	extends KaleoTimerModelImpl implements KaleoTimer {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class KaleoTimerBaseImpl extends KaleoTimerModelImpl
 			KaleoTimerLocalServiceUtil.updateKaleoTimer(this);
 		}
 	}
+
 }

@@ -169,7 +169,8 @@ class Analytics {
 
 		if (userId) {
 			return Promise.resolve(userId);
-		} else {
+		}
+		else {
 			userId = this._generateUserId();
 
 			this._persist(STORAGE_KEY_USER_ID, userId);
@@ -263,7 +264,8 @@ class Analytics {
 				})
 				.catch(console.error)
 				.then(() => (this.isFlushInProgress = false));
-		} else {
+		}
+		else {
 			result = Promise.resolve();
 		}
 
@@ -311,7 +313,8 @@ class Analytics {
 					return this._getEventKey(evt) === eventKey;
 				});
 			});
-		} else {
+		}
+		else {
 			this.events.length = 0;
 		}
 

@@ -23,6 +23,7 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
+import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFileEntryPermission;
 import com.liferay.petra.string.CharPool;
@@ -32,6 +33,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.repository.capabilities.CommentCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -280,8 +282,8 @@ public class DLFileEntryAssetRenderer
 		}
 
 		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			liferayPortletRequest, group, DLPortletKeys.DOCUMENT_LIBRARY, 0, 0,
-			PortletRequest.RENDER_PHASE);
+			liferayPortletRequest, group, DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
+			0, 0, PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter(
 			"mvcRenderCommandName", "/document_library/edit_file_entry");
@@ -349,6 +351,14 @@ public class DLFileEntryAssetRenderer
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
 		String noSuchEntryRedirect) {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)liferayPortletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		if (!DLUtil.hasViewInContextGroupLayout(themeDisplay)) {
+			return null;
+		}
 
 		return getURLViewInContext(
 			liferayPortletRequest, noSuchEntryRedirect,
@@ -437,6 +447,16 @@ public class DLFileEntryAssetRenderer
 		}
 
 		return super.isCategorizable(groupId);
+	}
+
+	@Override
+	public boolean isCommentable() {
+		if (super.isCommentable()) {
+			return _fileEntry.isRepositoryCapabilityProvided(
+				CommentCapability.class);
+		}
+
+		return false;
 	}
 
 	@Override

@@ -17,10 +17,8 @@ package com.liferay.dynamic.data.lists.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordSetVersion;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 
@@ -38,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVersion>,
-	Externalizable, MVCCModel {
+public class DDLRecordSetVersionCacheModel
+	implements CacheModel<DDLRecordSetVersion>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -50,10 +49,13 @@ public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVer
 			return false;
 		}
 
-		DDLRecordSetVersionCacheModel ddlRecordSetVersionCacheModel = (DDLRecordSetVersionCacheModel)obj;
+		DDLRecordSetVersionCacheModel ddlRecordSetVersionCacheModel =
+			(DDLRecordSetVersionCacheModel)obj;
 
-		if ((recordSetVersionId == ddlRecordSetVersionCacheModel.recordSetVersionId) &&
-				(mvccVersion == ddlRecordSetVersionCacheModel.mvccVersion)) {
+		if ((recordSetVersionId ==
+				ddlRecordSetVersionCacheModel.recordSetVersionId) &&
+			(mvccVersion == ddlRecordSetVersionCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -122,7 +124,8 @@ public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVer
 
 	@Override
 	public DDLRecordSetVersion toEntityModel() {
-		DDLRecordSetVersionImpl ddlRecordSetVersionImpl = new DDLRecordSetVersionImpl();
+		DDLRecordSetVersionImpl ddlRecordSetVersionImpl =
+			new DDLRecordSetVersionImpl();
 
 		ddlRecordSetVersionImpl.setMvccVersion(mvccVersion);
 		ddlRecordSetVersionImpl.setRecordSetVersionId(recordSetVersionId);
@@ -227,8 +230,7 @@ public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVer
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(recordSetVersionId);
@@ -311,4 +313,5 @@ public class DDLRecordSetVersionCacheModel implements CacheModel<DDLRecordSetVer
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+
 }

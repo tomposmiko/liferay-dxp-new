@@ -36,8 +36,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface MDRRuleGroupInstanceModel extends AttachedModel,
-	BaseModel<MDRRuleGroupInstance>, ShardedModel, StagedGroupedModel {
+public interface MDRRuleGroupInstanceModel
+	extends AttachedModel, BaseModel<MDRRuleGroupInstance>, ShardedModel,
+			StagedGroupedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -287,4 +289,5 @@ public interface MDRRuleGroupInstanceModel extends AttachedModel,
 	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate);
+
 }

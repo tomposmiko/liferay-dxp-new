@@ -32,8 +32,10 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public class OAuth2ScopeGrantWrapper extends BaseModelWrapper<OAuth2ScopeGrant>
+public class OAuth2ScopeGrantWrapper
+	extends BaseModelWrapper<OAuth2ScopeGrant>
 	implements OAuth2ScopeGrant, ModelWrapper<OAuth2ScopeGrant> {
+
 	public OAuth2ScopeGrantWrapper(OAuth2ScopeGrant oAuth2ScopeGrant) {
 		super(oAuth2ScopeGrant);
 	}
@@ -44,7 +46,8 @@ public class OAuth2ScopeGrantWrapper extends BaseModelWrapper<OAuth2ScopeGrant>
 
 		attributes.put("oAuth2ScopeGrantId", getOAuth2ScopeGrantId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("oAuth2ApplicationScopeAliasesId",
+		attributes.put(
+			"oAuth2ApplicationScopeAliasesId",
 			getOAuth2ApplicationScopeAliasesId());
 		attributes.put("applicationName", getApplicationName());
 		attributes.put("bundleSymbolicName", getBundleSymbolicName());
@@ -68,7 +71,7 @@ public class OAuth2ScopeGrantWrapper extends BaseModelWrapper<OAuth2ScopeGrant>
 		}
 
 		Long oAuth2ApplicationScopeAliasesId = (Long)attributes.get(
-				"oAuth2ApplicationScopeAliasesId");
+			"oAuth2ApplicationScopeAliasesId");
 
 		if (oAuth2ApplicationScopeAliasesId != null) {
 			setOAuth2ApplicationScopeAliasesId(oAuth2ApplicationScopeAliasesId);
@@ -80,7 +83,8 @@ public class OAuth2ScopeGrantWrapper extends BaseModelWrapper<OAuth2ScopeGrant>
 			setApplicationName(applicationName);
 		}
 
-		String bundleSymbolicName = (String)attributes.get("bundleSymbolicName");
+		String bundleSymbolicName = (String)attributes.get(
+			"bundleSymbolicName");
 
 		if (bundleSymbolicName != null) {
 			setBundleSymbolicName(bundleSymbolicName);
@@ -94,70 +98,70 @@ public class OAuth2ScopeGrantWrapper extends BaseModelWrapper<OAuth2ScopeGrant>
 	}
 
 	/**
-	* Returns the application name of this o auth2 scope grant.
-	*
-	* @return the application name of this o auth2 scope grant
-	*/
+	 * Returns the application name of this o auth2 scope grant.
+	 *
+	 * @return the application name of this o auth2 scope grant
+	 */
 	@Override
 	public String getApplicationName() {
 		return model.getApplicationName();
 	}
 
 	/**
-	* Returns the bundle symbolic name of this o auth2 scope grant.
-	*
-	* @return the bundle symbolic name of this o auth2 scope grant
-	*/
+	 * Returns the bundle symbolic name of this o auth2 scope grant.
+	 *
+	 * @return the bundle symbolic name of this o auth2 scope grant
+	 */
 	@Override
 	public String getBundleSymbolicName() {
 		return model.getBundleSymbolicName();
 	}
 
 	/**
-	* Returns the company ID of this o auth2 scope grant.
-	*
-	* @return the company ID of this o auth2 scope grant
-	*/
+	 * Returns the company ID of this o auth2 scope grant.
+	 *
+	 * @return the company ID of this o auth2 scope grant
+	 */
 	@Override
 	public long getCompanyId() {
 		return model.getCompanyId();
 	}
 
 	/**
-	* Returns the o auth2 application scope aliases ID of this o auth2 scope grant.
-	*
-	* @return the o auth2 application scope aliases ID of this o auth2 scope grant
-	*/
+	 * Returns the o auth2 application scope aliases ID of this o auth2 scope grant.
+	 *
+	 * @return the o auth2 application scope aliases ID of this o auth2 scope grant
+	 */
 	@Override
 	public long getOAuth2ApplicationScopeAliasesId() {
 		return model.getOAuth2ApplicationScopeAliasesId();
 	}
 
 	/**
-	* Returns the o auth2 scope grant ID of this o auth2 scope grant.
-	*
-	* @return the o auth2 scope grant ID of this o auth2 scope grant
-	*/
+	 * Returns the o auth2 scope grant ID of this o auth2 scope grant.
+	 *
+	 * @return the o auth2 scope grant ID of this o auth2 scope grant
+	 */
 	@Override
 	public long getOAuth2ScopeGrantId() {
 		return model.getOAuth2ScopeGrantId();
 	}
 
 	/**
-	* Returns the primary key of this o auth2 scope grant.
-	*
-	* @return the primary key of this o auth2 scope grant
-	*/
+	 * Returns the primary key of this o auth2 scope grant.
+	 *
+	 * @return the primary key of this o auth2 scope grant
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
 	}
 
 	/**
-	* Returns the scope of this o auth2 scope grant.
-	*
-	* @return the scope of this o auth2 scope grant
-	*/
+	 * Returns the scope of this o auth2 scope grant.
+	 *
+	 * @return the scope of this o auth2 scope grant
+	 */
 	@Override
 	public String getScope() {
 		return model.getScope();
@@ -169,71 +173,73 @@ public class OAuth2ScopeGrantWrapper extends BaseModelWrapper<OAuth2ScopeGrant>
 	}
 
 	/**
-	* Sets the application name of this o auth2 scope grant.
-	*
-	* @param applicationName the application name of this o auth2 scope grant
-	*/
+	 * Sets the application name of this o auth2 scope grant.
+	 *
+	 * @param applicationName the application name of this o auth2 scope grant
+	 */
 	@Override
 	public void setApplicationName(String applicationName) {
 		model.setApplicationName(applicationName);
 	}
 
 	/**
-	* Sets the bundle symbolic name of this o auth2 scope grant.
-	*
-	* @param bundleSymbolicName the bundle symbolic name of this o auth2 scope grant
-	*/
+	 * Sets the bundle symbolic name of this o auth2 scope grant.
+	 *
+	 * @param bundleSymbolicName the bundle symbolic name of this o auth2 scope grant
+	 */
 	@Override
 	public void setBundleSymbolicName(String bundleSymbolicName) {
 		model.setBundleSymbolicName(bundleSymbolicName);
 	}
 
 	/**
-	* Sets the company ID of this o auth2 scope grant.
-	*
-	* @param companyId the company ID of this o auth2 scope grant
-	*/
+	 * Sets the company ID of this o auth2 scope grant.
+	 *
+	 * @param companyId the company ID of this o auth2 scope grant
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		model.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the o auth2 application scope aliases ID of this o auth2 scope grant.
-	*
-	* @param oAuth2ApplicationScopeAliasesId the o auth2 application scope aliases ID of this o auth2 scope grant
-	*/
+	 * Sets the o auth2 application scope aliases ID of this o auth2 scope grant.
+	 *
+	 * @param oAuth2ApplicationScopeAliasesId the o auth2 application scope aliases ID of this o auth2 scope grant
+	 */
 	@Override
 	public void setOAuth2ApplicationScopeAliasesId(
 		long oAuth2ApplicationScopeAliasesId) {
-		model.setOAuth2ApplicationScopeAliasesId(oAuth2ApplicationScopeAliasesId);
+
+		model.setOAuth2ApplicationScopeAliasesId(
+			oAuth2ApplicationScopeAliasesId);
 	}
 
 	/**
-	* Sets the o auth2 scope grant ID of this o auth2 scope grant.
-	*
-	* @param oAuth2ScopeGrantId the o auth2 scope grant ID of this o auth2 scope grant
-	*/
+	 * Sets the o auth2 scope grant ID of this o auth2 scope grant.
+	 *
+	 * @param oAuth2ScopeGrantId the o auth2 scope grant ID of this o auth2 scope grant
+	 */
 	@Override
 	public void setOAuth2ScopeGrantId(long oAuth2ScopeGrantId) {
 		model.setOAuth2ScopeGrantId(oAuth2ScopeGrantId);
 	}
 
 	/**
-	* Sets the primary key of this o auth2 scope grant.
-	*
-	* @param primaryKey the primary key of this o auth2 scope grant
-	*/
+	 * Sets the primary key of this o auth2 scope grant.
+	 *
+	 * @param primaryKey the primary key of this o auth2 scope grant
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	* Sets the scope of this o auth2 scope grant.
-	*
-	* @param scope the scope of this o auth2 scope grant
-	*/
+	 * Sets the scope of this o auth2 scope grant.
+	 *
+	 * @param scope the scope of this o auth2 scope grant
+	 */
 	@Override
 	public void setScope(String scope) {
 		model.setScope(scope);
@@ -243,4 +249,5 @@ public class OAuth2ScopeGrantWrapper extends BaseModelWrapper<OAuth2ScopeGrant>
 	protected OAuth2ScopeGrantWrapper wrap(OAuth2ScopeGrant oAuth2ScopeGrant) {
 		return new OAuth2ScopeGrantWrapper(oAuth2ScopeGrant);
 	}
+
 }

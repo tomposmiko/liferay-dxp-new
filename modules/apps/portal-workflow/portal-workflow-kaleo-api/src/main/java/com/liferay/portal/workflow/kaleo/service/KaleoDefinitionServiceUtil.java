@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -37,6 +36,7 @@ import org.osgi.util.tracker.ServiceTracker;
 @Deprecated
 @ProviderType
 public class KaleoDefinitionServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -44,28 +44,32 @@ public class KaleoDefinitionServiceUtil {
 	 */
 
 	/**
-	* @deprecated As of Judson (7.1.x), with no direct replacement
-	*/
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
 	@Deprecated
-	public static java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoDefinition> getKaleoDefinitions(
-		int start, int end) {
+	public static java.util.List
+		<com.liferay.portal.workflow.kaleo.model.KaleoDefinition>
+			getKaleoDefinitions(int start, int end) {
+
 		return getService().getKaleoDefinitions(start, end);
 	}
 
 	/**
-	* @deprecated As of Judson (7.1.x), with no direct replacement
-	*/
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
 	@Deprecated
-	public static java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoDefinition> getKaleoDefinitions(
-		long companyId, int start, int end) {
+	public static java.util.List
+		<com.liferay.portal.workflow.kaleo.model.KaleoDefinition>
+			getKaleoDefinitions(long companyId, int start, int end) {
+
 		return getService().getKaleoDefinitions(companyId, start, end);
 	}
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
@@ -74,17 +78,22 @@ public class KaleoDefinitionServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<KaleoDefinitionService, KaleoDefinitionService> _serviceTracker;
+	private static ServiceTracker
+		<KaleoDefinitionService, KaleoDefinitionService> _serviceTracker;
 
 	static {
 		Bundle bundle = FrameworkUtil.getBundle(KaleoDefinitionService.class);
 
-		ServiceTracker<KaleoDefinitionService, KaleoDefinitionService> serviceTracker =
-			new ServiceTracker<KaleoDefinitionService, KaleoDefinitionService>(bundle.getBundleContext(),
-				KaleoDefinitionService.class, null);
+		ServiceTracker<KaleoDefinitionService, KaleoDefinitionService>
+			serviceTracker =
+				new ServiceTracker
+					<KaleoDefinitionService, KaleoDefinitionService>(
+						bundle.getBundleContext(), KaleoDefinitionService.class,
+						null);
 
 		serviceTracker.open();
 
 		_serviceTracker = serviceTracker;
 	}
+
 }

@@ -204,25 +204,34 @@ public class FragmentDisplayContext {
 			SoyContextFactoryUtil.createSoyContext();
 
 		allowedStatusSoyContext.put(
-			"approved", String.valueOf(WorkflowConstants.STATUS_APPROVED));
-		allowedStatusSoyContext.put(
-			"draft", String.valueOf(WorkflowConstants.STATUS_DRAFT));
-
-		soyContext.put("allowedStatus", allowedStatusSoyContext);
+			"approved", String.valueOf(WorkflowConstants.STATUS_APPROVED)
+		).put(
+			"draft", String.valueOf(WorkflowConstants.STATUS_DRAFT)
+		);
 
 		soyContext.put(
+			"allowedStatus", allowedStatusSoyContext
+		).put(
 			"autocompleteTags",
-			_fragmentEntryProcessorRegistry.getAvailableTagsJSONArray());
-		soyContext.put("fragmentCollectionId", getFragmentCollectionId());
-		soyContext.put("fragmentEntryId", getFragmentEntryId());
-		soyContext.put("initialCSS", getCssContent());
-		soyContext.put("initialHTML", getHtmlContent());
-		soyContext.put("initialJS", getJsContent());
-		soyContext.put("name", getName());
-		soyContext.put("portletNamespace", _renderResponse.getNamespace());
-		soyContext.put(
+			_fragmentEntryProcessorRegistry.getAvailableTagsJSONArray()
+		).put(
+			"fragmentCollectionId", getFragmentCollectionId()
+		).put(
+			"fragmentEntryId", getFragmentEntryId()
+		).put(
+			"initialCSS", getCssContent()
+		).put(
+			"initialHTML", getHtmlContent()
+		).put(
+			"initialJS", getJsContent()
+		).put(
+			"name", getName()
+		).put(
+			"portletNamespace", _renderResponse.getNamespace()
+		).put(
 			"spritemap",
-			_themeDisplay.getPathThemeImages() + "/lexicon/icons.svg");
+			_themeDisplay.getPathThemeImages() + "/lexicon/icons.svg"
+		);
 
 		FragmentEntry fragmentEntry = getFragmentEntry();
 
@@ -237,19 +246,21 @@ public class FragmentDisplayContext {
 		editActionURL.setParameter(
 			ActionRequest.ACTION_NAME, "/fragment/edit_fragment_entry");
 
-		urlsSoycontext.put("edit", editActionURL.toString());
-
 		urlsSoycontext.put(
+			"edit", editActionURL.toString()
+		).put(
 			"preview",
 			_getFragmentEntryRenderURL(
 				fragmentEntry, "/fragment/preview_fragment_entry",
-				LiferayWindowState.POP_UP));
-		urlsSoycontext.put("redirect", getRedirect());
-		urlsSoycontext.put(
+				LiferayWindowState.POP_UP)
+		).put(
+			"redirect", getRedirect()
+		).put(
 			"render",
 			_getFragmentEntryRenderURL(
 				fragmentEntry, "/fragment/render_fragment_entry",
-				LiferayWindowState.POP_UP));
+				LiferayWindowState.POP_UP)
+		);
 
 		soyContext.put("urls", urlsSoycontext);
 
@@ -281,11 +292,11 @@ public class FragmentDisplayContext {
 		List<FragmentEntry> fragmentEntries = null;
 		int fragmentEntriesCount = 0;
 
-		if (isNavigationElements() || isNavigationSections()) {
+		if (isNavigationComponents() || isNavigationSections()) {
 			int type = FragmentEntryTypeConstants.TYPE_SECTION;
 
-			if (isNavigationElements()) {
-				type = FragmentEntryTypeConstants.TYPE_ELEMENT;
+			if (isNavigationComponents()) {
+				type = FragmentEntryTypeConstants.TYPE_COMPONENT;
 			}
 
 			fragmentEntries = FragmentEntryServiceUtil.getFragmentEntriesByType(
@@ -483,8 +494,8 @@ public class FragmentDisplayContext {
 		return redirect;
 	}
 
-	public boolean isNavigationElements() {
-		if (Objects.equals(getNavigation(), "elements")) {
+	public boolean isNavigationComponents() {
+		if (Objects.equals(getNavigation(), "components")) {
 			return true;
 		}
 

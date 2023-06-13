@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class CTEntrySoap implements Serializable {
+
 	public static CTEntrySoap toSoapModel(CTEntry model) {
 		CTEntrySoap soapModel = new CTEntrySoap();
 
@@ -39,10 +40,12 @@ public class CTEntrySoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
-		soapModel.setClassNameId(model.getClassNameId());
-		soapModel.setClassPK(model.getClassPK());
-		soapModel.setResourcePrimKey(model.getResourcePrimKey());
+		soapModel.setOriginalCTCollectionId(model.getOriginalCTCollectionId());
+		soapModel.setModelClassNameId(model.getModelClassNameId());
+		soapModel.setModelClassPK(model.getModelClassPK());
+		soapModel.setModelResourcePrimKey(model.getModelResourcePrimKey());
 		soapModel.setChangeType(model.getChangeType());
+		soapModel.setCollision(model.isCollision());
 		soapModel.setStatus(model.getStatus());
 
 		return soapModel;
@@ -76,7 +79,8 @@ public class CTEntrySoap implements Serializable {
 	}
 
 	public static CTEntrySoap[] toSoapModels(List<CTEntry> models) {
-		List<CTEntrySoap> soapModels = new ArrayList<CTEntrySoap>(models.size());
+		List<CTEntrySoap> soapModels = new ArrayList<CTEntrySoap>(
+			models.size());
 
 		for (CTEntry model : models) {
 			soapModels.add(toSoapModel(model));
@@ -144,28 +148,36 @@ public class CTEntrySoap implements Serializable {
 		_modifiedDate = modifiedDate;
 	}
 
-	public long getClassNameId() {
-		return _classNameId;
+	public long getOriginalCTCollectionId() {
+		return _originalCTCollectionId;
 	}
 
-	public void setClassNameId(long classNameId) {
-		_classNameId = classNameId;
+	public void setOriginalCTCollectionId(long originalCTCollectionId) {
+		_originalCTCollectionId = originalCTCollectionId;
 	}
 
-	public long getClassPK() {
-		return _classPK;
+	public long getModelClassNameId() {
+		return _modelClassNameId;
 	}
 
-	public void setClassPK(long classPK) {
-		_classPK = classPK;
+	public void setModelClassNameId(long modelClassNameId) {
+		_modelClassNameId = modelClassNameId;
 	}
 
-	public long getResourcePrimKey() {
-		return _resourcePrimKey;
+	public long getModelClassPK() {
+		return _modelClassPK;
 	}
 
-	public void setResourcePrimKey(long resourcePrimKey) {
-		_resourcePrimKey = resourcePrimKey;
+	public void setModelClassPK(long modelClassPK) {
+		_modelClassPK = modelClassPK;
+	}
+
+	public long getModelResourcePrimKey() {
+		return _modelResourcePrimKey;
+	}
+
+	public void setModelResourcePrimKey(long modelResourcePrimKey) {
+		_modelResourcePrimKey = modelResourcePrimKey;
 	}
 
 	public int getChangeType() {
@@ -174,6 +186,18 @@ public class CTEntrySoap implements Serializable {
 
 	public void setChangeType(int changeType) {
 		_changeType = changeType;
+	}
+
+	public boolean getCollision() {
+		return _collision;
+	}
+
+	public boolean isCollision() {
+		return _collision;
+	}
+
+	public void setCollision(boolean collision) {
+		_collision = collision;
 	}
 
 	public int getStatus() {
@@ -190,9 +214,12 @@ public class CTEntrySoap implements Serializable {
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
-	private long _classNameId;
-	private long _classPK;
-	private long _resourcePrimKey;
+	private long _originalCTCollectionId;
+	private long _modelClassNameId;
+	private long _modelClassPK;
+	private long _modelResourcePrimKey;
 	private int _changeType;
+	private boolean _collision;
 	private int _status;
+
 }

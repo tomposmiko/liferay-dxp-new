@@ -26,6 +26,8 @@ import com.liferay.portal.tools.java.parser.util.JavaParserUtil;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Hugo Huijser
@@ -34,12 +36,15 @@ public class ParsedJavaTerm implements Comparable<ParsedJavaTerm> {
 
 	public ParsedJavaTerm(
 		String content, Position startPosition, Position endPosition,
-		String className) {
+		String className, String precedingNestedCodeBlockClassName,
+		String followingNestedCodeBlockClassName) {
 
 		_content = content;
 		_startPosition = startPosition;
 		_endPosition = endPosition;
 		_className = className;
+		_precedingNestedCodeBlockClassName = precedingNestedCodeBlockClassName;
+		_followingNestedCodeBlockClassName = followingNestedCodeBlockClassName;
 	}
 
 	@Override
@@ -49,6 +54,16 @@ public class ParsedJavaTerm implements Comparable<ParsedJavaTerm> {
 
 	public boolean containsCommentToken() {
 		return _containsCommentToken;
+	}
+
+	public String getAccessModifier() {
+		Matcher matcher = _accessModifierPattern.matcher(_content);
+
+		if (matcher.find()) {
+			return matcher.group(1);
+		}
+
+		return null;
 	}
 
 	public String getClassName() {
@@ -81,118 +96,43 @@ public class ParsedJavaTerm implements Comparable<ParsedJavaTerm> {
 			if (((precedingCommentToken.getType() ==
 					TokenTypes.BLOCK_COMMENT_BEGIN) &&
 				 StringUtil.startsWith(
-					 precedingCommentToken.getText(), CharPool.STAR)) ||
+					 StringUtil.trim(precedingCommentToken.getText()),
+					 CharPool.STAR)) ||
 				((precedingCommentToken.getType() ==
 					TokenTypes.SINGLE_LINE_COMMENT) &&
 				 StringUtil.startsWith(
 					 precedingCommentToken.getText(), CharPool.SPACE))) {
 
-				// TODO
-
-				return NO_ACTION_REQUIRED;
-			}
-		}
-
-		if (_content.endsWith("-> {")) {
-			return SINGLE_LINE_BREAK_REQUIRED;
-		}
-
-		String trimmedNextJavaTermContent = StringUtil.trim(
-			nextParsedJavaTerm.getContent());
-
-		if (StringUtil.startsWith(
-				StringUtil.trim(_content), CharPool.CLOSE_CURLY_BRACE)) {
-
-			if (!_content.endsWith(StringPool.OPEN_CURLY_BRACE)) {
-
-				// TODO
-
-				return NO_ACTION_REQUIRED;
-			}
-
-			if (!trimmedNextJavaTermContent.equals(
-					StringPool.OPEN_CURLY_BRACE)) {
-
 				return DOUBLE_LINE_BREAK_REQUIRED;
-			}
-		}
-
-		if (_className.equals(JavaAnnotationFieldDefinition.class.getName())) {
-			return DOUBLE_LINE_BREAK_REQUIRED;
-		}
-
-		int lineCount = StringUtil.count(_content, CharPool.NEW_LINE) + 1;
-
-		if (_className.equals(JavaEnumConstantDefinitions.class.getName()) &&
-			(!_content.endsWith(StringPool.OPEN_CURLY_BRACE) ||
-			 (lineCount == 1) ||
-			 Objects.equals(
-				 _getIndent(_content, 1), _getIndent(_content, lineCount)))) {
-
-			return DOUBLE_LINE_BREAK_REQUIRED;
-		}
-
-		if (_content.endsWith(StringPool.SEMICOLON)) {
-			if (_className.equals(JavaMethodDefinition.class.getName())) {
-				return DOUBLE_LINE_BREAK_REQUIRED;
-			}
-
-			if (_className.equals(JavaBreakStatement.class.getName()) ||
-				_className.equals(JavaContinueStatement.class.getName()) ||
-				_className.equals(JavaReturnStatement.class.getName()) ||
-				_className.equals(JavaThrowStatement.class.getName())) {
-
-				return SINGLE_LINE_BREAK_REQUIRED;
 			}
 
 			return NO_ACTION_REQUIRED;
 		}
 
-		if (!_content.endsWith(StringPool.OPEN_CURLY_BRACE) ||
-			trimmedNextJavaTermContent.startsWith(
-				StringPool.CLOSE_CURLY_BRACE)) {
-
-			// TODO
-
+		if (nextParsedJavaTerm.getPrecedingLineAction() != NO_ACTION_REQUIRED) {
 			return NO_ACTION_REQUIRED;
 		}
 
-		if (_className.equals(JavaClassDefinition.class.getName())) {
+		if (_content.endsWith(StringPool.OPEN_CURLY_BRACE)) {
+			if (_followingNestedCodeBlockClassName != null) {
+				return _getOpenCurlyBraceFollowingLineAction(
+					_followingNestedCodeBlockClassName);
+			}
+
+			return _getOpenCurlyBraceFollowingLineAction(_className);
+		}
+
+		if (Objects.equals(
+				StringUtil.trim(_content), StringPool.CLOSE_CURLY_BRACE) ||
+			_className.equals(JavaConstructorCall.class.getName()) ||
+			_className.equals(JavaMethodDefinition.class.getName()) ||
+			_className.equals(JavaEnumConstantDefinitions.class.getName()) ||
+			_className.equals(JavaAnnotationFieldDefinition.class.getName())) {
+
 			return DOUBLE_LINE_BREAK_REQUIRED;
 		}
 
-		if (trimmedNextJavaTermContent.equals(StringPool.OPEN_CURLY_BRACE)) {
-			String lastLine = StringUtil.trim(
-				JavaParserUtil.getLastLine(_content));
-
-			if (lastLine.startsWith("new ") ||
-				_containsUnquoted(lastLine, " new ")) {
-
-				return SINGLE_LINE_BREAK_REQUIRED;
-			}
-
-			return DOUBLE_LINE_BREAK_REQUIRED;
-		}
-
-		if ((lineCount == 1) ||
-			Objects.equals(
-				_getIndent(_content, 1), _getIndent(_content, lineCount))) {
-
-			String lastLine = StringUtil.trim(
-				JavaParserUtil.getLastLine(_content));
-
-			int x = lastLine.lastIndexOf(" new ");
-
-			if ((x != -1) && !ToolsUtil.isInsideQuotes(lastLine, x) &&
-				(ToolsUtil.getLevel(lastLine.substring(x)) == 0)) {
-
-				return DOUBLE_LINE_BREAK_REQUIRED;
-			}
-
-			return SINGLE_LINE_BREAK_REQUIRED;
-		}
-
-		return DOUBLE_LINE_BREAK_REQUIRED;
+		return NO_ACTION_REQUIRED;
 	}
 
 	public ParsedJavaTerm getNextParsedJavaTerm() {
@@ -204,19 +144,62 @@ public class ParsedJavaTerm implements Comparable<ParsedJavaTerm> {
 	}
 
 	public int getPrecedingLineAction() {
-		if (((_precedingCommentToken != null) &&
-			 StringUtil.startsWith(
-				 StringUtil.trim(_precedingCommentToken.getText()),
-				 CharPool.STAR)) ||
-			StringUtil.startsWith(
-				StringUtil.trim(_content), StringPool.CLOSE_CURLY_BRACE)) {
+		ParsedJavaTerm previousParsedJavaTerm = getPreviousParsedJavaTerm();
 
-			// TODO
+		if (_precedingCommentToken != null) {
+			if (previousParsedJavaTerm == null) {
+				return DOUBLE_LINE_BREAK_REQUIRED;
+			}
+
+			if ((_precedingCommentToken.getType() ==
+					TokenTypes.SINGLE_LINE_COMMENT) &&
+				StringUtil.startsWith(
+					_precedingCommentToken.getText(), CharPool.SPACE)) {
+
+				Position previousEndPosition =
+					previousParsedJavaTerm.getEndPosition();
+
+				if (previousEndPosition.getLineNumber() ==
+						_precedingCommentToken.getLine()) {
+
+					return NO_ACTION_REQUIRED;
+				}
+
+				return DOUBLE_LINE_BREAK_REQUIRED;
+			}
+
+			if ((_precedingCommentToken.getType() ==
+					TokenTypes.BLOCK_COMMENT_BEGIN) &&
+				StringUtil.startsWith(
+					StringUtil.trim(_precedingCommentToken.getText()),
+					CharPool.STAR) &&
+				!StringUtil.startsWith(
+					StringUtil.trim(_content), StringPool.CLOSE_CURLY_BRACE)) {
+
+				return SINGLE_LINE_BREAK_REQUIRED;
+			}
 
 			return NO_ACTION_REQUIRED;
 		}
 
-		ParsedJavaTerm previousParsedJavaTerm = getPreviousParsedJavaTerm();
+		if (previousParsedJavaTerm == null) {
+			return NO_ACTION_REQUIRED;
+		}
+
+		if (_className.equals(JavaVariableDefinition.class.getName()) &&
+			_className.equals(previousParsedJavaTerm.getClassName())) {
+
+			return _getBetweenVariableDefinitionsLineAction(
+				previousParsedJavaTerm);
+		}
+
+		if ((_className.equals(JavaConstructorDefinition.class.getName()) ||
+			 _className.equals(JavaMethodDefinition.class.getName())) &&
+			!StringUtil.startsWith(
+				StringUtil.trim(_content), StringPool.CLOSE_CURLY_BRACE)) {
+
+			return DOUBLE_LINE_BREAK_REQUIRED;
+		}
 
 		if (StringUtil.endsWith(
 				previousParsedJavaTerm.getContent(),
@@ -225,16 +208,25 @@ public class ParsedJavaTerm implements Comparable<ParsedJavaTerm> {
 			return NO_ACTION_REQUIRED;
 		}
 
+		if (StringUtil.startsWith(
+				StringUtil.trim(_content), StringPool.CLOSE_CURLY_BRACE)) {
+
+			if (_precedingNestedCodeBlockClassName != null) {
+				return _getCloseCurlyBracePrecedingLineAction(
+					_precedingNestedCodeBlockClassName);
+			}
+
+			return _getCloseCurlyBracePrecedingLineAction(_className);
+		}
+
 		if (_className.equals(JavaAnnotationFieldDefinition.class.getName()) ||
 			_className.equals(JavaBreakStatement.class.getName()) ||
-			_className.equals(JavaConstructorDefinition.class.getName()) ||
 			_className.equals(JavaContinueStatement.class.getName()) ||
 			_className.equals(JavaDoStatement.class.getName()) ||
 			_className.equals(JavaEnhancedForStatement.class.getName()) ||
 			_className.equals(JavaEnumConstantDefinitions.class.getName()) ||
 			_className.equals(JavaForStatement.class.getName()) ||
 			_className.equals(JavaIfStatement.class.getName()) ||
-			_className.equals(JavaMethodDefinition.class.getName()) ||
 			_className.equals(JavaReturnStatement.class.getName()) ||
 			_className.equals(JavaStaticInitialization.class.getName()) ||
 			_className.equals(JavaSynchronizedStatement.class.getName()) ||
@@ -273,6 +265,16 @@ public class ParsedJavaTerm implements Comparable<ParsedJavaTerm> {
 
 	public Position getStartPosition() {
 		return _startPosition;
+	}
+
+	public String getVariableName() {
+		Matcher matcher = _variableNamePattern.matcher(_content);
+
+		if (matcher.find()) {
+			return matcher.group(1);
+		}
+
+		return null;
 	}
 
 	public void setContainsCommentToken(boolean containsCommentToken) {
@@ -317,6 +319,85 @@ public class ParsedJavaTerm implements Comparable<ParsedJavaTerm> {
 		}
 	}
 
+	private int _getBetweenVariableDefinitionsLineAction(
+		ParsedJavaTerm previousJavaTerm) {
+
+		if ((_followingNestedCodeBlockClassName != null) ||
+			(previousJavaTerm._followingNestedCodeBlockClassName != null) ||
+			(previousJavaTerm._precedingNestedCodeBlockClassName != null) ||
+			(previousJavaTerm.getPrecedingCommentToken() != null)) {
+
+			return NO_ACTION_REQUIRED;
+		}
+
+		String accessModifier = getAccessModifier();
+		String previousAccessModifier = previousJavaTerm.getAccessModifier();
+
+		if ((accessModifier == null) && (previousAccessModifier == null)) {
+			return NO_ACTION_REQUIRED;
+		}
+
+		if (!Objects.equals(accessModifier, previousAccessModifier) ||
+			(previousJavaTerm.getPrecedingCommentToken() != null) ||
+			StringUtil.startsWith(StringUtil.trim(_content), CharPool.AT) ||
+			StringUtil.startsWith(
+				StringUtil.trim(previousJavaTerm.getContent()), CharPool.AT)) {
+
+			return DOUBLE_LINE_BREAK_REQUIRED;
+		}
+
+		String previousContent = previousJavaTerm.getContent();
+
+		if (previousContent.matches("(?s).*\\sstatic\\s.*") ^
+			_content.matches("(?s).*\\sstatic\\s.*")) {
+
+			return DOUBLE_LINE_BREAK_REQUIRED;
+		}
+
+		String previousVariableName = previousJavaTerm.getVariableName();
+		String variableName = getVariableName();
+
+		if ((StringUtil.isUpperCase(previousVariableName) &&
+			 !StringUtil.isLowerCase(previousVariableName)) ||
+			(StringUtil.isUpperCase(variableName) &&
+			 !StringUtil.isLowerCase(variableName))) {
+
+			return DOUBLE_LINE_BREAK_REQUIRED;
+		}
+
+		if (previousContent.matches("(?s).*\\sstatic\\s.*") &&
+			(previousVariableName.equals("_instance") ||
+			 previousVariableName.equals("_log") ||
+			 previousVariableName.equals("_logger"))) {
+
+			return DOUBLE_LINE_BREAK_REQUIRED;
+		}
+
+		return SINGLE_LINE_BREAK_REQUIRED;
+	}
+
+	private int _getCloseCurlyBracePrecedingLineAction(String className) {
+		if (className.equals(JavaEnumConstantDefinition.class.getName()) ||
+			className.equals(JavaClassDefinition.class.getName())) {
+
+			return DOUBLE_LINE_BREAK_REQUIRED;
+		}
+
+		if (className.equals(JavaClassCall.class.getName())) {
+			ParsedJavaTerm previousParsedJavaTerm = getPreviousParsedJavaTerm();
+
+			String previousClassName = previousParsedJavaTerm.getClassName();
+
+			if (!previousClassName.equals(
+					JavaInstanceInitialization.class.getName())) {
+
+				return DOUBLE_LINE_BREAK_REQUIRED;
+			}
+		}
+
+		return SINGLE_LINE_BREAK_REQUIRED;
+	}
+
 	private String _getIndent(String s, int lineNumber) {
 		int x = -1;
 
@@ -335,12 +416,89 @@ public class ParsedJavaTerm implements Comparable<ParsedJavaTerm> {
 		}
 	}
 
+	private int _getOpenCurlyBraceFollowingLineAction(String className) {
+		if (className.equals(JavaLambdaExpression.class.getName())) {
+			if (_content.endsWith(") -> {")) {
+				String lastLine = StringUtil.trim(
+					JavaParserUtil.getLastLine(_content));
+
+				if (!lastLine.contains(StringPool.OPEN_PARENTHESIS)) {
+					return DOUBLE_LINE_BREAK_REQUIRED;
+				}
+			}
+
+			return SINGLE_LINE_BREAK_REQUIRED;
+		}
+
+		ParsedJavaTerm nextParsedJavaTerm = getNextParsedJavaTerm();
+
+		String trimmedNextJavaTermContent = StringUtil.trim(
+			nextParsedJavaTerm.getContent());
+
+		if (trimmedNextJavaTermContent.startsWith(
+				StringPool.CLOSE_CURLY_BRACE)) {
+
+			return SINGLE_LINE_BREAK_REQUIRED;
+		}
+
+		if (className.equals(JavaClassDefinition.class.getName()) ||
+			className.equals(JavaEnumConstantDefinition.class.getName())) {
+
+			return DOUBLE_LINE_BREAK_REQUIRED;
+		}
+
+		if (Objects.equals(
+				nextParsedJavaTerm.getClassName(),
+				JavaInstanceInitialization.class.getName())) {
+
+			String lastLine = StringUtil.trim(
+				JavaParserUtil.getLastLine(_content));
+
+			if (lastLine.startsWith("new ") ||
+				_containsUnquoted(lastLine, " new ")) {
+
+				return SINGLE_LINE_BREAK_REQUIRED;
+			}
+
+			return DOUBLE_LINE_BREAK_REQUIRED;
+		}
+
+		int lineCount = StringUtil.count(_content, CharPool.NEW_LINE) + 1;
+
+		if ((_precedingNestedCodeBlockClassName != null) ||
+			((lineCount > 1) &&
+			 !Objects.equals(
+				 _getIndent(_content, 1), _getIndent(_content, lineCount)))) {
+
+			return DOUBLE_LINE_BREAK_REQUIRED;
+		}
+
+		String lastLine = StringUtil.trim(JavaParserUtil.getLastLine(_content));
+
+		int x = lastLine.lastIndexOf(" new ");
+
+		if ((x != -1) && !ToolsUtil.isInsideQuotes(lastLine, x) &&
+			(ToolsUtil.getLevel(lastLine.substring(x)) == 0)) {
+
+			return DOUBLE_LINE_BREAK_REQUIRED;
+		}
+
+		return SINGLE_LINE_BREAK_REQUIRED;
+	}
+
+	private static final Pattern _accessModifierPattern = Pattern.compile(
+		"\t(private|protected|public)\\s");
+	private static final Pattern _variableNamePattern = Pattern.compile(
+		"\\s(\\w+)( =|;)");
+
 	private final String _className;
 	private boolean _containsCommentToken;
 	private final String _content;
 	private final Position _endPosition;
+	private final String _followingNestedCodeBlockClassName;
 	private ParsedJavaTerm _nextParsedJavaTerm;
 	private CommonHiddenStreamToken _precedingCommentToken;
+	private final String _precedingNestedCodeBlockClassName;
 	private ParsedJavaTerm _previousParsedJavaTerm;
 	private final Position _startPosition;
 

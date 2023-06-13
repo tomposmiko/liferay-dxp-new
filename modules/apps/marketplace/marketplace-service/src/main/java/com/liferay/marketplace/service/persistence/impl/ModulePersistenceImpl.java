@@ -21,9 +21,7 @@ import com.liferay.marketplace.model.Module;
 import com.liferay.marketplace.model.impl.ModuleImpl;
 import com.liferay.marketplace.model.impl.ModuleModelImpl;
 import com.liferay.marketplace.service.persistence.ModulePersistence;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -49,6 +47,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -65,18 +64,23 @@ import java.util.Set;
  * @generated
  */
 @ProviderType
-public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
-	implements ModulePersistence {
+public class ModulePersistenceImpl
+	extends BasePersistenceImpl<Module> implements ModulePersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>ModuleUtil</code> to access the module persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = ModuleImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		ModuleImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -126,8 +130,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of matching modules
 	 */
 	@Override
-	public List<Module> findByUuid(String uuid, int start, int end,
+	public List<Module> findByUuid(
+		String uuid, int start, int end,
 		OrderByComparator<Module> orderByComparator) {
+
 		return findByUuid(uuid, start, end, orderByComparator, true);
 	}
 
@@ -146,8 +152,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of matching modules
 	 */
 	@Override
-	public List<Module> findByUuid(String uuid, int start, int end,
-		OrderByComparator<Module> orderByComparator, boolean retrieveFromCache) {
+	public List<Module> findByUuid(
+		String uuid, int start, int end,
+		OrderByComparator<Module> orderByComparator,
+		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -155,21 +164,22 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] { uuid };
+			finderArgs = new Object[] {uuid};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid;
-			finderArgs = new Object[] { uuid, start, end, orderByComparator };
+			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<Module> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Module>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Module>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Module module : list) {
@@ -186,8 +196,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -207,11 +217,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(ModuleModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -231,16 +240,16 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				}
 
 				if (!pagination) {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -269,9 +278,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByUuid_First(String uuid,
-		OrderByComparator<Module> orderByComparator)
+	public Module findByUuid_First(
+			String uuid, OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		Module module = fetchByUuid_First(uuid, orderByComparator);
 
 		if (module != null) {
@@ -298,8 +308,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the first matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByUuid_First(String uuid,
-		OrderByComparator<Module> orderByComparator) {
+	public Module fetchByUuid_First(
+		String uuid, OrderByComparator<Module> orderByComparator) {
+
 		List<Module> list = findByUuid(uuid, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -318,9 +329,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByUuid_Last(String uuid,
-		OrderByComparator<Module> orderByComparator)
+	public Module findByUuid_Last(
+			String uuid, OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		Module module = fetchByUuid_Last(uuid, orderByComparator);
 
 		if (module != null) {
@@ -347,15 +359,17 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the last matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByUuid_Last(String uuid,
-		OrderByComparator<Module> orderByComparator) {
+	public Module fetchByUuid_Last(
+		String uuid, OrderByComparator<Module> orderByComparator) {
+
 		int count = countByUuid(uuid);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Module> list = findByUuid(uuid, count - 1, count, orderByComparator);
+		List<Module> list = findByUuid(
+			uuid, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -374,9 +388,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a module with the primary key could not be found
 	 */
 	@Override
-	public Module[] findByUuid_PrevAndNext(long moduleId, String uuid,
-		OrderByComparator<Module> orderByComparator)
+	public Module[] findByUuid_PrevAndNext(
+			long moduleId, String uuid,
+			OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		uuid = Objects.toString(uuid, "");
 
 		Module module = findByPrimaryKey(moduleId);
@@ -388,13 +404,13 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			Module[] array = new ModuleImpl[3];
 
-			array[0] = getByUuid_PrevAndNext(session, module, uuid,
-					orderByComparator, true);
+			array[0] = getByUuid_PrevAndNext(
+				session, module, uuid, orderByComparator, true);
 
 			array[1] = module;
 
-			array[2] = getByUuid_PrevAndNext(session, module, uuid,
-					orderByComparator, false);
+			array[2] = getByUuid_PrevAndNext(
+				session, module, uuid, orderByComparator, false);
 
 			return array;
 		}
@@ -406,14 +422,15 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		}
 	}
 
-	protected Module getByUuid_PrevAndNext(Session session, Module module,
-		String uuid, OrderByComparator<Module> orderByComparator,
-		boolean previous) {
+	protected Module getByUuid_PrevAndNext(
+		Session session, Module module, String uuid,
+		OrderByComparator<Module> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -434,7 +451,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -506,8 +524,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					module)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(module)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -529,8 +548,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public void removeByUuid(String uuid) {
-		for (Module module : findByUuid(uuid, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Module module :
+				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(module);
 		}
 	}
@@ -547,7 +567,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 		FinderPath finderPath = _finderPathCountByUuid;
 
-		Object[] finderArgs = new Object[] { uuid };
+		Object[] finderArgs = new Object[] {uuid};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -600,7 +620,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	}
 
 	private static final String _FINDER_COLUMN_UUID_UUID_2 = "module.uuid = ?";
-	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(module.uuid IS NULL OR module.uuid = '')";
+
+	private static final String _FINDER_COLUMN_UUID_UUID_3 =
+		"(module.uuid IS NULL OR module.uuid = '')";
+
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -614,8 +637,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public List<Module> findByUuid_C(String uuid, long companyId) {
-		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByUuid_C(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -632,8 +655,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the range of matching modules
 	 */
 	@Override
-	public List<Module> findByUuid_C(String uuid, long companyId, int start,
-		int end) {
+	public List<Module> findByUuid_C(
+		String uuid, long companyId, int start, int end) {
+
 		return findByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -652,9 +676,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of matching modules
 	 */
 	@Override
-	public List<Module> findByUuid_C(String uuid, long companyId, int start,
-		int end, OrderByComparator<Module> orderByComparator) {
-		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
+	public List<Module> findByUuid_C(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<Module> orderByComparator) {
+
+		return findByUuid_C(
+			uuid, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -673,9 +700,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of matching modules
 	 */
 	@Override
-	public List<Module> findByUuid_C(String uuid, long companyId, int start,
-		int end, OrderByComparator<Module> orderByComparator,
+	public List<Module> findByUuid_C(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<Module> orderByComparator,
 		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -683,30 +712,30 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] { uuid, companyId };
+			finderArgs = new Object[] {uuid, companyId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
-					uuid, companyId,
-					
-					start, end, orderByComparator
-				};
+				uuid, companyId, start, end, orderByComparator
+			};
 		}
 
 		List<Module> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Module>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Module>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Module module : list) {
 					if (!uuid.equals(module.getUuid()) ||
-							(companyId != module.getCompanyId())) {
+						(companyId != module.getCompanyId())) {
+
 						list = null;
 
 						break;
@@ -719,8 +748,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -742,11 +771,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(ModuleModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -768,16 +796,16 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -807,9 +835,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByUuid_C_First(String uuid, long companyId,
-		OrderByComparator<Module> orderByComparator)
+	public Module findByUuid_C_First(
+			String uuid, long companyId,
+			OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		Module module = fetchByUuid_C_First(uuid, companyId, orderByComparator);
 
 		if (module != null) {
@@ -840,10 +870,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the first matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByUuid_C_First(String uuid, long companyId,
+	public Module fetchByUuid_C_First(
+		String uuid, long companyId,
 		OrderByComparator<Module> orderByComparator) {
-		List<Module> list = findByUuid_C(uuid, companyId, 0, 1,
-				orderByComparator);
+
+		List<Module> list = findByUuid_C(
+			uuid, companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -862,9 +894,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByUuid_C_Last(String uuid, long companyId,
-		OrderByComparator<Module> orderByComparator)
+	public Module findByUuid_C_Last(
+			String uuid, long companyId,
+			OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		Module module = fetchByUuid_C_Last(uuid, companyId, orderByComparator);
 
 		if (module != null) {
@@ -895,16 +929,18 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the last matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByUuid_C_Last(String uuid, long companyId,
+	public Module fetchByUuid_C_Last(
+		String uuid, long companyId,
 		OrderByComparator<Module> orderByComparator) {
+
 		int count = countByUuid_C(uuid, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Module> list = findByUuid_C(uuid, companyId, count - 1, count,
-				orderByComparator);
+		List<Module> list = findByUuid_C(
+			uuid, companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -924,9 +960,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a module with the primary key could not be found
 	 */
 	@Override
-	public Module[] findByUuid_C_PrevAndNext(long moduleId, String uuid,
-		long companyId, OrderByComparator<Module> orderByComparator)
+	public Module[] findByUuid_C_PrevAndNext(
+			long moduleId, String uuid, long companyId,
+			OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		uuid = Objects.toString(uuid, "");
 
 		Module module = findByPrimaryKey(moduleId);
@@ -938,13 +976,13 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			Module[] array = new ModuleImpl[3];
 
-			array[0] = getByUuid_C_PrevAndNext(session, module, uuid,
-					companyId, orderByComparator, true);
+			array[0] = getByUuid_C_PrevAndNext(
+				session, module, uuid, companyId, orderByComparator, true);
 
 			array[1] = module;
 
-			array[2] = getByUuid_C_PrevAndNext(session, module, uuid,
-					companyId, orderByComparator, false);
+			array[2] = getByUuid_C_PrevAndNext(
+				session, module, uuid, companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -956,14 +994,15 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		}
 	}
 
-	protected Module getByUuid_C_PrevAndNext(Session session, Module module,
-		String uuid, long companyId,
+	protected Module getByUuid_C_PrevAndNext(
+		Session session, Module module, String uuid, long companyId,
 		OrderByComparator<Module> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -986,7 +1025,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1060,8 +1100,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					module)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(module)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1084,8 +1125,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public void removeByUuid_C(String uuid, long companyId) {
-		for (Module module : findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Module module :
+				findByUuid_C(
+					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(module);
 		}
 	}
@@ -1103,7 +1147,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		Object[] finderArgs = new Object[] { uuid, companyId };
+		Object[] finderArgs = new Object[] {uuid, companyId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1159,9 +1203,15 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "module.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(module.uuid IS NULL OR module.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "module.companyId = ?";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
+		"module.uuid = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
+		"(module.uuid IS NULL OR module.uuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
+		"module.companyId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByAppId;
 	private FinderPath _finderPathWithoutPaginationFindByAppId;
 	private FinderPath _finderPathCountByAppId;
@@ -1208,8 +1258,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of matching modules
 	 */
 	@Override
-	public List<Module> findByAppId(long appId, int start, int end,
+	public List<Module> findByAppId(
+		long appId, int start, int end,
 		OrderByComparator<Module> orderByComparator) {
+
 		return findByAppId(appId, start, end, orderByComparator, true);
 	}
 
@@ -1228,28 +1280,32 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of matching modules
 	 */
 	@Override
-	public List<Module> findByAppId(long appId, int start, int end,
-		OrderByComparator<Module> orderByComparator, boolean retrieveFromCache) {
+	public List<Module> findByAppId(
+		long appId, int start, int end,
+		OrderByComparator<Module> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByAppId;
-			finderArgs = new Object[] { appId };
+			finderArgs = new Object[] {appId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByAppId;
-			finderArgs = new Object[] { appId, start, end, orderByComparator };
+			finderArgs = new Object[] {appId, start, end, orderByComparator};
 		}
 
 		List<Module> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Module>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Module>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Module module : list) {
@@ -1266,8 +1322,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1278,11 +1334,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			query.append(_FINDER_COLUMN_APPID_APPID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(ModuleModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1300,16 +1355,16 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				qPos.add(appId);
 
 				if (!pagination) {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1338,9 +1393,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByAppId_First(long appId,
-		OrderByComparator<Module> orderByComparator)
+	public Module findByAppId_First(
+			long appId, OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		Module module = fetchByAppId_First(appId, orderByComparator);
 
 		if (module != null) {
@@ -1367,8 +1423,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the first matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByAppId_First(long appId,
-		OrderByComparator<Module> orderByComparator) {
+	public Module fetchByAppId_First(
+		long appId, OrderByComparator<Module> orderByComparator) {
+
 		List<Module> list = findByAppId(appId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -1387,9 +1444,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByAppId_Last(long appId,
-		OrderByComparator<Module> orderByComparator)
+	public Module findByAppId_Last(
+			long appId, OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		Module module = fetchByAppId_Last(appId, orderByComparator);
 
 		if (module != null) {
@@ -1416,16 +1474,17 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the last matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByAppId_Last(long appId,
-		OrderByComparator<Module> orderByComparator) {
+	public Module fetchByAppId_Last(
+		long appId, OrderByComparator<Module> orderByComparator) {
+
 		int count = countByAppId(appId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Module> list = findByAppId(appId, count - 1, count,
-				orderByComparator);
+		List<Module> list = findByAppId(
+			appId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1444,9 +1503,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a module with the primary key could not be found
 	 */
 	@Override
-	public Module[] findByAppId_PrevAndNext(long moduleId, long appId,
-		OrderByComparator<Module> orderByComparator)
+	public Module[] findByAppId_PrevAndNext(
+			long moduleId, long appId,
+			OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		Module module = findByPrimaryKey(moduleId);
 
 		Session session = null;
@@ -1456,13 +1517,13 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			Module[] array = new ModuleImpl[3];
 
-			array[0] = getByAppId_PrevAndNext(session, module, appId,
-					orderByComparator, true);
+			array[0] = getByAppId_PrevAndNext(
+				session, module, appId, orderByComparator, true);
 
 			array[1] = module;
 
-			array[2] = getByAppId_PrevAndNext(session, module, appId,
-					orderByComparator, false);
+			array[2] = getByAppId_PrevAndNext(
+				session, module, appId, orderByComparator, false);
 
 			return array;
 		}
@@ -1474,14 +1535,15 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		}
 	}
 
-	protected Module getByAppId_PrevAndNext(Session session, Module module,
-		long appId, OrderByComparator<Module> orderByComparator,
-		boolean previous) {
+	protected Module getByAppId_PrevAndNext(
+		Session session, Module module, long appId,
+		OrderByComparator<Module> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1493,7 +1555,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		query.append(_FINDER_COLUMN_APPID_APPID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1563,8 +1626,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		qPos.add(appId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					module)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(module)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1586,8 +1650,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public void removeByAppId(long appId) {
-		for (Module module : findByAppId(appId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Module module :
+				findByAppId(
+					appId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(module);
 		}
 	}
@@ -1602,7 +1668,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	public int countByAppId(long appId) {
 		FinderPath finderPath = _finderPathCountByAppId;
 
-		Object[] finderArgs = new Object[] { appId };
+		Object[] finderArgs = new Object[] {appId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1643,7 +1709,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_APPID_APPID_2 = "module.appId = ?";
+	private static final String _FINDER_COLUMN_APPID_APPID_2 =
+		"module.appId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByBundleSymbolicName;
 	private FinderPath _finderPathWithoutPaginationFindByBundleSymbolicName;
 	private FinderPath _finderPathCountByBundleSymbolicName;
@@ -1656,8 +1724,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public List<Module> findByBundleSymbolicName(String bundleSymbolicName) {
-		return findByBundleSymbolicName(bundleSymbolicName, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByBundleSymbolicName(
+			bundleSymbolicName, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -1673,8 +1741,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the range of matching modules
 	 */
 	@Override
-	public List<Module> findByBundleSymbolicName(String bundleSymbolicName,
-		int start, int end) {
+	public List<Module> findByBundleSymbolicName(
+		String bundleSymbolicName, int start, int end) {
+
 		return findByBundleSymbolicName(bundleSymbolicName, start, end, null);
 	}
 
@@ -1692,10 +1761,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of matching modules
 	 */
 	@Override
-	public List<Module> findByBundleSymbolicName(String bundleSymbolicName,
-		int start, int end, OrderByComparator<Module> orderByComparator) {
-		return findByBundleSymbolicName(bundleSymbolicName, start, end,
-			orderByComparator, true);
+	public List<Module> findByBundleSymbolicName(
+		String bundleSymbolicName, int start, int end,
+		OrderByComparator<Module> orderByComparator) {
+
+		return findByBundleSymbolicName(
+			bundleSymbolicName, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -1713,9 +1784,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of matching modules
 	 */
 	@Override
-	public List<Module> findByBundleSymbolicName(String bundleSymbolicName,
-		int start, int end, OrderByComparator<Module> orderByComparator,
+	public List<Module> findByBundleSymbolicName(
+		String bundleSymbolicName, int start, int end,
+		OrderByComparator<Module> orderByComparator,
 		boolean retrieveFromCache) {
+
 		bundleSymbolicName = Objects.toString(bundleSymbolicName, "");
 
 		boolean pagination = true;
@@ -1723,30 +1796,30 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByBundleSymbolicName;
-			finderArgs = new Object[] { bundleSymbolicName };
+			finderArgs = new Object[] {bundleSymbolicName};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByBundleSymbolicName;
 			finderArgs = new Object[] {
-					bundleSymbolicName,
-					
-					start, end, orderByComparator
-				};
+				bundleSymbolicName, start, end, orderByComparator
+			};
 		}
 
 		List<Module> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Module>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Module>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Module module : list) {
 					if (!bundleSymbolicName.equals(
-								module.getBundleSymbolicName())) {
+							module.getBundleSymbolicName())) {
+
 						list = null;
 
 						break;
@@ -1759,8 +1832,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1771,20 +1844,21 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			boolean bindBundleSymbolicName = false;
 
 			if (bundleSymbolicName.isEmpty()) {
-				query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3);
+				query.append(
+					_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3);
 			}
 			else {
 				bindBundleSymbolicName = true;
 
-				query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_2);
+				query.append(
+					_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_2);
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(ModuleModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1804,16 +1878,16 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				}
 
 				if (!pagination) {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1842,11 +1916,13 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByBundleSymbolicName_First(String bundleSymbolicName,
-		OrderByComparator<Module> orderByComparator)
+	public Module findByBundleSymbolicName_First(
+			String bundleSymbolicName,
+			OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
-		Module module = fetchByBundleSymbolicName_First(bundleSymbolicName,
-				orderByComparator);
+
+		Module module = fetchByBundleSymbolicName_First(
+			bundleSymbolicName, orderByComparator);
 
 		if (module != null) {
 			return module;
@@ -1872,10 +1948,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the first matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByBundleSymbolicName_First(String bundleSymbolicName,
+	public Module fetchByBundleSymbolicName_First(
+		String bundleSymbolicName,
 		OrderByComparator<Module> orderByComparator) {
-		List<Module> list = findByBundleSymbolicName(bundleSymbolicName, 0, 1,
-				orderByComparator);
+
+		List<Module> list = findByBundleSymbolicName(
+			bundleSymbolicName, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1893,11 +1971,13 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByBundleSymbolicName_Last(String bundleSymbolicName,
-		OrderByComparator<Module> orderByComparator)
+	public Module findByBundleSymbolicName_Last(
+			String bundleSymbolicName,
+			OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
-		Module module = fetchByBundleSymbolicName_Last(bundleSymbolicName,
-				orderByComparator);
+
+		Module module = fetchByBundleSymbolicName_Last(
+			bundleSymbolicName, orderByComparator);
 
 		if (module != null) {
 			return module;
@@ -1923,16 +2003,18 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the last matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByBundleSymbolicName_Last(String bundleSymbolicName,
+	public Module fetchByBundleSymbolicName_Last(
+		String bundleSymbolicName,
 		OrderByComparator<Module> orderByComparator) {
+
 		int count = countByBundleSymbolicName(bundleSymbolicName);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Module> list = findByBundleSymbolicName(bundleSymbolicName,
-				count - 1, count, orderByComparator);
+		List<Module> list = findByBundleSymbolicName(
+			bundleSymbolicName, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1951,9 +2033,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a module with the primary key could not be found
 	 */
 	@Override
-	public Module[] findByBundleSymbolicName_PrevAndNext(long moduleId,
-		String bundleSymbolicName, OrderByComparator<Module> orderByComparator)
+	public Module[] findByBundleSymbolicName_PrevAndNext(
+			long moduleId, String bundleSymbolicName,
+			OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		bundleSymbolicName = Objects.toString(bundleSymbolicName, "");
 
 		Module module = findByPrimaryKey(moduleId);
@@ -1965,13 +2049,13 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			Module[] array = new ModuleImpl[3];
 
-			array[0] = getByBundleSymbolicName_PrevAndNext(session, module,
-					bundleSymbolicName, orderByComparator, true);
+			array[0] = getByBundleSymbolicName_PrevAndNext(
+				session, module, bundleSymbolicName, orderByComparator, true);
 
 			array[1] = module;
 
-			array[2] = getByBundleSymbolicName_PrevAndNext(session, module,
-					bundleSymbolicName, orderByComparator, false);
+			array[2] = getByBundleSymbolicName_PrevAndNext(
+				session, module, bundleSymbolicName, orderByComparator, false);
 
 			return array;
 		}
@@ -1983,14 +2067,15 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		}
 	}
 
-	protected Module getByBundleSymbolicName_PrevAndNext(Session session,
-		Module module, String bundleSymbolicName,
+	protected Module getByBundleSymbolicName_PrevAndNext(
+		Session session, Module module, String bundleSymbolicName,
 		OrderByComparator<Module> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2002,16 +2087,19 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		boolean bindBundleSymbolicName = false;
 
 		if (bundleSymbolicName.isEmpty()) {
-			query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3);
+			query.append(
+				_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3);
 		}
 		else {
 			bindBundleSymbolicName = true;
 
-			query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_2);
+			query.append(
+				_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2083,8 +2171,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					module)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(module)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2106,8 +2195,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public void removeByBundleSymbolicName(String bundleSymbolicName) {
-		for (Module module : findByBundleSymbolicName(bundleSymbolicName,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (Module module :
+				findByBundleSymbolicName(
+					bundleSymbolicName, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(module);
 		}
 	}
@@ -2124,7 +2216,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 		FinderPath finderPath = _finderPathCountByBundleSymbolicName;
 
-		Object[] finderArgs = new Object[] { bundleSymbolicName };
+		Object[] finderArgs = new Object[] {bundleSymbolicName};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2136,12 +2228,14 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			boolean bindBundleSymbolicName = false;
 
 			if (bundleSymbolicName.isEmpty()) {
-				query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3);
+				query.append(
+					_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3);
 			}
 			else {
 				bindBundleSymbolicName = true;
 
-				query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_2);
+				query.append(
+					_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_2);
 			}
 
 			String sql = query.toString();
@@ -2176,10 +2270,14 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_2 =
-		"module.bundleSymbolicName = ?";
-	private static final String _FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3 =
-		"(module.bundleSymbolicName IS NULL OR module.bundleSymbolicName = '')";
+	private static final String
+		_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_2 =
+			"module.bundleSymbolicName = ?";
+
+	private static final String
+		_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3 =
+			"(module.bundleSymbolicName IS NULL OR module.bundleSymbolicName = '')";
+
 	private FinderPath _finderPathWithPaginationFindByContextName;
 	private FinderPath _finderPathWithoutPaginationFindByContextName;
 	private FinderPath _finderPathCountByContextName;
@@ -2192,8 +2290,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public List<Module> findByContextName(String contextName) {
-		return findByContextName(contextName, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByContextName(
+			contextName, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -2209,7 +2307,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the range of matching modules
 	 */
 	@Override
-	public List<Module> findByContextName(String contextName, int start, int end) {
+	public List<Module> findByContextName(
+		String contextName, int start, int end) {
+
 		return findByContextName(contextName, start, end, null);
 	}
 
@@ -2227,10 +2327,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of matching modules
 	 */
 	@Override
-	public List<Module> findByContextName(String contextName, int start,
-		int end, OrderByComparator<Module> orderByComparator) {
-		return findByContextName(contextName, start, end, orderByComparator,
-			true);
+	public List<Module> findByContextName(
+		String contextName, int start, int end,
+		OrderByComparator<Module> orderByComparator) {
+
+		return findByContextName(
+			contextName, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -2248,9 +2350,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of matching modules
 	 */
 	@Override
-	public List<Module> findByContextName(String contextName, int start,
-		int end, OrderByComparator<Module> orderByComparator,
+	public List<Module> findByContextName(
+		String contextName, int start, int end,
+		OrderByComparator<Module> orderByComparator,
 		boolean retrieveFromCache) {
+
 		contextName = Objects.toString(contextName, "");
 
 		boolean pagination = true;
@@ -2258,21 +2362,24 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByContextName;
-			finderArgs = new Object[] { contextName };
+			finderArgs = new Object[] {contextName};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByContextName;
-			finderArgs = new Object[] { contextName, start, end, orderByComparator };
+			finderArgs = new Object[] {
+				contextName, start, end, orderByComparator
+			};
 		}
 
 		List<Module> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Module>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Module>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Module module : list) {
@@ -2289,8 +2396,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2310,11 +2417,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(ModuleModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2334,16 +2440,16 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				}
 
 				if (!pagination) {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2372,10 +2478,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByContextName_First(String contextName,
-		OrderByComparator<Module> orderByComparator)
+	public Module findByContextName_First(
+			String contextName, OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
-		Module module = fetchByContextName_First(contextName, orderByComparator);
+
+		Module module = fetchByContextName_First(
+			contextName, orderByComparator);
 
 		if (module != null) {
 			return module;
@@ -2401,10 +2509,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the first matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByContextName_First(String contextName,
-		OrderByComparator<Module> orderByComparator) {
-		List<Module> list = findByContextName(contextName, 0, 1,
-				orderByComparator);
+	public Module fetchByContextName_First(
+		String contextName, OrderByComparator<Module> orderByComparator) {
+
+		List<Module> list = findByContextName(
+			contextName, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2422,9 +2531,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByContextName_Last(String contextName,
-		OrderByComparator<Module> orderByComparator)
+	public Module findByContextName_Last(
+			String contextName, OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		Module module = fetchByContextName_Last(contextName, orderByComparator);
 
 		if (module != null) {
@@ -2451,16 +2561,17 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the last matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByContextName_Last(String contextName,
-		OrderByComparator<Module> orderByComparator) {
+	public Module fetchByContextName_Last(
+		String contextName, OrderByComparator<Module> orderByComparator) {
+
 		int count = countByContextName(contextName);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Module> list = findByContextName(contextName, count - 1, count,
-				orderByComparator);
+		List<Module> list = findByContextName(
+			contextName, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2479,9 +2590,11 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a module with the primary key could not be found
 	 */
 	@Override
-	public Module[] findByContextName_PrevAndNext(long moduleId,
-		String contextName, OrderByComparator<Module> orderByComparator)
+	public Module[] findByContextName_PrevAndNext(
+			long moduleId, String contextName,
+			OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+
 		contextName = Objects.toString(contextName, "");
 
 		Module module = findByPrimaryKey(moduleId);
@@ -2493,13 +2606,13 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			Module[] array = new ModuleImpl[3];
 
-			array[0] = getByContextName_PrevAndNext(session, module,
-					contextName, orderByComparator, true);
+			array[0] = getByContextName_PrevAndNext(
+				session, module, contextName, orderByComparator, true);
 
 			array[1] = module;
 
-			array[2] = getByContextName_PrevAndNext(session, module,
-					contextName, orderByComparator, false);
+			array[2] = getByContextName_PrevAndNext(
+				session, module, contextName, orderByComparator, false);
 
 			return array;
 		}
@@ -2511,14 +2624,15 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		}
 	}
 
-	protected Module getByContextName_PrevAndNext(Session session,
-		Module module, String contextName,
+	protected Module getByContextName_PrevAndNext(
+		Session session, Module module, String contextName,
 		OrderByComparator<Module> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2539,7 +2653,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2611,8 +2726,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					module)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(module)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2634,8 +2750,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public void removeByContextName(String contextName) {
-		for (Module module : findByContextName(contextName, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Module module :
+				findByContextName(
+					contextName, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(module);
 		}
 	}
@@ -2652,7 +2770,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 		FinderPath finderPath = _finderPathCountByContextName;
 
-		Object[] finderArgs = new Object[] { contextName };
+		Object[] finderArgs = new Object[] {contextName};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2704,8 +2822,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_2 = "module.contextName = ?";
-	private static final String _FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_3 = "(module.contextName IS NULL OR module.contextName = '')";
+	private static final String _FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_2 =
+		"module.contextName = ?";
+
+	private static final String _FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_3 =
+		"(module.contextName IS NULL OR module.contextName = '')";
+
 	private FinderPath _finderPathFetchByA_CN;
 	private FinderPath _finderPathCountByA_CN;
 
@@ -2720,6 +2842,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	@Override
 	public Module findByA_CN(long appId, String contextName)
 		throws NoSuchModuleException {
+
 		Module module = fetchByA_CN(appId, contextName);
 
 		if (module == null) {
@@ -2766,24 +2889,26 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByA_CN(long appId, String contextName,
-		boolean retrieveFromCache) {
+	public Module fetchByA_CN(
+		long appId, String contextName, boolean retrieveFromCache) {
+
 		contextName = Objects.toString(contextName, "");
 
-		Object[] finderArgs = new Object[] { appId, contextName };
+		Object[] finderArgs = new Object[] {appId, contextName};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(_finderPathFetchByA_CN, finderArgs,
-					this);
+			result = finderCache.getResult(
+				_finderPathFetchByA_CN, finderArgs, this);
 		}
 
 		if (result instanceof Module) {
 			Module module = (Module)result;
 
 			if ((appId != module.getAppId()) ||
-					!Objects.equals(contextName, module.getContextName())) {
+				!Objects.equals(contextName, module.getContextName())) {
+
 				result = null;
 			}
 		}
@@ -2826,8 +2951,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				List<Module> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(_finderPathFetchByA_CN, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByA_CN, finderArgs, list);
 				}
 				else {
 					if (list.size() > 1) {
@@ -2836,8 +2961,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"ModulePersistenceImpl.fetchByA_CN(long, String, boolean) with parameters (" +
-								StringUtil.merge(finderArgs) +
-								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 						}
 					}
 
@@ -2876,6 +3001,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	@Override
 	public Module removeByA_CN(long appId, String contextName)
 		throws NoSuchModuleException {
+
 		Module module = findByA_CN(appId, contextName);
 
 		return remove(module);
@@ -2894,7 +3020,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 		FinderPath finderPath = _finderPathCountByA_CN;
 
-		Object[] finderArgs = new Object[] { appId, contextName };
+		Object[] finderArgs = new Object[] {appId, contextName};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2950,9 +3076,15 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_A_CN_APPID_2 = "module.appId = ? AND ";
-	private static final String _FINDER_COLUMN_A_CN_CONTEXTNAME_2 = "module.contextName = ?";
-	private static final String _FINDER_COLUMN_A_CN_CONTEXTNAME_3 = "(module.contextName IS NULL OR module.contextName = '')";
+	private static final String _FINDER_COLUMN_A_CN_APPID_2 =
+		"module.appId = ? AND ";
+
+	private static final String _FINDER_COLUMN_A_CN_CONTEXTNAME_2 =
+		"module.contextName = ?";
+
+	private static final String _FINDER_COLUMN_A_CN_CONTEXTNAME_3 =
+		"(module.contextName IS NULL OR module.contextName = '')";
+
 	private FinderPath _finderPathFetchByA_BSN_BV;
 	private FinderPath _finderPathCountByA_BSN_BV;
 
@@ -2966,9 +3098,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @throws NoSuchModuleException if a matching module could not be found
 	 */
 	@Override
-	public Module findByA_BSN_BV(long appId, String bundleSymbolicName,
-		String bundleVersion) throws NoSuchModuleException {
-		Module module = fetchByA_BSN_BV(appId, bundleSymbolicName, bundleVersion);
+	public Module findByA_BSN_BV(
+			long appId, String bundleSymbolicName, String bundleVersion)
+		throws NoSuchModuleException {
+
+		Module module = fetchByA_BSN_BV(
+			appId, bundleSymbolicName, bundleVersion);
 
 		if (module == null) {
 			StringBundler msg = new StringBundler(8);
@@ -3005,8 +3140,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByA_BSN_BV(long appId, String bundleSymbolicName,
-		String bundleVersion) {
+	public Module fetchByA_BSN_BV(
+		long appId, String bundleSymbolicName, String bundleVersion) {
+
 		return fetchByA_BSN_BV(appId, bundleSymbolicName, bundleVersion, true);
 	}
 
@@ -3020,29 +3156,32 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the matching module, or <code>null</code> if a matching module could not be found
 	 */
 	@Override
-	public Module fetchByA_BSN_BV(long appId, String bundleSymbolicName,
-		String bundleVersion, boolean retrieveFromCache) {
+	public Module fetchByA_BSN_BV(
+		long appId, String bundleSymbolicName, String bundleVersion,
+		boolean retrieveFromCache) {
+
 		bundleSymbolicName = Objects.toString(bundleSymbolicName, "");
 		bundleVersion = Objects.toString(bundleVersion, "");
 
 		Object[] finderArgs = new Object[] {
-				appId, bundleSymbolicName, bundleVersion
-			};
+			appId, bundleSymbolicName, bundleVersion
+		};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(_finderPathFetchByA_BSN_BV,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByA_BSN_BV, finderArgs, this);
 		}
 
 		if (result instanceof Module) {
 			Module module = (Module)result;
 
 			if ((appId != module.getAppId()) ||
-					!Objects.equals(bundleSymbolicName,
-						module.getBundleSymbolicName()) ||
-					!Objects.equals(bundleVersion, module.getBundleVersion())) {
+				!Objects.equals(
+					bundleSymbolicName, module.getBundleSymbolicName()) ||
+				!Objects.equals(bundleVersion, module.getBundleVersion())) {
+
 				result = null;
 			}
 		}
@@ -3100,8 +3239,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				List<Module> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(_finderPathFetchByA_BSN_BV,
-						finderArgs, list);
+					finderCache.putResult(
+						_finderPathFetchByA_BSN_BV, finderArgs, list);
 				}
 				else {
 					if (list.size() > 1) {
@@ -3110,8 +3249,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"ModulePersistenceImpl.fetchByA_BSN_BV(long, String, String, boolean) with parameters (" +
-								StringUtil.merge(finderArgs) +
-								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 						}
 					}
 
@@ -3123,7 +3262,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathFetchByA_BSN_BV, finderArgs);
+				finderCache.removeResult(
+					_finderPathFetchByA_BSN_BV, finderArgs);
 
 				throw processException(e);
 			}
@@ -3149,9 +3289,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the module that was removed
 	 */
 	@Override
-	public Module removeByA_BSN_BV(long appId, String bundleSymbolicName,
-		String bundleVersion) throws NoSuchModuleException {
-		Module module = findByA_BSN_BV(appId, bundleSymbolicName, bundleVersion);
+	public Module removeByA_BSN_BV(
+			long appId, String bundleSymbolicName, String bundleVersion)
+		throws NoSuchModuleException {
+
+		Module module = findByA_BSN_BV(
+			appId, bundleSymbolicName, bundleVersion);
 
 		return remove(module);
 	}
@@ -3165,16 +3308,17 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the number of matching modules
 	 */
 	@Override
-	public int countByA_BSN_BV(long appId, String bundleSymbolicName,
-		String bundleVersion) {
+	public int countByA_BSN_BV(
+		long appId, String bundleSymbolicName, String bundleVersion) {
+
 		bundleSymbolicName = Objects.toString(bundleSymbolicName, "");
 		bundleVersion = Objects.toString(bundleVersion, "");
 
 		FinderPath finderPath = _finderPathCountByA_BSN_BV;
 
 		Object[] finderArgs = new Object[] {
-				appId, bundleSymbolicName, bundleVersion
-			};
+			appId, bundleSymbolicName, bundleVersion
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -3245,11 +3389,20 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_A_BSN_BV_APPID_2 = "module.appId = ? AND ";
-	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_2 = "module.bundleSymbolicName = ? AND ";
-	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_3 = "(module.bundleSymbolicName IS NULL OR module.bundleSymbolicName = '') AND ";
-	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_2 = "module.bundleVersion = ?";
-	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_3 = "(module.bundleVersion IS NULL OR module.bundleVersion = '')";
+	private static final String _FINDER_COLUMN_A_BSN_BV_APPID_2 =
+		"module.appId = ? AND ";
+
+	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_2 =
+		"module.bundleSymbolicName = ? AND ";
+
+	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_3 =
+		"(module.bundleSymbolicName IS NULL OR module.bundleSymbolicName = '') AND ";
+
+	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_2 =
+		"module.bundleVersion = ?";
+
+	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_3 =
+		"(module.bundleVersion IS NULL OR module.bundleVersion = '')";
 
 	public ModulePersistenceImpl() {
 		setModelClass(Module.class);
@@ -3257,6 +3410,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		setModelImplClass(ModuleImpl.class);
 		setModelPKClass(long.class);
 		setEntityCacheEnabled(ModuleModelImpl.ENTITY_CACHE_ENABLED);
+
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
+		setDBColumnNames(dbColumnNames);
 	}
 
 	/**
@@ -3266,17 +3425,21 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public void cacheResult(Module module) {
-		entityCache.putResult(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-			ModuleImpl.class, module.getPrimaryKey(), module);
+		entityCache.putResult(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED, ModuleImpl.class,
+			module.getPrimaryKey(), module);
 
-		finderCache.putResult(_finderPathFetchByA_CN,
-			new Object[] { module.getAppId(), module.getContextName() }, module);
+		finderCache.putResult(
+			_finderPathFetchByA_CN,
+			new Object[] {module.getAppId(), module.getContextName()}, module);
 
-		finderCache.putResult(_finderPathFetchByA_BSN_BV,
+		finderCache.putResult(
+			_finderPathFetchByA_BSN_BV,
 			new Object[] {
 				module.getAppId(), module.getBundleSymbolicName(),
 				module.getBundleVersion()
-			}, module);
+			},
+			module);
 
 		module.resetOriginalValues();
 	}
@@ -3289,8 +3452,10 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	@Override
 	public void cacheResult(List<Module> modules) {
 		for (Module module : modules) {
-			if (entityCache.getResult(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-						ModuleImpl.class, module.getPrimaryKey()) == null) {
+			if (entityCache.getResult(
+					ModuleModelImpl.ENTITY_CACHE_ENABLED, ModuleImpl.class,
+					module.getPrimaryKey()) == null) {
+
 				cacheResult(module);
 			}
 			else {
@@ -3324,8 +3489,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public void clearCache(Module module) {
-		entityCache.removeResult(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-			ModuleImpl.class, module.getPrimaryKey());
+		entityCache.removeResult(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED, ModuleImpl.class,
+			module.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -3339,8 +3505,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Module module : modules) {
-			entityCache.removeResult(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleImpl.class, module.getPrimaryKey());
+			entityCache.removeResult(
+				ModuleModelImpl.ENTITY_CACHE_ENABLED, ModuleImpl.class,
+				module.getPrimaryKey());
 
 			clearUniqueFindersCache((ModuleModelImpl)module, true);
 		}
@@ -3348,43 +3515,44 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 	protected void cacheUniqueFindersCache(ModuleModelImpl moduleModelImpl) {
 		Object[] args = new Object[] {
-				moduleModelImpl.getAppId(), moduleModelImpl.getContextName()
-			};
+			moduleModelImpl.getAppId(), moduleModelImpl.getContextName()
+		};
 
-		finderCache.putResult(_finderPathCountByA_CN, args, Long.valueOf(1),
-			false);
-		finderCache.putResult(_finderPathFetchByA_CN, args, moduleModelImpl,
-			false);
+		finderCache.putResult(
+			_finderPathCountByA_CN, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByA_CN, args, moduleModelImpl, false);
 
 		args = new Object[] {
-				moduleModelImpl.getAppId(),
-				moduleModelImpl.getBundleSymbolicName(),
-				moduleModelImpl.getBundleVersion()
-			};
+			moduleModelImpl.getAppId(), moduleModelImpl.getBundleSymbolicName(),
+			moduleModelImpl.getBundleVersion()
+		};
 
-		finderCache.putResult(_finderPathCountByA_BSN_BV, args,
-			Long.valueOf(1), false);
-		finderCache.putResult(_finderPathFetchByA_BSN_BV, args,
-			moduleModelImpl, false);
+		finderCache.putResult(
+			_finderPathCountByA_BSN_BV, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByA_BSN_BV, args, moduleModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(ModuleModelImpl moduleModelImpl,
-		boolean clearCurrent) {
+	protected void clearUniqueFindersCache(
+		ModuleModelImpl moduleModelImpl, boolean clearCurrent) {
+
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					moduleModelImpl.getAppId(), moduleModelImpl.getContextName()
-				};
+				moduleModelImpl.getAppId(), moduleModelImpl.getContextName()
+			};
 
 			finderCache.removeResult(_finderPathCountByA_CN, args);
 			finderCache.removeResult(_finderPathFetchByA_CN, args);
 		}
 
 		if ((moduleModelImpl.getColumnBitmask() &
-				_finderPathFetchByA_CN.getColumnBitmask()) != 0) {
+			 _finderPathFetchByA_CN.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					moduleModelImpl.getOriginalAppId(),
-					moduleModelImpl.getOriginalContextName()
-				};
+				moduleModelImpl.getOriginalAppId(),
+				moduleModelImpl.getOriginalContextName()
+			};
 
 			finderCache.removeResult(_finderPathCountByA_CN, args);
 			finderCache.removeResult(_finderPathFetchByA_CN, args);
@@ -3392,22 +3560,23 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					moduleModelImpl.getAppId(),
-					moduleModelImpl.getBundleSymbolicName(),
-					moduleModelImpl.getBundleVersion()
-				};
+				moduleModelImpl.getAppId(),
+				moduleModelImpl.getBundleSymbolicName(),
+				moduleModelImpl.getBundleVersion()
+			};
 
 			finderCache.removeResult(_finderPathCountByA_BSN_BV, args);
 			finderCache.removeResult(_finderPathFetchByA_BSN_BV, args);
 		}
 
 		if ((moduleModelImpl.getColumnBitmask() &
-				_finderPathFetchByA_BSN_BV.getColumnBitmask()) != 0) {
+			 _finderPathFetchByA_BSN_BV.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					moduleModelImpl.getOriginalAppId(),
-					moduleModelImpl.getOriginalBundleSymbolicName(),
-					moduleModelImpl.getOriginalBundleVersion()
-				};
+				moduleModelImpl.getOriginalAppId(),
+				moduleModelImpl.getOriginalBundleSymbolicName(),
+				moduleModelImpl.getOriginalBundleVersion()
+			};
 
 			finderCache.removeResult(_finderPathCountByA_BSN_BV, args);
 			finderCache.removeResult(_finderPathFetchByA_BSN_BV, args);
@@ -3469,8 +3638,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchModuleException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchModuleException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(module);
@@ -3494,8 +3663,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			session = openSession();
 
 			if (!session.contains(module)) {
-				module = (Module)session.get(ModuleImpl.class,
-						module.getPrimaryKeyObj());
+				module = (Module)session.get(
+					ModuleImpl.class, module.getPrimaryKeyObj());
 			}
 
 			if (module != null) {
@@ -3528,12 +3697,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in module proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom Module implementation " +
-				module.getClass());
+					module.getClass());
 		}
 
 		ModuleModelImpl moduleModelImpl = (ModuleModelImpl)module;
@@ -3570,136 +3739,149 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		if (!ModuleModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
-			Object[] args = new Object[] { moduleModelImpl.getUuid() };
+		else if (isNew) {
+			Object[] args = new Object[] {moduleModelImpl.getUuid()};
 
 			finderCache.removeResult(_finderPathCountByUuid, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-				args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByUuid, args);
 
 			args = new Object[] {
+				moduleModelImpl.getUuid(), moduleModelImpl.getCompanyId()
+			};
+
+			finderCache.removeResult(_finderPathCountByUuid_C, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByUuid_C, args);
+
+			args = new Object[] {moduleModelImpl.getAppId()};
+
+			finderCache.removeResult(_finderPathCountByAppId, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByAppId, args);
+
+			args = new Object[] {moduleModelImpl.getBundleSymbolicName()};
+
+			finderCache.removeResult(
+				_finderPathCountByBundleSymbolicName, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByBundleSymbolicName, args);
+
+			args = new Object[] {moduleModelImpl.getContextName()};
+
+			finderCache.removeResult(_finderPathCountByContextName, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByContextName, args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((moduleModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					moduleModelImpl.getOriginalUuid()
+				};
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+
+				args = new Object[] {moduleModelImpl.getUuid()};
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+			}
+
+			if ((moduleModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					moduleModelImpl.getOriginalUuid(),
+					moduleModelImpl.getOriginalCompanyId()
+				};
+
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
+
+				args = new Object[] {
 					moduleModelImpl.getUuid(), moduleModelImpl.getCompanyId()
 				};
 
-			finderCache.removeResult(_finderPathCountByUuid_C, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-				args);
-
-			args = new Object[] { moduleModelImpl.getAppId() };
-
-			finderCache.removeResult(_finderPathCountByAppId, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByAppId,
-				args);
-
-			args = new Object[] { moduleModelImpl.getBundleSymbolicName() };
-
-			finderCache.removeResult(_finderPathCountByBundleSymbolicName, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByBundleSymbolicName,
-				args);
-
-			args = new Object[] { moduleModelImpl.getContextName() };
-
-			finderCache.removeResult(_finderPathCountByContextName, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByContextName,
-				args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((moduleModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUuid.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { moduleModelImpl.getOriginalUuid() };
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-					args);
-
-				args = new Object[] { moduleModelImpl.getUuid() };
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-					args);
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
 			}
 
 			if ((moduleModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) != 0) {
+				 _finderPathWithoutPaginationFindByAppId.getColumnBitmask()) !=
+					 0) {
+
 				Object[] args = new Object[] {
-						moduleModelImpl.getOriginalUuid(),
-						moduleModelImpl.getOriginalCompanyId()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-					args);
-
-				args = new Object[] {
-						moduleModelImpl.getUuid(),
-						moduleModelImpl.getCompanyId()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-					args);
-			}
-
-			if ((moduleModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByAppId.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { moduleModelImpl.getOriginalAppId() };
+					moduleModelImpl.getOriginalAppId()
+				};
 
 				finderCache.removeResult(_finderPathCountByAppId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByAppId,
-					args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByAppId, args);
 
-				args = new Object[] { moduleModelImpl.getAppId() };
+				args = new Object[] {moduleModelImpl.getAppId()};
 
 				finderCache.removeResult(_finderPathCountByAppId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByAppId,
-					args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByAppId, args);
 			}
 
 			if ((moduleModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByBundleSymbolicName.getColumnBitmask()) != 0) {
+				 _finderPathWithoutPaginationFindByBundleSymbolicName.
+					 getColumnBitmask()) != 0) {
+
 				Object[] args = new Object[] {
-						moduleModelImpl.getOriginalBundleSymbolicName()
-					};
+					moduleModelImpl.getOriginalBundleSymbolicName()
+				};
 
-				finderCache.removeResult(_finderPathCountByBundleSymbolicName,
-					args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByBundleSymbolicName,
-					args);
+				finderCache.removeResult(
+					_finderPathCountByBundleSymbolicName, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByBundleSymbolicName, args);
 
-				args = new Object[] { moduleModelImpl.getBundleSymbolicName() };
+				args = new Object[] {moduleModelImpl.getBundleSymbolicName()};
 
-				finderCache.removeResult(_finderPathCountByBundleSymbolicName,
-					args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByBundleSymbolicName,
-					args);
+				finderCache.removeResult(
+					_finderPathCountByBundleSymbolicName, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByBundleSymbolicName, args);
 			}
 
 			if ((moduleModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByContextName.getColumnBitmask()) != 0) {
+				 _finderPathWithoutPaginationFindByContextName.
+					 getColumnBitmask()) != 0) {
+
 				Object[] args = new Object[] {
-						moduleModelImpl.getOriginalContextName()
-					};
+					moduleModelImpl.getOriginalContextName()
+				};
 
 				finderCache.removeResult(_finderPathCountByContextName, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByContextName,
-					args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByContextName, args);
 
-				args = new Object[] { moduleModelImpl.getContextName() };
+				args = new Object[] {moduleModelImpl.getContextName()};
 
 				finderCache.removeResult(_finderPathCountByContextName, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByContextName,
-					args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByContextName, args);
 			}
 		}
 
-		entityCache.putResult(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-			ModuleImpl.class, module.getPrimaryKey(), module, false);
+		entityCache.putResult(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED, ModuleImpl.class,
+			module.getPrimaryKey(), module, false);
 
 		clearUniqueFindersCache(moduleModelImpl, false);
 		cacheUniqueFindersCache(moduleModelImpl);
@@ -3719,6 +3901,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	@Override
 	public Module findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchModuleException {
+
 		Module module = fetchByPrimaryKey(primaryKey);
 
 		if (module == null) {
@@ -3726,8 +3909,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchModuleException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchModuleException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return module;
@@ -3795,8 +3978,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of modules
 	 */
 	@Override
-	public List<Module> findAll(int start, int end,
-		OrderByComparator<Module> orderByComparator) {
+	public List<Module> findAll(
+		int start, int end, OrderByComparator<Module> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -3814,28 +3998,31 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * @return the ordered range of modules
 	 */
 	@Override
-	public List<Module> findAll(int start, int end,
-		OrderByComparator<Module> orderByComparator, boolean retrieveFromCache) {
+	public List<Module> findAll(
+		int start, int end, OrderByComparator<Module> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<Module> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Module>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Module>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -3843,13 +4030,13 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_MODULE);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -3869,16 +4056,16 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Module>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Module>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3916,8 +4103,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(_finderPathCountAll,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -3929,11 +4116,12 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -3974,159 +4162,169 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 * Initializes the module persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-				new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
 
-		_finderPathCountAll = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-				new String[0]);
+		_finderPathCountAll = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
 
-		_finderPathWithPaginationFindByUuid = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-				new String[] {
-					String.class.getName(),
-					
+		_finderPathWithPaginationFindByUuid = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+			new String[] {
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+			new String[] {String.class.getName()},
+			ModuleModelImpl.UUID_COLUMN_BITMASK);
+
+		_finderPathCountByUuid = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+			new String[] {String.class.getName()});
+
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+			new String[] {
+				String.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-				new String[] { String.class.getName() },
-				ModuleModelImpl.UUID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			ModuleModelImpl.UUID_COLUMN_BITMASK |
+			ModuleModelImpl.COMPANYID_COLUMN_BITMASK);
 
-		_finderPathCountByUuid = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-				new String[] { String.class.getName() });
+		_finderPathCountByUuid_C = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()});
 
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-				new String[] {
-					String.class.getName(), Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+		_finderPathWithPaginationFindByAppId = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByAppId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-				new String[] { String.class.getName(), Long.class.getName() },
-				ModuleModelImpl.UUID_COLUMN_BITMASK |
-				ModuleModelImpl.COMPANYID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByAppId = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByAppId",
+			new String[] {Long.class.getName()},
+			ModuleModelImpl.APPID_COLUMN_BITMASK);
 
-		_finderPathCountByUuid_C = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-				new String[] { String.class.getName(), Long.class.getName() });
+		_finderPathCountByAppId = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByAppId",
+			new String[] {Long.class.getName()});
 
-		_finderPathWithPaginationFindByAppId = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByAppId",
-				new String[] {
-					Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+		_finderPathWithPaginationFindByBundleSymbolicName = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByBundleSymbolicName",
+			new String[] {
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByAppId = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByAppId",
-				new String[] { Long.class.getName() },
-				ModuleModelImpl.APPID_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByBundleSymbolicName = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"findByBundleSymbolicName", new String[] {String.class.getName()},
+			ModuleModelImpl.BUNDLESYMBOLICNAME_COLUMN_BITMASK);
 
-		_finderPathCountByAppId = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByAppId",
-				new String[] { Long.class.getName() });
+		_finderPathCountByBundleSymbolicName = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByBundleSymbolicName", new String[] {String.class.getName()});
 
-		_finderPathWithPaginationFindByBundleSymbolicName = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"findByBundleSymbolicName",
-				new String[] {
-					String.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+		_finderPathWithPaginationFindByContextName = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByContextName",
+			new String[] {
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByBundleSymbolicName = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"findByBundleSymbolicName",
-				new String[] { String.class.getName() },
-				ModuleModelImpl.BUNDLESYMBOLICNAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByContextName = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByContextName",
+			new String[] {String.class.getName()},
+			ModuleModelImpl.CONTEXTNAME_COLUMN_BITMASK);
 
-		_finderPathCountByBundleSymbolicName = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByBundleSymbolicName",
-				new String[] { String.class.getName() });
+		_finderPathCountByContextName = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByContextName",
+			new String[] {String.class.getName()});
 
-		_finderPathWithPaginationFindByContextName = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByContextName",
-				new String[] {
-					String.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+		_finderPathFetchByA_CN = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByA_CN",
+			new String[] {Long.class.getName(), String.class.getName()},
+			ModuleModelImpl.APPID_COLUMN_BITMASK |
+			ModuleModelImpl.CONTEXTNAME_COLUMN_BITMASK);
 
-		_finderPathWithoutPaginationFindByContextName = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByContextName",
-				new String[] { String.class.getName() },
-				ModuleModelImpl.CONTEXTNAME_COLUMN_BITMASK);
+		_finderPathCountByA_CN = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_CN",
+			new String[] {Long.class.getName(), String.class.getName()});
 
-		_finderPathCountByContextName = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByContextName", new String[] { String.class.getName() });
+		_finderPathFetchByA_BSN_BV = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByA_BSN_BV",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				String.class.getName()
+			},
+			ModuleModelImpl.APPID_COLUMN_BITMASK |
+			ModuleModelImpl.BUNDLESYMBOLICNAME_COLUMN_BITMASK |
+			ModuleModelImpl.BUNDLEVERSION_COLUMN_BITMASK);
 
-		_finderPathFetchByA_CN = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_ENTITY, "fetchByA_CN",
-				new String[] { Long.class.getName(), String.class.getName() },
-				ModuleModelImpl.APPID_COLUMN_BITMASK |
-				ModuleModelImpl.CONTEXTNAME_COLUMN_BITMASK);
-
-		_finderPathCountByA_CN = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_CN",
-				new String[] { Long.class.getName(), String.class.getName() });
-
-		_finderPathFetchByA_BSN_BV = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, ModuleImpl.class,
-				FINDER_CLASS_NAME_ENTITY, "fetchByA_BSN_BV",
-				new String[] {
-					Long.class.getName(), String.class.getName(),
-					String.class.getName()
-				},
-				ModuleModelImpl.APPID_COLUMN_BITMASK |
-				ModuleModelImpl.BUNDLESYMBOLICNAME_COLUMN_BITMASK |
-				ModuleModelImpl.BUNDLEVERSION_COLUMN_BITMASK);
-
-		_finderPathCountByA_BSN_BV = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
-				ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_BSN_BV",
-				new String[] {
-					Long.class.getName(), String.class.getName(),
-					String.class.getName()
-				});
+		_finderPathCountByA_BSN_BV = new FinderPath(
+			ModuleModelImpl.ENTITY_CACHE_ENABLED,
+			ModuleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_BSN_BV",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				String.class.getName()
+			});
 	}
 
 	public void destroy() {
@@ -4138,19 +4336,37 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
+
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
+
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_MODULE = "SELECT module FROM Module module";
-	private static final String _SQL_SELECT_MODULE_WHERE = "SELECT module FROM Module module WHERE ";
-	private static final String _SQL_COUNT_MODULE = "SELECT COUNT(module) FROM Module module";
-	private static final String _SQL_COUNT_MODULE_WHERE = "SELECT COUNT(module) FROM Module module WHERE ";
+
+	private static final String _SQL_SELECT_MODULE =
+		"SELECT module FROM Module module";
+
+	private static final String _SQL_SELECT_MODULE_WHERE =
+		"SELECT module FROM Module module WHERE ";
+
+	private static final String _SQL_COUNT_MODULE =
+		"SELECT COUNT(module) FROM Module module";
+
+	private static final String _SQL_COUNT_MODULE_WHERE =
+		"SELECT COUNT(module) FROM Module module WHERE ";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "module.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Module exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Module exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(ModulePersistenceImpl.class);
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"uuid"
-			});
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No Module exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No Module exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ModulePersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"uuid"});
+
 }

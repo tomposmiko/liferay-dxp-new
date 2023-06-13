@@ -17,7 +17,6 @@ package com.liferay.external.reference.service.base;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.external.reference.service.ERUserGroupLocalService;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -46,8 +45,9 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class ERUserGroupLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements ERUserGroupLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements ERUserGroupLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -70,6 +70,7 @@ public abstract class ERUserGroupLocalServiceBaseImpl
 	 */
 	public void setERUserGroupLocalService(
 		ERUserGroupLocalService erUserGroupLocalService) {
+
 		this.erUserGroupLocalService = erUserGroupLocalService;
 	}
 
@@ -78,7 +79,9 @@ public abstract class ERUserGroupLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -88,7 +91,9 @@ public abstract class ERUserGroupLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -97,7 +102,9 @@ public abstract class ERUserGroupLocalServiceBaseImpl
 	 *
 	 * @return the user group local service
 	 */
-	public com.liferay.portal.kernel.service.UserGroupLocalService getUserGroupLocalService() {
+	public com.liferay.portal.kernel.service.UserGroupLocalService
+		getUserGroupLocalService() {
+
 		return userGroupLocalService;
 	}
 
@@ -107,7 +114,9 @@ public abstract class ERUserGroupLocalServiceBaseImpl
 	 * @param userGroupLocalService the user group local service
 	 */
 	public void setUserGroupLocalService(
-		com.liferay.portal.kernel.service.UserGroupLocalService userGroupLocalService) {
+		com.liferay.portal.kernel.service.UserGroupLocalService
+			userGroupLocalService) {
+
 		this.userGroupLocalService = userGroupLocalService;
 	}
 
@@ -127,6 +136,7 @@ public abstract class ERUserGroupLocalServiceBaseImpl
 	 */
 	public void setUserGroupPersistence(
 		UserGroupPersistence userGroupPersistence) {
+
 		this.userGroupPersistence = userGroupPersistence;
 	}
 
@@ -160,8 +170,8 @@ public abstract class ERUserGroupLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -172,10 +182,20 @@ public abstract class ERUserGroupLocalServiceBaseImpl
 
 	@BeanReference(type = ERUserGroupLocalService.class)
 	protected ERUserGroupLocalService erUserGroupLocalService;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserGroupLocalService.class)
-	protected com.liferay.portal.kernel.service.UserGroupLocalService userGroupLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserGroupLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserGroupLocalService
+		userGroupLocalService;
+
 	@ServiceReference(type = UserGroupPersistence.class)
 	protected UserGroupPersistence userGroupPersistence;
+
 }

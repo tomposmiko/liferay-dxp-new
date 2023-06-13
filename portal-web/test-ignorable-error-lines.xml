@@ -68,10 +68,6 @@
 			<contains>No theme found for specified theme id userdashboard_WAR_userdashboardtheme</contains>
 			<matches></matches>
 		</ignore-error>
-		<ignore-error description="APIO-202 temporary workaround">
-			<contains></contains>
-			<matches>.*Failed to install artifact.*com.liferay.apio.architect.impl.internal.application.ApioApplication-default.config[\s\S]*</matches>
-		</ignore-error>
 		<ignore-error description="LPS-22821">
 			<contains>Exception sending context destroyed event to listener instance of class com.liferay.portal.spring.context.PortalContextLoaderListener</contains>
 			<matches></matches>
@@ -207,6 +203,14 @@
 		<ignore-error description="LPS-88418 - temporarily ignore until fixed">
 			<contains>SQLSTATE=42710</contains>
 			<matches></matches>
+		</ignore-error>
+		<ignore-error description="LPS-88431">
+			<contains></contains>
+			<matches>.*Unable to find class loader for com.liferay.portal.cluster.multiple_.* class loader com.liferay.portal.cluster.multiple_.*</matches>
+		</ignore-error>
+		<ignore-error description="LPS-88431">
+			<contains></contains>
+			<matches>.*Unable to find class loader for com.liferay.portal.scheduler.quartz_.* class loader com.liferay.portal.scheduler.quartz_.*</matches>
 		</ignore-error>
 		<ignore-error description="LPS-88522 - temporarily ignore until fixed">
 			<contains>already has the column lastPublishDate</contains>

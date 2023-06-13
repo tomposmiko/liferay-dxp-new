@@ -17,7 +17,6 @@ package com.liferay.document.library.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the local service utility for DLTrash. This utility wraps
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  */
 @ProviderType
 public class DLTrashLocalServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -40,46 +40,51 @@ public class DLTrashLocalServiceUtil {
 	 */
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryFromTrash(
-		long userId, long repositoryId, long fileEntryId, long newFolderId,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.portal.kernel.repository.model.FileEntry
+			moveFileEntryFromTrash(
+				long userId, long repositoryId, long fileEntryId,
+				long newFolderId,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .moveFileEntryFromTrash(userId, repositoryId, fileEntryId,
-			newFolderId, serviceContext);
+
+		return getService().moveFileEntryFromTrash(
+			userId, repositoryId, fileEntryId, newFolderId, serviceContext);
 	}
 
-	public static com.liferay.portal.kernel.repository.model.FileEntry moveFileEntryToTrash(
-		long userId, long repositoryId, long fileEntryId)
+	public static com.liferay.portal.kernel.repository.model.FileEntry
+			moveFileEntryToTrash(
+				long userId, long repositoryId, long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .moveFileEntryToTrash(userId, repositoryId, fileEntryId);
+
+		return getService().moveFileEntryToTrash(
+			userId, repositoryId, fileEntryId);
 	}
 
-	public static void restoreFileEntryFromTrash(long userId,
-		long repositoryId, long fileEntryId)
+	public static void restoreFileEntryFromTrash(
+			long userId, long repositoryId, long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		getService().restoreFileEntryFromTrash(userId, repositoryId, fileEntryId);
+
+		getService().restoreFileEntryFromTrash(
+			userId, repositoryId, fileEntryId);
 	}
 
 	public static DLTrashLocalService getService() {
 		if (_service == null) {
-			_service = (DLTrashLocalService)PortalBeanLocatorUtil.locate(DLTrashLocalService.class.getName());
-
-			ReferenceRegistry.registerReference(DLTrashLocalServiceUtil.class,
-				"_service");
+			_service = (DLTrashLocalService)PortalBeanLocatorUtil.locate(
+				DLTrashLocalService.class.getName());
 		}
 
 		return _service;
 	}
 
 	private static DLTrashLocalService _service;
+
 }

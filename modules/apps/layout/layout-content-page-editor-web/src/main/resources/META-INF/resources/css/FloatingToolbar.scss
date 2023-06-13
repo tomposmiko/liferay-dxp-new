@@ -1,15 +1,17 @@
 @import "variables";
 
 .fragments-editor__floating-toolbar {
-	display: inline-block;
-	padding: $fragmentsEditorSpacing;
+	display: block;
+	height: 0;
+	left: -1px;
 	position: absolute;
-	text-align: right;
-	z-index: $floatingToolbarZIndex;
+	top: -1px;
+	width: 0;
 
-	&-buttons.popover,
-	&-panel.popover {
-		position: static;
+	&-buttons,
+	&-panel {
+		position: absolute;
+		z-index: $floatingToolbarZIndex;
 	}
 
 	&-buttons {
@@ -24,19 +26,33 @@
 				opacity: 1;
 			}
 		}
+
+		& > .popover {
+			padding: $fragmentsEditorSpacing;
+			position: static;
+			white-space: nowrap;
+		}
 	}
 
 	&-panel {
-		margin-top: $fragmentsEditorSpacing;
-		min-width: $floatingToolbarPanelMinWidth;
-		padding: $fragmentsEditorSpacing * 2;
+		padding: 0 $fragmentsEditorSpacing;
 
-		.form-group, .form-group-autofit {
+		& > .popover {
+			min-width: $floatingToolbarPanelMinWidth;
+			padding: $fragmentsEditorSpacing * 2;
+			position: static;
+		}
+
+		.btn, .form-group, .form-group-autofit {
 			margin-bottom: $fragmentsEditorSpacing * 2;
 
 			&:last-child {
 				margin: 0;
 			}
+		}
+
+		.floating-toolbar-mapping-panel__asset-select {
+			margin-bottom: $fragmentsEditorSpacing;
 		}
 
 		.palette-container {
@@ -73,6 +89,18 @@
 		.palette-items-container {
 			display: flex;
 			flex-wrap: wrap;
+		}
+	}
+
+	&--mapped-field {
+		.fragments-editor__floating-toolbar-buttons {
+			.btn.active, .btn:hover {
+				background-color: $fragmentEditableFieldGridMappedColorFaded;
+			}
+
+			.lexicon-icon {
+				fill: $fragmentEditableFieldGridMappedColor;
+			}
 		}
 	}
 }

@@ -2,12 +2,13 @@
 
 {template .render}
 	{@param spritemap: string}
-	{@param? _handlePageDescriptionChanged: any}
-	{@param? _handlePageTitleChanged: any}
 	{@param? _handleDuplicateButtonClicked: any}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleFieldEdited: any}
 	{@param? _handleDeleteButtonClicked: any}
 	{@param? _handleOnClickResize: any}
+	{@param? _handlePageDescriptionChanged: any}
+	{@param? _handlePageTitleChanged: any}
 	{@param? _handleSelectFieldFocused: any}
 	{@param? activePage: number}
 	{@param? contentRenderer: string}
@@ -26,12 +27,13 @@
 	{@param? titlePlaceholder: string}
 
 	{delcall PageRenderer.container variant="$contentRenderer"}
-		{param _handlePageDescriptionChanged: $_handlePageDescriptionChanged /}
-		{param _handlePageTitleChanged: $_handlePageTitleChanged /}
 		{param _handleDuplicateButtonClicked: $_handleDuplicateButtonClicked /}
+		{param _handleFieldBlurred: $_handleFieldBlurred /}
 		{param _handleFieldEdited: $_handleFieldEdited /}
 		{param _handleDeleteButtonClicked: $_handleDeleteButtonClicked /}
 		{param _handleOnClickResize: $_handleOnClickResize /}
+		{param _handlePageDescriptionChanged: $_handlePageDescriptionChanged /}
+		{param _handlePageTitleChanged: $_handlePageTitleChanged /}
 		{param _handleSelectFieldFocused: $_handleSelectFieldFocused /}
 		{param activePage: $activePage /}
 		{param contentRenderer: $contentRenderer /}
@@ -48,12 +50,13 @@
 
 {deltemplate PageRenderer.container variant="'grid'"}
 	{@param spritemap: string}
-	{@param? _handlePageDescriptionChanged: any}
-	{@param? _handlePageTitleChanged: any}
 	{@param? _handleDeleteButtonClicked: any}
 	{@param? _handleDuplicateButtonClicked: any}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleFieldEdited: any}
 	{@param? _handleOnClickResize: any}
+	{@param? _handlePageDescriptionChanged: any}
+	{@param? _handlePageTitleChanged: any}
 	{@param? _handleSelectFieldFocused: any}
 	{@param? activePage: number}
 	{@param? contentRenderer: string}
@@ -71,7 +74,7 @@
 	}
 	{@param? titlePlaceholder: string}
 
-	<div class="ddm-page-container-layout">
+	<div class="ddm-layout-builder ddm-page-container-layout">
 		{if $activePage == $pageIndex}
 			<div class="ddm-form-page pl-4 pr-4">
 				{call .form}
@@ -89,6 +92,7 @@
 					{delcall PageRenderer.page variant="$contentRenderer"}
 						{param _handleDeleteButtonClicked: $_handleDeleteButtonClicked /}
 						{param _handleDuplicateButtonClicked: $_handleDuplicateButtonClicked /}
+						{param _handleFieldBlurred: $_handleFieldBlurred /}
 						{param _handleFieldEdited: $_handleFieldEdited /}
 						{param _handleOnClickResize: $_handleOnClickResize /}
 						{param _handleSelectFieldFocused: $_handleSelectFieldFocused /}
@@ -107,6 +111,7 @@
 
 {deltemplate PageRenderer.container variant="'list'"}
 	{@param spritemap: string}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleFieldEdited: any}
 	{@param? activePage: number}
 	{@param? contentRenderer: string}
@@ -123,6 +128,7 @@
 
 	<div aria-labelledby="sidebarLightFormsFieldTab" class="{$classes}" id="sidebarLightDetails" role="tabpanel">
 		{delcall PageRenderer.page variant="$contentRenderer"}
+			{param _handleFieldBlurred: $_handleFieldBlurred /}
 			{param _handleFieldEdited: $_handleFieldEdited /}
 			{param contentRenderer: $contentRenderer /}
 			{param editable: $editable /}
@@ -167,6 +173,7 @@
 	{@param spritemap: string}
 	{@param? _handleDeleteButtonClicked: any}
 	{@param? _handleDuplicateButtonClicked: any}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleFieldEdited: any}
 	{@param? _handleOnClickResize: any}
 	{@param? _handleSelectFieldFocused: any}
@@ -179,6 +186,7 @@
 		{delcall PageRenderer.row variant="'grid'"}
 			{param _handleDeleteButtonClicked: $_handleDeleteButtonClicked /}
 			{param _handleDuplicateButtonClicked: $_handleDuplicateButtonClicked /}
+			{param _handleFieldBlurred: $_handleFieldBlurred /}
 			{param _handleFieldEdited: $_handleFieldEdited /}
 			{param _handleOnClickResize: $_handleOnClickResize /}
 			{param _handleSelectFieldFocused: $_handleSelectFieldFocused /}
@@ -196,6 +204,7 @@
 	{@param spritemap: string}
 	{@param? _handleDeleteButtonClicked: any}
 	{@param? _handleDuplicateButtonClicked: any}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleFieldEdited: any}
 	{@param? _handleOnClickResize: any}
 	{@param? _handleSelectFieldFocused: any}
@@ -206,6 +215,10 @@
 	{@param? pageIndex: number}
 
 	<div class="layout-page">
+		{for $i in range(12)}
+			<div class="ddm-resize-column" data-resize-column="{$i}" ref="resizeColumn{$i}"></div>
+		{/for}
+
 		{if $empty}
 			{let $attributes kind="attributes"}
 				class="col col-empty col-md-12 last-col lfr-initial-col mt-5 mb-4"
@@ -233,6 +246,7 @@
 				{delcall PageRenderer.row variant="$contentRenderer"}
 					{param _handleDeleteButtonClicked: $_handleDeleteButtonClicked /}
 					{param _handleDuplicateButtonClicked: $_handleDuplicateButtonClicked /}
+					{param _handleFieldBlurred: $_handleFieldBlurred /}
 					{param _handleFieldEdited: $_handleFieldEdited /}
 					{param _handleOnClickResize: $_handleOnClickResize /}
 					{param _handleSelectFieldFocused: $_handleSelectFieldFocused /}
@@ -261,6 +275,7 @@
 	{@param spritemap: string}
 	{@param? _handleDeleteButtonClicked: any}
 	{@param? _handleDuplicateButtonClicked: any}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleFieldEdited: any}
 	{@param? _handleOnClickResize: any}
 	{@param? _handleSelectFieldFocused: any}
@@ -270,11 +285,12 @@
 	{@param? row: ?}
 	{@param? rowIndex: number}
 
-	<div class="row">
+	<div class="position-relative row">
 		{for $column in $row.columns}
 			{delcall PageRenderer.column variant="$contentRenderer"}
 				{param _handleDeleteButtonClicked: $_handleDeleteButtonClicked /}
 				{param _handleDuplicateButtonClicked: $_handleDuplicateButtonClicked /}
+				{param _handleFieldBlurred: $_handleFieldBlurred /}
 				{param _handleFieldEdited: $_handleFieldEdited /}
 				{param _handleOnClickResize: $_handleOnClickResize /}
 				{param _handleSelectFieldFocused: $_handleSelectFieldFocused /}
@@ -291,6 +307,7 @@
 
 {deltemplate PageRenderer.column variant="'list'"}
 	{@param spritemap: string}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleFieldEdited: any}
 	{@param? column: ?}
 	{@param? columnIndex: number}
@@ -310,6 +327,7 @@
 				{delcall PageRenderer.RegisterFieldType variant="$fieldType" data="$field" allowemptydefault="true"}
 					{param editable: $editable /}
 					{param events: [
+						'fieldBlurred': $_handleFieldBlurred,
 						'fieldEdited': $_handleFieldEdited
 					] /}
 					{param ref: $field.type + $field.fieldName + $field.name + $field.label + $rowIndex + $columnIndex + $pageIndex /}
@@ -324,6 +342,7 @@
 	{@param spritemap: string}
 	{@param? _handleDeleteButtonClicked: any}
 	{@param? _handleDuplicateButtonClicked: any}
+	{@param? _handleFieldBlurred: any}
 	{@param? _handleFieldEdited: any}
 	{@param? _handleOnClickResize: any}
 	{@param? _handleSelectFieldFocused: any}
@@ -334,9 +353,7 @@
 	{@param? rowIndex: number}
 
 	{if length($column.fields) != 0}
-		{let $attributes kind="attributes"}
-			class="col-md-{$column.size} col-ddm"
-
+		{let $indexes kind="attributes"}
 			{if $rowIndex != 'undefined'}
 				data-ddm-field-row="{$rowIndex}"
 			{/if}
@@ -350,6 +367,12 @@
 			{/if}
 		{/let}
 
+		{let $attributes kind="attributes"}
+			class="col-md-{$column.size} col-ddm"
+
+			{$indexes}
+		{/let}
+
 		<div {$attributes}>
 			{let $content kind="html"}
 				{for $field in $column.fields}
@@ -358,6 +381,7 @@
 					{delcall PageRenderer.RegisterFieldType variant="$fieldType" data="$field" allowemptydefault="true"}
 						{param readOnly: true  /}
 						{param events: [
+							'fieldBlurred': $_handleFieldBlurred,
 							'fieldEdited': $_handleFieldEdited
 						] /}
 						{param ref: $field.type + $field.fieldName + $field.name + $field.label + $rowIndex + $columnIndex + $pageIndex /}
@@ -367,8 +391,8 @@
 			{/let}
 
 			{if $editable}
-				<div class="ddm-field-container">
-					<div class="ddm-resize-handle-left" data-onclick="{$_handleOnClickResize}"></div>
+				<div class="ddm-field-container h-100">
+					<div class="ddm-resize-handle ddm-resize-handle-left" data-onclick="{$_handleOnClickResize}" {$indexes}></div>
 
 					{let $attributesDrag kind="attributes"}
 						class="ddm-drag"
@@ -386,7 +410,7 @@
 						{param spritemap: $spritemap /}
 					{/call}
 
-					<div class="ddm-resize-handle-right" data-onclick="{$_handleOnClickResize}"></div>
+					<div class="ddm-resize-handle ddm-resize-handle-right" data-onclick="{$_handleOnClickResize}" {$indexes}></div>
 				</div>
 			{else}
 				{$content}

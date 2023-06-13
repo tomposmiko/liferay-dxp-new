@@ -115,7 +115,7 @@ definition {
 		ProductMenu.gotoSite(site = "Global");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -176,7 +176,7 @@ definition {
 			for (var portletName : list "${portletTitleList}") {
 				var key_portletName = "${portletName}";
 
-				AssertTextEquals.assertTextCaseInsensitive(
+				AssertTextEquals(
 					locator1 = "Portlet#TITLE",
 					value1 = "${portletName}"
 				);

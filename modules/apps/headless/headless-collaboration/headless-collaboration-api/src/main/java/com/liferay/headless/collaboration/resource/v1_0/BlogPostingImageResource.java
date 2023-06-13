@@ -16,6 +16,8 @@ package com.liferay.headless.collaboration.resource.v1_0;
 
 import com.liferay.headless.collaboration.dto.v1_0.BlogPostingImage;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -33,18 +35,20 @@ import javax.annotation.Generated;
 @Generated("")
 public interface BlogPostingImageResource {
 
+	public void deleteBlogPostingImage(Long blogPostingImageId)
+		throws Exception;
+
+	public BlogPostingImage getBlogPostingImage(Long blogPostingImageId)
+		throws Exception;
+
 	public Page<BlogPostingImage> getContentSpaceBlogPostingImagesPage(
-				Long contentSpaceId,Pagination pagination)
-			throws Exception;
+			Long contentSpaceId, String search, Filter filter,
+			Pagination pagination, Sort[] sorts)
+		throws Exception;
+
 	public BlogPostingImage postContentSpaceBlogPostingImage(
-				Long contentSpaceId,MultipartBody multipartBody)
-			throws Exception;
-	public boolean deleteImageObject(
-				Long imageObjectId)
-			throws Exception;
-	public BlogPostingImage getImageObject(
-				Long imageObjectId)
-			throws Exception;
+			Long contentSpaceId, MultipartBody multipartBody)
+		throws Exception;
 
 	public void setContextCompany(Company contextCompany);
 

@@ -17,7 +17,6 @@ package com.liferay.portal.tools.service.builder.test.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
@@ -38,8 +37,10 @@ import java.io.Serializable;
  * @generated
  */
 @ProviderType
-public interface VersionedEntryModel extends BaseModel<VersionedEntry>, MVCCModel,
-	VersionedModel<VersionedEntryVersion> {
+public interface VersionedEntryModel
+	extends BaseModel<VersionedEntry>, MVCCModel,
+			VersionedModel<VersionedEntryVersion> {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -178,4 +179,5 @@ public interface VersionedEntryModel extends BaseModel<VersionedEntry>, MVCCMode
 
 	@Override
 	public String toXmlString();
+
 }

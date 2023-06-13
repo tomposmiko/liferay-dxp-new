@@ -14,9 +14,9 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.portal.kernel.search.Query;
-import com.liferay.portal.kernel.search.generic.DisMaxQuery;
-import com.liferay.portal.kernel.search.query.QueryVisitor;
+import com.liferay.portal.search.query.DisMaxQuery;
+import com.liferay.portal.search.query.Query;
+import com.liferay.portal.search.query.QueryVisitor;
 
 import org.elasticsearch.index.query.DisMaxQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(immediate = true, service = DisMaxQueryTranslator.class)
+@Component(service = DisMaxQueryTranslator.class)
 public class DisMaxQueryTranslatorImpl implements DisMaxQueryTranslator {
 
 	@Override
@@ -35,10 +35,6 @@ public class DisMaxQueryTranslatorImpl implements DisMaxQueryTranslator {
 		DisMaxQuery disMaxQuery, QueryVisitor<QueryBuilder> queryVisitor) {
 
 		DisMaxQueryBuilder disMaxQueryBuilder = QueryBuilders.disMaxQuery();
-
-		if (!disMaxQuery.isDefaultBoost()) {
-			disMaxQueryBuilder.boost(disMaxQuery.getBoost());
-		}
 
 		for (Query query : disMaxQuery.getQueries()) {
 			QueryBuilder queryBuilder = query.accept(queryVisitor);

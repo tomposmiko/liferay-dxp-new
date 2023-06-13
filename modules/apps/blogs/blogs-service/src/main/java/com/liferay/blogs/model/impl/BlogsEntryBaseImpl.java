@@ -32,8 +32,9 @@ import com.liferay.blogs.service.BlogsEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class BlogsEntryBaseImpl extends BlogsEntryModelImpl
-	implements BlogsEntry {
+public abstract class BlogsEntryBaseImpl
+	extends BlogsEntryModelImpl implements BlogsEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class BlogsEntryBaseImpl extends BlogsEntryModelImpl
 			BlogsEntryLocalServiceUtil.updateBlogsEntry(this);
 		}
 	}
+
 }

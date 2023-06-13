@@ -35,6 +35,7 @@ import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLinkLocal
 public abstract class DDMDataProviderInstanceLinkBaseImpl
 	extends DDMDataProviderInstanceLinkModelImpl
 	implements DDMDataProviderInstanceLink {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -43,10 +44,13 @@ public abstract class DDMDataProviderInstanceLinkBaseImpl
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			DDMDataProviderInstanceLinkLocalServiceUtil.addDDMDataProviderInstanceLink(this);
+			DDMDataProviderInstanceLinkLocalServiceUtil.
+				addDDMDataProviderInstanceLink(this);
 		}
 		else {
-			DDMDataProviderInstanceLinkLocalServiceUtil.updateDDMDataProviderInstanceLink(this);
+			DDMDataProviderInstanceLinkLocalServiceUtil.
+				updateDDMDataProviderInstanceLink(this);
 		}
 	}
+
 }

@@ -14,90 +14,293 @@
 
 package com.liferay.headless.web.experience.dto.v1_0;
 
-import com.liferay.petra.function.UnsafeSupplier;
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Date;
+import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface ContentDocument {
+@GraphQLName("ContentDocument")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "ContentDocument")
+public class ContentDocument {
 
-	public String getContentUrl();
+	public String getContentUrl() {
+		return contentUrl;
+	}
 
+	public void setContentUrl(String contentUrl) {
+		this.contentUrl = contentUrl;
+	}
+
+	@JsonIgnore
 	public void setContentUrl(
-			String contentUrl);
+		UnsafeSupplier<String, Exception> contentUrlUnsafeSupplier) {
 
-	public void setContentUrl(
-			UnsafeSupplier<String, Throwable>
-				contentUrlUnsafeSupplier);
-	public Creator getCreator();
+		try {
+			contentUrl = contentUrlUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setCreator(
-			Creator creator);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String contentUrl;
 
-	public void setCreator(
-			UnsafeSupplier<Creator, Throwable>
-				creatorUnsafeSupplier);
-	public Date getDateCreated();
+	public String getDescription() {
+		return description;
+	}
 
-	public void setDateCreated(
-			Date dateCreated);
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-	public void setDateCreated(
-			UnsafeSupplier<Date, Throwable>
-				dateCreatedUnsafeSupplier);
-	public Date getDateModified();
+	@JsonIgnore
+	public void setDescription(
+		UnsafeSupplier<String, Exception> descriptionUnsafeSupplier) {
 
-	public void setDateModified(
-			Date dateModified);
+		try {
+			description = descriptionUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setDateModified(
-			UnsafeSupplier<Date, Throwable>
-				dateModifiedUnsafeSupplier);
-	public String getEncodingFormat();
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String description;
 
+	public String getEncodingFormat() {
+		return encodingFormat;
+	}
+
+	public void setEncodingFormat(String encodingFormat) {
+		this.encodingFormat = encodingFormat;
+	}
+
+	@JsonIgnore
 	public void setEncodingFormat(
-			String encodingFormat);
+		UnsafeSupplier<String, Exception> encodingFormatUnsafeSupplier) {
 
-	public void setEncodingFormat(
-			UnsafeSupplier<String, Throwable>
-				encodingFormatUnsafeSupplier);
-	public String getFileExtension();
+		try {
+			encodingFormat = encodingFormatUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String encodingFormat;
+
+	public String getFileExtension() {
+		return fileExtension;
+	}
+
+	public void setFileExtension(String fileExtension) {
+		this.fileExtension = fileExtension;
+	}
+
+	@JsonIgnore
 	public void setFileExtension(
-			String fileExtension);
+		UnsafeSupplier<String, Exception> fileExtensionUnsafeSupplier) {
 
-	public void setFileExtension(
-			UnsafeSupplier<String, Throwable>
-				fileExtensionUnsafeSupplier);
-	public Long getId();
+		try {
+			fileExtension = fileExtensionUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String fileExtension;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public Number getSizeInBytes();
+	public Long getId() {
+		return id;
+	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	public Number getSizeInBytes() {
+		return sizeInBytes;
+	}
+
+	public void setSizeInBytes(Number sizeInBytes) {
+		this.sizeInBytes = sizeInBytes;
+	}
+
+	@JsonIgnore
 	public void setSizeInBytes(
-			Number sizeInBytes);
+		UnsafeSupplier<Number, Exception> sizeInBytesUnsafeSupplier) {
 
-	public void setSizeInBytes(
-			UnsafeSupplier<Number, Throwable>
-				sizeInBytesUnsafeSupplier);
-	public String getTitle();
+		try {
+			sizeInBytes = sizeInBytesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Number sizeInBytes;
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	@JsonIgnore
 	public void setTitle(
-			String title);
+		UnsafeSupplier<String, Exception> titleUnsafeSupplier) {
 
-	public void setTitle(
-			UnsafeSupplier<String, Throwable>
-				titleUnsafeSupplier);
+		try {
+			title = titleUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String title;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof ContentDocument)) {
+			return false;
+		}
+
+		ContentDocument contentDocument = (ContentDocument)object;
+
+		return Objects.equals(toString(), contentDocument.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"contentUrl\": ");
+
+		sb.append("\"");
+		sb.append(contentUrl);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"description\": ");
+
+		sb.append("\"");
+		sb.append(description);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"encodingFormat\": ");
+
+		sb.append("\"");
+		sb.append(encodingFormat);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"fileExtension\": ");
+
+		sb.append("\"");
+		sb.append(fileExtension);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"sizeInBytes\": ");
+
+		sb.append(sizeInBytes);
+		sb.append(", ");
+
+		sb.append("\"title\": ");
+
+		sb.append("\"");
+		sb.append(title);
+		sb.append("\"");
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

@@ -32,8 +32,9 @@ import com.liferay.message.boards.service.MBMailingListLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class MBMailingListBaseImpl extends MBMailingListModelImpl
-	implements MBMailingList {
+public abstract class MBMailingListBaseImpl
+	extends MBMailingListModelImpl implements MBMailingList {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class MBMailingListBaseImpl extends MBMailingListModelImpl
 			MBMailingListLocalServiceUtil.updateMBMailingList(this);
 		}
 	}
+
 }

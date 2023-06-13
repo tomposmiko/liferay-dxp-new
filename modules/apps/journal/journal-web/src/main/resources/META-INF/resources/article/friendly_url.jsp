@@ -22,14 +22,13 @@ JournalArticle article = journalDisplayContext.getArticle();
 JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalEditArticleDisplayContext(request, liferayPortletResponse, article);
 %>
 
-<div class="form-group">
-	<label for="<portlet:namespace />friendlyURL"><liferay-ui:message key="friendly-url" /><liferay-ui:icon-help message='<%= LanguageUtil.format(request, "for-example-x", "<em>news</em>", false) %>' /></label>
+<p class="mb-2 text-secondary">
+	<%= journalEditArticleDisplayContext.getFriendlyURLBase() %>
+</p>
 
-	<liferay-ui:input-localized
-		defaultLanguageId="<%= journalEditArticleDisplayContext.getDefaultLanguageId() %>"
-		inputAddon="<%= journalEditArticleDisplayContext.getFriendlyURLBase() %>"
-		maxLength='<%= String.valueOf(ModelHintsUtil.getMaxLength(JournalArticle.class.getName(), "urlTitle")) %>'
-		name="friendlyURL"
-		xml="<%= (article != null) ? HttpUtil.decodeURL(article.getFriendlyURLsXML()) : StringPool.BLANK %>"
-	/>
-</div>
+<liferay-ui:input-localized
+	defaultLanguageId="<%= journalEditArticleDisplayContext.getDefaultLanguageId() %>"
+	maxLength='<%= String.valueOf(ModelHintsUtil.getMaxLength(JournalArticle.class.getName(), "urlTitle")) %>'
+	name="friendlyURL"
+	xml="<%= (article != null) ? HttpUtil.decodeURL(article.getFriendlyURLsXML()) : StringPool.BLANK %>"
+/>

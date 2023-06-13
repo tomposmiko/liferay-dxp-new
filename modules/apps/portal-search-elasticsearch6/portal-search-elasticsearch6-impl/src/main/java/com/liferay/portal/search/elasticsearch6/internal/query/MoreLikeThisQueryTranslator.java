@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.portal.kernel.search.generic.MoreLikeThisQuery;
+import com.liferay.portal.search.query.MoreLikeThisQuery;
 
 import org.elasticsearch.index.query.QueryBuilder;
 

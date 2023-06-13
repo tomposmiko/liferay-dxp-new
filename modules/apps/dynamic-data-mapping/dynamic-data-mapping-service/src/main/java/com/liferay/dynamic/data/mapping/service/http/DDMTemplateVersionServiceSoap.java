@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -64,46 +63,64 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class DDMTemplateVersionServiceSoap {
-	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap getLatestTemplateVersion(
-		long templateId) throws RemoteException {
-		try {
-			com.liferay.dynamic.data.mapping.model.DDMTemplateVersion returnValue =
-				DDMTemplateVersionServiceUtil.getLatestTemplateVersion(templateId);
 
-			return com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap getTemplateVersion(
-		long templateVersionId) throws RemoteException {
-		try {
-			com.liferay.dynamic.data.mapping.model.DDMTemplateVersion returnValue =
-				DDMTemplateVersionServiceUtil.getTemplateVersion(templateVersionId);
-
-			return com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap[] getTemplateVersions(
-		long templateId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion> orderByComparator)
+	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap
+			getLatestTemplateVersion(long templateId)
 		throws RemoteException {
-		try {
-			java.util.List<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion> returnValue =
-				DDMTemplateVersionServiceUtil.getTemplateVersions(templateId,
-					start, end, orderByComparator);
 
-			return com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap.toSoapModels(returnValue);
+		try {
+			com.liferay.dynamic.data.mapping.model.DDMTemplateVersion
+				returnValue =
+					DDMTemplateVersionServiceUtil.getLatestTemplateVersion(
+						templateId);
+
+			return com.liferay.dynamic.data.mapping.model.
+				DDMTemplateVersionSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap
+			getTemplateVersion(long templateVersionId)
+		throws RemoteException {
+
+		try {
+			com.liferay.dynamic.data.mapping.model.DDMTemplateVersion
+				returnValue = DDMTemplateVersionServiceUtil.getTemplateVersion(
+					templateVersionId);
+
+			return com.liferay.dynamic.data.mapping.model.
+				DDMTemplateVersionSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static
+		com.liferay.dynamic.data.mapping.model.DDMTemplateVersionSoap[]
+				getTemplateVersions(
+					long templateId, int start, int end,
+					com.liferay.portal.kernel.util.OrderByComparator
+						<com.liferay.dynamic.data.mapping.model.
+							DDMTemplateVersion> orderByComparator)
+			throws RemoteException {
+
+		try {
+			java.util.List
+				<com.liferay.dynamic.data.mapping.model.DDMTemplateVersion>
+					returnValue =
+						DDMTemplateVersionServiceUtil.getTemplateVersions(
+							templateId, start, end, orderByComparator);
+
+			return com.liferay.dynamic.data.mapping.model.
+				DDMTemplateVersionSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -114,8 +131,11 @@ public class DDMTemplateVersionServiceSoap {
 
 	public static int getTemplateVersionsCount(long templateId)
 		throws RemoteException {
+
 		try {
-			int returnValue = DDMTemplateVersionServiceUtil.getTemplateVersionsCount(templateId);
+			int returnValue =
+				DDMTemplateVersionServiceUtil.getTemplateVersionsCount(
+					templateId);
 
 			return returnValue;
 		}
@@ -126,5 +146,7 @@ public class DDMTemplateVersionServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DDMTemplateVersionServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		DDMTemplateVersionServiceSoap.class);
+
 }

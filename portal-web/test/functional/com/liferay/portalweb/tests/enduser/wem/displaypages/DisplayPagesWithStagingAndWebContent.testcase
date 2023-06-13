@@ -30,9 +30,9 @@ definition {
 		}
 
 		task ("Add a display page with fragments mapped to Basic Web Content") {
-			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-staging");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-staging");
 
-			DisplayPagesAdmin.addDisplayPage(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.addDisplayPage(displayPageName = "Display Page Name");
 
 			PageEditor.addFragment(
 				collectionName = "Collection Name",
@@ -44,26 +44,28 @@ definition {
 				fragmentName = "Rich Text"
 			);
 
-			PageEditorMapping.selectAssetType(
-				assetType = "Web Content Article",
+			PageEditorMapping.selectContentType(
+				contentType = "Web Content Article",
 				subType = "Basic Web Content"
 			);
 
-			PageEditorMapping.mapEditableTextToAsset(
+			PageEditorMapping.mapEditableTextToField(
+				field = "Title",
 				fragmentName = "Title",
 				id = "title",
-				itemName = "Title"
+				source = "Basic Web Content (Default)"
 			);
 
-			PageEditorMapping.mapEditableTextToAsset(
+			PageEditorMapping.mapEditableTextToField(
+				field = "Content",
 				fragmentName = "Rich Text",
 				id = "rich-text",
-				itemName = "Content"
+				source = "Basic Web Content (Default)"
 			);
 
 			Button.clickPublish();
 
-			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-staging");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-staging");
 		}
 	}
 
@@ -93,8 +95,10 @@ definition {
 
 			WebContent.editDisplayPage(
 				pageName = "Display Page Name",
-				pageType = "Display Pages"
+				pageType = "Display Page Templates"
 			);
+
+			PortletEntry.publish();
 		}
 
 		task ("Publish the site to live") {
@@ -128,7 +132,7 @@ definition {
 		}
 
 		task ("Assert the display page still exists") {
-			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
 			AssertVisible(
 				locator1 = "Card#SPECIFIC_LARGE_TEXT",
@@ -152,8 +156,10 @@ definition {
 
 			WebContent.editDisplayPage(
 				pageName = "Display Page Name",
-				pageType = "Display Pages"
+				pageType = "Display Page Templates"
 			);
+
+			PortletEntry.publish();
 		}
 
 		task ("Assert the web content article displays using the display page in the staging site") {
@@ -217,7 +223,7 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a web content article") {
@@ -229,7 +235,23 @@ definition {
 				webContentContent = "Webcontent Content",
 				webContentTitle = "Webcontent Title"
 			);
+		}
 
+		task ("Assert the display page is selected by default") {
+			Panel.expandPanel(panel = "Display Page");
+
+			AssertSelectedLabel(
+				locator1 = "WCEditWebContent#DISPLAY_PAGE_SELECT",
+				value1 = "Default Display Page"
+			);
+
+			AssertTextEquals(
+				locator1 = "WCEditWebContent#DISPLAY_PAGE_DEFAULT_SELECTION",
+				value1 = "Display Page Name"
+			);
+		}
+
+		task ("Publish the web content article") {
 			PortletEntry.publish();
 		}
 
@@ -294,7 +316,7 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a web content article") {
@@ -317,9 +339,9 @@ definition {
 		}
 
 		task ("Add a Content fragment to the display page and map it to the Basic Web Content Title") {
-			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-staging");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-staging");
 
-			DisplayPagesAdmin.gotoDisplayPageEllipsisItem(
+			DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
 				displayPageName = "Display Page Name",
 				item = "Edit"
 			);
@@ -329,10 +351,11 @@ definition {
 				fragmentName = "Content"
 			);
 
-			PageEditorMapping.mapEditableTextToAsset(
+			PageEditorMapping.mapEditableTextToField(
+				field = "Title",
 				fragmentName = "Content",
 				id = "content",
-				itemName = "Title"
+				source = "Basic Web Content (Default)"
 			);
 
 			Button.clickPublish();

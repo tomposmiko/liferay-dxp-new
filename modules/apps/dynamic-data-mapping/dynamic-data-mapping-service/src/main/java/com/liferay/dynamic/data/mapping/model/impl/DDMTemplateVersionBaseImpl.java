@@ -34,6 +34,7 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionLocalServiceUt
 @ProviderType
 public abstract class DDMTemplateVersionBaseImpl
 	extends DDMTemplateVersionModelImpl implements DDMTemplateVersion {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class DDMTemplateVersionBaseImpl
 			DDMTemplateVersionLocalServiceUtil.updateDDMTemplateVersion(this);
 		}
 	}
+
 }

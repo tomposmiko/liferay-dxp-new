@@ -49,8 +49,23 @@ public class CTProcessModel {
 	}
 
 	@XmlElement
+	public long getCTProcessId() {
+		return _ctProcessId;
+	}
+
+	@XmlElement
 	public Date getDate() {
 		return _date;
+	}
+
+	@XmlElement
+	public int getPercentage() {
+		return _percentage;
+	}
+
+	@XmlElement
+	public String getStatus() {
+		return _status;
 	}
 
 	@XmlElement
@@ -96,8 +111,26 @@ public class CTProcessModel {
 			return this;
 		}
 
+		public Builder setCTProcessId(long ctProcessId) {
+			_ctProcessModel._ctProcessId = ctProcessId;
+
+			return this;
+		}
+
 		public Builder setDate(Date date) {
 			_ctProcessModel._date = date;
+
+			return this;
+		}
+
+		public Builder setPercentage(int percentage) {
+			_ctProcessModel._percentage = percentage;
+
+			return this;
+		}
+
+		public Builder setStatus(String status) {
+			_ctProcessModel._status = status;
 
 			return this;
 		}
@@ -129,7 +162,10 @@ public class CTProcessModel {
 
 	private long _companyId;
 	private CTCollectionModel _ctCollection;
+	private long _ctProcessId;
 	private Date _date;
+	private int _percentage;
+	private String _status;
 	private String _userInitials;
 	private String _userName;
 	private String _userPortraitURL;

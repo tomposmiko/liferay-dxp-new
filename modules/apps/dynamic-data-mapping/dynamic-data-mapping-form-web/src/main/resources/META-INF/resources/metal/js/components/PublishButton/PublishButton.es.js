@@ -1,15 +1,16 @@
-import {Config} from 'metal-state';
-import {convertToSearchParams, makeFetch} from 'dynamic-data-mapping-form-builder/metal/js/util/fetch.es';
 import ClayButton from 'clay-button';
 import Component from 'metal-jsx';
 import Notifications from '../../util/Notifications.es';
+import {Config} from 'metal-state';
 
 class PublishButton extends Component {
 	static PROPS = {
 		namespace: Config.string().required(),
 		published: Config.bool().value(false),
 		resolvePublishURL: Config.func().required(),
+		showPublishAlert: Config.bool().value(false),
 		spritemap: Config.string().required(),
+		submitForm: Config.func().required(),
 		url: Config.string()
 	};
 
@@ -17,30 +18,39 @@ class PublishButton extends Component {
 		Notifications.closeAlert();
 	}
 
-	publish() {
-		return this._savePublished(true);
+	publish(event) {
+		return this._savePublished(event, true);
 	}
 
-	toggle() {
+	toggle(event) {
 		const {published} = this.props;
 		let promise;
 
 		if (published) {
-			promise = this.unpublish();
+			promise = this.unpublish(event);
 		}
 		else {
-			promise = this.publish();
+			promise = this.publish(event);
 		}
 
 		return promise;
 	}
 
-	unpublish() {
-		return this._savePublished(false);
+	unpublish(event) {
+		return this._savePublished(event, false);
 	}
 
 	render() {
-		const {published, spritemap} = this.props;
+		const {published, resolvePublishURL, showPublishAlert, spritemap} = this.props;
+
+		if (showPublishAlert) {
+			if (published) {
+				this._showPublishAlert(resolvePublishURL());
+			}
+			else {
+				this._showUnpublishAlert();
+			}
+		}
 
 		return (
 			<ClayButton
@@ -57,45 +67,22 @@ class PublishButton extends Component {
 		);
 	}
 
-	_handleButtonClicked() {
-		this.toggle();
+	_handleButtonClicked(event) {
+		this.toggle(event);
 	}
 
-	_savePublished(published) {
-		const {namespace, resolvePublishURL} = this.props;
+	_savePublished(event, published) {
+		const {namespace, submitForm, url} = this.props;
 
-		return resolvePublishURL().then(
-			({formInstanceId, publishURL}) => {
-				const payload = {
-					[`${namespace}formInstanceId`]: formInstanceId,
-					[`${namespace}published`]: published
-				};
+		event.preventDefault();
 
-				return makeFetch(
-					{
-						body: convertToSearchParams(payload),
-						url: this.props.url
-					}
-				).then(
-					() => {
-						this.props.published = published;
+		const form = document.querySelector(`#${namespace}editForm`);
 
-						if (published) {
-							this._showPublishAlert(publishURL);
-						}
-						else {
-							this._showUnpublishAlert();
-						}
+		if (form) {
+			form.setAttribute('action', url);
+		}
 
-						return publishURL;
-					}
-				);
-			}
-		).catch(
-			() => {
-				Notifications.showError(Liferay.Language.get('your-request-failed-to-complete'));
-			}
-		);
+		return Promise.resolve(submitForm());
 	}
 
 	_showPublishAlert(publishURL) {

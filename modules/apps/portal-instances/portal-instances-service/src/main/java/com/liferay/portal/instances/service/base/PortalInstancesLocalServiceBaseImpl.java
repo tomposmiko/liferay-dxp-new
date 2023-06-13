@@ -44,8 +44,9 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class PortalInstancesLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements PortalInstancesLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements PortalInstancesLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -68,6 +69,7 @@ public abstract class PortalInstancesLocalServiceBaseImpl
 	 */
 	public void setPortalInstancesLocalService(
 		PortalInstancesLocalService portalInstancesLocalService) {
+
 		this.portalInstancesLocalService = portalInstancesLocalService;
 	}
 
@@ -76,7 +78,9 @@ public abstract class PortalInstancesLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -86,7 +90,9 @@ public abstract class PortalInstancesLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -120,8 +126,8 @@ public abstract class PortalInstancesLocalServiceBaseImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -132,6 +138,11 @@ public abstract class PortalInstancesLocalServiceBaseImpl
 
 	@BeanReference(type = PortalInstancesLocalService.class)
 	protected PortalInstancesLocalService portalInstancesLocalService;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 }

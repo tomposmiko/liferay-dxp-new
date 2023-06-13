@@ -167,11 +167,6 @@ definition {
 			locator1 = "SocialBookmarks#ENABLE_SOCIAL_BOOKMARK_CURRENT_SELECT",
 			value1 = "Facebook"
 		);
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "SocialBookmarks#ENABLE_SOCIAL_BOOKMARK_CURRENT_SELECT",
-			value1 = "Google+"
-		);
 	}
 
 	macro viewDefaultConfigurationRSS {
@@ -196,7 +191,7 @@ definition {
 	macro viewNoPermissionCP {
 		var key_portletTitle = "Blogs";
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "Home#SITE_ADMINISTRATION_PORTLET_TITLE",
 			value1 = "Blogs"
 		);
@@ -255,7 +250,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs"
 		);

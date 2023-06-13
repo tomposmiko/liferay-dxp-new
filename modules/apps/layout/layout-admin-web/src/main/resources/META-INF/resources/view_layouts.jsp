@@ -48,7 +48,7 @@
 	<c:choose>
 		<c:when test="<%= layoutsAdminDisplayContext.hasLayouts() %>">
 			<c:choose>
-				<c:when test="<%= layoutsAdminDisplayContext.isFlattenedView() %>">
+				<c:when test="<%= layoutsAdminDisplayContext.isSearch() %>">
 					<liferay-util:include page="/flattened_view.jsp" servletContext="<%= application %>" />
 				</c:when>
 				<c:otherwise>
@@ -87,7 +87,7 @@
 <aui:script sandbox="<%= true %>">
 	var deleteSelectedPages = function() {
 		if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-			submitForm($(document.<portlet:namespace />fm));
+			submitForm(document.<portlet:namespace />fm);
 		}
 	};
 

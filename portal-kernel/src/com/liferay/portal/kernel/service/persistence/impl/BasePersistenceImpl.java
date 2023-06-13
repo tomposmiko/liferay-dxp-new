@@ -670,7 +670,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	protected String getColumnName(
 		String entityAlias, String fieldName, boolean sqlQuery) {
 
-		String columnName = _getDBColumnName(fieldName);
+		String columnName = _dbColumnNames.getOrDefault(fieldName, fieldName);
 
 		if (sqlQuery) {
 			fieldName = columnName;
@@ -731,6 +731,10 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	 */
 	protected T removeImpl(T model) {
 		throw new UnsupportedOperationException();
+	}
+
+	protected void setDBColumnNames(Map<String, String> dbColumnNames) {
+		_dbColumnNames = dbColumnNames;
 	}
 
 	protected void setEntityCacheEnabled(boolean entityCacheEnabled) {
@@ -798,6 +802,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	protected static final NullModel nullModel = new NullModel();
 
 	protected int databaseInMaxParameters;
+	protected Map<String, String> dbColumnNames;
 	protected boolean entityCacheEnabled;
 	protected boolean finderCacheEnabled;
 
@@ -807,28 +812,13 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	@Deprecated
 	protected ModelListener<T>[] listeners = new ModelListener[0];
 
-	private String _getDBColumnName(String fieldName) {
-		if (_dbColumnNames == null) {
-			Map<String, String> dbColumnNames = new HashMap<>();
-
-			for (String badColumnName : getBadColumnNames()) {
-				dbColumnNames.put(
-					badColumnName, badColumnName.concat(StringPool.UNDERLINE));
-			}
-
-			_dbColumnNames = dbColumnNames;
-		}
-
-		return _dbColumnNames.getOrDefault(fieldName, fieldName);
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		BasePersistenceImpl.class);
 
 	private int _databaseOrderByMaxColumns;
 	private DataSource _dataSource;
 	private DB _db;
-	private Map<String, String> _dbColumnNames;
+	private Map<String, String> _dbColumnNames = Collections.emptyMap();
 	private Dialect _dialect;
 	private Class<T> _modelClass;
 	private Class<? extends T> _modelImplClass;

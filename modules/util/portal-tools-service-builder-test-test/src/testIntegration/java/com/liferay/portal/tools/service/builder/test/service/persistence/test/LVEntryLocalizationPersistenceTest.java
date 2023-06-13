@@ -15,7 +15,6 @@
 package com.liferay.portal.tools.service.builder.test.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -35,15 +34,6 @@ import com.liferay.portal.tools.service.builder.test.model.LVEntryLocalization;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntryLocalizationPersistence;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntryLocalizationUtil;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -54,16 +44,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class LVEntryLocalizationPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.portal.tools.service.builder.test.service"));
 
 	@Before
@@ -77,7 +78,8 @@ public class LVEntryLocalizationPersistenceTest {
 
 	@After
 	public void tearDown() throws Exception {
-		Iterator<LVEntryLocalization> iterator = _lvEntryLocalizations.iterator();
+		Iterator<LVEntryLocalization> iterator =
+			_lvEntryLocalizations.iterator();
 
 		while (iterator.hasNext()) {
 			_persistence.remove(iterator.next());
@@ -103,7 +105,9 @@ public class LVEntryLocalizationPersistenceTest {
 
 		_persistence.remove(newLVEntryLocalization);
 
-		LVEntryLocalization existingLVEntryLocalization = _persistence.fetchByPrimaryKey(newLVEntryLocalization.getPrimaryKey());
+		LVEntryLocalization existingLVEntryLocalization =
+			_persistence.fetchByPrimaryKey(
+				newLVEntryLocalization.getPrimaryKey());
 
 		Assert.assertNull(existingLVEntryLocalization);
 	}
@@ -123,6 +127,8 @@ public class LVEntryLocalizationPersistenceTest {
 
 		newLVEntryLocalization.setHeadId(RandomTestUtil.nextLong());
 
+		newLVEntryLocalization.setCompanyId(RandomTestUtil.nextLong());
+
 		newLVEntryLocalization.setLvEntryId(RandomTestUtil.nextLong());
 
 		newLVEntryLocalization.setLanguageId(RandomTestUtil.randomString());
@@ -133,21 +139,33 @@ public class LVEntryLocalizationPersistenceTest {
 
 		_lvEntryLocalizations.add(_persistence.update(newLVEntryLocalization));
 
-		LVEntryLocalization existingLVEntryLocalization = _persistence.findByPrimaryKey(newLVEntryLocalization.getPrimaryKey());
+		LVEntryLocalization existingLVEntryLocalization =
+			_persistence.findByPrimaryKey(
+				newLVEntryLocalization.getPrimaryKey());
 
-		Assert.assertEquals(existingLVEntryLocalization.getMvccVersion(),
+		Assert.assertEquals(
+			existingLVEntryLocalization.getMvccVersion(),
 			newLVEntryLocalization.getMvccVersion());
-		Assert.assertEquals(existingLVEntryLocalization.getHeadId(),
+		Assert.assertEquals(
+			existingLVEntryLocalization.getHeadId(),
 			newLVEntryLocalization.getHeadId());
-		Assert.assertEquals(existingLVEntryLocalization.getLvEntryLocalizationId(),
+		Assert.assertEquals(
+			existingLVEntryLocalization.getLvEntryLocalizationId(),
 			newLVEntryLocalization.getLvEntryLocalizationId());
-		Assert.assertEquals(existingLVEntryLocalization.getLvEntryId(),
+		Assert.assertEquals(
+			existingLVEntryLocalization.getCompanyId(),
+			newLVEntryLocalization.getCompanyId());
+		Assert.assertEquals(
+			existingLVEntryLocalization.getLvEntryId(),
 			newLVEntryLocalization.getLvEntryId());
-		Assert.assertEquals(existingLVEntryLocalization.getLanguageId(),
+		Assert.assertEquals(
+			existingLVEntryLocalization.getLanguageId(),
 			newLVEntryLocalization.getLanguageId());
-		Assert.assertEquals(existingLVEntryLocalization.getTitle(),
+		Assert.assertEquals(
+			existingLVEntryLocalization.getTitle(),
 			newLVEntryLocalization.getTitle());
-		Assert.assertEquals(existingLVEntryLocalization.getContent(),
+		Assert.assertEquals(
+			existingLVEntryLocalization.getContent(),
 			newLVEntryLocalization.getContent());
 	}
 
@@ -178,9 +196,12 @@ public class LVEntryLocalizationPersistenceTest {
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		LVEntryLocalization newLVEntryLocalization = addLVEntryLocalization();
 
-		LVEntryLocalization existingLVEntryLocalization = _persistence.findByPrimaryKey(newLVEntryLocalization.getPrimaryKey());
+		LVEntryLocalization existingLVEntryLocalization =
+			_persistence.findByPrimaryKey(
+				newLVEntryLocalization.getPrimaryKey());
 
-		Assert.assertEquals(existingLVEntryLocalization, newLVEntryLocalization);
+		Assert.assertEquals(
+			existingLVEntryLocalization, newLVEntryLocalization);
 	}
 
 	@Test(expected = NoSuchLVEntryLocalizationException.class)
@@ -192,31 +213,35 @@ public class LVEntryLocalizationPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<LVEntryLocalization> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("LVEntryLocalization",
-			"mvccVersion", true, "headId", true, "lvEntryLocalizationId", true,
-			"lvEntryId", true, "languageId", true, "title", true, "content",
-			true);
+		return OrderByComparatorFactoryUtil.create(
+			"LVEntryLocalization", "mvccVersion", true, "headId", true,
+			"lvEntryLocalizationId", true, "companyId", true, "lvEntryId", true,
+			"languageId", true, "title", true, "content", true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		LVEntryLocalization newLVEntryLocalization = addLVEntryLocalization();
 
-		LVEntryLocalization existingLVEntryLocalization = _persistence.fetchByPrimaryKey(newLVEntryLocalization.getPrimaryKey());
+		LVEntryLocalization existingLVEntryLocalization =
+			_persistence.fetchByPrimaryKey(
+				newLVEntryLocalization.getPrimaryKey());
 
-		Assert.assertEquals(existingLVEntryLocalization, newLVEntryLocalization);
+		Assert.assertEquals(
+			existingLVEntryLocalization, newLVEntryLocalization);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		LVEntryLocalization missingLVEntryLocalization = _persistence.fetchByPrimaryKey(pk);
+		LVEntryLocalization missingLVEntryLocalization =
+			_persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingLVEntryLocalization);
 	}
@@ -224,6 +249,7 @@ public class LVEntryLocalizationPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		LVEntryLocalization newLVEntryLocalization1 = addLVEntryLocalization();
 		LVEntryLocalization newLVEntryLocalization2 = addLVEntryLocalization();
 
@@ -232,18 +258,22 @@ public class LVEntryLocalizationPersistenceTest {
 		primaryKeys.add(newLVEntryLocalization1.getPrimaryKey());
 		primaryKeys.add(newLVEntryLocalization2.getPrimaryKey());
 
-		Map<Serializable, LVEntryLocalization> lvEntryLocalizations = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LVEntryLocalization> lvEntryLocalizations =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, lvEntryLocalizations.size());
-		Assert.assertEquals(newLVEntryLocalization1,
+		Assert.assertEquals(
+			newLVEntryLocalization1,
 			lvEntryLocalizations.get(newLVEntryLocalization1.getPrimaryKey()));
-		Assert.assertEquals(newLVEntryLocalization2,
+		Assert.assertEquals(
+			newLVEntryLocalization2,
 			lvEntryLocalizations.get(newLVEntryLocalization2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -253,7 +283,8 @@ public class LVEntryLocalizationPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, LVEntryLocalization> lvEntryLocalizations = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LVEntryLocalization> lvEntryLocalizations =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(lvEntryLocalizations.isEmpty());
 	}
@@ -261,6 +292,7 @@ public class LVEntryLocalizationPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		LVEntryLocalization newLVEntryLocalization = addLVEntryLocalization();
 
 		long pk = RandomTestUtil.nextLong();
@@ -270,87 +302,97 @@ public class LVEntryLocalizationPersistenceTest {
 		primaryKeys.add(newLVEntryLocalization.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, LVEntryLocalization> lvEntryLocalizations = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LVEntryLocalization> lvEntryLocalizations =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, lvEntryLocalizations.size());
-		Assert.assertEquals(newLVEntryLocalization,
+		Assert.assertEquals(
+			newLVEntryLocalization,
 			lvEntryLocalizations.get(newLVEntryLocalization.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, LVEntryLocalization> lvEntryLocalizations = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LVEntryLocalization> lvEntryLocalizations =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(lvEntryLocalizations.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		LVEntryLocalization newLVEntryLocalization = addLVEntryLocalization();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newLVEntryLocalization.getPrimaryKey());
 
-		Map<Serializable, LVEntryLocalization> lvEntryLocalizations = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LVEntryLocalization> lvEntryLocalizations =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, lvEntryLocalizations.size());
-		Assert.assertEquals(newLVEntryLocalization,
+		Assert.assertEquals(
+			newLVEntryLocalization,
 			lvEntryLocalizations.get(newLVEntryLocalization.getPrimaryKey()));
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		LVEntryLocalization newLVEntryLocalization = addLVEntryLocalization();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LVEntryLocalization.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LVEntryLocalization.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("lvEntryLocalizationId",
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"lvEntryLocalizationId",
 				newLVEntryLocalization.getLvEntryLocalizationId()));
 
-		List<LVEntryLocalization> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<LVEntryLocalization> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
 		LVEntryLocalization existingLVEntryLocalization = result.get(0);
 
-		Assert.assertEquals(existingLVEntryLocalization, newLVEntryLocalization);
+		Assert.assertEquals(
+			existingLVEntryLocalization, newLVEntryLocalization);
 	}
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LVEntryLocalization.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LVEntryLocalization.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("lvEntryLocalizationId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"lvEntryLocalizationId", RandomTestUtil.nextLong()));
 
-		List<LVEntryLocalization> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<LVEntryLocalization> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		LVEntryLocalization newLVEntryLocalization = addLVEntryLocalization();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LVEntryLocalization.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LVEntryLocalization.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"lvEntryLocalizationId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("lvEntryLocalizationId"));
 
-		Object newLvEntryLocalizationId = newLVEntryLocalization.getLvEntryLocalizationId();
+		Object newLvEntryLocalizationId =
+			newLVEntryLocalization.getLvEntryLocalizationId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("lvEntryLocalizationId",
-				new Object[] { newLvEntryLocalizationId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"lvEntryLocalizationId",
+				new Object[] {newLvEntryLocalizationId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -358,20 +400,22 @@ public class LVEntryLocalizationPersistenceTest {
 
 		Object existingLvEntryLocalizationId = result.get(0);
 
-		Assert.assertEquals(existingLvEntryLocalizationId,
-			newLvEntryLocalizationId);
+		Assert.assertEquals(
+			existingLvEntryLocalizationId, newLvEntryLocalizationId);
 	}
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LVEntryLocalization.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LVEntryLocalization.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"lvEntryLocalizationId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("lvEntryLocalizationId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("lvEntryLocalizationId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"lvEntryLocalizationId",
+				new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -384,25 +428,30 @@ public class LVEntryLocalizationPersistenceTest {
 
 		_persistence.clearCache();
 
-		LVEntryLocalization existingLVEntryLocalization = _persistence.findByPrimaryKey(newLVEntryLocalization.getPrimaryKey());
+		LVEntryLocalization existingLVEntryLocalization =
+			_persistence.findByPrimaryKey(
+				newLVEntryLocalization.getPrimaryKey());
 
-		Assert.assertEquals(Long.valueOf(
-				existingLVEntryLocalization.getLvEntryId()),
-			ReflectionTestUtil.<Long>invoke(existingLVEntryLocalization,
-				"getOriginalLvEntryId", new Class<?>[0]));
-		Assert.assertTrue(Objects.equals(
+		Assert.assertEquals(
+			Long.valueOf(existingLVEntryLocalization.getLvEntryId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingLVEntryLocalization, "getOriginalLvEntryId",
+				new Class<?>[0]));
+		Assert.assertTrue(
+			Objects.equals(
 				existingLVEntryLocalization.getLanguageId(),
-				ReflectionTestUtil.invoke(existingLVEntryLocalization,
-					"getOriginalLanguageId", new Class<?>[0])));
+				ReflectionTestUtil.invoke(
+					existingLVEntryLocalization, "getOriginalLanguageId",
+					new Class<?>[0])));
 
-		Assert.assertEquals(Long.valueOf(
-				existingLVEntryLocalization.getHeadId()),
-			ReflectionTestUtil.<Long>invoke(existingLVEntryLocalization,
-				"getOriginalHeadId", new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingLVEntryLocalization.getHeadId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingLVEntryLocalization, "getOriginalHeadId",
+				new Class<?>[0]));
 	}
 
-	protected LVEntryLocalization addLVEntryLocalization()
-		throws Exception {
+	protected LVEntryLocalization addLVEntryLocalization() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
 		LVEntryLocalization lvEntryLocalization = _persistence.create(pk);
@@ -410,6 +459,8 @@ public class LVEntryLocalizationPersistenceTest {
 		lvEntryLocalization.setMvccVersion(RandomTestUtil.nextLong());
 
 		lvEntryLocalization.setHeadId(RandomTestUtil.nextLong());
+
+		lvEntryLocalization.setCompanyId(RandomTestUtil.nextLong());
 
 		lvEntryLocalization.setLvEntryId(RandomTestUtil.nextLong());
 
@@ -424,7 +475,9 @@ public class LVEntryLocalizationPersistenceTest {
 		return lvEntryLocalization;
 	}
 
-	private List<LVEntryLocalization> _lvEntryLocalizations = new ArrayList<LVEntryLocalization>();
+	private List<LVEntryLocalization> _lvEntryLocalizations =
+		new ArrayList<LVEntryLocalization>();
 	private LVEntryLocalizationPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

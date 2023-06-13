@@ -29,6 +29,7 @@ import java.util.List;
  */
 @ProviderType
 public class EntrySoap implements Serializable {
+
 	public static EntrySoap toSoapModel(Entry model) {
 		EntrySoap soapModel = new EntrySoap();
 
@@ -144,4 +145,5 @@ public class EntrySoap implements Serializable {
 	private long _toUserId;
 	private String _content;
 	private int _flag;
+
 }

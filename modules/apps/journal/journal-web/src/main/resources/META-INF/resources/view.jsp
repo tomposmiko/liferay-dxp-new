@@ -17,6 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+JournalManagementToolbarDisplayContext journalManagementToolbarDisplayContext = new JournalManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, journalDisplayContext, trashHelper);
+
 String title = journalDisplayContext.getFolderTitle();
 
 if (Validator.isNotNull(title)) {
@@ -35,7 +37,15 @@ if (Validator.isNotNull(title)) {
 	navigationItems='<%= journalDisplayContext.getNavigationBarItems("web-content") %>'
 />
 
-<liferay-util:include page="/toolbar.jsp" servletContext="<%= application %>" />
+<clay:management-toolbar
+	displayContext="<%= journalManagementToolbarDisplayContext %>"
+/>
+
+<liferay-frontend:component
+	componentId="<%= journalManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+	context="<%= journalManagementToolbarDisplayContext.getComponentContext() %>"
+	module="js/ManagementToolbarDefaultEventHandler.es"
+/>
 
 <div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
 	<c:if test="<%= journalDisplayContext.isShowInfoButton() %>">
@@ -61,6 +71,10 @@ if (Validator.isNotNull(title)) {
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 			<aui:input name="groupId" type="hidden" value="<%= scopeGroupId %>" />
 			<aui:input name="newFolderId" type="hidden" />
+
+			<%
+			request.setAttribute("view.jsp-journalManagementToolbarDisplayContext", journalManagementToolbarDisplayContext);
+			%>
 
 			<c:choose>
 				<c:when test="<%= !journalDisplayContext.isSearch() %>">
@@ -98,7 +112,6 @@ if (Validator.isNotNull(title)) {
 						names="<%= StringUtil.merge(tabsNames) %>"
 						portletURL="<%= journalDisplayContext.getPortletURL() %>"
 						tabsValues="<%= StringUtil.merge(tabsValues) %>"
-						type="tabs nav-tabs-default"
 					/>
 
 					<c:choose>

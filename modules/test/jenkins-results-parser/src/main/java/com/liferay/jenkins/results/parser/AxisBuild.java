@@ -22,6 +22,7 @@ import com.liferay.jenkins.results.parser.failure.message.generator.GradleTaskFa
 import com.liferay.jenkins.results.parser.failure.message.generator.IntegrationTestTimeoutFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.LocalGitMirrorFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.ModulesCompilationFailureMessageGenerator;
+import com.liferay.jenkins.results.parser.failure.message.generator.PMDFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.PluginFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.PluginGitIDFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.SemanticVersioningFailureMessageGenerator;
@@ -417,6 +418,23 @@ public class AxisBuild extends BaseBuild {
 	}
 
 	@Override
+	protected void extractBuildURLComponents(Matcher matcher) {
+		super.extractBuildURLComponents(matcher);
+
+		axisVariable = matcher.group("axisVariable");
+	}
+
+	@Override
+	protected Pattern getArchiveBuildURLPattern() {
+		return archiveBuildURLPattern;
+	}
+
+	@Override
+	protected Pattern getBuildURLPattern() {
+		return buildURLPattern;
+	}
+
+	@Override
 	protected FailureMessageGenerator[] getFailureMessageGenerators() {
 		return _FAILURE_MESSAGE_GENERATORS;
 	}
@@ -430,7 +448,7 @@ public class AxisBuild extends BaseBuild {
 	protected List<Element> getJenkinsReportTableRowElements(
 		String result, String status) {
 
-		return Collections.emptyList();
+		return getJenkinsReportStopWatchRecordElements();
 	}
 
 	@Override
@@ -453,57 +471,6 @@ public class AxisBuild extends BaseBuild {
 			"stop.properties");
 	}
 
-	@Override
-	protected void setBuildURL(String buildURL) {
-		try {
-			buildURL = JenkinsResultsParserUtil.decode(buildURL);
-		}
-		catch (UnsupportedEncodingException uee) {
-			throw new IllegalArgumentException(
-				"Unable to decode " + buildURL, uee);
-		}
-
-		try {
-			String archiveMarkerContent = JenkinsResultsParserUtil.toString(
-				buildURL + "/archive-marker", false, 0, 0, 0);
-
-			if ((archiveMarkerContent != null) &&
-				!archiveMarkerContent.isEmpty()) {
-
-				fromArchive = true;
-			}
-			else {
-				fromArchive = false;
-			}
-		}
-		catch (IOException ioe) {
-			fromArchive = false;
-		}
-
-		Matcher matcher = buildURLPattern.matcher(buildURL);
-
-		if (!matcher.find()) {
-			matcher = archiveBuildURLPattern.matcher(buildURL);
-
-			if (!matcher.find()) {
-				throw new IllegalArgumentException(
-					"Invalid build URL " + buildURL);
-			}
-
-			archiveName = matcher.group("archiveName");
-		}
-
-		axisVariable = matcher.group("axisVariable");
-		jobName = matcher.group("jobName");
-		setJenkinsMaster(new JenkinsMaster(matcher.group("master")));
-
-		setBuildNumber(Integer.parseInt(matcher.group("buildNumber")));
-
-		loadParametersFromBuildJSONObject();
-
-		setStatus("running");
-	}
-
 	protected static final Pattern archiveBuildURLPattern = Pattern.compile(
 		JenkinsResultsParserUtil.combine(
 			"(", Pattern.quote("${dependencies.url}"), "|",
@@ -522,6 +489,8 @@ public class AxisBuild extends BaseBuild {
 
 	protected String axisVariable;
 
+	// Skip JavaParser
+
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =
 		{
 			new ModulesCompilationFailureMessageGenerator(),
@@ -529,6 +498,7 @@ public class AxisBuild extends BaseBuild {
 			new CompileFailureMessageGenerator(),
 			new IntegrationTestTimeoutFailureMessageGenerator(),
 			new LocalGitMirrorFailureMessageGenerator(),
+			new PMDFailureMessageGenerator(),
 			new PluginFailureMessageGenerator(),
 			new PluginGitIDFailureMessageGenerator(),
 			new SemanticVersioningFailureMessageGenerator(),

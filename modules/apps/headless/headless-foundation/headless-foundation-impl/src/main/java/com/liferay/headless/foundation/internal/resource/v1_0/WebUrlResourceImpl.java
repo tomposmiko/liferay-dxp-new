@@ -14,9 +14,20 @@
 
 package com.liferay.headless.foundation.internal.resource.v1_0;
 
+import com.liferay.headless.foundation.dto.v1_0.WebUrl;
+import com.liferay.headless.foundation.internal.dto.v1_0.util.WebUrlUtil;
 import com.liferay.headless.foundation.resource.v1_0.WebUrlResource;
+import com.liferay.portal.kernel.model.Contact;
+import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.OrganizationService;
+import com.liferay.portal.kernel.service.UserService;
+import com.liferay.portal.kernel.service.WebsiteService;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 
 /**
@@ -27,4 +38,49 @@ import org.osgi.service.component.annotations.ServiceScope;
 	scope = ServiceScope.PROTOTYPE, service = WebUrlResource.class
 )
 public class WebUrlResourceImpl extends BaseWebUrlResourceImpl {
+
+	@Override
+	public Page<WebUrl> getOrganizationWebUrlsPage(
+			Long organizationId, Pagination pagination)
+		throws Exception {
+
+		Organization organization = _organizationService.getOrganization(
+			organizationId);
+
+		return Page.of(
+			transform(
+				_websiteService.getWebsites(
+					organization.getModelClassName(),
+					organization.getOrganizationId()),
+				WebUrlUtil::toWebUrl));
+	}
+
+	@Override
+	public Page<WebUrl> getUserAccountWebUrlsPage(
+			Long userAccountId, Pagination pagination)
+		throws Exception {
+
+		User user = _userService.getUserById(userAccountId);
+
+		return Page.of(
+			transform(
+				_websiteService.getWebsites(
+					Contact.class.getName(), user.getContactId()),
+				WebUrlUtil::toWebUrl));
+	}
+
+	@Override
+	public WebUrl getWebUrl(Long webUrlId) throws Exception {
+		return WebUrlUtil.toWebUrl(_websiteService.getWebsite(webUrlId));
+	}
+
+	@Reference
+	private OrganizationService _organizationService;
+
+	@Reference
+	private UserService _userService;
+
+	@Reference
+	private WebsiteService _websiteService;
+
 }

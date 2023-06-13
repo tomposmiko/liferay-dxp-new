@@ -201,17 +201,6 @@ definition {
 		);
 	}
 
-	macro changeDisplayStyle {
-		Click(
-			locator1 = "SitePages#DISPLAY_STYLE"
-		);
-
-		Click(
-			locator1 = "SitePages#DISPLAY_STYLE_ITEM",
-			key_displayStyle = "Table"
-		);
-	}
-
 	macro configureChildPage {
 		SitePages.gotoPageMenuItem(
 			menuItem = "Configure",
@@ -233,7 +222,7 @@ definition {
 
 	macro configurePage {
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);

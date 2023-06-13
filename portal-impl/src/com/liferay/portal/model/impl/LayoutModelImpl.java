@@ -18,11 +18,8 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
-
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -31,6 +28,7 @@ import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutModel;
 import com.liferay.portal.kernel.model.LayoutSoap;
+import com.liferay.portal.kernel.model.LayoutVersion;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
@@ -73,55 +71,48 @@ import java.util.function.Function;
  */
 @JSON(strict = true)
 @ProviderType
-public class LayoutModelImpl extends BaseModelImpl<Layout>
-	implements LayoutModel {
+public class LayoutModelImpl
+	extends BaseModelImpl<Layout> implements LayoutModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a layout model instance should use the <code>Layout</code> interface instead.
 	 */
 	public static final String TABLE_NAME = "Layout";
+
 	public static final Object[][] TABLE_COLUMNS = {
-			{ "mvccVersion", Types.BIGINT },
-			{ "uuid_", Types.VARCHAR },
-			{ "plid", Types.BIGINT },
-			{ "groupId", Types.BIGINT },
-			{ "companyId", Types.BIGINT },
-			{ "userId", Types.BIGINT },
-			{ "userName", Types.VARCHAR },
-			{ "createDate", Types.TIMESTAMP },
-			{ "modifiedDate", Types.TIMESTAMP },
-			{ "parentPlid", Types.BIGINT },
-			{ "leftPlid", Types.BIGINT },
-			{ "rightPlid", Types.BIGINT },
-			{ "privateLayout", Types.BOOLEAN },
-			{ "layoutId", Types.BIGINT },
-			{ "parentLayoutId", Types.BIGINT },
-			{ "name", Types.VARCHAR },
-			{ "title", Types.VARCHAR },
-			{ "description", Types.VARCHAR },
-			{ "keywords", Types.VARCHAR },
-			{ "robots", Types.VARCHAR },
-			{ "type_", Types.VARCHAR },
-			{ "typeSettings", Types.CLOB },
-			{ "hidden_", Types.BOOLEAN },
-			{ "system_", Types.BOOLEAN },
-			{ "friendlyURL", Types.VARCHAR },
-			{ "iconImageId", Types.BIGINT },
-			{ "themeId", Types.VARCHAR },
-			{ "colorSchemeId", Types.VARCHAR },
-			{ "css", Types.CLOB },
-			{ "priority", Types.INTEGER },
-			{ "layoutPrototypeUuid", Types.VARCHAR },
-			{ "layoutPrototypeLinkEnabled", Types.BOOLEAN },
-			{ "sourcePrototypeLayoutUuid", Types.VARCHAR },
-			{ "lastPublishDate", Types.TIMESTAMP }
-		};
-	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
+		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"headId", Types.BIGINT}, {"head", Types.BOOLEAN},
+		{"plid", Types.BIGINT}, {"groupId", Types.BIGINT},
+		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
+		{"modifiedDate", Types.TIMESTAMP}, {"parentPlid", Types.BIGINT},
+		{"leftPlid", Types.BIGINT}, {"rightPlid", Types.BIGINT},
+		{"privateLayout", Types.BOOLEAN}, {"layoutId", Types.BIGINT},
+		{"parentLayoutId", Types.BIGINT}, {"classNameId", Types.BIGINT},
+		{"classPK", Types.BIGINT}, {"name", Types.VARCHAR},
+		{"title", Types.VARCHAR}, {"description", Types.VARCHAR},
+		{"keywords", Types.VARCHAR}, {"robots", Types.VARCHAR},
+		{"type_", Types.VARCHAR}, {"typeSettings", Types.CLOB},
+		{"hidden_", Types.BOOLEAN}, {"system_", Types.BOOLEAN},
+		{"friendlyURL", Types.VARCHAR}, {"iconImageId", Types.BIGINT},
+		{"themeId", Types.VARCHAR}, {"colorSchemeId", Types.VARCHAR},
+		{"css", Types.CLOB}, {"priority", Types.INTEGER},
+		{"layoutPrototypeUuid", Types.VARCHAR},
+		{"layoutPrototypeLinkEnabled", Types.BOOLEAN},
+		{"sourcePrototypeLayoutUuid", Types.VARCHAR},
+		{"publishDate", Types.TIMESTAMP}, {"lastPublishDate", Types.TIMESTAMP}
+	};
+
+	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
+		new HashMap<String, Integer>();
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("headId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("head", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("plid", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -135,6 +126,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		TABLE_COLUMNS_MAP.put("privateLayout", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("layoutId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("parentLayoutId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("classNameId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("classPK", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("title", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("description", Types.VARCHAR);
@@ -153,40 +146,79 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		TABLE_COLUMNS_MAP.put("layoutPrototypeUuid", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("layoutPrototypeLinkEnabled", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("sourcePrototypeLayoutUuid", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("publishDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("lastPublishDate", Types.TIMESTAMP);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table Layout (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,plid LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,parentPlid LONG,leftPlid LONG,rightPlid LONG,privateLayout BOOLEAN,layoutId LONG,parentLayoutId LONG,name STRING null,title STRING null,description STRING null,keywords STRING null,robots STRING null,type_ VARCHAR(75) null,typeSettings TEXT null,hidden_ BOOLEAN,system_ BOOLEAN,friendlyURL VARCHAR(255) null,iconImageId LONG,themeId VARCHAR(75) null,colorSchemeId VARCHAR(75) null,css TEXT null,priority INTEGER,layoutPrototypeUuid VARCHAR(75) null,layoutPrototypeLinkEnabled BOOLEAN,sourcePrototypeLayoutUuid VARCHAR(75) null,lastPublishDate DATE null)";
+	public static final String TABLE_SQL_CREATE =
+		"create table Layout (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,headId LONG,head BOOLEAN,plid LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,parentPlid LONG,leftPlid LONG,rightPlid LONG,privateLayout BOOLEAN,layoutId LONG,parentLayoutId LONG,classNameId LONG,classPK LONG,name STRING null,title STRING null,description STRING null,keywords STRING null,robots STRING null,type_ VARCHAR(75) null,typeSettings TEXT null,hidden_ BOOLEAN,system_ BOOLEAN,friendlyURL VARCHAR(255) null,iconImageId LONG,themeId VARCHAR(75) null,colorSchemeId VARCHAR(75) null,css TEXT null,priority INTEGER,layoutPrototypeUuid VARCHAR(75) null,layoutPrototypeLinkEnabled BOOLEAN,sourcePrototypeLayoutUuid VARCHAR(75) null,publishDate DATE null,lastPublishDate DATE null)";
+
 	public static final String TABLE_SQL_DROP = "drop table Layout";
-	public static final String ORDER_BY_JPQL = " ORDER BY layout.parentLayoutId ASC, layout.priority ASC";
-	public static final String ORDER_BY_SQL = " ORDER BY Layout.parentLayoutId ASC, Layout.priority ASC";
+
+	public static final String ORDER_BY_JPQL =
+		" ORDER BY layout.parentLayoutId ASC, layout.priority ASC";
+
+	public static final String ORDER_BY_SQL =
+		" ORDER BY Layout.parentLayoutId ASC, Layout.priority ASC";
+
 	public static final String DATA_SOURCE = "liferayDataSource";
+
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
+
 	public static final String TX_MANAGER = "liferayTransactionManager";
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
-				"value.object.entity.cache.enabled.com.liferay.portal.kernel.model.Layout"),
-			true);
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
-				"value.object.finder.cache.enabled.com.liferay.portal.kernel.model.Layout"),
-			true);
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.portal.util.PropsUtil.get(
-				"value.object.column.bitmask.enabled.com.liferay.portal.kernel.model.Layout"),
-			true);
-	public static final long COMPANYID_COLUMN_BITMASK = 1L;
-	public static final long FRIENDLYURL_COLUMN_BITMASK = 2L;
-	public static final long GROUPID_COLUMN_BITMASK = 4L;
-	public static final long ICONIMAGEID_COLUMN_BITMASK = 8L;
-	public static final long LAYOUTID_COLUMN_BITMASK = 16L;
-	public static final long LAYOUTPROTOTYPEUUID_COLUMN_BITMASK = 32L;
-	public static final long LEFTPLID_COLUMN_BITMASK = 64L;
-	public static final long PARENTLAYOUTID_COLUMN_BITMASK = 128L;
-	public static final long PARENTPLID_COLUMN_BITMASK = 256L;
-	public static final long PRIORITY_COLUMN_BITMASK = 512L;
-	public static final long PRIVATELAYOUT_COLUMN_BITMASK = 1024L;
-	public static final long RIGHTPLID_COLUMN_BITMASK = 2048L;
-	public static final long SOURCEPROTOTYPELAYOUTUUID_COLUMN_BITMASK = 4096L;
-	public static final long TYPE_COLUMN_BITMASK = 8192L;
-	public static final long UUID_COLUMN_BITMASK = 16384L;
+
+	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(
+		com.liferay.portal.util.PropsUtil.get(
+			"value.object.entity.cache.enabled.com.liferay.portal.kernel.model.Layout"),
+		true);
+
+	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(
+		com.liferay.portal.util.PropsUtil.get(
+			"value.object.finder.cache.enabled.com.liferay.portal.kernel.model.Layout"),
+		true);
+
+	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(
+		com.liferay.portal.util.PropsUtil.get(
+			"value.object.column.bitmask.enabled.com.liferay.portal.kernel.model.Layout"),
+		true);
+
+	public static final long CLASSNAMEID_COLUMN_BITMASK = 1L;
+
+	public static final long CLASSPK_COLUMN_BITMASK = 2L;
+
+	public static final long COMPANYID_COLUMN_BITMASK = 4L;
+
+	public static final long FRIENDLYURL_COLUMN_BITMASK = 8L;
+
+	public static final long GROUPID_COLUMN_BITMASK = 16L;
+
+	public static final long HEAD_COLUMN_BITMASK = 32L;
+
+	public static final long HEADID_COLUMN_BITMASK = 64L;
+
+	public static final long ICONIMAGEID_COLUMN_BITMASK = 128L;
+
+	public static final long LAYOUTID_COLUMN_BITMASK = 256L;
+
+	public static final long LAYOUTPROTOTYPEUUID_COLUMN_BITMASK = 512L;
+
+	public static final long LEFTPLID_COLUMN_BITMASK = 1024L;
+
+	public static final long PARENTLAYOUTID_COLUMN_BITMASK = 2048L;
+
+	public static final long PARENTPLID_COLUMN_BITMASK = 4096L;
+
+	public static final long PRIORITY_COLUMN_BITMASK = 8192L;
+
+	public static final long PRIVATELAYOUT_COLUMN_BITMASK = 16384L;
+
+	public static final long RIGHTPLID_COLUMN_BITMASK = 32768L;
+
+	public static final long SOURCEPROTOTYPELAYOUTUUID_COLUMN_BITMASK = 65536L;
+
+	public static final long TYPE_COLUMN_BITMASK = 131072L;
+
+	public static final long UUID_COLUMN_BITMASK = 262144L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -203,6 +235,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setUuid(soapModel.getUuid());
+		model.setHeadId(soapModel.getHeadId());
 		model.setPlid(soapModel.getPlid());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -216,6 +249,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		model.setPrivateLayout(soapModel.isPrivateLayout());
 		model.setLayoutId(soapModel.getLayoutId());
 		model.setParentLayoutId(soapModel.getParentLayoutId());
+		model.setClassNameId(soapModel.getClassNameId());
+		model.setClassPK(soapModel.getClassPK());
 		model.setName(soapModel.getName());
 		model.setTitle(soapModel.getTitle());
 		model.setDescription(soapModel.getDescription());
@@ -232,8 +267,11 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		model.setCss(soapModel.getCss());
 		model.setPriority(soapModel.getPriority());
 		model.setLayoutPrototypeUuid(soapModel.getLayoutPrototypeUuid());
-		model.setLayoutPrototypeLinkEnabled(soapModel.isLayoutPrototypeLinkEnabled());
-		model.setSourcePrototypeLayoutUuid(soapModel.getSourcePrototypeLayoutUuid());
+		model.setLayoutPrototypeLinkEnabled(
+			soapModel.isLayoutPrototypeLinkEnabled());
+		model.setSourcePrototypeLayoutUuid(
+			soapModel.getSourcePrototypeLayoutUuid());
+		model.setPublishDate(soapModel.getPublishDate());
 		model.setLastPublishDate(soapModel.getLastPublishDate());
 
 		return model;
@@ -259,8 +297,9 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		return models;
 	}
 
-	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.portal.util.PropsUtil.get(
-				"lock.expiration.time.com.liferay.portal.kernel.model.Layout"));
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
+		com.liferay.portal.util.PropsUtil.get(
+			"lock.expiration.time.com.liferay.portal.kernel.model.Layout"));
 
 	public LayoutModelImpl() {
 	}
@@ -299,14 +338,17 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		Map<String, Function<Layout, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<Layout, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		for (Map.Entry<String, Function<Layout, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<Layout, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
 			Function<Layout, Object> attributeGetterFunction = entry.getValue();
 
-			attributes.put(attributeName,
-				attributeGetterFunction.apply((Layout)this));
+			attributes.put(
+				attributeName, attributeGetterFunction.apply((Layout)this));
 		}
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
@@ -317,15 +359,18 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Map<String, BiConsumer<Layout, Object>> attributeSetterBiConsumers = getAttributeSetterBiConsumers();
+		Map<String, BiConsumer<Layout, Object>> attributeSetterBiConsumers =
+			getAttributeSetterBiConsumers();
 
 		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
 			String attributeName = entry.getKey();
 
-			BiConsumer<Layout, Object> attributeSetterBiConsumer = attributeSetterBiConsumers.get(attributeName);
+			BiConsumer<Layout, Object> attributeSetterBiConsumer =
+				attributeSetterBiConsumers.get(attributeName);
 
 			if (attributeSetterBiConsumer != null) {
-				attributeSetterBiConsumer.accept((Layout)this, entry.getValue());
+				attributeSetterBiConsumer.accept(
+					(Layout)this, entry.getValue());
 			}
 		}
 	}
@@ -334,90 +379,222 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		return _attributeGetterFunctions;
 	}
 
-	public Map<String, BiConsumer<Layout, Object>> getAttributeSetterBiConsumers() {
+	public Map<String, BiConsumer<Layout, Object>>
+		getAttributeSetterBiConsumers() {
+
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Layout, Object>> _attributeGetterFunctions;
-	private static final Map<String, BiConsumer<Layout, Object>> _attributeSetterBiConsumers;
+	private static final Map<String, Function<Layout, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<Layout, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
-		Map<String, Function<Layout, Object>> attributeGetterFunctions = new LinkedHashMap<String, Function<Layout, Object>>();
-		Map<String, BiConsumer<Layout, ?>> attributeSetterBiConsumers = new LinkedHashMap<String, BiConsumer<Layout, ?>>();
-
+		Map<String, Function<Layout, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Layout, Object>>();
+		Map<String, BiConsumer<Layout, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<Layout, ?>>();
 
 		attributeGetterFunctions.put("mvccVersion", Layout::getMvccVersion);
-		attributeSetterBiConsumers.put("mvccVersion", (BiConsumer<Layout, Long>)Layout::setMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion", (BiConsumer<Layout, Long>)Layout::setMvccVersion);
 		attributeGetterFunctions.put("uuid", Layout::getUuid);
-		attributeSetterBiConsumers.put("uuid", (BiConsumer<Layout, String>)Layout::setUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<Layout, String>)Layout::setUuid);
+		attributeGetterFunctions.put("headId", Layout::getHeadId);
+		attributeSetterBiConsumers.put(
+			"headId", (BiConsumer<Layout, Long>)Layout::setHeadId);
 		attributeGetterFunctions.put("plid", Layout::getPlid);
-		attributeSetterBiConsumers.put("plid", (BiConsumer<Layout, Long>)Layout::setPlid);
+		attributeSetterBiConsumers.put(
+			"plid", (BiConsumer<Layout, Long>)Layout::setPlid);
 		attributeGetterFunctions.put("groupId", Layout::getGroupId);
-		attributeSetterBiConsumers.put("groupId", (BiConsumer<Layout, Long>)Layout::setGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId", (BiConsumer<Layout, Long>)Layout::setGroupId);
 		attributeGetterFunctions.put("companyId", Layout::getCompanyId);
-		attributeSetterBiConsumers.put("companyId", (BiConsumer<Layout, Long>)Layout::setCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<Layout, Long>)Layout::setCompanyId);
 		attributeGetterFunctions.put("userId", Layout::getUserId);
-		attributeSetterBiConsumers.put("userId", (BiConsumer<Layout, Long>)Layout::setUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<Layout, Long>)Layout::setUserId);
 		attributeGetterFunctions.put("userName", Layout::getUserName);
-		attributeSetterBiConsumers.put("userName", (BiConsumer<Layout, String>)Layout::setUserName);
+		attributeSetterBiConsumers.put(
+			"userName", (BiConsumer<Layout, String>)Layout::setUserName);
 		attributeGetterFunctions.put("createDate", Layout::getCreateDate);
-		attributeSetterBiConsumers.put("createDate", (BiConsumer<Layout, Date>)Layout::setCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate", (BiConsumer<Layout, Date>)Layout::setCreateDate);
 		attributeGetterFunctions.put("modifiedDate", Layout::getModifiedDate);
-		attributeSetterBiConsumers.put("modifiedDate", (BiConsumer<Layout, Date>)Layout::setModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate", (BiConsumer<Layout, Date>)Layout::setModifiedDate);
 		attributeGetterFunctions.put("parentPlid", Layout::getParentPlid);
-		attributeSetterBiConsumers.put("parentPlid", (BiConsumer<Layout, Long>)Layout::setParentPlid);
+		attributeSetterBiConsumers.put(
+			"parentPlid", (BiConsumer<Layout, Long>)Layout::setParentPlid);
 		attributeGetterFunctions.put("leftPlid", Layout::getLeftPlid);
-		attributeSetterBiConsumers.put("leftPlid", (BiConsumer<Layout, Long>)Layout::setLeftPlid);
+		attributeSetterBiConsumers.put(
+			"leftPlid", (BiConsumer<Layout, Long>)Layout::setLeftPlid);
 		attributeGetterFunctions.put("rightPlid", Layout::getRightPlid);
-		attributeSetterBiConsumers.put("rightPlid", (BiConsumer<Layout, Long>)Layout::setRightPlid);
+		attributeSetterBiConsumers.put(
+			"rightPlid", (BiConsumer<Layout, Long>)Layout::setRightPlid);
 		attributeGetterFunctions.put("privateLayout", Layout::getPrivateLayout);
-		attributeSetterBiConsumers.put("privateLayout", (BiConsumer<Layout, Boolean>)Layout::setPrivateLayout);
+		attributeSetterBiConsumers.put(
+			"privateLayout",
+			(BiConsumer<Layout, Boolean>)Layout::setPrivateLayout);
 		attributeGetterFunctions.put("layoutId", Layout::getLayoutId);
-		attributeSetterBiConsumers.put("layoutId", (BiConsumer<Layout, Long>)Layout::setLayoutId);
-		attributeGetterFunctions.put("parentLayoutId", Layout::getParentLayoutId);
-		attributeSetterBiConsumers.put("parentLayoutId", (BiConsumer<Layout, Long>)Layout::setParentLayoutId);
+		attributeSetterBiConsumers.put(
+			"layoutId", (BiConsumer<Layout, Long>)Layout::setLayoutId);
+		attributeGetterFunctions.put(
+			"parentLayoutId", Layout::getParentLayoutId);
+		attributeSetterBiConsumers.put(
+			"parentLayoutId",
+			(BiConsumer<Layout, Long>)Layout::setParentLayoutId);
+		attributeGetterFunctions.put("classNameId", Layout::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId", (BiConsumer<Layout, Long>)Layout::setClassNameId);
+		attributeGetterFunctions.put("classPK", Layout::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK", (BiConsumer<Layout, Long>)Layout::setClassPK);
 		attributeGetterFunctions.put("name", Layout::getName);
-		attributeSetterBiConsumers.put("name", (BiConsumer<Layout, String>)Layout::setName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<Layout, String>)Layout::setName);
 		attributeGetterFunctions.put("title", Layout::getTitle);
-		attributeSetterBiConsumers.put("title", (BiConsumer<Layout, String>)Layout::setTitle);
+		attributeSetterBiConsumers.put(
+			"title", (BiConsumer<Layout, String>)Layout::setTitle);
 		attributeGetterFunctions.put("description", Layout::getDescription);
-		attributeSetterBiConsumers.put("description", (BiConsumer<Layout, String>)Layout::setDescription);
+		attributeSetterBiConsumers.put(
+			"description", (BiConsumer<Layout, String>)Layout::setDescription);
 		attributeGetterFunctions.put("keywords", Layout::getKeywords);
-		attributeSetterBiConsumers.put("keywords", (BiConsumer<Layout, String>)Layout::setKeywords);
+		attributeSetterBiConsumers.put(
+			"keywords", (BiConsumer<Layout, String>)Layout::setKeywords);
 		attributeGetterFunctions.put("robots", Layout::getRobots);
-		attributeSetterBiConsumers.put("robots", (BiConsumer<Layout, String>)Layout::setRobots);
+		attributeSetterBiConsumers.put(
+			"robots", (BiConsumer<Layout, String>)Layout::setRobots);
 		attributeGetterFunctions.put("type", Layout::getType);
-		attributeSetterBiConsumers.put("type", (BiConsumer<Layout, String>)Layout::setType);
+		attributeSetterBiConsumers.put(
+			"type", (BiConsumer<Layout, String>)Layout::setType);
 		attributeGetterFunctions.put("typeSettings", Layout::getTypeSettings);
-		attributeSetterBiConsumers.put("typeSettings", (BiConsumer<Layout, String>)Layout::setTypeSettings);
+		attributeSetterBiConsumers.put(
+			"typeSettings",
+			(BiConsumer<Layout, String>)Layout::setTypeSettings);
 		attributeGetterFunctions.put("hidden", Layout::getHidden);
-		attributeSetterBiConsumers.put("hidden", (BiConsumer<Layout, Boolean>)Layout::setHidden);
+		attributeSetterBiConsumers.put(
+			"hidden", (BiConsumer<Layout, Boolean>)Layout::setHidden);
 		attributeGetterFunctions.put("system", Layout::getSystem);
-		attributeSetterBiConsumers.put("system", (BiConsumer<Layout, Boolean>)Layout::setSystem);
+		attributeSetterBiConsumers.put(
+			"system", (BiConsumer<Layout, Boolean>)Layout::setSystem);
 		attributeGetterFunctions.put("friendlyURL", Layout::getFriendlyURL);
-		attributeSetterBiConsumers.put("friendlyURL", (BiConsumer<Layout, String>)Layout::setFriendlyURL);
+		attributeSetterBiConsumers.put(
+			"friendlyURL", (BiConsumer<Layout, String>)Layout::setFriendlyURL);
 		attributeGetterFunctions.put("iconImageId", Layout::getIconImageId);
-		attributeSetterBiConsumers.put("iconImageId", (BiConsumer<Layout, Long>)Layout::setIconImageId);
+		attributeSetterBiConsumers.put(
+			"iconImageId", (BiConsumer<Layout, Long>)Layout::setIconImageId);
 		attributeGetterFunctions.put("themeId", Layout::getThemeId);
-		attributeSetterBiConsumers.put("themeId", (BiConsumer<Layout, String>)Layout::setThemeId);
+		attributeSetterBiConsumers.put(
+			"themeId", (BiConsumer<Layout, String>)Layout::setThemeId);
 		attributeGetterFunctions.put("colorSchemeId", Layout::getColorSchemeId);
-		attributeSetterBiConsumers.put("colorSchemeId", (BiConsumer<Layout, String>)Layout::setColorSchemeId);
+		attributeSetterBiConsumers.put(
+			"colorSchemeId",
+			(BiConsumer<Layout, String>)Layout::setColorSchemeId);
 		attributeGetterFunctions.put("css", Layout::getCss);
-		attributeSetterBiConsumers.put("css", (BiConsumer<Layout, String>)Layout::setCss);
+		attributeSetterBiConsumers.put(
+			"css", (BiConsumer<Layout, String>)Layout::setCss);
 		attributeGetterFunctions.put("priority", Layout::getPriority);
-		attributeSetterBiConsumers.put("priority", (BiConsumer<Layout, Integer>)Layout::setPriority);
-		attributeGetterFunctions.put("layoutPrototypeUuid", Layout::getLayoutPrototypeUuid);
-		attributeSetterBiConsumers.put("layoutPrototypeUuid", (BiConsumer<Layout, String>)Layout::setLayoutPrototypeUuid);
-		attributeGetterFunctions.put("layoutPrototypeLinkEnabled", Layout::getLayoutPrototypeLinkEnabled);
-		attributeSetterBiConsumers.put("layoutPrototypeLinkEnabled", (BiConsumer<Layout, Boolean>)Layout::setLayoutPrototypeLinkEnabled);
-		attributeGetterFunctions.put("sourcePrototypeLayoutUuid", Layout::getSourcePrototypeLayoutUuid);
-		attributeSetterBiConsumers.put("sourcePrototypeLayoutUuid", (BiConsumer<Layout, String>)Layout::setSourcePrototypeLayoutUuid);
-		attributeGetterFunctions.put("lastPublishDate", Layout::getLastPublishDate);
-		attributeSetterBiConsumers.put("lastPublishDate", (BiConsumer<Layout, Date>)Layout::setLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"priority", (BiConsumer<Layout, Integer>)Layout::setPriority);
+		attributeGetterFunctions.put(
+			"layoutPrototypeUuid", Layout::getLayoutPrototypeUuid);
+		attributeSetterBiConsumers.put(
+			"layoutPrototypeUuid",
+			(BiConsumer<Layout, String>)Layout::setLayoutPrototypeUuid);
+		attributeGetterFunctions.put(
+			"layoutPrototypeLinkEnabled",
+			Layout::getLayoutPrototypeLinkEnabled);
+		attributeSetterBiConsumers.put(
+			"layoutPrototypeLinkEnabled",
+			(BiConsumer<Layout, Boolean>)Layout::setLayoutPrototypeLinkEnabled);
+		attributeGetterFunctions.put(
+			"sourcePrototypeLayoutUuid", Layout::getSourcePrototypeLayoutUuid);
+		attributeSetterBiConsumers.put(
+			"sourcePrototypeLayoutUuid",
+			(BiConsumer<Layout, String>)Layout::setSourcePrototypeLayoutUuid);
+		attributeGetterFunctions.put("publishDate", Layout::getPublishDate);
+		attributeSetterBiConsumers.put(
+			"publishDate", (BiConsumer<Layout, Date>)Layout::setPublishDate);
+		attributeGetterFunctions.put(
+			"lastPublishDate", Layout::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<Layout, Date>)Layout::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
+	}
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(attributeGetterFunctions);
-		_attributeSetterBiConsumers = Collections.unmodifiableMap((Map)attributeSetterBiConsumers);
+	public boolean getHead() {
+		return _head;
+	}
+
+	@Override
+	public boolean isHead() {
+		return _head;
+	}
+
+	public boolean getOriginalHead() {
+		return _originalHead;
+	}
+
+	public void setHead(boolean head) {
+		_columnBitmask |= HEAD_COLUMN_BITMASK;
+
+		if (!_setOriginalHead) {
+			_setOriginalHead = true;
+
+			_originalHead = _head;
+		}
+
+		_head = head;
+	}
+
+	@Override
+	public void populateVersionModel(LayoutVersion layoutVersion) {
+		layoutVersion.setUuid(getUuid());
+		layoutVersion.setGroupId(getGroupId());
+		layoutVersion.setCompanyId(getCompanyId());
+		layoutVersion.setUserId(getUserId());
+		layoutVersion.setUserName(getUserName());
+		layoutVersion.setCreateDate(getCreateDate());
+		layoutVersion.setModifiedDate(getModifiedDate());
+		layoutVersion.setParentPlid(getParentPlid());
+		layoutVersion.setLeftPlid(getLeftPlid());
+		layoutVersion.setRightPlid(getRightPlid());
+		layoutVersion.setPrivateLayout(getPrivateLayout());
+		layoutVersion.setLayoutId(getLayoutId());
+		layoutVersion.setParentLayoutId(getParentLayoutId());
+		layoutVersion.setClassNameId(getClassNameId());
+		layoutVersion.setClassPK(getClassPK());
+		layoutVersion.setName(getName());
+		layoutVersion.setTitle(getTitle());
+		layoutVersion.setDescription(getDescription());
+		layoutVersion.setKeywords(getKeywords());
+		layoutVersion.setRobots(getRobots());
+		layoutVersion.setType(getType());
+		layoutVersion.setTypeSettings(getTypeSettings());
+		layoutVersion.setHidden(getHidden());
+		layoutVersion.setSystem(getSystem());
+		layoutVersion.setFriendlyURL(getFriendlyURL());
+		layoutVersion.setIconImageId(getIconImageId());
+		layoutVersion.setThemeId(getThemeId());
+		layoutVersion.setColorSchemeId(getColorSchemeId());
+		layoutVersion.setCss(getCss());
+		layoutVersion.setPriority(getPriority());
+		layoutVersion.setLayoutPrototypeUuid(getLayoutPrototypeUuid());
+		layoutVersion.setLayoutPrototypeLinkEnabled(
+			getLayoutPrototypeLinkEnabled());
+		layoutVersion.setSourcePrototypeLayoutUuid(
+			getSourcePrototypeLayoutUuid());
+		layoutVersion.setPublishDate(getPublishDate());
+		layoutVersion.setLastPublishDate(getLastPublishDate());
 	}
 
 	@JSON
@@ -455,6 +632,36 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	public String getOriginalUuid() {
 		return GetterUtil.getString(_originalUuid);
+	}
+
+	@JSON
+	@Override
+	public long getHeadId() {
+		return _headId;
+	}
+
+	@Override
+	public void setHeadId(long headId) {
+		_columnBitmask |= HEADID_COLUMN_BITMASK;
+
+		if (!_setOriginalHeadId) {
+			_setOriginalHeadId = true;
+
+			_originalHeadId = _headId;
+		}
+
+		if (headId >= 0) {
+			setHead(false);
+		}
+		else {
+			setHead(true);
+		}
+
+		_headId = headId;
+	}
+
+	public long getOriginalHeadId() {
+		return _originalHeadId;
 	}
 
 	@JSON
@@ -729,6 +936,72 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		return _originalParentLayoutId;
 	}
 
+	@Override
+	public String getClassName() {
+		if (getClassNameId() <= 0) {
+			return "";
+		}
+
+		return PortalUtil.getClassName(getClassNameId());
+	}
+
+	@Override
+	public void setClassName(String className) {
+		long classNameId = 0;
+
+		if (Validator.isNotNull(className)) {
+			classNameId = PortalUtil.getClassNameId(className);
+		}
+
+		setClassNameId(classNameId);
+	}
+
+	@JSON
+	@Override
+	public long getClassNameId() {
+		return _classNameId;
+	}
+
+	@Override
+	public void setClassNameId(long classNameId) {
+		_columnBitmask |= CLASSNAMEID_COLUMN_BITMASK;
+
+		if (!_setOriginalClassNameId) {
+			_setOriginalClassNameId = true;
+
+			_originalClassNameId = _classNameId;
+		}
+
+		_classNameId = classNameId;
+	}
+
+	public long getOriginalClassNameId() {
+		return _originalClassNameId;
+	}
+
+	@JSON
+	@Override
+	public long getClassPK() {
+		return _classPK;
+	}
+
+	@Override
+	public void setClassPK(long classPK) {
+		_columnBitmask |= CLASSPK_COLUMN_BITMASK;
+
+		if (!_setOriginalClassPK) {
+			_setOriginalClassPK = true;
+
+			_originalClassPK = _classPK;
+		}
+
+		_classPK = classPK;
+	}
+
+	public long getOriginalClassPK() {
+		return _originalClassPK;
+	}
+
 	@JSON
 	@Override
 	public String getName() {
@@ -761,8 +1034,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public String getName(String languageId, boolean useDefault) {
-		return LocalizationUtil.getLocalization(getName(), languageId,
-			useDefault);
+		return LocalizationUtil.getLocalization(
+			getName(), languageId, useDefault);
 	}
 
 	@Override
@@ -799,12 +1072,14 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
 		if (Validator.isNotNull(name)) {
-			setName(LocalizationUtil.updateLocalization(getName(), "Name",
-					name, languageId, defaultLanguageId));
+			setName(
+				LocalizationUtil.updateLocalization(
+					getName(), "Name", name, languageId, defaultLanguageId));
 		}
 		else {
-			setName(LocalizationUtil.removeLocalization(getName(), "Name",
-					languageId));
+			setName(
+				LocalizationUtil.removeLocalization(
+					getName(), "Name", languageId));
 		}
 	}
 
@@ -824,7 +1099,9 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 			return;
 		}
 
-		setName(LocalizationUtil.updateLocalization(nameMap, getName(), "Name",
+		setName(
+			LocalizationUtil.updateLocalization(
+				nameMap, getName(), "Name",
 				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
@@ -860,8 +1137,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public String getTitle(String languageId, boolean useDefault) {
-		return LocalizationUtil.getLocalization(getTitle(), languageId,
-			useDefault);
+		return LocalizationUtil.getLocalization(
+			getTitle(), languageId, useDefault);
 	}
 
 	@Override
@@ -898,12 +1175,14 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
 		if (Validator.isNotNull(title)) {
-			setTitle(LocalizationUtil.updateLocalization(getTitle(), "Title",
-					title, languageId, defaultLanguageId));
+			setTitle(
+				LocalizationUtil.updateLocalization(
+					getTitle(), "Title", title, languageId, defaultLanguageId));
 		}
 		else {
-			setTitle(LocalizationUtil.removeLocalization(getTitle(), "Title",
-					languageId));
+			setTitle(
+				LocalizationUtil.removeLocalization(
+					getTitle(), "Title", languageId));
 		}
 	}
 
@@ -918,13 +1197,17 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	}
 
 	@Override
-	public void setTitleMap(Map<Locale, String> titleMap, Locale defaultLocale) {
+	public void setTitleMap(
+		Map<Locale, String> titleMap, Locale defaultLocale) {
+
 		if (titleMap == null) {
 			return;
 		}
 
-		setTitle(LocalizationUtil.updateLocalization(titleMap, getTitle(),
-				"Title", LocaleUtil.toLanguageId(defaultLocale)));
+		setTitle(
+			LocalizationUtil.updateLocalization(
+				titleMap, getTitle(), "Title",
+				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -959,8 +1242,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public String getDescription(String languageId, boolean useDefault) {
-		return LocalizationUtil.getLocalization(getDescription(), languageId,
-			useDefault);
+		return LocalizationUtil.getLocalization(
+			getDescription(), languageId, useDefault);
 	}
 
 	@Override
@@ -992,18 +1275,21 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	}
 
 	@Override
-	public void setDescription(String description, Locale locale,
-		Locale defaultLocale) {
+	public void setDescription(
+		String description, Locale locale, Locale defaultLocale) {
+
 		String languageId = LocaleUtil.toLanguageId(locale);
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
 		if (Validator.isNotNull(description)) {
-			setDescription(LocalizationUtil.updateLocalization(
+			setDescription(
+				LocalizationUtil.updateLocalization(
 					getDescription(), "Description", description, languageId,
 					defaultLanguageId));
 		}
 		else {
-			setDescription(LocalizationUtil.removeLocalization(
+			setDescription(
+				LocalizationUtil.removeLocalization(
 					getDescription(), "Description", languageId));
 		}
 	}
@@ -1019,14 +1305,16 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	}
 
 	@Override
-	public void setDescriptionMap(Map<Locale, String> descriptionMap,
-		Locale defaultLocale) {
+	public void setDescriptionMap(
+		Map<Locale, String> descriptionMap, Locale defaultLocale) {
+
 		if (descriptionMap == null) {
 			return;
 		}
 
-		setDescription(LocalizationUtil.updateLocalization(descriptionMap,
-				getDescription(), "Description",
+		setDescription(
+			LocalizationUtil.updateLocalization(
+				descriptionMap, getDescription(), "Description",
 				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
@@ -1062,8 +1350,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public String getKeywords(String languageId, boolean useDefault) {
-		return LocalizationUtil.getLocalization(getKeywords(), languageId,
-			useDefault);
+		return LocalizationUtil.getLocalization(
+			getKeywords(), languageId, useDefault);
 	}
 
 	@Override
@@ -1095,17 +1383,22 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	}
 
 	@Override
-	public void setKeywords(String keywords, Locale locale, Locale defaultLocale) {
+	public void setKeywords(
+		String keywords, Locale locale, Locale defaultLocale) {
+
 		String languageId = LocaleUtil.toLanguageId(locale);
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
 		if (Validator.isNotNull(keywords)) {
-			setKeywords(LocalizationUtil.updateLocalization(getKeywords(),
-					"Keywords", keywords, languageId, defaultLanguageId));
+			setKeywords(
+				LocalizationUtil.updateLocalization(
+					getKeywords(), "Keywords", keywords, languageId,
+					defaultLanguageId));
 		}
 		else {
-			setKeywords(LocalizationUtil.removeLocalization(getKeywords(),
-					"Keywords", languageId));
+			setKeywords(
+				LocalizationUtil.removeLocalization(
+					getKeywords(), "Keywords", languageId));
 		}
 	}
 
@@ -1120,14 +1413,16 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	}
 
 	@Override
-	public void setKeywordsMap(Map<Locale, String> keywordsMap,
-		Locale defaultLocale) {
+	public void setKeywordsMap(
+		Map<Locale, String> keywordsMap, Locale defaultLocale) {
+
 		if (keywordsMap == null) {
 			return;
 		}
 
-		setKeywords(LocalizationUtil.updateLocalization(keywordsMap,
-				getKeywords(), "Keywords",
+		setKeywords(
+			LocalizationUtil.updateLocalization(
+				keywordsMap, getKeywords(), "Keywords",
 				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
@@ -1163,8 +1458,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public String getRobots(String languageId, boolean useDefault) {
-		return LocalizationUtil.getLocalization(getRobots(), languageId,
-			useDefault);
+		return LocalizationUtil.getLocalization(
+			getRobots(), languageId, useDefault);
 	}
 
 	@Override
@@ -1201,12 +1496,15 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
 		if (Validator.isNotNull(robots)) {
-			setRobots(LocalizationUtil.updateLocalization(getRobots(),
-					"Robots", robots, languageId, defaultLanguageId));
+			setRobots(
+				LocalizationUtil.updateLocalization(
+					getRobots(), "Robots", robots, languageId,
+					defaultLanguageId));
 		}
 		else {
-			setRobots(LocalizationUtil.removeLocalization(getRobots(),
-					"Robots", languageId));
+			setRobots(
+				LocalizationUtil.removeLocalization(
+					getRobots(), "Robots", languageId));
 		}
 	}
 
@@ -1221,13 +1519,17 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	}
 
 	@Override
-	public void setRobotsMap(Map<Locale, String> robotsMap, Locale defaultLocale) {
+	public void setRobotsMap(
+		Map<Locale, String> robotsMap, Locale defaultLocale) {
+
 		if (robotsMap == null) {
 			return;
 		}
 
-		setRobots(LocalizationUtil.updateLocalization(robotsMap, getRobots(),
-				"Robots", LocaleUtil.toLanguageId(defaultLocale)));
+		setRobots(
+			LocalizationUtil.updateLocalization(
+				robotsMap, getRobots(), "Robots",
+				LocaleUtil.toLanguageId(defaultLocale)));
 	}
 
 	@JSON
@@ -1467,6 +1769,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public void setLayoutPrototypeLinkEnabled(
 		boolean layoutPrototypeLinkEnabled) {
+
 		_layoutPrototypeLinkEnabled = layoutPrototypeLinkEnabled;
 	}
 
@@ -1494,6 +1797,17 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	public String getOriginalSourcePrototypeLayoutUuid() {
 		return GetterUtil.getString(_originalSourcePrototypeLayoutUuid);
+	}
+
+	@JSON
+	@Override
+	public Date getPublishDate() {
+		return _publishDate;
+	}
+
+	@Override
+	public void setPublishDate(Date publishDate) {
+		_publishDate = publishDate;
 	}
 
 	@JSON
@@ -1529,8 +1843,9 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public StagedModelType getStagedModelType() {
-		return new StagedModelType(PortalUtil.getClassNameId(
-				Layout.class.getName()));
+		return new StagedModelType(
+			PortalUtil.getClassNameId(Layout.class.getName()),
+			getClassNameId());
 	}
 
 	public long getColumnBitmask() {
@@ -1539,8 +1854,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		return ExpandoBridgeFactoryUtil.getExpandoBridge(getCompanyId(),
-			Layout.class.getName(), getPrimaryKey());
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(
+			getCompanyId(), Layout.class.getName(), getPrimaryKey());
 	}
 
 	@Override
@@ -1609,7 +1924,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 			}
 		}
 
-		return availableLanguageIds.toArray(new String[availableLanguageIds.size()]);
+		return availableLanguageIds.toArray(
+			new String[availableLanguageIds.size()]);
 	}
 
 	@Override
@@ -1627,12 +1943,15 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public void prepareLocalizedFieldsForImport() throws LocaleException {
-		Locale defaultLocale = LocaleUtil.fromLanguageId(getDefaultLanguageId());
+		Locale defaultLocale = LocaleUtil.fromLanguageId(
+			getDefaultLanguageId());
 
-		Locale[] availableLocales = LocaleUtil.fromLanguageIds(getAvailableLanguageIds());
+		Locale[] availableLocales = LocaleUtil.fromLanguageIds(
+			getAvailableLanguageIds());
 
-		Locale defaultImportLocale = LocalizationUtil.getDefaultImportLocale(Layout.class.getName(),
-				getPrimaryKey(), defaultLocale, availableLocales);
+		Locale defaultImportLocale = LocalizationUtil.getDefaultImportLocale(
+			Layout.class.getName(), getPrimaryKey(), defaultLocale,
+			availableLocales);
 
 		prepareLocalizedFieldsForImport(defaultImportLocale);
 	}
@@ -1641,6 +1960,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@SuppressWarnings("unused")
 	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
 		throws LocaleException {
+
 		Locale defaultLocale = LocaleUtil.getSiteDefault();
 
 		String modelDefaultLanguageId = getDefaultLanguageId();
@@ -1666,11 +1986,12 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		String description = getDescription(defaultLocale);
 
 		if (Validator.isNull(description)) {
-			setDescription(getDescription(modelDefaultLanguageId), defaultLocale);
+			setDescription(
+				getDescription(modelDefaultLanguageId), defaultLocale);
 		}
 		else {
-			setDescription(getDescription(defaultLocale), defaultLocale,
-				defaultLocale);
+			setDescription(
+				getDescription(defaultLocale), defaultLocale, defaultLocale);
 		}
 
 		String keywords = getKeywords(defaultLocale);
@@ -1679,7 +2000,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 			setKeywords(getKeywords(modelDefaultLanguageId), defaultLocale);
 		}
 		else {
-			setKeywords(getKeywords(defaultLocale), defaultLocale, defaultLocale);
+			setKeywords(
+				getKeywords(defaultLocale), defaultLocale, defaultLocale);
 		}
 
 		String robots = getRobots(defaultLocale);
@@ -1695,8 +2017,9 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	@Override
 	public Layout toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = (Layout)ProxyUtil.newProxyInstance(_classLoader,
-					_escapedModelInterfaces, new AutoEscapeBeanHandler(this));
+			_escapedModel = (Layout)ProxyUtil.newProxyInstance(
+				_classLoader, _escapedModelInterfaces,
+				new AutoEscapeBeanHandler(this));
 		}
 
 		return _escapedModel;
@@ -1708,6 +2031,7 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 		layoutImpl.setMvccVersion(getMvccVersion());
 		layoutImpl.setUuid(getUuid());
+		layoutImpl.setHeadId(getHeadId());
 		layoutImpl.setPlid(getPlid());
 		layoutImpl.setGroupId(getGroupId());
 		layoutImpl.setCompanyId(getCompanyId());
@@ -1721,6 +2045,8 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		layoutImpl.setPrivateLayout(isPrivateLayout());
 		layoutImpl.setLayoutId(getLayoutId());
 		layoutImpl.setParentLayoutId(getParentLayoutId());
+		layoutImpl.setClassNameId(getClassNameId());
+		layoutImpl.setClassPK(getClassPK());
 		layoutImpl.setName(getName());
 		layoutImpl.setTitle(getTitle());
 		layoutImpl.setDescription(getDescription());
@@ -1737,8 +2063,10 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		layoutImpl.setCss(getCss());
 		layoutImpl.setPriority(getPriority());
 		layoutImpl.setLayoutPrototypeUuid(getLayoutPrototypeUuid());
-		layoutImpl.setLayoutPrototypeLinkEnabled(isLayoutPrototypeLinkEnabled());
+		layoutImpl.setLayoutPrototypeLinkEnabled(
+			isLayoutPrototypeLinkEnabled());
 		layoutImpl.setSourcePrototypeLayoutUuid(getSourcePrototypeLayoutUuid());
+		layoutImpl.setPublishDate(getPublishDate());
 		layoutImpl.setLastPublishDate(getLastPublishDate());
 
 		layoutImpl.resetOriginalValues();
@@ -1824,6 +2152,14 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 		layoutModelImpl._originalUuid = layoutModelImpl._uuid;
 
+		layoutModelImpl._originalHeadId = layoutModelImpl._headId;
+
+		layoutModelImpl._setOriginalHeadId = false;
+
+		layoutModelImpl._originalHead = layoutModelImpl._head;
+
+		layoutModelImpl._setOriginalHead = false;
+
 		layoutModelImpl._originalGroupId = layoutModelImpl._groupId;
 
 		layoutModelImpl._setOriginalGroupId = false;
@@ -1854,9 +2190,18 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 		layoutModelImpl._setOriginalLayoutId = false;
 
-		layoutModelImpl._originalParentLayoutId = layoutModelImpl._parentLayoutId;
+		layoutModelImpl._originalParentLayoutId =
+			layoutModelImpl._parentLayoutId;
 
 		layoutModelImpl._setOriginalParentLayoutId = false;
+
+		layoutModelImpl._originalClassNameId = layoutModelImpl._classNameId;
+
+		layoutModelImpl._setOriginalClassNameId = false;
+
+		layoutModelImpl._originalClassPK = layoutModelImpl._classPK;
+
+		layoutModelImpl._setOriginalClassPK = false;
 
 		layoutModelImpl._originalType = layoutModelImpl._type;
 
@@ -1870,9 +2215,11 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 		layoutModelImpl._setOriginalPriority = false;
 
-		layoutModelImpl._originalLayoutPrototypeUuid = layoutModelImpl._layoutPrototypeUuid;
+		layoutModelImpl._originalLayoutPrototypeUuid =
+			layoutModelImpl._layoutPrototypeUuid;
 
-		layoutModelImpl._originalSourcePrototypeLayoutUuid = layoutModelImpl._sourcePrototypeLayoutUuid;
+		layoutModelImpl._originalSourcePrototypeLayoutUuid =
+			layoutModelImpl._sourcePrototypeLayoutUuid;
 
 		layoutModelImpl._columnBitmask = 0;
 	}
@@ -1890,6 +2237,10 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		if ((uuid != null) && (uuid.length() == 0)) {
 			layoutCacheModel.uuid = null;
 		}
+
+		layoutCacheModel.headId = getHeadId();
+
+		layoutCacheModel.head = isHead();
 
 		layoutCacheModel.plid = getPlid();
 
@@ -1936,6 +2287,10 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		layoutCacheModel.layoutId = getLayoutId();
 
 		layoutCacheModel.parentLayoutId = getParentLayoutId();
+
+		layoutCacheModel.classNameId = getClassNameId();
+
+		layoutCacheModel.classPK = getClassPK();
 
 		layoutCacheModel.name = getName();
 
@@ -2038,19 +2393,33 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		String layoutPrototypeUuid = layoutCacheModel.layoutPrototypeUuid;
 
 		if ((layoutPrototypeUuid != null) &&
-				(layoutPrototypeUuid.length() == 0)) {
+			(layoutPrototypeUuid.length() == 0)) {
+
 			layoutCacheModel.layoutPrototypeUuid = null;
 		}
 
-		layoutCacheModel.layoutPrototypeLinkEnabled = isLayoutPrototypeLinkEnabled();
+		layoutCacheModel.layoutPrototypeLinkEnabled =
+			isLayoutPrototypeLinkEnabled();
 
-		layoutCacheModel.sourcePrototypeLayoutUuid = getSourcePrototypeLayoutUuid();
+		layoutCacheModel.sourcePrototypeLayoutUuid =
+			getSourcePrototypeLayoutUuid();
 
-		String sourcePrototypeLayoutUuid = layoutCacheModel.sourcePrototypeLayoutUuid;
+		String sourcePrototypeLayoutUuid =
+			layoutCacheModel.sourcePrototypeLayoutUuid;
 
 		if ((sourcePrototypeLayoutUuid != null) &&
-				(sourcePrototypeLayoutUuid.length() == 0)) {
+			(sourcePrototypeLayoutUuid.length() == 0)) {
+
 			layoutCacheModel.sourcePrototypeLayoutUuid = null;
+		}
+
+		Date publishDate = getPublishDate();
+
+		if (publishDate != null) {
+			layoutCacheModel.publishDate = publishDate.getTime();
+		}
+		else {
+			layoutCacheModel.publishDate = Long.MIN_VALUE;
 		}
 
 		Date lastPublishDate = getLastPublishDate();
@@ -2067,14 +2436,17 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public String toString() {
-		Map<String, Function<Layout, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<Layout, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((4 * attributeGetterFunctions.size()) +
-				2);
+		StringBundler sb = new StringBundler(
+			4 * attributeGetterFunctions.size() + 2);
 
 		sb.append("{");
 
-		for (Map.Entry<String, Function<Layout, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<Layout, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
 			Function<Layout, Object> attributeGetterFunction = entry.getValue();
 
@@ -2095,16 +2467,19 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 
 	@Override
 	public String toXmlString() {
-		Map<String, Function<Layout, Object>> attributeGetterFunctions = getAttributeGetterFunctions();
+		Map<String, Function<Layout, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((5 * attributeGetterFunctions.size()) +
-				4);
+		StringBundler sb = new StringBundler(
+			5 * attributeGetterFunctions.size() + 4);
 
 		sb.append("<model><model-name>");
 		sb.append(getModelClassName());
 		sb.append("</model-name>");
 
-		for (Map.Entry<String, Function<Layout, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<Layout, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
 			Function<Layout, Object> attributeGetterFunction = entry.getValue();
 
@@ -2120,13 +2495,21 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader = Layout.class.getClassLoader();
+	private static final ClassLoader _classLoader =
+		Layout.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			Layout.class, ModelWrapper.class
-		};
+		Layout.class, ModelWrapper.class
+	};
+
 	private long _mvccVersion;
 	private String _uuid;
 	private String _originalUuid;
+	private long _headId;
+	private long _originalHeadId;
+	private boolean _setOriginalHeadId;
+	private boolean _head;
+	private boolean _originalHead;
+	private boolean _setOriginalHead;
 	private long _plid;
 	private long _groupId;
 	private long _originalGroupId;
@@ -2157,6 +2540,12 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	private long _parentLayoutId;
 	private long _originalParentLayoutId;
 	private boolean _setOriginalParentLayoutId;
+	private long _classNameId;
+	private long _originalClassNameId;
+	private boolean _setOriginalClassNameId;
+	private long _classPK;
+	private long _originalClassPK;
+	private boolean _setOriginalClassPK;
 	private String _name;
 	private String _nameCurrentLanguageId;
 	private String _title;
@@ -2188,7 +2577,9 @@ public class LayoutModelImpl extends BaseModelImpl<Layout>
 	private boolean _layoutPrototypeLinkEnabled;
 	private String _sourcePrototypeLayoutUuid;
 	private String _originalSourcePrototypeLayoutUuid;
+	private Date _publishDate;
 	private Date _lastPublishDate;
 	private long _columnBitmask;
 	private Layout _escapedModel;
+
 }

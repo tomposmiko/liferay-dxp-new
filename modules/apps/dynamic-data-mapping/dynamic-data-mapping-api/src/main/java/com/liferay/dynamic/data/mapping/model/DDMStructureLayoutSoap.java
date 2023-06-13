@@ -23,13 +23,14 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This class is used by SOAP remote services.
+ * This class is used by SOAP remote services, specifically {@link com.liferay.dynamic.data.mapping.service.http.DDMStructureLayoutServiceSoap}.
  *
  * @author Brian Wing Shun Chan
  * @generated
  */
 @ProviderType
 public class DDMStructureLayoutSoap implements Serializable {
+
 	public static DDMStructureLayoutSoap toSoapModel(DDMStructureLayout model) {
 		DDMStructureLayoutSoap soapModel = new DDMStructureLayoutSoap();
 
@@ -51,7 +52,9 @@ public class DDMStructureLayoutSoap implements Serializable {
 
 	public static DDMStructureLayoutSoap[] toSoapModels(
 		DDMStructureLayout[] models) {
-		DDMStructureLayoutSoap[] soapModels = new DDMStructureLayoutSoap[models.length];
+
+		DDMStructureLayoutSoap[] soapModels =
+			new DDMStructureLayoutSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -62,10 +65,12 @@ public class DDMStructureLayoutSoap implements Serializable {
 
 	public static DDMStructureLayoutSoap[][] toSoapModels(
 		DDMStructureLayout[][] models) {
+
 		DDMStructureLayoutSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new DDMStructureLayoutSoap[models.length][models[0].length];
+			soapModels =
+				new DDMStructureLayoutSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new DDMStructureLayoutSoap[0][0];
@@ -80,13 +85,16 @@ public class DDMStructureLayoutSoap implements Serializable {
 
 	public static DDMStructureLayoutSoap[] toSoapModels(
 		List<DDMStructureLayout> models) {
-		List<DDMStructureLayoutSoap> soapModels = new ArrayList<DDMStructureLayoutSoap>(models.size());
+
+		List<DDMStructureLayoutSoap> soapModels =
+			new ArrayList<DDMStructureLayoutSoap>(models.size());
 
 		for (DDMStructureLayout model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new DDMStructureLayoutSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new DDMStructureLayoutSoap[soapModels.size()]);
 	}
 
 	public DDMStructureLayoutSoap() {
@@ -208,4 +216,5 @@ public class DDMStructureLayoutSoap implements Serializable {
 	private String _name;
 	private String _description;
 	private String _definition;
+
 }

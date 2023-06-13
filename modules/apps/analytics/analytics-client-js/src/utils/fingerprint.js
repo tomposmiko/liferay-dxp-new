@@ -33,7 +33,8 @@ function getCanvasFingerprint() {
 		context.fillText(fingerPrintText, 4, 17);
 
 		canvasFingerprint = canvas.toDataURL();
-	} catch (error) {}
+	}
+	catch (error) {}
 
 	return canvasFingerprint;
 }

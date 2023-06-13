@@ -15,9 +15,11 @@
 package com.liferay.change.tracking.configuration.builder;
 
 import com.liferay.change.tracking.configuration.CTConfiguration;
+import com.liferay.portal.kernel.model.BaseModel;
 
 import java.io.Serializable;
 
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -42,14 +44,14 @@ public interface CTConfigurationBuilder<T, U> {
 
 	public interface EntityClassesStep<T, U> {
 
-		public ResourceEntityByResourceEntityIdStep<T, U> setEntityClasses(
+		public ResourceEntitiesByCompanyIdStep<T, U> setEntityClasses(
 			Class<T> resourceEntityClass, Class<U> versionEntityClass);
 
 	}
 
 	public interface EntityIdsFromResourceEntityStep<T, U> {
 
-		public VersionEntityByVersionEntityIdStep<U>
+		public VersionEntitiesFromResourceEntityStep<T, U>
 			setEntityIdsFromResourceEntityFunctions(
 				Function<T, Serializable>
 					resourceEntityIdFromResourceEntityFunction,
@@ -69,11 +71,27 @@ public interface CTConfigurationBuilder<T, U> {
 
 	}
 
+	public interface ResourceEntitiesByCompanyIdStep<T, U> {
+
+		public ResourceEntityByResourceEntityIdStep<T, U>
+			setResourceEntitiesByCompanyIdFunction(
+				Function<Long, List<T>> resourceEntitiesByCompanyIdFunction);
+
+	}
+
 	public interface ResourceEntityByResourceEntityIdStep<T, U> {
 
 		public EntityIdsFromResourceEntityStep<T, U>
 			setResourceEntityByResourceEntityIdFunction(
 				Function<Long, T> resourceEntityByResourceEntityIdFunction);
+
+	}
+
+	public interface VersionEntitiesFromResourceEntityStep<T, U> {
+
+		public VersionEntityByVersionEntityIdStep<U>
+			setVersionEntitiesFromResourceEntityFunction(
+				Function<T, List<U>> versionEntitiesFromResourceEntityFunction);
 
 	}
 
@@ -88,6 +106,8 @@ public interface CTConfigurationBuilder<T, U> {
 	public interface VersionEntityDetailsStep<U> {
 
 		public EntityIdsFromVersionEntityStep<U> setVersionEntityDetails(
+			List<Function<U, ? extends BaseModel>>
+				versionEntityRelatedEntityFunctions,
 			Function<U, String> versionEntitySiteNameFunction,
 			Function<U, String> versionEntityTitleFunction,
 			Function<U, Serializable> versionEntityVersionFunction);

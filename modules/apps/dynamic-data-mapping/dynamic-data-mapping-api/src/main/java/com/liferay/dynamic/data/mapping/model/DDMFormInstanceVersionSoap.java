@@ -30,8 +30,10 @@ import java.util.List;
  */
 @ProviderType
 public class DDMFormInstanceVersionSoap implements Serializable {
+
 	public static DDMFormInstanceVersionSoap toSoapModel(
 		DDMFormInstanceVersion model) {
+
 		DDMFormInstanceVersionSoap soapModel = new DDMFormInstanceVersionSoap();
 
 		soapModel.setFormInstanceVersionId(model.getFormInstanceVersionId());
@@ -56,7 +58,9 @@ public class DDMFormInstanceVersionSoap implements Serializable {
 
 	public static DDMFormInstanceVersionSoap[] toSoapModels(
 		DDMFormInstanceVersion[] models) {
-		DDMFormInstanceVersionSoap[] soapModels = new DDMFormInstanceVersionSoap[models.length];
+
+		DDMFormInstanceVersionSoap[] soapModels =
+			new DDMFormInstanceVersionSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -67,10 +71,12 @@ public class DDMFormInstanceVersionSoap implements Serializable {
 
 	public static DDMFormInstanceVersionSoap[][] toSoapModels(
 		DDMFormInstanceVersion[][] models) {
+
 		DDMFormInstanceVersionSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new DDMFormInstanceVersionSoap[models.length][models[0].length];
+			soapModels =
+				new DDMFormInstanceVersionSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new DDMFormInstanceVersionSoap[0][0];
@@ -85,13 +91,16 @@ public class DDMFormInstanceVersionSoap implements Serializable {
 
 	public static DDMFormInstanceVersionSoap[] toSoapModels(
 		List<DDMFormInstanceVersion> models) {
-		List<DDMFormInstanceVersionSoap> soapModels = new ArrayList<DDMFormInstanceVersionSoap>(models.size());
+
+		List<DDMFormInstanceVersionSoap> soapModels =
+			new ArrayList<DDMFormInstanceVersionSoap>(models.size());
 
 		for (DDMFormInstanceVersion model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new DDMFormInstanceVersionSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new DDMFormInstanceVersionSoap[soapModels.size()]);
 	}
 
 	public DDMFormInstanceVersionSoap() {
@@ -249,4 +258,5 @@ public class DDMFormInstanceVersionSoap implements Serializable {
 	private long _statusByUserId;
 	private String _statusByUserName;
 	private Date _statusDate;
+
 }

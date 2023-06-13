@@ -1641,7 +1641,7 @@ sendPasswordCaptchaEnabled=&quot;false&quot;</echo>
 									<Resource
 										auth="Container"
 										description="Global Address Database"
-										driverClassName="com.mysql.jdbc.Driver"
+										driverClassName="com.mysql.cj.jdbc.Driver"
 										maxActive="40"
 										maxIdle="20"
 										maxWait="1000"
@@ -2748,7 +2748,7 @@ ${tomcat-gc-log}
 					import com.liferay.jenkins.results.parser.test.clazz.group.BatchTestClassGroup;
 					import com.liferay.jenkins.results.parser.test.clazz.group.TestClassGroupFactory;
 
-					Job job = JobFactory.newJob(project.getProperty("top.level.job.name"), project.getProperty("env.CI_TEST_SUITE"), project.getProperty("portal.branch.name"));
+					Job job = JobFactory.newJob(project.getProperty("top.level.job.name"), project.getProperty("env.CI_TEST_SUITE"), project.getProperty("portal.branch.name"), project.getProperty("env.REPOSITORY_NAME"));
 
 					BatchTestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), job);
 
@@ -5288,6 +5288,36 @@ go</echo>
 		</gradle-execute>
 	</target>
 
+	<target name="copy-cluster-log">
+		<local name="log.dir" />
+
+		<condition else="${app.server.parent.dir}-${app.server.bundle.index}/logs" property="log.dir" value="${app.server.parent.dir}/logs">
+			<or>
+				<not>
+					<isset property="app.server.bundle.index" />
+				</not>
+				<equals arg1="${app.server.bundle.index}" arg2="0" />
+			</or>
+		</condition>
+
+		<for param="log.file">
+			<path>
+				<fileset
+					dir="${log.dir}"
+				>
+					<include name="*.log" />
+				</fileset>
+			</path>
+			<sequential>
+				<copy
+					file="@{log.file}"
+					overwrite="true"
+					tofile="${liferay.home}/cluster${app.server.bundle.index}.log"
+				/>
+			</sequential>
+		</for>
+	</target>
+
 	<target name="copy-log-file">
 		<for param="log.file">
 			<path>
@@ -5632,6 +5662,34 @@ go</echo>
 				/>
 			</then>
 		</if>
+
+		<condition else="${app.server.parent.dir}-${app.server.bundle.index}/deploy" property="deploy.dir" value="${app.server.parent.dir}/deploy">
+			<or>
+				<not>
+					<isset property="app.server.bundle.index" />
+				</not>
+				<equals arg1="${app.server.bundle.index}" arg2="0" />
+			</or>
+		</condition>
+
+		<echo>Deploy directory is ${deploy.dir}.</echo>
+
+		<if>
+			<isset property="liferay.dependency.jars" />
+			<then>
+				<property name="liferay.dependency.jars" value="${liferay.dependency.jars}" />
+
+				<echo>Copying ${project.dir}/portal-web/test/functional/com/liferay/portalweb/dependencies/${liferay.dependency.jars} to ${deploy.dir}/${liferay.dependency.jars}.</echo>
+
+				<copy
+					file="${project.dir}/portal-web/test/functional/com/liferay/portalweb/dependencies/${liferay.dependency.jars}"
+					todir="${deploy.dir}"
+				/>
+			</then>
+			<else>
+				<echo>The property "liferay.dependency.jars" is not set.</echo>
+			</else>
+		</if>
 	</target>
 
 	<target name="deploy-extra-apps">
@@ -5747,6 +5805,19 @@ go</echo>
 	</target>
 
 	<target name="deploy-lcs-environment-token">
+		<if>
+			<and>
+				<isset property="portal.lcs.license.url" />
+				<matches pattern="https?://" string="${portal.lcs.license.url}" />
+			</and>
+			<then>
+				<mirrors-get
+					dest="${selenium.output.dir.name}"
+					src="${portal.lcs.license.url}"
+				/>
+			</then>
+		</if>
+
 		<get-testcase-property property.name="app.server.bundles.size" />
 
 		<if>
@@ -6023,7 +6094,15 @@ go</echo>
 
 				<local name="osgi.module.pattern" />
 
-				<property name="osgi.module.pattern" value="**/apps/**" />
+				<if>
+					<equals arg1="${osgi.modules.includes}" arg2="revert-schema-version" />
+					<then>
+						<property name="osgi.module.pattern" value="**/test/**" />
+					</then>
+					<else>
+						<property name="osgi.module.pattern" value="**/apps/**" />
+					</else>
+				</if>
 
 				<antelope:stringutil property="osgi.modules.includes.pattern" string="${osgi.module.pattern}/${osgi.modules.includes}">
 					<antelope:replace regex="," replacement=",${osgi.module.pattern}/" />
@@ -7144,14 +7223,22 @@ jdbc.default.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			<equals arg1="${cluster.enabled}" arg2="true" />
 			<then>
 				<echo append="true" file="portal-impl/src/portal-ext.properties">
-
 cluster.link.autodetect.address=
 
 cluster.link.enabled=true
 
-dl.store.impl=com.liferay.portal.store.db.DBStore
-
 web.server.display.node=true</echo>
+			</then>
+		</if>
+
+		<get-testcase-property property.name="cluster.jdbc.ping" />
+
+		<if>
+			<equals arg1="${cluster.jdbc.ping}" arg2="true" />
+			<then>
+				<echo append="true" file="portal-impl/src/portal-ext.properties">
+
+cluster.link.channel.properties.control=UDP(bind_addr=${cluster.link.bind.addr["cluster-link-control"]};mcast_group_addr=${multicast.group.address["cluster-link-control"]};mcast_port=${multicast.group.port["cluster-link-control"]}):JDBC_PING(connection_driver=${jdbc.default.driverClassName};connection_url=${jdbc.default.url};connection_username=${jdbc.default.username};connection_password=${jdbc.default.password}):MERGE3(min_interval=10000;max_interval=30000):FD_SOCK:FD_ALL:VERIFY_SUSPECT(timeout=1500):pbcast.NAKACK2(xmit_interval=500;xmit_table_num_rows=100;xmit_table_msgs_per_row=2000;xmit_table_max_compaction_time=30000;max_msg_batch_size=500;use_mcast_xmit=false;discard_delivered_msgs=true):UNICAST3(xmit_interval=500;xmit_table_num_rows=100;xmit_table_msgs_per_row=2000;xmit_table_max_compaction_time=60000;conn_expiry_timeout=0;max_msg_batch_size=500):pbcast.STABLE(stability_delay=1000;desired_avg_gossip=50000;max_bytes=4M):pbcast.GMS(join_timeout=2000;print_local_addr=true;view_bundling=true):UFC(max_credits=2M;min_threshold=0.4):MFC(max_credits=2M;min_threshold=0.4):FRAG2(frag_size=60K):RSVP(resend_interval=2000;timeout=10000)</echo>
 			</then>
 		</if>
 
@@ -7802,39 +7889,6 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			<else>
 				<echo append="true" file="${test.ext.properties.file}">
 					test.portal.instance=${test.portal.instance}
-				</echo>
-			</else>
-		</if>
-
-		<var name="test.toggle.file.names" unset="true" />
-
-		<pathconvert pathsep="," property="test.toggle.file.names">
-			<fileset
-				dir="${project.dir}"
-			>
-				<include name="modules/*/*/poshi.toggle" />
-				<include name="modules/*/*/*/poshi.toggle" />
-				<include name="modules/*/*/*/*/poshi.toggle" />
-				<include name="modules/*/*/*/*/*/poshi.toggle" />
-				<include name="modules/*/*/*/*/*/*/poshi.toggle" />
-				<include name="portal-web/poshi.toggle" />
-			</fileset>
-		</pathconvert>
-
-		<antelope:stringutil property="test.toggle.file.names" string="${test.toggle.file.names}">
-			<antelope:replace regex="\\" replacement="/" />
-		</antelope:stringutil>
-
-		<if>
-			<isset property="test.base.dir.name" />
-			<then>
-				<echo append="true" file="${test.ext.properties.file}">
-					test.toggle.file.names=${test.toggle.file.names},${test.base.dir.name}/poshi.toggle
-				</echo>
-			</then>
-			<else>
-				<echo append="true" file="${test.ext.properties.file}">
-					test.toggle.file.names=${test.toggle.file.names}
 				</echo>
 			</else>
 		</if>
@@ -10283,6 +10337,76 @@ if (ppstate.equals("normal")) {
 		<echo>Writing ${project.dir}/${report.csv.file.name}</echo>
 	</target>
 
+	<target name="redeploy-osgi-modules">
+		<get-testcase-property property.name="osgi.modules.includes" />
+
+		<if>
+			<isset property="update.properties" />
+			<then>
+				<replace
+					file="${project.dir}/${module.base.dir}/${osgi.modules.includes}/bnd.bnd"
+					token="${update.properties.original}"
+					value="${update.properties}"
+				/>
+			</then>
+		</if>
+
+		<echo file="tools/sdk/build.${user.name}.properties">auto.deploy.dir=${liferay.home}/deploy</echo>
+
+		<local name="osgi.module.pattern" />
+
+		<if>
+			<equals arg1="${osgi.modules.includes}" arg2="revert-schema-version" />
+			<then>
+				<property name="osgi.module.pattern" value="**/test/**" />
+			</then>
+			<else>
+				<property name="osgi.module.pattern" value="**/apps/**" />
+			</else>
+		</if>
+
+		<antelope:stringutil property="osgi.modules.includes.pattern" string="${osgi.module.pattern}/${osgi.modules.includes}">
+			<antelope:replace regex="," replacement=",${osgi.module.pattern}/" />
+		</antelope:stringutil>
+
+		<pathconvert pathsep="," property="osgi.modules.paths">
+			<dirset
+				dir="modules"
+				includes="${osgi.modules.includes.pattern}"
+			>
+				<or>
+					<present targetdir="modules">
+						<mapper
+							from="*"
+							to="*/build.gradle"
+							type="glob"
+						/>
+					</present>
+					<present targetdir="modules">
+						<mapper
+							from="*"
+							to="*/build.xml"
+							type="glob"
+						/>
+					</present>
+				</or>
+			</dirset>
+		</pathconvert>
+
+		<for list="${osgi.modules.paths}" parallel="true" param="osgi.module.path">
+			<sequential>
+				<local name="module.base.dir" />
+				<local name="osgi.module.command.prefix" />
+
+				<dirname file="@{osgi.module.path}" property="module.base.dir" />
+
+				<gradle-execute dir="@{osgi.module.path}" forcedcacheenabled="false" task="deploy">
+					<arg value="clean" />
+				</gradle-execute>
+			</sequential>
+		</for>
+	</target>
+
 	<target name="remove-plugin">
 		<get-auto-deploy-dir />
 
@@ -10848,6 +10972,15 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 
 		<remake-dir dir="${selenium.output.dir.name}" />
 
+		<get-testcase-property property.name="deploy.lcs.token.file" />
+
+		<if>
+			<equals arg1="${deploy.lcs.token.file}" arg2="true" />
+			<then>
+				<antcall target="deploy-lcs-environment-token" />
+			</then>
+		</if>
+
 		<get-testcase-property property.name="skip.start-app-server" />
 
 		<if>
@@ -10886,7 +11019,7 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 					<param name="database.type" value="@{database.type}" />
 				</antcall>
 
-				<start-app-server />
+				<antcall target="start-app-server-preserve-liferay-home" />
 
 				<get-testcase-property property.name="app.server.bundles.size" />
 

@@ -33,6 +33,7 @@ import com.liferay.portal.lock.service.LockLocalServiceUtil;
  */
 @ProviderType
 public abstract class LockBaseImpl extends LockModelImpl implements Lock {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -47,4 +48,5 @@ public abstract class LockBaseImpl extends LockModelImpl implements Lock {
 			LockLocalServiceUtil.updateLock(this);
 		}
 	}
+
 }

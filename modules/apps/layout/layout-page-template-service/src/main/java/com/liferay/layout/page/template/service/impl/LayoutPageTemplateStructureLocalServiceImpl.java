@@ -16,12 +16,14 @@ package com.liferay.layout.page.template.service.impl;
 
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.base.LayoutPageTemplateStructureLocalServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -179,9 +181,33 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 		layoutPageTemplateStructurePersistence.update(
 			layoutPageTemplateStructure);
 
-		_fragmentEntryLinkLocalService.updateClassModel(classNameId, classPK);
+		_updateClassModel(classNameId, classPK);
 
 		return layoutPageTemplateStructure;
+	}
+
+	private void _updateClassModel(long classNameId, long classPK)
+		throws PortalException {
+
+		if (classNameId == _portal.getClassNameId(Layout.class)) {
+			Layout layout = _layoutLocalService.getLayout(classPK);
+
+			_layoutLocalService.updateLayout(
+				layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getLayoutId(), layout.getTypeSettings());
+		}
+		else if (classNameId == _portal.getClassNameId(
+					LayoutPageTemplateEntry.class)) {
+
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				layoutPageTemplateEntryLocalService.getLayoutPageTemplateEntry(
+					classPK);
+
+			layoutPageTemplateEntry.setModifiedDate(new Date());
+
+			layoutPageTemplateEntryLocalService.updateLayoutPageTemplateEntry(
+				layoutPageTemplateEntry);
+		}
 	}
 
 	@ServiceReference(type = FragmentEntryLinkLocalService.class)

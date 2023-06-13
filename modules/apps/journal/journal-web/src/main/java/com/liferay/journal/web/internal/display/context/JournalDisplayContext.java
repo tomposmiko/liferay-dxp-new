@@ -14,6 +14,7 @@
 
 package com.liferay.journal.web.internal.display.context;
 
+import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -32,6 +33,7 @@ import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.service.JournalArticleServiceUtil;
 import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.service.JournalFolderServiceUtil;
+import com.liferay.journal.util.JournalChangeTrackingHelper;
 import com.liferay.journal.util.comparator.FolderArticleArticleIdComparator;
 import com.liferay.journal.util.comparator.FolderArticleDisplayDateComparator;
 import com.liferay.journal.util.comparator.FolderArticleModifiedDateComparator;
@@ -80,8 +82,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PrefsParamUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -97,10 +97,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Eudaldo Alonso
@@ -110,12 +113,14 @@ public class JournalDisplayContext {
 	public JournalDisplayContext(
 		HttpServletRequest request, LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		PortletPreferences portletPreferences, TrashHelper trashHelper) {
+		AssetDisplayPageFriendlyURLProvider assetDisplayPageFriendlyURLProvider,
+		TrashHelper trashHelper) {
 
 		_request = request;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_portletPreferences = portletPreferences;
+		_assetDisplayPageFriendlyURLProvider =
+			assetDisplayPageFriendlyURLProvider;
 		_trashHelper = trashHelper;
 
 		_journalWebConfiguration =
@@ -180,7 +185,7 @@ public class JournalDisplayContext {
 			articleActionDropdownItemsProvider =
 				new JournalArticleActionDropdownItemsProvider(
 					article, _liferayPortletRequest, _liferayPortletResponse,
-					_trashHelper);
+					_assetDisplayPageFriendlyURLProvider, _trashHelper);
 
 		return articleActionDropdownItemsProvider.getActionDropdownItems();
 	}
@@ -220,7 +225,7 @@ public class JournalDisplayContext {
 			articleActionDropdownItemsProvider =
 				new JournalArticleActionDropdownItemsProvider(
 					article, _liferayPortletRequest, _liferayPortletResponse,
-					_trashHelper);
+					_assetDisplayPageFriendlyURLProvider, _trashHelper);
 
 		return articleActionDropdownItemsProvider.
 			getArticleHistoryActionDropdownItems();
@@ -241,10 +246,19 @@ public class JournalDisplayContext {
 			articleActionDropdownItemsProvider =
 				new JournalArticleActionDropdownItemsProvider(
 					article, _liferayPortletRequest, _liferayPortletResponse,
-					_trashHelper);
+					_assetDisplayPageFriendlyURLProvider, _trashHelper);
 
 		return articleActionDropdownItemsProvider.
 			getArticleVersionActionDropdownItems();
+	}
+
+	public String getChangeListName(JournalArticle journalArticle) {
+		if (_journalChangeTrackingHelper == null) {
+			return StringPool.BLANK;
+		}
+
+		return _journalChangeTrackingHelper.getJournalArticleCTCollectionName(
+			_themeDisplay.getUserId(), journalArticle.getId());
 	}
 
 	public String[] getCharactersBlacklist() throws PortalException {
@@ -418,14 +432,7 @@ public class JournalDisplayContext {
 	}
 
 	public String[] getDisplayViews() {
-		if (_displayViews == null) {
-			_displayViews = StringUtil.split(
-				PrefsParamUtil.getString(
-					_portletPreferences, _request, "displayViews",
-					StringUtil.merge(_journalWebConfiguration.displayViews())));
-		}
-
-		return _displayViews;
+		return _journalWebConfiguration.displayViews();
 	}
 
 	public JournalFolder getFolder() {
@@ -774,6 +781,10 @@ public class JournalDisplayContext {
 	public SearchContainer getSearchContainer(boolean showVersions)
 		throws PortalException {
 
+		if (_articleSearchContainer != null) {
+			return _articleSearchContainer;
+		}
+
 		SearchContainer articleSearchContainer = new SearchContainer(
 			_liferayPortletRequest, getPortletURL(), null, null);
 
@@ -1004,7 +1015,9 @@ public class JournalDisplayContext {
 			articleSearchContainer.setResults(results);
 		}
 
-		return articleSearchContainer;
+		_articleSearchContainer = articleSearchContainer;
+
+		return _articleSearchContainer;
 	}
 
 	public int getStatus() {
@@ -1074,6 +1087,24 @@ public class JournalDisplayContext {
 		}
 
 		return false;
+	}
+
+	public boolean isChangeListColumnVisible() {
+		if (_journalChangeTrackingHelper == null) {
+			return false;
+		}
+
+		return _journalChangeTrackingHelper.hasActiveCTCollection(
+			_themeDisplay.getCompanyId(), _themeDisplay.getUserId());
+	}
+
+	public boolean isJournalArticleInChangeList(JournalArticle journalArticle) {
+		if (_journalChangeTrackingHelper == null) {
+			return false;
+		}
+
+		return _journalChangeTrackingHelper.isJournalArticleInChangeList(
+			_themeDisplay.getUserId(), journalArticle.getId());
 	}
 
 	public boolean isNavigationHome() {
@@ -1239,15 +1270,33 @@ public class JournalDisplayContext {
 		return jsonArray;
 	}
 
+	private static JournalChangeTrackingHelper _journalChangeTrackingHelper;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			JournalChangeTrackingHelper.class);
+
+		ServiceTracker<JournalChangeTrackingHelper, JournalChangeTrackingHelper>
+			serviceTracker = new ServiceTracker<>(
+				bundle.getBundleContext(), JournalChangeTrackingHelper.class,
+				null);
+
+		serviceTracker.open();
+
+		_journalChangeTrackingHelper = serviceTracker.getService();
+	}
+
 	private String[] _addMenuFavItems;
 	private JournalArticle _article;
 	private JournalArticleDisplay _articleDisplay;
+	private SearchContainer _articleSearchContainer;
+	private final AssetDisplayPageFriendlyURLProvider
+		_assetDisplayPageFriendlyURLProvider;
 	private String _ddmStructureKey;
 	private String _ddmStructureName;
 	private List<DDMStructure> _ddmStructures;
 	private String _ddmTemplateKey;
 	private String _displayStyle;
-	private String[] _displayViews;
 	private JournalFolder _folder;
 	private Long _folderId;
 	private final JournalWebConfiguration _journalWebConfiguration;
@@ -1259,7 +1308,6 @@ public class JournalDisplayContext {
 	private String _orderByType;
 	private Long _parentFolderId;
 	private final PortalPreferences _portalPreferences;
-	private final PortletPreferences _portletPreferences;
 	private final HttpServletRequest _request;
 	private Integer _restrictionType;
 	private Integer _status;

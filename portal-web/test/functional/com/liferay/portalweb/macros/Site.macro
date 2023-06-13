@@ -7,9 +7,10 @@ definition {
 
 		Search.searchCP(searchTerm = "${siteName}");
 
-		LexiconEntry.openEntryMenu(rowEntry = "${siteName}");
-
-		MenuItem.click(menuItem = "Activate");
+		LexiconTable.clickEllipsisItem(
+			item = "Activate",
+			tableEntry = "${siteName}"
+		);
 
 		Alert.viewSuccessMessage();
 	}
@@ -60,6 +61,10 @@ definition {
 			if (contains("${siteTemplateName}", "{siteTemplateName}")) {
 				var siteTemplateName = "${siteType} Site";
 			}
+
+			MetalComponent.waitForCard(
+				card = "${siteTemplateName}"
+			);
 
 			LexiconCard.clickCard(
 				card = "${siteTemplateName}"
@@ -361,7 +366,7 @@ definition {
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "cards");
 
-		Check(locator1 = "Card#SPECIFIC_CHECKBOX", key_cardText = "${roleName}");
+		LexiconCard.checkCardCheckbox(card = "${roleName}");
 
 		SelectFrameTop();
 
@@ -457,7 +462,7 @@ definition {
 
 	macro changeSiteLogo {
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -579,9 +584,10 @@ definition {
 			value1 = "${siteName}"
 		);
 
-		LexiconEntry.openEntryMenu(rowEntry = "${siteName}");
-
-		MenuItem.clickNoError(menuItem = "Delete");
+		LexiconTable.clickEllipsisItem(
+			item = "Delete",
+			tableEntry = "${siteName}"
+		);
 
 		AssertConfirm(
 			value1 = "Are you sure you want to delete this? It will be deleted immediately."
@@ -676,7 +682,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		AssertElementPresent(locator1 = "SitesEditSite#SITE_ID");
@@ -699,8 +705,8 @@ definition {
 
 		var siteLARFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "Public_Pages-*.lar");
 
-		SikuliUploadTempFile(
-			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+		UploadTempFile.uploadTempFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
 			value1 = "${siteLARFileName}"
 		);
 
@@ -874,7 +880,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Site Administration",
-			portlet = "Site Settings"
+			portlet = "Settings"
 		);
 
 		if ("${selectMembershipType}" == "true") {
@@ -1125,9 +1131,9 @@ definition {
 	macro viewChildCP {
 		Site.viewCP(siteName = "${siteName}");
 
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "View Child Sites",
-			rowEntry = "${siteName}"
+		LexiconTable.clickEllipsisItem(
+			item = "View Child Sites",
+			tableEntry = "${siteName}"
 		);
 
 		Breadcrumb.viewActiveEntry(breadcrumbName = "${siteName}");
@@ -1471,16 +1477,15 @@ definition {
 	}
 
 	macro viewSiteRoleViaSiteMembershipsCP {
-		AssertTextEquals(
-			locator1 = "Card#SPECIFIC_LARGE_TEXT",
-			value1 = "${resourceName}",
-			key_cardText = "${resourceName}"
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		LexiconList.viewListEntryTitle(
+			listEntry = "${resourceName}"
 		);
 
-		AssertTextEquals(
-			locator1 = "Card#SPECIFIC_SMALL_TEXT",
-			value1 = "${roleTitle}",
-			key_cardText = "${resourceName}"
+		LexiconList.viewListEntrySubtitle(
+			listEntry = "${resourceName}",
+			listEntrySubtitle = "${roleTitle}"
 		);
 	}
 

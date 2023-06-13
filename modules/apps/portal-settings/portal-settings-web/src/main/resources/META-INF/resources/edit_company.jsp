@@ -34,9 +34,11 @@ request.setAttribute("websites.classPK", company.getAccountId());
 
 <portlet:actionURL name="/portal_settings/edit_company" var="editCompanyURL" />
 
+<h2 class="hide-accessible">Portal Settings</h2>
+
 <aui:form action="<%= editCompanyURL %>" cssClass="container-fluid-1280" data-senna-off="true" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveCompany();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
-	<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
+	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
 	<liferay-util:buffer
 		var="htmlTop"
@@ -59,20 +61,32 @@ request.setAttribute("websites.classPK", company.getAccountId());
 	/>
 </aui:form>
 
-<aui:script>
+<script>
 	function <portlet:namespace />saveCompany() {
-		var form = AUI.$(document.<portlet:namespace />fm);
-
-		form.fm('<%= Constants.CMD %>').val('<%= Constants.UPDATE %>');
-
 		<portlet:namespace />saveLocales();
 
-		submitForm(form);
+		Liferay.Util.postForm(
+			document.<portlet:namespace />fm,
+			{
+				data: {
+					'<%= Constants.CMD %>': '<%= Constants.UPDATE %>'
+				}
+			}
+		);
 	}
 
 	function <portlet:namespace />saveLocales() {
-		var form = AUI.$(document.<portlet:namespace />fm);
+		var form = document.<portlet:namespace />fm;
 
-		form.fm('<%= PropsKeys.LOCALES %>').val(Liferay.Util.listSelect(form.fm('currentLanguageIds')));
+		var currentLanguageIdsElement = Liferay.Util.getFormElement(form, 'currentLanguageIds');
+
+		if (currentLanguageIdsElement) {
+			Liferay.Util.setFormValues(
+				form,
+				{
+					'<%= PropsKeys.LOCALES %>': Liferay.Util.listSelect(currentLanguageIdsElement)
+				}
+			);
+		}
 	}
-</aui:script>
+</script>

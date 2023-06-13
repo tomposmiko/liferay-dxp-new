@@ -32,8 +32,9 @@ import com.liferay.portal.tools.service.builder.test.service.UADPartialEntryLoca
  * @generated
  */
 @ProviderType
-public abstract class UADPartialEntryBaseImpl extends UADPartialEntryModelImpl
-	implements UADPartialEntry {
+public abstract class UADPartialEntryBaseImpl
+	extends UADPartialEntryModelImpl implements UADPartialEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class UADPartialEntryBaseImpl extends UADPartialEntryModelImpl
 			UADPartialEntryLocalServiceUtil.updateUADPartialEntry(this);
 		}
 	}
+
 }

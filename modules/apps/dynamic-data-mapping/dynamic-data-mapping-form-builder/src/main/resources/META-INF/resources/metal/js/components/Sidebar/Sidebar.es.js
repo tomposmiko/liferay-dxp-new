@@ -1,3 +1,12 @@
+import * as FormSupport from '../Form/FormSupport.es';
+import autobind from 'autobind-decorator';
+import classnames from 'classnames';
+import ClayButton from 'clay-button';
+import Component, {Fragment} from 'metal-jsx';
+import dom from 'metal-dom';
+import FieldTypeBox from '../FieldTypeBox/FieldTypeBox.es.js';
+import FormRenderer from '../Form/FormRenderer.es';
+import WithEvaluator from '../Form/Evaluator.es';
 import {ClayActionsDropdown, ClayDropdownBase} from 'clay-dropdown';
 import {ClayIcon} from 'clay-icon';
 import {Config} from 'metal-state';
@@ -5,33 +14,11 @@ import {Drag, DragDrop} from 'metal-drag-drop';
 import {EventHandler} from 'metal-events';
 import {focusedFieldStructure} from '../../util/config.es';
 import {getFieldPropertiesFromSettingsContext, normalizeSettingsContextPages} from '../../util/fieldSupport.es';
-import {PagesVisitor} from '../../util/visitors.es';
+import {PagesVisitor, RulesVisitor} from '../../util/visitors.es';
 import {selectText} from '../../util/dom.es';
-import autobind from 'autobind-decorator';
-import classnames from 'classnames';
-import ClayButton from 'clay-button';
-import Component, {Fragment} from 'metal-jsx';
-import dom from 'metal-dom';
-import FieldTypeBox from '../FieldTypeBox/FieldTypeBox.es.js';
-import FormRenderer, {FormSupport} from '../Form/index.es.js';
-import WithEvaluator from '../Form/Evaluator.es';
 
 const EVALUATOR_URL = '/o/dynamic-data-mapping-form-context-provider/';
 const FormWithEvaluator = WithEvaluator(FormRenderer);
-
-const getImplementedFieldTypes = fieldTypes => {
-	return fieldTypes.filter(
-		({name}) => {
-			return ![
-				'checkbox_multiple',
-				'date',
-				'grid',
-				'radio',
-				'select'
-			].some(fieldType => fieldType === name);
-		}
-	);
-};
 
 /**
  * Sidebar is a tooling to mount forms.
@@ -100,6 +87,7 @@ class Sidebar extends Component {
 	};
 
 	static PROPS = {
+		editingLanguageId: Config.string(),
 
 		/**
 		 * @default {}
@@ -181,20 +169,24 @@ class Sidebar extends Component {
 	}
 
 	changeFieldType(type) {
-		const {fieldTypes, focusedField, namespace} = this.props;
+		const {editingLanguageId, fieldTypes, focusedField, namespace} = this.props;
 		const newFieldType = fieldTypes.find(({name}) => name === type);
 		const newSettingsContext = {
 			...newFieldType.settingsContext,
 			pages: normalizeSettingsContextPages(newFieldType.settingsContext.pages, namespace, newFieldType, focusedField.fieldName)
 		};
-		const settingsContext = this._mergeFieldTypeSettings(focusedField.settingsContext, newSettingsContext);
+		let {settingsContext} = focusedField;
+
+		if (type !== focusedField.type) {
+			settingsContext = this._mergeFieldTypeSettings(settingsContext, newSettingsContext);
+		}
 
 		this.emit(
 			'focusedFieldUpdated',
 			{
 				...focusedField,
 				...newFieldType,
-				...getFieldPropertiesFromSettingsContext(settingsContext),
+				...getFieldPropertiesFromSettingsContext(editingLanguageId, settingsContext),
 				settingsContext,
 				type: newFieldType.name
 			}
@@ -306,7 +298,7 @@ class Sidebar extends Component {
 	_dropdownFieldTypesValueFn() {
 		const {fieldTypes} = this.props;
 
-		return getImplementedFieldTypes(fieldTypes).filter(
+		return fieldTypes.filter(
 			({system}) => {
 				return !system;
 			}
@@ -340,8 +332,8 @@ class Sidebar extends Component {
 			}
 		};
 
-		return getImplementedFieldTypes(fieldTypes).reduce(
-			(prev, next, index, original) => {
+		return fieldTypes.reduce(
+			(prev, next) => {
 				if (next.group && !next.system) {
 					prev[next.group].fields.push(next);
 				}
@@ -350,6 +342,13 @@ class Sidebar extends Component {
 			},
 			group
 		);
+	}
+
+	_hasRuleExpression(fieldName) {
+		const {rules} = this.props;
+		const visitor = new RulesVisitor(rules);
+
+		return visitor.containsFieldExpression(fieldName);
 	}
 
 	/**
@@ -493,12 +492,17 @@ class Sidebar extends Component {
 
 	/**
 	 * Continues the propagation of event.
-	 * @param {Object} data
+	 * @param {Object} event
 	 * @protected
 	 */
 	@autobind
-	_handleFieldEdited(data) {
-		this.emit('fieldEdited', data);
+	_handleSettingsFieldEdited(event) {
+		this.emit('settingsFieldEdited', event);
+	}
+
+	@autobind
+	_handleSettingsFieldBlurred(event) {
+		this.emit('settingsFieldBlurred', event);
 	}
 
 	/**
@@ -606,16 +610,26 @@ class Sidebar extends Component {
 		const newVisitor = new PagesVisitor(newSettingsContext.pages);
 		const oldVisitor = new PagesVisitor(oldSettingsContext.pages);
 
-		const excludedFields = ['type', 'validation'];
+		const excludedFields = [
+			'indexType',
+			'type',
+			'validation'
+		];
 
-		const getByFieldNameAndType = (fieldName, type) => {
+		const getPreviousField = ({fieldName, type, value}) => {
 			let field;
 
-			oldVisitor.mapFields(
+			oldVisitor.findField(
 				oldField => {
-					if (excludedFields.indexOf(fieldName) === -1 && oldField.fieldName === fieldName && oldField.type === type) {
+					if (
+						excludedFields.indexOf(fieldName) === -1 &&
+						oldField.fieldName === fieldName &&
+						oldField.type === type
+					) {
 						field = oldField;
 					}
+
+					return field;
 				}
 			);
 
@@ -626,13 +640,23 @@ class Sidebar extends Component {
 			...newSettingsContext,
 			pages: newVisitor.mapFields(
 				newField => {
-					const mergedField = getByFieldNameAndType(newField.fieldName, newField.type);
+					const previousField = getPreviousField(newField);
 
-					if (mergedField) {
-						newField = {
-							...mergedField,
-							visible: newField.visible
-						};
+					if (previousField) {
+						const {multiple, visible} = newField;
+
+						for (const prop in newField) {
+							if (previousField.hasOwnProperty(prop)) {
+								newField[prop] = previousField[prop];
+							}
+						}
+
+						newField.multiple = multiple;
+						newField.visible = visible;
+
+						if (newField.fieldName === 'predefinedValue') {
+							delete newField.value;
+						}
 					}
 
 					return newField;
@@ -883,6 +907,7 @@ class Sidebar extends Component {
 	render() {
 		const {activeTab, open} = this.state;
 		const {
+			editingLanguageId,
 			focusedField,
 			spritemap
 		} = this.props;
@@ -891,7 +916,8 @@ class Sidebar extends Component {
 
 		const layoutRenderEvents = {
 			evaluated: this._handleEvaluatorChanged,
-			fieldEdited: this._handleFieldEdited
+			fieldBlurred: this._handleSettingsFieldBlurred,
+			fieldEdited: this._handleSettingsFieldEdited
 		};
 
 		const editMode = this._isEditMode();
@@ -943,11 +969,11 @@ class Sidebar extends Component {
 									<FormWithEvaluator
 										activePage={activeTab}
 										editable={true}
+										editingLanguageId={editingLanguageId}
 										events={layoutRenderEvents}
 										fieldType={focusedField.type}
 										formContext={settingsContext}
 										modeRenderer="list"
-										pages={settingsContext.pages}
 										ref="FormRenderer"
 										spritemap={spritemap}
 										url={EVALUATOR_URL}

@@ -17,7 +17,6 @@ package com.liferay.knowledge.base.web.internal.display.context;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
 import com.liferay.knowledge.base.constants.KBActionKeys;
 import com.liferay.knowledge.base.model.KBTemplate;
 import com.liferay.knowledge.base.model.KBTemplateSearchDisplay;
@@ -250,19 +249,18 @@ public class KBTemplatesManagementToolbarDisplayContext {
 						orderColumnsMap.entrySet()) {
 
 					add(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								String orderByCol = orderByColEntry.getKey();
+						dropdownItem -> {
+							String orderByCol = orderByColEntry.getKey();
 
-								dropdownItem.setActive(
-									orderByCol.equals(_getOrderByCol()));
+							dropdownItem.setActive(
+								orderByCol.equals(_getOrderByCol()));
 
-								dropdownItem.setHref(
-									_getCurrentSortingURL(), "orderByCol",
-									orderByColEntry.getValue());
-								dropdownItem.setLabel(
-									LanguageUtil.get(_request, orderByCol));
-							}));
+							dropdownItem.setHref(
+								_getCurrentSortingURL(), "orderByCol",
+								orderByColEntry.getValue());
+							dropdownItem.setLabel(
+								LanguageUtil.get(_request, orderByCol));
+						});
 				}
 			}
 		};

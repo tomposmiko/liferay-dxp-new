@@ -20,6 +20,7 @@ import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
 import com.liferay.document.library.kernel.model.DLFileVersion;
 import com.liferay.document.library.test.util.search.FileEntryBlueprint;
 import com.liferay.document.library.test.util.search.FileEntrySearchFixture;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -197,9 +198,17 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 			"dataRepositoryId", String.valueOf(fileEntry.getRepositoryId()));
 		map.put("ddmContent", "text/plain; charset=UTF-8 UTF-8");
 		map.put("extension", fileEntry.getExtension());
+		map.put("extension_String_sortable", fileEntry.getExtension());
 		map.put("fileEntryTypeId", "0");
 		map.put("hidden", "false");
-		map.put("mimeType", fileEntry.getMimeType().replaceAll("/", "_"));
+		map.put(
+			"mimeType",
+			StringUtil.replace(
+				fileEntry.getMimeType(), CharPool.SLASH, CharPool.UNDERLINE));
+		map.put(
+			"mimeType_String_sortable",
+			StringUtil.replace(
+				fileEntry.getMimeType(), CharPool.SLASH, CharPool.UNDERLINE));
 		map.put("path", fileEntry.getTitle());
 		map.put("readCount", String.valueOf(fileEntry.getReadCount()));
 		map.put("size", String.valueOf(fileEntry.getSize()));
@@ -209,6 +218,7 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 		populateDates(fileEntry, map);
 		populateHttpHeaders(fileEntry, map);
 		populateLocalizedTitles(fileEntry, map);
+		populateViewCount(fileEntry, map);
 
 		indexedFieldsFixture.populatePriority("0.0", map);
 		indexedFieldsFixture.populateRoleIdFields(
@@ -262,6 +272,13 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 			map.put(key, title);
 			map.put(key.concat("_sortable"), title);
 		}
+	}
+
+	protected void populateViewCount(
+		FileEntry fileEntry, Map<String, String> map) {
+
+		map.put("viewCount", String.valueOf(fileEntry.getReadCount()));
+		map.put("viewCount_sortable", String.valueOf(fileEntry.getReadCount()));
 	}
 
 	protected FileEntrySearchFixture fileEntrySearchFixture;

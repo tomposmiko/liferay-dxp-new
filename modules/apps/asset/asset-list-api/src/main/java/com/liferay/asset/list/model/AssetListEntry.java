@@ -30,13 +30,15 @@ import com.liferay.portal.kernel.util.Accessor;
 @ImplementationClassName("com.liferay.asset.list.model.impl.AssetListEntryImpl")
 @ProviderType
 public interface AssetListEntry extends AssetListEntryModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.asset.list.model.impl.AssetListEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<AssetListEntry, Long> ASSET_LIST_ENTRY_ID_ACCESSOR =
-		new Accessor<AssetListEntry, Long>() {
+	public static final Accessor<AssetListEntry, Long>
+		ASSET_LIST_ENTRY_ID_ACCESSOR = new Accessor<AssetListEntry, Long>() {
+
 			@Override
 			public Long get(AssetListEntry assetListEntry) {
 				return assetListEntry.getAssetListEntryId();
@@ -51,16 +53,30 @@ public interface AssetListEntry extends AssetListEntryModel, PersistedModel {
 			public Class<AssetListEntry> getTypeClass() {
 				return AssetListEntry.class;
 			}
+
 		};
 
-	public java.util.List<com.liferay.asset.kernel.model.AssetEntry> getAssetEntries();
+	public java.util.List<com.liferay.asset.kernel.model.AssetEntry>
+		getAssetEntries(long segmentsEntryId);
 
-	public java.util.List<com.liferay.asset.kernel.model.AssetEntry> getAssetEntries(
-		int start, int end);
+	public java.util.List<com.liferay.asset.kernel.model.AssetEntry>
+		getAssetEntries(long segmentsEntryId, int start, int end);
 
-	public int getAssetEntriesCount();
+	public java.util.List<com.liferay.asset.kernel.model.AssetEntry>
+			getAssetEntries(long[] segmentsEntryIds)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public com.liferay.asset.kernel.service.persistence.AssetEntryQuery getAssetEntryQuery();
+	public int getAssetEntriesCount(long segmentsEntryId);
+
+	public com.liferay.asset.kernel.service.persistence.AssetEntryQuery
+		getAssetEntryQuery(long segmentsEntryId);
+
+	public com.liferay.asset.kernel.service.persistence.AssetEntryQuery
+			getAssetEntryQuery(long[] segmentsEntryIds)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public String getTypeLabel();
+
+	public String getTypeSettings(long segmentsEntryId);
+
 }

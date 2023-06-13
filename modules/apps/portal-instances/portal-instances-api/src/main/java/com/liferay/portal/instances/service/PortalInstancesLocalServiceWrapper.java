@@ -28,9 +28,11 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 @ProviderType
 public class PortalInstancesLocalServiceWrapper
 	implements PortalInstancesLocalService,
-		ServiceWrapper<PortalInstancesLocalService> {
+			   ServiceWrapper<PortalInstancesLocalService> {
+
 	public PortalInstancesLocalServiceWrapper(
 		PortalInstancesLocalService portalInstancesLocalService) {
+
 		_portalInstancesLocalService = portalInstancesLocalService;
 	}
 
@@ -60,10 +62,10 @@ public class PortalInstancesLocalServiceWrapper
 	}
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	@Override
 	public String getOSGiServiceIdentifier() {
 		return _portalInstancesLocalService.getOSGiServiceIdentifier();
@@ -77,8 +79,9 @@ public class PortalInstancesLocalServiceWrapper
 	@Override
 	public void initializePortalInstance(
 		javax.servlet.ServletContext servletContext, String webId) {
-		_portalInstancesLocalService.initializePortalInstance(servletContext,
-			webId);
+
+		_portalInstancesLocalService.initializePortalInstance(
+			servletContext, webId);
 	}
 
 	@Override
@@ -129,8 +132,10 @@ public class PortalInstancesLocalServiceWrapper
 	@Override
 	public void setWrappedService(
 		PortalInstancesLocalService portalInstancesLocalService) {
+
 		_portalInstancesLocalService = portalInstancesLocalService;
 	}
 
 	private PortalInstancesLocalService _portalInstancesLocalService;
+
 }

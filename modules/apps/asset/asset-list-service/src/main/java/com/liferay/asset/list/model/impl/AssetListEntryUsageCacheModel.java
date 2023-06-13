@@ -17,10 +17,8 @@ package com.liferay.asset.list.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.list.model.AssetListEntryUsage;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class AssetListEntryUsageCacheModel implements CacheModel<AssetListEntryUsage>,
-	Externalizable {
+public class AssetListEntryUsageCacheModel
+	implements CacheModel<AssetListEntryUsage>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,9 +48,12 @@ public class AssetListEntryUsageCacheModel implements CacheModel<AssetListEntryU
 			return false;
 		}
 
-		AssetListEntryUsageCacheModel assetListEntryUsageCacheModel = (AssetListEntryUsageCacheModel)obj;
+		AssetListEntryUsageCacheModel assetListEntryUsageCacheModel =
+			(AssetListEntryUsageCacheModel)obj;
 
-		if (assetListEntryUsageId == assetListEntryUsageCacheModel.assetListEntryUsageId) {
+		if (assetListEntryUsageId ==
+				assetListEntryUsageCacheModel.assetListEntryUsageId) {
+
 			return true;
 		}
 
@@ -100,7 +102,8 @@ public class AssetListEntryUsageCacheModel implements CacheModel<AssetListEntryU
 
 	@Override
 	public AssetListEntryUsage toEntityModel() {
-		AssetListEntryUsageImpl assetListEntryUsageImpl = new AssetListEntryUsageImpl();
+		AssetListEntryUsageImpl assetListEntryUsageImpl =
+			new AssetListEntryUsageImpl();
 
 		if (uuid == null) {
 			assetListEntryUsageImpl.setUuid("");
@@ -150,7 +153,8 @@ public class AssetListEntryUsageCacheModel implements CacheModel<AssetListEntryU
 			assetListEntryUsageImpl.setLastPublishDate(null);
 		}
 		else {
-			assetListEntryUsageImpl.setLastPublishDate(new Date(lastPublishDate));
+			assetListEntryUsageImpl.setLastPublishDate(
+				new Date(lastPublishDate));
 		}
 
 		assetListEntryUsageImpl.resetOriginalValues();
@@ -183,8 +187,7 @@ public class AssetListEntryUsageCacheModel implements CacheModel<AssetListEntryU
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -239,4 +242,5 @@ public class AssetListEntryUsageCacheModel implements CacheModel<AssetListEntryU
 	public long classPK;
 	public String portletId;
 	public long lastPublishDate;
+
 }

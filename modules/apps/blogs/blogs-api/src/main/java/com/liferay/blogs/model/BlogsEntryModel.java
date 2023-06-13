@@ -38,8 +38,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface BlogsEntryModel extends BaseModel<BlogsEntry>, ShardedModel,
-	StagedGroupedModel, TrashedModel, WorkflowedModel {
+public interface BlogsEntryModel
+	extends BaseModel<BlogsEntry>, ShardedModel, StagedGroupedModel,
+			TrashedModel, WorkflowedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -667,4 +669,5 @@ public interface BlogsEntryModel extends BaseModel<BlogsEntry>, ShardedModel,
 	 */
 	@Override
 	public boolean isScheduled();
+
 }

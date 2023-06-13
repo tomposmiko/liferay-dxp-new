@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.model.ShardedModel;
  */
 @ProviderType
 public interface ModuleModel extends BaseModel<Module>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -156,4 +157,5 @@ public interface ModuleModel extends BaseModel<Module>, ShardedModel {
 	 * @param contextName the context name of this module
 	 */
 	public void setContextName(String contextName);
+
 }

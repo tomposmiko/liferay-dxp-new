@@ -29,12 +29,14 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -96,6 +98,16 @@ public class AddLayoutPageTemplateEntryMVCActionCommand
 
 			JSONPortletResponseUtil.writeJSON(
 				actionRequest, actionResponse, jsonObject);
+
+			if (type ==
+					LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE) {
+
+				MultiSessionMessages.add(actionRequest, "displayPageAdded");
+			}
+			else if (type == LayoutPageTemplateEntryTypeConstants.TYPE_BASIC) {
+				MultiSessionMessages.add(
+					actionRequest, "layoutPageTemplateAdded");
+			}
 		}
 		catch (PortalException pe) {
 			SessionErrors.add(
@@ -116,12 +128,26 @@ public class AddLayoutPageTemplateEntryMVCActionCommand
 		Layout layout = _layoutLocalService.getLayout(
 			layoutPageTemplateEntry.getPlid());
 
+		Layout draftLayout = _layoutLocalService.fetchLayout(
+			_portal.getClassNameId(Layout.class), layout.getPlid());
+
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String layoutFullURL = _portal.getLayoutFullURL(layout, themeDisplay);
+		String layoutFullURL = _portal.getLayoutFullURL(
+			draftLayout, themeDisplay);
 
-		return _http.setParameter(layoutFullURL, "p_l_mode", Constants.EDIT);
+		layoutFullURL = _http.setParameter(
+			layoutFullURL, "p_l_mode", Constants.EDIT);
+
+		String backURL = ParamUtil.getString(actionRequest, "backURL");
+
+		if (Validator.isNotNull(backURL)) {
+			layoutFullURL = _http.setParameter(
+				layoutFullURL, "p_l_back_url", backURL);
+		}
+
+		return layoutFullURL;
 	}
 
 	@Reference

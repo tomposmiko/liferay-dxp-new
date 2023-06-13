@@ -34,8 +34,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface OAuth2AuthorizationModel extends BaseModel<OAuth2Authorization>,
-	ShardedModel {
+public interface OAuth2AuthorizationModel
+	extends BaseModel<OAuth2Authorization>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -300,4 +301,5 @@ public interface OAuth2AuthorizationModel extends BaseModel<OAuth2Authorization>
 	 * @param refreshTokenExpirationDate the refresh token expiration date of this o auth2 authorization
 	 */
 	public void setRefreshTokenExpirationDate(Date refreshTokenExpirationDate);
+
 }

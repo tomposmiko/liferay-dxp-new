@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class JournalFeedSoap implements Serializable {
+
 	public static JournalFeedSoap toSoapModel(JournalFeed model) {
 		JournalFeedSoap soapModel = new JournalFeedSoap();
 
@@ -50,7 +51,8 @@ public class JournalFeedSoap implements Serializable {
 		soapModel.setDelta(model.getDelta());
 		soapModel.setOrderByCol(model.getOrderByCol());
 		soapModel.setOrderByType(model.getOrderByType());
-		soapModel.setTargetLayoutFriendlyUrl(model.getTargetLayoutFriendlyUrl());
+		soapModel.setTargetLayoutFriendlyUrl(
+			model.getTargetLayoutFriendlyUrl());
 		soapModel.setTargetPortletId(model.getTargetPortletId());
 		soapModel.setContentField(model.getContentField());
 		soapModel.setFeedFormat(model.getFeedFormat());
@@ -88,7 +90,8 @@ public class JournalFeedSoap implements Serializable {
 	}
 
 	public static JournalFeedSoap[] toSoapModels(List<JournalFeed> models) {
-		List<JournalFeedSoap> soapModels = new ArrayList<JournalFeedSoap>(models.size());
+		List<JournalFeedSoap> soapModels = new ArrayList<JournalFeedSoap>(
+			models.size());
 
 		for (JournalFeed model : models) {
 			soapModels.add(toSoapModel(model));
@@ -315,4 +318,5 @@ public class JournalFeedSoap implements Serializable {
 	private String _feedFormat;
 	private double _feedVersion;
 	private Date _lastPublishDate;
+
 }

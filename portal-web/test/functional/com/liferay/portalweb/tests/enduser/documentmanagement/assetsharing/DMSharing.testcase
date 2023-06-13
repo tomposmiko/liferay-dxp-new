@@ -28,7 +28,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -130,7 +130,7 @@ definition {
 		);
 	}
 
-	@description = "This test asserts only one entry displays in a user's Shared with Me app when multiple users share the same document to him."
+	@description = "This test asserts only one entry displays in a user's Shared Assets app when multiple users share the same document to him."
 	@priority = "4"
 	test AssertSingleEntry {
 		ProductMenu.gotoPortlet(
@@ -220,16 +220,102 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "My Account",
 			panel = "User",
-			portlet = "Shared With Me"
+			portlet = "Shared Assets"
 		);
 
 		var key_dmDocumentTitle = "DM Document Title";
 
-		AssertTextEquals(locator1 = "DocumentsAndMediaShare#SHARED_WITH_ME_DOCUMENT_TITLE", value1 = "DM Document Title");
+		AssertTextEquals(locator1 = "DocumentsAndMediaShare#SHARED_ASSETS_DOCUMENT_TITLE", value1 = "DM Document Title");
 		AssertElementNotPresent(locator1 = "//tbody/tr[2]/td[contains(@class,'table-cell-content')]/a[contains(.,'DM Document Title')]");
 	}
 
-	@description = "This test ensures that users can Order By Shared Date in the Shared with Me app."
+	@description = "This test ensures that Sharing can be disabled at the instance level."
+	@priority = "4"
+	test DisableSharingAtInstanceScope {
+		property test.name.skip.portal.instance = "DMSharing#DisableSharingAtInstanceScope";
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "System Settings"
+		);
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Sharing",
+			configurationName = "Virtual Instance Sharing",
+			configurationScope = "Virtual Instance Scope"
+		);
+
+		FormFields.disableCheckbox(fieldName = "enabled");
+
+		SystemSettings.saveConfiguration();
+
+		Navigator.openURL();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.addPG(
+			dmDocumentFile = "Document_1.doc",
+			dmDocumentTitle = "Document with sharing disabled"
+		);
+
+		LexiconEntry.openEntryMenu(rowEntry = "Document with sharing disabled");
+
+		AssertElementNotPresent(locator1="MenuItem#ANY_MENU_ITEM", key_menuItem="Share");
+
+		AssertClick(
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			key_dmDocumentTitle = "Document with sharing disabled",
+			value1 = "Document with sharing disabled"
+		);
+
+		AssertElementNotPresent(locator1="Button#ANY", key_text="Share");
+	}
+
+	@description = "This test ensures that Sharing can be disabled at the system level."
+	@priority = "4"
+	test DisableSharingAtSystemScope {
+		property test.name.skip.portal.instance = "DMSharing#DisableSharingAtSystemScope";
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "System Settings"
+		);
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Sharing",
+			configurationName = "Sharing",
+			configurationScope = "System Scope"
+		);
+
+		FormFields.disableCheckbox(fieldName = "enabled");
+
+		SystemSettings.saveConfiguration();
+
+		Navigator.openURL();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.addPG(
+			dmDocumentFile = "Document_1.doc",
+			dmDocumentTitle = "Document with sharing disabled"
+		);
+
+		LexiconEntry.openEntryMenu(rowEntry = "Document with sharing disabled");
+
+		AssertElementNotPresent(locator1="MenuItem#ANY_MENU_ITEM", key_menuItem="Share");
+
+		AssertClick(
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			key_dmDocumentTitle = "Document with sharing disabled",
+			value1 = "Document with sharing disabled"
+		);
+
+		AssertElementNotPresent(locator1="Button#ANY", key_text="Share");
+	}
+
+	@description = "This test ensures that users can Order By Shared Date in the Shared Assets app."
 	@priority = "3"
 	test FilterByAssetType {
 
@@ -254,7 +340,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "My Account",
 			panel = "User",
-			portlet = "Shared With Me"
+			portlet = "Shared Assets"
 		);
 
 		ManagementBar.setFilterAndOrder(filterBy = "Asset Types");
@@ -269,7 +355,7 @@ definition {
 		var key_assetType = "Documents";
 
 		AssertClick(
-			locator1="DocumentsAndMediaShare#SHARED_WITH_ME_ASSET_TYPE",
+			locator1="DocumentsAndMediaShare#SHARED_ASSETS_ASSET_TYPE",
 			value1="Documents"
 		);
 
@@ -278,12 +364,12 @@ definition {
 		AssertClick(locator1 = "Button#SELECT", value1 = "Select");
 	}
 
-	@description = "This test ensures that users receives an email when a document is shared with them. This email contains a link that navigates user to Shared With Me app."
+	@description = "This test ensures that users receives an email when a document is shared with them. This email contains a link that navigates user to Shared Assets app."
 	@priority = "4"
-	test GoToSharedWithMeViaEmail {
+	test GoToSharedAssetsViaEmail {
 		property custom.properties = "message.boards.message.formats.default=html${line.separator}pop.server.notifications.enabled=true${line.separator}pop.server.subdomain=${line.separator}mail.session.mail.smtp.auth=true${line.separator}mail.session.mail.store.protocol=pop3${line.separator}mail.session.mail.transport.protocol=smtp";
 		property dummy.socket.proxy.disabled = "true";
-		property test.name.skip.portal.instance = "DMSharing#GoToSharedWithMeViaEmail";
+		property test.name.skip.portal.instance = "DMSharing#GoToSharedAssetsViaEmail";
 		var portalURL = PropsUtil.get("portal.url");
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
@@ -373,15 +459,15 @@ definition {
 
 		SelectWindow(locator1 = "title=- Liferay");
 
-		DMDocumentSharing.viewDocumentViaSharedWithMe(
+		DMDocumentSharing.viewDocumentViaSharedAssets(
 			assetSharingPermission = "View",
 			dmDocumentTitle = "DM Document Title (Version 1.0)"
 		);
 	}
 
-	@description = "This test ensures that users receive a notification in portal when a document is shared to them, and that clicking on that notification navigates them to the Shared With Me app."
+	@description = "This test ensures that users receive a notification in portal when a document is shared to them, and that clicking on that notification navigates them to the Shared Assets app."
 	@priority = "4"
-	test GoToSharedWithMeViaNotifications {
+	test GoToSharedAssetsViaNotifications {
 		DMDocumentSharing.addDocumentWithOnlyOwnerPermissions(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentFile = "Document_1.doc",
@@ -410,7 +496,7 @@ definition {
 			ownerName = "Test Test"
 		);
 
-		DMDocumentSharing.viewDocumentViaSharedWithMe(
+		DMDocumentSharing.viewDocumentViaSharedAssets(
 			assetSharingPermission = "View",
 			dmDocumentTitle = "DM Document Title (Version 1.0)"
 		);
@@ -506,7 +592,7 @@ definition {
 		);
 	}
 
-	@description = "This test ensures that users can Order By Shared Date in the Shared with Me app."
+	@description = "This test ensures that users can Order By Shared Date in the Shared Assets app."
 	@priority = "3"
 	test OrderBySharedDate {
 		DMDocument.addMultiplePG(
@@ -539,7 +625,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "My Account",
 			panel = "User",
-			portlet = "Shared With Me"
+			portlet = "Shared Assets"
 		);
 
 		ManagementBar.setFilterAndOrder(orderBy = "Shared Date");
@@ -547,9 +633,9 @@ definition {
 		ManagementBar.toggleViewOrder(order = "Descending");
 	}
 
-	@description = "This test asserts that users can share via Shared With Me app."
+	@description = "This test asserts that users can share via Shared Assets app."
 	@priority = "5"
-	test ShareViaSharedWithMe {
+	test ShareViaSharedAssets {
 		JSONUser.addUser(
 			userEmailAddress = "userea2@liferay.com",
 			userFirstName = "userfn2",
@@ -593,10 +679,10 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "My Account",
 			panel = "User",
-			portlet = "Shared With Me"
+			portlet = "Shared Assets"
 		);
 
-		DMNavigator.gotoShareViaSharedWithMe(dmDocumentTitle = "DM Document Title");
+		DMNavigator.gotoShareViaSharedAssets(dmDocumentTitle = "DM Document Title");
 
 		DMDocument.sharePG(
 			shareable = "true",
@@ -615,6 +701,63 @@ definition {
 			dmDocumentTitle = "DM Document Title",
 			dmDocumentUploader = "Test Test"
 		);
+	}
+
+	@description = "This test share an asset to a user and disable the sharing option. This test asserts that a collaborator without sharing permissions will not be able to share this asset."
+	@priority = "5"
+	test ShareWithNoSharingPermissions {
+		JSONUser.addUser(
+			userEmailAddress = "userea1@liferay.com",
+			userFirstName = "userfn1",
+			userLastName = "userln1",
+			userScreenName = "usersn1"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		User.editPasswordCP(
+			userEmailAddress = "userea@liferay.com",
+			userScreenName = "usersn"
+		);
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocumentSharing.addDocumentWithOnlyOwnerPermissions(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.doc",
+			dmDocumentTitle = "DM Document Title"
+		);
+
+		DMNavigator.gotoShare(dmDocumentTitle = "DM Document Title");
+
+		DMDocument.sharePG(
+			userEmailAddress = "userea@liferay.com",
+			userName = "userfn userln"
+		);
+
+		User.logoutPG();
+
+		User.loginUserPG(password = "test", userEmailAddress = "userea@liferay.com");
+
+		ProductMenu.gotoPortlet(
+			category = "My Account",
+			panel = "User",
+			portlet = "Shared Assets"
+		);
+
+		var key_dmDocumentTitle = "DM Document Title";
+
+		AssertElementNotPresent(locator1 = "DocumentsAndMediaShare#SHARED_ASSETS_DOCUMENT_OPTIONS");
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		Click(locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
+
+		MenuItem.viewNotPresent(menuItem = "Share");
 	}
 
 	@description = "This test makes sure only owners see the Collaborators List. Collaborators will only see the owner of the document. This usecase also tests that a user can successfully remove collaborators through Manage Collaborators and asserts that empty message displays when all collaborators are removed."

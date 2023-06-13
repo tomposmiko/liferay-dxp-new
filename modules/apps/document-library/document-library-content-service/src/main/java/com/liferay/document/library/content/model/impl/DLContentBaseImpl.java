@@ -32,8 +32,9 @@ import com.liferay.document.library.content.service.DLContentLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DLContentBaseImpl extends DLContentModelImpl
-	implements DLContent {
+public abstract class DLContentBaseImpl
+	extends DLContentModelImpl implements DLContent {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class DLContentBaseImpl extends DLContentModelImpl
 			DLContentLocalServiceUtil.updateDLContent(this);
 		}
 	}
+
 }

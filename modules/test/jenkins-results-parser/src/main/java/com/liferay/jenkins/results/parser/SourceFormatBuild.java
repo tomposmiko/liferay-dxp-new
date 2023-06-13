@@ -63,7 +63,9 @@ public class SourceFormatBuild extends TopLevelBuild {
 			Dom4JUtil.getNewElement("h4", null, "Sender Branch:"),
 			getSenderBranchDetailsElement());
 
-		if (_pullRequest.getUpstreamBranchName().contains("-private")) {
+		String upstreamBranchName = _pullRequest.getUpstreamBranchName();
+
+		if (upstreamBranchName.contains("-private")) {
 			Dom4JUtil.addToElement(
 				detailsElement,
 				Dom4JUtil.getNewElement("h4", null, "Companion Branch:"),
@@ -114,6 +116,9 @@ public class SourceFormatBuild extends TopLevelBuild {
 
 	@Override
 	protected FailureMessageGenerator[] getFailureMessageGenerators() {
+
+		// Skip JavaParser
+
 		return new FailureMessageGenerator[] {
 			new RebaseFailureMessageGenerator(),
 			new SourceFormatFailureMessageGenerator(),

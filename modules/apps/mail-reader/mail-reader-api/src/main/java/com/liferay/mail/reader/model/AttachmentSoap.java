@@ -29,6 +29,7 @@ import java.util.List;
  */
 @ProviderType
 public class AttachmentSoap implements Serializable {
+
 	public static AttachmentSoap toSoapModel(Attachment model) {
 		AttachmentSoap soapModel = new AttachmentSoap();
 
@@ -73,7 +74,8 @@ public class AttachmentSoap implements Serializable {
 	}
 
 	public static AttachmentSoap[] toSoapModels(List<Attachment> models) {
-		List<AttachmentSoap> soapModels = new ArrayList<AttachmentSoap>(models.size());
+		List<AttachmentSoap> soapModels = new ArrayList<AttachmentSoap>(
+			models.size());
 
 		for (Attachment model : models) {
 			soapModels.add(toSoapModel(model));
@@ -174,4 +176,5 @@ public class AttachmentSoap implements Serializable {
 	private String _contentPath;
 	private String _fileName;
 	private long _size;
+
 }

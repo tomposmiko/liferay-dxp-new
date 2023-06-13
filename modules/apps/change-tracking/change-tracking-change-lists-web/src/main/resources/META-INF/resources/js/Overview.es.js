@@ -1,3 +1,5 @@
+import 'clay-icon';
+
 import Soy from 'metal-soy';
 import PortletBase from 'frontend-js-web/liferay/PortletBase.es';
 import {Config} from 'metal-state';
@@ -13,8 +15,12 @@ import templates from './Overview.soy';
 class Overview extends PortletBase {
 
 	created() {
-		let urls = [this.urlActiveCollection, this.urlProductionInformation];
+		this._render();
 
+		this._fetchProductionCollection();
+	}
+
+	_fetchProductionCollection() {
 		let headers = new Headers();
 		headers.append('Content-Type', 'application/json');
 
@@ -24,24 +30,13 @@ class Overview extends PortletBase {
 			method: 'GET'
 		};
 
-		this._fetchAll(
-			urls,
-			init
-		)
-			.then(result => this._populateFields(result))
-			.catch(
-				error => {
-					const message = typeof error === 'string' ?
-						error :
-						Liferay.Language.get('an-error-occured-while-parsing-data');
+		let url = this.urlCollectionsBase + '?type=production&companyId=' + Liferay.ThemeDisplay.getCompanyId();
 
-					openToast(
-						{
-							message,
-							title: Liferay.Language.get('error'),
-							type: 'danger'
-						}
-					);
+		fetch(url, init)
+			.then(r => r.json())
+			.then(
+				response => {
+					this.productionCTCollectionId = response[0].ctCollectionId;
 				}
 			);
 	}
@@ -101,36 +96,173 @@ class Overview extends PortletBase {
 			);
 	}
 
+	_fetchCollisions(url, type) {
+		this.collisionsLoading = true;
+
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+
+		let init = {
+			credentials: 'include',
+			headers,
+			method: type
+		};
+
+		fetch(url, init)
+			.then(r => r.json())
+			.then(response => this._populateCollidingChangeEntries(response))
+			.catch(
+				error => {
+					const message = typeof error === 'string' ?
+						error :
+						Liferay.Util.sub(Liferay.Language.get('an-error-occured-while-getting-data-from-x'), url);
+
+					openToast(
+						{
+							message,
+							title: Liferay.Language.get('error'),
+							type: 'danger'
+						}
+					);
+				}
+			);
+	}
+
+	_fetchRecentCollections(url, type) {
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+
+		let init = {
+			credentials: 'include',
+			headers,
+			method: type
+		};
+
+		fetch(url, init)
+			.then(r => r.json())
+			.then(response => this._populateChangeListsDropdown(response))
+			.catch(
+				error => {
+					const message = typeof error === 'string' ?
+						error :
+						Liferay.Util.sub(Liferay.Language.get('an-error-occured-while-getting-data-from-x'), url);
+
+					openToast(
+						{
+							message,
+							title: Liferay.Language.get('error'),
+							type: 'danger'
+						}
+					);
+				}
+			);
+	}
+
 	_handleClickPublish(event) {
 		new PublishChangeList(
 			{
 				changeListDescription: this.descriptionActiveChangeList,
 				changeListName: this.headerTitleActiveChangeList,
 				spritemap: themeDisplay.getPathThemeImages() + '/lexicon/icons.svg',
+				urlChangeListsHistory: this.urlChangeListsHistory,
+				urlCheckoutProduction: this.urlCollectionsBase + '/' + this.productionCTCollectionId + '/checkout?userId=' + Liferay.ThemeDisplay.getUserId(),
 				urlPublishChangeList: this.urlActiveCollectionPublish
 			}
 		);
 	}
 
+	_handleClickRecentCollections(event) {
+		event.preventDefault();
+
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+
+		let body = {
+			credentials: 'include',
+			headers,
+			method: 'POST'
+		};
+
+		let collectionId = event.target.getAttribute('data-collection-id');
+
+		let production = event.target.getAttribute('data-production');
+
+		let url = this.urlCollectionsBase + '/' + collectionId + '/checkout?userId=' + Liferay.ThemeDisplay.getUserId();
+
+		fetch(url, body)
+			.then(
+				response => {
+					if (response.status === 202) {
+						if (production) {
+							Liferay.Util.navigate(this.urlSelectProduction);
+						}
+						else {
+							this._render();
+						}
+					}
+					else if (response.status === 400) {
+						response.json()
+							.then(
+								data => {
+									openToast(
+										{
+											message: Liferay.Util.sub(Liferay.Language.get('an-error-occured-when-trying-to-check-x-out-x'), this.changeListName, data.message),
+											title: Liferay.Language.get('error'),
+											type: 'danger'
+										}
+									);
+								}
+							);
+					}
+				}
+			)
+			.catch(
+				error => {
+					const message = typeof error === 'string' ?
+						error :
+						Liferay.Util.sub(Liferay.Language.get('an-error-occured-when-trying-to-check-x-out'), this.changeListName);
+
+					openToast(
+						{
+							message,
+							title: Liferay.Language.get('error'),
+							type: 'danger'
+						}
+					);
+				}
+			);
+	}
+
 	_populateChangeEntries(changeEntriesResult) {
 		this.changeEntries = [];
 
-		changeEntriesResult.forEach(
+		if (!changeEntriesResult.items) {
+			this.headerButtonDisabled = true;
+
+			return;
+		}
+
+		changeEntriesResult.items.forEach(
 			changeEntry => {
 				let changeTypeStr = Liferay.Language.get('added');
 
-				if (changeEntry.changeType === 2) {
+				if (changeEntry.changeType === 1) {
 					changeTypeStr = Liferay.Language.get('deleted');
 				}
-				else if (changeEntry.changeType === 3) {
+				else if (changeEntry.changeType === 2) {
 					changeTypeStr = Liferay.Language.get('modified');
 				}
+
+				let entityNameTranslation = this.entityNameTranslations.find(
+					entityNameTranslation =>
+						entityNameTranslation.key == changeEntry.contentType
+				);
 
 				this.changeEntries.push(
 					{
 						changeType: changeTypeStr,
 						conflict: false,
-						contentType: changeEntry.contentType,
+						contentType: entityNameTranslation.translation,
 						lastEdited: new Intl.DateTimeFormat(
 							Liferay.ThemeDisplay.getBCP47LanguageId(),
 							{
@@ -139,7 +271,7 @@ class Overview extends PortletBase {
 								minute: 'numeric',
 								month: 'numeric',
 								year: 'numeric'
-							}).format(changeEntry.modifiedDate),
+							}).format(new Date(changeEntry.modifiedDate)),
 						site: changeEntry.siteName,
 						title: changeEntry.title,
 						userName: changeEntry.userName,
@@ -154,6 +286,31 @@ class Overview extends PortletBase {
 		}
 	}
 
+	_populateChangeListsDropdown(collectionResults) {
+		this.changeListsDropdownMenu = [];
+
+		collectionResults.forEach(
+			ctCollection => {
+				this.changeListsDropdownMenu.push(
+					{
+						ctCollectionId: ctCollection.ctCollectionId,
+						label: ctCollection.name
+					}
+				);
+			}
+		);
+	}
+
+	_populateCollidingChangeEntries(collisionsResult) {
+		if (collisionsResult.items) {
+			this.collisionsCount = collisionsResult.items.length;
+		}
+
+		this.collisionsTooltip = Liferay.Util.sub(Liferay.Language.get('collision-detected-for-x-change-lists'), this.collisionsCount);
+
+		this.collisionsLoading = false;
+	}
+
 	_populateFields(requestResult) {
 		let activeCollection = requestResult[0];
 		let productionInformation = requestResult[1];
@@ -165,6 +322,7 @@ class Overview extends PortletBase {
 		);
 
 		if (foundEntriesLink) {
+			this._fetchCollisions(foundEntriesLink.href + '?collision=true', foundEntriesLink.type);
 			this._fetchChangeEntries(foundEntriesLink.href, foundEntriesLink.type);
 		}
 
@@ -186,59 +344,93 @@ class Overview extends PortletBase {
 
 		this.descriptionActiveChangeList = activeCollection.description;
 
-		// Production Information Description
-
-		this.descriptionProductionInformation = productionInformation.ctcollection.description;
-
 		// Change Lists dropdown Menu
 
-		this.changeListsDropdownMenu = [
-			{
-				label: 'Change List 01',
-				link: 'link01'
-			},
-			{
-				label: 'Change List 02',
-				link: 'link02'
-			},
-			{
-				label: 'Change List 03',
-				link: 'link03'
-			}
-		];
+		let urlRecentCollections = this.urlCollectionsBase + '?companyId=' + Liferay.ThemeDisplay.getCompanyId() + '&limit=5&sort=modifiedDate:desc';
+
+		this._fetchRecentCollections(urlRecentCollections, 'GET');
 
 		// Active Change List Header Title
 
 		this.headerTitleActiveChangeList = activeCollection.name;
 
-		// Production Information Header Title
-
-		this.headerTitleProductionInformation = productionInformation.ctcollection.name;
-
 		// Initial Fetch
 
 		this.initialFetch = true;
 
-		// Production Information Published By
+		if ((productionInformation !== undefined) && (productionInformation.ctcollection !== undefined) && (productionInformation.ctcollection.name !== undefined)) {
 
-		let publishDate = new Date(productionInformation.date);
+			// Production Information Description
 
-		this.publishedBy = {
-			dateTime: new Intl.DateTimeFormat(
-				Liferay.ThemeDisplay.getBCP47LanguageId(),
-				{
-					day: 'numeric',
-					hour: 'numeric',
-					minute: 'numeric',
-					month: 'numeric',
-					year: 'numeric'
-				}).format(publishDate),
-			userInitials: productionInformation.userInitials,
-			userName: productionInformation.userName,
-			userPortraitURL: productionInformation.userPortraitURL
-		};
+			this.descriptionProductionInformation = productionInformation.ctcollection.description;
+
+			// Production Information Header Title
+
+			this.headerTitleProductionInformation = productionInformation.ctcollection.name;
+
+			// Production Information Published By
+
+			let publishDate = new Date(productionInformation.date);
+
+			this.publishedBy = {
+				dateTime: new Intl.DateTimeFormat(
+					Liferay.ThemeDisplay.getBCP47LanguageId(),
+					{
+						day: 'numeric',
+						hour: 'numeric',
+						minute: 'numeric',
+						month: 'numeric',
+						year: 'numeric'
+					}).format(publishDate),
+				userInitials: productionInformation.userInitials,
+				userName: productionInformation.userName,
+				userPortraitURL: productionInformation.userPortraitURL
+			};
+
+			this.productionFound = true;
+		}
+		else {
+			this.productionFound = false;
+		}
 	}
 
+	_render() {
+		let urlActiveCollection = this.urlCollectionsBase + '?type=active&userId=' + Liferay.ThemeDisplay.getUserId();
+
+		let urls = [urlActiveCollection, this.urlProductionInformation];
+
+		this.initialFetch = false;
+
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+
+		let init = {
+			credentials: 'include',
+			headers,
+			method: 'GET'
+		};
+
+		this._fetchAll(
+			urls,
+			init
+		)
+			.then(result => this._populateFields(result))
+			.catch(
+				error => {
+					const message = typeof error === 'string' ?
+						error :
+						Liferay.Language.get('an-error-occured-while-parsing-data');
+
+					openToast(
+						{
+							message,
+							title: Liferay.Language.get('error'),
+							type: 'danger'
+						}
+					);
+				}
+			);
+	}
 }
 
 /**
@@ -299,6 +491,18 @@ Overview.STATE = {
 	descriptionProductionInformation: Config.string(),
 
 	/**
+	 * TODO:
+	 */
+	entityNameTranslations: Config.arrayOf(
+		Config.shapeOf(
+			{
+				key: Config.string(),
+				translation: Config.string()
+			}
+		)
+	),
+
+	/**
 	 * Contains the change entries for the currently selected CT Collection.
 	 * @default undefined
 	 * @instance
@@ -334,11 +538,33 @@ Overview.STATE = {
 	changeListsDropdownMenu: Config.arrayOf(
 		Config.shapeOf(
 			{
-				label: Config.string(),
-				link: Config.string()
+				ctCollectionId: Config.string(),
+				label: Config.string()
 			}
 		)
 	),
+
+	/**
+	 * Stores if fetching collission is in progress.
+	 * @default true
+	 * @instance
+	 * @memberOf Overview
+	 * @review
+	 * @type {boolean}
+	 */
+	collisionsLoading: Config.bool().value(true),
+
+	/**
+	 * Stores the number of collisions.
+	 * @default true
+	 * @instance
+	 * @memberOf Overview
+	 * @review
+	 * @type {boolean}
+	 */
+	collisionsCount: Config.number().value(0),
+
+	collisionsTooltip: Config.string(),
 
 	/**
 	 * Stores if the head button is disabled or not.
@@ -383,6 +609,10 @@ Overview.STATE = {
 
 	initialFetch: Config.bool().value(false),
 
+	productionCTCollectionId: Config.number(),
+
+	productionFound: Config.bool().value(false),
+
 	/**
 	 * Information of who published to production
 	 * @instance
@@ -401,17 +631,19 @@ Overview.STATE = {
 	),
 
 	/**
-	 * REST API URL to the active CT Collection
+	 * BBase REST API URL to collection resource
 	 * @default
 	 * @instance
 	 * @memberOf Overview
 	 * @review
-	 * @type {!string}
+	 * @type {string}
 	 */
 
-	urlActiveCollection: Config.string().required(),
+	urlCollectionsBase: Config.string(),
 
 	urlActiveCollectionPublish: Config.object(),
+
+	urlChangeListsHistory: Config.string().required(),
 
 	/**
 	 * The URL for the REST service to the change entries
@@ -446,6 +678,17 @@ Overview.STATE = {
 	 */
 
 	urlProductionView: Config.string().required(),
+
+	/**
+	 * Property that contains the url for the list view with
+	 * production checked out
+	 * @default undefined
+	 * @instance
+	 * @memberOf Overview
+	 * @review
+	 * @type {string}
+	 */
+	urlSelectProduction: Config.string(),
 
 	/**
 	 * Path of the available icons.

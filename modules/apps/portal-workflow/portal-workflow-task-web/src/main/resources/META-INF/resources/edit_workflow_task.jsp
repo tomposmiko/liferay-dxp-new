@@ -179,6 +179,18 @@ renderResponse.setTitle(headerTitle);
 											url="<%= workflowTaskDisplayContext.getTaglibViewDiffsURL(workflowTask) %>"
 										/>
 									</c:if>
+
+									<%
+									String viewUsagesURL = assetRenderer.getURLViewUsages(request);
+									%>
+
+									<c:if test="<%= Validator.isNotNull(viewUsagesURL) %>">
+										<liferay-frontend:management-bar-button
+											href="<%= viewUsagesURL %>"
+											icon="list"
+											label="view-usages"
+										/>
+									</c:if>
 								</c:if>
 
 								<c:if test="<%= workflowTaskDisplayContext.hasEditPortletURL(workflowTask) %>">
@@ -225,8 +237,8 @@ renderResponse.setTitle(headerTitle);
 						<liferay-comment:discussion
 							assetEntryVisible="<%= false %>"
 							className="<%= assetRenderer.getClassName() %>"
-							classPK="<%= assetRenderer.getClassPK() %>"
-							formName='<%= "fm" + assetRenderer.getClassPK() %>'
+							classPK="<%= assetEntry.getClassPK() %>"
+							formName='<%= "fm" + assetEntry.getClassPK() %>'
 							ratingsEnabled="<%= false %>"
 							redirect="<%= currentURL %>"
 							userId="<%= user.getUserId() %>"

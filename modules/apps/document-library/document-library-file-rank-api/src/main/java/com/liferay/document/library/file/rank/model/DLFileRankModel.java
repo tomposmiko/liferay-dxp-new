@@ -34,6 +34,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface DLFileRankModel extends BaseModel<DLFileRank>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -174,4 +175,5 @@ public interface DLFileRankModel extends BaseModel<DLFileRank>, ShardedModel {
 	 * @param active the active of this document library file rank
 	 */
 	public void setActive(boolean active);
+
 }

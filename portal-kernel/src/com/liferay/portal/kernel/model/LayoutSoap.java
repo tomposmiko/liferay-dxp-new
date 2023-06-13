@@ -30,11 +30,13 @@ import java.util.List;
  */
 @ProviderType
 public class LayoutSoap implements Serializable {
+
 	public static LayoutSoap toSoapModel(Layout model) {
 		LayoutSoap soapModel = new LayoutSoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setUuid(model.getUuid());
+		soapModel.setHeadId(model.getHeadId());
 		soapModel.setPlid(model.getPlid());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
@@ -48,6 +50,8 @@ public class LayoutSoap implements Serializable {
 		soapModel.setPrivateLayout(model.isPrivateLayout());
 		soapModel.setLayoutId(model.getLayoutId());
 		soapModel.setParentLayoutId(model.getParentLayoutId());
+		soapModel.setClassNameId(model.getClassNameId());
+		soapModel.setClassPK(model.getClassPK());
 		soapModel.setName(model.getName());
 		soapModel.setTitle(model.getTitle());
 		soapModel.setDescription(model.getDescription());
@@ -64,8 +68,11 @@ public class LayoutSoap implements Serializable {
 		soapModel.setCss(model.getCss());
 		soapModel.setPriority(model.getPriority());
 		soapModel.setLayoutPrototypeUuid(model.getLayoutPrototypeUuid());
-		soapModel.setLayoutPrototypeLinkEnabled(model.isLayoutPrototypeLinkEnabled());
-		soapModel.setSourcePrototypeLayoutUuid(model.getSourcePrototypeLayoutUuid());
+		soapModel.setLayoutPrototypeLinkEnabled(
+			model.isLayoutPrototypeLinkEnabled());
+		soapModel.setSourcePrototypeLayoutUuid(
+			model.getSourcePrototypeLayoutUuid());
+		soapModel.setPublishDate(model.getPublishDate());
 		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
@@ -133,6 +140,14 @@ public class LayoutSoap implements Serializable {
 
 	public void setUuid(String uuid) {
 		_uuid = uuid;
+	}
+
+	public long getHeadId() {
+		return _headId;
+	}
+
+	public void setHeadId(long headId) {
+		_headId = headId;
 	}
 
 	public long getPlid() {
@@ -241,6 +256,22 @@ public class LayoutSoap implements Serializable {
 
 	public void setParentLayoutId(long parentLayoutId) {
 		_parentLayoutId = parentLayoutId;
+	}
+
+	public long getClassNameId() {
+		return _classNameId;
+	}
+
+	public void setClassNameId(long classNameId) {
+		_classNameId = classNameId;
+	}
+
+	public long getClassPK() {
+		return _classPK;
+	}
+
+	public void setClassPK(long classPK) {
+		_classPK = classPK;
 	}
 
 	public String getName() {
@@ -389,6 +420,7 @@ public class LayoutSoap implements Serializable {
 
 	public void setLayoutPrototypeLinkEnabled(
 		boolean layoutPrototypeLinkEnabled) {
+
 		_layoutPrototypeLinkEnabled = layoutPrototypeLinkEnabled;
 	}
 
@@ -398,6 +430,14 @@ public class LayoutSoap implements Serializable {
 
 	public void setSourcePrototypeLayoutUuid(String sourcePrototypeLayoutUuid) {
 		_sourcePrototypeLayoutUuid = sourcePrototypeLayoutUuid;
+	}
+
+	public Date getPublishDate() {
+		return _publishDate;
+	}
+
+	public void setPublishDate(Date publishDate) {
+		_publishDate = publishDate;
 	}
 
 	public Date getLastPublishDate() {
@@ -410,6 +450,7 @@ public class LayoutSoap implements Serializable {
 
 	private long _mvccVersion;
 	private String _uuid;
+	private long _headId;
 	private long _plid;
 	private long _groupId;
 	private long _companyId;
@@ -423,6 +464,8 @@ public class LayoutSoap implements Serializable {
 	private boolean _privateLayout;
 	private long _layoutId;
 	private long _parentLayoutId;
+	private long _classNameId;
+	private long _classPK;
 	private String _name;
 	private String _title;
 	private String _description;
@@ -441,5 +484,7 @@ public class LayoutSoap implements Serializable {
 	private String _layoutPrototypeUuid;
 	private boolean _layoutPrototypeLinkEnabled;
 	private String _sourcePrototypeLayoutUuid;
+	private Date _publishDate;
 	private Date _lastPublishDate;
+
 }

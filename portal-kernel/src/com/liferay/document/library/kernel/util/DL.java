@@ -260,6 +260,8 @@ public interface DL {
 			boolean manualCheckInRequired, boolean officeExtensionRequired)
 		throws PortalException;
 
+	public boolean hasViewInContextGroupLayout(ThemeDisplay themeDisplay);
+
 	public boolean hasWorkflowDefinitionLink(
 			long companyId, long groupId, long folderId, long fileEntryTypeId)
 		throws Exception;

@@ -32,8 +32,9 @@ import com.liferay.portal.workflow.kaleo.service.KaleoConditionLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class KaleoConditionBaseImpl extends KaleoConditionModelImpl
-	implements KaleoCondition {
+public abstract class KaleoConditionBaseImpl
+	extends KaleoConditionModelImpl implements KaleoCondition {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class KaleoConditionBaseImpl extends KaleoConditionModelImpl
 			KaleoConditionLocalServiceUtil.updateKaleoCondition(this);
 		}
 	}
+
 }

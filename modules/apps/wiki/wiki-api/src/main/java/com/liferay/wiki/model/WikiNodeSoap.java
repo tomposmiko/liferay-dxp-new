@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class WikiNodeSoap implements Serializable {
+
 	public static WikiNodeSoap toSoapModel(WikiNode model) {
 		WikiNodeSoap soapModel = new WikiNodeSoap();
 
@@ -81,7 +82,8 @@ public class WikiNodeSoap implements Serializable {
 	}
 
 	public static WikiNodeSoap[] toSoapModels(List<WikiNode> models) {
-		List<WikiNodeSoap> soapModels = new ArrayList<WikiNodeSoap>(models.size());
+		List<WikiNodeSoap> soapModels = new ArrayList<WikiNodeSoap>(
+			models.size());
 
 		for (WikiNode model : models) {
 			soapModels.add(toSoapModel(model));
@@ -245,4 +247,5 @@ public class WikiNodeSoap implements Serializable {
 	private long _statusByUserId;
 	private String _statusByUserName;
 	private Date _statusDate;
+
 }

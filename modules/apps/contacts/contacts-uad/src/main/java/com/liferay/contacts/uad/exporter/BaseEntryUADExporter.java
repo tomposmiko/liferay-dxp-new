@@ -17,11 +17,8 @@ package com.liferay.contacts.uad.exporter;
 import com.liferay.contacts.model.Entry;
 import com.liferay.contacts.service.EntryLocalService;
 import com.liferay.contacts.uad.constants.ContactsUADConstants;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
-
 import com.liferay.user.associated.data.exporter.DynamicQueryUADExporter;
 
 import org.osgi.service.component.annotations.Reference;
@@ -38,7 +35,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public abstract class BaseEntryUADExporter extends DynamicQueryUADExporter<Entry> {
+public abstract class BaseEntryUADExporter
+	extends DynamicQueryUADExporter<Entry> {
+
 	@Override
 	public Class<Entry> getTypeClass() {
 		return Entry.class;
@@ -94,4 +93,5 @@ public abstract class BaseEntryUADExporter extends DynamicQueryUADExporter<Entry
 
 	@Reference
 	protected EntryLocalService entryLocalService;
+
 }

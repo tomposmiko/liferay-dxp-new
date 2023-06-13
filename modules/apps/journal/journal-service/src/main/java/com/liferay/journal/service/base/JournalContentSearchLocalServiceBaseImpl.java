@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.journal.model.JournalContentSearch;
 import com.liferay.journal.service.JournalContentSearchLocalService;
 import com.liferay.journal.service.persistence.JournalContentSearchPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -66,8 +65,9 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class JournalContentSearchLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements JournalContentSearchLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements JournalContentSearchLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -84,6 +84,7 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	@Override
 	public JournalContentSearch addJournalContentSearch(
 		JournalContentSearch journalContentSearch) {
+
 		journalContentSearch.setNew(true);
 
 		return journalContentSearchPersistence.update(journalContentSearch);
@@ -97,7 +98,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 */
 	@Override
 	@Transactional(enabled = false)
-	public JournalContentSearch createJournalContentSearch(long contentSearchId) {
+	public JournalContentSearch createJournalContentSearch(
+		long contentSearchId) {
+
 		return journalContentSearchPersistence.create(contentSearchId);
 	}
 
@@ -112,6 +115,7 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	@Override
 	public JournalContentSearch deleteJournalContentSearch(long contentSearchId)
 		throws PortalException {
+
 		return journalContentSearchPersistence.remove(contentSearchId);
 	}
 
@@ -125,6 +129,7 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	@Override
 	public JournalContentSearch deleteJournalContentSearch(
 		JournalContentSearch journalContentSearch) {
+
 		return journalContentSearchPersistence.remove(journalContentSearch);
 	}
 
@@ -132,8 +137,8 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(JournalContentSearch.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			JournalContentSearch.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -144,7 +149,8 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 */
 	@Override
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
-		return journalContentSearchPersistence.findWithDynamicQuery(dynamicQuery);
+		return journalContentSearchPersistence.findWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -160,10 +166,11 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return journalContentSearchPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return journalContentSearchPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -180,10 +187,12 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return journalContentSearchPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return journalContentSearchPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -194,7 +203,8 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return journalContentSearchPersistence.countWithDynamicQuery(dynamicQuery);
+		return journalContentSearchPersistence.countWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -205,15 +215,19 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return journalContentSearchPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return journalContentSearchPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
-	public JournalContentSearch fetchJournalContentSearch(long contentSearchId) {
-		return journalContentSearchPersistence.fetchByPrimaryKey(contentSearchId);
+	public JournalContentSearch fetchJournalContentSearch(
+		long contentSearchId) {
+
+		return journalContentSearchPersistence.fetchByPrimaryKey(
+			contentSearchId);
 	}
 
 	/**
@@ -226,14 +240,18 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	@Override
 	public JournalContentSearch getJournalContentSearch(long contentSearchId)
 		throws PortalException {
-		return journalContentSearchPersistence.findByPrimaryKey(contentSearchId);
+
+		return journalContentSearchPersistence.findByPrimaryKey(
+			contentSearchId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(journalContentSearchLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			journalContentSearchLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(JournalContentSearch.class);
 
@@ -243,12 +261,17 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(journalContentSearchLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			journalContentSearchLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
-		indexableActionableDynamicQuery.setModelClass(JournalContentSearch.class);
+		indexableActionableDynamicQuery.setModelClass(
+			JournalContentSearch.class);
 
 		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
 			"contentSearchId");
@@ -258,7 +281,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(journalContentSearchLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			journalContentSearchLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(JournalContentSearch.class);
 
@@ -271,12 +296,15 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return journalContentSearchLocalService.deleteJournalContentSearch((JournalContentSearch)persistedModel);
+
+		return journalContentSearchLocalService.deleteJournalContentSearch(
+			(JournalContentSearch)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return journalContentSearchPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -292,8 +320,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 * @return the range of journal content searchs
 	 */
 	@Override
-	public List<JournalContentSearch> getJournalContentSearchs(int start,
-		int end) {
+	public List<JournalContentSearch> getJournalContentSearchs(
+		int start, int end) {
+
 		return journalContentSearchPersistence.findAll(start, end);
 	}
 
@@ -317,6 +346,7 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	@Override
 	public JournalContentSearch updateJournalContentSearch(
 		JournalContentSearch journalContentSearch) {
+
 		return journalContentSearchPersistence.update(journalContentSearch);
 	}
 
@@ -325,7 +355,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 *
 	 * @return the journal content search local service
 	 */
-	public JournalContentSearchLocalService getJournalContentSearchLocalService() {
+	public JournalContentSearchLocalService
+		getJournalContentSearchLocalService() {
+
 		return journalContentSearchLocalService;
 	}
 
@@ -336,7 +368,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 */
 	public void setJournalContentSearchLocalService(
 		JournalContentSearchLocalService journalContentSearchLocalService) {
-		this.journalContentSearchLocalService = journalContentSearchLocalService;
+
+		this.journalContentSearchLocalService =
+			journalContentSearchLocalService;
 	}
 
 	/**
@@ -344,7 +378,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 *
 	 * @return the journal content search persistence
 	 */
-	public JournalContentSearchPersistence getJournalContentSearchPersistence() {
+	public JournalContentSearchPersistence
+		getJournalContentSearchPersistence() {
+
 		return journalContentSearchPersistence;
 	}
 
@@ -355,6 +391,7 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 */
 	public void setJournalContentSearchPersistence(
 		JournalContentSearchPersistence journalContentSearchPersistence) {
+
 		this.journalContentSearchPersistence = journalContentSearchPersistence;
 	}
 
@@ -363,7 +400,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -373,7 +412,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -382,7 +423,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 *
 	 * @return the group local service
 	 */
-	public com.liferay.portal.kernel.service.GroupLocalService getGroupLocalService() {
+	public com.liferay.portal.kernel.service.GroupLocalService
+		getGroupLocalService() {
+
 		return groupLocalService;
 	}
 
@@ -393,6 +436,7 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 */
 	public void setGroupLocalService(
 		com.liferay.portal.kernel.service.GroupLocalService groupLocalService) {
+
 		this.groupLocalService = groupLocalService;
 	}
 
@@ -419,7 +463,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 *
 	 * @return the layout local service
 	 */
-	public com.liferay.portal.kernel.service.LayoutLocalService getLayoutLocalService() {
+	public com.liferay.portal.kernel.service.LayoutLocalService
+		getLayoutLocalService() {
+
 		return layoutLocalService;
 	}
 
@@ -429,7 +475,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 * @param layoutLocalService the layout local service
 	 */
 	public void setLayoutLocalService(
-		com.liferay.portal.kernel.service.LayoutLocalService layoutLocalService) {
+		com.liferay.portal.kernel.service.LayoutLocalService
+			layoutLocalService) {
+
 		this.layoutLocalService = layoutLocalService;
 	}
 
@@ -456,7 +504,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 *
 	 * @return the portlet preferences local service
 	 */
-	public com.liferay.portal.kernel.service.PortletPreferencesLocalService getPortletPreferencesLocalService() {
+	public com.liferay.portal.kernel.service.PortletPreferencesLocalService
+		getPortletPreferencesLocalService() {
+
 		return portletPreferencesLocalService;
 	}
 
@@ -466,7 +516,9 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 * @param portletPreferencesLocalService the portlet preferences local service
 	 */
 	public void setPortletPreferencesLocalService(
-		com.liferay.portal.kernel.service.PortletPreferencesLocalService portletPreferencesLocalService) {
+		com.liferay.portal.kernel.service.PortletPreferencesLocalService
+			portletPreferencesLocalService) {
+
 		this.portletPreferencesLocalService = portletPreferencesLocalService;
 	}
 
@@ -486,11 +538,13 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 */
 	public void setPortletPreferencesPersistence(
 		PortletPreferencesPersistence portletPreferencesPersistence) {
+
 		this.portletPreferencesPersistence = portletPreferencesPersistence;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.journal.model.JournalContentSearch",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.journal.model.JournalContentSearch",
 			journalContentSearchLocalService);
 	}
 
@@ -524,15 +578,16 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = journalContentSearchPersistence.getDataSource();
+			DataSource dataSource =
+				journalContentSearchPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -543,22 +598,45 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 
 	@BeanReference(type = JournalContentSearchLocalService.class)
 	protected JournalContentSearchLocalService journalContentSearchLocalService;
+
 	@BeanReference(type = JournalContentSearchPersistence.class)
 	protected JournalContentSearchPersistence journalContentSearchPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@ServiceReference(type = com.liferay.portal.kernel.service.GroupLocalService.class)
-	protected com.liferay.portal.kernel.service.GroupLocalService groupLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.GroupLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.GroupLocalService
+		groupLocalService;
+
 	@ServiceReference(type = GroupPersistence.class)
 	protected GroupPersistence groupPersistence;
-	@ServiceReference(type = com.liferay.portal.kernel.service.LayoutLocalService.class)
-	protected com.liferay.portal.kernel.service.LayoutLocalService layoutLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.LayoutLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.LayoutLocalService
+		layoutLocalService;
+
 	@ServiceReference(type = LayoutPersistence.class)
 	protected LayoutPersistence layoutPersistence;
-	@ServiceReference(type = com.liferay.portal.kernel.service.PortletPreferencesLocalService.class)
-	protected com.liferay.portal.kernel.service.PortletPreferencesLocalService portletPreferencesLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.PortletPreferencesLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.PortletPreferencesLocalService
+		portletPreferencesLocalService;
+
 	@ServiceReference(type = PortletPreferencesPersistence.class)
 	protected PortletPreferencesPersistence portletPreferencesPersistence;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

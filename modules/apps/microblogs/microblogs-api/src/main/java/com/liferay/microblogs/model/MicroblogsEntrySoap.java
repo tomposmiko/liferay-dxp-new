@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class MicroblogsEntrySoap implements Serializable {
+
 	public static MicroblogsEntrySoap toSoapModel(MicroblogsEntry model) {
 		MicroblogsEntrySoap soapModel = new MicroblogsEntrySoap();
 
@@ -43,14 +44,16 @@ public class MicroblogsEntrySoap implements Serializable {
 		soapModel.setCreatorClassPK(model.getCreatorClassPK());
 		soapModel.setContent(model.getContent());
 		soapModel.setType(model.getType());
-		soapModel.setParentMicroblogsEntryId(model.getParentMicroblogsEntryId());
+		soapModel.setParentMicroblogsEntryId(
+			model.getParentMicroblogsEntryId());
 		soapModel.setSocialRelationType(model.getSocialRelationType());
 
 		return soapModel;
 	}
 
 	public static MicroblogsEntrySoap[] toSoapModels(MicroblogsEntry[] models) {
-		MicroblogsEntrySoap[] soapModels = new MicroblogsEntrySoap[models.length];
+		MicroblogsEntrySoap[] soapModels =
+			new MicroblogsEntrySoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -61,10 +64,12 @@ public class MicroblogsEntrySoap implements Serializable {
 
 	public static MicroblogsEntrySoap[][] toSoapModels(
 		MicroblogsEntry[][] models) {
+
 		MicroblogsEntrySoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new MicroblogsEntrySoap[models.length][models[0].length];
+			soapModels =
+				new MicroblogsEntrySoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new MicroblogsEntrySoap[0][0];
@@ -79,7 +84,9 @@ public class MicroblogsEntrySoap implements Serializable {
 
 	public static MicroblogsEntrySoap[] toSoapModels(
 		List<MicroblogsEntry> models) {
-		List<MicroblogsEntrySoap> soapModels = new ArrayList<MicroblogsEntrySoap>(models.size());
+
+		List<MicroblogsEntrySoap> soapModels =
+			new ArrayList<MicroblogsEntrySoap>(models.size());
 
 		for (MicroblogsEntry model : models) {
 			soapModels.add(toSoapModel(model));
@@ -207,4 +214,5 @@ public class MicroblogsEntrySoap implements Serializable {
 	private int _type;
 	private long _parentMicroblogsEntryId;
 	private int _socialRelationType;
+
 }

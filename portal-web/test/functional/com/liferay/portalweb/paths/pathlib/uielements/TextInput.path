@@ -160,7 +160,7 @@
 </tr>
 <tr>
 	<td>FILE</td>
-	<td>//input[contains(@id,'file') or contains(@id,'File')][@type='file']</td>
+	<td>//input[contains(@id,'file') or contains(@id,'File')][@type='file'] | //input[@type='file']</td>
 	<td></td>
 </tr>
 <tr>
@@ -316,6 +316,11 @@
 <tr>
 	<td>PORTAL_NAME</td>
 	<td>//div[label[contains(.,'Portal Name')]]//input[@type='text']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PORTLET_TITLE</td>
+	<td>//div[contains(@class,'portlet-title-editable')]//input</td>
 	<td></td>
 </tr>
 <tr>

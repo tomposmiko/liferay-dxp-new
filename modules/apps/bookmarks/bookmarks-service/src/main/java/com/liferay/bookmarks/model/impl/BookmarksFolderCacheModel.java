@@ -17,10 +17,8 @@ package com.liferay.bookmarks.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.bookmarks.model.BookmarksFolder;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class BookmarksFolderCacheModel implements CacheModel<BookmarksFolder>,
-	Externalizable {
+public class BookmarksFolderCacheModel
+	implements CacheModel<BookmarksFolder>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class BookmarksFolderCacheModel implements CacheModel<BookmarksFolder>,
 			return false;
 		}
 
-		BookmarksFolderCacheModel bookmarksFolderCacheModel = (BookmarksFolderCacheModel)obj;
+		BookmarksFolderCacheModel bookmarksFolderCacheModel =
+			(BookmarksFolderCacheModel)obj;
 
 		if (folderId == bookmarksFolderCacheModel.folderId) {
 			return true;
@@ -224,8 +224,7 @@ public class BookmarksFolderCacheModel implements CacheModel<BookmarksFolder>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -307,4 +306,5 @@ public class BookmarksFolderCacheModel implements CacheModel<BookmarksFolder>,
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+
 }

@@ -6,7 +6,6 @@
 {template .render}
 	{@param defaultEditorConfigurations: ?}
 	{@param defaultLanguageId: string}
-	{@param defaultSegmentId: string}
 	{@param fragmentEntryLinks: ?}
 	{@param languageId: string}
 	{@param layoutData: [
@@ -22,18 +21,11 @@
 			rowId: string
 		]>
 	]}
-	{@param? _handleFragmentEntryLinkListHoverEnd: any}
 	{@param? _handleFragmentMove: any}
-	{@param? _handleSectionFocusOut: any}
-	{@param? _handleSectionClick: any}
-	{@param? _handleSectionHoverStart: any}
-	{@param? _handleSectionKeyUp: any}
-	{@param? _handleSectionRemoveButtonClick: any}
+	{@param? defaultSegmentsExperienceId: string}
 	{@param? dropTargetItemTypes: ?}
 	{@param? fragmentsEditorSidebarVisible: bool}
-	{@param? highlightMapping: bool}
 	{@param? mappingFieldsURL: string}
-	{@param? segmentId: string}
 	{@param? store: ?}
 
 	{let $entryLinksClasses kind="text"}
@@ -49,32 +41,19 @@
 			{sp}fragment-entry-link-list--padded
 		{/if}
 
-		{if $highlightMapping}
-			{sp}mapping
-		{/if}
-
 		{if $languageId != $defaultLanguageId}
 			{sp}translating
 		{/if}
 	{/let}
 
 	{if $layoutData.structure and (length($layoutData.structure) > 0)}
-		<div
-			class="{$entryLinksClasses}"
-			data-onmouseleave="{$_handleFragmentEntryLinkListHoverEnd}"
-			ref="fragmentEntryLinks"
-		>
+		<div class="{$entryLinksClasses}">
 			{foreach $row in $layoutData.structure}
 				{call com.liferay.layout.content.page.editor.web.FragmentEntryLinkListSection.render}
 					{param _handleFragmentMove: $_handleFragmentMove /}
-					{param _handleSectionClick: $_handleSectionClick /}
-					{param _handleSectionFocusOut: $_handleSectionFocusOut /}
-					{param _handleSectionHoverStart: $_handleSectionHoverStart /}
-					{param _handleSectionKeyUp: $_handleSectionKeyUp /}
-					{param _handleSectionRemoveButtonClick: $_handleSectionRemoveButtonClick /}
 					{param columns: $row.columns /}
 					{param defaultEditorConfigurations: $defaultEditorConfigurations /}
-					{param defaultSegmentId: $defaultSegmentId /}
+					{param defaultSegmentsExperienceId: $defaultSegmentsExperienceId /}
 					{param dropTargetItemTypes: $dropTargetItemTypes /}
 					{param empty: $row.empty /}
 					{param fragmentEntryLinks: $fragmentEntryLinks /}
@@ -82,7 +61,6 @@
 					{param mappingFieldsURL: $mappingFieldsURL /}
 					{param row: $row /}
 					{param rowId: $row.rowId /}
-					{param segmentId: $segmentId /}
 					{param store: $store /}
 				{/call}
 			{/foreach}
@@ -101,7 +79,8 @@
 	{@param? fragmentsEditorSidebarVisible: bool}
 
 	{let $emptyListClasses kind="text"}
-		fragments-editor__drop-target--fragment
+		fragment-entry-link-list
+		{sp}fragments-editor__drop-target--fragment
 		{sp}fragments-editor__drop-target--layout
 		{sp}fragments-editor__drop-target--sidebar-fragment
 		{sp}fragments-editor__drop-target--sidebar-layout

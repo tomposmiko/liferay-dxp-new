@@ -18,6 +18,7 @@ import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
+import com.liferay.dynamic.data.mapping.form.web.internal.constants.DDMFormWebKeys;
 import com.liferay.dynamic.data.mapping.form.web.internal.display.context.DDMFormDisplayContext;
 import com.liferay.dynamic.data.mapping.form.web.internal.instance.lifecycle.AddDefaultSharedFormLayoutPortalInstanceLifecycleListener;
 import com.liferay.dynamic.data.mapping.io.DDMFormFieldTypesSerializerTracker;
@@ -147,6 +148,11 @@ public class DDMFormPortlet extends MVCPortlet {
 
 			checkFormIsNotRestricted(
 				renderRequest, renderResponse, ddmFormPortletDisplayContext);
+
+			if (ddmFormPortletDisplayContext.isFormShared()) {
+				saveRefererGroupIdInRequest(
+					renderRequest, ddmFormPortletDisplayContext);
+			}
 		}
 		catch (Exception e) {
 			if (isSessionErrorException(e)) {
@@ -171,21 +177,22 @@ public class DDMFormPortlet extends MVCPortlet {
 			DDMFormDisplayContext ddmFormDisplayContext)
 		throws PortalException {
 
-		DDMFormInstance formInstance = ddmFormDisplayContext.getFormInstance();
+		DDMFormInstance ddmFormInstance =
+			ddmFormDisplayContext.getFormInstance();
 
-		if (formInstance == null) {
+		if (ddmFormInstance == null) {
 			return;
 		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		DDMFormInstanceSettings formInstanceSettings =
-			formInstance.getSettingsModel();
+		DDMFormInstanceSettings ddmFormInstanceSettings =
+			ddmFormInstance.getSettingsModel();
 
 		Layout layout = themeDisplay.getLayout();
 
-		if (formInstanceSettings.requireAuthentication() &&
+		if (ddmFormInstanceSettings.requireAuthentication() &&
 			!layout.isPrivateLayout()) {
 
 			throw new PrincipalException.MustBeAuthenticated(
@@ -215,6 +222,19 @@ public class DDMFormPortlet extends MVCPortlet {
 
 			portletSession.setAttribute("formInstanceId", formInstanceId);
 			portletSession.setAttribute("shared", Boolean.TRUE);
+		}
+	}
+
+	protected void saveRefererGroupIdInRequest(
+		RenderRequest renderRequest,
+		DDMFormDisplayContext ddmFormPortletDisplayContext) {
+
+		if (ddmFormPortletDisplayContext.getFormInstanceId() > 0) {
+			DDMFormInstance ddmFormInstance =
+				ddmFormPortletDisplayContext.getFormInstance();
+
+			renderRequest.setAttribute(
+				DDMFormWebKeys.REFERER_GROUP_ID, ddmFormInstance.getGroupId());
 		}
 	}
 

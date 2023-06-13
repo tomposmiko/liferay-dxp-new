@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the remote service utility for Account. This utility wraps
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  */
 @ProviderType
 public class AccountServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -40,24 +40,23 @@ public class AccountServiceUtil {
 	 */
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static AccountService getService() {
 		if (_service == null) {
-			_service = (AccountService)PortalBeanLocatorUtil.locate(AccountService.class.getName());
-
-			ReferenceRegistry.registerReference(AccountServiceUtil.class,
-				"_service");
+			_service = (AccountService)PortalBeanLocatorUtil.locate(
+				AccountService.class.getName());
 		}
 
 		return _service;
 	}
 
 	private static AccountService _service;
+
 }

@@ -15,7 +15,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Kaleo Forms Admin"
 		);
@@ -241,7 +241,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Kaleo Forms Admin"
 		);
@@ -305,7 +305,7 @@ definition {
 		KaleoFormsAdmin.saveProcess(kfProcessName = "Kaleo Forms Process");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Kaleo Forms Admin"
 		);
@@ -328,7 +328,7 @@ definition {
 		Workflow.viewDefaultMyWorkflowTasksCP();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Kaleo Forms Admin"
 		);
@@ -385,7 +385,12 @@ definition {
 			portlet = "My Workflow Tasks"
 		);
 
-		Navigator.gotoNavTab(navTab = "Assigned to Me");
+		var key_tab = "Assigned to Me";
+
+		AssertClick.assertPartialTextClickAt(
+			locator1 = "NavTab#NAV_TABS",
+			value1 = "Assigned to Me"
+		);
 
 		Workflow.viewCompletedTask(
 			workflowAssetTitle = "Kaleo Forms Process",
@@ -489,7 +494,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Kaleo Forms Admin"
 		);
@@ -534,7 +539,7 @@ definition {
 		KaleoFormsAdmin.saveProcess(kfProcessName = "Kaleo Forms Process");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Kaleo Forms Admin"
 		);
@@ -552,7 +557,7 @@ definition {
 		Workflow.viewDefaultMyWorkflowTasksCP();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Kaleo Forms Admin"
 		);

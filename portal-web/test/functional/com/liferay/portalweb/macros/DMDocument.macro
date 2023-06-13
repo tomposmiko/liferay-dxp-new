@@ -1,6 +1,6 @@
 definition {
 	var assetType = "Document";
-	var dmDocumentTypeName = "Basic Document";
+	var dmDocumentTypeName = "File Upload";
 
 	macro addCategories {
 		Panel.expandPanel(panel = "Categorization");
@@ -9,80 +9,6 @@ definition {
 			categoryNameList = "${categoryNameList}",
 			vocabularyName = "${vocabularyName}"
 		);
-	}
-
-	macro addContractCP {
-		DMNavigator.gotoAddDocumentType(dmDocumentTypeName = "Contract");
-
-		if (isSet(dmContractFile)) {
-			UploadCommonFile(locator1 = "TextInput#FILE", value1 = "${dmContractFile}");
-		}
-
-		PortletEntry.inputTitle(title = "${dmContractTitle}");
-
-		if (isSet(dmContractDescription)) {
-			PortletEntry.inputDescription(description = "${dmContractDescription}");
-		}
-
-		if (isSet(effectiveDate)) {
-			Type.clickAtType(
-				locator1 = "TextInput#GENERIC_TEXT_INPUT",
-				value1 = "${effectiveDate}",
-				key_fieldLabel = "Effective Date"
-			);
-		}
-
-		if (isSet(expirationDate)) {
-			Type.clickAtType(
-				locator1 = "TextInput#GENERIC_TEXT_INPUT",
-				value1 = "${expirationDate}",
-				key_fieldLabel = "Expiration Date"
-			);
-		}
-
-		if (isSet(contractType)) {
-			Select(
-				locator1 = "Select#GENERIC_SELECT_FIELD",
-				value1 = "${contractType}",
-				key_fieldLabel = "Contract Type"
-			);
-		}
-
-		if (isSet(status)) {
-			Select(
-				locator1 = "Select#GENERIC_SELECT_FIELD",
-				value1 = "${status}",
-				key_fieldLabel = "Status"
-			);
-		}
-
-		if (isSet(dmContractLegalReviewer)) {
-			Type(
-				locator1 = "TextInput#GENERIC_TEXT_INPUT",
-				value1 = "${dmContractLegalReviewer}",
-				key_fieldLabel = "Legal Reviewer"
-			);
-		}
-
-		if (isSet(dmContractSigningAuthority)) {
-			Type(
-				locator1 = "TextInput#GENERIC_TEXT_INPUT",
-				value1 = "${dmContractSigningAuthority}",
-				key_fieldLabel = "Signing Authority"
-			);
-		}
-
-		if (isSet(dmContractDealName)) {
-			Type(
-				locator1 = "TextInput#GENERIC_TEXT_INPUT",
-				value1 = "${dmContractDealName}",
-				key_fieldLabel = "Deal Name"
-			);
-		}
-
-		AssertClick(locator1 = "Button#PUBLISH", value1 = "Publish");
-
-		Alert.viewSuccessMessage();
 	}
 
 	macro addCP {
@@ -106,12 +32,8 @@ definition {
 			Panel.expandPanel(panel = "Categorization");
 
 			for (var tagName : list "${tagNameList}") {
-				Click.clickAt(locator1 = "Button#ADD_TAGS", value1 = "Add");
-
-				Type(locator1 = "AssetCategorization#TAGS_FIELD", value1 = "${tagName}");
+				AssetCategorization.addTag(tagName = "${tagName}");
 			}
-
-			Click.clickAt(locator1 = "Button#ADD_TAGS", value1 = "Add");
 		}
 
 		if (isSet(vocabularyName)) {
@@ -138,51 +60,6 @@ definition {
 		else {
 			PortletEntry.publish();
 		}
-	}
-
-	macro addDMMarketingBannerCP {
-		var key_dmDocumentTitle = "${dmDocumentTitle}";
-
-		LexiconEntry.gotoAdd();
-
-		MenuItem.click(menuItem = "Marketing Banner");
-
-		UploadCommonFile(locator1 = "TextInput#FILE", value1 = "${dmDocumentFile}");
-
-		PortletEntry.inputTitle(title = "${dmDocumentTitle}");
-
-		PortletEntry.inputDescription(description = "${dmDocumentDescription}");
-
-		Select(
-			locator1 = "DocumentsAndMediaEditMarketingBanner#MARKETING_SELECT",
-			value1 = "${marketingSelect}"
-		);
-
-		Select(
-			locator1 = "DocumentsAndMediaEditMarketingBanner#CAMPAIGN_THEME_SELECT",
-			value1 = "${campaignTheme}"
-		);
-
-		Select(
-			locator1 = "DocumentsAndMediaEditMarketingBanner#BUSINESS_GOAL_SELECT",
-			value1 = "${businessGoal}"
-		);
-
-		Click(
-			locator1 = "DocumentsAndMediaEditMarketingBanner#NEEDS_LEGAL_REVIEW_${legalReview}_RADIO"
-		);
-
-		Type(
-			locator1 = "DocumentsAndMediaEditMarketingBanner#BANNER_NAME_FIELD",
-			value1 = "${bannerName}"
-		);
-
-		Type(
-			locator1 = "DocumentsAndMediaEditMarketingBanner#BANNER_DESCRIPTION_FIELD",
-			value1 = "${bannerDescription}"
-		);
-
-		PortletEntry.publish();
 	}
 
 	macro addDMShortcutCP {
@@ -269,36 +146,29 @@ definition {
 	macro addGoogleApp {
 		Portlet.clickPortletPlusIconPG(portletName = "Documents and Media");
 
-		if ("${dmGoogleApp}" == "Google Docs") {
-			Click(locator1 = "DocumentsAndMedia#GOOGLE_DOCS_MENU_ITEM");
-		}
-		else {
-			var key_menuItem = "${dmGoogleApp}";
+		var key_menuItem = "${dmGoogleApp}";
 
-			MenuItem.click(menuItem = "${dmGoogleApp}");
-		}
+		MenuItem.click(menuItem = "${dmGoogleApp}");
 	}
 
-	macro addMultiplePG {
-		Portlet.clickPortletPlusIconPG(portletName = "Documents and Media");
-
-		MenuItem.click(menuItem = "Multiple Documents");
+	macro addMultipleCP {
+		DMNavigator.gotoAddDocumentType(dmDocumentTypeName = "Multiple Files Upload");
 
 		if (isSet(dmDocumentFileList)) {
 			for (var dmDocumentFile : list "${dmDocumentFileList}") {
 				var key_dmDocumentFile = "${dmDocumentFile}";
 
-				AssertClick(locator1 = "Button#SELECT_FILES", value1 = "Select Files");
+				AssertElementPresent(locator1 = "Button#SELECT_FILES");
 
 				if ("${uploadTempFile}" == "true") {
-					SikuliUploadTempFile(
-						locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+					UploadTempFile.uploadTempFileHiddenNoMouseOver(
+						locator1 = "TextInput#FILE",
 						value1 = "${dmDocumentFile}"
 					);
 				}
 				else {
-					SikuliUploadCommonFile(
-						locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+					UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+						locator1 = "TextInput#FILE",
 						value1 = "${dmDocumentFile}"
 					);
 				}
@@ -321,6 +191,50 @@ definition {
 		AssertElementPresent(locator1 = "Message#SUCCESS");
 	}
 
+	macro addMultiplePG {
+		Portlet.clickPortletPlusIconPG(portletName = "Documents and Media");
+
+		MenuItem.click(menuItem = "Multiple Files Upload");
+
+		if (isSet(dmDocumentFileList)) {
+			for (var dmDocumentFile : list "${dmDocumentFileList}") {
+				var key_dmDocumentFile = "${dmDocumentFile}";
+
+				AssertClick(locator1 = "Button#SELECT_FILES", value1 = "Select Files");
+
+				if ("${uploadTempFile}" == "true") {
+					SikuliUploadTempFile(
+						locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+						value1 = "${dmDocumentFile}"
+					);
+				}
+				else {
+					UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+						locator1 = "TextInput#FILE",
+						value1 = "${dmDocumentFile}"
+					);
+				}
+
+				AssertChecked(locator1 = "DynamicUploader#SELECT_ALL_CHECKBOX");
+
+				AssertElementPresent(
+					locator1 = "DynamicUploader#ALL_FILES_READY_TO_BE_SAVED_DOCUMENT_TITLE",
+					key_documentName = "${dmDocumentFile}"
+				);
+			}
+		}
+
+		if (isSet(viewableBy)) {
+			Select(locator1 = "Select#PERMISSIONS", value1 = "${viewableBy}");
+		}
+
+		AssertClick(locator1 = "Button#PUBLISH", value1 = "Publish");
+
+		AssertElementPresent(locator1 = "Message#SUCCESS");
+
+		Alert.closeMessage(messageType = "SUCCESS");
+	}
+
 	macro addPG {
 		if ("${stagingActivated}" == "true") {
 			AssertElementNotPresent(locator1 = "Message#WORKFLOW_UNAPPROVED");
@@ -334,7 +248,7 @@ definition {
 			MenuItem.click(menuItem = "${dmDocumentTypeName}");
 		}
 		else {
-			MenuItem.click(menuItem = "Basic Document");
+			MenuItem.click(menuItem = "File Upload");
 		}
 
 		DMDocument.editDocument(
@@ -433,7 +347,7 @@ definition {
 	macro addPGViaMG {
 		Portlet.clickPortletPlusIconPG(portletName = "Media Gallery");
 
-		MenuItem.click(menuItem = "Basic Document");
+		MenuItem.click(menuItem = "File Upload");
 
 		UploadCommonFile(locator1 = "TextInput#FILE", value1 = "${mgDocumentFile}");
 
@@ -484,9 +398,8 @@ definition {
 
 		var key_dmDocumentTitle = "${dmDocumentTitle}";
 
-		AssertTextEquals(
-			locator1 = "DocumentsAndMedia#ICON_DOCUMENT_TITLE",
-			value1 = "${dmDocumentTitle}"
+		DMDocument.viewCardTitle(
+			dmDocumentTitle = "${dmDocumentTitle}"
 		);
 	}
 
@@ -876,14 +789,15 @@ definition {
 
 	macro editPGViaAP {
 		var key_assetTitle = "${assetTitle}";
+		var key_portletName = "${portletName}";
 
 		Click(locator1 = "AP#ASSET_ABSTRACT_EDIT");
 
-		Click(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
+		ScrollWebElementIntoView(locator1 = "Portlet#TITLE");
 
-		Click(locator1 = "AP#ASSET_EDIT");
+		MouseOver(locator1 = "AP#ASSET_ABSTRACT_EDIT");
 
-		SelectFrame(locator1 = "IFrame#DIALOG");
+		Click.clickNoMouseOver(locator1 = "AP#ASSET_EDIT");
 
 		if (!(contains("${dmDocumentTitleEdit}", "{dmDocumentTitleEdit}"))) {
 			Type(locator1 = "TextInput#TITLE", value1 = "${dmDocumentTitleEdit}");
@@ -982,16 +896,16 @@ definition {
 	}
 
 	macro expandInfo {
-		if (IsElementNotPresent(locator1 = "Icon#INFO_ACTIVE")) {
-			Click(locator1 = "Icon#INFO");
+		if (IsElementNotPresent(locator1 = "DocumentsAndMedia#SIDEBAR_INFO_ACTIVE")) {
+			ManagementBar.clickInfo();
 		}
 
-		AssertVisible(locator1 = "Icon#INFO_ACTIVE");
+		AssertVisible(locator1 = "DocumentsAndMedia#SIDEBAR_INFO_ACTIVE");
 	}
 
 	macro getDMLatestVersionURL {
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media"
 		);
@@ -1007,6 +921,12 @@ definition {
 		echo("## * Document URL: ${dmDocumentURL}");
 
 		return "${dmDocumentURL}";
+	}
+
+	macro gotoEntry {
+		LexiconCard.clickCard(
+			card = "${dmDocumentTitle}"
+		);
 	}
 
 	macro linkImage {
@@ -1029,8 +949,6 @@ definition {
 
 		MenuItem.click(menuItem = "Move");
 
-		AssertClick(locator1 = "Button#SELECT", value1 = "Select");
-
 		SelectFrame(locator1 = "DocumentsAndMediaSelectFolder#SELECT_FOLDER_IFRAME");
 
 		if ("${dmFolderName}" == "Home") {
@@ -1050,35 +968,29 @@ definition {
 
 		SelectFrame(locator1 = "relative=top");
 
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaEditDocument#FOLDER",
-			value1 = "${dmFolderName}"
-		);
-
-		AssertClick(locator1 = "Button#MOVE", value1 = "Move");
-
 		Alert.viewSuccessMessage();
 	}
 
 	macro moveToFolderPG {
 		var key_dmDocumentTitle = "${dmDocumentTitle}";
 
-		Click(
-			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS"
-		);
+		if (isSet(bulkSelection)) {
+			AssertTextEquals(
+				locator1="ManagementBar#NAVBAR_TEXT",
+				value1="${bulkSelection}"
+			);
 
-		MenuItem.click(menuItem = "Move");
+			Click(locator1="Icon#MOVE");
+		}
+		else {
+			Click(locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
 
-		AssertClick(locator1 = "Button#SELECT", value1 = "Select");
+			MenuItem.click(menuItem = "Move");
+		}
 
 		SelectFrame(locator1 = "IFrame#SELECT_FOLDER");
 
 		var key_dmFolderName = "${dmFolderName}";
-
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaSelectFolder#FOLDER",
-			value1 = "${dmFolderName}"
-		);
 
 		AssertClick(
 			locator1 = "DocumentsAndMediaSelectFolder#CHOOSE_BUTTON",
@@ -1086,8 +998,6 @@ definition {
 		);
 
 		SelectFrameTop();
-
-		AssertClick(locator1 = "Button#MOVE", value1 = "Move");
 
 		if (isSet(dmDuplicateDocument)) {
 			Alert.viewRequestFailedToComplete();
@@ -1107,16 +1017,15 @@ definition {
 
 		AssertElementPresent(locator1 = "DocumentsAndMedia#ICON_DOCUMENT");
 
-		AssertTextEquals(
-			locator1 = "DocumentsAndMedia#ICON_DOCUMENT_TITLE",
-			value1 = "${dmDocumentTitle}"
+		DMDocument.viewCardTitle(
+			dmDocumentTitle = "${dmDocumentTitle}"
 		);
 
 		MouseOver(locator1 = "DocumentsAndMedia#ICON_DOCUMENT");
 
-		AssertElementPresent(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_CHECKBOX");
-
-		Check(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_CHECKBOX");
+		LexiconCard.checkCardCheckbox(
+			card = "${dmDocumentTitle}"
+		);
 
 		Click(locator1 = "Icon#MOVE_TO_RECYCLE_BIN");
 
@@ -1136,8 +1045,6 @@ definition {
 		Click(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_VERTICAL_ELLIPSIS");
 
 		MenuItem.click(menuItem = "Move");
-
-		AssertClick(locator1 = "Button#SELECT", value1 = "Select");
 
 		SelectFrame(locator1 = "DocumentsAndMediaSelectFolder#SELECT_FOLDER_IFRAME");
 
@@ -1159,13 +1066,6 @@ definition {
 		);
 
 		SelectFrame(locator1 = "relative=top");
-
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaEditDocument#FOLDER",
-			value1 = "${dmSubFolderName}"
-		);
-
-		AssertClick(locator1 = "Button#MOVE", value1 = "Move");
 
 		Alert.viewSuccessMessage();
 	}
@@ -1229,13 +1129,9 @@ definition {
 	}
 
 	macro selectVersion {
-		AssertClick(locator1 = "DocumentsAndMedia#SIDEBAR_DROPDOWN", value1 = "Details");
+		var key_tab = "Versions";
 
-		AssertClick(
-			locator1 = "MenuItem#ANY_MENU_ITEM",
-			value1 = "Versions",
-			key_menuItem = "Versions"
-		);
+		AssertClick(locator1 = "NavTab#NAV_TABS", value1 = "Versions");
 	}
 
 	macro sharePG {
@@ -1291,7 +1187,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media"
 		);
@@ -1341,7 +1237,7 @@ definition {
 
 		DMDocument.viewDocumentToolbarCmdPG();
 
-		DMDocument.viewDocumentAuthorCmdPG(dmDocumentAuthor = "${dmDocumentAuthor}");
+		//DMDocument.viewDocumentAuthorCmdPG(dmDocumentAuthor = "${dmDocumentAuthor}");
 
 		if (isSet(commentBody)) {
 			var key_entryComment = "${commentBody}";
@@ -1355,11 +1251,11 @@ definition {
 			DMDocument.viewDocumentNoCommentsCmdPG();
 		}
 
-		DMDocument.viewDocumentVersionNumberCmdPG(
-			dmDocumentVersionNumber = "${dmDocumentVersionNumber}"
-		);
+		//DMDocument.viewDocumentVersionNumberCmdPG(
+		//	dmDocumentVersionNumber = "${dmDocumentVersionNumber}"
+		//);
 
-		DMDocument.viewDocumentDetailsCmdPG();
+		//DMDocument.viewDocumentDetailsCmdPG();
 	}
 
 	macro viewCannotAddRepository {
@@ -1447,9 +1343,7 @@ definition {
 			value1 = "${dmDocumentTitle}"
 		);
 
-		AssertElementPresent(locator1 = "Icon#INFO");
-
-		Click(locator1 = "Icon#INFO");
+		DMDocument.expandInfo();
 
 		if ((isSet(dmDocumentSize)) && (!(contains("${dmDocumentSize}", "{dmDocumentSize}")))) {
 			var key_dmDocumentSize = "${dmDocumentSize}";
@@ -1478,10 +1372,7 @@ definition {
 				value1 = "${dmDocumentStatus}"
 			);
 
-			AssertClick(
-				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_TITLE_LINK",
-				value1 = "${dmDocumentTitle}"
-			);
+			DMDocument.gotoEntry(dmDocumentTitle = "${dmDocumentTitle}");
 
 			AssertTextEquals(locator1 = "TextInput#TITLE", value1 = "${dmDocumentTitle}");
 		}
@@ -1499,7 +1390,9 @@ definition {
 	macro viewDMMarketingBannerPG {
 		var key_assetTitle = "${assetTitle}";
 
-		AssertClick(locator1 = "AP#ASSET_ABSTRACT_TITLE", value1 = "${assetTitle}");
+		AssetPublisherPortlet.clickAssetTitle(
+			assetTitle = "${assetTitle}"
+		);
 
 		DMNavigator.gotoDocumentDetails();
 
@@ -1635,7 +1528,7 @@ definition {
 	macro viewDocumentToolbarCmdPG {
 		AssertVisible(locator1 = "Button#DOWNLOAD", value1 = "Download");
 
-		AssertTextEquals(locator1 = "Button#DOWNLOAD", value1 = "Download");
+		AssertTextEquals.assertPartialText(locator1 = "Button#DOWNLOAD", value1 = "Download");
 
 		AssertTextEquals(locator1 = "Button#EDIT", value1 = "Edit");
 
@@ -1735,15 +1628,7 @@ definition {
 
 		AssertElementPresent(locator1 = "DocumentsAndMedia#ICON_DOCUMENT");
 
-		AssertClick(
-			locator1 = "DocumentsAndMedia#ICON_DOCUMENT_TITLE_LINK",
-			value1 = "${dmDocumentTitleEdit}"
-		);
-
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE",
-			value1 = "${dmDocumentTitleEdit}"
-		);
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "${dmDocumentTitleEdit}");
 
 		if (isSet(dmDocumentVersionNumber)) {
 			DMDocument.viewDocumentVersionNumberCmdPG(dmDocumentVersionNumber = "${dmDocumentVersionNumber}");
@@ -1852,52 +1737,6 @@ definition {
 			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
 			value1 = "${dmDocumentTitle}"
 		);
-
-		DMDocument.expandInfo();
-
-		DMDocument.viewDocumentTitleCmdPG(dmDocumentTitle = "${dmDocumentTitle}");
-
-		if ("${dmRepositoryName}" == "true") {
-			AssertElementNotPresent(
-				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_RATING"
-			);
-		}
-		else {
-			AssertElementPresent(
-				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_RATING"
-			);
-		}
-
-		if (isSet(dmDocumentDescription)) {
-			ScrollWebElementIntoView(locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_DESCRIPTION");
-
-			AssertTextEquals(
-				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_DESCRIPTION",
-				value1 = "${dmDocumentDescription}"
-			);
-		}
-
-		if ("${dmDocumentFileType}" == "Image") {
-			AssertElementPresent(
-				locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW"
-			);
-		}
-
-		if (isSet(tagNameList)) {
-			for (var tagName : list "${tagNameList}") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TAGS",
-					value1 = "${tagName}"
-				);
-			}
-		}
-
-		if (isSet(categoryName)) {
-			AssertTextEquals(
-				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_CATEGORIES",
-				value1 = "Topic: ${categoryName}"
-			);
-		}
 	}
 
 	macro viewPGDetails {
@@ -2040,9 +1879,8 @@ definition {
 		var key_dmDocumentTitle = "${dmDocumentTitle}";
 
 		if ("${documentAdded}" == "true") {
-			AssertTextEquals(
-				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_TITLE",
-				value1 = "${dmDocumentTitle}"
+			DMDocument.viewCardTitle(
+				dmDocumentTitle = "${dmDocumentTitle}"
 			);
 
 			AssertClick.assertPartialTextClickAt(
@@ -2050,9 +1888,8 @@ definition {
 				value1 = "Live"
 			);
 
-			AssertTextNotPresent(
-				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_TITLE",
-				value1 = "${dmDocumentTitle}"
+			LexiconCard.viewCardNotPresent(
+				card = "${dmDocumentTitle}"
 			);
 
 			AssertTextEquals(
@@ -2105,17 +1942,9 @@ definition {
 
 		MenuItem.viewPresent(menuItem = "Repository");
 
-		MenuItem.viewPresent(menuItem = "Multiple Documents");
+		MenuItem.viewPresent(menuItem = "Multiple Files Upload");
 
-		MenuItem.viewPresent(menuItem = "Basic Document");
-
-		MenuItem.viewPresent(menuItem = "Contract");
-
-		MenuItem.viewPresent(menuItem = "Marketing Banner");
-
-		MenuItem.viewPresent(menuItem = "Online Training");
-
-		MenuItem.viewPresent(menuItem = "Sales Presentation");
+		MenuItem.viewPresent(menuItem = "File Upload");
 
 		SelectFrameTop();
 
@@ -2193,5 +2022,11 @@ definition {
 
 			AssertTextEquals(locator1 = "DocumentsAndMedia#TAG", value1 = "${tagName}");
 		}
+	}
+
+	macro viewCardTitle {
+		LexiconCard.viewCardTitle(
+			card = "${dmDocumentTitle}"
+		);
 	}
 }

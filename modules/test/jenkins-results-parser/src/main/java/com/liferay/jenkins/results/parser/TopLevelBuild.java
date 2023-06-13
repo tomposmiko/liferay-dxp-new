@@ -21,6 +21,7 @@ import com.liferay.jenkins.results.parser.failure.message.generator.FailureMessa
 import com.liferay.jenkins.results.parser.failure.message.generator.GenericFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.GitLPushFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.GradleTaskFailureMessageGenerator;
+import com.liferay.jenkins.results.parser.failure.message.generator.JenkinsRegenFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.PoshiTestFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.PoshiValidationFailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.RebaseFailureMessageGenerator;
@@ -360,8 +361,15 @@ public class TopLevelBuild extends BaseBuild {
 
 		_updateDuration = System.currentTimeMillis() - start;
 
-		if (_sendBuildMetrics) {
-			sendBuildMetricsOnModifiedBuilds();
+		if (_sendBuildMetrics && !fromArchive && (getParentBuild() == null)) {
+			if (!fromCompletedBuild) {
+				sendBuildMetricsOnModifiedBuilds();
+			}
+			else {
+				sendBuildMetrics(
+					StatsDMetricsUtil.generateGaugeDeltaMetric(
+						"build_slave_usage_gauge", -1, getMetricLabels()));
+			}
 		}
 	}
 
@@ -404,6 +412,12 @@ public class TopLevelBuild extends BaseBuild {
 			catch (NumberFormatException nfe) {
 				throw new IllegalArgumentException(
 					"Please set \"build.metrics.host.port\" to an integer");
+			}
+
+			if (topLevelBuild == null) {
+				sendBuildMetrics(
+					StatsDMetricsUtil.generateGaugeDeltaMetric(
+						"build_slave_usage_gauge", 1, getMetricLabels()));
 			}
 		}
 	}
@@ -1140,6 +1154,13 @@ public class TopLevelBuild extends BaseBuild {
 			topLevelTableElement, getJenkinsReportTableColumnHeadersElement(),
 			getJenkinsReportTableRowElement());
 
+		List<Element> jenkinsReportStopWatchRecordElements =
+			getJenkinsReportStopWatchRecordElements();
+
+		Dom4JUtil.addToElement(
+			topLevelTableElement,
+			jenkinsReportStopWatchRecordElements.toArray());
+
 		return topLevelTableElement;
 	}
 
@@ -1490,6 +1511,8 @@ public class TopLevelBuild extends BaseBuild {
 	private static final long _DOWNSTREAM_BUILDS_LISTING_INTERVAL =
 		1000 * 60 * 5;
 
+	// Skip JavaParser
+
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =
 		{
 			new CompileFailureMessageGenerator(),
@@ -1499,6 +1522,7 @@ public class TopLevelBuild extends BaseBuild {
 
 			new GitLPushFailureMessageGenerator(),
 			new GradleTaskFailureMessageGenerator(),
+			new JenkinsRegenFailureMessageGenerator(),
 			new RebaseFailureMessageGenerator(),
 
 			new CIFailureMessageGenerator(),

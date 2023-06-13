@@ -18,9 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
-
 import com.liferay.push.notifications.model.PushNotificationsDevice;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class PushNotificationsDeviceCacheModel implements CacheModel<PushNotificationsDevice>,
-	Externalizable {
+public class PushNotificationsDeviceCacheModel
+	implements CacheModel<PushNotificationsDevice>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,9 +48,12 @@ public class PushNotificationsDeviceCacheModel implements CacheModel<PushNotific
 			return false;
 		}
 
-		PushNotificationsDeviceCacheModel pushNotificationsDeviceCacheModel = (PushNotificationsDeviceCacheModel)obj;
+		PushNotificationsDeviceCacheModel pushNotificationsDeviceCacheModel =
+			(PushNotificationsDeviceCacheModel)obj;
 
-		if (pushNotificationsDeviceId == pushNotificationsDeviceCacheModel.pushNotificationsDeviceId) {
+		if (pushNotificationsDeviceId ==
+				pushNotificationsDeviceCacheModel.pushNotificationsDeviceId) {
+
 			return true;
 		}
 
@@ -86,9 +88,11 @@ public class PushNotificationsDeviceCacheModel implements CacheModel<PushNotific
 
 	@Override
 	public PushNotificationsDevice toEntityModel() {
-		PushNotificationsDeviceImpl pushNotificationsDeviceImpl = new PushNotificationsDeviceImpl();
+		PushNotificationsDeviceImpl pushNotificationsDeviceImpl =
+			new PushNotificationsDeviceImpl();
 
-		pushNotificationsDeviceImpl.setPushNotificationsDeviceId(pushNotificationsDeviceId);
+		pushNotificationsDeviceImpl.setPushNotificationsDeviceId(
+			pushNotificationsDeviceId);
 		pushNotificationsDeviceImpl.setCompanyId(companyId);
 		pushNotificationsDeviceImpl.setUserId(userId);
 
@@ -131,8 +135,7 @@ public class PushNotificationsDeviceCacheModel implements CacheModel<PushNotific
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(pushNotificationsDeviceId);
 
 		objectOutput.writeLong(companyId);
@@ -161,4 +164,5 @@ public class PushNotificationsDeviceCacheModel implements CacheModel<PushNotific
 	public long createDate;
 	public String platform;
 	public String token;
+
 }

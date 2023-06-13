@@ -34,6 +34,7 @@ import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalServ
 @ProviderType
 public abstract class KaleoDefinitionVersionBaseImpl
 	extends KaleoDefinitionVersionModelImpl implements KaleoDefinitionVersion {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -42,10 +43,13 @@ public abstract class KaleoDefinitionVersionBaseImpl
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			KaleoDefinitionVersionLocalServiceUtil.addKaleoDefinitionVersion(this);
+			KaleoDefinitionVersionLocalServiceUtil.addKaleoDefinitionVersion(
+				this);
 		}
 		else {
-			KaleoDefinitionVersionLocalServiceUtil.updateKaleoDefinitionVersion(this);
+			KaleoDefinitionVersionLocalServiceUtil.updateKaleoDefinitionVersion(
+				this);
 		}
 	}
+
 }

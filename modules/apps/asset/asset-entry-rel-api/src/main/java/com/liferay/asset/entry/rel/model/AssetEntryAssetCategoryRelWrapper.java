@@ -32,11 +32,14 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public class AssetEntryAssetCategoryRelWrapper extends BaseModelWrapper<AssetEntryAssetCategoryRel>
+public class AssetEntryAssetCategoryRelWrapper
+	extends BaseModelWrapper<AssetEntryAssetCategoryRel>
 	implements AssetEntryAssetCategoryRel,
-		ModelWrapper<AssetEntryAssetCategoryRel> {
+			   ModelWrapper<AssetEntryAssetCategoryRel> {
+
 	public AssetEntryAssetCategoryRelWrapper(
 		AssetEntryAssetCategoryRel assetEntryAssetCategoryRel) {
+
 		super(assetEntryAssetCategoryRel);
 	}
 
@@ -44,8 +47,8 @@ public class AssetEntryAssetCategoryRelWrapper extends BaseModelWrapper<AssetEnt
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("assetEntryAssetCategoryRelId",
-			getAssetEntryAssetCategoryRelId());
+		attributes.put(
+			"assetEntryAssetCategoryRelId", getAssetEntryAssetCategoryRelId());
 		attributes.put("assetEntryId", getAssetEntryId());
 		attributes.put("assetCategoryId", getAssetCategoryId());
 		attributes.put("priority", getPriority());
@@ -56,7 +59,7 @@ public class AssetEntryAssetCategoryRelWrapper extends BaseModelWrapper<AssetEnt
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
 		Long assetEntryAssetCategoryRelId = (Long)attributes.get(
-				"assetEntryAssetCategoryRelId");
+			"assetEntryAssetCategoryRelId");
 
 		if (assetEntryAssetCategoryRelId != null) {
 			setAssetEntryAssetCategoryRelId(assetEntryAssetCategoryRelId);
@@ -82,50 +85,50 @@ public class AssetEntryAssetCategoryRelWrapper extends BaseModelWrapper<AssetEnt
 	}
 
 	/**
-	* Returns the asset category ID of this asset entry asset category rel.
-	*
-	* @return the asset category ID of this asset entry asset category rel
-	*/
+	 * Returns the asset category ID of this asset entry asset category rel.
+	 *
+	 * @return the asset category ID of this asset entry asset category rel
+	 */
 	@Override
 	public long getAssetCategoryId() {
 		return model.getAssetCategoryId();
 	}
 
 	/**
-	* Returns the asset entry asset category rel ID of this asset entry asset category rel.
-	*
-	* @return the asset entry asset category rel ID of this asset entry asset category rel
-	*/
+	 * Returns the asset entry asset category rel ID of this asset entry asset category rel.
+	 *
+	 * @return the asset entry asset category rel ID of this asset entry asset category rel
+	 */
 	@Override
 	public long getAssetEntryAssetCategoryRelId() {
 		return model.getAssetEntryAssetCategoryRelId();
 	}
 
 	/**
-	* Returns the asset entry ID of this asset entry asset category rel.
-	*
-	* @return the asset entry ID of this asset entry asset category rel
-	*/
+	 * Returns the asset entry ID of this asset entry asset category rel.
+	 *
+	 * @return the asset entry ID of this asset entry asset category rel
+	 */
 	@Override
 	public long getAssetEntryId() {
 		return model.getAssetEntryId();
 	}
 
 	/**
-	* Returns the primary key of this asset entry asset category rel.
-	*
-	* @return the primary key of this asset entry asset category rel
-	*/
+	 * Returns the primary key of this asset entry asset category rel.
+	 *
+	 * @return the primary key of this asset entry asset category rel
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
 	}
 
 	/**
-	* Returns the priority of this asset entry asset category rel.
-	*
-	* @return the priority of this asset entry asset category rel
-	*/
+	 * Returns the priority of this asset entry asset category rel.
+	 *
+	 * @return the priority of this asset entry asset category rel
+	 */
 	@Override
 	public int getPriority() {
 		return model.getPriority();
@@ -137,51 +140,52 @@ public class AssetEntryAssetCategoryRelWrapper extends BaseModelWrapper<AssetEnt
 	}
 
 	/**
-	* Sets the asset category ID of this asset entry asset category rel.
-	*
-	* @param assetCategoryId the asset category ID of this asset entry asset category rel
-	*/
+	 * Sets the asset category ID of this asset entry asset category rel.
+	 *
+	 * @param assetCategoryId the asset category ID of this asset entry asset category rel
+	 */
 	@Override
 	public void setAssetCategoryId(long assetCategoryId) {
 		model.setAssetCategoryId(assetCategoryId);
 	}
 
 	/**
-	* Sets the asset entry asset category rel ID of this asset entry asset category rel.
-	*
-	* @param assetEntryAssetCategoryRelId the asset entry asset category rel ID of this asset entry asset category rel
-	*/
+	 * Sets the asset entry asset category rel ID of this asset entry asset category rel.
+	 *
+	 * @param assetEntryAssetCategoryRelId the asset entry asset category rel ID of this asset entry asset category rel
+	 */
 	@Override
 	public void setAssetEntryAssetCategoryRelId(
 		long assetEntryAssetCategoryRelId) {
+
 		model.setAssetEntryAssetCategoryRelId(assetEntryAssetCategoryRelId);
 	}
 
 	/**
-	* Sets the asset entry ID of this asset entry asset category rel.
-	*
-	* @param assetEntryId the asset entry ID of this asset entry asset category rel
-	*/
+	 * Sets the asset entry ID of this asset entry asset category rel.
+	 *
+	 * @param assetEntryId the asset entry ID of this asset entry asset category rel
+	 */
 	@Override
 	public void setAssetEntryId(long assetEntryId) {
 		model.setAssetEntryId(assetEntryId);
 	}
 
 	/**
-	* Sets the primary key of this asset entry asset category rel.
-	*
-	* @param primaryKey the primary key of this asset entry asset category rel
-	*/
+	 * Sets the primary key of this asset entry asset category rel.
+	 *
+	 * @param primaryKey the primary key of this asset entry asset category rel
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	* Sets the priority of this asset entry asset category rel.
-	*
-	* @param priority the priority of this asset entry asset category rel
-	*/
+	 * Sets the priority of this asset entry asset category rel.
+	 *
+	 * @param priority the priority of this asset entry asset category rel
+	 */
 	@Override
 	public void setPriority(int priority) {
 		model.setPriority(priority);
@@ -190,6 +194,9 @@ public class AssetEntryAssetCategoryRelWrapper extends BaseModelWrapper<AssetEnt
 	@Override
 	protected AssetEntryAssetCategoryRelWrapper wrap(
 		AssetEntryAssetCategoryRel assetEntryAssetCategoryRel) {
-		return new AssetEntryAssetCategoryRelWrapper(assetEntryAssetCategoryRel);
+
+		return new AssetEntryAssetCategoryRelWrapper(
+			assetEntryAssetCategoryRel);
 	}
+
 }

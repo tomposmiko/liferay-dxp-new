@@ -39,8 +39,10 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public interface PollsChoiceModel extends BaseModel<PollsChoice>, LocalizedModel,
-	ShardedModel, StagedGroupedModel {
+public interface PollsChoiceModel
+	extends BaseModel<PollsChoice>, LocalizedModel, ShardedModel,
+			StagedGroupedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -314,8 +316,8 @@ public interface PollsChoiceModel extends BaseModel<PollsChoice>, LocalizedModel
 	 * @param locale the locale of the language
 	 * @param defaultLocale the default locale
 	 */
-	public void setDescription(String description, Locale locale,
-		Locale defaultLocale);
+	public void setDescription(
+		String description, Locale locale, Locale defaultLocale);
 
 	public void setDescriptionCurrentLanguageId(String languageId);
 
@@ -332,8 +334,8 @@ public interface PollsChoiceModel extends BaseModel<PollsChoice>, LocalizedModel
 	 * @param descriptionMap the locales and localized descriptions of this polls choice
 	 * @param defaultLocale the default locale
 	 */
-	public void setDescriptionMap(Map<Locale, String> descriptionMap,
-		Locale defaultLocale);
+	public void setDescriptionMap(
+		Map<Locale, String> descriptionMap, Locale defaultLocale);
 
 	/**
 	 * Returns the last publish date of this polls choice.
@@ -363,4 +365,5 @@ public interface PollsChoiceModel extends BaseModel<PollsChoice>, LocalizedModel
 	@Override
 	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
 		throws LocaleException;
+
 }

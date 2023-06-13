@@ -1,5 +1,5 @@
 definition {
-	var dmDocumentTypeName = "Basic Document";
+	var dmDocumentTypeName = "File Upload";
 
 	macro gotoAddDocumentType {
 		LexiconEntry.gotoAdd();
@@ -167,11 +167,11 @@ definition {
 		AssertClick(locator1 = "Button#ANY", value1 = "Share");
 	}
 
-	macro gotoShareViaSharedWithMe {
+	macro gotoShareViaSharedAssets {
 		var key_dmDocumentTitle = "${dmDocumentTitle}";
 
 		Click(
-			locator1 = "DocumentsAndMediaShare#SHARED_WITH_ME_DOCUMENT_OPTIONS",
+			locator1 = "DocumentsAndMediaShare#SHARED_ASSETS_DOCUMENT_OPTIONS",
 			value1 = "${dmDocumentTitle}"
 		);
 
@@ -179,7 +179,7 @@ definition {
 	}
 
 	macro gotoURLDetail {
-		Click(locator1 = "Icon#INFO");
+		DMDocument.expandInfo();
 
 		Click(locator1 = "DocumentsAndMediaDocument#DETAILS_URL");
 	}

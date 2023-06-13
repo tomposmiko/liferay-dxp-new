@@ -17,10 +17,8 @@ package com.liferay.knowledge.base.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.knowledge.base.model.KBTemplate;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class KBTemplateCacheModel implements CacheModel<KBTemplate>,
-	Externalizable {
+public class KBTemplateCacheModel
+	implements CacheModel<KBTemplate>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -177,8 +176,7 @@ public class KBTemplateCacheModel implements CacheModel<KBTemplate>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -232,4 +230,5 @@ public class KBTemplateCacheModel implements CacheModel<KBTemplate>,
 	public String title;
 	public String content;
 	public long lastPublishDate;
+
 }

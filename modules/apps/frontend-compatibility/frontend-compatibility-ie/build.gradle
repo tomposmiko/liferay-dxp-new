@@ -4,11 +4,13 @@ configurations {
 	arrayFill
 	arrayFind
 	arrayFrom
+	arrayIncludes
 	fetch
 	formData
 	objectAssign
 	objectEntries
 	objectValues
+	promise
 	stringEndsWith
 	urlSearchParams
 }
@@ -16,11 +18,13 @@ configurations {
 task buildArrayFill(type: Copy)
 task buildArrayFind(type: Copy)
 task buildArrayFrom(type: Copy)
+task buildArrayIncludes(type: Copy)
 task buildFetch(type: Copy)
 task buildFormData(type: Copy)
 task buildObjectAssign(type: Copy)
 task buildObjectEntries(type: Copy)
 task buildObjectValues(type: Copy)
+task buildPromise(type: Copy)
 task buildStringEndsWith(type: Copy)
 task buildUrlSearchParams(type: Copy)
 
@@ -69,6 +73,22 @@ buildArrayFrom {
 
 	rename {
 		it.replace "Array.from", "array.from"
+	}
+}
+
+buildArrayIncludes {
+	eachFile new StripPathSegmentsAction(5)
+
+	from {
+		zipTree(configurations.arrayIncludes.singleFile)
+	}
+
+	include "META-INF/resources/webjars/mdn-polyfills/5.8.0/Array.prototype.includes.js"
+	includeEmptyDirs = false
+	into "classes/META-INF/resources"
+
+	rename {
+		it.replace "Array.prototype.includes", "array.includes"
 	}
 }
 
@@ -148,6 +168,22 @@ buildObjectValues {
 	}
 }
 
+buildPromise {
+	eachFile new StripPathSegmentsAction(6)
+
+	from {
+		zipTree(configurations.promise.singleFile)
+	}
+
+	include "META-INF/resources/webjars/promise-polyfill/8.1.0/dist/polyfill.js"
+	includeEmptyDirs = false
+	into "classes/META-INF/resources"
+
+	rename {
+		it.replace "polyfill", "promise"
+	}
+}
+
 buildStringEndsWith{
 	eachFile new StripPathSegmentsAction(5)
 
@@ -184,11 +220,13 @@ classes {
 	dependsOn buildArrayFill
 	dependsOn buildArrayFind
 	dependsOn buildArrayFrom
+	dependsOn buildArrayIncludes
 	dependsOn buildFetch
 	dependsOn buildFormData
 	dependsOn buildObjectAssign
 	dependsOn buildObjectEntries
 	dependsOn buildObjectValues
+	dependsOn buildPromise
 	dependsOn buildStringEndsWith
 	dependsOn buildUrlSearchParams
 }
@@ -199,6 +237,8 @@ dependencies {
 	arrayFind group: "org.webjars.bower", name: "Array.prototype.find", transitive: false, version: "1.0.0"
 
 	arrayFrom group: "org.webjars.npm", name: "mdn-polyfills", transitive: false, version: "5.8.0"
+
+	arrayIncludes group: "org.webjars.npm", name: "mdn-polyfills", transitive: false, version: "5.8.0"
 
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
@@ -216,6 +256,8 @@ dependencies {
 	objectEntries group: "org.webjars.npm", name: "object_entries", transitive: false, version: "0.1.2"
 
 	objectValues group: "org.webjars.npm", name: "object_values", transitive: false, version: "0.1.2"
+
+	promise group: "org.webjars.npm", name: "promise-polyfill", transitive: false, version: "8.1.0"
 
 	stringEndsWith group: "org.webjars.npm", name: "mdn-polyfills", transitive: false, version: "5.8.0"
 

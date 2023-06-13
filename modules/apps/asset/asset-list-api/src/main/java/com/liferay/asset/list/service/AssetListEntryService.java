@@ -17,14 +17,12 @@ package com.liferay.asset.list.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.list.model.AssetListEntry;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -43,33 +41,44 @@ import java.util.List;
  */
 @AccessControlled
 @JSONWebService
-@OSGiBeanProperties(property =  {
-	"json.web.service.context.name=assetlist", "json.web.service.context.path=AssetListEntry"}, service = AssetListEntryService.class)
 @ProviderType
-@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
-	PortalException.class, SystemException.class})
+@Transactional(
+	isolation = Isolation.PORTAL,
+	rollbackFor = {PortalException.class, SystemException.class}
+)
 public interface AssetListEntryService extends BaseService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AssetListEntryServiceUtil} to access the asset list entry remote service. Add custom service methods to <code>com.liferay.asset.list.service.impl.AssetListEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public void addAssetEntrySelection(long assetListEntryId,
-		long assetEntryId, ServiceContext serviceContext)
+	public void addAssetEntrySelection(
+			long assetListEntryId, long assetEntryId, long segmentsEntryId,
+			ServiceContext serviceContext)
 		throws PortalException;
 
-	public AssetListEntry addAssetListEntry(long groupId, String title,
-		int type, ServiceContext serviceContext) throws PortalException;
-
-	public AssetListEntry addDynamicAssetListEntry(long userId, long groupId,
-		String title, String typeSettings, ServiceContext serviceContext)
+	public void addAssetEntrySelections(
+			long assetListEntryId, long[] assetEntryIds, long segmentsEntryId,
+			ServiceContext serviceContext)
 		throws PortalException;
 
-	public AssetListEntry addManualAssetListEntry(long userId, long groupId,
-		String title, long[] assetEntryIds, ServiceContext serviceContext)
+	public AssetListEntry addAssetListEntry(
+			long groupId, String title, int type, ServiceContext serviceContext)
 		throws PortalException;
 
-	public void deleteAssetEntrySelection(long assetListEntryId, int position)
+	public AssetListEntry addDynamicAssetListEntry(
+			long userId, long groupId, String title, String typeSettings,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	public AssetListEntry addManualAssetListEntry(
+			long userId, long groupId, String title, long[] assetEntryIds,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	public void deleteAssetEntrySelection(
+			long assetListEntryId, long segmentsEntryId, int position)
 		throws PortalException;
 
 	public void deleteAssetListEntries(long[] assetListEntriesIds)
@@ -78,17 +87,23 @@ public interface AssetListEntryService extends BaseService {
 	public AssetListEntry deleteAssetListEntry(long assetListEntryId)
 		throws PortalException;
 
+	public void deleteAssetListEntry(
+			long assetListEntryId, long segmentsEntryId)
+		throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AssetListEntry fetchAssetListEntry(long assetListEntryId)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<AssetListEntry> getAssetListEntries(long groupId, int start,
-		int end, OrderByComparator<AssetListEntry> orderByComparator);
+	public List<AssetListEntry> getAssetListEntries(
+		long groupId, int start, int end,
+		OrderByComparator<AssetListEntry> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<AssetListEntry> getAssetListEntries(long groupId, String title,
-		int start, int end, OrderByComparator<AssetListEntry> orderByComparator);
+	public List<AssetListEntry> getAssetListEntries(
+		long groupId, String title, int start, int end,
+		OrderByComparator<AssetListEntry> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getAssetListEntriesCount(long groupId);
@@ -97,22 +112,28 @@ public interface AssetListEntryService extends BaseService {
 	public int getAssetListEntriesCount(long groupId, String title);
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public String getOSGiServiceIdentifier();
 
-	public void moveAssetEntrySelection(long assetListEntryId, int position,
-		int newPosition) throws PortalException;
-
-	public AssetListEntry updateAssetListEntry(long assetListEntryId,
-		String title) throws PortalException;
-
-	public AssetListEntry updateAssetListEntryTypeSettings(
-		long assetListEntryId, String typeSettings) throws PortalException;
-
-	public AssetListEntry updateAssetListEntryTypeSettingsProperties(
-		long assetListEntryId, String typeSettingsProperties)
+	public void moveAssetEntrySelection(
+			long assetListEntryId, long segmentsEntryId, int position,
+			int newPosition)
 		throws PortalException;
+
+	public void updateAssetListEntry(
+			long assetListEntryId, long segmentsEntryId, String typeSettings,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	public AssetListEntry updateAssetListEntry(
+			long assetListEntryId, String title)
+		throws PortalException;
+
+	public void updateAssetListEntryTypeSettings(
+			long assetListEntryId, long segmentsEntryId, String typeSettings)
+		throws PortalException;
+
 }

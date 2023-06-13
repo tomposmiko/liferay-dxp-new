@@ -64,17 +64,23 @@ public class ConcurrentReferenceKeyHashMapTest
 			innerConcurrentMap,
 			concurrentReferenceKeyHashMap.innerConcurrentMap);
 
-		Map<String, Object> dataMap = createDataMap();
-
-		concurrentReferenceKeyHashMap = new ConcurrentReferenceKeyHashMap<>(
-			dataMap, FinalizeManager.WEAK_REFERENCE_FACTORY);
-
-		Assert.assertEquals(dataMap, concurrentReferenceKeyHashMap);
-
 		new ConcurrentReferenceKeyHashMap<String, Object>(
 			10, FinalizeManager.WEAK_REFERENCE_FACTORY);
 		new ConcurrentReferenceKeyHashMap<String, Object>(
 			10, 0.75F, 4, FinalizeManager.WEAK_REFERENCE_FACTORY);
+	}
+
+	@Test
+	public void testPutAll() {
+		ConcurrentReferenceKeyHashMap<String, Object>
+			concurrentReferenceKeyHashMap = new ConcurrentReferenceKeyHashMap<>(
+				FinalizeManager.WEAK_REFERENCE_FACTORY);
+
+		Map<String, Object> dataMap = createDataMap();
+
+		concurrentReferenceKeyHashMap.putAll(dataMap);
+
+		Assert.assertEquals(dataMap, concurrentReferenceKeyHashMap);
 	}
 
 }

@@ -19,6 +19,10 @@ import com.liferay.headless.form.dto.v1_0.FormRecord;
 import com.liferay.headless.form.resource.v1_0.FormDocumentResource;
 import com.liferay.headless.form.resource.v1_0.FormRecordResource;
 import com.liferay.headless.form.resource.v1_0.FormResource;
+import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLInvokeDetached;
@@ -26,9 +30,7 @@ import graphql.annotations.annotationTypes.GraphQLName;
 
 import javax.annotation.Generated;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.service.component.ComponentServiceObjects;
 
 /**
  * @author Javier Gamarra
@@ -37,102 +39,161 @@ import org.osgi.util.tracker.ServiceTracker;
 @Generated("")
 public class Mutation {
 
+	public static void setFormResourceComponentServiceObjects(
+		ComponentServiceObjects<FormResource>
+			formResourceComponentServiceObjects) {
+
+		_formResourceComponentServiceObjects =
+			formResourceComponentServiceObjects;
+	}
+
+	public static void setFormDocumentResourceComponentServiceObjects(
+		ComponentServiceObjects<FormDocumentResource>
+			formDocumentResourceComponentServiceObjects) {
+
+		_formDocumentResourceComponentServiceObjects =
+			formDocumentResourceComponentServiceObjects;
+	}
+
+	public static void setFormRecordResourceComponentServiceObjects(
+		ComponentServiceObjects<FormRecordResource>
+			formRecordResourceComponentServiceObjects) {
+
+		_formRecordResourceComponentServiceObjects =
+			formRecordResourceComponentServiceObjects;
+	}
+
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Form postFormEvaluateContext(
-	@GraphQLName("form-id") Long formId,@GraphQLName("Form") Form form)
-			throws Exception {
+			@GraphQLName("form-id") Long formId, @GraphQLName("Form") Form form)
+		throws Exception {
 
-				return _getFormResource().postFormEvaluateContext(
-					formId,form);
+		return _applyComponentServiceObjects(
+			_formResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			formResource -> formResource.postFormEvaluateContext(formId, form));
 	}
+
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Form postFormUploadFile(
-	@GraphQLName("form-id") Long formId,@GraphQLName("Form") Form form)
-			throws Exception {
+			@GraphQLName("form-id") Long formId, @GraphQLName("Form") Form form)
+		throws Exception {
 
-				return _getFormResource().postFormUploadFile(
-					formId,form);
+		return _applyComponentServiceObjects(
+			_formResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			formResource -> formResource.postFormUploadFile(formId, form));
 	}
+
 	@GraphQLInvokeDetached
-	public boolean deleteFormDocument(
-	@GraphQLName("form-document-id") Long formDocumentId)
-			throws Exception {
+	public void deleteFormDocument(
+			@GraphQLName("form-document-id") Long formDocumentId)
+		throws Exception {
 
-				return _getFormDocumentResource().deleteFormDocument(
-					formDocumentId);
+		_applyVoidComponentServiceObjects(
+			_formDocumentResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			formDocumentResource -> formDocumentResource.deleteFormDocument(
+				formDocumentId));
 	}
+
 	@GraphQLInvokeDetached
 	public FormRecord putFormRecord(
-	@GraphQLName("form-record-id") Long formRecordId,@GraphQLName("FormRecord") FormRecord formRecord)
-			throws Exception {
+			@GraphQLName("form-record-id") Long formRecordId,
+			@GraphQLName("FormRecord") FormRecord formRecord)
+		throws Exception {
 
-				return _getFormRecordResource().putFormRecord(
-					formRecordId,formRecord);
+		return _applyComponentServiceObjects(
+			_formRecordResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			formRecordResource -> formRecordResource.putFormRecord(
+				formRecordId, formRecord));
 	}
+
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public FormRecord postFormFormRecord(
-	@GraphQLName("form-id") Long formId,@GraphQLName("FormRecord") FormRecord formRecord)
-			throws Exception {
+			@GraphQLName("form-id") Long formId,
+			@GraphQLName("FormRecord") FormRecord formRecord)
+		throws Exception {
 
-				return _getFormRecordResource().postFormFormRecord(
-					formId,formRecord);
+		return _applyComponentServiceObjects(
+			_formRecordResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			formRecordResource -> formRecordResource.postFormFormRecord(
+				formId, formRecord));
 	}
 
-	private static FormResource _getFormResource() {
-			return _formResourceServiceTracker.getService();
+	private <T, R, E1 extends Throwable, E2 extends Throwable> R
+			_applyComponentServiceObjects(
+				ComponentServiceObjects<T> componentServiceObjects,
+				UnsafeConsumer<T, E1> unsafeConsumer,
+				UnsafeFunction<T, R, E2> unsafeFunction)
+		throws E1, E2 {
+
+		T resource = componentServiceObjects.getService();
+
+		try {
+			unsafeConsumer.accept(resource);
+
+			return unsafeFunction.apply(resource);
+		}
+		finally {
+			componentServiceObjects.ungetService(resource);
+		}
 	}
 
-	private static final ServiceTracker<FormResource, FormResource>
-			_formResourceServiceTracker;
-	private static FormDocumentResource _getFormDocumentResource() {
-			return _formDocumentResourceServiceTracker.getService();
+	private <T, E1 extends Throwable, E2 extends Throwable> void
+			_applyVoidComponentServiceObjects(
+				ComponentServiceObjects<T> componentServiceObjects,
+				UnsafeConsumer<T, E1> unsafeConsumer,
+				UnsafeConsumer<T, E2> unsafeFunction)
+		throws E1, E2 {
+
+		T resource = componentServiceObjects.getService();
+
+		try {
+			unsafeConsumer.accept(resource);
+
+			unsafeFunction.accept(resource);
+		}
+		finally {
+			componentServiceObjects.ungetService(resource);
+		}
 	}
 
-	private static final ServiceTracker<FormDocumentResource, FormDocumentResource>
-			_formDocumentResourceServiceTracker;
-	private static FormRecordResource _getFormRecordResource() {
-			return _formRecordResourceServiceTracker.getService();
+	private void _populateResourceContext(FormResource formResource)
+		throws Exception {
+
+		formResource.setContextCompany(
+			CompanyLocalServiceUtil.getCompany(
+				CompanyThreadLocal.getCompanyId()));
 	}
 
-	private static final ServiceTracker<FormRecordResource, FormRecordResource>
-			_formRecordResourceServiceTracker;
+	private void _populateResourceContext(
+			FormDocumentResource formDocumentResource)
+		throws Exception {
 
-		static {
-			Bundle bundle = FrameworkUtil.getBundle(Mutation.class);
-
-				ServiceTracker<FormResource, FormResource>
-					formResourceServiceTracker =
-						new ServiceTracker<>(
-							bundle.getBundleContext(),
-							FormResource.class, null);
-
-				formResourceServiceTracker.open();
-
-				_formResourceServiceTracker =
-					formResourceServiceTracker;
-				ServiceTracker<FormDocumentResource, FormDocumentResource>
-					formDocumentResourceServiceTracker =
-						new ServiceTracker<>(
-							bundle.getBundleContext(),
-							FormDocumentResource.class, null);
-
-				formDocumentResourceServiceTracker.open();
-
-				_formDocumentResourceServiceTracker =
-					formDocumentResourceServiceTracker;
-				ServiceTracker<FormRecordResource, FormRecordResource>
-					formRecordResourceServiceTracker =
-						new ServiceTracker<>(
-							bundle.getBundleContext(),
-							FormRecordResource.class, null);
-
-				formRecordResourceServiceTracker.open();
-
-				_formRecordResourceServiceTracker =
-					formRecordResourceServiceTracker;
+		formDocumentResource.setContextCompany(
+			CompanyLocalServiceUtil.getCompany(
+				CompanyThreadLocal.getCompanyId()));
 	}
+
+	private void _populateResourceContext(FormRecordResource formRecordResource)
+		throws Exception {
+
+		formRecordResource.setContextCompany(
+			CompanyLocalServiceUtil.getCompany(
+				CompanyThreadLocal.getCompanyId()));
+	}
+
+	private static ComponentServiceObjects<FormResource>
+		_formResourceComponentServiceObjects;
+	private static ComponentServiceObjects<FormDocumentResource>
+		_formDocumentResourceComponentServiceObjects;
+	private static ComponentServiceObjects<FormRecordResource>
+		_formRecordResourceComponentServiceObjects;
 
 }

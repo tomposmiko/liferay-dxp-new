@@ -17,7 +17,6 @@ package com.liferay.calendar.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.calendar.service.CalendarNotificationTemplateServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -64,20 +63,30 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class CalendarNotificationTemplateServiceSoap {
-	public static com.liferay.calendar.model.CalendarNotificationTemplateSoap addCalendarNotificationTemplate(
-		long calendarId,
-		com.liferay.calendar.notification.NotificationType notificationType,
-		String notificationTypeSettings,
-		com.liferay.calendar.notification.NotificationTemplateType notificationTemplateType,
-		String subject, String body,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-		try {
-			com.liferay.calendar.model.CalendarNotificationTemplate returnValue = CalendarNotificationTemplateServiceUtil.addCalendarNotificationTemplate(calendarId,
-					notificationType, notificationTypeSettings,
-					notificationTemplateType, subject, body, serviceContext);
 
-			return com.liferay.calendar.model.CalendarNotificationTemplateSoap.toSoapModel(returnValue);
+	public static com.liferay.calendar.model.CalendarNotificationTemplateSoap
+			addCalendarNotificationTemplate(
+				long calendarId,
+				com.liferay.calendar.notification.NotificationType
+					notificationType,
+				String notificationTypeSettings,
+				com.liferay.calendar.notification.NotificationTemplateType
+					notificationTemplateType,
+				String subject, String body,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.calendar.model.CalendarNotificationTemplate
+				returnValue =
+					CalendarNotificationTemplateServiceUtil.
+						addCalendarNotificationTemplate(
+							calendarId, notificationType,
+							notificationTypeSettings, notificationTemplateType,
+							subject, body, serviceContext);
+
+			return com.liferay.calendar.model.CalendarNotificationTemplateSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -86,16 +95,24 @@ public class CalendarNotificationTemplateServiceSoap {
 		}
 	}
 
-	public static com.liferay.calendar.model.CalendarNotificationTemplateSoap updateCalendarNotificationTemplate(
-		long calendarNotificationTemplateId, String notificationTypeSettings,
-		String subject, String body,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.calendar.model.CalendarNotificationTemplateSoap
+			updateCalendarNotificationTemplate(
+				long calendarNotificationTemplateId,
+				String notificationTypeSettings, String subject, String body,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
-		try {
-			com.liferay.calendar.model.CalendarNotificationTemplate returnValue = CalendarNotificationTemplateServiceUtil.updateCalendarNotificationTemplate(calendarNotificationTemplateId,
-					notificationTypeSettings, subject, body, serviceContext);
 
-			return com.liferay.calendar.model.CalendarNotificationTemplateSoap.toSoapModel(returnValue);
+		try {
+			com.liferay.calendar.model.CalendarNotificationTemplate
+				returnValue =
+					CalendarNotificationTemplateServiceUtil.
+						updateCalendarNotificationTemplate(
+							calendarNotificationTemplateId,
+							notificationTypeSettings, subject, body,
+							serviceContext);
+
+			return com.liferay.calendar.model.CalendarNotificationTemplateSoap.
+				toSoapModel(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -104,5 +121,7 @@ public class CalendarNotificationTemplateServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(CalendarNotificationTemplateServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		CalendarNotificationTemplateServiceSoap.class);
+
 }

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 /**
- * @author André de Oliveira
+ * @author Michael C. Han
  */
 public class StringQueryTest extends BaseStringQueryTestCase {
 
@@ -51,7 +51,7 @@ public class StringQueryTest extends BaseStringQueryTestCase {
 	}
 
 	@Override
-	protected IndexingFixture createIndexingFixture() {
+	protected IndexingFixture createIndexingFixture() throws Exception {
 		return new ElasticsearchIndexingFixture() {
 			{
 				setCompanyId(BaseIndexingTestCase.COMPANY_ID);

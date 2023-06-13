@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class CTCollectionSoap implements Serializable {
+
 	public static CTCollectionSoap toSoapModel(CTCollection model) {
 		CTCollectionSoap soapModel = new CTCollectionSoap();
 
@@ -77,7 +78,8 @@ public class CTCollectionSoap implements Serializable {
 	}
 
 	public static CTCollectionSoap[] toSoapModels(List<CTCollection> models) {
-		List<CTCollectionSoap> soapModels = new ArrayList<CTCollectionSoap>(models.size());
+		List<CTCollectionSoap> soapModels = new ArrayList<CTCollectionSoap>(
+			models.size());
 
 		for (CTCollection model : models) {
 			soapModels.add(toSoapModel(model));
@@ -205,4 +207,5 @@ public class CTCollectionSoap implements Serializable {
 	private long _statusByUserId;
 	private String _statusByUserName;
 	private Date _statusDate;
+
 }

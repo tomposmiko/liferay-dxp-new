@@ -35,8 +35,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface AssetListEntryAssetEntryRelModel extends BaseModel<AssetListEntryAssetEntryRel>,
-	ShardedModel, StagedGroupedModel {
+public interface AssetListEntryAssetEntryRelModel
+	extends BaseModel<AssetListEntryAssetEntryRel>, ShardedModel,
+			StagedGroupedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -231,6 +233,20 @@ public interface AssetListEntryAssetEntryRelModel extends BaseModel<AssetListEnt
 	public void setAssetEntryId(long assetEntryId);
 
 	/**
+	 * Returns the segments entry ID of this asset list entry asset entry rel.
+	 *
+	 * @return the segments entry ID of this asset list entry asset entry rel
+	 */
+	public long getSegmentsEntryId();
+
+	/**
+	 * Sets the segments entry ID of this asset list entry asset entry rel.
+	 *
+	 * @param segmentsEntryId the segments entry ID of this asset list entry asset entry rel
+	 */
+	public void setSegmentsEntryId(long segmentsEntryId);
+
+	/**
 	 * Returns the position of this asset list entry asset entry rel.
 	 *
 	 * @return the position of this asset list entry asset entry rel
@@ -259,4 +275,5 @@ public interface AssetListEntryAssetEntryRelModel extends BaseModel<AssetListEnt
 	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate);
+
 }

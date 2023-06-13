@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import com.liferay.sync.service.SyncDeviceServiceUtil;
 
 import java.rmi.RemoteException;
@@ -64,14 +63,18 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class SyncDeviceServiceSoap {
-	public static com.liferay.sync.model.SyncDeviceSoap registerSyncDevice(
-		String type, long buildNumber, int featureSet, String uuid)
-		throws RemoteException {
-		try {
-			com.liferay.sync.model.SyncDevice returnValue = SyncDeviceServiceUtil.registerSyncDevice(type,
-					buildNumber, featureSet, uuid);
 
-			return com.liferay.sync.model.SyncDeviceSoap.toSoapModel(returnValue);
+	public static com.liferay.sync.model.SyncDeviceSoap registerSyncDevice(
+			String type, long buildNumber, int featureSet, String uuid)
+		throws RemoteException {
+
+		try {
+			com.liferay.sync.model.SyncDevice returnValue =
+				SyncDeviceServiceUtil.registerSyncDevice(
+					type, buildNumber, featureSet, uuid);
+
+			return com.liferay.sync.model.SyncDeviceSoap.toSoapModel(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -82,6 +85,7 @@ public class SyncDeviceServiceSoap {
 
 	public static void unregisterSyncDevice(String uuid)
 		throws RemoteException {
+
 		try {
 			SyncDeviceServiceUtil.unregisterSyncDevice(uuid);
 		}
@@ -92,5 +96,7 @@ public class SyncDeviceServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(SyncDeviceServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		SyncDeviceServiceSoap.class);
+
 }

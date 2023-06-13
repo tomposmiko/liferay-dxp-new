@@ -34,6 +34,7 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureVersionLocalServiceU
 @ProviderType
 public abstract class DDMStructureVersionBaseImpl
 	extends DDMStructureVersionModelImpl implements DDMStructureVersion {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class DDMStructureVersionBaseImpl
 			DDMStructureVersionLocalServiceUtil.updateDDMStructureVersion(this);
 		}
 	}
+
 }

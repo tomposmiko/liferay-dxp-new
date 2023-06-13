@@ -1,9 +1,9 @@
 import '../FieldBase/FieldBase.es';
 import './ParagraphRegister.soy.js';
-import {Config} from 'metal-state';
 import Component from 'metal-component';
 import Soy from 'metal-soy';
 import templates from './Paragraph.soy.js';
+import {Config} from 'metal-state';
 
 class Paragraph extends Component {
 	static STATE = {
@@ -106,15 +106,6 @@ class Paragraph extends Component {
 		 */
 
 		spritemap: Config.string(),
-
-		/**
-		 * @default undefined
-		 * @instance
-		 * @memberof Paragraph
-		 * @type {?(string|undefined)}
-		 */
-
-		tip: Config.string(),
 
 		/**
 		 * @default undefined

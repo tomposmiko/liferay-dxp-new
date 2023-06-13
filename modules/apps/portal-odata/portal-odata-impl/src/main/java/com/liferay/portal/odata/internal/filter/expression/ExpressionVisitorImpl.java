@@ -179,6 +179,11 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 				expressions, MethodExpression.Type.CONTAINS);
 		}
 
+		if (methodKind == MethodKind.STARTSWITH) {
+			return new MethodExpressionImpl(
+				expressions, MethodExpression.Type.STARTS_WITH);
+		}
+
 		throw new UnsupportedOperationException("Method call: " + methodKind);
 	}
 
@@ -282,6 +287,9 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 		}
 		else if (binaryOperatorKind == BinaryOperatorKind.LT) {
 			return Optional.of(BinaryExpression.Operation.LT);
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.NE) {
+			return Optional.of(BinaryExpression.Operation.NE);
 		}
 		else if (binaryOperatorKind == BinaryOperatorKind.OR) {
 			return Optional.of(BinaryExpression.Operation.OR);

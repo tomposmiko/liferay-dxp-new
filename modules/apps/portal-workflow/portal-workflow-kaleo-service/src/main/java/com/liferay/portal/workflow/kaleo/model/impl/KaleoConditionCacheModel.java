@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.workflow.kaleo.model.KaleoCondition;
@@ -37,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
-	Externalizable, MVCCModel {
+public class KaleoConditionCacheModel
+	implements CacheModel<KaleoCondition>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +49,12 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 			return false;
 		}
 
-		KaleoConditionCacheModel kaleoConditionCacheModel = (KaleoConditionCacheModel)obj;
+		KaleoConditionCacheModel kaleoConditionCacheModel =
+			(KaleoConditionCacheModel)obj;
 
 		if ((kaleoConditionId == kaleoConditionCacheModel.kaleoConditionId) &&
-				(mvccVersion == kaleoConditionCacheModel.mvccVersion)) {
+			(mvccVersion == kaleoConditionCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -142,7 +144,8 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 			kaleoConditionImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		kaleoConditionImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		kaleoConditionImpl.setKaleoDefinitionVersionId(
+			kaleoDefinitionVersionId);
 		kaleoConditionImpl.setKaleoNodeId(kaleoNodeId);
 
 		if (script == null) {
@@ -163,7 +166,8 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 			kaleoConditionImpl.setScriptRequiredContexts("");
 		}
 		else {
-			kaleoConditionImpl.setScriptRequiredContexts(scriptRequiredContexts);
+			kaleoConditionImpl.setScriptRequiredContexts(
+				scriptRequiredContexts);
 		}
 
 		kaleoConditionImpl.resetOriginalValues();
@@ -195,8 +199,7 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(kaleoConditionId);
@@ -256,4 +259,5 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 	public String script;
 	public String scriptLanguage;
 	public String scriptRequiredContexts;
+
 }

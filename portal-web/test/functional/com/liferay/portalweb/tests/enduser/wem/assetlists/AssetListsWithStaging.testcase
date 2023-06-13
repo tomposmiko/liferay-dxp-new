@@ -38,9 +38,9 @@ definition {
 		task("Navigate to asset list administration in the staging site.") {
 			ProductMenuHelper.expandPanel(panel = "Site Administration");
 
-			ProductMenuHelper.expandCategory(category = "Content");
+			ProductMenuHelper.expandCategory(category = "Content &amp; Data");
 
-			AssertVisible(locator1 = "ProductMenu#PORTLET", key_portlet = "Asset Lists");
+			AssertVisible(locator1 = "ProductMenu#PORTLET", key_portlet = "Content Sets");
 		}
 
 		task("Assert we cannot navigate to asset list administration in the live site.") {
@@ -48,11 +48,11 @@ definition {
 
 			ProductMenuHelper.expandPanel(panel = "Site Administration");
 
-			ProductMenuHelper.expandCategory(category = "Content");
+			ProductMenuHelper.expandCategory(category = "Content &amp; Data");
 
 			AssertElementNotPresent(
 				locator1 = "ProductMenu#PORTLET",
-				key_portlet = "Asset Lists"
+				key_portlet = "Content Sets"
 			);
 		}
 	}

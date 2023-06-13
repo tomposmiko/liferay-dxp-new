@@ -17,10 +17,8 @@ package com.liferay.blogs.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.blogs.model.BlogsStatsUser;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class BlogsStatsUserCacheModel implements CacheModel<BlogsStatsUser>,
-	Externalizable {
+public class BlogsStatsUserCacheModel
+	implements CacheModel<BlogsStatsUser>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class BlogsStatsUserCacheModel implements CacheModel<BlogsStatsUser>,
 			return false;
 		}
 
-		BlogsStatsUserCacheModel blogsStatsUserCacheModel = (BlogsStatsUserCacheModel)obj;
+		BlogsStatsUserCacheModel blogsStatsUserCacheModel =
+			(BlogsStatsUserCacheModel)obj;
 
 		if (statsUserId == blogsStatsUserCacheModel.statsUserId) {
 			return true;
@@ -137,8 +137,7 @@ public class BlogsStatsUserCacheModel implements CacheModel<BlogsStatsUser>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(statsUserId);
 
 		objectOutput.writeLong(groupId);
@@ -166,4 +165,5 @@ public class BlogsStatsUserCacheModel implements CacheModel<BlogsStatsUser>,
 	public int ratingsTotalEntries;
 	public double ratingsTotalScore;
 	public double ratingsAverageScore;
+
 }

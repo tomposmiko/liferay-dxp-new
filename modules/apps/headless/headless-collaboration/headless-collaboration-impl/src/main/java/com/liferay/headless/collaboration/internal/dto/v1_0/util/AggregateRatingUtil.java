@@ -15,7 +15,6 @@
 package com.liferay.headless.collaboration.internal.dto.v1_0.util;
 
 import com.liferay.headless.collaboration.dto.v1_0.AggregateRating;
-import com.liferay.headless.collaboration.internal.dto.v1_0.AggregateRatingImpl;
 import com.liferay.ratings.kernel.model.RatingsStats;
 
 /**
@@ -28,7 +27,7 @@ public class AggregateRatingUtil {
 			return null;
 		}
 
-		return new AggregateRatingImpl() {
+		return new AggregateRating() {
 			{
 				bestRating = 1;
 				ratingCount = ratingsStats.getTotalEntries();

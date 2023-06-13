@@ -23,16 +23,15 @@ import javax.ws.rs.ext.ExceptionMapper;
 import org.osgi.service.component.annotations.Component;
 
 /**
- * Converts any {@code FileNameException} to a {@code 422}
- * error.
+ * Converts any {@code FileNameException} to a {@code 400} error.
  *
  * @author Alejandro Hernández
  * @review
  */
 @Component(
 	property = {
+		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.Headless.Document.Library)",
 		"osgi.jaxrs.extension=true",
-		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.Headless.Document.Library)",
 		"osgi.jaxrs.name=Liferay.Headless.Document.Library.FileNameExceptionMapper"
 	},
 	service = ExceptionMapper.class
@@ -43,7 +42,7 @@ public class FileNameExceptionMapper
 	@Override
 	public Response toResponse(FileNameException fne) {
 		return Response.status(
-			422
+			400
 		).type(
 			MediaType.TEXT_PLAIN
 		).entity(

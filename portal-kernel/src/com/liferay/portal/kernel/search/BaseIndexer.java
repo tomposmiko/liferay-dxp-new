@@ -1691,20 +1691,8 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 	protected Map<Locale, String> populateMap(
 		AssetEntry assetEntry, Map<Locale, String> map) {
 
-		String defaultValue = map.get(
-			LocaleUtil.fromLanguageId(assetEntry.getDefaultLanguageId()));
-
-		for (Locale availableLocale :
-				LanguageUtil.getAvailableLocales(assetEntry.getGroupId())) {
-
-			if (!map.containsKey(availableLocale) ||
-				Validator.isNull(map.get(availableLocale))) {
-
-				map.put(availableLocale, defaultValue);
-			}
-		}
-
-		return map;
+		return LocalizationUtil.populateLocalizationMap(
+			map, assetEntry.getDefaultLanguageId(), assetEntry.getGroupId());
 	}
 
 	protected void postProcessFullQuery(

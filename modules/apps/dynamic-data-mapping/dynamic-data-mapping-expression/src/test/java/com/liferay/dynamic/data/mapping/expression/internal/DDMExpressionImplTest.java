@@ -80,29 +80,33 @@ public class DDMExpressionImplTest extends PowerMockito {
 
 	@Test
 	public void testDivision1() throws Exception {
+		BigDecimal bigDecimal = new BigDecimal(2);
+
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"6 / 3");
 
-		Assert.assertEquals(
-			new BigDecimal(2).setScale(2), ddmExpression.evaluate());
+		Assert.assertEquals(bigDecimal.setScale(2), ddmExpression.evaluate());
 	}
 
 	@Test
 	public void testDivision2() throws Exception {
+		BigDecimal bigDecimal = new BigDecimal(7.5);
+
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"15 / 2");
 
-		Assert.assertEquals(
-			new BigDecimal(7.5).setScale(2), ddmExpression.evaluate());
+		Assert.assertEquals(bigDecimal.setScale(2), ddmExpression.evaluate());
 	}
 
 	@Test
 	public void testDivision3() throws Exception {
+		BigDecimal bigDecimal = new BigDecimal(1.11);
+
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"10 / 9");
 
 		Assert.assertEquals(
-			new BigDecimal(1.11).setScale(2, RoundingMode.FLOOR),
+			bigDecimal.setScale(2, RoundingMode.FLOOR),
 			ddmExpression.evaluate());
 	}
 
@@ -172,9 +176,9 @@ public class DDMExpressionImplTest extends PowerMockito {
 			functions
 		);
 
-		BigDecimal actual = ddmExpression.evaluate();
+		BigDecimal bigDecimal = ddmExpression.evaluate();
 
-		Assert.assertEquals(0, actual.compareTo(new BigDecimal("6")));
+		Assert.assertEquals(0, bigDecimal.compareTo(new BigDecimal("6")));
 	}
 
 	@Test
@@ -194,9 +198,9 @@ public class DDMExpressionImplTest extends PowerMockito {
 			functions
 		);
 
-		BigDecimal actual = ddmExpression.evaluate();
+		BigDecimal bigDecimal = ddmExpression.evaluate();
 
-		Assert.assertEquals(0, actual.compareTo(new BigDecimal("4")));
+		Assert.assertEquals(0, bigDecimal.compareTo(new BigDecimal("4")));
 	}
 
 	@Test
@@ -221,9 +225,9 @@ public class DDMExpressionImplTest extends PowerMockito {
 			functions
 		);
 
-		BigDecimal actual = ddmExpression.evaluate();
+		BigDecimal bigDecimal = ddmExpression.evaluate();
 
-		Assert.assertEquals(0, actual.compareTo(new BigDecimal("10")));
+		Assert.assertEquals(0, bigDecimal.compareTo(new BigDecimal("10")));
 	}
 
 	@Test
@@ -317,9 +321,9 @@ public class DDMExpressionImplTest extends PowerMockito {
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"2.45 * 2");
 
-		BigDecimal actual = ddmExpression.evaluate();
+		BigDecimal bigDecimal = ddmExpression.evaluate();
 
-		Assert.assertEquals(0, actual.compareTo(new BigDecimal("4.9")));
+		Assert.assertEquals(0, bigDecimal.compareTo(new BigDecimal("4.9")));
 	}
 
 	@Test
@@ -327,9 +331,9 @@ public class DDMExpressionImplTest extends PowerMockito {
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"-2 * -3.55");
 
-		BigDecimal actual = ddmExpression.evaluate();
+		BigDecimal bigDecimal = ddmExpression.evaluate();
 
-		Assert.assertEquals(0, actual.compareTo(new BigDecimal("7.10")));
+		Assert.assertEquals(0, bigDecimal.compareTo(new BigDecimal("7.10")));
 	}
 
 	@Test
@@ -387,11 +391,12 @@ public class DDMExpressionImplTest extends PowerMockito {
 
 	@Test
 	public void testParenthesis() throws Exception {
+		BigDecimal bigDecimal = new BigDecimal(4);
+
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"(8 + 2) / 2.5");
 
-		Assert.assertEquals(
-			new BigDecimal(4).setScale(2), ddmExpression.evaluate());
+		Assert.assertEquals(bigDecimal.setScale(2), ddmExpression.evaluate());
 	}
 
 	@Test
@@ -401,9 +406,9 @@ public class DDMExpressionImplTest extends PowerMockito {
 
 		BigDecimal expected = new BigDecimal("-8");
 
-		BigDecimal actual = ddmExpression.evaluate();
+		BigDecimal bigDecimal = ddmExpression.evaluate();
 
-		Assert.assertEquals(0, actual.compareTo(expected));
+		Assert.assertEquals(0, bigDecimal.compareTo(expected));
 	}
 
 	@Test
@@ -421,9 +426,9 @@ public class DDMExpressionImplTest extends PowerMockito {
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"-2 -3.55");
 
-		BigDecimal actual = ddmExpression.evaluate();
+		BigDecimal bigDecimal = ddmExpression.evaluate();
 
-		Assert.assertEquals(0, actual.compareTo(new BigDecimal("-5.55")));
+		Assert.assertEquals(0, bigDecimal.compareTo(new BigDecimal("-5.55")));
 	}
 
 	@Test
@@ -431,9 +436,9 @@ public class DDMExpressionImplTest extends PowerMockito {
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"4 - 2 - 1");
 
-		BigDecimal actual = ddmExpression.evaluate();
+		BigDecimal bigDecimal = ddmExpression.evaluate();
 
-		Assert.assertEquals(0, actual.compareTo(new BigDecimal("1")));
+		Assert.assertEquals(0, bigDecimal.compareTo(new BigDecimal("1")));
 	}
 
 	@Test(expected = DDMExpressionException.class)

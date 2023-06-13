@@ -30,11 +30,15 @@ import java.util.List;
  */
 @ProviderType
 public class OAuth2ApplicationScopeAliasesSoap implements Serializable {
+
 	public static OAuth2ApplicationScopeAliasesSoap toSoapModel(
 		OAuth2ApplicationScopeAliases model) {
-		OAuth2ApplicationScopeAliasesSoap soapModel = new OAuth2ApplicationScopeAliasesSoap();
 
-		soapModel.setOAuth2ApplicationScopeAliasesId(model.getOAuth2ApplicationScopeAliasesId());
+		OAuth2ApplicationScopeAliasesSoap soapModel =
+			new OAuth2ApplicationScopeAliasesSoap();
+
+		soapModel.setOAuth2ApplicationScopeAliasesId(
+			model.getOAuth2ApplicationScopeAliasesId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
 		soapModel.setUserName(model.getUserName());
@@ -48,7 +52,9 @@ public class OAuth2ApplicationScopeAliasesSoap implements Serializable {
 
 	public static OAuth2ApplicationScopeAliasesSoap[] toSoapModels(
 		OAuth2ApplicationScopeAliases[] models) {
-		OAuth2ApplicationScopeAliasesSoap[] soapModels = new OAuth2ApplicationScopeAliasesSoap[models.length];
+
+		OAuth2ApplicationScopeAliasesSoap[] soapModels =
+			new OAuth2ApplicationScopeAliasesSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -59,10 +65,12 @@ public class OAuth2ApplicationScopeAliasesSoap implements Serializable {
 
 	public static OAuth2ApplicationScopeAliasesSoap[][] toSoapModels(
 		OAuth2ApplicationScopeAliases[][] models) {
+
 		OAuth2ApplicationScopeAliasesSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new OAuth2ApplicationScopeAliasesSoap[models.length][models[0].length];
+			soapModels = new OAuth2ApplicationScopeAliasesSoap
+				[models.length][models[0].length];
 		}
 		else {
 			soapModels = new OAuth2ApplicationScopeAliasesSoap[0][0];
@@ -77,13 +85,16 @@ public class OAuth2ApplicationScopeAliasesSoap implements Serializable {
 
 	public static OAuth2ApplicationScopeAliasesSoap[] toSoapModels(
 		List<OAuth2ApplicationScopeAliases> models) {
-		List<OAuth2ApplicationScopeAliasesSoap> soapModels = new ArrayList<OAuth2ApplicationScopeAliasesSoap>(models.size());
+
+		List<OAuth2ApplicationScopeAliasesSoap> soapModels =
+			new ArrayList<OAuth2ApplicationScopeAliasesSoap>(models.size());
 
 		for (OAuth2ApplicationScopeAliases model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new OAuth2ApplicationScopeAliasesSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new OAuth2ApplicationScopeAliasesSoap[soapModels.size()]);
 	}
 
 	public OAuth2ApplicationScopeAliasesSoap() {
@@ -103,6 +114,7 @@ public class OAuth2ApplicationScopeAliasesSoap implements Serializable {
 
 	public void setOAuth2ApplicationScopeAliasesId(
 		long oAuth2ApplicationScopeAliasesId) {
+
 		_oAuth2ApplicationScopeAliasesId = oAuth2ApplicationScopeAliasesId;
 	}
 
@@ -170,4 +182,5 @@ public class OAuth2ApplicationScopeAliasesSoap implements Serializable {
 	private long _oAuth2ApplicationId;
 	private String _scopeAliases;
 	private long _scopeAliasesHash;
+
 }

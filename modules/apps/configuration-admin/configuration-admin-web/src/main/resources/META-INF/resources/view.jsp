@@ -43,15 +43,21 @@ ConfigurationEntryRetriever configurationEntryRetriever = (ConfigurationEntryRet
 
 			<li class="list-group-header">
 				<h3 class="list-group-header-title text-uppercase">
-					<liferay-ui:message key='<%= "category-section." + configurationCategorySectionDisplay.getConfigurationCategorySection() %>' />
+					<%= HtmlUtil.escape(configurationCategorySectionDisplay.getConfigurationCategorySectionLabel(locale)) %>
 				</h3>
 			</li>
 			<li class="list-group-card">
 				<ul class="list-group">
 
 					<%
+					ConfigurationScopeDisplayContext configurationScopeDisplayContext = new ConfigurationScopeDisplayContext(renderRequest);
+
 					for (ConfigurationCategoryDisplay configurationCategoryDisplay : configurationCategorySectionDisplay.getConfigurationCategoryDisplays()) {
-						ConfigurationCategoryMenuDisplay configurationCategoryMenuDisplay = configurationEntryRetriever.getConfigurationCategoryMenuDisplay(configurationCategoryDisplay.getCategoryKey(), themeDisplay.getLanguageId());
+						ConfigurationCategoryMenuDisplay configurationCategoryMenuDisplay = configurationEntryRetriever.getConfigurationCategoryMenuDisplay(configurationCategoryDisplay.getCategoryKey(), themeDisplay.getLanguageId(), configurationScopeDisplayContext.getScope(), configurationScopeDisplayContext.getScopePK());
+
+						if (configurationCategoryMenuDisplay.isEmpty()) {
+							continue;
+						}
 
 						String viewCategoryHREF = ConfigurationCategoryUtil.getHREF(configurationCategoryMenuDisplay, liferayPortletResponse, renderRequest, renderResponse);
 					%>

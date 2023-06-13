@@ -15,7 +15,6 @@
 package com.liferay.headless.collaboration.internal.dto.v1_0.util;
 
 import com.liferay.headless.collaboration.dto.v1_0.Creator;
-import com.liferay.headless.collaboration.internal.dto.v1_0.CreatorImpl;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
@@ -32,7 +31,7 @@ public class CreatorUtil {
 			return null;
 		}
 
-		return new CreatorImpl() {
+		return new Creator() {
 			{
 				additionalName = user.getMiddleName();
 				familyName = user.getLastName();

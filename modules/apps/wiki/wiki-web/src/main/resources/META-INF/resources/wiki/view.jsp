@@ -193,6 +193,7 @@ if (portletTitleBasedNavigation) {
 
 				contextObjects.put("assetEntry", layoutAssetEntry);
 				contextObjects.put("formattedContent", formattedContent);
+				contextObjects.put("viewURL", viewPageURL.toString());
 				contextObjects.put("wikiPortletInstanceConfiguration", wikiPortletInstanceConfiguration);
 
 				// Deprecated
@@ -400,19 +401,6 @@ if (portletTitleBasedNavigation) {
 						</c:if>
 					</div>
 				</liferay-ddm:template-renderer>
-
-				<aui:script sandbox="<%= true %>">
-					var toc = $('#p_p_id<portlet:namespace /> .toc');
-
-					var index = toc.find('.toc-index');
-
-					toc.find('a.toc-trigger').on(
-						'click',
-						function(event) {
-							index.toggleClass('hide');
-						}
-					);
-				</aui:script>
 
 				<%
 				if (!wikiPage.getTitle().equals(wikiGroupServiceConfiguration.frontPageName())) {

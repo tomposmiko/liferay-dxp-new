@@ -93,7 +93,7 @@
  * @param? selectedTool
  */
 {template .tools}
-	<div class="controls text-center pt-2">
+	<div class="controls pt-2 text-center">
 		<ul class="d-flex justify-content-center list-inline">
 			{foreach $tool in $imageEditorCapabilities.tools}
 				<li class="{$selectedTool == 'tool-' + index($tool) ? 'open' : ''}">

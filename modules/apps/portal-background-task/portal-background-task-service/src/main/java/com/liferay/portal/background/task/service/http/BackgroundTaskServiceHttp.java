@@ -53,15 +53,18 @@ import com.liferay.portal.kernel.util.MethodKey;
  */
 @ProviderType
 public class BackgroundTaskServiceHttp {
-	public static int getBackgroundTasksCount(HttpPrincipal httpPrincipal,
-		long groupId, String taskExecutorClassName, String completed) {
-		try {
-			MethodKey methodKey = new MethodKey(BackgroundTaskServiceUtil.class,
-					"getBackgroundTasksCount",
-					_getBackgroundTasksCountParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, groupId,
-					taskExecutorClassName, completed);
+	public static int getBackgroundTasksCount(
+		HttpPrincipal httpPrincipal, long groupId, String taskExecutorClassName,
+		String completed) {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				BackgroundTaskServiceUtil.class, "getBackgroundTasksCount",
+				_getBackgroundTasksCountParameterTypes0);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, groupId, taskExecutorClassName, completed);
 
 			Object returnObj = null;
 
@@ -69,7 +72,8 @@ public class BackgroundTaskServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return ((Integer)returnObj).intValue();
@@ -83,13 +87,14 @@ public class BackgroundTaskServiceHttp {
 
 	public static String getBackgroundTaskStatusJSON(
 		HttpPrincipal httpPrincipal, long backgroundTaskId) {
-		try {
-			MethodKey methodKey = new MethodKey(BackgroundTaskServiceUtil.class,
-					"getBackgroundTaskStatusJSON",
-					_getBackgroundTaskStatusJSONParameterTypes1);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					backgroundTaskId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				BackgroundTaskServiceUtil.class, "getBackgroundTaskStatusJSON",
+				_getBackgroundTaskStatusJSONParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, backgroundTaskId);
 
 			Object returnObj = null;
 
@@ -97,7 +102,8 @@ public class BackgroundTaskServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return (String)returnObj;
@@ -109,11 +115,12 @@ public class BackgroundTaskServiceHttp {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(BackgroundTaskServiceHttp.class);
-	private static final Class<?>[] _getBackgroundTasksCountParameterTypes0 = new Class[] {
-			long.class, String.class, String.class
-		};
-	private static final Class<?>[] _getBackgroundTaskStatusJSONParameterTypes1 = new Class[] {
-			long.class
-		};
+	private static Log _log = LogFactoryUtil.getLog(
+		BackgroundTaskServiceHttp.class);
+
+	private static final Class<?>[] _getBackgroundTasksCountParameterTypes0 =
+		new Class[] {long.class, String.class, String.class};
+	private static final Class<?>[]
+		_getBackgroundTaskStatusJSONParameterTypes1 = new Class[] {long.class};
+
 }

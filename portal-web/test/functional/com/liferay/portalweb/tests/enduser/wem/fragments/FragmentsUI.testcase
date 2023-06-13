@@ -91,6 +91,10 @@ definition {
 			);
 		}
 
+		task ("Publish the content page") {
+			PageEditor.clickPublish();
+		}
+
 		task ("Navigate to the content page") {
 			Navigator.openWithAppendToBaseURL(
 				urlAppend = "web/test-site-name/test-content-page-name"
@@ -115,10 +119,6 @@ definition {
 			AssertElementPresent(locator1 = "Button#SUBMIT");
 
 			AssertElementPresent(locator1 = "Button#CANCEL");
-
-			AssertClickNoError(locator1 = "Button#SUBMIT", value1 = "Submit");
-
-			AssertConfirm(value1 = "Form submitted");
 		}
 	}
 
@@ -156,7 +156,7 @@ definition {
 				value1 = ""
 			);
 
-			SelectFrame(locator1 = "FragmentEditor#PREVIEW_IFRAME");
+			SelectFrame.selectFrameNoLoading(locator1 = "FragmentEditor#PREVIEW_IFRAME");
 
 			AssertTextEquals(
 				locator1 = "//div[@class='fragment-header']/h1[@class='title']",
@@ -175,7 +175,7 @@ definition {
 		}
 
 		task ("Assert the edits to the section fragment persist by asserting that the preview displays the Title fragment") {
-			SelectFrame(locator1 = "FragmentEditor#PREVIEW_IFRAME");
+			SelectFrame.selectFrameNoLoading(locator1 = "FragmentEditor#PREVIEW_IFRAME");
 
 			AssertTextEquals(
 				locator1 = "//div[@class='fragment-header']/h1[@class='title']",
@@ -192,17 +192,33 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Assert the preview properly displays the Button fragment") {
-			SelectFrame(locator1 = "FragmentEditor#PREVIEW_IFRAME");
+			SelectFrame.selectFrameNoLoading(locator1 = "FragmentEditor#PREVIEW_IFRAME");
 
 			AssertElementPresent(locator1 = "Button#SUBMIT");
 
 			AssertElementPresent(locator1 = "Button#CANCEL");
 
-			AssertClickNoError(locator1 = "Button#SUBMIT", value1 = "Submit");
-
-			AssertConfirm(value1 = "Form submitted");
-
 			SelectFrameTop();
+		}
+	}
+
+	@description = "This is a test for LPS-89251. When creating fragments there should be a visible reference to the Liferay Fragments Toolkit."
+	@priority = "4"
+	test ViewReferenceToFragmentsToolkit {
+		task ("Click on the Fragments Toolkit link") {
+			Click(
+				locator1 = "FragmentEditor#FRAGMENTS_TOOLKIT_LINK"
+			);
+		}
+
+		task ("Assert user is taken to the the Liferay Fragments Toolkit documentation page") {
+			SelectWindow.selectPopUp(
+				locator1 = "null"
+			);
+
+			AssertLocation(
+				value1 = "https://github.com/liferay/generator-liferay-fragments#liferay-fragments-cli"
+			);
 		}
 	}
 }

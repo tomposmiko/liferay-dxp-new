@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -39,15 +38,6 @@ import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionLocalServiceUtil
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoDefinitionPersistence;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoDefinitionUtil;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -58,16 +48,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class KaleoDefinitionPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.portal.workflow.kaleo.service"));
 
 	@Before
@@ -107,7 +108,8 @@ public class KaleoDefinitionPersistenceTest {
 
 		_persistence.remove(newKaleoDefinition);
 
-		KaleoDefinition existingKaleoDefinition = _persistence.fetchByPrimaryKey(newKaleoDefinition.getPrimaryKey());
+		KaleoDefinition existingKaleoDefinition =
+			_persistence.fetchByPrimaryKey(newKaleoDefinition.getPrimaryKey());
 
 		Assert.assertNull(existingKaleoDefinition);
 	}
@@ -151,38 +153,48 @@ public class KaleoDefinitionPersistenceTest {
 
 		_kaleoDefinitions.add(_persistence.update(newKaleoDefinition));
 
-		KaleoDefinition existingKaleoDefinition = _persistence.findByPrimaryKey(newKaleoDefinition.getPrimaryKey());
+		KaleoDefinition existingKaleoDefinition = _persistence.findByPrimaryKey(
+			newKaleoDefinition.getPrimaryKey());
 
-		Assert.assertEquals(existingKaleoDefinition.getMvccVersion(),
+		Assert.assertEquals(
+			existingKaleoDefinition.getMvccVersion(),
 			newKaleoDefinition.getMvccVersion());
-		Assert.assertEquals(existingKaleoDefinition.getKaleoDefinitionId(),
+		Assert.assertEquals(
+			existingKaleoDefinition.getKaleoDefinitionId(),
 			newKaleoDefinition.getKaleoDefinitionId());
-		Assert.assertEquals(existingKaleoDefinition.getGroupId(),
+		Assert.assertEquals(
+			existingKaleoDefinition.getGroupId(),
 			newKaleoDefinition.getGroupId());
-		Assert.assertEquals(existingKaleoDefinition.getCompanyId(),
+		Assert.assertEquals(
+			existingKaleoDefinition.getCompanyId(),
 			newKaleoDefinition.getCompanyId());
-		Assert.assertEquals(existingKaleoDefinition.getUserId(),
+		Assert.assertEquals(
+			existingKaleoDefinition.getUserId(),
 			newKaleoDefinition.getUserId());
-		Assert.assertEquals(existingKaleoDefinition.getUserName(),
+		Assert.assertEquals(
+			existingKaleoDefinition.getUserName(),
 			newKaleoDefinition.getUserName());
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingKaleoDefinition.getCreateDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingKaleoDefinition.getCreateDate()),
 			Time.getShortTimestamp(newKaleoDefinition.getCreateDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingKaleoDefinition.getModifiedDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingKaleoDefinition.getModifiedDate()),
 			Time.getShortTimestamp(newKaleoDefinition.getModifiedDate()));
-		Assert.assertEquals(existingKaleoDefinition.getName(),
-			newKaleoDefinition.getName());
-		Assert.assertEquals(existingKaleoDefinition.getTitle(),
-			newKaleoDefinition.getTitle());
-		Assert.assertEquals(existingKaleoDefinition.getDescription(),
+		Assert.assertEquals(
+			existingKaleoDefinition.getName(), newKaleoDefinition.getName());
+		Assert.assertEquals(
+			existingKaleoDefinition.getTitle(), newKaleoDefinition.getTitle());
+		Assert.assertEquals(
+			existingKaleoDefinition.getDescription(),
 			newKaleoDefinition.getDescription());
-		Assert.assertEquals(existingKaleoDefinition.getContent(),
+		Assert.assertEquals(
+			existingKaleoDefinition.getContent(),
 			newKaleoDefinition.getContent());
-		Assert.assertEquals(existingKaleoDefinition.getVersion(),
+		Assert.assertEquals(
+			existingKaleoDefinition.getVersion(),
 			newKaleoDefinition.getVersion());
-		Assert.assertEquals(existingKaleoDefinition.isActive(),
-			newKaleoDefinition.isActive());
+		Assert.assertEquals(
+			existingKaleoDefinition.isActive(), newKaleoDefinition.isActive());
 	}
 
 	@Test
@@ -203,16 +215,16 @@ public class KaleoDefinitionPersistenceTest {
 
 	@Test
 	public void testCountByC_A() throws Exception {
-		_persistence.countByC_A(RandomTestUtil.nextLong(),
-			RandomTestUtil.randomBoolean());
+		_persistence.countByC_A(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
 
 		_persistence.countByC_A(0L, RandomTestUtil.randomBoolean());
 	}
 
 	@Test
 	public void testCountByC_N_V() throws Exception {
-		_persistence.countByC_N_V(RandomTestUtil.nextLong(), "",
-			RandomTestUtil.nextInt());
+		_persistence.countByC_N_V(
+			RandomTestUtil.nextLong(), "", RandomTestUtil.nextInt());
 
 		_persistence.countByC_N_V(0L, "null", 0);
 
@@ -221,20 +233,21 @@ public class KaleoDefinitionPersistenceTest {
 
 	@Test
 	public void testCountByC_N_A() throws Exception {
-		_persistence.countByC_N_A(RandomTestUtil.nextLong(), "",
-			RandomTestUtil.randomBoolean());
+		_persistence.countByC_N_A(
+			RandomTestUtil.nextLong(), "", RandomTestUtil.randomBoolean());
 
 		_persistence.countByC_N_A(0L, "null", RandomTestUtil.randomBoolean());
 
-		_persistence.countByC_N_A(0L, (String)null,
-			RandomTestUtil.randomBoolean());
+		_persistence.countByC_N_A(
+			0L, (String)null, RandomTestUtil.randomBoolean());
 	}
 
 	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		KaleoDefinition newKaleoDefinition = addKaleoDefinition();
 
-		KaleoDefinition existingKaleoDefinition = _persistence.findByPrimaryKey(newKaleoDefinition.getPrimaryKey());
+		KaleoDefinition existingKaleoDefinition = _persistence.findByPrimaryKey(
+			newKaleoDefinition.getPrimaryKey());
 
 		Assert.assertEquals(existingKaleoDefinition, newKaleoDefinition);
 	}
@@ -248,23 +261,25 @@ public class KaleoDefinitionPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<KaleoDefinition> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("KaleoDefinition",
-			"mvccVersion", true, "kaleoDefinitionId", true, "groupId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "name", true, "title", true,
-			"description", true, "version", true, "active", true);
+		return OrderByComparatorFactoryUtil.create(
+			"KaleoDefinition", "mvccVersion", true, "kaleoDefinitionId", true,
+			"groupId", true, "companyId", true, "userId", true, "userName",
+			true, "createDate", true, "modifiedDate", true, "name", true,
+			"title", true, "description", true, "version", true, "active",
+			true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		KaleoDefinition newKaleoDefinition = addKaleoDefinition();
 
-		KaleoDefinition existingKaleoDefinition = _persistence.fetchByPrimaryKey(newKaleoDefinition.getPrimaryKey());
+		KaleoDefinition existingKaleoDefinition =
+			_persistence.fetchByPrimaryKey(newKaleoDefinition.getPrimaryKey());
 
 		Assert.assertEquals(existingKaleoDefinition, newKaleoDefinition);
 	}
@@ -273,7 +288,8 @@ public class KaleoDefinitionPersistenceTest {
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		KaleoDefinition missingKaleoDefinition = _persistence.fetchByPrimaryKey(pk);
+		KaleoDefinition missingKaleoDefinition = _persistence.fetchByPrimaryKey(
+			pk);
 
 		Assert.assertNull(missingKaleoDefinition);
 	}
@@ -281,6 +297,7 @@ public class KaleoDefinitionPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		KaleoDefinition newKaleoDefinition1 = addKaleoDefinition();
 		KaleoDefinition newKaleoDefinition2 = addKaleoDefinition();
 
@@ -289,18 +306,22 @@ public class KaleoDefinitionPersistenceTest {
 		primaryKeys.add(newKaleoDefinition1.getPrimaryKey());
 		primaryKeys.add(newKaleoDefinition2.getPrimaryKey());
 
-		Map<Serializable, KaleoDefinition> kaleoDefinitions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoDefinition> kaleoDefinitions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, kaleoDefinitions.size());
-		Assert.assertEquals(newKaleoDefinition1,
+		Assert.assertEquals(
+			newKaleoDefinition1,
 			kaleoDefinitions.get(newKaleoDefinition1.getPrimaryKey()));
-		Assert.assertEquals(newKaleoDefinition2,
+		Assert.assertEquals(
+			newKaleoDefinition2,
 			kaleoDefinitions.get(newKaleoDefinition2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -310,7 +331,8 @@ public class KaleoDefinitionPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, KaleoDefinition> kaleoDefinitions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoDefinition> kaleoDefinitions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(kaleoDefinitions.isEmpty());
 	}
@@ -318,6 +340,7 @@ public class KaleoDefinitionPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		KaleoDefinition newKaleoDefinition = addKaleoDefinition();
 
 		long pk = RandomTestUtil.nextLong();
@@ -327,36 +350,39 @@ public class KaleoDefinitionPersistenceTest {
 		primaryKeys.add(newKaleoDefinition.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, KaleoDefinition> kaleoDefinitions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoDefinition> kaleoDefinitions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, kaleoDefinitions.size());
-		Assert.assertEquals(newKaleoDefinition,
+		Assert.assertEquals(
+			newKaleoDefinition,
 			kaleoDefinitions.get(newKaleoDefinition.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, KaleoDefinition> kaleoDefinitions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoDefinition> kaleoDefinitions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(kaleoDefinitions.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		KaleoDefinition newKaleoDefinition = addKaleoDefinition();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newKaleoDefinition.getPrimaryKey());
 
-		Map<Serializable, KaleoDefinition> kaleoDefinitions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, KaleoDefinition> kaleoDefinitions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, kaleoDefinitions.size());
-		Assert.assertEquals(newKaleoDefinition,
+		Assert.assertEquals(
+			newKaleoDefinition,
 			kaleoDefinitions.get(newKaleoDefinition.getPrimaryKey()));
 	}
 
@@ -364,15 +390,19 @@ public class KaleoDefinitionPersistenceTest {
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = KaleoDefinitionLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			KaleoDefinitionLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<KaleoDefinition>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<KaleoDefinition>() {
+
 				@Override
 				public void performAction(KaleoDefinition kaleoDefinition) {
 					Assert.assertNotNull(kaleoDefinition);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -381,17 +411,19 @@ public class KaleoDefinitionPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		KaleoDefinition newKaleoDefinition = addKaleoDefinition();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoDefinition.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoDefinition.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("kaleoDefinitionId",
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"kaleoDefinitionId",
 				newKaleoDefinition.getKaleoDefinitionId()));
 
-		List<KaleoDefinition> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<KaleoDefinition> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
@@ -402,32 +434,34 @@ public class KaleoDefinitionPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoDefinition.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoDefinition.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("kaleoDefinitionId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"kaleoDefinitionId", RandomTestUtil.nextLong()));
 
-		List<KaleoDefinition> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<KaleoDefinition> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		KaleoDefinition newKaleoDefinition = addKaleoDefinition();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoDefinition.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoDefinition.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"kaleoDefinitionId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("kaleoDefinitionId"));
 
 		Object newKaleoDefinitionId = newKaleoDefinition.getKaleoDefinitionId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("kaleoDefinitionId",
-				new Object[] { newKaleoDefinitionId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"kaleoDefinitionId", new Object[] {newKaleoDefinitionId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -440,14 +474,15 @@ public class KaleoDefinitionPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(KaleoDefinition.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			KaleoDefinition.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"kaleoDefinitionId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("kaleoDefinitionId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("kaleoDefinitionId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"kaleoDefinitionId", new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -460,35 +495,53 @@ public class KaleoDefinitionPersistenceTest {
 
 		_persistence.clearCache();
 
-		KaleoDefinition existingKaleoDefinition = _persistence.findByPrimaryKey(newKaleoDefinition.getPrimaryKey());
+		KaleoDefinition existingKaleoDefinition = _persistence.findByPrimaryKey(
+			newKaleoDefinition.getPrimaryKey());
 
-		Assert.assertEquals(Long.valueOf(existingKaleoDefinition.getCompanyId()),
-			ReflectionTestUtil.<Long>invoke(existingKaleoDefinition,
-				"getOriginalCompanyId", new Class<?>[0]));
-		Assert.assertTrue(Objects.equals(existingKaleoDefinition.getName(),
-				ReflectionTestUtil.invoke(existingKaleoDefinition,
-					"getOriginalName", new Class<?>[0])));
+		Assert.assertEquals(
+			Long.valueOf(existingKaleoDefinition.getCompanyId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingKaleoDefinition, "getOriginalCompanyId",
+				new Class<?>[0]));
+		Assert.assertTrue(
+			Objects.equals(
+				existingKaleoDefinition.getName(),
+				ReflectionTestUtil.invoke(
+					existingKaleoDefinition, "getOriginalName",
+					new Class<?>[0])));
 
-		Assert.assertEquals(Long.valueOf(existingKaleoDefinition.getCompanyId()),
-			ReflectionTestUtil.<Long>invoke(existingKaleoDefinition,
-				"getOriginalCompanyId", new Class<?>[0]));
-		Assert.assertTrue(Objects.equals(existingKaleoDefinition.getName(),
-				ReflectionTestUtil.invoke(existingKaleoDefinition,
-					"getOriginalName", new Class<?>[0])));
-		Assert.assertEquals(Integer.valueOf(
-				existingKaleoDefinition.getVersion()),
-			ReflectionTestUtil.<Integer>invoke(existingKaleoDefinition,
-				"getOriginalVersion", new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingKaleoDefinition.getCompanyId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingKaleoDefinition, "getOriginalCompanyId",
+				new Class<?>[0]));
+		Assert.assertTrue(
+			Objects.equals(
+				existingKaleoDefinition.getName(),
+				ReflectionTestUtil.invoke(
+					existingKaleoDefinition, "getOriginalName",
+					new Class<?>[0])));
+		Assert.assertEquals(
+			Integer.valueOf(existingKaleoDefinition.getVersion()),
+			ReflectionTestUtil.<Integer>invoke(
+				existingKaleoDefinition, "getOriginalVersion",
+				new Class<?>[0]));
 
-		Assert.assertEquals(Long.valueOf(existingKaleoDefinition.getCompanyId()),
-			ReflectionTestUtil.<Long>invoke(existingKaleoDefinition,
-				"getOriginalCompanyId", new Class<?>[0]));
-		Assert.assertTrue(Objects.equals(existingKaleoDefinition.getName(),
-				ReflectionTestUtil.invoke(existingKaleoDefinition,
-					"getOriginalName", new Class<?>[0])));
-		Assert.assertEquals(Boolean.valueOf(existingKaleoDefinition.getActive()),
-			ReflectionTestUtil.<Boolean>invoke(existingKaleoDefinition,
-				"getOriginalActive", new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingKaleoDefinition.getCompanyId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingKaleoDefinition, "getOriginalCompanyId",
+				new Class<?>[0]));
+		Assert.assertTrue(
+			Objects.equals(
+				existingKaleoDefinition.getName(),
+				ReflectionTestUtil.invoke(
+					existingKaleoDefinition, "getOriginalName",
+					new Class<?>[0])));
+		Assert.assertEquals(
+			Boolean.valueOf(existingKaleoDefinition.getActive()),
+			ReflectionTestUtil.<Boolean>invoke(
+				existingKaleoDefinition, "getOriginalActive", new Class<?>[0]));
 	}
 
 	protected KaleoDefinition addKaleoDefinition() throws Exception {
@@ -527,7 +580,9 @@ public class KaleoDefinitionPersistenceTest {
 		return kaleoDefinition;
 	}
 
-	private List<KaleoDefinition> _kaleoDefinitions = new ArrayList<KaleoDefinition>();
+	private List<KaleoDefinition> _kaleoDefinitions =
+		new ArrayList<KaleoDefinition>();
 	private KaleoDefinitionPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

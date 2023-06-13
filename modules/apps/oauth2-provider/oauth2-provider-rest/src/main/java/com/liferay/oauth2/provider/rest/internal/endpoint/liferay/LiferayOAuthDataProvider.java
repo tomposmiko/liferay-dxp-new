@@ -21,7 +21,7 @@ import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.rest.internal.endpoint.authorize.configuration.OAuth2AuthorizationFlowConfiguration;
-import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRestEndpointConstants;
+import com.liferay.oauth2.provider.rest.internal.endpoint.constants.OAuth2ProviderRESTEndpointConstants;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProvider;
 import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenProviderAccessor;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
@@ -35,7 +35,6 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
-import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -161,10 +160,8 @@ public class LiferayOAuthDataProvider
 		serverAuthorizationCodeGrant.setRequestedScopes(
 			authorizationCodeRegistration.getRequestedScope());
 
-		_codeGrantsPortalCache.put(
-			serverAuthorizationCodeGrant.getCode(),
-			serverAuthorizationCodeGrant,
-			Math.toIntExact(serverAuthorizationCodeGrant.getExpiresIn()));
+		_serverAuthorizationCodeGrantProvider.putServerAuthorizationCodeGrant(
+			serverAuthorizationCodeGrant);
 
 		return serverAuthorizationCodeGrant;
 	}
@@ -321,40 +318,13 @@ public class LiferayOAuthDataProvider
 		throw new UnsupportedOperationException();
 	}
 
-	public ServerAuthorizationCodeGrant getCodeGrant(String code) {
-		if (code == null) {
-			return null;
-		}
-
-		return _codeGrantsPortalCache.get(code);
-	}
-
 	@Override
 	public List<ServerAuthorizationCodeGrant> getCodeGrants(
 			Client client, UserSubject subject)
 		throws OAuthServiceException {
 
-		List<ServerAuthorizationCodeGrant> serverAuthorizationCodeGrants =
-			new ArrayList<>();
-
-		List<String> keys = _codeGrantsPortalCache.getKeys();
-
-		for (String key : keys) {
-			ServerAuthorizationCodeGrant serverAuthorizationCodeGrant =
-				_codeGrantsPortalCache.get(key);
-
-			if (serverAuthorizationCodeGrant == null) {
-				continue;
-			}
-
-			if (client.equals(serverAuthorizationCodeGrant.getClient()) &&
-				subject.equals(serverAuthorizationCodeGrant.getSubject())) {
-
-				serverAuthorizationCodeGrants.add(serverAuthorizationCodeGrant);
-			}
-		}
-
-		return serverAuthorizationCodeGrants;
+		return _serverAuthorizationCodeGrantProvider.
+			getServerAuthorizationCodeGrants(client, subject);
 	}
 
 	@Override
@@ -445,7 +415,7 @@ public class LiferayOAuthDataProvider
 				refreshToken.getExtraProperties();
 
 			extraProperties.put(
-				OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
+				OAuth2ProviderRESTEndpointConstants.PROPERTY_KEY_COMPANY_ID,
 				String.valueOf(oAuth2Authorization.getCompanyId()));
 
 			return refreshToken;
@@ -461,6 +431,17 @@ public class LiferayOAuthDataProvider
 		throws OAuthServiceException {
 
 		return null;
+	}
+
+	public ServerAuthorizationCodeGrant getServerAuthorizationCodeGrant(
+		String code) {
+
+		if (code == null) {
+			return null;
+		}
+
+		return _serverAuthorizationCodeGrantProvider.
+			getServerAuthorizationCodeGrant(code);
 	}
 
 	@Override
@@ -570,12 +551,8 @@ public class LiferayOAuthDataProvider
 			return null;
 		}
 
-		ServerAuthorizationCodeGrant serverAuthorizationCodeGrant =
-			_codeGrantsPortalCache.get(code);
-
-		_codeGrantsPortalCache.remove(code);
-
-		return serverAuthorizationCodeGrant;
+		return _serverAuthorizationCodeGrantProvider.
+			removeServerAuthorizationCodeGrant(code);
 	}
 
 	public OAuth2Application resolveOAuth2Application(Client client) {
@@ -583,7 +560,7 @@ public class LiferayOAuthDataProvider
 
 		long companyId = GetterUtil.getLong(
 			properties.get(
-				OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID));
+				OAuth2ProviderRESTEndpointConstants.PROPERTY_KEY_COMPANY_ID));
 
 		OAuth2Application oAuth2Application =
 			_oAuth2ApplicationLocalService.fetchOAuth2Application(
@@ -612,9 +589,6 @@ public class LiferayOAuthDataProvider
 	@Activate
 	@SuppressWarnings("unchecked")
 	protected void activate(Map<String, Object> properties) {
-		_codeGrantsPortalCache =
-			(PortalCache<String, ServerAuthorizationCodeGrant>)
-				_multiVMPool.getPortalCache("oauth2-provider-code-grants");
 		_oAuth2AuthorizeFlowConfiguration = ConfigurableUtil.createConfigurable(
 			OAuth2AuthorizationFlowConfiguration.class, properties);
 		_oAuth2ProviderConfiguration = ConfigurableUtil.createConfigurable(
@@ -836,7 +810,7 @@ public class LiferayOAuthDataProvider
 			serverAccessToken.getExtraProperties();
 
 		extraProperties.put(
-			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
+			OAuth2ProviderRESTEndpointConstants.PROPERTY_KEY_COMPANY_ID,
 			String.valueOf(oAuth2Authorization.getCompanyId()));
 
 		return serverAccessToken;
@@ -870,7 +844,7 @@ public class LiferayOAuthDataProvider
 
 				clientGrantTypes.add(OAuthConstants.AUTHORIZATION_CODE_GRANT);
 				clientGrantTypes.add(
-					OAuth2ProviderRestEndpointConstants.
+					OAuth2ProviderRESTEndpointConstants.
 						AUTHORIZATION_CODE_PKCE_GRANT);
 			}
 			else if (_oAuth2ProviderConfiguration.
@@ -934,15 +908,15 @@ public class LiferayOAuthDataProvider
 		Map<String, String> properties = client.getProperties();
 
 		properties.put(
-			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
+			OAuth2ProviderRESTEndpointConstants.PROPERTY_KEY_COMPANY_ID,
 			String.valueOf(oAuth2Application.getCompanyId()));
 		properties.put(
-			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_CLIENT_FEATURES,
+			OAuth2ProviderRESTEndpointConstants.PROPERTY_KEY_CLIENT_FEATURES,
 			oAuth2Application.getFeatures());
 
 		for (String feature : oAuth2Application.getFeaturesList()) {
 			properties.put(
-				OAuth2ProviderRestEndpointConstants.
+				OAuth2ProviderRESTEndpointConstants.
 					PROPERTY_KEY_CLIENT_FEATURE_PREFIX + feature,
 				feature);
 		}
@@ -959,7 +933,7 @@ public class LiferayOAuthDataProvider
 		Map<String, String> properties = userSubject.getProperties();
 
 		properties.put(
-			OAuth2ProviderRestEndpointConstants.PROPERTY_KEY_COMPANY_ID,
+			OAuth2ProviderRESTEndpointConstants.PROPERTY_KEY_COMPANY_ID,
 			String.valueOf(companyId));
 
 		return userSubject;
@@ -1086,10 +1060,10 @@ public class LiferayOAuthDataProvider
 		Map<String, String> properties = client.getProperties();
 
 		String remoteAddr = properties.get(
-			OAuth2ProviderRestEndpointConstants.
+			OAuth2ProviderRESTEndpointConstants.
 				PROPERTY_KEY_CLIENT_REMOTE_ADDR);
 		String remoteHost = properties.get(
-			OAuth2ProviderRestEndpointConstants.
+			OAuth2ProviderRESTEndpointConstants.
 				PROPERTY_KEY_CLIENT_REMOTE_HOST);
 
 		OAuth2Authorization oAuth2Authorization =
@@ -1133,9 +1107,6 @@ public class LiferayOAuthDataProvider
 	)
 	private volatile BearerTokenProviderAccessor _bearerTokenProviderAccessor;
 
-	private PortalCache<String, ServerAuthorizationCodeGrant>
-		_codeGrantsPortalCache;
-
 	@Reference
 	private ConfigurationProvider _configurationProvider;
 
@@ -1164,6 +1135,10 @@ public class LiferayOAuthDataProvider
 
 	@Reference
 	private ScopeLocator _scopeFinderLocator;
+
+	@Reference
+	private ServerAuthorizationCodeGrantProvider
+		_serverAuthorizationCodeGrantProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

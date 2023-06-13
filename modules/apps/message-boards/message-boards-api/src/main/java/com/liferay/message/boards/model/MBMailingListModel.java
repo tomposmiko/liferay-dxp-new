@@ -36,8 +36,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface MBMailingListModel extends BaseModel<MBMailingList>,
-	GroupedModel, ShardedModel, StagedAuditedModel {
+public interface MBMailingListModel
+	extends BaseModel<MBMailingList>, GroupedModel, ShardedModel,
+			StagedAuditedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -497,4 +499,5 @@ public interface MBMailingListModel extends BaseModel<MBMailingList>,
 	 * @param active the active of this message boards mailing list
 	 */
 	public void setActive(boolean active);
+
 }

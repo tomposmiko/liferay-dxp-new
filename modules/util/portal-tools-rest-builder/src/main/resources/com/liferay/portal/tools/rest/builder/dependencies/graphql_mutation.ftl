@@ -1,15 +1,16 @@
-package ${configYAML.apiPackagePath}.internal.graphql.mutation.${versionDirName};
+package ${configYAML.apiPackagePath}.internal.graphql.mutation.${escapedVersion};
 
-<#compress>
-	<#list openAPIYAML.components.schemas?keys as schemaName>
-		import ${configYAML.apiPackagePath}.dto.${versionDirName}.${schemaName};
-		import ${configYAML.apiPackagePath}.resource.${versionDirName}.${schemaName}Resource;
-	</#list>
-</#compress>
+<#list openAPIYAML.components.schemas?keys as schemaName>
+	import ${configYAML.apiPackagePath}.dto.${escapedVersion}.${schemaName};
+	import ${configYAML.apiPackagePath}.resource.${escapedVersion}.${schemaName}Resource;
+</#list>
 
-import com.liferay.oauth2.provider.scope.RequiresScope;
+import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -25,9 +26,7 @@ import javax.annotation.Generated;
 
 import javax.ws.rs.core.Response;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.service.component.ComponentServiceObjects;
 
 /**
  * @author ${configYAML.author}
@@ -36,53 +35,73 @@ import org.osgi.util.tracker.ServiceTracker;
 @Generated("")
 public class Mutation {
 
-	<#assign javaMethodSignatures = freeMarkerTool.getGraphQLJavaMethodSignatures(configYAML, openAPIYAML, "mutation", false) />
+	<#assign
+		javaMethodSignatures = freeMarkerTool.getGraphQLJavaMethodSignatures(configYAML, "mutation", openAPIYAML)
+
+		schemaNames = freeMarkerTool.getGraphQLSchemaNames(javaMethodSignatures)
+	/>
+
+	<#list schemaNames as schemaName>
+		public static void set${schemaName}ResourceComponentServiceObjects(ComponentServiceObjects<${schemaName}Resource> ${freeMarkerTool.getSchemaVarName(schemaName)}ResourceComponentServiceObjects) {
+			_${freeMarkerTool.getSchemaVarName(schemaName)}ResourceComponentServiceObjects = ${freeMarkerTool.getSchemaVarName(schemaName)}ResourceComponentServiceObjects;
+		}
+	</#list>
 
 	<#list javaMethodSignatures as javaMethodSignature>
 		${freeMarkerTool.getGraphQLMethodAnnotations(javaMethodSignature)}
-		public ${javaMethodSignature.returnType} ${javaMethodSignature.methodName}(
-				${freeMarkerTool.getGraphQLParameters(javaMethodSignature.javaParameters, true)})
-			throws Exception {
+		public ${javaMethodSignature.returnType} ${javaMethodSignature.methodName}(${freeMarkerTool.getGraphQLParameters(javaMethodSignature.javaMethodParameters, javaMethodSignature.operation, true)}) throws Exception {
+			<#if javaMethodSignature.returnType?contains("Collection<")>
+				return _applyComponentServiceObjects(
+					_${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}ResourceComponentServiceObjects, this::_populateResourceContext,
+					${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource -> {
+						<#assign arguments = freeMarkerTool.getGraphQLArguments(javaMethodSignature.javaMethodParameters) />
 
-			<#if stringUtil.equals(javaMethodSignature.returnType, "Response")>
-				Response.ResponseBuilder responseBuilder = Response.ok();
+						Page paginationPage = ${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource.${javaMethodSignature.methodName}(${arguments?replace("pageSize,page", "Pagination.of(pageSize, page)")});
 
-				return responseBuilder.build();
+						return paginationPage.getItems();
+					});
+			<#elseif javaMethodSignature.returnType?contains("void")>
+				_applyVoidComponentServiceObjects(_${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}ResourceComponentServiceObjects, this::_populateResourceContext,${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource -> ${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource.${javaMethodSignature.methodName}(${freeMarkerTool.getGraphQLArguments(javaMethodSignature.javaMethodParameters)}));
 			<#else>
-				return _get${javaMethodSignature.schemaName}Resource().${javaMethodSignature.methodName}(
-					${freeMarkerTool.getGraphQLArguments(javaMethodSignature.javaParameters)});
+				return _applyComponentServiceObjects(_${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}ResourceComponentServiceObjects, this::_populateResourceContext,${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource -> ${freeMarkerTool.getSchemaVarName(javaMethodSignature.schemaName)}Resource.${javaMethodSignature.methodName}(${freeMarkerTool.getGraphQLArguments(javaMethodSignature.javaMethodParameters)}));
 			</#if>
 		}
 	</#list>
 
-	<#assign schemaNames = freeMarkerTool.getGraphQLSchemaNames(javaMethodSignatures) />
+	private <T, R, E1 extends Throwable, E2 extends Throwable> R _applyComponentServiceObjects(ComponentServiceObjects<T> componentServiceObjects, UnsafeConsumer<T, E1> unsafeConsumer, UnsafeFunction<T, R, E2> unsafeFunction) throws E1, E2 {
+		T resource = componentServiceObjects.getService();
+
+		try {
+			unsafeConsumer.accept(resource);
+
+			return unsafeFunction.apply(resource);
+		}
+		finally {
+			componentServiceObjects.ungetService(resource);
+		}
+	}
+
+	private <T, E1 extends Throwable, E2 extends Throwable> void _applyVoidComponentServiceObjects(ComponentServiceObjects<T> componentServiceObjects, UnsafeConsumer<T, E1> unsafeConsumer, UnsafeConsumer<T, E2> unsafeFunction) throws E1, E2 {
+		T resource = componentServiceObjects.getService();
+
+		try {
+			unsafeConsumer.accept(resource);
+
+			unsafeFunction.accept(resource);
+		}
+		finally {
+			componentServiceObjects.ungetService(resource);
+		}
+	}
 
 	<#list schemaNames as schemaName>
-		private static ${schemaName}Resource _get${schemaName}Resource() {
-			return _${schemaName?uncap_first}ResourceServiceTracker.getService();
+		private void _populateResourceContext(${schemaName}Resource ${freeMarkerTool.getSchemaVarName(schemaName)}Resource) throws Exception {
+			${freeMarkerTool.getSchemaVarName(schemaName)}Resource.setContextCompany(CompanyLocalServiceUtil.getCompany(CompanyThreadLocal.getCompanyId()));
 		}
-
-		private static final ServiceTracker<${schemaName}Resource, ${schemaName}Resource>
-			_${schemaName?uncap_first}ResourceServiceTracker;
 	</#list>
 
-	<#if schemaNames?size != 0>
-		static {
-			Bundle bundle = FrameworkUtil.getBundle(Mutation.class);
-
-			<#list schemaNames as schemaName>
-				ServiceTracker<${schemaName}Resource, ${schemaName}Resource>
-					${schemaName?uncap_first}ResourceServiceTracker =
-						new ServiceTracker<>(
-							bundle.getBundleContext(),
-							${schemaName}Resource.class, null);
-
-				${schemaName?uncap_first}ResourceServiceTracker.open();
-
-				_${schemaName?uncap_first}ResourceServiceTracker =
-					${schemaName?uncap_first}ResourceServiceTracker;
-			</#list>
-		}
-	</#if>
+	<#list schemaNames as schemaName>
+		private static ComponentServiceObjects<${schemaName}Resource> _${freeMarkerTool.getSchemaVarName(schemaName)}ResourceComponentServiceObjects;
+	</#list>
 
 }

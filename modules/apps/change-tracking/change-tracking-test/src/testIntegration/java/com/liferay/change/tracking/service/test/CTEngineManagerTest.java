@@ -16,6 +16,7 @@ package com.liferay.change.tracking.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.change.tracking.CTEngineManager;
+import com.liferay.change.tracking.CTManager;
 import com.liferay.change.tracking.configuration.CTConfiguration;
 import com.liferay.change.tracking.configuration.CTConfigurationRegistrar;
 import com.liferay.change.tracking.configuration.builder.CTConfigurationBuilder;
@@ -23,14 +24,16 @@ import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.constants.CTPortletKeys;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
+import com.liferay.change.tracking.model.CTProcess;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTEntryLocalService;
-import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.change.tracking.service.CTProcessLocalService;
+import com.liferay.change.tracking.service.test.model.TestResourceModelClass;
+import com.liferay.change.tracking.service.test.model.TestVersionModelClass;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
+import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
@@ -39,21 +42,22 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
-import java.io.Serializable;
-
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.After;
@@ -69,6 +73,7 @@ import org.junit.runner.RunWith;
  * @author Daniel Kocsis
  */
 @RunWith(Arquillian.class)
+@Sync(cleanTransaction = true)
 public class CTEngineManagerTest {
 
 	@ClassRule
@@ -95,10 +100,47 @@ public class CTEngineManagerTest {
 			_ctEngineManager.disableChangeTracking(
 				TestPropsValues.getCompanyId());
 		}
+
+		_testVersionClassName = _classNameLocalService.addClassName(
+			TestVersionModelClass.class.getName());
+
+		_testResourceClassName = _classNameLocalService.addClassName(
+			TestResourceModelClass.class.getName());
+
+		_ctConfiguration = _ctConfigurationBuilder.setContentType(
+			"Test Object"
+		).setContentTypeLanguageKey(
+			"test-object"
+		).setEntityClasses(
+			TestResourceModelClass.class, TestVersionModelClass.class
+		).setResourceEntitiesByCompanyIdFunction(
+			id -> Collections.emptyList()
+		).setResourceEntityByResourceEntityIdFunction(
+			id -> new TestResourceModelClass()
+		).setEntityIdsFromResourceEntityFunctions(
+			testResource -> 0L, testResource -> 0L
+		).setVersionEntitiesFromResourceEntityFunction(
+			testResource -> Collections.emptyList()
+		).setVersionEntityByVersionEntityIdFunction(
+			id -> new TestVersionModelClass()
+		).setVersionEntityDetails(
+			Collections.emptyList(), o -> RandomTestUtil.randomString(),
+			o -> RandomTestUtil.randomString(), o -> 1L
+		).setEntityIdsFromVersionEntityFunctions(
+			testVersion -> 0L, testVersion -> 0L
+		).setVersionEntityStatusInfo(
+			new Integer[] {WorkflowConstants.STATUS_APPROVED},
+			testVersion -> WorkflowConstants.STATUS_APPROVED
+		).build();
+
+		_ctConfigurationRegistrar.register(_ctConfiguration);
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		if (_ctConfiguration != null) {
+			_ctConfigurationRegistrar.unregister(_ctConfiguration);
+		}
 
 		// If the change tracking was enabled originally, then leave it in the
 		// same state
@@ -377,7 +419,7 @@ public class CTEngineManagerTest {
 				)));
 
 		Optional<CTCollection> activeCTCollectionOptional =
-			_ctEngineManager.getActiveCTCollectionOptional(_user.getUserId());
+			_ctManager.getActiveCTCollectionOptional(_user.getUserId());
 
 		Assert.assertTrue(activeCTCollectionOptional.isPresent());
 		Assert.assertEquals(
@@ -402,92 +444,11 @@ public class CTEngineManagerTest {
 			String.valueOf(ctCollection.getCtCollectionId()));
 
 		Optional<CTCollection> activeCTCollectionOptional =
-			_ctEngineManager.getActiveCTCollectionOptional(_user.getUserId());
+			_ctManager.getActiveCTCollectionOptional(_user.getUserId());
 
 		Assert.assertFalse(
 			"Change tracking collection must be null",
 			activeCTCollectionOptional.isPresent());
-	}
-
-	@Test
-	public void testGetCollidingCTEntriesWhenCollision() throws Exception {
-		_ctEngineManager.enableChangeTracking(
-			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
-
-		CTCollection ctCollection = _ctCollectionLocalService.addCTCollection(
-			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), new ServiceContext());
-
-		long resourcePrimKey = RandomTestUtil.nextLong();
-
-		CTEntry ctEntry = _ctEntryLocalService.addCTEntry(
-			TestPropsValues.getUserId(), 0, 1, resourcePrimKey,
-			CTConstants.CT_CHANGE_TYPE_ADDITION,
-			ctCollection.getCtCollectionId(), new ServiceContext());
-
-		Optional<CTCollection> productionCTCollectionOptional =
-			_ctEngineManager.getProductionCTCollectionOptional(
-				TestPropsValues.getCompanyId());
-
-		long productionCTCollectionId = productionCTCollectionOptional.map(
-			CTCollection::getCtCollectionId
-		).orElse(
-			0L
-		);
-
-		_ctEntryLocalService.addCTEntry(
-			TestPropsValues.getUserId(), 0, 2, resourcePrimKey,
-			CTConstants.CT_CHANGE_TYPE_ADDITION, productionCTCollectionId,
-			new ServiceContext());
-
-		List<CTEntry> collidingCTEntries =
-			_ctEngineManager.getCollidingCTEntries(
-				ctCollection.getCtCollectionId());
-
-		Assert.assertTrue(
-			"There must be a colliding change entry",
-			ListUtil.isNotEmpty(collidingCTEntries));
-		Assert.assertEquals(ctEntry, collidingCTEntries.get(0));
-	}
-
-	@Test
-	public void testGetCollidingCTEntriesWhenNoCollision() throws Exception {
-		_ctEngineManager.enableChangeTracking(
-			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
-
-		CTCollection ctCollection = _ctCollectionLocalService.addCTCollection(
-			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), new ServiceContext());
-
-		long resourcePrimKey = RandomTestUtil.nextLong();
-
-		_ctEntryLocalService.addCTEntry(
-			TestPropsValues.getUserId(), 0, 2, resourcePrimKey,
-			CTConstants.CT_CHANGE_TYPE_ADDITION,
-			ctCollection.getCtCollectionId(), new ServiceContext());
-
-		Optional<CTCollection> productionCTCollectionOptional =
-			_ctEngineManager.getProductionCTCollectionOptional(
-				TestPropsValues.getCompanyId());
-
-		long productionCTCollectionId = productionCTCollectionOptional.map(
-			CTCollection::getCtCollectionId
-		).orElse(
-			0L
-		);
-
-		_ctEntryLocalService.addCTEntry(
-			TestPropsValues.getUserId(), 0, 1, resourcePrimKey,
-			CTConstants.CT_CHANGE_TYPE_ADDITION, productionCTCollectionId,
-			new ServiceContext());
-
-		List<CTEntry> collidingCTEntries =
-			_ctEngineManager.getCollidingCTEntries(
-				ctCollection.getCtCollectionId());
-
-		Assert.assertTrue(
-			"There must not be any colliding change entries",
-			ListUtil.isEmpty(collidingCTEntries));
 	}
 
 	@Test
@@ -585,8 +546,8 @@ public class CTEngineManagerTest {
 			ListUtil.isEmpty(ctEntries));
 
 		CTEntry ctEntry = _ctEntryLocalService.addCTEntry(
-			TestPropsValues.getUserId(), 0, 0, 0,
-			CTConstants.CT_CHANGE_TYPE_ADDITION,
+			TestPropsValues.getUserId(), _testVersionClassName.getClassNameId(),
+			0, 0, CTConstants.CT_CHANGE_TYPE_ADDITION,
 			ctCollection.getCtCollectionId(), new ServiceContext());
 
 		ctEntries = _ctEngineManager.getCTEntries(
@@ -595,6 +556,84 @@ public class CTEngineManagerTest {
 		Assert.assertEquals(
 			"There must be one change tracking entry", 1, ctEntries.size());
 		Assert.assertEquals(ctEntry, ctEntries.get(0));
+	}
+
+	@Test
+	public void testGetCTEntriesWithIndexing() throws Exception {
+		_ctEngineManager.enableChangeTracking(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+
+		CTCollection ctCollection = _ctCollectionLocalService.addCTCollection(
+			_user.getUserId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), new ServiceContext());
+
+		CTEntry ctEntry1 = _ctEntryLocalService.addCTEntry(
+			_user.getUserId(), _testVersionClassName.getClassNameId(),
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+			CTConstants.CT_CHANGE_TYPE_ADDITION,
+			ctCollection.getCtCollectionId(), new ServiceContext());
+		CTEntry ctEntry2 = _ctEntryLocalService.addCTEntry(
+			TestPropsValues.getUserId(), _testVersionClassName.getClassNameId(),
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+			CTConstants.CT_CHANGE_TYPE_DELETION,
+			ctCollection.getCtCollectionId(), new ServiceContext());
+
+		OrderByComparator<CTEntry> orderByComparator =
+			OrderByComparatorFactoryUtil.create("CTEntry", "createDate", true);
+
+		QueryDefinition<CTEntry> queryDefinition = new QueryDefinition<>();
+
+		queryDefinition.setOrderByComparator(orderByComparator);
+
+		List<CTEntry> ctEntries = _ctEngineManager.getCTEntries(
+			ctCollection, null, null,
+			new long[] {_testVersionClassName.getClassNameId()}, null, false,
+			queryDefinition);
+
+		Assert.assertEquals(
+			"There must be two change entries", 2, ctEntries.size());
+		Assert.assertEquals(ctEntry1, ctEntries.get(0));
+		Assert.assertEquals(ctEntry2, ctEntries.get(1));
+
+		int ctEntriesCount = _ctEngineManager.getCTEntriesCount(
+			ctCollection, null, null,
+			new long[] {_testVersionClassName.getClassNameId()}, null, false,
+			queryDefinition);
+
+		Assert.assertEquals(
+			"There must be two change entries", 2, ctEntriesCount);
+
+		ctEntries = _ctEngineManager.getCTEntries(
+			ctCollection, null, new long[] {_user.getUserId()}, null, null,
+			false, queryDefinition);
+
+		Assert.assertEquals(
+			"There must be one change entry", 1, ctEntries.size());
+		Assert.assertEquals(ctEntry1, ctEntries.get(0));
+
+		ctEntriesCount = _ctEngineManager.getCTEntriesCount(
+			ctCollection, null, new long[] {_user.getUserId()}, null, null,
+			false, queryDefinition);
+
+		Assert.assertEquals(
+			"There must be one change entry", 1, ctEntriesCount);
+
+		ctEntries = _ctEngineManager.getCTEntries(
+			ctCollection, null, null, null,
+			new int[] {CTConstants.CT_CHANGE_TYPE_DELETION}, false,
+			queryDefinition);
+
+		Assert.assertEquals(
+			"There must be one change entry", 1, ctEntries.size());
+		Assert.assertEquals(ctEntry2, ctEntries.get(0));
+
+		ctEntriesCount = _ctEngineManager.getCTEntriesCount(
+			ctCollection, null, null, null,
+			new int[] {CTConstants.CT_CHANGE_TYPE_DELETION}, false,
+			queryDefinition);
+
+		Assert.assertEquals(
+			"There must be one change entry", 1, ctEntriesCount);
 	}
 
 	@Test
@@ -668,73 +707,32 @@ public class CTEngineManagerTest {
 
 	@Test
 	public void testIsChangeTrackingSupported() throws Exception {
-		ClassName testVersionClassName = null;
-		CTConfiguration ctConfiguration = null;
+		_ctConfigurationRegistrar.unregister(_ctConfiguration);
 
-		try {
-			boolean changeTrackingSupported =
-				_ctEngineManager.isChangeTrackingSupported(
-					TestPropsValues.getCompanyId(), TestVersionClass.class);
+		boolean changeTrackingSupported =
+			_ctEngineManager.isChangeTrackingSupported(
+				TestPropsValues.getCompanyId(), TestVersionModelClass.class);
 
-			Assert.assertFalse(changeTrackingSupported);
+		Assert.assertFalse(changeTrackingSupported);
 
-			testVersionClassName = _classNameLocalService.addClassName(
-				TestVersionClass.class.getName());
+		changeTrackingSupported = _ctEngineManager.isChangeTrackingSupported(
+			TestPropsValues.getCompanyId(),
+			_testVersionClassName.getClassNameId());
 
-			changeTrackingSupported =
-				_ctEngineManager.isChangeTrackingSupported(
-					TestPropsValues.getCompanyId(),
-					testVersionClassName.getClassNameId());
+		Assert.assertFalse(changeTrackingSupported);
 
-			Assert.assertFalse(changeTrackingSupported);
+		_ctConfigurationRegistrar.register(_ctConfiguration);
 
-			ctConfiguration = _ctConfigurationBuilder.setContentType(
-				"Test Object"
-			).setContentTypeLanguageKey(
-				"test-object"
-			).setEntityClasses(
-				Object.class, TestVersionClass.class
-			).setResourceEntityByResourceEntityIdFunction(
-				id -> new Object()
-			).setEntityIdsFromResourceEntityFunctions(
-				testResource -> 0L, testResource -> 0L
-			).setVersionEntityByVersionEntityIdFunction(
-				id -> new TestVersionClass()
-			).setVersionEntityDetails(
-				o -> RandomTestUtil.randomString(),
-				o -> RandomTestUtil.randomString(), o -> 1L
-			).setEntityIdsFromVersionEntityFunctions(
-				testVersion -> 0L, testVersion -> 0L
-			).setVersionEntityStatusInfo(
-				new Integer[] {WorkflowConstants.STATUS_APPROVED},
-				testVersion -> WorkflowConstants.STATUS_APPROVED
-			).build();
+		changeTrackingSupported = _ctEngineManager.isChangeTrackingSupported(
+			TestPropsValues.getCompanyId(), TestVersionModelClass.class);
 
-			_ctConfigurationRegistrar.register(ctConfiguration);
+		Assert.assertTrue(changeTrackingSupported);
 
-			changeTrackingSupported =
-				_ctEngineManager.isChangeTrackingSupported(
-					TestPropsValues.getCompanyId(), TestVersionClass.class);
+		changeTrackingSupported = _ctEngineManager.isChangeTrackingSupported(
+			TestPropsValues.getCompanyId(),
+			_testVersionClassName.getClassNameId());
 
-			Assert.assertTrue(changeTrackingSupported);
-
-			changeTrackingSupported =
-				_ctEngineManager.isChangeTrackingSupported(
-					TestPropsValues.getCompanyId(),
-					testVersionClassName.getClassNameId());
-
-			Assert.assertTrue(changeTrackingSupported);
-		}
-		finally {
-			if (testVersionClassName != null) {
-				_classNameLocalService.deleteClassName(
-					testVersionClassName.getClassNameId());
-			}
-
-			if (ctConfiguration != null) {
-				_ctConfigurationRegistrar.unregister(ctConfiguration);
-			}
-		}
+		Assert.assertTrue(changeTrackingSupported);
 	}
 
 	@Test
@@ -752,8 +750,8 @@ public class CTEngineManagerTest {
 		CTCollection ctCollection = ctCollectionOptional.get();
 
 		CTEntry ctEntry = _ctEntryLocalService.addCTEntry(
-			TestPropsValues.getUserId(), 0, 0, 0,
-			CTConstants.CT_CHANGE_TYPE_ADDITION,
+			TestPropsValues.getUserId(), _testVersionClassName.getClassNameId(),
+			0, 0, CTConstants.CT_CHANGE_TYPE_ADDITION,
 			ctCollection.getCtCollectionId(), new ServiceContext());
 
 		Optional<CTCollection> productionCTCollectionOptional =
@@ -768,9 +766,7 @@ public class CTEngineManagerTest {
 		List<CTEntry> productionCTEntries = _ctEngineManager.getCTEntries(
 			productionCTCollection.getCtCollectionId());
 
-		Assert.assertTrue(
-			"Production change tracking collection must be empty",
-			ListUtil.isEmpty(productionCTEntries));
+		int originalCTEntriesCount = productionCTEntries.size();
 
 		_ctEngineManager.publishCTCollection(
 			TestPropsValues.getUserId(), ctCollection.getCtCollectionId());
@@ -779,9 +775,10 @@ public class CTEngineManagerTest {
 			productionCTCollection.getCtCollectionId());
 
 		Assert.assertEquals(
-			"Production change tracking collection must have one entry", 1,
-			productionCTEntries.size());
-		Assert.assertEquals(ctEntry, productionCTEntries.get(0));
+			"Production change tracking collection must one more entry",
+			originalCTEntriesCount + 1, productionCTEntries.size());
+		Assert.assertTrue(
+			"CTEntry must be published", productionCTEntries.contains(ctEntry));
 	}
 
 	@Test
@@ -808,8 +805,127 @@ public class CTEngineManagerTest {
 			productionCTCollectionOptional.isPresent());
 	}
 
-	@Inject
-	private BackgroundTaskManager _backgroundTaskManager;
+	@Test
+	public void testPublishCTCollectionWhenDraftEntryCollides()
+		throws Exception {
+
+		_ctEngineManager.enableChangeTracking(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+
+		long modelResourcePrimKey = RandomTestUtil.nextLong();
+
+		Optional<CTCollection> ctCollectionOptionalA =
+			_ctEngineManager.createCTCollection(
+				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString());
+
+		Assert.assertTrue(ctCollectionOptionalA.isPresent());
+
+		CTCollection ctCollectionA = ctCollectionOptionalA.get();
+
+		CTEntry ctEntryA = _ctEntryLocalService.addCTEntry(
+			TestPropsValues.getUserId(), _testVersionClassName.getClassNameId(),
+			0, modelResourcePrimKey, CTConstants.CT_CHANGE_TYPE_ADDITION,
+			ctCollectionA.getCtCollectionId(), new ServiceContext());
+
+		Assert.assertFalse(ctEntryA.isCollision());
+
+		Optional<CTCollection> ctCollectionOptionalB =
+			_ctEngineManager.createCTCollection(
+				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString());
+
+		Assert.assertTrue(ctCollectionOptionalB.isPresent());
+
+		CTCollection ctCollectionB = ctCollectionOptionalB.get();
+
+		CTEntry ctEntryB = _ctEntryLocalService.addCTEntry(
+			TestPropsValues.getUserId(), _testVersionClassName.getClassNameId(),
+			1, modelResourcePrimKey, CTConstants.CT_CHANGE_TYPE_ADDITION,
+			ctCollectionB.getCtCollectionId(), new ServiceContext());
+
+		Assert.assertFalse(ctEntryB.isCollision());
+
+		_ctEngineManager.publishCTCollection(
+			TestPropsValues.getUserId(), ctCollectionB.getCtCollectionId());
+
+		CTProcess ctProcess = _ctProcessLocalService.fetchLatestCTProcess(
+			TestPropsValues.getCompanyId());
+
+		Assert.assertEquals(
+			BackgroundTaskConstants.STATUS_SUCCESSFUL, ctProcess.getStatus());
+
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(
+				TestPropsValues.getCompanyId());
+
+		Assert.assertTrue(productionCTCollectionOptional.isPresent());
+
+		CTCollection productionCTCollection =
+			productionCTCollectionOptional.get();
+
+		List<CTEntry> productionCTEntries =
+			_ctEntryLocalService.getCTCollectionCTEntries(
+				productionCTCollection.getCtCollectionId());
+
+		Assert.assertFalse(productionCTEntries.contains(ctEntryA));
+		Assert.assertTrue(productionCTEntries.contains(ctEntryB));
+
+		ctEntryA = _ctEntryLocalService.getCTEntry(ctEntryA.getCtEntryId());
+
+		Assert.assertTrue(ctEntryA.isCollision());
+	}
+
+	@Ignore
+	@Test
+	public void testPublishCTCollectionWhenPublishedEntryCollides()
+		throws Exception {
+
+		_ctEngineManager.enableChangeTracking(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+
+		Optional<CTCollection> ctCollectionOptional =
+			_ctEngineManager.createCTCollection(
+				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString());
+
+		Assert.assertTrue(ctCollectionOptional.isPresent());
+
+		CTCollection ctCollection = ctCollectionOptional.get();
+
+		CTEntry ctEntry = _ctEntryLocalService.addCTEntry(
+			TestPropsValues.getUserId(), _testVersionClassName.getClassNameId(),
+			0, 0, CTConstants.CT_CHANGE_TYPE_ADDITION,
+			ctCollection.getCtCollectionId(), new ServiceContext());
+
+		ctEntry.setCollision(true);
+
+		ctEntry = _ctEntryLocalService.updateCTEntry(ctEntry);
+
+		_ctEngineManager.publishCTCollection(
+			TestPropsValues.getUserId(), ctCollection.getCtCollectionId());
+
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(
+				TestPropsValues.getCompanyId());
+
+		Assert.assertTrue(productionCTCollectionOptional.isPresent());
+
+		CTCollection productionCTCollection =
+			productionCTCollectionOptional.get();
+
+		List<CTEntry> productionCTEntries =
+			_ctEntryLocalService.getCTCollectionCTEntries(
+				productionCTCollection.getCtCollectionId());
+
+		Assert.assertFalse(productionCTEntries.contains(ctEntry));
+
+		CTProcess ctProcess = _ctProcessLocalService.fetchLatestCTProcess(
+			TestPropsValues.getCompanyId());
+
+		Assert.assertEquals(
+			BackgroundTaskConstants.STATUS_FAILED, ctProcess.getStatus());
+	}
 
 	@Inject
 	private ClassNameLocalService _classNameLocalService;
@@ -817,9 +933,11 @@ public class CTEngineManagerTest {
 	@Inject
 	private CTCollectionLocalService _ctCollectionLocalService;
 
+	private CTConfiguration _ctConfiguration;
+
 	@Inject
-	private CTConfigurationBuilder<Object, TestVersionClass>
-		_ctConfigurationBuilder;
+	private CTConfigurationBuilder
+		<TestResourceModelClass, TestVersionModelClass> _ctConfigurationBuilder;
 
 	@Inject
 	private CTConfigurationRegistrar _ctConfigurationRegistrar;
@@ -830,125 +948,21 @@ public class CTEngineManagerTest {
 	@Inject
 	private CTEntryLocalService _ctEntryLocalService;
 
+	@Inject
+	private CTManager _ctManager;
+
+	@Inject
+	private CTProcessLocalService _ctProcessLocalService;
+
 	private boolean _originallyEnabled;
 
 	@DeleteAfterTestRun
+	private ClassName _testResourceClassName;
+
+	@DeleteAfterTestRun
+	private ClassName _testVersionClassName;
+
+	@DeleteAfterTestRun
 	private User _user;
-
-	private class TestVersionClass implements BaseModel<TestVersionClass> {
-
-		@Override
-		public Object clone() {
-			return null;
-		}
-
-		@Override
-		public int compareTo(TestVersionClass testVersionClass) {
-			return 0;
-		}
-
-		@Override
-		public ExpandoBridge getExpandoBridge() {
-			return null;
-		}
-
-		@Override
-		public Map<String, Object> getModelAttributes() {
-			return null;
-		}
-
-		@Override
-		public Class<?> getModelClass() {
-			return null;
-		}
-
-		@Override
-		public String getModelClassName() {
-			return null;
-		}
-
-		@Override
-		public Serializable getPrimaryKeyObj() {
-			return null;
-		}
-
-		@Override
-		public boolean isCachedModel() {
-			return false;
-		}
-
-		@Override
-		public boolean isEntityCacheEnabled() {
-			return false;
-		}
-
-		@Override
-		public boolean isEscapedModel() {
-			return false;
-		}
-
-		@Override
-		public boolean isFinderCacheEnabled() {
-			return false;
-		}
-
-		@Override
-		public boolean isNew() {
-			return false;
-		}
-
-		@Override
-		public void resetOriginalValues() {
-		}
-
-		@Override
-		public void setCachedModel(boolean cachedModel) {
-		}
-
-		@Override
-		public void setExpandoBridgeAttributes(BaseModel baseModel) {
-		}
-
-		@Override
-		public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		}
-
-		@Override
-		public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
-		}
-
-		@Override
-		public void setModelAttributes(Map attributes) {
-		}
-
-		@Override
-		public void setNew(boolean n) {
-		}
-
-		@Override
-		public void setPrimaryKeyObj(Serializable primaryKeyObj) {
-		}
-
-		@Override
-		public CacheModel<TestVersionClass> toCacheModel() {
-			return null;
-		}
-
-		@Override
-		public TestVersionClass toEscapedModel() {
-			return null;
-		}
-
-		@Override
-		public TestVersionClass toUnescapedModel() {
-			return null;
-		}
-
-		@Override
-		public String toXmlString() {
-			return null;
-		}
-
-	}
 
 }

@@ -4,7 +4,7 @@ definition {
 	macro _checkForRSSTitleCP {
 		if (IsElementNotPresent(locator1 = "RSS#FEED_TITLE")) {
 			ProductMenu.gotoPortlet(
-				category = "Content",
+				category = "Content &amp; Data",
 				panel = "Site Administration",
 				portlet = "Wiki"
 			);
@@ -41,12 +41,10 @@ definition {
 
 		AssertVisible(locator1 = "Button#SELECT_FILES");
 
-		Click(locator1 = "Button#SELECT_FILES");
-
 		var key_attachmentFileName = "${attachmentFileName}";
 
-		SikuliUploadCommonFile(
-			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
 			value1 = "${attachmentFileName}"
 		);
 
@@ -405,10 +403,7 @@ definition {
 	macro compareVersionsCP {
 		var key_wikiPageTitle = "${wikiPageTitle}";
 
-		AssertClick(
-			locator1 = "Wiki#DESCRIPTIVE_VIEW_ENTRY_TITLE",
-			value1 = "${wikiPageTitle}"
-		);
+		WikiNavigator.gotoCP(wikiPageTitle = "${wikiPageTitle}");
 
 		Click(locator1 = "Icon#INFO");
 
@@ -935,7 +930,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Wiki"
 		);
@@ -1490,8 +1485,11 @@ definition {
 			);
 		}
 		else if ("${wikiAttachment}" == "true") {
-			AssertTextEquals.assertPartialText(
-				locator1 = "Wiki#SEARCH_RESULT_ATTACHMENT_BODY",
+			Click(locator1 = "Wiki#SEARCH_RESULT_ATTACHMENT_BODY");
+
+			AssertTextEquals(
+				locator1 = "WikiEntry#ATTACHMENT_FILE_NAME",
+				key_attachmentFileName = "${wikiAttachmentBody}",
 				value1 = "${wikiAttachmentBody}"
 			);
 		}

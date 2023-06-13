@@ -42,6 +42,15 @@ public class AssetDisplayContributorTrackerImpl
 	}
 
 	@Override
+	public AssetDisplayContributor
+		getAssetDisplayContributorByAssetURLSeparator(
+			String assetURLSeparator) {
+
+		return _assetDisplayContributorByAssetURLSeparator.get(
+			assetURLSeparator);
+	}
+
+	@Override
 	public List<AssetDisplayContributor> getAssetDisplayContributors() {
 		return new ArrayList(_assetDisplayContributor.values());
 	}
@@ -55,15 +64,22 @@ public class AssetDisplayContributorTrackerImpl
 
 		_assetDisplayContributor.put(
 			assetDisplayContributor.getClassName(), assetDisplayContributor);
+		_assetDisplayContributorByAssetURLSeparator.put(
+			assetDisplayContributor.getAssetURLSeparator(),
+			assetDisplayContributor);
 	}
 
 	protected void unsetAssetDisplayContributor(
 		AssetDisplayContributor assetDisplayContributor) {
 
 		_assetDisplayContributor.remove(assetDisplayContributor.getClassName());
+		_assetDisplayContributorByAssetURLSeparator.remove(
+			assetDisplayContributor.getAssetURLSeparator());
 	}
 
 	private final Map<String, AssetDisplayContributor>
 		_assetDisplayContributor = new ConcurrentHashMap<>();
+	private final Map<String, AssetDisplayContributor>
+		_assetDisplayContributorByAssetURLSeparator = new ConcurrentHashMap<>();
 
 }

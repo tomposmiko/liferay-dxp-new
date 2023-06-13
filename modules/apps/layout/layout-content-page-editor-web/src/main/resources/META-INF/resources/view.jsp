@@ -30,7 +30,7 @@ ContentPageEditorDisplayContext contentPageEditorDisplayContext = (ContentPageEd
 
 <soy:component-renderer
 	componentId='<%= renderResponse.getNamespace() + "fragmentsEditor" %>'
-	context="<%= contentPageEditorDisplayContext.getEditorContext() %>"
+	context="<%= contentPageEditorDisplayContext.getEditorSoyContext() %>"
 	module="js/FragmentsEditor.es"
 	templateNamespace="com.liferay.layout.content.page.editor.web.FragmentsEditor.render"
 />
@@ -52,7 +52,7 @@ JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
 
 <aui:script require="<%= sb.toString() %>">
 	StoreModule.createStore(
-		<%= jsonSerializer.serializeDeep(contentPageEditorDisplayContext.getEditorContext()) %>,
+		<%= jsonSerializer.serializeDeep(contentPageEditorDisplayContext.getEditorSoyContext()) %>,
 		ReducersModule.reducers,
 		[
 			'<portlet:namespace />editModeWrapper',

@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.ExistsFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.search.filter.PrefixFilter;
 import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.search.filter.RangeTermFilter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
@@ -206,6 +207,18 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 				(EntityField)expressions.get(0), expressions.get(1), _locale);
 		}
 
+		if (type == MethodExpression.Type.STARTS_WITH) {
+			if (expressions.size() != 2) {
+				throw new UnsupportedOperationException(
+					StringBundler.concat(
+						"Unsupported method visitMethodExpression with method",
+						"type ", type, " and ", expressions.size(), "params"));
+			}
+
+			return _startsWith(
+				(EntityField)expressions.get(0), expressions.get(1), _locale);
+		}
+
 		throw new UnsupportedOperationException(
 			"Unsupported method visitMethodExpression with method type " +
 				type);
@@ -260,7 +273,13 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 		EntityField entityField, Object fieldValue, Locale locale) {
 
 		if (fieldValue == null) {
-			return new ExistsFilter(entityField.getFilterableName(locale));
+			BooleanFilter booleanFilter = new BooleanFilter();
+
+			booleanFilter.add(
+				new ExistsFilter(entityField.getFilterableName(locale)),
+				BooleanClauseOccur.MUST_NOT);
+
+			return booleanFilter;
 		}
 
 		return new TermFilter(
@@ -291,6 +310,9 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 		}
 		else if (Objects.equals(BinaryExpression.Operation.LT, operation)) {
 			filter = _getLTFilter((EntityField)left, right, locale);
+		}
+		else if (Objects.equals(BinaryExpression.Operation.NE, operation)) {
+			filter = _getNEFilter((EntityField)left, right, locale);
 		}
 		else if (Objects.equals(BinaryExpression.Operation.OR, operation)) {
 			filter = _getORFilter((Filter)left, (Filter)right);
@@ -417,6 +439,24 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 				entityField.getType());
 	}
 
+	private Filter _getNEFilter(
+		EntityField entityField, Object fieldValue, Locale locale) {
+
+		if (fieldValue == null) {
+			return new ExistsFilter(entityField.getFilterableName(locale));
+		}
+
+		BooleanFilter booleanFilter = new BooleanFilter();
+
+		booleanFilter.add(
+			new TermFilter(
+				entityField.getFilterableName(locale),
+				entityField.getFilterableValue(fieldValue)),
+			BooleanClauseOccur.MUST_NOT);
+
+		return booleanFilter;
+	}
+
 	private Filter _getNotFilter(Filter filter) {
 		BooleanFilter booleanFilter = new BooleanFilter();
 
@@ -453,6 +493,14 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 
 		return StringUtil.replace(
 			literal, StringPool.DOUBLE_APOSTROPHE, StringPool.APOSTROPHE);
+	}
+
+	private Filter _startsWith(
+		EntityField entityField, Object fieldValue, Locale locale) {
+
+		return new PrefixFilter(
+			entityField.getFilterableName(locale),
+			entityField.getFilterableValue(fieldValue));
 	}
 
 	private final EntityModel _entityModel;

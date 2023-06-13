@@ -5,50 +5,99 @@
  */
 {template .render}
 	{@param content: html}
-	{@param editableId: string}
 	{@param type: string}
-	{@param? _editing: bool}
 	{@param? _handleEditableClick: any}
-	{@param? _handleEditableFocusOut: any}
-	{@param? _handleEditableHoverStart: any}
-	{@param? _handleEditableMouseEnter: any}
-	{@param? _handleEditableMouseLeave: any}
-	{@param? _handleOutsideTooltipClick: any}
-	{@param? _handleTooltipButtonClick: any}
-	{@param? _showTooltip: bool}
-	{@param? _tooltipAlignElement: ?}
-	{@param? _tooltipButtons: list<[
-		id: string,
-		label: string
-	]>}
-	{@param? _tooltipLabel: string}
-	{@param? store: ?}
+	{@param? _handleEditableFocus: any}
+	{@param? _highlighted: any}
+	{@param? _mapped: bool}
+	{@param? _mappedFieldLabel: string}
+	{@param? _translated: bool}
+	{@param? activeItemId: string}
+	{@param? activeItemType: string}
+	{@param? defaultLanguageId: string}
+	{@param? editableId: string}
+	{@param? editableValues: ?}
+	{@param? fragmentEntryLinkId: string}
+	{@param? hoveredItemId: string}
+	{@param? hoveredItemType: string}
+	{@param? itemId: string}
+	{@param? itemTypes: ?}
+	{@param? languageId: string}
 
-	<lfr-editable
-		data-onclick="{$_handleEditableClick}"
-		data-onfocusout="{$_handleEditableFocusOut}"
-		data-onmouseenter="{$_handleEditableMouseEnter}"
-		data-onmouseleave="{$_handleEditableMouseLeave}"
-		data-onmouseover="{$_handleEditableHoverStart}"
-		id="{$editableId}"
+	{let $editableClasses kind="text"}
+		fragments-editor__editable
+
+		{if $activeItemId == $itemId and $activeItemType == $itemTypes.editable}
+			{sp}fragments-editor__editable--active
+		{/if}
+
+		{if $hoveredItemId == $itemId and $hoveredItemType == $itemTypes.editable}
+			{sp}fragments-editor__editable--hovered
+		{/if}
+
+		{if $_highlighted}
+			{sp}fragments-editor__editable--highlighted
+		{/if}
+
+		{if $languageId != $defaultLanguageId}
+			{sp}fragments-editor__editable--translating
+
+			{if $_translated}
+				{sp}fragments-editor__editable--translated
+			{/if}
+		{/if}
+
+		{if $_mapped}
+			{sp}fragments-editor__editable--mapped
+		{/if}
+
+		{if $editableValues.config and $editableValues.mappedField}
+			{if $type == 'html' or $type == 'rich-text' or $type == 'text'}
+				{if $editableValues.config.textAlignment}
+					{sp}text-{$editableValues.config.textAlignment}
+				{/if}
+
+				{if $editableValues.config.textColor}
+					{sp}text-palette-{$editableValues.config.textColor}
+				{/if}
+
+				{if $editableValues.config.textStyle}
+					{sp}{$editableValues.config.textStyle}
+				{/if}
+			{/if}
+		{/if}
+	{/let}
+
+	{let $editableAttributes kind="attributes"}
+		class="{$editableClasses}"
+		data-editable-id="{$editableId}"
+		data-fragment-entry-link-id="{$fragmentEntryLinkId}"
+		data-fragments-editor-item-id="{$itemId}"
+		data-fragments-editor-item-type="fragments-editor-editable-field"
+		data-onfocus="{$_handleEditableFocus}"
+		id="{$itemId}"
 		ref="editable"
 		tabindex="0"
+		title="{$_mappedFieldLabel ?: ''}"
 		type="{$type}"
-	>
-		{$content}
 
-		{if not $_editing and $_showTooltip and $_tooltipAlignElement and $_tooltipButtons}
-			{call com.liferay.layout.content.page.editor.web.FragmentEditableFieldTooltip.render}
-				{param alignElement: $_tooltipAlignElement /}
-				{param buttons: $_tooltipButtons /}
-				{param events: [
-					'buttonClick': $_handleTooltipButtonClick,
-					'outsideTooltipClick': $_handleOutsideTooltipClick
-				] /}
-				{param label: $_tooltipLabel /}
-				{param portalElement: 'body' /}
-				{param store: $store /}
-			{/call}
+		{if (not $_mapped) and ($activeItemId == $itemId) and ($activeItemType == $itemTypes.editable)}
+			data-onclick="{$_handleEditableClick}"
+		{/if}
+	{/let}
+
+	<lfr-editable {$editableAttributes}>
+		{if ($type == 'image') and $editableValues.mappedField and $editableValues.config and $editableValues.config.imageLink}
+			{let $linkAttributes kind="attributes"}
+				href="{$editableValues.config.imageLink}"
+				target="{$editableValues.config.imageTarget}"
+			{/let}
+
+			<a {$linkAttributes}>
+				{$content}
+			</a>
+		{else}
+			{$content}
 		{/if}
 	</lfr-editable>
 {/template}

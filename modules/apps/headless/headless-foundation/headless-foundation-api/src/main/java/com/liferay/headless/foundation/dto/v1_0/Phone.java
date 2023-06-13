@@ -14,48 +14,225 @@
 
 package com.liferay.headless.foundation.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface Phone {
+@GraphQLName("Phone")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "Phone")
+public class Phone {
 
-	public String getExtension();
+	public String getExtension() {
+		return extension;
+	}
 
+	public void setExtension(String extension) {
+		this.extension = extension;
+	}
+
+	@JsonIgnore
 	public void setExtension(
-			String extension);
+		UnsafeSupplier<String, Exception> extensionUnsafeSupplier) {
 
-	public void setExtension(
-			UnsafeSupplier<String, Throwable>
-				extensionUnsafeSupplier);
-	public Long getId();
+		try {
+			extension = extensionUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String extension;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public String getPhoneNumber();
+	public Long getId() {
+		return id;
+	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	@JsonIgnore
 	public void setPhoneNumber(
-			String phoneNumber);
+		UnsafeSupplier<String, Exception> phoneNumberUnsafeSupplier) {
 
-	public void setPhoneNumber(
-			UnsafeSupplier<String, Throwable>
-				phoneNumberUnsafeSupplier);
-	public String getPhoneType();
+		try {
+			phoneNumber = phoneNumberUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String phoneNumber;
+
+	public String getPhoneType() {
+		return phoneType;
+	}
+
+	public void setPhoneType(String phoneType) {
+		this.phoneType = phoneType;
+	}
+
+	@JsonIgnore
 	public void setPhoneType(
-			String phoneType);
+		UnsafeSupplier<String, Exception> phoneTypeUnsafeSupplier) {
 
-	public void setPhoneType(
-			UnsafeSupplier<String, Throwable>
-				phoneTypeUnsafeSupplier);
+		try {
+			phoneType = phoneTypeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String phoneType;
+
+	public Boolean getPrimary() {
+		return primary;
+	}
+
+	public void setPrimary(Boolean primary) {
+		this.primary = primary;
+	}
+
+	@JsonIgnore
+	public void setPrimary(
+		UnsafeSupplier<Boolean, Exception> primaryUnsafeSupplier) {
+
+		try {
+			primary = primaryUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean primary;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Phone)) {
+			return false;
+		}
+
+		Phone phone = (Phone)object;
+
+		return Objects.equals(toString(), phone.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"extension\": ");
+
+		sb.append("\"");
+		sb.append(extension);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"phoneNumber\": ");
+
+		sb.append("\"");
+		sb.append(phoneNumber);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"phoneType\": ");
+
+		sb.append("\"");
+		sb.append(phoneType);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"primary\": ");
+
+		sb.append(primary);
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

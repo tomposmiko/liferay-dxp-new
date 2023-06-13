@@ -17,7 +17,6 @@ package com.liferay.message.boards.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.message.boards.service.MBBanServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -64,15 +63,18 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class MBBanServiceSoap {
-	public static com.liferay.message.boards.model.MBBanSoap addBan(
-		long banUserId,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-		try {
-			com.liferay.message.boards.model.MBBan returnValue = MBBanServiceUtil.addBan(banUserId,
-					serviceContext);
 
-			return com.liferay.message.boards.model.MBBanSoap.toSoapModel(returnValue);
+	public static com.liferay.message.boards.model.MBBanSoap addBan(
+			long banUserId,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.message.boards.model.MBBan returnValue =
+				MBBanServiceUtil.addBan(banUserId, serviceContext);
+
+			return com.liferay.message.boards.model.MBBanSoap.toSoapModel(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -81,9 +83,11 @@ public class MBBanServiceSoap {
 		}
 	}
 
-	public static void deleteBan(long banUserId,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static void deleteBan(
+			long banUserId,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
+
 		try {
 			MBBanServiceUtil.deleteBan(banUserId, serviceContext);
 		}
@@ -95,4 +99,5 @@ public class MBBanServiceSoap {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(MBBanServiceSoap.class);
+
 }

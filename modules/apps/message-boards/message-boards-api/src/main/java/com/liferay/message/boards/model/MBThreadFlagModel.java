@@ -35,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface MBThreadFlagModel extends BaseModel<MBThreadFlag>, ShardedModel,
-	StagedGroupedModel {
+public interface MBThreadFlagModel
+	extends BaseModel<MBThreadFlag>, ShardedModel, StagedGroupedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -230,4 +231,5 @@ public interface MBThreadFlagModel extends BaseModel<MBThreadFlag>, ShardedModel
 	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate);
+
 }

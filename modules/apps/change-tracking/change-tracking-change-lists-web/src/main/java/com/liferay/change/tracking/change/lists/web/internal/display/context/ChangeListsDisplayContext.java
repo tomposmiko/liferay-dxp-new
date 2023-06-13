@@ -15,6 +15,7 @@
 package com.liferay.change.tracking.change.lists.web.internal.display.context;
 
 import com.liferay.change.tracking.CTEngineManager;
+import com.liferay.change.tracking.configuration.CTConfigurationRegistryUtil;
 import com.liferay.change.tracking.constants.CTPortletKeys;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
@@ -26,6 +27,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
@@ -38,10 +40,10 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.template.soy.util.SoyContext;
 import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -67,36 +69,58 @@ public class ChangeListsDisplayContext {
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
+		_ctEngineManager = _serviceTracker.getService();
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
-	public SoyContext getChangeListsContext() {
+	public SoyContext getChangeListsContext() throws Exception {
 		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
 
 		soyContext.put(
+			"entityNameTranslations",
+			JSONUtil.toJSONArray(
+				CTConfigurationRegistryUtil.getContentTypeLanguageKeys(),
+				contentTypeLanguageKey -> JSONUtil.put(
+					"key", contentTypeLanguageKey
+				).put(
+					"translation",
+					LanguageUtil.get(
+						_httpServletRequest, contentTypeLanguageKey)
+				))
+		).put(
 			"spritemap",
-			_themeDisplay.getPathThemeImages() + "/lexicon/icons.svg");
-		soyContext.put(
-			"urlActiveCollection",
-			_themeDisplay.getPortalURL() +
-				"/o/change-tracking/collections?type=active&userId=" +
-					_themeDisplay.getUserId());
-		soyContext.put(
+			_themeDisplay.getPathThemeImages() + "/lexicon/icons.svg"
+		).put(
+			"urlCollectionsBase",
+			_themeDisplay.getPortalURL() + "/o/change-tracking/collections"
+		).put(
 			"urlProductionInformation",
 			StringBundler.concat(
 				_themeDisplay.getPortalURL(),
 				"/o/change-tracking/processes?companyId=",
-				_themeDisplay.getCompanyId(), "&published=true"));
-		soyContext.put("urlProductionView", _themeDisplay.getPortalURL());
+				_themeDisplay.getCompanyId(), "&type=published-latest")
+		).put(
+			"urlProductionView", _themeDisplay.getPortalURL()
+		);
 
 		PortletURL portletURL = PortletURLFactoryUtil.create(
+			_renderRequest, CTPortletKeys.CHANGE_LISTS_HISTORY,
+			PortletRequest.RENDER_PHASE);
+
+		soyContext.put("urlChangeListsHistory", portletURL.toString());
+
+		portletURL = PortletURLFactoryUtil.create(
 			_renderRequest, CTPortletKeys.CHANGE_LISTS,
 			PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter("select", "true");
 
 		soyContext.put("urlSelectChangeList", portletURL.toString());
+
+		portletURL.setParameter("production", "true");
+
+		soyContext.put("urlSelectProduction", portletURL.toString());
 
 		return soyContext;
 	}
@@ -122,6 +146,17 @@ public class ChangeListsDisplayContext {
 			});
 
 		return creationMenu;
+	}
+
+	public String getDisplayStyle() {
+		if (_displayStyle != null) {
+			return _displayStyle;
+		}
+
+		_displayStyle = ParamUtil.getString(
+			_httpServletRequest, "displayStyle", "icon");
+
+		return _displayStyle;
 	}
 
 	public List<DropdownItem> getFilterDropdownItems() {
@@ -167,19 +202,27 @@ public class ChangeListsDisplayContext {
 		return _orderByType;
 	}
 
+	public CTCollection getProductionCTCollection() {
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(
+				_themeDisplay.getCompanyId());
+
+		return productionCTCollectionOptional.orElse(null);
+	}
+
 	public SearchContainer<CTCollection> getSearchContainer() {
 		SearchContainer<CTCollection> searchContainer = new SearchContainer<>(
 			_renderRequest, new DisplayTerms(_renderRequest), null,
 			SearchContainer.DEFAULT_CUR_PARAM, 0, SearchContainer.DEFAULT_DELTA,
 			_getIteratorURL(), null, "there-are-no-change-lists");
 
-		CTEngineManager ctEngineManager = _serviceTracker.getService();
-
 		QueryDefinition<CTCollection> queryDefinition = new QueryDefinition<>();
 
 		DisplayTerms displayTerms = searchContainer.getDisplayTerms();
 
-		queryDefinition.setAttribute("keywords", displayTerms.getKeywords());
+		String keywords = displayTerms.getKeywords();
+
+		queryDefinition.setAttribute("keywords", keywords);
 
 		OrderByComparator<CTCollection> orderByComparator =
 			OrderByComparatorFactoryUtil.create(
@@ -188,16 +231,19 @@ public class ChangeListsDisplayContext {
 
 		queryDefinition.setOrderByComparator(orderByComparator);
 
-		List<CTCollection> ctCollections = ctEngineManager.searchByKeywords(
-			_themeDisplay.getCompanyId(), queryDefinition);
+		List<CTCollection> ctCollections = new ArrayList<>();
 
-		Stream<CTCollection> stream = ctCollections.stream();
+		Optional<CTCollection> productionCTCollection =
+			_ctEngineManager.getProductionCTCollectionOptional(
+				_themeDisplay.getCompanyId());
 
-		ctCollections = stream.filter(
-			ctCollection -> !ctCollection.isProduction()
-		).collect(
-			Collectors.toList()
-		);
+		if (productionCTCollection.isPresent() && Validator.isNull(keywords)) {
+			ctCollections.add(productionCTCollection.get());
+		}
+
+		ctCollections.addAll(
+			_ctEngineManager.searchByKeywords(
+				_themeDisplay.getCompanyId(), queryDefinition));
 
 		searchContainer.setResults(ctCollections);
 
@@ -211,7 +257,7 @@ public class ChangeListsDisplayContext {
 
 		sortingURL.setParameter(
 			"orderByType",
-			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
+			Objects.equals(getOrderByType(), "desc") ? "desc" : "asc");
 
 		return sortingURL.toString();
 	}
@@ -226,7 +272,7 @@ public class ChangeListsDisplayContext {
 	}
 
 	public List<ViewTypeItem> getViewTypeItems() {
-		return new ViewTypeItemList(_getPortletURL(), _getDisplayStyle()) {
+		return new ViewTypeItemList(_getPortletURL(), _displayStyle) {
 			{
 				addCardViewTypeItem();
 				addTableViewTypeItem();
@@ -234,15 +280,15 @@ public class ChangeListsDisplayContext {
 		};
 	}
 
-	private String _getDisplayStyle() {
-		if (_displayStyle != null) {
-			return _displayStyle;
+	public boolean isChangeListActive(long ctCollectionId) {
+		long recentCTCollectionId = _ctEngineManager.getRecentCTCollectionId(
+			_themeDisplay.getUserId());
+
+		if (recentCTCollectionId == ctCollectionId) {
+			return true;
 		}
 
-		_displayStyle = ParamUtil.getString(
-			_httpServletRequest, "displayStyle", "list");
-
-		return _displayStyle;
+		return false;
 	}
 
 	private String _getFilterByStatus() {
@@ -343,13 +389,15 @@ public class ChangeListsDisplayContext {
 	}
 
 	private PortletURL _getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			_renderRequest, CTPortletKeys.CHANGE_LISTS,
+			PortletRequest.RENDER_PHASE);
 
 		String displayStyle = ParamUtil.getString(
 			_httpServletRequest, "displayStyle");
 
 		if (Validator.isNotNull(displayStyle)) {
-			portletURL.setParameter("displayStyle", _getDisplayStyle());
+			portletURL.setParameter("displayStyle", getDisplayStyle());
 		}
 
 		String orderByCol = _getOrderByCol();
@@ -363,6 +411,8 @@ public class ChangeListsDisplayContext {
 		if (Validator.isNotNull(orderByType)) {
 			portletURL.setParameter("orderByType", orderByType);
 		}
+
+		portletURL.setParameter("select", "true");
 
 		return portletURL;
 	}
@@ -382,6 +432,7 @@ public class ChangeListsDisplayContext {
 		_serviceTracker = serviceTracker;
 	}
 
+	private final CTEngineManager _ctEngineManager;
 	private String _displayStyle;
 	private String _filterByStatus;
 	private final HttpServletRequest _httpServletRequest;

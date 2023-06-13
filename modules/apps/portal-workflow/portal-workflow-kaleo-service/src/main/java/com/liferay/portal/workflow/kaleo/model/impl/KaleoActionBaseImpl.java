@@ -32,8 +32,9 @@ import com.liferay.portal.workflow.kaleo.service.KaleoActionLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class KaleoActionBaseImpl extends KaleoActionModelImpl
-	implements KaleoAction {
+public abstract class KaleoActionBaseImpl
+	extends KaleoActionModelImpl implements KaleoAction {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class KaleoActionBaseImpl extends KaleoActionModelImpl
 			KaleoActionLocalServiceUtil.updateKaleoAction(this);
 		}
 	}
+
 }

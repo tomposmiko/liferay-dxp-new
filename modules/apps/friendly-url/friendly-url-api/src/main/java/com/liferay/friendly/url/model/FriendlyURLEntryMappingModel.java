@@ -32,8 +32,9 @@ import com.liferay.portal.kernel.model.MVCCModel;
  * @generated
  */
 @ProviderType
-public interface FriendlyURLEntryMappingModel extends AttachedModel,
-	BaseModel<FriendlyURLEntryMapping>, MVCCModel {
+public interface FriendlyURLEntryMappingModel
+	extends AttachedModel, BaseModel<FriendlyURLEntryMapping>, MVCCModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -139,4 +140,5 @@ public interface FriendlyURLEntryMappingModel extends AttachedModel,
 	 * @param friendlyURLEntryId the friendly url entry ID of this friendly url entry mapping
 	 */
 	public void setFriendlyURLEntryId(long friendlyURLEntryId);
+
 }

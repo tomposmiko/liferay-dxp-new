@@ -57,10 +57,7 @@ definition {
 
 		var key_entryTitle = "${entryTitle}";
 
-		AssertTextEquals(
-			locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_TITLE",
-			value1 = "${entryTitle}"
-		);
+		Blogs.viewEntryTitle(entryTitle = "${entryTitle}");
 
 		Click(
 			locator1 = "LexiconList#LIST_ENTRY_ELLIPSIS",
@@ -107,9 +104,8 @@ definition {
 			);
 		}
 
-		AssertClick(
-			locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_TITLE",
-			value1 = "${entryTitle}"
+		LexiconList.clickListEntryTitle(
+			listEntry = "${entryTitle}"
 		);
 	}
 
@@ -166,17 +162,21 @@ definition {
 
 		var key_entryTitle = "${entryTitle}";
 
-		AssertTextEquals(
-			locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_TITLE",
-			value1 = "${entryTitle}"
-		);
+		Blogs.viewEntryTitle(entryTitle = "${entryTitle}");
 
 		Click(
 			locator1 = "LexiconList#LIST_ENTRY_ELLIPSIS",
 			key_listEntry = "${entryTitle}"
 		);
 
-		PortletEntry.clickMoveToRecycleBin();
+		ClickNoError(
+			locator1 = "MenuItem#DROPDOWN_MENU_ITEM",
+			key_menuItem = "Move to Recycle Bin"
+		);
+
+		AssertConfirm(
+			value1 = "Are you sure you want to move this to the Recycle Bin?"
+		);
 
 		AssertElementPresent(locator1 = "Message#SUCCESS");
 	}

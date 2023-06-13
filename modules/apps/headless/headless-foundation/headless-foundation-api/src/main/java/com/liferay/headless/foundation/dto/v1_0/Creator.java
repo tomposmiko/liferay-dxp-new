@@ -14,72 +14,293 @@
 
 package com.liferay.headless.foundation.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface Creator {
+@GraphQLName("Creator")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "Creator")
+public class Creator {
 
-	public String getAdditionalName();
+	public String getAdditionalName() {
+		return additionalName;
+	}
 
+	public void setAdditionalName(String additionalName) {
+		this.additionalName = additionalName;
+	}
+
+	@JsonIgnore
 	public void setAdditionalName(
-			String additionalName);
+		UnsafeSupplier<String, Exception> additionalNameUnsafeSupplier) {
 
-	public void setAdditionalName(
-			UnsafeSupplier<String, Throwable>
-				additionalNameUnsafeSupplier);
-	public String getFamilyName();
+		try {
+			additionalName = additionalNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String additionalName;
+
+	public String getFamilyName() {
+		return familyName;
+	}
+
+	public void setFamilyName(String familyName) {
+		this.familyName = familyName;
+	}
+
+	@JsonIgnore
 	public void setFamilyName(
-			String familyName);
+		UnsafeSupplier<String, Exception> familyNameUnsafeSupplier) {
 
-	public void setFamilyName(
-			UnsafeSupplier<String, Throwable>
-				familyNameUnsafeSupplier);
-	public String getGivenName();
+		try {
+			familyName = familyNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String familyName;
+
+	public String getGivenName() {
+		return givenName;
+	}
+
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
+	}
+
+	@JsonIgnore
 	public void setGivenName(
-			String givenName);
+		UnsafeSupplier<String, Exception> givenNameUnsafeSupplier) {
 
-	public void setGivenName(
-			UnsafeSupplier<String, Throwable>
-				givenNameUnsafeSupplier);
-	public Long getId();
+		try {
+			givenName = givenNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String givenName;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public String getImage();
+	public Long getId() {
+		return id;
+	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	@JsonIgnore
 	public void setImage(
-			String image);
+		UnsafeSupplier<String, Exception> imageUnsafeSupplier) {
 
-	public void setImage(
-			UnsafeSupplier<String, Throwable>
-				imageUnsafeSupplier);
-	public String getName();
+		try {
+			image = imageUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setName(
-			String name);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String image;
 
-	public void setName(
-			UnsafeSupplier<String, Throwable>
-				nameUnsafeSupplier);
-	public String getProfileURL();
+	public String getName() {
+		return name;
+	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@JsonIgnore
+	public void setName(UnsafeSupplier<String, Exception> nameUnsafeSupplier) {
+		try {
+			name = nameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String name;
+
+	public String getProfileURL() {
+		return profileURL;
+	}
+
+	public void setProfileURL(String profileURL) {
+		this.profileURL = profileURL;
+	}
+
+	@JsonIgnore
 	public void setProfileURL(
-			String profileURL);
+		UnsafeSupplier<String, Exception> profileURLUnsafeSupplier) {
 
-	public void setProfileURL(
-			UnsafeSupplier<String, Throwable>
-				profileURLUnsafeSupplier);
+		try {
+			profileURL = profileURLUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String profileURL;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Creator)) {
+			return false;
+		}
+
+		Creator creator = (Creator)object;
+
+		return Objects.equals(toString(), creator.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"additionalName\": ");
+
+		sb.append("\"");
+		sb.append(additionalName);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"familyName\": ");
+
+		sb.append("\"");
+		sb.append(familyName);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"givenName\": ");
+
+		sb.append("\"");
+		sb.append(givenName);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"image\": ");
+
+		sb.append("\"");
+		sb.append(image);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"name\": ");
+
+		sb.append("\"");
+		sb.append(name);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"profileURL\": ");
+
+		sb.append("\"");
+		sb.append(profileURL);
+		sb.append("\"");
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

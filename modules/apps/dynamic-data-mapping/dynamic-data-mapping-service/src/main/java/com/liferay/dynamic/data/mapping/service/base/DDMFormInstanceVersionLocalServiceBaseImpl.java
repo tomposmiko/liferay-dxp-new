@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceVersionPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -63,8 +62,9 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements DDMFormInstanceVersionLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements DDMFormInstanceVersionLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -81,6 +81,7 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	@Override
 	public DDMFormInstanceVersion addDDMFormInstanceVersion(
 		DDMFormInstanceVersion ddmFormInstanceVersion) {
+
 		ddmFormInstanceVersion.setNew(true);
 
 		return ddmFormInstanceVersionPersistence.update(ddmFormInstanceVersion);
@@ -96,6 +97,7 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	@Transactional(enabled = false)
 	public DDMFormInstanceVersion createDDMFormInstanceVersion(
 		long formInstanceVersionId) {
+
 		return ddmFormInstanceVersionPersistence.create(formInstanceVersionId);
 	}
 
@@ -109,7 +111,9 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public DDMFormInstanceVersion deleteDDMFormInstanceVersion(
-		long formInstanceVersionId) throws PortalException {
+			long formInstanceVersionId)
+		throws PortalException {
+
 		return ddmFormInstanceVersionPersistence.remove(formInstanceVersionId);
 	}
 
@@ -123,6 +127,7 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	@Override
 	public DDMFormInstanceVersion deleteDDMFormInstanceVersion(
 		DDMFormInstanceVersion ddmFormInstanceVersion) {
+
 		return ddmFormInstanceVersionPersistence.remove(ddmFormInstanceVersion);
 	}
 
@@ -130,8 +135,8 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(DDMFormInstanceVersion.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			DDMFormInstanceVersion.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -142,7 +147,8 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 */
 	@Override
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
-		return ddmFormInstanceVersionPersistence.findWithDynamicQuery(dynamicQuery);
+		return ddmFormInstanceVersionPersistence.findWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -158,10 +164,11 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return ddmFormInstanceVersionPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return ddmFormInstanceVersionPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -178,10 +185,12 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return ddmFormInstanceVersionPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return ddmFormInstanceVersionPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -192,7 +201,8 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return ddmFormInstanceVersionPersistence.countWithDynamicQuery(dynamicQuery);
+		return ddmFormInstanceVersionPersistence.countWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -203,16 +213,19 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return ddmFormInstanceVersionPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return ddmFormInstanceVersionPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
 	public DDMFormInstanceVersion fetchDDMFormInstanceVersion(
 		long formInstanceVersionId) {
-		return ddmFormInstanceVersionPersistence.fetchByPrimaryKey(formInstanceVersionId);
+
+		return ddmFormInstanceVersionPersistence.fetchByPrimaryKey(
+			formInstanceVersionId);
 	}
 
 	/**
@@ -224,15 +237,20 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 */
 	@Override
 	public DDMFormInstanceVersion getDDMFormInstanceVersion(
-		long formInstanceVersionId) throws PortalException {
-		return ddmFormInstanceVersionPersistence.findByPrimaryKey(formInstanceVersionId);
+			long formInstanceVersionId)
+		throws PortalException {
+
+		return ddmFormInstanceVersionPersistence.findByPrimaryKey(
+			formInstanceVersionId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(ddmFormInstanceVersionLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			ddmFormInstanceVersionLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDMFormInstanceVersion.class);
 
@@ -243,12 +261,17 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(ddmFormInstanceVersionLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			ddmFormInstanceVersionLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
-		indexableActionableDynamicQuery.setModelClass(DDMFormInstanceVersion.class);
+		indexableActionableDynamicQuery.setModelClass(
+			DDMFormInstanceVersion.class);
 
 		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
 			"formInstanceVersionId");
@@ -258,7 +281,9 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(ddmFormInstanceVersionLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			ddmFormInstanceVersionLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDMFormInstanceVersion.class);
 
@@ -272,13 +297,17 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return ddmFormInstanceVersionLocalService.deleteDDMFormInstanceVersion((DDMFormInstanceVersion)persistedModel);
+
+		return ddmFormInstanceVersionLocalService.deleteDDMFormInstanceVersion(
+			(DDMFormInstanceVersion)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
-		return ddmFormInstanceVersionPersistence.findByPrimaryKey(primaryKeyObj);
+
+		return ddmFormInstanceVersionPersistence.findByPrimaryKey(
+			primaryKeyObj);
 	}
 
 	/**
@@ -293,8 +322,9 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 * @return the range of ddm form instance versions
 	 */
 	@Override
-	public List<DDMFormInstanceVersion> getDDMFormInstanceVersions(int start,
-		int end) {
+	public List<DDMFormInstanceVersion> getDDMFormInstanceVersions(
+		int start, int end) {
+
 		return ddmFormInstanceVersionPersistence.findAll(start, end);
 	}
 
@@ -318,6 +348,7 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	@Override
 	public DDMFormInstanceVersion updateDDMFormInstanceVersion(
 		DDMFormInstanceVersion ddmFormInstanceVersion) {
+
 		return ddmFormInstanceVersionPersistence.update(ddmFormInstanceVersion);
 	}
 
@@ -326,7 +357,9 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 *
 	 * @return the ddm form instance version local service
 	 */
-	public DDMFormInstanceVersionLocalService getDDMFormInstanceVersionLocalService() {
+	public DDMFormInstanceVersionLocalService
+		getDDMFormInstanceVersionLocalService() {
+
 		return ddmFormInstanceVersionLocalService;
 	}
 
@@ -337,7 +370,9 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 */
 	public void setDDMFormInstanceVersionLocalService(
 		DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService) {
-		this.ddmFormInstanceVersionLocalService = ddmFormInstanceVersionLocalService;
+
+		this.ddmFormInstanceVersionLocalService =
+			ddmFormInstanceVersionLocalService;
 	}
 
 	/**
@@ -345,7 +380,9 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 *
 	 * @return the ddm form instance version persistence
 	 */
-	public DDMFormInstanceVersionPersistence getDDMFormInstanceVersionPersistence() {
+	public DDMFormInstanceVersionPersistence
+		getDDMFormInstanceVersionPersistence() {
+
 		return ddmFormInstanceVersionPersistence;
 	}
 
@@ -356,7 +393,9 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 */
 	public void setDDMFormInstanceVersionPersistence(
 		DDMFormInstanceVersionPersistence ddmFormInstanceVersionPersistence) {
-		this.ddmFormInstanceVersionPersistence = ddmFormInstanceVersionPersistence;
+
+		this.ddmFormInstanceVersionPersistence =
+			ddmFormInstanceVersionPersistence;
 	}
 
 	/**
@@ -364,7 +403,9 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -374,12 +415,15 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion",
 			ddmFormInstanceVersionLocalService);
 	}
 
@@ -413,15 +457,16 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = ddmFormInstanceVersionPersistence.getDataSource();
+			DataSource dataSource =
+				ddmFormInstanceVersionPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -431,11 +476,21 @@ public abstract class DDMFormInstanceVersionLocalServiceBaseImpl
 	}
 
 	@BeanReference(type = DDMFormInstanceVersionLocalService.class)
-	protected DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService;
+	protected DDMFormInstanceVersionLocalService
+		ddmFormInstanceVersionLocalService;
+
 	@BeanReference(type = DDMFormInstanceVersionPersistence.class)
-	protected DDMFormInstanceVersionPersistence ddmFormInstanceVersionPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	protected DDMFormInstanceVersionPersistence
+		ddmFormInstanceVersionPersistence;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

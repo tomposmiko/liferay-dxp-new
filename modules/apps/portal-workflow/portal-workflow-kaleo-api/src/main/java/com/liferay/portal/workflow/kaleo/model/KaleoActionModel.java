@@ -36,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface KaleoActionModel extends BaseModel<KaleoAction>, GroupedModel,
-	MVCCModel, ShardedModel {
+public interface KaleoActionModel
+	extends BaseModel<KaleoAction>, GroupedModel, MVCCModel, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -362,4 +363,5 @@ public interface KaleoActionModel extends BaseModel<KaleoAction>, GroupedModel,
 	 * @param priority the priority of this kaleo action
 	 */
 	public void setPriority(int priority);
+
 }

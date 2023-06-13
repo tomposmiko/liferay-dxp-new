@@ -22,16 +22,21 @@
 		deleted: number,
 		modified: number
 	]}
+	{@param? collisionsLoading: bool}
+	{@param? collisionsCount: number}
+	{@param? collisionsTooltip: string}
 	{@param? descriptionActiveChangeList: string}
 	{@param? descriptionProductionInformation: string}
 	{@param? changeListsDropdownMenu: list<[
 		label: string,
-		link: string
+		ctCollectionId: string
 	]>}
 	{@param? headerButtonDisabled: bool}
 	{@param? headerTitleActiveChangeList: string}
 	{@param? headerTitleProductionInformation: string}
 	{@param? initialFetch: bool}
+	{@param? productionCTCollectionId: number}
+	{@param? productionFound: bool}
 	{@param? publishedBy: [
 		dateTime: string,
 		userInitials: string,
@@ -39,6 +44,7 @@
 		userName: string
 	]}
 	{@param? _handleClickPublish: any}
+	{@param? _handleClickRecentCollections: any}
 
 	{let $headerButtonLabel kind="text"}
 		{msg desc=""}publish{/msg}
@@ -67,7 +73,8 @@
 			<div class="row">
 				<div class="col-sm-6">
 					{call .overviewCard}
-						{param cardState: 'border-left-blue' /}
+						{param cardEmpty: false /}
+						{param cardStateColor: 'border-left-blue' /}
 						{param changes: [
 							'added': $changes.added,
 							'addedLabel': $addedLabel,
@@ -78,6 +85,9 @@
 						{param changesLabel kind="text"}
 							{msg desc=""}changes{/msg}
 						{/param}
+						{param collisionsLoading: $collisionsLoading /}
+						{param collisionsCount: $collisionsCount /}
+						{param collisionsTooltip: $collisionsTooltip /}
 						{param description: $descriptionActiveChangeList /}
 						{param descriptionTitle kind="text"}
 							{msg desc=""}description{/msg}
@@ -88,19 +98,25 @@
 						{param changeListsDropdownMenuTitle kind="text"}
 							{msg desc=""}select-change-list{/msg}
 						{/param}
+						{param changeListsProductionDropdownMenuTitle kind="text"}
+							{msg desc=""}work-on-production{/msg}
+						{/param}
 						{param urlSelectChangeList: $urlSelectChangeList /}
 						{param headerSubTitle kind="text"}
 							{msg desc=""}active-change-list{/msg}
 						{/param}
 						{param headerTitle: $headerTitleActiveChangeList /}
+						{param productionCTCollectionId: $productionCTCollectionId /}
 						{param spritemap: $spritemap /}
 						{param _handleClickPublish: $_handleClickPublish /}
+						{param _handleClickRecentCollections: $_handleClickRecentCollections /}
 					{/call}
 				</div>
 
 				<div class="col-sm-6">
 					{call .overviewCard}
-						{param cardState: 'border-left-green' /}
+						{param cardEmpty: not $productionFound /}
+						{param cardStateColor: 'border-left-green' /}
 						{param description: $descriptionProductionInformation /}
 						{param descriptionTitle kind="text"}
 							{msg desc=""}description{/msg}
@@ -124,7 +140,8 @@
 			<div class="row">
 				<div class="col-sm-12">
 					{call .overviewCard}
-						{param cardState: 'border-left-blue' /}
+						{param cardEmpty: false /}
+						{param cardStateColor: 'border-left-blue' /}
 						{param changeEntries: $changeEntries /}
 						{param headerSubTitle kind="text"}
 							{msg desc=""}latest-changes-in{/msg} {$headerTitleActiveChangeList}
@@ -144,7 +161,8 @@
  */
 {template .overviewCard}
 	{@param  spritemap: string}
-	{@param? cardState: string}
+	{@param? cardEmpty: bool}
+	{@param? cardStateColor: string}
 	{@param? changeEntries: list<[
 		title: string,
 		conflict: bool,
@@ -157,9 +175,10 @@
 	]>}
 	{@param? changeListsDropdownMenu: list<[
 		label: string,
-		link: string
+		ctCollectionId: string
 	]>}
 	{@param? changeListsDropdownMenuTitle: string}
+	{@param? changeListsProductionDropdownMenuTitle: string}
 	{@param? changes: [
 		added: number,
 		addedLabel: string,
@@ -169,6 +188,9 @@
 		modifiedLabel: string
 	]}
 	{@param? changesLabel: string}
+	{@param? collisionsLoading : bool}
+	{@param? collisionsCount: number}
+	{@param? collisionsTooltip: string}
 	{@param? description: string}
 	{@param? descriptionTitle: string}
 	{@param? headerButton: [
@@ -181,6 +203,7 @@
 	]}
 	{@param? headerSubTitle: string}
 	{@param? headerTitle: string}
+	{@param? productionCTCollectionId: number}
 	{@param? publishedBy: [
 		dateTime: string,
 		userInitials: string,
@@ -190,44 +213,63 @@
 	{@param? publishedByTitle: string}
 	{@param? urlSelectChangeList: string}
 	{@param? _handleClickPublish: any}
+	{@param? _handleClickRecentCollections: any}
 
-	<div class="overview-card-sheet {$cardState}">
+	<div class="overview-card-sheet {$cardStateColor}">
 		{call .overviewCardHeader}
+			{param cardEmpty: $cardEmpty /}
 			{param headerButton: $headerButton /}
 			{param headerButtonDisabled: $headerButtonDisabled /}
 			{param changeListsDropdownMenu: $changeListsDropdownMenu /}
 			{param changeListsDropdownMenuTitle: $changeListsDropdownMenuTitle /}
+			{param changeListsProductionDropdownMenuTitle: $changeListsProductionDropdownMenuTitle /}
+			{param collisionsLoading: $collisionsLoading /}
+			{param collisionsCount: $collisionsCount /}
+			{param collisionsTooltip: $collisionsTooltip /}
 			{param urlSelectChangeList: $urlSelectChangeList /}
 			{param headerLink: $headerLink /}
 			{param headerSubTitle: $headerSubTitle /}
 			{param headerTitle: $headerTitle /}
+			{param productionCTCollectionId: $productionCTCollectionId /}
 			{param spritemap: $spritemap /}
 			{param _handleClickPublish: $_handleClickPublish /}
+			{param _handleClickRecentCollections: $_handleClickRecentCollections /}
 		{/call}
 
-		<div class="overview-card-sheet-divider"></div>
+		{if not $cardEmpty}
+			<div class="overview-card-sheet-divider"></div>
 
-		{call .overviewCardBody}
-			{param changes: $changes /}
-			{param changeEntries: $changeEntries /}
-			{param changesLabel: $changesLabel /}
-			{param description: $description /}
-			{param descriptionTitle: $descriptionTitle /}
-			{param publishedBy: $publishedBy /}
-			{param publishedByTitle: $publishedByTitle /}
-			{param spritemap: $spritemap /}
-		{/call}
+			{call .overviewCardBody}
+				{param changes: $changes /}
+				{param changeEntries: $changeEntries /}
+				{param changesLabel: $changesLabel /}
+				{param description: $description /}
+				{param descriptionTitle: $descriptionTitle /}
+				{param publishedBy: $publishedBy /}
+				{param publishedByTitle: $publishedByTitle /}
+				{param spritemap: $spritemap /}
+			{/call}
+		{else}
+			<div class="empty-production-view sheet-text text-center text-strong">
+				{msg desc=""}no-change-list-has-been-published-yet{/msg}
+			</div>
+		{/if}
 
 	</div>
 {/template}
 
 {template .overviewCardHeader}
 	{@param  spritemap: string}
+	{@param? cardEmpty: bool}
 	{@param? changeListsDropdownMenu: list<[
 		label: string,
-		link: string
+		ctCollectionId: string
 	]>}
 	{@param? changeListsDropdownMenuTitle: string}
+	{@param? changeListsProductionDropdownMenuTitle: string}
+	{@param? collisionsLoading: bool}
+	{@param? collisionsCount: number}
+	{@param? collisionsTooltip: string}
 	{@param? headerButton: [
 		label: string
 	]}
@@ -238,8 +280,10 @@
 	]}
 	{@param? headerSubTitle: string}
 	{@param? headerTitle: string}
+	{@param? productionCTCollectionId: number}
 	{@param? urlSelectChangeList: string}
 	{@param? _handleClickPublish: any}
+	{@param? _handleClickRecentCollections: any}
 
 	{let $twoColumns: $headerButton /}
 
@@ -249,14 +293,17 @@
 				{if $headerSubTitle}
 					<h3 data-qa-id="headerSubTitle">{$headerSubTitle}</h3>
 				{/if}
+
 				{if $headerTitle}
 					<div class="overview-card-sheet-title" data-qa-id="headerTitle">{$headerTitle}</div>
 				{/if}
-				{if $headerLink}
+
+				{if $headerLink and not $cardEmpty}
 					<div class="header-line">
 						<a data-qa-id="headerLink" href="{$headerLink.link}" onclick="" target="_blank">{$headerLink.label}</a>
 					</div>
 				{/if}
+
 				{if $changeListsDropdownMenu and $changeListsDropdownMenuTitle}
 					<div class="header-line">
 						<a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" data-qa-id="headerDropDownMenu" data-toggle="dropdown" href="#1" role="button">
@@ -270,9 +317,10 @@
 
 						<div aria-labelledby="" class="dropdown-menu">
 							{foreach $changeListsDropdownMenuItem in $changeListsDropdownMenu}
-								<a class="dropdown-item" href="{$changeListsDropdownMenuItem.link}">{$changeListsDropdownMenuItem.label}</a>
+								<a class="dropdown-item"  data-collection-id="{$changeListsDropdownMenuItem.ctCollectionId}" href="#" onclick="{$_handleClickRecentCollections}">{$changeListsDropdownMenuItem.label}</a>
 							{/foreach}
-							<a class="dropdown-item dropdown-item-last" href="{$urlSelectChangeList}">{$changeListsDropdownMenuTitle}</a>
+							<a class="dropdown-item dropdown-item-last" data-qa-id="selectChangeListMenuItem" href="{$urlSelectChangeList}">{$changeListsDropdownMenuTitle}</a>
+							<a class="dropdown-item" data-collection-id="{$productionCTCollectionId}" data-production="true" data-qa-id="selectProductionChangeListMenuItem" href="#" onclick="{$_handleClickRecentCollections}">{$changeListsProductionDropdownMenuTitle}</a>
 						</div>
 					</div>
 				{/if}
@@ -282,15 +330,18 @@
 				<div class="col-sm-6">
 					<div class="navbar-nav stick-to-right">
 						<div class="btn-group">
-							<div class="btn-group-item">
-								<svg class="lexicon-icon lexicon-icon-exclamation-circle" focusable="false" role="presentation">
-									<use xlink:href="{$spritemap}#exclamation-circle" />
-								</svg>
-							</div>
+
+							{call .collisions}
+								{param spritemap: $spritemap /}
+								{param collisionsCount: $collisionsCount /}
+								{param collisionsLoading: $collisionsLoading /}
+								{param collisionsTooltip: $collisionsTooltip /}
+							{/call}
+
 							{if $headerButton}
 								<div class="btn-group-item">
 									<div class="flex-col">
-										<button class="btn btn-default btn-primary" {if $headerButtonDisabled} disabled {/if} onclick="{$_handleClickPublish}" data-qa-id="headerButton" id="" type="button">
+										<button class="btn btn-default btn-primary" {if $headerButtonDisabled} disabled {/if} data-qa-id="headerButton" id="" onclick="{$_handleClickPublish}" type="button">
 											<span class="lfr-btn-label">{$headerButton.label}</span>
 										</button>
 									</div>
@@ -383,7 +434,7 @@
 			</div>
 		{/if}
 		{if $changes}
-			<div class="glance-card-sheet-block">
+			<div class="overview-card-sheet-block">
 				<h3>{$changesLabel}</h3>
 
 				<div class="changes-row">
@@ -511,5 +562,45 @@
 {template .loading}
 	<div class="loading-indicator">
 		<span aria-hidden="true" class="loading-animation"></span>
+	</div>
+{/template}
+
+{template .collisions}
+	{@param spritemap: string}
+	{@param? collisionsCount: number}
+	{@param? collisionsLoading: bool}
+	{@param? collisionsTooltip: string}
+
+	<div class="btn-group-item">
+		{if $collisionsLoading}
+			<span class="change-lists-helper float-right lfr-portal-tooltip"
+					title="{msg desc=""}collision-detection{/msg}">
+				{call .smallLoading /}
+			</span>
+		{else}
+			{if $collisionsCount > 0}
+				<span class="change-lists-helper float-right lfr-portal-tooltip"
+						title="{$collisionsTooltip}">
+					{call ClayIcon.render}
+						{param spritemap: $spritemap /}
+						{param symbol: 'exclamation-circle' /}
+					{/call}
+				</span>
+			{else}
+				<span class="change-lists-helper float-right lfr-portal-tooltip"
+						title="{msg desc=""}no-collisions{/msg}">
+					{call ClayIcon.render}
+						{param spritemap: $spritemap /}
+						{param symbol: 'check-circle' /}
+					{/call}
+				</span>
+			{/if}
+		{/if}
+	</div>
+{/template}
+
+{template .smallLoading}
+	<div class="small-loading-indicator">
+		<span aria-hidden="true" class="loading-animation loading-animation-sm"></span>
 	</div>
 {/template}

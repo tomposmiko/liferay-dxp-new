@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -60,11 +61,25 @@ public class SelectLayoutPageTemplateEntryVerticalCard implements VerticalCard {
 
 			addLayoutURL.setParameter(
 				"mvcRenderCommandName", "/layout/add_layout");
+
+			String redirect = ParamUtil.getString(_request, "redirect");
+
+			addLayoutURL.setParameter("backURL", redirect);
+
+			long selPlid = ParamUtil.getLong(_request, "selPlid");
+
+			addLayoutURL.setParameter("selPlid", String.valueOf(selPlid));
+
+			boolean privateLayout = ParamUtil.getBoolean(
+				_request, "privateLayout");
+
+			addLayoutURL.setParameter(
+				"privateLayout", String.valueOf(privateLayout));
+
 			addLayoutURL.setParameter(
 				"layoutPageTemplateEntryId",
 				String.valueOf(
 					_layoutPageTemplateEntry.getLayoutPageTemplateEntryId()));
-
 			addLayoutURL.setWindowState(LiferayWindowState.POP_UP);
 
 			data.put("add-layout-url", addLayoutURL.toString());
@@ -77,7 +92,8 @@ public class SelectLayoutPageTemplateEntryVerticalCard implements VerticalCard {
 
 	@Override
 	public String getElementClasses() {
-		return "add-layout-action-option";
+		return "add-layout-action-option card-interactive " +
+			"card-interactive-primary";
 	}
 
 	@Override

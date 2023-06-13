@@ -17,7 +17,6 @@ package com.liferay.portal.service.persistence.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -51,6 +50,7 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,18 +67,23 @@ import java.util.Set;
  * @generated
  */
 @ProviderType
-public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
-	implements WebsitePersistence {
+public class WebsitePersistenceImpl
+	extends BasePersistenceImpl<Website> implements WebsitePersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>WebsiteUtil</code> to access the website persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = WebsiteImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		WebsiteImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -128,8 +133,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByUuid(String uuid, int start, int end,
+	public List<Website> findByUuid(
+		String uuid, int start, int end,
 		OrderByComparator<Website> orderByComparator) {
+
 		return findByUuid(uuid, start, end, orderByComparator, true);
 	}
 
@@ -148,8 +155,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByUuid(String uuid, int start, int end,
-		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
+	public List<Website> findByUuid(
+		String uuid, int start, int end,
+		OrderByComparator<Website> orderByComparator,
+		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -157,21 +167,22 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] { uuid };
+			finderArgs = new Object[] {uuid};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid;
-			finderArgs = new Object[] { uuid, start, end, orderByComparator };
+			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<Website> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<Website>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Website website : list) {
@@ -188,8 +199,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -209,11 +220,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(WebsiteModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -233,16 +243,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				}
 
 				if (!pagination) {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -271,9 +281,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByUuid_First(String uuid,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByUuid_First(
+			String uuid, OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = fetchByUuid_First(uuid, orderByComparator);
 
 		if (website != null) {
@@ -300,8 +311,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the first matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByUuid_First(String uuid,
-		OrderByComparator<Website> orderByComparator) {
+	public Website fetchByUuid_First(
+		String uuid, OrderByComparator<Website> orderByComparator) {
+
 		List<Website> list = findByUuid(uuid, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -320,9 +332,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByUuid_Last(String uuid,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByUuid_Last(
+			String uuid, OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = fetchByUuid_Last(uuid, orderByComparator);
 
 		if (website != null) {
@@ -349,16 +362,17 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the last matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByUuid_Last(String uuid,
-		OrderByComparator<Website> orderByComparator) {
+	public Website fetchByUuid_Last(
+		String uuid, OrderByComparator<Website> orderByComparator) {
+
 		int count = countByUuid(uuid);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Website> list = findByUuid(uuid, count - 1, count,
-				orderByComparator);
+		List<Website> list = findByUuid(
+			uuid, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -377,9 +391,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
-	public Website[] findByUuid_PrevAndNext(long websiteId, String uuid,
-		OrderByComparator<Website> orderByComparator)
+	public Website[] findByUuid_PrevAndNext(
+			long websiteId, String uuid,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		uuid = Objects.toString(uuid, "");
 
 		Website website = findByPrimaryKey(websiteId);
@@ -391,13 +407,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			Website[] array = new WebsiteImpl[3];
 
-			array[0] = getByUuid_PrevAndNext(session, website, uuid,
-					orderByComparator, true);
+			array[0] = getByUuid_PrevAndNext(
+				session, website, uuid, orderByComparator, true);
 
 			array[1] = website;
 
-			array[2] = getByUuid_PrevAndNext(session, website, uuid,
-					orderByComparator, false);
+			array[2] = getByUuid_PrevAndNext(
+				session, website, uuid, orderByComparator, false);
 
 			return array;
 		}
@@ -409,14 +425,15 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		}
 	}
 
-	protected Website getByUuid_PrevAndNext(Session session, Website website,
-		String uuid, OrderByComparator<Website> orderByComparator,
-		boolean previous) {
+	protected Website getByUuid_PrevAndNext(
+		Session session, Website website, String uuid,
+		OrderByComparator<Website> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -437,7 +454,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -509,8 +527,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					website)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(website)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -532,8 +551,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public void removeByUuid(String uuid) {
-		for (Website website : findByUuid(uuid, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Website website :
+				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(website);
 		}
 	}
@@ -550,10 +570,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		FinderPath finderPath = _finderPathCountByUuid;
 
-		Object[] finderArgs = new Object[] { uuid };
+		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -604,7 +624,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	}
 
 	private static final String _FINDER_COLUMN_UUID_UUID_2 = "website.uuid = ?";
-	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(website.uuid IS NULL OR website.uuid = '')";
+
+	private static final String _FINDER_COLUMN_UUID_UUID_3 =
+		"(website.uuid IS NULL OR website.uuid = '')";
+
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -618,8 +641,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public List<Website> findByUuid_C(String uuid, long companyId) {
-		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByUuid_C(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -636,8 +659,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the range of matching websites
 	 */
 	@Override
-	public List<Website> findByUuid_C(String uuid, long companyId, int start,
-		int end) {
+	public List<Website> findByUuid_C(
+		String uuid, long companyId, int start, int end) {
+
 		return findByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -656,9 +680,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByUuid_C(String uuid, long companyId, int start,
-		int end, OrderByComparator<Website> orderByComparator) {
-		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
+	public List<Website> findByUuid_C(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<Website> orderByComparator) {
+
+		return findByUuid_C(
+			uuid, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -677,9 +704,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByUuid_C(String uuid, long companyId, int start,
-		int end, OrderByComparator<Website> orderByComparator,
+	public List<Website> findByUuid_C(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<Website> orderByComparator,
 		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -687,30 +716,30 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] { uuid, companyId };
+			finderArgs = new Object[] {uuid, companyId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
-					uuid, companyId,
-					
-					start, end, orderByComparator
-				};
+				uuid, companyId, start, end, orderByComparator
+			};
 		}
 
 		List<Website> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<Website>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Website website : list) {
 					if (!uuid.equals(website.getUuid()) ||
-							(companyId != website.getCompanyId())) {
+						(companyId != website.getCompanyId())) {
+
 						list = null;
 
 						break;
@@ -723,8 +752,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -746,11 +775,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(WebsiteModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -772,16 +800,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -811,10 +839,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByUuid_C_First(String uuid, long companyId,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByUuid_C_First(
+			String uuid, long companyId,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
-		Website website = fetchByUuid_C_First(uuid, companyId, orderByComparator);
+
+		Website website = fetchByUuid_C_First(
+			uuid, companyId, orderByComparator);
 
 		if (website != null) {
 			return website;
@@ -844,10 +875,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the first matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByUuid_C_First(String uuid, long companyId,
+	public Website fetchByUuid_C_First(
+		String uuid, long companyId,
 		OrderByComparator<Website> orderByComparator) {
-		List<Website> list = findByUuid_C(uuid, companyId, 0, 1,
-				orderByComparator);
+
+		List<Website> list = findByUuid_C(
+			uuid, companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -866,10 +899,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByUuid_C_Last(String uuid, long companyId,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByUuid_C_Last(
+			String uuid, long companyId,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
-		Website website = fetchByUuid_C_Last(uuid, companyId, orderByComparator);
+
+		Website website = fetchByUuid_C_Last(
+			uuid, companyId, orderByComparator);
 
 		if (website != null) {
 			return website;
@@ -899,16 +935,18 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the last matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByUuid_C_Last(String uuid, long companyId,
+	public Website fetchByUuid_C_Last(
+		String uuid, long companyId,
 		OrderByComparator<Website> orderByComparator) {
+
 		int count = countByUuid_C(uuid, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Website> list = findByUuid_C(uuid, companyId, count - 1, count,
-				orderByComparator);
+		List<Website> list = findByUuid_C(
+			uuid, companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -928,9 +966,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
-	public Website[] findByUuid_C_PrevAndNext(long websiteId, String uuid,
-		long companyId, OrderByComparator<Website> orderByComparator)
+	public Website[] findByUuid_C_PrevAndNext(
+			long websiteId, String uuid, long companyId,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		uuid = Objects.toString(uuid, "");
 
 		Website website = findByPrimaryKey(websiteId);
@@ -942,13 +982,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			Website[] array = new WebsiteImpl[3];
 
-			array[0] = getByUuid_C_PrevAndNext(session, website, uuid,
-					companyId, orderByComparator, true);
+			array[0] = getByUuid_C_PrevAndNext(
+				session, website, uuid, companyId, orderByComparator, true);
 
 			array[1] = website;
 
-			array[2] = getByUuid_C_PrevAndNext(session, website, uuid,
-					companyId, orderByComparator, false);
+			array[2] = getByUuid_C_PrevAndNext(
+				session, website, uuid, companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -960,14 +1000,15 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		}
 	}
 
-	protected Website getByUuid_C_PrevAndNext(Session session, Website website,
-		String uuid, long companyId,
+	protected Website getByUuid_C_PrevAndNext(
+		Session session, Website website, String uuid, long companyId,
 		OrderByComparator<Website> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -990,7 +1031,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1064,8 +1106,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					website)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(website)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1088,8 +1131,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public void removeByUuid_C(String uuid, long companyId) {
-		for (Website website : findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Website website :
+				findByUuid_C(
+					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(website);
 		}
 	}
@@ -1107,10 +1153,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		Object[] finderArgs = new Object[] { uuid, companyId };
+		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -1164,9 +1210,15 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "website.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(website.uuid IS NULL OR website.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "website.companyId = ?";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
+		"website.uuid = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
+		"(website.uuid IS NULL OR website.uuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
+		"website.companyId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByCompanyId;
 	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
 	private FinderPath _finderPathCountByCompanyId;
@@ -1179,8 +1231,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public List<Website> findByCompanyId(long companyId) {
-		return findByCompanyId(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByCompanyId(
+			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -1214,8 +1266,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByCompanyId(long companyId, int start, int end,
+	public List<Website> findByCompanyId(
+		long companyId, int start, int end,
 		OrderByComparator<Website> orderByComparator) {
+
 		return findByCompanyId(companyId, start, end, orderByComparator, true);
 	}
 
@@ -1234,28 +1288,34 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByCompanyId(long companyId, int start, int end,
-		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
+	public List<Website> findByCompanyId(
+		long companyId, int start, int end,
+		OrderByComparator<Website> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByCompanyId;
-			finderArgs = new Object[] { companyId };
+			finderArgs = new Object[] {companyId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
-			finderArgs = new Object[] { companyId, start, end, orderByComparator };
+			finderArgs = new Object[] {
+				companyId, start, end, orderByComparator
+			};
 		}
 
 		List<Website> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<Website>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Website website : list) {
@@ -1272,8 +1332,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1284,11 +1344,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(WebsiteModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1306,16 +1365,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1344,9 +1403,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByCompanyId_First(long companyId,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByCompanyId_First(
+			long companyId, OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = fetchByCompanyId_First(companyId, orderByComparator);
 
 		if (website != null) {
@@ -1373,9 +1433,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the first matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByCompanyId_First(long companyId,
-		OrderByComparator<Website> orderByComparator) {
-		List<Website> list = findByCompanyId(companyId, 0, 1, orderByComparator);
+	public Website fetchByCompanyId_First(
+		long companyId, OrderByComparator<Website> orderByComparator) {
+
+		List<Website> list = findByCompanyId(
+			companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1393,9 +1455,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByCompanyId_Last(long companyId,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByCompanyId_Last(
+			long companyId, OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = fetchByCompanyId_Last(companyId, orderByComparator);
 
 		if (website != null) {
@@ -1422,16 +1485,17 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the last matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByCompanyId_Last(long companyId,
-		OrderByComparator<Website> orderByComparator) {
+	public Website fetchByCompanyId_Last(
+		long companyId, OrderByComparator<Website> orderByComparator) {
+
 		int count = countByCompanyId(companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Website> list = findByCompanyId(companyId, count - 1, count,
-				orderByComparator);
+		List<Website> list = findByCompanyId(
+			companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1450,9 +1514,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
-	public Website[] findByCompanyId_PrevAndNext(long websiteId,
-		long companyId, OrderByComparator<Website> orderByComparator)
+	public Website[] findByCompanyId_PrevAndNext(
+			long websiteId, long companyId,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = findByPrimaryKey(websiteId);
 
 		Session session = null;
@@ -1462,13 +1528,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			Website[] array = new WebsiteImpl[3];
 
-			array[0] = getByCompanyId_PrevAndNext(session, website, companyId,
-					orderByComparator, true);
+			array[0] = getByCompanyId_PrevAndNext(
+				session, website, companyId, orderByComparator, true);
 
 			array[1] = website;
 
-			array[2] = getByCompanyId_PrevAndNext(session, website, companyId,
-					orderByComparator, false);
+			array[2] = getByCompanyId_PrevAndNext(
+				session, website, companyId, orderByComparator, false);
 
 			return array;
 		}
@@ -1480,14 +1546,15 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		}
 	}
 
-	protected Website getByCompanyId_PrevAndNext(Session session,
-		Website website, long companyId,
+	protected Website getByCompanyId_PrevAndNext(
+		Session session, Website website, long companyId,
 		OrderByComparator<Website> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1499,7 +1566,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		query.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1569,8 +1637,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					website)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(website)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1592,8 +1661,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public void removeByCompanyId(long companyId) {
-		for (Website website : findByCompanyId(companyId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Website website :
+				findByCompanyId(
+					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(website);
 		}
 	}
@@ -1608,10 +1679,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	public int countByCompanyId(long companyId) {
 		FinderPath finderPath = _finderPathCountByCompanyId;
 
-		Object[] finderArgs = new Object[] { companyId };
+		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -1650,7 +1721,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 = "website.companyId = ?";
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
+		"website.companyId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByUserId;
 	private FinderPath _finderPathWithoutPaginationFindByUserId;
 	private FinderPath _finderPathCountByUserId;
@@ -1697,8 +1770,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByUserId(long userId, int start, int end,
+	public List<Website> findByUserId(
+		long userId, int start, int end,
 		OrderByComparator<Website> orderByComparator) {
+
 		return findByUserId(userId, start, end, orderByComparator, true);
 	}
 
@@ -1717,28 +1792,32 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByUserId(long userId, int start, int end,
-		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
+	public List<Website> findByUserId(
+		long userId, int start, int end,
+		OrderByComparator<Website> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUserId;
-			finderArgs = new Object[] { userId };
+			finderArgs = new Object[] {userId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUserId;
-			finderArgs = new Object[] { userId, start, end, orderByComparator };
+			finderArgs = new Object[] {userId, start, end, orderByComparator};
 		}
 
 		List<Website> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<Website>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Website website : list) {
@@ -1755,8 +1834,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1767,11 +1846,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(WebsiteModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1789,16 +1867,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				qPos.add(userId);
 
 				if (!pagination) {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1827,9 +1905,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByUserId_First(long userId,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByUserId_First(
+			long userId, OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = fetchByUserId_First(userId, orderByComparator);
 
 		if (website != null) {
@@ -1856,8 +1935,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the first matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByUserId_First(long userId,
-		OrderByComparator<Website> orderByComparator) {
+	public Website fetchByUserId_First(
+		long userId, OrderByComparator<Website> orderByComparator) {
+
 		List<Website> list = findByUserId(userId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -1876,9 +1956,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByUserId_Last(long userId,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByUserId_Last(
+			long userId, OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = fetchByUserId_Last(userId, orderByComparator);
 
 		if (website != null) {
@@ -1905,16 +1986,17 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the last matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByUserId_Last(long userId,
-		OrderByComparator<Website> orderByComparator) {
+	public Website fetchByUserId_Last(
+		long userId, OrderByComparator<Website> orderByComparator) {
+
 		int count = countByUserId(userId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Website> list = findByUserId(userId, count - 1, count,
-				orderByComparator);
+		List<Website> list = findByUserId(
+			userId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1933,9 +2015,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
-	public Website[] findByUserId_PrevAndNext(long websiteId, long userId,
-		OrderByComparator<Website> orderByComparator)
+	public Website[] findByUserId_PrevAndNext(
+			long websiteId, long userId,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = findByPrimaryKey(websiteId);
 
 		Session session = null;
@@ -1945,13 +2029,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			Website[] array = new WebsiteImpl[3];
 
-			array[0] = getByUserId_PrevAndNext(session, website, userId,
-					orderByComparator, true);
+			array[0] = getByUserId_PrevAndNext(
+				session, website, userId, orderByComparator, true);
 
 			array[1] = website;
 
-			array[2] = getByUserId_PrevAndNext(session, website, userId,
-					orderByComparator, false);
+			array[2] = getByUserId_PrevAndNext(
+				session, website, userId, orderByComparator, false);
 
 			return array;
 		}
@@ -1963,14 +2047,15 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		}
 	}
 
-	protected Website getByUserId_PrevAndNext(Session session, Website website,
-		long userId, OrderByComparator<Website> orderByComparator,
-		boolean previous) {
+	protected Website getByUserId_PrevAndNext(
+		Session session, Website website, long userId,
+		OrderByComparator<Website> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1982,7 +2067,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		query.append(_FINDER_COLUMN_USERID_USERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2052,8 +2138,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		qPos.add(userId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					website)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(website)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2075,8 +2162,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public void removeByUserId(long userId) {
-		for (Website website : findByUserId(userId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Website website :
+				findByUserId(
+					userId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(website);
 		}
 	}
@@ -2091,10 +2180,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	public int countByUserId(long userId) {
 		FinderPath finderPath = _finderPathCountByUserId;
 
-		Object[] finderArgs = new Object[] { userId };
+		Object[] finderArgs = new Object[] {userId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -2133,7 +2222,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_USERID_USERID_2 = "website.userId = ?";
+	private static final String _FINDER_COLUMN_USERID_USERID_2 =
+		"website.userId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByC_C;
 	private FinderPath _finderPathWithoutPaginationFindByC_C;
 	private FinderPath _finderPathCountByC_C;
@@ -2147,8 +2238,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public List<Website> findByC_C(long companyId, long classNameId) {
-		return findByC_C(companyId, classNameId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return findByC_C(
+			companyId, classNameId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -2165,8 +2256,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the range of matching websites
 	 */
 	@Override
-	public List<Website> findByC_C(long companyId, long classNameId, int start,
-		int end) {
+	public List<Website> findByC_C(
+		long companyId, long classNameId, int start, int end) {
+
 		return findByC_C(companyId, classNameId, start, end, null);
 	}
 
@@ -2185,10 +2277,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByC_C(long companyId, long classNameId, int start,
-		int end, OrderByComparator<Website> orderByComparator) {
-		return findByC_C(companyId, classNameId, start, end, orderByComparator,
-			true);
+	public List<Website> findByC_C(
+		long companyId, long classNameId, int start, int end,
+		OrderByComparator<Website> orderByComparator) {
+
+		return findByC_C(
+			companyId, classNameId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -2207,38 +2301,40 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByC_C(long companyId, long classNameId, int start,
-		int end, OrderByComparator<Website> orderByComparator,
+	public List<Website> findByC_C(
+		long companyId, long classNameId, int start, int end,
+		OrderByComparator<Website> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_C;
-			finderArgs = new Object[] { companyId, classNameId };
+			finderArgs = new Object[] {companyId, classNameId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_C;
 			finderArgs = new Object[] {
-					companyId, classNameId,
-					
-					start, end, orderByComparator
-				};
+				companyId, classNameId, start, end, orderByComparator
+			};
 		}
 
 		List<Website> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<Website>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Website website : list) {
 					if ((companyId != website.getCompanyId()) ||
-							(classNameId != website.getClassNameId())) {
+						(classNameId != website.getClassNameId())) {
+
 						list = null;
 
 						break;
@@ -2251,8 +2347,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -2265,11 +2361,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			query.append(_FINDER_COLUMN_C_C_CLASSNAMEID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(WebsiteModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2289,16 +2384,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				qPos.add(classNameId);
 
 				if (!pagination) {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2328,11 +2423,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByC_C_First(long companyId, long classNameId,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByC_C_First(
+			long companyId, long classNameId,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
-		Website website = fetchByC_C_First(companyId, classNameId,
-				orderByComparator);
+
+		Website website = fetchByC_C_First(
+			companyId, classNameId, orderByComparator);
 
 		if (website != null) {
 			return website;
@@ -2362,10 +2459,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the first matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByC_C_First(long companyId, long classNameId,
+	public Website fetchByC_C_First(
+		long companyId, long classNameId,
 		OrderByComparator<Website> orderByComparator) {
-		List<Website> list = findByC_C(companyId, classNameId, 0, 1,
-				orderByComparator);
+
+		List<Website> list = findByC_C(
+			companyId, classNameId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2384,11 +2483,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByC_C_Last(long companyId, long classNameId,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByC_C_Last(
+			long companyId, long classNameId,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
-		Website website = fetchByC_C_Last(companyId, classNameId,
-				orderByComparator);
+
+		Website website = fetchByC_C_Last(
+			companyId, classNameId, orderByComparator);
 
 		if (website != null) {
 			return website;
@@ -2418,16 +2519,18 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the last matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByC_C_Last(long companyId, long classNameId,
+	public Website fetchByC_C_Last(
+		long companyId, long classNameId,
 		OrderByComparator<Website> orderByComparator) {
+
 		int count = countByC_C(companyId, classNameId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Website> list = findByC_C(companyId, classNameId, count - 1,
-				count, orderByComparator);
+		List<Website> list = findByC_C(
+			companyId, classNameId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2447,9 +2550,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
-	public Website[] findByC_C_PrevAndNext(long websiteId, long companyId,
-		long classNameId, OrderByComparator<Website> orderByComparator)
+	public Website[] findByC_C_PrevAndNext(
+			long websiteId, long companyId, long classNameId,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = findByPrimaryKey(websiteId);
 
 		Session session = null;
@@ -2459,13 +2564,15 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			Website[] array = new WebsiteImpl[3];
 
-			array[0] = getByC_C_PrevAndNext(session, website, companyId,
-					classNameId, orderByComparator, true);
+			array[0] = getByC_C_PrevAndNext(
+				session, website, companyId, classNameId, orderByComparator,
+				true);
 
 			array[1] = website;
 
-			array[2] = getByC_C_PrevAndNext(session, website, companyId,
-					classNameId, orderByComparator, false);
+			array[2] = getByC_C_PrevAndNext(
+				session, website, companyId, classNameId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -2477,14 +2584,15 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		}
 	}
 
-	protected Website getByC_C_PrevAndNext(Session session, Website website,
-		long companyId, long classNameId,
+	protected Website getByC_C_PrevAndNext(
+		Session session, Website website, long companyId, long classNameId,
 		OrderByComparator<Website> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2498,7 +2606,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		query.append(_FINDER_COLUMN_C_C_CLASSNAMEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2570,8 +2679,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		qPos.add(classNameId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					website)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(website)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2594,8 +2704,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public void removeByC_C(long companyId, long classNameId) {
-		for (Website website : findByC_C(companyId, classNameId,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (Website website :
+				findByC_C(
+					companyId, classNameId, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(website);
 		}
 	}
@@ -2611,10 +2724,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	public int countByC_C(long companyId, long classNameId) {
 		FinderPath finderPath = _finderPathCountByC_C;
 
-		Object[] finderArgs = new Object[] { companyId, classNameId };
+		Object[] finderArgs = new Object[] {companyId, classNameId};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -2657,8 +2770,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_C_COMPANYID_2 = "website.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_C_CLASSNAMEID_2 = "website.classNameId = ?";
+	private static final String _FINDER_COLUMN_C_C_COMPANYID_2 =
+		"website.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_CLASSNAMEID_2 =
+		"website.classNameId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByC_C_C;
 	private FinderPath _finderPathWithoutPaginationFindByC_C_C;
 	private FinderPath _finderPathCountByC_C_C;
@@ -2672,9 +2789,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the matching websites
 	 */
 	@Override
-	public List<Website> findByC_C_C(long companyId, long classNameId,
-		long classPK) {
-		return findByC_C_C(companyId, classNameId, classPK, QueryUtil.ALL_POS,
+	public List<Website> findByC_C_C(
+		long companyId, long classNameId, long classPK) {
+
+		return findByC_C_C(
+			companyId, classNameId, classPK, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, null);
 	}
 
@@ -2693,8 +2812,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the range of matching websites
 	 */
 	@Override
-	public List<Website> findByC_C_C(long companyId, long classNameId,
-		long classPK, int start, int end) {
+	public List<Website> findByC_C_C(
+		long companyId, long classNameId, long classPK, int start, int end) {
+
 		return findByC_C_C(companyId, classNameId, classPK, start, end, null);
 	}
 
@@ -2714,11 +2834,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByC_C_C(long companyId, long classNameId,
-		long classPK, int start, int end,
+	public List<Website> findByC_C_C(
+		long companyId, long classNameId, long classPK, int start, int end,
 		OrderByComparator<Website> orderByComparator) {
-		return findByC_C_C(companyId, classNameId, classPK, start, end,
-			orderByComparator, true);
+
+		return findByC_C_C(
+			companyId, classNameId, classPK, start, end, orderByComparator,
+			true);
 	}
 
 	/**
@@ -2738,39 +2860,41 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByC_C_C(long companyId, long classNameId,
-		long classPK, int start, int end,
-		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
+	public List<Website> findByC_C_C(
+		long companyId, long classNameId, long classPK, int start, int end,
+		OrderByComparator<Website> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_C_C;
-			finderArgs = new Object[] { companyId, classNameId, classPK };
+			finderArgs = new Object[] {companyId, classNameId, classPK};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_C_C;
 			finderArgs = new Object[] {
-					companyId, classNameId, classPK,
-					
-					start, end, orderByComparator
-				};
+				companyId, classNameId, classPK, start, end, orderByComparator
+			};
 		}
 
 		List<Website> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<Website>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Website website : list) {
 					if ((companyId != website.getCompanyId()) ||
-							(classNameId != website.getClassNameId()) ||
-							(classPK != website.getClassPK())) {
+						(classNameId != website.getClassNameId()) ||
+						(classPK != website.getClassPK())) {
+
 						list = null;
 
 						break;
@@ -2783,8 +2907,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -2799,11 +2923,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			query.append(_FINDER_COLUMN_C_C_C_CLASSPK_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(WebsiteModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2825,16 +2948,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				qPos.add(classPK);
 
 				if (!pagination) {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2865,11 +2988,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByC_C_C_First(long companyId, long classNameId,
-		long classPK, OrderByComparator<Website> orderByComparator)
+	public Website findByC_C_C_First(
+			long companyId, long classNameId, long classPK,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
-		Website website = fetchByC_C_C_First(companyId, classNameId, classPK,
-				orderByComparator);
+
+		Website website = fetchByC_C_C_First(
+			companyId, classNameId, classPK, orderByComparator);
 
 		if (website != null) {
 			return website;
@@ -2903,10 +3028,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the first matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByC_C_C_First(long companyId, long classNameId,
-		long classPK, OrderByComparator<Website> orderByComparator) {
-		List<Website> list = findByC_C_C(companyId, classNameId, classPK, 0, 1,
-				orderByComparator);
+	public Website fetchByC_C_C_First(
+		long companyId, long classNameId, long classPK,
+		OrderByComparator<Website> orderByComparator) {
+
+		List<Website> list = findByC_C_C(
+			companyId, classNameId, classPK, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2926,11 +3053,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByC_C_C_Last(long companyId, long classNameId,
-		long classPK, OrderByComparator<Website> orderByComparator)
+	public Website findByC_C_C_Last(
+			long companyId, long classNameId, long classPK,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
-		Website website = fetchByC_C_C_Last(companyId, classNameId, classPK,
-				orderByComparator);
+
+		Website website = fetchByC_C_C_Last(
+			companyId, classNameId, classPK, orderByComparator);
 
 		if (website != null) {
 			return website;
@@ -2964,16 +3093,19 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the last matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByC_C_C_Last(long companyId, long classNameId,
-		long classPK, OrderByComparator<Website> orderByComparator) {
+	public Website fetchByC_C_C_Last(
+		long companyId, long classNameId, long classPK,
+		OrderByComparator<Website> orderByComparator) {
+
 		int count = countByC_C_C(companyId, classNameId, classPK);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Website> list = findByC_C_C(companyId, classNameId, classPK,
-				count - 1, count, orderByComparator);
+		List<Website> list = findByC_C_C(
+			companyId, classNameId, classPK, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2994,10 +3126,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
-	public Website[] findByC_C_C_PrevAndNext(long websiteId, long companyId,
-		long classNameId, long classPK,
-		OrderByComparator<Website> orderByComparator)
+	public Website[] findByC_C_C_PrevAndNext(
+			long websiteId, long companyId, long classNameId, long classPK,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = findByPrimaryKey(websiteId);
 
 		Session session = null;
@@ -3007,13 +3140,15 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			Website[] array = new WebsiteImpl[3];
 
-			array[0] = getByC_C_C_PrevAndNext(session, website, companyId,
-					classNameId, classPK, orderByComparator, true);
+			array[0] = getByC_C_C_PrevAndNext(
+				session, website, companyId, classNameId, classPK,
+				orderByComparator, true);
 
 			array[1] = website;
 
-			array[2] = getByC_C_C_PrevAndNext(session, website, companyId,
-					classNameId, classPK, orderByComparator, false);
+			array[2] = getByC_C_C_PrevAndNext(
+				session, website, companyId, classNameId, classPK,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -3025,14 +3160,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		}
 	}
 
-	protected Website getByC_C_C_PrevAndNext(Session session, Website website,
-		long companyId, long classNameId, long classPK,
-		OrderByComparator<Website> orderByComparator, boolean previous) {
+	protected Website getByC_C_C_PrevAndNext(
+		Session session, Website website, long companyId, long classNameId,
+		long classPK, OrderByComparator<Website> orderByComparator,
+		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3048,7 +3185,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		query.append(_FINDER_COLUMN_C_C_C_CLASSPK_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3122,8 +3260,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		qPos.add(classPK);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					website)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(website)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3147,8 +3286,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public void removeByC_C_C(long companyId, long classNameId, long classPK) {
-		for (Website website : findByC_C_C(companyId, classNameId, classPK,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (Website website :
+				findByC_C_C(
+					companyId, classNameId, classPK, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(website);
 		}
 	}
@@ -3165,10 +3307,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	public int countByC_C_C(long companyId, long classNameId, long classPK) {
 		FinderPath finderPath = _finderPathCountByC_C_C;
 
-		Object[] finderArgs = new Object[] { companyId, classNameId, classPK };
+		Object[] finderArgs = new Object[] {companyId, classNameId, classPK};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(4);
@@ -3215,9 +3357,15 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_C_C_COMPANYID_2 = "website.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_C_C_CLASSNAMEID_2 = "website.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_C_C_C_CLASSPK_2 = "website.classPK = ?";
+	private static final String _FINDER_COLUMN_C_C_C_COMPANYID_2 =
+		"website.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_C_CLASSNAMEID_2 =
+		"website.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_C_CLASSPK_2 =
+		"website.classPK = ?";
+
 	private FinderPath _finderPathWithPaginationFindByC_C_C_P;
 	private FinderPath _finderPathWithoutPaginationFindByC_C_C_P;
 	private FinderPath _finderPathCountByC_C_C_P;
@@ -3232,10 +3380,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the matching websites
 	 */
 	@Override
-	public List<Website> findByC_C_C_P(long companyId, long classNameId,
-		long classPK, boolean primary) {
-		return findByC_C_C_P(companyId, classNameId, classPK, primary,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<Website> findByC_C_C_P(
+		long companyId, long classNameId, long classPK, boolean primary) {
+
+		return findByC_C_C_P(
+			companyId, classNameId, classPK, primary, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -3254,10 +3404,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the range of matching websites
 	 */
 	@Override
-	public List<Website> findByC_C_C_P(long companyId, long classNameId,
-		long classPK, boolean primary, int start, int end) {
-		return findByC_C_C_P(companyId, classNameId, classPK, primary, start,
-			end, null);
+	public List<Website> findByC_C_C_P(
+		long companyId, long classNameId, long classPK, boolean primary,
+		int start, int end) {
+
+		return findByC_C_C_P(
+			companyId, classNameId, classPK, primary, start, end, null);
 	}
 
 	/**
@@ -3277,11 +3429,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByC_C_C_P(long companyId, long classNameId,
-		long classPK, boolean primary, int start, int end,
-		OrderByComparator<Website> orderByComparator) {
-		return findByC_C_C_P(companyId, classNameId, classPK, primary, start,
-			end, orderByComparator, true);
+	public List<Website> findByC_C_C_P(
+		long companyId, long classNameId, long classPK, boolean primary,
+		int start, int end, OrderByComparator<Website> orderByComparator) {
+
+		return findByC_C_C_P(
+			companyId, classNameId, classPK, primary, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -3302,40 +3456,45 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of matching websites
 	 */
 	@Override
-	public List<Website> findByC_C_C_P(long companyId, long classNameId,
-		long classPK, boolean primary, int start, int end,
-		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
+	public List<Website> findByC_C_C_P(
+		long companyId, long classNameId, long classPK, boolean primary,
+		int start, int end, OrderByComparator<Website> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByC_C_C_P;
-			finderArgs = new Object[] { companyId, classNameId, classPK, primary };
+			finderArgs = new Object[] {
+				companyId, classNameId, classPK, primary
+			};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByC_C_C_P;
 			finderArgs = new Object[] {
-					companyId, classNameId, classPK, primary,
-					
-					start, end, orderByComparator
-				};
+				companyId, classNameId, classPK, primary, start, end,
+				orderByComparator
+			};
 		}
 
 		List<Website> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<Website>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Website website : list) {
 					if ((companyId != website.getCompanyId()) ||
-							(classNameId != website.getClassNameId()) ||
-							(classPK != website.getClassPK()) ||
-							(primary != website.isPrimary())) {
+						(classNameId != website.getClassNameId()) ||
+						(classPK != website.getClassPK()) ||
+						(primary != website.isPrimary())) {
+
 						list = null;
 
 						break;
@@ -3348,8 +3507,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					6 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -3366,11 +3525,10 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			query.append(_FINDER_COLUMN_C_C_C_P_PRIMARY_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(WebsiteModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3394,16 +3552,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				qPos.add(primary);
 
 				if (!pagination) {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3435,12 +3593,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByC_C_C_P_First(long companyId, long classNameId,
-		long classPK, boolean primary,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByC_C_C_P_First(
+			long companyId, long classNameId, long classPK, boolean primary,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
-		Website website = fetchByC_C_C_P_First(companyId, classNameId, classPK,
-				primary, orderByComparator);
+
+		Website website = fetchByC_C_C_P_First(
+			companyId, classNameId, classPK, primary, orderByComparator);
 
 		if (website != null) {
 			return website;
@@ -3478,11 +3637,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the first matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByC_C_C_P_First(long companyId, long classNameId,
-		long classPK, boolean primary,
+	public Website fetchByC_C_C_P_First(
+		long companyId, long classNameId, long classPK, boolean primary,
 		OrderByComparator<Website> orderByComparator) {
-		List<Website> list = findByC_C_C_P(companyId, classNameId, classPK,
-				primary, 0, 1, orderByComparator);
+
+		List<Website> list = findByC_C_C_P(
+			companyId, classNameId, classPK, primary, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3503,12 +3663,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a matching website could not be found
 	 */
 	@Override
-	public Website findByC_C_C_P_Last(long companyId, long classNameId,
-		long classPK, boolean primary,
-		OrderByComparator<Website> orderByComparator)
+	public Website findByC_C_C_P_Last(
+			long companyId, long classNameId, long classPK, boolean primary,
+			OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
-		Website website = fetchByC_C_C_P_Last(companyId, classNameId, classPK,
-				primary, orderByComparator);
+
+		Website website = fetchByC_C_C_P_Last(
+			companyId, classNameId, classPK, primary, orderByComparator);
 
 		if (website != null) {
 			return website;
@@ -3546,17 +3707,19 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the last matching website, or <code>null</code> if a matching website could not be found
 	 */
 	@Override
-	public Website fetchByC_C_C_P_Last(long companyId, long classNameId,
-		long classPK, boolean primary,
+	public Website fetchByC_C_C_P_Last(
+		long companyId, long classNameId, long classPK, boolean primary,
 		OrderByComparator<Website> orderByComparator) {
+
 		int count = countByC_C_C_P(companyId, classNameId, classPK, primary);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Website> list = findByC_C_C_P(companyId, classNameId, classPK,
-				primary, count - 1, count, orderByComparator);
+		List<Website> list = findByC_C_C_P(
+			companyId, classNameId, classPK, primary, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3578,10 +3741,11 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @throws NoSuchWebsiteException if a website with the primary key could not be found
 	 */
 	@Override
-	public Website[] findByC_C_C_P_PrevAndNext(long websiteId, long companyId,
-		long classNameId, long classPK, boolean primary,
-		OrderByComparator<Website> orderByComparator)
+	public Website[] findByC_C_C_P_PrevAndNext(
+			long websiteId, long companyId, long classNameId, long classPK,
+			boolean primary, OrderByComparator<Website> orderByComparator)
 		throws NoSuchWebsiteException {
+
 		Website website = findByPrimaryKey(websiteId);
 
 		Session session = null;
@@ -3591,13 +3755,15 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 			Website[] array = new WebsiteImpl[3];
 
-			array[0] = getByC_C_C_P_PrevAndNext(session, website, companyId,
-					classNameId, classPK, primary, orderByComparator, true);
+			array[0] = getByC_C_C_P_PrevAndNext(
+				session, website, companyId, classNameId, classPK, primary,
+				orderByComparator, true);
 
 			array[1] = website;
 
-			array[2] = getByC_C_C_P_PrevAndNext(session, website, companyId,
-					classNameId, classPK, primary, orderByComparator, false);
+			array[2] = getByC_C_C_P_PrevAndNext(
+				session, website, companyId, classNameId, classPK, primary,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -3609,15 +3775,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		}
 	}
 
-	protected Website getByC_C_C_P_PrevAndNext(Session session,
-		Website website, long companyId, long classNameId, long classPK,
-		boolean primary, OrderByComparator<Website> orderByComparator,
-		boolean previous) {
+	protected Website getByC_C_C_P_PrevAndNext(
+		Session session, Website website, long companyId, long classNameId,
+		long classPK, boolean primary,
+		OrderByComparator<Website> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3635,7 +3802,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		query.append(_FINDER_COLUMN_C_C_C_P_PRIMARY_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3711,8 +3879,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		qPos.add(primary);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					website)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(website)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3736,10 +3905,14 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @param primary the primary
 	 */
 	@Override
-	public void removeByC_C_C_P(long companyId, long classNameId, long classPK,
-		boolean primary) {
-		for (Website website : findByC_C_C_P(companyId, classNameId, classPK,
-				primary, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByC_C_C_P(
+		long companyId, long classNameId, long classPK, boolean primary) {
+
+		for (Website website :
+				findByC_C_C_P(
+					companyId, classNameId, classPK, primary, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(website);
 		}
 	}
@@ -3754,16 +3927,17 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the number of matching websites
 	 */
 	@Override
-	public int countByC_C_C_P(long companyId, long classNameId, long classPK,
-		boolean primary) {
+	public int countByC_C_C_P(
+		long companyId, long classNameId, long classPK, boolean primary) {
+
 		FinderPath finderPath = _finderPathCountByC_C_C_P;
 
 		Object[] finderArgs = new Object[] {
-				companyId, classNameId, classPK, primary
-			};
+			companyId, classNameId, classPK, primary
+		};
 
-		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
-				this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
 
 		if (count == null) {
 			StringBundler query = new StringBundler(5);
@@ -3814,10 +3988,17 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_C_C_C_P_COMPANYID_2 = "website.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_C_C_P_CLASSNAMEID_2 = "website.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_C_C_C_P_CLASSPK_2 = "website.classPK = ? AND ";
-	private static final String _FINDER_COLUMN_C_C_C_P_PRIMARY_2 = "website.primary = ?";
+	private static final String _FINDER_COLUMN_C_C_C_P_COMPANYID_2 =
+		"website.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_C_P_CLASSNAMEID_2 =
+		"website.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_C_P_CLASSPK_2 =
+		"website.classPK = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_C_P_PRIMARY_2 =
+		"website.primary = ?";
 
 	public WebsitePersistenceImpl() {
 		setModelClass(Website.class);
@@ -3825,6 +4006,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		setModelImplClass(WebsiteImpl.class);
 		setModelPKClass(long.class);
 		setEntityCacheEnabled(WebsiteModelImpl.ENTITY_CACHE_ENABLED);
+
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("primary", "primary_");
+
+		setDBColumnNames(dbColumnNames);
 	}
 
 	/**
@@ -3834,8 +4022,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public void cacheResult(Website website) {
-		EntityCacheUtil.putResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-			WebsiteImpl.class, website.getPrimaryKey(), website);
+		EntityCacheUtil.putResult(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED, WebsiteImpl.class,
+			website.getPrimaryKey(), website);
 
 		website.resetOriginalValues();
 	}
@@ -3849,8 +4038,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	public void cacheResult(List<Website> websites) {
 		for (Website website : websites) {
 			if (EntityCacheUtil.getResult(
-						WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-						WebsiteImpl.class, website.getPrimaryKey()) == null) {
+					WebsiteModelImpl.ENTITY_CACHE_ENABLED, WebsiteImpl.class,
+					website.getPrimaryKey()) == null) {
+
 				cacheResult(website);
 			}
 			else {
@@ -3884,8 +4074,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public void clearCache(Website website) {
-		EntityCacheUtil.removeResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-			WebsiteImpl.class, website.getPrimaryKey());
+		EntityCacheUtil.removeResult(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED, WebsiteImpl.class,
+			website.getPrimaryKey());
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -3897,8 +4088,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Website website : websites) {
-			EntityCacheUtil.removeResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteImpl.class, website.getPrimaryKey());
+			EntityCacheUtil.removeResult(
+				WebsiteModelImpl.ENTITY_CACHE_ENABLED, WebsiteImpl.class,
+				website.getPrimaryKey());
 		}
 	}
 
@@ -3946,20 +4138,22 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	@Override
 	public Website remove(Serializable primaryKey)
 		throws NoSuchWebsiteException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			Website website = (Website)session.get(WebsiteImpl.class, primaryKey);
+			Website website = (Website)session.get(
+				WebsiteImpl.class, primaryKey);
 
 			if (website == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchWebsiteException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchWebsiteException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(website);
@@ -3983,8 +4177,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			session = openSession();
 
 			if (!session.contains(website)) {
-				website = (Website)session.get(WebsiteImpl.class,
-						website.getPrimaryKeyObj());
+				website = (Website)session.get(
+					WebsiteImpl.class, website.getPrimaryKeyObj());
 			}
 
 			if (website != null) {
@@ -4017,12 +4211,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in website proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom Website implementation " +
-				website.getClass());
+					website.getClass());
 		}
 
 		WebsiteModelImpl websiteModelImpl = (WebsiteModelImpl)website;
@@ -4033,7 +4227,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			website.setUuid(uuid);
 		}
 
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -4079,213 +4274,227 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 
 		if (!WebsiteModelImpl.COLUMN_BITMASK_ENABLED) {
-			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+			FinderCacheUtil.clearCache(
+				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
-			Object[] args = new Object[] { websiteModelImpl.getUuid() };
+		else if (isNew) {
+			Object[] args = new Object[] {websiteModelImpl.getUuid()};
 
 			FinderCacheUtil.removeResult(_finderPathCountByUuid, args);
-			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid,
-				args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByUuid, args);
 
 			args = new Object[] {
+				websiteModelImpl.getUuid(), websiteModelImpl.getCompanyId()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByUuid_C, args);
+
+			args = new Object[] {websiteModelImpl.getCompanyId()};
+
+			FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByCompanyId, args);
+
+			args = new Object[] {websiteModelImpl.getUserId()};
+
+			FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByUserId, args);
+
+			args = new Object[] {
+				websiteModelImpl.getCompanyId(),
+				websiteModelImpl.getClassNameId()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByC_C, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByC_C, args);
+
+			args = new Object[] {
+				websiteModelImpl.getCompanyId(),
+				websiteModelImpl.getClassNameId(), websiteModelImpl.getClassPK()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByC_C_C, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByC_C_C, args);
+
+			args = new Object[] {
+				websiteModelImpl.getCompanyId(),
+				websiteModelImpl.getClassNameId(),
+				websiteModelImpl.getClassPK(), websiteModelImpl.isPrimary()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByC_C_C_P, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByC_C_C_P, args);
+
+			FinderCacheUtil.removeResult(
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((websiteModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					websiteModelImpl.getOriginalUuid()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByUuid, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+
+				args = new Object[] {websiteModelImpl.getUuid()};
+
+				FinderCacheUtil.removeResult(_finderPathCountByUuid, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+			}
+
+			if ((websiteModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					websiteModelImpl.getOriginalUuid(),
+					websiteModelImpl.getOriginalCompanyId()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
+
+				args = new Object[] {
 					websiteModelImpl.getUuid(), websiteModelImpl.getCompanyId()
 				};
 
-			FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
-			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-				args);
+				FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
+			}
 
-			args = new Object[] { websiteModelImpl.getCompanyId() };
+			if ((websiteModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByCompanyId.
+					 getColumnBitmask()) != 0) {
 
-			FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
-			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByCompanyId,
-				args);
+				Object[] args = new Object[] {
+					websiteModelImpl.getOriginalCompanyId()
+				};
 
-			args = new Object[] { websiteModelImpl.getUserId() };
+				FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByCompanyId, args);
 
-			FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
-			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUserId,
-				args);
+				args = new Object[] {websiteModelImpl.getCompanyId()};
 
-			args = new Object[] {
+				FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByCompanyId, args);
+			}
+
+			if ((websiteModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUserId.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					websiteModelImpl.getOriginalUserId()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUserId, args);
+
+				args = new Object[] {websiteModelImpl.getUserId()};
+
+				FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByUserId, args);
+			}
+
+			if ((websiteModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByC_C.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					websiteModelImpl.getOriginalCompanyId(),
+					websiteModelImpl.getOriginalClassNameId()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByC_C, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByC_C, args);
+
+				args = new Object[] {
 					websiteModelImpl.getCompanyId(),
 					websiteModelImpl.getClassNameId()
 				};
 
-			FinderCacheUtil.removeResult(_finderPathCountByC_C, args);
-			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C,
-				args);
+				FinderCacheUtil.removeResult(_finderPathCountByC_C, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByC_C, args);
+			}
 
-			args = new Object[] {
+			if ((websiteModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByC_C_C.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					websiteModelImpl.getOriginalCompanyId(),
+					websiteModelImpl.getOriginalClassNameId(),
+					websiteModelImpl.getOriginalClassPK()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByC_C_C, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByC_C_C, args);
+
+				args = new Object[] {
 					websiteModelImpl.getCompanyId(),
 					websiteModelImpl.getClassNameId(),
 					websiteModelImpl.getClassPK()
 				};
 
-			FinderCacheUtil.removeResult(_finderPathCountByC_C_C, args);
-			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C,
-				args);
+				FinderCacheUtil.removeResult(_finderPathCountByC_C_C, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByC_C_C, args);
+			}
 
-			args = new Object[] {
+			if ((websiteModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByC_C_C_P.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					websiteModelImpl.getOriginalCompanyId(),
+					websiteModelImpl.getOriginalClassNameId(),
+					websiteModelImpl.getOriginalClassPK(),
+					websiteModelImpl.getOriginalPrimary()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByC_C_C_P, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByC_C_C_P, args);
+
+				args = new Object[] {
 					websiteModelImpl.getCompanyId(),
 					websiteModelImpl.getClassNameId(),
 					websiteModelImpl.getClassPK(), websiteModelImpl.isPrimary()
 				};
 
-			FinderCacheUtil.removeResult(_finderPathCountByC_C_C_P, args);
-			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C_P,
-				args);
-
-			FinderCacheUtil.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindAll,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((websiteModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUuid.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] { websiteModelImpl.getOriginalUuid() };
-
-				FinderCacheUtil.removeResult(_finderPathCountByUuid, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid,
-					args);
-
-				args = new Object[] { websiteModelImpl.getUuid() };
-
-				FinderCacheUtil.removeResult(_finderPathCountByUuid, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid,
-					args);
-			}
-
-			if ((websiteModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						websiteModelImpl.getOriginalUuid(),
-						websiteModelImpl.getOriginalCompanyId()
-					};
-
-				FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-					args);
-
-				args = new Object[] {
-						websiteModelImpl.getUuid(),
-						websiteModelImpl.getCompanyId()
-					};
-
-				FinderCacheUtil.removeResult(_finderPathCountByUuid_C, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-					args);
-			}
-
-			if ((websiteModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByCompanyId.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						websiteModelImpl.getOriginalCompanyId()
-					};
-
-				FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByCompanyId,
-					args);
-
-				args = new Object[] { websiteModelImpl.getCompanyId() };
-
-				FinderCacheUtil.removeResult(_finderPathCountByCompanyId, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByCompanyId,
-					args);
-			}
-
-			if ((websiteModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUserId.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						websiteModelImpl.getOriginalUserId()
-					};
-
-				FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUserId,
-					args);
-
-				args = new Object[] { websiteModelImpl.getUserId() };
-
-				FinderCacheUtil.removeResult(_finderPathCountByUserId, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByUserId,
-					args);
-			}
-
-			if ((websiteModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByC_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						websiteModelImpl.getOriginalCompanyId(),
-						websiteModelImpl.getOriginalClassNameId()
-					};
-
-				FinderCacheUtil.removeResult(_finderPathCountByC_C, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C,
-					args);
-
-				args = new Object[] {
-						websiteModelImpl.getCompanyId(),
-						websiteModelImpl.getClassNameId()
-					};
-
-				FinderCacheUtil.removeResult(_finderPathCountByC_C, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C,
-					args);
-			}
-
-			if ((websiteModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByC_C_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						websiteModelImpl.getOriginalCompanyId(),
-						websiteModelImpl.getOriginalClassNameId(),
-						websiteModelImpl.getOriginalClassPK()
-					};
-
-				FinderCacheUtil.removeResult(_finderPathCountByC_C_C, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C,
-					args);
-
-				args = new Object[] {
-						websiteModelImpl.getCompanyId(),
-						websiteModelImpl.getClassNameId(),
-						websiteModelImpl.getClassPK()
-					};
-
-				FinderCacheUtil.removeResult(_finderPathCountByC_C_C, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C,
-					args);
-			}
-
-			if ((websiteModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByC_C_C_P.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						websiteModelImpl.getOriginalCompanyId(),
-						websiteModelImpl.getOriginalClassNameId(),
-						websiteModelImpl.getOriginalClassPK(),
-						websiteModelImpl.getOriginalPrimary()
-					};
-
 				FinderCacheUtil.removeResult(_finderPathCountByC_C_C_P, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C_P,
-					args);
-
-				args = new Object[] {
-						websiteModelImpl.getCompanyId(),
-						websiteModelImpl.getClassNameId(),
-						websiteModelImpl.getClassPK(),
-						websiteModelImpl.isPrimary()
-					};
-
-				FinderCacheUtil.removeResult(_finderPathCountByC_C_C_P, args);
-				FinderCacheUtil.removeResult(_finderPathWithoutPaginationFindByC_C_C_P,
-					args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByC_C_C_P, args);
 			}
 		}
 
-		EntityCacheUtil.putResult(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-			WebsiteImpl.class, website.getPrimaryKey(), website, false);
+		EntityCacheUtil.putResult(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED, WebsiteImpl.class,
+			website.getPrimaryKey(), website, false);
 
 		website.resetOriginalValues();
 
@@ -4302,6 +4511,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	@Override
 	public Website findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchWebsiteException {
+
 		Website website = fetchByPrimaryKey(primaryKey);
 
 		if (website == null) {
@@ -4309,8 +4519,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchWebsiteException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchWebsiteException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return website;
@@ -4326,6 +4536,7 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	@Override
 	public Website findByPrimaryKey(long websiteId)
 		throws NoSuchWebsiteException {
+
 		return findByPrimaryKey((Serializable)websiteId);
 	}
 
@@ -4379,8 +4590,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of websites
 	 */
 	@Override
-	public List<Website> findAll(int start, int end,
-		OrderByComparator<Website> orderByComparator) {
+	public List<Website> findAll(
+		int start, int end, OrderByComparator<Website> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -4398,28 +4610,31 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * @return the ordered range of websites
 	 */
 	@Override
-	public List<Website> findAll(int start, int end,
-		OrderByComparator<Website> orderByComparator, boolean retrieveFromCache) {
+	public List<Website> findAll(
+		int start, int end, OrderByComparator<Website> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<Website> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Website>)FinderCacheUtil.getResult(finderPath,
-					finderArgs, this);
+			list = (List<Website>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -4427,13 +4642,13 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_WEBSITE);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -4453,16 +4668,16 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end, false);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Website>)QueryUtil.list(q, getDialect(),
-							start, end);
+					list = (List<Website>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -4500,8 +4715,8 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(_finderPathCountAll,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)FinderCacheUtil.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -4513,12 +4728,12 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(_finderPathCountAll,
-					FINDER_ARGS_EMPTY, count);
+				FinderCacheUtil.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				FinderCacheUtil.removeResult(_finderPathCountAll,
-					FINDER_ARGS_EMPTY);
+				FinderCacheUtil.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -4559,194 +4774,205 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 	 * Initializes the website persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-				new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
 
-		_finderPathCountAll = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-				new String[0]);
+		_finderPathCountAll = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
 
-		_finderPathWithPaginationFindByUuid = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-				new String[] {
-					String.class.getName(),
-					
+		_finderPathWithPaginationFindByUuid = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+			new String[] {
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+			new String[] {String.class.getName()},
+			WebsiteModelImpl.UUID_COLUMN_BITMASK |
+			WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
+
+		_finderPathCountByUuid = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+			new String[] {String.class.getName()});
+
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+			new String[] {
+				String.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-				new String[] { String.class.getName() },
-				WebsiteModelImpl.UUID_COLUMN_BITMASK |
-				WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			WebsiteModelImpl.UUID_COLUMN_BITMASK |
+			WebsiteModelImpl.COMPANYID_COLUMN_BITMASK |
+			WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByUuid = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-				new String[] { String.class.getName() });
+		_finderPathCountByUuid_C = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()});
 
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-				new String[] {
-					String.class.getName(), Long.class.getName(),
-					
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+			new String[] {Long.class.getName()},
+			WebsiteModelImpl.COMPANYID_COLUMN_BITMASK |
+			WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
+
+		_finderPathCountByCompanyId = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByUserId = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUserId = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
+			new String[] {Long.class.getName()},
+			WebsiteModelImpl.USERID_COLUMN_BITMASK |
+			WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
+
+		_finderPathCountByUserId = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByC_C = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-				new String[] { String.class.getName(), Long.class.getName() },
-				WebsiteModelImpl.UUID_COLUMN_BITMASK |
-				WebsiteModelImpl.COMPANYID_COLUMN_BITMASK |
-				WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByC_C = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			WebsiteModelImpl.COMPANYID_COLUMN_BITMASK |
+			WebsiteModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByUuid_C = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-				new String[] { String.class.getName(), Long.class.getName() });
+		_finderPathCountByC_C = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
+			new String[] {Long.class.getName(), Long.class.getName()});
 
-		_finderPathWithPaginationFindByCompanyId = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
-				new String[] {
-					Long.class.getName(),
-					
+		_finderPathWithPaginationFindByC_C_C = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByC_C_C = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			},
+			WebsiteModelImpl.COMPANYID_COLUMN_BITMASK |
+			WebsiteModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			WebsiteModelImpl.CLASSPK_COLUMN_BITMASK |
+			WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
+
+		_finderPathCountByC_C_C = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			});
+
+		_finderPathWithPaginationFindByC_C_C_P = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C_P",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Boolean.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
-				new String[] { Long.class.getName() },
-				WebsiteModelImpl.COMPANYID_COLUMN_BITMASK |
-				WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByC_C_C_P = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C_P",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Boolean.class.getName()
+			},
+			WebsiteModelImpl.COMPANYID_COLUMN_BITMASK |
+			WebsiteModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			WebsiteModelImpl.CLASSPK_COLUMN_BITMASK |
+			WebsiteModelImpl.PRIMARY_COLUMN_BITMASK |
+			WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
 
-		_finderPathCountByCompanyId = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
-				new String[] { Long.class.getName() });
-
-		_finderPathWithPaginationFindByUserId = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
-				new String[] {
-					Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithoutPaginationFindByUserId = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
-				new String[] { Long.class.getName() },
-				WebsiteModelImpl.USERID_COLUMN_BITMASK |
-				WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
-
-		_finderPathCountByUserId = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
-				new String[] { Long.class.getName() });
-
-		_finderPathWithPaginationFindByC_C = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithoutPaginationFindByC_C = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C",
-				new String[] { Long.class.getName(), Long.class.getName() },
-				WebsiteModelImpl.COMPANYID_COLUMN_BITMASK |
-				WebsiteModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-				WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
-
-		_finderPathCountByC_C = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
-				new String[] { Long.class.getName(), Long.class.getName() });
-
-		_finderPathWithPaginationFindByC_C_C = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithoutPaginationFindByC_C_C = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName()
-				},
-				WebsiteModelImpl.COMPANYID_COLUMN_BITMASK |
-				WebsiteModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-				WebsiteModelImpl.CLASSPK_COLUMN_BITMASK |
-				WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
-
-		_finderPathCountByC_C_C = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName()
-				});
-
-		_finderPathWithPaginationFindByC_C_C_P = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C_P",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Boolean.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithoutPaginationFindByC_C_C_P = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, WebsiteImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C_P",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Boolean.class.getName()
-				},
-				WebsiteModelImpl.COMPANYID_COLUMN_BITMASK |
-				WebsiteModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-				WebsiteModelImpl.CLASSPK_COLUMN_BITMASK |
-				WebsiteModelImpl.PRIMARY_COLUMN_BITMASK |
-				WebsiteModelImpl.CREATEDATE_COLUMN_BITMASK);
-
-		_finderPathCountByC_C_C_P = new FinderPath(WebsiteModelImpl.ENTITY_CACHE_ENABLED,
-				WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C_P",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Boolean.class.getName()
-				});
+		_finderPathCountByC_C_C_P = new FinderPath(
+			WebsiteModelImpl.ENTITY_CACHE_ENABLED,
+			WebsiteModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C_P",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Boolean.class.getName()
+			});
 	}
 
 	public void destroy() {
@@ -4758,15 +4984,31 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 
 	@BeanReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
-	private static final String _SQL_SELECT_WEBSITE = "SELECT website FROM Website website";
-	private static final String _SQL_SELECT_WEBSITE_WHERE = "SELECT website FROM Website website WHERE ";
-	private static final String _SQL_COUNT_WEBSITE = "SELECT COUNT(website) FROM Website website";
-	private static final String _SQL_COUNT_WEBSITE_WHERE = "SELECT COUNT(website) FROM Website website WHERE ";
+
+	private static final String _SQL_SELECT_WEBSITE =
+		"SELECT website FROM Website website";
+
+	private static final String _SQL_SELECT_WEBSITE_WHERE =
+		"SELECT website FROM Website website WHERE ";
+
+	private static final String _SQL_COUNT_WEBSITE =
+		"SELECT COUNT(website) FROM Website website";
+
+	private static final String _SQL_COUNT_WEBSITE_WHERE =
+		"SELECT COUNT(website) FROM Website website WHERE ";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "website.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Website exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Website exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(WebsitePersistenceImpl.class);
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"uuid", "primary"
-			});
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No Website exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No Website exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		WebsitePersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"uuid", "primary"});
+
 }

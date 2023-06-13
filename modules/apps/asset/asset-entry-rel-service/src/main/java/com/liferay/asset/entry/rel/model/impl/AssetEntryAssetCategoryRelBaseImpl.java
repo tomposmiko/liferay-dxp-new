@@ -35,6 +35,7 @@ import com.liferay.asset.entry.rel.service.AssetEntryAssetCategoryRelLocalServic
 public abstract class AssetEntryAssetCategoryRelBaseImpl
 	extends AssetEntryAssetCategoryRelModelImpl
 	implements AssetEntryAssetCategoryRel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -43,10 +44,13 @@ public abstract class AssetEntryAssetCategoryRelBaseImpl
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			AssetEntryAssetCategoryRelLocalServiceUtil.addAssetEntryAssetCategoryRel(this);
+			AssetEntryAssetCategoryRelLocalServiceUtil.
+				addAssetEntryAssetCategoryRel(this);
 		}
 		else {
-			AssetEntryAssetCategoryRelLocalServiceUtil.updateAssetEntryAssetCategoryRel(this);
+			AssetEntryAssetCategoryRelLocalServiceUtil.
+				updateAssetEntryAssetCategoryRel(this);
 		}
 	}
+
 }

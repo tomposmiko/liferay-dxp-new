@@ -15,9 +15,7 @@
 package com.liferay.headless.document.library.internal.resource.v1_0;
 
 import com.liferay.headless.document.library.dto.v1_0.Document;
-import com.liferay.headless.document.library.internal.dto.v1_0.DocumentImpl;
 import com.liferay.headless.document.library.resource.v1_0.DocumentResource;
-import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.search.Sort;
@@ -28,22 +26,31 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.net.URI;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Generated;
 
+import javax.validation.constraints.NotNull;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -56,95 +63,160 @@ public abstract class BaseDocumentResourceImpl implements DocumentResource {
 
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "filter"),
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
+			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+		}
+	)
 	@Path("/content-spaces/{content-space-id}/documents")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "Document")})
 	public Page<Document> getContentSpaceDocumentsPage(
-	@PathParam("content-space-id") Long contentSpaceId,@Context Filter filter,@Context Pagination pagination,@Context Sort[] sorts)
-			throws Exception {
+			@NotNull @PathParam("content-space-id") Long contentSpaceId,
+			@QueryParam("flatten") Boolean flatten,
+			@QueryParam("search") String search, @Context Filter filter,
+			@Context Pagination pagination, @Context Sort[] sorts)
+		throws Exception {
 
-				return Page.of(Collections.emptyList());
+		return Page.of(Collections.emptyList());
 	}
+
 	@Override
 	@Consumes("multipart/form-data")
 	@POST
 	@Path("/content-spaces/{content-space-id}/documents")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "Document")})
 	public Document postContentSpaceDocument(
-	@PathParam("content-space-id") Long contentSpaceId,MultipartBody multipartBody)
-			throws Exception {
+			@NotNull @PathParam("content-space-id") Long contentSpaceId,
+			MultipartBody multipartBody)
+		throws Exception {
 
-				return new DocumentImpl();
+		return new Document();
 	}
+
 	@Override
 	@DELETE
 	@Path("/documents/{document-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
-	public boolean deleteDocument(
-	@PathParam("document-id") Long documentId)
-			throws Exception {
-
-				return false;
+	@Tags(value = {@Tag(name = "Document")})
+	public void deleteDocument(
+			@NotNull @PathParam("document-id") Long documentId)
+		throws Exception {
 	}
+
 	@Override
 	@GET
 	@Path("/documents/{document-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "Document")})
 	public Document getDocument(
-	@PathParam("document-id") Long documentId)
-			throws Exception {
+			@NotNull @PathParam("document-id") Long documentId)
+		throws Exception {
 
-				return new DocumentImpl();
+		return new Document();
 	}
+
+	@Override
+	@Consumes("multipart/form-data")
+	@PATCH
+	@Path("/documents/{document-id}")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Document")})
+	public Document patchDocument(
+			@NotNull @PathParam("document-id") Long documentId,
+			MultipartBody multipartBody)
+		throws Exception {
+
+		return new Document();
+	}
+
+	@Override
+	@Consumes("multipart/form-data")
+	@PUT
+	@Path("/documents/{document-id}")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Document")})
+	public Document putDocument(
+			@NotNull @PathParam("document-id") Long documentId,
+			MultipartBody multipartBody)
+		throws Exception {
+
+		return new Document();
+	}
+
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "filter"),
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
+			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+		}
+	)
 	@Path("/folders/{folder-id}/documents")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "Document")})
 	public Page<Document> getFolderDocumentsPage(
-	@PathParam("folder-id") Long folderId,@Context Filter filter,@Context Pagination pagination,@Context Sort[] sorts)
-			throws Exception {
+			@NotNull @PathParam("folder-id") Long folderId,
+			@QueryParam("search") String search, @Context Filter filter,
+			@Context Pagination pagination, @Context Sort[] sorts)
+		throws Exception {
 
-				return Page.of(Collections.emptyList());
+		return Page.of(Collections.emptyList());
 	}
+
 	@Override
 	@Consumes("multipart/form-data")
 	@POST
 	@Path("/folders/{folder-id}/documents")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "Document")})
 	public Document postFolderDocument(
-	@PathParam("folder-id") Long folderId,MultipartBody multipartBody)
-			throws Exception {
+			@NotNull @PathParam("folder-id") Long folderId,
+			MultipartBody multipartBody)
+		throws Exception {
 
-				return new DocumentImpl();
+		return new Document();
 	}
 
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected String getJAXRSLink(String methodName, Object... values) {
-		URI baseURI = contextUriInfo.getBaseUri();
-
-		URI resourceURI = UriBuilder.fromResource(
-			BaseDocumentResourceImpl.class
-		).build();
-
-		URI methodURI = UriBuilder.fromMethod(
-			BaseDocumentResourceImpl.class, methodName
-		).build(
-			values
-		);
-
-		return baseURI.toString() + resourceURI.toString() + methodURI.toString();
+	protected void preparePatch(Document document) {
 	}
 
-	protected <T, R> List<R> transform(List<T> list, UnsafeFunction<T, R, Throwable> unsafeFunction) {
-		return TransformUtil.transform(list, unsafeFunction);
+	protected <T, R> List<R> transform(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transform(collection, unsafeFunction);
+	}
+
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
+
+		return TransformUtil.transform(array, unsafeFunction, clazz);
+	}
+
+	protected <T, R> R[] transformToArray(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
+
+		return TransformUtil.transformToArray(
+			collection, unsafeFunction, clazz);
+	}
+
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
 	@Context

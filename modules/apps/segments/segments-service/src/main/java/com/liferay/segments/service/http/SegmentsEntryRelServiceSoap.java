@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import com.liferay.segments.service.SegmentsEntryRelServiceUtil;
 
 import java.rmi.RemoteException;
@@ -64,15 +63,20 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class SegmentsEntryRelServiceSoap {
-	public static com.liferay.segments.model.SegmentsEntryRelSoap addSegmentsEntryRel(
-		long segmentsEntryId, long classNameId, long classPK,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-		try {
-			com.liferay.segments.model.SegmentsEntryRel returnValue = SegmentsEntryRelServiceUtil.addSegmentsEntryRel(segmentsEntryId,
-					classNameId, classPK, serviceContext);
 
-			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModel(returnValue);
+	public static com.liferay.segments.model.SegmentsEntryRelSoap
+			addSegmentsEntryRel(
+				long segmentsEntryId, long classNameId, long classPK,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.segments.model.SegmentsEntryRel returnValue =
+				SegmentsEntryRelServiceUtil.addSegmentsEntryRel(
+					segmentsEntryId, classNameId, classPK, serviceContext);
+
+			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModel(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -83,8 +87,10 @@ public class SegmentsEntryRelServiceSoap {
 
 	public static void deleteSegmentsEntryRel(long segmentsEntryRelId)
 		throws RemoteException {
+
 		try {
-			SegmentsEntryRelServiceUtil.deleteSegmentsEntryRel(segmentsEntryRelId);
+			SegmentsEntryRelServiceUtil.deleteSegmentsEntryRel(
+				segmentsEntryRelId);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -93,44 +99,13 @@ public class SegmentsEntryRelServiceSoap {
 		}
 	}
 
-	public static void deleteSegmentsEntryRel(long segmentsEntryId,
-		long classNameId, long classPK) throws RemoteException {
-		try {
-			SegmentsEntryRelServiceUtil.deleteSegmentsEntryRel(segmentsEntryId,
-				classNameId, classPK);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.segments.model.SegmentsEntryRelSoap[] getSegmentsEntryRels(
-		long segmentsEntryId) throws RemoteException {
-		try {
-			java.util.List<com.liferay.segments.model.SegmentsEntryRel> returnValue =
-				SegmentsEntryRelServiceUtil.getSegmentsEntryRels(segmentsEntryId);
-
-			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModels(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.segments.model.SegmentsEntryRelSoap[] getSegmentsEntryRels(
-		long segmentsEntryId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.segments.model.SegmentsEntryRel> orderByComparator)
+	public static void deleteSegmentsEntryRel(
+			long segmentsEntryId, long classNameId, long classPK)
 		throws RemoteException {
-		try {
-			java.util.List<com.liferay.segments.model.SegmentsEntryRel> returnValue =
-				SegmentsEntryRelServiceUtil.getSegmentsEntryRels(segmentsEntryId,
-					start, end, orderByComparator);
 
-			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModels(returnValue);
+		try {
+			SegmentsEntryRelServiceUtil.deleteSegmentsEntryRel(
+				segmentsEntryId, classNameId, classPK);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -139,14 +114,59 @@ public class SegmentsEntryRelServiceSoap {
 		}
 	}
 
-	public static com.liferay.segments.model.SegmentsEntryRelSoap[] getSegmentsEntryRels(
-		long groupId, long classNameId, long classPK) throws RemoteException {
-		try {
-			java.util.List<com.liferay.segments.model.SegmentsEntryRel> returnValue =
-				SegmentsEntryRelServiceUtil.getSegmentsEntryRels(groupId,
-					classNameId, classPK);
+	public static com.liferay.segments.model.SegmentsEntryRelSoap[]
+			getSegmentsEntryRels(long segmentsEntryId)
+		throws RemoteException {
 
-			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModels(returnValue);
+		try {
+			java.util.List<com.liferay.segments.model.SegmentsEntryRel>
+				returnValue = SegmentsEntryRelServiceUtil.getSegmentsEntryRels(
+					segmentsEntryId);
+
+			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModels(
+				returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.segments.model.SegmentsEntryRelSoap[]
+			getSegmentsEntryRels(
+				long segmentsEntryId, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.segments.model.SegmentsEntryRel>
+						orderByComparator)
+		throws RemoteException {
+
+		try {
+			java.util.List<com.liferay.segments.model.SegmentsEntryRel>
+				returnValue = SegmentsEntryRelServiceUtil.getSegmentsEntryRels(
+					segmentsEntryId, start, end, orderByComparator);
+
+			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModels(
+				returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.segments.model.SegmentsEntryRelSoap[]
+			getSegmentsEntryRels(long groupId, long classNameId, long classPK)
+		throws RemoteException {
+
+		try {
+			java.util.List<com.liferay.segments.model.SegmentsEntryRel>
+				returnValue = SegmentsEntryRelServiceUtil.getSegmentsEntryRels(
+					groupId, classNameId, classPK);
+
+			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModels(
+				returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -157,8 +177,11 @@ public class SegmentsEntryRelServiceSoap {
 
 	public static int getSegmentsEntryRelsCount(long segmentsEntryId)
 		throws RemoteException {
+
 		try {
-			int returnValue = SegmentsEntryRelServiceUtil.getSegmentsEntryRelsCount(segmentsEntryId);
+			int returnValue =
+				SegmentsEntryRelServiceUtil.getSegmentsEntryRelsCount(
+					segmentsEntryId);
 
 			return returnValue;
 		}
@@ -169,11 +192,14 @@ public class SegmentsEntryRelServiceSoap {
 		}
 	}
 
-	public static int getSegmentsEntryRelsCount(long groupId, long classNameId,
-		long classPK) throws RemoteException {
+	public static int getSegmentsEntryRelsCount(
+			long groupId, long classNameId, long classPK)
+		throws RemoteException {
+
 		try {
-			int returnValue = SegmentsEntryRelServiceUtil.getSegmentsEntryRelsCount(groupId,
-					classNameId, classPK);
+			int returnValue =
+				SegmentsEntryRelServiceUtil.getSegmentsEntryRelsCount(
+					groupId, classNameId, classPK);
 
 			return returnValue;
 		}
@@ -184,11 +210,14 @@ public class SegmentsEntryRelServiceSoap {
 		}
 	}
 
-	public static boolean hasSegmentsEntryRel(long segmentsEntryId,
-		long classNameId, long classPK) throws RemoteException {
+	public static boolean hasSegmentsEntryRel(
+			long segmentsEntryId, long classNameId, long classPK)
+		throws RemoteException {
+
 		try {
-			boolean returnValue = SegmentsEntryRelServiceUtil.hasSegmentsEntryRel(segmentsEntryId,
-					classNameId, classPK);
+			boolean returnValue =
+				SegmentsEntryRelServiceUtil.hasSegmentsEntryRel(
+					segmentsEntryId, classNameId, classPK);
 
 			return returnValue;
 		}
@@ -199,5 +228,7 @@ public class SegmentsEntryRelServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(SegmentsEntryRelServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		SegmentsEntryRelServiceSoap.class);
+
 }

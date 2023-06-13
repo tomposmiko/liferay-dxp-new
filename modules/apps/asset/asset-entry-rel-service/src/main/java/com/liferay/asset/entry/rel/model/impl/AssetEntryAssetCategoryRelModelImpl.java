@@ -18,18 +18,14 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel;
 import com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRelModel;
-
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
@@ -55,21 +51,25 @@ import java.util.function.Function;
  * @generated
  */
 @ProviderType
-public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntryAssetCategoryRel>
+public class AssetEntryAssetCategoryRelModelImpl
+	extends BaseModelImpl<AssetEntryAssetCategoryRel>
 	implements AssetEntryAssetCategoryRelModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a asset entry asset category rel model instance should use the <code>AssetEntryAssetCategoryRel</code> interface instead.
 	 */
 	public static final String TABLE_NAME = "AssetEntryAssetCategoryRel";
+
 	public static final Object[][] TABLE_COLUMNS = {
-			{ "assetEntryAssetCategoryRelId", Types.BIGINT },
-			{ "assetEntryId", Types.BIGINT },
-			{ "assetCategoryId", Types.BIGINT },
-			{ "priority", Types.INTEGER }
-		};
-	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
+		{"assetEntryAssetCategoryRelId", Types.BIGINT},
+		{"assetEntryId", Types.BIGINT}, {"assetCategoryId", Types.BIGINT},
+		{"priority", Types.INTEGER}
+	};
+
+	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
+		new HashMap<String, Integer>();
 
 	static {
 		TABLE_COLUMNS_MAP.put("assetEntryAssetCategoryRelId", Types.BIGINT);
@@ -78,27 +78,37 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 		TABLE_COLUMNS_MAP.put("priority", Types.INTEGER);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table AssetEntryAssetCategoryRel (assetEntryAssetCategoryRelId LONG not null primary key,assetEntryId LONG,assetCategoryId LONG,priority INTEGER)";
-	public static final String TABLE_SQL_DROP = "drop table AssetEntryAssetCategoryRel";
-	public static final String ORDER_BY_JPQL = " ORDER BY assetEntryAssetCategoryRel.assetEntryAssetCategoryRelId ASC";
-	public static final String ORDER_BY_SQL = " ORDER BY AssetEntryAssetCategoryRel.assetEntryAssetCategoryRelId ASC";
+	public static final String TABLE_SQL_CREATE =
+		"create table AssetEntryAssetCategoryRel (assetEntryAssetCategoryRelId LONG not null primary key,assetEntryId LONG,assetCategoryId LONG,priority INTEGER)";
+
+	public static final String TABLE_SQL_DROP =
+		"drop table AssetEntryAssetCategoryRel";
+
+	public static final String ORDER_BY_JPQL =
+		" ORDER BY assetEntryAssetCategoryRel.assetEntryAssetCategoryRelId ASC";
+
+	public static final String ORDER_BY_SQL =
+		" ORDER BY AssetEntryAssetCategoryRel.assetEntryAssetCategoryRelId ASC";
+
 	public static final String DATA_SOURCE = "liferayDataSource";
+
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
+
 	public static final String TX_MANAGER = "liferayTransactionManager";
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.asset.entry.rel.service.util.ServiceProps.get(
-				"value.object.entity.cache.enabled.com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel"),
-			true);
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(com.liferay.asset.entry.rel.service.util.ServiceProps.get(
-				"value.object.finder.cache.enabled.com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel"),
-			true);
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.asset.entry.rel.service.util.ServiceProps.get(
-				"value.object.column.bitmask.enabled.com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel"),
-			true);
+
 	public static final long ASSETCATEGORYID_COLUMN_BITMASK = 1L;
+
 	public static final long ASSETENTRYID_COLUMN_BITMASK = 2L;
+
 	public static final long ASSETENTRYASSETCATEGORYRELID_COLUMN_BITMASK = 4L;
-	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.asset.entry.rel.service.util.ServiceProps.get(
-				"lock.expiration.time.com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRel"));
+
+	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
+		_entityCacheEnabled = entityCacheEnabled;
+	}
+
+	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+		_finderCacheEnabled = finderCacheEnabled;
+	}
 
 	public AssetEntryAssetCategoryRelModelImpl() {
 	}
@@ -137,16 +147,20 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		Map<String, Function<AssetEntryAssetCategoryRel, Object>> attributeGetterFunctions =
-			getAttributeGetterFunctions();
+		Map<String, Function<AssetEntryAssetCategoryRel, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
 
-		for (Map.Entry<String, Function<AssetEntryAssetCategoryRel, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<AssetEntryAssetCategoryRel, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<AssetEntryAssetCategoryRel, Object> attributeGetterFunction =
-				entry.getValue();
+			Function<AssetEntryAssetCategoryRel, Object>
+				attributeGetterFunction = entry.getValue();
 
-			attributes.put(attributeName,
-				attributeGetterFunction.apply((AssetEntryAssetCategoryRel)this));
+			attributes.put(
+				attributeName,
+				attributeGetterFunction.apply(
+					(AssetEntryAssetCategoryRel)this));
 		}
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
@@ -157,52 +171,82 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Map<String, BiConsumer<AssetEntryAssetCategoryRel, Object>> attributeSetterBiConsumers =
-			getAttributeSetterBiConsumers();
+		Map<String, BiConsumer<AssetEntryAssetCategoryRel, Object>>
+			attributeSetterBiConsumers = getAttributeSetterBiConsumers();
 
 		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
 			String attributeName = entry.getKey();
 
-			BiConsumer<AssetEntryAssetCategoryRel, Object> attributeSetterBiConsumer =
-				attributeSetterBiConsumers.get(attributeName);
+			BiConsumer<AssetEntryAssetCategoryRel, Object>
+				attributeSetterBiConsumer = attributeSetterBiConsumers.get(
+					attributeName);
 
 			if (attributeSetterBiConsumer != null) {
-				attributeSetterBiConsumer.accept((AssetEntryAssetCategoryRel)this,
-					entry.getValue());
+				attributeSetterBiConsumer.accept(
+					(AssetEntryAssetCategoryRel)this, entry.getValue());
 			}
 		}
 	}
 
-	public Map<String, Function<AssetEntryAssetCategoryRel, Object>> getAttributeGetterFunctions() {
+	public Map<String, Function<AssetEntryAssetCategoryRel, Object>>
+		getAttributeGetterFunctions() {
+
 		return _attributeGetterFunctions;
 	}
 
-	public Map<String, BiConsumer<AssetEntryAssetCategoryRel, Object>> getAttributeSetterBiConsumers() {
+	public Map<String, BiConsumer<AssetEntryAssetCategoryRel, Object>>
+		getAttributeSetterBiConsumers() {
+
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<AssetEntryAssetCategoryRel, Object>> _attributeGetterFunctions;
-	private static final Map<String, BiConsumer<AssetEntryAssetCategoryRel, Object>> _attributeSetterBiConsumers;
+	private static final Map
+		<String, Function<AssetEntryAssetCategoryRel, Object>>
+			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<AssetEntryAssetCategoryRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
-		Map<String, Function<AssetEntryAssetCategoryRel, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<AssetEntryAssetCategoryRel, Object>>();
-		Map<String, BiConsumer<AssetEntryAssetCategoryRel, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<AssetEntryAssetCategoryRel, ?>>();
+		Map<String, Function<AssetEntryAssetCategoryRel, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<AssetEntryAssetCategoryRel, Object>>();
+		Map<String, BiConsumer<AssetEntryAssetCategoryRel, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<AssetEntryAssetCategoryRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"assetEntryAssetCategoryRelId",
+			AssetEntryAssetCategoryRel::getAssetEntryAssetCategoryRelId);
+		attributeSetterBiConsumers.put(
+			"assetEntryAssetCategoryRelId",
+			(BiConsumer<AssetEntryAssetCategoryRel, Long>)
+				AssetEntryAssetCategoryRel::setAssetEntryAssetCategoryRelId);
+		attributeGetterFunctions.put(
+			"assetEntryId", AssetEntryAssetCategoryRel::getAssetEntryId);
+		attributeSetterBiConsumers.put(
+			"assetEntryId",
+			(BiConsumer<AssetEntryAssetCategoryRel, Long>)
+				AssetEntryAssetCategoryRel::setAssetEntryId);
+		attributeGetterFunctions.put(
+			"assetCategoryId", AssetEntryAssetCategoryRel::getAssetCategoryId);
+		attributeSetterBiConsumers.put(
+			"assetCategoryId",
+			(BiConsumer<AssetEntryAssetCategoryRel, Long>)
+				AssetEntryAssetCategoryRel::setAssetCategoryId);
+		attributeGetterFunctions.put(
+			"priority", AssetEntryAssetCategoryRel::getPriority);
+		attributeSetterBiConsumers.put(
+			"priority",
+			(BiConsumer<AssetEntryAssetCategoryRel, Integer>)
+				AssetEntryAssetCategoryRel::setPriority);
 
-		attributeGetterFunctions.put("assetEntryAssetCategoryRelId", AssetEntryAssetCategoryRel::getAssetEntryAssetCategoryRelId);
-		attributeSetterBiConsumers.put("assetEntryAssetCategoryRelId", (BiConsumer<AssetEntryAssetCategoryRel, Long>)AssetEntryAssetCategoryRel::setAssetEntryAssetCategoryRelId);
-		attributeGetterFunctions.put("assetEntryId", AssetEntryAssetCategoryRel::getAssetEntryId);
-		attributeSetterBiConsumers.put("assetEntryId", (BiConsumer<AssetEntryAssetCategoryRel, Long>)AssetEntryAssetCategoryRel::setAssetEntryId);
-		attributeGetterFunctions.put("assetCategoryId", AssetEntryAssetCategoryRel::getAssetCategoryId);
-		attributeSetterBiConsumers.put("assetCategoryId", (BiConsumer<AssetEntryAssetCategoryRel, Long>)AssetEntryAssetCategoryRel::setAssetCategoryId);
-		attributeGetterFunctions.put("priority", AssetEntryAssetCategoryRel::getPriority);
-		attributeSetterBiConsumers.put("priority", (BiConsumer<AssetEntryAssetCategoryRel, Integer>)AssetEntryAssetCategoryRel::setPriority);
-
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(attributeGetterFunctions);
-		_attributeSetterBiConsumers = Collections.unmodifiableMap((Map)attributeSetterBiConsumers);
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -213,6 +257,7 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 	@Override
 	public void setAssetEntryAssetCategoryRelId(
 		long assetEntryAssetCategoryRelId) {
+
 		_assetEntryAssetCategoryRelId = assetEntryAssetCategoryRelId;
 	}
 
@@ -276,8 +321,8 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		return ExpandoBridgeFactoryUtil.getExpandoBridge(0,
-			AssetEntryAssetCategoryRel.class.getName(), getPrimaryKey());
+		return ExpandoBridgeFactoryUtil.getExpandoBridge(
+			0, AssetEntryAssetCategoryRel.class.getName(), getPrimaryKey());
 	}
 
 	@Override
@@ -290,8 +335,10 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 	@Override
 	public AssetEntryAssetCategoryRel toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = (AssetEntryAssetCategoryRel)ProxyUtil.newProxyInstance(_classLoader,
-					_escapedModelInterfaces, new AutoEscapeBeanHandler(this));
+			_escapedModel =
+				(AssetEntryAssetCategoryRel)ProxyUtil.newProxyInstance(
+					_classLoader, _escapedModelInterfaces,
+					new AutoEscapeBeanHandler(this));
 		}
 
 		return _escapedModel;
@@ -299,9 +346,11 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 
 	@Override
 	public Object clone() {
-		AssetEntryAssetCategoryRelImpl assetEntryAssetCategoryRelImpl = new AssetEntryAssetCategoryRelImpl();
+		AssetEntryAssetCategoryRelImpl assetEntryAssetCategoryRelImpl =
+			new AssetEntryAssetCategoryRelImpl();
 
-		assetEntryAssetCategoryRelImpl.setAssetEntryAssetCategoryRelId(getAssetEntryAssetCategoryRelId());
+		assetEntryAssetCategoryRelImpl.setAssetEntryAssetCategoryRelId(
+			getAssetEntryAssetCategoryRelId());
 		assetEntryAssetCategoryRelImpl.setAssetEntryId(getAssetEntryId());
 		assetEntryAssetCategoryRelImpl.setAssetCategoryId(getAssetCategoryId());
 		assetEntryAssetCategoryRelImpl.setPriority(getPriority());
@@ -312,7 +361,9 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 	}
 
 	@Override
-	public int compareTo(AssetEntryAssetCategoryRel assetEntryAssetCategoryRel) {
+	public int compareTo(
+		AssetEntryAssetCategoryRel assetEntryAssetCategoryRel) {
+
 		long primaryKey = assetEntryAssetCategoryRel.getPrimaryKey();
 
 		if (getPrimaryKey() < primaryKey) {
@@ -336,7 +387,8 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 			return false;
 		}
 
-		AssetEntryAssetCategoryRel assetEntryAssetCategoryRel = (AssetEntryAssetCategoryRel)obj;
+		AssetEntryAssetCategoryRel assetEntryAssetCategoryRel =
+			(AssetEntryAssetCategoryRel)obj;
 
 		long primaryKey = assetEntryAssetCategoryRel.getPrimaryKey();
 
@@ -355,23 +407,26 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return ENTITY_CACHE_ENABLED;
+		return _entityCacheEnabled;
 	}
 
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return FINDER_CACHE_ENABLED;
+		return _finderCacheEnabled;
 	}
 
 	@Override
 	public void resetOriginalValues() {
-		AssetEntryAssetCategoryRelModelImpl assetEntryAssetCategoryRelModelImpl = this;
+		AssetEntryAssetCategoryRelModelImpl
+			assetEntryAssetCategoryRelModelImpl = this;
 
-		assetEntryAssetCategoryRelModelImpl._originalAssetEntryId = assetEntryAssetCategoryRelModelImpl._assetEntryId;
+		assetEntryAssetCategoryRelModelImpl._originalAssetEntryId =
+			assetEntryAssetCategoryRelModelImpl._assetEntryId;
 
 		assetEntryAssetCategoryRelModelImpl._setOriginalAssetEntryId = false;
 
-		assetEntryAssetCategoryRelModelImpl._originalAssetCategoryId = assetEntryAssetCategoryRelModelImpl._assetCategoryId;
+		assetEntryAssetCategoryRelModelImpl._originalAssetCategoryId =
+			assetEntryAssetCategoryRelModelImpl._assetCategoryId;
 
 		assetEntryAssetCategoryRelModelImpl._setOriginalAssetCategoryId = false;
 
@@ -380,14 +435,17 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 
 	@Override
 	public CacheModel<AssetEntryAssetCategoryRel> toCacheModel() {
-		AssetEntryAssetCategoryRelCacheModel assetEntryAssetCategoryRelCacheModel =
-			new AssetEntryAssetCategoryRelCacheModel();
+		AssetEntryAssetCategoryRelCacheModel
+			assetEntryAssetCategoryRelCacheModel =
+				new AssetEntryAssetCategoryRelCacheModel();
 
-		assetEntryAssetCategoryRelCacheModel.assetEntryAssetCategoryRelId = getAssetEntryAssetCategoryRelId();
+		assetEntryAssetCategoryRelCacheModel.assetEntryAssetCategoryRelId =
+			getAssetEntryAssetCategoryRelId();
 
 		assetEntryAssetCategoryRelCacheModel.assetEntryId = getAssetEntryId();
 
-		assetEntryAssetCategoryRelCacheModel.assetCategoryId = getAssetCategoryId();
+		assetEntryAssetCategoryRelCacheModel.assetCategoryId =
+			getAssetCategoryId();
 
 		assetEntryAssetCategoryRelCacheModel.priority = getPriority();
 
@@ -396,22 +454,25 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 
 	@Override
 	public String toString() {
-		Map<String, Function<AssetEntryAssetCategoryRel, Object>> attributeGetterFunctions =
-			getAttributeGetterFunctions();
+		Map<String, Function<AssetEntryAssetCategoryRel, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((4 * attributeGetterFunctions.size()) +
-				2);
+		StringBundler sb = new StringBundler(
+			4 * attributeGetterFunctions.size() + 2);
 
 		sb.append("{");
 
-		for (Map.Entry<String, Function<AssetEntryAssetCategoryRel, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<AssetEntryAssetCategoryRel, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<AssetEntryAssetCategoryRel, Object> attributeGetterFunction =
-				entry.getValue();
+			Function<AssetEntryAssetCategoryRel, Object>
+				attributeGetterFunction = entry.getValue();
 
 			sb.append(attributeName);
 			sb.append("=");
-			sb.append(attributeGetterFunction.apply(
+			sb.append(
+				attributeGetterFunction.apply(
 					(AssetEntryAssetCategoryRel)this));
 			sb.append(", ");
 		}
@@ -427,25 +488,28 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 
 	@Override
 	public String toXmlString() {
-		Map<String, Function<AssetEntryAssetCategoryRel, Object>> attributeGetterFunctions =
-			getAttributeGetterFunctions();
+		Map<String, Function<AssetEntryAssetCategoryRel, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
 
-		StringBundler sb = new StringBundler((5 * attributeGetterFunctions.size()) +
-				4);
+		StringBundler sb = new StringBundler(
+			5 * attributeGetterFunctions.size() + 4);
 
 		sb.append("<model><model-name>");
 		sb.append(getModelClassName());
 		sb.append("</model-name>");
 
-		for (Map.Entry<String, Function<AssetEntryAssetCategoryRel, Object>> entry : attributeGetterFunctions.entrySet()) {
+		for (Map.Entry<String, Function<AssetEntryAssetCategoryRel, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
 			String attributeName = entry.getKey();
-			Function<AssetEntryAssetCategoryRel, Object> attributeGetterFunction =
-				entry.getValue();
+			Function<AssetEntryAssetCategoryRel, Object>
+				attributeGetterFunction = entry.getValue();
 
 			sb.append("<column><column-name>");
 			sb.append(attributeName);
 			sb.append("</column-name><column-value><![CDATA[");
-			sb.append(attributeGetterFunction.apply(
+			sb.append(
+				attributeGetterFunction.apply(
 					(AssetEntryAssetCategoryRel)this));
 			sb.append("]]></column-value></column>");
 		}
@@ -455,10 +519,14 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader = AssetEntryAssetCategoryRel.class.getClassLoader();
+	private static final ClassLoader _classLoader =
+		AssetEntryAssetCategoryRel.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			AssetEntryAssetCategoryRel.class, ModelWrapper.class
-		};
+		AssetEntryAssetCategoryRel.class, ModelWrapper.class
+	};
+	private static boolean _entityCacheEnabled;
+	private static boolean _finderCacheEnabled;
+
 	private long _assetEntryAssetCategoryRelId;
 	private long _assetEntryId;
 	private long _originalAssetEntryId;
@@ -469,4 +537,5 @@ public class AssetEntryAssetCategoryRelModelImpl extends BaseModelImpl<AssetEntr
 	private int _priority;
 	private long _columnBitmask;
 	private AssetEntryAssetCategoryRel _escapedModel;
+
 }

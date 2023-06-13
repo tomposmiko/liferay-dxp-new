@@ -33,8 +33,9 @@ import java.io.ObjectOutput;
  * @generated
  */
 @ProviderType
-public class VersionedEntryVersionCacheModel implements CacheModel<VersionedEntryVersion>,
-	Externalizable {
+public class VersionedEntryVersionCacheModel
+	implements CacheModel<VersionedEntryVersion>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -45,9 +46,12 @@ public class VersionedEntryVersionCacheModel implements CacheModel<VersionedEntr
 			return false;
 		}
 
-		VersionedEntryVersionCacheModel versionedEntryVersionCacheModel = (VersionedEntryVersionCacheModel)obj;
+		VersionedEntryVersionCacheModel versionedEntryVersionCacheModel =
+			(VersionedEntryVersionCacheModel)obj;
 
-		if (versionedEntryVersionId == versionedEntryVersionCacheModel.versionedEntryVersionId) {
+		if (versionedEntryVersionId ==
+				versionedEntryVersionCacheModel.versionedEntryVersionId) {
+
 			return true;
 		}
 
@@ -78,9 +82,11 @@ public class VersionedEntryVersionCacheModel implements CacheModel<VersionedEntr
 
 	@Override
 	public VersionedEntryVersion toEntityModel() {
-		VersionedEntryVersionImpl versionedEntryVersionImpl = new VersionedEntryVersionImpl();
+		VersionedEntryVersionImpl versionedEntryVersionImpl =
+			new VersionedEntryVersionImpl();
 
-		versionedEntryVersionImpl.setVersionedEntryVersionId(versionedEntryVersionId);
+		versionedEntryVersionImpl.setVersionedEntryVersionId(
+			versionedEntryVersionId);
 		versionedEntryVersionImpl.setVersion(version);
 		versionedEntryVersionImpl.setVersionedEntryId(versionedEntryId);
 		versionedEntryVersionImpl.setGroupId(groupId);
@@ -102,8 +108,7 @@ public class VersionedEntryVersionCacheModel implements CacheModel<VersionedEntr
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(versionedEntryVersionId);
 
 		objectOutput.writeInt(version);
@@ -117,4 +122,5 @@ public class VersionedEntryVersionCacheModel implements CacheModel<VersionedEntr
 	public int version;
 	public long versionedEntryId;
 	public long groupId;
+
 }

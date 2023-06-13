@@ -43,6 +43,15 @@ class SidebarAvailableSections extends Component {
 	}
 
 	/**
+	 * Handle layoutData changed
+	 * @inheritDoc
+	 * @review
+	 */
+	syncLayoutData() {
+		this._initializeDragAndDrop();
+	}
+
+	/**
 	 * Callback that is executed when an item is being dragged.
 	 * @param {object} eventData
 	 * @param {MouseEvent} data.originalEvent
@@ -53,11 +62,10 @@ class SidebarAvailableSections extends Component {
 		const targetItem = eventData.target;
 
 		const data = targetItem ? targetItem.dataset : null;
-		const targetIsColumn = targetItem && ('columnId' in data);
 		const targetIsFragment = targetItem && ('fragmentEntryLinkId' in data);
 		const targetIsSection = targetItem && ('layoutSectionId' in data);
 
-		if (targetIsColumn || targetIsFragment || targetIsSection) {
+		if (targetIsFragment || targetIsSection) {
 			const mouseY = eventData.originalEvent.clientY;
 			const targetItemRegion = position.getRegion(targetItem);
 
@@ -73,11 +81,7 @@ class SidebarAvailableSections extends Component {
 			let dropTargetItemId = null;
 			let dropTargetItemType = null;
 
-			if (targetIsColumn) {
-				dropTargetItemId = data.columnId;
-				dropTargetItemType = FRAGMENTS_EDITOR_ITEM_TYPES.column;
-			}
-			else if (targetIsFragment) {
+			if (targetIsFragment) {
 				dropTargetItemId = data.fragmentEntryLinkId;
 				dropTargetItemType = FRAGMENTS_EDITOR_ITEM_TYPES.fragment;
 			}
@@ -86,14 +90,16 @@ class SidebarAvailableSections extends Component {
 				dropTargetItemType = FRAGMENTS_EDITOR_ITEM_TYPES.section;
 			}
 
-			this.store.dispatchAction(
-				UPDATE_DROP_TARGET,
-				{
-					dropTargetBorder: nearestBorder,
-					dropTargetItemId,
-					dropTargetItemType
-				}
-			);
+			if (dropTargetItemId && dropTargetItemType) {
+				this.store.dispatchAction(
+					UPDATE_DROP_TARGET,
+					{
+						dropTargetBorder: nearestBorder,
+						dropTargetItemId,
+						dropTargetItemType
+					}
+				);
+			}
 		}
 	}
 
@@ -254,6 +260,7 @@ SidebarAvailableSections.STATE = {
 const ConnectedSidebarAvailableSections = getConnectedComponent(
 	SidebarAvailableSections,
 	[
+		'layoutData',
 		'sections',
 		'spritemap'
 	]

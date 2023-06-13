@@ -290,15 +290,17 @@ public class ServiceContextFactory {
 		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
 			String name = entry.getKey();
 
-			if (name.startsWith("assetCategoryIds")) {
-				updateAssetCategoryIds = true;
+			if (!name.startsWith("assetCategoryIds")) {
+				continue;
+			}
 
-				long[] assetVocabularyAssetCategoryIds = StringUtil.split(
-					ParamUtil.getString(request, name), 0L);
+			updateAssetCategoryIds = true;
 
-				for (long assetCategoryId : assetVocabularyAssetCategoryIds) {
-					assetCategoryIdsList.add(assetCategoryId);
-				}
+			long[] assetVocabularyAssetCategoryIds = ParamUtil.getLongValues(
+				request, name);
+
+			for (long assetCategoryId : assetVocabularyAssetCategoryIds) {
+				assetCategoryIdsList.add(assetCategoryId);
 			}
 		}
 
@@ -326,9 +328,7 @@ public class ServiceContextFactory {
 		String[] assetTagNames = ParamUtil.getStringValues(
 			request, "assetTagNames");
 
-		if (ArrayUtil.isNotEmpty(assetTagNames)) {
-			serviceContext.setAssetTagNames(assetTagNames);
-		}
+		serviceContext.setAssetTagNames(assetTagNames);
 
 		// Workflow
 
@@ -450,15 +450,17 @@ public class ServiceContextFactory {
 		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
 			String name = entry.getKey();
 
-			if (name.startsWith("assetCategoryIds")) {
-				updateAssetCategoryIds = true;
+			if (!name.startsWith("assetCategoryIds")) {
+				continue;
+			}
 
-				long[] assetVocabularyAssetCategoryIds = StringUtil.split(
-					ParamUtil.getString(portletRequest, name), 0L);
+			updateAssetCategoryIds = true;
 
-				for (long assetCategoryId : assetVocabularyAssetCategoryIds) {
-					assetCategoryIdsList.add(assetCategoryId);
-				}
+			long[] assetVocabularyAssetCategoryIds = ParamUtil.getLongValues(
+				portletRequest, name);
+
+			for (long assetCategoryId : assetVocabularyAssetCategoryIds) {
+				assetCategoryIdsList.add(assetCategoryId);
 			}
 		}
 
@@ -486,9 +488,7 @@ public class ServiceContextFactory {
 		String[] assetTagNames = ParamUtil.getStringValues(
 			request, "assetTagNames");
 
-		if (ArrayUtil.isNotEmpty(assetTagNames)) {
-			serviceContext.setAssetTagNames(assetTagNames);
-		}
+		serviceContext.setAssetTagNames(assetTagNames);
 
 		// Workflow
 

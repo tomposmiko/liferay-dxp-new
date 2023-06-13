@@ -15,8 +15,9 @@
 package com.liferay.headless.collaboration.internal.dto.v1_0.util;
 
 import com.liferay.headless.collaboration.dto.v1_0.Comment;
-import com.liferay.headless.collaboration.internal.dto.v1_0.CommentImpl;
+import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 /**
  * @author Javier Gamarra
@@ -24,19 +25,22 @@ import com.liferay.portal.kernel.util.Portal;
 public class CommentUtil {
 
 	public static Comment toComment(
-			com.liferay.portal.kernel.comment.Comment comment, Portal portal)
+			com.liferay.portal.kernel.comment.Comment comment,
+			CommentManager commentManager, Portal portal)
 		throws Exception {
 
 		if (comment == null) {
 			return null;
 		}
 
-		return new CommentImpl() {
+		return new Comment() {
 			{
 				creator = CreatorUtil.toCreator(portal, comment.getUser());
 				dateCreated = comment.getCreateDate();
 				dateModified = comment.getModifiedDate();
 				id = comment.getCommentId();
+				numberOfComments = commentManager.getChildCommentsCount(
+					comment.getCommentId(), WorkflowConstants.STATUS_APPROVED);
 				text = comment.getBody();
 			}
 		};

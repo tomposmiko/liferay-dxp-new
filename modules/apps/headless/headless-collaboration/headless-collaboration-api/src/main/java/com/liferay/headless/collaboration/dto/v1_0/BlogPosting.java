@@ -14,178 +14,782 @@
 
 package com.liferay.headless.collaboration.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface BlogPosting {
+@GraphQLName("BlogPosting")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "BlogPosting")
+public class BlogPosting {
 
-	public AggregateRating getAggregateRating();
+	public static enum ViewableBy {
 
+		ANYONE("Anyone"), MEMBERS("Members"), OWNER("Owner");
+
+		@JsonCreator
+		public static ViewableBy create(String value) {
+			for (ViewableBy viewableBy : values()) {
+				if (Objects.equals(viewableBy.getValue(), value)) {
+					return viewableBy;
+				}
+			}
+
+			return null;
+		}
+
+		@JsonValue
+		public String getValue() {
+			return _value;
+		}
+
+		@Override
+		public String toString() {
+			return _value;
+		}
+
+		private ViewableBy(String value) {
+			_value = value;
+		}
+
+		private final String _value;
+
+	}
+
+	public AggregateRating getAggregateRating() {
+		return aggregateRating;
+	}
+
+	public void setAggregateRating(AggregateRating aggregateRating) {
+		this.aggregateRating = aggregateRating;
+	}
+
+	@JsonIgnore
 	public void setAggregateRating(
-			AggregateRating aggregateRating);
+		UnsafeSupplier<AggregateRating, Exception>
+			aggregateRatingUnsafeSupplier) {
 
-	public void setAggregateRating(
-			UnsafeSupplier<AggregateRating, Throwable>
-				aggregateRatingUnsafeSupplier);
-	public String getAlternativeHeadline();
+		try {
+			aggregateRating = aggregateRatingUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected AggregateRating aggregateRating;
+
+	public String getAlternativeHeadline() {
+		return alternativeHeadline;
+	}
+
+	public void setAlternativeHeadline(String alternativeHeadline) {
+		this.alternativeHeadline = alternativeHeadline;
+	}
+
+	@JsonIgnore
 	public void setAlternativeHeadline(
-			String alternativeHeadline);
+		UnsafeSupplier<String, Exception> alternativeHeadlineUnsafeSupplier) {
 
-	public void setAlternativeHeadline(
-			UnsafeSupplier<String, Throwable>
-				alternativeHeadlineUnsafeSupplier);
-	public String getArticleBody();
+		try {
+			alternativeHeadline = alternativeHeadlineUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String alternativeHeadline;
+
+	public String getArticleBody() {
+		return articleBody;
+	}
+
+	public void setArticleBody(String articleBody) {
+		this.articleBody = articleBody;
+	}
+
+	@JsonIgnore
 	public void setArticleBody(
-			String articleBody);
+		UnsafeSupplier<String, Exception> articleBodyUnsafeSupplier) {
 
-	public void setArticleBody(
-			UnsafeSupplier<String, Throwable>
-				articleBodyUnsafeSupplier);
-	public String getCaption();
+		try {
+			articleBody = articleBodyUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setCaption(
-			String caption);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String articleBody;
 
-	public void setCaption(
-			UnsafeSupplier<String, Throwable>
-				captionUnsafeSupplier);
-	public Categories[] getCategories();
+	public Long getContentSpaceId() {
+		return contentSpaceId;
+	}
 
-	public void setCategories(
-			Categories[] categories);
+	public void setContentSpaceId(Long contentSpaceId) {
+		this.contentSpaceId = contentSpaceId;
+	}
 
-	public void setCategories(
-			UnsafeSupplier<Categories[], Throwable>
-				categoriesUnsafeSupplier);
-	public Long[] getCategoryIds();
+	@JsonIgnore
+	public void setContentSpaceId(
+		UnsafeSupplier<Long, Exception> contentSpaceIdUnsafeSupplier) {
 
-	public void setCategoryIds(
-			Long[] categoryIds);
+		try {
+			contentSpaceId = contentSpaceIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setCategoryIds(
-			UnsafeSupplier<Long[], Throwable>
-				categoryIdsUnsafeSupplier);
-	public Long getContentSpace();
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long contentSpaceId;
 
-	public void setContentSpace(
-			Long contentSpace);
+	public Creator getCreator() {
+		return creator;
+	}
 
-	public void setContentSpace(
-			UnsafeSupplier<Long, Throwable>
-				contentSpaceUnsafeSupplier);
-	public Creator getCreator();
+	public void setCreator(Creator creator) {
+		this.creator = creator;
+	}
 
+	@JsonIgnore
 	public void setCreator(
-			Creator creator);
+		UnsafeSupplier<Creator, Exception> creatorUnsafeSupplier) {
 
-	public void setCreator(
-			UnsafeSupplier<Creator, Throwable>
-				creatorUnsafeSupplier);
-	public Date getDateCreated();
+		try {
+			creator = creatorUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Creator creator;
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	@JsonIgnore
 	public void setDateCreated(
-			Date dateCreated);
+		UnsafeSupplier<Date, Exception> dateCreatedUnsafeSupplier) {
 
-	public void setDateCreated(
-			UnsafeSupplier<Date, Throwable>
-				dateCreatedUnsafeSupplier);
-	public Date getDateModified();
+		try {
+			dateCreated = dateCreatedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Date dateCreated;
+
+	public Date getDateModified() {
+		return dateModified;
+	}
+
+	public void setDateModified(Date dateModified) {
+		this.dateModified = dateModified;
+	}
+
+	@JsonIgnore
 	public void setDateModified(
-			Date dateModified);
+		UnsafeSupplier<Date, Exception> dateModifiedUnsafeSupplier) {
 
-	public void setDateModified(
-			UnsafeSupplier<Date, Throwable>
-				dateModifiedUnsafeSupplier);
-	public Date getDatePublished();
+		try {
+			dateModified = dateModifiedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Date dateModified;
+
+	public Date getDatePublished() {
+		return datePublished;
+	}
+
+	public void setDatePublished(Date datePublished) {
+		this.datePublished = datePublished;
+	}
+
+	@JsonIgnore
 	public void setDatePublished(
-			Date datePublished);
+		UnsafeSupplier<Date, Exception> datePublishedUnsafeSupplier) {
 
-	public void setDatePublished(
-			UnsafeSupplier<Date, Throwable>
-				datePublishedUnsafeSupplier);
-	public String getDescription();
+		try {
+			datePublished = datePublishedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Date datePublished;
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	@JsonIgnore
 	public void setDescription(
-			String description);
+		UnsafeSupplier<String, Exception> descriptionUnsafeSupplier) {
 
-	public void setDescription(
-			UnsafeSupplier<String, Throwable>
-				descriptionUnsafeSupplier);
-	public String getEncodingFormat();
+		try {
+			description = descriptionUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String description;
+
+	public String getEncodingFormat() {
+		return encodingFormat;
+	}
+
+	public void setEncodingFormat(String encodingFormat) {
+		this.encodingFormat = encodingFormat;
+	}
+
+	@JsonIgnore
 	public void setEncodingFormat(
-			String encodingFormat);
+		UnsafeSupplier<String, Exception> encodingFormatUnsafeSupplier) {
 
-	public void setEncodingFormat(
-			UnsafeSupplier<String, Throwable>
-				encodingFormatUnsafeSupplier);
-	public String getFriendlyUrlPath();
+		try {
+			encodingFormat = encodingFormatUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String encodingFormat;
+
+	public String getFriendlyUrlPath() {
+		return friendlyUrlPath;
+	}
+
+	public void setFriendlyUrlPath(String friendlyUrlPath) {
+		this.friendlyUrlPath = friendlyUrlPath;
+	}
+
+	@JsonIgnore
 	public void setFriendlyUrlPath(
-			String friendlyUrlPath);
+		UnsafeSupplier<String, Exception> friendlyUrlPathUnsafeSupplier) {
 
-	public void setFriendlyUrlPath(
-			UnsafeSupplier<String, Throwable>
-				friendlyUrlPathUnsafeSupplier);
-	public Boolean getHasComments();
+		try {
+			friendlyUrlPath = friendlyUrlPathUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setHasComments(
-			Boolean hasComments);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String friendlyUrlPath;
 
-	public void setHasComments(
-			UnsafeSupplier<Boolean, Throwable>
-				hasCommentsUnsafeSupplier);
-	public String getHeadline();
+	public String getHeadline() {
+		return headline;
+	}
 
+	public void setHeadline(String headline) {
+		this.headline = headline;
+	}
+
+	@JsonIgnore
 	public void setHeadline(
-			String headline);
+		UnsafeSupplier<String, Exception> headlineUnsafeSupplier) {
 
-	public void setHeadline(
-			UnsafeSupplier<String, Throwable>
-				headlineUnsafeSupplier);
-	public Long getId();
+		try {
+			headline = headlineUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String headline;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public Image getImage();
+	public Long getId() {
+		return id;
+	}
 
-	public void setImage(
-			Image image);
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-	public void setImage(
-			UnsafeSupplier<Image, Throwable>
-				imageUnsafeSupplier);
-	public Long getImageId();
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setImageId(
-			Long imageId);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
 
-	public void setImageId(
-			UnsafeSupplier<Long, Throwable>
-				imageIdUnsafeSupplier);
-	public String[] getKeywords();
+	public Image getImage() {
+		return image;
+	}
 
+	public void setImage(Image image) {
+		this.image = image;
+	}
+
+	@JsonIgnore
+	public void setImage(UnsafeSupplier<Image, Exception> imageUnsafeSupplier) {
+		try {
+			image = imageUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Image image;
+
+	public String[] getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(String[] keywords) {
+		this.keywords = keywords;
+	}
+
+	@JsonIgnore
 	public void setKeywords(
-			String[] keywords);
+		UnsafeSupplier<String[], Exception> keywordsUnsafeSupplier) {
 
-	public void setKeywords(
-			UnsafeSupplier<String[], Throwable>
-				keywordsUnsafeSupplier);
+		try {
+			keywords = keywordsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String[] keywords;
+
+	public Number getNumberOfComments() {
+		return numberOfComments;
+	}
+
+	public void setNumberOfComments(Number numberOfComments) {
+		this.numberOfComments = numberOfComments;
+	}
+
+	@JsonIgnore
+	public void setNumberOfComments(
+		UnsafeSupplier<Number, Exception> numberOfCommentsUnsafeSupplier) {
+
+		try {
+			numberOfComments = numberOfCommentsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Number numberOfComments;
+
+	public TaxonomyCategory[] getTaxonomyCategories() {
+		return taxonomyCategories;
+	}
+
+	public void setTaxonomyCategories(TaxonomyCategory[] taxonomyCategories) {
+		this.taxonomyCategories = taxonomyCategories;
+	}
+
+	@JsonIgnore
+	public void setTaxonomyCategories(
+		UnsafeSupplier<TaxonomyCategory[], Exception>
+			taxonomyCategoriesUnsafeSupplier) {
+
+		try {
+			taxonomyCategories = taxonomyCategoriesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected TaxonomyCategory[] taxonomyCategories;
+
+	public Long[] getTaxonomyCategoryIds() {
+		return taxonomyCategoryIds;
+	}
+
+	public void setTaxonomyCategoryIds(Long[] taxonomyCategoryIds) {
+		this.taxonomyCategoryIds = taxonomyCategoryIds;
+	}
+
+	@JsonIgnore
+	public void setTaxonomyCategoryIds(
+		UnsafeSupplier<Long[], Exception> taxonomyCategoryIdsUnsafeSupplier) {
+
+		try {
+			taxonomyCategoryIds = taxonomyCategoryIdsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	protected Long[] taxonomyCategoryIds;
+
+	public ViewableBy getViewableBy() {
+		return viewableBy;
+	}
+
+	@JsonIgnore
+	public String getViewableByAsString() {
+		if (viewableBy == null) {
+			return null;
+		}
+
+		return viewableBy.toString();
+	}
+
+	public void setViewableBy(ViewableBy viewableBy) {
+		this.viewableBy = viewableBy;
+	}
+
+	@JsonIgnore
+	public void setViewableBy(
+		UnsafeSupplier<ViewableBy, Exception> viewableByUnsafeSupplier) {
+
+		try {
+			viewableBy = viewableByUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	protected ViewableBy viewableBy;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof BlogPosting)) {
+			return false;
+		}
+
+		BlogPosting blogPosting = (BlogPosting)object;
+
+		return Objects.equals(toString(), blogPosting.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"aggregateRating\": ");
+
+		sb.append(aggregateRating);
+		sb.append(", ");
+
+		sb.append("\"alternativeHeadline\": ");
+
+		sb.append("\"");
+		sb.append(alternativeHeadline);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"articleBody\": ");
+
+		sb.append("\"");
+		sb.append(articleBody);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"contentSpaceId\": ");
+
+		sb.append(contentSpaceId);
+		sb.append(", ");
+
+		sb.append("\"creator\": ");
+
+		sb.append(creator);
+		sb.append(", ");
+
+		sb.append("\"dateCreated\": ");
+
+		sb.append("\"");
+		sb.append(dateCreated);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"dateModified\": ");
+
+		sb.append("\"");
+		sb.append(dateModified);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"datePublished\": ");
+
+		sb.append("\"");
+		sb.append(datePublished);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"description\": ");
+
+		sb.append("\"");
+		sb.append(description);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"encodingFormat\": ");
+
+		sb.append("\"");
+		sb.append(encodingFormat);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"friendlyUrlPath\": ");
+
+		sb.append("\"");
+		sb.append(friendlyUrlPath);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"headline\": ");
+
+		sb.append("\"");
+		sb.append(headline);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"image\": ");
+
+		sb.append(image);
+		sb.append(", ");
+
+		sb.append("\"keywords\": ");
+
+		if (keywords == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < keywords.length; i++) {
+				sb.append("\"");
+				sb.append(keywords[i]);
+				sb.append("\"");
+
+				if ((i + 1) < keywords.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"numberOfComments\": ");
+
+		sb.append(numberOfComments);
+		sb.append(", ");
+
+		sb.append("\"taxonomyCategories\": ");
+
+		if (taxonomyCategories == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < taxonomyCategories.length; i++) {
+				sb.append(taxonomyCategories[i]);
+
+				if ((i + 1) < taxonomyCategories.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"taxonomyCategoryIds\": ");
+
+		if (taxonomyCategoryIds == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < taxonomyCategoryIds.length; i++) {
+				sb.append(taxonomyCategoryIds[i]);
+
+				if ((i + 1) < taxonomyCategoryIds.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"viewableBy\": ");
+
+		sb.append("\"");
+		sb.append(viewableBy);
+		sb.append("\"");
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

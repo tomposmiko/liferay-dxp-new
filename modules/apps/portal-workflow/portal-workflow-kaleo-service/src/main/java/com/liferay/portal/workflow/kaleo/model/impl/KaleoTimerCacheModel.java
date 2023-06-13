@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.workflow.kaleo.model.KaleoTimer;
@@ -37,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class KaleoTimerCacheModel implements CacheModel<KaleoTimer>,
-	Externalizable, MVCCModel {
+public class KaleoTimerCacheModel
+	implements CacheModel<KaleoTimer>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,7 +52,8 @@ public class KaleoTimerCacheModel implements CacheModel<KaleoTimer>,
 		KaleoTimerCacheModel kaleoTimerCacheModel = (KaleoTimerCacheModel)obj;
 
 		if ((kaleoTimerId == kaleoTimerCacheModel.kaleoTimerId) &&
-				(mvccVersion == kaleoTimerCacheModel.mvccVersion)) {
+			(mvccVersion == kaleoTimerCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -233,8 +234,7 @@ public class KaleoTimerCacheModel implements CacheModel<KaleoTimer>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(kaleoTimerId);
@@ -319,4 +319,5 @@ public class KaleoTimerCacheModel implements CacheModel<KaleoTimer>,
 	public String scale;
 	public double recurrenceDuration;
 	public String recurrenceScale;
+
 }

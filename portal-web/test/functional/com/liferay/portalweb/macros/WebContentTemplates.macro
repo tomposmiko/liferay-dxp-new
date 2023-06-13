@@ -211,7 +211,9 @@ definition {
 			PortletEntry.inputName(name = "${templateName}");
 		}
 
-		WebContentTemplates._inputStructure(structureName = "${structureName}");
+		if (isSet(structureName)) {
+			WebContentTemplates._inputStructure(structureName = "${structureName}");
+		}
 
 		WebContentTemplates._inputDescription(
 			templateDescription = "${templateDescription}"
@@ -253,12 +255,29 @@ definition {
 		}
 	}
 
+	@summary = "Modify template"
+	macro modifyTemplate {
+		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Edit");
+
+		WebContentTemplates.inputTemplateAddScreenFields(
+			templateDescription = "${templateDescription}",
+			templateFieldNames = "${templateFieldNames}",
+			templateFile = "${templateFile}",
+			templateLanguage = "${templateLanguage}",
+			templateName = "${templateName}",
+			templateScript = "${templateScript}",
+			templateSmallImageURL = "${templateSmallImageURL}"
+		);
+
+		DDLDataDefinition.save();
+	}
+
 	@summary = "Teardown templates in the guest site"
 	macro tearDownCP {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);

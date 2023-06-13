@@ -7,13 +7,15 @@ AUI.add(
 
 		var HTML5_UPLOAD = WIN && WIN.File && WIN.FormData && WIN.XMLHttpRequest;
 
+		var TPL_MOVE_FORM = '<form action="{actionUrl}" method="POST"><input name="{namespace}cmd" value="move"/>' +
+			'<input name="{namespace}newFolderId" value="{newFolderId}"/>' +
+			'<input name="{namespace}{parameterName}" value="{parameterValue}"/>' +
+			'<input name="{namespace}redirect" value="{redirectUrl}"/>' +
+			'</form>';
+
 		var DocumentLibrary = A.Component.create(
 			{
 				ATTRS: {
-					classNameId: {
-						validator: Lang.isString
-					},
-
 					downloadEntryUrl: {
 						validator: Lang.isString
 					},
@@ -26,15 +28,7 @@ AUI.add(
 						validator: Lang.isObject
 					},
 
-					moveEntryUrl: {
-						validator: Lang.isString
-					},
-
-					npmResolvedPackageName: {
-						validator: Lang.isString
-					},
-
-					pathModule: {
+					openViewMoreFileEntryTypesURL: {
 						validator: Lang.isString
 					},
 
@@ -42,11 +36,11 @@ AUI.add(
 						validator: Lang.isString
 					},
 
-					selectCategoriesURL: {
+					selectFileEntryTypeURL: {
 						validator: Lang.isString
 					},
 
-					selectFileEntryTypeURL: {
+					selectFolderURL: {
 						validator: Lang.isString
 					},
 
@@ -127,17 +121,19 @@ AUI.add(
 						if (action === 'editTags') {
 							instance._openModalTags();
 
-							return;
+							action = null;
 						}
 
 						if (action === 'editCategories') {
 							instance._openModalCategories();
 
-							return;
+							action = null;
 						}
 
 						if (action === 'move' || action === 'moveEntries') {
-							url = instance.get('moveEntryUrl');
+							instance._openModalMove();
+
+							action = null;
 						}
 
 						if (action === 'download') {
@@ -159,6 +155,22 @@ AUI.add(
 						if (action) {
 							instance._processAction(action, url);
 						}
+					},
+
+					handleCreationMenuMoreButtonClicked: function(event) {
+						var instance = this;
+
+						Liferay.Util.openWindow(
+							{
+								dialog: {
+									destroyOnHide: true,
+									modal: true
+								},
+								id: instance.ns('selectAddMenuItem'),
+								title: Liferay.Language.get('more'),
+								uri: instance.get('openViewMoreFileEntryTypesURL')
+							}
+						);
 					},
 
 					handleFilterItemClicked: function(event) {
@@ -193,6 +205,43 @@ AUI.add(
 						}
 					},
 
+					showFolderDialog: function(selectedItems, parameterName, parameterValue) {
+						var instance = this;
+
+						var namespace = instance.NS;
+
+						var dialogTitle = '';
+
+						if (selectedItems == 1) {
+							dialogTitle = Liferay.Language.get('select-destination-folder-for-x-item');
+						}
+						else {
+							dialogTitle = Liferay.Language.get('select-destination-folder-for-x-items');
+						}
+
+						Liferay.Util.selectEntity(
+							{
+								dialog: {
+									constrain: true,
+									destroyOnHide: true,
+									modal: true,
+									width: 680
+								},
+								id: namespace + 'selectFolder',
+								title: Lang.sub(dialogTitle, [selectedItems]),
+								uri: instance.get('selectFolderURL')
+							},
+							function(event) {
+								if (parameterName && parameterValue) {
+									instance._moveSingleElement(event.folderid, parameterName, parameterValue);
+								}
+								else {
+									instance._moveCurrectSelection(event.folderid);
+								}
+							}
+						);
+					},
+
 					_handleSearchContainerRowToggled: function(event) {
 						var instance = this;
 
@@ -206,10 +255,50 @@ AUI.add(
 						}
 					},
 
-					_moveToFolder: function(obj) {
+					_moveCurrectSelection: function(newFolderId) {
 						var instance = this;
 
+						var form = instance.get('form').node;
+
+						var actionUrl = instance.get('editEntryUrl');
+
+						form.attr('action', actionUrl);
+						form.attr('method', 'POST');
+						form.attr('enctype', 'multipart/form-data');
+
+						form.get(instance.NS + 'cmd').val('move');
+						form.get(instance.NS + 'newFolderId').val(newFolderId);
+
+						submitForm(form, actionUrl, false);
+					},
+
+					_moveSingleElement: function(newFolderId, parameterName, parameterValue) {
+						var instance = this;
+
+						var actionUrl = instance.get('editEntryUrl');
 						var namespace = instance.NS;
+						var originalForm = instance.get('form').node;
+						var redirectUrl = originalForm.get(namespace + 'redirect').val();
+
+						var formNode = A.Node.create(
+							A.Lang.sub(
+								TPL_MOVE_FORM,
+								{
+									actionUrl: actionUrl,
+									namespace: namespace,
+									newFolderId: newFolderId,
+									parameterName: parameterName,
+									parameterValue: parameterValue,
+									redirectUrl: redirectUrl
+								}
+							)
+						);
+
+						submitForm(formNode, actionUrl, false);
+					},
+
+					_moveToFolder: function(obj) {
+						var instance = this;
 
 						var dropTarget = obj.targetItem;
 
@@ -221,11 +310,7 @@ AUI.add(
 							if (!instance._searchContainer.select ||
 								selectedItems.indexOf(dropTarget.one('input[type=checkbox]'))
 							) {
-								var form = instance.get('form').node;
-
-								form.get(namespace + 'newFolderId').val(folderId);
-
-								instance._processAction('move', instance.get('moveEntryUrl'));
+								instance._moveCurrectSelection(folderId);
 							}
 						}
 					},
@@ -262,86 +347,36 @@ AUI.add(
 					_openModalCategories: function() {
 						var instance = this;
 
-						var editCategories = instance._editCategories;
-						var form = instance.get('form').node;
-						var namespace = instance.NS;
+						var editCategoriesComponent = Liferay.component(instance.NS + 'EditCategoriesComponent');
 
-						var bulkSelection = instance._searchContainer.select && instance._searchContainer.select.get('bulkSelection');
+						if (editCategoriesComponent) {
+							var bulkSelection = instance._searchContainer.select && instance._searchContainer.select.get('bulkSelection');
 
-						if (!editCategories) {
-							var pathModule = instance.get('pathModule');
-
-							var urlCategories = pathModule + '/bulk/asset/categories/' + instance._config.scopeGroupId + '/' + instance.get('classNameId') + '/common';
-							var urlUpdateCategories = pathModule + '/bulk/asset/categories/' + instance.get('classNameId');
-
-							Liferay.Loader.require(
-								instance.get('npmResolvedPackageName') + '/document_library/categorization/EditCategories.es',
-								function(EditCategories) {
-									instance._editCategories = new EditCategories.default(
-										{
-											fileEntries: instance._selectedFileEntries,
-											folderId: instance.getFolderId(),
-											portletNamespace: namespace,
-											repositoryId: parseFloat(form.get(namespace + 'repositoryId').val()),
-											selectAll: bulkSelection,
-											selectCategoriesUrl: instance.get('selectCategoriesURL'),
-											spritemap: themeDisplay.getPathThemeImages() + '/lexicon/icons.svg',
-											urlCategories: urlCategories,
-											urlUpdateCategories: urlUpdateCategories
-										},
-										'#' + instance.NS + 'documentLibraryModal'
-									);
-								}
-							);
+							editCategoriesComponent.open(instance._selectedFileEntries, bulkSelection, instance.getFolderId());
 						}
-						else {
-							editCategories.fileEntries = instance._selectedFileEntries;
-							editCategories.selectAll = bulkSelection;
-							editCategories.folderId = instance.getFolderId();
-							editCategories.open();
+					},
+
+					_openModalMove: function() {
+						var instance = this;
+
+						var selectedItems = 0;
+
+						if (instance._searchContainer.select) {
+							selectedItems = instance._searchContainer.select.getAllSelectedElements().filter(':enabled').size();
 						}
+
+						this.showFolderDialog(selectedItems);
 					},
 
 					_openModalTags: function() {
 						var instance = this;
 
-						var editTagsComponent = instance._editTagsComponent;
-						var form = instance.get('form').node;
-						var namespace = instance.NS;
+						var editTagsComponent = Liferay.component(instance.NS + 'EditTagsComponent');
 
-						var bulkSelection = instance._searchContainer.select && instance._searchContainer.select.get('bulkSelection');
+						if (editTagsComponent) {
+							var bulkSelection = instance._searchContainer.select && instance._searchContainer.select.get('bulkSelection');
 
-						if (!editTagsComponent) {
-							var pathModule = instance.get('pathModule');
-							var urlSearchTags = pathModule +'/bulk/asset/tags/' + instance._config.scopeGroupId + '/search';
-							var urlTags = pathModule + '/bulk/asset/tags/' + instance.get('classNameId') + '/common';
-							var urlUpdateTags = pathModule + '/bulk/asset/tags/' + instance.get('classNameId');
-
-							Liferay.Loader.require(
-								instance.get('npmResolvedPackageName') + '/document_library/categorization/EditTags.es',
-								function(EditTags) {
-									instance._editTagsComponent = new EditTags.default(
-										{
-											fileEntries: instance._selectedFileEntries,
-											folderId: instance.getFolderId(),
-											portletNamespace: namespace,
-											repositoryId: parseFloat(form.get(namespace + 'repositoryId').val()),
-											selectAll: bulkSelection,
-											spritemap: themeDisplay.getPathThemeImages() + '/lexicon/icons.svg',
-											urlSearchTags: urlSearchTags,
-											urlTags: urlTags,
-											urlUpdateTags: urlUpdateTags
-										},
-										'#' + instance.NS + 'documentLibraryModal'
-									);
-								}
-							);
-						}
-						else {
-							editTagsComponent.fileEntries = instance._selectedFileEntries;
-							editTagsComponent.selectAll = bulkSelection;
-							editTagsComponent.folderId = instance.getFolderId();
-							editTagsComponent.open();
+							editTagsComponent.open(instance._selectedFileEntries, bulkSelection, instance.getFolderId());
 						}
 					},
 
@@ -385,6 +420,10 @@ AUI.add(
 						}
 
 						form.get(namespace + 'redirect').val(redirectUrl);
+
+						var bulkSelection = instance._searchContainer.select && instance._searchContainer.select.get('bulkSelection');
+
+						form.get(namespace + 'selectAll').val(bulkSelection);
 
 						submitForm(form, url, false);
 					}

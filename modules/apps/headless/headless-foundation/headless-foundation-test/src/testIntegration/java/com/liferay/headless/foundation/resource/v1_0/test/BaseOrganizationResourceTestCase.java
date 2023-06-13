@@ -14,38 +14,66 @@
 
 package com.liferay.headless.foundation.resource.v1_0.test;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-import com.liferay.headless.foundation.dto.v1_0.ContactInformation;
-import com.liferay.headless.foundation.dto.v1_0.Location;
 import com.liferay.headless.foundation.dto.v1_0.Organization;
-import com.liferay.headless.foundation.dto.v1_0.Services;
-import com.liferay.headless.foundation.dto.v1_0.UserAccount;
-import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.headless.foundation.resource.v1_0.OrganizationResource;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Base64;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.odata.entity.EntityField;
+import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.test.rule.Inject;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
+
+import java.lang.reflect.InvocationTargetException;
 
 import java.net.URL;
 
+import java.text.DateFormat;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
+
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -55,8 +83,20 @@ import org.junit.Test;
 @Generated("")
 public abstract class BaseOrganizationResourceTestCase {
 
+	@ClassRule
+	@Rule
+	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
+		new LiferayIntegrationTestRule();
+
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+	}
+
 	@Before
 	public void setUp() throws Exception {
+		irrelevantGroup = GroupTestUtil.addGroup();
 		testGroup = GroupTestUtil.addGroup();
 
 		_resourceURL = new URL(
@@ -65,155 +105,1056 @@ public abstract class BaseOrganizationResourceTestCase {
 
 	@After
 	public void tearDown() throws Exception {
+		GroupTestUtil.deleteGroup(irrelevantGroup);
 		GroupTestUtil.deleteGroup(testGroup);
 	}
 
 	@Test
 	public void testGetMyUserAccountOrganizationsPage() throws Exception {
-			Assert.assertTrue(true);
-	}
-	@Test
-	public void testGetOrganizationsPage() throws Exception {
-			Assert.assertTrue(true);
-	}
-	@Test
-	public void testGetOrganization() throws Exception {
-			Assert.assertTrue(true);
-	}
-	@Test
-	public void testGetOrganizationOrganizationsPage() throws Exception {
-			Assert.assertTrue(true);
-	}
-	@Test
-	public void testGetUserAccountOrganizationsPage() throws Exception {
-			Assert.assertTrue(true);
+		Long userAccountId =
+			testGetMyUserAccountOrganizationsPage_getUserAccountId();
+		Long irrelevantUserAccountId =
+			testGetMyUserAccountOrganizationsPage_getIrrelevantUserAccountId();
+
+		if ((irrelevantUserAccountId != null)) {
+			Organization irrelevantOrganization =
+				testGetMyUserAccountOrganizationsPage_addOrganization(
+					irrelevantUserAccountId, randomIrrelevantOrganization());
+
+			Page<Organization> page = invokeGetMyUserAccountOrganizationsPage(
+				irrelevantUserAccountId, Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantOrganization),
+				(List<Organization>)page.getItems());
+			assertValid(page);
+		}
+
+		Organization organization1 =
+			testGetMyUserAccountOrganizationsPage_addOrganization(
+				userAccountId, randomOrganization());
+
+		Organization organization2 =
+			testGetMyUserAccountOrganizationsPage_addOrganization(
+				userAccountId, randomOrganization());
+
+		Page<Organization> page = invokeGetMyUserAccountOrganizationsPage(
+			userAccountId, Pagination.of(1, 2));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(organization1, organization2),
+			(List<Organization>)page.getItems());
+		assertValid(page);
 	}
 
-	protected void assertResponseCode(int expectedResponseCode, Http.Response actualResponse) {
-		Assert.assertEquals(expectedResponseCode, actualResponse.getResponseCode());
+	@Test
+	public void testGetMyUserAccountOrganizationsPageWithPagination()
+		throws Exception {
+
+		Long userAccountId =
+			testGetMyUserAccountOrganizationsPage_getUserAccountId();
+
+		Organization organization1 =
+			testGetMyUserAccountOrganizationsPage_addOrganization(
+				userAccountId, randomOrganization());
+
+		Organization organization2 =
+			testGetMyUserAccountOrganizationsPage_addOrganization(
+				userAccountId, randomOrganization());
+
+		Organization organization3 =
+			testGetMyUserAccountOrganizationsPage_addOrganization(
+				userAccountId, randomOrganization());
+
+		Page<Organization> page1 = invokeGetMyUserAccountOrganizationsPage(
+			userAccountId, Pagination.of(1, 2));
+
+		List<Organization> organizations1 =
+			(List<Organization>)page1.getItems();
+
+		Assert.assertEquals(
+			organizations1.toString(), 2, organizations1.size());
+
+		Page<Organization> page2 = invokeGetMyUserAccountOrganizationsPage(
+			userAccountId, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<Organization> organizations2 =
+			(List<Organization>)page2.getItems();
+
+		Assert.assertEquals(
+			organizations2.toString(), 1, organizations2.size());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(organization1, organization2, organization3),
+			new ArrayList<Organization>() {
+				{
+					addAll(organizations1);
+					addAll(organizations2);
+				}
+			});
+	}
+
+	protected Organization
+			testGetMyUserAccountOrganizationsPage_addOrganization(
+				Long userAccountId, Organization organization)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetMyUserAccountOrganizationsPage_getUserAccountId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long
+			testGetMyUserAccountOrganizationsPage_getIrrelevantUserAccountId()
+		throws Exception {
+
+		return null;
 	}
 
 	protected Page<Organization> invokeGetMyUserAccountOrganizationsPage(
-				Long myUserAccountId,Pagination pagination)
-			throws Exception {
+			Long userAccountId, Pagination pagination)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/my-user-accounts/{my-user-account-id}/organizations", myUserAccountId));
+		String location =
+			_resourceURL +
+				_toPath(
+					"/my-user-accounts/{user-account-id}/organizations",
+					userAccountId);
 
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), new TypeReference<Page<OrganizationImpl>>() {});
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		return _outputObjectMapper.readValue(
+			string,
+			new TypeReference<Page<Organization>>() {
+			});
 	}
 
 	protected Http.Response invokeGetMyUserAccountOrganizationsPageResponse(
-				Long myUserAccountId,Pagination pagination)
-			throws Exception {
+			Long userAccountId, Pagination pagination)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/my-user-accounts/{my-user-account-id}/organizations", myUserAccountId));
+		String location =
+			_resourceURL +
+				_toPath(
+					"/my-user-accounts/{user-account-id}/organizations",
+					userAccountId);
 
-			HttpUtil.URLtoString(options);
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
 
-			return options.getResponse();
+		options.setLocation(location);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
 	}
+
+	@Test
+	public void testGetOrganizationsPage() throws Exception {
+		Organization organization1 = testGetOrganizationsPage_addOrganization(
+			randomOrganization());
+
+		Organization organization2 = testGetOrganizationsPage_addOrganization(
+			randomOrganization());
+
+		Page<Organization> page = invokeGetOrganizationsPage(
+			null, null, Pagination.of(1, 2), null);
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(organization1, organization2),
+			(List<Organization>)page.getItems());
+		assertValid(page);
+	}
+
+	@Test
+	public void testGetOrganizationsPageWithFilterDateTimeEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DATE_TIME);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		for (EntityField entityField : entityFields) {
+			BeanUtils.setProperty(
+				organization1, entityField.getName(),
+				DateUtils.addMinutes(new Date(), -2));
+		}
+
+		organization1 = testGetOrganizationsPage_addOrganization(organization1);
+
+		Thread.sleep(1000);
+
+		organization2 = testGetOrganizationsPage_addOrganization(organization2);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> page = invokeGetOrganizationsPage(
+				null, getFilterString(entityField, "eq", organization1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(organization1),
+				(List<Organization>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationsPageWithFilterStringEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.STRING);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Organization organization1 = testGetOrganizationsPage_addOrganization(
+			randomOrganization());
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Organization organization2 = testGetOrganizationsPage_addOrganization(
+			randomOrganization());
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> page = invokeGetOrganizationsPage(
+				null, getFilterString(entityField, "eq", organization1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(organization1),
+				(List<Organization>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationsPageWithPagination() throws Exception {
+		Organization organization1 = testGetOrganizationsPage_addOrganization(
+			randomOrganization());
+
+		Organization organization2 = testGetOrganizationsPage_addOrganization(
+			randomOrganization());
+
+		Organization organization3 = testGetOrganizationsPage_addOrganization(
+			randomOrganization());
+
+		Page<Organization> page1 = invokeGetOrganizationsPage(
+			null, null, Pagination.of(1, 2), null);
+
+		List<Organization> organizations1 =
+			(List<Organization>)page1.getItems();
+
+		Assert.assertEquals(
+			organizations1.toString(), 2, organizations1.size());
+
+		Page<Organization> page2 = invokeGetOrganizationsPage(
+			null, null, Pagination.of(2, 2), null);
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<Organization> organizations2 =
+			(List<Organization>)page2.getItems();
+
+		Assert.assertEquals(
+			organizations2.toString(), 1, organizations2.size());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(organization1, organization2, organization3),
+			new ArrayList<Organization>() {
+				{
+					addAll(organizations1);
+					addAll(organizations2);
+				}
+			});
+	}
+
+	@Test
+	public void testGetOrganizationsPageWithSortDateTime() throws Exception {
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DATE_TIME);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		for (EntityField entityField : entityFields) {
+			BeanUtils.setProperty(
+				organization1, entityField.getName(),
+				DateUtils.addMinutes(new Date(), -2));
+		}
+
+		organization1 = testGetOrganizationsPage_addOrganization(organization1);
+
+		Thread.sleep(1000);
+
+		organization2 = testGetOrganizationsPage_addOrganization(organization2);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage = invokeGetOrganizationsPage(
+				null, null, Pagination.of(1, 2),
+				entityField.getName() + ":asc");
+
+			assertEquals(
+				Arrays.asList(organization1, organization2),
+				(List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage = invokeGetOrganizationsPage(
+				null, null, Pagination.of(1, 2),
+				entityField.getName() + ":desc");
+
+			assertEquals(
+				Arrays.asList(organization2, organization1),
+				(List<Organization>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationsPageWithSortString() throws Exception {
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.STRING);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		for (EntityField entityField : entityFields) {
+			BeanUtils.setProperty(organization1, entityField.getName(), "Aaa");
+			BeanUtils.setProperty(organization2, entityField.getName(), "Bbb");
+		}
+
+		organization1 = testGetOrganizationsPage_addOrganization(organization1);
+
+		organization2 = testGetOrganizationsPage_addOrganization(organization2);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage = invokeGetOrganizationsPage(
+				null, null, Pagination.of(1, 2),
+				entityField.getName() + ":asc");
+
+			assertEquals(
+				Arrays.asList(organization1, organization2),
+				(List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage = invokeGetOrganizationsPage(
+				null, null, Pagination.of(1, 2),
+				entityField.getName() + ":desc");
+
+			assertEquals(
+				Arrays.asList(organization2, organization1),
+				(List<Organization>)descPage.getItems());
+		}
+	}
+
+	protected Organization testGetOrganizationsPage_addOrganization(
+			Organization organization)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
 	protected Page<Organization> invokeGetOrganizationsPage(
-				Pagination pagination)
-			throws Exception {
+			String search, String filterString, Pagination pagination,
+			String sortString)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/organizations", pagination));
+		String location = _resourceURL + _toPath("/organizations");
 
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), new TypeReference<Page<OrganizationImpl>>() {});
+		location = HttpUtil.addParameter(location, "filter", filterString);
+
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		location = HttpUtil.addParameter(location, "sort", sortString);
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		return _outputObjectMapper.readValue(
+			string,
+			new TypeReference<Page<Organization>>() {
+			});
 	}
 
 	protected Http.Response invokeGetOrganizationsPageResponse(
-				Pagination pagination)
-			throws Exception {
+			String search, String filterString, Pagination pagination,
+			String sortString)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/organizations", pagination));
+		String location = _resourceURL + _toPath("/organizations");
 
-			HttpUtil.URLtoString(options);
+		location = HttpUtil.addParameter(location, "filter", filterString);
 
-			return options.getResponse();
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		location = HttpUtil.addParameter(location, "sort", sortString);
+
+		options.setLocation(location);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
 	}
-	protected Organization invokeGetOrganization(
-				Long organizationId)
-			throws Exception {
 
-			Http.Options options = _createHttpOptions();
+	@Test
+	public void testGetOrganization() throws Exception {
+		Organization postOrganization = testGetOrganization_addOrganization();
 
-			options.setLocation(_resourceURL + _toPath("/organizations/{organization-id}", organizationId));
+		Organization getOrganization = invokeGetOrganization(
+			postOrganization.getId());
 
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), OrganizationImpl.class);
+		assertEquals(postOrganization, getOrganization);
+		assertValid(getOrganization);
 	}
 
-	protected Http.Response invokeGetOrganizationResponse(
-				Long organizationId)
-			throws Exception {
+	protected Organization testGetOrganization_addOrganization()
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
-
-			options.setLocation(_resourceURL + _toPath("/organizations/{organization-id}", organizationId));
-
-			HttpUtil.URLtoString(options);
-
-			return options.getResponse();
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
+
+	protected Organization invokeGetOrganization(Long organizationId)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL +
+				_toPath("/organizations/{organization-id}", organizationId);
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		try {
+			return _outputObjectMapper.readValue(string, Organization.class);
+		}
+		catch (Exception e) {
+			_log.error("Unable to process HTTP response: " + string, e);
+
+			throw e;
+		}
+	}
+
+	protected Http.Response invokeGetOrganizationResponse(Long organizationId)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL +
+				_toPath("/organizations/{organization-id}", organizationId);
+
+		options.setLocation(location);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
+	}
+
+	@Test
+	public void testGetOrganizationOrganizationsPage() throws Exception {
+		Long organizationId =
+			testGetOrganizationOrganizationsPage_getOrganizationId();
+		Long irrelevantOrganizationId =
+			testGetOrganizationOrganizationsPage_getIrrelevantOrganizationId();
+
+		if ((irrelevantOrganizationId != null)) {
+			Organization irrelevantOrganization =
+				testGetOrganizationOrganizationsPage_addOrganization(
+					irrelevantOrganizationId, randomIrrelevantOrganization());
+
+			Page<Organization> page = invokeGetOrganizationOrganizationsPage(
+				irrelevantOrganizationId, null, null, Pagination.of(1, 2),
+				null);
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantOrganization),
+				(List<Organization>)page.getItems());
+			assertValid(page);
+		}
+
+		Organization organization1 =
+			testGetOrganizationOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		Organization organization2 =
+			testGetOrganizationOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		Page<Organization> page = invokeGetOrganizationOrganizationsPage(
+			organizationId, null, null, Pagination.of(1, 2), null);
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(organization1, organization2),
+			(List<Organization>)page.getItems());
+		assertValid(page);
+	}
+
+	@Test
+	public void testGetOrganizationOrganizationsPageWithFilterDateTimeEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DATE_TIME);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long organizationId =
+			testGetOrganizationOrganizationsPage_getOrganizationId();
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		for (EntityField entityField : entityFields) {
+			BeanUtils.setProperty(
+				organization1, entityField.getName(),
+				DateUtils.addMinutes(new Date(), -2));
+		}
+
+		organization1 = testGetOrganizationOrganizationsPage_addOrganization(
+			organizationId, organization1);
+
+		Thread.sleep(1000);
+
+		organization2 = testGetOrganizationOrganizationsPage_addOrganization(
+			organizationId, organization2);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> page = invokeGetOrganizationOrganizationsPage(
+				organizationId, null,
+				getFilterString(entityField, "eq", organization1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(organization1),
+				(List<Organization>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationOrganizationsPageWithFilterStringEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.STRING);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long organizationId =
+			testGetOrganizationOrganizationsPage_getOrganizationId();
+
+		Organization organization1 =
+			testGetOrganizationOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Organization organization2 =
+			testGetOrganizationOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> page = invokeGetOrganizationOrganizationsPage(
+				organizationId, null,
+				getFilterString(entityField, "eq", organization1),
+				Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(organization1),
+				(List<Organization>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationOrganizationsPageWithPagination()
+		throws Exception {
+
+		Long organizationId =
+			testGetOrganizationOrganizationsPage_getOrganizationId();
+
+		Organization organization1 =
+			testGetOrganizationOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		Organization organization2 =
+			testGetOrganizationOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		Organization organization3 =
+			testGetOrganizationOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		Page<Organization> page1 = invokeGetOrganizationOrganizationsPage(
+			organizationId, null, null, Pagination.of(1, 2), null);
+
+		List<Organization> organizations1 =
+			(List<Organization>)page1.getItems();
+
+		Assert.assertEquals(
+			organizations1.toString(), 2, organizations1.size());
+
+		Page<Organization> page2 = invokeGetOrganizationOrganizationsPage(
+			organizationId, null, null, Pagination.of(2, 2), null);
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<Organization> organizations2 =
+			(List<Organization>)page2.getItems();
+
+		Assert.assertEquals(
+			organizations2.toString(), 1, organizations2.size());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(organization1, organization2, organization3),
+			new ArrayList<Organization>() {
+				{
+					addAll(organizations1);
+					addAll(organizations2);
+				}
+			});
+	}
+
+	@Test
+	public void testGetOrganizationOrganizationsPageWithSortDateTime()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DATE_TIME);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long organizationId =
+			testGetOrganizationOrganizationsPage_getOrganizationId();
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		for (EntityField entityField : entityFields) {
+			BeanUtils.setProperty(
+				organization1, entityField.getName(),
+				DateUtils.addMinutes(new Date(), -2));
+		}
+
+		organization1 = testGetOrganizationOrganizationsPage_addOrganization(
+			organizationId, organization1);
+
+		Thread.sleep(1000);
+
+		organization2 = testGetOrganizationOrganizationsPage_addOrganization(
+			organizationId, organization2);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage = invokeGetOrganizationOrganizationsPage(
+				organizationId, null, null, Pagination.of(1, 2),
+				entityField.getName() + ":asc");
+
+			assertEquals(
+				Arrays.asList(organization1, organization2),
+				(List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage =
+				invokeGetOrganizationOrganizationsPage(
+					organizationId, null, null, Pagination.of(1, 2),
+					entityField.getName() + ":desc");
+
+			assertEquals(
+				Arrays.asList(organization2, organization1),
+				(List<Organization>)descPage.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationOrganizationsPageWithSortString()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.STRING);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		Long organizationId =
+			testGetOrganizationOrganizationsPage_getOrganizationId();
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		for (EntityField entityField : entityFields) {
+			BeanUtils.setProperty(organization1, entityField.getName(), "Aaa");
+			BeanUtils.setProperty(organization2, entityField.getName(), "Bbb");
+		}
+
+		organization1 = testGetOrganizationOrganizationsPage_addOrganization(
+			organizationId, organization1);
+
+		organization2 = testGetOrganizationOrganizationsPage_addOrganization(
+			organizationId, organization2);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage = invokeGetOrganizationOrganizationsPage(
+				organizationId, null, null, Pagination.of(1, 2),
+				entityField.getName() + ":asc");
+
+			assertEquals(
+				Arrays.asList(organization1, organization2),
+				(List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage =
+				invokeGetOrganizationOrganizationsPage(
+					organizationId, null, null, Pagination.of(1, 2),
+					entityField.getName() + ":desc");
+
+			assertEquals(
+				Arrays.asList(organization2, organization1),
+				(List<Organization>)descPage.getItems());
+		}
+	}
+
+	protected Organization testGetOrganizationOrganizationsPage_addOrganization(
+			Long organizationId, Organization organization)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetOrganizationOrganizationsPage_getOrganizationId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long
+			testGetOrganizationOrganizationsPage_getIrrelevantOrganizationId()
+		throws Exception {
+
+		return null;
+	}
+
 	protected Page<Organization> invokeGetOrganizationOrganizationsPage(
-				Long organizationId,Pagination pagination)
-			throws Exception {
+			Long organizationId, String search, String filterString,
+			Pagination pagination, String sortString)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/organizations/{organization-id}/organizations", organizationId));
+		String location =
+			_resourceURL +
+				_toPath(
+					"/organizations/{organization-id}/organizations",
+					organizationId);
 
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), new TypeReference<Page<OrganizationImpl>>() {});
+		location = HttpUtil.addParameter(location, "filter", filterString);
+
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		location = HttpUtil.addParameter(location, "sort", sortString);
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		return _outputObjectMapper.readValue(
+			string,
+			new TypeReference<Page<Organization>>() {
+			});
 	}
 
 	protected Http.Response invokeGetOrganizationOrganizationsPageResponse(
-				Long organizationId,Pagination pagination)
-			throws Exception {
+			Long organizationId, String search, String filterString,
+			Pagination pagination, String sortString)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/organizations/{organization-id}/organizations", organizationId));
+		String location =
+			_resourceURL +
+				_toPath(
+					"/organizations/{organization-id}/organizations",
+					organizationId);
 
-			HttpUtil.URLtoString(options);
+		location = HttpUtil.addParameter(location, "filter", filterString);
 
-			return options.getResponse();
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		location = HttpUtil.addParameter(location, "sort", sortString);
+
+		options.setLocation(location);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
 	}
+
+	@Test
+	public void testGetUserAccountOrganizationsPage() throws Exception {
+		Long userAccountId =
+			testGetUserAccountOrganizationsPage_getUserAccountId();
+		Long irrelevantUserAccountId =
+			testGetUserAccountOrganizationsPage_getIrrelevantUserAccountId();
+
+		if ((irrelevantUserAccountId != null)) {
+			Organization irrelevantOrganization =
+				testGetUserAccountOrganizationsPage_addOrganization(
+					irrelevantUserAccountId, randomIrrelevantOrganization());
+
+			Page<Organization> page = invokeGetUserAccountOrganizationsPage(
+				irrelevantUserAccountId, Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantOrganization),
+				(List<Organization>)page.getItems());
+			assertValid(page);
+		}
+
+		Organization organization1 =
+			testGetUserAccountOrganizationsPage_addOrganization(
+				userAccountId, randomOrganization());
+
+		Organization organization2 =
+			testGetUserAccountOrganizationsPage_addOrganization(
+				userAccountId, randomOrganization());
+
+		Page<Organization> page = invokeGetUserAccountOrganizationsPage(
+			userAccountId, Pagination.of(1, 2));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(organization1, organization2),
+			(List<Organization>)page.getItems());
+		assertValid(page);
+	}
+
+	@Test
+	public void testGetUserAccountOrganizationsPageWithPagination()
+		throws Exception {
+
+		Long userAccountId =
+			testGetUserAccountOrganizationsPage_getUserAccountId();
+
+		Organization organization1 =
+			testGetUserAccountOrganizationsPage_addOrganization(
+				userAccountId, randomOrganization());
+
+		Organization organization2 =
+			testGetUserAccountOrganizationsPage_addOrganization(
+				userAccountId, randomOrganization());
+
+		Organization organization3 =
+			testGetUserAccountOrganizationsPage_addOrganization(
+				userAccountId, randomOrganization());
+
+		Page<Organization> page1 = invokeGetUserAccountOrganizationsPage(
+			userAccountId, Pagination.of(1, 2));
+
+		List<Organization> organizations1 =
+			(List<Organization>)page1.getItems();
+
+		Assert.assertEquals(
+			organizations1.toString(), 2, organizations1.size());
+
+		Page<Organization> page2 = invokeGetUserAccountOrganizationsPage(
+			userAccountId, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<Organization> organizations2 =
+			(List<Organization>)page2.getItems();
+
+		Assert.assertEquals(
+			organizations2.toString(), 1, organizations2.size());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(organization1, organization2, organization3),
+			new ArrayList<Organization>() {
+				{
+					addAll(organizations1);
+					addAll(organizations2);
+				}
+			});
+	}
+
+	protected Organization testGetUserAccountOrganizationsPage_addOrganization(
+			Long userAccountId, Organization organization)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetUserAccountOrganizationsPage_getUserAccountId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long
+			testGetUserAccountOrganizationsPage_getIrrelevantUserAccountId()
+		throws Exception {
+
+		return null;
+	}
+
 	protected Page<Organization> invokeGetUserAccountOrganizationsPage(
-				Long userAccountId,Pagination pagination)
-			throws Exception {
+			Long userAccountId, Pagination pagination)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/user-accounts/{user-account-id}/organizations", userAccountId));
+		String location =
+			_resourceURL +
+				_toPath(
+					"/user-accounts/{user-account-id}/organizations",
+					userAccountId);
 
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), new TypeReference<Page<OrganizationImpl>>() {});
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		return _outputObjectMapper.readValue(
+			string,
+			new TypeReference<Page<Organization>>() {
+			});
 	}
 
 	protected Http.Response invokeGetUserAccountOrganizationsPageResponse(
-				Long userAccountId,Pagination pagination)
-			throws Exception {
+			Long userAccountId, Pagination pagination)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/user-accounts/{user-account-id}/organizations", userAccountId));
+		String location =
+			_resourceURL +
+				_toPath(
+					"/user-accounts/{user-account-id}/organizations",
+					userAccountId);
 
-			HttpUtil.URLtoString(options);
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
 
-			return options.getResponse();
+		options.setLocation(location);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
 	}
 
-	protected void assertEquals(Organization organization1, Organization organization2) {
-		Assert.assertTrue(organization1 + " does not equal " + organization2, equals(organization1, organization2));
+	protected void assertResponseCode(
+		int expectedResponseCode, Http.Response actualResponse) {
+
+		Assert.assertEquals(
+			expectedResponseCode, actualResponse.getResponseCode());
 	}
 
-	protected void assertEquals(List<Organization> organizations1, List<Organization> organizations2) {
+	protected void assertEquals(
+		Organization organization1, Organization organization2) {
+
+		Assert.assertTrue(
+			organization1 + " does not equal " + organization2,
+			equals(organization1, organization2));
+	}
+
+	protected void assertEquals(
+		List<Organization> organizations1, List<Organization> organizations2) {
+
 		Assert.assertEquals(organizations1.size(), organizations2.size());
 
 		for (int i = 0; i < organizations1.size(); i++) {
@@ -221,409 +1162,249 @@ public abstract class BaseOrganizationResourceTestCase {
 			Organization organization2 = organizations2.get(i);
 
 			assertEquals(organization1, organization2);
-	}
+		}
 	}
 
-	protected boolean equals(Organization organization1, Organization organization2) {
+	protected void assertEqualsIgnoringOrder(
+		List<Organization> organizations1, List<Organization> organizations2) {
+
+		Assert.assertEquals(organizations1.size(), organizations2.size());
+
+		for (Organization organization1 : organizations1) {
+			boolean contains = false;
+
+			for (Organization organization2 : organizations2) {
+				if (equals(organization1, organization2)) {
+					contains = true;
+
+					break;
+				}
+			}
+
+			Assert.assertTrue(
+				organizations2 + " does not contain " + organization1,
+				contains);
+		}
+	}
+
+	protected void assertValid(Organization organization) {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected void assertValid(Page<Organization> page) {
+		boolean valid = false;
+
+		Collection<Organization> organizations = page.getItems();
+
+		int size = organizations.size();
+
+		if ((page.getLastPage() > 0) && (page.getPage() > 0) &&
+			(page.getPageSize() > 0) && (page.getTotalCount() > 0) &&
+			(size > 0)) {
+
+			valid = true;
+		}
+
+		Assert.assertTrue(valid);
+	}
+
+	protected boolean equals(
+		Organization organization1, Organization organization2) {
+
 		if (organization1 == organization2) {
 			return true;
-	}
+		}
 
 		return false;
 	}
 
-	protected Organization randomOrganization() {
-		return new OrganizationImpl() {
-			{
+	protected Collection<EntityField> getEntityFields() throws Exception {
+		if (!(_organizationResource instanceof EntityModelResource)) {
+			throw new UnsupportedOperationException(
+				"Resource is not an instance of EntityModelResource");
+		}
 
-						comment = RandomTestUtil.randomString();
-						id = RandomTestUtil.randomLong();
-						logo = RandomTestUtil.randomString();
-						name = RandomTestUtil.randomString();
-						parentOrganizationId = RandomTestUtil.randomLong();
+		EntityModelResource entityModelResource =
+			(EntityModelResource)_organizationResource;
+
+		EntityModel entityModel = entityModelResource.getEntityModel(
+			new MultivaluedHashMap());
+
+		Map<String, EntityField> entityFieldsMap =
+			entityModel.getEntityFieldsMap();
+
+		return entityFieldsMap.values();
 	}
+
+	protected List<EntityField> getEntityFields(EntityField.Type type)
+		throws Exception {
+
+		Collection<EntityField> entityFields = getEntityFields();
+
+		Stream<EntityField> stream = entityFields.stream();
+
+		return stream.filter(
+			entityField -> Objects.equals(entityField.getType(), type)
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	protected String getFilterString(
+		EntityField entityField, String operator, Organization organization) {
+
+		StringBundler sb = new StringBundler();
+
+		String entityFieldName = entityField.getName();
+
+		sb.append(entityFieldName);
+
+		sb.append(" ");
+		sb.append(operator);
+		sb.append(" ");
+
+		if (entityFieldName.equals("comment")) {
+			sb.append("'");
+			sb.append(String.valueOf(organization.getComment()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("contactInformation")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("dateCreated")) {
+			sb.append(_dateFormat.format(organization.getDateCreated()));
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("dateModified")) {
+			sb.append(_dateFormat.format(organization.getDateModified()));
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("id")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("image")) {
+			sb.append("'");
+			sb.append(String.valueOf(organization.getImage()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("keywords")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("location")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("name")) {
+			sb.append("'");
+			sb.append(String.valueOf(organization.getName()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("numberOfOrganizations")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("parentOrganization")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("parentOrganizationId")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("services")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		throw new IllegalArgumentException(
+			"Invalid entity field " + entityFieldName);
+	}
+
+	protected Organization randomOrganization() {
+		return new Organization() {
+			{
+				comment = RandomTestUtil.randomString();
+				dateCreated = RandomTestUtil.nextDate();
+				dateModified = RandomTestUtil.nextDate();
+				id = RandomTestUtil.randomLong();
+				image = RandomTestUtil.randomString();
+				name = RandomTestUtil.randomString();
+				parentOrganizationId = RandomTestUtil.randomLong();
+			}
 		};
 	}
 
+	protected Organization randomIrrelevantOrganization() {
+		return randomOrganization();
+	}
+
+	protected Organization randomPatchOrganization() {
+		return randomOrganization();
+	}
+
+	protected Group irrelevantGroup;
 	protected Group testGroup;
-
-	protected static class OrganizationImpl implements Organization {
-
-	public String getComment() {
-				return comment;
-	}
-
-	public void setComment(String comment) {
-				this.comment = comment;
-	}
-
-	@JsonIgnore
-	public void setComment(
-				UnsafeSupplier<String, Throwable> commentUnsafeSupplier) {
-
-				try {
-					comment = commentUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String comment;
-	public ContactInformation getContactInformation() {
-				return contactInformation;
-	}
-
-	public void setContactInformation(ContactInformation contactInformation) {
-				this.contactInformation = contactInformation;
-	}
-
-	@JsonIgnore
-	public void setContactInformation(
-				UnsafeSupplier<ContactInformation, Throwable> contactInformationUnsafeSupplier) {
-
-				try {
-					contactInformation = contactInformationUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected ContactInformation contactInformation;
-	public Long getId() {
-				return id;
-	}
-
-	public void setId(Long id) {
-				this.id = id;
-	}
-
-	@JsonIgnore
-	public void setId(
-				UnsafeSupplier<Long, Throwable> idUnsafeSupplier) {
-
-				try {
-					id = idUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Long id;
-	public Location getLocation() {
-				return location;
-	}
-
-	public void setLocation(Location location) {
-				this.location = location;
-	}
-
-	@JsonIgnore
-	public void setLocation(
-				UnsafeSupplier<Location, Throwable> locationUnsafeSupplier) {
-
-				try {
-					location = locationUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Location location;
-	public String getLogo() {
-				return logo;
-	}
-
-	public void setLogo(String logo) {
-				this.logo = logo;
-	}
-
-	@JsonIgnore
-	public void setLogo(
-				UnsafeSupplier<String, Throwable> logoUnsafeSupplier) {
-
-				try {
-					logo = logoUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String logo;
-	public UserAccount[] getMembers() {
-				return members;
-	}
-
-	public void setMembers(UserAccount[] members) {
-				this.members = members;
-	}
-
-	@JsonIgnore
-	public void setMembers(
-				UnsafeSupplier<UserAccount[], Throwable> membersUnsafeSupplier) {
-
-				try {
-					members = membersUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected UserAccount[] members;
-	public Long[] getMembersIds() {
-				return membersIds;
-	}
-
-	public void setMembersIds(Long[] membersIds) {
-				this.membersIds = membersIds;
-	}
-
-	@JsonIgnore
-	public void setMembersIds(
-				UnsafeSupplier<Long[], Throwable> membersIdsUnsafeSupplier) {
-
-				try {
-					membersIds = membersIdsUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Long[] membersIds;
-	public String getName() {
-				return name;
-	}
-
-	public void setName(String name) {
-				this.name = name;
-	}
-
-	@JsonIgnore
-	public void setName(
-				UnsafeSupplier<String, Throwable> nameUnsafeSupplier) {
-
-				try {
-					name = nameUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String name;
-	public Organization getParentOrganization() {
-				return parentOrganization;
-	}
-
-	public void setParentOrganization(Organization parentOrganization) {
-				this.parentOrganization = parentOrganization;
-	}
-
-	@JsonIgnore
-	public void setParentOrganization(
-				UnsafeSupplier<Organization, Throwable> parentOrganizationUnsafeSupplier) {
-
-				try {
-					parentOrganization = parentOrganizationUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Organization parentOrganization;
-	public Long getParentOrganizationId() {
-				return parentOrganizationId;
-	}
-
-	public void setParentOrganizationId(Long parentOrganizationId) {
-				this.parentOrganizationId = parentOrganizationId;
-	}
-
-	@JsonIgnore
-	public void setParentOrganizationId(
-				UnsafeSupplier<Long, Throwable> parentOrganizationIdUnsafeSupplier) {
-
-				try {
-					parentOrganizationId = parentOrganizationIdUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Long parentOrganizationId;
-	public Services[] getServices() {
-				return services;
-	}
-
-	public void setServices(Services[] services) {
-				this.services = services;
-	}
-
-	@JsonIgnore
-	public void setServices(
-				UnsafeSupplier<Services[], Throwable> servicesUnsafeSupplier) {
-
-				try {
-					services = servicesUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Services[] services;
-	public Organization[] getSubOrganization() {
-				return subOrganization;
-	}
-
-	public void setSubOrganization(Organization[] subOrganization) {
-				this.subOrganization = subOrganization;
-	}
-
-	@JsonIgnore
-	public void setSubOrganization(
-				UnsafeSupplier<Organization[], Throwable> subOrganizationUnsafeSupplier) {
-
-				try {
-					subOrganization = subOrganizationUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Organization[] subOrganization;
-	public Long[] getSubOrganizationIds() {
-				return subOrganizationIds;
-	}
-
-	public void setSubOrganizationIds(Long[] subOrganizationIds) {
-				this.subOrganizationIds = subOrganizationIds;
-	}
-
-	@JsonIgnore
-	public void setSubOrganizationIds(
-				UnsafeSupplier<Long[], Throwable> subOrganizationIdsUnsafeSupplier) {
-
-				try {
-					subOrganizationIds = subOrganizationIdsUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Long[] subOrganizationIds;
-
-	public String toString() {
-			StringBundler sb = new StringBundler();
-
-			sb.append("{");
-
-					sb.append("comment=");
-
-				sb.append(comment);
-					sb.append(", contactInformation=");
-
-				sb.append(contactInformation);
-					sb.append(", id=");
-
-				sb.append(id);
-					sb.append(", location=");
-
-				sb.append(location);
-					sb.append(", logo=");
-
-				sb.append(logo);
-					sb.append(", members=");
-
-				sb.append(members);
-					sb.append(", membersIds=");
-
-				sb.append(membersIds);
-					sb.append(", name=");
-
-				sb.append(name);
-					sb.append(", parentOrganization=");
-
-				sb.append(parentOrganization);
-					sb.append(", parentOrganizationId=");
-
-				sb.append(parentOrganizationId);
-					sb.append(", services=");
-
-				sb.append(services);
-					sb.append(", subOrganization=");
-
-				sb.append(subOrganization);
-					sb.append(", subOrganizationIds=");
-
-				sb.append(subOrganizationIds);
-
-			sb.append("}");
-
-			return sb.toString();
-	}
-
-	}
 
 	protected static class Page<T> {
 
-	public Collection<T> getItems() {
+		public Collection<T> getItems() {
 			return new ArrayList<>(items);
-	}
+		}
 
-	public int getItemsPerPage() {
-			return itemsPerPage;
-	}
+		public long getLastPage() {
+			return lastPage;
+		}
 
-	public int getLastPageNumber() {
-			return lastPageNumber;
-	}
+		public long getPage() {
+			return page;
+		}
 
-	public int getPageNumber() {
-			return pageNumber;
-	}
+		public long getPageSize() {
+			return pageSize;
+		}
 
-	public int getTotalCount() {
+		public long getTotalCount() {
 			return totalCount;
-	}
+		}
 
-	@JsonProperty
-	protected Collection<T> items;
+		@JsonProperty
+		protected Collection<T> items;
 
-	@JsonProperty
-	protected int itemsPerPage;
+		@JsonProperty
+		protected long lastPage;
 
-	@JsonProperty
-	protected int lastPageNumber;
+		@JsonProperty
+		protected long page;
 
-	@JsonProperty
-	protected int pageNumber;
+		@JsonProperty
+		protected long pageSize;
 
-	@JsonProperty
-	protected int totalCount;
+		@JsonProperty
+		protected long totalCount;
 
 	}
 
@@ -634,25 +1415,74 @@ public abstract class BaseOrganizationResourceTestCase {
 
 		String userNameAndPassword = "test@liferay.com:test";
 
-		String encodedUserNameAndPassword = Base64.encode(userNameAndPassword.getBytes());
+		String encodedUserNameAndPassword = Base64.encode(
+			userNameAndPassword.getBytes());
 
-		options.addHeader("Authorization", "Basic " + encodedUserNameAndPassword);
+		options.addHeader(
+			"Authorization", "Basic " + encodedUserNameAndPassword);
 
 		options.addHeader("Content-Type", "application/json");
 
 		return options;
 	}
 
-	private String _toPath(String template, Object value) {
-		return template.replaceFirst("\\{.*\\}", String.valueOf(value));
+	private String _toPath(String template, Object... values) {
+		if (ArrayUtil.isEmpty(values)) {
+			return template;
+		}
+
+		for (int i = 0; i < values.length; i++) {
+			template = template.replaceFirst(
+				"\\{.*?\\}", String.valueOf(values[i]));
+		}
+
+		return template;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		BaseOrganizationResourceTestCase.class);
+
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
+	private static DateFormat _dateFormat;
 	private final static ObjectMapper _inputObjectMapper = new ObjectMapper() {
 		{
+			setFilterProvider(
+				new SimpleFilterProvider() {
+					{
+						addFilter(
+							"Liferay.Vulcan",
+							SimpleBeanPropertyFilter.serializeAll());
+					}
+				});
 			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-	}
+		}
 	};
-	private final static ObjectMapper _outputObjectMapper = new ObjectMapper();
+	private final static ObjectMapper _outputObjectMapper = new ObjectMapper() {
+		{
+			setFilterProvider(
+				new SimpleFilterProvider() {
+					{
+						addFilter(
+							"Liferay.Vulcan",
+							SimpleBeanPropertyFilter.serializeAll());
+					}
+				});
+		}
+	};
+
+	@Inject
+	private OrganizationResource _organizationResource;
 
 	private URL _resourceURL;
 

@@ -66,8 +66,18 @@ public class SelectBasicPagesHorizontalCard implements HorizontalCard {
 			addLayoutURL.setParameter(
 				"mvcRenderCommandName", "/layout/add_layout");
 			addLayoutURL.setParameter("backURL", redirect);
-			addLayoutURL.setParameter("type", _type);
 
+			long selPlid = ParamUtil.getLong(_request, "selPlid");
+
+			addLayoutURL.setParameter("selPlid", String.valueOf(selPlid));
+
+			boolean privateLayout = ParamUtil.getBoolean(
+				_request, "privateLayout");
+
+			addLayoutURL.setParameter(
+				"privateLayout", String.valueOf(privateLayout));
+
+			addLayoutURL.setParameter("type", _type);
 			addLayoutURL.setWindowState(LiferayWindowState.POP_UP);
 
 			data.put("add-layout-url", addLayoutURL.toString());
@@ -80,7 +90,8 @@ public class SelectBasicPagesHorizontalCard implements HorizontalCard {
 
 	@Override
 	public String getElementClasses() {
-		return "add-layout-action-option";
+		return "add-layout-action-option card-interactive " +
+			"card-interactive-primary";
 	}
 
 	@Override

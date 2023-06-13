@@ -35,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface AppModel extends BaseModel<App>, ShardedModel,
-	StagedAuditedModel {
+public interface AppModel
+	extends BaseModel<App>, ShardedModel, StagedAuditedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -294,4 +295,5 @@ public interface AppModel extends BaseModel<App>, ShardedModel,
 	 * @param required the required of this app
 	 */
 	public void setRequired(boolean required);
+
 }

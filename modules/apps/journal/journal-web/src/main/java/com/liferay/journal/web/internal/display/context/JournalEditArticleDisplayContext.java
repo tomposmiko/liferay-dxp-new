@@ -234,6 +234,12 @@ public class JournalEditArticleDisplayContext {
 		return _ddmStructure;
 	}
 
+	public long getDDMStructureId() {
+		DDMStructure ddmStructure = getDDMStructure();
+
+		return ddmStructure.getStructureId();
+	}
+
 	public String getDDMStructureKey() {
 		if (_ddmStructureKey != null) {
 			return _ddmStructureKey;
@@ -466,6 +472,34 @@ public class JournalEditArticleDisplayContext {
 		}
 
 		return "save";
+	}
+
+	public String getSmallImageSource() {
+		if (_article == null) {
+			_smallImageSource = "none";
+
+			return _smallImageSource;
+		}
+
+		_smallImageSource = ParamUtil.getString(_request, "smallImageSource");
+
+		if (Validator.isNotNull(_smallImageSource)) {
+			return _smallImageSource;
+		}
+
+		if (!_article.getSmallImage()) {
+			_smallImageSource = "none";
+		}
+		else if (Validator.isNotNull(_article.getSmallImageURL())) {
+			_smallImageSource = "url";
+		}
+		else if ((_article.getSmallImageId() > 0) &&
+				 Validator.isNull(_article.getSmallImageURL())) {
+
+			_smallImageSource = "file";
+		}
+
+		return _smallImageSource;
 	}
 
 	public double getVersion() {
@@ -714,6 +748,7 @@ public class JournalEditArticleDisplayContext {
 	private String _referringPortletResource;
 	private final HttpServletRequest _request;
 	private Boolean _showHeader;
+	private String _smallImageSource;
 	private final ThemeDisplay _themeDisplay;
 	private Double _version;
 

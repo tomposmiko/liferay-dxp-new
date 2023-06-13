@@ -38,8 +38,10 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public interface FriendlyURLEntryModel extends AttachedModel,
-	BaseModel<FriendlyURLEntry>, MVCCModel, ShardedModel, StagedModel {
+public interface FriendlyURLEntryModel
+	extends AttachedModel, BaseModel<FriendlyURLEntry>, MVCCModel, ShardedModel,
+			StagedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -237,4 +239,5 @@ public interface FriendlyURLEntryModel extends AttachedModel,
 	public String getUrlTitleMapAsXML();
 
 	public Map<String, String> getLanguageIdToUrlTitleMap();
+
 }

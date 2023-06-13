@@ -55,15 +55,15 @@
 	.cover-image-caption {
 		color: #868896;
 		margin-top: 8px;
-		text-align: left;
+		text-align: center;
 
 		p {
 			margin-bottom: 0;
 		}
 	}
 
-	.entry-body, .widget-mode-detail .widget-mode-detail-text {
-		img, .cke_widget_embedurl, .embed-responsive {
+	.entry-body, .widget-mode-detail .widget-mode-detail-text, .widget-mode-simple-entry .widget-content {
+		img, .cke_widget_embedurl, .cke_widget_image, .embed-responsive {
 			&[style*="float: left;"], &[style*="float:left;"] {
 				margin-right: 24px;
 			}

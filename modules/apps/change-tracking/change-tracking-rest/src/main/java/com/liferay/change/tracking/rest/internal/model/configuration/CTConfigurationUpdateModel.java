@@ -14,6 +14,8 @@
 
 package com.liferay.change.tracking.rest.internal.model.configuration;
 
+import com.liferay.portal.kernel.util.GetterUtil;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -31,8 +33,8 @@ public class CTConfigurationUpdateModel {
 	}
 
 	@XmlElement
-	public void setChangeTrackingEnabled(boolean changeTrackingEnabled) {
-		_changeTrackingEnabled = changeTrackingEnabled;
+	public void setChangeTrackingEnabled(String changeTrackingEnabled) {
+		_changeTrackingEnabled = GetterUtil.getBoolean(changeTrackingEnabled);
 	}
 
 	private boolean _changeTrackingEnabled;

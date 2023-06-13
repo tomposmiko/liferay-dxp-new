@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class CalendarSoap implements Serializable {
+
 	public static CalendarSoap toSoapModel(Calendar model) {
 		CalendarSoap soapModel = new CalendarSoap();
 
@@ -82,7 +83,8 @@ public class CalendarSoap implements Serializable {
 	}
 
 	public static CalendarSoap[] toSoapModels(List<Calendar> models) {
-		List<CalendarSoap> soapModels = new ArrayList<CalendarSoap>(models.size());
+		List<CalendarSoap> soapModels = new ArrayList<CalendarSoap>(
+			models.size());
 
 		for (Calendar model : models) {
 			soapModels.add(toSoapModel(model));
@@ -267,4 +269,5 @@ public class CalendarSoap implements Serializable {
 	private boolean _enableComments;
 	private boolean _enableRatings;
 	private Date _lastPublishDate;
+
 }

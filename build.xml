@@ -242,6 +242,7 @@ message.
 	<target name="compile">
 		<setup-libs />
 		<setup-sdk />
+		<setup-yarn />
 
 		<delete file="javac.output.txt" />
 
@@ -1082,6 +1083,10 @@ This target has been renamed to "snapshot-bundle". Please call "snapshot-bundle"
 
 	<target name="setup-sdk">
 		<setup-sdk />
+	</target>
+
+	<target name="setup-yarn">
+		<setup-yarn />
 	</target>
 
 	<target name="snapshot-bundle">

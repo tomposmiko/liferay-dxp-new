@@ -30,12 +30,15 @@ import com.liferay.portal.kernel.util.Accessor;
 @ImplementationClassName("com.liferay.change.tracking.model.impl.CTEntryImpl")
 @ProviderType
 public interface CTEntry extends CTEntryModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.change.tracking.model.impl.CTEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<CTEntry, Long> CT_ENTRY_ID_ACCESSOR = new Accessor<CTEntry, Long>() {
+	public static final Accessor<CTEntry, Long> CT_ENTRY_ID_ACCESSOR =
+		new Accessor<CTEntry, Long>() {
+
 			@Override
 			public Long get(CTEntry ctEntry) {
 				return ctEntry.getCtEntryId();
@@ -50,5 +53,11 @@ public interface CTEntry extends CTEntryModel, PersistedModel {
 			public Class<CTEntry> getTypeClass() {
 				return CTEntry.class;
 			}
+
 		};
+
+	public java.util.List<CTEntryAggregate> getCTEntryAggregates();
+
+	public boolean hasCTEntryAggregate();
+
 }

@@ -19,23 +19,35 @@ import com.liferay.change.tracking.CTManager;
 import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.exception.CTEntryException;
 import com.liferay.change.tracking.exception.CTException;
+import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
+import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.journal.exception.NoSuchArticleException;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalArticleLocalServiceWrapper;
+import com.liferay.journal.util.comparator.ArticleVersionComparator;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.File;
 import java.io.Serializable;
@@ -47,6 +59,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -302,6 +316,195 @@ public class CTJournalArticleLocalServiceWrapper
 
 		if (_isRetrievable(journalArticle)) {
 			return journalArticle;
+		}
+
+		return null;
+	}
+
+	@Override
+	public JournalArticle fetchJournalArticle(long id) {
+		JournalArticle journalArticle = super.fetchJournalArticle(id);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		return null;
+	}
+
+	@Override
+	public JournalArticle fetchLatestArticle(long resourcePrimKey) {
+		JournalArticle journalArticle = super.fetchLatestArticle(
+			resourcePrimKey);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		return fetchLatestArticle(
+			resourcePrimKey, WorkflowConstants.STATUS_ANY);
+	}
+
+	@Override
+	public JournalArticle fetchLatestArticle(long resourcePrimKey, int status) {
+		JournalArticle journalArticle = super.fetchLatestArticle(
+			resourcePrimKey, status);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		return fetchLatestArticle(resourcePrimKey, status, true);
+	}
+
+	@Override
+	public JournalArticle fetchLatestArticle(
+		long resourcePrimKey, int status, boolean preferApproved) {
+
+		JournalArticle journalArticle = super.fetchLatestArticle(
+			resourcePrimKey, status, preferApproved);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		journalArticle = null;
+
+		OrderByComparator<JournalArticle> orderByComparator =
+			new ArticleVersionComparator();
+
+		DynamicQuery withStatusDynamicQuery =
+			_getChangeTrackingAwareDynamicQuery();
+
+		Property resourcePrimKeyProperty = PropertyFactoryUtil.forName(
+			"resourcePrimKey");
+
+		withStatusDynamicQuery.add(resourcePrimKeyProperty.eq(resourcePrimKey));
+
+		Property statusProperty = PropertyFactoryUtil.forName("status");
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			if (preferApproved) {
+				withStatusDynamicQuery.add(
+					statusProperty.eq(WorkflowConstants.STATUS_APPROVED));
+
+				List<JournalArticle> journalArticles = dynamicQuery(
+					withStatusDynamicQuery, 0, 1, orderByComparator);
+
+				if (!journalArticles.isEmpty()) {
+					journalArticle = journalArticles.get(0);
+				}
+			}
+
+			if (journalArticle == null) {
+				DynamicQuery withoutStatusDynamicQuery =
+					_getChangeTrackingAwareDynamicQuery();
+
+				withoutStatusDynamicQuery.add(
+					resourcePrimKeyProperty.eq(resourcePrimKey));
+
+				List<JournalArticle> journalArticles = dynamicQuery(
+					withoutStatusDynamicQuery, 0, 1, orderByComparator);
+
+				if (!journalArticles.isEmpty()) {
+					journalArticle = journalArticles.get(0);
+				}
+			}
+		}
+		else {
+			withStatusDynamicQuery.add(statusProperty.eq(status));
+
+			List<JournalArticle> journalArticles = dynamicQuery(
+				withStatusDynamicQuery, 0, 1, orderByComparator);
+
+			if (!journalArticles.isEmpty()) {
+				journalArticle = journalArticles.get(0);
+			}
+		}
+
+		return journalArticle;
+	}
+
+	@Override
+	public JournalArticle fetchLatestArticle(
+		long resourcePrimKey, int[] statuses) {
+
+		JournalArticle journalArticle = super.fetchLatestArticle(
+			resourcePrimKey, statuses);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		DynamicQuery dynamicQuery = _getChangeTrackingAwareDynamicQuery();
+
+		Property resourcePrimKeyProperty = PropertyFactoryUtil.forName(
+			"resourcePrimKey");
+
+		dynamicQuery.add(resourcePrimKeyProperty.eq(resourcePrimKey));
+
+		Property statusProperty = PropertyFactoryUtil.forName("status");
+
+		dynamicQuery.add(statusProperty.in(statuses));
+
+		OrderByComparator<JournalArticle> orderByComparator =
+			new ArticleVersionComparator();
+
+		List<JournalArticle> journalArticles = dynamicQuery(
+			dynamicQuery, 0, 1, orderByComparator);
+
+		if (!journalArticles.isEmpty()) {
+			return journalArticles.get(0);
+		}
+
+		return null;
+	}
+
+	@Override
+	public JournalArticle fetchLatestArticle(
+		long groupId, String articleId, int status) {
+
+		JournalArticle journalArticle = super.fetchLatestArticle(
+			groupId, articleId, status);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		OrderByComparator<JournalArticle> orderByComparator =
+			new ArticleVersionComparator();
+
+		DynamicQuery dynamicQuery = _getChangeTrackingAwareDynamicQuery();
+
+		Property groupIdProperty = PropertyFactoryUtil.forName("groupId");
+
+		dynamicQuery.add(groupIdProperty.eq(groupId));
+
+		Property articleIdProperty = PropertyFactoryUtil.forName("articleId");
+
+		dynamicQuery.add(articleIdProperty.eq(articleId));
+
+		Property statusProperty = PropertyFactoryUtil.forName("status");
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			dynamicQuery.add(
+				statusProperty.ne(WorkflowConstants.STATUS_IN_TRASH));
+
+			List<JournalArticle> journalArticles = dynamicQuery(
+				dynamicQuery, 0, 1, orderByComparator);
+
+			if (!journalArticles.isEmpty()) {
+				return journalArticles.get(0);
+			}
+		}
+
+		dynamicQuery.add(statusProperty.eq(status));
+
+		List<JournalArticle> journalArticles = dynamicQuery(
+			dynamicQuery, 0, 1, orderByComparator);
+
+		if (!journalArticles.isEmpty()) {
+			return journalArticles.get(0);
 		}
 
 		return null;
@@ -761,6 +964,194 @@ public class CTJournalArticleLocalServiceWrapper
 			journalArticle -> !_isRetrievable(journalArticle));
 
 		return journalArticles;
+	}
+
+	@Override
+	public JournalArticle getLatestArticle(long resourcePrimKey)
+		throws PortalException {
+
+		JournalArticle journalArticle = super.getLatestArticle(resourcePrimKey);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		return getLatestArticle(resourcePrimKey, WorkflowConstants.STATUS_ANY);
+	}
+
+	@Override
+	public JournalArticle getLatestArticle(long resourcePrimKey, int status)
+		throws PortalException {
+
+		JournalArticle journalArticle = super.getLatestArticle(
+			resourcePrimKey, status);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		return getLatestArticle(resourcePrimKey, status, true);
+	}
+
+	@Override
+	public JournalArticle getLatestArticle(
+			long resourcePrimKey, int status, boolean preferApproved)
+		throws PortalException {
+
+		JournalArticle journalArticle = super.getLatestArticle(
+			resourcePrimKey, status, preferApproved);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		journalArticle = null;
+
+		OrderByComparator<JournalArticle> orderByComparator =
+			new ArticleVersionComparator();
+
+		DynamicQuery withStatusDynamicQuery =
+			_getChangeTrackingAwareDynamicQuery();
+
+		Property resourcePrimKeyProperty = PropertyFactoryUtil.forName(
+			"resourcePrimKey");
+
+		withStatusDynamicQuery.add(resourcePrimKeyProperty.eq(resourcePrimKey));
+
+		Property statusProperty = PropertyFactoryUtil.forName("status");
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			if (preferApproved) {
+				withStatusDynamicQuery.add(
+					statusProperty.eq(WorkflowConstants.STATUS_APPROVED));
+
+				List<JournalArticle> journalArticles = dynamicQuery(
+					withStatusDynamicQuery, 0, 1, orderByComparator);
+
+				if (!journalArticles.isEmpty()) {
+					journalArticle = journalArticles.get(0);
+				}
+			}
+
+			if (journalArticle == null) {
+				DynamicQuery withoutStatusDynamicQuery =
+					_getChangeTrackingAwareDynamicQuery();
+
+				withoutStatusDynamicQuery.add(
+					resourcePrimKeyProperty.eq(resourcePrimKey));
+
+				List<JournalArticle> journalArticles = dynamicQuery(
+					withoutStatusDynamicQuery, 0, 1, orderByComparator);
+
+				if (!journalArticles.isEmpty()) {
+					journalArticle = journalArticles.get(0);
+				}
+			}
+		}
+		else {
+			withStatusDynamicQuery.add(statusProperty.eq(status));
+
+			List<JournalArticle> journalArticles = dynamicQuery(
+				withStatusDynamicQuery, 0, 1, orderByComparator);
+
+			if (!journalArticles.isEmpty()) {
+				journalArticle = journalArticles.get(0);
+			}
+		}
+
+		if (journalArticle == null) {
+			StringBundler sb = new StringBundler(5);
+
+			sb.append(_NO_SUCH_ARTICLE_IN_CURRENT_CHANGE_COLLECTION);
+			sb.append("resourcePrimKey=");
+			sb.append(resourcePrimKey);
+			sb.append(", status=");
+			sb.append(status);
+
+			throw new NoSuchArticleException(sb.toString());
+		}
+
+		return journalArticle;
+	}
+
+	@Override
+	public JournalArticle getLatestArticle(long groupId, String articleId)
+		throws PortalException {
+
+		JournalArticle journalArticle = super.getLatestArticle(
+			groupId, articleId);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		return getLatestArticle(
+			groupId, articleId, WorkflowConstants.STATUS_ANY);
+	}
+
+	@Override
+	public JournalArticle getLatestArticle(
+			long groupId, String articleId, int status)
+		throws PortalException {
+
+		JournalArticle journalArticle = super.getLatestArticle(
+			groupId, articleId, status);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		return _getFirstArticle(
+			groupId, articleId, status, new ArticleVersionComparator());
+	}
+
+	@Override
+	public JournalArticle getLatestArticle(
+			long groupId, String className, long classPK)
+		throws PortalException {
+
+		JournalArticle journalArticle = super.getLatestArticle(
+			groupId, className, classPK);
+
+		if (_isRetrievable(journalArticle)) {
+			return journalArticle;
+		}
+
+		DynamicQuery dynamicQuery = _getChangeTrackingAwareDynamicQuery();
+
+		Property groupIdProperty = PropertyFactoryUtil.forName("groupId");
+
+		dynamicQuery.add(groupIdProperty.eq(groupId));
+
+		long classNameId = _classNameLocalService.getClassNameId(className);
+
+		Property classNameIdProperty = PropertyFactoryUtil.forName(
+			"classNameId");
+
+		dynamicQuery.add(classNameIdProperty.eq(classNameId));
+
+		Property classPKProperty = PropertyFactoryUtil.forName("classPK");
+
+		dynamicQuery.add(classPKProperty.eq(classPK));
+
+		List<JournalArticle> journalArticles = dynamicQuery(
+			dynamicQuery, 0, 1, new ArticleVersionComparator());
+
+		if (journalArticles.isEmpty()) {
+			StringBundler sb = new StringBundler(7);
+
+			sb.append(_NO_SUCH_ARTICLE_IN_CURRENT_CHANGE_COLLECTION);
+			sb.append("groupId=");
+			sb.append(groupId);
+			sb.append(", className=");
+			sb.append(className);
+			sb.append(", classPK=");
+			sb.append(classPK);
+
+			throw new NoSuchArticleException(sb.toString());
+		}
+
+		return journalArticles.get(0);
 	}
 
 	@Override
@@ -1393,8 +1784,127 @@ public class CTJournalArticleLocalServiceWrapper
 	protected void setJournalArticleLocalService(
 		JournalArticleLocalService journalArticleLocalService) {
 
-		// this is needed because of synchronisation
+		// Needed for synchronization
 
+	}
+
+	private DynamicQuery _getChangeTrackingAwareDynamicQuery() {
+		Optional<CTCollection> activeCTCollectionOptional =
+			_ctManager.getActiveCTCollectionOptional(
+				PrincipalThreadLocal.getUserId());
+
+		long activeCTCollectionId = activeCTCollectionOptional.map(
+			CTCollection::getCtCollectionId
+		).orElse(
+			0L
+		);
+
+		List<CTEntry> ctEntries = new ArrayList<>(
+			_ctEntryLocalService.getCTCollectionCTEntries(
+				activeCTCollectionId));
+
+		long companyId = _getCompanyId(PrincipalThreadLocal.getUserId());
+
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(companyId);
+
+		long productionCTCollectionId = productionCTCollectionOptional.map(
+			CTCollection::getCtCollectionId
+		).orElse(
+			0L
+		);
+
+		ctEntries.addAll(
+			_ctEntryLocalService.getCTCollectionCTEntries(
+				productionCTCollectionId));
+
+		Stream<CTEntry> ctEntryStream = ctEntries.stream();
+
+		List<Long> classPKs = ctEntryStream.filter(
+			ctEntry ->
+				ctEntry.getModelClassNameId() == _portal.getClassNameId(
+					JournalArticle.class.getName())
+		).map(
+			CTEntry::getModelClassPK
+		).collect(
+			Collectors.toList()
+		);
+
+		DynamicQuery journalArticleDynamicQuery = dynamicQuery();
+
+		if (ListUtil.isNotEmpty(classPKs)) {
+			Property idProperty = PropertyFactoryUtil.forName("id");
+
+			journalArticleDynamicQuery.add(idProperty.in(classPKs));
+		}
+
+		return journalArticleDynamicQuery;
+	}
+
+	private long _getCompanyId(long userId) {
+		long companyId = 0;
+
+		User user = _userLocalService.fetchUser(userId);
+
+		if (user == null) {
+			companyId = CompanyThreadLocal.getCompanyId();
+		}
+		else {
+			companyId = user.getCompanyId();
+		}
+
+		if (companyId <= 0) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Unable to get company ID");
+			}
+		}
+
+		return companyId;
+	}
+
+	private JournalArticle _getFirstArticle(
+			long groupId, String articleId, int status,
+			OrderByComparator<JournalArticle> orderByComparator)
+		throws PortalException {
+
+		DynamicQuery dynamicQuery = _getChangeTrackingAwareDynamicQuery();
+
+		Property groupIdProperty = PropertyFactoryUtil.forName("groupId");
+
+		dynamicQuery.add(groupIdProperty.eq(groupId));
+
+		Property articleIdProperty = PropertyFactoryUtil.forName("articleId");
+
+		dynamicQuery.add(articleIdProperty.eq(articleId));
+
+		Property statusProperty = PropertyFactoryUtil.forName("status");
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			dynamicQuery.add(
+				statusProperty.ne(WorkflowConstants.STATUS_IN_TRASH));
+		}
+		else {
+			dynamicQuery.add(statusProperty.eq(status));
+		}
+
+		List<JournalArticle> journalArticles = dynamicQuery(
+			dynamicQuery, 0, 1, orderByComparator);
+
+		if (journalArticles.isEmpty()) {
+			StringBundler sb = new StringBundler(7);
+
+			sb.append(_NO_SUCH_ARTICLE_IN_CURRENT_CHANGE_COLLECTION);
+			sb.append("groupId=");
+			sb.append(groupId);
+			sb.append("articleId=");
+			sb.append(articleId);
+			sb.append(", status=");
+			sb.append(status);
+
+			throw new NoSuchArticleException(sb.toString());
+		}
+
+		return journalArticles.get(0);
 	}
 
 	private boolean _isRetrievable(JournalArticle journalArticle) {
@@ -1443,6 +1953,11 @@ public class CTJournalArticleLocalServiceWrapper
 				_portal.getClassNameId(JournalArticle.class.getName()),
 				journalArticle.getId(), journalArticle.getResourcePrimKey(),
 				changeType, force);
+
+			_ctManager.registerRelatedChanges(
+				PrincipalThreadLocal.getUserId(),
+				_portal.getClassNameId(JournalArticle.class.getName()),
+				journalArticle.getId(), force);
 		}
 		catch (CTException cte) {
 			if (cte instanceof CTEntryException) {
@@ -1475,12 +1990,21 @@ public class CTJournalArticleLocalServiceWrapper
 		CTJournalArticleLocalServiceWrapper.class);
 
 	@Reference
+	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
 	private CTEngineManager _ctEngineManager;
+
+	@Reference
+	private CTEntryLocalService _ctEntryLocalService;
 
 	@Reference
 	private CTManager _ctManager;
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

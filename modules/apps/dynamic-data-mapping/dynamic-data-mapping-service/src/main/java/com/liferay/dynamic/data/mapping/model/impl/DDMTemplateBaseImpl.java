@@ -32,8 +32,9 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DDMTemplateBaseImpl extends DDMTemplateModelImpl
-	implements DDMTemplate {
+public abstract class DDMTemplateBaseImpl
+	extends DDMTemplateModelImpl implements DDMTemplate {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class DDMTemplateBaseImpl extends DDMTemplateModelImpl
 			DDMTemplateLocalServiceUtil.updateDDMTemplate(this);
 		}
 	}
+
 }

@@ -38,8 +38,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface BookmarksEntryModel extends BaseModel<BookmarksEntry>,
-	ShardedModel, StagedGroupedModel, TrashedModel, WorkflowedModel {
+public interface BookmarksEntryModel
+	extends BaseModel<BookmarksEntry>, ShardedModel, StagedGroupedModel,
+			TrashedModel, WorkflowedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -515,4 +517,5 @@ public interface BookmarksEntryModel extends BaseModel<BookmarksEntry>,
 	 */
 	@Override
 	public boolean isScheduled();
+
 }

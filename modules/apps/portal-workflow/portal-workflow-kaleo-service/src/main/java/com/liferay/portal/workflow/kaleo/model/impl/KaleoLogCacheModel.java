@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.workflow.kaleo.model.KaleoLog;
@@ -37,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class KaleoLogCacheModel implements CacheModel<KaleoLog>, Externalizable,
-	MVCCModel {
+public class KaleoLogCacheModel
+	implements CacheModel<KaleoLog>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -52,7 +52,8 @@ public class KaleoLogCacheModel implements CacheModel<KaleoLog>, Externalizable,
 		KaleoLogCacheModel kaleoLogCacheModel = (KaleoLogCacheModel)obj;
 
 		if ((kaleoLogId == kaleoLogCacheModel.kaleoLogId) &&
-				(mvccVersion == kaleoLogCacheModel.mvccVersion)) {
+			(mvccVersion == kaleoLogCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -228,7 +229,8 @@ public class KaleoLogCacheModel implements CacheModel<KaleoLog>, Externalizable,
 			kaleoLogImpl.setPreviousAssigneeClassName("");
 		}
 		else {
-			kaleoLogImpl.setPreviousAssigneeClassName(previousAssigneeClassName);
+			kaleoLogImpl.setPreviousAssigneeClassName(
+				previousAssigneeClassName);
 		}
 
 		kaleoLogImpl.setPreviousAssigneeClassPK(previousAssigneeClassPK);
@@ -335,8 +337,7 @@ public class KaleoLogCacheModel implements CacheModel<KaleoLog>, Externalizable,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(kaleoLogId);
@@ -484,4 +485,5 @@ public class KaleoLogCacheModel implements CacheModel<KaleoLog>, Externalizable,
 	public long endDate;
 	public long duration;
 	public String workflowContext;
+
 }

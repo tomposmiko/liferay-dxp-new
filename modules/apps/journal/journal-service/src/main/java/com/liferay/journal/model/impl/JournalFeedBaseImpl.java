@@ -32,8 +32,9 @@ import com.liferay.journal.service.JournalFeedLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class JournalFeedBaseImpl extends JournalFeedModelImpl
-	implements JournalFeed {
+public abstract class JournalFeedBaseImpl
+	extends JournalFeedModelImpl implements JournalFeed {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class JournalFeedBaseImpl extends JournalFeedModelImpl
 			JournalFeedLocalServiceUtil.updateJournalFeed(this);
 		}
 	}
+
 }

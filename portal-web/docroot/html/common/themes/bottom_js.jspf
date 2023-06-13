@@ -279,9 +279,11 @@ if (layout != null) {
 
 	<script type="text/javascript">
 		// <![CDATA[
-			<%= GetterUtil.getString(layoutSetSettings.getProperty("javascript")) %>
+			<c:if test="<%= !layout.isTypeControlPanel() %>">
+				<%= GetterUtil.getString(layoutSetSettings.getProperty("javascript")) %>
 
-			<%= GetterUtil.getString(layoutTypeSettings.getProperty("javascript")) %>
+				<%= GetterUtil.getString(layoutTypeSettings.getProperty("javascript")) %>
+			</c:if>
 		// ]]>
 	</script>
 </c:if>

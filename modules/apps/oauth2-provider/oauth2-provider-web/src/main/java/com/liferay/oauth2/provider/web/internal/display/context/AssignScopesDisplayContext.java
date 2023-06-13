@@ -17,11 +17,13 @@ package com.liferay.oauth2.provider.web.internal.display.context;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration;
 import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
+import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
 import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.scope.spi.application.descriptor.ApplicationDescriptor;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.web.internal.AssignableScopes;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -201,6 +203,7 @@ public class AssignScopesDisplayContext
 			AssignableScopes applicationAssignableScopes =
 				assignableScopes.getApplicationAssignableScopes(
 					applicationName);
+			boolean unassignable = true;
 
 			for (Map.Entry<AssignableScopes, Relations> entry :
 					localRelations.entrySet()) {
@@ -211,8 +214,23 @@ public class AssignScopesDisplayContext
 					relations._globalAssignableScopes.add(assignableScopes);
 				}
 
+				if (!unassignable) {
+					continue;
+				}
+
 				applicationAssignableScopes =
 					applicationAssignableScopes.subtract(entry.getKey());
+
+				Set<LiferayOAuth2Scope> liferayOAuth2Scopes =
+					applicationAssignableScopes.getLiferayOAuth2Scopes();
+
+				if (liferayOAuth2Scopes.isEmpty()) {
+					unassignable = false;
+				}
+			}
+
+			if (!unassignable) {
+				continue;
 			}
 
 			Relations relations = assignableScopesRelations.computeIfAbsent(
@@ -317,6 +335,13 @@ public class AssignScopesDisplayContext
 		@Override
 		public int hashCode() {
 			return Objects.hash(_globalAssignableScopes, _scopeAliases);
+		}
+
+		@Override
+		public String toString() {
+			return StringBundler.concat(
+				"[", StringUtil.merge(getScopeAliases()), "][",
+				StringUtil.merge(getGlobalScopeAliases()), "]");
 		}
 
 		private Set<AssignableScopes> _globalAssignableScopes = new HashSet<>();

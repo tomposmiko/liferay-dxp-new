@@ -34,6 +34,7 @@ import com.liferay.document.library.service.DLFileVersionPreviewLocalServiceUtil
 @ProviderType
 public abstract class DLFileVersionPreviewBaseImpl
 	extends DLFileVersionPreviewModelImpl implements DLFileVersionPreview {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -45,7 +46,9 @@ public abstract class DLFileVersionPreviewBaseImpl
 			DLFileVersionPreviewLocalServiceUtil.addDLFileVersionPreview(this);
 		}
 		else {
-			DLFileVersionPreviewLocalServiceUtil.updateDLFileVersionPreview(this);
+			DLFileVersionPreviewLocalServiceUtil.updateDLFileVersionPreview(
+				this);
 		}
 	}
+
 }

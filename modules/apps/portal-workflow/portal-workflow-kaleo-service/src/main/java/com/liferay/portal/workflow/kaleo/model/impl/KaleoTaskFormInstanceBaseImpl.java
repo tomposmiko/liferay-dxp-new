@@ -34,6 +34,7 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTaskFormInstanceLocalServi
 @ProviderType
 public abstract class KaleoTaskFormInstanceBaseImpl
 	extends KaleoTaskFormInstanceModelImpl implements KaleoTaskFormInstance {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -42,10 +43,13 @@ public abstract class KaleoTaskFormInstanceBaseImpl
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			KaleoTaskFormInstanceLocalServiceUtil.addKaleoTaskFormInstance(this);
+			KaleoTaskFormInstanceLocalServiceUtil.addKaleoTaskFormInstance(
+				this);
 		}
 		else {
-			KaleoTaskFormInstanceLocalServiceUtil.updateKaleoTaskFormInstance(this);
+			KaleoTaskFormInstanceLocalServiceUtil.updateKaleoTaskFormInstance(
+				this);
 		}
 	}
+
 }

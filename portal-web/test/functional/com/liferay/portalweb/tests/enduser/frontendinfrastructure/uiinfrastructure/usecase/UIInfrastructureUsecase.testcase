@@ -24,7 +24,7 @@ definition {
 		property test.name.skip.portal.instance = "UIInfrastructureUsecase#RightToLeftSmoke";
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -47,7 +47,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -73,7 +73,7 @@ definition {
 		property portal.acceptance = "true";
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -115,7 +115,12 @@ definition {
 
 			IFrame.selectConfigurationFrame();
 
-			AssertTextEquals(locator1 = "NavTab#GENERAL", value1 = "General");
+			var key_tab = "General";
+
+			AssertTextEquals(
+				locator1 = "NavTab#TAB_LINK",
+				value1 = "General"
+			);
 
 			IFrame.closeFrame();
 		}

@@ -36,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface DDLRecordModel extends BaseModel<DDLRecord>, MVCCModel,
-	ShardedModel, StagedGroupedModel {
+public interface DDLRecordModel
+	extends BaseModel<DDLRecord>, MVCCModel, ShardedModel, StagedGroupedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -348,4 +349,5 @@ public interface DDLRecordModel extends BaseModel<DDLRecord>, MVCCModel,
 	 */
 	@Override
 	public void setLastPublishDate(Date lastPublishDate);
+
 }

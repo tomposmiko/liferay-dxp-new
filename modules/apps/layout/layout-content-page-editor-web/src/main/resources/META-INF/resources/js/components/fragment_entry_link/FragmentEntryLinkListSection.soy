@@ -10,19 +10,21 @@
 		size: string
 	]>}
 	{@param defaultEditorConfigurations: ?}
-	{@param defaultSegmentId: string}
 	{@param fragmentEntryLinks: ?}
 	{@param key: string}
 	{@param row: ?}
 	{@param rowId: string}
+	{@param? _columnResizerVisible: bool}
 	{@param? _handleFragmentMove: any}
-	{@param? _handleSectionFocusOut: any}
-	{@param? _handleSectionClick: any}
-	{@param? _handleSectionHoverStart: any}
+	{@param? _handleResizerMouseDown: any}
 	{@param? _handleSectionKeyUp: any}
 	{@param? _handleSectionRemoveButtonClick: any}
+	{@param? _resizeColumnIndex: number}
+	{@param? _resizeHighlightedColumn: number}
+	{@param? _resizing: bool}
 	{@param? activeItemId: string}
 	{@param? activeItemType: string}
+	{@param? defaultSegmentsExperienceId: string}
 	{@param? dropTargetItemTypes: ?}
 	{@param? empty: bool}
 	{@param? dropTargetBorder: string}
@@ -31,7 +33,6 @@
 	{@param? hoveredItemId: string}
 	{@param? hoveredItemType: string}
 	{@param? mappingFieldsURL: string}
-	{@param? segmentId: string}
 	{@param? selectedMappingTypes: [
 		subtype: [
 			id: string,
@@ -58,6 +59,10 @@
 		{sp}fragments-editor__topper-wrapper
 		{sp}fragment-entry-link-list__container
 
+		{if $_resizing}
+			{sp}fragment-entry-link-list__container--resizing
+		{/if}
+
 		{if $empty}
 			{sp}fragment-entry-link-list__container--empty
 		{/if}
@@ -66,12 +71,12 @@
 			{sp}{$dropTargetBorder}
 		{/if}
 
-		{if $activeItemId == $rowId and $activeItemType == $dropTargetItemTypes.section}
+		{if not $_resizing and $activeItemId == $rowId and $activeItemType == $dropTargetItemTypes.section}
 			{sp}fragment-entry-link-list__row-section--active
 			{sp}fragments-editor__topper-wrapper--active
 		{/if}
 
-		{if $hoveredItemId == $rowId and $hoveredItemType == $dropTargetItemTypes.section}
+		{if not $_resizing and $hoveredItemId == $rowId and $hoveredItemType == $dropTargetItemTypes.section}
 			{sp}fragment-entry-link-list__container--hovered
 			{sp}fragments-editor__topper-wrapper--hovered
 		{/if}
@@ -105,11 +110,10 @@
 	<section
 		class="{$sectionClasses}"
 		data-drag-source-label="{msg desc=""}section{/msg}"
+		data-fragments-editor-item-id="{$rowId}"
+		data-fragments-editor-item-type="fragments-editor-section"
 		data-layout-section-id="{$rowId}"
-		data-onfocusout="{$_handleSectionFocusOut}"
-		data-onclick="{$_handleSectionClick}"
 		data-onkeyup="{$_handleSectionKeyUp}"
-		data-onmouseover="{$_handleSectionHoverStart}"
 		key="{$key}"
 		style="{$sectionStyle}"
 		tabindex="0"
@@ -151,14 +155,30 @@
 			{/if}
 		{/let}
 
+		{if $_resizing}
+			{call com.liferay.layout.content.page.editor.web.ColumnOverlayGrid.render}
+				{param columnSpacing: ($row and $row.config and $row.config.columnSpacing) ?: true /}
+				{param containerType: ($row and $row.config and $row.config.containerType) ?: 'fluid' /}
+				{param padding: ($row and $row.config and $row.config.paddingHorizontal) ?: '3' /}
+				{param highlightedColumn: $_resizeHighlightedColumn /}
+				{param ref: 'columnOverlayGrid' /}
+			{/call}
+		{/if}
+
 		<div class="{$rowWrapperClasses}">
 			<div class="{$rowClasses}">
 				{foreach $column in $columns}
 					{call .column}
+						{param _columnResizerVisible: $_columnResizerVisible /}
 						{param _handleFragmentMove: $_handleFragmentMove /}
+						{param _handleResizerMouseDown: $_handleResizerMouseDown /}
+						{param _resizeColumnIndex: $_resizeColumnIndex /}
+						{param activeItemId: $activeItemId /}
+						{param activeItemType: $activeItemType /}
 						{param columnId: $column.columnId /}
+						{param columnIndex: index($column) /}
 						{param defaultEditorConfigurations: $defaultEditorConfigurations /}
-						{param defaultSegmentId: $defaultSegmentId /}
+						{param defaultSegmentsExperienceId: $defaultSegmentsExperienceId /}
 						{param dropTargetItemTypes: $dropTargetItemTypes /}
 						{param fragmentEntryLinkIds: $column.fragmentEntryLinkIds /}
 						{param fragmentEntryLinks: $fragmentEntryLinks /}
@@ -168,8 +188,8 @@
 						{param hoveredItemId: $hoveredItemId /}
 						{param hoveredItemType: $hoveredItemType /}
 						{param key: $column.columnId /}
+						{param lastColumn: isLast($column) /}
 						{param mappingFieldsURL: $mappingFieldsURL /}
-						{param segmentId: $segmentId /}
 						{param selectedMappingTypes: $selectedMappingTypes /}
 						{param size: $column.size /}
 						{param store: $store /}
@@ -185,20 +205,26 @@
  */
 {template .column}
 	{@param columnId: string}
+	{@param columnIndex: number}
 	{@param defaultEditorConfigurations: ?}
-	{@param defaultSegmentId: string}
 	{@param fragmentEntryLinkIds: list<string>}
 	{@param fragmentEntryLinks: ?}
 	{@param key: string}
+	{@param? _columnResizerVisible: bool}
 	{@param? _handleFragmentMove: any}
+	{@param? _handleResizerMouseDown: any}
+	{@param? _resizeColumnIndex: number}
+	{@param? defaultSegmentsExperienceId: string}
 	{@param? dropTargetItemTypes: ?}
 	{@param? dropTargetBorder: string}
 	{@param? dropTargetItemId: string}
 	{@param? dropTargetItemType: string}
+	{@param? activeItemId: string}
+	{@param? activeItemType: string}
 	{@param? hoveredItemId: string}
 	{@param? hoveredItemType: string}
+	{@param? lastColumn: bool}
 	{@param? mappingFieldsURL: string}
-	{@param? segmentId: string}
 	{@param? selectedMappingTypes: [
 		subtype: [
 			id: string,
@@ -229,19 +255,29 @@
 		{/if}
 	{/let}
 
-	<div
+	{let $columnAttributes kind="attributes"}
 		class="{$columnClasses}"
 		data-column-id="{$columnId}"
 		key="{$key}"
-	>
+
+		{if $columnIndex == $_resizeColumnIndex}
+			ref="resizeColumn"
+		{elseif $columnIndex == ($_resizeColumnIndex + 1)}
+			ref="resizeNextColumn"
+		{/if}
+	{/let}
+
+	<div {$columnAttributes}>
 		{foreach $fragmentEntryLinkId in $fragmentEntryLinkIds}
 			{let $fragmentEntryLink: $fragmentEntryLinks[$fragmentEntryLinkId] /}
 
 			{if $fragmentEntryLink}
 				{call .fragmentEntryLink}
+					{param activeItemId: $activeItemId /}
+					{param activeItemType: $activeItemType /}
 					{param content: $fragmentEntryLink.content /}
 					{param defaultEditorConfigurations: $defaultEditorConfigurations /}
-					{param defaultSegmentId: $defaultSegmentId /}
+					{param defaultSegmentsExperienceId: $defaultSegmentsExperienceId /}
 					{param dropTargetItemTypes: $dropTargetItemTypes /}
 					{param editableValues: $fragmentEntryLink.editableValues /}
 					{param fragmentEntryLinkId: $fragmentEntryLink.fragmentEntryLinkId /}
@@ -253,13 +289,20 @@
 					{param key: $fragmentEntryLink.fragmentEntryLinkId /}
 					{param mappingFieldsURL: $mappingFieldsURL /}
 					{param name: $fragmentEntryLink.name /}
-					{param segmentId: $segmentId /}
 					{param selectedMappingTypes: $selectedMappingTypes /}
 					{param store: $store /}
 					{param _handleFragmentMove: $_handleFragmentMove /}
 				{/call}
 			{/if}
 		{/foreach}
+
+		{if not $lastColumn}
+			{call .resizer}
+				{param columnId: $columnId /}
+				{param _handleResizerMouseDown: $_handleResizerMouseDown /}
+				{param visible: $_columnResizerVisible /}
+			{/call}
+		{/if}
 	</div>
 {/template}
 
@@ -268,39 +311,21 @@
  */
 {template .fragmentEntryLink}
 	{@param defaultEditorConfigurations: ?}
-	{@param defaultSegmentId: string}
+	{@param? defaultSegmentsExperienceId: string}
 	{@param editableValues: ?}
 	{@param fragmentEntryLinkId: string}
 	{@param key: string}
-	{@param dropTargetBorder: ?}
-	{@param dropTargetItemId: ?}
-	{@param dropTargetItemType: ?}
 	{@param mappingFieldsURL: ?}
 	{@param name: string}
 	{@param selectedMappingTypes: ?}
 	{@param store: ?}
-	{@param? hoveredItemId: string}
-	{@param? hoveredItemType: string}
 	{@param? _handleFragmentMove: ?}
 	{@param? content: ?}
-	{@param? dropTargetItemTypes: ?}
-	{@param? segmentId: string}
-
-	{let $styleModifier kind="text"}
-		{if $dropTargetItemId == $fragmentEntryLinkId and $dropTargetItemType == $dropTargetItemTypes.fragment}
-			{sp}{$dropTargetBorder}
-		{/if}
-
-		{if $hoveredItemId == $fragmentEntryLinkId and $hoveredItemType == $dropTargetItemTypes.fragment}
-			{sp}fragments-editor__topper-wrapper--hovered
-			{sp}fragment-entry-link-wrapper--hovered
-		{/if}
-	{/let}
 
 	{call com.liferay.layout.content.page.editor.web.FragmentEntryLink.render}
 		{param content: $content /}
 		{param defaultEditorConfigurations: $defaultEditorConfigurations /}
-		{param defaultSegmentId: $defaultSegmentId /}
+		{param defaultSegmentsExperienceId: $defaultSegmentsExperienceId /}
 		{param editableValues: $editableValues /}
 		{param events: [
 			'moveFragment': $_handleFragmentMove
@@ -309,9 +334,33 @@
 		{param key: $key /}
 		{param name: $name /}
 		{param ref: $key /}
-		{param segmentId: $segmentId /}
 		{param showMapping: $selectedMappingTypes and $mappingFieldsURL ? true : false /}
 		{param store: $store /}
-		{param styleModifier: $styleModifier /}
 	{/call}
+{/template}
+
+/**
+ * Resizer
+ */
+{template .resizer}
+	{@param columnId: string}
+	{@param? _handleResizerMouseDown: any}
+	{@param? visible: bool}
+
+	{let $resizerClasses kind="text"}
+		btn
+		{sp}btn-primary
+		{sp}fragment-entry-link-list__col-resizer
+
+		{if not $visible}
+			{sp}hide
+		{/if}
+	{/let}
+
+	<button
+		class="{$resizerClasses}"
+		data-column-id="{$columnId}"
+		data-onmousedown="{$_handleResizerMouseDown}"
+		type="button"
+	></button>
 {/template}

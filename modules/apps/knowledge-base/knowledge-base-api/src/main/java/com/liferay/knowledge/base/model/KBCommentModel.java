@@ -36,8 +36,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface KBCommentModel extends AttachedModel, BaseModel<KBComment>,
-	ShardedModel, StagedGroupedModel {
+public interface KBCommentModel
+	extends AttachedModel, BaseModel<KBComment>, ShardedModel,
+			StagedGroupedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -302,4 +304,5 @@ public interface KBCommentModel extends AttachedModel, BaseModel<KBComment>,
 	 * @param status the status of this kb comment
 	 */
 	public void setStatus(int status);
+
 }

@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class SyncDLObjectSoap implements Serializable {
+
 	public static SyncDLObjectSoap toSoapModel(SyncDLObject model) {
 		SyncDLObjectSoap soapModel = new SyncDLObjectSoap();
 
@@ -54,7 +55,8 @@ public class SyncDLObjectSoap implements Serializable {
 		soapModel.setChecksum(model.getChecksum());
 		soapModel.setEvent(model.getEvent());
 		soapModel.setLanTokenKey(model.getLanTokenKey());
-		soapModel.setLastPermissionChangeDate(model.getLastPermissionChangeDate());
+		soapModel.setLastPermissionChangeDate(
+			model.getLastPermissionChangeDate());
 		soapModel.setLockExpirationDate(model.getLockExpirationDate());
 		soapModel.setLockUserId(model.getLockUserId());
 		soapModel.setLockUserName(model.getLockUserName());
@@ -93,7 +95,8 @@ public class SyncDLObjectSoap implements Serializable {
 	}
 
 	public static SyncDLObjectSoap[] toSoapModels(List<SyncDLObject> models) {
-		List<SyncDLObjectSoap> soapModels = new ArrayList<SyncDLObjectSoap>(models.size());
+		List<SyncDLObjectSoap> soapModels = new ArrayList<SyncDLObjectSoap>(
+			models.size());
 
 		for (SyncDLObject model : models) {
 			soapModels.add(toSoapModel(model));
@@ -365,4 +368,5 @@ public class SyncDLObjectSoap implements Serializable {
 	private String _type;
 	private long _typePK;
 	private String _typeUuid;
+
 }

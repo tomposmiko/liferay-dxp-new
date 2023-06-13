@@ -45,6 +45,10 @@ List<MenuItem> menuItems = menu.getMenuItems();
 			menuItem="<%= menuItem %>"
 		/>
 
+		<c:if test="<%= menuItem.hasSeparator() %>">
+			<li aria-hidden="true" class="dropdown-divider" role="presentation"></li>
+		</c:if>
+
 	<%
 	}
 	%>

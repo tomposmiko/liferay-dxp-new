@@ -22,8 +22,6 @@ JournalArticle article = journalDisplayContext.getArticle();
 JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalEditArticleDisplayContext(request, liferayPortletResponse, article);
 
 long classNameId = ParamUtil.getLong(request, "classNameId");
-
-String newArticleId = ParamUtil.getString(request, "newArticleId");
 %>
 
 <liferay-ui:error-marker
@@ -74,7 +72,7 @@ String newArticleId = ParamUtil.getString(request, "newArticleId");
 
 	<c:choose>
 		<c:when test="<%= Objects.equals(message, JournalArticleConstants.DISPLAY_PAGE) %>">
-			<liferay-ui:message key="please-select-an-existing-display-page" />
+			<liferay-ui:message key="please-select-an-existing-display-page-template" />
 		</c:when>
 		<c:otherwise>
 			<liferay-ui:message key="the-content-references-a-missing-page" />
@@ -87,41 +85,6 @@ String newArticleId = ParamUtil.getString(request, "newArticleId");
 <liferay-ui:error exception="<%= StorageFieldRequiredException.class %>" message="please-fill-out-all-required-fields" />
 
 <liferay-frontend:fieldset>
-	<aui:input autoFocus="<%= true %>" label="title" localized="<%= true %>" name="titleMapAsXML" type="text" wrapperCssClass="article-content-title">
-		<c:if test="<%= classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT %>">
-			<aui:validator name="required" />
-		</c:if>
-	</aui:input>
-
-	<c:if test="<%= (article == null) || article.isNew() %>">
-		<c:choose>
-			<c:when test="<%= journalWebConfiguration.journalArticleForceAutogenerateId() || (classNameId != JournalArticleConstants.CLASSNAME_ID_DEFAULT) %>">
-				<aui:input name="newArticleId" type="hidden" />
-				<aui:input name="autoArticleId" type="hidden" value="<%= true %>" />
-			</c:when>
-			<c:otherwise>
-				<aui:input field="articleId" fieldParam="newArticleId" label="id" name="newArticleId" value="<%= newArticleId %>" />
-
-				<aui:input label="autogenerate-id" name="autoArticleId" type="checkbox" />
-			</c:otherwise>
-		</c:choose>
-	</c:if>
-
-	<div class="article-content-description">
-		<label for="<portlet:namespace />descriptionMapAsXML"><liferay-ui:message key="summary" /></label>
-
-		<liferay-ui:input-localized
-			cssClass="form-control"
-			defaultLanguageId="<%= journalEditArticleDisplayContext.getDefaultLanguageId() %>"
-			editorName="alloyeditor"
-			formName="fm"
-			ignoreRequestValue="<%= journalEditArticleDisplayContext.isChangeStructure() %>"
-			name="descriptionMapAsXML"
-			placeholder="description"
-			type="editor"
-			xml="<%= (article != null) ? article.getDescriptionMapAsXML() : StringPool.BLANK %>"
-		/>
-	</div>
 
 	<%
 	JournalItemSelectorHelper journalItemSelectorHelper = new JournalItemSelectorHelper(article, journalDisplayContext.getFolder(), renderRequest, renderResponse);
@@ -129,7 +92,7 @@ String newArticleId = ParamUtil.getString(request, "newArticleId");
 	DDMStructure ddmStructure = journalEditArticleDisplayContext.getDDMStructure();
 	%>
 
-	<div class="article-content-content" style="border-top: solid 1px #ccc; margin-top: 24px; padding-top: 8px;">
+	<div class="article-content-content">
 		<liferay-ddm:html
 			checkRequired="<%= classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT %>"
 			classNameId="<%= PortalUtil.getClassNameId(DDMStructure.class) %>"
@@ -142,10 +105,4 @@ String newArticleId = ParamUtil.getString(request, "newArticleId");
 			requestedLocale="<%= locale %>"
 		/>
 	</div>
-
-	<aui:input label="searchable" name="indexable" type="toggle-switch" value="<%= (article != null) ? article.isIndexable() : true %>" />
 </liferay-frontend:fieldset>
-
-<aui:script>
-	Liferay.Util.disableToggleBoxes('<portlet:namespace />autoArticleId', '<portlet:namespace />newArticleId', true);
-</aui:script>

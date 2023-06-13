@@ -53,6 +53,22 @@ public class UserPortraitTag extends IncludeTag {
 		return sb.toString();
 	}
 
+	public String getCssClass() {
+		return _cssClass;
+	}
+
+	public User getUser() {
+		return _user;
+	}
+
+	public long getUserId() {
+		if (_user == null) {
+			return 0;
+		}
+
+		return _user.getUserId();
+	}
+
 	@Override
 	public int processEndTag() throws Exception {
 		JspWriter jspWriter = pageContext.getOut();
@@ -126,10 +142,6 @@ public class UserPortraitTag extends IncludeTag {
 		}
 
 		return portraitURL;
-	}
-
-	protected User getUser() {
-		return _user;
 	}
 
 	@Override

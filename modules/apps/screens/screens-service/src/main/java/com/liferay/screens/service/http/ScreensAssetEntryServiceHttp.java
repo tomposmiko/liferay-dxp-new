@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.security.auth.HttpPrincipal;
 import com.liferay.portal.kernel.service.http.TunnelUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
-
 import com.liferay.screens.service.ScreensAssetEntryServiceUtil;
 
 /**
@@ -54,17 +53,21 @@ import com.liferay.screens.service.ScreensAssetEntryServiceUtil;
  */
 @ProviderType
 public class ScreensAssetEntryServiceHttp {
-	public static com.liferay.portal.kernel.json.JSONArray getAssetEntries(
-		HttpPrincipal httpPrincipal,
-		com.liferay.asset.kernel.service.persistence.AssetEntryQuery assetEntryQuery,
-		java.util.Locale locale)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(ScreensAssetEntryServiceUtil.class,
-					"getAssetEntries", _getAssetEntriesParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					assetEntryQuery, locale);
+	public static com.liferay.portal.kernel.json.JSONArray getAssetEntries(
+			HttpPrincipal httpPrincipal,
+			com.liferay.asset.kernel.service.persistence.AssetEntryQuery
+				assetEntryQuery,
+			java.util.Locale locale)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				ScreensAssetEntryServiceUtil.class, "getAssetEntries",
+				_getAssetEntriesParameterTypes0);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, assetEntryQuery, locale);
 
 			Object returnObj = null;
 
@@ -72,11 +75,15 @@ public class ScreensAssetEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return (com.liferay.portal.kernel.json.JSONArray)returnObj;
@@ -89,15 +96,17 @@ public class ScreensAssetEntryServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.json.JSONArray getAssetEntries(
-		HttpPrincipal httpPrincipal, long companyId, long groupId,
-		String portletItemName, java.util.Locale locale, int max)
+			HttpPrincipal httpPrincipal, long companyId, long groupId,
+			String portletItemName, java.util.Locale locale, int max)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(ScreensAssetEntryServiceUtil.class,
-					"getAssetEntries", _getAssetEntriesParameterTypes1);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					companyId, groupId, portletItemName, locale, max);
+		try {
+			MethodKey methodKey = new MethodKey(
+				ScreensAssetEntryServiceUtil.class, "getAssetEntries",
+				_getAssetEntriesParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, groupId, portletItemName, locale, max);
 
 			Object returnObj = null;
 
@@ -105,11 +114,15 @@ public class ScreensAssetEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return (com.liferay.portal.kernel.json.JSONArray)returnObj;
@@ -122,14 +135,16 @@ public class ScreensAssetEntryServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.json.JSONObject getAssetEntry(
-		HttpPrincipal httpPrincipal, long entryId, java.util.Locale locale)
+			HttpPrincipal httpPrincipal, long entryId, java.util.Locale locale)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(ScreensAssetEntryServiceUtil.class,
-					"getAssetEntry", _getAssetEntryParameterTypes2);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey, entryId,
-					locale);
+		try {
+			MethodKey methodKey = new MethodKey(
+				ScreensAssetEntryServiceUtil.class, "getAssetEntry",
+				_getAssetEntryParameterTypes2);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, entryId, locale);
 
 			Object returnObj = null;
 
@@ -137,11 +152,15 @@ public class ScreensAssetEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return (com.liferay.portal.kernel.json.JSONObject)returnObj;
@@ -154,15 +173,17 @@ public class ScreensAssetEntryServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.json.JSONObject getAssetEntry(
-		HttpPrincipal httpPrincipal, String className, long classPK,
-		java.util.Locale locale)
+			HttpPrincipal httpPrincipal, String className, long classPK,
+			java.util.Locale locale)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(ScreensAssetEntryServiceUtil.class,
-					"getAssetEntry", _getAssetEntryParameterTypes3);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					className, classPK, locale);
+		try {
+			MethodKey methodKey = new MethodKey(
+				ScreensAssetEntryServiceUtil.class, "getAssetEntry",
+				_getAssetEntryParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, className, classPK, locale);
 
 			Object returnObj = null;
 
@@ -170,11 +191,15 @@ public class ScreensAssetEntryServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return (com.liferay.portal.kernel.json.JSONObject)returnObj;
@@ -186,19 +211,22 @@ public class ScreensAssetEntryServiceHttp {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(ScreensAssetEntryServiceHttp.class);
-	private static final Class<?>[] _getAssetEntriesParameterTypes0 = new Class[] {
+	private static Log _log = LogFactoryUtil.getLog(
+		ScreensAssetEntryServiceHttp.class);
+
+	private static final Class<?>[] _getAssetEntriesParameterTypes0 =
+		new Class[] {
 			com.liferay.asset.kernel.service.persistence.AssetEntryQuery.class,
 			java.util.Locale.class
 		};
-	private static final Class<?>[] _getAssetEntriesParameterTypes1 = new Class[] {
+	private static final Class<?>[] _getAssetEntriesParameterTypes1 =
+		new Class[] {
 			long.class, long.class, String.class, java.util.Locale.class,
 			int.class
 		};
-	private static final Class<?>[] _getAssetEntryParameterTypes2 = new Class[] {
-			long.class, java.util.Locale.class
-		};
-	private static final Class<?>[] _getAssetEntryParameterTypes3 = new Class[] {
-			String.class, long.class, java.util.Locale.class
-		};
+	private static final Class<?>[] _getAssetEntryParameterTypes2 =
+		new Class[] {long.class, java.util.Locale.class};
+	private static final Class<?>[] _getAssetEntryParameterTypes3 =
+		new Class[] {String.class, long.class, java.util.Locale.class};
+
 }

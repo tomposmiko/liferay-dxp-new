@@ -32,8 +32,10 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public class DDMTemplateLinkWrapper extends BaseModelWrapper<DDMTemplateLink>
+public class DDMTemplateLinkWrapper
+	extends BaseModelWrapper<DDMTemplateLink>
 	implements DDMTemplateLink, ModelWrapper<DDMTemplateLink> {
+
 	public DDMTemplateLinkWrapper(DDMTemplateLink ddmTemplateLink) {
 		super(ddmTemplateLink);
 	}
@@ -85,50 +87,50 @@ public class DDMTemplateLinkWrapper extends BaseModelWrapper<DDMTemplateLink>
 	}
 
 	/**
-	* Returns the fully qualified class name of this ddm template link.
-	*
-	* @return the fully qualified class name of this ddm template link
-	*/
+	 * Returns the fully qualified class name of this ddm template link.
+	 *
+	 * @return the fully qualified class name of this ddm template link
+	 */
 	@Override
 	public String getClassName() {
 		return model.getClassName();
 	}
 
 	/**
-	* Returns the class name ID of this ddm template link.
-	*
-	* @return the class name ID of this ddm template link
-	*/
+	 * Returns the class name ID of this ddm template link.
+	 *
+	 * @return the class name ID of this ddm template link
+	 */
 	@Override
 	public long getClassNameId() {
 		return model.getClassNameId();
 	}
 
 	/**
-	* Returns the class pk of this ddm template link.
-	*
-	* @return the class pk of this ddm template link
-	*/
+	 * Returns the class pk of this ddm template link.
+	 *
+	 * @return the class pk of this ddm template link
+	 */
 	@Override
 	public long getClassPK() {
 		return model.getClassPK();
 	}
 
 	/**
-	* Returns the company ID of this ddm template link.
-	*
-	* @return the company ID of this ddm template link
-	*/
+	 * Returns the company ID of this ddm template link.
+	 *
+	 * @return the company ID of this ddm template link
+	 */
 	@Override
 	public long getCompanyId() {
 		return model.getCompanyId();
 	}
 
 	/**
-	* Returns the primary key of this ddm template link.
-	*
-	* @return the primary key of this ddm template link
-	*/
+	 * Returns the primary key of this ddm template link.
+	 *
+	 * @return the primary key of this ddm template link
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
@@ -137,24 +139,25 @@ public class DDMTemplateLinkWrapper extends BaseModelWrapper<DDMTemplateLink>
 	@Override
 	public DDMTemplate getTemplate()
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return model.getTemplate();
 	}
 
 	/**
-	* Returns the template ID of this ddm template link.
-	*
-	* @return the template ID of this ddm template link
-	*/
+	 * Returns the template ID of this ddm template link.
+	 *
+	 * @return the template ID of this ddm template link
+	 */
 	@Override
 	public long getTemplateId() {
 		return model.getTemplateId();
 	}
 
 	/**
-	* Returns the template link ID of this ddm template link.
-	*
-	* @return the template link ID of this ddm template link
-	*/
+	 * Returns the template link ID of this ddm template link.
+	 *
+	 * @return the template link ID of this ddm template link
+	 */
 	@Override
 	public long getTemplateLinkId() {
 		return model.getTemplateLinkId();
@@ -171,60 +174,60 @@ public class DDMTemplateLinkWrapper extends BaseModelWrapper<DDMTemplateLink>
 	}
 
 	/**
-	* Sets the class name ID of this ddm template link.
-	*
-	* @param classNameId the class name ID of this ddm template link
-	*/
+	 * Sets the class name ID of this ddm template link.
+	 *
+	 * @param classNameId the class name ID of this ddm template link
+	 */
 	@Override
 	public void setClassNameId(long classNameId) {
 		model.setClassNameId(classNameId);
 	}
 
 	/**
-	* Sets the class pk of this ddm template link.
-	*
-	* @param classPK the class pk of this ddm template link
-	*/
+	 * Sets the class pk of this ddm template link.
+	 *
+	 * @param classPK the class pk of this ddm template link
+	 */
 	@Override
 	public void setClassPK(long classPK) {
 		model.setClassPK(classPK);
 	}
 
 	/**
-	* Sets the company ID of this ddm template link.
-	*
-	* @param companyId the company ID of this ddm template link
-	*/
+	 * Sets the company ID of this ddm template link.
+	 *
+	 * @param companyId the company ID of this ddm template link
+	 */
 	@Override
 	public void setCompanyId(long companyId) {
 		model.setCompanyId(companyId);
 	}
 
 	/**
-	* Sets the primary key of this ddm template link.
-	*
-	* @param primaryKey the primary key of this ddm template link
-	*/
+	 * Sets the primary key of this ddm template link.
+	 *
+	 * @param primaryKey the primary key of this ddm template link
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
 	}
 
 	/**
-	* Sets the template ID of this ddm template link.
-	*
-	* @param templateId the template ID of this ddm template link
-	*/
+	 * Sets the template ID of this ddm template link.
+	 *
+	 * @param templateId the template ID of this ddm template link
+	 */
 	@Override
 	public void setTemplateId(long templateId) {
 		model.setTemplateId(templateId);
 	}
 
 	/**
-	* Sets the template link ID of this ddm template link.
-	*
-	* @param templateLinkId the template link ID of this ddm template link
-	*/
+	 * Sets the template link ID of this ddm template link.
+	 *
+	 * @param templateLinkId the template link ID of this ddm template link
+	 */
 	@Override
 	public void setTemplateLinkId(long templateLinkId) {
 		model.setTemplateLinkId(templateLinkId);
@@ -234,4 +237,5 @@ public class DDMTemplateLinkWrapper extends BaseModelWrapper<DDMTemplateLink>
 	protected DDMTemplateLinkWrapper wrap(DDMTemplateLink ddmTemplateLink) {
 		return new DDMTemplateLinkWrapper(ddmTemplateLink);
 	}
+
 }

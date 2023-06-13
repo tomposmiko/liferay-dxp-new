@@ -14,6 +14,8 @@
 
 package com.liferay.document.library.web.internal.portlet.action;
 
+import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
+import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
 import com.liferay.asset.kernel.model.AssetVocabulary;
@@ -226,10 +228,13 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				DLFileEntry.class.getName(), actionRequest);
 
-			_dlAppService.addFileEntry(
+			FileEntry fileEntry = _dlAppService.addFileEntry(
 				repositoryId, folderId, uniqueFileName, mimeType,
 				uniqueFileName, description, changeLog, inputStream, size,
 				serviceContext);
+
+			_updateAssetDisplayPage(
+				fileEntry, serviceContext, themeDisplay, actionRequest);
 
 			validFileNameKVPs.add(
 				new KeyValuePair(uniqueFileName, selectedFileName));
@@ -982,12 +987,52 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					inputStream, size, serviceContext);
 			}
 
+			_updateAssetDisplayPage(
+				fileEntry, serviceContext, themeDisplay, actionRequest);
+
 			return fileEntry;
+		}
+	}
+
+	private void _updateAssetDisplayPage(
+			FileEntry fileEntry, ServiceContext serviceContext,
+			ThemeDisplay themeDisplay, ActionRequest actionRequest)
+		throws PortalException {
+
+		AssetDisplayPageEntry assetDisplayPageEntry =
+			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
+				themeDisplay.getScopeGroupId(),
+				_portal.getClassNameId(DLFileEntry.class),
+				fileEntry.getFileEntryId());
+
+		long assetDisplayPageId = ParamUtil.getLong(
+			actionRequest, "assetDisplayPageId");
+		int displayPageType = ParamUtil.getInteger(
+			actionRequest, "displayPageType");
+
+		if (assetDisplayPageEntry == null) {
+			_assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
+				themeDisplay.getUserId(), themeDisplay.getScopeGroupId(),
+				_portal.getClassNameId(DLFileEntry.class),
+				fileEntry.getFileEntryId(), assetDisplayPageId, displayPageType,
+				serviceContext);
+		}
+		else {
+			assetDisplayPageEntry.setLayoutPageTemplateEntryId(
+				assetDisplayPageId);
+			assetDisplayPageEntry.setType(displayPageType);
+
+			_assetDisplayPageEntryLocalService.updateAssetDisplayPageEntry(
+				assetDisplayPageEntry);
 		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditFileEntryMVCActionCommand.class);
+
+	@Reference
+	private AssetDisplayPageEntryLocalService
+		_assetDisplayPageEntryLocalService;
 
 	private DLAppService _dlAppService;
 	private volatile DLConfiguration _dlConfiguration;

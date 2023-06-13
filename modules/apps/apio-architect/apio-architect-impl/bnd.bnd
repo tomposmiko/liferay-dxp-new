@@ -1,4 +1,0 @@
-Bundle-Name: Liferay Apio Architect Implementation
-Bundle-SymbolicName: com.liferay.apio.architect.impl
-Bundle-Version: 2.0.0
--dsannotations-options: inherit

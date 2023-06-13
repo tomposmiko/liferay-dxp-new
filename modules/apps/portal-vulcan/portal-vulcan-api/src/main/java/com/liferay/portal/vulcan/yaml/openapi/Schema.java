@@ -22,6 +22,19 @@ import java.util.Map;
  */
 public class Schema {
 
+	public Schema() {
+	}
+
+	public Schema(boolean freeFormObject) {
+		if (freeFormObject) {
+			setType("?");
+		}
+	}
+
+	public Schema getAdditionalPropertySchema() {
+		return _additionalPropertySchema;
+	}
+
 	public List<Schema> getAllOfSchemas() {
 		return _allOfSchemas;
 	}
@@ -32,6 +45,10 @@ public class Schema {
 
 	public String getDescription() {
 		return _description;
+	}
+
+	public List<String> getEnumValues() {
+		return _enumValues;
 	}
 
 	public String getFormat() {
@@ -54,8 +71,24 @@ public class Schema {
 		return _reference;
 	}
 
+	public List<String> getRequiredPropertySchemaNames() {
+		return _requiredPropertySchemaNames;
+	}
+
 	public String getType() {
 		return _type;
+	}
+
+	public boolean isReadOnly() {
+		return _readOnly;
+	}
+
+	public boolean isWriteOnly() {
+		return _writeOnly;
+	}
+
+	public void setAdditionalPropertySchema(Schema additionalPropertySchema) {
+		_additionalPropertySchema = additionalPropertySchema;
 	}
 
 	public void setAllOfSchemas(List<Schema> allOfSchemas) {
@@ -68,6 +101,10 @@ public class Schema {
 
 	public void setDescription(String description) {
 		_description = description;
+	}
+
+	public void setEnumValues(List<String> enumValues) {
+		_enumValues = enumValues;
 	}
 
 	public void setFormat(String format) {
@@ -86,22 +123,41 @@ public class Schema {
 		_propertySchemas = propertySchemas;
 	}
 
+	public void setReadOnly(boolean readOnly) {
+		_readOnly = readOnly;
+	}
+
 	public void setReference(String reference) {
 		_reference = reference;
+	}
+
+	public void setRequiredPropertySchemaNames(
+		List<String> requiredPropertySchemaNames) {
+
+		_requiredPropertySchemaNames = requiredPropertySchemaNames;
 	}
 
 	public void setType(String type) {
 		_type = type;
 	}
 
+	public void setWriteOnly(boolean writeOnly) {
+		_writeOnly = writeOnly;
+	}
+
+	private Schema _additionalPropertySchema;
 	private List<Schema> _allOfSchemas;
 	private List<Schema> _anyOfSchemas;
 	private String _description;
+	private List<String> _enumValues;
 	private String _format;
 	private Items _items;
 	private List<Schema> _oneOfSchemas;
 	private Map<String, Schema> _propertySchemas;
+	private boolean _readOnly;
 	private String _reference;
+	private List<String> _requiredPropertySchemaNames;
 	private String _type;
+	private boolean _writeOnly;
 
 }

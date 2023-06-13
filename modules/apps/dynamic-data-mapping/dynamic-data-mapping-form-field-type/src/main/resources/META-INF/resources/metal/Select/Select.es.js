@@ -1,12 +1,15 @@
 import '../FieldBase/FieldBase.es';
+import '../Text/Text.es';
 import './SelectRegister.soy.js';
+import 'clay-dropdown';
 import 'clay-icon';
-import {Config} from 'metal-state';
-import {EventHandler} from 'metal-events';
+import 'clay-label';
 import Component from 'metal-component';
 import dom from 'metal-dom';
 import Soy from 'metal-soy';
 import templates from './Select.soy.js';
+import {Config} from 'metal-state';
+import {EventHandler} from 'metal-events';
 
 class Select extends Component {
 	static STATE = {
@@ -14,11 +17,38 @@ class Select extends Component {
 		/**
 		 * @default 'string'
 		 * @instance
-		 * @memberof Text
+		 * @memberof Select
 		 * @type {?(string|undefined)}
 		 */
 
 		dataType: Config.string().value('string'),
+
+		/**
+		 * @default 'boolean'
+		 * @instance
+		 * @memberof Select
+		 * @type {?(boolean|undefined)}
+		 */
+
+		evaluable: Config.bool().value(false),
+
+		/**
+		 * @default undefined
+		 * @instance
+		 * @memberof Select
+		 * @type {?bool}
+		 */
+
+		expanded: Config.bool().internal().value(false),
+
+		/**
+		 * @default 'string'
+		 * @instance
+		 * @memberof Select
+		 * @type {?(string|undefined)}
+		 */
+
+		dataSourceType: Config.string(),
 
 		/**
 		 * @default false
@@ -61,17 +91,13 @@ class Select extends Component {
 		fixedOptions: Config.arrayOf(
 			Config.shapeOf(
 				{
-					dataType: Config.string(),
+					active: Config.bool().value(false),
+					disabled: Config.bool().value(false),
+					id: Config.string(),
+					inline: Config.bool().value(false),
+					label: Config.string(),
 					name: Config.string(),
-					options: Config.arrayOf(
-						Config.shapeOf(
-							{
-								label: Config.string(),
-								value: Config.string()
-							}
-						)
-					),
-					type: Config.string(),
+					showLabel: Config.bool().value(true),
 					value: Config.string()
 				}
 			)
@@ -112,10 +138,10 @@ class Select extends Component {
 		 * @default undefined
 		 * @instance
 		 * @memberof Select
-		 * @type {?bool}
+		 * @type {?(string|undefined)}
 		 */
 
-		open: Config.bool().value(false),
+		multiple: Config.bool(),
 
 		/**
 		 * @default Choose an Option
@@ -133,7 +159,7 @@ class Select extends Component {
 		 * @type {?string}
 		 */
 
-		predefinedValue: Config.oneOfType([Config.array(), Config.string()]),
+		predefinedValue: Config.oneOfType([Config.array(), Config.string()]).value([]),
 
 		/**
 		 * @default false
@@ -180,7 +206,8 @@ class Select extends Component {
 
 		strings: Config.object().value(
 			{
-				chooseAnOption: Liferay.Language.get('choose-an-option')
+				chooseAnOption: Liferay.Language.get('choose-an-option'),
+				chooseOptions: Liferay.Language.get('choose-options')
 			}
 		),
 
@@ -200,7 +227,9 @@ class Select extends Component {
 		 * @type {?(string|undefined)}
 		 */
 
-		value: Config.oneOfType([Config.array(), Config.string()])
+		value: Config.oneOfType([Config.array(), Config.string()]),
+
+		visible: Config.bool().value(true)
 	};
 
 	attached() {
@@ -208,6 +237,12 @@ class Select extends Component {
 
 		this._eventHandler.add(
 			dom.on(document, 'click', this._handleDocumentClicked.bind(this))
+		);
+
+		this.setState(
+			{
+				visible: true
+			}
 		);
 	}
 
@@ -219,74 +254,196 @@ class Select extends Component {
 
 	prepareStateForRender(state) {
 		const {predefinedValue, value} = state;
+		const {fixedOptions, multiple, options} = this;
 		const predefinedValueArray = this._getArrayValue(predefinedValue);
-		const valueArray = this._getArrayValue(value);
+		let valueArray = this._getArrayValue(value);
 
-		const selectedValue = valueArray[0] || '';
+		valueArray = this._isEmptyArray(valueArray) ? predefinedValueArray : valueArray;
+
+		valueArray = valueArray.filter(
+			(value, index) => {
+				return (multiple ? true : index === 0);
+			}
+		);
+
+		const emptyOption = {
+			label: this.strings.chooseAnOption,
+			value: ''
+		};
+
+		let newOptions = [
+			...options
+		].map(
+			(option, index) => {
+				return {
+					...this._prepareOption(option, valueArray),
+					separator: (fixedOptions.length > 0) && (index === options.length - 1)
+				};
+			}
+		).concat(
+			fixedOptions.map(
+				option => this._prepareOption(option, valueArray)
+			)
+		).filter(
+			({value}) => value !== ''
+		);
+
+		if (!multiple) {
+			newOptions = [emptyOption, ...newOptions];
+		}
 
 		return {
 			...state,
-			predefinedValue: predefinedValueArray[0] || '',
-			selectedLabel: this._getSelectedLabel(selectedValue),
-			value: selectedValue
+			options: newOptions,
+			value: valueArray.filter(
+				value => newOptions.some(
+					option => value === option.value
+				)
+			)
+		};
+	}
+
+	syncMultiple(multiple) {
+		if (multiple === false) {
+			this.setState(
+				{
+					value: []
+				},
+				() => this.emit(
+					'fieldEdited',
+					{
+						fieldInstance: this,
+						value: []
+					}
+				)
+			);
+		}
+	}
+
+	_prepareOption(option, valueArray) {
+		const {multiple} = this;
+		const included = valueArray.includes(option.value);
+
+		return {
+			...option,
+			active: !multiple && included,
+			checked: multiple && included,
+			type: multiple ? 'checkbox' : 'item'
 		};
 	}
 
 	_getArrayValue(value) {
-		let newValue = value;
+		let newValue = value || '';
 
-		if (!Array.isArray(value)) {
-			newValue = [value];
+		if (!Array.isArray(newValue)) {
+			newValue = [newValue];
 		}
 
 		return newValue;
 	}
 
-	_getSelectedLabel(selectedValue) {
-		const {fixedOptions, options, placeholder} = this;
-		let selectedOption = options.find(option => option.value === selectedValue);
-
-		if (!selectedOption) {
-			selectedOption = fixedOptions.find(option => option.value === selectedValue);
-		}
-
-		return selectedOption ? selectedOption.label : placeholder;
-	}
-
 	_handleDocumentClicked({target}) {
-		if (!this.element.contains(target)) {
-			this.setState({open: false});
+		const {base} = this.refs;
+		const {dropdown} = base.refs;
+		const {menu} = dropdown.refs.portal.refs;
+		const {expanded} = this;
+
+		if (expanded && !this.element.contains(target) && !dropdown.element.contains(target) && !menu.contains(target)) {
+			this.setState({expanded: false});
 		}
 	}
 
-	_handleItemClicked(event) {
-		const value = [event.target.dataset.optionValue];
+	_isEmptyArray(array) {
+		return array.some(value => value !== '') === false;
+	}
+
+	addValue(value) {
+		const currentValue = this._getArrayValue(this.value);
+		const newValue = [...currentValue];
+
+		if (value) {
+			newValue.push(value);
+		}
+
+		return newValue;
+	}
+
+	deleteValue(value) {
+		const currentValue = this._getArrayValue(this.value);
+
+		return currentValue.filter(v => v !== value);
+	}
+
+	setValue(value) {
+		const newValue = [];
+
+		if (value) {
+			newValue.push(value);
+		}
+
+		return newValue;
+	}
+
+	_handleItemClicked({data, preventDefault}) {
+		const {multiple} = this;
+		const currentValue = this._getArrayValue(this.value);
+		const itemValue = data.item.value;
+
+		let newValue;
+
+		if (multiple) {
+			if (currentValue.includes(itemValue)) {
+				newValue = this.deleteValue(itemValue);
+
+				if (document.activeElement) {
+					document.activeElement.blur();
+				}
+			}
+			else {
+				newValue = this.addValue(itemValue);
+			}
+		}
+		else {
+			newValue = this.setValue(itemValue);
+		}
+
+		preventDefault();
 
 		this.setState(
 			{
-				open: !this.open,
-				value
-			}
-		);
-
-		this.emit(
-			'fieldEdited',
-			{
-				fieldInstance: this,
-				originalEvent: event,
-				value
-			}
+				expanded: multiple,
+				value: newValue
+			},
+			() => this.emit(
+				'fieldEdited',
+				{
+					fieldInstance: this,
+					value: newValue
+				}
+			)
 		);
 	}
 
-	_handleClick() {
-		if (!this.readOnly) {
-			this.setState(
+	_handleLabelClosed({target, preventDefault, stopPropagation}) {
+		const {value} = target.data;
+
+		preventDefault();
+		stopPropagation();
+
+		const newValue = this.deleteValue(value);
+
+		this.setState(
+			{
+				value: newValue
+			},
+			() => this.emit(
+				'fieldEdited',
 				{
-					open: !this.open
+					fieldInstance: this,
+					value: newValue
 				}
-			);
-		}
+			)
+		);
 	}
 }
 

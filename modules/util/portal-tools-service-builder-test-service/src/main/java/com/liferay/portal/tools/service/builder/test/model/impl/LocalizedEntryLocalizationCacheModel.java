@@ -34,8 +34,10 @@ import java.io.ObjectOutput;
  * @generated
  */
 @ProviderType
-public class LocalizedEntryLocalizationCacheModel implements CacheModel<LocalizedEntryLocalization>,
-	Externalizable, MVCCModel {
+public class LocalizedEntryLocalizationCacheModel
+	implements CacheModel<LocalizedEntryLocalization>, Externalizable,
+			   MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -46,11 +48,15 @@ public class LocalizedEntryLocalizationCacheModel implements CacheModel<Localize
 			return false;
 		}
 
-		LocalizedEntryLocalizationCacheModel localizedEntryLocalizationCacheModel =
-			(LocalizedEntryLocalizationCacheModel)obj;
+		LocalizedEntryLocalizationCacheModel
+			localizedEntryLocalizationCacheModel =
+				(LocalizedEntryLocalizationCacheModel)obj;
 
-		if ((localizedEntryLocalizationId == localizedEntryLocalizationCacheModel.localizedEntryLocalizationId) &&
-				(mvccVersion == localizedEntryLocalizationCacheModel.mvccVersion)) {
+		if ((localizedEntryLocalizationId ==
+				localizedEntryLocalizationCacheModel.
+					localizedEntryLocalizationId) &&
+			(mvccVersion == localizedEntryLocalizationCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -97,10 +103,12 @@ public class LocalizedEntryLocalizationCacheModel implements CacheModel<Localize
 
 	@Override
 	public LocalizedEntryLocalization toEntityModel() {
-		LocalizedEntryLocalizationImpl localizedEntryLocalizationImpl = new LocalizedEntryLocalizationImpl();
+		LocalizedEntryLocalizationImpl localizedEntryLocalizationImpl =
+			new LocalizedEntryLocalizationImpl();
 
 		localizedEntryLocalizationImpl.setMvccVersion(mvccVersion);
-		localizedEntryLocalizationImpl.setLocalizedEntryLocalizationId(localizedEntryLocalizationId);
+		localizedEntryLocalizationImpl.setLocalizedEntryLocalizationId(
+			localizedEntryLocalizationId);
 		localizedEntryLocalizationImpl.setLocalizedEntryId(localizedEntryId);
 
 		if (languageId == null) {
@@ -142,8 +150,7 @@ public class LocalizedEntryLocalizationCacheModel implements CacheModel<Localize
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(localizedEntryLocalizationId);
@@ -178,4 +185,5 @@ public class LocalizedEntryLocalizationCacheModel implements CacheModel<Localize
 	public String languageId;
 	public String title;
 	public String content;
+
 }

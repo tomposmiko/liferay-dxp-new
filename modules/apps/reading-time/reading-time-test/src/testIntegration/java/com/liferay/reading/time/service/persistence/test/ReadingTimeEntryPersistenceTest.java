@@ -15,7 +15,6 @@
 package com.liferay.reading.time.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -33,21 +32,11 @@ import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
-
 import com.liferay.reading.time.exception.NoSuchEntryException;
 import com.liferay.reading.time.model.ReadingTimeEntry;
 import com.liferay.reading.time.service.ReadingTimeEntryLocalServiceUtil;
 import com.liferay.reading.time.service.persistence.ReadingTimeEntryPersistence;
 import com.liferay.reading.time.service.persistence.ReadingTimeEntryUtil;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
 
 import java.io.Serializable;
 
@@ -59,17 +48,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class ReadingTimeEntryPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
-				"com.liferay.reading.time.service"));
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED, "com.liferay.reading.time.service"));
 
 	@Before
 	public void setUp() {
@@ -108,7 +107,8 @@ public class ReadingTimeEntryPersistenceTest {
 
 		_persistence.remove(newReadingTimeEntry);
 
-		ReadingTimeEntry existingReadingTimeEntry = _persistence.fetchByPrimaryKey(newReadingTimeEntry.getPrimaryKey());
+		ReadingTimeEntry existingReadingTimeEntry =
+			_persistence.fetchByPrimaryKey(newReadingTimeEntry.getPrimaryKey());
 
 		Assert.assertNull(existingReadingTimeEntry);
 	}
@@ -142,27 +142,34 @@ public class ReadingTimeEntryPersistenceTest {
 
 		_readingTimeEntries.add(_persistence.update(newReadingTimeEntry));
 
-		ReadingTimeEntry existingReadingTimeEntry = _persistence.findByPrimaryKey(newReadingTimeEntry.getPrimaryKey());
+		ReadingTimeEntry existingReadingTimeEntry =
+			_persistence.findByPrimaryKey(newReadingTimeEntry.getPrimaryKey());
 
-		Assert.assertEquals(existingReadingTimeEntry.getUuid(),
-			newReadingTimeEntry.getUuid());
-		Assert.assertEquals(existingReadingTimeEntry.getReadingTimeEntryId(),
+		Assert.assertEquals(
+			existingReadingTimeEntry.getUuid(), newReadingTimeEntry.getUuid());
+		Assert.assertEquals(
+			existingReadingTimeEntry.getReadingTimeEntryId(),
 			newReadingTimeEntry.getReadingTimeEntryId());
-		Assert.assertEquals(existingReadingTimeEntry.getGroupId(),
+		Assert.assertEquals(
+			existingReadingTimeEntry.getGroupId(),
 			newReadingTimeEntry.getGroupId());
-		Assert.assertEquals(existingReadingTimeEntry.getCompanyId(),
+		Assert.assertEquals(
+			existingReadingTimeEntry.getCompanyId(),
 			newReadingTimeEntry.getCompanyId());
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingReadingTimeEntry.getCreateDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingReadingTimeEntry.getCreateDate()),
 			Time.getShortTimestamp(newReadingTimeEntry.getCreateDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingReadingTimeEntry.getModifiedDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingReadingTimeEntry.getModifiedDate()),
 			Time.getShortTimestamp(newReadingTimeEntry.getModifiedDate()));
-		Assert.assertEquals(existingReadingTimeEntry.getClassNameId(),
+		Assert.assertEquals(
+			existingReadingTimeEntry.getClassNameId(),
 			newReadingTimeEntry.getClassNameId());
-		Assert.assertEquals(existingReadingTimeEntry.getClassPK(),
+		Assert.assertEquals(
+			existingReadingTimeEntry.getClassPK(),
 			newReadingTimeEntry.getClassPK());
-		Assert.assertEquals(existingReadingTimeEntry.getReadingTime(),
+		Assert.assertEquals(
+			existingReadingTimeEntry.getReadingTime(),
 			newReadingTimeEntry.getReadingTime());
 	}
 
@@ -195,8 +202,9 @@ public class ReadingTimeEntryPersistenceTest {
 
 	@Test
 	public void testCountByG_C_C() throws Exception {
-		_persistence.countByG_C_C(RandomTestUtil.nextLong(),
-			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
+		_persistence.countByG_C_C(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+			RandomTestUtil.nextLong());
 
 		_persistence.countByG_C_C(0L, 0L, 0L);
 	}
@@ -205,7 +213,8 @@ public class ReadingTimeEntryPersistenceTest {
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		ReadingTimeEntry newReadingTimeEntry = addReadingTimeEntry();
 
-		ReadingTimeEntry existingReadingTimeEntry = _persistence.findByPrimaryKey(newReadingTimeEntry.getPrimaryKey());
+		ReadingTimeEntry existingReadingTimeEntry =
+			_persistence.findByPrimaryKey(newReadingTimeEntry.getPrimaryKey());
 
 		Assert.assertEquals(existingReadingTimeEntry, newReadingTimeEntry);
 	}
@@ -219,22 +228,24 @@ public class ReadingTimeEntryPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<ReadingTimeEntry> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("ReadingTimeEntry", "uuid",
-			true, "readingTimeEntryId", true, "groupId", true, "companyId",
-			true, "createDate", true, "modifiedDate", true, "classNameId",
-			true, "classPK", true, "readingTime", true);
+		return OrderByComparatorFactoryUtil.create(
+			"ReadingTimeEntry", "uuid", true, "readingTimeEntryId", true,
+			"groupId", true, "companyId", true, "createDate", true,
+			"modifiedDate", true, "classNameId", true, "classPK", true,
+			"readingTime", true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		ReadingTimeEntry newReadingTimeEntry = addReadingTimeEntry();
 
-		ReadingTimeEntry existingReadingTimeEntry = _persistence.fetchByPrimaryKey(newReadingTimeEntry.getPrimaryKey());
+		ReadingTimeEntry existingReadingTimeEntry =
+			_persistence.fetchByPrimaryKey(newReadingTimeEntry.getPrimaryKey());
 
 		Assert.assertEquals(existingReadingTimeEntry, newReadingTimeEntry);
 	}
@@ -243,7 +254,8 @@ public class ReadingTimeEntryPersistenceTest {
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		ReadingTimeEntry missingReadingTimeEntry = _persistence.fetchByPrimaryKey(pk);
+		ReadingTimeEntry missingReadingTimeEntry =
+			_persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingReadingTimeEntry);
 	}
@@ -251,6 +263,7 @@ public class ReadingTimeEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		ReadingTimeEntry newReadingTimeEntry1 = addReadingTimeEntry();
 		ReadingTimeEntry newReadingTimeEntry2 = addReadingTimeEntry();
 
@@ -259,18 +272,22 @@ public class ReadingTimeEntryPersistenceTest {
 		primaryKeys.add(newReadingTimeEntry1.getPrimaryKey());
 		primaryKeys.add(newReadingTimeEntry2.getPrimaryKey());
 
-		Map<Serializable, ReadingTimeEntry> readingTimeEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, ReadingTimeEntry> readingTimeEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, readingTimeEntries.size());
-		Assert.assertEquals(newReadingTimeEntry1,
+		Assert.assertEquals(
+			newReadingTimeEntry1,
 			readingTimeEntries.get(newReadingTimeEntry1.getPrimaryKey()));
-		Assert.assertEquals(newReadingTimeEntry2,
+		Assert.assertEquals(
+			newReadingTimeEntry2,
 			readingTimeEntries.get(newReadingTimeEntry2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -280,7 +297,8 @@ public class ReadingTimeEntryPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, ReadingTimeEntry> readingTimeEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, ReadingTimeEntry> readingTimeEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(readingTimeEntries.isEmpty());
 	}
@@ -288,6 +306,7 @@ public class ReadingTimeEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		ReadingTimeEntry newReadingTimeEntry = addReadingTimeEntry();
 
 		long pk = RandomTestUtil.nextLong();
@@ -297,36 +316,39 @@ public class ReadingTimeEntryPersistenceTest {
 		primaryKeys.add(newReadingTimeEntry.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, ReadingTimeEntry> readingTimeEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, ReadingTimeEntry> readingTimeEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, readingTimeEntries.size());
-		Assert.assertEquals(newReadingTimeEntry,
+		Assert.assertEquals(
+			newReadingTimeEntry,
 			readingTimeEntries.get(newReadingTimeEntry.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, ReadingTimeEntry> readingTimeEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, ReadingTimeEntry> readingTimeEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(readingTimeEntries.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		ReadingTimeEntry newReadingTimeEntry = addReadingTimeEntry();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newReadingTimeEntry.getPrimaryKey());
 
-		Map<Serializable, ReadingTimeEntry> readingTimeEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, ReadingTimeEntry> readingTimeEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, readingTimeEntries.size());
-		Assert.assertEquals(newReadingTimeEntry,
+		Assert.assertEquals(
+			newReadingTimeEntry,
 			readingTimeEntries.get(newReadingTimeEntry.getPrimaryKey()));
 	}
 
@@ -334,15 +356,19 @@ public class ReadingTimeEntryPersistenceTest {
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = ReadingTimeEntryLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			ReadingTimeEntryLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<ReadingTimeEntry>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<ReadingTimeEntry>() {
+
 				@Override
 				public void performAction(ReadingTimeEntry readingTimeEntry) {
 					Assert.assertNotNull(readingTimeEntry);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -351,17 +377,19 @@ public class ReadingTimeEntryPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		ReadingTimeEntry newReadingTimeEntry = addReadingTimeEntry();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(ReadingTimeEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			ReadingTimeEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("readingTimeEntryId",
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"readingTimeEntryId",
 				newReadingTimeEntry.getReadingTimeEntryId()));
 
-		List<ReadingTimeEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<ReadingTimeEntry> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
@@ -372,32 +400,35 @@ public class ReadingTimeEntryPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(ReadingTimeEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			ReadingTimeEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("readingTimeEntryId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"readingTimeEntryId", RandomTestUtil.nextLong()));
 
-		List<ReadingTimeEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<ReadingTimeEntry> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		ReadingTimeEntry newReadingTimeEntry = addReadingTimeEntry();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(ReadingTimeEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			ReadingTimeEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"readingTimeEntryId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("readingTimeEntryId"));
 
-		Object newReadingTimeEntryId = newReadingTimeEntry.getReadingTimeEntryId();
+		Object newReadingTimeEntryId =
+			newReadingTimeEntry.getReadingTimeEntryId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("readingTimeEntryId",
-				new Object[] { newReadingTimeEntryId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"readingTimeEntryId", new Object[] {newReadingTimeEntryId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -410,14 +441,16 @@ public class ReadingTimeEntryPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(ReadingTimeEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			ReadingTimeEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"readingTimeEntryId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("readingTimeEntryId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("readingTimeEntryId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"readingTimeEntryId",
+				new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -430,25 +463,36 @@ public class ReadingTimeEntryPersistenceTest {
 
 		_persistence.clearCache();
 
-		ReadingTimeEntry existingReadingTimeEntry = _persistence.findByPrimaryKey(newReadingTimeEntry.getPrimaryKey());
+		ReadingTimeEntry existingReadingTimeEntry =
+			_persistence.findByPrimaryKey(newReadingTimeEntry.getPrimaryKey());
 
-		Assert.assertTrue(Objects.equals(existingReadingTimeEntry.getUuid(),
-				ReflectionTestUtil.invoke(existingReadingTimeEntry,
-					"getOriginalUuid", new Class<?>[0])));
-		Assert.assertEquals(Long.valueOf(existingReadingTimeEntry.getGroupId()),
-			ReflectionTestUtil.<Long>invoke(existingReadingTimeEntry,
-				"getOriginalGroupId", new Class<?>[0]));
+		Assert.assertTrue(
+			Objects.equals(
+				existingReadingTimeEntry.getUuid(),
+				ReflectionTestUtil.invoke(
+					existingReadingTimeEntry, "getOriginalUuid",
+					new Class<?>[0])));
+		Assert.assertEquals(
+			Long.valueOf(existingReadingTimeEntry.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingReadingTimeEntry, "getOriginalGroupId",
+				new Class<?>[0]));
 
-		Assert.assertEquals(Long.valueOf(existingReadingTimeEntry.getGroupId()),
-			ReflectionTestUtil.<Long>invoke(existingReadingTimeEntry,
-				"getOriginalGroupId", new Class<?>[0]));
-		Assert.assertEquals(Long.valueOf(
-				existingReadingTimeEntry.getClassNameId()),
-			ReflectionTestUtil.<Long>invoke(existingReadingTimeEntry,
-				"getOriginalClassNameId", new Class<?>[0]));
-		Assert.assertEquals(Long.valueOf(existingReadingTimeEntry.getClassPK()),
-			ReflectionTestUtil.<Long>invoke(existingReadingTimeEntry,
-				"getOriginalClassPK", new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingReadingTimeEntry.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingReadingTimeEntry, "getOriginalGroupId",
+				new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingReadingTimeEntry.getClassNameId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingReadingTimeEntry, "getOriginalClassNameId",
+				new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingReadingTimeEntry.getClassPK()),
+			ReflectionTestUtil.<Long>invoke(
+				existingReadingTimeEntry, "getOriginalClassPK",
+				new Class<?>[0]));
 	}
 
 	protected ReadingTimeEntry addReadingTimeEntry() throws Exception {
@@ -477,7 +521,9 @@ public class ReadingTimeEntryPersistenceTest {
 		return readingTimeEntry;
 	}
 
-	private List<ReadingTimeEntry> _readingTimeEntries = new ArrayList<ReadingTimeEntry>();
+	private List<ReadingTimeEntry> _readingTimeEntries =
+		new ArrayList<ReadingTimeEntry>();
 	private ReadingTimeEntryPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

@@ -1,21 +1,21 @@
-import {Config} from 'metal-state';
-import {EventHandler} from 'metal-events';
-import {isKeyInSet, isModifyingKey} from 'dynamic-data-mapping-form-builder/metal/js/util/dom.es';
-import {pageStructure} from 'dynamic-data-mapping-form-builder/metal/js/util/config.es';
-import {sub} from 'dynamic-data-mapping-form-builder/metal/js/util/strings.es';
 import autobind from 'autobind-decorator';
 import AutoSave from './util/AutoSave.es';
 import ClayModal from 'clay-modal';
 import Component from 'metal-jsx';
 import core from 'metal';
 import dom from 'metal-dom';
-import FormBuilder from 'dynamic-data-mapping-form-builder/metal/js/components/FormBuilder/index.es';
-import LayoutProvider from 'dynamic-data-mapping-form-builder/metal/js/components/LayoutProvider/index.es';
+import FormBuilder from 'dynamic-data-mapping-form-builder/metal/js/components/FormBuilder/FormBuilder.es';
+import LayoutProvider from 'dynamic-data-mapping-form-builder/metal/js/components/LayoutProvider/LayoutProvider.es';
 import PreviewButton from './components/PreviewButton/PreviewButton.es';
 import PublishButton from './components/PublishButton/PublishButton.es';
-import RuleBuilder from 'dynamic-data-mapping-form-builder/metal/js/components/RuleBuilder/index.es';
+import RuleBuilder from 'dynamic-data-mapping-form-builder/metal/js/components/RuleBuilder/RuleBuilder.es';
 import ShareFormPopover from './components/ShareFormPopover/ShareFormPopover.es';
 import StateSyncronizer from './util/StateSyncronizer.es';
+import {Config} from 'metal-state';
+import {EventHandler} from 'metal-events';
+import {isKeyInSet, isModifyingKey} from 'dynamic-data-mapping-form-builder/metal/js/util/dom.es';
+import {pageStructure} from 'dynamic-data-mapping-form-builder/metal/js/util/config.es';
+import {sub} from 'dynamic-data-mapping-form-builder/metal/js/util/strings.es';
 
 /**
  * Form.
@@ -79,6 +79,15 @@ class Form extends Component {
 		 */
 
 		editingLanguageId: Config.string().value(themeDisplay.getDefaultLanguageId()),
+
+		/**
+		 * @default []
+		 * @instance
+		 * @memberof Form
+		 * @type {?(array|undefined)}
+		 */
+
+		fieldTypes: Config.array().value([]),
 
 		/**
 		 * A map with all translated values available as the form description.
@@ -177,6 +186,16 @@ class Form extends Component {
 		 * @type {!boolean}
 		 */
 		saved: Config.bool(),
+
+		/**
+		 * Wether a published alert needs to be shown or not
+		 * @default false
+		 * @instance
+		 * @memberof Form
+		 * @type {!boolean}
+		 */
+
+		showPublishAlert: Config.bool().value(false),
 
 		/**
 		 * The path to the SVG spritemap file containing the icons.
@@ -349,6 +368,7 @@ class Form extends Component {
 		);
 	}
 
+	@autobind
 	_createFormURL() {
 		let formURL;
 
@@ -364,6 +384,7 @@ class Form extends Component {
 		return formURL + this._getFormInstanceId();
 	}
 
+	@autobind
 	_getFormInstanceId() {
 		const {namespace} = this.props;
 
@@ -489,9 +510,11 @@ class Form extends Component {
 	render() {
 		const {
 			context,
+			fieldTypes,
 			formInstanceId,
 			namespace,
 			published,
+			showPublishAlert,
 			spritemap
 		} = this.props;
 
@@ -515,7 +538,9 @@ class Form extends Component {
 			<div class={'ddm-form-builder'}>
 				<LayoutProvider {...layoutProviderProps}>
 					<RuleBuilder
+						dataProviderInstanceParameterSettingsURL={this.props.dataProviderInstanceParameterSettingsURL}
 						dataProviderInstancesURL={this.props.dataProviderInstancesURL}
+						fieldTypes={fieldTypes}
 						functionsMetadata={this.props.functionsMetadata}
 						functionsURL={this.props.functionsURL}
 						pages={context.pages}
@@ -524,11 +549,16 @@ class Form extends Component {
 						spritemap={spritemap}
 						visible={showRuleBuilder}
 					/>
-					<FormBuilder
-						namespace={this.props.namespace}
-						ref="builder"
-						visible={!showRuleBuilder}
-					/>
+					{!showRuleBuilder && (
+						<FormBuilder
+							fieldTypes={fieldTypes}
+							namespace={this.props.namespace}
+							ref="builder"
+							rules={this.props.rules}
+							spritemap={spritemap}
+							visible={!showRuleBuilder}
+						/>
+					)}
 				</LayoutProvider>
 
 				<div class="container-fluid-1280">
@@ -542,8 +572,10 @@ class Form extends Component {
 							formInstanceId={formInstanceId}
 							namespace={namespace}
 							published={published}
-							resolvePublishURL={this._resolvePublishURL}
+							resolvePublishURL={this._createFormURL}
+							showPublishAlert={showPublishAlert}
 							spritemap={spritemap}
+							submitForm={this.submitForm}
 							url={Liferay.DDM.FormSettings.publishFormInstanceURL}
 						/>
 						<button class="btn ddm-button btn-default" data-onclick="_handleSaveButtonClicked" ref="saveButton">
@@ -590,6 +622,7 @@ class Form extends Component {
 		);
 	}
 
+	@autobind
 	submitForm() {
 		const {namespace} = this.props;
 

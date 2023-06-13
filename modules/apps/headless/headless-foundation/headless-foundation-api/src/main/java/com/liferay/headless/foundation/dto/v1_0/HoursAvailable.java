@@ -14,48 +14,193 @@
 
 package com.liferay.headless.foundation.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface HoursAvailable {
+@GraphQLName("HoursAvailable")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "HoursAvailable")
+public class HoursAvailable {
 
-	public String getCloses();
+	public String getCloses() {
+		return closes;
+	}
 
+	public void setCloses(String closes) {
+		this.closes = closes;
+	}
+
+	@JsonIgnore
 	public void setCloses(
-			String closes);
+		UnsafeSupplier<String, Exception> closesUnsafeSupplier) {
 
-	public void setCloses(
-			UnsafeSupplier<String, Throwable>
-				closesUnsafeSupplier);
-	public String getDayOfWeek();
+		try {
+			closes = closesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String closes;
+
+	public String getDayOfWeek() {
+		return dayOfWeek;
+	}
+
+	public void setDayOfWeek(String dayOfWeek) {
+		this.dayOfWeek = dayOfWeek;
+	}
+
+	@JsonIgnore
 	public void setDayOfWeek(
-			String dayOfWeek);
+		UnsafeSupplier<String, Exception> dayOfWeekUnsafeSupplier) {
 
-	public void setDayOfWeek(
-			UnsafeSupplier<String, Throwable>
-				dayOfWeekUnsafeSupplier);
-	public Long getId();
+		try {
+			dayOfWeek = dayOfWeekUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String dayOfWeek;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public String getOpens();
+	public Long getId() {
+		return id;
+	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	public String getOpens() {
+		return opens;
+	}
+
+	public void setOpens(String opens) {
+		this.opens = opens;
+	}
+
+	@JsonIgnore
 	public void setOpens(
-			String opens);
+		UnsafeSupplier<String, Exception> opensUnsafeSupplier) {
 
-	public void setOpens(
-			UnsafeSupplier<String, Throwable>
-				opensUnsafeSupplier);
+		try {
+			opens = opensUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String opens;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof HoursAvailable)) {
+			return false;
+		}
+
+		HoursAvailable hoursAvailable = (HoursAvailable)object;
+
+		return Objects.equals(toString(), hoursAvailable.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"closes\": ");
+
+		sb.append("\"");
+		sb.append(closes);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"dayOfWeek\": ");
+
+		sb.append("\"");
+		sb.append(dayOfWeek);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"opens\": ");
+
+		sb.append("\"");
+		sb.append(opens);
+		sb.append("\"");
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

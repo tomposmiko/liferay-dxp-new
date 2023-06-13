@@ -39,6 +39,7 @@ if (ctCollection != null) {
 		<aui:input name="ctCollectionId" type="hidden" value="<%= ctCollectionId %>" />
 
 		<aui:input label="name" name="name" placeholder="change-list-name-placeholder" value="<%= name %>">
+			<aui:validator name="maxLength"><%= ModelHintsUtil.getMaxLength(CTCollection.class.getName(), "name") %></aui:validator>
 			<aui:validator name="required" />
 		</aui:input>
 

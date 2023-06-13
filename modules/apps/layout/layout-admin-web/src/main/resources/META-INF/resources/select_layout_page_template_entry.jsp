@@ -55,7 +55,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 								<c:if test="<%= layoutPageTemplateEntriesCount > 0 %>">
 									<li class="nav-item">
 										<a class="nav-link truncate-text <%= (selectLayoutPageTemplateEntryDisplayContext.getLayoutPageTemplateCollectionId() == layoutPageTemplateCollection.getLayoutPageTemplateCollectionId()) ? "active" : StringPool.BLANK %>" href="<%= layoutsAdminDisplayContext.getSelectLayoutPageTemplateEntryURL(layoutPageTemplateCollection.getLayoutPageTemplateCollectionId(), layoutsAdminDisplayContext.isPrivateLayout()) %>">
-											<%= layoutPageTemplateCollection.getName() %>
+											<%= HtmlUtil.escape(layoutPageTemplateCollection.getName()) %>
 										</a>
 									</li>
 								</c:if>
@@ -101,7 +101,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 							%>
 
 							<c:if test="<%= layoutPageTemplateCollection != null %>">
-								<%= layoutPageTemplateCollection.getName() %>
+								<%= HtmlUtil.escape(layoutPageTemplateCollection.getName()) %>
 							</c:if>
 						</c:when>
 						<c:when test="<%= selectLayoutPageTemplateEntryDisplayContext.isBasicPages() %>">

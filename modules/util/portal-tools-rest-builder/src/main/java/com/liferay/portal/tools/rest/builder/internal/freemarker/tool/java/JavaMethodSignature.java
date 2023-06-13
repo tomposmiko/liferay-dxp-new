@@ -18,6 +18,7 @@ import com.liferay.portal.vulcan.yaml.openapi.Operation;
 import com.liferay.portal.vulcan.yaml.openapi.PathItem;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Peter Shin
@@ -25,21 +26,23 @@ import java.util.List;
 public class JavaMethodSignature {
 
 	public JavaMethodSignature(
-		String path, PathItem pathItem, Operation operation, String schemaName,
-		List<JavaParameter> javaParameters, String methodName,
+		String path, PathItem pathItem, Operation operation,
+		Set<String> requestBodyMediaTypes, String schemaName,
+		List<JavaMethodParameter> javaMethodParameters, String methodName,
 		String returnType) {
 
 		_path = path;
 		_pathItem = pathItem;
 		_operation = operation;
+		_requestBodyMediaTypes = requestBodyMediaTypes;
 		_schemaName = schemaName;
-		_javaParameters = javaParameters;
+		_javaMethodParameters = javaMethodParameters;
 		_methodName = methodName;
 		_returnType = returnType;
 	}
 
-	public List<JavaParameter> getJavaParameters() {
-		return _javaParameters;
+	public List<JavaMethodParameter> getJavaMethodParameters() {
+		return _javaMethodParameters;
 	}
 
 	public String getMethodName() {
@@ -58,6 +61,10 @@ public class JavaMethodSignature {
 		return _pathItem;
 	}
 
+	public Set<String> getRequestBodyMediaTypes() {
+		return _requestBodyMediaTypes;
+	}
+
 	public String getReturnType() {
 		return _returnType;
 	}
@@ -66,11 +73,12 @@ public class JavaMethodSignature {
 		return _schemaName;
 	}
 
-	private final List<JavaParameter> _javaParameters;
+	private final List<JavaMethodParameter> _javaMethodParameters;
 	private final String _methodName;
 	private final Operation _operation;
 	private final String _path;
 	private final PathItem _pathItem;
+	private final Set<String> _requestBodyMediaTypes;
 	private final String _returnType;
 	private final String _schemaName;
 

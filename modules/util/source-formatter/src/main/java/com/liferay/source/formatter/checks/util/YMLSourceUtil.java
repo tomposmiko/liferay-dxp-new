@@ -17,31 +17,54 @@ package com.liferay.source.formatter.checks.util;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Peter Shin
+ * @author Alan Huang
  */
 public class YMLSourceUtil {
 
 	public static List<String> getDefinitions(String content, String indent) {
 		List<String> definitions = new ArrayList<>();
 
-		Pattern pattern = Pattern.compile(
-			StringBundler.concat(
-				"^", indent, "[a-z].*:.*(\n|\\Z)((", indent,
-				"[^a-z\n].*)?(\n|\\Z))*"),
-			Pattern.MULTILINE);
+		String[] lines = content.split("\n");
 
-		Matcher matcher = pattern.matcher(content);
+		StringBundler sb = new StringBundler();
 
-		while (matcher.find()) {
-			definitions.add(matcher.group());
+		for (String line : lines) {
+			if (Validator.isNull(line)) {
+				sb.append("\n");
+
+				continue;
+			}
+
+			if (!line.startsWith(indent)) {
+				continue;
+			}
+
+			String s = line.substring(indent.length(), indent.length() + 1);
+
+			if (!s.equals(StringPool.SPACE) && (sb.length() != 0)) {
+				sb.setIndex(sb.index() - 1);
+
+				definitions.add(sb.toString());
+
+				sb.setIndex(0);
+			}
+
+			sb.append(line);
+			sb.append("\n");
 		}
+
+		if (sb.index() > 0) {
+			sb.setIndex(sb.index() - 1);
+		}
+
+		definitions.add(sb.toString());
 
 		return definitions;
 	}
@@ -56,7 +79,7 @@ public class YMLSourceUtil {
 		for (int i = 1; i < lines.length; i++) {
 			String line = lines[i];
 
-			String indent = line.replaceAll("^(\\s+).+", "$1");
+			String indent = line.replaceFirst("^( +).+", "$1");
 
 			if (!indent.equals(line)) {
 				return indent;

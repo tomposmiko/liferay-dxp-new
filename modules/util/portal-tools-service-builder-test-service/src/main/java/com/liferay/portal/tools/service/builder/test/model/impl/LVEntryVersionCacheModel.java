@@ -33,8 +33,9 @@ import java.io.ObjectOutput;
  * @generated
  */
 @ProviderType
-public class LVEntryVersionCacheModel implements CacheModel<LVEntryVersion>,
-	Externalizable {
+public class LVEntryVersionCacheModel
+	implements CacheModel<LVEntryVersion>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -45,7 +46,8 @@ public class LVEntryVersionCacheModel implements CacheModel<LVEntryVersion>,
 			return false;
 		}
 
-		LVEntryVersionCacheModel lvEntryVersionCacheModel = (LVEntryVersionCacheModel)obj;
+		LVEntryVersionCacheModel lvEntryVersionCacheModel =
+			(LVEntryVersionCacheModel)obj;
 
 		if (lvEntryVersionId == lvEntryVersionCacheModel.lvEntryVersionId) {
 			return true;
@@ -61,7 +63,7 @@ public class LVEntryVersionCacheModel implements CacheModel<LVEntryVersion>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("{lvEntryVersionId=");
 		sb.append(lvEntryVersionId);
@@ -73,6 +75,8 @@ public class LVEntryVersionCacheModel implements CacheModel<LVEntryVersion>,
 		sb.append(defaultLanguageId);
 		sb.append(", lvEntryId=");
 		sb.append(lvEntryId);
+		sb.append(", companyId=");
+		sb.append(companyId);
 		sb.append(", groupId=");
 		sb.append(groupId);
 		sb.append(", uniqueGroupKey=");
@@ -104,6 +108,7 @@ public class LVEntryVersionCacheModel implements CacheModel<LVEntryVersion>,
 		}
 
 		lvEntryVersionImpl.setLvEntryId(lvEntryId);
+		lvEntryVersionImpl.setCompanyId(companyId);
 		lvEntryVersionImpl.setGroupId(groupId);
 
 		if (uniqueGroupKey == null) {
@@ -128,13 +133,14 @@ public class LVEntryVersionCacheModel implements CacheModel<LVEntryVersion>,
 
 		lvEntryId = objectInput.readLong();
 
+		companyId = objectInput.readLong();
+
 		groupId = objectInput.readLong();
 		uniqueGroupKey = objectInput.readUTF();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(lvEntryVersionId);
 
 		objectOutput.writeInt(version);
@@ -155,6 +161,8 @@ public class LVEntryVersionCacheModel implements CacheModel<LVEntryVersion>,
 
 		objectOutput.writeLong(lvEntryId);
 
+		objectOutput.writeLong(companyId);
+
 		objectOutput.writeLong(groupId);
 
 		if (uniqueGroupKey == null) {
@@ -170,6 +178,8 @@ public class LVEntryVersionCacheModel implements CacheModel<LVEntryVersion>,
 	public String uuid;
 	public String defaultLanguageId;
 	public long lvEntryId;
+	public long companyId;
 	public long groupId;
 	public String uniqueGroupKey;
+
 }

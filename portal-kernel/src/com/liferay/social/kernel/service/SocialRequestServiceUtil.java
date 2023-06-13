@@ -17,7 +17,6 @@ package com.liferay.social.kernel.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ReferenceRegistry;
 
 /**
  * Provides the remote service utility for SocialRequest. This utility wraps
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.ReferenceRegistry;
  */
 @ProviderType
 public class SocialRequestServiceUtil {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -40,31 +40,31 @@ public class SocialRequestServiceUtil {
 	 */
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static com.liferay.social.kernel.model.SocialRequest updateRequest(
-		long requestId, int status,
-		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay)
+			long requestId, int status,
+			com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay)
 		throws com.liferay.portal.kernel.exception.PortalException {
+
 		return getService().updateRequest(requestId, status, themeDisplay);
 	}
 
 	public static SocialRequestService getService() {
 		if (_service == null) {
-			_service = (SocialRequestService)PortalBeanLocatorUtil.locate(SocialRequestService.class.getName());
-
-			ReferenceRegistry.registerReference(SocialRequestServiceUtil.class,
-				"_service");
+			_service = (SocialRequestService)PortalBeanLocatorUtil.locate(
+				SocialRequestService.class.getName());
 		}
 
 		return _service;
 	}
 
 	private static SocialRequestService _service;
+
 }

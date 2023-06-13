@@ -17,10 +17,8 @@ package com.liferay.mobile.device.rules.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.mobile.device.rules.model.MDRRuleGroup;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class MDRRuleGroupCacheModel implements CacheModel<MDRRuleGroup>,
-	Externalizable {
+public class MDRRuleGroupCacheModel
+	implements CacheModel<MDRRuleGroup>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,7 +48,8 @@ public class MDRRuleGroupCacheModel implements CacheModel<MDRRuleGroup>,
 			return false;
 		}
 
-		MDRRuleGroupCacheModel mdrRuleGroupCacheModel = (MDRRuleGroupCacheModel)obj;
+		MDRRuleGroupCacheModel mdrRuleGroupCacheModel =
+			(MDRRuleGroupCacheModel)obj;
 
 		if (ruleGroupId == mdrRuleGroupCacheModel.ruleGroupId) {
 			return true;
@@ -177,8 +177,7 @@ public class MDRRuleGroupCacheModel implements CacheModel<MDRRuleGroup>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -232,4 +231,5 @@ public class MDRRuleGroupCacheModel implements CacheModel<MDRRuleGroup>,
 	public String name;
 	public String description;
 	public long lastPublishDate;
+
 }

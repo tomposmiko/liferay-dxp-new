@@ -17,7 +17,6 @@ package com.liferay.screens.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecord;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -44,12 +43,20 @@ import java.util.Locale;
  */
 @AccessControlled
 @JSONWebService
-@OSGiBeanProperties(property =  {
-	"json.web.service.context.name=screens", "json.web.service.context.path=ScreensDDLRecord"}, service = ScreensDDLRecordService.class)
+@OSGiBeanProperties(
+	property = {
+		"json.web.service.context.name=screens",
+		"json.web.service.context.path=ScreensDDLRecord"
+	},
+	service = ScreensDDLRecordService.class
+)
 @ProviderType
-@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
-	PortalException.class, SystemException.class})
+@Transactional(
+	isolation = Isolation.PORTAL,
+	rollbackFor = {PortalException.class, SystemException.class}
+)
 public interface ScreensDDLRecordService extends BaseService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -60,27 +67,29 @@ public interface ScreensDDLRecordService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JSONArray getDDLRecords(long ddlRecordSetId, Locale locale,
-		int start, int end, OrderByComparator<DDLRecord> obc)
+	public JSONArray getDDLRecords(
+			long ddlRecordSetId, Locale locale, int start, int end,
+			OrderByComparator<DDLRecord> obc)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JSONArray getDDLRecords(long ddlRecordSetId, long userId,
-		Locale locale, int start, int end, OrderByComparator<DDLRecord> obc)
+	public JSONArray getDDLRecords(
+			long ddlRecordSetId, long userId, Locale locale, int start, int end,
+			OrderByComparator<DDLRecord> obc)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getDDLRecordsCount(long ddlRecordSetId)
-		throws PortalException;
+	public int getDDLRecordsCount(long ddlRecordSetId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getDDLRecordsCount(long ddlRecordSetId, long userId)
 		throws PortalException;
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public String getOSGiServiceIdentifier();
+
 }

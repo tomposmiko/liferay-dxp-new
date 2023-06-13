@@ -32,8 +32,9 @@ import com.liferay.change.tracking.service.CTCollectionLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class CTCollectionBaseImpl extends CTCollectionModelImpl
-	implements CTCollection {
+public abstract class CTCollectionBaseImpl
+	extends CTCollectionModelImpl implements CTCollection {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class CTCollectionBaseImpl extends CTCollectionModelImpl
 			CTCollectionLocalServiceUtil.updateCTCollection(this);
 		}
 	}
+
 }

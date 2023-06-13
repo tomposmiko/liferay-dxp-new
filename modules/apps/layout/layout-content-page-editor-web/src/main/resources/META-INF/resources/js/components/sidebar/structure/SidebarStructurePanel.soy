@@ -4,336 +4,238 @@
  * SidebarStructurePanel
  */
 {template .render}
-	{@param? _handleElementClick: any}
+	{@param? _expandedNodes: ?}
 	{@param? _handleElementRemoveButtonClick: any}
-	{@param? activeItemId: ?}
-	{@param? activeItemType: ?}
-	{@param? fragmentEntryLinks: ?}
-	{@param? itemTypes: ?}
+	{@param? _handleElementClick: any}
+	{@param? activeItemId: string}
+	{@param? hoveredItemId: string}
 	{@param? layoutData: ?}
+	{@param? structure: [
+		active: bool,
+		children: list<?>,
+		elementId: string,
+		elementType: string,
+		expanded: bool,
+		hovered: bool,
+		key: string,
+		label: string,
+		removable: bool
+	]}
 	{@param? spritemap: string}
 
-	<div class="fragments-editor-sidebar-section__structure-panel">
-		{if $fragmentEntryLinks and $layoutData and $layoutData.structure}
-			<nav class="menubar menubar-transparent menubar-vertical-expand-lg">
-				<div class="collapse menubar-collapse">
-					<ul class="nav nav-nested">
-						<li class="nav-item">
-							{call .treeRoot}
-								{param activeItemId: $activeItemId /}
-								{param activeItemType: $activeItemType /}
-								{param clickHandler: $_handleElementClick /}
-								{param fragmentEntryLinks: $fragmentEntryLinks /}
-								{param itemTypes: $itemTypes /}
-								{param layoutData: $layoutData /}
-								{param removeButtonClickHandler: $_handleElementRemoveButtonClick /}
-								{param spritemap: $spritemap /}
-							{/call}
-						</li>
-					</ul>
-				</div>
-			</nav>
-		{/if}
+	<div
+		class="fragments-editor-sidebar-section__structure-panel"
+		data-active-item-id="{$activeItemId}"
+		data-expanded-nodes="{$_expandedNodes}"
+		data-hovered-item-id="{$hoveredItemId}"
+		data-layout-data="{$layoutData}"
+	>
+		<nav class="menubar menubar-transparent menubar-vertical-expand-lg">
+			<div class="collapse menubar-collapse">
+				{if $spritemap and $structure}
+					{call .treeNode}
+						{param handleElementRemoveButtonClick: $_handleElementRemoveButtonClick /}
+						{param handleElementClick: $_handleElementClick /}
+						{param node: $structure /}
+						{param spritemap: $spritemap /}
+					{/call}
+				{/if}
+			</div>
+		</nav>
 	</div>
 {/template}
 
 /**
  * Tree root
  */
-{template .treeRoot}
-	{@param? activeItemId: ?}
-	{@param? activeItemType: ?}
-	{@param? clickHandler: ?}
-	{@param? fragmentEntryLinks: ?}
-	{@param? itemTypes: ?}
-	{@param? layoutData: ?}
-	{@param? removeButtonClickHandler: ?}
-	{@param? spritemap: string}
+{template .treeNode}
+	{@param? handleElementClick: any}
+	{@param? handleElementRemoveButtonClick: any}
+	{@param node: [
+		active: bool,
+		children: list<?>,
+		elementId: string,
+		elementType: string,
+		expanded: bool,
+		hovered: bool,
+		key: string,
+		label: string,
+		removable: bool
+	]}
+	{@param spritemap: string}
 
-	{let $rootName kind="text"}
-		{msg desc=""}page{/msg}
-	{/let}
+	<ul class="nav nav-stacked" key="{$node.key}">
+		<li class="nav-item">
+			{let $itemClasses kind="text"}
+				d-flex
+				{sp}fragments-editor-sidebar-section__structure-panel__item
+				{sp}justify-content-between
+				{sp}my-1
+				{sp}p-1
+				{sp}rounded
 
-	{call .treeElementButton}
-		{param activeItemId: $activeItemId /}
-		{param activeItemType: $activeItemType /}
-		{param elementName: $rootName /}
-		{param expanded: true /}
-		{param hasChildren: true /}
-		{param itemTypes: $itemTypes /}
-		{param removeButtonClickHandler: $removeButtonClickHandler /}
-		{param spritemap: $spritemap /}
-		{param treeLevelId: 'sidebar-tree-root' /}
-	{/call}
+				{if $node.active}
+					{sp}active
+				{/if}
 
-	<div
-		class="collapse show"
-		id="sidebar-tree-root"
-	>
-		<ul class="nav nav-stacked">
-			<li class="nav-item">
-				{foreach $row in $layoutData.structure}
-					{let $treeRowLevelId kind="text"}
-						sidebar-tree-row-{index($row)}
-					{/let}
+				{if $node.hovered}
+					{sp}hovered
+				{/if}
+			{/let}
 
-					{call .treeRow}
-						{param activeItemId: $activeItemId /}
-						{param activeItemType: $activeItemType /}
-						{param clickHandler: $clickHandler /}
-						{param fragmentEntryLinks: $fragmentEntryLinks /}
-						{param itemTypes: $itemTypes /}
-						{param row: $row /}
-						{param rowIndex: index($row) /}
-						{param removeButtonClickHandler: $removeButtonClickHandler /}
+			<div class="{$itemClasses}">
+				{call .itemName}
+					{param handleElementClick: $handleElementClick /}
+					{param node: $node /}
+					{param spritemap: $spritemap /}
+				{/call}
+
+				{if $node.removable}
+					{call .removeIcon}
+						{param handleClick: $handleElementRemoveButtonClick /}
+						{param node: $node /}
 						{param spritemap: $spritemap /}
-						{param treeRowLevelId: $treeRowLevelId /}
 					{/call}
-				{/foreach}
-			</li>
-		</ul>
-	</div>
-{/template}
+				{/if}
+			</div>
 
-/**
- * Tree row
- */
-{template .treeRow}
-	{@param? activeItemId: ?}
-	{@param? activeItemType: ?}
-	{@param? clickHandler: ?}
-	{@param? fragmentEntryLinks: ?}
-	{@param? itemTypes: ?}
-	{@param? row: ?}
-	{@param? rowIndex: ?}
-	{@param? removeButtonClickHandler: ?}
-	{@param? spritemap: string}
-	{@param? treeRowLevelId: ?}
+			{if $node.children and (length($node.children) > 0)}
+				{let $childrenClasses kind="text"}
+					collapse
+					{sp}pl-3
 
-	{let $rowName kind="text"}
-		{msg desc=""}section{/msg}
-	{/let}
+					{if $node.expanded}
+						{sp}show
+					{/if}
+				{/let}
 
-	{call .treeElementButton}
-		{param activeItemId: $activeItemId /}
-		{param activeItemType: $activeItemType /}
-		{param clickHandler: $clickHandler /}
-		{param elementId: $row.rowId /}
-		{param elementName: $rowName /}
-		{param elementType: $itemTypes.section /}
-		{param hasChildren: true /}
-		{param itemTypes: $itemTypes /}
-		{param removeButtonClickHandler: $removeButtonClickHandler /}
-		{param spritemap: $spritemap /}
-		{param treeLevelId: $treeRowLevelId /}
-	{/call}
-
-	<div
-		class="collapse"
-		id="{$treeRowLevelId}"
-	>
-		<ul class="nav nav-stacked">
-			<li class="nav-item">
-				{foreach $column in $row.columns}
-					{let $treeColLevelId kind="text"}
-						sidebar-tree-col-{$rowIndex}-{index($column)}
-					{/let}
-
-					{call .treeCol}
-						{param activeItemId: $activeItemId /}
-						{param activeItemType: $activeItemType /}
-						{param clickHandler: $clickHandler /}
-						{param column: $column /}
-						{param fragmentEntryLinks: $fragmentEntryLinks /}
-						{param itemTypes: $itemTypes /}
-						{param removeButtonClickHandler: $removeButtonClickHandler /}
-						{param spritemap: $spritemap /}
-						{param treeColLevelId: $treeColLevelId /}
-					{/call}
-				{/foreach}
-			</li>
-		</ul>
-	</div>
-{/template}
-
-/**
- * Tree column
- */
-{template .treeCol}
-	{@param? activeItemId: ?}
-	{@param? activeItemType: ?}
-	{@param? clickHandler: ?}
-	{@param? column: ?}
-	{@param? fragmentEntryLinks: ?}
-	{@param? itemTypes: ?}
-	{@param? removeButtonClickHandler: ?}
-	{@param? spritemap: string}
-	{@param? treeColLevelId: ?}
-
-	{let $columnName kind="text"}
-		{msg desc=""}column{/msg}
-	{/let}
-
-	{call .treeElementButton}
-		{param activeItemId: $activeItemId /}
-		{param activeItemType: $activeItemType /}
-		{param elementName: $columnName /}
-		{param hasChildren: true /}
-		{param itemTypes: $itemTypes /}
-		{param removeButtonClickHandler: $removeButtonClickHandler /}
-		{param spritemap: $spritemap /}
-		{param treeLevelId: $treeColLevelId /}
-	{/call}
-
-	<div
-		class="collapse"
-		id="{$treeColLevelId}"
-	>
-		<ul class="nav nav-stacked">
-			<li class="nav-item">
-				{foreach $fragmentEntryLinkId in $column.fragmentEntryLinkIds}
-					{let $fragmentEntryLink: $fragmentEntryLinks[$fragmentEntryLinkId] /}
-
-					{if $fragmentEntryLink}
-						{call .treeElementButton}
-							{param activeItemId: $activeItemId /}
-							{param activeItemType: $activeItemType /}
-							{param clickHandler: $clickHandler /}
-							{param elementId: $fragmentEntryLink.fragmentEntryLinkId /}
-							{param elementName: $fragmentEntryLink.name /}
-							{param elementType: $itemTypes.fragment /}
-							{param hasChildren: false /}
-							{param itemTypes: $itemTypes /}
-							{param removeButtonClickHandler: $removeButtonClickHandler /}
+				<div class="{$childrenClasses}">
+					{foreach $nodeChild in $node.children}
+						{call .treeNode}
+							{param handleElementRemoveButtonClick: $handleElementRemoveButtonClick /}
+							{param handleElementClick: $handleElementClick /}
+							{param key: $nodeChild.key /}
+							{param node: $nodeChild /}
 							{param spritemap: $spritemap /}
 						{/call}
-					{/if}
-				{/foreach}
-			</li>
-		</ul>
-	</div>
-{/template}
-
-/**
- * Tree element button
- */
-{template .treeElementButton}
-	{@param? activeItemId: string}
-	{@param? activeItemType: ?}
-	{@param? clickHandler: ?}
-	{@param? elementId: ?}
-	{@param? elementName: ?}
-	{@param? elementType: ?}
-	{@param? expanded: bool}
-	{@param? hasChildren: ?}
-	{@param? itemTypes: ?}
-	{@param? removeButtonClickHandler: ?}
-	{@param? spritemap: string}
-	{@param? treeLevelId: ?}
-
-	{let $elementClasses kind="text"}
-		fragments-editor-sidebar-section__structure-panel__item
-
-		{if $elementId and ($activeItemId == $elementId) and ($activeItemType == $elementType)}
-			{sp}active
-		{/if}
-	{/let}
-
-	<div class="{$elementClasses}">
-		<div
-			class="fragments-editor-sidebar-section__structure-panel__item-name text-truncate"
-			data-onclick="{$clickHandler}"
-			data-element-id="{$elementId}"
-			data-element-type="{$elementType}"
-		>
-			{$elementName}
-		</div>
-
-		{if $hasChildren}
-			{call .collapseIcon}
-				{param expanded: $expanded /}
-				{param icon: 'open' /}
-				{param spritemap: $spritemap /}
-				{param treeLevelId: $treeLevelId /}
-			{/call}
-
-			{call .collapseIcon}
-				{param expanded: $expanded /}
-				{param icon: 'closed' /}
-				{param spritemap: $spritemap /}
-				{param treeLevelId: $treeLevelId /}
-			{/call}
-		{/if}
-
-		{let $removeButtonClasses kind="text"}
-			btn
-			{sp}btn-unstyled
-			{sp}btn-monospaced
-			{sp}btn-sm
-			{sp}fragments-editor-sidebar-section__structure-panel__item-remove-btn
-		{/let}
-
-		{if ($elementType == $itemTypes.section) or ($elementType == $itemTypes.fragment)}
-			<button
-				class="{$removeButtonClasses}"
-				data-onclick="{$removeButtonClickHandler}"
-				data-element-id="{$elementId}"
-				data-element-type="{$elementType}"
-				type="button"
-			>
-				<svg class="lexicon-icon lexicon-icon-times-circle">
-					<use xlink:href="{$spritemap}#times-circle"></use>
-				</svg>
-			</button>
-		{/if}
-	</div>
+					{/foreach}
+				</div>
+			{/if}
+		</li>
+	</ul>
 {/template}
 
 /**
  * Collapse Icon
  */
 {template .collapseIcon}
-	{@param icon: string}
-	{@param? expanded: bool}
+	{@param node: [
+		expanded: bool
+	]}
 	{@param? spritemap: string}
-	{@param? treeLevelId: string}
 
-	{let $collapseIconWrapperClasses kind="text"}
-		collapse-icon
-		{sp}fragments-editor-sidebar-section__structure-panel__item-icon
+	<span class="btn btn-sm btn-unstyled py-1">
+		{let $angleDirection kind="text"}
+			{if $node.expanded}
+				down
+			{else}
+				right
+			{/if}
+		{/let}
 
-		{if not $expanded}
-			{sp}collapsed
-		{/if}
-	{/let}
-
-	{let $collapseIconAttributes kind="attributes"}
-		aria-controls="{$treeLevelId}"
-		class="collapse-icon-{$icon}"
-		data-toggle="collapse"
-		href="#{$treeLevelId}"
-		role="button"
-
-		{if $expanded}
-			aria-expanded="true"
-		{else}
-			aria-expanded="false"
-		{/if}
-	{/let}
-
-	<span class="{$collapseIconWrapperClasses}">
-		<a {$collapseIconAttributes}>
-			{let $angleDirection kind="text"}
-				{if $icon == 'closed'}
-					right
-				{else}
-					down
-				{/if}
-			{/let}
-
-			<svg class="lexicon-icon lexicon-icon-angle-{$angleDirection}">
-				<use xlink:href="{$spritemap}#angle-{$angleDirection}"></use>
-			</svg>
-		</a>
+		<svg class="lexicon-icon lexicon-icon-angle-{$angleDirection}">
+			<use xlink:href="{$spritemap}#angle-{$angleDirection}"></use>
+		</svg>
 	</span>
+{/template}
+
+{template .itemName}
+	{@param node: [
+		children: list<?>,
+		elementId: string,
+		elementType: string,
+		expanded: bool,
+		key: string,
+		label: string
+	]}
+	{@param? handleElementClick: any}
+	{@param? spritemap: string}
+
+	{let $itemNameClasses kind="text"}
+		btn
+		{sp}btn-unstyled
+		{sp}flex-grow-1
+		{sp}text-truncate
+
+		{if (not $node.children) or (length($node.children) == 0)}
+			{sp}fragments-editor-sidebar-section__structure-panel__item-name--padded
+		{/if}
+	{/let}
+
+	{let $itemNameButtonAttributes kind="attributes"}
+		class="{$itemNameClasses}"
+		data-onclick="{$handleElementClick}"
+		type="button"
+
+		{if $node.elementId and $node.elementType}
+			data-element-id="{$node.elementId}"
+			data-element-type="{$node.elementType}"
+			data-fragments-editor-item-id="{$node.elementId}"
+			data-fragments-editor-item-type="{$node.elementType}"
+		{/if}
+
+		{if $node.children and length($node.children) > 0}
+			aria-controls="{$node.key}"
+			data-node-key="{$node.key}"
+
+			{if $node.expanded}
+				aria-expanded="true"
+			{else}
+				aria-expanded="false"
+			{/if}
+		{/if}
+	{/let}
+
+	<button {$itemNameButtonAttributes}>
+		{if $node.children and length($node.children) > 0}
+			{call .collapseIcon}
+				{param node: $node /}
+				{param spritemap: $spritemap /}
+			{/call}
+		{/if}
+
+		{$node.label}
+	</button>
+{/template}
+
+/**
+ * Remove icon
+ */
+{template .removeIcon}
+	{@param handleClick: any}
+	{@param node: [
+		elementId: string,
+		elementType: string
+	]}
+	{@param spritemap: string}
+
+	{let $removeButtonClasses kind="text"}
+		btn
+		{sp}btn-sm
+		{sp}btn-unstyled
+		{sp}fragments-editor-sidebar-section__structure-panel__item-remove-btn
+		{sp}py-1
+	{/let}
+
+	<button
+		class="{$removeButtonClasses}"
+		data-onclick="{$handleClick}"
+		data-element-id="{$node.elementId}"
+		data-element-type="{$node.elementType}"
+		type="button"
+	>
+		<svg class="lexicon-icon lexicon-icon-times-circle">
+			<use xlink:href="{$spritemap}#times-circle"></use>
+		</svg>
+	</button>
 {/template}

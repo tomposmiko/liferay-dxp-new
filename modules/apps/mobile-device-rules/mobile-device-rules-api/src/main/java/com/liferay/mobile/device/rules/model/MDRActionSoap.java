@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class MDRActionSoap implements Serializable {
+
 	public static MDRActionSoap toSoapModel(MDRAction model) {
 		MDRActionSoap soapModel = new MDRActionSoap();
 
@@ -81,7 +82,8 @@ public class MDRActionSoap implements Serializable {
 	}
 
 	public static MDRActionSoap[] toSoapModels(List<MDRAction> models) {
-		List<MDRActionSoap> soapModels = new ArrayList<MDRActionSoap>(models.size());
+		List<MDRActionSoap> soapModels = new ArrayList<MDRActionSoap>(
+			models.size());
 
 		for (MDRAction model : models) {
 			soapModels.add(toSoapModel(model));
@@ -245,4 +247,5 @@ public class MDRActionSoap implements Serializable {
 	private String _type;
 	private String _typeSettings;
 	private Date _lastPublishDate;
+
 }

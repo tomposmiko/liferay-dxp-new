@@ -40,9 +40,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface WikiPageModel extends BaseModel<WikiPage>, ContainerModel,
-	ResourcedModel, ShardedModel, StagedGroupedModel, TrashedModel,
-	WorkflowedModel {
+public interface WikiPageModel
+	extends BaseModel<WikiPage>, ContainerModel, ResourcedModel, ShardedModel,
+			StagedGroupedModel, TrashedModel, WorkflowedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -635,4 +636,5 @@ public interface WikiPageModel extends BaseModel<WikiPage>, ContainerModel,
 	 */
 	@Override
 	public void setParentContainerModelId(long parentContainerModelId);
+
 }

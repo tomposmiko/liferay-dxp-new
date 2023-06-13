@@ -39,8 +39,10 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public interface DDMFormInstanceModel extends BaseModel<DDMFormInstance>,
-	LocalizedModel, ShardedModel, StagedGroupedModel {
+public interface DDMFormInstanceModel
+	extends BaseModel<DDMFormInstance>, LocalizedModel, ShardedModel,
+			StagedGroupedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -456,8 +458,8 @@ public interface DDMFormInstanceModel extends BaseModel<DDMFormInstance>,
 	 * @param locale the locale of the language
 	 * @param defaultLocale the default locale
 	 */
-	public void setDescription(String description, Locale locale,
-		Locale defaultLocale);
+	public void setDescription(
+		String description, Locale locale, Locale defaultLocale);
 
 	public void setDescriptionCurrentLanguageId(String languageId);
 
@@ -474,8 +476,8 @@ public interface DDMFormInstanceModel extends BaseModel<DDMFormInstance>,
 	 * @param descriptionMap the locales and localized descriptions of this ddm form instance
 	 * @param defaultLocale the default locale
 	 */
-	public void setDescriptionMap(Map<Locale, String> descriptionMap,
-		Locale defaultLocale);
+	public void setDescriptionMap(
+		Map<Locale, String> descriptionMap, Locale defaultLocale);
 
 	/**
 	 * Returns the settings of this ddm form instance.
@@ -520,4 +522,5 @@ public interface DDMFormInstanceModel extends BaseModel<DDMFormInstance>,
 	@Override
 	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
 		throws LocaleException;
+
 }

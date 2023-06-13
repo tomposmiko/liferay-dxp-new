@@ -18,7 +18,6 @@ import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryService;
 import com.liferay.blogs.service.persistence.BlogsEntryFinder;
 import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
-
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -29,9 +28,9 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
 
-import org.osgi.service.component.annotations.Reference;
-
 import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the blogs entry remote service.
@@ -44,8 +43,10 @@ import javax.sql.DataSource;
  * @see com.liferay.blogs.service.impl.BlogsEntryServiceImpl
  * @generated
  */
-public abstract class BlogsEntryServiceBaseImpl extends BaseServiceImpl
+public abstract class BlogsEntryServiceBaseImpl
+	extends BaseServiceImpl
 	implements BlogsEntryService, AopService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -95,8 +96,8 @@ public abstract class BlogsEntryServiceBaseImpl extends BaseServiceImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -106,46 +107,83 @@ public abstract class BlogsEntryServiceBaseImpl extends BaseServiceImpl
 	}
 
 	@Reference
-	protected com.liferay.blogs.service.BlogsEntryLocalService blogsEntryLocalService;
+	protected com.liferay.blogs.service.BlogsEntryLocalService
+		blogsEntryLocalService;
+
 	protected BlogsEntryService blogsEntryService;
+
 	@Reference
 	protected BlogsEntryPersistence blogsEntryPersistence;
+
 	@Reference
 	protected BlogsEntryFinder blogsEntryFinder;
+
 	@Reference
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@Reference
-	protected com.liferay.portal.kernel.service.CompanyLocalService companyLocalService;
+	protected com.liferay.portal.kernel.service.CompanyLocalService
+		companyLocalService;
+
 	@Reference
 	protected com.liferay.portal.kernel.service.CompanyService companyService;
+
 	@Reference
-	protected com.liferay.portal.kernel.service.GroupLocalService groupLocalService;
+	protected com.liferay.portal.kernel.service.GroupLocalService
+		groupLocalService;
+
 	@Reference
 	protected com.liferay.portal.kernel.service.GroupService groupService;
+
 	@Reference
-	protected com.liferay.portal.kernel.service.ImageLocalService imageLocalService;
+	protected com.liferay.portal.kernel.service.ImageLocalService
+		imageLocalService;
+
 	@Reference
 	protected com.liferay.portal.kernel.service.ImageService imageService;
+
 	@Reference
-	protected com.liferay.portal.kernel.service.OrganizationLocalService organizationLocalService;
+	protected com.liferay.portal.kernel.service.OrganizationLocalService
+		organizationLocalService;
+
 	@Reference
-	protected com.liferay.portal.kernel.service.OrganizationService organizationService;
+	protected com.liferay.portal.kernel.service.OrganizationService
+		organizationService;
+
 	@Reference
-	protected com.liferay.portal.kernel.service.ResourceLocalService resourceLocalService;
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
 	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
 	@Reference
 	protected com.liferay.portal.kernel.service.UserService userService;
+
 	@Reference
-	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService;
+	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
+		workflowInstanceLinkLocalService;
+
 	@Reference
-	protected com.liferay.asset.kernel.service.AssetEntryLocalService assetEntryLocalService;
+	protected com.liferay.asset.kernel.service.AssetEntryLocalService
+		assetEntryLocalService;
+
 	@Reference
-	protected com.liferay.asset.kernel.service.AssetEntryService assetEntryService;
+	protected com.liferay.asset.kernel.service.AssetEntryService
+		assetEntryService;
+
 	@Reference
-	protected com.liferay.asset.kernel.service.AssetLinkLocalService assetLinkLocalService;
+	protected com.liferay.asset.kernel.service.AssetLinkLocalService
+		assetLinkLocalService;
+
 	@Reference
-	protected com.liferay.expando.kernel.service.ExpandoRowLocalService expandoRowLocalService;
+	protected com.liferay.expando.kernel.service.ExpandoRowLocalService
+		expandoRowLocalService;
+
 	@Reference
-	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService ratingsStatsLocalService;
+	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService
+		ratingsStatsLocalService;
+
 }

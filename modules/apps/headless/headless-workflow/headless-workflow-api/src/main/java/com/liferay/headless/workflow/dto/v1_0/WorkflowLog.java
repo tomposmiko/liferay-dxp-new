@@ -14,106 +14,388 @@
 
 package com.liferay.headless.workflow.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
 
 import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface WorkflowLog {
+@GraphQLName("WorkflowLog")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "WorkflowLog")
+public class WorkflowLog {
 
-	public String getAuditPerson();
+	public Creator getAuditPerson() {
+		return auditPerson;
+	}
 
+	public void setAuditPerson(Creator auditPerson) {
+		this.auditPerson = auditPerson;
+	}
+
+	@JsonIgnore
 	public void setAuditPerson(
-			String auditPerson);
+		UnsafeSupplier<Creator, Exception> auditPersonUnsafeSupplier) {
 
-	public void setAuditPerson(
-			UnsafeSupplier<String, Throwable>
-				auditPersonUnsafeSupplier);
-	public String getCommentLog();
+		try {
+			auditPerson = auditPersonUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Creator auditPerson;
+
+	public String getCommentLog() {
+		return commentLog;
+	}
+
+	public void setCommentLog(String commentLog) {
+		this.commentLog = commentLog;
+	}
+
+	@JsonIgnore
 	public void setCommentLog(
-			String commentLog);
+		UnsafeSupplier<String, Exception> commentLogUnsafeSupplier) {
 
-	public void setCommentLog(
-			UnsafeSupplier<String, Throwable>
-				commentLogUnsafeSupplier);
-	public Date getDateCreated();
+		try {
+			commentLog = commentLogUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String commentLog;
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	@JsonIgnore
 	public void setDateCreated(
-			Date dateCreated);
+		UnsafeSupplier<Date, Exception> dateCreatedUnsafeSupplier) {
 
-	public void setDateCreated(
-			UnsafeSupplier<Date, Throwable>
-				dateCreatedUnsafeSupplier);
-	public Long getId();
+		try {
+			dateCreated = dateCreatedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Date dateCreated;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public String getPerson();
+	public Long getId() {
+		return id;
+	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	public Creator getPerson() {
+		return person;
+	}
+
+	public void setPerson(Creator person) {
+		this.person = person;
+	}
+
+	@JsonIgnore
 	public void setPerson(
-			String person);
+		UnsafeSupplier<Creator, Exception> personUnsafeSupplier) {
 
-	public void setPerson(
-			UnsafeSupplier<String, Throwable>
-				personUnsafeSupplier);
-	public String getPreviousPerson();
+		try {
+			person = personUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Creator person;
+
+	public Creator getPreviousPerson() {
+		return previousPerson;
+	}
+
+	public void setPreviousPerson(Creator previousPerson) {
+		this.previousPerson = previousPerson;
+	}
+
+	@JsonIgnore
 	public void setPreviousPerson(
-			String previousPerson);
+		UnsafeSupplier<Creator, Exception> previousPersonUnsafeSupplier) {
 
-	public void setPreviousPerson(
-			UnsafeSupplier<String, Throwable>
-				previousPersonUnsafeSupplier);
-	public String getPreviousState();
+		try {
+			previousPerson = previousPersonUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Creator previousPerson;
+
+	public String getPreviousState() {
+		return previousState;
+	}
+
+	public void setPreviousState(String previousState) {
+		this.previousState = previousState;
+	}
+
+	@JsonIgnore
 	public void setPreviousState(
-			String previousState);
+		UnsafeSupplier<String, Exception> previousStateUnsafeSupplier) {
 
-	public void setPreviousState(
-			UnsafeSupplier<String, Throwable>
-				previousStateUnsafeSupplier);
-	public String getState();
+		try {
+			previousState = previousStateUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String previousState;
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	@JsonIgnore
 	public void setState(
-			String state);
+		UnsafeSupplier<String, Exception> stateUnsafeSupplier) {
 
-	public void setState(
-			UnsafeSupplier<String, Throwable>
-				stateUnsafeSupplier);
-	public WorkflowTask getTask();
+		try {
+			state = stateUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setTask(
-			WorkflowTask task);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String state;
 
-	public void setTask(
-			UnsafeSupplier<WorkflowTask, Throwable>
-				taskUnsafeSupplier);
-	public Long getTaskId();
+	public Long getTaskId() {
+		return taskId;
+	}
 
+	public void setTaskId(Long taskId) {
+		this.taskId = taskId;
+	}
+
+	@JsonIgnore
 	public void setTaskId(
-			Long taskId);
+		UnsafeSupplier<Long, Exception> taskIdUnsafeSupplier) {
 
-	public void setTaskId(
-			UnsafeSupplier<Long, Throwable>
-				taskIdUnsafeSupplier);
-	public String getType();
+		try {
+			taskId = taskIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setType(
-			String type);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long taskId;
 
-	public void setType(
-			UnsafeSupplier<String, Throwable>
-				typeUnsafeSupplier);
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	@JsonIgnore
+	public void setType(UnsafeSupplier<String, Exception> typeUnsafeSupplier) {
+		try {
+			type = typeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String type;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof WorkflowLog)) {
+			return false;
+		}
+
+		WorkflowLog workflowLog = (WorkflowLog)object;
+
+		return Objects.equals(toString(), workflowLog.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"auditPerson\": ");
+
+		sb.append(auditPerson);
+		sb.append(", ");
+
+		sb.append("\"commentLog\": ");
+
+		sb.append("\"");
+		sb.append(commentLog);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"dateCreated\": ");
+
+		sb.append("\"");
+		sb.append(dateCreated);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"person\": ");
+
+		sb.append(person);
+		sb.append(", ");
+
+		sb.append("\"previousPerson\": ");
+
+		sb.append(previousPerson);
+		sb.append(", ");
+
+		sb.append("\"previousState\": ");
+
+		sb.append("\"");
+		sb.append(previousState);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"state\": ");
+
+		sb.append("\"");
+		sb.append(state);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"taskId\": ");
+
+		sb.append(taskId);
+		sb.append(", ");
+
+		sb.append("\"type\": ");
+
+		sb.append("\"");
+		sb.append(type);
+		sb.append("\"");
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

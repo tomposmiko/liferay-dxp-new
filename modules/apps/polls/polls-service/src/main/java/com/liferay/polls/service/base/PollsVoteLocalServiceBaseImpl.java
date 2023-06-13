@@ -21,14 +21,12 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-
 import com.liferay.polls.model.PollsVote;
 import com.liferay.polls.service.PollsVoteLocalService;
 import com.liferay.polls.service.persistence.PollsChoicePersistence;
 import com.liferay.polls.service.persistence.PollsQuestionFinder;
 import com.liferay.polls.service.persistence.PollsQuestionPersistence;
 import com.liferay.polls.service.persistence.PollsVotePersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -73,8 +71,10 @@ import javax.sql.DataSource;
  * @generated
  */
 @ProviderType
-public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
+public abstract class PollsVoteLocalServiceBaseImpl
+	extends BaseLocalServiceImpl
 	implements PollsVoteLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -136,8 +136,8 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(PollsVote.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			PollsVote.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -164,10 +164,11 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return pollsVotePersistence.findWithDynamicQuery(dynamicQuery, start,
-			end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return pollsVotePersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -184,10 +185,12 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return pollsVotePersistence.findWithDynamicQuery(dynamicQuery, start,
-			end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return pollsVotePersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -209,10 +212,11 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return pollsVotePersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return pollsVotePersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
@@ -246,7 +250,8 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(pollsVoteLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -258,10 +263,14 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(pollsVoteLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			pollsVoteLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(PollsVote.class);
 
@@ -272,6 +281,7 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
+
 		actionableDynamicQuery.setBaseLocalService(pollsVoteLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(PollsVote.class);
@@ -282,51 +292,67 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		final PortletDataContext portletDataContext) {
-		final ExportActionableDynamicQuery exportActionableDynamicQuery = new ExportActionableDynamicQuery() {
+
+		final ExportActionableDynamicQuery exportActionableDynamicQuery =
+			new ExportActionableDynamicQuery() {
+
 				@Override
 				public long performCount() throws PortalException {
-					ManifestSummary manifestSummary = portletDataContext.getManifestSummary();
+					ManifestSummary manifestSummary =
+						portletDataContext.getManifestSummary();
 
 					StagedModelType stagedModelType = getStagedModelType();
 
 					long modelAdditionCount = super.performCount();
 
-					manifestSummary.addModelAdditionCount(stagedModelType,
-						modelAdditionCount);
+					manifestSummary.addModelAdditionCount(
+						stagedModelType, modelAdditionCount);
 
-					long modelDeletionCount = ExportImportHelperUtil.getModelDeletionCount(portletDataContext,
-							stagedModelType);
+					long modelDeletionCount =
+						ExportImportHelperUtil.getModelDeletionCount(
+							portletDataContext, stagedModelType);
 
-					manifestSummary.addModelDeletionCount(stagedModelType,
-						modelDeletionCount);
+					manifestSummary.addModelDeletionCount(
+						stagedModelType, modelDeletionCount);
 
 					return modelAdditionCount;
 				}
+
 			};
 
 		initActionableDynamicQuery(exportActionableDynamicQuery);
 
-		exportActionableDynamicQuery.setAddCriteriaMethod(new ActionableDynamicQuery.AddCriteriaMethod() {
+		exportActionableDynamicQuery.setAddCriteriaMethod(
+			new ActionableDynamicQuery.AddCriteriaMethod() {
+
 				@Override
 				public void addCriteria(DynamicQuery dynamicQuery) {
-					portletDataContext.addDateRangeCriteria(dynamicQuery,
-						"modifiedDate");
+					portletDataContext.addDateRangeCriteria(
+						dynamicQuery, "modifiedDate");
 				}
+
 			});
 
-		exportActionableDynamicQuery.setCompanyId(portletDataContext.getCompanyId());
+		exportActionableDynamicQuery.setCompanyId(
+			portletDataContext.getCompanyId());
 
-		exportActionableDynamicQuery.setGroupId(portletDataContext.getScopeGroupId());
+		exportActionableDynamicQuery.setGroupId(
+			portletDataContext.getScopeGroupId());
 
-		exportActionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<PollsVote>() {
+		exportActionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<PollsVote>() {
+
 				@Override
 				public void performAction(PollsVote pollsVote)
 					throws PortalException {
-					StagedModelDataHandlerUtil.exportStagedModel(portletDataContext,
-						pollsVote);
+
+					StagedModelDataHandlerUtil.exportStagedModel(
+						portletDataContext, pollsVote);
 				}
+
 			});
-		exportActionableDynamicQuery.setStagedModelType(new StagedModelType(
+		exportActionableDynamicQuery.setStagedModelType(
+			new StagedModelType(
 				PortalUtil.getClassNameId(PollsVote.class.getName())));
 
 		return exportActionableDynamicQuery;
@@ -338,12 +364,14 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
+
 		return pollsVoteLocalService.deletePollsVote((PollsVote)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return pollsVotePersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -355,8 +383,9 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @return the matching polls votes, or an empty list if no matches were found
 	 */
 	@Override
-	public List<PollsVote> getPollsVotesByUuidAndCompanyId(String uuid,
-		long companyId) {
+	public List<PollsVote> getPollsVotesByUuidAndCompanyId(
+		String uuid, long companyId) {
+
 		return pollsVotePersistence.findByUuid_C(uuid, companyId);
 	}
 
@@ -371,11 +400,12 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @return the range of matching polls votes, or an empty list if no matches were found
 	 */
 	@Override
-	public List<PollsVote> getPollsVotesByUuidAndCompanyId(String uuid,
-		long companyId, int start, int end,
+	public List<PollsVote> getPollsVotesByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
 		OrderByComparator<PollsVote> orderByComparator) {
-		return pollsVotePersistence.findByUuid_C(uuid, companyId, start, end,
-			orderByComparator);
+
+		return pollsVotePersistence.findByUuid_C(
+			uuid, companyId, start, end, orderByComparator);
 	}
 
 	/**
@@ -389,6 +419,7 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public PollsVote getPollsVoteByUuidAndGroupId(String uuid, long groupId)
 		throws PortalException {
+
 		return pollsVotePersistence.findByUUID_G(uuid, groupId);
 	}
 
@@ -446,6 +477,7 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 */
 	public void setPollsVoteLocalService(
 		PollsVoteLocalService pollsVoteLocalService) {
+
 		this.pollsVoteLocalService = pollsVoteLocalService;
 	}
 
@@ -465,6 +497,7 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 */
 	public void setPollsVotePersistence(
 		PollsVotePersistence pollsVotePersistence) {
+
 		this.pollsVotePersistence = pollsVotePersistence;
 	}
 
@@ -473,7 +506,9 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -483,7 +518,9 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -492,7 +529,9 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the polls choice local service
 	 */
-	public com.liferay.polls.service.PollsChoiceLocalService getPollsChoiceLocalService() {
+	public com.liferay.polls.service.PollsChoiceLocalService
+		getPollsChoiceLocalService() {
+
 		return pollsChoiceLocalService;
 	}
 
@@ -502,7 +541,9 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param pollsChoiceLocalService the polls choice local service
 	 */
 	public void setPollsChoiceLocalService(
-		com.liferay.polls.service.PollsChoiceLocalService pollsChoiceLocalService) {
+		com.liferay.polls.service.PollsChoiceLocalService
+			pollsChoiceLocalService) {
+
 		this.pollsChoiceLocalService = pollsChoiceLocalService;
 	}
 
@@ -522,6 +563,7 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 */
 	public void setPollsChoicePersistence(
 		PollsChoicePersistence pollsChoicePersistence) {
+
 		this.pollsChoicePersistence = pollsChoicePersistence;
 	}
 
@@ -530,7 +572,9 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the polls question local service
 	 */
-	public com.liferay.polls.service.PollsQuestionLocalService getPollsQuestionLocalService() {
+	public com.liferay.polls.service.PollsQuestionLocalService
+		getPollsQuestionLocalService() {
+
 		return pollsQuestionLocalService;
 	}
 
@@ -540,7 +584,9 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param pollsQuestionLocalService the polls question local service
 	 */
 	public void setPollsQuestionLocalService(
-		com.liferay.polls.service.PollsQuestionLocalService pollsQuestionLocalService) {
+		com.liferay.polls.service.PollsQuestionLocalService
+			pollsQuestionLocalService) {
+
 		this.pollsQuestionLocalService = pollsQuestionLocalService;
 	}
 
@@ -560,6 +606,7 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 */
 	public void setPollsQuestionPersistence(
 		PollsQuestionPersistence pollsQuestionPersistence) {
+
 		this.pollsQuestionPersistence = pollsQuestionPersistence;
 	}
 
@@ -577,7 +624,9 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param pollsQuestionFinder the polls question finder
 	 */
-	public void setPollsQuestionFinder(PollsQuestionFinder pollsQuestionFinder) {
+	public void setPollsQuestionFinder(
+		PollsQuestionFinder pollsQuestionFinder) {
+
 		this.pollsQuestionFinder = pollsQuestionFinder;
 	}
 
@@ -586,7 +635,9 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the user local service
 	 */
-	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
 		return userLocalService;
 	}
 
@@ -597,6 +648,7 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 */
 	public void setUserLocalService(
 		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
 		this.userLocalService = userLocalService;
 	}
 
@@ -619,8 +671,8 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.polls.model.PollsVote",
-			pollsVoteLocalService);
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.polls.model.PollsVote", pollsVoteLocalService);
 	}
 
 	public void destroy() {
@@ -660,8 +712,8 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -672,24 +724,48 @@ public abstract class PollsVoteLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@BeanReference(type = PollsVoteLocalService.class)
 	protected PollsVoteLocalService pollsVoteLocalService;
+
 	@BeanReference(type = PollsVotePersistence.class)
 	protected PollsVotePersistence pollsVotePersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@BeanReference(type = com.liferay.polls.service.PollsChoiceLocalService.class)
-	protected com.liferay.polls.service.PollsChoiceLocalService pollsChoiceLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@BeanReference(
+		type = com.liferay.polls.service.PollsChoiceLocalService.class
+	)
+	protected com.liferay.polls.service.PollsChoiceLocalService
+		pollsChoiceLocalService;
+
 	@BeanReference(type = PollsChoicePersistence.class)
 	protected PollsChoicePersistence pollsChoicePersistence;
-	@BeanReference(type = com.liferay.polls.service.PollsQuestionLocalService.class)
-	protected com.liferay.polls.service.PollsQuestionLocalService pollsQuestionLocalService;
+
+	@BeanReference(
+		type = com.liferay.polls.service.PollsQuestionLocalService.class
+	)
+	protected com.liferay.polls.service.PollsQuestionLocalService
+		pollsQuestionLocalService;
+
 	@BeanReference(type = PollsQuestionPersistence.class)
 	protected PollsQuestionPersistence pollsQuestionPersistence;
+
 	@BeanReference(type = PollsQuestionFinder.class)
 	protected PollsQuestionFinder pollsQuestionFinder;
-	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
-	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

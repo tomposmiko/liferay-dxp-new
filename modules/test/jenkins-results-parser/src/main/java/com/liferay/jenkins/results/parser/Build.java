@@ -162,6 +162,10 @@ public interface Build {
 
 	public boolean isBuildModified();
 
+	public boolean isFromArchive();
+
+	public boolean isFromCompletedBuild();
+
 	public void reinvoke();
 
 	public void reinvoke(ReinvokeRule reinvokeRule);

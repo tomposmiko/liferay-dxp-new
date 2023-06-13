@@ -165,7 +165,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Test Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
 		);
@@ -183,7 +183,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Test Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists"
 		);
@@ -267,7 +267,7 @@ definition {
 		property testray.component.names = "Asset Publisher,Bookmarks";
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -343,7 +343,7 @@ definition {
 		property testray.component.names = "Asset Publisher,Bookmarks,Content and Display Templates,Training";
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -392,15 +392,6 @@ definition {
 
 		AssetPublisherPortlet.configureDisplayTemplatePG(
 			displayTemplate = "Full Content"
-		);
-
-		Navigator.gotoSitePage(
-			pageName = "Asset Publisher Page",
-			siteName = "Test Site Name"
-		);
-
-		AssetPublisherPortlet.viewConfigureAPDisplayTemplateFullContentBookmarksPG(
-			assetTitle = "Test Bookmark Name"
 		);
 
 		Navigator.gotoSitePage(
@@ -595,9 +586,12 @@ definition {
 	@priority = "5"
 	test ConfigureAPPortletSelectedWebContent {
 		property portal.acceptance = "true";
-		property testray.component.names = "Asset Publisher";
+		property testray.component.names = "Asset Publisher,Training";
 
-		AssetPublisherPortlet.configureSelectedPG(selectedAsset = "Web Content Article");
+		AssetPublisherPortlet.configureAssetTypePG(
+			assetSubtype = "Basic Web Content",
+			selectedAsset = "Web Content Article"
+		);
 
 		Navigator.gotoSitePage(
 			pageName = "Asset Publisher Page",
@@ -606,7 +600,8 @@ definition {
 
 		AssetPublisherPortlet.viewSelectedPG(
 			selectedAsset = "Basic Web Content",
-			selectedAssetConfiguration = "Web Content Article"
+			selectedAssetConfiguration = "Web Content Article",
+			assetSubtypeConfiguration = "Basic Web Content"
 		);
 	}
 
@@ -634,7 +629,7 @@ definition {
 		property testray.component.names = "Asset Publisher,Bookmarks";
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -714,7 +709,7 @@ definition {
 		property testray.component.names = "Asset Publisher,Tags";
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -759,7 +754,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Test Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -775,7 +770,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Test Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media"
 		);
@@ -998,7 +993,7 @@ definition {
 
 		for (var i : list "1,5,3") {
 			ProductMenu.gotoPortlet(
-				category = "Content",
+				category = "Content &amp; Data",
 				panel = "Site Administration",
 				portlet = "Web Content"
 			);
@@ -1164,6 +1159,14 @@ definition {
 			assetTitle2 = "WebContent Title 2",
 			assetTitle3 = "WebContent Title 3"
 		);
+
+		Navigator.gotoPage(pageName = "Asset Publisher Page");
+
+		Portlet.configureCustomTitlePG(portletTitleName = "Asset Publisher");
+
+		Navigator.gotoPage(pageName = "Asset Publisher Page");
+
+		Portlet.viewSpecificPG(portletName = "Asset Publisher Custom");
 	}
 
 	@priority = "5"
@@ -1173,7 +1176,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);

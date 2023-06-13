@@ -32,12 +32,16 @@ import javax.annotation.Generated;
 @Generated("")
 public interface PostalAddressResource {
 
-	public Page<PostalAddress> getGenericParentPostalAddressesPage(
-				Object genericParentId,Pagination pagination)
-			throws Exception;
-	public PostalAddress getAddress(
-				Long addressId)
-			throws Exception;
+	public Page<PostalAddress> getOrganizationPostalAddressesPage(
+			Long organizationId, Pagination pagination)
+		throws Exception;
+
+	public PostalAddress getPostalAddress(Long postalAddressId)
+		throws Exception;
+
+	public Page<PostalAddress> getUserAccountPostalAddressesPage(
+			Long userAccountId, Pagination pagination)
+		throws Exception;
 
 	public void setContextCompany(Company contextCompany);
 

@@ -106,10 +106,13 @@ renderResponse.setTitle(categoryDisplayName);
 					<aui:input name="pid" type="hidden" value="<%= configurationModel.getID() %>" />
 
 					<%
-					String configurationTitle;
+					String configurationTitle = null;
+
+					ConfigurationScopeDisplayContext
+						configurationScopeDisplayContext = new ConfigurationScopeDisplayContext(renderRequest);
 
 					if (configurationModel.isFactory() && !configurationModel.isCompanyFactory()) {
-						if (configurationModel.hasConfiguration()) {
+						if (configurationModel.hasScopeConfiguration(configurationScopeDisplayContext.getScope())) {
 							configurationTitle = configurationModel.getLabel();
 						}
 						else {
@@ -124,7 +127,7 @@ renderResponse.setTitle(categoryDisplayName);
 					<h2>
 						<%= HtmlUtil.escape(configurationTitle) %>
 
-						<c:if test="<%= configurationModel.hasConfiguration() %>">
+						<c:if test="<%= configurationModel.hasScopeConfiguration(configurationScopeDisplayContext.getScope()) %>">
 							<liferay-ui:icon-menu
 								cssClass="float-right"
 								direction="right"
@@ -160,21 +163,23 @@ renderResponse.setTitle(categoryDisplayName);
 									</c:otherwise>
 								</c:choose>
 
-								<portlet:resourceURL id="export" var="exportURL">
-									<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
-									<portlet:param name="pid" value="<%= configurationModel.getID() %>" />
-								</portlet:resourceURL>
+								<c:if test="<%= ExtendedObjectClassDefinition.Scope.SYSTEM.equals(configurationScopeDisplayContext.getScope()) %>">
+									<portlet:resourceURL id="export" var="exportURL">
+										<portlet:param name="factoryPid" value="<%= configurationModel.getFactoryPid() %>" />
+										<portlet:param name="pid" value="<%= configurationModel.getID() %>" />
+									</portlet:resourceURL>
 
-								<liferay-ui:icon
-									message="export"
-									method="get"
-									url="<%= exportURL %>"
-								/>
+									<liferay-ui:icon
+										message="export"
+										method="get"
+										url="<%= exportURL %>"
+									/>
+								</c:if>
 							</liferay-ui:icon-menu>
 						</c:if>
 					</h2>
 
-					<c:if test="<%= !configurationModel.hasConfiguration() %>">
+					<c:if test="<%= !configurationModel.hasScopeConfiguration(configurationScopeDisplayContext.getScope()) %>">
 						<aui:alert closeable="<%= false %>" id="errorAlert" type="info">
 							<liferay-ui:message key="this-configuration-was-not-saved-yet" />
 						</aui:alert>
@@ -198,7 +203,7 @@ renderResponse.setTitle(categoryDisplayName);
 
 					<aui:button-row>
 						<c:choose>
-							<c:when test="<%= configurationModel.hasConfiguration() %>">
+							<c:when test="<%= configurationModel.hasScopeConfiguration(configurationScopeDisplayContext.getScope()) %>">
 								<aui:button name="update" type="submit" value="update" />
 							</c:when>
 							<c:otherwise>

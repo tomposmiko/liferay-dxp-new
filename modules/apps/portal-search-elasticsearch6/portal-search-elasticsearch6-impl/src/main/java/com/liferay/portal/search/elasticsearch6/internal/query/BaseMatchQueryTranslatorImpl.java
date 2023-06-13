@@ -14,26 +14,13 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.portal.kernel.search.generic.MatchQuery;
-
-import org.elasticsearch.index.query.Operator;
+import com.liferay.portal.search.query.MatchQuery;
+import com.liferay.portal.search.query.Operator;
 
 /**
  * @author Michael C. Han
  */
 public abstract class BaseMatchQueryTranslatorImpl {
-
-	protected Operator translate(MatchQuery.Operator matchQueryOperator) {
-		if (matchQueryOperator == MatchQuery.Operator.AND) {
-			return Operator.AND;
-		}
-		else if (matchQueryOperator == MatchQuery.Operator.OR) {
-			return Operator.AND;
-		}
-
-		throw new IllegalArgumentException(
-			"Invalid operator: " + matchQueryOperator);
-	}
 
 	protected String translate(
 		MatchQuery.RewriteMethod matchQueryRewriteMethod) {
@@ -86,6 +73,20 @@ public abstract class BaseMatchQueryTranslatorImpl {
 
 		throw new IllegalArgumentException(
 			"Invalid zero terms query: " + matchQueryZeroTermsQuery);
+	}
+
+	protected org.elasticsearch.index.query.Operator translate(
+		Operator matchQueryOperator) {
+
+		if (matchQueryOperator == Operator.AND) {
+			return org.elasticsearch.index.query.Operator.AND;
+		}
+		else if (matchQueryOperator == Operator.OR) {
+			return org.elasticsearch.index.query.Operator.AND;
+		}
+
+		throw new IllegalArgumentException(
+			"Invalid operator: " + matchQueryOperator);
 	}
 
 }

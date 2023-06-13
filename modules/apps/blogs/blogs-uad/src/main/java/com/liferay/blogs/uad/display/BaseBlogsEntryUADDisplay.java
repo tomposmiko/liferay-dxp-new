@@ -17,17 +17,15 @@ package com.liferay.blogs.uad.display;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.blogs.uad.constants.BlogsUADConstants;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
-
 import com.liferay.user.associated.data.display.BaseModelUADDisplay;
-
-import org.osgi.service.component.annotations.Reference;
 
 import java.io.Serializable;
 
 import java.util.List;
+
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the BlogsEntry UAD display.
@@ -41,11 +39,13 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  * @generated
  */
-public abstract class BaseBlogsEntryUADDisplay extends BaseModelUADDisplay<BlogsEntry> {
+public abstract class BaseBlogsEntryUADDisplay
+	extends BaseModelUADDisplay<BlogsEntry> {
+
 	@Override
 	public BlogsEntry get(Serializable primaryKey) throws PortalException {
-		return blogsEntryLocalService.getBlogsEntry(Long.valueOf(
-				primaryKey.toString()));
+		return blogsEntryLocalService.getBlogsEntry(
+			Long.valueOf(primaryKey.toString()));
 	}
 
 	@Override
@@ -72,8 +72,9 @@ public abstract class BaseBlogsEntryUADDisplay extends BaseModelUADDisplay<Blogs
 	}
 
 	@Override
-	protected List<BlogsEntry> doGetRange(DynamicQuery dynamicQuery, int start,
-		int end) {
+	protected List<BlogsEntry> doGetRange(
+		DynamicQuery dynamicQuery, int start, int end) {
+
 		return blogsEntryLocalService.dynamicQuery(dynamicQuery, start, end);
 	}
 
@@ -84,4 +85,5 @@ public abstract class BaseBlogsEntryUADDisplay extends BaseModelUADDisplay<Blogs
 
 	@Reference
 	protected BlogsEntryLocalService blogsEntryLocalService;
+
 }

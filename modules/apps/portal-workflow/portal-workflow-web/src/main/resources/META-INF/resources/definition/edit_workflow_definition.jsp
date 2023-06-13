@@ -155,7 +155,6 @@ renderResponse.setTitle((workflowDefinition == null) ? LanguageUtil.get(request,
 						cssClass="navigation-bar component-navigation-bar navbar-no-collapse"
 						names="details,revision-history"
 						refresh="<%= false %>"
-						type="tabs nav-tabs-default "
 					>
 						<liferay-ui:section>
 							<div style="margin-top:1.5rem;">
@@ -335,85 +334,107 @@ renderResponse.setTitle((workflowDefinition == null) ? LanguageUtil.get(request,
 
 	contentEditor.set(STR_VALUE, content);
 
-	var uploadFile = $('#<portlet:namespace />upload');
+	var uploadFile = document.getElementById('<portlet:namespace />upload');
 
 	var previousContent = '';
 
-	uploadFile.on(
-		'change',
-		function(evt) {
-			var files = evt.target.files;
+	if (uploadFile) {
+		uploadFile.addEventListener(
+			'change',
+			function(evt) {
+				var files = evt.target.files;
 
-			if (files) {
-				var reader = new FileReader();
+				if (files) {
+					var reader = new FileReader();
 
-				reader.onloadend = function(evt) {
-					if (evt.target.readyState == FileReader.DONE) {
-						previousContent = contentEditor.get(STR_VALUE);
+					reader.onloadend = function(evt) {
+						if (evt.target.readyState == FileReader.DONE) {
+							previousContent = contentEditor.get(STR_VALUE);
 
-						contentEditor.set(STR_VALUE, evt.target.result);
+							contentEditor.set(STR_VALUE, evt.target.result);
 
-						uploadFile.val('');
+							uploadFile.value = '';
 
-						Liferay.WorkflowWeb.showDefinitionImportSuccessMessage('<portlet:namespace />');
-					}
-				};
+							Liferay.WorkflowWeb.showDefinitionImportSuccessMessage('<portlet:namespace />');
+						}
+					};
 
-				reader.readAsText(files[0]);
+					reader.readAsText(files[0]);
+				}
 			}
-		}
-	);
+		);
+	}
 
-	var uploadLink = A.one('#<portlet:namespace />uploadLink');
+	var uploadLink = document.getElementById('<portlet:namespace />uploadLink');
 
-	uploadLink.on(
-		'click',
-		function(event) {
-			event.preventDefault();
+	if (uploadLink) {
+		uploadLink.addEventListener(
+			'click',
+			function(event) {
+				event.preventDefault();
 
-			uploadFile.trigger('click');
-		}
-	);
+				uploadFile.click();
+			}
+		);
+	}
 
 	var untitledWorkflowTitle = '<liferay-ui:message key="untitled-workflow" />';
 
 	var defaultLanguageId = '<%= themeDisplay.getLanguageId() %>';
 
+	var form = document.<portlet:namespace />fm;
+
 	Liferay.on(
 		'<portlet:namespace />publishDefinition',
 		function(event) {
-			var form = AUI.$('#<portlet:namespace />fm');
+			var titleElement = Liferay.Util.getFormElement(form, 'title_' + defaultLanguageId);
 
-			form.attr('action', '<%= deployWorkflowDefinitionURL %>');
-
-			var titleValue = form.fm('title_' + defaultLanguageId).val();
-
-			if (!titleValue) {
-				form.fm('title_' + defaultLanguageId).val(untitledWorkflowTitle);
+			if (!titleElement) {
+				Liferay.Util.setFormValues(
+					form,
+					{
+						titleElement: ''
+					}
+				);
 			}
 
-			form.fm('content').val(contentEditor.get(STR_VALUE));
-
-			submitForm(form);
+			Liferay.Util.postForm(
+				form,
+				{
+					data: {
+						content: contentEditor.get(STR_VALUE),
+						titleValue: untitledWorkflowTitle
+					},
+					url: '<%= deployWorkflowDefinitionURL %>'
+				}
+			);
 		}
 	);
 
 	Liferay.on(
 		'<portlet:namespace />saveDefinition',
 		function(event) {
-			var form = AUI.$('#<portlet:namespace />fm');
+			var titleElement = Liferay.Util.getFormElement(form, 'title_' + defaultLanguageId);
 
-			form.attr('action', '<%= saveWorkflowDefinitionURL %>');
-
-			var titleValue = form.fm('title_' + defaultLanguageId).val();
-
-			if (!titleValue) {
-				form.fm('title_' + defaultLanguageId).val(untitledWorkflowTitle);
+			if (!titleElement) {
+				Liferay.Util.setFormValues(
+					form,
+					{
+						titleElement: ''
+					}
+				);
 			}
 
-			form.fm('content').val(contentEditor.get(STR_VALUE));
-
-			submitForm(form);
+			Liferay.Util.postForm(
+				form,
+				{
+					data: {
+						content: contentEditor.get(STR_VALUE),
+						titleValue: untitledWorkflowTitle
+					},
+					url: '<%= saveWorkflowDefinitionURL %>'
+				}
+			);
 		}
 	);
 
@@ -437,16 +458,20 @@ renderResponse.setTitle((workflowDefinition == null) ? LanguageUtil.get(request,
 		}
 	);
 
-	A.one('#<portlet:namespace />title').on(
-		'keypress',
-		function(event) {
-			var keycode = (event.keyCode ? event.keyCode : event.which);
+	var title = document.getElementById('<portlet:namespace />title');
 
-			if (keycode == '13') {
-				event.preventDefault();
+	if (title) {
+		title.addEventListener(
+			'keypress',
+			function(event) {
+				var keycode = (event.keyCode ? event.keyCode : event.which);
+
+				if (keycode == '13') {
+					event.preventDefault();
+				}
 			}
-		}
-	);
+		);
+	}
 
 	var sidenavSlider = $('#<portlet:namespace />infoPanelId');
 

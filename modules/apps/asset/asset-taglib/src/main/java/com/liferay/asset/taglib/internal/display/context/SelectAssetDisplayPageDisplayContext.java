@@ -22,8 +22,6 @@ import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.asset.kernel.model.ClassType;
-import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.asset.taglib.internal.item.selector.ItemSelectorUtil;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
@@ -40,11 +38,13 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -101,27 +101,14 @@ public class SelectAssetDisplayPageDisplayContext {
 			return _assetDisplayPageId;
 		}
 
+		_assetDisplayPageId = 0L;
+
 		AssetDisplayPageEntry assetDisplayPageEntry =
 			_getAssetDisplayPageEntry();
 
 		if (assetDisplayPageEntry != null) {
 			_assetDisplayPageId =
 				assetDisplayPageEntry.getLayoutPageTemplateEntryId();
-
-			return _assetDisplayPageId;
-		}
-
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			LayoutPageTemplateEntryServiceUtil.
-				fetchDefaultLayoutPageTemplateEntry(
-					_groupId, _classNameId, _classTypeId);
-
-		if (layoutPageTemplateEntry != null) {
-			_assetDisplayPageId =
-				layoutPageTemplateEntry.getLayoutPageTemplateEntryId();
-		}
-		else {
-			_assetDisplayPageId = 0L;
 		}
 
 		return _assetDisplayPageId;
@@ -177,82 +164,41 @@ public class SelectAssetDisplayPageDisplayContext {
 		return itemSelectorURL.toString();
 	}
 
-	public String getAssetDisplayPageName() throws Exception {
-		String assetDisplayPageName = _getAssetDisplayPageName();
-
-		if (Validator.isNotNull(assetDisplayPageName)) {
-			return assetDisplayPageName;
+	public int getAssetDisplayPageType() {
+		if (_displayPageType != null) {
+			return _displayPageType;
 		}
 
-		String layoutUuid = getLayoutUuid();
+		if (_classPK == 0) {
+			_displayPageType = AssetDisplayPageConstants.TYPE_DEFAULT;
 
-		if (Validator.isNull(layoutUuid)) {
-			return StringPool.BLANK;
+			return _displayPageType;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		AssetDisplayPageEntry assetDisplayPageEntry =
+			_getAssetDisplayPageEntry();
 
-		Layout selLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
-			layoutUuid, themeDisplay.getSiteGroupId(), false);
-
-		if (selLayout == null) {
-			selLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
-				layoutUuid, themeDisplay.getSiteGroupId(), true);
+		if (assetDisplayPageEntry == null) {
+			_displayPageType = AssetDisplayPageConstants.TYPE_NONE;
+		}
+		else {
+			_displayPageType = assetDisplayPageEntry.getType();
 		}
 
-		if (selLayout != null) {
-			return _getLayoutBreadcrumb(selLayout);
-		}
-
-		return StringPool.BLANK;
-	}
-
-	public String getAssetTypeName() throws PortalException {
-		if (Validator.isNotNull(_assetTypeName)) {
-			return _assetTypeName;
-		}
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		AssetRendererFactory assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.
-				getAssetRendererFactoryByClassNameId(_classNameId);
-
-		_assetTypeName = assetRendererFactory.getTypeName(
-			themeDisplay.getLocale());
-
-		if (_classTypeId > 0) {
-			ClassTypeReader classTypeReader =
-				assetRendererFactory.getClassTypeReader();
-
-			ClassType classType = classTypeReader.getClassType(
-				_classTypeId, themeDisplay.getLocale());
-
-			_assetTypeName = classType.getName();
-		}
-
-		return _assetTypeName;
+		return _displayPageType;
 	}
 
 	public String getDefaultAssetDisplayPageName() {
-		if (_defaultAssetDisplayPageName != null) {
-			return _defaultAssetDisplayPageName;
-		}
-
-		LayoutPageTemplateEntry layoutPageTemplateEntry = null;
-
-		layoutPageTemplateEntry =
+		LayoutPageTemplateEntry defaultAssetDisplayPage =
 			LayoutPageTemplateEntryServiceUtil.
 				fetchDefaultLayoutPageTemplateEntry(
 					_groupId, _classNameId, _classTypeId);
 
-		if (layoutPageTemplateEntry != null) {
-			_defaultAssetDisplayPageName = layoutPageTemplateEntry.getName();
+		if (defaultAssetDisplayPage != null) {
+			return defaultAssetDisplayPage.getName();
 		}
 
-		return _defaultAssetDisplayPageName;
+		return null;
 	}
 
 	public String getEventName() {
@@ -274,7 +220,42 @@ public class SelectAssetDisplayPageDisplayContext {
 		return assetEntry.getLayoutUuid();
 	}
 
-	public String getURLViewInContext() throws Exception {
+	public String getSpecificAssetDisplayPageName() throws Exception {
+		String assetDisplayPageName = _getAssetDisplayPageName();
+
+		if (Validator.isNotNull(assetDisplayPageName)) {
+			return assetDisplayPageName;
+		}
+
+		String layoutUuid = getLayoutUuid();
+
+		if (Validator.isNull(layoutUuid)) {
+			return null;
+		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Layout selLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+			layoutUuid, themeDisplay.getSiteGroupId(), false);
+
+		if (selLayout == null) {
+			selLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+				layoutUuid, themeDisplay.getSiteGroupId(), true);
+		}
+
+		if (selLayout != null) {
+			return _getLayoutBreadcrumb(selLayout);
+		}
+
+		return null;
+	}
+
+	public String getURLViewInContext() {
+		if (_classPK <= 0) {
+			return StringPool.BLANK;
+		}
+
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -282,16 +263,26 @@ public class SelectAssetDisplayPageDisplayContext {
 			AssetRendererFactoryRegistryUtil.
 				getAssetRendererFactoryByClassNameId(_classNameId);
 
-		AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(
-			_classPK);
+		try {
+			AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(
+				_classPK);
 
-		return assetRenderer.getURLViewInContext(
-			_liferayPortletRequest, _liferayPortletResponse,
-			themeDisplay.getURLCurrent());
+			String viewInContextURL = assetRenderer.getURLViewInContext(
+				_liferayPortletRequest, _liferayPortletResponse,
+				themeDisplay.getURLCurrent());
+
+			return HttpUtil.addParameter(
+				viewInContextURL, "p_p_state",
+				LiferayWindowState.POP_UP.toString());
+		}
+		catch (Exception e) {
+		}
+
+		return StringPool.BLANK;
 	}
 
 	public boolean isAssetDisplayPageTypeDefault() {
-		if (_getAssetDisplayPageType() ==
+		if (getAssetDisplayPageType() ==
 				AssetDisplayPageConstants.TYPE_DEFAULT) {
 
 			return true;
@@ -300,16 +291,8 @@ public class SelectAssetDisplayPageDisplayContext {
 		return false;
 	}
 
-	public boolean isAssetDisplayPageTypeNone() {
-		if (_getAssetDisplayPageType() == AssetDisplayPageConstants.TYPE_NONE) {
-			return true;
-		}
-
-		return false;
-	}
-
 	public boolean isAssetDisplayPageTypeSpecific() {
-		if (_getAssetDisplayPageType() ==
+		if (getAssetDisplayPageType() ==
 				AssetDisplayPageConstants.TYPE_SPECIFIC) {
 
 			return true;
@@ -327,11 +310,9 @@ public class SelectAssetDisplayPageDisplayContext {
 			return false;
 		}
 
-		if (Validator.isNull(getLayoutUuid())) {
-			return false;
-		}
+		if (Validator.isNull(getLayoutUuid()) &&
+			Validator.isNull(getURLViewInContext())) {
 
-		if (Validator.isNull(getURLViewInContext())) {
 			return false;
 		}
 
@@ -372,30 +353,6 @@ public class SelectAssetDisplayPageDisplayContext {
 		return layoutPageTemplateEntry.getName();
 	}
 
-	private int _getAssetDisplayPageType() {
-		if (_displayPageType != null) {
-			return _displayPageType;
-		}
-
-		if (_classPK == 0) {
-			_displayPageType = AssetDisplayPageConstants.TYPE_DEFAULT;
-
-			return _displayPageType;
-		}
-
-		AssetDisplayPageEntry assetDisplayPageEntry =
-			_getAssetDisplayPageEntry();
-
-		if (assetDisplayPageEntry == null) {
-			_displayPageType = AssetDisplayPageConstants.TYPE_NONE;
-		}
-		else {
-			_displayPageType = assetDisplayPageEntry.getType();
-		}
-
-		return _displayPageType;
-	}
-
 	private String _getLayoutBreadcrumb(Layout layout) throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -433,11 +390,9 @@ public class SelectAssetDisplayPageDisplayContext {
 
 	private AssetDisplayPageEntry _assetDisplayPageEntry;
 	private Long _assetDisplayPageId;
-	private String _assetTypeName;
 	private final Long _classNameId;
 	private Long _classPK;
 	private final Long _classTypeId;
-	private String _defaultAssetDisplayPageName;
 	private Integer _displayPageType;
 	private final String _eventName;
 	private final long _groupId;

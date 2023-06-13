@@ -1,9 +1,9 @@
 import 'clay-multi-select';
-import ClayButton from 'clay-button';
-import ClayRadio from 'clay-radio';
+import 'clay-radio';
 import Component from 'metal-component';
 import {Config} from 'metal-state';
 import Soy from 'metal-soy';
+import 'asset-taglib/asset_tags_selector/AssetTagsSelector.es';
 import 'frontend-js-web/liferay/compat/modal/Modal.es';
 import templates from './EditTags.soy';
 
@@ -17,16 +17,14 @@ class EditTags extends Component {
 	 * @inheritDoc
 	 */
 	attached() {
-		this._getCommonTags();
-
-		this._bulkStatusComponent =	Liferay.component(this.portletNamespace + 'BulkStatus');
+		this._bulkStatusComponent =	Liferay.component(this.namespace + 'BulkStatus');
 	}
 
 	/**
 	 * Close the modal.
 	 */
 	close() {
-		this.refs.modal.visible = false;
+		this.showModal = false;
 	}
 
 	/**
@@ -34,27 +32,18 @@ class EditTags extends Component {
 	 */
 	created() {
 		this.append = true;
-
-		this.dataSource = query => (
-			fetch(
-				this.urlSearchTags + '?name=' + query,
-				{
-					credentials: 'include',
-					method: 'GET'
-				}
-			)
-				.then(
-					response => response.json()
-				)
-		);
 	}
 
 	/**
 	 * Open the modal and get the
 	 * commont tags.
 	 */
-	open() {
-		this.refs.modal.visible = true;
+	open(fileEntries, selectAll, folderId) {
+		this.fileEntries = fileEntries;
+		this.selectAll = selectAll;
+		this.folderId = folderId;
+		this.showModal = true;
+
 		this._getCommonTags();
 	}
 
@@ -65,7 +54,7 @@ class EditTags extends Component {
 	 * @param {Object} bodyData The body of the request
 	 * @param {Function} callback Callback function
 	 */
-	_fetchTagsRequest(url, bodyData, callback) {
+	_fetchTagsRequest(url, method, bodyData) {
 		let body = JSON.stringify(bodyData);
 
 		let headers = new Headers();
@@ -75,17 +64,12 @@ class EditTags extends Component {
 			body,
 			credentials: 'include',
 			headers,
-			method: 'POST'
+			method
 		};
 
-		fetch(url, request)
+		return fetch(this.pathModule + url, request)
 			.then(
 				response => response.json()
-			)
-			.then(
-				response => {
-					callback(response);
-				}
 			)
 			.catch(
 				(xhr) => {
@@ -104,27 +88,23 @@ class EditTags extends Component {
 	_getCommonTags() {
 		this.loading = true;
 
-		let bodyData = {
-			repositoryId: this.repositoryId,
-			selection: this._getSelection()
-		};
+		let selection = this._getSelection();
 
-		this._fetchTagsRequest(
-			this.urlTags,
-			bodyData,
-			response => {
-				if (response) {
+		Promise.all(
+			[
+				this._fetchTagsRequest(this.urlTags, 'POST', selection),
+				this._fetchTagsRequest(this.urlSelectionDescription, 'POST', selection)
+			]
+		).then(
+			([responseTags, responseDescription]) => {
+				if (responseTags && responseDescription) {
 					this.loading = false;
-					this.commonTags = response.tagNames;
-					this.description = response.description;
+					this.commonTags = (responseTags.items || []).map(item => item.name);
+					this.description = responseDescription.description;
 					this.multiple = (this.fileEntries.length > 1) || this.selectAll;
 				}
 			}
 		);
-	}
-
-	_getSelection() {
-		return this.selectAll ? ['all:' + this.folderId] : this.fileEntries;
 	}
 
 	/**
@@ -162,19 +142,17 @@ class EditTags extends Component {
 			tag => finalTags.indexOf(tag) == -1
 		);
 
-		let bodyData = {
-			append: this.append,
-			repositoryId: this.repositoryId,
-			selection: this._getSelection(),
-			toAddTagNames: addedTags,
-			toRemoveTagNames: removedTags
-		};
-
 		let instance = this;
 
 		this._fetchTagsRequest(
 			this.urlUpdateTags,
-			bodyData,
+			this.append ? 'PATCH' : 'PUT',
+			{
+				documentBulkSelection: this._getSelection(),
+				keywordsToAdd: addedTags,
+				keywordsToRemove: removedTags
+			}
+		).then(
 			response => {
 				instance.close();
 
@@ -211,6 +189,17 @@ class EditTags extends Component {
 		}
 
 		return commonTagsObjList;
+	}
+
+	_getSelection() {
+		return {
+			documentIds: this.fileEntries,
+			selectionScope: {
+				folderId: this.folderId,
+				repositoryId: this.repositoryId,
+				selectAll: this.selectAll
+			}
+		};
 	}
 }
 
@@ -250,7 +239,7 @@ EditTags.STATE = {
 	 * @review
 	 * @type {List<String>}
 	 */
-	fileEntries: Config.array().required(),
+	fileEntries: Config.array(),
 
 	/**
 	 * Folder Id
@@ -260,7 +249,13 @@ EditTags.STATE = {
 	 * @review
 	 * @type {String}
 	 */
-	folderId: Config.string().required(),
+	folderId: Config.string(),
+
+	/**
+	 * [groupIds description]
+	 * @type {[type]}
+	 */
+	groupIds: Config.array().required(),
 
 	/**
 	 * Flag that indicate if loading icon must
@@ -292,7 +287,7 @@ EditTags.STATE = {
 	 * @review
 	 * @type {string}
 	 */
-	portletNamespace: Config.string().required(),
+	namespace: Config.string().required(),
 
 	/**
 	 * RepositoryId
@@ -300,9 +295,19 @@ EditTags.STATE = {
 	 * @instance
 	 * @memberof EditTags
 	 * @review
-	 * @type {Number}
+	 * @type {String}
 	 */
-	repositoryId: Config.number().required(),
+	repositoryId: Config.string().required(),
+
+	/**
+	 * PathModule
+	 *
+	 * @instance
+	 * @memberof EditTags
+	 * @review
+	 * @type {String}
+	 */
+	pathModule: Config.string().required(),
 
 	/**
 	 * Flag that indicate if "select all" checkbox
@@ -316,6 +321,17 @@ EditTags.STATE = {
 	selectAll: Config.bool(),
 
 	/**
+	 * Flag that indicate if the modal must
+	 * be shown.
+	 *
+	 * @instance
+	 * @memberof EditTags
+	 * @review
+	 * @type {Boolean}
+	 */
+	showModal: Config.bool().value(false).internal(),
+
+	/**
 	 * Path to images.
 	 *
 	 * @instance
@@ -327,17 +343,6 @@ EditTags.STATE = {
 
 	/**
 	 * Url to backend service that provides
-	 * tags search.
-	 *
-	 * @instance
-	 * @memberof EditTags
-	 * @review
-	 * @type {String}
-	 */
-	urlSearchTags: Config.string().required(),
-
-	/**
-	 * Url to backend service that provides
 	 * the common tags info.
 	 *
 	 * @instance
@@ -345,7 +350,18 @@ EditTags.STATE = {
 	 * @review
 	 * @type {String}
 	 */
-	urlTags: Config.string().required(),
+	urlTags: Config.string().value('/bulk-rest/v1.0/keywords/common'),
+
+	/**
+	 * Url to backend service that provides
+	 * the selection description.
+	 *
+	 * @instance
+	 * @memberof EditTags
+	 * @review
+	 * @type {String}
+	 */
+	urlSelectionDescription: Config.string().value('/bulk-rest/v1.0/bulk-selection'),
 
 	/**
 	 * Url to backend service that updates
@@ -356,7 +372,7 @@ EditTags.STATE = {
 	 * @review
 	 * @type {String}
 	 */
-	urlUpdateTags: Config.string().required()
+	urlUpdateTags: Config.string().value('/bulk-rest/v1.0/keywords/batch')
 };
 
 // Register component

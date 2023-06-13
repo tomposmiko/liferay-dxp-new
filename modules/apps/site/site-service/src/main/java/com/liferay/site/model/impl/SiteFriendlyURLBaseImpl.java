@@ -32,8 +32,9 @@ import com.liferay.site.service.SiteFriendlyURLLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class SiteFriendlyURLBaseImpl extends SiteFriendlyURLModelImpl
-	implements SiteFriendlyURL {
+public abstract class SiteFriendlyURLBaseImpl
+	extends SiteFriendlyURLModelImpl implements SiteFriendlyURL {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class SiteFriendlyURLBaseImpl extends SiteFriendlyURLModelImpl
 			SiteFriendlyURLLocalServiceUtil.updateSiteFriendlyURL(this);
 		}
 	}
+
 }

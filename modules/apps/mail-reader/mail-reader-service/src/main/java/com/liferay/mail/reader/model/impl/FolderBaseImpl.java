@@ -33,6 +33,7 @@ import com.liferay.mail.reader.service.FolderLocalServiceUtil;
  */
 @ProviderType
 public abstract class FolderBaseImpl extends FolderModelImpl implements Folder {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -47,4 +48,5 @@ public abstract class FolderBaseImpl extends FolderModelImpl implements Folder {
 			FolderLocalServiceUtil.updateFolder(this);
 		}
 	}
+
 }

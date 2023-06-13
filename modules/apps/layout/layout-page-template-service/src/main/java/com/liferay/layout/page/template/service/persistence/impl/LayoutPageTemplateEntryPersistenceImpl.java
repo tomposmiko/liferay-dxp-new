@@ -21,9 +21,7 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryImpl;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryModelImpl;
 import com.liferay.layout.page.template.service.persistence.LayoutPageTemplateEntryPersistence;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -54,6 +52,7 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,18 +69,24 @@ import java.util.Set;
  * @generated
  */
 @ProviderType
-public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<LayoutPageTemplateEntry>
+public class LayoutPageTemplateEntryPersistenceImpl
+	extends BasePersistenceImpl<LayoutPageTemplateEntry>
 	implements LayoutPageTemplateEntryPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>LayoutPageTemplateEntryUtil</code> to access the layout page template entry persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = LayoutPageTemplateEntryImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		LayoutPageTemplateEntryImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -113,8 +118,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByUuid(String uuid, int start,
-		int end) {
+	public List<LayoutPageTemplateEntry> findByUuid(
+		String uuid, int start, int end) {
+
 		return findByUuid(uuid, start, end, null);
 	}
 
@@ -132,8 +138,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByUuid(String uuid, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+	public List<LayoutPageTemplateEntry> findByUuid(
+		String uuid, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		return findByUuid(uuid, start, end, orderByComparator, true);
 	}
 
@@ -152,9 +160,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByUuid(String uuid, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+	public List<LayoutPageTemplateEntry> findByUuid(
+		String uuid, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -162,21 +172,22 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid;
-			finderArgs = new Object[] { uuid };
+			finderArgs = new Object[] {uuid};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid;
-			finderArgs = new Object[] { uuid, start, end, orderByComparator };
+			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
@@ -193,8 +204,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -214,11 +225,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -238,16 +248,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				}
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -276,11 +286,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByUuid_First(String uuid,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByUuid_First(
+			String uuid,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByUuid_First(uuid,
-				orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByUuid_First(
+			uuid, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -306,10 +318,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByUuid_First(String uuid,
+	public LayoutPageTemplateEntry fetchByUuid_First(
+		String uuid,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByUuid(uuid, 0, 1,
-				orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByUuid(
+			uuid, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -327,11 +341,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByUuid_Last(String uuid,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByUuid_Last(
+			String uuid,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByUuid_Last(uuid,
-				orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByUuid_Last(
+			uuid, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -357,16 +373,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByUuid_Last(String uuid,
+	public LayoutPageTemplateEntry fetchByUuid_Last(
+		String uuid,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByUuid(uuid);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByUuid(uuid, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByUuid(
+			uuid, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -386,27 +404,32 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByUuid_PrevAndNext(
-		long layoutPageTemplateEntryId, String uuid,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, String uuid,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		uuid = Objects.toString(uuid, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByUuid_PrevAndNext(session, layoutPageTemplateEntry,
-					uuid, orderByComparator, true);
+			array[0] = getByUuid_PrevAndNext(
+				session, layoutPageTemplateEntry, uuid, orderByComparator,
+				true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByUuid_PrevAndNext(session, layoutPageTemplateEntry,
-					uuid, orderByComparator, false);
+			array[2] = getByUuid_PrevAndNext(
+				session, layoutPageTemplateEntry, uuid, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -418,15 +441,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	protected LayoutPageTemplateEntry getByUuid_PrevAndNext(Session session,
-		LayoutPageTemplateEntry layoutPageTemplateEntry, String uuid,
+	protected LayoutPageTemplateEntry getByUuid_PrevAndNext(
+		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
+		String uuid,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -447,7 +472,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -519,8 +545,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -542,8 +570,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void removeByUuid(String uuid) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByUuid(
-				uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -560,7 +589,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		FinderPath finderPath = _finderPathCountByUuid;
 
-		Object[] finderArgs = new Object[] { uuid };
+		Object[] finderArgs = new Object[] {uuid};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -612,8 +641,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_UUID_2 = "layoutPageTemplateEntry.uuid = ?";
-	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(layoutPageTemplateEntry.uuid IS NULL OR layoutPageTemplateEntry.uuid = '')";
+	private static final String _FINDER_COLUMN_UUID_UUID_2 =
+		"layoutPageTemplateEntry.uuid = ?";
+
+	private static final String _FINDER_COLUMN_UUID_UUID_3 =
+		"(layoutPageTemplateEntry.uuid IS NULL OR layoutPageTemplateEntry.uuid = '')";
+
 	private FinderPath _finderPathFetchByUUID_G;
 	private FinderPath _finderPathCountByUUID_G;
 
@@ -628,8 +661,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry findByUUID_G(String uuid, long groupId)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByUUID_G(uuid,
-				groupId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByUUID_G(
+			uuid, groupId);
 
 		if (layoutPageTemplateEntry == null) {
 			StringBundler msg = new StringBundler(6);
@@ -675,24 +709,27 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByUUID_G(String uuid, long groupId,
-		boolean retrieveFromCache) {
+	public LayoutPageTemplateEntry fetchByUUID_G(
+		String uuid, long groupId, boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
-		Object[] finderArgs = new Object[] { uuid, groupId };
+		Object[] finderArgs = new Object[] {uuid, groupId};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(_finderPathFetchByUUID_G,
-					finderArgs, this);
+			result = finderCache.getResult(
+				_finderPathFetchByUUID_G, finderArgs, this);
 		}
 
 		if (result instanceof LayoutPageTemplateEntry) {
-			LayoutPageTemplateEntry layoutPageTemplateEntry = (LayoutPageTemplateEntry)result;
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				(LayoutPageTemplateEntry)result;
 
 			if (!Objects.equals(uuid, layoutPageTemplateEntry.getUuid()) ||
-					(groupId != layoutPageTemplateEntry.getGroupId())) {
+				(groupId != layoutPageTemplateEntry.getGroupId())) {
+
 				result = null;
 			}
 		}
@@ -735,11 +772,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				List<LayoutPageTemplateEntry> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(_finderPathFetchByUUID_G, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByUUID_G, finderArgs, list);
 				}
 				else {
-					LayoutPageTemplateEntry layoutPageTemplateEntry = list.get(0);
+					LayoutPageTemplateEntry layoutPageTemplateEntry = list.get(
+						0);
 
 					result = layoutPageTemplateEntry;
 
@@ -774,8 +812,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry removeByUUID_G(String uuid, long groupId)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByUUID_G(uuid,
-				groupId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByUUID_G(
+			uuid, groupId);
 
 		return remove(layoutPageTemplateEntry);
 	}
@@ -793,7 +832,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		FinderPath finderPath = _finderPathCountByUUID_G;
 
-		Object[] finderArgs = new Object[] { uuid, groupId };
+		Object[] finderArgs = new Object[] {uuid, groupId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -849,9 +888,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "layoutPageTemplateEntry.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(layoutPageTemplateEntry.uuid IS NULL OR layoutPageTemplateEntry.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "layoutPageTemplateEntry.groupId = ?";
+	private static final String _FINDER_COLUMN_UUID_G_UUID_2 =
+		"layoutPageTemplateEntry.uuid = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_G_UUID_3 =
+		"(layoutPageTemplateEntry.uuid IS NULL OR layoutPageTemplateEntry.uuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
 	private FinderPath _finderPathCountByUuid_C;
@@ -864,10 +909,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByUuid_C(String uuid,
-		long companyId) {
-		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByUuid_C(
+		String uuid, long companyId) {
+
+		return findByUuid_C(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -884,8 +930,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByUuid_C(String uuid,
-		long companyId, int start, int end) {
+	public List<LayoutPageTemplateEntry> findByUuid_C(
+		String uuid, long companyId, int start, int end) {
+
 		return findByUuid_C(uuid, companyId, start, end, null);
 	}
 
@@ -904,10 +951,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByUuid_C(String uuid,
-		long companyId, int start, int end,
+	public List<LayoutPageTemplateEntry> findByUuid_C(
+		String uuid, long companyId, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByUuid_C(uuid, companyId, start, end, orderByComparator, true);
+
+		return findByUuid_C(
+			uuid, companyId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -926,10 +975,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByUuid_C(String uuid,
-		long companyId, int start, int end,
+	public List<LayoutPageTemplateEntry> findByUuid_C(
+		String uuid, long companyId, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		uuid = Objects.toString(uuid, "");
 
 		boolean pagination = true;
@@ -937,30 +987,30 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByUuid_C;
-			finderArgs = new Object[] { uuid, companyId };
+			finderArgs = new Object[] {uuid, companyId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
-					uuid, companyId,
-					
-					start, end, orderByComparator
-				};
+				uuid, companyId, start, end, orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if (!uuid.equals(layoutPageTemplateEntry.getUuid()) ||
-							(companyId != layoutPageTemplateEntry.getCompanyId())) {
+						(companyId != layoutPageTemplateEntry.getCompanyId())) {
+
 						list = null;
 
 						break;
@@ -973,8 +1023,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -996,11 +1046,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1022,16 +1071,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(companyId);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1061,12 +1110,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByUuid_C_First(String uuid,
-		long companyId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByUuid_C_First(
+			String uuid, long companyId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByUuid_C_First(uuid,
-				companyId, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByUuid_C_First(
+			uuid, companyId, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -1096,11 +1146,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByUuid_C_First(String uuid,
-		long companyId,
+	public LayoutPageTemplateEntry fetchByUuid_C_First(
+		String uuid, long companyId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByUuid_C(uuid, companyId, 0,
-				1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByUuid_C(
+			uuid, companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1119,12 +1170,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByUuid_C_Last(String uuid,
-		long companyId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByUuid_C_Last(
+			String uuid, long companyId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByUuid_C_Last(uuid,
-				companyId, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByUuid_C_Last(
+			uuid, companyId, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -1154,17 +1206,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByUuid_C_Last(String uuid,
-		long companyId,
+	public LayoutPageTemplateEntry fetchByUuid_C_Last(
+		String uuid, long companyId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByUuid_C(uuid, companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByUuid_C(uuid, companyId,
-				count - 1, count, orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByUuid_C(
+			uuid, companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1185,29 +1238,32 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByUuid_C_PrevAndNext(
-		long layoutPageTemplateEntryId, String uuid, long companyId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, String uuid, long companyId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		uuid = Objects.toString(uuid, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByUuid_C_PrevAndNext(session,
-					layoutPageTemplateEntry, uuid, companyId,
-					orderByComparator, true);
+			array[0] = getByUuid_C_PrevAndNext(
+				session, layoutPageTemplateEntry, uuid, companyId,
+				orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByUuid_C_PrevAndNext(session,
-					layoutPageTemplateEntry, uuid, companyId,
-					orderByComparator, false);
+			array[2] = getByUuid_C_PrevAndNext(
+				session, layoutPageTemplateEntry, uuid, companyId,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -1219,16 +1275,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	protected LayoutPageTemplateEntry getByUuid_C_PrevAndNext(Session session,
-		LayoutPageTemplateEntry layoutPageTemplateEntry, String uuid,
-		long companyId,
+	protected LayoutPageTemplateEntry getByUuid_C_PrevAndNext(
+		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
+		String uuid, long companyId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1251,7 +1308,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1325,8 +1383,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(companyId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1349,8 +1409,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void removeByUuid_C(String uuid, long companyId) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByUuid_C(
-				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByUuid_C(
+					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -1368,7 +1431,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		Object[] finderArgs = new Object[] { uuid, companyId };
+		Object[] finderArgs = new Object[] {uuid, companyId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -1424,9 +1487,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "layoutPageTemplateEntry.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(layoutPageTemplateEntry.uuid IS NULL OR layoutPageTemplateEntry.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "layoutPageTemplateEntry.companyId = ?";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
+		"layoutPageTemplateEntry.uuid = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
+		"(layoutPageTemplateEntry.uuid IS NULL OR layoutPageTemplateEntry.uuid = '') AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
+		"layoutPageTemplateEntry.companyId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByGroupId;
 	private FinderPath _finderPathWithoutPaginationFindByGroupId;
 	private FinderPath _finderPathCountByGroupId;
@@ -1439,7 +1508,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public List<LayoutPageTemplateEntry> findByGroupId(long groupId) {
-		return findByGroupId(groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		return findByGroupId(
+			groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -1455,8 +1525,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByGroupId(long groupId, int start,
-		int end) {
+	public List<LayoutPageTemplateEntry> findByGroupId(
+		long groupId, int start, int end) {
+
 		return findByGroupId(groupId, start, end, null);
 	}
 
@@ -1474,8 +1545,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByGroupId(long groupId, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+	public List<LayoutPageTemplateEntry> findByGroupId(
+		long groupId, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		return findByGroupId(groupId, start, end, orderByComparator, true);
 	}
 
@@ -1494,29 +1567,32 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByGroupId(long groupId, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+	public List<LayoutPageTemplateEntry> findByGroupId(
+		long groupId, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByGroupId;
-			finderArgs = new Object[] { groupId };
+			finderArgs = new Object[] {groupId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByGroupId;
-			finderArgs = new Object[] { groupId, start, end, orderByComparator };
+			finderArgs = new Object[] {groupId, start, end, orderByComparator};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
@@ -1533,8 +1609,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1545,11 +1621,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -1567,16 +1642,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(groupId);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1605,11 +1680,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByGroupId_First(long groupId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByGroupId_First(
+			long groupId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByGroupId_First(groupId,
-				orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByGroupId_First(
+			groupId, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -1635,10 +1712,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByGroupId_First(long groupId,
+	public LayoutPageTemplateEntry fetchByGroupId_First(
+		long groupId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByGroupId(groupId, 0, 1,
-				orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByGroupId(
+			groupId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1656,11 +1735,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByGroupId_Last(long groupId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByGroupId_Last(
+			long groupId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByGroupId_Last(groupId,
-				orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByGroupId_Last(
+			groupId, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -1686,16 +1767,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByGroupId_Last(long groupId,
+	public LayoutPageTemplateEntry fetchByGroupId_Last(
+		long groupId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByGroupId(groupId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByGroupId(groupId, count - 1,
-				count, orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByGroupId(
+			groupId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -1715,25 +1798,30 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByGroupId_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByGroupId_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, orderByComparator, true);
+			array[0] = getByGroupId_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, orderByComparator,
+				true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByGroupId_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, orderByComparator, false);
+			array[2] = getByGroupId_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -1750,11 +1838,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -1766,7 +1855,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -1836,8 +1926,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(groupId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -1860,8 +1952,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public List<LayoutPageTemplateEntry> filterFindByGroupId(long groupId) {
-		return filterFindByGroupId(groupId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+		return filterFindByGroupId(
+			groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -1877,8 +1969,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByGroupId(long groupId,
-		int start, int end) {
+	public List<LayoutPageTemplateEntry> filterFindByGroupId(
+		long groupId, int start, int end) {
+
 		return filterFindByGroupId(groupId, start, end, null);
 	}
 
@@ -1896,9 +1989,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByGroupId(long groupId,
-		int start, int end,
+	public List<LayoutPageTemplateEntry> filterFindByGroupId(
+		long groupId, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByGroupId(groupId, start, end, orderByComparator);
 		}
@@ -1906,8 +2000,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(3 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				3 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(4);
@@ -1917,23 +2011,25 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -1945,9 +2041,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -1957,20 +2053,20 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			qPos.add(groupId);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -1991,30 +2087,35 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByGroupId_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByGroupId_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, orderByComparator);
+			return findByGroupId_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByGroupId_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, orderByComparator, true);
+			array[0] = filterGetByGroupId_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, orderByComparator,
+				true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByGroupId_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, orderByComparator, false);
+			array[2] = filterGetByGroupId_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -2031,11 +2132,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2046,17 +2148,20 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2064,12 +2169,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -2096,12 +2205,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -2131,9 +2242,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -2141,10 +2252,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -2152,8 +2265,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(groupId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2175,8 +2290,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void removeByGroupId(long groupId) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByGroupId(
-				groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByGroupId(
+					groupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -2191,7 +2308,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	public int countByGroupId(long groupId) {
 		FinderPath finderPath = _finderPathCountByGroupId;
 
-		Object[] finderArgs = new Object[] { groupId };
+		Object[] finderArgs = new Object[] {groupId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2250,9 +2367,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_GROUPID_GROUPID_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -2261,8 +2378,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -2280,7 +2397,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 = "layoutPageTemplateEntry.groupId = ?";
+	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ?";
+
 	private FinderPath _finderPathWithPaginationFindByLayoutPrototypeId;
 	private FinderPath _finderPathWithoutPaginationFindByLayoutPrototypeId;
 	private FinderPath _finderPathCountByLayoutPrototypeId;
@@ -2294,8 +2413,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public List<LayoutPageTemplateEntry> findByLayoutPrototypeId(
 		long layoutPrototypeId) {
-		return findByLayoutPrototypeId(layoutPrototypeId, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+
+		return findByLayoutPrototypeId(
+			layoutPrototypeId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -2313,6 +2433,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public List<LayoutPageTemplateEntry> findByLayoutPrototypeId(
 		long layoutPrototypeId, int start, int end) {
+
 		return findByLayoutPrototypeId(layoutPrototypeId, start, end, null);
 	}
 
@@ -2333,8 +2454,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	public List<LayoutPageTemplateEntry> findByLayoutPrototypeId(
 		long layoutPrototypeId, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByLayoutPrototypeId(layoutPrototypeId, start, end,
-			orderByComparator, true);
+
+		return findByLayoutPrototypeId(
+			layoutPrototypeId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -2356,34 +2478,36 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long layoutPrototypeId, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByLayoutPrototypeId;
-			finderArgs = new Object[] { layoutPrototypeId };
+			finderArgs = new Object[] {layoutPrototypeId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByLayoutPrototypeId;
 			finderArgs = new Object[] {
-					layoutPrototypeId,
-					
-					start, end, orderByComparator
-				};
+				layoutPrototypeId, start, end, orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
-					if ((layoutPrototypeId != layoutPageTemplateEntry.getLayoutPrototypeId())) {
+					if ((layoutPrototypeId !=
+							layoutPageTemplateEntry.getLayoutPrototypeId())) {
+
 						list = null;
 
 						break;
@@ -2396,8 +2520,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2408,11 +2532,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_LAYOUTPROTOTYPEID_LAYOUTPROTOTYPEID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -2430,16 +2553,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(layoutPrototypeId);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -2469,11 +2592,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry findByLayoutPrototypeId_First(
-		long layoutPrototypeId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPrototypeId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByLayoutPrototypeId_First(layoutPrototypeId,
-				orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByLayoutPrototypeId_First(
+				layoutPrototypeId, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -2502,8 +2627,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	public LayoutPageTemplateEntry fetchByLayoutPrototypeId_First(
 		long layoutPrototypeId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByLayoutPrototypeId(layoutPrototypeId,
-				0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByLayoutPrototypeId(
+			layoutPrototypeId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2522,11 +2648,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry findByLayoutPrototypeId_Last(
-		long layoutPrototypeId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPrototypeId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByLayoutPrototypeId_Last(layoutPrototypeId,
-				orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByLayoutPrototypeId_Last(layoutPrototypeId, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -2555,14 +2682,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	public LayoutPageTemplateEntry fetchByLayoutPrototypeId_Last(
 		long layoutPrototypeId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByLayoutPrototypeId(layoutPrototypeId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByLayoutPrototypeId(layoutPrototypeId,
-				count - 1, count, orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByLayoutPrototypeId(
+			layoutPrototypeId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -2582,27 +2710,30 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByLayoutPrototypeId_PrevAndNext(
-		long layoutPageTemplateEntryId, long layoutPrototypeId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long layoutPrototypeId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByLayoutPrototypeId_PrevAndNext(session,
-					layoutPageTemplateEntry, layoutPrototypeId,
-					orderByComparator, true);
+			array[0] = getByLayoutPrototypeId_PrevAndNext(
+				session, layoutPageTemplateEntry, layoutPrototypeId,
+				orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByLayoutPrototypeId_PrevAndNext(session,
-					layoutPageTemplateEntry, layoutPrototypeId,
-					orderByComparator, false);
+			array[2] = getByLayoutPrototypeId_PrevAndNext(
+				session, layoutPageTemplateEntry, layoutPrototypeId,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -2619,11 +2750,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long layoutPrototypeId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -2635,7 +2767,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_LAYOUTPROTOTYPEID_LAYOUTPROTOTYPEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -2705,8 +2838,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(layoutPrototypeId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -2728,8 +2863,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void removeByLayoutPrototypeId(long layoutPrototypeId) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByLayoutPrototypeId(
-				layoutPrototypeId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByLayoutPrototypeId(
+					layoutPrototypeId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -2744,7 +2882,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	public int countByLayoutPrototypeId(long layoutPrototypeId) {
 		FinderPath finderPath = _finderPathCountByLayoutPrototypeId;
 
-		Object[] finderArgs = new Object[] { layoutPrototypeId };
+		Object[] finderArgs = new Object[] {layoutPrototypeId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2785,8 +2923,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_LAYOUTPROTOTYPEID_LAYOUTPROTOTYPEID_2 =
-		"layoutPageTemplateEntry.layoutPrototypeId = ?";
+	private static final String
+		_FINDER_COLUMN_LAYOUTPROTOTYPEID_LAYOUTPROTOTYPEID_2 =
+			"layoutPageTemplateEntry.layoutPrototypeId = ?";
+
 	private FinderPath _finderPathFetchByPlid;
 	private FinderPath _finderPathCountByPlid;
 
@@ -2800,6 +2940,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry findByPlid(long plid)
 		throws NoSuchPageTemplateEntryException {
+
 		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByPlid(plid);
 
 		if (layoutPageTemplateEntry == null) {
@@ -2841,19 +2982,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByPlid(long plid,
-		boolean retrieveFromCache) {
-		Object[] finderArgs = new Object[] { plid };
+	public LayoutPageTemplateEntry fetchByPlid(
+		long plid, boolean retrieveFromCache) {
+
+		Object[] finderArgs = new Object[] {plid};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(_finderPathFetchByPlid, finderArgs,
-					this);
+			result = finderCache.getResult(
+				_finderPathFetchByPlid, finderArgs, this);
 		}
 
 		if (result instanceof LayoutPageTemplateEntry) {
-			LayoutPageTemplateEntry layoutPageTemplateEntry = (LayoutPageTemplateEntry)result;
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				(LayoutPageTemplateEntry)result;
 
 			if ((plid != layoutPageTemplateEntry.getPlid())) {
 				result = null;
@@ -2883,11 +3026,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				List<LayoutPageTemplateEntry> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(_finderPathFetchByPlid, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByPlid, finderArgs, list);
 				}
 				else {
-					LayoutPageTemplateEntry layoutPageTemplateEntry = list.get(0);
+					LayoutPageTemplateEntry layoutPageTemplateEntry = list.get(
+						0);
 
 					result = layoutPageTemplateEntry;
 
@@ -2921,6 +3065,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry removeByPlid(long plid)
 		throws NoSuchPageTemplateEntryException {
+
 		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPlid(plid);
 
 		return remove(layoutPageTemplateEntry);
@@ -2936,7 +3081,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	public int countByPlid(long plid) {
 		FinderPath finderPath = _finderPathCountByPlid;
 
-		Object[] finderArgs = new Object[] { plid };
+		Object[] finderArgs = new Object[] {plid};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -2977,7 +3122,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_PLID_PLID_2 = "layoutPageTemplateEntry.plid = ?";
+	private static final String _FINDER_COLUMN_PLID_PLID_2 =
+		"layoutPageTemplateEntry.plid = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_L;
 	private FinderPath _finderPathWithoutPaginationFindByG_L;
 	private FinderPath _finderPathCountByG_L;
@@ -2990,10 +3137,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L(long groupId,
-		long layoutPageTemplateCollectionId) {
-		return findByG_L(groupId, layoutPageTemplateCollectionId,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_L(
+		long groupId, long layoutPageTemplateCollectionId) {
+
+		return findByG_L(
+			groupId, layoutPageTemplateCollectionId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -3010,10 +3159,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L(long groupId,
-		long layoutPageTemplateCollectionId, int start, int end) {
-		return findByG_L(groupId, layoutPageTemplateCollectionId, start, end,
-			null);
+	public List<LayoutPageTemplateEntry> findByG_L(
+		long groupId, long layoutPageTemplateCollectionId, int start, int end) {
+
+		return findByG_L(
+			groupId, layoutPageTemplateCollectionId, start, end, null);
 	}
 
 	/**
@@ -3031,10 +3181,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L(long groupId,
-		long layoutPageTemplateCollectionId, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_L(
+		long groupId, long layoutPageTemplateCollectionId, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_L(groupId, layoutPageTemplateCollectionId, start, end,
+
+		return findByG_L(
+			groupId, layoutPageTemplateCollectionId, start, end,
 			orderByComparator, true);
 	}
 
@@ -3054,39 +3206,43 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L(long groupId,
-		long layoutPageTemplateCollectionId, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_L(
+		long groupId, long layoutPageTemplateCollectionId, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_L;
-			finderArgs = new Object[] { groupId, layoutPageTemplateCollectionId };
+			finderArgs = new Object[] {groupId, layoutPageTemplateCollectionId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_L;
 			finderArgs = new Object[] {
-					groupId, layoutPageTemplateCollectionId,
-					
-					start, end, orderByComparator
-				};
+				groupId, layoutPageTemplateCollectionId, start, end,
+				orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(layoutPageTemplateCollectionId != layoutPageTemplateEntry.getLayoutPageTemplateCollectionId())) {
+						(layoutPageTemplateCollectionId !=
+							layoutPageTemplateEntry.
+								getLayoutPageTemplateCollectionId())) {
+
 						list = null;
 
 						break;
@@ -3099,8 +3255,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -3113,11 +3269,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_L_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -3137,16 +3292,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(layoutPageTemplateCollectionId);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -3176,12 +3331,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_L_First(long groupId,
-		long layoutPageTemplateCollectionId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_L_First(
+			long groupId, long layoutPageTemplateCollectionId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_First(groupId,
-				layoutPageTemplateCollectionId, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_First(
+			groupId, layoutPageTemplateCollectionId, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -3211,11 +3367,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_L_First(long groupId,
-		long layoutPageTemplateCollectionId,
+	public LayoutPageTemplateEntry fetchByG_L_First(
+		long groupId, long layoutPageTemplateCollectionId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_L(groupId,
-				layoutPageTemplateCollectionId, 0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_L(
+			groupId, layoutPageTemplateCollectionId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3234,12 +3391,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_L_Last(long groupId,
-		long layoutPageTemplateCollectionId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_L_Last(
+			long groupId, long layoutPageTemplateCollectionId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_Last(groupId,
-				layoutPageTemplateCollectionId, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_Last(
+			groupId, layoutPageTemplateCollectionId, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -3269,18 +3427,19 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_L_Last(long groupId,
-		long layoutPageTemplateCollectionId,
+	public LayoutPageTemplateEntry fetchByG_L_Last(
+		long groupId, long layoutPageTemplateCollectionId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByG_L(groupId, layoutPageTemplateCollectionId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_L(groupId,
-				layoutPageTemplateCollectionId, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_L(
+			groupId, layoutPageTemplateCollectionId, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -3301,28 +3460,31 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_L_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		long layoutPageTemplateCollectionId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			long layoutPageTemplateCollectionId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_L_PrevAndNext(session, layoutPageTemplateEntry,
-					groupId, layoutPageTemplateCollectionId, orderByComparator,
-					true);
+			array[0] = getByG_L_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_L_PrevAndNext(session, layoutPageTemplateEntry,
-					groupId, layoutPageTemplateCollectionId, orderByComparator,
-					false);
+			array[2] = getByG_L_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, orderByComparator, false);
 
 			return array;
 		}
@@ -3334,16 +3496,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	protected LayoutPageTemplateEntry getByG_L_PrevAndNext(Session session,
-		LayoutPageTemplateEntry layoutPageTemplateEntry, long groupId,
-		long layoutPageTemplateCollectionId,
+	protected LayoutPageTemplateEntry getByG_L_PrevAndNext(
+		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
+		long groupId, long layoutPageTemplateCollectionId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3357,7 +3520,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3429,8 +3593,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(layoutPageTemplateCollectionId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3453,10 +3619,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L(long groupId,
-		long layoutPageTemplateCollectionId) {
-		return filterFindByG_L(groupId, layoutPageTemplateCollectionId,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_L(
+		long groupId, long layoutPageTemplateCollectionId) {
+
+		return filterFindByG_L(
+			groupId, layoutPageTemplateCollectionId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -3473,10 +3641,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L(long groupId,
-		long layoutPageTemplateCollectionId, int start, int end) {
-		return filterFindByG_L(groupId, layoutPageTemplateCollectionId, start,
-			end, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_L(
+		long groupId, long layoutPageTemplateCollectionId, int start, int end) {
+
+		return filterFindByG_L(
+			groupId, layoutPageTemplateCollectionId, start, end, null);
 	}
 
 	/**
@@ -3494,19 +3663,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L(long groupId,
-		long layoutPageTemplateCollectionId, int start, int end,
+	public List<LayoutPageTemplateEntry> filterFindByG_L(
+		long groupId, long layoutPageTemplateCollectionId, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_L(groupId, layoutPageTemplateCollectionId, start,
-				end, orderByComparator);
+			return findByG_L(
+				groupId, layoutPageTemplateCollectionId, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(5);
@@ -3516,7 +3687,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_L_GROUPID_2);
@@ -3524,17 +3696,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -3546,9 +3719,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -3558,12 +3731,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -3572,8 +3745,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(layoutPageTemplateCollectionId);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -3595,33 +3768,37 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_L_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		long layoutPageTemplateCollectionId,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			long layoutPageTemplateCollectionId,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_L_PrevAndNext(layoutPageTemplateEntryId, groupId,
+			return findByG_L_PrevAndNext(
+				layoutPageTemplateEntryId, groupId,
 				layoutPageTemplateCollectionId, orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_L_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, orderByComparator, true);
+			array[0] = filterGetByG_L_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_L_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, orderByComparator, false);
+			array[2] = filterGetByG_L_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, orderByComparator, false);
 
 			return array;
 		}
@@ -3638,11 +3815,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long layoutPageTemplateCollectionId,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -3653,7 +3831,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_L_GROUPID_2);
@@ -3661,11 +3840,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -3673,12 +3854,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -3705,12 +3890,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -3740,9 +3927,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -3750,10 +3937,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -3763,8 +3952,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(layoutPageTemplateCollectionId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -3787,9 +3978,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void removeByG_L(long groupId, long layoutPageTemplateCollectionId) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_L(
-				groupId, layoutPageTemplateCollectionId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_L(
+					groupId, layoutPageTemplateCollectionId, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -3806,8 +3999,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		FinderPath finderPath = _finderPathCountByG_L;
 
 		Object[] finderArgs = new Object[] {
-				groupId, layoutPageTemplateCollectionId
-			};
+			groupId, layoutPageTemplateCollectionId
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -3860,8 +4053,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_L(long groupId,
-		long layoutPageTemplateCollectionId) {
+	public int filterCountByG_L(
+		long groupId, long layoutPageTemplateCollectionId) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_L(groupId, layoutPageTemplateCollectionId);
 		}
@@ -3874,9 +4068,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_L_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -3885,8 +4079,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -3906,9 +4100,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_L_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
-		"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ?";
+	private static final String _FINDER_COLUMN_G_L_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String
+		_FINDER_COLUMN_G_L_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
+			"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ?";
+
 	private FinderPath _finderPathFetchByG_N;
 	private FinderPath _finderPathCountByG_N;
 
@@ -3923,8 +4121,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry findByG_N(long groupId, String name)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_N(groupId,
-				name);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_N(
+			groupId, name);
 
 		if (layoutPageTemplateEntry == null) {
 			StringBundler msg = new StringBundler(6);
@@ -3970,24 +4169,27 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_N(long groupId, String name,
-		boolean retrieveFromCache) {
+	public LayoutPageTemplateEntry fetchByG_N(
+		long groupId, String name, boolean retrieveFromCache) {
+
 		name = Objects.toString(name, "");
 
-		Object[] finderArgs = new Object[] { groupId, name };
+		Object[] finderArgs = new Object[] {groupId, name};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(_finderPathFetchByG_N, finderArgs,
-					this);
+			result = finderCache.getResult(
+				_finderPathFetchByG_N, finderArgs, this);
 		}
 
 		if (result instanceof LayoutPageTemplateEntry) {
-			LayoutPageTemplateEntry layoutPageTemplateEntry = (LayoutPageTemplateEntry)result;
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				(LayoutPageTemplateEntry)result;
 
 			if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-					!Objects.equals(name, layoutPageTemplateEntry.getName())) {
+				!Objects.equals(name, layoutPageTemplateEntry.getName())) {
+
 				result = null;
 			}
 		}
@@ -4030,11 +4232,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				List<LayoutPageTemplateEntry> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(_finderPathFetchByG_N, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByG_N, finderArgs, list);
 				}
 				else {
-					LayoutPageTemplateEntry layoutPageTemplateEntry = list.get(0);
+					LayoutPageTemplateEntry layoutPageTemplateEntry = list.get(
+						0);
 
 					result = layoutPageTemplateEntry;
 
@@ -4069,8 +4272,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry removeByG_N(long groupId, String name)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByG_N(groupId,
-				name);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByG_N(
+			groupId, name);
 
 		return remove(layoutPageTemplateEntry);
 	}
@@ -4088,7 +4292,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		FinderPath finderPath = _finderPathCountByG_N;
 
-		Object[] finderArgs = new Object[] { groupId, name };
+		Object[] finderArgs = new Object[] {groupId, name};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -4144,9 +4348,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_G_N_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_N_NAME_2 = "layoutPageTemplateEntry.name = ?";
-	private static final String _FINDER_COLUMN_G_N_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name = '')";
+	private static final String _FINDER_COLUMN_G_N_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_N_NAME_2 =
+		"layoutPageTemplateEntry.name = ?";
+
+	private static final String _FINDER_COLUMN_G_N_NAME_3 =
+		"(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name = '')";
+
 	private FinderPath _finderPathWithPaginationFindByG_T;
 	private FinderPath _finderPathWithoutPaginationFindByG_T;
 	private FinderPath _finderPathCountByG_T;
@@ -4160,8 +4370,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public List<LayoutPageTemplateEntry> findByG_T(long groupId, int type) {
-		return findByG_T(groupId, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByG_T(
+			groupId, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -4178,8 +4388,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T(long groupId, int type,
-		int start, int end) {
+	public List<LayoutPageTemplateEntry> findByG_T(
+		long groupId, int type, int start, int end) {
+
 		return findByG_T(groupId, type, start, end, null);
 	}
 
@@ -4198,9 +4409,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T(long groupId, int type,
-		int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_T(
+		long groupId, int type, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		return findByG_T(groupId, type, start, end, orderByComparator, true);
 	}
 
@@ -4220,39 +4432,40 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T(long groupId, int type,
-		int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_T(
+		long groupId, int type, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_T;
-			finderArgs = new Object[] { groupId, type };
+			finderArgs = new Object[] {groupId, type};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_T;
 			finderArgs = new Object[] {
-					groupId, type,
-					
-					start, end, orderByComparator
-				};
+				groupId, type, start, end, orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(type != layoutPageTemplateEntry.getType())) {
+						(type != layoutPageTemplateEntry.getType())) {
+
 						list = null;
 
 						break;
@@ -4265,8 +4478,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -4279,11 +4492,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_T_TYPE_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -4303,16 +4515,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(type);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -4342,11 +4554,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_T_First(long groupId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_T_First(
+			long groupId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_First(groupId,
-				type, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_First(
+			groupId, type, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -4376,10 +4590,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_T_First(long groupId, int type,
+	public LayoutPageTemplateEntry fetchByG_T_First(
+		long groupId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_T(groupId, type, 0, 1,
-				orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_T(
+			groupId, type, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -4398,11 +4614,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_T_Last(long groupId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_T_Last(
+			long groupId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_Last(groupId,
-				type, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_Last(
+			groupId, type, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -4432,16 +4650,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_T_Last(long groupId, int type,
+	public LayoutPageTemplateEntry fetchByG_T_Last(
+		long groupId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByG_T(groupId, type);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_T(groupId, type,
-				count - 1, count, orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_T(
+			groupId, type, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -4462,25 +4682,30 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_T_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_T_PrevAndNext(session, layoutPageTemplateEntry,
-					groupId, type, orderByComparator, true);
+			array[0] = getByG_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, type,
+				orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_T_PrevAndNext(session, layoutPageTemplateEntry,
-					groupId, type, orderByComparator, false);
+			array[2] = getByG_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, type,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -4492,15 +4717,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	protected LayoutPageTemplateEntry getByG_T_PrevAndNext(Session session,
-		LayoutPageTemplateEntry layoutPageTemplateEntry, long groupId,
-		int type, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+	protected LayoutPageTemplateEntry getByG_T_PrevAndNext(
+		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
+		long groupId, int type,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -4514,7 +4741,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_TYPE_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4586,8 +4814,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(type);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4610,9 +4840,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T(long groupId, int type) {
-		return filterFindByG_T(groupId, type, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_T(
+		long groupId, int type) {
+
+		return filterFindByG_T(
+			groupId, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -4629,8 +4861,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T(long groupId,
-		int type, int start, int end) {
+	public List<LayoutPageTemplateEntry> filterFindByG_T(
+		long groupId, int type, int start, int end) {
+
 		return filterFindByG_T(groupId, type, start, end, null);
 	}
 
@@ -4649,9 +4882,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T(long groupId,
-		int type, int start, int end,
+	public List<LayoutPageTemplateEntry> filterFindByG_T(
+		long groupId, int type, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return findByG_T(groupId, type, start, end, orderByComparator);
 		}
@@ -4659,8 +4893,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(5);
@@ -4670,7 +4904,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_T_GROUPID_2);
@@ -4678,17 +4913,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_TYPE_2_SQL);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -4700,9 +4936,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -4712,12 +4948,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -4726,8 +4962,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(type);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -4749,32 +4985,35 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_T_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_T_PrevAndNext(layoutPageTemplateEntryId, groupId,
-				type, orderByComparator);
+			return findByG_T_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, type, orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, type, orderByComparator,
-					true);
+			array[0] = filterGetByG_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, type,
+				orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, type, orderByComparator,
-					false);
+			array[2] = filterGetByG_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, type,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -4791,11 +5030,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -4806,7 +5046,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_T_GROUPID_2);
@@ -4814,11 +5055,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_TYPE_2_SQL);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -4826,12 +5069,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -4858,12 +5105,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -4893,9 +5142,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -4903,10 +5152,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -4916,8 +5167,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(type);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -4940,8 +5193,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void removeByG_T(long groupId, int type) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_T(
-				groupId, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_T(
+					groupId, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -4957,7 +5213,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	public int countByG_T(long groupId, int type) {
 		FinderPath finderPath = _finderPathCountByG_T;
 
-		Object[] finderArgs = new Object[] { groupId, type };
+		Object[] finderArgs = new Object[] {groupId, type};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -5023,9 +5279,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_T_TYPE_2_SQL);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -5034,8 +5290,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -5055,9 +5311,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_T_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_T_TYPE_2 = "layoutPageTemplateEntry.type = ?";
-	private static final String _FINDER_COLUMN_G_T_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ?";
+	private static final String _FINDER_COLUMN_G_T_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_T_TYPE_2 =
+		"layoutPageTemplateEntry.type = ?";
+
+	private static final String _FINDER_COLUMN_G_T_TYPE_2_SQL =
+		"layoutPageTemplateEntry.type_ = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_L_LikeN;
 	private FinderPath _finderPathWithPaginationCountByG_L_LikeN;
 
@@ -5070,10 +5332,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_LikeN(long groupId,
-		long layoutPageTemplateCollectionId, String name) {
-		return findByG_L_LikeN(groupId, layoutPageTemplateCollectionId, name,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_L_LikeN(
+		long groupId, long layoutPageTemplateCollectionId, String name) {
+
+		return findByG_L_LikeN(
+			groupId, layoutPageTemplateCollectionId, name, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -5091,10 +5355,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_LikeN(long groupId,
-		long layoutPageTemplateCollectionId, String name, int start, int end) {
-		return findByG_L_LikeN(groupId, layoutPageTemplateCollectionId, name,
-			start, end, null);
+	public List<LayoutPageTemplateEntry> findByG_L_LikeN(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int start, int end) {
+
+		return findByG_L_LikeN(
+			groupId, layoutPageTemplateCollectionId, name, start, end, null);
 	}
 
 	/**
@@ -5113,11 +5379,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_LikeN(long groupId,
-		long layoutPageTemplateCollectionId, String name, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_L_LikeN(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_L_LikeN(groupId, layoutPageTemplateCollectionId, name,
-			start, end, orderByComparator, true);
+
+		return findByG_L_LikeN(
+			groupId, layoutPageTemplateCollectionId, name, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -5137,10 +5406,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_LikeN(long groupId,
-		long layoutPageTemplateCollectionId, String name, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_L_LikeN(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		name = Objects.toString(name, "");
 
 		boolean pagination = true;
@@ -5149,24 +5420,26 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		finderPath = _finderPathWithPaginationFindByG_L_LikeN;
 		finderArgs = new Object[] {
-				groupId, layoutPageTemplateCollectionId, name,
-				
-				start, end, orderByComparator
-			};
+			groupId, layoutPageTemplateCollectionId, name, start, end,
+			orderByComparator
+		};
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(layoutPageTemplateCollectionId != layoutPageTemplateEntry.getLayoutPageTemplateCollectionId()) ||
-							!StringUtil.wildcardMatches(
-								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', true)) {
+						(layoutPageTemplateCollectionId !=
+							layoutPageTemplateEntry.
+								getLayoutPageTemplateCollectionId()) ||
+						!StringUtil.wildcardMatches(
+							layoutPageTemplateEntry.getName(), name, '_', '%',
+							'\\', true)) {
+
 						list = null;
 
 						break;
@@ -5179,8 +5452,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -5190,7 +5463,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			query.append(_FINDER_COLUMN_G_L_LIKEN_GROUPID_2);
 
-			query.append(_FINDER_COLUMN_G_L_LIKEN_LAYOUTPAGETEMPLATECOLLECTIONID_2);
+			query.append(
+				_FINDER_COLUMN_G_L_LIKEN_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 			boolean bindName = false;
 
@@ -5204,11 +5478,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -5232,16 +5505,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				}
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -5272,12 +5545,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_L_LikeN_First(long groupId,
-		long layoutPageTemplateCollectionId, String name,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_L_LikeN_First(
+			long groupId, long layoutPageTemplateCollectionId, String name,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_LikeN_First(groupId,
-				layoutPageTemplateCollectionId, name, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_L_LikeN_First(
+				groupId, layoutPageTemplateCollectionId, name,
+				orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -5311,11 +5587,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_L_LikeN_First(long groupId,
-		long layoutPageTemplateCollectionId, String name,
+	public LayoutPageTemplateEntry fetchByG_L_LikeN_First(
+		long groupId, long layoutPageTemplateCollectionId, String name,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_L_LikeN(groupId,
-				layoutPageTemplateCollectionId, name, 0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_L_LikeN(
+			groupId, layoutPageTemplateCollectionId, name, 0, 1,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5335,12 +5613,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_L_LikeN_Last(long groupId,
-		long layoutPageTemplateCollectionId, String name,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_L_LikeN_Last(
+			long groupId, long layoutPageTemplateCollectionId, String name,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_LikeN_Last(groupId,
-				layoutPageTemplateCollectionId, name, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_LikeN_Last(
+			groupId, layoutPageTemplateCollectionId, name, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -5374,19 +5653,20 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_L_LikeN_Last(long groupId,
-		long layoutPageTemplateCollectionId, String name,
+	public LayoutPageTemplateEntry fetchByG_L_LikeN_Last(
+		long groupId, long layoutPageTemplateCollectionId, String name,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		int count = countByG_L_LikeN(groupId, layoutPageTemplateCollectionId,
-				name);
+
+		int count = countByG_L_LikeN(
+			groupId, layoutPageTemplateCollectionId, name);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_L_LikeN(groupId,
-				layoutPageTemplateCollectionId, name, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_L_LikeN(
+			groupId, layoutPageTemplateCollectionId, name, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -5408,32 +5688,33 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_L_LikeN_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		long layoutPageTemplateCollectionId, String name,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			long layoutPageTemplateCollectionId, String name,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_L_LikeN_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, name, orderByComparator,
-					true);
+			array[0] = getByG_L_LikeN_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, name, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_L_LikeN_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, name, orderByComparator,
-					false);
+			array[2] = getByG_L_LikeN_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, name, orderByComparator, false);
 
 			return array;
 		}
@@ -5450,11 +5731,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long layoutPageTemplateCollectionId, String name,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -5479,7 +5761,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -5555,8 +5838,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -5580,10 +5865,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN(long groupId,
-		long layoutPageTemplateCollectionId, String name) {
-		return filterFindByG_L_LikeN(groupId, layoutPageTemplateCollectionId,
-			name, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN(
+		long groupId, long layoutPageTemplateCollectionId, String name) {
+
+		return filterFindByG_L_LikeN(
+			groupId, layoutPageTemplateCollectionId, name, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -5601,10 +5888,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN(long groupId,
-		long layoutPageTemplateCollectionId, String name, int start, int end) {
-		return filterFindByG_L_LikeN(groupId, layoutPageTemplateCollectionId,
-			name, start, end, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int start, int end) {
+
+		return filterFindByG_L_LikeN(
+			groupId, layoutPageTemplateCollectionId, name, start, end, null);
 	}
 
 	/**
@@ -5623,12 +5912,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN(long groupId,
-		long layoutPageTemplateCollectionId, String name, int start, int end,
+	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_L_LikeN(groupId, layoutPageTemplateCollectionId,
-				name, start, end, orderByComparator);
+			return findByG_L_LikeN(
+				groupId, layoutPageTemplateCollectionId, name, start, end,
+				orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
@@ -5636,8 +5928,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -5647,7 +5939,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_L_LIKEN_GROUPID_2);
@@ -5666,17 +5959,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -5688,9 +5982,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -5700,12 +5994,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -5718,8 +6012,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(name);
 			}
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -5742,37 +6036,39 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_L_LikeN_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		long layoutPageTemplateCollectionId, String name,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			long layoutPageTemplateCollectionId, String name,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_L_LikeN_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, layoutPageTemplateCollectionId, name, orderByComparator);
+			return findByG_L_LikeN_PrevAndNext(
+				layoutPageTemplateEntryId, groupId,
+				layoutPageTemplateCollectionId, name, orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_L_LikeN_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, name, orderByComparator,
-					true);
+			array[0] = filterGetByG_L_LikeN_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, name, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_L_LikeN_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, name, orderByComparator,
-					false);
+			array[2] = filterGetByG_L_LikeN_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, name, orderByComparator, false);
 
 			return array;
 		}
@@ -5789,11 +6085,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long layoutPageTemplateCollectionId, String name,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -5804,7 +6101,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_L_LIKEN_GROUPID_2);
@@ -5823,11 +6121,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -5835,12 +6135,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -5867,12 +6171,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -5902,9 +6208,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -5912,10 +6218,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -5929,8 +6237,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -5953,11 +6263,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param name the name
 	 */
 	@Override
-	public void removeByG_L_LikeN(long groupId,
-		long layoutPageTemplateCollectionId, String name) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_L_LikeN(
-				groupId, layoutPageTemplateCollectionId, name,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByG_L_LikeN(
+		long groupId, long layoutPageTemplateCollectionId, String name) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_L_LikeN(
+					groupId, layoutPageTemplateCollectionId, name,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -5971,15 +6284,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_L_LikeN(long groupId,
-		long layoutPageTemplateCollectionId, String name) {
+	public int countByG_L_LikeN(
+		long groupId, long layoutPageTemplateCollectionId, String name) {
+
 		name = Objects.toString(name, "");
 
 		FinderPath finderPath = _finderPathWithPaginationCountByG_L_LikeN;
 
 		Object[] finderArgs = new Object[] {
-				groupId, layoutPageTemplateCollectionId, name
-			};
+			groupId, layoutPageTemplateCollectionId, name
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -5990,7 +6304,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			query.append(_FINDER_COLUMN_G_L_LIKEN_GROUPID_2);
 
-			query.append(_FINDER_COLUMN_G_L_LIKEN_LAYOUTPAGETEMPLATECOLLECTIONID_2);
+			query.append(
+				_FINDER_COLUMN_G_L_LIKEN_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 			boolean bindName = false;
 
@@ -6048,11 +6363,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_L_LikeN(long groupId,
-		long layoutPageTemplateCollectionId, String name) {
+	public int filterCountByG_L_LikeN(
+		long groupId, long layoutPageTemplateCollectionId, String name) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return countByG_L_LikeN(groupId, layoutPageTemplateCollectionId,
-				name);
+			return countByG_L_LikeN(
+				groupId, layoutPageTemplateCollectionId, name);
 		}
 
 		name = Objects.toString(name, "");
@@ -6076,9 +6392,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_L_LIKEN_NAME_2);
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -6087,8 +6403,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -6112,11 +6428,19 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_L_LIKEN_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_LIKEN_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
-		"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_LIKEN_NAME_2 = "layoutPageTemplateEntry.name LIKE ?";
-	private static final String _FINDER_COLUMN_G_L_LIKEN_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '')";
+	private static final String _FINDER_COLUMN_G_L_LIKEN_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String
+		_FINDER_COLUMN_G_L_LIKEN_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
+			"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_L_LIKEN_NAME_2 =
+		"layoutPageTemplateEntry.name LIKE ?";
+
+	private static final String _FINDER_COLUMN_G_L_LIKEN_NAME_3 =
+		"(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '')";
+
 	private FinderPath _finderPathWithPaginationFindByG_L_T;
 	private FinderPath _finderPathWithoutPaginationFindByG_L_T;
 	private FinderPath _finderPathCountByG_L_T;
@@ -6130,10 +6454,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_T(long groupId,
-		long layoutPageTemplateCollectionId, int type) {
-		return findByG_L_T(groupId, layoutPageTemplateCollectionId, type,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_L_T(
+		long groupId, long layoutPageTemplateCollectionId, int type) {
+
+		return findByG_L_T(
+			groupId, layoutPageTemplateCollectionId, type, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -6151,10 +6477,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_T(long groupId,
-		long layoutPageTemplateCollectionId, int type, int start, int end) {
-		return findByG_L_T(groupId, layoutPageTemplateCollectionId, type,
-			start, end, null);
+	public List<LayoutPageTemplateEntry> findByG_L_T(
+		long groupId, long layoutPageTemplateCollectionId, int type, int start,
+		int end) {
+
+		return findByG_L_T(
+			groupId, layoutPageTemplateCollectionId, type, start, end, null);
 	}
 
 	/**
@@ -6173,11 +6501,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_T(long groupId,
-		long layoutPageTemplateCollectionId, int type, int start, int end,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_L_T(groupId, layoutPageTemplateCollectionId, type,
-			start, end, orderByComparator, true);
+	public List<LayoutPageTemplateEntry> findByG_L_T(
+		long groupId, long layoutPageTemplateCollectionId, int type, int start,
+		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return findByG_L_T(
+			groupId, layoutPageTemplateCollectionId, type, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -6197,42 +6527,46 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_T(long groupId,
-		long layoutPageTemplateCollectionId, int type, int start, int end,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+	public List<LayoutPageTemplateEntry> findByG_L_T(
+		long groupId, long layoutPageTemplateCollectionId, int type, int start,
+		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_L_T;
 			finderArgs = new Object[] {
-					groupId, layoutPageTemplateCollectionId, type
-				};
+				groupId, layoutPageTemplateCollectionId, type
+			};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_L_T;
 			finderArgs = new Object[] {
-					groupId, layoutPageTemplateCollectionId, type,
-					
-					start, end, orderByComparator
-				};
+				groupId, layoutPageTemplateCollectionId, type, start, end,
+				orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(layoutPageTemplateCollectionId != layoutPageTemplateEntry.getLayoutPageTemplateCollectionId()) ||
-							(type != layoutPageTemplateEntry.getType())) {
+						(layoutPageTemplateCollectionId !=
+							layoutPageTemplateEntry.
+								getLayoutPageTemplateCollectionId()) ||
+						(type != layoutPageTemplateEntry.getType())) {
+
 						list = null;
 
 						break;
@@ -6245,8 +6579,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -6261,11 +6595,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_L_T_TYPE_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -6287,16 +6620,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(type);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -6327,12 +6660,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_L_T_First(long groupId,
-		long layoutPageTemplateCollectionId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_L_T_First(
+			long groupId, long layoutPageTemplateCollectionId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_T_First(groupId,
-				layoutPageTemplateCollectionId, type, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_T_First(
+			groupId, layoutPageTemplateCollectionId, type, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -6366,11 +6700,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_L_T_First(long groupId,
-		long layoutPageTemplateCollectionId, int type,
+	public LayoutPageTemplateEntry fetchByG_L_T_First(
+		long groupId, long layoutPageTemplateCollectionId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_L_T(groupId,
-				layoutPageTemplateCollectionId, type, 0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_L_T(
+			groupId, layoutPageTemplateCollectionId, type, 0, 1,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6390,12 +6726,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_L_T_Last(long groupId,
-		long layoutPageTemplateCollectionId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_L_T_Last(
+			long groupId, long layoutPageTemplateCollectionId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_T_Last(groupId,
-				layoutPageTemplateCollectionId, type, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_T_Last(
+			groupId, layoutPageTemplateCollectionId, type, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -6429,18 +6766,19 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_L_T_Last(long groupId,
-		long layoutPageTemplateCollectionId, int type,
+	public LayoutPageTemplateEntry fetchByG_L_T_Last(
+		long groupId, long layoutPageTemplateCollectionId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByG_L_T(groupId, layoutPageTemplateCollectionId, type);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_L_T(groupId,
-				layoutPageTemplateCollectionId, type, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_L_T(
+			groupId, layoutPageTemplateCollectionId, type, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -6462,28 +6800,31 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_L_T_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		long layoutPageTemplateCollectionId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			long layoutPageTemplateCollectionId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_L_T_PrevAndNext(session, layoutPageTemplateEntry,
-					groupId, layoutPageTemplateCollectionId, type,
-					orderByComparator, true);
+			array[0] = getByG_L_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, type, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_L_T_PrevAndNext(session, layoutPageTemplateEntry,
-					groupId, layoutPageTemplateCollectionId, type,
-					orderByComparator, false);
+			array[2] = getByG_L_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, type, orderByComparator, false);
 
 			return array;
 		}
@@ -6495,16 +6836,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	protected LayoutPageTemplateEntry getByG_L_T_PrevAndNext(Session session,
-		LayoutPageTemplateEntry layoutPageTemplateEntry, long groupId,
-		long layoutPageTemplateCollectionId, int type,
+	protected LayoutPageTemplateEntry getByG_L_T_PrevAndNext(
+		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
+		long groupId, long layoutPageTemplateCollectionId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -6520,7 +6862,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_T_TYPE_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -6594,8 +6937,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(type);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -6619,10 +6964,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_T(long groupId,
-		long layoutPageTemplateCollectionId, int type) {
-		return filterFindByG_L_T(groupId, layoutPageTemplateCollectionId, type,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_L_T(
+		long groupId, long layoutPageTemplateCollectionId, int type) {
+
+		return filterFindByG_L_T(
+			groupId, layoutPageTemplateCollectionId, type, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -6640,10 +6987,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_T(long groupId,
-		long layoutPageTemplateCollectionId, int type, int start, int end) {
-		return filterFindByG_L_T(groupId, layoutPageTemplateCollectionId, type,
-			start, end, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_L_T(
+		long groupId, long layoutPageTemplateCollectionId, int type, int start,
+		int end) {
+
+		return filterFindByG_L_T(
+			groupId, layoutPageTemplateCollectionId, type, start, end, null);
 	}
 
 	/**
@@ -6662,19 +7011,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_T(long groupId,
-		long layoutPageTemplateCollectionId, int type, int start, int end,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+	public List<LayoutPageTemplateEntry> filterFindByG_L_T(
+		long groupId, long layoutPageTemplateCollectionId, int type, int start,
+		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_L_T(groupId, layoutPageTemplateCollectionId, type,
-				start, end, orderByComparator);
+			return findByG_L_T(
+				groupId, layoutPageTemplateCollectionId, type, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -6684,7 +7035,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_L_T_GROUPID_2);
@@ -6694,17 +7046,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_T_TYPE_2_SQL);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -6716,9 +7069,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -6728,12 +7081,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -6744,8 +7097,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(type);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -6768,35 +7121,37 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_L_T_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		long layoutPageTemplateCollectionId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			long layoutPageTemplateCollectionId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_L_T_PrevAndNext(layoutPageTemplateEntryId, groupId,
+			return findByG_L_T_PrevAndNext(
+				layoutPageTemplateEntryId, groupId,
 				layoutPageTemplateCollectionId, type, orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_L_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, type, orderByComparator,
-					true);
+			array[0] = filterGetByG_L_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, type, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_L_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, type, orderByComparator,
-					false);
+			array[2] = filterGetByG_L_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, type, orderByComparator, false);
 
 			return array;
 		}
@@ -6813,11 +7168,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long layoutPageTemplateCollectionId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -6828,7 +7184,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_L_T_GROUPID_2);
@@ -6838,11 +7195,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_T_TYPE_2_SQL);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -6850,12 +7209,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -6882,12 +7245,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -6917,9 +7282,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -6927,10 +7292,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -6942,8 +7309,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(type);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -6966,11 +7335,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param type the type
 	 */
 	@Override
-	public void removeByG_L_T(long groupId,
-		long layoutPageTemplateCollectionId, int type) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_L_T(
-				groupId, layoutPageTemplateCollectionId, type,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByG_L_T(
+		long groupId, long layoutPageTemplateCollectionId, int type) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_L_T(
+					groupId, layoutPageTemplateCollectionId, type,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -6984,13 +7356,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_L_T(long groupId, long layoutPageTemplateCollectionId,
-		int type) {
+	public int countByG_L_T(
+		long groupId, long layoutPageTemplateCollectionId, int type) {
+
 		FinderPath finderPath = _finderPathCountByG_L_T;
 
 		Object[] finderArgs = new Object[] {
-				groupId, layoutPageTemplateCollectionId, type
-			};
+			groupId, layoutPageTemplateCollectionId, type
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -7048,8 +7421,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_L_T(long groupId,
-		long layoutPageTemplateCollectionId, int type) {
+	public int filterCountByG_L_T(
+		long groupId, long layoutPageTemplateCollectionId, int type) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_L_T(groupId, layoutPageTemplateCollectionId, type);
 		}
@@ -7064,9 +7438,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_L_T_TYPE_2_SQL);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -7075,8 +7449,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -7098,11 +7472,19 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_L_T_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_T_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
-		"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_T_TYPE_2 = "layoutPageTemplateEntry.type = ?";
-	private static final String _FINDER_COLUMN_G_L_T_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ?";
+	private static final String _FINDER_COLUMN_G_L_T_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String
+		_FINDER_COLUMN_G_L_T_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
+			"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_L_T_TYPE_2 =
+		"layoutPageTemplateEntry.type = ?";
+
+	private static final String _FINDER_COLUMN_G_L_T_TYPE_2_SQL =
+		"layoutPageTemplateEntry.type_ = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_L_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_L_S;
 	private FinderPath _finderPathCountByG_L_S;
@@ -7116,10 +7498,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_S(long groupId,
-		long layoutPageTemplateCollectionId, int status) {
-		return findByG_L_S(groupId, layoutPageTemplateCollectionId, status,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_L_S(
+		long groupId, long layoutPageTemplateCollectionId, int status) {
+
+		return findByG_L_S(
+			groupId, layoutPageTemplateCollectionId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -7137,10 +7521,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_S(long groupId,
-		long layoutPageTemplateCollectionId, int status, int start, int end) {
-		return findByG_L_S(groupId, layoutPageTemplateCollectionId, status,
-			start, end, null);
+	public List<LayoutPageTemplateEntry> findByG_L_S(
+		long groupId, long layoutPageTemplateCollectionId, int status,
+		int start, int end) {
+
+		return findByG_L_S(
+			groupId, layoutPageTemplateCollectionId, status, start, end, null);
 	}
 
 	/**
@@ -7159,11 +7545,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_S(long groupId,
-		long layoutPageTemplateCollectionId, int status, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_L_S(
+		long groupId, long layoutPageTemplateCollectionId, int status,
+		int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_L_S(groupId, layoutPageTemplateCollectionId, status,
-			start, end, orderByComparator, true);
+
+		return findByG_L_S(
+			groupId, layoutPageTemplateCollectionId, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -7183,42 +7572,47 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_S(long groupId,
-		long layoutPageTemplateCollectionId, int status, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_L_S(
+		long groupId, long layoutPageTemplateCollectionId, int status,
+		int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_L_S;
 			finderArgs = new Object[] {
-					groupId, layoutPageTemplateCollectionId, status
-				};
+				groupId, layoutPageTemplateCollectionId, status
+			};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_L_S;
 			finderArgs = new Object[] {
-					groupId, layoutPageTemplateCollectionId, status,
-					
-					start, end, orderByComparator
-				};
+				groupId, layoutPageTemplateCollectionId, status, start, end,
+				orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(layoutPageTemplateCollectionId != layoutPageTemplateEntry.getLayoutPageTemplateCollectionId()) ||
-							(status != layoutPageTemplateEntry.getStatus())) {
+						(layoutPageTemplateCollectionId !=
+							layoutPageTemplateEntry.
+								getLayoutPageTemplateCollectionId()) ||
+						(status != layoutPageTemplateEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -7231,8 +7625,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -7247,11 +7641,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_L_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -7273,16 +7666,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -7313,12 +7706,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_L_S_First(long groupId,
-		long layoutPageTemplateCollectionId, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_L_S_First(
+			long groupId, long layoutPageTemplateCollectionId, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_S_First(groupId,
-				layoutPageTemplateCollectionId, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_S_First(
+			groupId, layoutPageTemplateCollectionId, status, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -7352,11 +7746,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_L_S_First(long groupId,
-		long layoutPageTemplateCollectionId, int status,
+	public LayoutPageTemplateEntry fetchByG_L_S_First(
+		long groupId, long layoutPageTemplateCollectionId, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_L_S(groupId,
-				layoutPageTemplateCollectionId, status, 0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_L_S(
+			groupId, layoutPageTemplateCollectionId, status, 0, 1,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -7376,12 +7772,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_L_S_Last(long groupId,
-		long layoutPageTemplateCollectionId, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_L_S_Last(
+			long groupId, long layoutPageTemplateCollectionId, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_S_Last(groupId,
-				layoutPageTemplateCollectionId, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_S_Last(
+			groupId, layoutPageTemplateCollectionId, status, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -7415,18 +7812,20 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_L_S_Last(long groupId,
-		long layoutPageTemplateCollectionId, int status,
+	public LayoutPageTemplateEntry fetchByG_L_S_Last(
+		long groupId, long layoutPageTemplateCollectionId, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		int count = countByG_L_S(groupId, layoutPageTemplateCollectionId, status);
+
+		int count = countByG_L_S(
+			groupId, layoutPageTemplateCollectionId, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_L_S(groupId,
-				layoutPageTemplateCollectionId, status, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_L_S(
+			groupId, layoutPageTemplateCollectionId, status, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -7448,28 +7847,33 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_L_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		long layoutPageTemplateCollectionId, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			long layoutPageTemplateCollectionId, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_L_S_PrevAndNext(session, layoutPageTemplateEntry,
-					groupId, layoutPageTemplateCollectionId, status,
-					orderByComparator, true);
+			array[0] = getByG_L_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, status, orderByComparator,
+				true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_L_S_PrevAndNext(session, layoutPageTemplateEntry,
-					groupId, layoutPageTemplateCollectionId, status,
-					orderByComparator, false);
+			array[2] = getByG_L_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, status, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -7481,16 +7885,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	protected LayoutPageTemplateEntry getByG_L_S_PrevAndNext(Session session,
-		LayoutPageTemplateEntry layoutPageTemplateEntry, long groupId,
-		long layoutPageTemplateCollectionId, int status,
+	protected LayoutPageTemplateEntry getByG_L_S_PrevAndNext(
+		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
+		long groupId, long layoutPageTemplateCollectionId, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -7506,7 +7911,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -7580,8 +7986,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -7605,10 +8013,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_S(long groupId,
-		long layoutPageTemplateCollectionId, int status) {
-		return filterFindByG_L_S(groupId, layoutPageTemplateCollectionId,
-			status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_L_S(
+		long groupId, long layoutPageTemplateCollectionId, int status) {
+
+		return filterFindByG_L_S(
+			groupId, layoutPageTemplateCollectionId, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -7626,10 +8036,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_S(long groupId,
-		long layoutPageTemplateCollectionId, int status, int start, int end) {
-		return filterFindByG_L_S(groupId, layoutPageTemplateCollectionId,
-			status, start, end, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_L_S(
+		long groupId, long layoutPageTemplateCollectionId, int status,
+		int start, int end) {
+
+		return filterFindByG_L_S(
+			groupId, layoutPageTemplateCollectionId, status, start, end, null);
 	}
 
 	/**
@@ -7648,19 +8060,22 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_S(long groupId,
-		long layoutPageTemplateCollectionId, int status, int start, int end,
+	public List<LayoutPageTemplateEntry> filterFindByG_L_S(
+		long groupId, long layoutPageTemplateCollectionId, int status,
+		int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_L_S(groupId, layoutPageTemplateCollectionId, status,
-				start, end, orderByComparator);
+			return findByG_L_S(
+				groupId, layoutPageTemplateCollectionId, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -7670,7 +8085,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_L_S_GROUPID_2);
@@ -7680,17 +8096,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -7702,9 +8119,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -7714,12 +8131,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -7730,8 +8147,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(status);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -7754,35 +8171,39 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_L_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		long layoutPageTemplateCollectionId, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			long layoutPageTemplateCollectionId, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_L_S_PrevAndNext(layoutPageTemplateEntryId, groupId,
+			return findByG_L_S_PrevAndNext(
+				layoutPageTemplateEntryId, groupId,
 				layoutPageTemplateCollectionId, status, orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_L_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, status, orderByComparator,
-					true);
+			array[0] = filterGetByG_L_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, status, orderByComparator,
+				true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_L_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, status, orderByComparator,
-					false);
+			array[2] = filterGetByG_L_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, status, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -7799,11 +8220,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long layoutPageTemplateCollectionId, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -7814,7 +8236,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_L_S_GROUPID_2);
@@ -7824,11 +8247,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -7836,12 +8261,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -7868,12 +8297,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -7903,9 +8334,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -7913,10 +8344,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -7928,8 +8361,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -7952,11 +8387,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_L_S(long groupId,
-		long layoutPageTemplateCollectionId, int status) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_L_S(
-				groupId, layoutPageTemplateCollectionId, status,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByG_L_S(
+		long groupId, long layoutPageTemplateCollectionId, int status) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_L_S(
+					groupId, layoutPageTemplateCollectionId, status,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -7970,13 +8408,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_L_S(long groupId, long layoutPageTemplateCollectionId,
-		int status) {
+	public int countByG_L_S(
+		long groupId, long layoutPageTemplateCollectionId, int status) {
+
 		FinderPath finderPath = _finderPathCountByG_L_S;
 
 		Object[] finderArgs = new Object[] {
-				groupId, layoutPageTemplateCollectionId, status
-			};
+			groupId, layoutPageTemplateCollectionId, status
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -8034,10 +8473,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_L_S(long groupId,
-		long layoutPageTemplateCollectionId, int status) {
+	public int filterCountByG_L_S(
+		long groupId, long layoutPageTemplateCollectionId, int status) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return countByG_L_S(groupId, layoutPageTemplateCollectionId, status);
+			return countByG_L_S(
+				groupId, layoutPageTemplateCollectionId, status);
 		}
 
 		StringBundler query = new StringBundler(4);
@@ -8050,9 +8491,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_L_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -8061,8 +8502,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -8084,10 +8525,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_L_S_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_S_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
-		"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_S_STATUS_2 = "layoutPageTemplateEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_L_S_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String
+		_FINDER_COLUMN_G_L_S_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
+			"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_L_S_STATUS_2 =
+		"layoutPageTemplateEntry.status = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_T_LikeN;
 	private FinderPath _finderPathWithPaginationCountByG_T_LikeN;
 
@@ -8100,10 +8547,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_LikeN(long groupId,
-		String name, int type) {
-		return findByG_T_LikeN(groupId, name, type, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_T_LikeN(
+		long groupId, String name, int type) {
+
+		return findByG_T_LikeN(
+			groupId, name, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -8121,8 +8569,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_LikeN(long groupId,
-		String name, int type, int start, int end) {
+	public List<LayoutPageTemplateEntry> findByG_T_LikeN(
+		long groupId, String name, int type, int start, int end) {
+
 		return findByG_T_LikeN(groupId, name, type, start, end, null);
 	}
 
@@ -8142,11 +8591,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_LikeN(long groupId,
-		String name, int type, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_T_LikeN(
+		long groupId, String name, int type, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_T_LikeN(groupId, name, type, start, end,
-			orderByComparator, true);
+
+		return findByG_T_LikeN(
+			groupId, name, type, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -8166,10 +8616,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_LikeN(long groupId,
-		String name, int type, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_T_LikeN(
+		long groupId, String name, int type, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		name = Objects.toString(name, "");
 
 		boolean pagination = true;
@@ -8178,24 +8629,23 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		finderPath = _finderPathWithPaginationFindByG_T_LikeN;
 		finderArgs = new Object[] {
-				groupId, name, type,
-				
-				start, end, orderByComparator
-			};
+			groupId, name, type, start, end, orderByComparator
+		};
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							!StringUtil.wildcardMatches(
-								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', true) ||
-							(type != layoutPageTemplateEntry.getType())) {
+						!StringUtil.wildcardMatches(
+							layoutPageTemplateEntry.getName(), name, '_', '%',
+							'\\', true) ||
+						(type != layoutPageTemplateEntry.getType())) {
+
 						list = null;
 
 						break;
@@ -8208,8 +8658,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -8233,11 +8683,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_T_LIKEN_TYPE_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -8261,16 +8710,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(type);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -8301,12 +8750,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_T_LikeN_First(long groupId,
-		String name, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_T_LikeN_First(
+			long groupId, String name, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_LikeN_First(groupId,
-				name, type, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_T_LikeN_First(groupId, name, type, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -8340,11 +8790,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_T_LikeN_First(long groupId,
-		String name, int type,
+	public LayoutPageTemplateEntry fetchByG_T_LikeN_First(
+		long groupId, String name, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_T_LikeN(groupId, name,
-				type, 0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_T_LikeN(
+			groupId, name, type, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -8364,12 +8815,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_T_LikeN_Last(long groupId,
-		String name, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_T_LikeN_Last(
+			long groupId, String name, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_LikeN_Last(groupId,
-				name, type, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_LikeN_Last(
+			groupId, name, type, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -8403,17 +8855,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_T_LikeN_Last(long groupId,
-		String name, int type,
+	public LayoutPageTemplateEntry fetchByG_T_LikeN_Last(
+		long groupId, String name, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByG_T_LikeN(groupId, name, type);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_T_LikeN(groupId, name,
-				type, count - 1, count, orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_T_LikeN(
+			groupId, name, type, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -8435,29 +8888,32 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_T_LikeN_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, String name, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, String name, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_T_LikeN_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, name, type,
-					orderByComparator, true);
+			array[0] = getByG_T_LikeN_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, name, type,
+				orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_T_LikeN_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, name, type,
-					orderByComparator, false);
+			array[2] = getByG_T_LikeN_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, name, type,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -8474,11 +8930,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, String name, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -8503,7 +8960,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_LIKEN_TYPE_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -8579,8 +9037,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(type);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -8604,10 +9064,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN(long groupId,
-		String name, int type) {
-		return filterFindByG_T_LikeN(groupId, name, type, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN(
+		long groupId, String name, int type) {
+
+		return filterFindByG_T_LikeN(
+			groupId, name, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -8625,8 +9086,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN(long groupId,
-		String name, int type, int start, int end) {
+	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN(
+		long groupId, String name, int type, int start, int end) {
+
 		return filterFindByG_T_LikeN(groupId, name, type, start, end, null);
 	}
 
@@ -8646,12 +9108,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN(long groupId,
-		String name, int type, int start, int end,
+	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN(
+		long groupId, String name, int type, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_T_LikeN(groupId, name, type, start, end,
-				orderByComparator);
+			return findByG_T_LikeN(
+				groupId, name, type, start, end, orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
@@ -8659,8 +9122,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -8670,7 +9133,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_T_LIKEN_GROUPID_2);
@@ -8689,17 +9153,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_LIKEN_TYPE_2_SQL);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -8711,9 +9176,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -8723,12 +9188,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -8741,8 +9206,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(type);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -8765,34 +9230,38 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_T_LikeN_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, String name, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, String name, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_T_LikeN_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, name, type, orderByComparator);
+			return findByG_T_LikeN_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, name, type,
+				orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_T_LikeN_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, name, type,
-					orderByComparator, true);
+			array[0] = filterGetByG_T_LikeN_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, name, type,
+				orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_T_LikeN_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, name, type,
-					orderByComparator, false);
+			array[2] = filterGetByG_T_LikeN_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, name, type,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -8809,11 +9278,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, String name, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -8824,7 +9294,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_T_LIKEN_GROUPID_2);
@@ -8843,11 +9314,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_LIKEN_TYPE_2_SQL);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -8855,12 +9328,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -8887,12 +9364,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -8922,9 +9401,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -8932,10 +9411,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -8949,8 +9430,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(type);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -8974,8 +9457,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void removeByG_T_LikeN(long groupId, String name, int type) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_T_LikeN(
-				groupId, name, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_T_LikeN(
+					groupId, name, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -8994,7 +9480,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		FinderPath finderPath = _finderPathWithPaginationCountByG_T_LikeN;
 
-		Object[] finderArgs = new Object[] { groupId, name, type };
+		Object[] finderArgs = new Object[] {groupId, name, type};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -9089,9 +9575,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_T_LIKEN_TYPE_2_SQL);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -9100,8 +9586,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -9125,11 +9611,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_T_LIKEN_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_NAME_2 = "layoutPageTemplateEntry.name LIKE ? AND ";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_TYPE_2 = "layoutPageTemplateEntry.type = ?";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ?";
+	private static final String _FINDER_COLUMN_G_T_LIKEN_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_T_LIKEN_NAME_2 =
+		"layoutPageTemplateEntry.name LIKE ? AND ";
+
+	private static final String _FINDER_COLUMN_G_T_LIKEN_NAME_3 =
+		"(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
+
+	private static final String _FINDER_COLUMN_G_T_LIKEN_TYPE_2 =
+		"layoutPageTemplateEntry.type = ?";
+
+	private static final String _FINDER_COLUMN_G_T_LIKEN_TYPE_2_SQL =
+		"layoutPageTemplateEntry.type_ = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_T_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_T_S;
 	private FinderPath _finderPathCountByG_T_S;
@@ -9143,10 +9639,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_S(long groupId, int type,
-		int status) {
-		return findByG_T_S(groupId, type, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_T_S(
+		long groupId, int type, int status) {
+
+		return findByG_T_S(
+			groupId, type, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -9164,8 +9661,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_S(long groupId, int type,
-		int status, int start, int end) {
+	public List<LayoutPageTemplateEntry> findByG_T_S(
+		long groupId, int type, int status, int start, int end) {
+
 		return findByG_T_S(groupId, type, status, start, end, null);
 	}
 
@@ -9185,11 +9683,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_S(long groupId, int type,
-		int status, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_T_S(
+		long groupId, int type, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_T_S(groupId, type, status, start, end,
-			orderByComparator, true);
+
+		return findByG_T_S(
+			groupId, type, status, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -9209,40 +9708,41 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_S(long groupId, int type,
-		int status, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_T_S(
+		long groupId, int type, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_T_S;
-			finderArgs = new Object[] { groupId, type, status };
+			finderArgs = new Object[] {groupId, type, status};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_T_S;
 			finderArgs = new Object[] {
-					groupId, type, status,
-					
-					start, end, orderByComparator
-				};
+				groupId, type, status, start, end, orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(type != layoutPageTemplateEntry.getType()) ||
-							(status != layoutPageTemplateEntry.getStatus())) {
+						(type != layoutPageTemplateEntry.getType()) ||
+						(status != layoutPageTemplateEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -9255,8 +9755,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					5 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -9271,11 +9771,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_T_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -9297,16 +9796,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -9337,11 +9836,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_T_S_First(long groupId, int type,
-		int status, OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_T_S_First(
+			long groupId, int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_S_First(groupId,
-				type, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_S_First(
+			groupId, type, status, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -9375,10 +9876,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_T_S_First(long groupId, int type,
-		int status, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_T_S(groupId, type, status,
-				0, 1, orderByComparator);
+	public LayoutPageTemplateEntry fetchByG_T_S_First(
+		long groupId, int type, int status,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		List<LayoutPageTemplateEntry> list = findByG_T_S(
+			groupId, type, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -9398,11 +9901,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_T_S_Last(long groupId, int type,
-		int status, OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_T_S_Last(
+			long groupId, int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_S_Last(groupId,
-				type, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_S_Last(
+			groupId, type, status, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -9436,16 +9941,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_T_S_Last(long groupId, int type,
-		int status, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+	public LayoutPageTemplateEntry fetchByG_T_S_Last(
+		long groupId, int type, int status,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByG_T_S(groupId, type, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_T_S(groupId, type, status,
-				count - 1, count, orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_T_S(
+			groupId, type, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -9467,25 +9974,30 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_T_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_T_S_PrevAndNext(session, layoutPageTemplateEntry,
-					groupId, type, status, orderByComparator, true);
+			array[0] = getByG_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, type, status,
+				orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_T_S_PrevAndNext(session, layoutPageTemplateEntry,
-					groupId, type, status, orderByComparator, false);
+			array[2] = getByG_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, type, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -9497,16 +10009,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	protected LayoutPageTemplateEntry getByG_T_S_PrevAndNext(Session session,
-		LayoutPageTemplateEntry layoutPageTemplateEntry, long groupId,
-		int type, int status,
+	protected LayoutPageTemplateEntry getByG_T_S_PrevAndNext(
+		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
+		long groupId, int type, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -9522,7 +10035,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -9596,8 +10110,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -9621,10 +10137,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T_S(long groupId,
-		int type, int status) {
-		return filterFindByG_T_S(groupId, type, status, QueryUtil.ALL_POS,
-			QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_T_S(
+		long groupId, int type, int status) {
+
+		return filterFindByG_T_S(
+			groupId, type, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -9642,8 +10159,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T_S(long groupId,
-		int type, int status, int start, int end) {
+	public List<LayoutPageTemplateEntry> filterFindByG_T_S(
+		long groupId, int type, int status, int start, int end) {
+
 		return filterFindByG_T_S(groupId, type, status, start, end, null);
 	}
 
@@ -9663,19 +10181,20 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T_S(long groupId,
-		int type, int status, int start, int end,
+	public List<LayoutPageTemplateEntry> filterFindByG_T_S(
+		long groupId, int type, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_T_S(groupId, type, status, start, end,
-				orderByComparator);
+			return findByG_T_S(
+				groupId, type, status, start, end, orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				5 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(6);
@@ -9685,7 +10204,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_T_S_GROUPID_2);
@@ -9695,17 +10215,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -9717,9 +10238,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -9729,12 +10250,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -9745,8 +10266,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(status);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -9769,32 +10290,36 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_T_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_T_S_PrevAndNext(layoutPageTemplateEntryId, groupId,
-				type, status, orderByComparator);
+			return findByG_T_S_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, type, status,
+				orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_T_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, type, status,
-					orderByComparator, true);
+			array[0] = filterGetByG_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, type, status,
+				orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_T_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, type, status,
-					orderByComparator, false);
+			array[2] = filterGetByG_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, type, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -9811,11 +10336,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, int type, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -9826,7 +10352,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_T_S_GROUPID_2);
@@ -9836,11 +10363,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -9848,12 +10377,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -9880,12 +10413,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -9915,9 +10450,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -9925,10 +10460,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -9940,8 +10477,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -9965,9 +10504,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void removeByG_T_S(long groupId, int type, int status) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_T_S(
-				groupId, type, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				null)) {
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_T_S(
+					groupId, type, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -9984,7 +10525,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	public int countByG_T_S(long groupId, int type, int status) {
 		FinderPath finderPath = _finderPathCountByG_T_S;
 
-		Object[] finderArgs = new Object[] { groupId, type, status };
+		Object[] finderArgs = new Object[] {groupId, type, status};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -10057,9 +10598,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_T_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -10068,8 +10609,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -10091,10 +10632,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_T_S_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_T_S_TYPE_2 = "layoutPageTemplateEntry.type = ? AND ";
-	private static final String _FINDER_COLUMN_G_T_S_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ? AND ";
-	private static final String _FINDER_COLUMN_G_T_S_STATUS_2 = "layoutPageTemplateEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_T_S_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_T_S_TYPE_2 =
+		"layoutPageTemplateEntry.type = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_T_S_TYPE_2_SQL =
+		"layoutPageTemplateEntry.type_ = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_T_S_STATUS_2 =
+		"layoutPageTemplateEntry.status = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_L_LikeN_S;
 	private FinderPath _finderPathWithPaginationCountByG_L_LikeN_S;
 
@@ -10108,10 +10657,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_LikeN_S(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status) {
-		return findByG_L_LikeN_S(groupId, layoutPageTemplateCollectionId, name,
-			status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_L_LikeN_S(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status) {
+
+		return findByG_L_LikeN_S(
+			groupId, layoutPageTemplateCollectionId, name, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -10130,11 +10682,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_LikeN_S(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
-		int start, int end) {
-		return findByG_L_LikeN_S(groupId, layoutPageTemplateCollectionId, name,
-			status, start, end, null);
+	public List<LayoutPageTemplateEntry> findByG_L_LikeN_S(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status, int start, int end) {
+
+		return findByG_L_LikeN_S(
+			groupId, layoutPageTemplateCollectionId, name, status, start, end,
+			null);
 	}
 
 	/**
@@ -10154,12 +10708,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_LikeN_S(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
-		int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_L_LikeN_S(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_L_LikeN_S(groupId, layoutPageTemplateCollectionId, name,
-			status, start, end, orderByComparator, true);
+
+		return findByG_L_LikeN_S(
+			groupId, layoutPageTemplateCollectionId, name, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -10180,11 +10736,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_L_LikeN_S(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
-		int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_L_LikeN_S(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		name = Objects.toString(name, "");
 
 		boolean pagination = true;
@@ -10193,25 +10750,27 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		finderPath = _finderPathWithPaginationFindByG_L_LikeN_S;
 		finderArgs = new Object[] {
-				groupId, layoutPageTemplateCollectionId, name, status,
-				
-				start, end, orderByComparator
-			};
+			groupId, layoutPageTemplateCollectionId, name, status, start, end,
+			orderByComparator
+		};
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(layoutPageTemplateCollectionId != layoutPageTemplateEntry.getLayoutPageTemplateCollectionId()) ||
-							!StringUtil.wildcardMatches(
-								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', true) ||
-							(status != layoutPageTemplateEntry.getStatus())) {
+						(layoutPageTemplateCollectionId !=
+							layoutPageTemplateEntry.
+								getLayoutPageTemplateCollectionId()) ||
+						!StringUtil.wildcardMatches(
+							layoutPageTemplateEntry.getName(), name, '_', '%',
+							'\\', true) ||
+						(status != layoutPageTemplateEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -10224,8 +10783,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					6 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -10235,7 +10794,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			query.append(_FINDER_COLUMN_G_L_LIKEN_S_GROUPID_2);
 
-			query.append(_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
+			query.append(
+				_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 			boolean bindName = false;
 
@@ -10251,11 +10811,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_L_LIKEN_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -10281,16 +10840,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -10322,12 +10881,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_L_LikeN_S_First(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_L_LikeN_S_First(
+			long groupId, long layoutPageTemplateCollectionId, String name,
+			int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_LikeN_S_First(groupId,
-				layoutPageTemplateCollectionId, name, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_L_LikeN_S_First(
+				groupId, layoutPageTemplateCollectionId, name, status,
+				orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -10365,12 +10928,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_L_LikeN_S_First(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
+	public LayoutPageTemplateEntry fetchByG_L_LikeN_S_First(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_L_LikeN_S(groupId,
-				layoutPageTemplateCollectionId, name, status, 0, 1,
-				orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_L_LikeN_S(
+			groupId, layoutPageTemplateCollectionId, name, status, 0, 1,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -10391,12 +10956,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_L_LikeN_S_Last(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_L_LikeN_S_Last(
+			long groupId, long layoutPageTemplateCollectionId, String name,
+			int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_L_LikeN_S_Last(groupId,
-				layoutPageTemplateCollectionId, name, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_L_LikeN_S_Last(
+				groupId, layoutPageTemplateCollectionId, name, status,
+				orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -10434,19 +11003,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_L_LikeN_S_Last(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
+	public LayoutPageTemplateEntry fetchByG_L_LikeN_S_Last(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		int count = countByG_L_LikeN_S(groupId, layoutPageTemplateCollectionId,
-				name, status);
+
+		int count = countByG_L_LikeN_S(
+			groupId, layoutPageTemplateCollectionId, name, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_L_LikeN_S(groupId,
-				layoutPageTemplateCollectionId, name, status, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_L_LikeN_S(
+			groupId, layoutPageTemplateCollectionId, name, status, count - 1,
+			count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -10469,32 +11040,35 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_L_LikeN_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			long layoutPageTemplateCollectionId, String name, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_L_LikeN_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, name, status,
-					orderByComparator, true);
+			array[0] = getByG_L_LikeN_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, name, status, orderByComparator,
+				true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_L_LikeN_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, name, status,
-					orderByComparator, false);
+			array[2] = getByG_L_LikeN_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, name, status, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -10512,11 +11086,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -10527,7 +11102,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_L_LIKEN_S_GROUPID_2);
 
-		query.append(_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
+		query.append(
+			_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 		boolean bindName = false;
 
@@ -10543,7 +11119,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_LIKEN_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -10621,8 +11198,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -10647,10 +11226,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN_S(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status) {
-		return filterFindByG_L_LikeN_S(groupId, layoutPageTemplateCollectionId,
-			name, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN_S(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status) {
+
+		return filterFindByG_L_LikeN_S(
+			groupId, layoutPageTemplateCollectionId, name, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -10669,11 +11251,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN_S(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
-		int start, int end) {
-		return filterFindByG_L_LikeN_S(groupId, layoutPageTemplateCollectionId,
-			name, status, start, end, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN_S(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status, int start, int end) {
+
+		return filterFindByG_L_LikeN_S(
+			groupId, layoutPageTemplateCollectionId, name, status, start, end,
+			null);
 	}
 
 	/**
@@ -10693,13 +11277,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN_S(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
-		int start, int end,
+	public List<LayoutPageTemplateEntry> filterFindByG_L_LikeN_S(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_L_LikeN_S(groupId, layoutPageTemplateCollectionId,
-				name, status, start, end, orderByComparator);
+			return findByG_L_LikeN_S(
+				groupId, layoutPageTemplateCollectionId, name, status, start,
+				end, orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
@@ -10707,8 +11293,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -10718,12 +11304,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_L_LIKEN_S_GROUPID_2);
 
-		query.append(_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
+		query.append(
+			_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 		boolean bindName = false;
 
@@ -10739,17 +11327,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_LIKEN_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -10761,9 +11350,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -10773,12 +11362,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -10793,8 +11382,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(status);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -10818,38 +11407,42 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_L_LikeN_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId,
-		long layoutPageTemplateCollectionId, String name, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId,
+			long layoutPageTemplateCollectionId, String name, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_L_LikeN_S_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, layoutPageTemplateCollectionId, name, status,
+			return findByG_L_LikeN_S_PrevAndNext(
+				layoutPageTemplateEntryId, groupId,
+				layoutPageTemplateCollectionId, name, status,
 				orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_L_LikeN_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, name, status,
-					orderByComparator, true);
+			array[0] = filterGetByG_L_LikeN_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, name, status, orderByComparator,
+				true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_L_LikeN_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId,
-					layoutPageTemplateCollectionId, name, status,
-					orderByComparator, false);
+			array[2] = filterGetByG_L_LikeN_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId,
+				layoutPageTemplateCollectionId, name, status, orderByComparator,
+				false);
 
 			return array;
 		}
@@ -10867,11 +11460,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(8 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -10882,12 +11476,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_L_LIKEN_S_GROUPID_2);
 
-		query.append(_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
+		query.append(
+			_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 		boolean bindName = false;
 
@@ -10903,11 +11499,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_L_LIKEN_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -10915,12 +11513,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -10947,12 +11549,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -10982,9 +11586,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -10992,10 +11596,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -11011,8 +11617,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -11036,11 +11644,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_L_LikeN_S(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_L_LikeN_S(
-				groupId, layoutPageTemplateCollectionId, name, status,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByG_L_LikeN_S(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_L_LikeN_S(
+					groupId, layoutPageTemplateCollectionId, name, status,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -11055,15 +11667,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_L_LikeN_S(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status) {
+	public int countByG_L_LikeN_S(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status) {
+
 		name = Objects.toString(name, "");
 
 		FinderPath finderPath = _finderPathWithPaginationCountByG_L_LikeN_S;
 
 		Object[] finderArgs = new Object[] {
-				groupId, layoutPageTemplateCollectionId, name, status
-			};
+			groupId, layoutPageTemplateCollectionId, name, status
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -11074,7 +11688,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			query.append(_FINDER_COLUMN_G_L_LIKEN_S_GROUPID_2);
 
-			query.append(_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
+			query.append(
+				_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 			boolean bindName = false;
 
@@ -11137,11 +11752,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_L_LikeN_S(long groupId,
-		long layoutPageTemplateCollectionId, String name, int status) {
+	public int filterCountByG_L_LikeN_S(
+		long groupId, long layoutPageTemplateCollectionId, String name,
+		int status) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return countByG_L_LikeN_S(groupId, layoutPageTemplateCollectionId,
-				name, status);
+			return countByG_L_LikeN_S(
+				groupId, layoutPageTemplateCollectionId, name, status);
 		}
 
 		name = Objects.toString(name, "");
@@ -11152,7 +11769,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_L_LIKEN_S_GROUPID_2);
 
-		query.append(_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
+		query.append(
+			_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2);
 
 		boolean bindName = false;
 
@@ -11167,9 +11785,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_L_LIKEN_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -11178,8 +11796,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -11205,12 +11823,22 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_L_LIKEN_S_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
-		"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_LIKEN_S_NAME_2 = "layoutPageTemplateEntry.name LIKE ? AND ";
-	private static final String _FINDER_COLUMN_G_L_LIKEN_S_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
-	private static final String _FINDER_COLUMN_G_L_LIKEN_S_STATUS_2 = "layoutPageTemplateEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_L_LIKEN_S_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String
+		_FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
+			"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_L_LIKEN_S_NAME_2 =
+		"layoutPageTemplateEntry.name LIKE ? AND ";
+
+	private static final String _FINDER_COLUMN_G_L_LIKEN_S_NAME_3 =
+		"(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
+
+	private static final String _FINDER_COLUMN_G_L_LIKEN_S_STATUS_2 =
+		"layoutPageTemplateEntry.status = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_C_C_T;
 	private FinderPath _finderPathWithoutPaginationFindByG_C_C_T;
 	private FinderPath _finderPathCountByG_C_C_T;
@@ -11225,10 +11853,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_T(long groupId,
-		long classNameId, long classTypeId, int type) {
-		return findByG_C_C_T(groupId, classNameId, classTypeId, type,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_T(
+		long groupId, long classNameId, long classTypeId, int type) {
+
+		return findByG_C_C_T(
+			groupId, classNameId, classTypeId, type, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -11247,10 +11877,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_T(long groupId,
-		long classNameId, long classTypeId, int type, int start, int end) {
-		return findByG_C_C_T(groupId, classNameId, classTypeId, type, start,
-			end, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_T(
+		long groupId, long classNameId, long classTypeId, int type, int start,
+		int end) {
+
+		return findByG_C_C_T(
+			groupId, classNameId, classTypeId, type, start, end, null);
 	}
 
 	/**
@@ -11270,11 +11902,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_T(long groupId,
-		long classNameId, long classTypeId, int type, int start, int end,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_C_C_T(groupId, classNameId, classTypeId, type, start,
-			end, orderByComparator, true);
+	public List<LayoutPageTemplateEntry> findByG_C_C_T(
+		long groupId, long classNameId, long classTypeId, int type, int start,
+		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return findByG_C_C_T(
+			groupId, classNameId, classTypeId, type, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -11295,41 +11929,45 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_T(long groupId,
-		long classNameId, long classTypeId, int type, int start, int end,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+	public List<LayoutPageTemplateEntry> findByG_C_C_T(
+		long groupId, long classNameId, long classTypeId, int type, int start,
+		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_C_C_T;
-			finderArgs = new Object[] { groupId, classNameId, classTypeId, type };
+			finderArgs = new Object[] {groupId, classNameId, classTypeId, type};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_C_C_T;
 			finderArgs = new Object[] {
-					groupId, classNameId, classTypeId, type,
-					
-					start, end, orderByComparator
-				};
+				groupId, classNameId, classTypeId, type, start, end,
+				orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(classNameId != layoutPageTemplateEntry.getClassNameId()) ||
-							(classTypeId != layoutPageTemplateEntry.getClassTypeId()) ||
-							(type != layoutPageTemplateEntry.getType())) {
+						(classNameId !=
+							layoutPageTemplateEntry.getClassNameId()) ||
+						(classTypeId !=
+							layoutPageTemplateEntry.getClassTypeId()) ||
+						(type != layoutPageTemplateEntry.getType())) {
+
 						list = null;
 
 						break;
@@ -11342,8 +11980,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					6 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -11360,11 +11998,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_C_C_T_TYPE_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -11388,16 +12025,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(type);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -11429,12 +12066,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_T_First(long groupId,
-		long classNameId, long classTypeId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_T_First(
+			long groupId, long classNameId, long classTypeId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_T_First(groupId,
-				classNameId, classTypeId, type, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_T_First(
+			groupId, classNameId, classTypeId, type, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -11472,11 +12110,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_T_First(long groupId,
-		long classNameId, long classTypeId, int type,
+	public LayoutPageTemplateEntry fetchByG_C_C_T_First(
+		long groupId, long classNameId, long classTypeId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_C_C_T(groupId,
-				classNameId, classTypeId, type, 0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_C_C_T(
+			groupId, classNameId, classTypeId, type, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -11497,12 +12136,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_T_Last(long groupId,
-		long classNameId, long classTypeId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_T_Last(
+			long groupId, long classNameId, long classTypeId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_T_Last(groupId,
-				classNameId, classTypeId, type, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_T_Last(
+			groupId, classNameId, classTypeId, type, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -11540,18 +12180,19 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_T_Last(long groupId,
-		long classNameId, long classTypeId, int type,
+	public LayoutPageTemplateEntry fetchByG_C_C_T_Last(
+		long groupId, long classNameId, long classTypeId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByG_C_C_T(groupId, classNameId, classTypeId, type);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_C_C_T(groupId,
-				classNameId, classTypeId, type, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_C_C_T(
+			groupId, classNameId, classTypeId, type, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -11574,28 +12215,31 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_C_C_T_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_C_C_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					type, orderByComparator, true);
+			array[0] = getByG_C_C_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, type, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_C_C_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					type, orderByComparator, false);
+			array[2] = getByG_C_C_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, type, orderByComparator, false);
 
 			return array;
 		}
@@ -11612,11 +12256,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long classNameId, long classTypeId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -11634,7 +12279,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_T_TYPE_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -11710,8 +12356,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(type);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -11736,10 +12384,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T(long groupId,
-		long classNameId, long classTypeId, int type) {
-		return filterFindByG_C_C_T(groupId, classNameId, classTypeId, type,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T(
+		long groupId, long classNameId, long classTypeId, int type) {
+
+		return filterFindByG_C_C_T(
+			groupId, classNameId, classTypeId, type, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -11758,10 +12408,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T(long groupId,
-		long classNameId, long classTypeId, int type, int start, int end) {
-		return filterFindByG_C_C_T(groupId, classNameId, classTypeId, type,
-			start, end, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T(
+		long groupId, long classNameId, long classTypeId, int type, int start,
+		int end) {
+
+		return filterFindByG_C_C_T(
+			groupId, classNameId, classTypeId, type, start, end, null);
 	}
 
 	/**
@@ -11781,19 +12433,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T(long groupId,
-		long classNameId, long classTypeId, int type, int start, int end,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T(
+		long groupId, long classNameId, long classTypeId, int type, int start,
+		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_T(groupId, classNameId, classTypeId, type,
-				start, end, orderByComparator);
+			return findByG_C_C_T(
+				groupId, classNameId, classTypeId, type, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -11803,7 +12457,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_T_GROUPID_2);
@@ -11815,17 +12470,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_T_TYPE_2_SQL);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -11837,9 +12493,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -11849,12 +12505,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -11867,8 +12523,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(type);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -11892,33 +12548,37 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_C_C_T_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_T_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, classNameId, classTypeId, type, orderByComparator);
+			return findByG_C_C_T_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, classNameId, classTypeId,
+				type, orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_C_C_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					type, orderByComparator, true);
+			array[0] = filterGetByG_C_C_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, type, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_C_C_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					type, orderByComparator, false);
+			array[2] = filterGetByG_C_C_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, type, orderByComparator, false);
 
 			return array;
 		}
@@ -11935,11 +12595,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long classNameId, long classTypeId, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(8 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -11950,7 +12611,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_T_GROUPID_2);
@@ -11962,11 +12624,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_T_TYPE_2_SQL);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -11974,12 +12638,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -12006,12 +12674,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -12041,9 +12711,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -12051,10 +12721,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -12068,8 +12740,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(type);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -12093,11 +12767,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param type the type
 	 */
 	@Override
-	public void removeByG_C_C_T(long groupId, long classNameId,
-		long classTypeId, int type) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_C_C_T(
-				groupId, classNameId, classTypeId, type, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+	public void removeByG_C_C_T(
+		long groupId, long classNameId, long classTypeId, int type) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_C_C_T(
+					groupId, classNameId, classTypeId, type, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -12112,13 +12789,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_C_C_T(long groupId, long classNameId, long classTypeId,
-		int type) {
+	public int countByG_C_C_T(
+		long groupId, long classNameId, long classTypeId, int type) {
+
 		FinderPath finderPath = _finderPathCountByG_C_C_T;
 
 		Object[] finderArgs = new Object[] {
-				groupId, classNameId, classTypeId, type
-			};
+			groupId, classNameId, classTypeId, type
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -12181,8 +12859,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_C_C_T(long groupId, long classNameId,
-		long classTypeId, int type) {
+	public int filterCountByG_C_C_T(
+		long groupId, long classNameId, long classTypeId, int type) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_C_C_T(groupId, classNameId, classTypeId, type);
 		}
@@ -12199,9 +12878,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_C_C_T_TYPE_2_SQL);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -12210,8 +12889,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -12235,11 +12914,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_C_C_T_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_T_CLASSNAMEID_2 = "layoutPageTemplateEntry.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_T_CLASSTYPEID_2 = "layoutPageTemplateEntry.classTypeId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_T_TYPE_2 = "layoutPageTemplateEntry.type = ?";
-	private static final String _FINDER_COLUMN_G_C_C_T_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ?";
+	private static final String _FINDER_COLUMN_G_C_C_T_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_T_CLASSNAMEID_2 =
+		"layoutPageTemplateEntry.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_T_CLASSTYPEID_2 =
+		"layoutPageTemplateEntry.classTypeId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_T_TYPE_2 =
+		"layoutPageTemplateEntry.type = ?";
+
+	private static final String _FINDER_COLUMN_G_C_C_T_TYPE_2_SQL =
+		"layoutPageTemplateEntry.type_ = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_C_C_D;
 	private FinderPath _finderPathWithoutPaginationFindByG_C_C_D;
 	private FinderPath _finderPathCountByG_C_C_D;
@@ -12254,10 +12943,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_D(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate) {
-		return findByG_C_C_D(groupId, classNameId, classTypeId,
-			defaultTemplate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_D(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate) {
+
+		return findByG_C_C_D(
+			groupId, classNameId, classTypeId, defaultTemplate,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -12276,11 +12968,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_D(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate, int start,
-		int end) {
-		return findByG_C_C_D(groupId, classNameId, classTypeId,
-			defaultTemplate, start, end, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_D(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int start, int end) {
+
+		return findByG_C_C_D(
+			groupId, classNameId, classTypeId, defaultTemplate, start, end,
+			null);
 	}
 
 	/**
@@ -12300,11 +12994,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_D(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_C_C_D(groupId, classNameId, classTypeId,
-			defaultTemplate, start, end, orderByComparator, true);
+	public List<LayoutPageTemplateEntry> findByG_C_C_D(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return findByG_C_C_D(
+			groupId, classNameId, classTypeId, defaultTemplate, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -12325,43 +13022,49 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_D(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+	public List<LayoutPageTemplateEntry> findByG_C_C_D(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_C_C_D;
 			finderArgs = new Object[] {
-					groupId, classNameId, classTypeId, defaultTemplate
-				};
+				groupId, classNameId, classTypeId, defaultTemplate
+			};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_C_C_D;
 			finderArgs = new Object[] {
-					groupId, classNameId, classTypeId, defaultTemplate,
-					
-					start, end, orderByComparator
-				};
+				groupId, classNameId, classTypeId, defaultTemplate, start, end,
+				orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(classNameId != layoutPageTemplateEntry.getClassNameId()) ||
-							(classTypeId != layoutPageTemplateEntry.getClassTypeId()) ||
-							(defaultTemplate != layoutPageTemplateEntry.isDefaultTemplate())) {
+						(classNameId !=
+							layoutPageTemplateEntry.getClassNameId()) ||
+						(classTypeId !=
+							layoutPageTemplateEntry.getClassTypeId()) ||
+						(defaultTemplate !=
+							layoutPageTemplateEntry.isDefaultTemplate())) {
+
 						list = null;
 
 						break;
@@ -12374,8 +13077,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					6 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -12392,11 +13095,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_C_C_D_DEFAULTTEMPLATE_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -12420,16 +13122,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(defaultTemplate);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -12461,12 +13163,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_D_First(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_D_First(
+			long groupId, long classNameId, long classTypeId,
+			boolean defaultTemplate,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_D_First(groupId,
-				classNameId, classTypeId, defaultTemplate, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_D_First(
+			groupId, classNameId, classTypeId, defaultTemplate,
+			orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -12504,12 +13209,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_D_First(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
+	public LayoutPageTemplateEntry fetchByG_C_C_D_First(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_C_C_D(groupId,
-				classNameId, classTypeId, defaultTemplate, 0, 1,
-				orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_C_C_D(
+			groupId, classNameId, classTypeId, defaultTemplate, 0, 1,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -12530,12 +13237,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_D_Last(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_D_Last(
+			long groupId, long classNameId, long classTypeId,
+			boolean defaultTemplate,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_D_Last(groupId,
-				classNameId, classTypeId, defaultTemplate, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_D_Last(
+			groupId, classNameId, classTypeId, defaultTemplate,
+			orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -12573,19 +13283,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_D_Last(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
+	public LayoutPageTemplateEntry fetchByG_C_C_D_Last(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		int count = countByG_C_C_D(groupId, classNameId, classTypeId,
-				defaultTemplate);
+
+		int count = countByG_C_C_D(
+			groupId, classNameId, classTypeId, defaultTemplate);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_C_C_D(groupId,
-				classNameId, classTypeId, defaultTemplate, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_C_C_D(
+			groupId, classNameId, classTypeId, defaultTemplate, count - 1,
+			count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -12608,28 +13320,31 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_C_C_D_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, boolean defaultTemplate,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, boolean defaultTemplate,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_C_C_D_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					defaultTemplate, orderByComparator, true);
+			array[0] = getByG_C_C_D_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, defaultTemplate, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_C_C_D_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					defaultTemplate, orderByComparator, false);
+			array[2] = getByG_C_C_D_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, defaultTemplate, orderByComparator, false);
 
 			return array;
 		}
@@ -12647,11 +13362,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		boolean defaultTemplate,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -12669,7 +13385,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_D_DEFAULTTEMPLATE_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -12745,8 +13462,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(defaultTemplate);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -12771,10 +13490,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate) {
-		return filterFindByG_C_C_D(groupId, classNameId, classTypeId,
-			defaultTemplate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate) {
+
+		return filterFindByG_C_C_D(
+			groupId, classNameId, classTypeId, defaultTemplate,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -12793,11 +13515,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate, int start,
-		int end) {
-		return filterFindByG_C_C_D(groupId, classNameId, classTypeId,
-			defaultTemplate, start, end, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int start, int end) {
+
+		return filterFindByG_C_C_D(
+			groupId, classNameId, classTypeId, defaultTemplate, start, end,
+			null);
 	}
 
 	/**
@@ -12817,19 +13541,22 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_D(groupId, classNameId, classTypeId,
-				defaultTemplate, start, end, orderByComparator);
+			return findByG_C_C_D(
+				groupId, classNameId, classTypeId, defaultTemplate, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -12839,7 +13566,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_D_GROUPID_2);
@@ -12851,17 +13579,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_D_DEFAULTTEMPLATE_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -12873,9 +13602,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -12885,12 +13614,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -12903,8 +13632,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(defaultTemplate);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -12928,34 +13657,37 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_C_C_D_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, boolean defaultTemplate,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, boolean defaultTemplate,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_D_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, classNameId, classTypeId, defaultTemplate,
-				orderByComparator);
+			return findByG_C_C_D_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, classNameId, classTypeId,
+				defaultTemplate, orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_C_C_D_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					defaultTemplate, orderByComparator, true);
+			array[0] = filterGetByG_C_C_D_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, defaultTemplate, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_C_C_D_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					defaultTemplate, orderByComparator, false);
+			array[2] = filterGetByG_C_C_D_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, defaultTemplate, orderByComparator, false);
 
 			return array;
 		}
@@ -12973,11 +13705,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		boolean defaultTemplate,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(8 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -12988,7 +13721,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_D_GROUPID_2);
@@ -13000,11 +13734,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_D_DEFAULTTEMPLATE_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -13012,12 +13748,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -13044,12 +13784,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -13079,9 +13821,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -13089,10 +13831,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -13106,8 +13850,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(defaultTemplate);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -13131,11 +13877,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param defaultTemplate the default template
 	 */
 	@Override
-	public void removeByG_C_C_D(long groupId, long classNameId,
-		long classTypeId, boolean defaultTemplate) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_C_C_D(
-				groupId, classNameId, classTypeId, defaultTemplate,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByG_C_C_D(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_C_C_D(
+					groupId, classNameId, classTypeId, defaultTemplate,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -13150,13 +13900,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_C_C_D(long groupId, long classNameId, long classTypeId,
+	public int countByG_C_C_D(
+		long groupId, long classNameId, long classTypeId,
 		boolean defaultTemplate) {
+
 		FinderPath finderPath = _finderPathCountByG_C_C_D;
 
 		Object[] finderArgs = new Object[] {
-				groupId, classNameId, classTypeId, defaultTemplate
-			};
+			groupId, classNameId, classTypeId, defaultTemplate
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -13219,11 +13971,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_C_C_D(long groupId, long classNameId,
-		long classTypeId, boolean defaultTemplate) {
+	public int filterCountByG_C_C_D(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return countByG_C_C_D(groupId, classNameId, classTypeId,
-				defaultTemplate);
+			return countByG_C_C_D(
+				groupId, classNameId, classTypeId, defaultTemplate);
 		}
 
 		StringBundler query = new StringBundler(5);
@@ -13238,9 +13992,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_C_C_D_DEFAULTTEMPLATE_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -13249,8 +14003,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -13274,10 +14028,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_C_C_D_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_D_CLASSNAMEID_2 = "layoutPageTemplateEntry.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_D_CLASSTYPEID_2 = "layoutPageTemplateEntry.classTypeId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_D_DEFAULTTEMPLATE_2 = "layoutPageTemplateEntry.defaultTemplate = ?";
+	private static final String _FINDER_COLUMN_G_C_C_D_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_D_CLASSNAMEID_2 =
+		"layoutPageTemplateEntry.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_D_CLASSTYPEID_2 =
+		"layoutPageTemplateEntry.classTypeId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_D_DEFAULTTEMPLATE_2 =
+		"layoutPageTemplateEntry.defaultTemplate = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_C_T_D;
 	private FinderPath _finderPathWithoutPaginationFindByG_C_T_D;
 	private FinderPath _finderPathCountByG_C_T_D;
@@ -13292,10 +14054,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_T_D(long groupId,
-		long classNameId, int type, boolean defaultTemplate) {
-		return findByG_C_T_D(groupId, classNameId, type, defaultTemplate,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_C_T_D(
+		long groupId, long classNameId, int type, boolean defaultTemplate) {
+
+		return findByG_C_T_D(
+			groupId, classNameId, type, defaultTemplate, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -13314,10 +14078,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_T_D(long groupId,
-		long classNameId, int type, boolean defaultTemplate, int start, int end) {
-		return findByG_C_T_D(groupId, classNameId, type, defaultTemplate,
-			start, end, null);
+	public List<LayoutPageTemplateEntry> findByG_C_T_D(
+		long groupId, long classNameId, int type, boolean defaultTemplate,
+		int start, int end) {
+
+		return findByG_C_T_D(
+			groupId, classNameId, type, defaultTemplate, start, end, null);
 	}
 
 	/**
@@ -13337,11 +14103,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_T_D(long groupId,
-		long classNameId, int type, boolean defaultTemplate, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_C_T_D(groupId, classNameId, type, defaultTemplate,
-			start, end, orderByComparator, true);
+	public List<LayoutPageTemplateEntry> findByG_C_T_D(
+		long groupId, long classNameId, int type, boolean defaultTemplate,
+		int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return findByG_C_T_D(
+			groupId, classNameId, type, defaultTemplate, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -13362,43 +14131,48 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_T_D(long groupId,
-		long classNameId, int type, boolean defaultTemplate, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+	public List<LayoutPageTemplateEntry> findByG_C_T_D(
+		long groupId, long classNameId, int type, boolean defaultTemplate,
+		int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_C_T_D;
 			finderArgs = new Object[] {
-					groupId, classNameId, type, defaultTemplate
-				};
+				groupId, classNameId, type, defaultTemplate
+			};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_C_T_D;
 			finderArgs = new Object[] {
-					groupId, classNameId, type, defaultTemplate,
-					
-					start, end, orderByComparator
-				};
+				groupId, classNameId, type, defaultTemplate, start, end,
+				orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(classNameId != layoutPageTemplateEntry.getClassNameId()) ||
-							(type != layoutPageTemplateEntry.getType()) ||
-							(defaultTemplate != layoutPageTemplateEntry.isDefaultTemplate())) {
+						(classNameId !=
+							layoutPageTemplateEntry.getClassNameId()) ||
+						(type != layoutPageTemplateEntry.getType()) ||
+						(defaultTemplate !=
+							layoutPageTemplateEntry.isDefaultTemplate())) {
+
 						list = null;
 
 						break;
@@ -13411,8 +14185,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					6 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -13429,11 +14203,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_C_T_D_DEFAULTTEMPLATE_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -13457,16 +14230,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(defaultTemplate);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -13498,12 +14271,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_T_D_First(long groupId,
-		long classNameId, int type, boolean defaultTemplate,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_T_D_First(
+			long groupId, long classNameId, int type, boolean defaultTemplate,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_T_D_First(groupId,
-				classNameId, type, defaultTemplate, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_T_D_First(
+			groupId, classNameId, type, defaultTemplate, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -13541,11 +14315,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_T_D_First(long groupId,
-		long classNameId, int type, boolean defaultTemplate,
+	public LayoutPageTemplateEntry fetchByG_C_T_D_First(
+		long groupId, long classNameId, int type, boolean defaultTemplate,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_C_T_D(groupId,
-				classNameId, type, defaultTemplate, 0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_C_T_D(
+			groupId, classNameId, type, defaultTemplate, 0, 1,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -13566,12 +14342,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_T_D_Last(long groupId,
-		long classNameId, int type, boolean defaultTemplate,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_T_D_Last(
+			long groupId, long classNameId, int type, boolean defaultTemplate,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_T_D_Last(groupId,
-				classNameId, type, defaultTemplate, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_T_D_Last(
+			groupId, classNameId, type, defaultTemplate, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -13609,18 +14386,19 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_T_D_Last(long groupId,
-		long classNameId, int type, boolean defaultTemplate,
+	public LayoutPageTemplateEntry fetchByG_C_T_D_Last(
+		long groupId, long classNameId, int type, boolean defaultTemplate,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByG_C_T_D(groupId, classNameId, type, defaultTemplate);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_C_T_D(groupId,
-				classNameId, type, defaultTemplate, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_C_T_D(
+			groupId, classNameId, type, defaultTemplate, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -13643,28 +14421,31 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_C_T_D_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		int type, boolean defaultTemplate,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			int type, boolean defaultTemplate,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_C_T_D_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, type,
-					defaultTemplate, orderByComparator, true);
+			array[0] = getByG_C_T_D_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId, type,
+				defaultTemplate, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_C_T_D_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, type,
-					defaultTemplate, orderByComparator, false);
+			array[2] = getByG_C_T_D_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId, type,
+				defaultTemplate, orderByComparator, false);
 
 			return array;
 		}
@@ -13681,11 +14462,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long classNameId, int type, boolean defaultTemplate,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -13703,7 +14485,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_T_D_DEFAULTTEMPLATE_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -13779,8 +14562,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(defaultTemplate);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -13805,10 +14590,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_T_D(long groupId,
-		long classNameId, int type, boolean defaultTemplate) {
-		return filterFindByG_C_T_D(groupId, classNameId, type, defaultTemplate,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_C_T_D(
+		long groupId, long classNameId, int type, boolean defaultTemplate) {
+
+		return filterFindByG_C_T_D(
+			groupId, classNameId, type, defaultTemplate, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -13827,10 +14614,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_T_D(long groupId,
-		long classNameId, int type, boolean defaultTemplate, int start, int end) {
-		return filterFindByG_C_T_D(groupId, classNameId, type, defaultTemplate,
-			start, end, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_C_T_D(
+		long groupId, long classNameId, int type, boolean defaultTemplate,
+		int start, int end) {
+
+		return filterFindByG_C_T_D(
+			groupId, classNameId, type, defaultTemplate, start, end, null);
 	}
 
 	/**
@@ -13850,19 +14639,22 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_T_D(long groupId,
-		long classNameId, int type, boolean defaultTemplate, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+	public List<LayoutPageTemplateEntry> filterFindByG_C_T_D(
+		long groupId, long classNameId, int type, boolean defaultTemplate,
+		int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_T_D(groupId, classNameId, type, defaultTemplate,
-				start, end, orderByComparator);
+			return findByG_C_T_D(
+				groupId, classNameId, type, defaultTemplate, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -13872,7 +14664,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_T_D_GROUPID_2);
@@ -13884,17 +14677,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_T_D_DEFAULTTEMPLATE_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -13906,9 +14700,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -13918,12 +14712,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -13936,8 +14730,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(defaultTemplate);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -13961,33 +14755,37 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_C_T_D_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		int type, boolean defaultTemplate,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			int type, boolean defaultTemplate,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_T_D_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, classNameId, type, defaultTemplate, orderByComparator);
+			return findByG_C_T_D_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, classNameId, type,
+				defaultTemplate, orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_C_T_D_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, type,
-					defaultTemplate, orderByComparator, true);
+			array[0] = filterGetByG_C_T_D_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId, type,
+				defaultTemplate, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_C_T_D_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, type,
-					defaultTemplate, orderByComparator, false);
+			array[2] = filterGetByG_C_T_D_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId, type,
+				defaultTemplate, orderByComparator, false);
 
 			return array;
 		}
@@ -14004,11 +14802,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long classNameId, int type, boolean defaultTemplate,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(8 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -14019,7 +14818,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_T_D_GROUPID_2);
@@ -14031,11 +14831,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_T_D_DEFAULTTEMPLATE_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -14043,12 +14845,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -14075,12 +14881,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -14110,9 +14918,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -14120,10 +14928,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -14137,8 +14947,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(defaultTemplate);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -14162,11 +14974,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param defaultTemplate the default template
 	 */
 	@Override
-	public void removeByG_C_T_D(long groupId, long classNameId, int type,
-		boolean defaultTemplate) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_C_T_D(
-				groupId, classNameId, type, defaultTemplate, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+	public void removeByG_C_T_D(
+		long groupId, long classNameId, int type, boolean defaultTemplate) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_C_T_D(
+					groupId, classNameId, type, defaultTemplate,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -14181,13 +14996,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_C_T_D(long groupId, long classNameId, int type,
-		boolean defaultTemplate) {
+	public int countByG_C_T_D(
+		long groupId, long classNameId, int type, boolean defaultTemplate) {
+
 		FinderPath finderPath = _finderPathCountByG_C_T_D;
 
 		Object[] finderArgs = new Object[] {
-				groupId, classNameId, type, defaultTemplate
-			};
+			groupId, classNameId, type, defaultTemplate
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -14250,8 +15066,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_C_T_D(long groupId, long classNameId, int type,
-		boolean defaultTemplate) {
+	public int filterCountByG_C_T_D(
+		long groupId, long classNameId, int type, boolean defaultTemplate) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_C_T_D(groupId, classNameId, type, defaultTemplate);
 		}
@@ -14268,9 +15085,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_C_T_D_DEFAULTTEMPLATE_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -14279,8 +15096,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -14304,11 +15121,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_C_T_D_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_T_D_CLASSNAMEID_2 = "layoutPageTemplateEntry.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_T_D_TYPE_2 = "layoutPageTemplateEntry.type = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_T_D_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_T_D_DEFAULTTEMPLATE_2 = "layoutPageTemplateEntry.defaultTemplate = ?";
+	private static final String _FINDER_COLUMN_G_C_T_D_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_T_D_CLASSNAMEID_2 =
+		"layoutPageTemplateEntry.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_T_D_TYPE_2 =
+		"layoutPageTemplateEntry.type = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_T_D_TYPE_2_SQL =
+		"layoutPageTemplateEntry.type_ = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_T_D_DEFAULTTEMPLATE_2 =
+		"layoutPageTemplateEntry.defaultTemplate = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_T_LikeN_S;
 	private FinderPath _finderPathWithPaginationCountByG_T_LikeN_S;
 
@@ -14322,10 +15149,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_LikeN_S(long groupId,
-		String name, int type, int status) {
-		return findByG_T_LikeN_S(groupId, name, type, status,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_T_LikeN_S(
+		long groupId, String name, int type, int status) {
+
+		return findByG_T_LikeN_S(
+			groupId, name, type, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -14344,8 +15173,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_LikeN_S(long groupId,
-		String name, int type, int status, int start, int end) {
+	public List<LayoutPageTemplateEntry> findByG_T_LikeN_S(
+		long groupId, String name, int type, int status, int start, int end) {
+
 		return findByG_T_LikeN_S(groupId, name, type, status, start, end, null);
 	}
 
@@ -14366,11 +15196,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_LikeN_S(long groupId,
-		String name, int type, int status, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_T_LikeN_S(
+		long groupId, String name, int type, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_T_LikeN_S(groupId, name, type, status, start, end,
-			orderByComparator, true);
+
+		return findByG_T_LikeN_S(
+			groupId, name, type, status, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -14391,10 +15222,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_T_LikeN_S(long groupId,
-		String name, int type, int status, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_T_LikeN_S(
+		long groupId, String name, int type, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		name = Objects.toString(name, "");
 
 		boolean pagination = true;
@@ -14403,25 +15235,24 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		finderPath = _finderPathWithPaginationFindByG_T_LikeN_S;
 		finderArgs = new Object[] {
-				groupId, name, type, status,
-				
-				start, end, orderByComparator
-			};
+			groupId, name, type, status, start, end, orderByComparator
+		};
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							!StringUtil.wildcardMatches(
-								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', true) ||
-							(type != layoutPageTemplateEntry.getType()) ||
-							(status != layoutPageTemplateEntry.getStatus())) {
+						!StringUtil.wildcardMatches(
+							layoutPageTemplateEntry.getName(), name, '_', '%',
+							'\\', true) ||
+						(type != layoutPageTemplateEntry.getType()) ||
+						(status != layoutPageTemplateEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -14434,8 +15265,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					6 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -14461,11 +15292,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_T_LIKEN_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -14491,16 +15321,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -14532,12 +15362,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_T_LikeN_S_First(long groupId,
-		String name, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_T_LikeN_S_First(
+			long groupId, String name, int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_LikeN_S_First(groupId,
-				name, type, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_T_LikeN_S_First(
+				groupId, name, type, status, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -14575,11 +15407,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_T_LikeN_S_First(long groupId,
-		String name, int type, int status,
+	public LayoutPageTemplateEntry fetchByG_T_LikeN_S_First(
+		long groupId, String name, int type, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_T_LikeN_S(groupId, name,
-				type, status, 0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_T_LikeN_S(
+			groupId, name, type, status, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -14600,12 +15433,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_T_LikeN_S_Last(long groupId,
-		String name, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_T_LikeN_S_Last(
+			long groupId, String name, int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_T_LikeN_S_Last(groupId,
-				name, type, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_T_LikeN_S_Last(
+				groupId, name, type, status, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -14643,17 +15478,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_T_LikeN_S_Last(long groupId,
-		String name, int type, int status,
+	public LayoutPageTemplateEntry fetchByG_T_LikeN_S_Last(
+		long groupId, String name, int type, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		int count = countByG_T_LikeN_S(groupId, name, type, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_T_LikeN_S(groupId, name,
-				type, status, count - 1, count, orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_T_LikeN_S(
+			groupId, name, type, status, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -14676,29 +15512,33 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_T_LikeN_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, String name, int type,
-		int status, OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, String name, int type,
+			int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_T_LikeN_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, name, type, status,
-					orderByComparator, true);
+			array[0] = getByG_T_LikeN_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, name, type, status,
+				orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_T_LikeN_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, name, type, status,
-					orderByComparator, false);
+			array[2] = getByG_T_LikeN_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, name, type, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -14715,11 +15555,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, String name, int type, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -14746,7 +15587,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_LIKEN_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -14824,8 +15666,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -14850,10 +15694,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN_S(long groupId,
-		String name, int type, int status) {
-		return filterFindByG_T_LikeN_S(groupId, name, type, status,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN_S(
+		long groupId, String name, int type, int status) {
+
+		return filterFindByG_T_LikeN_S(
+			groupId, name, type, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
 	}
 
 	/**
@@ -14872,10 +15718,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN_S(long groupId,
-		String name, int type, int status, int start, int end) {
-		return filterFindByG_T_LikeN_S(groupId, name, type, status, start, end,
-			null);
+	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN_S(
+		long groupId, String name, int type, int status, int start, int end) {
+
+		return filterFindByG_T_LikeN_S(
+			groupId, name, type, status, start, end, null);
 	}
 
 	/**
@@ -14895,12 +15742,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN_S(long groupId,
-		String name, int type, int status, int start, int end,
+	public List<LayoutPageTemplateEntry> filterFindByG_T_LikeN_S(
+		long groupId, String name, int type, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_T_LikeN_S(groupId, name, type, status, start, end,
-				orderByComparator);
+			return findByG_T_LikeN_S(
+				groupId, name, type, status, start, end, orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
@@ -14908,8 +15756,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				6 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(7);
@@ -14919,7 +15767,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_T_LIKEN_S_GROUPID_2);
@@ -14940,17 +15789,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_LIKEN_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -14962,9 +15812,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -14974,12 +15824,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -14994,8 +15844,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(status);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -15019,34 +15869,39 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_T_LikeN_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, String name, int type,
-		int status, OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, String name, int type,
+			int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_T_LikeN_S_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, name, type, status, orderByComparator);
+			return findByG_T_LikeN_S_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, name, type, status,
+				orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_T_LikeN_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, name, type, status,
-					orderByComparator, true);
+			array[0] = filterGetByG_T_LikeN_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, name, type, status,
+				orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_T_LikeN_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, name, type, status,
-					orderByComparator, false);
+			array[2] = filterGetByG_T_LikeN_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, name, type, status,
+				orderByComparator, false);
 
 			return array;
 		}
@@ -15063,11 +15918,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, String name, int type, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(8 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -15078,7 +15934,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_T_LIKEN_S_GROUPID_2);
@@ -15099,11 +15956,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_T_LIKEN_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -15111,12 +15970,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -15143,12 +16006,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -15178,9 +16043,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -15188,10 +16053,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -15207,8 +16074,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -15232,11 +16101,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_T_LikeN_S(long groupId, String name, int type,
-		int status) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_T_LikeN_S(
-				groupId, name, type, status, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+	public void removeByG_T_LikeN_S(
+		long groupId, String name, int type, int status) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_T_LikeN_S(
+					groupId, name, type, status, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -15251,13 +16123,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_T_LikeN_S(long groupId, String name, int type,
-		int status) {
+	public int countByG_T_LikeN_S(
+		long groupId, String name, int type, int status) {
+
 		name = Objects.toString(name, "");
 
 		FinderPath finderPath = _finderPathWithPaginationCountByG_T_LikeN_S;
 
-		Object[] finderArgs = new Object[] { groupId, name, type, status };
+		Object[] finderArgs = new Object[] {groupId, name, type, status};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -15331,8 +16204,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_T_LikeN_S(long groupId, String name, int type,
-		int status) {
+	public int filterCountByG_T_LikeN_S(
+		long groupId, String name, int type, int status) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_T_LikeN_S(groupId, name, type, status);
 		}
@@ -15360,9 +16234,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_T_LIKEN_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -15371,8 +16245,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -15398,12 +16272,24 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_T_LIKEN_S_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_S_NAME_2 = "layoutPageTemplateEntry.name LIKE ? AND ";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_S_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_S_TYPE_2 = "layoutPageTemplateEntry.type = ? AND ";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_S_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ? AND ";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_S_STATUS_2 = "layoutPageTemplateEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_T_LIKEN_S_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_T_LIKEN_S_NAME_2 =
+		"layoutPageTemplateEntry.name LIKE ? AND ";
+
+	private static final String _FINDER_COLUMN_G_T_LIKEN_S_NAME_3 =
+		"(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
+
+	private static final String _FINDER_COLUMN_G_T_LIKEN_S_TYPE_2 =
+		"layoutPageTemplateEntry.type = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_T_LIKEN_S_TYPE_2_SQL =
+		"layoutPageTemplateEntry.type_ = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_T_LIKEN_S_STATUS_2 =
+		"layoutPageTemplateEntry.status = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_C_C_LikeN_T;
 	private FinderPath _finderPathWithPaginationCountByG_C_C_LikeN_T;
 
@@ -15418,10 +16304,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T(long groupId,
-		long classNameId, long classTypeId, String name, int type) {
-		return findByG_C_C_LikeN_T(groupId, classNameId, classTypeId, name,
-			type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T(
+		long groupId, long classNameId, long classTypeId, String name,
+		int type) {
+
+		return findByG_C_C_LikeN_T(
+			groupId, classNameId, classTypeId, name, type, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -15441,11 +16330,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T(long groupId,
-		long classNameId, long classTypeId, String name, int type, int start,
-		int end) {
-		return findByG_C_C_LikeN_T(groupId, classNameId, classTypeId, name,
-			type, start, end, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int start, int end) {
+
+		return findByG_C_C_LikeN_T(
+			groupId, classNameId, classTypeId, name, type, start, end, null);
 	}
 
 	/**
@@ -15466,11 +16356,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T(long groupId,
-		long classNameId, long classTypeId, String name, int type, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_C_C_LikeN_T(groupId, classNameId, classTypeId, name,
-			type, start, end, orderByComparator, true);
+	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return findByG_C_C_LikeN_T(
+			groupId, classNameId, classTypeId, name, type, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -15492,10 +16385,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T(long groupId,
-		long classNameId, long classTypeId, String name, int type, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		name = Objects.toString(name, "");
 
 		boolean pagination = true;
@@ -15504,26 +16399,28 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		finderPath = _finderPathWithPaginationFindByG_C_C_LikeN_T;
 		finderArgs = new Object[] {
-				groupId, classNameId, classTypeId, name, type,
-				
-				start, end, orderByComparator
-			};
+			groupId, classNameId, classTypeId, name, type, start, end,
+			orderByComparator
+		};
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(classNameId != layoutPageTemplateEntry.getClassNameId()) ||
-							(classTypeId != layoutPageTemplateEntry.getClassTypeId()) ||
-							!StringUtil.wildcardMatches(
-								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', true) ||
-							(type != layoutPageTemplateEntry.getType())) {
+						(classNameId !=
+							layoutPageTemplateEntry.getClassNameId()) ||
+						(classTypeId !=
+							layoutPageTemplateEntry.getClassTypeId()) ||
+						!StringUtil.wildcardMatches(
+							layoutPageTemplateEntry.getName(), name, '_', '%',
+							'\\', true) ||
+						(type != layoutPageTemplateEntry.getType())) {
+
 						list = null;
 
 						break;
@@ -15536,8 +16433,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(7 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					7 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(7);
@@ -15565,11 +16462,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -15597,16 +16493,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(type);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -15639,12 +16535,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_LikeN_T_First(long groupId,
-		long classNameId, long classTypeId, String name, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_LikeN_T_First(
+			long groupId, long classNameId, long classTypeId, String name,
+			int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_LikeN_T_First(groupId,
-				classNameId, classTypeId, name, type, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_C_C_LikeN_T_First(
+				groupId, classNameId, classTypeId, name, type,
+				orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -15686,11 +16586,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_LikeN_T_First(long groupId,
-		long classNameId, long classTypeId, String name, int type,
+	public LayoutPageTemplateEntry fetchByG_C_C_LikeN_T_First(
+		long groupId, long classNameId, long classTypeId, String name, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_C_C_LikeN_T(groupId,
-				classNameId, classTypeId, name, type, 0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_C_C_LikeN_T(
+			groupId, classNameId, classTypeId, name, type, 0, 1,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -15712,12 +16614,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_LikeN_T_Last(long groupId,
-		long classNameId, long classTypeId, String name, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_LikeN_T_Last(
+			long groupId, long classNameId, long classTypeId, String name,
+			int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_LikeN_T_Last(groupId,
-				classNameId, classTypeId, name, type, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_C_C_LikeN_T_Last(
+				groupId, classNameId, classTypeId, name, type,
+				orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -15759,19 +16665,20 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_LikeN_T_Last(long groupId,
-		long classNameId, long classTypeId, String name, int type,
+	public LayoutPageTemplateEntry fetchByG_C_C_LikeN_T_Last(
+		long groupId, long classNameId, long classTypeId, String name, int type,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		int count = countByG_C_C_LikeN_T(groupId, classNameId, classTypeId,
-				name, type);
+
+		int count = countByG_C_C_LikeN_T(
+			groupId, classNameId, classTypeId, name, type);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_C_C_LikeN_T(groupId,
-				classNameId, classTypeId, name, type, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_C_C_LikeN_T(
+			groupId, classNameId, classTypeId, name, type, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -15795,30 +16702,33 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_C_C_LikeN_T_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, String name, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, String name, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_C_C_LikeN_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					name, type, orderByComparator, true);
+			array[0] = getByG_C_C_LikeN_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, name, type, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_C_C_LikeN_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					name, type, orderByComparator, false);
+			array[2] = getByG_C_C_LikeN_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, name, type, orderByComparator, false);
 
 			return array;
 		}
@@ -15832,14 +16742,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 	protected LayoutPageTemplateEntry getByG_C_C_LikeN_T_PrevAndNext(
 		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
-		long groupId, long classNameId, long classTypeId, String name,
-		int type, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(8 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -15868,7 +16779,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -15948,8 +16860,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(type);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -15976,9 +16890,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public List<LayoutPageTemplateEntry> filterFindByG_C_C_LikeN_T(
-		long groupId, long classNameId, long classTypeId, String name, int type) {
-		return filterFindByG_C_C_LikeN_T(groupId, classNameId, classTypeId,
-			name, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		long groupId, long classNameId, long classTypeId, String name,
+		int type) {
+
+		return filterFindByG_C_C_LikeN_T(
+			groupId, classNameId, classTypeId, name, type, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -15999,10 +16916,11 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public List<LayoutPageTemplateEntry> filterFindByG_C_C_LikeN_T(
-		long groupId, long classNameId, long classTypeId, String name,
-		int type, int start, int end) {
-		return filterFindByG_C_C_LikeN_T(groupId, classNameId, classTypeId,
-			name, type, start, end, null);
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int start, int end) {
+
+		return filterFindByG_C_C_LikeN_T(
+			groupId, classNameId, classTypeId, name, type, start, end, null);
 	}
 
 	/**
@@ -16024,12 +16942,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public List<LayoutPageTemplateEntry> filterFindByG_C_C_LikeN_T(
-		long groupId, long classNameId, long classTypeId, String name,
-		int type, int start, int end,
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_LikeN_T(groupId, classNameId, classTypeId, name,
-				type, start, end, orderByComparator);
+			return findByG_C_C_LikeN_T(
+				groupId, classNameId, classTypeId, name, type, start, end,
+				orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
@@ -16037,8 +16957,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(8);
@@ -16048,7 +16968,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_GROUPID_2);
@@ -16071,17 +16992,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2_SQL);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -16093,9 +17015,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -16105,12 +17027,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -16127,8 +17049,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(type);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -16153,35 +17075,39 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_C_C_LikeN_T_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, String name, int type,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, String name, int type,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_LikeN_T_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, classNameId, classTypeId, name, type, orderByComparator);
+			return findByG_C_C_LikeN_T_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, classNameId, classTypeId,
+				name, type, orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_C_C_LikeN_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					name, type, orderByComparator, true);
+			array[0] = filterGetByG_C_C_LikeN_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, name, type, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_C_C_LikeN_T_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					name, type, orderByComparator, false);
+			array[2] = filterGetByG_C_C_LikeN_T_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, name, type, orderByComparator, false);
 
 			return array;
 		}
@@ -16195,14 +17121,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 	protected LayoutPageTemplateEntry filterGetByG_C_C_LikeN_T_PrevAndNext(
 		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
-		long groupId, long classNameId, long classTypeId, String name,
-		int type, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(9 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				9 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -16213,7 +17140,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_GROUPID_2);
@@ -16236,11 +17164,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2_SQL);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -16248,12 +17178,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -16280,12 +17214,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -16315,9 +17251,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -16325,10 +17261,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -16346,8 +17284,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(type);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -16372,11 +17312,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param type the type
 	 */
 	@Override
-	public void removeByG_C_C_LikeN_T(long groupId, long classNameId,
-		long classTypeId, String name, int type) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_C_C_LikeN_T(
-				groupId, classNameId, classTypeId, name, type,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByG_C_C_LikeN_T(
+		long groupId, long classNameId, long classTypeId, String name,
+		int type) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_C_C_LikeN_T(
+					groupId, classNameId, classTypeId, name, type,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -16392,15 +17336,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_C_C_LikeN_T(long groupId, long classNameId,
-		long classTypeId, String name, int type) {
+	public int countByG_C_C_LikeN_T(
+		long groupId, long classNameId, long classTypeId, String name,
+		int type) {
+
 		name = Objects.toString(name, "");
 
 		FinderPath finderPath = _finderPathWithPaginationCountByG_C_C_LikeN_T;
 
 		Object[] finderArgs = new Object[] {
-				groupId, classNameId, classTypeId, name, type
-			};
+			groupId, classNameId, classTypeId, name, type
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -16479,11 +17425,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_C_C_LikeN_T(long groupId, long classNameId,
-		long classTypeId, String name, int type) {
+	public int filterCountByG_C_C_LikeN_T(
+		long groupId, long classNameId, long classTypeId, String name,
+		int type) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return countByG_C_C_LikeN_T(groupId, classNameId, classTypeId,
-				name, type);
+			return countByG_C_C_LikeN_T(
+				groupId, classNameId, classTypeId, name, type);
 		}
 
 		name = Objects.toString(name, "");
@@ -16511,9 +17459,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2_SQL);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -16522,8 +17470,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -16551,13 +17499,27 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_CLASSNAMEID_2 = "layoutPageTemplateEntry.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_CLASSTYPEID_2 = "layoutPageTemplateEntry.classTypeId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_NAME_2 = "layoutPageTemplateEntry.name LIKE ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2 = "layoutPageTemplateEntry.type = ?";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ?";
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_CLASSNAMEID_2 =
+		"layoutPageTemplateEntry.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_CLASSTYPEID_2 =
+		"layoutPageTemplateEntry.classTypeId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_NAME_2 =
+		"layoutPageTemplateEntry.name LIKE ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_NAME_3 =
+		"(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2 =
+		"layoutPageTemplateEntry.type = ?";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2_SQL =
+		"layoutPageTemplateEntry.type_ = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_C_C_T_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_C_C_T_S;
 	private FinderPath _finderPathCountByG_C_C_T_S;
@@ -16573,10 +17535,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_T_S(long groupId,
-		long classNameId, long classTypeId, int type, int status) {
-		return findByG_C_C_T_S(groupId, classNameId, classTypeId, type, status,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_T_S(
+		long groupId, long classNameId, long classTypeId, int type,
+		int status) {
+
+		return findByG_C_C_T_S(
+			groupId, classNameId, classTypeId, type, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -16596,11 +17561,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_T_S(long groupId,
-		long classNameId, long classTypeId, int type, int status, int start,
-		int end) {
-		return findByG_C_C_T_S(groupId, classNameId, classTypeId, type, status,
-			start, end, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_T_S(
+		long groupId, long classNameId, long classTypeId, int type, int status,
+		int start, int end) {
+
+		return findByG_C_C_T_S(
+			groupId, classNameId, classTypeId, type, status, start, end, null);
 	}
 
 	/**
@@ -16621,11 +17587,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_T_S(long groupId,
-		long classNameId, long classTypeId, int type, int status, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_C_C_T_S(groupId, classNameId, classTypeId, type, status,
-			start, end, orderByComparator, true);
+	public List<LayoutPageTemplateEntry> findByG_C_C_T_S(
+		long groupId, long classNameId, long classTypeId, int type, int status,
+		int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		return findByG_C_C_T_S(
+			groupId, classNameId, classTypeId, type, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -16647,44 +17616,49 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_T_S(long groupId,
-		long classNameId, long classTypeId, int type, int status, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
+	public List<LayoutPageTemplateEntry> findByG_C_C_T_S(
+		long groupId, long classNameId, long classTypeId, int type, int status,
+		int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_C_C_T_S;
 			finderArgs = new Object[] {
-					groupId, classNameId, classTypeId, type, status
-				};
+				groupId, classNameId, classTypeId, type, status
+			};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_C_C_T_S;
 			finderArgs = new Object[] {
-					groupId, classNameId, classTypeId, type, status,
-					
-					start, end, orderByComparator
-				};
+				groupId, classNameId, classTypeId, type, status, start, end,
+				orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(classNameId != layoutPageTemplateEntry.getClassNameId()) ||
-							(classTypeId != layoutPageTemplateEntry.getClassTypeId()) ||
-							(type != layoutPageTemplateEntry.getType()) ||
-							(status != layoutPageTemplateEntry.getStatus())) {
+						(classNameId !=
+							layoutPageTemplateEntry.getClassNameId()) ||
+						(classTypeId !=
+							layoutPageTemplateEntry.getClassTypeId()) ||
+						(type != layoutPageTemplateEntry.getType()) ||
+						(status != layoutPageTemplateEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -16697,8 +17671,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(7 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					7 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(7);
@@ -16717,11 +17691,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_C_C_T_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -16747,16 +17720,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -16789,12 +17762,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_T_S_First(long groupId,
-		long classNameId, long classTypeId, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_T_S_First(
+			long groupId, long classNameId, long classTypeId, int type,
+			int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_T_S_First(groupId,
-				classNameId, classTypeId, type, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_C_C_T_S_First(
+				groupId, classNameId, classTypeId, type, status,
+				orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -16836,11 +17813,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_T_S_First(long groupId,
-		long classNameId, long classTypeId, int type, int status,
+	public LayoutPageTemplateEntry fetchByG_C_C_T_S_First(
+		long groupId, long classNameId, long classTypeId, int type, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_C_C_T_S(groupId,
-				classNameId, classTypeId, type, status, 0, 1, orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_C_C_T_S(
+			groupId, classNameId, classTypeId, type, status, 0, 1,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -16862,12 +17841,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_T_S_Last(long groupId,
-		long classNameId, long classTypeId, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_T_S_Last(
+			long groupId, long classNameId, long classTypeId, int type,
+			int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_T_S_Last(groupId,
-				classNameId, classTypeId, type, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_T_S_Last(
+			groupId, classNameId, classTypeId, type, status, orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -16909,19 +17890,20 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_T_S_Last(long groupId,
-		long classNameId, long classTypeId, int type, int status,
+	public LayoutPageTemplateEntry fetchByG_C_C_T_S_Last(
+		long groupId, long classNameId, long classTypeId, int type, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		int count = countByG_C_C_T_S(groupId, classNameId, classTypeId, type,
-				status);
+
+		int count = countByG_C_C_T_S(
+			groupId, classNameId, classTypeId, type, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_C_C_T_S(groupId,
-				classNameId, classTypeId, type, status, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_C_C_T_S(
+			groupId, classNameId, classTypeId, type, status, count - 1, count,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -16945,28 +17927,31 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_C_C_T_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_C_C_T_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					type, status, orderByComparator, true);
+			array[0] = getByG_C_C_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, type, status, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_C_C_T_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					type, status, orderByComparator, false);
+			array[2] = getByG_C_C_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, type, status, orderByComparator, false);
 
 			return array;
 		}
@@ -16983,11 +17968,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long classNameId, long classTypeId, int type, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(8 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -17007,7 +17993,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_T_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -17085,8 +18072,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -17112,10 +18101,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T_S(long groupId,
-		long classNameId, long classTypeId, int type, int status) {
-		return filterFindByG_C_C_T_S(groupId, classNameId, classTypeId, type,
-			status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T_S(
+		long groupId, long classNameId, long classTypeId, int type,
+		int status) {
+
+		return filterFindByG_C_C_T_S(
+			groupId, classNameId, classTypeId, type, status, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -17135,11 +18127,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T_S(long groupId,
-		long classNameId, long classTypeId, int type, int status, int start,
-		int end) {
-		return filterFindByG_C_C_T_S(groupId, classNameId, classTypeId, type,
-			status, start, end, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T_S(
+		long groupId, long classNameId, long classTypeId, int type, int status,
+		int start, int end) {
+
+		return filterFindByG_C_C_T_S(
+			groupId, classNameId, classTypeId, type, status, start, end, null);
 	}
 
 	/**
@@ -17160,19 +18153,22 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T_S(long groupId,
-		long classNameId, long classTypeId, int type, int status, int start,
-		int end, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_T_S(
+		long groupId, long classNameId, long classTypeId, int type, int status,
+		int start, int end,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_T_S(groupId, classNameId, classTypeId, type,
-				status, start, end, orderByComparator);
+			return findByG_C_C_T_S(
+				groupId, classNameId, classTypeId, type, status, start, end,
+				orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(8);
@@ -17182,7 +18178,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_T_S_GROUPID_2);
@@ -17196,17 +18193,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_T_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -17218,9 +18216,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -17230,12 +18228,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -17250,8 +18248,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(status);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -17276,34 +18274,37 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_C_C_T_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_T_S_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, classNameId, classTypeId, type, status,
-				orderByComparator);
+			return findByG_C_C_T_S_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, classNameId, classTypeId,
+				type, status, orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_C_C_T_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					type, status, orderByComparator, true);
+			array[0] = filterGetByG_C_C_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, type, status, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_C_C_T_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					type, status, orderByComparator, false);
+			array[2] = filterGetByG_C_C_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, type, status, orderByComparator, false);
 
 			return array;
 		}
@@ -17320,11 +18321,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		long groupId, long classNameId, long classTypeId, int type, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(9 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				9 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -17335,7 +18337,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_T_S_GROUPID_2);
@@ -17349,11 +18352,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_T_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -17361,12 +18366,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -17393,12 +18402,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -17428,9 +18439,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -17438,10 +18449,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -17457,8 +18470,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -17483,11 +18498,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_C_C_T_S(long groupId, long classNameId,
-		long classTypeId, int type, int status) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_C_C_T_S(
-				groupId, classNameId, classTypeId, type, status,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByG_C_C_T_S(
+		long groupId, long classNameId, long classTypeId, int type,
+		int status) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_C_C_T_S(
+					groupId, classNameId, classTypeId, type, status,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -17503,13 +18522,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_C_C_T_S(long groupId, long classNameId,
-		long classTypeId, int type, int status) {
+	public int countByG_C_C_T_S(
+		long groupId, long classNameId, long classTypeId, int type,
+		int status) {
+
 		FinderPath finderPath = _finderPathCountByG_C_C_T_S;
 
 		Object[] finderArgs = new Object[] {
-				groupId, classNameId, classTypeId, type, status
-			};
+			groupId, classNameId, classTypeId, type, status
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -17577,11 +18598,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_C_C_T_S(long groupId, long classNameId,
-		long classTypeId, int type, int status) {
+	public int filterCountByG_C_C_T_S(
+		long groupId, long classNameId, long classTypeId, int type,
+		int status) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return countByG_C_C_T_S(groupId, classNameId, classTypeId, type,
-				status);
+			return countByG_C_C_T_S(
+				groupId, classNameId, classTypeId, type, status);
 		}
 
 		StringBundler query = new StringBundler(6);
@@ -17598,9 +18621,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_C_C_T_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -17609,8 +18632,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -17636,12 +18659,24 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_C_C_T_S_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_T_S_CLASSNAMEID_2 = "layoutPageTemplateEntry.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_T_S_CLASSTYPEID_2 = "layoutPageTemplateEntry.classTypeId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_T_S_TYPE_2 = "layoutPageTemplateEntry.type = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_T_S_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_T_S_STATUS_2 = "layoutPageTemplateEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_C_C_T_S_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_T_S_CLASSNAMEID_2 =
+		"layoutPageTemplateEntry.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_T_S_CLASSTYPEID_2 =
+		"layoutPageTemplateEntry.classTypeId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_T_S_TYPE_2 =
+		"layoutPageTemplateEntry.type = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_T_S_TYPE_2_SQL =
+		"layoutPageTemplateEntry.type_ = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_T_S_STATUS_2 =
+		"layoutPageTemplateEntry.status = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_C_C_D_S;
 	private FinderPath _finderPathWithoutPaginationFindByG_C_C_D_S;
 	private FinderPath _finderPathCountByG_C_C_D_S;
@@ -17657,10 +18692,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_D_S(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate, int status) {
-		return findByG_C_C_D_S(groupId, classNameId, classTypeId,
-			defaultTemplate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_D_S(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status) {
+
+		return findByG_C_C_D_S(
+			groupId, classNameId, classTypeId, defaultTemplate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -17680,11 +18718,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_D_S(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		int status, int start, int end) {
-		return findByG_C_C_D_S(groupId, classNameId, classTypeId,
-			defaultTemplate, status, start, end, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_D_S(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status, int start, int end) {
+
+		return findByG_C_C_D_S(
+			groupId, classNameId, classTypeId, defaultTemplate, status, start,
+			end, null);
 	}
 
 	/**
@@ -17705,12 +18745,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_D_S(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		int status, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_C_C_D_S(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_C_C_D_S(groupId, classNameId, classTypeId,
-			defaultTemplate, status, start, end, orderByComparator, true);
+
+		return findByG_C_C_D_S(
+			groupId, classNameId, classTypeId, defaultTemplate, status, start,
+			end, orderByComparator, true);
 	}
 
 	/**
@@ -17732,45 +18774,50 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_D_S(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		int status, int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_C_C_D_S(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByG_C_C_D_S;
 			finderArgs = new Object[] {
-					groupId, classNameId, classTypeId, defaultTemplate, status
-				};
+				groupId, classNameId, classTypeId, defaultTemplate, status
+			};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByG_C_C_D_S;
 			finderArgs = new Object[] {
-					groupId, classNameId, classTypeId, defaultTemplate, status,
-					
-					start, end, orderByComparator
-				};
+				groupId, classNameId, classTypeId, defaultTemplate, status,
+				start, end, orderByComparator
+			};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(classNameId != layoutPageTemplateEntry.getClassNameId()) ||
-							(classTypeId != layoutPageTemplateEntry.getClassTypeId()) ||
-							(defaultTemplate != layoutPageTemplateEntry.isDefaultTemplate()) ||
-							(status != layoutPageTemplateEntry.getStatus())) {
+						(classNameId !=
+							layoutPageTemplateEntry.getClassNameId()) ||
+						(classTypeId !=
+							layoutPageTemplateEntry.getClassTypeId()) ||
+						(defaultTemplate !=
+							layoutPageTemplateEntry.isDefaultTemplate()) ||
+						(status != layoutPageTemplateEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -17783,8 +18830,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(7 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					7 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(7);
@@ -17803,11 +18850,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_C_C_D_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -17833,16 +18879,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -17875,12 +18921,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_D_S_First(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		int status, OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_D_S_First(
+			long groupId, long classNameId, long classTypeId,
+			boolean defaultTemplate, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_D_S_First(groupId,
-				classNameId, classTypeId, defaultTemplate, status,
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_C_C_D_S_First(
+				groupId, classNameId, classTypeId, defaultTemplate, status,
 				orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
@@ -17923,12 +18972,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_D_S_First(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		int status, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_C_C_D_S(groupId,
-				classNameId, classTypeId, defaultTemplate, status, 0, 1,
-				orderByComparator);
+	public LayoutPageTemplateEntry fetchByG_C_C_D_S_First(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		List<LayoutPageTemplateEntry> list = findByG_C_C_D_S(
+			groupId, classNameId, classTypeId, defaultTemplate, status, 0, 1,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -17950,13 +19001,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_D_S_Last(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		int status, OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_D_S_Last(
+			long groupId, long classNameId, long classTypeId,
+			boolean defaultTemplate, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_D_S_Last(groupId,
-				classNameId, classTypeId, defaultTemplate, status,
-				orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_D_S_Last(
+			groupId, classNameId, classTypeId, defaultTemplate, status,
+			orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -17998,19 +19051,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_D_S_Last(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		int status, OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		int count = countByG_C_C_D_S(groupId, classNameId, classTypeId,
-				defaultTemplate, status);
+	public LayoutPageTemplateEntry fetchByG_C_C_D_S_Last(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status,
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
+		int count = countByG_C_C_D_S(
+			groupId, classNameId, classTypeId, defaultTemplate, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_C_C_D_S(groupId,
-				classNameId, classTypeId, defaultTemplate, status, count - 1,
-				count, orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_C_C_D_S(
+			groupId, classNameId, classTypeId, defaultTemplate, status,
+			count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -18034,28 +19089,31 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_C_C_D_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, boolean defaultTemplate, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, boolean defaultTemplate, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_C_C_D_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					defaultTemplate, status, orderByComparator, true);
+			array[0] = getByG_C_C_D_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, defaultTemplate, status, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_C_C_D_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					defaultTemplate, status, orderByComparator, false);
+			array[2] = getByG_C_C_D_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, defaultTemplate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -18073,11 +19131,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		boolean defaultTemplate, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(8 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -18097,7 +19156,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_D_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -18175,8 +19235,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -18202,10 +19264,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D_S(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate, int status) {
-		return filterFindByG_C_C_D_S(groupId, classNameId, classTypeId,
-			defaultTemplate, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D_S(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status) {
+
+		return filterFindByG_C_C_D_S(
+			groupId, classNameId, classTypeId, defaultTemplate, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -18225,11 +19290,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D_S(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		int status, int start, int end) {
-		return filterFindByG_C_C_D_S(groupId, classNameId, classTypeId,
-			defaultTemplate, status, start, end, null);
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D_S(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status, int start, int end) {
+
+		return filterFindByG_C_C_D_S(
+			groupId, classNameId, classTypeId, defaultTemplate, status, start,
+			end, null);
 	}
 
 	/**
@@ -18250,20 +19317,22 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D_S(long groupId,
-		long classNameId, long classTypeId, boolean defaultTemplate,
-		int status, int start, int end,
+	public List<LayoutPageTemplateEntry> filterFindByG_C_C_D_S(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_D_S(groupId, classNameId, classTypeId,
-				defaultTemplate, status, start, end, orderByComparator);
+			return findByG_C_C_D_S(
+				groupId, classNameId, classTypeId, defaultTemplate, status,
+				start, end, orderByComparator);
 		}
 
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(7 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(8);
@@ -18273,7 +19342,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_D_S_GROUPID_2);
@@ -18287,17 +19357,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_D_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -18309,9 +19380,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -18321,12 +19392,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -18341,8 +19412,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(status);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -18367,34 +19438,37 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_C_C_D_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, boolean defaultTemplate, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, boolean defaultTemplate, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_D_S_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, classNameId, classTypeId, defaultTemplate, status,
-				orderByComparator);
+			return findByG_C_C_D_S_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, classNameId, classTypeId,
+				defaultTemplate, status, orderByComparator);
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_C_C_D_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					defaultTemplate, status, orderByComparator, true);
+			array[0] = filterGetByG_C_C_D_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, defaultTemplate, status, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_C_C_D_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					defaultTemplate, status, orderByComparator, false);
+			array[2] = filterGetByG_C_C_D_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, defaultTemplate, status, orderByComparator, false);
 
 			return array;
 		}
@@ -18412,11 +19486,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		boolean defaultTemplate, int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(9 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				9 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -18427,7 +19502,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_D_S_GROUPID_2);
@@ -18441,11 +19517,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_D_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -18453,12 +19531,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -18485,12 +19567,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -18520,9 +19604,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -18530,10 +19614,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -18549,8 +19635,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -18575,11 +19663,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_C_C_D_S(long groupId, long classNameId,
-		long classTypeId, boolean defaultTemplate, int status) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_C_C_D_S(
-				groupId, classNameId, classTypeId, defaultTemplate, status,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByG_C_C_D_S(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_C_C_D_S(
+					groupId, classNameId, classTypeId, defaultTemplate, status,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -18595,13 +19687,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_C_C_D_S(long groupId, long classNameId,
-		long classTypeId, boolean defaultTemplate, int status) {
+	public int countByG_C_C_D_S(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status) {
+
 		FinderPath finderPath = _finderPathCountByG_C_C_D_S;
 
 		Object[] finderArgs = new Object[] {
-				groupId, classNameId, classTypeId, defaultTemplate, status
-			};
+			groupId, classNameId, classTypeId, defaultTemplate, status
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -18669,11 +19763,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_C_C_D_S(long groupId, long classNameId,
-		long classTypeId, boolean defaultTemplate, int status) {
+	public int filterCountByG_C_C_D_S(
+		long groupId, long classNameId, long classTypeId,
+		boolean defaultTemplate, int status) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return countByG_C_C_D_S(groupId, classNameId, classTypeId,
-				defaultTemplate, status);
+			return countByG_C_C_D_S(
+				groupId, classNameId, classTypeId, defaultTemplate, status);
 		}
 
 		StringBundler query = new StringBundler(6);
@@ -18690,9 +19786,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_C_C_D_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -18701,8 +19797,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -18728,11 +19824,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_C_C_D_S_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_D_S_CLASSNAMEID_2 = "layoutPageTemplateEntry.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_D_S_CLASSTYPEID_2 = "layoutPageTemplateEntry.classTypeId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_D_S_DEFAULTTEMPLATE_2 = "layoutPageTemplateEntry.defaultTemplate = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_D_S_STATUS_2 = "layoutPageTemplateEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_C_C_D_S_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_D_S_CLASSNAMEID_2 =
+		"layoutPageTemplateEntry.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_D_S_CLASSTYPEID_2 =
+		"layoutPageTemplateEntry.classTypeId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_D_S_DEFAULTTEMPLATE_2 =
+		"layoutPageTemplateEntry.defaultTemplate = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_D_S_STATUS_2 =
+		"layoutPageTemplateEntry.status = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_C_C_LikeN_T_S;
 	private FinderPath _finderPathWithPaginationCountByG_C_C_LikeN_T_S;
 
@@ -18748,10 +19854,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T_S(long groupId,
-		long classNameId, long classTypeId, String name, int type, int status) {
-		return findByG_C_C_LikeN_T_S(groupId, classNameId, classTypeId, name,
-			type, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T_S(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status) {
+
+		return findByG_C_C_LikeN_T_S(
+			groupId, classNameId, classTypeId, name, type, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -18772,11 +19881,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T_S(long groupId,
-		long classNameId, long classTypeId, String name, int type, int status,
-		int start, int end) {
-		return findByG_C_C_LikeN_T_S(groupId, classNameId, classTypeId, name,
-			type, status, start, end, null);
+	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T_S(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status, int start, int end) {
+
+		return findByG_C_C_LikeN_T_S(
+			groupId, classNameId, classTypeId, name, type, status, start, end,
+			null);
 	}
 
 	/**
@@ -18798,12 +19909,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T_S(long groupId,
-		long classNameId, long classTypeId, String name, int type, int status,
-		int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T_S(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		return findByG_C_C_LikeN_T_S(groupId, classNameId, classTypeId, name,
-			type, status, start, end, orderByComparator, true);
+
+		return findByG_C_C_LikeN_T_S(
+			groupId, classNameId, classTypeId, name, type, status, start, end,
+			orderByComparator, true);
 	}
 
 	/**
@@ -18826,11 +19939,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of matching layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T_S(long groupId,
-		long classNameId, long classTypeId, String name, int type, int status,
-		int start, int end,
+	public List<LayoutPageTemplateEntry> findByG_C_C_LikeN_T_S(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		name = Objects.toString(name, "");
 
 		boolean pagination = true;
@@ -18839,27 +19953,29 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		finderPath = _finderPathWithPaginationFindByG_C_C_LikeN_T_S;
 		finderArgs = new Object[] {
-				groupId, classNameId, classTypeId, name, type, status,
-				
-				start, end, orderByComparator
-			};
+			groupId, classNameId, classTypeId, name, type, status, start, end,
+			orderByComparator
+		};
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateEntry layoutPageTemplateEntry : list) {
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
-							(classNameId != layoutPageTemplateEntry.getClassNameId()) ||
-							(classTypeId != layoutPageTemplateEntry.getClassTypeId()) ||
-							!StringUtil.wildcardMatches(
-								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', true) ||
-							(type != layoutPageTemplateEntry.getType()) ||
-							(status != layoutPageTemplateEntry.getStatus())) {
+						(classNameId !=
+							layoutPageTemplateEntry.getClassNameId()) ||
+						(classTypeId !=
+							layoutPageTemplateEntry.getClassTypeId()) ||
+						!StringUtil.wildcardMatches(
+							layoutPageTemplateEntry.getName(), name, '_', '%',
+							'\\', true) ||
+						(type != layoutPageTemplateEntry.getType()) ||
+						(status != layoutPageTemplateEntry.getStatus())) {
+
 						list = null;
 
 						break;
@@ -18872,8 +19988,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(8 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					8 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(8);
@@ -18903,11 +20019,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_S_STATUS_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -18937,16 +20052,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(status);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -18980,12 +20095,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_LikeN_T_S_First(long groupId,
-		long classNameId, long classTypeId, String name, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_LikeN_T_S_First(
+			long groupId, long classNameId, long classTypeId, String name,
+			int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_LikeN_T_S_First(groupId,
-				classNameId, classTypeId, name, type, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_C_C_LikeN_T_S_First(
+				groupId, classNameId, classTypeId, name, type, status,
+				orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -19031,12 +20150,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the first matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_LikeN_T_S_First(long groupId,
-		long classNameId, long classTypeId, String name, int type, int status,
+	public LayoutPageTemplateEntry fetchByG_C_C_LikeN_T_S_First(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		List<LayoutPageTemplateEntry> list = findByG_C_C_LikeN_T_S(groupId,
-				classNameId, classTypeId, name, type, status, 0, 1,
-				orderByComparator);
+
+		List<LayoutPageTemplateEntry> list = findByG_C_C_LikeN_T_S(
+			groupId, classNameId, classTypeId, name, type, status, 0, 1,
+			orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -19059,12 +20180,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry findByG_C_C_LikeN_T_S_Last(long groupId,
-		long classNameId, long classTypeId, String name, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+	public LayoutPageTemplateEntry findByG_C_C_LikeN_T_S_Last(
+			long groupId, long classNameId, long classTypeId, String name,
+			int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_C_C_LikeN_T_S_Last(groupId,
-				classNameId, classTypeId, name, type, status, orderByComparator);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			fetchByG_C_C_LikeN_T_S_Last(
+				groupId, classNameId, classTypeId, name, type, status,
+				orderByComparator);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry;
@@ -19110,19 +20235,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the last matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
 	 */
 	@Override
-	public LayoutPageTemplateEntry fetchByG_C_C_LikeN_T_S_Last(long groupId,
-		long classNameId, long classTypeId, String name, int type, int status,
+	public LayoutPageTemplateEntry fetchByG_C_C_LikeN_T_S_Last(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
-		int count = countByG_C_C_LikeN_T_S(groupId, classNameId, classTypeId,
-				name, type, status);
+
+		int count = countByG_C_C_LikeN_T_S(
+			groupId, classNameId, classTypeId, name, type, status);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<LayoutPageTemplateEntry> list = findByG_C_C_LikeN_T_S(groupId,
-				classNameId, classTypeId, name, type, status, count - 1, count,
-				orderByComparator);
+		List<LayoutPageTemplateEntry> list = findByG_C_C_LikeN_T_S(
+			groupId, classNameId, classTypeId, name, type, status, count - 1,
+			count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -19147,30 +20274,33 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] findByG_C_C_LikeN_T_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, String name, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, String name, int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = getByG_C_C_LikeN_T_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					name, type, status, orderByComparator, true);
+			array[0] = getByG_C_C_LikeN_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, name, type, status, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = getByG_C_C_LikeN_T_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					name, type, status, orderByComparator, false);
+			array[2] = getByG_C_C_LikeN_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, name, type, status, orderByComparator, false);
 
 			return array;
 		}
@@ -19184,15 +20314,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 	protected LayoutPageTemplateEntry getByG_C_C_LikeN_T_S_PrevAndNext(
 		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
-		long groupId, long classNameId, long classTypeId, String name,
-		int type, int status,
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(9 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				9 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -19223,7 +20354,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_S_STATUS_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -19305,8 +20437,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -19334,10 +20468,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public List<LayoutPageTemplateEntry> filterFindByG_C_C_LikeN_T_S(
-		long groupId, long classNameId, long classTypeId, String name,
-		int type, int status) {
-		return filterFindByG_C_C_LikeN_T_S(groupId, classNameId, classTypeId,
-			name, type, status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status) {
+
+		return filterFindByG_C_C_LikeN_T_S(
+			groupId, classNameId, classTypeId, name, type, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -19359,10 +20495,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public List<LayoutPageTemplateEntry> filterFindByG_C_C_LikeN_T_S(
-		long groupId, long classNameId, long classTypeId, String name,
-		int type, int status, int start, int end) {
-		return filterFindByG_C_C_LikeN_T_S(groupId, classNameId, classTypeId,
-			name, type, status, start, end, null);
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status, int start, int end) {
+
+		return filterFindByG_C_C_LikeN_T_S(
+			groupId, classNameId, classTypeId, name, type, status, start, end,
+			null);
 	}
 
 	/**
@@ -19385,12 +20523,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public List<LayoutPageTemplateEntry> filterFindByG_C_C_LikeN_T_S(
-		long groupId, long classNameId, long classTypeId, String name,
-		int type, int status, int start, int end,
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status, int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_LikeN_T_S(groupId, classNameId, classTypeId,
-				name, type, status, start, end, orderByComparator);
+			return findByG_C_C_LikeN_T_S(
+				groupId, classNameId, classTypeId, name, type, status, start,
+				end, orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
@@ -19398,8 +20538,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(8 +
-					(orderByComparator.getOrderByFields().length * 2));
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
 			query = new StringBundler(9);
@@ -19409,7 +20549,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_S_GROUPID_2);
@@ -19434,17 +20575,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
 			if (getDB().isSupportsInlineDistinct()) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
 			}
 			else {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
-					orderByComparator, true);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
 			}
 		}
 		else {
@@ -19456,9 +20598,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -19468,12 +20610,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
 			if (getDB().isSupportsInlineDistinct()) {
-				q.addEntity(_FILTER_ENTITY_ALIAS,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 			}
 			else {
-				q.addEntity(_FILTER_ENTITY_TABLE,
-					LayoutPageTemplateEntryImpl.class);
+				q.addEntity(
+					_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 			}
 
 			QueryPos qPos = QueryPos.getInstance(q);
@@ -19492,8 +20634,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			qPos.add(status);
 
-			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-				getDialect(), start, end);
+			return (List<LayoutPageTemplateEntry>)QueryUtil.list(
+				q, getDialect(), start, end);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -19519,36 +20661,39 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry[] filterFindByG_C_C_LikeN_T_S_PrevAndNext(
-		long layoutPageTemplateEntryId, long groupId, long classNameId,
-		long classTypeId, String name, int type, int status,
-		OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
+			long layoutPageTemplateEntryId, long groupId, long classNameId,
+			long classTypeId, String name, int type, int status,
+			OrderByComparator<LayoutPageTemplateEntry> orderByComparator)
 		throws NoSuchPageTemplateEntryException {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return findByG_C_C_LikeN_T_S_PrevAndNext(layoutPageTemplateEntryId,
-				groupId, classNameId, classTypeId, name, type, status,
-				orderByComparator);
+			return findByG_C_C_LikeN_T_S_PrevAndNext(
+				layoutPageTemplateEntryId, groupId, classNameId, classTypeId,
+				name, type, status, orderByComparator);
 		}
 
 		name = Objects.toString(name, "");
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(layoutPageTemplateEntryId);
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByPrimaryKey(
+			layoutPageTemplateEntryId);
 
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry[] array = new LayoutPageTemplateEntryImpl[3];
+			LayoutPageTemplateEntry[] array =
+				new LayoutPageTemplateEntryImpl[3];
 
-			array[0] = filterGetByG_C_C_LikeN_T_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					name, type, status, orderByComparator, true);
+			array[0] = filterGetByG_C_C_LikeN_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, name, type, status, orderByComparator, true);
 
 			array[1] = layoutPageTemplateEntry;
 
-			array[2] = filterGetByG_C_C_LikeN_T_S_PrevAndNext(session,
-					layoutPageTemplateEntry, groupId, classNameId, classTypeId,
-					name, type, status, orderByComparator, false);
+			array[2] = filterGetByG_C_C_LikeN_T_S_PrevAndNext(
+				session, layoutPageTemplateEntry, groupId, classNameId,
+				classTypeId, name, type, status, orderByComparator, false);
 
 			return array;
 		}
@@ -19562,16 +20707,18 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 	protected LayoutPageTemplateEntry filterGetByG_C_C_LikeN_T_S_PrevAndNext(
 		Session session, LayoutPageTemplateEntry layoutPageTemplateEntry,
-		long groupId, long classNameId, long classTypeId, String name,
-		int type, int status,
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(10 +
+			query = new StringBundler(
+				10 +
 					(orderByComparator.getOrderByConditionFields().length * 3) +
-					(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(9);
@@ -19581,7 +20728,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
 		}
 		else {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_S_GROUPID_2);
@@ -19606,11 +20754,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_S_STATUS_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
-			query.append(_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
+			query.append(
+				_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2);
 		}
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -19618,12 +20768,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByConditionFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByConditionFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
 				}
 
 				if ((i + 1) < orderByConditionFields.length) {
@@ -19650,12 +20804,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				if (getDB().isSupportsInlineDistinct()) {
-					query.append(getColumnName(_ORDER_BY_ENTITY_ALIAS,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
 				}
 				else {
-					query.append(getColumnName(_ORDER_BY_ENTITY_TABLE,
-							orderByFields[i], true));
+					query.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
 				}
 
 				if ((i + 1) < orderByFields.length) {
@@ -19685,9 +20841,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			}
 		}
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -19695,10 +20851,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		q.setMaxResults(2);
 
 		if (getDB().isSupportsInlineDistinct()) {
-			q.addEntity(_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_ALIAS, LayoutPageTemplateEntryImpl.class);
 		}
 		else {
-			q.addEntity(_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
+			q.addEntity(
+				_FILTER_ENTITY_TABLE, LayoutPageTemplateEntryImpl.class);
 		}
 
 		QueryPos qPos = QueryPos.getInstance(q);
@@ -19718,8 +20876,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(status);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					layoutPageTemplateEntry)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutPageTemplateEntry)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -19745,11 +20905,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @param status the status
 	 */
 	@Override
-	public void removeByG_C_C_LikeN_T_S(long groupId, long classNameId,
-		long classTypeId, String name, int type, int status) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : findByG_C_C_LikeN_T_S(
-				groupId, classNameId, classTypeId, name, type, status,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+	public void removeByG_C_C_LikeN_T_S(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				findByG_C_C_LikeN_T_S(
+					groupId, classNameId, classTypeId, name, type, status,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(layoutPageTemplateEntry);
 		}
 	}
@@ -19766,15 +20930,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries
 	 */
 	@Override
-	public int countByG_C_C_LikeN_T_S(long groupId, long classNameId,
-		long classTypeId, String name, int type, int status) {
+	public int countByG_C_C_LikeN_T_S(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status) {
+
 		name = Objects.toString(name, "");
 
 		FinderPath finderPath = _finderPathWithPaginationCountByG_C_C_LikeN_T_S;
 
 		Object[] finderArgs = new Object[] {
-				groupId, classNameId, classTypeId, name, type, status
-			};
+			groupId, classNameId, classTypeId, name, type, status
+		};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -19858,11 +21024,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the number of matching layout page template entries that the user has permission to view
 	 */
 	@Override
-	public int filterCountByG_C_C_LikeN_T_S(long groupId, long classNameId,
-		long classTypeId, String name, int type, int status) {
+	public int filterCountByG_C_C_LikeN_T_S(
+		long groupId, long classNameId, long classTypeId, String name, int type,
+		int status) {
+
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			return countByG_C_C_LikeN_T_S(groupId, classNameId, classTypeId,
-				name, type, status);
+			return countByG_C_C_LikeN_T_S(
+				groupId, classNameId, classTypeId, name, type, status);
 		}
 
 		name = Objects.toString(name, "");
@@ -19892,9 +21060,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		query.append(_FINDER_COLUMN_G_C_C_LIKEN_T_S_STATUS_2);
 
-		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
-				LayoutPageTemplateEntry.class.getName(),
-				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			query.toString(), LayoutPageTemplateEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
 
@@ -19903,8 +21071,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
-			q.addScalar(COUNT_COLUMN_NAME,
-				com.liferay.portal.kernel.dao.orm.Type.LONG);
+			q.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -19934,21 +21102,44 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		}
 	}
 
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_CLASSNAMEID_2 = "layoutPageTemplateEntry.classNameId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_CLASSTYPEID_2 = "layoutPageTemplateEntry.classTypeId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_NAME_2 = "layoutPageTemplateEntry.name LIKE ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_TYPE_2 = "layoutPageTemplateEntry.type = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_STATUS_2 = "layoutPageTemplateEntry.status = ?";
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_GROUPID_2 =
+		"layoutPageTemplateEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_CLASSNAMEID_2 =
+		"layoutPageTemplateEntry.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_CLASSTYPEID_2 =
+		"layoutPageTemplateEntry.classTypeId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_NAME_2 =
+		"layoutPageTemplateEntry.name LIKE ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_NAME_3 =
+		"(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_TYPE_2 =
+		"layoutPageTemplateEntry.type = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_TYPE_2_SQL =
+		"layoutPageTemplateEntry.type_ = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_STATUS_2 =
+		"layoutPageTemplateEntry.status = ?";
 
 	public LayoutPageTemplateEntryPersistenceImpl() {
 		setModelClass(LayoutPageTemplateEntry.class);
 
 		setModelImplClass(LayoutPageTemplateEntryImpl.class);
 		setModelPKClass(long.class);
-		setEntityCacheEnabled(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED);
+		setEntityCacheEnabled(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED);
+
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("type", "type_");
+
+		setDBColumnNames(dbColumnNames);
 	}
 
 	/**
@@ -19958,25 +21149,31 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void cacheResult(LayoutPageTemplateEntry layoutPageTemplateEntry) {
-		entityCache.putResult(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
 			LayoutPageTemplateEntryImpl.class,
 			layoutPageTemplateEntry.getPrimaryKey(), layoutPageTemplateEntry);
 
-		finderCache.putResult(_finderPathFetchByUUID_G,
+		finderCache.putResult(
+			_finderPathFetchByUUID_G,
 			new Object[] {
 				layoutPageTemplateEntry.getUuid(),
 				layoutPageTemplateEntry.getGroupId()
-			}, layoutPageTemplateEntry);
-
-		finderCache.putResult(_finderPathFetchByPlid,
-			new Object[] { layoutPageTemplateEntry.getPlid() },
+			},
 			layoutPageTemplateEntry);
 
-		finderCache.putResult(_finderPathFetchByG_N,
+		finderCache.putResult(
+			_finderPathFetchByPlid,
+			new Object[] {layoutPageTemplateEntry.getPlid()},
+			layoutPageTemplateEntry);
+
+		finderCache.putResult(
+			_finderPathFetchByG_N,
 			new Object[] {
 				layoutPageTemplateEntry.getGroupId(),
 				layoutPageTemplateEntry.getName()
-			}, layoutPageTemplateEntry);
+			},
+			layoutPageTemplateEntry);
 
 		layoutPageTemplateEntry.resetOriginalValues();
 	}
@@ -19989,11 +21186,15 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public void cacheResult(
 		List<LayoutPageTemplateEntry> layoutPageTemplateEntries) {
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : layoutPageTemplateEntries) {
+
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				layoutPageTemplateEntries) {
+
 			if (entityCache.getResult(
-						LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-						LayoutPageTemplateEntryImpl.class,
-						layoutPageTemplateEntry.getPrimaryKey()) == null) {
+					LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+					LayoutPageTemplateEntryImpl.class,
+					layoutPageTemplateEntry.getPrimaryKey()) == null) {
+
 				cacheResult(layoutPageTemplateEntry);
 			}
 			else {
@@ -20027,82 +21228,94 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public void clearCache(LayoutPageTemplateEntry layoutPageTemplateEntry) {
-		entityCache.removeResult(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.removeResult(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
 			LayoutPageTemplateEntryImpl.class,
 			layoutPageTemplateEntry.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		clearUniqueFindersCache((LayoutPageTemplateEntryModelImpl)layoutPageTemplateEntry,
-			true);
+		clearUniqueFindersCache(
+			(LayoutPageTemplateEntryModelImpl)layoutPageTemplateEntry, true);
 	}
 
 	@Override
 	public void clearCache(
 		List<LayoutPageTemplateEntry> layoutPageTemplateEntries) {
+
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		for (LayoutPageTemplateEntry layoutPageTemplateEntry : layoutPageTemplateEntries) {
-			entityCache.removeResult(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+		for (LayoutPageTemplateEntry layoutPageTemplateEntry :
+				layoutPageTemplateEntries) {
+
+			entityCache.removeResult(
+				LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
 				LayoutPageTemplateEntryImpl.class,
 				layoutPageTemplateEntry.getPrimaryKey());
 
-			clearUniqueFindersCache((LayoutPageTemplateEntryModelImpl)layoutPageTemplateEntry,
+			clearUniqueFindersCache(
+				(LayoutPageTemplateEntryModelImpl)layoutPageTemplateEntry,
 				true);
 		}
 	}
 
 	protected void cacheUniqueFindersCache(
 		LayoutPageTemplateEntryModelImpl layoutPageTemplateEntryModelImpl) {
+
 		Object[] args = new Object[] {
-				layoutPageTemplateEntryModelImpl.getUuid(),
-				layoutPageTemplateEntryModelImpl.getGroupId()
-			};
+			layoutPageTemplateEntryModelImpl.getUuid(),
+			layoutPageTemplateEntryModelImpl.getGroupId()
+		};
 
-		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1),
+		finderCache.putResult(
+			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByUUID_G, args, layoutPageTemplateEntryModelImpl,
 			false);
-		finderCache.putResult(_finderPathFetchByUUID_G, args,
-			layoutPageTemplateEntryModelImpl, false);
 
-		args = new Object[] { layoutPageTemplateEntryModelImpl.getPlid() };
+		args = new Object[] {layoutPageTemplateEntryModelImpl.getPlid()};
 
-		finderCache.putResult(_finderPathCountByPlid, args, Long.valueOf(1),
+		finderCache.putResult(
+			_finderPathCountByPlid, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByPlid, args, layoutPageTemplateEntryModelImpl,
 			false);
-		finderCache.putResult(_finderPathFetchByPlid, args,
-			layoutPageTemplateEntryModelImpl, false);
 
 		args = new Object[] {
-				layoutPageTemplateEntryModelImpl.getGroupId(),
-				layoutPageTemplateEntryModelImpl.getName()
-			};
+			layoutPageTemplateEntryModelImpl.getGroupId(),
+			layoutPageTemplateEntryModelImpl.getName()
+		};
 
-		finderCache.putResult(_finderPathCountByG_N, args, Long.valueOf(1),
+		finderCache.putResult(
+			_finderPathCountByG_N, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByG_N, args, layoutPageTemplateEntryModelImpl,
 			false);
-		finderCache.putResult(_finderPathFetchByG_N, args,
-			layoutPageTemplateEntryModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
 		LayoutPageTemplateEntryModelImpl layoutPageTemplateEntryModelImpl,
 		boolean clearCurrent) {
+
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					layoutPageTemplateEntryModelImpl.getUuid(),
-					layoutPageTemplateEntryModelImpl.getGroupId()
-				};
+				layoutPageTemplateEntryModelImpl.getUuid(),
+				layoutPageTemplateEntryModelImpl.getGroupId()
+			};
 
 			finderCache.removeResult(_finderPathCountByUUID_G, args);
 			finderCache.removeResult(_finderPathFetchByUUID_G, args);
 		}
 
 		if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-				_finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
+			 _finderPathFetchByUUID_G.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					layoutPageTemplateEntryModelImpl.getOriginalUuid(),
-					layoutPageTemplateEntryModelImpl.getOriginalGroupId()
-				};
+				layoutPageTemplateEntryModelImpl.getOriginalUuid(),
+				layoutPageTemplateEntryModelImpl.getOriginalGroupId()
+			};
 
 			finderCache.removeResult(_finderPathCountByUUID_G, args);
 			finderCache.removeResult(_finderPathFetchByUUID_G, args);
@@ -20110,18 +21323,19 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					layoutPageTemplateEntryModelImpl.getPlid()
-				};
+				layoutPageTemplateEntryModelImpl.getPlid()
+			};
 
 			finderCache.removeResult(_finderPathCountByPlid, args);
 			finderCache.removeResult(_finderPathFetchByPlid, args);
 		}
 
 		if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-				_finderPathFetchByPlid.getColumnBitmask()) != 0) {
+			 _finderPathFetchByPlid.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					layoutPageTemplateEntryModelImpl.getOriginalPlid()
-				};
+				layoutPageTemplateEntryModelImpl.getOriginalPlid()
+			};
 
 			finderCache.removeResult(_finderPathCountByPlid, args);
 			finderCache.removeResult(_finderPathFetchByPlid, args);
@@ -20129,20 +21343,21 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					layoutPageTemplateEntryModelImpl.getGroupId(),
-					layoutPageTemplateEntryModelImpl.getName()
-				};
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.getName()
+			};
 
 			finderCache.removeResult(_finderPathCountByG_N, args);
 			finderCache.removeResult(_finderPathFetchByG_N, args);
 		}
 
 		if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-				_finderPathFetchByG_N.getColumnBitmask()) != 0) {
+			 _finderPathFetchByG_N.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-					layoutPageTemplateEntryModelImpl.getOriginalName()
-				};
+				layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+				layoutPageTemplateEntryModelImpl.getOriginalName()
+			};
 
 			finderCache.removeResult(_finderPathCountByG_N, args);
 			finderCache.removeResult(_finderPathFetchByG_N, args);
@@ -20157,7 +21372,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry create(long layoutPageTemplateEntryId) {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = new LayoutPageTemplateEntryImpl();
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			new LayoutPageTemplateEntryImpl();
 
 		layoutPageTemplateEntry.setNew(true);
 		layoutPageTemplateEntry.setPrimaryKey(layoutPageTemplateEntryId);
@@ -20181,6 +21397,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry remove(long layoutPageTemplateEntryId)
 		throws NoSuchPageTemplateEntryException {
+
 		return remove((Serializable)layoutPageTemplateEntryId);
 	}
 
@@ -20194,21 +21411,23 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry remove(Serializable primaryKey)
 		throws NoSuchPageTemplateEntryException {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			LayoutPageTemplateEntry layoutPageTemplateEntry = (LayoutPageTemplateEntry)session.get(LayoutPageTemplateEntryImpl.class,
-					primaryKey);
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				(LayoutPageTemplateEntry)session.get(
+					LayoutPageTemplateEntryImpl.class, primaryKey);
 
 			if (layoutPageTemplateEntry == null) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchPageTemplateEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchPageTemplateEntryException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(layoutPageTemplateEntry);
@@ -20227,14 +21446,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	protected LayoutPageTemplateEntry removeImpl(
 		LayoutPageTemplateEntry layoutPageTemplateEntry) {
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
 			if (!session.contains(layoutPageTemplateEntry)) {
-				layoutPageTemplateEntry = (LayoutPageTemplateEntry)session.get(LayoutPageTemplateEntryImpl.class,
-						layoutPageTemplateEntry.getPrimaryKeyObj());
+				layoutPageTemplateEntry = (LayoutPageTemplateEntry)session.get(
+					LayoutPageTemplateEntryImpl.class,
+					layoutPageTemplateEntry.getPrimaryKeyObj());
 			}
 
 			if (layoutPageTemplateEntry != null) {
@@ -20258,25 +21479,30 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry updateImpl(
 		LayoutPageTemplateEntry layoutPageTemplateEntry) {
+
 		boolean isNew = layoutPageTemplateEntry.isNew();
 
-		if (!(layoutPageTemplateEntry instanceof LayoutPageTemplateEntryModelImpl)) {
+		if (!(layoutPageTemplateEntry instanceof
+				LayoutPageTemplateEntryModelImpl)) {
+
 			InvocationHandler invocationHandler = null;
 
 			if (ProxyUtil.isProxyClass(layoutPageTemplateEntry.getClass())) {
-				invocationHandler = ProxyUtil.getInvocationHandler(layoutPageTemplateEntry);
+				invocationHandler = ProxyUtil.getInvocationHandler(
+					layoutPageTemplateEntry);
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in layoutPageTemplateEntry proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom LayoutPageTemplateEntry implementation " +
-				layoutPageTemplateEntry.getClass());
+					layoutPageTemplateEntry.getClass());
 		}
 
-		LayoutPageTemplateEntryModelImpl layoutPageTemplateEntryModelImpl = (LayoutPageTemplateEntryModelImpl)layoutPageTemplateEntry;
+		LayoutPageTemplateEntryModelImpl layoutPageTemplateEntryModelImpl =
+			(LayoutPageTemplateEntryModelImpl)layoutPageTemplateEntry;
 
 		if (Validator.isNull(layoutPageTemplateEntry.getUuid())) {
 			String uuid = PortalUUIDUtil.generate();
@@ -20284,7 +21510,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			layoutPageTemplateEntry.setUuid(uuid);
 		}
 
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -20293,8 +21520,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				layoutPageTemplateEntry.setCreateDate(now);
 			}
 			else {
-				layoutPageTemplateEntry.setCreateDate(serviceContext.getCreateDate(
-						now));
+				layoutPageTemplateEntry.setCreateDate(
+					serviceContext.getCreateDate(now));
 			}
 		}
 
@@ -20303,8 +21530,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				layoutPageTemplateEntry.setModifiedDate(now);
 			}
 			else {
-				layoutPageTemplateEntry.setModifiedDate(serviceContext.getModifiedDate(
-						now));
+				layoutPageTemplateEntry.setModifiedDate(
+					serviceContext.getModifiedDate(now));
 			}
 		}
 
@@ -20319,7 +21546,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				layoutPageTemplateEntry.setNew(false);
 			}
 			else {
-				layoutPageTemplateEntry = (LayoutPageTemplateEntry)session.merge(layoutPageTemplateEntry);
+				layoutPageTemplateEntry =
+					(LayoutPageTemplateEntry)session.merge(
+						layoutPageTemplateEntry);
 			}
 		}
 		catch (Exception e) {
@@ -20334,119 +21563,467 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		if (!LayoutPageTemplateEntryModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
+		else if (isNew) {
 			Object[] args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getUuid()
+			};
+
+			finderCache.removeResult(_finderPathCountByUuid, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByUuid, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getUuid(),
+				layoutPageTemplateEntryModelImpl.getCompanyId()
+			};
+
+			finderCache.removeResult(_finderPathCountByUuid_C, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByUuid_C, args);
+
+			args = new Object[] {layoutPageTemplateEntryModelImpl.getGroupId()};
+
+			finderCache.removeResult(_finderPathCountByGroupId, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByGroupId, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getLayoutPrototypeId()
+			};
+
+			finderCache.removeResult(_finderPathCountByLayoutPrototypeId, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByLayoutPrototypeId, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.
+					getLayoutPageTemplateCollectionId()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_L, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_L, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.getType()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_T, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_T, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.
+					getLayoutPageTemplateCollectionId(),
+				layoutPageTemplateEntryModelImpl.getType()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_L_T, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_L_T, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.
+					getLayoutPageTemplateCollectionId(),
+				layoutPageTemplateEntryModelImpl.getStatus()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_L_S, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_L_S, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.getType(),
+				layoutPageTemplateEntryModelImpl.getStatus()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_T_S, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_T_S, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.getClassNameId(),
+				layoutPageTemplateEntryModelImpl.getClassTypeId(),
+				layoutPageTemplateEntryModelImpl.getType()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_C_C_T, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_C_C_T, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.getClassNameId(),
+				layoutPageTemplateEntryModelImpl.getClassTypeId(),
+				layoutPageTemplateEntryModelImpl.isDefaultTemplate()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_C_C_D, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_C_C_D, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.getClassNameId(),
+				layoutPageTemplateEntryModelImpl.getType(),
+				layoutPageTemplateEntryModelImpl.isDefaultTemplate()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_C_T_D, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_C_T_D, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.getClassNameId(),
+				layoutPageTemplateEntryModelImpl.getClassTypeId(),
+				layoutPageTemplateEntryModelImpl.getType(),
+				layoutPageTemplateEntryModelImpl.getStatus()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_C_C_T_S, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_C_C_T_S, args);
+
+			args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.getClassNameId(),
+				layoutPageTemplateEntryModelImpl.getClassTypeId(),
+				layoutPageTemplateEntryModelImpl.isDefaultTemplate(),
+				layoutPageTemplateEntryModelImpl.getStatus()
+			};
+
+			finderCache.removeResult(_finderPathCountByG_C_C_D_S, args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByG_C_C_D_S, args);
+
+			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
+		}
+		else {
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalUuid()
+				};
+
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getUuid()
 				};
 
-			finderCache.removeResult(_finderPathCountByUuid, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-				args);
+				finderCache.removeResult(_finderPathCountByUuid, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid, args);
+			}
 
-			args = new Object[] {
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalUuid(),
+					layoutPageTemplateEntryModelImpl.getOriginalCompanyId()
+				};
+
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getUuid(),
 					layoutPageTemplateEntryModelImpl.getCompanyId()
 				};
 
-			finderCache.removeResult(_finderPathCountByUuid_C, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-				args);
+				finderCache.removeResult(_finderPathCountByUuid_C, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByUuid_C, args);
+			}
 
-			args = new Object[] { layoutPageTemplateEntryModelImpl.getGroupId() };
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByGroupId.
+					 getColumnBitmask()) != 0) {
 
-			finderCache.removeResult(_finderPathCountByGroupId, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByGroupId,
-				args);
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId()
+				};
 
-			args = new Object[] {
+				finderCache.removeResult(_finderPathCountByGroupId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByGroupId, args);
+
+				args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getGroupId()
+				};
+
+				finderCache.removeResult(_finderPathCountByGroupId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByGroupId, args);
+			}
+
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByLayoutPrototypeId.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.
+						getOriginalLayoutPrototypeId()
+				};
+
+				finderCache.removeResult(
+					_finderPathCountByLayoutPrototypeId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByLayoutPrototypeId, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getLayoutPrototypeId()
 				};
 
-			finderCache.removeResult(_finderPathCountByLayoutPrototypeId, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByLayoutPrototypeId,
-				args);
+				finderCache.removeResult(
+					_finderPathCountByLayoutPrototypeId, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByLayoutPrototypeId, args);
+			}
 
-			args = new Object[] {
-					layoutPageTemplateEntryModelImpl.getGroupId(),
-					layoutPageTemplateEntryModelImpl.getLayoutPageTemplateCollectionId()
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_L.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.
+						getOriginalLayoutPageTemplateCollectionId()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_L, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_L, args);
+				finderCache.removeResult(_finderPathCountByG_L, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_L, args);
 
-			args = new Object[] {
+				args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getGroupId(),
+					layoutPageTemplateEntryModelImpl.
+						getLayoutPageTemplateCollectionId()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_L, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_L, args);
+			}
+
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_T.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.getOriginalType()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_T, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getGroupId(),
 					layoutPageTemplateEntryModelImpl.getType()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_T, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_T, args);
+				finderCache.removeResult(_finderPathCountByG_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_T, args);
+			}
 
-			args = new Object[] {
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_L_T.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.
+						getOriginalLayoutPageTemplateCollectionId(),
+					layoutPageTemplateEntryModelImpl.getOriginalType()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_L_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_L_T, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getGroupId(),
-					layoutPageTemplateEntryModelImpl.getLayoutPageTemplateCollectionId(),
+					layoutPageTemplateEntryModelImpl.
+						getLayoutPageTemplateCollectionId(),
 					layoutPageTemplateEntryModelImpl.getType()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_L_T, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_L_T,
-				args);
+				finderCache.removeResult(_finderPathCountByG_L_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_L_T, args);
+			}
 
-			args = new Object[] {
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_L_S.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.
+						getOriginalLayoutPageTemplateCollectionId(),
+					layoutPageTemplateEntryModelImpl.getOriginalStatus()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_L_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_L_S, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getGroupId(),
-					layoutPageTemplateEntryModelImpl.getLayoutPageTemplateCollectionId(),
+					layoutPageTemplateEntryModelImpl.
+						getLayoutPageTemplateCollectionId(),
 					layoutPageTemplateEntryModelImpl.getStatus()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_L_S, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_L_S,
-				args);
+				finderCache.removeResult(_finderPathCountByG_L_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_L_S, args);
+			}
 
-			args = new Object[] {
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_T_S.getColumnBitmask()) !=
+					 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.getOriginalType(),
+					layoutPageTemplateEntryModelImpl.getOriginalStatus()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_T_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_T_S, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getGroupId(),
 					layoutPageTemplateEntryModelImpl.getType(),
 					layoutPageTemplateEntryModelImpl.getStatus()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_T_S, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_T_S,
-				args);
+				finderCache.removeResult(_finderPathCountByG_T_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_T_S, args);
+			}
 
-			args = new Object[] {
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_C_C_T.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.getOriginalClassNameId(),
+					layoutPageTemplateEntryModelImpl.getOriginalClassTypeId(),
+					layoutPageTemplateEntryModelImpl.getOriginalType()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_C_C_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_C_C_T, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getGroupId(),
 					layoutPageTemplateEntryModelImpl.getClassNameId(),
 					layoutPageTemplateEntryModelImpl.getClassTypeId(),
 					layoutPageTemplateEntryModelImpl.getType()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_C_C_T, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_T,
-				args);
+				finderCache.removeResult(_finderPathCountByG_C_C_T, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_C_C_T, args);
+			}
 
-			args = new Object[] {
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_C_C_D.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.getOriginalClassNameId(),
+					layoutPageTemplateEntryModelImpl.getOriginalClassTypeId(),
+					layoutPageTemplateEntryModelImpl.
+						getOriginalDefaultTemplate()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_C_C_D, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_C_C_D, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getGroupId(),
 					layoutPageTemplateEntryModelImpl.getClassNameId(),
 					layoutPageTemplateEntryModelImpl.getClassTypeId(),
 					layoutPageTemplateEntryModelImpl.isDefaultTemplate()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_C_C_D, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_D,
-				args);
+				finderCache.removeResult(_finderPathCountByG_C_C_D, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_C_C_D, args);
+			}
 
-			args = new Object[] {
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_C_T_D.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.getOriginalClassNameId(),
+					layoutPageTemplateEntryModelImpl.getOriginalType(),
+					layoutPageTemplateEntryModelImpl.
+						getOriginalDefaultTemplate()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_C_T_D, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_C_T_D, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getGroupId(),
 					layoutPageTemplateEntryModelImpl.getClassNameId(),
 					layoutPageTemplateEntryModelImpl.getType(),
 					layoutPageTemplateEntryModelImpl.isDefaultTemplate()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_C_T_D, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_T_D,
-				args);
+				finderCache.removeResult(_finderPathCountByG_C_T_D, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_C_T_D, args);
+			}
 
-			args = new Object[] {
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_C_C_T_S.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.getOriginalClassNameId(),
+					layoutPageTemplateEntryModelImpl.getOriginalClassTypeId(),
+					layoutPageTemplateEntryModelImpl.getOriginalType(),
+					layoutPageTemplateEntryModelImpl.getOriginalStatus()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_C_C_T_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_C_C_T_S, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getGroupId(),
 					layoutPageTemplateEntryModelImpl.getClassNameId(),
 					layoutPageTemplateEntryModelImpl.getClassTypeId(),
@@ -20454,11 +22031,29 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 					layoutPageTemplateEntryModelImpl.getStatus()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_C_C_T_S, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_T_S,
-				args);
+				finderCache.removeResult(_finderPathCountByG_C_C_T_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_C_C_T_S, args);
+			}
 
-			args = new Object[] {
+			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_C_C_D_S.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.getOriginalClassNameId(),
+					layoutPageTemplateEntryModelImpl.getOriginalClassTypeId(),
+					layoutPageTemplateEntryModelImpl.
+						getOriginalDefaultTemplate(),
+					layoutPageTemplateEntryModelImpl.getOriginalStatus()
+				};
+
+				finderCache.removeResult(_finderPathCountByG_C_C_D_S, args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_C_C_D_S, args);
+
+				args = new Object[] {
 					layoutPageTemplateEntryModelImpl.getGroupId(),
 					layoutPageTemplateEntryModelImpl.getClassNameId(),
 					layoutPageTemplateEntryModelImpl.getClassTypeId(),
@@ -20466,336 +22061,14 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 					layoutPageTemplateEntryModelImpl.getStatus()
 				};
 
-			finderCache.removeResult(_finderPathCountByG_C_C_D_S, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_D_S,
-				args);
-
-			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
-				FINDER_ARGS_EMPTY);
-		}
-
-		else {
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUuid.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalUuid()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-					args);
-
-				args = new Object[] { layoutPageTemplateEntryModelImpl.getUuid() };
-
-				finderCache.removeResult(_finderPathCountByUuid, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByUuid_C.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalUuid(),
-						layoutPageTemplateEntryModelImpl.getOriginalCompanyId()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getUuid(),
-						layoutPageTemplateEntryModelImpl.getCompanyId()
-					};
-
-				finderCache.removeResult(_finderPathCountByUuid_C, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByUuid_C,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByGroupId.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId()
-					};
-
-				finderCache.removeResult(_finderPathCountByGroupId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByGroupId,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId()
-					};
-
-				finderCache.removeResult(_finderPathCountByGroupId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByGroupId,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByLayoutPrototypeId.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalLayoutPrototypeId()
-					};
-
-				finderCache.removeResult(_finderPathCountByLayoutPrototypeId,
-					args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByLayoutPrototypeId,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getLayoutPrototypeId()
-					};
-
-				finderCache.removeResult(_finderPathCountByLayoutPrototypeId,
-					args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByLayoutPrototypeId,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_L.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-						layoutPageTemplateEntryModelImpl.getOriginalLayoutPageTemplateCollectionId()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_L, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_L,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId(),
-						layoutPageTemplateEntryModelImpl.getLayoutPageTemplateCollectionId()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_L, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_L,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-						layoutPageTemplateEntryModelImpl.getOriginalType()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_T,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId(),
-						layoutPageTemplateEntryModelImpl.getType()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_T,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_L_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-						layoutPageTemplateEntryModelImpl.getOriginalLayoutPageTemplateCollectionId(),
-						layoutPageTemplateEntryModelImpl.getOriginalType()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_L_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_L_T,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId(),
-						layoutPageTemplateEntryModelImpl.getLayoutPageTemplateCollectionId(),
-						layoutPageTemplateEntryModelImpl.getType()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_L_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_L_T,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_L_S.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-						layoutPageTemplateEntryModelImpl.getOriginalLayoutPageTemplateCollectionId(),
-						layoutPageTemplateEntryModelImpl.getOriginalStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_L_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_L_S,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId(),
-						layoutPageTemplateEntryModelImpl.getLayoutPageTemplateCollectionId(),
-						layoutPageTemplateEntryModelImpl.getStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_L_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_L_S,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_T_S.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-						layoutPageTemplateEntryModelImpl.getOriginalType(),
-						layoutPageTemplateEntryModelImpl.getOriginalStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_T_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_T_S,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId(),
-						layoutPageTemplateEntryModelImpl.getType(),
-						layoutPageTemplateEntryModelImpl.getStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_T_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_T_S,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_C_C_T.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-						layoutPageTemplateEntryModelImpl.getOriginalClassNameId(),
-						layoutPageTemplateEntryModelImpl.getOriginalClassTypeId(),
-						layoutPageTemplateEntryModelImpl.getOriginalType()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_C_C_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_T,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId(),
-						layoutPageTemplateEntryModelImpl.getClassNameId(),
-						layoutPageTemplateEntryModelImpl.getClassTypeId(),
-						layoutPageTemplateEntryModelImpl.getType()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_C_C_T, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_T,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_C_C_D.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-						layoutPageTemplateEntryModelImpl.getOriginalClassNameId(),
-						layoutPageTemplateEntryModelImpl.getOriginalClassTypeId(),
-						layoutPageTemplateEntryModelImpl.getOriginalDefaultTemplate()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_C_C_D, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_D,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId(),
-						layoutPageTemplateEntryModelImpl.getClassNameId(),
-						layoutPageTemplateEntryModelImpl.getClassTypeId(),
-						layoutPageTemplateEntryModelImpl.isDefaultTemplate()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_C_C_D, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_D,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_C_T_D.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-						layoutPageTemplateEntryModelImpl.getOriginalClassNameId(),
-						layoutPageTemplateEntryModelImpl.getOriginalType(),
-						layoutPageTemplateEntryModelImpl.getOriginalDefaultTemplate()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_C_T_D, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_T_D,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId(),
-						layoutPageTemplateEntryModelImpl.getClassNameId(),
-						layoutPageTemplateEntryModelImpl.getType(),
-						layoutPageTemplateEntryModelImpl.isDefaultTemplate()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_C_T_D, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_T_D,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_C_C_T_S.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-						layoutPageTemplateEntryModelImpl.getOriginalClassNameId(),
-						layoutPageTemplateEntryModelImpl.getOriginalClassTypeId(),
-						layoutPageTemplateEntryModelImpl.getOriginalType(),
-						layoutPageTemplateEntryModelImpl.getOriginalStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_C_C_T_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_T_S,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId(),
-						layoutPageTemplateEntryModelImpl.getClassNameId(),
-						layoutPageTemplateEntryModelImpl.getClassTypeId(),
-						layoutPageTemplateEntryModelImpl.getType(),
-						layoutPageTemplateEntryModelImpl.getStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_C_C_T_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_T_S,
-					args);
-			}
-
-			if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByG_C_C_D_S.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
-						layoutPageTemplateEntryModelImpl.getOriginalClassNameId(),
-						layoutPageTemplateEntryModelImpl.getOriginalClassTypeId(),
-						layoutPageTemplateEntryModelImpl.getOriginalDefaultTemplate(),
-						layoutPageTemplateEntryModelImpl.getOriginalStatus()
-					};
-
 				finderCache.removeResult(_finderPathCountByG_C_C_D_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_D_S,
-					args);
-
-				args = new Object[] {
-						layoutPageTemplateEntryModelImpl.getGroupId(),
-						layoutPageTemplateEntryModelImpl.getClassNameId(),
-						layoutPageTemplateEntryModelImpl.getClassTypeId(),
-						layoutPageTemplateEntryModelImpl.isDefaultTemplate(),
-						layoutPageTemplateEntryModelImpl.getStatus()
-					};
-
-				finderCache.removeResult(_finderPathCountByG_C_C_D_S, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByG_C_C_D_S,
-					args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByG_C_C_D_S, args);
 			}
 		}
 
-		entityCache.putResult(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+		entityCache.putResult(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
 			LayoutPageTemplateEntryImpl.class,
 			layoutPageTemplateEntry.getPrimaryKey(), layoutPageTemplateEntry,
 			false);
@@ -20818,15 +22091,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchPageTemplateEntryException {
-		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByPrimaryKey(primaryKey);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByPrimaryKey(
+			primaryKey);
 
 		if (layoutPageTemplateEntry == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchPageTemplateEntryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchPageTemplateEntryException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return layoutPageTemplateEntry;
@@ -20841,7 +22116,9 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public LayoutPageTemplateEntry findByPrimaryKey(
-		long layoutPageTemplateEntryId) throws NoSuchPageTemplateEntryException {
+			long layoutPageTemplateEntryId)
+		throws NoSuchPageTemplateEntryException {
+
 		return findByPrimaryKey((Serializable)layoutPageTemplateEntryId);
 	}
 
@@ -20854,6 +22131,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry fetchByPrimaryKey(
 		long layoutPageTemplateEntryId) {
+
 		return fetchByPrimaryKey((Serializable)layoutPageTemplateEntryId);
 	}
 
@@ -20896,8 +22174,10 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findAll(int start, int end,
+	public List<LayoutPageTemplateEntry> findAll(
+		int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -20915,29 +22195,32 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * @return the ordered range of layout page template entries
 	 */
 	@Override
-	public List<LayoutPageTemplateEntry> findAll(int start, int end,
+	public List<LayoutPageTemplateEntry> findAll(
+		int start, int end,
 		OrderByComparator<LayoutPageTemplateEntry> orderByComparator,
 		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<LayoutPageTemplateEntry> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(finderPath,
-					finderArgs, this);
+			list = (List<LayoutPageTemplateEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -20945,13 +22228,13 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -20959,7 +22242,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				sql = _SQL_SELECT_LAYOUTPAGETEMPLATEENTRY;
 
 				if (pagination) {
-					sql = sql.concat(LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
+					sql = sql.concat(
+						LayoutPageTemplateEntryModelImpl.ORDER_BY_JPQL);
 				}
 			}
 
@@ -20971,16 +22255,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end, false);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
-							getDialect(), start, end);
+					list = (List<LayoutPageTemplateEntry>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -21018,8 +22302,8 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(_finderPathCountAll,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -21027,15 +22311,17 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			try {
 				session = openSession();
 
-				Query q = session.createQuery(_SQL_COUNT_LAYOUTPAGETEMPLATEENTRY);
+				Query q = session.createQuery(
+					_SQL_COUNT_LAYOUTPAGETEMPLATEENTRY);
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -21076,629 +22362,641 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	 * Initializes the layout page template entry persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-				new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
 
-		_finderPathCountAll = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countAll", new String[0]);
+		_finderPathCountAll = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
 
-		_finderPathWithPaginationFindByUuid = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-				new String[] {
-					String.class.getName(),
-					
+		_finderPathWithPaginationFindByUuid = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+			new String[] {
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+			new String[] {String.class.getName()},
+			LayoutPageTemplateEntryModelImpl.UUID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+
+		_finderPathCountByUuid = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+			new String[] {String.class.getName()});
+
+		_finderPathFetchByUUID_G = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByUUID_G",
+			new String[] {String.class.getName(), Long.class.getName()},
+			LayoutPageTemplateEntryModelImpl.UUID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK);
+
+		_finderPathCountByUUID_G = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
+			new String[] {String.class.getName(), Long.class.getName()});
+
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+			new String[] {
+				String.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-				new String[] { String.class.getName() },
-				LayoutPageTemplateEntryModelImpl.UUID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()},
+			LayoutPageTemplateEntryModelImpl.UUID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.COMPANYID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByUuid = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByUuid", new String[] { String.class.getName() });
+		_finderPathCountByUuid_C = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+			new String[] {String.class.getName(), Long.class.getName()});
 
-		_finderPathFetchByUUID_G = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class, FINDER_CLASS_NAME_ENTITY,
-				"fetchByUUID_G",
-				new String[] { String.class.getName(), Long.class.getName() },
-				LayoutPageTemplateEntryModelImpl.UUID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK);
+		_finderPathWithPaginationFindByGroupId = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathCountByUUID_G = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByUUID_G",
-				new String[] { String.class.getName(), Long.class.getName() });
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
+			new String[] {Long.class.getName()},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-				new String[] {
-					String.class.getName(), Long.class.getName(),
-					
+		_finderPathCountByGroupId = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByLayoutPrototypeId = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByLayoutPrototypeId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByLayoutPrototypeId = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"findByLayoutPrototypeId", new String[] {Long.class.getName()},
+			LayoutPageTemplateEntryModelImpl.LAYOUTPROTOTYPEID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+
+		_finderPathCountByLayoutPrototypeId = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByLayoutPrototypeId", new String[] {Long.class.getName()});
+
+		_finderPathFetchByPlid = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByPlid", new String[] {Long.class.getName()},
+			LayoutPageTemplateEntryModelImpl.PLID_COLUMN_BITMASK);
+
+		_finderPathCountByPlid = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByPlid",
+			new String[] {Long.class.getName()});
+
+		_finderPathWithPaginationFindByG_L = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-				new String[] { String.class.getName(), Long.class.getName() },
-				LayoutPageTemplateEntryModelImpl.UUID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.COMPANYID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_L = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_L",
+			new String[] {Long.class.getName(), Long.class.getName()},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.
+				LAYOUTPAGETEMPLATECOLLECTIONID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByUuid_C = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByUuid_C",
-				new String[] { String.class.getName(), Long.class.getName() });
+		_finderPathCountByG_L = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_L",
+			new String[] {Long.class.getName(), Long.class.getName()});
 
-		_finderPathWithPaginationFindByGroupId = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
-				new String[] {
-					Long.class.getName(),
-					
+		_finderPathFetchByG_N = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByG_N",
+			new String[] {Long.class.getName(), String.class.getName()},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+
+		_finderPathCountByG_N = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N",
+			new String[] {Long.class.getName(), String.class.getName()});
+
+		_finderPathWithPaginationFindByG_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByGroupId = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
-				new String[] { Long.class.getName() },
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_T",
+			new String[] {Long.class.getName(), Integer.class.getName()},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByGroupId = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByGroupId", new String[] { Long.class.getName() });
+		_finderPathCountByG_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_T",
+			new String[] {Long.class.getName(), Integer.class.getName()});
 
-		_finderPathWithPaginationFindByLayoutPrototypeId = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"findByLayoutPrototypeId",
-				new String[] {
-					Long.class.getName(),
-					
+		_finderPathWithPaginationFindByG_L_LikeN = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L_LikeN",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithPaginationCountByG_L_LikeN = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_L_LikeN",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			});
+
+		_finderPathWithPaginationFindByG_L_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByLayoutPrototypeId = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"findByLayoutPrototypeId",
-				new String[] { Long.class.getName() },
-				LayoutPageTemplateEntryModelImpl.LAYOUTPROTOTYPEID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_L_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_L_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.
+				LAYOUTPAGETEMPLATECOLLECTIONID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByLayoutPrototypeId = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByLayoutPrototypeId",
-				new String[] { Long.class.getName() });
+		_finderPathCountByG_L_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_L_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
 
-		_finderPathFetchByPlid = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class, FINDER_CLASS_NAME_ENTITY,
-				"fetchByPlid", new String[] { Long.class.getName() },
-				LayoutPageTemplateEntryModelImpl.PLID_COLUMN_BITMASK);
-
-		_finderPathCountByPlid = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByPlid", new String[] { Long.class.getName() });
-
-		_finderPathWithPaginationFindByG_L = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					
+		_finderPathWithPaginationFindByG_L_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_L = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_L",
-				new String[] { Long.class.getName(), Long.class.getName() },
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.LAYOUTPAGETEMPLATECOLLECTIONID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_L_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_L_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.
+				LAYOUTPAGETEMPLATECOLLECTIONID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.STATUS_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByG_L = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_L",
-				new String[] { Long.class.getName(), Long.class.getName() });
+		_finderPathCountByG_L_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_L_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
 
-		_finderPathFetchByG_N = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class, FINDER_CLASS_NAME_ENTITY,
-				"fetchByG_N",
-				new String[] { Long.class.getName(), String.class.getName() },
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
-
-		_finderPathCountByG_N = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_N",
-				new String[] { Long.class.getName(), String.class.getName() });
-
-		_finderPathWithPaginationFindByG_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T",
-				new String[] {
-					Long.class.getName(), Integer.class.getName(),
-					
+		_finderPathWithPaginationFindByG_T_LikeN = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T_LikeN",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_T",
-				new String[] { Long.class.getName(), Integer.class.getName() },
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithPaginationCountByG_T_LikeN = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_T_LikeN",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Integer.class.getName()
+			});
 
-		_finderPathCountByG_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_T",
-				new String[] { Long.class.getName(), Integer.class.getName() });
-
-		_finderPathWithPaginationFindByG_L_LikeN = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L_LikeN",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					String.class.getName(),
-					
+		_finderPathWithPaginationFindByG_T_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T_S",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithPaginationCountByG_L_LikeN = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"countByG_L_LikeN",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					String.class.getName()
-				});
+		_finderPathWithoutPaginationFindByG_T_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_T_S",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName()
+			},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.STATUS_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByG_L_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName(),
-					
+		_finderPathCountByG_T_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_T_S",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName()
+			});
+
+		_finderPathWithPaginationFindByG_L_LikeN_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L_LikeN_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_L_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_L_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				},
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.LAYOUTPAGETEMPLATECOLLECTIONID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithPaginationCountByG_L_LikeN_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_L_LikeN_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName(), Integer.class.getName()
+			});
 
-		_finderPathCountByG_L_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_L_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				});
-
-		_finderPathWithPaginationFindByG_L_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName(),
-					
+		_finderPathWithPaginationFindByG_C_C_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_L_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_L_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				},
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.LAYOUTPAGETEMPLATECOLLECTIONID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.STATUS_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_C_C_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_C_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName()
+			},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.CLASSTYPEID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByG_L_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_L_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName()
-				});
+		_finderPathCountByG_C_C_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_C_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName()
+			});
 
-		_finderPathWithPaginationFindByG_T_LikeN = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T_LikeN",
-				new String[] {
-					Long.class.getName(), String.class.getName(),
-					Integer.class.getName(),
-					
+		_finderPathWithPaginationFindByG_C_C_D = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_D",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Boolean.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithPaginationCountByG_T_LikeN = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"countByG_T_LikeN",
-				new String[] {
-					Long.class.getName(), String.class.getName(),
-					Integer.class.getName()
-				});
+		_finderPathWithoutPaginationFindByG_C_C_D = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_C_D",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Boolean.class.getName()
+			},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.CLASSTYPEID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.DEFAULTTEMPLATE_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByG_T_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T_S",
-				new String[] {
-					Long.class.getName(), Integer.class.getName(),
-					Integer.class.getName(),
-					
+		_finderPathCountByG_C_C_D = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_C_D",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Boolean.class.getName()
+			});
+
+		_finderPathWithPaginationFindByG_C_T_D = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_T_D",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(), Boolean.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_T_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_T_S",
-				new String[] {
-					Long.class.getName(), Integer.class.getName(),
-					Integer.class.getName()
-				},
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.STATUS_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_C_T_D = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_T_D",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(), Boolean.class.getName()
+			},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.DEFAULTTEMPLATE_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByG_T_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_T_S",
-				new String[] {
-					Long.class.getName(), Integer.class.getName(),
-					Integer.class.getName()
-				});
+		_finderPathCountByG_C_T_D = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_T_D",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(), Boolean.class.getName()
+			});
 
-		_finderPathWithPaginationFindByG_L_LikeN_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L_LikeN_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					String.class.getName(), Integer.class.getName(),
-					
+		_finderPathWithPaginationFindByG_T_LikeN_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T_LikeN_S",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithPaginationCountByG_L_LikeN_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"countByG_L_LikeN_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					String.class.getName(), Integer.class.getName()
-				});
-
-		_finderPathWithPaginationFindByG_C_C_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Integer.class.getName(),
-					
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_C_C_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_C_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Integer.class.getName()
-				},
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.CLASSTYPEID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithPaginationCountByG_T_LikeN_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_T_LikeN_S",
+			new String[] {
+				Long.class.getName(), String.class.getName(),
+				Integer.class.getName(), Integer.class.getName()
+			});
 
-		_finderPathCountByG_C_C_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_C_C_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Integer.class.getName()
-				});
-
-		_finderPathWithPaginationFindByG_C_C_D = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_D",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Boolean.class.getName(),
-					
+		_finderPathWithPaginationFindByG_C_C_LikeN_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_LikeN_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), String.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_C_C_D = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_C_D",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Boolean.class.getName()
-				},
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.CLASSTYPEID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.DEFAULTTEMPLATE_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithPaginationCountByG_C_C_LikeN_T = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_C_C_LikeN_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), String.class.getName(),
+				Integer.class.getName()
+			});
 
-		_finderPathCountByG_C_C_D = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_C_C_D",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Boolean.class.getName()
-				});
-
-		_finderPathWithPaginationFindByG_C_T_D = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_T_D",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName(), Boolean.class.getName(),
-					
+		_finderPathWithPaginationFindByG_C_C_T_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_T_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_C_T_D = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_T_D",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName(), Boolean.class.getName()
-				},
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.DEFAULTTEMPLATE_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByG_C_C_T_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_C_T_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName()
+			},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.CLASSTYPEID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.STATUS_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathCountByG_C_T_D = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_C_T_D",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Integer.class.getName(), Boolean.class.getName()
-				});
+		_finderPathCountByG_C_C_T_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_C_T_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName()
+			});
 
-		_finderPathWithPaginationFindByG_T_LikeN_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T_LikeN_S",
-				new String[] {
-					Long.class.getName(), String.class.getName(),
-					Integer.class.getName(), Integer.class.getName(),
-					
+		_finderPathWithPaginationFindByG_C_C_D_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_D_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Boolean.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithPaginationCountByG_T_LikeN_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"countByG_T_LikeN_S",
-				new String[] {
-					Long.class.getName(), String.class.getName(),
-					Integer.class.getName(), Integer.class.getName()
-				});
+		_finderPathWithoutPaginationFindByG_C_C_D_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_C_D_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Boolean.class.getName(),
+				Integer.class.getName()
+			},
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.CLASSTYPEID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.DEFAULTTEMPLATE_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.STATUS_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
 
-		_finderPathWithPaginationFindByG_C_C_LikeN_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_LikeN_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), String.class.getName(),
-					Integer.class.getName(),
-					
+		_finderPathCountByG_C_C_D_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_C_D_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Boolean.class.getName(),
+				Integer.class.getName()
+			});
+
+		_finderPathWithPaginationFindByG_C_C_LikeN_T_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_LikeN_T_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), String.class.getName(),
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithPaginationCountByG_C_C_LikeN_T = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"countByG_C_C_LikeN_T",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), String.class.getName(),
-					Integer.class.getName()
-				});
-
-		_finderPathWithPaginationFindByG_C_C_T_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_T_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Integer.class.getName(),
-					Integer.class.getName(),
-					
 				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+				OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByG_C_C_T_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_C_T_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Integer.class.getName(),
-					Integer.class.getName()
-				},
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.CLASSTYPEID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.TYPE_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.STATUS_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
-
-		_finderPathCountByG_C_C_T_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_C_C_T_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Integer.class.getName(),
-					Integer.class.getName()
-				});
-
-		_finderPathWithPaginationFindByG_C_C_D_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C_D_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Boolean.class.getName(),
-					Integer.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithoutPaginationFindByG_C_C_D_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_C_D_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Boolean.class.getName(),
-					Integer.class.getName()
-				},
-				LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.CLASSNAMEID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.CLASSTYPEID_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.DEFAULTTEMPLATE_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.STATUS_COLUMN_BITMASK |
-				LayoutPageTemplateEntryModelImpl.NAME_COLUMN_BITMASK);
-
-		_finderPathCountByG_C_C_D_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"countByG_C_C_D_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), Boolean.class.getName(),
-					Integer.class.getName()
-				});
-
-		_finderPathWithPaginationFindByG_C_C_LikeN_T_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				LayoutPageTemplateEntryImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"findByG_C_C_LikeN_T_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), String.class.getName(),
-					Integer.class.getName(), Integer.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
-
-		_finderPathWithPaginationCountByG_C_C_LikeN_T_S = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
-				LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
-				Long.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"countByG_C_C_LikeN_T_S",
-				new String[] {
-					Long.class.getName(), Long.class.getName(),
-					Long.class.getName(), String.class.getName(),
-					Integer.class.getName(), Integer.class.getName()
-				});
+		_finderPathWithPaginationCountByG_C_C_LikeN_T_S = new FinderPath(
+			LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_C_C_LikeN_T_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), String.class.getName(),
+				Integer.class.getName(), Integer.class.getName()
+			});
 	}
 
 	public void destroy() {
@@ -21710,30 +23008,66 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
+
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
+
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_LAYOUTPAGETEMPLATEENTRY = "SELECT layoutPageTemplateEntry FROM LayoutPageTemplateEntry layoutPageTemplateEntry";
-	private static final String _SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE = "SELECT layoutPageTemplateEntry FROM LayoutPageTemplateEntry layoutPageTemplateEntry WHERE ";
-	private static final String _SQL_COUNT_LAYOUTPAGETEMPLATEENTRY = "SELECT COUNT(layoutPageTemplateEntry) FROM LayoutPageTemplateEntry layoutPageTemplateEntry";
-	private static final String _SQL_COUNT_LAYOUTPAGETEMPLATEENTRY_WHERE = "SELECT COUNT(layoutPageTemplateEntry) FROM LayoutPageTemplateEntry layoutPageTemplateEntry WHERE ";
-	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "layoutPageTemplateEntry.layoutPageTemplateEntryId";
-	private static final String _FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE =
-		"SELECT DISTINCT {layoutPageTemplateEntry.*} FROM LayoutPageTemplateEntry layoutPageTemplateEntry WHERE ";
-	private static final String _FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1 =
-		"SELECT {LayoutPageTemplateEntry.*} FROM (SELECT DISTINCT layoutPageTemplateEntry.layoutPageTemplateEntryId FROM LayoutPageTemplateEntry layoutPageTemplateEntry WHERE ";
-	private static final String _FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2 =
-		") TEMP_TABLE INNER JOIN LayoutPageTemplateEntry ON TEMP_TABLE.layoutPageTemplateEntryId = LayoutPageTemplateEntry.layoutPageTemplateEntryId";
-	private static final String _FILTER_SQL_COUNT_LAYOUTPAGETEMPLATEENTRY_WHERE = "SELECT COUNT(DISTINCT layoutPageTemplateEntry.layoutPageTemplateEntryId) AS COUNT_VALUE FROM LayoutPageTemplateEntry layoutPageTemplateEntry WHERE ";
-	private static final String _FILTER_ENTITY_ALIAS = "layoutPageTemplateEntry";
-	private static final String _FILTER_ENTITY_TABLE = "LayoutPageTemplateEntry";
-	private static final String _ORDER_BY_ENTITY_ALIAS = "layoutPageTemplateEntry.";
-	private static final String _ORDER_BY_ENTITY_TABLE = "LayoutPageTemplateEntry.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No LayoutPageTemplateEntry exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No LayoutPageTemplateEntry exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(LayoutPageTemplateEntryPersistenceImpl.class);
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"uuid", "type"
-			});
+
+	private static final String _SQL_SELECT_LAYOUTPAGETEMPLATEENTRY =
+		"SELECT layoutPageTemplateEntry FROM LayoutPageTemplateEntry layoutPageTemplateEntry";
+
+	private static final String _SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE =
+		"SELECT layoutPageTemplateEntry FROM LayoutPageTemplateEntry layoutPageTemplateEntry WHERE ";
+
+	private static final String _SQL_COUNT_LAYOUTPAGETEMPLATEENTRY =
+		"SELECT COUNT(layoutPageTemplateEntry) FROM LayoutPageTemplateEntry layoutPageTemplateEntry";
+
+	private static final String _SQL_COUNT_LAYOUTPAGETEMPLATEENTRY_WHERE =
+		"SELECT COUNT(layoutPageTemplateEntry) FROM LayoutPageTemplateEntry layoutPageTemplateEntry WHERE ";
+
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN =
+		"layoutPageTemplateEntry.layoutPageTemplateEntryId";
+
+	private static final String
+		_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE =
+			"SELECT DISTINCT {layoutPageTemplateEntry.*} FROM LayoutPageTemplateEntry layoutPageTemplateEntry WHERE ";
+
+	private static final String
+		_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_1 =
+			"SELECT {LayoutPageTemplateEntry.*} FROM (SELECT DISTINCT layoutPageTemplateEntry.layoutPageTemplateEntryId FROM LayoutPageTemplateEntry layoutPageTemplateEntry WHERE ";
+
+	private static final String
+		_FILTER_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_NO_INLINE_DISTINCT_WHERE_2 =
+			") TEMP_TABLE INNER JOIN LayoutPageTemplateEntry ON TEMP_TABLE.layoutPageTemplateEntryId = LayoutPageTemplateEntry.layoutPageTemplateEntryId";
+
+	private static final String
+		_FILTER_SQL_COUNT_LAYOUTPAGETEMPLATEENTRY_WHERE =
+			"SELECT COUNT(DISTINCT layoutPageTemplateEntry.layoutPageTemplateEntryId) AS COUNT_VALUE FROM LayoutPageTemplateEntry layoutPageTemplateEntry WHERE ";
+
+	private static final String _FILTER_ENTITY_ALIAS =
+		"layoutPageTemplateEntry";
+
+	private static final String _FILTER_ENTITY_TABLE =
+		"LayoutPageTemplateEntry";
+
+	private static final String _ORDER_BY_ENTITY_ALIAS =
+		"layoutPageTemplateEntry.";
+
+	private static final String _ORDER_BY_ENTITY_TABLE =
+		"LayoutPageTemplateEntry.";
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No LayoutPageTemplateEntry exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No LayoutPageTemplateEntry exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		LayoutPageTemplateEntryPersistenceImpl.class);
+
+	private static final Set<String> _badColumnNames = SetUtil.fromArray(
+		new String[] {"uuid", "type"});
+
 }

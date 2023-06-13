@@ -32,8 +32,9 @@ import com.liferay.mail.reader.service.AttachmentLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class AttachmentBaseImpl extends AttachmentModelImpl
-	implements Attachment {
+public abstract class AttachmentBaseImpl
+	extends AttachmentModelImpl implements Attachment {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class AttachmentBaseImpl extends AttachmentModelImpl
 			AttachmentLocalServiceUtil.updateAttachment(this);
 		}
 	}
+
 }

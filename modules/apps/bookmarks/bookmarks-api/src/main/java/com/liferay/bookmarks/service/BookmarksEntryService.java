@@ -17,7 +17,6 @@ package com.liferay.bookmarks.service;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.bookmarks.model.BookmarksEntry;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -25,7 +24,6 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -44,30 +42,33 @@ import java.util.List;
  */
 @AccessControlled
 @JSONWebService
-@OSGiBeanProperties(property =  {
-	"json.web.service.context.name=bookmarks", "json.web.service.context.path=BookmarksEntry"}, service = BookmarksEntryService.class)
 @ProviderType
-@Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
-	PortalException.class, SystemException.class})
+@Transactional(
+	isolation = Isolation.PORTAL,
+	rollbackFor = {PortalException.class, SystemException.class}
+)
 public interface BookmarksEntryService extends BaseService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BookmarksEntryServiceUtil} to access the bookmarks entry remote service. Add custom service methods to <code>com.liferay.bookmarks.service.impl.BookmarksEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public BookmarksEntry addEntry(long groupId, long folderId, String name,
-		String url, String description, ServiceContext serviceContext)
+	public BookmarksEntry addEntry(
+			long groupId, long folderId, String name, String url,
+			String description, ServiceContext serviceContext)
 		throws PortalException;
 
 	public void deleteEntry(long entryId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<BookmarksEntry> getEntries(long groupId, long folderId,
-		int start, int end);
+	public List<BookmarksEntry> getEntries(
+		long groupId, long folderId, int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<BookmarksEntry> getEntries(long groupId, long folderId,
-		int start, int end, OrderByComparator<BookmarksEntry> orderByComparator);
+	public List<BookmarksEntry> getEntries(
+		long groupId, long folderId, int start, int end,
+		OrderByComparator<BookmarksEntry> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getEntriesCount(long groupId, long folderId);
@@ -82,16 +83,19 @@ public interface BookmarksEntryService extends BaseService {
 	public int getFoldersEntriesCount(long groupId, List<Long> folderIds);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<BookmarksEntry> getGroupEntries(long groupId, int start, int end)
+	public List<BookmarksEntry> getGroupEntries(
+			long groupId, int start, int end)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<BookmarksEntry> getGroupEntries(long groupId, long userId,
-		int start, int end) throws PortalException;
+	public List<BookmarksEntry> getGroupEntries(
+			long groupId, long userId, int start, int end)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<BookmarksEntry> getGroupEntries(long groupId, long userId,
-		long rootFolderId, int start, int end) throws PortalException;
+	public List<BookmarksEntry> getGroupEntries(
+			long groupId, long userId, long rootFolderId, int start, int end)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getGroupEntriesCount(long groupId) throws PortalException;
@@ -101,14 +105,15 @@ public interface BookmarksEntryService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getGroupEntriesCount(long groupId, long userId, long rootFolderId)
+	public int getGroupEntriesCount(
+			long groupId, long userId, long rootFolderId)
 		throws PortalException;
 
 	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
+	 * Returns the OSGi service identifier.
+	 *
+	 * @return the OSGi service identifier
+	 */
 	public String getOSGiServiceIdentifier();
 
 	public BookmarksEntry moveEntry(long entryId, long parentFolderId)
@@ -117,8 +122,7 @@ public interface BookmarksEntryService extends BaseService {
 	public BookmarksEntry moveEntryFromTrash(long entryId, long parentFolderId)
 		throws PortalException;
 
-	public BookmarksEntry moveEntryToTrash(long entryId)
-		throws PortalException;
+	public BookmarksEntry moveEntryToTrash(long entryId) throws PortalException;
 
 	public BookmarksEntry openEntry(BookmarksEntry entry)
 		throws PortalException;
@@ -128,14 +132,17 @@ public interface BookmarksEntryService extends BaseService {
 	public void restoreEntryFromTrash(long entryId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Hits search(long groupId, long creatorUserId, int status, int start,
-		int end) throws PortalException;
+	public Hits search(
+			long groupId, long creatorUserId, int status, int start, int end)
+		throws PortalException;
 
 	public void subscribeEntry(long entryId) throws PortalException;
 
 	public void unsubscribeEntry(long entryId) throws PortalException;
 
-	public BookmarksEntry updateEntry(long entryId, long groupId,
-		long folderId, String name, String url, String description,
-		ServiceContext serviceContext) throws PortalException;
+	public BookmarksEntry updateEntry(
+			long entryId, long groupId, long folderId, String name, String url,
+			String description, ServiceContext serviceContext)
+		throws PortalException;
+
 }

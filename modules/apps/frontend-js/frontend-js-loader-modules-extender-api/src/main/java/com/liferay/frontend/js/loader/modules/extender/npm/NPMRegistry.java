@@ -22,6 +22,8 @@ import java.util.Map;
  */
 public interface NPMRegistry {
 
+	public void addJSBundleTracker(JSBundleTracker jsBundleTracker);
+
 	public Map<String, String> getGlobalAliases();
 
 	public JSModule getJSModule(String identifier);
@@ -34,7 +36,11 @@ public interface NPMRegistry {
 
 	public Collection<JSModule> getResolvedJSModules();
 
+	public JSPackage getResolvedJSPackage(String identifier);
+
 	public Collection<JSPackage> getResolvedJSPackages();
+
+	public void removeJSBundleTracker(JSBundleTracker jsBundleTracker);
 
 	public JSPackage resolveJSPackageDependency(
 		JSPackageDependency jsPackageDependency);

@@ -165,14 +165,17 @@ public class MBMessageIndexerIndexedFieldsTest {
 		map.put(Field.STATUS, String.valueOf(mbMessage.getStatus()));
 		map.put(Field.USER_ID, String.valueOf(mbMessage.getUserId()));
 		map.put(Field.USER_NAME, StringUtil.lowerCase(mbMessage.getUserName()));
-
 		map.put("discussion", "false");
+		map.put(
+			"parentMessageId", String.valueOf(mbMessage.getParentMessageId()));
 		map.put("threadId", String.valueOf(mbMessage.getThreadId()));
 		map.put("visible", "true");
 
 		indexedFieldsFixture.populatePriority("0.0", map);
 		indexedFieldsFixture.populateUID(
 			MBMessage.class.getName(), mbMessage.getMessageId(), map);
+		indexedFieldsFixture.populateViewCount(
+			MBMessage.class, mbMessage.getMessageId(), map);
 
 		_populateDates(mbMessage, map);
 		_populateRoles(mbMessage, map);

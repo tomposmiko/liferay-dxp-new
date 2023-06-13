@@ -32,8 +32,9 @@ import com.liferay.microblogs.service.MicroblogsEntryLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class MicroblogsEntryBaseImpl extends MicroblogsEntryModelImpl
-	implements MicroblogsEntry {
+public abstract class MicroblogsEntryBaseImpl
+	extends MicroblogsEntryModelImpl implements MicroblogsEntry {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class MicroblogsEntryBaseImpl extends MicroblogsEntryModelImpl
 			MicroblogsEntryLocalServiceUtil.updateMicroblogsEntry(this);
 		}
 	}
+
 }

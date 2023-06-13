@@ -14,40 +14,159 @@
 
 package com.liferay.headless.form.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface Validation {
+@GraphQLName("Validation")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "Validation")
+public class Validation {
 
-	public String getErrorMessage();
+	public String getErrorMessage() {
+		return errorMessage;
+	}
 
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
+	@JsonIgnore
 	public void setErrorMessage(
-			String errorMessage);
+		UnsafeSupplier<String, Exception> errorMessageUnsafeSupplier) {
 
-	public void setErrorMessage(
-			UnsafeSupplier<String, Throwable>
-				errorMessageUnsafeSupplier);
-	public String getExpression();
+		try {
+			errorMessage = errorMessageUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String errorMessage;
+
+	public String getExpression() {
+		return expression;
+	}
+
+	public void setExpression(String expression) {
+		this.expression = expression;
+	}
+
+	@JsonIgnore
 	public void setExpression(
-			String expression);
+		UnsafeSupplier<String, Exception> expressionUnsafeSupplier) {
 
-	public void setExpression(
-			UnsafeSupplier<String, Throwable>
-				expressionUnsafeSupplier);
-	public Long getId();
+		try {
+			expression = expressionUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String expression;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Validation)) {
+			return false;
+		}
+
+		Validation validation = (Validation)object;
+
+		return Objects.equals(toString(), validation.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"errorMessage\": ");
+
+		sb.append("\"");
+		sb.append(errorMessage);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"expression\": ");
+
+		sb.append("\"");
+		sb.append(expression);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

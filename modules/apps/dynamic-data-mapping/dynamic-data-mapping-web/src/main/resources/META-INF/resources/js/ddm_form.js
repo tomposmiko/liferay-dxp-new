@@ -185,6 +185,22 @@ AUI.add(
 				return root || instance;
 			},
 
+			getReadOnly: function() {
+				var instance = this;
+
+				if (instance.get('readOnly')) {
+					return true;
+				}
+
+				var form = instance.getForm();
+
+				if (!instance.get('localizable') && form.getDefaultLocale() != instance.get('displayLocale')) {
+					return true;
+				}
+
+				return false;
+			},
+
 			_getField: function(fieldNode) {
 				var instance = this;
 
@@ -615,6 +631,22 @@ AUI.add(
 							function(fieldTemplate) {
 								var field = instance.createField(fieldTemplate);
 
+								var displayLocale = instance.get('displayLocale');
+
+								field.addLocaleToLocalizationMap(displayLocale);
+								field.set('displayLocale', displayLocale);
+
+								if (instance.originalField) {
+									field.originalField = instance.originalField;
+								}
+								else {
+									field.originalField = instance;
+								}
+
+								var form = field.getForm();
+
+								form.newRepeatableInstances.push(field);
+
 								field.renderUI();
 
 								instance._addFieldValidation(field, instance);
@@ -657,10 +689,12 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
+						var readOnly = instance.getReadOnly();
+
 						var inputNode = instance.getInputNode();
 
 						if (inputNode) {
-							inputNode.attr('disabled', instance.get('readOnly'));
+							inputNode.attr('disabled', readOnly);
 						}
 
 						var container = instance.get('container');
@@ -669,13 +703,13 @@ AUI.add(
 							var selectorInput = container.one('.selector-input');
 
 							if (selectorInput) {
-								selectorInput.attr('disabled', instance.get('readOnly'));
+								selectorInput.attr('disabled', readOnly);
 							}
 
 							var checkboxInput = container.one('input[type="checkbox"]');
 
 							if (checkboxInput) {
-								checkboxInput.attr('disabled', instance.get('readOnly'));
+								checkboxInput.attr('disabled', readOnly);
 							}
 
 							var disableCheckboxInput = container.one('input[type="checkbox"][name$="disable"]');
@@ -966,6 +1000,7 @@ AUI.add(
 
 						var colorPicker = new A.ColorPickerPopover(
 							{
+								position: 'bottom',
 								trigger: selectorInput,
 								zIndex: 65535
 							}
@@ -1240,20 +1275,22 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
+						var readOnly = instance.getReadOnly();
+
 						var container = instance.get('container');
 
 						var selectButtonNode = container.one('#' + instance.getInputName() + 'SelectButton');
 
-						selectButtonNode.attr('disabled', instance.get('readOnly'));
+						selectButtonNode.attr('disabled', readOnly);
 
 						var clearButtonNode = container.one('#' + instance.getInputName() + 'ClearButton');
 
-						clearButtonNode.attr('disabled', instance.get('readOnly'));
+						clearButtonNode.attr('disabled', readOnly);
 
 						var altNode = container.one('#' + instance.getInputName() + 'Alt');
 
 						if (altNode) {
-							altNode.set('readOnly', instance.get('readOnly'));
+							altNode.set('readOnly', readOnly);
 						}
 					},
 
@@ -1417,15 +1454,17 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
+						var readOnly = instance.getReadOnly();
+
 						var container = instance.get('container');
 
 						var selectButtonNode = container.one('#' + instance.getInputName() + 'SelectButton');
 
-						selectButtonNode.attr('disabled', instance.get('readOnly'));
+						selectButtonNode.attr('disabled', readOnly);
 
 						var clearButtonNode = container.one('#' + instance.getInputName() + 'ClearButton');
 
-						clearButtonNode.attr('disabled', instance.get('readOnly'));
+						clearButtonNode.attr('disabled', readOnly);
 					},
 
 					_handleButtonsClick: function(event) {
@@ -1622,15 +1661,17 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
+						var readOnly = instance.getReadOnly();
+
 						var container = instance.get('container');
 
 						var selectButtonNode = container.one('#' + instance.getInputName() + 'SelectButton');
 
-						selectButtonNode.attr('disabled', instance.get('readOnly'));
+						selectButtonNode.attr('disabled', readOnly);
 
 						var clearButtonNode = container.one('#' + instance.getInputName() + 'ClearButton');
 
-						clearButtonNode.attr('disabled', instance.get('readOnly'));
+						clearButtonNode.attr('disabled', readOnly);
 					},
 
 					_addBreadcrumbElement: function(label, layoutId, groupId, privateLayout) {
@@ -2818,7 +2859,7 @@ AUI.add(
 						instance.readOnlyLabel.html(instance.getLabelNode().getHTML());
 						instance.readOnlyText.html('<p>' + instance.getValue() + '</p>');
 
-						var readOnly = instance.get('readOnly');
+						var readOnly = instance.getReadOnly();
 
 						instance.readOnlyLabel.toggle(readOnly);
 						instance.readOnlyText.toggle(readOnly);
@@ -2912,9 +2953,11 @@ AUI.add(
 					syncReadOnlyUI: function() {
 						var instance = this;
 
+						var readOnly = instance.getReadOnly();
+
 						var radioNodes = instance.getRadioNodes();
 
-						radioNodes.attr('disabled', instance.get('readOnly'));
+						radioNodes.attr('disabled', readOnly);
 					}
 				}
 			}
@@ -3081,6 +3124,7 @@ AUI.add(
 						var instance = this;
 
 						instance.eventHandlers = [];
+						instance.newRepeatableInstances = [];
 						instance.repeatableInstances = {};
 
 						instance.bindUI();
@@ -3161,6 +3205,47 @@ AUI.add(
 								}
 							}
 						);
+					},
+
+					finalizeRepeatableFieldLocalizations: function() {
+						var instance = this;
+
+						var defaultLocale = instance.getDefaultLocale();
+
+						for (x in instance.newRepeatableInstances) {
+							var field = instance.newRepeatableInstances[x];
+
+							if (!field.get('localizable')) {
+								continue;
+							}
+
+							var currentLocale = field.get('displayLocale');
+							var originalField = field.originalField;
+
+							var newFieldLocalizations = field.get('localizationMap');
+							var totalLocalizations = originalField.get('localizationMap');
+
+							for (var localization in totalLocalizations) {
+								if (localization === currentLocale) {
+									continue;
+								}
+
+								if (!newFieldLocalizations[localization]) {
+									var localizationValue = '';
+
+									if (newFieldLocalizations[defaultLocale]) {
+										localizationValue = newFieldLocalizations[defaultLocale];
+									}
+									else if (defaultLocale === field.get('displayLocale') && field.getValue()) {
+										localizationValue = field.getValue();
+									}
+
+									newFieldLocalizations[localization] = localizationValue;
+								}
+							}
+
+							field.set('localizationMap', newFieldLocalizations);
+						}
 					},
 
 					moveField: function(parentField, oldIndex, newIndex) {
@@ -3390,6 +3475,8 @@ AUI.add(
 
 					_onSubmitForm: function(event) {
 						var instance = this;
+
+						instance.finalizeRepeatableFieldLocalizations();
 
 						instance.updateDDMFormInputValue();
 					},

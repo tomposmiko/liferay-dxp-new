@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.service.DDMStructureVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureVersionPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -63,8 +62,9 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class DDMStructureVersionLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements DDMStructureVersionLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements DDMStructureVersionLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -81,6 +81,7 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	@Override
 	public DDMStructureVersion addDDMStructureVersion(
 		DDMStructureVersion ddmStructureVersion) {
+
 		ddmStructureVersion.setNew(true);
 
 		return ddmStructureVersionPersistence.update(ddmStructureVersion);
@@ -96,6 +97,7 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	@Transactional(enabled = false)
 	public DDMStructureVersion createDDMStructureVersion(
 		long structureVersionId) {
+
 		return ddmStructureVersionPersistence.create(structureVersionId);
 	}
 
@@ -109,7 +111,9 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public DDMStructureVersion deleteDDMStructureVersion(
-		long structureVersionId) throws PortalException {
+			long structureVersionId)
+		throws PortalException {
+
 		return ddmStructureVersionPersistence.remove(structureVersionId);
 	}
 
@@ -123,6 +127,7 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	@Override
 	public DDMStructureVersion deleteDDMStructureVersion(
 		DDMStructureVersion ddmStructureVersion) {
+
 		return ddmStructureVersionPersistence.remove(ddmStructureVersion);
 	}
 
@@ -130,8 +135,8 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(DDMStructureVersion.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			DDMStructureVersion.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -142,7 +147,8 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 */
 	@Override
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
-		return ddmStructureVersionPersistence.findWithDynamicQuery(dynamicQuery);
+		return ddmStructureVersionPersistence.findWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -158,10 +164,11 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return ddmStructureVersionPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return ddmStructureVersionPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -178,10 +185,12 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return ddmStructureVersionPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return ddmStructureVersionPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -192,7 +201,8 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return ddmStructureVersionPersistence.countWithDynamicQuery(dynamicQuery);
+		return ddmStructureVersionPersistence.countWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -203,15 +213,19 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return ddmStructureVersionPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return ddmStructureVersionPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
-	public DDMStructureVersion fetchDDMStructureVersion(long structureVersionId) {
-		return ddmStructureVersionPersistence.fetchByPrimaryKey(structureVersionId);
+	public DDMStructureVersion fetchDDMStructureVersion(
+		long structureVersionId) {
+
+		return ddmStructureVersionPersistence.fetchByPrimaryKey(
+			structureVersionId);
 	}
 
 	/**
@@ -224,14 +238,18 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	@Override
 	public DDMStructureVersion getDDMStructureVersion(long structureVersionId)
 		throws PortalException {
-		return ddmStructureVersionPersistence.findByPrimaryKey(structureVersionId);
+
+		return ddmStructureVersionPersistence.findByPrimaryKey(
+			structureVersionId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(ddmStructureVersionLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			ddmStructureVersionLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDMStructureVersion.class);
 
@@ -241,12 +259,17 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(ddmStructureVersionLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			ddmStructureVersionLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
-		indexableActionableDynamicQuery.setModelClass(DDMStructureVersion.class);
+		indexableActionableDynamicQuery.setModelClass(
+			DDMStructureVersion.class);
 
 		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
 			"structureVersionId");
@@ -256,7 +279,9 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(ddmStructureVersionLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			ddmStructureVersionLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDMStructureVersion.class);
 
@@ -269,12 +294,15 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return ddmStructureVersionLocalService.deleteDDMStructureVersion((DDMStructureVersion)persistedModel);
+
+		return ddmStructureVersionLocalService.deleteDDMStructureVersion(
+			(DDMStructureVersion)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return ddmStructureVersionPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -290,7 +318,9 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 * @return the range of ddm structure versions
 	 */
 	@Override
-	public List<DDMStructureVersion> getDDMStructureVersions(int start, int end) {
+	public List<DDMStructureVersion> getDDMStructureVersions(
+		int start, int end) {
+
 		return ddmStructureVersionPersistence.findAll(start, end);
 	}
 
@@ -314,6 +344,7 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	@Override
 	public DDMStructureVersion updateDDMStructureVersion(
 		DDMStructureVersion ddmStructureVersion) {
+
 		return ddmStructureVersionPersistence.update(ddmStructureVersion);
 	}
 
@@ -322,7 +353,9 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 *
 	 * @return the ddm structure version local service
 	 */
-	public DDMStructureVersionLocalService getDDMStructureVersionLocalService() {
+	public DDMStructureVersionLocalService
+		getDDMStructureVersionLocalService() {
+
 		return ddmStructureVersionLocalService;
 	}
 
@@ -333,6 +366,7 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 */
 	public void setDDMStructureVersionLocalService(
 		DDMStructureVersionLocalService ddmStructureVersionLocalService) {
+
 		this.ddmStructureVersionLocalService = ddmStructureVersionLocalService;
 	}
 
@@ -352,6 +386,7 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 */
 	public void setDDMStructureVersionPersistence(
 		DDMStructureVersionPersistence ddmStructureVersionPersistence) {
+
 		this.ddmStructureVersionPersistence = ddmStructureVersionPersistence;
 	}
 
@@ -360,7 +395,9 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -370,12 +407,15 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.dynamic.data.mapping.model.DDMStructureVersion",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.dynamic.data.mapping.model.DDMStructureVersion",
 			ddmStructureVersionLocalService);
 	}
 
@@ -409,15 +449,16 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = ddmStructureVersionPersistence.getDataSource();
+			DataSource dataSource =
+				ddmStructureVersionPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -428,10 +469,18 @@ public abstract class DDMStructureVersionLocalServiceBaseImpl
 
 	@BeanReference(type = DDMStructureVersionLocalService.class)
 	protected DDMStructureVersionLocalService ddmStructureVersionLocalService;
+
 	@BeanReference(type = DDMStructureVersionPersistence.class)
 	protected DDMStructureVersionPersistence ddmStructureVersionPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

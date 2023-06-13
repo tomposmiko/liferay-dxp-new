@@ -30,12 +30,15 @@ import com.liferay.portal.kernel.util.Accessor;
 @ImplementationClassName("com.liferay.message.boards.model.impl.MBBanImpl")
 @ProviderType
 public interface MBBan extends MBBanModel, PersistedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.message.boards.model.impl.MBBanImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<MBBan, Long> BAN_ID_ACCESSOR = new Accessor<MBBan, Long>() {
+	public static final Accessor<MBBan, Long> BAN_ID_ACCESSOR =
+		new Accessor<MBBan, Long>() {
+
 			@Override
 			public Long get(MBBan mbBan) {
 				return mbBan.getBanId();
@@ -50,5 +53,7 @@ public interface MBBan extends MBBanModel, PersistedModel {
 			public Class<MBBan> getTypeClass() {
 				return MBBan.class;
 			}
+
 		};
+
 }

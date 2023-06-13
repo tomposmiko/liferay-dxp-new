@@ -32,8 +32,9 @@ import com.liferay.dynamic.data.mapping.service.DDMContentLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DDMContentBaseImpl extends DDMContentModelImpl
-	implements DDMContent {
+public abstract class DDMContentBaseImpl
+	extends DDMContentModelImpl implements DDMContent {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class DDMContentBaseImpl extends DDMContentModelImpl
 			DDMContentLocalServiceUtil.updateDDMContent(this);
 		}
 	}
+
 }

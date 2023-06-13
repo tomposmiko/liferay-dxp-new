@@ -37,12 +37,17 @@ import com.liferay.portal.search.aggregation.Aggregations;
 import com.liferay.portal.search.aggregation.HierarchicalAggregationResult;
 import com.liferay.portal.search.aggregation.bucket.Bucket;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
+import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.internal.aggregation.AggregationsImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderImpl;
+import com.liferay.portal.search.internal.query.QueriesImpl;
+import com.liferay.portal.search.internal.sort.SortsImpl;
+import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.SearchResponseBuilder;
+import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.search.test.util.DocumentsAssert;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.search.test.util.SearchMapUtil;
@@ -95,12 +100,8 @@ public abstract class BaseIndexingTestCase {
 			return;
 		}
 
-		try {
-			_indexWriter.deleteEntityDocuments(
-				createSearchContext(), _entryClassName);
-		}
-		catch (SearchException se) {
-		}
+		_indexWriter.deleteEntityDocuments(
+			createSearchContext(), _entryClassName);
 
 		_documentFixture.tearDown();
 
@@ -138,11 +139,7 @@ public abstract class BaseIndexingTestCase {
 			_indexWriter.addDocument(createSearchContext(), document);
 		}
 		catch (SearchException se) {
-			Throwable t = se.getCause();
-
-			if (t instanceof RuntimeException) {
-				throw (RuntimeException)t;
-			}
+			_handle(se);
 
 			throw new RuntimeException(se);
 		}
@@ -166,18 +163,20 @@ public abstract class BaseIndexingTestCase {
 		);
 	}
 
-	protected void assertSearch(Consumer<IndexingTestHelper> consumer) {
+	protected void assertSearch(
+		Consumer<IndexingTestHelper> indexingTestHelperConsumer) {
+
 		try {
 			IdempotentRetryAssert.retryAssert(
 				10, TimeUnit.SECONDS,
 				() -> {
-					consumer.accept(new IndexingTestHelper());
+					indexingTestHelperConsumer.accept(new IndexingTestHelper());
 
 					return null;
 				});
 		}
 		catch (RuntimeException re) {
-			throw (RuntimeException)re;
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -212,6 +211,10 @@ public abstract class BaseIndexingTestCase {
 		return _indexWriter;
 	}
 
+	protected SearchEngineAdapter getSearchEngineAdapter() {
+		return _indexingFixture.getSearchEngineAdapter();
+	}
+
 	protected Hits search(SearchContext searchContext) {
 		return search(searchContext, getDefaultQuery());
 	}
@@ -221,11 +224,7 @@ public abstract class BaseIndexingTestCase {
 			return _indexSearcher.search(searchContext, query);
 		}
 		catch (SearchException se) {
-			Throwable t = se.getCause();
-
-			if (t instanceof RuntimeException) {
-				throw (RuntimeException)t;
-			}
+			_handle(se);
 
 			throw new RuntimeException(se);
 		}
@@ -236,11 +235,7 @@ public abstract class BaseIndexingTestCase {
 			return _indexSearcher.searchCount(searchContext, query);
 		}
 		catch (SearchException se) {
-			Throwable t = se.getCause();
-
-			if (t instanceof RuntimeException) {
-				throw (RuntimeException)t;
-			}
+			_handle(se);
 
 			throw new RuntimeException(se);
 		}
@@ -259,6 +254,8 @@ public abstract class BaseIndexingTestCase {
 	protected static final long GROUP_ID = RandomTestUtil.randomLong();
 
 	protected final Aggregations aggregations = new AggregationsImpl();
+	protected final Queries queries = new QueriesImpl();
+	protected final Sorts sorts = new SortsImpl();
 
 	protected class IndexingTestHelper {
 
@@ -286,12 +283,14 @@ public abstract class BaseIndexingTestCase {
 				_hits.getDocs(), fieldName, expectedValues);
 		}
 
-		public void define(Consumer<SearchContext> consumer) {
-			consumer.accept(_searchContext);
+		public void define(Consumer<SearchContext> searchContextConsumer) {
+			searchContextConsumer.accept(_searchContext);
 		}
 
-		public void defineRequest(Consumer<SearchRequestBuilder> consumer) {
-			consumer.accept(_searchRequestBuilder);
+		public void defineRequest(
+			Consumer<SearchRequestBuilder> searchRequestBuilderConsumer) {
+
+			searchRequestBuilderConsumer.accept(_searchRequestBuilder);
 		}
 
 		public <AR extends AggregationResult> AR getAggregationResult(
@@ -370,16 +369,20 @@ public abstract class BaseIndexingTestCase {
 			_searchContext.setAttribute(name, value);
 		}
 
-		public void verify(Consumer<Hits> consumer) {
-			consumer.accept(_hits);
+		public void verify(Consumer<Hits> hitsConsumer) {
+			hitsConsumer.accept(_hits);
 		}
 
-		public void verifyContext(Consumer<SearchContext> consumer) {
-			consumer.accept(_searchContext);
+		public void verifyContext(
+			Consumer<SearchContext> searchContextConsumer) {
+
+			searchContextConsumer.accept(_searchContext);
 		}
 
-		public void verifyResponse(Consumer<SearchResponse> consumer) {
-			consumer.accept(_searchResponse);
+		public void verifyResponse(
+			Consumer<SearchResponse> searchResponseConsumer) {
+
+			searchResponseConsumer.accept(_searchResponse);
 		}
 
 		protected <AR extends AggregationResult> AR getAggregationResult(
@@ -424,6 +427,18 @@ public abstract class BaseIndexingTestCase {
 		private final SearchRequestBuilder _searchRequestBuilder;
 		private SearchResponse _searchResponse;
 
+	}
+
+	private void _handle(SearchException se) {
+		Throwable t = se.getCause();
+
+		if (t instanceof RuntimeException) {
+			throw (RuntimeException)t;
+		}
+
+		if (t != null) {
+			throw new RuntimeException(t);
+		}
 	}
 
 	private final DocumentFixture _documentFixture = new DocumentFixture();

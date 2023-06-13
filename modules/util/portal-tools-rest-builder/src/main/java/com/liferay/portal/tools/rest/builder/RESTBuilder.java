@@ -23,9 +23,9 @@ import com.liferay.portal.kernel.util.Validator_IW;
 import com.liferay.portal.tools.ArgumentsUtil;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.FreeMarkerTool;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaMethodSignature;
+import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.parser.util.OpenAPIParserUtil;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.util.FreeMarkerUtil;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.util.OpenAPIUtil;
-import com.liferay.portal.tools.rest.builder.internal.util.CamelCaseUtil;
 import com.liferay.portal.tools.rest.builder.internal.util.FileUtil;
 import com.liferay.portal.vulcan.yaml.YAMLUtil;
 import com.liferay.portal.vulcan.yaml.config.Application;
@@ -92,6 +92,11 @@ public class RESTBuilder {
 
 		_createApplicationFile(context);
 
+		if (Validator.isNotNull(_configYAML.getClientDir())) {
+			_createClientBaseJSONParserFile(context);
+			_createClientUnsafeSupplierFile(context);
+		}
+
 		File[] files = FileUtil.getFiles(_configDir, "rest-openapi", ".yaml");
 
 		for (File file : files) {
@@ -118,21 +123,22 @@ public class RESTBuilder {
 
 			context.put("openAPIYAML", openAPIYAML);
 
-			String versionDirName = OpenAPIUtil.getVersionDirName(openAPIYAML);
+			String escapedVersion = OpenAPIUtil.escapeVersion(openAPIYAML);
 
-			context.put("versionDirName", versionDirName);
+			context.put("escapedVersion", escapedVersion);
 
-			_createGraphQLMutationFile(context, versionDirName);
-			_createGraphQLQueryFile(context, versionDirName);
-			_createGraphQLServletDataFile(context, versionDirName);
-			_createObjectMapperContextResolver(context, versionDirName);
+			_createGraphQLMutationFile(context, escapedVersion);
+			_createGraphQLQueryFile(context, escapedVersion);
+			_createGraphQLServletDataFile(context, escapedVersion);
+			_createOpenAPIResourceFile(context, escapedVersion);
+			_createPropertiesFile(context, escapedVersion, "openapi");
 
 			for (Map.Entry<String, Schema> entry : schemas.entrySet()) {
 				String schemaName = entry.getKey();
 
 				List<JavaMethodSignature> javaMethodSignatures =
 					freeMarkerTool.getResourceJavaMethodSignatures(
-						_configYAML, openAPIYAML, schemaName, false);
+						_configYAML, openAPIYAML, schemaName);
 
 				if (javaMethodSignatures.isEmpty()) {
 					continue;
@@ -143,16 +149,23 @@ public class RESTBuilder {
 				_putSchema(context, schema, schemaName);
 
 				_createBaseResourceImplFile(
-					context, schemaName, versionDirName);
-				_createPropertiesFile(context, schemaName, versionDirName);
-				_createResourceFile(context, schemaName, versionDirName);
-				_createResourceImplFile(context, schemaName, versionDirName);
+					context, escapedVersion, schemaName);
+				_createPropertiesFile(
+					context, escapedVersion,
+					String.valueOf(context.get("schemaPath")));
+				_createResourceFile(context, escapedVersion, schemaName);
+				_createResourceImplFile(context, escapedVersion, schemaName);
+
+				if (Validator.isNotNull(_configYAML.getClientDir())) {
+					_createClientResourceFile(
+						context, escapedVersion, schemaName);
+				}
 
 				if (Validator.isNotNull(_configYAML.getTestDir())) {
 					_createBaseResourceTestCaseFile(
-						context, schemaName, versionDirName);
+						context, escapedVersion, schemaName);
 					_createResourceTestFile(
-						context, schemaName, versionDirName);
+						context, escapedVersion, schemaName);
 				}
 			}
 
@@ -162,8 +175,13 @@ public class RESTBuilder {
 
 				_putSchema(context, schema, schemaName);
 
-				_createDTOFile(context, schemaName, versionDirName);
-				_createDTOImplFile(context, schemaName, versionDirName);
+				_createDTOFile(context, escapedVersion, schemaName);
+
+				if (Validator.isNotNull(_configYAML.getClientDir())) {
+					_createClientDTOFile(context, escapedVersion, schemaName);
+					_createClientSerDesFile(
+						context, escapedVersion, schemaName);
+				}
 			}
 		}
 
@@ -208,8 +226,8 @@ public class RESTBuilder {
 	}
 
 	private void _createBaseResourceImplFile(
-			Map<String, Object> context, String schemaName,
-			String versionDirName)
+			Map<String, Object> context, String escapedVersion,
+			String schemaName)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
@@ -222,7 +240,7 @@ public class RESTBuilder {
 		sb.append(apiPackagePath.replace('.', '/'));
 
 		sb.append("/internal/resource/");
-		sb.append(versionDirName);
+		sb.append(escapedVersion);
 		sb.append("/Base");
 		sb.append(schemaName);
 		sb.append("ResourceImpl.java");
@@ -238,8 +256,8 @@ public class RESTBuilder {
 	}
 
 	private void _createBaseResourceTestCaseFile(
-			Map<String, Object> context, String schemaName,
-			String versionDirName)
+			Map<String, Object> context, String escapedVersion,
+			String schemaName)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
@@ -252,7 +270,7 @@ public class RESTBuilder {
 		sb.append(apiPackagePath.replace('.', '/'));
 
 		sb.append("/resource/");
-		sb.append(versionDirName);
+		sb.append(escapedVersion);
 		sb.append("/test/Base");
 		sb.append(schemaName);
 		sb.append("ResourceTestCase.java");
@@ -267,9 +285,147 @@ public class RESTBuilder {
 				_copyrightFileName, "base_resource_test_case", context));
 	}
 
+	private void _createClientBaseJSONParserFile(Map<String, Object> context)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getClientDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/client/json/BaseJSONParser.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "client_base_json_parser", context));
+	}
+
+	private void _createClientDTOFile(
+			Map<String, Object> context, String escapedVersion,
+			String schemaName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getClientDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/client/dto/");
+		sb.append(escapedVersion);
+		sb.append("/");
+		sb.append(schemaName);
+		sb.append(".java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "client_dto", context));
+	}
+
+	private void _createClientResourceFile(
+			Map<String, Object> context, String escapedVersion,
+			String schemaName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getClientDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/client/resource/");
+		sb.append(escapedVersion);
+		sb.append("/");
+		sb.append(schemaName);
+		sb.append("Resource.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "client_resource", context));
+	}
+
+	private void _createClientSerDesFile(
+			Map<String, Object> context, String escapedVersion,
+			String schemaName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getClientDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/client/serdes/");
+		sb.append(escapedVersion);
+		sb.append("/");
+		sb.append(schemaName);
+		sb.append("SerDes.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "client_serdes", context));
+	}
+
+	private void _createClientUnsafeSupplierFile(Map<String, Object> context)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getClientDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/client/function/UnsafeSupplier.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "client_unsafe_supplier", context));
+	}
+
 	private void _createDTOFile(
-			Map<String, Object> context, String schemaName,
-			String versionDirName)
+			Map<String, Object> context, String escapedVersion,
+			String schemaName)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
@@ -282,7 +438,7 @@ public class RESTBuilder {
 		sb.append(apiPackagePath.replace('.', '/'));
 
 		sb.append("/dto/");
-		sb.append(versionDirName);
+		sb.append(escapedVersion);
 		sb.append("/");
 		sb.append(schemaName);
 		sb.append(".java");
@@ -296,38 +452,8 @@ public class RESTBuilder {
 			FreeMarkerUtil.processTemplate(_copyrightFileName, "dto", context));
 	}
 
-	private void _createDTOImplFile(
-			Map<String, Object> context, String schemaName,
-			String versionDirName)
-		throws Exception {
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(_configYAML.getImplDir());
-		sb.append("/");
-
-		String apiPackagePath = _configYAML.getApiPackagePath();
-
-		sb.append(apiPackagePath.replace('.', '/'));
-
-		sb.append("/internal/dto/");
-		sb.append(versionDirName);
-		sb.append("/");
-		sb.append(schemaName);
-		sb.append("Impl.java");
-
-		File file = new File(sb.toString());
-
-		_files.add(file);
-
-		FileUtil.write(
-			file,
-			FreeMarkerUtil.processTemplate(
-				_copyrightFileName, "dto_impl", context));
-	}
-
 	private void _createGraphQLMutationFile(
-			Map<String, Object> context, String versionDirName)
+			Map<String, Object> context, String escapedVersion)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
@@ -340,7 +466,7 @@ public class RESTBuilder {
 		sb.append(apiPackagePath.replace('.', '/'));
 
 		sb.append("/internal/graphql/mutation/");
-		sb.append(versionDirName);
+		sb.append(escapedVersion);
 		sb.append("/Mutation.java");
 
 		File file = new File(sb.toString());
@@ -354,7 +480,7 @@ public class RESTBuilder {
 	}
 
 	private void _createGraphQLQueryFile(
-			Map<String, Object> context, String versionDirName)
+			Map<String, Object> context, String escapedVersion)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
@@ -367,7 +493,7 @@ public class RESTBuilder {
 		sb.append(apiPackagePath.replace('.', '/'));
 
 		sb.append("/internal/graphql/query/");
-		sb.append(versionDirName);
+		sb.append(escapedVersion);
 		sb.append("/Query.java");
 
 		File file = new File(sb.toString());
@@ -381,7 +507,7 @@ public class RESTBuilder {
 	}
 
 	private void _createGraphQLServletDataFile(
-			Map<String, Object> context, String versionDirName)
+			Map<String, Object> context, String escapedVersion)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
@@ -394,7 +520,7 @@ public class RESTBuilder {
 		sb.append(apiPackagePath.replace('.', '/'));
 
 		sb.append("/internal/graphql/servlet/");
-		sb.append(versionDirName);
+		sb.append(escapedVersion);
 		sb.append("/ServletDataImpl.java");
 
 		File file = new File(sb.toString());
@@ -407,8 +533,8 @@ public class RESTBuilder {
 				_copyrightFileName, "graphql_servlet_data", context));
 	}
 
-	private void _createObjectMapperContextResolver(
-			Map<String, Object> context, String versionDirName)
+	private void _createOpenAPIResourceFile(
+			Map<String, Object> context, String escapedVersion)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
@@ -420,9 +546,9 @@ public class RESTBuilder {
 
 		sb.append(apiPackagePath.replace('.', '/'));
 
-		sb.append("/internal/jaxrs/context/resolver/");
-		sb.append(versionDirName);
-		sb.append("/ObjectMapperContextResolver.java");
+		sb.append("/internal/resource/");
+		sb.append(escapedVersion);
+		sb.append("/OpenAPIResourceImpl.java");
 
 		File file = new File(sb.toString());
 
@@ -431,21 +557,21 @@ public class RESTBuilder {
 		FileUtil.write(
 			file,
 			FreeMarkerUtil.processTemplate(
-				_copyrightFileName, "object_mapper_context_resolver", context));
+				_copyrightFileName, "openapi_resource_impl", context));
 	}
 
 	private void _createPropertiesFile(
-			Map<String, Object> context, String schemaName,
-			String versionDirName)
+			Map<String, Object> context, String escapedVersion,
+			String schemaPath)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(_configYAML.getImplDir());
 		sb.append("/../resources/OSGI-INF/liferay/rest/");
-		sb.append(versionDirName);
+		sb.append(escapedVersion);
 		sb.append("/");
-		sb.append(CamelCaseUtil.fromCamelCase(schemaName));
+		sb.append(StringUtil.toLowerCase(schemaPath));
 		sb.append(".properties");
 
 		File file = new File(sb.toString());
@@ -457,8 +583,8 @@ public class RESTBuilder {
 	}
 
 	private void _createResourceFile(
-			Map<String, Object> context, String schemaName,
-			String versionDirName)
+			Map<String, Object> context, String escapedVersion,
+			String schemaName)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
@@ -471,7 +597,7 @@ public class RESTBuilder {
 		sb.append(apiPackagePath.replace('.', '/'));
 
 		sb.append("/resource/");
-		sb.append(versionDirName);
+		sb.append(escapedVersion);
 		sb.append("/");
 		sb.append(schemaName);
 		sb.append("Resource.java");
@@ -487,8 +613,8 @@ public class RESTBuilder {
 	}
 
 	private void _createResourceImplFile(
-			Map<String, Object> context, String schemaName,
-			String versionDirName)
+			Map<String, Object> context, String escapedVersion,
+			String schemaName)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
@@ -501,7 +627,7 @@ public class RESTBuilder {
 		sb.append(apiPackagePath.replace('.', '/'));
 
 		sb.append("/internal/resource/");
-		sb.append(versionDirName);
+		sb.append(escapedVersion);
 		sb.append("/");
 		sb.append(schemaName);
 		sb.append("ResourceImpl.java");
@@ -521,8 +647,8 @@ public class RESTBuilder {
 	}
 
 	private void _createResourceTestFile(
-			Map<String, Object> context, String schemaName,
-			String versionDirName)
+			Map<String, Object> context, String escapedVersion,
+			String schemaName)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
@@ -535,7 +661,7 @@ public class RESTBuilder {
 		sb.append(apiPackagePath.replace('.', '/'));
 
 		sb.append("/resource/");
-		sb.append(versionDirName);
+		sb.append(escapedVersion);
 		sb.append("/test/");
 		sb.append(schemaName);
 		sb.append("ResourceTest.java");
@@ -559,9 +685,11 @@ public class RESTBuilder {
 
 		context.put("schema", schema);
 		context.put("schemaName", schemaName);
-		context.put("schemaPath", CamelCaseUtil.fromCamelCase(schemaName));
+		context.put("schemaNames", TextFormatter.formatPlural(schemaName));
+		context.put(
+			"schemaPath", TextFormatter.format(schemaName, TextFormatter.K));
 
-		String schemaVarName = StringUtil.lowerCaseFirstLetter(schemaName);
+		String schemaVarName = OpenAPIParserUtil.getSchemaVarName(schemaName);
 
 		context.put("schemaVarName", schemaVarName);
 		context.put(

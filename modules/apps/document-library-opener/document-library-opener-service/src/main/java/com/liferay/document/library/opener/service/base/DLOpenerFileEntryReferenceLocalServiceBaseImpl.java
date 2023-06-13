@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.document.library.opener.model.DLOpenerFileEntryReference;
 import com.liferay.document.library.opener.service.DLOpenerFileEntryReferenceLocalService;
 import com.liferay.document.library.opener.service.persistence.DLOpenerFileEntryReferencePersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -65,6 +64,7 @@ import javax.sql.DataSource;
 public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements DLOpenerFileEntryReferenceLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -81,9 +81,11 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	@Override
 	public DLOpenerFileEntryReference addDLOpenerFileEntryReference(
 		DLOpenerFileEntryReference dlOpenerFileEntryReference) {
+
 		dlOpenerFileEntryReference.setNew(true);
 
-		return dlOpenerFileEntryReferencePersistence.update(dlOpenerFileEntryReference);
+		return dlOpenerFileEntryReferencePersistence.update(
+			dlOpenerFileEntryReference);
 	}
 
 	/**
@@ -96,7 +98,9 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	@Transactional(enabled = false)
 	public DLOpenerFileEntryReference createDLOpenerFileEntryReference(
 		long dlOpenerFileEntryReferenceId) {
-		return dlOpenerFileEntryReferencePersistence.create(dlOpenerFileEntryReferenceId);
+
+		return dlOpenerFileEntryReferencePersistence.create(
+			dlOpenerFileEntryReferenceId);
 	}
 
 	/**
@@ -109,8 +113,11 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public DLOpenerFileEntryReference deleteDLOpenerFileEntryReference(
-		long dlOpenerFileEntryReferenceId) throws PortalException {
-		return dlOpenerFileEntryReferencePersistence.remove(dlOpenerFileEntryReferenceId);
+			long dlOpenerFileEntryReferenceId)
+		throws PortalException {
+
+		return dlOpenerFileEntryReferencePersistence.remove(
+			dlOpenerFileEntryReferenceId);
 	}
 
 	/**
@@ -123,15 +130,17 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	@Override
 	public DLOpenerFileEntryReference deleteDLOpenerFileEntryReference(
 		DLOpenerFileEntryReference dlOpenerFileEntryReference) {
-		return dlOpenerFileEntryReferencePersistence.remove(dlOpenerFileEntryReference);
+
+		return dlOpenerFileEntryReferencePersistence.remove(
+			dlOpenerFileEntryReference);
 	}
 
 	@Override
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(DLOpenerFileEntryReference.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			DLOpenerFileEntryReference.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -142,7 +151,8 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 */
 	@Override
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
-		return dlOpenerFileEntryReferencePersistence.findWithDynamicQuery(dynamicQuery);
+		return dlOpenerFileEntryReferencePersistence.findWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -158,10 +168,11 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return dlOpenerFileEntryReferencePersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return dlOpenerFileEntryReferencePersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -178,10 +189,12 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return dlOpenerFileEntryReferencePersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return dlOpenerFileEntryReferencePersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -192,7 +205,8 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return dlOpenerFileEntryReferencePersistence.countWithDynamicQuery(dynamicQuery);
+		return dlOpenerFileEntryReferencePersistence.countWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -203,16 +217,19 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return dlOpenerFileEntryReferencePersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return dlOpenerFileEntryReferencePersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
 	public DLOpenerFileEntryReference fetchDLOpenerFileEntryReference(
 		long dlOpenerFileEntryReferenceId) {
-		return dlOpenerFileEntryReferencePersistence.fetchByPrimaryKey(dlOpenerFileEntryReferenceId);
+
+		return dlOpenerFileEntryReferencePersistence.fetchByPrimaryKey(
+			dlOpenerFileEntryReferenceId);
 	}
 
 	/**
@@ -224,15 +241,20 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 */
 	@Override
 	public DLOpenerFileEntryReference getDLOpenerFileEntryReference(
-		long dlOpenerFileEntryReferenceId) throws PortalException {
-		return dlOpenerFileEntryReferencePersistence.findByPrimaryKey(dlOpenerFileEntryReferenceId);
+			long dlOpenerFileEntryReferenceId)
+		throws PortalException {
+
+		return dlOpenerFileEntryReferencePersistence.findByPrimaryKey(
+			dlOpenerFileEntryReferenceId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(dlOpenerFileEntryReferenceLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			dlOpenerFileEntryReferenceLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DLOpenerFileEntryReference.class);
 
@@ -243,12 +265,17 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(dlOpenerFileEntryReferenceLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			dlOpenerFileEntryReferenceLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
-		indexableActionableDynamicQuery.setModelClass(DLOpenerFileEntryReference.class);
+		indexableActionableDynamicQuery.setModelClass(
+			DLOpenerFileEntryReference.class);
 
 		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
 			"dlOpenerFileEntryReferenceId");
@@ -258,7 +285,9 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(dlOpenerFileEntryReferenceLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			dlOpenerFileEntryReferenceLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DLOpenerFileEntryReference.class);
 
@@ -272,13 +301,18 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return dlOpenerFileEntryReferenceLocalService.deleteDLOpenerFileEntryReference((DLOpenerFileEntryReference)persistedModel);
+
+		return dlOpenerFileEntryReferenceLocalService.
+			deleteDLOpenerFileEntryReference(
+				(DLOpenerFileEntryReference)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
-		return dlOpenerFileEntryReferencePersistence.findByPrimaryKey(primaryKeyObj);
+
+		return dlOpenerFileEntryReferencePersistence.findByPrimaryKey(
+			primaryKeyObj);
 	}
 
 	/**
@@ -295,6 +329,7 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	@Override
 	public List<DLOpenerFileEntryReference> getDLOpenerFileEntryReferences(
 		int start, int end) {
+
 		return dlOpenerFileEntryReferencePersistence.findAll(start, end);
 	}
 
@@ -318,7 +353,9 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	@Override
 	public DLOpenerFileEntryReference updateDLOpenerFileEntryReference(
 		DLOpenerFileEntryReference dlOpenerFileEntryReference) {
-		return dlOpenerFileEntryReferencePersistence.update(dlOpenerFileEntryReference);
+
+		return dlOpenerFileEntryReferencePersistence.update(
+			dlOpenerFileEntryReference);
 	}
 
 	/**
@@ -326,7 +363,9 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 *
 	 * @return the dl opener file entry reference local service
 	 */
-	public DLOpenerFileEntryReferenceLocalService getDLOpenerFileEntryReferenceLocalService() {
+	public DLOpenerFileEntryReferenceLocalService
+		getDLOpenerFileEntryReferenceLocalService() {
+
 		return dlOpenerFileEntryReferenceLocalService;
 	}
 
@@ -336,8 +375,11 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 * @param dlOpenerFileEntryReferenceLocalService the dl opener file entry reference local service
 	 */
 	public void setDLOpenerFileEntryReferenceLocalService(
-		DLOpenerFileEntryReferenceLocalService dlOpenerFileEntryReferenceLocalService) {
-		this.dlOpenerFileEntryReferenceLocalService = dlOpenerFileEntryReferenceLocalService;
+		DLOpenerFileEntryReferenceLocalService
+			dlOpenerFileEntryReferenceLocalService) {
+
+		this.dlOpenerFileEntryReferenceLocalService =
+			dlOpenerFileEntryReferenceLocalService;
 	}
 
 	/**
@@ -345,7 +387,9 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 *
 	 * @return the dl opener file entry reference persistence
 	 */
-	public DLOpenerFileEntryReferencePersistence getDLOpenerFileEntryReferencePersistence() {
+	public DLOpenerFileEntryReferencePersistence
+		getDLOpenerFileEntryReferencePersistence() {
+
 		return dlOpenerFileEntryReferencePersistence;
 	}
 
@@ -355,8 +399,11 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 * @param dlOpenerFileEntryReferencePersistence the dl opener file entry reference persistence
 	 */
 	public void setDLOpenerFileEntryReferencePersistence(
-		DLOpenerFileEntryReferencePersistence dlOpenerFileEntryReferencePersistence) {
-		this.dlOpenerFileEntryReferencePersistence = dlOpenerFileEntryReferencePersistence;
+		DLOpenerFileEntryReferencePersistence
+			dlOpenerFileEntryReferencePersistence) {
+
+		this.dlOpenerFileEntryReferencePersistence =
+			dlOpenerFileEntryReferencePersistence;
 	}
 
 	/**
@@ -364,7 +411,9 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -374,12 +423,15 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.document.library.opener.model.DLOpenerFileEntryReference",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.document.library.opener.model.DLOpenerFileEntryReference",
 			dlOpenerFileEntryReferenceLocalService);
 	}
 
@@ -413,15 +465,16 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = dlOpenerFileEntryReferencePersistence.getDataSource();
+			DataSource dataSource =
+				dlOpenerFileEntryReferencePersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -431,11 +484,21 @@ public abstract class DLOpenerFileEntryReferenceLocalServiceBaseImpl
 	}
 
 	@BeanReference(type = DLOpenerFileEntryReferenceLocalService.class)
-	protected DLOpenerFileEntryReferenceLocalService dlOpenerFileEntryReferenceLocalService;
+	protected DLOpenerFileEntryReferenceLocalService
+		dlOpenerFileEntryReferenceLocalService;
+
 	@BeanReference(type = DLOpenerFileEntryReferencePersistence.class)
-	protected DLOpenerFileEntryReferencePersistence dlOpenerFileEntryReferencePersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	protected DLOpenerFileEntryReferencePersistence
+		dlOpenerFileEntryReferencePersistence;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

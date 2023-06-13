@@ -36,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface KaleoTimerModel extends BaseModel<KaleoTimer>, GroupedModel,
-	MVCCModel, ShardedModel {
+public interface KaleoTimerModel
+	extends BaseModel<KaleoTimer>, GroupedModel, MVCCModel, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -352,4 +353,5 @@ public interface KaleoTimerModel extends BaseModel<KaleoTimer>, GroupedModel,
 	 * @param recurrenceScale the recurrence scale of this kaleo timer
 	 */
 	public void setRecurrenceScale(String recurrenceScale);
+
 }

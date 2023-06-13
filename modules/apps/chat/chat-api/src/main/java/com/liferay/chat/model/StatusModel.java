@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.model.BaseModel;
  */
 @ProviderType
 public interface StatusModel extends BaseModel<Status> {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -200,4 +201,5 @@ public interface StatusModel extends BaseModel<Status> {
 	 * @param playSound the play sound of this status
 	 */
 	public void setPlaySound(boolean playSound);
+
 }

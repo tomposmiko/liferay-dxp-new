@@ -21,9 +21,7 @@ import com.liferay.mail.reader.model.Folder;
 import com.liferay.mail.reader.model.impl.FolderImpl;
 import com.liferay.mail.reader.model.impl.FolderModelImpl;
 import com.liferay.mail.reader.service.persistence.FolderPersistence;
-
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -64,18 +62,23 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
-	implements FolderPersistence {
+public class FolderPersistenceImpl
+	extends BasePersistenceImpl<Folder> implements FolderPersistence {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>FolderUtil</code> to access the folder persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static final String FINDER_CLASS_NAME_ENTITY = FolderImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List1";
-	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
-		".List2";
+	public static final String FINDER_CLASS_NAME_ENTITY =
+		FolderImpl.class.getName();
+
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List1";
+
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION =
+		FINDER_CLASS_NAME_ENTITY + ".List2";
+
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
@@ -91,8 +94,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 */
 	@Override
 	public List<Folder> findByAccountId(long accountId) {
-		return findByAccountId(accountId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			null);
+		return findByAccountId(
+			accountId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -126,8 +129,10 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * @return the ordered range of matching folders
 	 */
 	@Override
-	public List<Folder> findByAccountId(long accountId, int start, int end,
+	public List<Folder> findByAccountId(
+		long accountId, int start, int end,
 		OrderByComparator<Folder> orderByComparator) {
+
 		return findByAccountId(accountId, start, end, orderByComparator, true);
 	}
 
@@ -146,28 +151,34 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * @return the ordered range of matching folders
 	 */
 	@Override
-	public List<Folder> findByAccountId(long accountId, int start, int end,
-		OrderByComparator<Folder> orderByComparator, boolean retrieveFromCache) {
+	public List<Folder> findByAccountId(
+		long accountId, int start, int end,
+		OrderByComparator<Folder> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindByAccountId;
-			finderArgs = new Object[] { accountId };
+			finderArgs = new Object[] {accountId};
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindByAccountId;
-			finderArgs = new Object[] { accountId, start, end, orderByComparator };
+			finderArgs = new Object[] {
+				accountId, start, end, orderByComparator
+			};
 		}
 
 		List<Folder> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Folder>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Folder>)finderCache.getResult(
+				finderPath, finderArgs, this);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Folder folder : list) {
@@ -184,8 +195,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 			StringBundler query = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -196,11 +207,10 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 			query.append(_FINDER_COLUMN_ACCOUNTID_ACCOUNTID_2);
 
 			if (orderByComparator != null) {
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 			}
-			else
-			 if (pagination) {
+			else if (pagination) {
 				query.append(FolderModelImpl.ORDER_BY_JPQL);
 			}
 
@@ -218,16 +228,16 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 				qPos.add(accountId);
 
 				if (!pagination) {
-					list = (List<Folder>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Folder>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Folder>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Folder>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -256,9 +266,10 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * @throws NoSuchFolderException if a matching folder could not be found
 	 */
 	@Override
-	public Folder findByAccountId_First(long accountId,
-		OrderByComparator<Folder> orderByComparator)
+	public Folder findByAccountId_First(
+			long accountId, OrderByComparator<Folder> orderByComparator)
 		throws NoSuchFolderException {
+
 		Folder folder = fetchByAccountId_First(accountId, orderByComparator);
 
 		if (folder != null) {
@@ -285,8 +296,9 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * @return the first matching folder, or <code>null</code> if a matching folder could not be found
 	 */
 	@Override
-	public Folder fetchByAccountId_First(long accountId,
-		OrderByComparator<Folder> orderByComparator) {
+	public Folder fetchByAccountId_First(
+		long accountId, OrderByComparator<Folder> orderByComparator) {
+
 		List<Folder> list = findByAccountId(accountId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -305,9 +317,10 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * @throws NoSuchFolderException if a matching folder could not be found
 	 */
 	@Override
-	public Folder findByAccountId_Last(long accountId,
-		OrderByComparator<Folder> orderByComparator)
+	public Folder findByAccountId_Last(
+			long accountId, OrderByComparator<Folder> orderByComparator)
 		throws NoSuchFolderException {
+
 		Folder folder = fetchByAccountId_Last(accountId, orderByComparator);
 
 		if (folder != null) {
@@ -334,16 +347,17 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * @return the last matching folder, or <code>null</code> if a matching folder could not be found
 	 */
 	@Override
-	public Folder fetchByAccountId_Last(long accountId,
-		OrderByComparator<Folder> orderByComparator) {
+	public Folder fetchByAccountId_Last(
+		long accountId, OrderByComparator<Folder> orderByComparator) {
+
 		int count = countByAccountId(accountId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<Folder> list = findByAccountId(accountId, count - 1, count,
-				orderByComparator);
+		List<Folder> list = findByAccountId(
+			accountId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -362,9 +376,11 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * @throws NoSuchFolderException if a folder with the primary key could not be found
 	 */
 	@Override
-	public Folder[] findByAccountId_PrevAndNext(long folderId, long accountId,
-		OrderByComparator<Folder> orderByComparator)
+	public Folder[] findByAccountId_PrevAndNext(
+			long folderId, long accountId,
+			OrderByComparator<Folder> orderByComparator)
 		throws NoSuchFolderException {
+
 		Folder folder = findByPrimaryKey(folderId);
 
 		Session session = null;
@@ -374,13 +390,13 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 
 			Folder[] array = new FolderImpl[3];
 
-			array[0] = getByAccountId_PrevAndNext(session, folder, accountId,
-					orderByComparator, true);
+			array[0] = getByAccountId_PrevAndNext(
+				session, folder, accountId, orderByComparator, true);
 
 			array[1] = folder;
 
-			array[2] = getByAccountId_PrevAndNext(session, folder, accountId,
-					orderByComparator, false);
+			array[2] = getByAccountId_PrevAndNext(
+				session, folder, accountId, orderByComparator, false);
 
 			return array;
 		}
@@ -392,14 +408,15 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 		}
 	}
 
-	protected Folder getByAccountId_PrevAndNext(Session session, Folder folder,
-		long accountId, OrderByComparator<Folder> orderByComparator,
-		boolean previous) {
+	protected Folder getByAccountId_PrevAndNext(
+		Session session, Folder folder, long accountId,
+		OrderByComparator<Folder> orderByComparator, boolean previous) {
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(4 +
-					(orderByComparator.getOrderByConditionFields().length * 3) +
+			query = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
 					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
@@ -411,7 +428,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 		query.append(_FINDER_COLUMN_ACCOUNTID_ACCOUNTID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
 
 			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
@@ -481,8 +499,9 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 		qPos.add(accountId);
 
 		if (orderByComparator != null) {
-			for (Object orderByConditionValue : orderByComparator.getOrderByConditionValues(
-					folder)) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(folder)) {
+
 				qPos.add(orderByConditionValue);
 			}
 		}
@@ -504,8 +523,10 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 */
 	@Override
 	public void removeByAccountId(long accountId) {
-		for (Folder folder : findByAccountId(accountId, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null)) {
+		for (Folder folder :
+				findByAccountId(
+					accountId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
 			remove(folder);
 		}
 	}
@@ -520,7 +541,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	public int countByAccountId(long accountId) {
 		FinderPath finderPath = _finderPathCountByAccountId;
 
-		Object[] finderArgs = new Object[] { accountId };
+		Object[] finderArgs = new Object[] {accountId};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -561,7 +582,9 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_ACCOUNTID_ACCOUNTID_2 = "folder.accountId = ?";
+	private static final String _FINDER_COLUMN_ACCOUNTID_ACCOUNTID_2 =
+		"folder.accountId = ?";
+
 	private FinderPath _finderPathFetchByA_F;
 	private FinderPath _finderPathCountByA_F;
 
@@ -576,6 +599,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	@Override
 	public Folder findByA_F(long accountId, String fullName)
 		throws NoSuchFolderException {
+
 		Folder folder = fetchByA_F(accountId, fullName);
 
 		if (folder == null) {
@@ -622,24 +646,26 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * @return the matching folder, or <code>null</code> if a matching folder could not be found
 	 */
 	@Override
-	public Folder fetchByA_F(long accountId, String fullName,
-		boolean retrieveFromCache) {
+	public Folder fetchByA_F(
+		long accountId, String fullName, boolean retrieveFromCache) {
+
 		fullName = Objects.toString(fullName, "");
 
-		Object[] finderArgs = new Object[] { accountId, fullName };
+		Object[] finderArgs = new Object[] {accountId, fullName};
 
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(_finderPathFetchByA_F, finderArgs,
-					this);
+			result = finderCache.getResult(
+				_finderPathFetchByA_F, finderArgs, this);
 		}
 
 		if (result instanceof Folder) {
 			Folder folder = (Folder)result;
 
 			if ((accountId != folder.getAccountId()) ||
-					!Objects.equals(fullName, folder.getFullName())) {
+				!Objects.equals(fullName, folder.getFullName())) {
+
 				result = null;
 			}
 		}
@@ -682,8 +708,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 				List<Folder> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(_finderPathFetchByA_F, finderArgs,
-						list);
+					finderCache.putResult(
+						_finderPathFetchByA_F, finderArgs, list);
 				}
 				else {
 					if (list.size() > 1) {
@@ -692,8 +718,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"FolderPersistenceImpl.fetchByA_F(long, String, boolean) with parameters (" +
-								StringUtil.merge(finderArgs) +
-								") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 						}
 					}
 
@@ -732,6 +758,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	@Override
 	public Folder removeByA_F(long accountId, String fullName)
 		throws NoSuchFolderException {
+
 		Folder folder = findByA_F(accountId, fullName);
 
 		return remove(folder);
@@ -750,7 +777,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 
 		FinderPath finderPath = _finderPathCountByA_F;
 
-		Object[] finderArgs = new Object[] { accountId, fullName };
+		Object[] finderArgs = new Object[] {accountId, fullName};
 
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
 
@@ -806,9 +833,14 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_A_F_ACCOUNTID_2 = "folder.accountId = ? AND ";
-	private static final String _FINDER_COLUMN_A_F_FULLNAME_2 = "folder.fullName = ?";
-	private static final String _FINDER_COLUMN_A_F_FULLNAME_3 = "(folder.fullName IS NULL OR folder.fullName = '')";
+	private static final String _FINDER_COLUMN_A_F_ACCOUNTID_2 =
+		"folder.accountId = ? AND ";
+
+	private static final String _FINDER_COLUMN_A_F_FULLNAME_2 =
+		"folder.fullName = ?";
+
+	private static final String _FINDER_COLUMN_A_F_FULLNAME_3 =
+		"(folder.fullName IS NULL OR folder.fullName = '')";
 
 	public FolderPersistenceImpl() {
 		setModelClass(Folder.class);
@@ -825,11 +857,13 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 */
 	@Override
 	public void cacheResult(Folder folder) {
-		entityCache.putResult(FolderModelImpl.ENTITY_CACHE_ENABLED,
-			FolderImpl.class, folder.getPrimaryKey(), folder);
+		entityCache.putResult(
+			FolderModelImpl.ENTITY_CACHE_ENABLED, FolderImpl.class,
+			folder.getPrimaryKey(), folder);
 
-		finderCache.putResult(_finderPathFetchByA_F,
-			new Object[] { folder.getAccountId(), folder.getFullName() }, folder);
+		finderCache.putResult(
+			_finderPathFetchByA_F,
+			new Object[] {folder.getAccountId(), folder.getFullName()}, folder);
 
 		folder.resetOriginalValues();
 	}
@@ -842,8 +876,10 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	@Override
 	public void cacheResult(List<Folder> folders) {
 		for (Folder folder : folders) {
-			if (entityCache.getResult(FolderModelImpl.ENTITY_CACHE_ENABLED,
-						FolderImpl.class, folder.getPrimaryKey()) == null) {
+			if (entityCache.getResult(
+					FolderModelImpl.ENTITY_CACHE_ENABLED, FolderImpl.class,
+					folder.getPrimaryKey()) == null) {
+
 				cacheResult(folder);
 			}
 			else {
@@ -877,8 +913,9 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 */
 	@Override
 	public void clearCache(Folder folder) {
-		entityCache.removeResult(FolderModelImpl.ENTITY_CACHE_ENABLED,
-			FolderImpl.class, folder.getPrimaryKey());
+		entityCache.removeResult(
+			FolderModelImpl.ENTITY_CACHE_ENABLED, FolderImpl.class,
+			folder.getPrimaryKey());
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
@@ -892,8 +929,9 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		for (Folder folder : folders) {
-			entityCache.removeResult(FolderModelImpl.ENTITY_CACHE_ENABLED,
-				FolderImpl.class, folder.getPrimaryKey());
+			entityCache.removeResult(
+				FolderModelImpl.ENTITY_CACHE_ENABLED, FolderImpl.class,
+				folder.getPrimaryKey());
 
 			clearUniqueFindersCache((FolderModelImpl)folder, true);
 		}
@@ -901,33 +939,34 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 
 	protected void cacheUniqueFindersCache(FolderModelImpl folderModelImpl) {
 		Object[] args = new Object[] {
-				folderModelImpl.getAccountId(), folderModelImpl.getFullName()
-			};
+			folderModelImpl.getAccountId(), folderModelImpl.getFullName()
+		};
 
-		finderCache.putResult(_finderPathCountByA_F, args, Long.valueOf(1),
-			false);
-		finderCache.putResult(_finderPathFetchByA_F, args, folderModelImpl,
-			false);
+		finderCache.putResult(
+			_finderPathCountByA_F, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByA_F, args, folderModelImpl, false);
 	}
 
-	protected void clearUniqueFindersCache(FolderModelImpl folderModelImpl,
-		boolean clearCurrent) {
+	protected void clearUniqueFindersCache(
+		FolderModelImpl folderModelImpl, boolean clearCurrent) {
+
 		if (clearCurrent) {
 			Object[] args = new Object[] {
-					folderModelImpl.getAccountId(),
-					folderModelImpl.getFullName()
-				};
+				folderModelImpl.getAccountId(), folderModelImpl.getFullName()
+			};
 
 			finderCache.removeResult(_finderPathCountByA_F, args);
 			finderCache.removeResult(_finderPathFetchByA_F, args);
 		}
 
 		if ((folderModelImpl.getColumnBitmask() &
-				_finderPathFetchByA_F.getColumnBitmask()) != 0) {
+			 _finderPathFetchByA_F.getColumnBitmask()) != 0) {
+
 			Object[] args = new Object[] {
-					folderModelImpl.getOriginalAccountId(),
-					folderModelImpl.getOriginalFullName()
-				};
+				folderModelImpl.getOriginalAccountId(),
+				folderModelImpl.getOriginalFullName()
+			};
 
 			finderCache.removeResult(_finderPathCountByA_F, args);
 			finderCache.removeResult(_finderPathFetchByA_F, args);
@@ -985,8 +1024,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchFolderException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					primaryKey);
+				throw new NoSuchFolderException(
+					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(folder);
@@ -1010,8 +1049,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 			session = openSession();
 
 			if (!session.contains(folder)) {
-				folder = (Folder)session.get(FolderImpl.class,
-						folder.getPrimaryKeyObj());
+				folder = (Folder)session.get(
+					FolderImpl.class, folder.getPrimaryKeyObj());
 			}
 
 			if (folder != null) {
@@ -1044,17 +1083,18 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 
 				throw new IllegalArgumentException(
 					"Implement ModelWrapper in folder proxy " +
-					invocationHandler.getClass());
+						invocationHandler.getClass());
 			}
 
 			throw new IllegalArgumentException(
 				"Implement ModelWrapper in custom Folder implementation " +
-				folder.getClass());
+					folder.getClass());
 		}
 
 		FolderModelImpl folderModelImpl = (FolderModelImpl)folder;
 
-		ServiceContext serviceContext = ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
 		Date now = new Date();
 
@@ -1102,40 +1142,41 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 		if (!FolderModelImpl.COLUMN_BITMASK_ENABLED) {
 			finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 		}
-		else
-		 if (isNew) {
-			Object[] args = new Object[] { folderModelImpl.getAccountId() };
+		else if (isNew) {
+			Object[] args = new Object[] {folderModelImpl.getAccountId()};
 
 			finderCache.removeResult(_finderPathCountByAccountId, args);
-			finderCache.removeResult(_finderPathWithoutPaginationFindByAccountId,
-				args);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindByAccountId, args);
 
 			finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
-			finderCache.removeResult(_finderPathWithoutPaginationFindAll,
-				FINDER_ARGS_EMPTY);
+			finderCache.removeResult(
+				_finderPathWithoutPaginationFindAll, FINDER_ARGS_EMPTY);
 		}
-
 		else {
 			if ((folderModelImpl.getColumnBitmask() &
-					_finderPathWithoutPaginationFindByAccountId.getColumnBitmask()) != 0) {
+				 _finderPathWithoutPaginationFindByAccountId.
+					 getColumnBitmask()) != 0) {
+
 				Object[] args = new Object[] {
-						folderModelImpl.getOriginalAccountId()
-					};
+					folderModelImpl.getOriginalAccountId()
+				};
 
 				finderCache.removeResult(_finderPathCountByAccountId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByAccountId,
-					args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByAccountId, args);
 
-				args = new Object[] { folderModelImpl.getAccountId() };
+				args = new Object[] {folderModelImpl.getAccountId()};
 
 				finderCache.removeResult(_finderPathCountByAccountId, args);
-				finderCache.removeResult(_finderPathWithoutPaginationFindByAccountId,
-					args);
+				finderCache.removeResult(
+					_finderPathWithoutPaginationFindByAccountId, args);
 			}
 		}
 
-		entityCache.putResult(FolderModelImpl.ENTITY_CACHE_ENABLED,
-			FolderImpl.class, folder.getPrimaryKey(), folder, false);
+		entityCache.putResult(
+			FolderModelImpl.ENTITY_CACHE_ENABLED, FolderImpl.class,
+			folder.getPrimaryKey(), folder, false);
 
 		clearUniqueFindersCache(folderModelImpl, false);
 		cacheUniqueFindersCache(folderModelImpl);
@@ -1155,6 +1196,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	@Override
 	public Folder findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchFolderException {
+
 		Folder folder = fetchByPrimaryKey(primaryKey);
 
 		if (folder == null) {
@@ -1162,8 +1204,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchFolderException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				primaryKey);
+			throw new NoSuchFolderException(
+				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
 		return folder;
@@ -1231,8 +1273,9 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * @return the ordered range of folders
 	 */
 	@Override
-	public List<Folder> findAll(int start, int end,
-		OrderByComparator<Folder> orderByComparator) {
+	public List<Folder> findAll(
+		int start, int end, OrderByComparator<Folder> orderByComparator) {
+
 		return findAll(start, end, orderByComparator, true);
 	}
 
@@ -1250,28 +1293,31 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * @return the ordered range of folders
 	 */
 	@Override
-	public List<Folder> findAll(int start, int end,
-		OrderByComparator<Folder> orderByComparator, boolean retrieveFromCache) {
+	public List<Folder> findAll(
+		int start, int end, OrderByComparator<Folder> orderByComparator,
+		boolean retrieveFromCache) {
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-				(orderByComparator == null)) {
+			(orderByComparator == null)) {
+
 			pagination = false;
 			finderPath = _finderPathWithoutPaginationFindAll;
 			finderArgs = FINDER_ARGS_EMPTY;
 		}
 		else {
 			finderPath = _finderPathWithPaginationFindAll;
-			finderArgs = new Object[] { start, end, orderByComparator };
+			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<Folder> list = null;
 
 		if (retrieveFromCache) {
-			list = (List<Folder>)finderCache.getResult(finderPath, finderArgs,
-					this);
+			list = (List<Folder>)finderCache.getResult(
+				finderPath, finderArgs, this);
 		}
 
 		if (list == null) {
@@ -1279,13 +1325,13 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 			String sql = null;
 
 			if (orderByComparator != null) {
-				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 2));
+				query = new StringBundler(
+					2 + (orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_FOLDER);
 
-				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-					orderByComparator);
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
 
 				sql = query.toString();
 			}
@@ -1305,16 +1351,16 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 				Query q = session.createQuery(sql);
 
 				if (!pagination) {
-					list = (List<Folder>)QueryUtil.list(q, getDialect(), start,
-							end, false);
+					list = (List<Folder>)QueryUtil.list(
+						q, getDialect(), start, end, false);
 
 					Collections.sort(list);
 
 					list = Collections.unmodifiableList(list);
 				}
 				else {
-					list = (List<Folder>)QueryUtil.list(q, getDialect(), start,
-							end);
+					list = (List<Folder>)QueryUtil.list(
+						q, getDialect(), start, end);
 				}
 
 				cacheResult(list);
@@ -1352,8 +1398,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(_finderPathCountAll,
-				FINDER_ARGS_EMPTY, this);
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -1365,11 +1411,12 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(_finderPathCountAll, FINDER_ARGS_EMPTY,
-					count);
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(_finderPathCountAll, FINDER_ARGS_EMPTY);
+				finderCache.removeResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 				throw processException(e);
 			}
@@ -1405,53 +1452,59 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 * Initializes the folder persistence.
 	 */
 	public void afterPropertiesSet() {
-		_finderPathWithPaginationFindAll = new FinderPath(FolderModelImpl.ENTITY_CACHE_ENABLED,
-				FolderModelImpl.FINDER_CACHE_ENABLED, FolderImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+		_finderPathWithPaginationFindAll = new FinderPath(
+			FolderModelImpl.ENTITY_CACHE_ENABLED,
+			FolderModelImpl.FINDER_CACHE_ENABLED, FolderImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
 
-		_finderPathWithoutPaginationFindAll = new FinderPath(FolderModelImpl.ENTITY_CACHE_ENABLED,
-				FolderModelImpl.FINDER_CACHE_ENABLED, FolderImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
-				new String[0]);
+		_finderPathWithoutPaginationFindAll = new FinderPath(
+			FolderModelImpl.ENTITY_CACHE_ENABLED,
+			FolderModelImpl.FINDER_CACHE_ENABLED, FolderImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll",
+			new String[0]);
 
-		_finderPathCountAll = new FinderPath(FolderModelImpl.ENTITY_CACHE_ENABLED,
-				FolderModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
-				new String[0]);
+		_finderPathCountAll = new FinderPath(
+			FolderModelImpl.ENTITY_CACHE_ENABLED,
+			FolderModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
+			new String[0]);
 
-		_finderPathWithPaginationFindByAccountId = new FinderPath(FolderModelImpl.ENTITY_CACHE_ENABLED,
-				FolderModelImpl.FINDER_CACHE_ENABLED, FolderImpl.class,
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByAccountId",
-				new String[] {
-					Long.class.getName(),
-					
-				Integer.class.getName(), Integer.class.getName(),
-					OrderByComparator.class.getName()
-				});
+		_finderPathWithPaginationFindByAccountId = new FinderPath(
+			FolderModelImpl.ENTITY_CACHE_ENABLED,
+			FolderModelImpl.FINDER_CACHE_ENABLED, FolderImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByAccountId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
 
-		_finderPathWithoutPaginationFindByAccountId = new FinderPath(FolderModelImpl.ENTITY_CACHE_ENABLED,
-				FolderModelImpl.FINDER_CACHE_ENABLED, FolderImpl.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByAccountId",
-				new String[] { Long.class.getName() },
-				FolderModelImpl.ACCOUNTID_COLUMN_BITMASK |
-				FolderModelImpl.FULLNAME_COLUMN_BITMASK);
+		_finderPathWithoutPaginationFindByAccountId = new FinderPath(
+			FolderModelImpl.ENTITY_CACHE_ENABLED,
+			FolderModelImpl.FINDER_CACHE_ENABLED, FolderImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByAccountId",
+			new String[] {Long.class.getName()},
+			FolderModelImpl.ACCOUNTID_COLUMN_BITMASK |
+			FolderModelImpl.FULLNAME_COLUMN_BITMASK);
 
-		_finderPathCountByAccountId = new FinderPath(FolderModelImpl.ENTITY_CACHE_ENABLED,
-				FolderModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByAccountId",
-				new String[] { Long.class.getName() });
+		_finderPathCountByAccountId = new FinderPath(
+			FolderModelImpl.ENTITY_CACHE_ENABLED,
+			FolderModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByAccountId",
+			new String[] {Long.class.getName()});
 
-		_finderPathFetchByA_F = new FinderPath(FolderModelImpl.ENTITY_CACHE_ENABLED,
-				FolderModelImpl.FINDER_CACHE_ENABLED, FolderImpl.class,
-				FINDER_CLASS_NAME_ENTITY, "fetchByA_F",
-				new String[] { Long.class.getName(), String.class.getName() },
-				FolderModelImpl.ACCOUNTID_COLUMN_BITMASK |
-				FolderModelImpl.FULLNAME_COLUMN_BITMASK);
+		_finderPathFetchByA_F = new FinderPath(
+			FolderModelImpl.ENTITY_CACHE_ENABLED,
+			FolderModelImpl.FINDER_CACHE_ENABLED, FolderImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByA_F",
+			new String[] {Long.class.getName(), String.class.getName()},
+			FolderModelImpl.ACCOUNTID_COLUMN_BITMASK |
+			FolderModelImpl.FULLNAME_COLUMN_BITMASK);
 
-		_finderPathCountByA_F = new FinderPath(FolderModelImpl.ENTITY_CACHE_ENABLED,
-				FolderModelImpl.FINDER_CACHE_ENABLED, Long.class,
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_F",
-				new String[] { Long.class.getName(), String.class.getName() });
+		_finderPathCountByA_F = new FinderPath(
+			FolderModelImpl.ENTITY_CACHE_ENABLED,
+			FolderModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_F",
+			new String[] {Long.class.getName(), String.class.getName()});
 	}
 
 	public void destroy() {
@@ -1463,16 +1516,34 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
 	protected CompanyProvider companyProvider;
+
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
+
 	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
-	private static final String _SQL_SELECT_FOLDER = "SELECT folder FROM Folder folder";
-	private static final String _SQL_SELECT_FOLDER_WHERE = "SELECT folder FROM Folder folder WHERE ";
-	private static final String _SQL_COUNT_FOLDER = "SELECT COUNT(folder) FROM Folder folder";
-	private static final String _SQL_COUNT_FOLDER_WHERE = "SELECT COUNT(folder) FROM Folder folder WHERE ";
+
+	private static final String _SQL_SELECT_FOLDER =
+		"SELECT folder FROM Folder folder";
+
+	private static final String _SQL_SELECT_FOLDER_WHERE =
+		"SELECT folder FROM Folder folder WHERE ";
+
+	private static final String _SQL_COUNT_FOLDER =
+		"SELECT COUNT(folder) FROM Folder folder";
+
+	private static final String _SQL_COUNT_FOLDER_WHERE =
+		"SELECT COUNT(folder) FROM Folder folder WHERE ";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "folder.";
-	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No Folder exists with the primary key ";
-	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No Folder exists with the key {";
-	private static final Log _log = LogFactoryUtil.getLog(FolderPersistenceImpl.class);
+
+	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
+		"No Folder exists with the primary key ";
+
+	private static final String _NO_SUCH_ENTITY_WITH_KEY =
+		"No Folder exists with the key {";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		FolderPersistenceImpl.class);
+
 }

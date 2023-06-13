@@ -15,22 +15,30 @@
 package com.liferay.headless.foundation.internal.resource.v1_0;
 
 import com.liferay.headless.foundation.dto.v1_0.UserAccount;
-import com.liferay.headless.foundation.internal.dto.v1_0.UserAccountImpl;
 import com.liferay.headless.foundation.resource.v1_0.UserAccountResource;
-import com.liferay.oauth2.provider.scope.RequiresScope;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.net.URI;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Generated;
+
+import javax.validation.constraints.NotNull;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -42,7 +50,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -51,121 +58,179 @@ import javax.ws.rs.core.UriInfo;
  */
 @Generated("")
 @Path("/v1.0")
-public abstract class BaseUserAccountResourceImpl implements UserAccountResource {
+public abstract class BaseUserAccountResourceImpl
+	implements UserAccountResource {
 
 	@Override
 	@GET
-	@Path("/my-user-accounts/{my-user-account-id}")
+	@Path("/my-user-accounts/{user-account-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "UserAccount")})
 	public UserAccount getMyUserAccount(
-	@PathParam("my-user-account-id") Long myUserAccountId)
-			throws Exception {
+			@NotNull @PathParam("user-account-id") Long userAccountId)
+		throws Exception {
 
-				return new UserAccountImpl();
+		return new UserAccount();
 	}
+
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "filter"),
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
+			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+		}
+	)
 	@Path("/organizations/{organization-id}/user-accounts")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "UserAccount")})
 	public Page<UserAccount> getOrganizationUserAccountsPage(
-	@PathParam("organization-id") Long organizationId,@Context Pagination pagination)
-			throws Exception {
+			@NotNull @PathParam("organization-id") Long organizationId,
+			@QueryParam("search") String search, @Context Filter filter,
+			@Context Pagination pagination, @Context Sort[] sorts)
+		throws Exception {
 
-				return Page.of(Collections.emptyList());
+		return Page.of(Collections.emptyList());
 	}
+
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "filter"),
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
+			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+		}
+	)
 	@Path("/user-accounts")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "UserAccount")})
 	public Page<UserAccount> getUserAccountsPage(
-	@QueryParam("fullnamequery") String fullnamequery,@Context Pagination pagination)
-			throws Exception {
+			@QueryParam("search") String search, @Context Filter filter,
+			@Context Pagination pagination, @Context Sort[] sorts)
+		throws Exception {
 
-				return Page.of(Collections.emptyList());
+		return Page.of(Collections.emptyList());
 	}
+
 	@Override
 	@Consumes("application/json")
 	@POST
 	@Path("/user-accounts")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
-	public UserAccount postUserAccount(
-				UserAccount userAccount)
-			throws Exception {
+	@Tags(value = {@Tag(name = "UserAccount")})
+	public UserAccount postUserAccount(UserAccount userAccount)
+		throws Exception {
 
-				return new UserAccountImpl();
+		return new UserAccount();
 	}
+
+	@Override
+	@Consumes("multipart/form-data")
+	@POST
+	@Path("/user-accounts")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "UserAccount")})
+	public UserAccount postUserAccount(MultipartBody multipartBody)
+		throws Exception {
+
+		return new UserAccount();
+	}
+
 	@Override
 	@DELETE
 	@Path("/user-accounts/{user-account-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
-	public boolean deleteUserAccount(
-	@PathParam("user-account-id") Long userAccountId)
-			throws Exception {
-
-				return false;
+	@Tags(value = {@Tag(name = "UserAccount")})
+	public void deleteUserAccount(
+			@NotNull @PathParam("user-account-id") Long userAccountId)
+		throws Exception {
 	}
+
 	@Override
 	@GET
 	@Path("/user-accounts/{user-account-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "UserAccount")})
 	public UserAccount getUserAccount(
-	@PathParam("user-account-id") Long userAccountId)
-			throws Exception {
+			@NotNull @PathParam("user-account-id") Long userAccountId)
+		throws Exception {
 
-				return new UserAccountImpl();
+		return new UserAccount();
 	}
+
 	@Override
 	@Consumes("application/json")
 	@PUT
 	@Path("/user-accounts/{user-account-id}")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "UserAccount")})
 	public UserAccount putUserAccount(
-	@PathParam("user-account-id") Long userAccountId,UserAccount userAccount)
-			throws Exception {
+			@NotNull @PathParam("user-account-id") Long userAccountId,
+			UserAccount userAccount)
+		throws Exception {
 
-				return new UserAccountImpl();
+		return new UserAccount();
 	}
+
 	@Override
 	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "filter"),
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize"),
+			@Parameter(in = ParameterIn.QUERY, name = "sorts")
+		}
+	)
 	@Path("/web-sites/{web-site-id}/user-accounts")
 	@Produces("application/json")
-	@RequiresScope("everything.read")
+	@Tags(value = {@Tag(name = "UserAccount")})
 	public Page<UserAccount> getWebSiteUserAccountsPage(
-	@PathParam("web-site-id") Long webSiteId,@Context Pagination pagination)
-			throws Exception {
+			@NotNull @PathParam("web-site-id") Long webSiteId,
+			@QueryParam("search") String search, @Context Filter filter,
+			@Context Pagination pagination, @Context Sort[] sorts)
+		throws Exception {
 
-				return Page.of(Collections.emptyList());
+		return Page.of(Collections.emptyList());
 	}
 
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected String getJAXRSLink(String methodName, Object... values) {
-		URI baseURI = contextUriInfo.getBaseUri();
-
-		URI resourceURI = UriBuilder.fromResource(
-			BaseUserAccountResourceImpl.class
-		).build();
-
-		URI methodURI = UriBuilder.fromMethod(
-			BaseUserAccountResourceImpl.class, methodName
-		).build(
-			values
-		);
-
-		return baseURI.toString() + resourceURI.toString() + methodURI.toString();
+	protected void preparePatch(UserAccount userAccount) {
 	}
 
-	protected <T, R> List<R> transform(List<T> list, UnsafeFunction<T, R, Throwable> unsafeFunction) {
-		return TransformUtil.transform(list, unsafeFunction);
+	protected <T, R> List<R> transform(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transform(collection, unsafeFunction);
+	}
+
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
+
+		return TransformUtil.transform(array, unsafeFunction, clazz);
+	}
+
+	protected <T, R> R[] transformToArray(
+		Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
+
+		return TransformUtil.transformToArray(
+			collection, unsafeFunction, clazz);
+	}
+
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
+
+		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
 	@Context

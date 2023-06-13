@@ -25,13 +25,13 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.sharing.model.SharingEntry;
 import com.liferay.sharing.service.SharingEntryLocalService;
 import com.liferay.sharing.web.internal.constants.SharingPortletKeys;
+import com.liferay.sharing.web.internal.constants.SharingWebKeys;
 import com.liferay.sharing.web.internal.display.SharingEntryPermissionDisplay;
 import com.liferay.sharing.web.internal.display.SharingEntryPermissionDisplayAction;
 import com.liferay.sharing.web.internal.util.SharingUtil;
@@ -39,7 +39,6 @@ import com.liferay.sharing.web.internal.util.SharingUtil;
 import java.text.DateFormat;
 import java.text.Format;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -79,7 +78,8 @@ public class ManageCollaboratorsViewMVCRenderCommand
 			"collaborators", _getCollaboratorsJSONArray(renderRequest));
 		template.put(
 			"dialogId",
-			ParamUtil.getString(renderRequest, "manageCollaboratorDialogId"));
+			ParamUtil.getString(
+				renderRequest, SharingWebKeys.MANAGE_COLLABORATORS_DIALOG_ID));
 		template.put("portletNamespace", renderResponse.getNamespace());
 		template.put("spritemap", _getSpritemap(renderRequest));
 
@@ -97,43 +97,27 @@ public class ManageCollaboratorsViewMVCRenderCommand
 			long classNameId = ParamUtil.getLong(renderRequest, "classNameId");
 			long classPK = ParamUtil.getLong(renderRequest, "classPK");
 
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			int sharingEntriesCount =
+				_sharingEntryLocalService.getSharingEntriesCount(
+					classNameId, classPK);
 
-			int countSharingEntryToUserIds =
-				_sharingEntryLocalService.getFromUserSharingEntriesCount(
-					themeDisplay.getUserId(), classNameId, classPK);
-
-			if (countSharingEntryToUserIds == 0) {
+			if (sharingEntriesCount == 0) {
 				return JSONFactoryUtil.createJSONArray();
 			}
 
-			List<SharingEntry> fromUserSharingEntries =
-				_sharingEntryLocalService.getFromUserSharingEntries(
-					themeDisplay.getUserId(), classNameId, classPK, 0,
-					countSharingEntryToUserIds);
-
-			List<ObjectValuePair<SharingEntry, User>> sharingEntryToUserOVPs =
-				new ArrayList<>();
-
-			for (SharingEntry sharingEntry : fromUserSharingEntries) {
-				User toUser = _userLocalService.fetchUser(
-					sharingEntry.getToUserId());
-
-				if (toUser != null) {
-					sharingEntryToUserOVPs.add(
-						new ObjectValuePair<>(sharingEntry, toUser));
-				}
-			}
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 			JSONArray collaboratorsJSONArray =
 				JSONFactoryUtil.createJSONArray();
 
-			for (ObjectValuePair<SharingEntry, User> sharingEntryToUserOVP :
-					sharingEntryToUserOVPs) {
+			List<SharingEntry> sharingEntries =
+				_sharingEntryLocalService.getSharingEntries(
+					classNameId, classPK);
 
-				SharingEntry sharingEntry = sharingEntryToUserOVP.getKey();
-				User sharingEntryToUser = sharingEntryToUserOVP.getValue();
+			for (SharingEntry sharingEntry : sharingEntries) {
+				User sharingEntryToUser = _userLocalService.fetchUser(
+					sharingEntry.getToUserId());
 
 				JSONObject collaboratorJSONObject =
 					JSONFactoryUtil.createJSONObject();

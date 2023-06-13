@@ -63,13 +63,20 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class AuditEventServiceSoap {
-	public static com.liferay.portal.security.audit.storage.model.AuditEventSoap[] getAuditEvents(
-		long companyId, int start, int end) throws RemoteException {
-		try {
-			java.util.List<com.liferay.portal.security.audit.storage.model.AuditEvent> returnValue =
-				AuditEventServiceUtil.getAuditEvents(companyId, start, end);
 
-			return com.liferay.portal.security.audit.storage.model.AuditEventSoap.toSoapModels(returnValue);
+	public static
+		com.liferay.portal.security.audit.storage.model.AuditEventSoap[]
+				getAuditEvents(long companyId, int start, int end)
+			throws RemoteException {
+
+		try {
+			java.util.List
+				<com.liferay.portal.security.audit.storage.model.AuditEvent>
+					returnValue = AuditEventServiceUtil.getAuditEvents(
+						companyId, start, end);
+
+			return com.liferay.portal.security.audit.storage.model.
+				AuditEventSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -78,16 +85,22 @@ public class AuditEventServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.audit.storage.model.AuditEventSoap[] getAuditEvents(
-		long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws RemoteException {
-		try {
-			java.util.List<com.liferay.portal.security.audit.storage.model.AuditEvent> returnValue =
-				AuditEventServiceUtil.getAuditEvents(companyId, start, end,
-					orderByComparator);
+	public static
+		com.liferay.portal.security.audit.storage.model.AuditEventSoap[]
+				getAuditEvents(
+					long companyId, int start, int end,
+					com.liferay.portal.kernel.util.OrderByComparator
+						orderByComparator)
+			throws RemoteException {
 
-			return com.liferay.portal.security.audit.storage.model.AuditEventSoap.toSoapModels(returnValue);
+		try {
+			java.util.List
+				<com.liferay.portal.security.audit.storage.model.AuditEvent>
+					returnValue = AuditEventServiceUtil.getAuditEvents(
+						companyId, start, end, orderByComparator);
+
+			return com.liferay.portal.security.audit.storage.model.
+				AuditEventSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -96,20 +109,28 @@ public class AuditEventServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.audit.storage.model.AuditEventSoap[] getAuditEvents(
-		long companyId, long userId, String userName,
-		java.util.Date createDateGT, java.util.Date createDateLT,
-		String eventType, String className, String classPK, String clientHost,
-		String clientIP, String serverName, int serverPort, String sessionID,
-		boolean andSearch, int start, int end) throws RemoteException {
-		try {
-			java.util.List<com.liferay.portal.security.audit.storage.model.AuditEvent> returnValue =
-				AuditEventServiceUtil.getAuditEvents(companyId, userId,
-					userName, createDateGT, createDateLT, eventType, className,
-					classPK, clientHost, clientIP, serverName, serverPort,
-					sessionID, andSearch, start, end);
+	public static
+		com.liferay.portal.security.audit.storage.model.AuditEventSoap[]
+				getAuditEvents(
+					long companyId, long userId, String userName,
+					java.util.Date createDateGT, java.util.Date createDateLT,
+					String eventType, String className, String classPK,
+					String clientHost, String clientIP, String serverName,
+					int serverPort, String sessionID, boolean andSearch,
+					int start, int end)
+			throws RemoteException {
 
-			return com.liferay.portal.security.audit.storage.model.AuditEventSoap.toSoapModels(returnValue);
+		try {
+			java.util.List
+				<com.liferay.portal.security.audit.storage.model.AuditEvent>
+					returnValue = AuditEventServiceUtil.getAuditEvents(
+						companyId, userId, userName, createDateGT, createDateLT,
+						eventType, className, classPK, clientHost, clientIP,
+						serverName, serverPort, sessionID, andSearch, start,
+						end);
+
+			return com.liferay.portal.security.audit.storage.model.
+				AuditEventSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -118,22 +139,30 @@ public class AuditEventServiceSoap {
 		}
 	}
 
-	public static com.liferay.portal.security.audit.storage.model.AuditEventSoap[] getAuditEvents(
-		long companyId, long userId, String userName,
-		java.util.Date createDateGT, java.util.Date createDateLT,
-		String eventType, String className, String classPK, String clientHost,
-		String clientIP, String serverName, int serverPort, String sessionID,
-		boolean andSearch, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
-		throws RemoteException {
-		try {
-			java.util.List<com.liferay.portal.security.audit.storage.model.AuditEvent> returnValue =
-				AuditEventServiceUtil.getAuditEvents(companyId, userId,
-					userName, createDateGT, createDateLT, eventType, className,
-					classPK, clientHost, clientIP, serverName, serverPort,
-					sessionID, andSearch, start, end, orderByComparator);
+	public static
+		com.liferay.portal.security.audit.storage.model.AuditEventSoap[]
+				getAuditEvents(
+					long companyId, long userId, String userName,
+					java.util.Date createDateGT, java.util.Date createDateLT,
+					String eventType, String className, String classPK,
+					String clientHost, String clientIP, String serverName,
+					int serverPort, String sessionID, boolean andSearch,
+					int start, int end,
+					com.liferay.portal.kernel.util.OrderByComparator
+						orderByComparator)
+			throws RemoteException {
 
-			return com.liferay.portal.security.audit.storage.model.AuditEventSoap.toSoapModels(returnValue);
+		try {
+			java.util.List
+				<com.liferay.portal.security.audit.storage.model.AuditEvent>
+					returnValue = AuditEventServiceUtil.getAuditEvents(
+						companyId, userId, userName, createDateGT, createDateLT,
+						eventType, className, classPK, clientHost, clientIP,
+						serverName, serverPort, sessionID, andSearch, start,
+						end, orderByComparator);
+
+			return com.liferay.portal.security.audit.storage.model.
+				AuditEventSoap.toSoapModels(returnValue);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -144,8 +173,10 @@ public class AuditEventServiceSoap {
 
 	public static int getAuditEventsCount(long companyId)
 		throws RemoteException {
+
 		try {
-			int returnValue = AuditEventServiceUtil.getAuditEventsCount(companyId);
+			int returnValue = AuditEventServiceUtil.getAuditEventsCount(
+				companyId);
 
 			return returnValue;
 		}
@@ -156,17 +187,19 @@ public class AuditEventServiceSoap {
 		}
 	}
 
-	public static int getAuditEventsCount(long companyId, long userId,
-		String userName, java.util.Date createDateGT,
-		java.util.Date createDateLT, String eventType, String className,
-		String classPK, String clientHost, String clientIP, String serverName,
-		int serverPort, String sessionID, boolean andSearch)
+	public static int getAuditEventsCount(
+			long companyId, long userId, String userName,
+			java.util.Date createDateGT, java.util.Date createDateLT,
+			String eventType, String className, String classPK,
+			String clientHost, String clientIP, String serverName,
+			int serverPort, String sessionID, boolean andSearch)
 		throws RemoteException {
+
 		try {
-			int returnValue = AuditEventServiceUtil.getAuditEventsCount(companyId,
-					userId, userName, createDateGT, createDateLT, eventType,
-					className, classPK, clientHost, clientIP, serverName,
-					serverPort, sessionID, andSearch);
+			int returnValue = AuditEventServiceUtil.getAuditEventsCount(
+				companyId, userId, userName, createDateGT, createDateLT,
+				eventType, className, classPK, clientHost, clientIP, serverName,
+				serverPort, sessionID, andSearch);
 
 			return returnValue;
 		}
@@ -177,5 +210,7 @@ public class AuditEventServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(AuditEventServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		AuditEventServiceSoap.class);
+
 }

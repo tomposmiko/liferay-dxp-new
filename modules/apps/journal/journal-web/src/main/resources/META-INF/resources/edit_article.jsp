@@ -33,14 +33,7 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 	<portlet:param name="mvcPath" value="/edit_article.jsp" />
 </portlet:renderURL>
 
-<liferay-frontend:edit-form
-	action="<%= editArticleActionURL %>"
-	cssClass="contextual-sidebar-content"
-	enctype="multipart/form-data"
-	method="post"
-	name="fm1"
-	onSubmit="event.preventDefault();"
->
+<aui:form action="<%= editArticleActionURL %>" cssClass="edit-article-form" enctype="multipart/form-data" method="post" name="fm1" onSubmit="event.preventDefault();">
 	<aui:input name="<%= ActionRequest.ACTION_NAME %>" type="hidden" />
 	<aui:input name="hideDefaultSuccessMessage" type="hidden" value="<%= journalEditArticleDisplayContext.isHideDefaultSuccessMessage() || (journalEditArticleDisplayContext.getClassNameId() == PortalUtil.getClassNameId(DDMStructure.class)) %>" />
 	<aui:input name="redirect" type="hidden" value="<%= journalEditArticleDisplayContext.getRedirect() %>" />
@@ -61,102 +54,140 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 	<aui:input name="ddmTemplateId" type="hidden" />
 	<aui:input name="workflowAction" type="hidden" value="<%= String.valueOf(WorkflowConstants.ACTION_SAVE_DRAFT) %>" />
 
-	<liferay-frontend:edit-form-body>
-		<c:if test="<%= journalWebConfiguration.changeableDefaultLanguage() %>">
-			<soy:component-renderer
-				context="<%= journalEditArticleDisplayContext.getChangeDefaultLanguageSoyContext() %>"
-				module="js/ChangeDefaultLanguage.es"
-				templateNamespace="com.liferay.journal.web.ChangeDefaultLanguage.render"
-			/>
-		</c:if>
+	<nav class="component-tbar subnav-tbar-light tbar tbar-article">
+		<div class="container-fluid container-fluid-max-xl">
+			<ul class="tbar-nav">
+				<li class="tbar-item tbar-item-expand">
 
-		<liferay-ui:error exception="<%= ArticleContentSizeException.class %>" message="you-have-exceeded-the-maximum-web-content-size-allowed" />
-		<liferay-ui:error exception="<%= ArticleFriendlyURLException.class %>" message="you-must-define-a-friendly-url-for-default-language" />
-		<liferay-ui:error exception="<%= DuplicateFileEntryException.class %>" message="a-file-with-that-name-already-exists" />
+					<%
+					DDMStructure ddmStructure = journalEditArticleDisplayContext.getDDMStructure();
+					%>
 
-		<liferay-ui:error exception="<%= ExportImportContentValidationException.class %>">
+					<aui:input cssClass="form-control-inline" label="" localized="<%= true %>" name="titleMapAsXML" placeholder='<%= LanguageUtil.format(request, "untitled-x", HtmlUtil.escape(ddmStructure.getName(locale))) %>' type="text" wrapperCssClass="article-content-title mb-0" />
+				</li>
+
+				<c:if test="<%= journalWebConfiguration.changeableDefaultLanguage() %>">
+					<li class="tbar-item">
+						<div class="tbar-section">
+							<soy:component-renderer
+								context="<%= journalEditArticleDisplayContext.getChangeDefaultLanguageSoyContext() %>"
+								module="js/ChangeDefaultLanguage.es"
+								templateNamespace="com.liferay.journal.web.ChangeDefaultLanguage.render"
+							/>
+						</div>
+					</li>
+				</c:if>
+
+				<li class="tbar-item">
+					<div class="journal-article-button-row tbar-section text-right">
+						<a class="btn btn-outline-borderless btn-outline-secondary btn-sm mr-3" href="<%= journalEditArticleDisplayContext.getRedirect() %>">
+							<liferay-ui:message key="cancel" />
+						</a>
+
+						<c:if test="<%= journalEditArticleDisplayContext.hasSavePermission() %>">
+							<c:if test="<%= journalEditArticleDisplayContext.getClassNameId() == JournalArticleConstants.CLASSNAME_ID_DEFAULT %>">
+								<aui:button cssClass="btn-sm mr-3" data-actionname='<%= ((article == null) || Validator.isNull(article.getArticleId())) ? "addArticle" : "updateArticle" %>' name="saveButton" primary="<%= false %>" type="submit" value="<%= journalEditArticleDisplayContext.getSaveButtonLabel() %>" />
+							</c:if>
+
+							<aui:button cssClass="btn-sm mr-3" data-actionname="<%= Constants.PUBLISH %>" disabled="<%= journalEditArticleDisplayContext.isPending() %>" name="publishButton" type="submit" value="<%= journalEditArticleDisplayContext.getPublishButtonLabel() %>" />
+						</c:if>
+
+						<clay:button
+							icon="cog"
+							id='<%= renderResponse.getNamespace() + "contextualSidebarButton" %>'
+							size="sm"
+							style="borderless"
+						/>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</nav>
+
+	<div class="contextual-sidebar contextual-sidebar-visible edit-article-sidebar sidebar-light sidebar-sm" id="<portlet:namespace />contextualSidebarContainer">
+		<div class="sidebar-body">
 
 			<%
-			ExportImportContentValidationException eicve = (ExportImportContentValidationException)errorException;
+			String tabs1Names = "properties,usages";
+
+			if ((article == null) || (journalEditArticleDisplayContext.getClassNameId() != JournalArticleConstants.CLASSNAME_ID_DEFAULT)) {
+				tabs1Names = "properties";
+			}
 			%>
 
-			<c:choose>
-				<c:when test="<%= eicve.getType() == ExportImportContentValidationException.ARTICLE_NOT_FOUND %>">
-					<liferay-ui:message key="unable-to-validate-referenced-journal-article" />
-				</c:when>
-				<c:when test="<%= eicve.getType() == ExportImportContentValidationException.FILE_ENTRY_NOT_FOUND %>">
-					<liferay-ui:message arguments="<%= new String[] {MapUtil.toString(eicve.getDlReferenceParameters())} %>" key="unable-to-validate-referenced-file-entry-because-it-cannot-be-found-with-the-following-parameters-x" />
-				</c:when>
-				<c:when test="<%= eicve.getType() == ExportImportContentValidationException.LAYOUT_GROUP_NOT_FOUND %>">
-					<liferay-ui:message arguments="<%= new String[] {eicve.getLayoutURL(), eicve.getGroupFriendlyURL()} %>" key="unable-to-validate-referenced-page-with-url-x-because-the-page-group-with-url-x-cannot-be-found" />
-				</c:when>
-				<c:when test="<%= eicve.getType() == ExportImportContentValidationException.LAYOUT_NOT_FOUND %>">
-					<liferay-ui:message arguments="<%= new String[] {MapUtil.toString(eicve.getLayoutReferenceParameters())} %>" key="unable-to-validate-referenced-page-because-it-cannot-be-found-with-the-following-parameters-x" />
-				</c:when>
-				<c:when test="<%= eicve.getType() == ExportImportContentValidationException.LAYOUT_WITH_URL_NOT_FOUND %>">
-					<liferay-ui:message arguments="<%= new String[] {eicve.getLayoutURL()} %>" key="unable-to-validate-referenced-page-because-it-cannot-be-found-with-url-x" />
-				</c:when>
-				<c:otherwise>
-					<liferay-ui:message key="an-unexpected-error-occurred" />
-				</c:otherwise>
-			</c:choose>
-		</liferay-ui:error>
+			<liferay-ui:tabs
+				names="<%= tabs1Names %>"
+				param="tabs1"
+				refresh="<%= false %>"
+			>
+				<liferay-ui:section>
+					<liferay-frontend:form-navigator
+						formModelBean="<%= article %>"
+						id="<%= FormNavigatorConstants.FORM_NAVIGATOR_ID_JOURNAL %>"
+						showButtons="<%= false %>"
+					/>
+				</liferay-ui:section>
 
-		<liferay-ui:error exception="<%= FileSizeException.class %>">
-			<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(DLValidatorUtil.getMaxAllowableSize(), locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
-		</liferay-ui:error>
+				<c:if test="<%= (article != null) && (journalEditArticleDisplayContext.getClassNameId() == JournalArticleConstants.CLASSNAME_ID_DEFAULT) %>">
+					<liferay-ui:section>
+						<liferay-asset:asset-view-usages
+							className="<%= JournalArticle.class.getName() %>"
+							classPK="<%= article.getResourcePrimKey() %>"
+						/>
+					</liferay-ui:section>
+				</c:if>
+			</liferay-ui:tabs>
+		</div>
+	</div>
 
-		<liferay-ui:error exception="<%= LiferayFileItemException.class %>">
-			<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(LiferayFileItem.THRESHOLD_SIZE, locale) %>" key="please-enter-valid-content-with-valid-content-size-no-larger-than-x" translateArguments="<%= false %>" />
-		</liferay-ui:error>
+	<div class="contextual-sidebar-content">
+		<div class="container-fluid container-fluid-max-xl container-view">
+			<div class="sheet sheet-lg">
+				<liferay-ui:error exception="<%= ArticleContentSizeException.class %>" message="you-have-exceeded-the-maximum-web-content-size-allowed" />
+				<liferay-ui:error exception="<%= ArticleFriendlyURLException.class %>" message="you-must-define-a-friendly-url-for-default-language" />
+				<liferay-ui:error exception="<%= DuplicateFileEntryException.class %>" message="a-file-with-that-name-already-exists" />
 
-		<c:if test="<%= (article != null) && !article.isNew() && (journalEditArticleDisplayContext.getClassNameId() == JournalArticleConstants.CLASSNAME_ID_DEFAULT) %>">
-			<liferay-frontend:info-bar>
-				<aui:workflow-status id="<%= String.valueOf(article.getArticleId()) %>" markupView="lexicon" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= article.getStatus() %>" version="<%= String.valueOf(article.getVersion()) %>" />
-			</liferay-frontend:info-bar>
-		</c:if>
+				<liferay-ui:error exception="<%= ExportImportContentValidationException.class %>">
 
-		<c:if test="<%= journalEditArticleDisplayContext.getClassNameId() == JournalArticleConstants.CLASSNAME_ID_DEFAULT %>">
-			<c:if test="<%= journalEditArticleDisplayContext.isApproved() %>">
-				<div class="alert alert-info">
-					<liferay-ui:message key="a-new-version-is-created-automatically-if-this-content-is-modified" />
-				</div>
-			</c:if>
+					<%
+					ExportImportContentValidationException eicve = (ExportImportContentValidationException)errorException;
+					%>
 
-			<c:if test="<%= journalEditArticleDisplayContext.isPending() %>">
-				<div class="alert alert-info">
-					<liferay-ui:message key="there-is-a-publication-workflow-in-process" />
-				</div>
-			</c:if>
-		</c:if>
+					<c:choose>
+						<c:when test="<%= eicve.getType() == ExportImportContentValidationException.ARTICLE_NOT_FOUND %>">
+							<liferay-ui:message key="unable-to-validate-referenced-journal-article" />
+						</c:when>
+						<c:when test="<%= eicve.getType() == ExportImportContentValidationException.FILE_ENTRY_NOT_FOUND %>">
+							<liferay-ui:message arguments="<%= new String[] {MapUtil.toString(eicve.getDlReferenceParameters())} %>" key="unable-to-validate-referenced-file-entry-because-it-cannot-be-found-with-the-following-parameters-x" />
+						</c:when>
+						<c:when test="<%= eicve.getType() == ExportImportContentValidationException.LAYOUT_GROUP_NOT_FOUND %>">
+							<liferay-ui:message arguments="<%= new String[] {eicve.getLayoutURL(), eicve.getGroupFriendlyURL()} %>" key="unable-to-validate-referenced-page-with-url-x-because-the-page-group-with-url-x-cannot-be-found" />
+						</c:when>
+						<c:when test="<%= eicve.getType() == ExportImportContentValidationException.LAYOUT_NOT_FOUND %>">
+							<liferay-ui:message arguments="<%= new String[] {MapUtil.toString(eicve.getLayoutReferenceParameters())} %>" key="unable-to-validate-referenced-page-because-it-cannot-be-found-with-the-following-parameters-x" />
+						</c:when>
+						<c:when test="<%= eicve.getType() == ExportImportContentValidationException.LAYOUT_WITH_URL_NOT_FOUND %>">
+							<liferay-ui:message arguments="<%= new String[] {eicve.getLayoutURL()} %>" key="unable-to-validate-referenced-page-because-it-cannot-be-found-with-url-x" />
+						</c:when>
+						<c:otherwise>
+							<liferay-ui:message key="an-unexpected-error-occurred" />
+						</c:otherwise>
+					</c:choose>
+				</liferay-ui:error>
 
-		<liferay-util:include page="/article/content.jsp" servletContext="<%= application %>" />
+				<liferay-ui:error exception="<%= FileSizeException.class %>">
+					<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(DLValidatorUtil.getMaxAllowableSize(), locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
+				</liferay-ui:error>
 
-		<div class="contextual-sidebar contextual-sidebar-visible edit-article-sidebar sidebar-light">
-			<div class="sidebar-body">
-				<liferay-frontend:form-navigator
-					formModelBean="<%= article %>"
-					id="<%= FormNavigatorConstants.FORM_NAVIGATOR_ID_JOURNAL %>"
-					showButtons="<%= false %>"
-				/>
+				<liferay-ui:error exception="<%= LiferayFileItemException.class %>">
+					<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(LiferayFileItem.THRESHOLD_SIZE, locale) %>" key="please-enter-valid-content-with-valid-content-size-no-larger-than-x" translateArguments="<%= false %>" />
+				</liferay-ui:error>
+
+				<liferay-util:include page="/article/content.jsp" servletContext="<%= application %>" />
 			</div>
 		</div>
-	</liferay-frontend:edit-form-body>
-
-	<liferay-frontend:edit-form-footer>
-		<div class="journal-article-button-row">
-			<c:if test="<%= journalEditArticleDisplayContext.hasSavePermission() %>">
-				<aui:button data-actionname="<%= Constants.PUBLISH %>" disabled="<%= journalEditArticleDisplayContext.isPending() %>" name="publishButton" type="submit" value="<%= journalEditArticleDisplayContext.getPublishButtonLabel() %>" />
-
-				<c:if test="<%= journalEditArticleDisplayContext.getClassNameId() == JournalArticleConstants.CLASSNAME_ID_DEFAULT %>">
-					<aui:button data-actionname='<%= ((article == null) || Validator.isNull(article.getArticleId())) ? "addArticle" : "updateArticle" %>' name="saveButton" primary="<%= false %>" type="submit" value="<%= journalEditArticleDisplayContext.getSaveButtonLabel() %>" />
-				</c:if>
-			</c:if>
-
-			<aui:button href="<%= journalEditArticleDisplayContext.getRedirect() %>" type="cancel" />
-		</div>
-	</liferay-frontend:edit-form-footer>
-</liferay-frontend:edit-form>
+	</div>
+</aui:form>
 
 <aui:script use="liferay-portlet-journal">
 	new Liferay.Portlet.Journal(
@@ -175,4 +206,23 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 			'strings.saveAsDraftBeforePreview': '<liferay-ui:message key="in-order-to-preview-your-changes,-the-web-content-is-saved-as-a-draft" />'
 		}
 	);
+
+	var contextualSidebarButton = document.getElementById('<portlet:namespace />contextualSidebarButton');
+
+	if (contextualSidebarButton) {
+		contextualSidebarButton.addEventListener(
+			'click',
+			function(event) {
+				var contextualSidebarContainer = document.getElementById('<portlet:namespace />contextualSidebarContainer');
+
+				if (contextualSidebarContainer.classList.contains('contextual-sidebar-visible')) {
+					contextualSidebarContainer.classList.remove('contextual-sidebar-visible');
+
+				}
+				else {
+					contextualSidebarContainer.classList.add('contextual-sidebar-visible');
+				}
+			}
+		);
+	}
 </aui:script>

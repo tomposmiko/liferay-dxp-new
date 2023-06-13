@@ -14,9 +14,26 @@
 
 package com.liferay.headless.foundation.internal.resource.v1_0;
 
+import com.liferay.headless.foundation.dto.v1_0.PostalAddress;
+import com.liferay.headless.foundation.internal.dto.v1_0.util.PostalAddressUtil;
 import com.liferay.headless.foundation.resource.v1_0.PostalAddressResource;
+import com.liferay.portal.kernel.model.Contact;
+import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.AddressLocalService;
+import com.liferay.portal.kernel.service.AddressService;
+import com.liferay.portal.kernel.service.OrganizationService;
+import com.liferay.portal.kernel.service.UserService;
+import com.liferay.portal.kernel.service.permission.CommonPermissionUtil;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
+
+import javax.ws.rs.core.Context;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 
 /**
@@ -27,4 +44,67 @@ import org.osgi.service.component.annotations.ServiceScope;
 	scope = ServiceScope.PROTOTYPE, service = PostalAddressResource.class
 )
 public class PostalAddressResourceImpl extends BasePostalAddressResourceImpl {
+
+	@Override
+	public Page<PostalAddress> getOrganizationPostalAddressesPage(
+			Long organizationId, Pagination pagination)
+		throws Exception {
+
+		Organization organization = _organizationService.getOrganization(
+			organizationId);
+
+		return Page.of(
+			transform(
+				_addressLocalService.getAddresses(
+					contextCompany.getCompanyId(),
+					organization.getModelClassName(),
+					organization.getOrganizationId()),
+				address -> PostalAddressUtil.toPostalAddress(
+					address, contextAcceptLanguage.getPreferredLocale())));
+	}
+
+	@Override
+	public PostalAddress getPostalAddress(Long postalAddressId)
+		throws Exception {
+
+		return PostalAddressUtil.toPostalAddress(
+			_addressService.getAddress(postalAddressId),
+			contextAcceptLanguage.getPreferredLocale());
+	}
+
+	@Override
+	public Page<PostalAddress> getUserAccountPostalAddressesPage(
+			Long userAccountId, Pagination pagination)
+		throws Exception {
+
+		User user = _userService.getUserById(userAccountId);
+
+		CommonPermissionUtil.check(
+			PermissionThreadLocal.getPermissionChecker(),
+			user.getModelClassName(), user.getUserId(), ActionKeys.VIEW);
+
+		return Page.of(
+			transform(
+				_addressLocalService.getAddresses(
+					user.getCompanyId(), Contact.class.getName(),
+					user.getContactId()),
+				address -> PostalAddressUtil.toPostalAddress(
+					address, contextAcceptLanguage.getPreferredLocale())));
+	}
+
+	@Reference
+	private AddressLocalService _addressLocalService;
+
+	@Reference
+	private AddressService _addressService;
+
+	@Reference
+	private OrganizationService _organizationService;
+
+	@Context
+	private User _user;
+
+	@Reference
+	private UserService _userService;
+
 }

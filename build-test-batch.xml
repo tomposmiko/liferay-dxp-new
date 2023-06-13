@@ -7,6 +7,27 @@
 		<isset property="env.AXIS_VARIABLE" />
 	</condition>
 
+	<macrodef name="add-cdiannotations-header">
+		<attribute name="liferay.plugin.package.properties.file" />
+
+		<sequential>
+			<if>
+				<not>
+					<resourcecontains
+						resource="@{liferay.plugin.package.properties.file}"
+						substring="-cdiannotations:"
+					/>
+				</not>
+				<then>
+					<echo>Adding -cdiannotations: header to @{liferay.plugin.package.properties.file}.</echo>
+
+					<echo append="true" file="@{liferay.plugin.package.properties.file}">
+-cdiannotations:</echo>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="check-jenkins-console">
 		<sequential>
 			<if>
@@ -891,6 +912,8 @@ app.server.type=@{app.server.type}]]></echo>
 			</chmod>
 
 			<setup-libs />
+
+			<setup-yarn />
 
 			<antcall inheritAll="false" target="install-portal-snapshots" />
 
@@ -2231,32 +2254,17 @@ log.sanitizer.enabled=false</echo>
 
 							<get-test-batch-app-server-start-executable-arg-line />
 
-							<if>
-								<equals arg1="@{subrepository.name}" arg2="" />
-								<then>
-									<print-test-class-group test.class.group.index="${axis.variable}" />
+							<print-test-class-group test.class.group.index="${axis.variable}" />
 
-									<echo>Executing Gradle task in directory "modules": testIntegration.</echo>
+							<echo>Executing Gradle task in directory "modules": testIntegration.</echo>
 
-									<gradle-execute dir="modules" refreshdependencies="@{refreshdependencies}" task="testIntegration">
-										<arg value="-Dapp.server.start.executable.arg.line=${test.batch.app.server.start.executable.arg.line}" />
-										<arg value="-Ddatabase.type=@{database.type}" />
-										<arg value="-Dbuild.exclude.ant.plugin=true" />
-										<arg value="-Dtest.class.group.index=${axis.variable}" />
-									</gradle-execute>
-								</then>
-								<else>
-									<get-module-base-dir-from-subrepository-name subrepository.name="@{subrepository.name}" />
-
-									<echo>Executing Gradle task in directory "${module.base.dir}": testIntegration.</echo>
-
-									<gradle-execute dir="${module.base.dir}" refreshdependencies="@{refreshdependencies}" task="testIntegration">
-										<arg value="-Dapp.server.start.executable.arg.line=${test.batch.app.server.start.executable.arg.line}" />
-										<arg value="-Ddatabase.type=@{database.type}" />
-										<arg value="-Dbuild.exclude.ant.plugin=true" />
-									</gradle-execute>
-								</else>
-							</if>
+							<gradle-execute dir="modules" refreshdependencies="@{refreshdependencies}" task="testIntegration">
+								<arg value="--continue" />
+								<arg value="-Dapp.server.start.executable.arg.line=${test.batch.app.server.start.executable.arg.line}" />
+								<arg value="-Ddatabase.type=@{database.type}" />
+								<arg value="-Dbuild.exclude.ant.plugin=true" />
+								<arg value="-Dtest.class.group.index=${axis.variable}" />
+							</gradle-execute>
 
 							<if>
 								<and>
@@ -2411,14 +2419,9 @@ log.sanitizer.enabled=false</echo>
 						</then>
 					</if>
 
-					<if>
-						<equals arg1="@{subrepository.name}" arg2="" />
-						<then>
-							<antcall inheritAll="false" target="record-test-class-file-names">
-								<param name="test.class.groups.size" value="${test.batch.size}" />
-							</antcall>
-						</then>
-					</if>
+					<antcall inheritAll="false" target="record-test-class-file-names">
+						<param name="test.class.groups.size" value="${test.batch.size}" />
+					</antcall>
 				</test-set-up>
 
 				<test-tear-down>
@@ -2463,6 +2466,86 @@ log.sanitizer.enabled=false</echo>
 									includes="**/bundleFile"
 								/>
 							</delete>
+
+							<trycatch>
+								<try>
+									<antcall inheritall="false" target="start-app-server-preserve-liferay-home" />
+
+									<antcall inheritall="false" target="run-selenium-test">
+										<param name="test.batch.run.type" value="single" />
+										<param name="test.class" value="PortalSmoke#Smoke" />
+										<param name="test.skip.tear.down" value="false" />
+									</antcall>
+								</try>
+
+								<finally>
+									<ant dir="portal-kernel" inheritAll="false" target="test-class">
+										<property name="test.class" value="PortalLogAssertorTest" />
+									</ant>
+								</finally>
+							</trycatch>
+						</test-action>
+					</database-test-run-test>
+				</test-action>
+
+				<test-set-up>
+					<if>
+						<and>
+							<available file="liferay-portal-bundle-${app.server.type}.tar.gz" />
+							<available file="liferay-portal-source.tar.gz" />
+						</and>
+						<then>
+							<prepare-test-environment />
+						</then>
+						<else>
+							<prepare-test-build />
+						</else>
+					</if>
+				</test-set-up>
+			</run-batch-test>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="run-release-osgi-state-lpkg-change-directory-test">
+		<sequential>
+			<run-batch-test tomcat.gc.log="true">
+				<test-action>
+					<database-test-run-test database.type="mysql" stop.app.server="true">
+						<test-action>
+							<setup-lpkg-test database.type="@{database.type}" />
+
+							<antcall inheritall="false" target="start-app-server" />
+
+							<antcall inheritall="false" target="stop-app-server" />
+
+							<delete dir="${liferay.home}/logs" />
+
+							<delete>
+								<fileset
+									dir="${liferay.home}/osgi/state"
+									includes="**/bundleFile"
+								/>
+							</delete>
+
+							<antcall inheritAll="false" target="prepare-portal-ext-properties">
+								<param name="database.type" value="@{database.type}" />
+								<param name="liferay.home" value="${project.dir}/bun dles" />
+							</antcall>
+
+							<antcall inheritAll="false" target="prepare-system-ext-properties" />
+
+							<move
+								file="bundles"
+								tofile="bun dles"
+							/>
+
+							<propertyfile file="app.server.${env.HOSTNAME}.properties">
+								<entry key="app.server.parent.dir" value="${project.dir}/bun dles" />
+							</propertyfile>
+
+							<propertyfile file="build.${env.HOSTNAME}.properties">
+								<entry key="liferay.home" value="${project.dir}/bun dles" />
+							</propertyfile>
 
 							<trycatch>
 								<try>
@@ -4228,6 +4311,19 @@ log.sanitizer.enabled=false</echo>
 
 						<propertycopy from="browser.firefox.bin.file[${browser.firefox.version}]" name="browser.firefox.bin.file" silent="true" />
 
+						<!--
+						Add -cdiannotations: header before building so that JSF CDI portlets will deploy without error.
+						See LPS-86824 for more details.
+						-->
+
+						<add-cdiannotations-header
+							liferay.plugin.package.properties.file="${liferay.faces.bridge.impl.dir}/demo/jsf-cdi-applicant-portlet/src/main/webapp/WEB-INF/liferay-plugin-package.properties"
+						/>
+
+						<add-cdiannotations-header
+							liferay.plugin.package.properties.file="${liferay.faces.bridge.impl.dir}/demo/jsf-flows-portlet/src/main/webapp/WEB-INF/liferay-plugin-package.properties"
+						/>
+
 						<execute dir="${liferay.faces.bridge.impl.dir}/demo">
 							mvn clean package -P liferay,mojarra,tomcat
 						</execute>
@@ -4630,6 +4726,8 @@ log.sanitizer.enabled=false</echo>
 
 				<loadresource property="modules.compile.task.groups">
 					<filterchain>
+						<replacestring from="-test:assemble" to="-test:compileTestIntegrationJava" />
+
 						<tokenfilter>
 							<replaceregex flags="g" pattern="(\S+ ){${test.module.groups.size}}" replace="\0," />
 						</tokenfilter>
@@ -5028,6 +5126,7 @@ log.sanitizer.enabled=false</echo>
 		<run-batch-test>
 			<test-action>
 				<gradle-execute dir="modules" task="test">
+					<arg value="--continue" />
 					<arg value="-Dbuild.exclude.ant.plugin=true" />
 					<arg if:set="com.liferay.portal.search.solr7.test.unit.started" value="-Dcom.liferay.portal.search.solr7.test.unit.started=${com.liferay.portal.search.solr7.test.unit.started}" />
 					<arg value="-Djunit.code.coverage=${test.batch.code.coverage}" />
@@ -5686,6 +5785,10 @@ ${output.content}</echo>
 		<run-release-osgi-state-exploded-test />
 	</target>
 
+	<target name="release-osgi-state-lpkg-change-directory-test-jdk8">
+		<run-release-osgi-state-lpkg-change-directory-test />
+	</target>
+
 	<target name="release-osgi-state-lpkg-test-jdk8">
 		<run-release-osgi-state-lpkg-test />
 	</target>
@@ -6228,15 +6331,30 @@ information. Make sure to commit in all build services results.
 	<target name="subrepository-unit-jdk8">
 		<fail message="Please set the property ${subrepository.name}." unless="subrepository.name" />
 
-		<get-module-base-dir-from-subrepository-name subrepository.name="${subrepository.name}" />
-
 		<trycatch property="failure.property">
 			<try>
 				<gradle-execute dir="${project.dir}/modules/apps/petra" task="deploy">
 					<arg value="-Dportal.build=true" />
 				</gradle-execute>
 
-				<gradle-execute checktask="true" dir="${module.base.dir}" forcedcacheenabled="false" outputproperty="gradle.output" refreshdependencies="true" task="test" />
+				<if>
+					<equals arg1="${subrepository.validation}" arg2="true" />
+					<then>
+						<get-module-base-dir-from-subrepository-name subrepository.name="${subrepository.name}" />
+
+						<gradle-execute checktask="true" dir="${module.base.dir}" forcedcacheenabled="false" outputproperty="gradle.output" refreshdependencies="true" task="test" />
+					</then>
+					<else>
+						<antcall inheritAll="false" target="record-test-class-file-names">
+							<param name="test.class.groups.size" value="${test.batch.size}" />
+						</antcall>
+
+						<gradle-execute checktask="true" dir="modules" forcedcacheenabled="false" outputproperty="gradle.output" refreshdependencies="true" task="test">
+							<arg value="-Dbuild.exclude.ant.plugin=true" />
+							<arg value="-Dtest.class.group.index=${axis.variable}" />
+						</gradle-execute>
+					</else>
+				</if>
 			</try>
 			<catch>
 				<echo message="${gradle.output.error}" />

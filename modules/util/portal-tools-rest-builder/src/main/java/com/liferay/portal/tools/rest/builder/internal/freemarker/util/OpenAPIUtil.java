@@ -16,16 +16,25 @@ package com.liferay.portal.tools.rest.builder.internal.freemarker.util;
 
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaMethodSignature;
+import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.parser.GraphQLOpenAPIParser;
+import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.parser.util.OpenAPIParserUtil;
+import com.liferay.portal.vulcan.yaml.config.ConfigYAML;
 import com.liferay.portal.vulcan.yaml.openapi.Components;
 import com.liferay.portal.vulcan.yaml.openapi.Info;
 import com.liferay.portal.vulcan.yaml.openapi.Items;
 import com.liferay.portal.vulcan.yaml.openapi.OpenAPIYAML;
+import com.liferay.portal.vulcan.yaml.openapi.Operation;
 import com.liferay.portal.vulcan.yaml.openapi.Schema;
 
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +42,38 @@ import java.util.regex.Pattern;
  * @author Peter Shin
  */
 public class OpenAPIUtil {
+
+	public static String escapeVersion(OpenAPIYAML openAPIYAML) {
+		Info info = openAPIYAML.getInfo();
+
+		String version = info.getVersion();
+
+		if (Validator.isNull(version)) {
+			return null;
+		}
+
+		Matcher matcher = _nondigitPattern.matcher(version);
+
+		String escapedVersion = matcher.replaceAll("_");
+
+		matcher = _leadingUnderscorePattern.matcher(escapedVersion);
+
+		return "v" + matcher.replaceFirst("");
+	}
+
+	public static String formatSingular(String s) {
+		if (s.endsWith("ses")) {
+			s = s.substring(0, s.length() - 3) + "s";
+		}
+		else if (s.endsWith("ies")) {
+			s = s.substring(0, s.length() - 3) + "y";
+		}
+		else if (s.endsWith("s")) {
+			s = s.substring(0, s.length() - 1);
+		}
+
+		return s;
+	}
 
 	public static Map<String, Schema> getAllSchemas(OpenAPIYAML openAPIYAML) {
 		Map<String, Schema> allSchemas = new TreeMap<>();
@@ -56,6 +97,10 @@ public class OpenAPIUtil {
 				if (items != null) {
 					propertySchemas = items.getPropertySchemas();
 				}
+				else if (schema.getAllOfSchemas() != null) {
+					propertySchemas = OpenAPIParserUtil.getAllOfPropertySchemas(
+						schema);
+				}
 				else {
 					propertySchemas = schema.getPropertySchemas();
 				}
@@ -67,7 +112,31 @@ public class OpenAPIUtil {
 				String schemaName = StringUtil.upperCaseFirstLetter(
 					entry.getKey());
 
+				if (items != null) {
+					schemaName = formatSingular(schemaName);
+				}
+
 				allSchemas.put(schemaName, schema);
+
+				if (schema.getOneOfSchemas() != null) {
+					for (Schema oneOfSchema : schema.getOneOfSchemas()) {
+						Map<String, Schema> schemas =
+							oneOfSchema.getPropertySchemas();
+
+						Set<String> keys = schemas.keySet();
+
+						Iterator<String> iterator = keys.iterator();
+
+						String schemaKey = StringUtil.upperCaseFirstLetter(
+							iterator.next());
+
+						if (!allSchemas.containsKey(schemaKey)) {
+							allSchemas.put(schemaKey, oneOfSchema);
+
+							queue.add(schemas);
+						}
+					}
+				}
 
 				queue.add(propertySchemas);
 			}
@@ -76,22 +145,12 @@ public class OpenAPIUtil {
 		return allSchemas;
 	}
 
-	public static String getVersionDirName(OpenAPIYAML openAPIYAML) {
-		Info info = openAPIYAML.getInfo();
+	public static List<JavaMethodSignature> getJavaMethodSignatures(
+		ConfigYAML configYAML, OpenAPIYAML openAPIYAML,
+		Predicate<Operation> predicate) {
 
-		String version = info.getVersion();
-
-		if (Validator.isNull(version)) {
-			return null;
-		}
-
-		Matcher matcher = _nondigitPattern.matcher(version);
-
-		String versionDirName = matcher.replaceAll("_");
-
-		matcher = _leadingUnderscorePattern.matcher(versionDirName);
-
-		return "v" + matcher.replaceFirst("");
+		return GraphQLOpenAPIParser.getJavaMethodSignatures(
+			configYAML, openAPIYAML, predicate);
 	}
 
 	private static final Pattern _leadingUnderscorePattern = Pattern.compile(

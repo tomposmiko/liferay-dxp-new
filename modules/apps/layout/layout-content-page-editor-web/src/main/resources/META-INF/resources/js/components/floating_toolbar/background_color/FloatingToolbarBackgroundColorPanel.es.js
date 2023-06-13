@@ -1,10 +1,10 @@
-import {addClasses, removeClasses} from 'metal-dom';
 import Component from 'metal-component';
 import {Config} from 'metal-state';
 import Soy from 'metal-soy';
 
+import '../common/FloatingToolbarColorPicker.es';
 import './FloatingToolbarBackgroundColorPanelDelegateTemplate.soy';
-import {ITEM_CONFIG_KEYS} from '../../../utils/constants';
+import {CONFIG_KEYS} from '../../../utils/sectionConstants';
 import getConnectedComponent from '../../../store/ConnectedComponent.es';
 import templates from './FloatingToolbarBackgroundColorPanel.soy';
 import {UPDATE_LAST_SAVE_DATE, UPDATE_SAVING_CHANGES_STATUS, UPDATE_SECTION_CONFIG, UPDATE_TRANSLATION_STATUS} from '../../../actions/actions.es';
@@ -22,7 +22,7 @@ class FloatingToolbarBackgroundColorPanel extends Component {
 	_handleClearButtonClick() {
 		this._updateSectionConfig(
 			{
-				[ITEM_CONFIG_KEYS.backgroundColorCssClass]: ''
+				[CONFIG_KEYS.backgroundColorCssClass]: ''
 			}
 		);
 	}
@@ -34,18 +34,9 @@ class FloatingToolbarBackgroundColorPanel extends Component {
 	 * @review
 	 */
 	_handleBackgroundColorButtonClick(event) {
-		const button = event.delegateTarget;
-		const paletteItemSelected = this.element.querySelector('.palette-item-selected');
-
-		if (paletteItemSelected) {
-			removeClasses(paletteItemSelected, 'palette-item-selected');
-		}
-
-		addClasses(button.parentNode, 'palette-item-selected');
-
 		this._updateSectionConfig(
 			{
-				[ITEM_CONFIG_KEYS.backgroundColorCssClass]: button.dataset.backgroundColorCssClass
+				[CONFIG_KEYS.backgroundColorCssClass]: event.color
 			}
 		);
 	}

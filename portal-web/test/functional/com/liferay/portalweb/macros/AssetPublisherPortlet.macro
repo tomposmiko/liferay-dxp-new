@@ -3,8 +3,6 @@ definition {
 		Portlet.clickPortletPlusIconPG(portletName = "Asset Publisher");
 
 		MenuItem.click(menuItem = "${assetType}");
-
-		IFrame.selectConfigurationFrame();
 	}
 
 	macro assertSiteScopeSearch {
@@ -23,6 +21,13 @@ definition {
 		SelectFrame(locator1 = "IFrame#SELECT_SITES");
 
 		SiteSelector.viewSite(site = "${siteName}");
+	}
+
+	macro clickAssetTitle {
+		Click(
+			locator1 = "AP#ASSET_ABSTRACT_TITLE",
+			key_assetTitle = "${assetTitle}"
+		);
 	}
 
 	macro configureAddSiteScopes {
@@ -200,7 +205,7 @@ definition {
 
 		Select(
 			locator1 = "APConfiguration#FILTER_CATEGORIZATION_SELECT",
-			value1 = "Categories"
+			value1 = "categories"
 		);
 
 		if (isSet(queryAndOperator)) {
@@ -251,8 +256,16 @@ definition {
 	}
 
 	macro configureDisplaySettings {
-		AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
+		if ("${displayPage}" == "true") {
+			var key_portletName = "${portletName}";
 
+			Click(locator1 = "PageEditor#WIDGETS_OPTIONS_ICON");
+
+			SelectFrame(locator1 = "IFrame#DIALOG");
+		}
+		else {
+			AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
+		}
 		Navigator.gotoNavTab(navTab = "Display Settings");
 
 		Panel.expandPanel(panel = "Set and Enable");
@@ -636,7 +649,7 @@ definition {
 
 		Select(
 			locator1 = "APConfiguration#FILTER_CATEGORIZATION_SELECT",
-			value1 = "Tags"
+			value1 = "tags"
 		);
 
 		AssetCategorization.selectTag(tagNameList = "${tagNameList}");
@@ -790,8 +803,6 @@ definition {
 		);
 
 		MenuItem.click(menuItem = "Edit");
-
-		IFrame.selectEditAssetFrame();
 	}
 
 	macro gotoViewInContext {
@@ -910,9 +921,11 @@ definition {
 
 		AssertTextEquals(locator1 = "AP#ASSET_ABSTRACT_TITLE", value1 = "${assetTitle}");
 
-		AssertClick(locator1 = "AP#ASSET_ABSTRACT_TITLE", value1 = "${assetTitle}");
+		AssetPublisherPortlet.clickAssetTitle(
+			assetTitle = "${assetTitle}"
+		);
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "APAsset#ASSET_TITLE_HEADER",
 			value1 = "${assetTitle}"
 		);
@@ -984,7 +997,6 @@ definition {
 
 			AssertElementNotPresent(
 				locator1 = "Ratings#YOUR_RATING_STAR",
-				key_ratingStarPosition = "${ratingPosition}",
 				key_ratingStarPosition = MathUtil.sum("${ratingPosition}", "1")
 			);
 		}
@@ -1091,16 +1103,6 @@ definition {
 			locator1 = "Ratings#AVERAGE_LABEL",
 			value1 = "Average (1 Vote)"
 		);
-	}
-
-	macro viewConfigureAPDisplayTemplateFullContentBookmarksPG {
-		var key_assetTitle = "${assetTitle}";
-
-		AssertElementPresent(locator1 = "Icon#SHARE");
-
-		AssertElementNotPresent(locator1 = "Link#READ_MORE");
-
-		SocialBookmarks.viewBookmarkIcons(socialBookmarks = "Facebook,LinkedIn,Twitter");
 	}
 
 	macro viewConfigureAPDisplayTemplateTableBookmarksPG {
@@ -1657,6 +1659,13 @@ definition {
 			locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
 			value1 = "${selectedAssetConfiguration}"
 		);
+
+		if (isSet(assetSubtypeConfiguration)) {
+			AssertSelectedLabel(
+				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_SUBTYPE_SELECT",
+				value1 = "${assetSubtypeConfiguration}"
+			);
+		}
 
 		SelectFrameTop();
 	}

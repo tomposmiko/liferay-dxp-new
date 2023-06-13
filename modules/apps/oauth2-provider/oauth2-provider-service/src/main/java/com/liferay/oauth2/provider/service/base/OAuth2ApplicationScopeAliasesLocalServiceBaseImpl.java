@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ApplicationScopeAliasesPersistence;
-
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -43,13 +42,13 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 
-import org.osgi.service.component.annotations.Reference;
-
 import java.io.Serializable;
 
 import java.util.List;
 
 import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the o auth2 application scope aliases local service.
@@ -66,7 +65,8 @@ import javax.sql.DataSource;
 public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements OAuth2ApplicationScopeAliasesLocalService, AopService,
-		IdentifiableOSGiService {
+			   IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -83,9 +83,11 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	@Override
 	public OAuth2ApplicationScopeAliases addOAuth2ApplicationScopeAliases(
 		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases) {
+
 		oAuth2ApplicationScopeAliases.setNew(true);
 
-		return oAuth2ApplicationScopeAliasesPersistence.update(oAuth2ApplicationScopeAliases);
+		return oAuth2ApplicationScopeAliasesPersistence.update(
+			oAuth2ApplicationScopeAliases);
 	}
 
 	/**
@@ -98,7 +100,9 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	@Transactional(enabled = false)
 	public OAuth2ApplicationScopeAliases createOAuth2ApplicationScopeAliases(
 		long oAuth2ApplicationScopeAliasesId) {
-		return oAuth2ApplicationScopeAliasesPersistence.create(oAuth2ApplicationScopeAliasesId);
+
+		return oAuth2ApplicationScopeAliasesPersistence.create(
+			oAuth2ApplicationScopeAliasesId);
 	}
 
 	/**
@@ -111,8 +115,11 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public OAuth2ApplicationScopeAliases deleteOAuth2ApplicationScopeAliases(
-		long oAuth2ApplicationScopeAliasesId) throws PortalException {
-		return oAuth2ApplicationScopeAliasesPersistence.remove(oAuth2ApplicationScopeAliasesId);
+			long oAuth2ApplicationScopeAliasesId)
+		throws PortalException {
+
+		return oAuth2ApplicationScopeAliasesPersistence.remove(
+			oAuth2ApplicationScopeAliasesId);
 	}
 
 	/**
@@ -125,15 +132,17 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	@Override
 	public OAuth2ApplicationScopeAliases deleteOAuth2ApplicationScopeAliases(
 		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases) {
-		return oAuth2ApplicationScopeAliasesPersistence.remove(oAuth2ApplicationScopeAliases);
+
+		return oAuth2ApplicationScopeAliasesPersistence.remove(
+			oAuth2ApplicationScopeAliases);
 	}
 
 	@Override
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(OAuth2ApplicationScopeAliases.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			OAuth2ApplicationScopeAliases.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -144,7 +153,8 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	 */
 	@Override
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
-		return oAuth2ApplicationScopeAliasesPersistence.findWithDynamicQuery(dynamicQuery);
+		return oAuth2ApplicationScopeAliasesPersistence.findWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -160,10 +170,11 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return oAuth2ApplicationScopeAliasesPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return oAuth2ApplicationScopeAliasesPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -180,10 +191,12 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return oAuth2ApplicationScopeAliasesPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return oAuth2ApplicationScopeAliasesPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -194,7 +207,8 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return oAuth2ApplicationScopeAliasesPersistence.countWithDynamicQuery(dynamicQuery);
+		return oAuth2ApplicationScopeAliasesPersistence.countWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -205,16 +219,19 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return oAuth2ApplicationScopeAliasesPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return oAuth2ApplicationScopeAliasesPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
 	public OAuth2ApplicationScopeAliases fetchOAuth2ApplicationScopeAliases(
 		long oAuth2ApplicationScopeAliasesId) {
-		return oAuth2ApplicationScopeAliasesPersistence.fetchByPrimaryKey(oAuth2ApplicationScopeAliasesId);
+
+		return oAuth2ApplicationScopeAliasesPersistence.fetchByPrimaryKey(
+			oAuth2ApplicationScopeAliasesId);
 	}
 
 	/**
@@ -226,17 +243,23 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	 */
 	@Override
 	public OAuth2ApplicationScopeAliases getOAuth2ApplicationScopeAliases(
-		long oAuth2ApplicationScopeAliasesId) throws PortalException {
-		return oAuth2ApplicationScopeAliasesPersistence.findByPrimaryKey(oAuth2ApplicationScopeAliasesId);
+			long oAuth2ApplicationScopeAliasesId)
+		throws PortalException {
+
+		return oAuth2ApplicationScopeAliasesPersistence.findByPrimaryKey(
+			oAuth2ApplicationScopeAliasesId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(oAuth2ApplicationScopeAliasesLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			oAuth2ApplicationScopeAliasesLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
-		actionableDynamicQuery.setModelClass(OAuth2ApplicationScopeAliases.class);
+		actionableDynamicQuery.setModelClass(
+			OAuth2ApplicationScopeAliases.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName(
 			"oAuth2ApplicationScopeAliasesId");
@@ -245,12 +268,17 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(oAuth2ApplicationScopeAliasesLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			oAuth2ApplicationScopeAliasesLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
-		indexableActionableDynamicQuery.setModelClass(OAuth2ApplicationScopeAliases.class);
+		indexableActionableDynamicQuery.setModelClass(
+			OAuth2ApplicationScopeAliases.class);
 
 		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
 			"oAuth2ApplicationScopeAliasesId");
@@ -260,9 +288,12 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(oAuth2ApplicationScopeAliasesLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			oAuth2ApplicationScopeAliasesLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
-		actionableDynamicQuery.setModelClass(OAuth2ApplicationScopeAliases.class);
+		actionableDynamicQuery.setModelClass(
+			OAuth2ApplicationScopeAliases.class);
 
 		actionableDynamicQuery.setPrimaryKeyPropertyName(
 			"oAuth2ApplicationScopeAliasesId");
@@ -274,13 +305,18 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return oAuth2ApplicationScopeAliasesLocalService.deleteOAuth2ApplicationScopeAliases((OAuth2ApplicationScopeAliases)persistedModel);
+
+		return oAuth2ApplicationScopeAliasesLocalService.
+			deleteOAuth2ApplicationScopeAliases(
+				(OAuth2ApplicationScopeAliases)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
-		return oAuth2ApplicationScopeAliasesPersistence.findByPrimaryKey(primaryKeyObj);
+
+		return oAuth2ApplicationScopeAliasesPersistence.findByPrimaryKey(
+			primaryKeyObj);
 	}
 
 	/**
@@ -295,8 +331,9 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	 * @return the range of o auth2 application scope aliaseses
 	 */
 	@Override
-	public List<OAuth2ApplicationScopeAliases> getOAuth2ApplicationScopeAliaseses(
-		int start, int end) {
+	public List<OAuth2ApplicationScopeAliases>
+		getOAuth2ApplicationScopeAliaseses(int start, int end) {
+
 		return oAuth2ApplicationScopeAliasesPersistence.findAll(start, end);
 	}
 
@@ -320,7 +357,9 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	@Override
 	public OAuth2ApplicationScopeAliases updateOAuth2ApplicationScopeAliases(
 		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases) {
-		return oAuth2ApplicationScopeAliasesPersistence.update(oAuth2ApplicationScopeAliases);
+
+		return oAuth2ApplicationScopeAliasesPersistence.update(
+			oAuth2ApplicationScopeAliases);
 	}
 
 	@Override
@@ -333,7 +372,8 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 
 	@Override
 	public void setAopProxy(Object aopProxy) {
-		oAuth2ApplicationScopeAliasesLocalService = (OAuth2ApplicationScopeAliasesLocalService)aopProxy;
+		oAuth2ApplicationScopeAliasesLocalService =
+			(OAuth2ApplicationScopeAliasesLocalService)aopProxy;
 	}
 
 	/**
@@ -361,15 +401,16 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = oAuth2ApplicationScopeAliasesPersistence.getDataSource();
+			DataSource dataSource =
+				oAuth2ApplicationScopeAliasesPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -378,9 +419,15 @@ public abstract class OAuth2ApplicationScopeAliasesLocalServiceBaseImpl
 		}
 	}
 
-	protected OAuth2ApplicationScopeAliasesLocalService oAuth2ApplicationScopeAliasesLocalService;
+	protected OAuth2ApplicationScopeAliasesLocalService
+		oAuth2ApplicationScopeAliasesLocalService;
+
 	@Reference
-	protected OAuth2ApplicationScopeAliasesPersistence oAuth2ApplicationScopeAliasesPersistence;
+	protected OAuth2ApplicationScopeAliasesPersistence
+		oAuth2ApplicationScopeAliasesPersistence;
+
 	@Reference
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 }

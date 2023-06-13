@@ -171,7 +171,7 @@ definition {
 
 		Portlet.clickPortletPlusIconPG(portletName = "Documents and Media");
 
-		MenuItem.viewNotPresent(menuItem = "Basic Document");
+		MenuItem.viewNotPresent(menuItem = "File Upload");
 
 		User.logoutAndLoginPG(
 			userLoginEmailAddress = "test@liferay.com",
@@ -245,7 +245,7 @@ definition {
 
 		Portlet.clickPortletPlusIconPG(portletName = "Documents and Media");
 
-		MenuItem.viewNotPresent(menuItem = "Basic Document");
+		MenuItem.viewNotPresent(menuItem = "File Upload");
 
 		User.logoutAndLoginPG(
 			userLoginEmailAddress = "test@liferay.com",
@@ -298,7 +298,7 @@ definition {
 
 		Portlet.clickPortletPlusIconPG(portletName = "Documents and Media");
 
-		MenuItem.viewNotPresent(menuItem = "Basic Document");
+		MenuItem.viewNotPresent(menuItem = "File Upload");
 	}
 
 	@priority = "5"
@@ -391,7 +391,7 @@ definition {
 	@priority = "5"
 	test ViewDMDocumentNoGuestRole {
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -433,7 +433,7 @@ definition {
 	@priority = "4"
 	test ViewDMFolderGuestInline {
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -470,7 +470,7 @@ definition {
 
 		var dmFolderNameUpperCase = StringUtil.upperCase("DM Folder Name");
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "DocumentsAndMedia#BREADCRUMB_FOLDER_NAME",
 			value1 = "${dmFolderNameUpperCase}"
 		);
@@ -530,7 +530,7 @@ definition {
 
 		var dmFolderNameUpperCase = StringUtil.upperCase("DM Folder Name");
 
-		AssertTextEquals.assertTextCaseInsensitive(
+		AssertTextEquals(
 			locator1 = "DocumentsAndMedia#BREADCRUMB_FOLDER_NAME",
 			value1 = "${dmFolderNameUpperCase}"
 		);

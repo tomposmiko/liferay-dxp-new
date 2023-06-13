@@ -18,9 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
-
 import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class SiteNavigationMenuItemCacheModel implements CacheModel<SiteNavigationMenuItem>,
-	Externalizable {
+public class SiteNavigationMenuItemCacheModel
+	implements CacheModel<SiteNavigationMenuItem>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,9 +48,12 @@ public class SiteNavigationMenuItemCacheModel implements CacheModel<SiteNavigati
 			return false;
 		}
 
-		SiteNavigationMenuItemCacheModel siteNavigationMenuItemCacheModel = (SiteNavigationMenuItemCacheModel)obj;
+		SiteNavigationMenuItemCacheModel siteNavigationMenuItemCacheModel =
+			(SiteNavigationMenuItemCacheModel)obj;
 
-		if (siteNavigationMenuItemId == siteNavigationMenuItemCacheModel.siteNavigationMenuItemId) {
+		if (siteNavigationMenuItemId ==
+				siteNavigationMenuItemCacheModel.siteNavigationMenuItemId) {
+
 			return true;
 		}
 
@@ -104,7 +106,8 @@ public class SiteNavigationMenuItemCacheModel implements CacheModel<SiteNavigati
 
 	@Override
 	public SiteNavigationMenuItem toEntityModel() {
-		SiteNavigationMenuItemImpl siteNavigationMenuItemImpl = new SiteNavigationMenuItemImpl();
+		SiteNavigationMenuItemImpl siteNavigationMenuItemImpl =
+			new SiteNavigationMenuItemImpl();
 
 		if (uuid == null) {
 			siteNavigationMenuItemImpl.setUuid("");
@@ -113,7 +116,8 @@ public class SiteNavigationMenuItemCacheModel implements CacheModel<SiteNavigati
 			siteNavigationMenuItemImpl.setUuid(uuid);
 		}
 
-		siteNavigationMenuItemImpl.setSiteNavigationMenuItemId(siteNavigationMenuItemId);
+		siteNavigationMenuItemImpl.setSiteNavigationMenuItemId(
+			siteNavigationMenuItemId);
 		siteNavigationMenuItemImpl.setGroupId(groupId);
 		siteNavigationMenuItemImpl.setCompanyId(companyId);
 		siteNavigationMenuItemImpl.setUserId(userId);
@@ -139,8 +143,10 @@ public class SiteNavigationMenuItemCacheModel implements CacheModel<SiteNavigati
 			siteNavigationMenuItemImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		siteNavigationMenuItemImpl.setSiteNavigationMenuId(siteNavigationMenuId);
-		siteNavigationMenuItemImpl.setParentSiteNavigationMenuItemId(parentSiteNavigationMenuItemId);
+		siteNavigationMenuItemImpl.setSiteNavigationMenuId(
+			siteNavigationMenuId);
+		siteNavigationMenuItemImpl.setParentSiteNavigationMenuItemId(
+			parentSiteNavigationMenuItemId);
 
 		if (name == null) {
 			siteNavigationMenuItemImpl.setName("");
@@ -169,8 +175,8 @@ public class SiteNavigationMenuItemCacheModel implements CacheModel<SiteNavigati
 			siteNavigationMenuItemImpl.setLastPublishDate(null);
 		}
 		else {
-			siteNavigationMenuItemImpl.setLastPublishDate(new Date(
-					lastPublishDate));
+			siteNavigationMenuItemImpl.setLastPublishDate(
+				new Date(lastPublishDate));
 		}
 
 		siteNavigationMenuItemImpl.resetOriginalValues();
@@ -205,8 +211,7 @@ public class SiteNavigationMenuItemCacheModel implements CacheModel<SiteNavigati
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -276,4 +281,5 @@ public class SiteNavigationMenuItemCacheModel implements CacheModel<SiteNavigati
 	public String typeSettings;
 	public int order;
 	public long lastPublishDate;
+
 }

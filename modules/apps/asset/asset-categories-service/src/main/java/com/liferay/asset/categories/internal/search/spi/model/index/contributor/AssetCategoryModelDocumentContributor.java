@@ -18,10 +18,10 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -72,16 +72,20 @@ public class AssetCategoryModelDocumentContributor
 			assetCategory.getDescriptionMap());
 
 		document.addText(Field.NAME, assetCategory.getName());
-		document.addText(
-			Field.TITLE,
-			assetCategory.getTitle(assetCategory.getDefaultLanguageId()));
-		document.addLocalizedKeyword(
-			Field.TITLE,
-			_populateMap(assetCategory, assetCategory.getTitleMap()), true,
-			true);
+
+		_searchLocalizationHelper.addLocalizedField(
+			document, Field.TITLE, siteDefaultLocale,
+			assetCategory.getTitleMap());
 
 		document.addKeyword(
 			"leftCategoryId", assetCategory.getLeftCategoryId());
+		document.addLocalizedKeyword(
+			"localized_title",
+			LocalizationUtil.populateLocalizationMap(
+				assetCategory.getTitleMap(),
+				assetCategory.getDefaultLanguageId(),
+				assetCategory.getGroupId()),
+			true, true);
 	}
 
 	protected void addSearchAssetCategoryTitles(
@@ -149,25 +153,6 @@ public class AssetCategoryModelDocumentContributor
 
 	@Reference
 	protected Portal portal;
-
-	private Map<Locale, String> _populateMap(
-		AssetCategory assetCategory, Map<Locale, String> map) {
-
-		String defaultValue = map.get(
-			LocaleUtil.fromLanguageId(assetCategory.getDefaultLanguageId()));
-
-		for (Locale availableLocale :
-				LanguageUtil.getAvailableLocales(assetCategory.getGroupId())) {
-
-			if (!map.containsKey(availableLocale) ||
-				Validator.isNull(map.get(availableLocale))) {
-
-				map.put(availableLocale, defaultValue);
-			}
-		}
-
-		return map;
-	}
 
 	@Reference
 	private SearchLocalizationHelper _searchLocalizationHelper;

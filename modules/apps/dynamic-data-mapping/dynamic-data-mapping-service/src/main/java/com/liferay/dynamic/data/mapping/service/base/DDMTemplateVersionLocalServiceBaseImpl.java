@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.dynamic.data.mapping.model.DDMTemplateVersion;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMTemplateVersionPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -63,8 +62,9 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class DDMTemplateVersionLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements DDMTemplateVersionLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements DDMTemplateVersionLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -81,6 +81,7 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	@Override
 	public DDMTemplateVersion addDDMTemplateVersion(
 		DDMTemplateVersion ddmTemplateVersion) {
+
 		ddmTemplateVersion.setNew(true);
 
 		return ddmTemplateVersionPersistence.update(ddmTemplateVersion);
@@ -109,6 +110,7 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	@Override
 	public DDMTemplateVersion deleteDDMTemplateVersion(long templateVersionId)
 		throws PortalException {
+
 		return ddmTemplateVersionPersistence.remove(templateVersionId);
 	}
 
@@ -122,6 +124,7 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	@Override
 	public DDMTemplateVersion deleteDDMTemplateVersion(
 		DDMTemplateVersion ddmTemplateVersion) {
+
 		return ddmTemplateVersionPersistence.remove(ddmTemplateVersion);
 	}
 
@@ -129,8 +132,8 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(DDMTemplateVersion.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			DDMTemplateVersion.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -157,10 +160,11 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return ddmTemplateVersionPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return ddmTemplateVersionPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -177,10 +181,12 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return ddmTemplateVersionPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return ddmTemplateVersionPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -191,7 +197,8 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return ddmTemplateVersionPersistence.countWithDynamicQuery(dynamicQuery);
+		return ddmTemplateVersionPersistence.countWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -202,15 +209,17 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return ddmTemplateVersionPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return ddmTemplateVersionPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
 	public DDMTemplateVersion fetchDDMTemplateVersion(long templateVersionId) {
-		return ddmTemplateVersionPersistence.fetchByPrimaryKey(templateVersionId);
+		return ddmTemplateVersionPersistence.fetchByPrimaryKey(
+			templateVersionId);
 	}
 
 	/**
@@ -223,14 +232,18 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	@Override
 	public DDMTemplateVersion getDDMTemplateVersion(long templateVersionId)
 		throws PortalException {
-		return ddmTemplateVersionPersistence.findByPrimaryKey(templateVersionId);
+
+		return ddmTemplateVersionPersistence.findByPrimaryKey(
+			templateVersionId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(ddmTemplateVersionLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			ddmTemplateVersionLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDMTemplateVersion.class);
 
@@ -240,10 +253,14 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(ddmTemplateVersionLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			ddmTemplateVersionLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(DDMTemplateVersion.class);
 
@@ -255,7 +272,9 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(ddmTemplateVersionLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			ddmTemplateVersionLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDMTemplateVersion.class);
 
@@ -268,12 +287,15 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return ddmTemplateVersionLocalService.deleteDDMTemplateVersion((DDMTemplateVersion)persistedModel);
+
+		return ddmTemplateVersionLocalService.deleteDDMTemplateVersion(
+			(DDMTemplateVersion)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return ddmTemplateVersionPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -313,6 +335,7 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	@Override
 	public DDMTemplateVersion updateDDMTemplateVersion(
 		DDMTemplateVersion ddmTemplateVersion) {
+
 		return ddmTemplateVersionPersistence.update(ddmTemplateVersion);
 	}
 
@@ -332,6 +355,7 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	 */
 	public void setDDMTemplateVersionLocalService(
 		DDMTemplateVersionLocalService ddmTemplateVersionLocalService) {
+
 		this.ddmTemplateVersionLocalService = ddmTemplateVersionLocalService;
 	}
 
@@ -351,6 +375,7 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	 */
 	public void setDDMTemplateVersionPersistence(
 		DDMTemplateVersionPersistence ddmTemplateVersionPersistence) {
+
 		this.ddmTemplateVersionPersistence = ddmTemplateVersionPersistence;
 	}
 
@@ -359,7 +384,9 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -369,12 +396,15 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.dynamic.data.mapping.model.DDMTemplateVersion",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.dynamic.data.mapping.model.DDMTemplateVersion",
 			ddmTemplateVersionLocalService);
 	}
 
@@ -408,15 +438,16 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = ddmTemplateVersionPersistence.getDataSource();
+			DataSource dataSource =
+				ddmTemplateVersionPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -427,10 +458,18 @@ public abstract class DDMTemplateVersionLocalServiceBaseImpl
 
 	@BeanReference(type = DDMTemplateVersionLocalService.class)
 	protected DDMTemplateVersionLocalService ddmTemplateVersionLocalService;
+
 	@BeanReference(type = DDMTemplateVersionPersistence.class)
 	protected DDMTemplateVersionPersistence ddmTemplateVersionPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

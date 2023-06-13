@@ -17,10 +17,8 @@ package com.liferay.calendar.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.calendar.model.CalendarNotificationTemplate;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 
 import java.io.Externalizable;
@@ -37,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class CalendarNotificationTemplateCacheModel implements CacheModel<CalendarNotificationTemplate>,
-	Externalizable {
+public class CalendarNotificationTemplateCacheModel
+	implements CacheModel<CalendarNotificationTemplate>, Externalizable {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +48,14 @@ public class CalendarNotificationTemplateCacheModel implements CacheModel<Calend
 			return false;
 		}
 
-		CalendarNotificationTemplateCacheModel calendarNotificationTemplateCacheModel =
-			(CalendarNotificationTemplateCacheModel)obj;
+		CalendarNotificationTemplateCacheModel
+			calendarNotificationTemplateCacheModel =
+				(CalendarNotificationTemplateCacheModel)obj;
 
-		if (calendarNotificationTemplateId == calendarNotificationTemplateCacheModel.calendarNotificationTemplateId) {
+		if (calendarNotificationTemplateId ==
+				calendarNotificationTemplateCacheModel.
+					calendarNotificationTemplateId) {
+
 			return true;
 		}
 
@@ -105,7 +108,8 @@ public class CalendarNotificationTemplateCacheModel implements CacheModel<Calend
 
 	@Override
 	public CalendarNotificationTemplate toEntityModel() {
-		CalendarNotificationTemplateImpl calendarNotificationTemplateImpl = new CalendarNotificationTemplateImpl();
+		CalendarNotificationTemplateImpl calendarNotificationTemplateImpl =
+			new CalendarNotificationTemplateImpl();
 
 		if (uuid == null) {
 			calendarNotificationTemplateImpl.setUuid("");
@@ -114,7 +118,8 @@ public class CalendarNotificationTemplateCacheModel implements CacheModel<Calend
 			calendarNotificationTemplateImpl.setUuid(uuid);
 		}
 
-		calendarNotificationTemplateImpl.setCalendarNotificationTemplateId(calendarNotificationTemplateId);
+		calendarNotificationTemplateImpl.setCalendarNotificationTemplateId(
+			calendarNotificationTemplateId);
 		calendarNotificationTemplateImpl.setGroupId(groupId);
 		calendarNotificationTemplateImpl.setCompanyId(companyId);
 		calendarNotificationTemplateImpl.setUserId(userId);
@@ -130,15 +135,16 @@ public class CalendarNotificationTemplateCacheModel implements CacheModel<Calend
 			calendarNotificationTemplateImpl.setCreateDate(null);
 		}
 		else {
-			calendarNotificationTemplateImpl.setCreateDate(new Date(createDate));
+			calendarNotificationTemplateImpl.setCreateDate(
+				new Date(createDate));
 		}
 
 		if (modifiedDate == Long.MIN_VALUE) {
 			calendarNotificationTemplateImpl.setModifiedDate(null);
 		}
 		else {
-			calendarNotificationTemplateImpl.setModifiedDate(new Date(
-					modifiedDate));
+			calendarNotificationTemplateImpl.setModifiedDate(
+				new Date(modifiedDate));
 		}
 
 		calendarNotificationTemplateImpl.setCalendarId(calendarId);
@@ -147,21 +153,24 @@ public class CalendarNotificationTemplateCacheModel implements CacheModel<Calend
 			calendarNotificationTemplateImpl.setNotificationType("");
 		}
 		else {
-			calendarNotificationTemplateImpl.setNotificationType(notificationType);
+			calendarNotificationTemplateImpl.setNotificationType(
+				notificationType);
 		}
 
 		if (notificationTypeSettings == null) {
 			calendarNotificationTemplateImpl.setNotificationTypeSettings("");
 		}
 		else {
-			calendarNotificationTemplateImpl.setNotificationTypeSettings(notificationTypeSettings);
+			calendarNotificationTemplateImpl.setNotificationTypeSettings(
+				notificationTypeSettings);
 		}
 
 		if (notificationTemplateType == null) {
 			calendarNotificationTemplateImpl.setNotificationTemplateType("");
 		}
 		else {
-			calendarNotificationTemplateImpl.setNotificationTemplateType(notificationTemplateType);
+			calendarNotificationTemplateImpl.setNotificationTemplateType(
+				notificationTemplateType);
 		}
 
 		if (subject == null) {
@@ -182,8 +191,8 @@ public class CalendarNotificationTemplateCacheModel implements CacheModel<Calend
 			calendarNotificationTemplateImpl.setLastPublishDate(null);
 		}
 		else {
-			calendarNotificationTemplateImpl.setLastPublishDate(new Date(
-					lastPublishDate));
+			calendarNotificationTemplateImpl.setLastPublishDate(
+				new Date(lastPublishDate));
 		}
 
 		calendarNotificationTemplateImpl.resetOriginalValues();
@@ -216,8 +225,7 @@ public class CalendarNotificationTemplateCacheModel implements CacheModel<Calend
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -298,4 +306,5 @@ public class CalendarNotificationTemplateCacheModel implements CacheModel<Calend
 	public String subject;
 	public String body;
 	public long lastPublishDate;
+
 }

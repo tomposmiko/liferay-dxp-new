@@ -17,6 +17,7 @@ package com.liferay.document.library.internal.bulk.selection;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.bulk.selection.BulkSelection;
 import com.liferay.bulk.selection.BulkSelectionFactory;
+import com.liferay.document.library.internal.bulk.selection.util.BulkSelectionFactoryUtil;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.repository.RepositoryProvider;
@@ -42,40 +43,24 @@ public class FileEntryBulkSelectionFactory
 	implements BulkSelectionFactory<FileEntry> {
 
 	public BulkSelection<FileEntry> create(Map<String, String[]> parameterMap) {
+		if (BulkSelectionFactoryUtil.isSelectAll(parameterMap)) {
+			long repositoryId = BulkSelectionFactoryUtil.getRepositoryId(
+				parameterMap);
+			long folderId = BulkSelectionFactoryUtil.getFolderId(parameterMap);
+
+			return new FolderFileEntryBulkSelection(
+				repositoryId, folderId, parameterMap, _resourceBundleLoader,
+				_language, _repositoryProvider, _dlAppService,
+				_assetEntryLocalService);
+		}
+
 		if (!parameterMap.containsKey("rowIdsFileEntry")) {
 			return new EmptyBulkSelection<>();
 		}
 
 		String[] values = parameterMap.get("rowIdsFileEntry");
 
-		if (values.length > 1) {
-			return _getFileEntrySelection(values, parameterMap);
-		}
-
-		String value = values[0];
-
-		if (!value.startsWith("all:")) {
-			return _getFileEntrySelection(values, parameterMap);
-		}
-
-		if (!parameterMap.containsKey("repositoryId")) {
-			throw new IllegalArgumentException();
-		}
-
-		String[] repositoryIds = parameterMap.get("repositoryId");
-
-		long repositoryId = GetterUtil.getLong(repositoryIds[0]);
-
-		if (repositoryId == 0) {
-			throw new IllegalArgumentException();
-		}
-
-		long folderId = GetterUtil.getLong(value.substring(4));
-
-		return new FolderFileEntryBulkSelection(
-			repositoryId, folderId, parameterMap, _resourceBundleLoader,
-			_language, _repositoryProvider, _dlAppService,
-			_assetEntryLocalService);
+		return _getFileEntrySelection(values, parameterMap);
 	}
 
 	private BulkSelection<FileEntry> _getFileEntrySelection(

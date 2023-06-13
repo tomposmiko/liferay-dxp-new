@@ -1,19 +1,4 @@
 definition {
-	macro _gotoAddPGViaWCD {
-		Portlet.clickPortletPlusIconPG(portletName = "Web Content Display");
-
-		Click(locator1 = "WCD#ADD_WEB_CONTENT");
-
-		var key_structureName = "Basic Web Content";
-
-		AssertClick(
-			locator1 = "WCD#ADD_STRUCTURED_WEB_CONTENT",
-			value1 = "Basic Web Content"
-		);
-
-		SelectFrame(locator1 = "IFrame#EDIT_ASSET");
-	}
-
 	macro addArticleCP {
 		WebContentNavigator.gotoAddCP();
 
@@ -68,7 +53,7 @@ definition {
 	}
 
 	macro addDraftPGViaWCD {
-		WebContent._gotoAddPGViaWCD();
+		WebContentNavigator.gotoAddPGViaWCD();
 
 		WebContent.addDraft(
 			webContentContent = "${webContentContent}",
@@ -140,6 +125,17 @@ definition {
 		AssertTextEquals.assertPartialText(
 			locator1 = "Message#ERROR_1",
 			value1 = "Please select at least one category for ${vocabularyName}."
+		);
+	}
+
+	macro addFeaturedImageFromURL {
+		Panel.expandPanel(panel = "Featured Image");
+
+		Select(locator1 = "WCEditWebContent#SELECT_FEATURED_IMAGE_TYPE", value1 = "From URL");
+
+		Type(
+			locator1 = "WCEditWebContent#FEATURED_IMAGE_URL_INPUT",
+			value1 = "${imageSourceURL}"
 		);
 	}
 
@@ -238,8 +234,6 @@ definition {
 
 		Pause(locator1 = "5000");
 
-		SelectFrame(value1 = "relative=top");
-
 		var key_assetTitle = "${webContentTitle}";
 
 		AssertTextEquals(
@@ -262,26 +256,12 @@ definition {
 		);
 
 		Button.clickPublish();
-
-		SelectFrame(value1 = "relative=top");
 	}
 
 	macro addPriority {
 		Panel.expandPanel(panel = "Metadata");
 
 		Type(locator1 = "WC#PRIORITY", value1 = "${priority}");
-	}
-
-	macro addSmallImageViaURL {
-		Panel.expandPanel(panel = "Small Image");
-
-		Check(locator1 = "WCEditWebContent#USE_SMALL_IMAGE_CHECKBOX");
-		Click(locator1 = "WCEditWebContent#SMALL_IMAGE_URL");
-
-		Type(
-			locator1 = "WCEditWebContent#SMALL_IMAGE_URL_INPUT",
-			value1 = "${imageSourceURL}"
-		);
 	}
 
 	macro addStructuredPGViaWCD {
@@ -315,7 +295,7 @@ definition {
 
 		Type(locator1 = "AssetCategorization#TAGS_FIELD", value1 = "${tagName}");
 
-		AssertClick(locator1 = "Button#ADD_TAGS", value1 = "Add");
+		KeyPress(locator1 = "AssetCategorization#TAGS_FIELD", value1 = ",");
 
 		AssertTextEquals(
 			locator1 = "AssetCategorization#TAG",
@@ -377,7 +357,9 @@ definition {
 			);
 		}
 
-		Click(locator1 = "ItemSelector#SELECT_FILE_IMAGE_PREVIEW");
+		LexiconCard.clickCard(
+			card = "${dmDocumentTitle}"
+		);
 
 		SelectFrameTop(value1 = "relative=top");
 
@@ -423,8 +405,6 @@ definition {
 		);
 
 		SelectFrame(value1 = "relative=top");
-
-		SelectFrame(locator1 = "IFrame#EDIT_ASSET");
 
 		Panel.expandPanel(panel = "Structure and Template");
 
@@ -660,7 +640,11 @@ definition {
 		if ("${saveAsDraft}" == "true") {
 			PortletEntry.saveAsDraft();
 
-			AssertTextEquals(locator1 = "AssetWorkflow#WORKFLOW_STATUS", value1 = "Draft");
+			AssertTextEquals(
+				locator1 = "WCEditWebContent#WORKFLOW_STATUS",
+				value1 = "Draft",
+				key_status = "Draft"
+			);
 		}
 	}
 
@@ -673,15 +657,8 @@ definition {
 		Panel.expandPanel(panel = "Metadata");
 
 		for (var tagName : list "${tagNameList}") {
-			Click(locator1 = "Button#ADD_TAGS");
-
-			Type.clickAtType(
-				locator1 = "AssetCategorization#TAGS_FIELD",
-				value1 = "${tagName}"
-			);
+			AssetCategorization.addTag(tagName = "${tagName}");
 		}
-
-		Click(locator1 = "Button#ADD_TAGS");
 
 		PortletEntry.publish();
 	}
@@ -747,6 +724,16 @@ definition {
 		Alert.viewSuccessMessage();
 	}
 
+	macro closeSidebar {
+		Pause(locator1 = "1000");
+
+		Click(locator1 = "WC#SIDEBAR_BUTTON");
+
+		Pause(locator1 = "1000");
+
+		AssertNotVisible(locator1 = "WC#SIDEBAR_BODY");
+	}
+
 	macro deleteCP {
 		WebContent.moveToRecycleBinCP(
 			assetType = "Web Content Article",
@@ -759,7 +746,7 @@ definition {
 		RecycleBin.emptyCP();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -787,7 +774,7 @@ definition {
 		Navigator.gotoStagedSitePage(pageName = "${pageName}", siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -819,8 +806,9 @@ definition {
 			PortletEntry.saveAsDraft();
 
 			AssertTextEquals.assertPartialText(
-				locator1 = "Message#WEB_CONTENT_STATUS",
-				value1 = "Draft"
+				locator1 = "WCEditWebContent#WORKFLOW_STATUS",
+				value1 = "Draft",
+				key_status = "Draft"
 			);
 		}
 		else {
@@ -839,18 +827,32 @@ definition {
 		}
 	}
 
+	macro editDisplayDate {
+		Panel.expandPanel(panel = "Schedule");
+
+		Type.clickAtType(
+			locator1 = "TextInput#DISPLAY_DATE",
+			value1 = "${displayDate}"
+		);
+	}
+
 	macro editDisplayPage {
 		Panel.expandPanel(panel = "Display Page");
 
-		Click(locator1 = "WCSelectDisplayPage#USE_SPECIFIC_DISPLAY_PAGE");
+		Select(
+			locator1 = "WCEditWebContent#DISPLAY_PAGE_SELECT",
+			value1 = "Specific Display Page"
+		);
 
-		AssertClick(locator1 = "Button#CHOOSE", value1 = "Choose");
+		Click(
+			locator1 = "WCEditWebContent#DISPLAY_PAGE_CHOOSE_BUTTON"
+		);
 
 		Pause(locator1 = "5000");
 
 		SelectFrameTop();
 
-		SelectFrame(locator1 = "WCSelectDisplayPage#DISPLAY_PAGE_CONFIGURATION_IFRAME");
+		SelectFrame(locator1 = "WCEditWebContent#DISPLAY_PAGE_SELECT_PAGE_IFRAME");
 
 		if ("${pageType}" == "Public Pages") {
 			Navigator.gotoNavItem(navItem = "Public Pages");
@@ -873,16 +875,18 @@ definition {
 
 		SelectFrame(value1 = "relative=top");
 
-		if (IsElementPresent(locator1 = "IFrame#EDIT_ASSET")) {
-			SelectFrame(locator1 = "IFrame#EDIT_ASSET");
+		if ("${pageType}" == "Public Pages") {
+			AssertTextEquals(
+				locator1 = "WCEditWebContent#DISPLAY_PAGE_SPECIFIC_SELECTION",
+				value1 = "Public Pages > ${pageName}"
+			);
 		}
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "WCEditWebContent#DISPLAY_PAGE_SELECTION",
-			value1 = "${pageName}"
-		);
-
-		Button.clickPublish();
+		else {
+			AssertTextEquals(
+				locator1 = "WCEditWebContent#DISPLAY_PAGE_SPECIFIC_SELECTION",
+				value1 = "${pageName}"
+			);
+		}
 	}
 
 	macro editDisplayPagePGViaAP {
@@ -1194,8 +1198,6 @@ definition {
 	macro publishViaWCD {
 		Button.clickPublish();
 
-		SelectFrameTop();
-
 		AssertVisible(locator1 = "WCD#WEB_CONTENT_CONTENT");
 	}
 
@@ -1203,8 +1205,6 @@ definition {
 		Button.clickSaveAsDraft();
 
 		Pause(locator1 = "5000");
-
-		SelectFrame(value1 = "relative=top");
 
 		Refresh();
 
@@ -1289,10 +1289,6 @@ definition {
 
 		IFrame.selectTopFrame();
 
-		if (IsElementPresent(locator1 = "IFrame#EDIT_ASSET")) {
-			IFrame.selectEditAssetFrame();
-		}
-
 		Panel.expandPanel(panel = "Structure and Template");
 
 		AssertTextEquals(
@@ -1324,7 +1320,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -1358,7 +1354,7 @@ definition {
 			navTab = "${navTab}"
 		);
 
-		SelectFrame(locator1 = "CKEditor#BODY_FIELD_IFRAME");
+		SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
 
 		AssertElementPresent(locator1 = "CKEditor#CONTENT_AUDIO_LINK_IMAGE");
 
@@ -1373,7 +1369,7 @@ definition {
 			navTab = "${navTab}"
 		);
 
-		SelectFrame(locator1 = "CKEditor#BODY_FIELD_IFRAME");
+		SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
 
 		AssertElementPresent(locator1 = "CKEditor#CONTENT_VIDEO_LINK_IMAGE");
 
@@ -1598,7 +1594,7 @@ definition {
 	macro viewEmailConfigurationCP {
 		SiteAdmin.gotoPortletConfiguration();
 
-		AssertTextEquals(locator1 = "NavTab#EMAIL_FROM", value1 = "Email From");
+		Navigator.gotoNavTab(navTab = "Email From");
 
 		AssertTextEquals(
 			locator1 = "WCConfiguration#NAVIGATION_WEB_CONTENT_ADDED_EMAIL",
@@ -1697,7 +1693,7 @@ definition {
 			key_assetTitle = "${webContentTitle}"
 		);
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "APAsset#ASSET_TITLE_HEADER",
 			value1 = "${webContentTitle}"
 		);
@@ -1834,11 +1830,11 @@ definition {
 			);
 		}
 
-		AssertClick(locator1 = "AP#ASSET_ABSTRACT_TITLE", value1 = "${webContentTitle}");
+		AssetPublisherPortlet.clickAssetTitle(
+			assetTitle = "${webContentTitle}"
+		);
 
-		AssertVisible(locator1 = "Icon#SHARE");
-
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "APAsset#ASSET_TITLE_HEADER",
 			value1 = "${webContentTitle}"
 		);
@@ -1916,8 +1912,9 @@ definition {
 
 	macro viewStatus {
 		AssertTextEquals(
-			locator1 = "AssetWorkflow#WORKFLOW_STATUS",
-			value1 = "${webContentStatus}"
+			locator1 = "WCEditWebContent#WORKFLOW_STATUS",
+			value1 = "${webContentStatus}",
+			key_status = "${webContentStatus}"
 		);
 
 		AssertTextEquals(locator1 = "TextInput#TITLE", value1 = "${webContentTitle}");
@@ -1961,15 +1958,15 @@ definition {
 		);
 	}
 
-	macro viewStructureWithWorkflowCP {
+	macro viewStructureWithWorkflowPendingCP {
 		WebContentNavigator.gotoViewStatus(
 			webContentStatus = "PENDING",
 			webContentTitle = "${webContentTitle}"
 		);
 
-		AssertTextEquals(
-			locator1 = "AssetWorkflow#WORKFLOW_STATUS",
-			value1 = "Pending (${workflowTask})"
+		AssertElementPresent(
+			locator1 = "WCEditWebContent#WORKFLOW_STATUS",
+			key_status = "Pending"
 		);
 
 		AssertTextEquals(locator1 = "TextInput#TITLE", value1 = "${webContentTitle}");
@@ -2131,7 +2128,8 @@ definition {
 
 		AssertTextEquals(
 			locator1 = "AssetWorkflow#WORKFLOW_STATUS",
-			value1 = "Pending (${workflowTask})"
+			value1 = "Pending",
+			key_status = "Pending"
 		);
 
 		AssertTextEquals(locator1 = "TextInput#TITLE", value1 = "${webContentTitle}");
@@ -2161,8 +2159,9 @@ definition {
 		);
 
 		AssertTextEquals(
-			locator1 = "AssetWorkflow#WORKFLOW_STATUS",
-			value1 = "Pending (${workflowTask})"
+			locator1 = "WCEditWebContent#WORKFLOW_STATUS",
+			value1 = "Pending",
+			key_status = "Pending"
 		);
 
 		AssertTextEquals(locator1 = "TextInput#TITLE", value1 = "${webContentTitle}");

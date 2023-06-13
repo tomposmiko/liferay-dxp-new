@@ -82,7 +82,7 @@ class LayoutFinder extends Component {
 	_handleSearchInputKeyUp(event) {
 		const keywords = event.delegateTarget.value;
 
-		if (keywords.length < 3) {
+		if (keywords.length < 2) {
 			this.layouts = [];
 			this.totalCount = 0;
 			this._keywords = '';
@@ -104,7 +104,7 @@ class LayoutFinder extends Component {
 	_updatePageResults(keywords) {
 		let promise = Promise.resolve();
 
-		if (!this._loading && (keywords.length >= 3)) {
+		if (!this._loading && (keywords.length >= 2)) {
 			this._loading = true;
 
 			const formData = new FormData();

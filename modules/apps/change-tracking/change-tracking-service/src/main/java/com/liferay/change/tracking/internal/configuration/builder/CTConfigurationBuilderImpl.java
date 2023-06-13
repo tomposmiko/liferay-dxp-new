@@ -17,9 +17,11 @@ package com.liferay.change.tracking.internal.configuration.builder;
 import com.liferay.change.tracking.configuration.CTConfiguration;
 import com.liferay.change.tracking.configuration.builder.CTConfigurationBuilder;
 import com.liferay.change.tracking.internal.configuration.CTConfigurationImpl;
+import com.liferay.portal.kernel.model.BaseModel;
 
 import java.io.Serializable;
 
+import java.util.List;
 import java.util.function.Function;
 
 import org.osgi.service.component.annotations.Activate;
@@ -32,8 +34,9 @@ import org.osgi.service.component.annotations.ServiceScope;
 @Component(
 	scope = ServiceScope.PROTOTYPE, service = CTConfigurationBuilder.class
 )
-public class CTConfigurationBuilderImpl<T, U>
-	implements CTConfigurationBuilder<T, U> {
+public class CTConfigurationBuilderImpl
+	<T extends BaseModel, U extends BaseModel>
+		implements CTConfigurationBuilder<T, U> {
 
 	@Activate
 	public void activate() {
@@ -70,12 +73,16 @@ public class CTConfigurationBuilderImpl<T, U>
 
 	}
 
-	public interface CTConfigurationExtended<T, U>
-		extends CTConfiguration<T, U> {
+	public interface CTConfigurationExtended
+		<T extends BaseModel, U extends BaseModel>
+			extends CTConfiguration<T, U> {
 
 		public void setContentType(String contentType);
 
 		public void setContentTypeLanguageKey(String contentTypeLanguageKey);
+
+		public void setResourceEntitiesByCompanyIdFunction(
+			Function<Long, List<T>> resourceEntitiesByCompanyIdFunction);
 
 		public void setResourceEntityByResourceEntityIdFunction(
 			Function<Long, T> resourceEntityByResourceEntityIdFunction);
@@ -90,6 +97,9 @@ public class CTConfigurationBuilderImpl<T, U>
 			Function<U, Serializable>
 				resourceEntityIdFromVersionEntityFunction);
 
+		public void setVersionEntitiesFromResourceEntityFunction(
+			Function<T, List<U>> versionEntitiesFromResourceEntityFunction);
+
 		public void setVersionEntityAllowedStatuses(Integer[] allowedStatuses);
 
 		public void setVersionEntityByVersionEntityIdFunction(
@@ -103,6 +113,10 @@ public class CTConfigurationBuilderImpl<T, U>
 
 		public void setVersionEntityIdFromVersionEntityFunction(
 			Function<U, Serializable> versionEntityIdFromVersionEntityFunction);
+
+		public void setVersionEntityRelatedEntityFunctions(
+			List<Function<U, ? extends BaseModel>>
+				versionEntityRelatedEntityFunctions);
 
 		public void setVersionEntitySiteNameFunction(
 			Function<U, String> versionEntitySiteNameFunction);
@@ -121,13 +135,13 @@ public class CTConfigurationBuilderImpl<T, U>
 	public class EntityClassesStepImpl implements EntityClassesStep<T, U> {
 
 		@Override
-		public ResourceEntityByResourceEntityIdStep<T, U> setEntityClasses(
+		public ResourceEntitiesByCompanyIdStep<T, U> setEntityClasses(
 			Class<T> resourceEntityClass, Class<U> versionEntityClass) {
 
 			_ctConfiguration.setResourceEntityClass(resourceEntityClass);
 			_ctConfiguration.setVersionEntityClass(versionEntityClass);
 
-			return new ResourceEntityByResourceEntityIdStepImpl();
+			return new ResourceEntitiesByCompanyIdStepImpl();
 		}
 
 	}
@@ -136,7 +150,7 @@ public class CTConfigurationBuilderImpl<T, U>
 		implements EntityIdsFromResourceEntityStep<T, U> {
 
 		@Override
-		public VersionEntityByVersionEntityIdStep<U>
+		public VersionEntitiesFromResourceEntityStep<T, U>
 			setEntityIdsFromResourceEntityFunctions(
 				Function<T, Serializable>
 					resourceEntityIdFromResourceEntityFunction,
@@ -148,7 +162,7 @@ public class CTConfigurationBuilderImpl<T, U>
 			_ctConfiguration.setVersionEntityIdFromResourceEntityFunction(
 				versionEntityIdFromResourceEntityFunction);
 
-			return new VersionEntityByVersionEntityIdStepImpl();
+			return new VersionEntitiesFromResourceEntityStepImpl();
 		}
 
 	}
@@ -174,6 +188,22 @@ public class CTConfigurationBuilderImpl<T, U>
 
 	}
 
+	public class ResourceEntitiesByCompanyIdStepImpl
+		implements ResourceEntitiesByCompanyIdStep<T, U> {
+
+		@Override
+		public ResourceEntityByResourceEntityIdStep<T, U>
+			setResourceEntitiesByCompanyIdFunction(
+				Function<Long, List<T>> resourceEntitiesByCompanyIdFunction) {
+
+			_ctConfiguration.setResourceEntitiesByCompanyIdFunction(
+				resourceEntitiesByCompanyIdFunction);
+
+			return new ResourceEntityByResourceEntityIdStepImpl();
+		}
+
+	}
+
 	public class ResourceEntityByResourceEntityIdStepImpl
 		implements ResourceEntityByResourceEntityIdStep<T, U> {
 
@@ -186,6 +216,23 @@ public class CTConfigurationBuilderImpl<T, U>
 				resourceEntityByResourceEntityIdFunction);
 
 			return new EntityIdsFromResourceEntityStepImpl();
+		}
+
+	}
+
+	public class VersionEntitiesFromResourceEntityStepImpl
+		implements VersionEntitiesFromResourceEntityStep<T, U> {
+
+		@Override
+		public VersionEntityByVersionEntityIdStep<U>
+			setVersionEntitiesFromResourceEntityFunction(
+				Function<T, List<U>>
+					versionEntitiesFromResourceEntityFunction) {
+
+			_ctConfiguration.setVersionEntitiesFromResourceEntityFunction(
+				versionEntitiesFromResourceEntityFunction);
+
+			return new VersionEntityByVersionEntityIdStepImpl();
 		}
 
 	}
@@ -211,10 +258,14 @@ public class CTConfigurationBuilderImpl<T, U>
 
 		@Override
 		public EntityIdsFromVersionEntityStep<U> setVersionEntityDetails(
+			List<Function<U, ? extends BaseModel>>
+				versionEntityRelatedEntityFunctions,
 			Function<U, String> versionEntitySiteNameFunction,
 			Function<U, String> versionEntityTitleFunction,
 			Function<U, Serializable> versionEntityVersionFunction) {
 
+			_ctConfiguration.setVersionEntityRelatedEntityFunctions(
+				versionEntityRelatedEntityFunctions);
 			_ctConfiguration.setVersionEntitySiteNameFunction(
 				versionEntitySiteNameFunction);
 			_ctConfiguration.setVersionEntityTitleFunction(

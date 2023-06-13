@@ -93,18 +93,11 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		}
 		catch (EntryContentException | EntryDisplayDateException |
 			   EntryExpirationDateException | EntryTitleException |
-			   EntryURLException | NoSuchEntryException |
-			   PrincipalException e) {
+			   EntryURLException | NoSuchEntryException | PrincipalException
+				   e) {
 
 			SessionErrors.add(actionRequest, e.getClass());
 		}
-	}
-
-	@Reference(unbind = "-")
-	protected void setAnnouncementsEntryService(
-		AnnouncementsEntryService announcementsEntryService) {
-
-		_announcementsEntryService = announcementsEntryService;
 	}
 
 	protected void updateEntry(ActionRequest actionRequest) throws Exception {
@@ -199,6 +192,7 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
+	@Reference
 	private AnnouncementsEntryService _announcementsEntryService;
 
 	@Reference

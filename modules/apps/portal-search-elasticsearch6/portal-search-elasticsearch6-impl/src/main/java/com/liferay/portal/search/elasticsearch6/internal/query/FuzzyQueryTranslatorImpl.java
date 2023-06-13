@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.portal.kernel.search.generic.FuzzyQuery;
+import com.liferay.portal.search.query.FuzzyQuery;
 
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.FuzzyQueryBuilder;
@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(immediate = true, service = FuzzyQueryTranslator.class)
+@Component(service = FuzzyQueryTranslator.class)
 public class FuzzyQueryTranslatorImpl implements FuzzyQueryTranslator {
 
 	@Override
@@ -47,8 +47,12 @@ public class FuzzyQueryTranslatorImpl implements FuzzyQueryTranslator {
 			fuzzyQueryBuilder.prefixLength(fuzzyQuery.getPrefixLength());
 		}
 
-		if (!fuzzyQuery.isDefaultBoost()) {
-			fuzzyQueryBuilder.boost(fuzzyQuery.getBoost());
+		if (fuzzyQuery.getRewrite() != null) {
+			fuzzyQueryBuilder.rewrite(fuzzyQuery.getRewrite());
+		}
+
+		if (fuzzyQuery.getTranspositions() != null) {
+			fuzzyQueryBuilder.transpositions(fuzzyQuery.getTranspositions());
 		}
 
 		return fuzzyQueryBuilder;

@@ -22,7 +22,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "8080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -49,7 +49,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "9080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -61,7 +61,7 @@ definition {
 			webContentTitle = "WC WebContent Title"
 		);
 
-		Portlet.shutdownSpecificServer(nodePort = "8080");
+		Clustering.shutdownSpecificServer(nodePort = "8080");
 
 		Navigator.openSpecificURL(url = "http://localhost:9080");
 
@@ -74,7 +74,7 @@ definition {
 			patchFileZipURL = "${testBuildFixPackZipURL}"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "true",
 			keepCachedAppServerData = "true",
 			nodePort = "8080"
@@ -87,7 +87,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "9080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -110,7 +110,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "8080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -122,14 +122,14 @@ definition {
 			webContentTitle = "WC WebContent Title"
 		);
 
-		Portlet.shutdownSpecificServer(nodePort = "9080");
+		Clustering.shutdownSpecificServer(nodePort = "9080");
 
 		PatchingTool.installPatchOnSpecificServer(
 			nodePort = "9080",
 			patchFileZipURL = "${testBuildFixPackZipURL}"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "true",
 			keepCachedAppServerData = "true",
 			nodePort = "9080"
@@ -140,7 +140,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "8080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -163,7 +163,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "9080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -206,7 +206,7 @@ definition {
 
 		Page.assertNodePortPG(nodePort = "10080");
 
-		Portlet.shutdownSpecificServer(nodePort = "9080");
+		Clustering.shutdownSpecificServer(nodePort = "9080");
 
 		var testBuildFixPackZipURL = PropsUtil.get("test.build.fix.pack.zip.url");
 
@@ -215,7 +215,7 @@ definition {
 			patchFileZipURL = "${testBuildFixPackZipURL}"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "true",
 			keepCachedAppServerData = "true",
 			nodePort = "9080"
@@ -232,7 +232,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "9080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -259,7 +259,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "8080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -277,21 +277,21 @@ definition {
 		Page.assertNodePortPG(nodePort = "10080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
 
 		WebContent.viewTitle(webContentTitle = "WC WebContent Title Cluster2");
 
-		Portlet.shutdownSpecificServer(nodePort = "8080");
+		Clustering.shutdownSpecificServer(nodePort = "8080");
 
 		PatchingTool.installPatchOnSpecificServer(
 			nodePort = "8080",
 			patchFileZipURL = "${testBuildFixPackZipURL}"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "true",
 			keepCachedAppServerData = "true",
 			nodePort = "8080"
@@ -308,7 +308,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "8080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -335,7 +335,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "9080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -357,7 +357,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "10080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -370,14 +370,14 @@ definition {
 			userEmailAddress = "test@liferay.com"
 		);
 
-		Portlet.shutdownSpecificServer(nodePort = "10080");
+		Clustering.shutdownSpecificServer(nodePort = "10080");
 
 		PatchingTool.installPatchOnSpecificServer(
 			nodePort = "10080",
 			patchFileZipURL = "${testBuildFixPackZipURL}"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "true",
 			keepCachedAppServerData = "true",
 			nodePort = "10080"
@@ -392,7 +392,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "10080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -419,7 +419,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "8080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -437,7 +437,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "9080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -530,14 +530,14 @@ definition {
 			value1 = "30000"
 		);
 
-		Portlet.shutdownSpecificServer(nodePort = "8080");
+		Clustering.shutdownSpecificServer(nodePort = "8080");
 
 		PatchingTool.updateConfigurationOnSpecificServer(
 			nodePort = "8080",
 			updateConfiguration = "userNotificationTimeout=25000"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "false",
 			keepCachedAppServerData = "true",
 			nodePort = "8080"
@@ -567,7 +567,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -611,7 +611,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -646,7 +646,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -702,7 +702,7 @@ definition {
 		// Install the latest FP on all 3 servers
 
 		for (var nodePort : list "8080,9080,10080") {
-			Portlet.shutdownSpecificServer(nodePort = "${nodePort}");
+			Clustering.shutdownSpecificServer(nodePort = "${nodePort}");
 
 			var testBuildFixPackZipURL = PropsUtil.get("test.build.fix.pack.zip.url");
 
@@ -711,7 +711,7 @@ definition {
 				patchFileZipURL = "${testBuildFixPackZipURL}"
 			);
 
-			Portlet.startSpecificServer(
+			Clustering.startSpecificServer(
 				deleteLiferayHome = "true",
 				keepCachedAppServerData = "true",
 				nodePort = "${nodePort}"
@@ -732,18 +732,18 @@ definition {
 			);
 		}
 
-		// Take down cluster2, revert the latest FP and install FP3
+		// Take down cluster2, revert the latest FP and install FP5
 
-		Portlet.shutdownSpecificServer(nodePort = "9080");
+		Clustering.shutdownSpecificServer(nodePort = "9080");
 
 		PatchingTool.uninstallPatchOnSpecificServer(nodePort = "9080");
 
 		PatchingTool.installPatchOnSpecificServer(
 			nodePort = "9080",
-			patchFileZipURL = "https://files.liferay.com/private/ee/fix-packs/7.1.10/dxp/liferay-fix-pack-dxp-3-7110.zip"
+			patchFileZipURL = "https://files.liferay.com/private/ee/fix-packs/7.1.10/dxp/liferay-fix-pack-dxp-5-7110.zip"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "true",
 			keepCachedAppServerData = "true",
 			nodePort = "9080"
@@ -772,7 +772,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -802,7 +802,7 @@ definition {
 			);
 
 			ProductMenu.gotoPortlet(
-				category = "Content",
+				category = "Content &amp; Data",
 				panel = "Site Administration",
 				portlet = "Web Content"
 			);
@@ -816,18 +816,18 @@ definition {
 			);
 		}
 
-		// Take down cluster1, revert the latest FP and install FP3
+		// Take down cluster1, revert the latest FP and install FP5
 
-		Portlet.shutdownSpecificServer(nodePort = "8080");
+		Clustering.shutdownSpecificServer(nodePort = "8080");
 
 		PatchingTool.uninstallPatchOnSpecificServer(nodePort = "8080");
 
 		PatchingTool.installPatchOnSpecificServer(
 			nodePort = "8080",
-			patchFileZipURL = "https://files.liferay.com/private/ee/fix-packs/7.1.10/dxp/liferay-fix-pack-dxp-3-7110.zip"
+			patchFileZipURL = "https://files.liferay.com/private/ee/fix-packs/7.1.10/dxp/liferay-fix-pack-dxp-5-7110.zip"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "true",
 			keepCachedAppServerData = "true",
 			nodePort = "8080"
@@ -856,7 +856,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -904,18 +904,18 @@ definition {
 			);
 		}
 
-		// Take down cluster3, revert the latest FP and install FP3
+		// Take down cluster3, revert the latest FP and install FP5
 
-		Portlet.shutdownSpecificServer(nodePort = "10080");
+		Clustering.shutdownSpecificServer(nodePort = "10080");
 
 		PatchingTool.uninstallPatchOnSpecificServer(nodePort = "10080");
 
 		PatchingTool.installPatchOnSpecificServer(
 			nodePort = "10080",
-			patchFileZipURL = "https://files.liferay.com/private/ee/fix-packs/7.1.10/dxp/liferay-fix-pack-dxp-3-7110.zip"
+			patchFileZipURL = "https://files.liferay.com/private/ee/fix-packs/7.1.10/dxp/liferay-fix-pack-dxp-5-7110.zip"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "true",
 			keepCachedAppServerData = "true",
 			nodePort = "10080"
@@ -1020,15 +1020,15 @@ definition {
 
 		// Take down cluster2, update portal-ext.properties
 
-		Portlet.shutdownSpecificServer(nodePort = "9080");
+		Clustering.shutdownSpecificServer(nodePort = "9080");
 
-		Portlet.updatePortalPropertiesOnSpecificServer(
+		Clustering.updatePortalPropertiesOnSpecificServer(
 			nodePort = "9080",
 			propertiesOriginal = "company.security.auth.type=emailAddress",
 			propertiesUpdate = "company.security.auth.type=screenName"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "false",
 			nodePort = "9080"
 		);
@@ -1043,7 +1043,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "9080");
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -1071,7 +1071,7 @@ definition {
 			Page.assertNodePortPG(nodePort = "${nodePort}");
 
 			ProductMenu.gotoPortlet(
-				category = "Content",
+				category = "Content &amp; Data",
 				panel = "Site Administration",
 				portlet = "Web Content"
 			);
@@ -1083,15 +1083,15 @@ definition {
 
 		// Take down cluster1, update portal-ext.properties
 
-		Portlet.shutdownSpecificServer(nodePort = "8080");
+		Clustering.shutdownSpecificServer(nodePort = "8080");
 
-		Portlet.updatePortalPropertiesOnSpecificServer(
+		Clustering.updatePortalPropertiesOnSpecificServer(
 			nodePort = "8080",
 			propertiesOriginal = "company.security.auth.type=emailAddress",
 			propertiesUpdate = "company.security.auth.type=screenName"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "false",
 			nodePort = "8080"
 		);
@@ -1106,7 +1106,7 @@ definition {
 		Page.assertNodePortPG(nodePort = "8080");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -1166,15 +1166,15 @@ definition {
 
 		// Take down cluster3, update portal-ext.properties
 
-		Portlet.shutdownSpecificServer(nodePort = "10080");
+		Clustering.shutdownSpecificServer(nodePort = "10080");
 
-		Portlet.updatePortalPropertiesOnSpecificServer(
+		Clustering.updatePortalPropertiesOnSpecificServer(
 			nodePort = "10080",
 			propertiesOriginal = "company.security.auth.type=emailAddress",
 			propertiesUpdate = "company.security.auth.type=screenName"
 		);
 
-		Portlet.startSpecificServer(
+		Clustering.startSpecificServer(
 			deleteLiferayHome = "false",
 			nodePort = "10080"
 		);

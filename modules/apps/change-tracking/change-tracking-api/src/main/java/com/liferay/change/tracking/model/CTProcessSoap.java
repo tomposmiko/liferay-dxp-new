@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class CTProcessSoap implements Serializable {
+
 	public static CTProcessSoap toSoapModel(CTProcess model) {
 		CTProcessSoap soapModel = new CTProcessSoap();
 
@@ -71,7 +72,8 @@ public class CTProcessSoap implements Serializable {
 	}
 
 	public static CTProcessSoap[] toSoapModels(List<CTProcess> models) {
-		List<CTProcessSoap> soapModels = new ArrayList<CTProcessSoap>(models.size());
+		List<CTProcessSoap> soapModels = new ArrayList<CTProcessSoap>(
+			models.size());
 
 		for (CTProcess model : models) {
 			soapModels.add(toSoapModel(model));
@@ -145,4 +147,5 @@ public class CTProcessSoap implements Serializable {
 	private Date _createDate;
 	private long _ctCollectionId;
 	private long _backgroundTaskId;
+
 }

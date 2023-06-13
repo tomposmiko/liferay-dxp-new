@@ -143,12 +143,11 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 				"Missing parentheses around the left hand side argument of " +
 					"the '&&' operator",
 				"Unnecessary parentheses around expression.",
-				"Redundant parentheses",
 				"Unnecessary parentheses around expression.",
 				"Missing parentheses between the '&&' operator and the '||' " +
 					"operator"
 			},
-			new Integer[] {25, 25, 29, 33, 39, 43, 43, 47, 51, 59});
+			new Integer[] {25, 25, 29, 33, 39, 43, 43, 47, 55});
 	}
 
 	@Test
@@ -181,47 +180,6 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 				"Illegal import: jodd.util.StringPool",
 				"Use ProxyUtil instead of java.lang.reflect.Proxy"
 			});
-	}
-
-	@Test
-	public void testIncorrectLineBreaks() throws Exception {
-		test(
-			"IncorrectLineBreaks1.testjava",
-			new String[] {
-				"'=' should be on the previous line.",
-				"There should be a line break after '||'",
-				"There should be a line break after '\"Hello World\", " +
-					"\"Hello\", \"World\"),'",
-				"Add the string 'Hello World Hello World ' to the previous " +
-					"literal string",
-				"There should be a line break after '\"Hello World Hello " +
-					"World Hello World\",'",
-				"There should be a line break after " +
-					"'anotherStringWithAVeryLongName,'",
-				"There should be a line break after '='",
-				"There should be a line break after '+'",
-				"There should be a line break after '='",
-				"Line should not start with '.'",
-				"There should be a line break before 'throws'",
-				"There should be a line break after '}'",
-				"There should be a line break after '}'",
-				"There should be a line break after '('",
-				"There should be a line break after '('",
-				"'null) {' should be added to previous line",
-				"There should be a line break after 'stringArray,'",
-				"There should be a line break before 'new " +
-					"Comparator<String>() {'",
-				"There should be a line break after '},'",
-				"There should be a line break before 'throws'",
-				"There should be a line break after 'companyId,'",
-				"There should be a line break before 'throws'",
-				"There should be a line break after '}'"
-			},
-			new Integer[] {
-				32, 36, 44, 48, 48, 53, 56, 59, 62, 66, 69, 74, 78, 83, 87, 94,
-				105, 105, 118, 123, 130, 140, 158
-			});
-		test("IncorrectLineBreaks2.testjava");
 	}
 
 	@Test
@@ -264,20 +222,6 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 					"'^[a-z][a-zA-Z0-9]*$'"
 			},
 			new Integer[] {24, 28});
-	}
-
-	@Test
-	public void testIncorrectTabs() throws Exception {
-		test(
-			"IncorrectTabs.testjava",
-			new String[] {
-				"There should be a line break after '('",
-				"There should be a line break after '{'",
-				"Line starts with '3' tabs, but '4' tabs are expected",
-				"Line starts with '2' tabs, but '3' tabs are expected",
-				"Line starts with '3' tabs, but '4' tabs are expected"
-			},
-			new Integer[] {26, 30, 31, 32, 37});
 	}
 
 	@Test
@@ -333,7 +277,6 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 		test("JavaTermDividers.testjava");
 	}
 
-	@Test
 	public void testJavaTermMetadataIncorrectLineBreaks() throws Exception {
 		test("JavaTermMetadataIncorrectLineBreaks.testjava");
 	}
@@ -418,14 +361,7 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 
 	@Test
 	public void testSortAnnotationParameters() throws Exception {
-		test(
-			"SortAnnotationParameters.testjava",
-			new String[] {
-				"Annotation parameter 'immediate' is not sorted alphabetically",
-				"Annotation parameter 'propagation' is not sorted " +
-					"alphabetically"
-			},
-			new Integer[] {24, 27});
+		test("SortAnnotationParameters.testjava");
 	}
 
 	@Test

@@ -15,14 +15,19 @@
 package com.liferay.asset.display.contributor;
 
 import com.liferay.asset.display.contributor.util.AssetDisplayContributorFieldHelperUtil;
+import com.liferay.asset.display.contributor.util.ContentAccessor;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.exception.NoSuchEntryException;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.sanitizer.Sanitizer;
+import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 
 import java.util.HashMap;
@@ -111,6 +116,26 @@ public abstract class BaseAssetDisplayContributor<T>
 	}
 
 	@Override
+	public Object getAssetDisplayFieldValue(
+			AssetEntry assetEntry, String fieldName, Locale locale)
+		throws PortalException {
+
+		Map<String, Object> assetDisplayFieldsValues =
+			getAssetDisplayFieldsValues(assetEntry, locale);
+
+		Object fieldValue = assetDisplayFieldsValues.getOrDefault(
+			fieldName, StringPool.BLANK);
+
+		if (fieldValue instanceof ContentAccessor) {
+			ContentAccessor contentAccessor = (ContentAccessor)fieldValue;
+
+			fieldValue = contentAccessor.getContent();
+		}
+
+		return fieldValue;
+	}
+
+	@Override
 	public String getLabel(Locale locale) {
 		return ResourceActionsUtil.getModelResource(locale, getClassName());
 	}
@@ -130,6 +155,15 @@ public abstract class BaseAssetDisplayContributor<T>
 	@Deprecated
 	protected Map<String, String> getAssetEntryModelFieldsMap() {
 		throw new UnsupportedOperationException();
+	}
+
+	protected Object getClassTypeFieldValue(
+		T assetEntryObject, String fieldName, Locale locale) {
+
+		Map<String, Object> classTypeValues = getClassTypeValues(
+			assetEntryObject, locale);
+
+		return classTypeValues.getOrDefault(fieldName, StringPool.BLANK);
 	}
 
 	protected abstract Map<String, Object> getClassTypeValues(
@@ -203,23 +237,35 @@ public abstract class BaseAssetDisplayContributor<T>
 	}
 
 	private Map<String, Object> _getAssetEntryAssetDisplayFieldsValues(
-		AssetEntry assetEntry, Locale locale) {
+			AssetEntry assetEntry, Locale locale)
+		throws PortalException {
 
 		Map<String, Object> assetDisplayFieldsValues = new HashMap<>();
 
 		for (AssetDisplayContributorField assetDisplayContributorField :
 				_getAssetDisplayContributorFields(AssetEntry.class.getName())) {
 
-			assetDisplayFieldsValues.put(
-				assetDisplayContributorField.getKey(),
-				assetDisplayContributorField.getValue(assetEntry, locale));
+			Object assetDisplayFieldValue =
+				assetDisplayContributorField.getValue(assetEntry, locale);
+
+			if (assetDisplayFieldValue instanceof String) {
+				assetDisplayFieldValue = SanitizerUtil.sanitize(
+					assetEntry.getCompanyId(), assetEntry.getGroupId(),
+					assetEntry.getUserId(), AssetEntry.class.getName(),
+					assetEntry.getEntryId(), ContentTypes.TEXT_HTML,
+					Sanitizer.MODE_ALL, (String)assetDisplayFieldValue, null);
+			}
+
+			assetDisplayFieldsValues.putIfAbsent(
+				assetDisplayContributorField.getKey(), assetDisplayFieldValue);
 		}
 
 		return assetDisplayFieldsValues;
 	}
 
 	private Map<String, Object> _getParameterMap(
-		AssetEntry assetEntry, T assetObject, Locale locale) {
+			AssetEntry assetEntry, T assetObject, Locale locale)
+		throws PortalException {
 
 		// Field values for asset entry
 
@@ -235,9 +281,19 @@ public abstract class BaseAssetDisplayContributor<T>
 		for (AssetDisplayContributorField assetDisplayContributorField :
 				assetDisplayContributorFields) {
 
-			parameterMap.put(
-				assetDisplayContributorField.getKey(),
-				assetDisplayContributorField.getValue(assetObject, locale));
+			Object assetDisplayFieldValue =
+				assetDisplayContributorField.getValue(assetObject, locale);
+
+			if (assetDisplayFieldValue instanceof String) {
+				assetDisplayFieldValue = SanitizerUtil.sanitize(
+					assetEntry.getCompanyId(), assetEntry.getGroupId(),
+					assetEntry.getUserId(), AssetEntry.class.getName(),
+					assetEntry.getEntryId(), ContentTypes.TEXT_HTML,
+					Sanitizer.MODE_ALL, (String)assetDisplayFieldValue, null);
+			}
+
+			parameterMap.putIfAbsent(
+				assetDisplayContributorField.getKey(), assetDisplayFieldValue);
 		}
 
 		// Field values for the class type

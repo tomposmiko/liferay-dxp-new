@@ -13,13 +13,12 @@ import templates from './FragmentEditableFieldTooltip.soy';
 const WINDOW_RESIZE_DEBOUNCE_DELAY = 100;
 
 /**
- * FragmentEditableFieldTooltip
+ * Creates a Fragment Editable Field Tooltip component.
  */
 class FragmentEditableFieldTooltip extends Component {
 
 	/**
 	 * @inheritDoc
-	 * @review
 	 */
 	attached() {
 		this._alignTooltip();
@@ -27,7 +26,6 @@ class FragmentEditableFieldTooltip extends Component {
 
 	/**
 	 * @inheritDoc
-	 * @review
 	 */
 	created() {
 		this._handleDocumentClick = this._handleDocumentClick.bind(this);
@@ -52,7 +50,6 @@ class FragmentEditableFieldTooltip extends Component {
 
 	/**
 	 * @inheritDoc
-	 * @review
 	 */
 	disposed() {
 		if (this._documentClickHandler) {
@@ -68,16 +65,14 @@ class FragmentEditableFieldTooltip extends Component {
 
 	/**
 	 * @inheritDoc
-	 * @review
 	 */
 	rendered() {
 		this._alignTooltip();
 	}
 
 	/**
-	 * Align tooltip position acording to editable field
+	 * Aligns the tooltip position for editable fields.
 	 * @private
-	 * @review
 	 */
 	_alignTooltip() {
 		if (this.refs.tooltip) {
@@ -90,7 +85,7 @@ class FragmentEditableFieldTooltip extends Component {
 	}
 
 	/**
-	 * Handle a button click
+	 * Handles a button click.
 	 * @param {MouseEvent} event
 	 */
 	_handleButtonClick(event) {
@@ -106,8 +101,8 @@ class FragmentEditableFieldTooltip extends Component {
 	}
 
 	/**
-	 * Hide tooltip on document click when it is outside the tooltip
-	 * @param {MouseEvent} event
+	 * Hides the tooltip when a document click occurs outside the tooltip.
+	 * @param {MouseEvent} event The document click.
 	 */
 	_handleDocumentClick(event) {
 		if (
@@ -120,9 +115,8 @@ class FragmentEditableFieldTooltip extends Component {
 	}
 
 	/**
-	 * Handle window resize event
+	 * Callback executed to align the tooltip when the window is resized.
 	 * @private
-	 * @review
 	 */
 	_handleWindowResize() {
 		this._alignTooltip();
@@ -132,28 +126,25 @@ class FragmentEditableFieldTooltip extends Component {
 
 /**
  * State definition.
- * @review
  * @static
  * @type {!Object}
  */
 FragmentEditableFieldTooltip.STATE = {
 
 	/**
-	 * Reference element used for aligning the tooltip
+	 * Reference element the tooltip alignment is based on.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentEditableFieldTooltip
-	 * @review
 	 * @type {HTMLElement}
 	 */
 	alignElement: Config.object().required(),
 
 	/**
-	 * List of buttons rendered inside the tooltip
+	 * List of buttons rendered inside the tooltip.
 	 * @default undefined
 	 * @instance
 	 * @memberOf FragmentEditableFieldTooltip
-	 * @review
 	 * @type {!Array<{
 	 *   id: !string,
 	 *   label: !string

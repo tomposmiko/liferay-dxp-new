@@ -14,36 +14,62 @@
 
 package com.liferay.headless.foundation.resource.v1_0.test;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-import com.liferay.headless.foundation.dto.v1_0.Creator;
 import com.liferay.headless.foundation.dto.v1_0.Role;
-import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.headless.foundation.resource.v1_0.RoleResource;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Base64;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.odata.entity.EntityField;
+import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.test.rule.Inject;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
+
+import java.lang.reflect.InvocationTargetException;
 
 import java.net.URL;
 
+import java.text.DateFormat;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
+
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -53,8 +79,20 @@ import org.junit.Test;
 @Generated("")
 public abstract class BaseRoleResourceTestCase {
 
+	@ClassRule
+	@Rule
+	public static final LiferayIntegrationTestRule liferayIntegrationTestRule =
+		new LiferayIntegrationTestRule();
+
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+	}
+
 	@Before
 	public void setUp() throws Exception {
+		irrelevantGroup = GroupTestUtil.addGroup();
 		testGroup = GroupTestUtil.addGroup();
 
 		_resourceURL = new URL(
@@ -63,125 +101,420 @@ public abstract class BaseRoleResourceTestCase {
 
 	@After
 	public void tearDown() throws Exception {
+		GroupTestUtil.deleteGroup(irrelevantGroup);
 		GroupTestUtil.deleteGroup(testGroup);
 	}
 
 	@Test
 	public void testGetMyUserAccountRolesPage() throws Exception {
-			Assert.assertTrue(true);
-	}
-	@Test
-	public void testGetRolesPage() throws Exception {
-			Assert.assertTrue(true);
-	}
-	@Test
-	public void testGetRole() throws Exception {
-			Assert.assertTrue(true);
-	}
-	@Test
-	public void testGetUserAccountRolesPage() throws Exception {
-			Assert.assertTrue(true);
+		Long userAccountId = testGetMyUserAccountRolesPage_getUserAccountId();
+		Long irrelevantUserAccountId =
+			testGetMyUserAccountRolesPage_getIrrelevantUserAccountId();
+
+		if ((irrelevantUserAccountId != null)) {
+			Role irrelevantRole = testGetMyUserAccountRolesPage_addRole(
+				irrelevantUserAccountId, randomIrrelevantRole());
+
+			Page<Role> page = invokeGetMyUserAccountRolesPage(
+				irrelevantUserAccountId, Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantRole), (List<Role>)page.getItems());
+			assertValid(page);
+		}
+
+		Role role1 = testGetMyUserAccountRolesPage_addRole(
+			userAccountId, randomRole());
+
+		Role role2 = testGetMyUserAccountRolesPage_addRole(
+			userAccountId, randomRole());
+
+		Page<Role> page = invokeGetMyUserAccountRolesPage(
+			userAccountId, Pagination.of(1, 2));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(role1, role2), (List<Role>)page.getItems());
+		assertValid(page);
 	}
 
-	protected void assertResponseCode(int expectedResponseCode, Http.Response actualResponse) {
-		Assert.assertEquals(expectedResponseCode, actualResponse.getResponseCode());
+	@Test
+	public void testGetMyUserAccountRolesPageWithPagination() throws Exception {
+		Long userAccountId = testGetMyUserAccountRolesPage_getUserAccountId();
+
+		Role role1 = testGetMyUserAccountRolesPage_addRole(
+			userAccountId, randomRole());
+
+		Role role2 = testGetMyUserAccountRolesPage_addRole(
+			userAccountId, randomRole());
+
+		Role role3 = testGetMyUserAccountRolesPage_addRole(
+			userAccountId, randomRole());
+
+		Page<Role> page1 = invokeGetMyUserAccountRolesPage(
+			userAccountId, Pagination.of(1, 2));
+
+		List<Role> roles1 = (List<Role>)page1.getItems();
+
+		Assert.assertEquals(roles1.toString(), 2, roles1.size());
+
+		Page<Role> page2 = invokeGetMyUserAccountRolesPage(
+			userAccountId, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<Role> roles2 = (List<Role>)page2.getItems();
+
+		Assert.assertEquals(roles2.toString(), 1, roles2.size());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(role1, role2, role3),
+			new ArrayList<Role>() {
+				{
+					addAll(roles1);
+					addAll(roles2);
+				}
+			});
+	}
+
+	protected Role testGetMyUserAccountRolesPage_addRole(
+			Long userAccountId, Role role)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetMyUserAccountRolesPage_getUserAccountId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetMyUserAccountRolesPage_getIrrelevantUserAccountId()
+		throws Exception {
+
+		return null;
 	}
 
 	protected Page<Role> invokeGetMyUserAccountRolesPage(
-				Long myUserAccountId,Pagination pagination)
-			throws Exception {
+			Long userAccountId, Pagination pagination)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/my-user-accounts/{my-user-account-id}/roles", myUserAccountId));
+		String location =
+			_resourceURL +
+				_toPath(
+					"/my-user-accounts/{user-account-id}/roles", userAccountId);
 
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), new TypeReference<Page<RoleImpl>>() {});
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		return _outputObjectMapper.readValue(
+			string,
+			new TypeReference<Page<Role>>() {
+			});
 	}
 
 	protected Http.Response invokeGetMyUserAccountRolesPageResponse(
-				Long myUserAccountId,Pagination pagination)
-			throws Exception {
+			Long userAccountId, Pagination pagination)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/my-user-accounts/{my-user-account-id}/roles", myUserAccountId));
+		String location =
+			_resourceURL +
+				_toPath(
+					"/my-user-accounts/{user-account-id}/roles", userAccountId);
 
-			HttpUtil.URLtoString(options);
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
 
-			return options.getResponse();
-	}
-	protected Page<Role> invokeGetRolesPage(
-				Pagination pagination)
-			throws Exception {
+		options.setLocation(location);
 
-			Http.Options options = _createHttpOptions();
+		HttpUtil.URLtoByteArray(options);
 
-			options.setLocation(_resourceURL + _toPath("/roles", pagination));
-
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), new TypeReference<Page<RoleImpl>>() {});
-	}
-
-	protected Http.Response invokeGetRolesPageResponse(
-				Pagination pagination)
-			throws Exception {
-
-			Http.Options options = _createHttpOptions();
-
-			options.setLocation(_resourceURL + _toPath("/roles", pagination));
-
-			HttpUtil.URLtoString(options);
-
-			return options.getResponse();
-	}
-	protected Role invokeGetRole(
-				Long roleId)
-			throws Exception {
-
-			Http.Options options = _createHttpOptions();
-
-			options.setLocation(_resourceURL + _toPath("/roles/{role-id}", roleId));
-
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), RoleImpl.class);
+		return options.getResponse();
 	}
 
-	protected Http.Response invokeGetRoleResponse(
-				Long roleId)
-			throws Exception {
-
-			Http.Options options = _createHttpOptions();
-
-			options.setLocation(_resourceURL + _toPath("/roles/{role-id}", roleId));
-
-			HttpUtil.URLtoString(options);
-
-			return options.getResponse();
+	@Test
+	public void testGetRolesPage() throws Exception {
+		Assert.assertTrue(true);
 	}
+
+	protected Page<Role> invokeGetRolesPage(Pagination pagination)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location = _resourceURL + _toPath("/roles");
+
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		return _outputObjectMapper.readValue(
+			string,
+			new TypeReference<Page<Role>>() {
+			});
+	}
+
+	protected Http.Response invokeGetRolesPageResponse(Pagination pagination)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location = _resourceURL + _toPath("/roles");
+
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		options.setLocation(location);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
+	}
+
+	@Test
+	public void testGetRole() throws Exception {
+		Role postRole = testGetRole_addRole();
+
+		Role getRole = invokeGetRole(postRole.getId());
+
+		assertEquals(postRole, getRole);
+		assertValid(getRole);
+	}
+
+	protected Role testGetRole_addRole() throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Role invokeGetRole(Long roleId) throws Exception {
+		Http.Options options = _createHttpOptions();
+
+		String location = _resourceURL + _toPath("/roles/{role-id}", roleId);
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		try {
+			return _outputObjectMapper.readValue(string, Role.class);
+		}
+		catch (Exception e) {
+			_log.error("Unable to process HTTP response: " + string, e);
+
+			throw e;
+		}
+	}
+
+	protected Http.Response invokeGetRoleResponse(Long roleId)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location = _resourceURL + _toPath("/roles/{role-id}", roleId);
+
+		options.setLocation(location);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
+	}
+
+	@Test
+	public void testGetUserAccountRolesPage() throws Exception {
+		Long userAccountId = testGetUserAccountRolesPage_getUserAccountId();
+		Long irrelevantUserAccountId =
+			testGetUserAccountRolesPage_getIrrelevantUserAccountId();
+
+		if ((irrelevantUserAccountId != null)) {
+			Role irrelevantRole = testGetUserAccountRolesPage_addRole(
+				irrelevantUserAccountId, randomIrrelevantRole());
+
+			Page<Role> page = invokeGetUserAccountRolesPage(
+				irrelevantUserAccountId, Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantRole), (List<Role>)page.getItems());
+			assertValid(page);
+		}
+
+		Role role1 = testGetUserAccountRolesPage_addRole(
+			userAccountId, randomRole());
+
+		Role role2 = testGetUserAccountRolesPage_addRole(
+			userAccountId, randomRole());
+
+		Page<Role> page = invokeGetUserAccountRolesPage(
+			userAccountId, Pagination.of(1, 2));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(role1, role2), (List<Role>)page.getItems());
+		assertValid(page);
+	}
+
+	@Test
+	public void testGetUserAccountRolesPageWithPagination() throws Exception {
+		Long userAccountId = testGetUserAccountRolesPage_getUserAccountId();
+
+		Role role1 = testGetUserAccountRolesPage_addRole(
+			userAccountId, randomRole());
+
+		Role role2 = testGetUserAccountRolesPage_addRole(
+			userAccountId, randomRole());
+
+		Role role3 = testGetUserAccountRolesPage_addRole(
+			userAccountId, randomRole());
+
+		Page<Role> page1 = invokeGetUserAccountRolesPage(
+			userAccountId, Pagination.of(1, 2));
+
+		List<Role> roles1 = (List<Role>)page1.getItems();
+
+		Assert.assertEquals(roles1.toString(), 2, roles1.size());
+
+		Page<Role> page2 = invokeGetUserAccountRolesPage(
+			userAccountId, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<Role> roles2 = (List<Role>)page2.getItems();
+
+		Assert.assertEquals(roles2.toString(), 1, roles2.size());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(role1, role2, role3),
+			new ArrayList<Role>() {
+				{
+					addAll(roles1);
+					addAll(roles2);
+				}
+			});
+	}
+
+	protected Role testGetUserAccountRolesPage_addRole(
+			Long userAccountId, Role role)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetUserAccountRolesPage_getUserAccountId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetUserAccountRolesPage_getIrrelevantUserAccountId()
+		throws Exception {
+
+		return null;
+	}
+
 	protected Page<Role> invokeGetUserAccountRolesPage(
-				Long userAccountId,Pagination pagination)
-			throws Exception {
+			Long userAccountId, Pagination pagination)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/user-accounts/{user-account-id}/roles", userAccountId));
+		String location =
+			_resourceURL +
+				_toPath(
+					"/user-accounts/{user-account-id}/roles", userAccountId);
 
-				return _outputObjectMapper.readValue(HttpUtil.URLtoString(options), new TypeReference<Page<RoleImpl>>() {});
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		return _outputObjectMapper.readValue(
+			string,
+			new TypeReference<Page<Role>>() {
+			});
 	}
 
 	protected Http.Response invokeGetUserAccountRolesPageResponse(
-				Long userAccountId,Pagination pagination)
-			throws Exception {
+			Long userAccountId, Pagination pagination)
+		throws Exception {
 
-			Http.Options options = _createHttpOptions();
+		Http.Options options = _createHttpOptions();
 
-			options.setLocation(_resourceURL + _toPath("/user-accounts/{user-account-id}/roles", userAccountId));
+		String location =
+			_resourceURL +
+				_toPath(
+					"/user-accounts/{user-account-id}/roles", userAccountId);
 
-			HttpUtil.URLtoString(options);
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
 
-			return options.getResponse();
+		options.setLocation(location);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
+	}
+
+	protected void assertResponseCode(
+		int expectedResponseCode, Http.Response actualResponse) {
+
+		Assert.assertEquals(
+			expectedResponseCode, actualResponse.getResponseCode());
 	}
 
 	protected void assertEquals(Role role1, Role role2) {
-		Assert.assertTrue(role1 + " does not equal " + role2, equals(role1, role2));
+		Assert.assertTrue(
+			role1 + " does not equal " + role2, equals(role1, role2));
 	}
 
 	protected void assertEquals(List<Role> roles1, List<Role> roles2) {
@@ -192,285 +525,219 @@ public abstract class BaseRoleResourceTestCase {
 			Role role2 = roles2.get(i);
 
 			assertEquals(role1, role2);
+		}
 	}
+
+	protected void assertEqualsIgnoringOrder(
+		List<Role> roles1, List<Role> roles2) {
+
+		Assert.assertEquals(roles1.size(), roles2.size());
+
+		for (Role role1 : roles1) {
+			boolean contains = false;
+
+			for (Role role2 : roles2) {
+				if (equals(role1, role2)) {
+					contains = true;
+
+					break;
+				}
+			}
+
+			Assert.assertTrue(roles2 + " does not contain " + role1, contains);
+		}
+	}
+
+	protected void assertValid(Role role) {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected void assertValid(Page<Role> page) {
+		boolean valid = false;
+
+		Collection<Role> roles = page.getItems();
+
+		int size = roles.size();
+
+		if ((page.getLastPage() > 0) && (page.getPage() > 0) &&
+			(page.getPageSize() > 0) && (page.getTotalCount() > 0) &&
+			(size > 0)) {
+
+			valid = true;
+		}
+
+		Assert.assertTrue(valid);
 	}
 
 	protected boolean equals(Role role1, Role role2) {
 		if (role1 == role2) {
 			return true;
-	}
+		}
 
 		return false;
 	}
 
-	protected Role randomRole() {
-		return new RoleImpl() {
-			{
+	protected Collection<EntityField> getEntityFields() throws Exception {
+		if (!(_roleResource instanceof EntityModelResource)) {
+			throw new UnsupportedOperationException(
+				"Resource is not an instance of EntityModelResource");
+		}
 
-						dateCreated = RandomTestUtil.nextDate();
-						dateModified = RandomTestUtil.nextDate();
-						description = RandomTestUtil.randomString();
-						id = RandomTestUtil.randomLong();
-						name = RandomTestUtil.randomString();
-						roleType = RandomTestUtil.randomString();
+		EntityModelResource entityModelResource =
+			(EntityModelResource)_roleResource;
+
+		EntityModel entityModel = entityModelResource.getEntityModel(
+			new MultivaluedHashMap());
+
+		Map<String, EntityField> entityFieldsMap =
+			entityModel.getEntityFieldsMap();
+
+		return entityFieldsMap.values();
 	}
+
+	protected List<EntityField> getEntityFields(EntityField.Type type)
+		throws Exception {
+
+		Collection<EntityField> entityFields = getEntityFields();
+
+		Stream<EntityField> stream = entityFields.stream();
+
+		return stream.filter(
+			entityField -> Objects.equals(entityField.getType(), type)
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	protected String getFilterString(
+		EntityField entityField, String operator, Role role) {
+
+		StringBundler sb = new StringBundler();
+
+		String entityFieldName = entityField.getName();
+
+		sb.append(entityFieldName);
+
+		sb.append(" ");
+		sb.append(operator);
+		sb.append(" ");
+
+		if (entityFieldName.equals("availableLanguages")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("creator")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("dateCreated")) {
+			sb.append(_dateFormat.format(role.getDateCreated()));
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("dateModified")) {
+			sb.append(_dateFormat.format(role.getDateModified()));
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("description")) {
+			sb.append("'");
+			sb.append(String.valueOf(role.getDescription()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("id")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("name")) {
+			sb.append("'");
+			sb.append(String.valueOf(role.getName()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("roleType")) {
+			sb.append("'");
+			sb.append(String.valueOf(role.getRoleType()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		throw new IllegalArgumentException(
+			"Invalid entity field " + entityFieldName);
+	}
+
+	protected Role randomRole() {
+		return new Role() {
+			{
+				dateCreated = RandomTestUtil.nextDate();
+				dateModified = RandomTestUtil.nextDate();
+				description = RandomTestUtil.randomString();
+				id = RandomTestUtil.randomLong();
+				name = RandomTestUtil.randomString();
+				roleType = RandomTestUtil.randomString();
+			}
 		};
 	}
 
+	protected Role randomIrrelevantRole() {
+		return randomRole();
+	}
+
+	protected Role randomPatchRole() {
+		return randomRole();
+	}
+
+	protected Group irrelevantGroup;
 	protected Group testGroup;
-
-	protected static class RoleImpl implements Role {
-
-	public String[] getAvailableLanguages() {
-				return availableLanguages;
-	}
-
-	public void setAvailableLanguages(String[] availableLanguages) {
-				this.availableLanguages = availableLanguages;
-	}
-
-	@JsonIgnore
-	public void setAvailableLanguages(
-				UnsafeSupplier<String[], Throwable> availableLanguagesUnsafeSupplier) {
-
-				try {
-					availableLanguages = availableLanguagesUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String[] availableLanguages;
-	public Creator getCreator() {
-				return creator;
-	}
-
-	public void setCreator(Creator creator) {
-				this.creator = creator;
-	}
-
-	@JsonIgnore
-	public void setCreator(
-				UnsafeSupplier<Creator, Throwable> creatorUnsafeSupplier) {
-
-				try {
-					creator = creatorUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Creator creator;
-	public Date getDateCreated() {
-				return dateCreated;
-	}
-
-	public void setDateCreated(Date dateCreated) {
-				this.dateCreated = dateCreated;
-	}
-
-	@JsonIgnore
-	public void setDateCreated(
-				UnsafeSupplier<Date, Throwable> dateCreatedUnsafeSupplier) {
-
-				try {
-					dateCreated = dateCreatedUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Date dateCreated;
-	public Date getDateModified() {
-				return dateModified;
-	}
-
-	public void setDateModified(Date dateModified) {
-				this.dateModified = dateModified;
-	}
-
-	@JsonIgnore
-	public void setDateModified(
-				UnsafeSupplier<Date, Throwable> dateModifiedUnsafeSupplier) {
-
-				try {
-					dateModified = dateModifiedUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Date dateModified;
-	public String getDescription() {
-				return description;
-	}
-
-	public void setDescription(String description) {
-				this.description = description;
-	}
-
-	@JsonIgnore
-	public void setDescription(
-				UnsafeSupplier<String, Throwable> descriptionUnsafeSupplier) {
-
-				try {
-					description = descriptionUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String description;
-	public Long getId() {
-				return id;
-	}
-
-	public void setId(Long id) {
-				this.id = id;
-	}
-
-	@JsonIgnore
-	public void setId(
-				UnsafeSupplier<Long, Throwable> idUnsafeSupplier) {
-
-				try {
-					id = idUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected Long id;
-	public String getName() {
-				return name;
-	}
-
-	public void setName(String name) {
-				this.name = name;
-	}
-
-	@JsonIgnore
-	public void setName(
-				UnsafeSupplier<String, Throwable> nameUnsafeSupplier) {
-
-				try {
-					name = nameUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String name;
-	public String getRoleType() {
-				return roleType;
-	}
-
-	public void setRoleType(String roleType) {
-				this.roleType = roleType;
-	}
-
-	@JsonIgnore
-	public void setRoleType(
-				UnsafeSupplier<String, Throwable> roleTypeUnsafeSupplier) {
-
-				try {
-					roleType = roleTypeUnsafeSupplier.get();
-	}
-				catch (Throwable t) {
-					throw new RuntimeException(t);
-	}
-	}
-
-	@JsonProperty
-	protected String roleType;
-
-	public String toString() {
-			StringBundler sb = new StringBundler();
-
-			sb.append("{");
-
-					sb.append("availableLanguages=");
-
-				sb.append(availableLanguages);
-					sb.append(", creator=");
-
-				sb.append(creator);
-					sb.append(", dateCreated=");
-
-				sb.append(dateCreated);
-					sb.append(", dateModified=");
-
-				sb.append(dateModified);
-					sb.append(", description=");
-
-				sb.append(description);
-					sb.append(", id=");
-
-				sb.append(id);
-					sb.append(", name=");
-
-				sb.append(name);
-					sb.append(", roleType=");
-
-				sb.append(roleType);
-
-			sb.append("}");
-
-			return sb.toString();
-	}
-
-	}
 
 	protected static class Page<T> {
 
-	public Collection<T> getItems() {
+		public Collection<T> getItems() {
 			return new ArrayList<>(items);
-	}
+		}
 
-	public int getItemsPerPage() {
-			return itemsPerPage;
-	}
+		public long getLastPage() {
+			return lastPage;
+		}
 
-	public int getLastPageNumber() {
-			return lastPageNumber;
-	}
+		public long getPage() {
+			return page;
+		}
 
-	public int getPageNumber() {
-			return pageNumber;
-	}
+		public long getPageSize() {
+			return pageSize;
+		}
 
-	public int getTotalCount() {
+		public long getTotalCount() {
 			return totalCount;
-	}
+		}
 
-	@JsonProperty
-	protected Collection<T> items;
+		@JsonProperty
+		protected Collection<T> items;
 
-	@JsonProperty
-	protected int itemsPerPage;
+		@JsonProperty
+		protected long lastPage;
 
-	@JsonProperty
-	protected int lastPageNumber;
+		@JsonProperty
+		protected long page;
 
-	@JsonProperty
-	protected int pageNumber;
+		@JsonProperty
+		protected long pageSize;
 
-	@JsonProperty
-	protected int totalCount;
+		@JsonProperty
+		protected long totalCount;
 
 	}
 
@@ -481,25 +748,74 @@ public abstract class BaseRoleResourceTestCase {
 
 		String userNameAndPassword = "test@liferay.com:test";
 
-		String encodedUserNameAndPassword = Base64.encode(userNameAndPassword.getBytes());
+		String encodedUserNameAndPassword = Base64.encode(
+			userNameAndPassword.getBytes());
 
-		options.addHeader("Authorization", "Basic " + encodedUserNameAndPassword);
+		options.addHeader(
+			"Authorization", "Basic " + encodedUserNameAndPassword);
 
 		options.addHeader("Content-Type", "application/json");
 
 		return options;
 	}
 
-	private String _toPath(String template, Object value) {
-		return template.replaceFirst("\\{.*\\}", String.valueOf(value));
+	private String _toPath(String template, Object... values) {
+		if (ArrayUtil.isEmpty(values)) {
+			return template;
+		}
+
+		for (int i = 0; i < values.length; i++) {
+			template = template.replaceFirst(
+				"\\{.*?\\}", String.valueOf(values[i]));
+		}
+
+		return template;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		BaseRoleResourceTestCase.class);
+
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
+	private static DateFormat _dateFormat;
 	private final static ObjectMapper _inputObjectMapper = new ObjectMapper() {
 		{
+			setFilterProvider(
+				new SimpleFilterProvider() {
+					{
+						addFilter(
+							"Liferay.Vulcan",
+							SimpleBeanPropertyFilter.serializeAll());
+					}
+				});
 			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-	}
+		}
 	};
-	private final static ObjectMapper _outputObjectMapper = new ObjectMapper();
+	private final static ObjectMapper _outputObjectMapper = new ObjectMapper() {
+		{
+			setFilterProvider(
+				new SimpleFilterProvider() {
+					{
+						addFilter(
+							"Liferay.Vulcan",
+							SimpleBeanPropertyFilter.serializeAll());
+					}
+				});
+		}
+	};
+
+	@Inject
+	private RoleResource _roleResource;
 
 	private URL _resourceURL;
 

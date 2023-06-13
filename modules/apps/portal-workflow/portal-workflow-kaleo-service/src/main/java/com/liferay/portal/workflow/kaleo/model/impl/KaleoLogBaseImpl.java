@@ -32,8 +32,9 @@ import com.liferay.portal.workflow.kaleo.service.KaleoLogLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class KaleoLogBaseImpl extends KaleoLogModelImpl
-	implements KaleoLog {
+public abstract class KaleoLogBaseImpl
+	extends KaleoLogModelImpl implements KaleoLog {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class KaleoLogBaseImpl extends KaleoLogModelImpl
 			KaleoLogLocalServiceUtil.updateKaleoLog(this);
 		}
 	}
+
 }

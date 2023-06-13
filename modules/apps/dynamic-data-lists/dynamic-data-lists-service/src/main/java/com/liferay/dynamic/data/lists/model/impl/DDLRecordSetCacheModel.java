@@ -17,10 +17,8 @@ package com.liferay.dynamic.data.lists.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 
@@ -38,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
-	Externalizable, MVCCModel {
+public class DDLRecordSetCacheModel
+	implements CacheModel<DDLRecordSet>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -50,10 +49,12 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
 			return false;
 		}
 
-		DDLRecordSetCacheModel ddlRecordSetCacheModel = (DDLRecordSetCacheModel)obj;
+		DDLRecordSetCacheModel ddlRecordSetCacheModel =
+			(DDLRecordSetCacheModel)obj;
 
 		if ((recordSetId == ddlRecordSetCacheModel.recordSetId) &&
-				(mvccVersion == ddlRecordSetCacheModel.mvccVersion)) {
+			(mvccVersion == ddlRecordSetCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -231,6 +232,7 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
 	@Override
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
@@ -260,12 +262,13 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
 		settings = objectInput.readUTF();
 		lastPublishDate = objectInput.readLong();
 
-		_ddmFormValues = (com.liferay.dynamic.data.mapping.storage.DDMFormValues)objectInput.readObject();
+		_ddmFormValues =
+			(com.liferay.dynamic.data.mapping.storage.DDMFormValues)
+				objectInput.readObject();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		if (uuid == null) {
@@ -368,5 +371,7 @@ public class DDLRecordSetCacheModel implements CacheModel<DDLRecordSet>,
 	public int scope;
 	public String settings;
 	public long lastPublishDate;
-	public com.liferay.dynamic.data.mapping.storage.DDMFormValues _ddmFormValues;
+	public com.liferay.dynamic.data.mapping.storage.DDMFormValues
+		_ddmFormValues;
+
 }

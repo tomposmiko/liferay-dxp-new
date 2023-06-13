@@ -30,6 +30,7 @@ import java.util.List;
  */
 @ProviderType
 public class MBBanSoap implements Serializable {
+
 	public static MBBanSoap toSoapModel(MBBan model) {
 		MBBanSoap soapModel = new MBBanSoap();
 
@@ -185,4 +186,5 @@ public class MBBanSoap implements Serializable {
 	private Date _modifiedDate;
 	private long _banUserId;
 	private Date _lastPublishDate;
+
 }

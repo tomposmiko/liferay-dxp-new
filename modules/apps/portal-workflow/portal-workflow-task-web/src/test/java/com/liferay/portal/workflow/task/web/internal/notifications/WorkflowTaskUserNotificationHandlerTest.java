@@ -14,305 +14,260 @@
 
 package com.liferay.portal.workflow.task.web.internal.notifications;
 
-import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
+import com.liferay.portal.kernel.model.UserNotificationEventWrapper;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ProxyFactory;
+import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
+import com.liferay.portal.kernel.workflow.DefaultWorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManagerUtil;
+import com.liferay.portal.util.HtmlImpl;
+import com.liferay.portal.workflow.WorkflowTaskManagerProxyBean;
 import com.liferay.portal.workflow.task.web.internal.permission.WorkflowTaskPermissionChecker;
+import com.liferay.registry.BasicRegistryImpl;
+import com.liferay.registry.RegistryUtil;
 
-import java.lang.reflect.Field;
+import java.io.Serializable;
+
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.mockito.Matchers;
-import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Inácio Nery
  */
-@PrepareForTest(
-	{WorkflowHandlerRegistryUtil.class, WorkflowTaskManagerUtil.class}
-)
-@RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor(
-	{
-		"com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil",
-		"com.liferay.portal.kernel.workflow.WorkflowTaskManagerUtil"
-	}
-)
-public class WorkflowTaskUserNotificationHandlerTest extends PowerMockito {
+public class WorkflowTaskUserNotificationHandlerTest {
 
-	@Before
-	public void setUp() throws Exception {
-		setUpHtmlUtil();
-		setUpJSONFactoryUtil();
-		setUpThemeDisplay();
-		setUpUserNotificationEventLocalService();
-		setUpWorkflowTaskManagerUtil();
-		setUpWorkflowTaskPermissionChecker();
-		setUpWorkflowHandlerRegistryUtil();
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		RegistryUtil.setRegistry(new BasicRegistryImpl());
 
-		_notificationMessage = RandomTestUtil.randomString();
+		_setUpHtmlUtil();
+		_setUpJSONFactoryUtil();
+		_setUpUserNotificationEventLocalService();
+		_setUpWorkflowTaskManagerUtil();
+		_setUpWorkflowTaskPermissionChecker();
+		_setUpWorkflowHandlerRegistryUtil();
 	}
 
 	@Test
 	public void testInvalidWorkflowTaskIdShouldReturnBlankBody()
 		throws Exception {
 
-		UserNotificationEvent userNotificationEvent = mockUserNotificationEvent(
-			_INVALID_WORKFLOW_TASK_ID);
-
 		Assert.assertEquals(
 			StringPool.BLANK,
 			_workflowTaskUserNotificationHandler.getBody(
-				userNotificationEvent, _serviceContext));
+				mockUserNotificationEvent(null, _INVALID_WORKFLOW_TASK_ID),
+				_serviceContext));
 	}
 
 	@Test
 	public void testInvalidWorkflowTaskIdShouldReturnLink() throws Exception {
-		UserNotificationEvent userNotificationEvent = mockUserNotificationEvent(
-			_VALID_ENTRY_CLASS_NAME, _INVALID_WORKFLOW_TASK_ID);
-
 		Assert.assertEquals(
 			_VALID_LINK,
 			_workflowTaskUserNotificationHandler.getLink(
-				userNotificationEvent, _serviceContext));
+				mockUserNotificationEvent(
+					_VALID_ENTRY_CLASS_NAME, _INVALID_WORKFLOW_TASK_ID),
+				_serviceContext));
 	}
 
 	@Test
 	public void testNullWorkflowTaskIdShouldReturnBlankLink() throws Exception {
-		UserNotificationEvent userNotificationEvent = mockUserNotificationEvent(
-			_VALID_ENTRY_CLASS_NAME, 0L);
-
 		Assert.assertEquals(
 			StringPool.BLANK,
 			_workflowTaskUserNotificationHandler.getLink(
-				userNotificationEvent, _serviceContext));
+				mockUserNotificationEvent(_VALID_ENTRY_CLASS_NAME, 0),
+				_serviceContext));
 	}
 
 	@Test
 	public void testNullWorkflowTaskIdShouldReturnBody() throws Exception {
-		UserNotificationEvent userNotificationEvent = mockUserNotificationEvent(
-			0);
-
 		Assert.assertEquals(
-			_notificationMessage,
+			_NOTIFICATION_MESSAGE,
 			_workflowTaskUserNotificationHandler.getBody(
-				userNotificationEvent, _serviceContext));
+				mockUserNotificationEvent(null, 0), _serviceContext));
 	}
 
 	@Test
 	public void testValidWorkflowTaskIdShouldReturnBody() throws Exception {
-		UserNotificationEvent userNotificationEvent = mockUserNotificationEvent(
-			_VALID_WORKFLOW_TASK_ID);
-
 		Assert.assertEquals(
-			_notificationMessage,
+			_NOTIFICATION_MESSAGE,
 			_workflowTaskUserNotificationHandler.getBody(
-				userNotificationEvent, _serviceContext));
+				mockUserNotificationEvent(null, _VALID_WORKFLOW_TASK_ID),
+				_serviceContext));
 	}
 
 	@Test
 	public void testValidWorkflowTaskIdShouldReturnLink() throws Exception {
-		UserNotificationEvent userNotificationEvent = mockUserNotificationEvent(
-			_VALID_ENTRY_CLASS_NAME, _VALID_WORKFLOW_TASK_ID);
-
 		Assert.assertEquals(
 			_VALID_LINK,
 			_workflowTaskUserNotificationHandler.getLink(
-				userNotificationEvent, _serviceContext));
+				mockUserNotificationEvent(
+					_VALID_ENTRY_CLASS_NAME, _VALID_WORKFLOW_TASK_ID),
+				_serviceContext));
 	}
 
 	protected UserNotificationEvent mockUserNotificationEvent(
-		long workflowTaskId) {
+		String entryClassName, long workflowTaskId) {
 
-		return mockUserNotificationEvent(null, workflowTaskId);
-	}
-
-	protected UserNotificationEvent mockUserNotificationEvent(
-		String entryClassName, Long workflowTaskId) {
-
-		UserNotificationEvent userNotificationEvent = mock(
-			UserNotificationEvent.class);
-
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		jsonObject.put("entryClassName", entryClassName);
-		jsonObject.put("notificationMessage", _notificationMessage);
+		jsonObject.put("notificationMessage", _NOTIFICATION_MESSAGE);
 		jsonObject.put("workflowTaskId", workflowTaskId);
 
-		when(
-			userNotificationEvent.getPayload()
-		).thenReturn(
-			jsonObject.toJSONString()
-		);
+		return new UserNotificationEventWrapper(null) {
 
-		return userNotificationEvent;
+			@Override
+			public String getPayload() {
+				return jsonObject.toJSONString();
+			}
+
+			@Override
+			public long getUserNotificationEventId() {
+				return 0;
+			}
+
+		};
 	}
 
-	protected WorkflowHandler mockWorkflowHandler() throws PortalException {
-		WorkflowHandler workflowHandler = mock(WorkflowHandler.class);
-
-		when(
-			workflowHandler.getURLEditWorkflowTask(
-				_INVALID_WORKFLOW_TASK_ID, _serviceContext)
-		).thenReturn(
-			_VALID_LINK
-		);
-
-		when(
-			workflowHandler.getURLEditWorkflowTask(
-				_VALID_WORKFLOW_TASK_ID, _serviceContext)
-		).thenReturn(
-			_VALID_LINK
-		);
-
-		return workflowHandler;
-	}
-
-	protected void setUpHtmlUtil() {
+	private static void _setUpHtmlUtil() {
 		HtmlUtil htmlUtil = new HtmlUtil();
 
-		htmlUtil.setHtml(_html);
-
-		when(
-			_html.escape(Matchers.anyString())
-		).then(
-			new Answer<String>() {
+		htmlUtil.setHtml(
+			new HtmlImpl() {
 
 				@Override
-				public String answer(InvocationOnMock invocationOnMock)
-					throws Throwable {
-
-					return invocationOnMock.getArgumentAt(0, String.class);
+				public String escape(String text) {
+					return text;
 				}
 
-			}
-		);
+			});
 	}
 
-	protected void setUpJSONFactoryUtil() {
+	private static void _setUpJSONFactoryUtil() {
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
-		jsonFactoryUtil.setJSONFactory(_jsonFactory);
+		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
-	protected void setUpThemeDisplay() {
-		ThemeDisplay themeDisplay = mock(ThemeDisplay.class);
-
-		when(
-			_serviceContext.getThemeDisplay()
-		).thenReturn(
-			themeDisplay
-		);
-
-		when(
-			themeDisplay.getSiteGroupId()
-		).thenReturn(
-			RandomTestUtil.randomLong()
-		);
-	}
-
-	protected void setUpUserNotificationEventLocalService() throws Exception {
-		UserNotificationEventLocalService userNotificationEventLocalService =
-			mock(UserNotificationEventLocalService.class);
+	private static void _setUpUserNotificationEventLocalService()
+		throws Exception {
 
 		_workflowTaskUserNotificationHandler.
 			setUserNotificationEventLocalService(
-				userNotificationEventLocalService);
+				ProxyFactory.newDummyInstance(
+					UserNotificationEventLocalService.class));
 	}
 
-	protected void setUpWorkflowHandlerRegistryUtil() throws PortalException {
-		mockStatic(WorkflowHandlerRegistryUtil.class);
+	private static void _setUpWorkflowHandlerRegistryUtil() throws Exception {
+		Map<String, WorkflowHandler<?>> workflowHandlerMap =
+			ReflectionTestUtil.getFieldValue(
+				WorkflowHandlerRegistryUtil.class, "_workflowHandlerMap");
 
-		when(
-			WorkflowHandlerRegistryUtil.getWorkflowHandler(
-				Matchers.eq(_INVALID_ENTRY_CLASS_NAME))
-		).thenReturn(
-			null
-		);
+		workflowHandlerMap.put(
+			_VALID_ENTRY_CLASS_NAME,
+			new BaseWorkflowHandler<Object>() {
 
-		WorkflowHandler workflowHandler = mockWorkflowHandler();
+				@Override
+				public String getClassName() {
+					return _VALID_ENTRY_CLASS_NAME;
+				}
 
-		when(
-			WorkflowHandlerRegistryUtil.getWorkflowHandler(
-				Matchers.eq(_VALID_ENTRY_CLASS_NAME))
-		).thenReturn(
-			workflowHandler
-		);
+				@Override
+				public String getType(Locale locale) {
+					return null;
+				}
+
+				@Override
+				public String getURLEditWorkflowTask(
+					long workflowTaskId, ServiceContext serviceContext) {
+
+					if (_serviceContext == serviceContext) {
+						return _VALID_LINK;
+					}
+
+					return null;
+				}
+
+				@Override
+				public Object updateStatus(int status, Map workflowContext) {
+					return null;
+				}
+
+			});
 	}
 
-	protected void setUpWorkflowTaskManagerUtil() throws PortalException {
-		mockStatic(WorkflowTaskManagerUtil.class);
+	private static void _setUpWorkflowTaskManagerUtil() throws PortalException {
+		WorkflowTaskManagerUtil workflowTaskManagerUtil =
+			new WorkflowTaskManagerUtil();
 
-		when(
-			WorkflowTaskManagerUtil.fetchWorkflowTask(
-				Matchers.anyLong(), Matchers.eq(_INVALID_WORKFLOW_TASK_ID))
-		).thenReturn(
-			null
-		);
+		workflowTaskManagerUtil.setWorkflowTaskManager(
+			new WorkflowTaskManagerProxyBean() {
 
-		WorkflowTask workflowTask = mock(WorkflowTask.class);
+				@Override
+				public WorkflowTask fetchWorkflowTask(
+					long companyId, long workflowTaskId) {
 
-		when(
-			WorkflowTaskManagerUtil.fetchWorkflowTask(
-				Matchers.anyLong(), Matchers.eq(_VALID_WORKFLOW_TASK_ID))
-		).thenReturn(
-			workflowTask
-		);
+					if (workflowTaskId == _VALID_WORKFLOW_TASK_ID) {
+						return new DefaultWorkflowTask() {
+
+							@Override
+							public Map<String, Serializable>
+								getOptionalAttributes() {
+
+								return Collections.emptyMap();
+							}
+
+						};
+					}
+
+					return null;
+				}
+
+			});
 	}
 
-	protected void setUpWorkflowTaskPermissionChecker() throws Exception {
-		WorkflowTaskPermissionChecker workflowTaskPermissionChecker = mock(
-			WorkflowTaskPermissionChecker.class);
-
-		when(
-			workflowTaskPermissionChecker.hasPermission(
-				Matchers.anyLong(), Matchers.any(WorkflowTask.class),
-				Matchers.any(PermissionChecker.class))
-		).thenReturn(
-			true
-		);
-
-		Field field = ReflectionUtil.getDeclaredField(
-			_workflowTaskUserNotificationHandler.getClass(),
-			"_workflowTaskPermissionChecker");
-
-		field.set(
+	private static void _setUpWorkflowTaskPermissionChecker() throws Exception {
+		ReflectionTestUtil.setFieldValue(
 			_workflowTaskUserNotificationHandler,
-			workflowTaskPermissionChecker);
-	}
+			"_workflowTaskPermissionChecker",
+			new WorkflowTaskPermissionChecker() {
 
-	private static final String _INVALID_ENTRY_CLASS_NAME =
-		RandomTestUtil.randomString();
+				@Override
+				public boolean hasPermission(
+					long groupId, WorkflowTask workflowTask,
+					PermissionChecker permissionChecker) {
+
+					return true;
+				}
+
+			});
+	}
 
 	private static final Long _INVALID_WORKFLOW_TASK_ID =
 		RandomTestUtil.randomLong();
+
+	private static final String _NOTIFICATION_MESSAGE =
+		RandomTestUtil.randomString();
 
 	private static final String _VALID_ENTRY_CLASS_NAME =
 		RandomTestUtil.randomString();
@@ -322,16 +277,20 @@ public class WorkflowTaskUserNotificationHandlerTest extends PowerMockito {
 	private static final Long _VALID_WORKFLOW_TASK_ID =
 		RandomTestUtil.randomLong();
 
-	@Mock
-	private Html _html;
+	private static final ServiceContext _serviceContext = new ServiceContext() {
 
-	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
-	private String _notificationMessage;
+		@Override
+		public ThemeDisplay getThemeDisplay() {
+			return new ThemeDisplay() {
+				{
+					setSiteGroupId(RandomTestUtil.randomLong());
+				}
+			};
+		}
 
-	@Mock
-	private ServiceContext _serviceContext;
+	};
 
-	private final WorkflowTaskUserNotificationHandler
+	private static final WorkflowTaskUserNotificationHandler
 		_workflowTaskUserNotificationHandler =
 			new WorkflowTaskUserNotificationHandler();
 

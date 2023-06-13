@@ -14,120 +14,524 @@
 
 package com.liferay.headless.foundation.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Date;
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface Organization {
+@GraphQLName("Organization")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "Organization")
+public class Organization {
 
-	public String getComment();
+	public String getComment() {
+		return comment;
+	}
 
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	@JsonIgnore
 	public void setComment(
-			String comment);
+		UnsafeSupplier<String, Exception> commentUnsafeSupplier) {
 
-	public void setComment(
-			UnsafeSupplier<String, Throwable>
-				commentUnsafeSupplier);
-	public ContactInformation getContactInformation();
+		try {
+			comment = commentUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String comment;
+
+	@Schema(description = "https://www.schema.org/ContactInformation")
+	public ContactInformation getContactInformation() {
+		return contactInformation;
+	}
+
+	public void setContactInformation(ContactInformation contactInformation) {
+		this.contactInformation = contactInformation;
+	}
+
+	@JsonIgnore
 	public void setContactInformation(
-			ContactInformation contactInformation);
+		UnsafeSupplier<ContactInformation, Exception>
+			contactInformationUnsafeSupplier) {
 
-	public void setContactInformation(
-			UnsafeSupplier<ContactInformation, Throwable>
-				contactInformationUnsafeSupplier);
-	public Long getId();
+		try {
+			contactInformation = contactInformationUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setId(
-			Long id);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected ContactInformation contactInformation;
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public Location getLocation();
+	public Date getDateCreated() {
+		return dateCreated;
+	}
 
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	@JsonIgnore
+	public void setDateCreated(
+		UnsafeSupplier<Date, Exception> dateCreatedUnsafeSupplier) {
+
+		try {
+			dateCreated = dateCreatedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Date dateCreated;
+
+	public Date getDateModified() {
+		return dateModified;
+	}
+
+	public void setDateModified(Date dateModified) {
+		this.dateModified = dateModified;
+	}
+
+	@JsonIgnore
+	public void setDateModified(
+		UnsafeSupplier<Date, Exception> dateModifiedUnsafeSupplier) {
+
+		try {
+			dateModified = dateModifiedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Date dateModified;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	@JsonIgnore
+	public void setImage(
+		UnsafeSupplier<String, Exception> imageUnsafeSupplier) {
+
+		try {
+			image = imageUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String image;
+
+	public String[] getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(String[] keywords) {
+		this.keywords = keywords;
+	}
+
+	@JsonIgnore
+	public void setKeywords(
+		UnsafeSupplier<String[], Exception> keywordsUnsafeSupplier) {
+
+		try {
+			keywords = keywordsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String[] keywords;
+
+	@Schema(description = "https://www.schema.org/PostalAddress")
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+
+	@JsonIgnore
 	public void setLocation(
-			Location location);
+		UnsafeSupplier<Location, Exception> locationUnsafeSupplier) {
 
-	public void setLocation(
-			UnsafeSupplier<Location, Throwable>
-				locationUnsafeSupplier);
-	public String getLogo();
+		try {
+			location = locationUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setLogo(
-			String logo);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Location location;
 
-	public void setLogo(
-			UnsafeSupplier<String, Throwable>
-				logoUnsafeSupplier);
-	public UserAccount[] getMembers();
+	public String getName() {
+		return name;
+	}
 
-	public void setMembers(
-			UserAccount[] members);
+	public void setName(String name) {
+		this.name = name;
+	}
 
-	public void setMembers(
-			UnsafeSupplier<UserAccount[], Throwable>
-				membersUnsafeSupplier);
-	public Long[] getMembersIds();
+	@JsonIgnore
+	public void setName(UnsafeSupplier<String, Exception> nameUnsafeSupplier) {
+		try {
+			name = nameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setMembersIds(
-			Long[] membersIds);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String name;
 
-	public void setMembersIds(
-			UnsafeSupplier<Long[], Throwable>
-				membersIdsUnsafeSupplier);
-	public String getName();
+	public Number getNumberOfOrganizations() {
+		return numberOfOrganizations;
+	}
 
-	public void setName(
-			String name);
+	public void setNumberOfOrganizations(Number numberOfOrganizations) {
+		this.numberOfOrganizations = numberOfOrganizations;
+	}
 
-	public void setName(
-			UnsafeSupplier<String, Throwable>
-				nameUnsafeSupplier);
-	public Organization getParentOrganization();
+	@JsonIgnore
+	public void setNumberOfOrganizations(
+		UnsafeSupplier<Number, Exception> numberOfOrganizationsUnsafeSupplier) {
 
+		try {
+			numberOfOrganizations = numberOfOrganizationsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Number numberOfOrganizations;
+
+	public Organization getParentOrganization() {
+		return parentOrganization;
+	}
+
+	public void setParentOrganization(Organization parentOrganization) {
+		this.parentOrganization = parentOrganization;
+	}
+
+	@JsonIgnore
 	public void setParentOrganization(
-			Organization parentOrganization);
+		UnsafeSupplier<Organization, Exception>
+			parentOrganizationUnsafeSupplier) {
 
-	public void setParentOrganization(
-			UnsafeSupplier<Organization, Throwable>
-				parentOrganizationUnsafeSupplier);
-	public Long getParentOrganizationId();
+		try {
+			parentOrganization = parentOrganizationUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Organization parentOrganization;
+
+	public Long getParentOrganizationId() {
+		return parentOrganizationId;
+	}
+
+	public void setParentOrganizationId(Long parentOrganizationId) {
+		this.parentOrganizationId = parentOrganizationId;
+	}
+
+	@JsonIgnore
 	public void setParentOrganizationId(
-			Long parentOrganizationId);
+		UnsafeSupplier<Long, Exception> parentOrganizationIdUnsafeSupplier) {
 
-	public void setParentOrganizationId(
-			UnsafeSupplier<Long, Throwable>
-				parentOrganizationIdUnsafeSupplier);
-	public Services[] getServices();
+		try {
+			parentOrganizationId = parentOrganizationIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	protected Long parentOrganizationId;
+
+	@Schema(description = "https://www.schema.org/Service")
+	public Service[] getServices() {
+		return services;
+	}
+
+	public void setServices(Service[] services) {
+		this.services = services;
+	}
+
+	@JsonIgnore
 	public void setServices(
-			Services[] services);
+		UnsafeSupplier<Service[], Exception> servicesUnsafeSupplier) {
 
-	public void setServices(
-			UnsafeSupplier<Services[], Throwable>
-				servicesUnsafeSupplier);
-	public Organization[] getSubOrganization();
+		try {
+			services = servicesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setSubOrganization(
-			Organization[] subOrganization);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Service[] services;
 
-	public void setSubOrganization(
-			UnsafeSupplier<Organization[], Throwable>
-				subOrganizationUnsafeSupplier);
-	public Long[] getSubOrganizationIds();
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
 
-	public void setSubOrganizationIds(
-			Long[] subOrganizationIds);
+		if (!(object instanceof Organization)) {
+			return false;
+		}
 
-	public void setSubOrganizationIds(
-			UnsafeSupplier<Long[], Throwable>
-				subOrganizationIdsUnsafeSupplier);
+		Organization organization = (Organization)object;
+
+		return Objects.equals(toString(), organization.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"comment\": ");
+
+		sb.append("\"");
+		sb.append(comment);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"contactInformation\": ");
+
+		sb.append(contactInformation);
+		sb.append(", ");
+
+		sb.append("\"dateCreated\": ");
+
+		sb.append("\"");
+		sb.append(dateCreated);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"dateModified\": ");
+
+		sb.append("\"");
+		sb.append(dateModified);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"image\": ");
+
+		sb.append("\"");
+		sb.append(image);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"keywords\": ");
+
+		if (keywords == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < keywords.length; i++) {
+				sb.append("\"");
+				sb.append(keywords[i]);
+				sb.append("\"");
+
+				if ((i + 1) < keywords.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
+		sb.append("\"location\": ");
+
+		sb.append(location);
+		sb.append(", ");
+
+		sb.append("\"name\": ");
+
+		sb.append("\"");
+		sb.append(name);
+		sb.append("\"");
+		sb.append(", ");
+
+		sb.append("\"numberOfOrganizations\": ");
+
+		sb.append(numberOfOrganizations);
+		sb.append(", ");
+
+		sb.append("\"parentOrganization\": ");
+
+		sb.append(parentOrganization);
+		sb.append(", ");
+
+		sb.append("\"parentOrganizationId\": ");
+
+		sb.append(parentOrganizationId);
+		sb.append(", ");
+
+		sb.append("\"services\": ");
+
+		if (services == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < services.length; i++) {
+				sb.append(services[i]);
+
+				if ((i + 1) < services.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

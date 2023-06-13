@@ -15,6 +15,7 @@
 package com.liferay.segments.internal.odata.entity;
 
 import com.liferay.portal.odata.entity.BooleanEntityField;
+import com.liferay.portal.odata.entity.CollectionEntityField;
 import com.liferay.portal.odata.entity.DateEntityField;
 import com.liferay.portal.odata.entity.DateTimeEntityField;
 import com.liferay.portal.odata.entity.EntityField;
@@ -43,6 +44,9 @@ public class ContextEntityModel implements EntityModel {
 		_entityFieldsMap = Stream.of(
 			new BooleanEntityField(
 				Context.SIGNED_IN, locale -> Context.SIGNED_IN),
+			new CollectionEntityField(
+				new StringEntityField(
+					Context.COOKIES, locale -> Context.COOKIES)),
 			new DateEntityField(
 				Context.LOCAL_DATE, locale -> Context.LOCAL_DATE,
 				locale -> Context.LOCAL_DATE),
@@ -63,6 +67,8 @@ public class ContextEntityModel implements EntityModel {
 				Context.DEVICE_MODEL, locale -> Context.DEVICE_MODEL),
 			new StringEntityField(
 				Context.LANGUAGE_ID, locale -> Context.LANGUAGE_ID),
+			new StringEntityField(
+				Context.REFERRER_URL, locale -> Context.REFERRER_URL),
 			new StringEntityField(Context.URL, locale -> Context.URL),
 			new StringEntityField(
 				Context.USER_AGENT, locale -> Context.USER_AGENT)

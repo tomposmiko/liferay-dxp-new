@@ -15,13 +15,11 @@
 package com.liferay.asset.list.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.asset.list.exception.NoSuchEntryAssetEntryRelException;
 import com.liferay.asset.list.model.AssetListEntryAssetEntryRel;
 import com.liferay.asset.list.service.AssetListEntryAssetEntryRelLocalServiceUtil;
 import com.liferay.asset.list.service.persistence.AssetListEntryAssetEntryRelPersistence;
 import com.liferay.asset.list.service.persistence.AssetListEntryAssetEntryRelUtil;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -40,15 +38,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -59,17 +48,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class AssetListEntryAssetEntryRelPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
-				"com.liferay.asset.list.service"));
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED, "com.liferay.asset.list.service"));
 
 	@Before
 	public void setUp() {
@@ -82,7 +81,8 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 
 	@After
 	public void tearDown() throws Exception {
-		Iterator<AssetListEntryAssetEntryRel> iterator = _assetListEntryAssetEntryRels.iterator();
+		Iterator<AssetListEntryAssetEntryRel> iterator =
+			_assetListEntryAssetEntryRels.iterator();
 
 		while (iterator.hasNext()) {
 			_persistence.remove(iterator.next());
@@ -95,7 +95,8 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 	public void testCreate() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		AssetListEntryAssetEntryRel assetListEntryAssetEntryRel = _persistence.create(pk);
+		AssetListEntryAssetEntryRel assetListEntryAssetEntryRel =
+			_persistence.create(pk);
 
 		Assert.assertNotNull(assetListEntryAssetEntryRel);
 
@@ -104,11 +105,14 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 
 	@Test
 	public void testRemove() throws Exception {
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel = addAssetListEntryAssetEntryRel();
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel =
+			addAssetListEntryAssetEntryRel();
 
 		_persistence.remove(newAssetListEntryAssetEntryRel);
 
-		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel = _persistence.fetchByPrimaryKey(newAssetListEntryAssetEntryRel.getPrimaryKey());
+		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel =
+			_persistence.fetchByPrimaryKey(
+				newAssetListEntryAssetEntryRel.getPrimaryKey());
 
 		Assert.assertNull(existingAssetListEntryAssetEntryRel);
 	}
@@ -122,7 +126,8 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 	public void testUpdateExisting() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel = _persistence.create(pk);
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel =
+			_persistence.create(pk);
 
 		newAssetListEntryAssetEntryRel.setUuid(RandomTestUtil.randomString());
 
@@ -132,52 +137,78 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 
 		newAssetListEntryAssetEntryRel.setUserId(RandomTestUtil.nextLong());
 
-		newAssetListEntryAssetEntryRel.setUserName(RandomTestUtil.randomString());
+		newAssetListEntryAssetEntryRel.setUserName(
+			RandomTestUtil.randomString());
 
 		newAssetListEntryAssetEntryRel.setCreateDate(RandomTestUtil.nextDate());
 
-		newAssetListEntryAssetEntryRel.setModifiedDate(RandomTestUtil.nextDate());
+		newAssetListEntryAssetEntryRel.setModifiedDate(
+			RandomTestUtil.nextDate());
 
-		newAssetListEntryAssetEntryRel.setAssetListEntryId(RandomTestUtil.nextLong());
+		newAssetListEntryAssetEntryRel.setAssetListEntryId(
+			RandomTestUtil.nextLong());
 
-		newAssetListEntryAssetEntryRel.setAssetEntryId(RandomTestUtil.nextLong());
+		newAssetListEntryAssetEntryRel.setAssetEntryId(
+			RandomTestUtil.nextLong());
+
+		newAssetListEntryAssetEntryRel.setSegmentsEntryId(
+			RandomTestUtil.nextLong());
 
 		newAssetListEntryAssetEntryRel.setPosition(RandomTestUtil.nextInt());
 
-		newAssetListEntryAssetEntryRel.setLastPublishDate(RandomTestUtil.nextDate());
+		newAssetListEntryAssetEntryRel.setLastPublishDate(
+			RandomTestUtil.nextDate());
 
-		_assetListEntryAssetEntryRels.add(_persistence.update(
-				newAssetListEntryAssetEntryRel));
+		_assetListEntryAssetEntryRels.add(
+			_persistence.update(newAssetListEntryAssetEntryRel));
 
-		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel = _persistence.findByPrimaryKey(newAssetListEntryAssetEntryRel.getPrimaryKey());
+		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel =
+			_persistence.findByPrimaryKey(
+				newAssetListEntryAssetEntryRel.getPrimaryKey());
 
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel.getUuid(),
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel.getUuid(),
 			newAssetListEntryAssetEntryRel.getUuid());
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel.getAssetListEntryAssetEntryRelId(),
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel.
+				getAssetListEntryAssetEntryRelId(),
 			newAssetListEntryAssetEntryRel.getAssetListEntryAssetEntryRelId());
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel.getGroupId(),
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel.getGroupId(),
 			newAssetListEntryAssetEntryRel.getGroupId());
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel.getCompanyId(),
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel.getCompanyId(),
 			newAssetListEntryAssetEntryRel.getCompanyId());
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel.getUserId(),
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel.getUserId(),
 			newAssetListEntryAssetEntryRel.getUserId());
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel.getUserName(),
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel.getUserName(),
 			newAssetListEntryAssetEntryRel.getUserName());
-		Assert.assertEquals(Time.getShortTimestamp(
+		Assert.assertEquals(
+			Time.getShortTimestamp(
 				existingAssetListEntryAssetEntryRel.getCreateDate()),
 			Time.getShortTimestamp(
 				newAssetListEntryAssetEntryRel.getCreateDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
+		Assert.assertEquals(
+			Time.getShortTimestamp(
 				existingAssetListEntryAssetEntryRel.getModifiedDate()),
 			Time.getShortTimestamp(
 				newAssetListEntryAssetEntryRel.getModifiedDate()));
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel.getAssetListEntryId(),
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel.getAssetListEntryId(),
 			newAssetListEntryAssetEntryRel.getAssetListEntryId());
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel.getAssetEntryId(),
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel.getAssetEntryId(),
 			newAssetListEntryAssetEntryRel.getAssetEntryId());
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel.getPosition(),
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel.getSegmentsEntryId(),
+			newAssetListEntryAssetEntryRel.getSegmentsEntryId());
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel.getPosition(),
 			newAssetListEntryAssetEntryRel.getPosition());
-		Assert.assertEquals(Time.getShortTimestamp(
+		Assert.assertEquals(
+			Time.getShortTimestamp(
 				existingAssetListEntryAssetEntryRel.getLastPublishDate()),
 			Time.getShortTimestamp(
 				newAssetListEntryAssetEntryRel.getLastPublishDate()));
@@ -218,28 +249,42 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 	}
 
 	@Test
-	public void testCountByA_P() throws Exception {
-		_persistence.countByA_P(RandomTestUtil.nextLong(),
-			RandomTestUtil.nextInt());
+	public void testCountByA_S() throws Exception {
+		_persistence.countByA_S(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
-		_persistence.countByA_P(0L, 0);
+		_persistence.countByA_S(0L, 0L);
 	}
 
 	@Test
-	public void testCountByA_GtP() throws Exception {
-		_persistence.countByA_GtP(RandomTestUtil.nextLong(),
+	public void testCountByA_S_P() throws Exception {
+		_persistence.countByA_S_P(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
 			RandomTestUtil.nextInt());
 
-		_persistence.countByA_GtP(0L, 0);
+		_persistence.countByA_S_P(0L, 0L, 0);
+	}
+
+	@Test
+	public void testCountByA_S_GtP() throws Exception {
+		_persistence.countByA_S_GtP(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+			RandomTestUtil.nextInt());
+
+		_persistence.countByA_S_GtP(0L, 0L, 0);
 	}
 
 	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel = addAssetListEntryAssetEntryRel();
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel =
+			addAssetListEntryAssetEntryRel();
 
-		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel = _persistence.findByPrimaryKey(newAssetListEntryAssetEntryRel.getPrimaryKey());
+		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel =
+			_persistence.findByPrimaryKey(
+				newAssetListEntryAssetEntryRel.getPrimaryKey());
 
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel,
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel,
 			newAssetListEntryAssetEntryRel);
 	}
 
@@ -252,25 +297,33 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
-	protected OrderByComparator<AssetListEntryAssetEntryRel> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("AssetListEntryAssetEntryRel",
-			"uuid", true, "assetListEntryAssetEntryRelId", true, "groupId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "assetListEntryId", true,
-			"assetEntryId", true, "position", true, "lastPublishDate", true);
+	protected OrderByComparator<AssetListEntryAssetEntryRel>
+		getOrderByComparator() {
+
+		return OrderByComparatorFactoryUtil.create(
+			"AssetListEntryAssetEntryRel", "uuid", true,
+			"assetListEntryAssetEntryRelId", true, "groupId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "assetListEntryId", true, "assetEntryId",
+			true, "segmentsEntryId", true, "position", true, "lastPublishDate",
+			true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel = addAssetListEntryAssetEntryRel();
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel =
+			addAssetListEntryAssetEntryRel();
 
-		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel = _persistence.fetchByPrimaryKey(newAssetListEntryAssetEntryRel.getPrimaryKey());
+		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel =
+			_persistence.fetchByPrimaryKey(
+				newAssetListEntryAssetEntryRel.getPrimaryKey());
 
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel,
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel,
 			newAssetListEntryAssetEntryRel);
 	}
 
@@ -278,7 +331,8 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		AssetListEntryAssetEntryRel missingAssetListEntryAssetEntryRel = _persistence.fetchByPrimaryKey(pk);
+		AssetListEntryAssetEntryRel missingAssetListEntryAssetEntryRel =
+			_persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingAssetListEntryAssetEntryRel);
 	}
@@ -286,22 +340,28 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel1 = addAssetListEntryAssetEntryRel();
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel2 = addAssetListEntryAssetEntryRel();
+
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel1 =
+			addAssetListEntryAssetEntryRel();
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel2 =
+			addAssetListEntryAssetEntryRel();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newAssetListEntryAssetEntryRel1.getPrimaryKey());
 		primaryKeys.add(newAssetListEntryAssetEntryRel2.getPrimaryKey());
 
-		Map<Serializable, AssetListEntryAssetEntryRel> assetListEntryAssetEntryRels =
-			_persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, AssetListEntryAssetEntryRel>
+			assetListEntryAssetEntryRels = _persistence.fetchByPrimaryKeys(
+				primaryKeys);
 
 		Assert.assertEquals(2, assetListEntryAssetEntryRels.size());
-		Assert.assertEquals(newAssetListEntryAssetEntryRel1,
+		Assert.assertEquals(
+			newAssetListEntryAssetEntryRel1,
 			assetListEntryAssetEntryRels.get(
 				newAssetListEntryAssetEntryRel1.getPrimaryKey()));
-		Assert.assertEquals(newAssetListEntryAssetEntryRel2,
+		Assert.assertEquals(
+			newAssetListEntryAssetEntryRel2,
 			assetListEntryAssetEntryRels.get(
 				newAssetListEntryAssetEntryRel2.getPrimaryKey()));
 	}
@@ -309,6 +369,7 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -318,8 +379,9 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, AssetListEntryAssetEntryRel> assetListEntryAssetEntryRels =
-			_persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, AssetListEntryAssetEntryRel>
+			assetListEntryAssetEntryRels = _persistence.fetchByPrimaryKeys(
+				primaryKeys);
 
 		Assert.assertTrue(assetListEntryAssetEntryRels.isEmpty());
 	}
@@ -327,7 +389,9 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel = addAssetListEntryAssetEntryRel();
+
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel =
+			addAssetListEntryAssetEntryRel();
 
 		long pk = RandomTestUtil.nextLong();
 
@@ -336,40 +400,44 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 		primaryKeys.add(newAssetListEntryAssetEntryRel.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, AssetListEntryAssetEntryRel> assetListEntryAssetEntryRels =
-			_persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, AssetListEntryAssetEntryRel>
+			assetListEntryAssetEntryRels = _persistence.fetchByPrimaryKeys(
+				primaryKeys);
 
 		Assert.assertEquals(1, assetListEntryAssetEntryRels.size());
-		Assert.assertEquals(newAssetListEntryAssetEntryRel,
+		Assert.assertEquals(
+			newAssetListEntryAssetEntryRel,
 			assetListEntryAssetEntryRels.get(
 				newAssetListEntryAssetEntryRel.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, AssetListEntryAssetEntryRel> assetListEntryAssetEntryRels =
-			_persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, AssetListEntryAssetEntryRel>
+			assetListEntryAssetEntryRels = _persistence.fetchByPrimaryKeys(
+				primaryKeys);
 
 		Assert.assertTrue(assetListEntryAssetEntryRels.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel = addAssetListEntryAssetEntryRel();
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel =
+			addAssetListEntryAssetEntryRel();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newAssetListEntryAssetEntryRel.getPrimaryKey());
 
-		Map<Serializable, AssetListEntryAssetEntryRel> assetListEntryAssetEntryRels =
-			_persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, AssetListEntryAssetEntryRel>
+			assetListEntryAssetEntryRels = _persistence.fetchByPrimaryKeys(
+				primaryKeys);
 
 		Assert.assertEquals(1, assetListEntryAssetEntryRels.size());
-		Assert.assertEquals(newAssetListEntryAssetEntryRel,
+		Assert.assertEquals(
+			newAssetListEntryAssetEntryRel,
 			assetListEntryAssetEntryRels.get(
 				newAssetListEntryAssetEntryRel.getPrimaryKey()));
 	}
@@ -378,16 +446,23 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = AssetListEntryAssetEntryRelLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			AssetListEntryAssetEntryRelLocalServiceUtil.
+				getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<AssetListEntryAssetEntryRel>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod
+				<AssetListEntryAssetEntryRel>() {
+
 				@Override
 				public void performAction(
 					AssetListEntryAssetEntryRel assetListEntryAssetEntryRel) {
+
 					Assert.assertNotNull(assetListEntryAssetEntryRel);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -396,56 +471,65 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel = addAssetListEntryAssetEntryRel();
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel =
+			addAssetListEntryAssetEntryRel();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetListEntryAssetEntryRel.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			AssetListEntryAssetEntryRel.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq(
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
 				"assetListEntryAssetEntryRelId",
-				newAssetListEntryAssetEntryRel.getAssetListEntryAssetEntryRelId()));
+				newAssetListEntryAssetEntryRel.
+					getAssetListEntryAssetEntryRelId()));
 
-		List<AssetListEntryAssetEntryRel> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<AssetListEntryAssetEntryRel> result =
+			_persistence.findWithDynamicQuery(dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
-		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel = result.get(0);
+		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel =
+			result.get(0);
 
-		Assert.assertEquals(existingAssetListEntryAssetEntryRel,
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRel,
 			newAssetListEntryAssetEntryRel);
 	}
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetListEntryAssetEntryRel.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			AssetListEntryAssetEntryRel.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq(
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
 				"assetListEntryAssetEntryRelId", RandomTestUtil.nextLong()));
 
-		List<AssetListEntryAssetEntryRel> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<AssetListEntryAssetEntryRel> result =
+			_persistence.findWithDynamicQuery(dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel = addAssetListEntryAssetEntryRel();
+	public void testDynamicQueryByProjectionExisting() throws Exception {
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel =
+			addAssetListEntryAssetEntryRel();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetListEntryAssetEntryRel.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			AssetListEntryAssetEntryRel.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"assetListEntryAssetEntryRelId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("assetListEntryAssetEntryRelId"));
 
-		Object newAssetListEntryAssetEntryRelId = newAssetListEntryAssetEntryRel.getAssetListEntryAssetEntryRelId();
+		Object newAssetListEntryAssetEntryRelId =
+			newAssetListEntryAssetEntryRel.getAssetListEntryAssetEntryRelId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in(
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
 				"assetListEntryAssetEntryRelId",
-				new Object[] { newAssetListEntryAssetEntryRelId }));
+				new Object[] {newAssetListEntryAssetEntryRelId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -453,21 +537,23 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 
 		Object existingAssetListEntryAssetEntryRelId = result.get(0);
 
-		Assert.assertEquals(existingAssetListEntryAssetEntryRelId,
+		Assert.assertEquals(
+			existingAssetListEntryAssetEntryRelId,
 			newAssetListEntryAssetEntryRelId);
 	}
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(AssetListEntryAssetEntryRel.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			AssetListEntryAssetEntryRel.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"assetListEntryAssetEntryRelId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("assetListEntryAssetEntryRelId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in(
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
 				"assetListEntryAssetEntryRelId",
-				new Object[] { RandomTestUtil.nextLong() }));
+				new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -476,29 +562,41 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 
 	@Test
 	public void testResetOriginalValues() throws Exception {
-		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel = addAssetListEntryAssetEntryRel();
+		AssetListEntryAssetEntryRel newAssetListEntryAssetEntryRel =
+			addAssetListEntryAssetEntryRel();
 
 		_persistence.clearCache();
 
-		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel = _persistence.findByPrimaryKey(newAssetListEntryAssetEntryRel.getPrimaryKey());
+		AssetListEntryAssetEntryRel existingAssetListEntryAssetEntryRel =
+			_persistence.findByPrimaryKey(
+				newAssetListEntryAssetEntryRel.getPrimaryKey());
 
-		Assert.assertTrue(Objects.equals(
+		Assert.assertTrue(
+			Objects.equals(
 				existingAssetListEntryAssetEntryRel.getUuid(),
-				ReflectionTestUtil.invoke(existingAssetListEntryAssetEntryRel,
-					"getOriginalUuid", new Class<?>[0])));
-		Assert.assertEquals(Long.valueOf(
-				existingAssetListEntryAssetEntryRel.getGroupId()),
+				ReflectionTestUtil.invoke(
+					existingAssetListEntryAssetEntryRel, "getOriginalUuid",
+					new Class<?>[0])));
+		Assert.assertEquals(
+			Long.valueOf(existingAssetListEntryAssetEntryRel.getGroupId()),
 			ReflectionTestUtil.<Long>invoke(
 				existingAssetListEntryAssetEntryRel, "getOriginalGroupId",
 				new Class<?>[0]));
 
-		Assert.assertEquals(Long.valueOf(
+		Assert.assertEquals(
+			Long.valueOf(
 				existingAssetListEntryAssetEntryRel.getAssetListEntryId()),
 			ReflectionTestUtil.<Long>invoke(
 				existingAssetListEntryAssetEntryRel,
 				"getOriginalAssetListEntryId", new Class<?>[0]));
-		Assert.assertEquals(Integer.valueOf(
-				existingAssetListEntryAssetEntryRel.getPosition()),
+		Assert.assertEquals(
+			Long.valueOf(
+				existingAssetListEntryAssetEntryRel.getSegmentsEntryId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingAssetListEntryAssetEntryRel,
+				"getOriginalSegmentsEntryId", new Class<?>[0]));
+		Assert.assertEquals(
+			Integer.valueOf(existingAssetListEntryAssetEntryRel.getPosition()),
 			ReflectionTestUtil.<Integer>invoke(
 				existingAssetListEntryAssetEntryRel, "getOriginalPosition",
 				new Class<?>[0]));
@@ -506,9 +604,11 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 
 	protected AssetListEntryAssetEntryRel addAssetListEntryAssetEntryRel()
 		throws Exception {
+
 		long pk = RandomTestUtil.nextLong();
 
-		AssetListEntryAssetEntryRel assetListEntryAssetEntryRel = _persistence.create(pk);
+		AssetListEntryAssetEntryRel assetListEntryAssetEntryRel =
+			_persistence.create(pk);
 
 		assetListEntryAssetEntryRel.setUuid(RandomTestUtil.randomString());
 
@@ -524,21 +624,28 @@ public class AssetListEntryAssetEntryRelPersistenceTest {
 
 		assetListEntryAssetEntryRel.setModifiedDate(RandomTestUtil.nextDate());
 
-		assetListEntryAssetEntryRel.setAssetListEntryId(RandomTestUtil.nextLong());
+		assetListEntryAssetEntryRel.setAssetListEntryId(
+			RandomTestUtil.nextLong());
 
 		assetListEntryAssetEntryRel.setAssetEntryId(RandomTestUtil.nextLong());
 
+		assetListEntryAssetEntryRel.setSegmentsEntryId(
+			RandomTestUtil.nextLong());
+
 		assetListEntryAssetEntryRel.setPosition(RandomTestUtil.nextInt());
 
-		assetListEntryAssetEntryRel.setLastPublishDate(RandomTestUtil.nextDate());
+		assetListEntryAssetEntryRel.setLastPublishDate(
+			RandomTestUtil.nextDate());
 
-		_assetListEntryAssetEntryRels.add(_persistence.update(
-				assetListEntryAssetEntryRel));
+		_assetListEntryAssetEntryRels.add(
+			_persistence.update(assetListEntryAssetEntryRel));
 
 		return assetListEntryAssetEntryRel;
 	}
 
-	private List<AssetListEntryAssetEntryRel> _assetListEntryAssetEntryRels = new ArrayList<AssetListEntryAssetEntryRel>();
+	private List<AssetListEntryAssetEntryRel> _assetListEntryAssetEntryRels =
+		new ArrayList<AssetListEntryAssetEntryRel>();
 	private AssetListEntryAssetEntryRelPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

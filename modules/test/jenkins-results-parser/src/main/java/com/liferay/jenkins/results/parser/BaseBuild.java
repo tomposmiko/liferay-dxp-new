@@ -25,6 +25,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,12 +35,14 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
@@ -1183,7 +1188,9 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public boolean hasModifiedDownstreamBuilds() {
 		for (Build downstreamBuild : downstreamBuilds) {
-			if (downstreamBuild.isBuildModified()) {
+			if (downstreamBuild.isBuildModified() ||
+				downstreamBuild.hasModifiedDownstreamBuilds()) {
+
 				return true;
 			}
 		}
@@ -1194,6 +1201,16 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public boolean isBuildModified() {
 		return !_status.equals(_previousStatus);
+	}
+
+	@Override
+	public boolean isFromArchive() {
+		return fromArchive;
+	}
+
+	@Override
+	public boolean isFromCompletedBuild() {
+		return fromCompletedBuild;
 	}
 
 	@Override
@@ -1364,7 +1381,8 @@ public abstract class BaseBuild implements Build {
 	public void update() {
 		String status = getStatus();
 
-		if ((status.equals("completed") && isBuildModified()) ||
+		if ((status.equals("completed") &&
+			 (isBuildModified() || hasModifiedDownstreamBuilds())) ||
 			!status.equals("completed")) {
 
 			_previousStatus = _status;
@@ -1486,6 +1504,272 @@ public abstract class BaseBuild implements Build {
 
 	}
 
+	public static class StopWatchRecord implements Comparable<StopWatchRecord> {
+
+		public StopWatchRecord(
+			String name, long startTimestamp, BaseBuild baseBuild) {
+
+			_name = name;
+			_startTimestamp = startTimestamp;
+			_baseBuild = baseBuild;
+		}
+
+		public void addChildStopWatchRecord(
+			StopWatchRecord newChildStopWatchRecord) {
+
+			if (_childStopWatchRecords == null) {
+				_childStopWatchRecords = new TreeSet<>();
+			}
+
+			for (StopWatchRecord childStopWatchRecord :
+					_childStopWatchRecords) {
+
+				if (childStopWatchRecord.isParentOf(newChildStopWatchRecord)) {
+					childStopWatchRecord.addChildStopWatchRecord(
+						newChildStopWatchRecord);
+
+					return;
+				}
+			}
+
+			newChildStopWatchRecord.setParentStopWatchRecord(this);
+
+			_childStopWatchRecords.add(newChildStopWatchRecord);
+		}
+
+		@Override
+		public int compareTo(StopWatchRecord stopWatchRecord) {
+			int compareToValue = _startTimestamp.compareTo(
+				stopWatchRecord.getStartTimestamp());
+
+			if (compareToValue != 0) {
+				return compareToValue;
+			}
+
+			Long duration = getDuration();
+			Long stopWatchRecordDuration = stopWatchRecord.getDuration();
+
+			if ((duration == null) && (stopWatchRecordDuration != null)) {
+				return -1;
+			}
+
+			if ((duration != null) && (stopWatchRecordDuration == null)) {
+				return 1;
+			}
+
+			if ((duration != null) && (stopWatchRecordDuration != null)) {
+				compareToValue =
+					-1 * duration.compareTo(stopWatchRecordDuration);
+			}
+
+			if (compareToValue != 0) {
+				return compareToValue;
+			}
+
+			return _name.compareTo(stopWatchRecord.getName());
+		}
+
+		public int getDepth() {
+			if (_parentStopWatchRecord == null) {
+				return 0;
+			}
+
+			return _parentStopWatchRecord.getDepth() + 1;
+		}
+
+		public Long getDuration() {
+			return _duration;
+		}
+
+		public String getName() {
+			return _name;
+		}
+
+		public StopWatchRecord getParentStopWatchRecord() {
+			return _parentStopWatchRecord;
+		}
+
+		public Long getStartTimestamp() {
+			return _startTimestamp;
+		}
+
+		public boolean isParentOf(StopWatchRecord stopWatchRecord) {
+			Long duration = getDuration();
+			Long stopWatchRecordDuration = stopWatchRecord.getDuration();
+
+			if ((duration != null) && (stopWatchRecordDuration == null)) {
+				return false;
+			}
+
+			Long startTimestamp = getStartTimestamp();
+			Long stopWatchRecordStartTimestamp =
+				stopWatchRecord.getStartTimestamp();
+
+			if (startTimestamp <= stopWatchRecordStartTimestamp) {
+				if (duration == null) {
+					return true;
+				}
+
+				Long endTimestamp = startTimestamp + duration;
+				Long stopWatchRecordEndTimestamp =
+					stopWatchRecordStartTimestamp + stopWatchRecordDuration;
+
+				if (endTimestamp > stopWatchRecordEndTimestamp) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public void setDuration(long duration) {
+			_duration = duration;
+		}
+
+		@Override
+		public String toString() {
+			return JenkinsResultsParserUtil.combine(
+				getName(), " started at ",
+				JenkinsResultsParserUtil.toDateString(
+					new Date(getStartTimestamp()), "America/Los_Angeles"),
+				" and ran for ",
+				JenkinsResultsParserUtil.toDurationString(getDuration()), ".");
+		}
+
+		protected String getIndentedName() {
+			StringBuilder sb = new StringBuilder();
+
+			for (int i = 0; i < (getDepth() * _INDENTATION_SIZE); i++) {
+				sb.append("&nbsp;");
+			}
+
+			String name = getName();
+
+			StopWatchRecord parentStopWatchRecord = getParentStopWatchRecord();
+
+			if (parentStopWatchRecord != null) {
+				name = name.replace(parentStopWatchRecord.getName(), "");
+			}
+
+			sb.append(name);
+
+			return sb.toString();
+		}
+
+		protected List<Element> getJenkinsReportTableRowElements() {
+			Element buildInfoElement = Dom4JUtil.getNewElement("tr", null);
+
+			Dom4JUtil.getNewElement("td", buildInfoElement, getIndentedName());
+
+			Dom4JUtil.getNewElement("td", buildInfoElement, "&nbsp;");
+
+			Dom4JUtil.getNewElement("td", buildInfoElement, "&nbsp;");
+
+			Dom4JUtil.getNewElement(
+				"td", buildInfoElement,
+				_baseBuild.toJenkinsReportDateString(
+					new Date(getStartTimestamp()),
+					_baseBuild.getJenkinsReportTimeZoneName()));
+
+			if (getDuration() == null) {
+				Dom4JUtil.getNewElement("td", buildInfoElement, "&nbsp");
+			}
+			else {
+				Dom4JUtil.getNewElement(
+					"td", buildInfoElement,
+					JenkinsResultsParserUtil.toDurationString(getDuration()));
+			}
+
+			Dom4JUtil.getNewElement("td", buildInfoElement, "&nbsp;");
+
+			Dom4JUtil.getNewElement("td", buildInfoElement, "&nbsp;");
+
+			List<Element> jenkinsReportTableRowElements = new ArrayList<>();
+
+			jenkinsReportTableRowElements.add(buildInfoElement);
+
+			if (_childStopWatchRecords != null) {
+				for (StopWatchRecord childStopWatchRecord :
+						_childStopWatchRecords) {
+
+					jenkinsReportTableRowElements.addAll(
+						childStopWatchRecord.
+							getJenkinsReportTableRowElements());
+				}
+			}
+
+			return jenkinsReportTableRowElements;
+		}
+
+		protected void setParentStopWatchRecord(
+			StopWatchRecord stopWatchRecord) {
+
+			_parentStopWatchRecord = stopWatchRecord;
+		}
+
+		private static final int _INDENTATION_SIZE = 4;
+
+		private final BaseBuild _baseBuild;
+		private Set<StopWatchRecord> _childStopWatchRecords;
+		private Long _duration;
+		private final String _name;
+		private StopWatchRecord _parentStopWatchRecord;
+		private final Long _startTimestamp;
+
+	}
+
+	public static class StopWatchRecordsGroup
+		implements Iterable<StopWatchRecord> {
+
+		public void add(StopWatchRecord newStopWatchRecord) {
+			_stopWatchRecordsMap.put(
+				newStopWatchRecord.getName(), newStopWatchRecord);
+		}
+
+		public StopWatchRecord get(String name) {
+			return _stopWatchRecordsMap.get(name);
+		}
+
+		public List<StopWatchRecord> getStopWatchRecords() {
+			List<StopWatchRecord> allStopWatchRecords = new ArrayList<>(
+				_stopWatchRecordsMap.values());
+
+			Collections.sort(allStopWatchRecords);
+
+			List<StopWatchRecord> parentStopWatchRecords = new ArrayList<>();
+
+			for (StopWatchRecord stopWatchRecord : allStopWatchRecords) {
+				for (StopWatchRecord parentStopWatchRecord :
+						parentStopWatchRecords) {
+
+					if (parentStopWatchRecord.isParentOf(stopWatchRecord)) {
+						parentStopWatchRecord.addChildStopWatchRecord(
+							stopWatchRecord);
+
+						break;
+					}
+				}
+
+				if (stopWatchRecord.getParentStopWatchRecord() == null) {
+					parentStopWatchRecords.add(stopWatchRecord);
+				}
+			}
+
+			return parentStopWatchRecords;
+		}
+
+		@Override
+		public Iterator<StopWatchRecord> iterator() {
+			List<StopWatchRecord> list = getStopWatchRecords();
+
+			return list.iterator();
+		}
+
+		private final Map<String, StopWatchRecord> _stopWatchRecordsMap =
+			new HashMap<>();
+
+	}
+
 	protected static boolean isHighPriorityBuildFailureElement(
 		Element gitHubMessage) {
 
@@ -1521,7 +1805,9 @@ public abstract class BaseBuild implements Build {
 			setBuildURL(url);
 		}
 
-		update();
+		if (fromArchive || fromCompletedBuild) {
+			update();
+		}
 	}
 
 	protected void addDownstreamBuildsTimelineData(
@@ -1632,6 +1918,12 @@ public abstract class BaseBuild implements Build {
 		}
 	}
 
+	protected void extractBuildURLComponents(Matcher matcher) {
+		_buildNumber = Integer.parseInt(matcher.group("buildNumber"));
+		setJenkinsMaster(new JenkinsMaster(matcher.group("master")));
+		setJobName(matcher.group("jobName"));
+	}
+
 	protected void findDownstreamBuilds() {
 		List<String> foundDownstreamBuildURLs = new ArrayList<>(
 			findDownstreamBuildsInConsoleText());
@@ -1667,6 +1959,10 @@ public abstract class BaseBuild implements Build {
 
 	protected List<String> findDownstreamBuildsInConsoleText() {
 		return Collections.emptyList();
+	}
+
+	protected Pattern getArchiveBuildURLPattern() {
+		return _archiveBuildURLPattern;
 	}
 
 	protected String getBaseGitRepositoryType() {
@@ -1796,6 +2092,10 @@ public abstract class BaseBuild implements Build {
 			JenkinsResultsParserUtil.toDurationString(getDuration()));
 	}
 
+	protected Pattern getBuildURLPattern() {
+		return _buildURLPattern;
+	}
+
 	protected int getDownstreamBuildCountByResult(String result) {
 		List<Build> downstreamBuilds = getDownstreamBuilds(null);
 
@@ -1898,6 +2198,18 @@ public abstract class BaseBuild implements Build {
 		return "td";
 	}
 
+	protected List<Element> getJenkinsReportStopWatchRecordElements() {
+		List<Element> jenkinsReportStopWatchRecordTableRowElements =
+			new ArrayList<>();
+
+		for (StopWatchRecord stopWatchRecord : getStopWatchRecordsGroup()) {
+			jenkinsReportStopWatchRecordTableRowElements.addAll(
+				stopWatchRecord.getJenkinsReportTableRowElements());
+		}
+
+		return jenkinsReportStopWatchRecordTableRowElements;
+	}
+
 	protected Element getJenkinsReportTableRowElement() {
 		String cellElementTagName =
 			getJenkinsReportBuildInfoCellElementTagName();
@@ -1973,6 +2285,8 @@ public abstract class BaseBuild implements Build {
 			((status == null) || status.equals(getStatus()))) {
 
 			tableRowElements.add(getJenkinsReportTableRowElement());
+
+			tableRowElements.addAll(getJenkinsReportStopWatchRecordElements());
 		}
 
 		List<Build> downstreamBuilds = getDownstreamBuilds(result, status);
@@ -2164,6 +2478,70 @@ public abstract class BaseBuild implements Build {
 		return null;
 	}
 
+	protected StopWatchRecordsGroup getStopWatchRecordsGroup() {
+		String consoleText = getConsoleText();
+
+		int consoleTextLength = consoleText.length();
+
+		consoleText = consoleText.substring(stopWatchRecordConsoleReadCursor);
+
+		for (String line : consoleText.split("\n")) {
+			Matcher matcher = stopWatchStartTimestampPattern.matcher(line);
+
+			if (matcher.matches()) {
+				Date timestamp = null;
+
+				try {
+					timestamp = stopWatchTimestampSimpleDateFormat.parse(
+						matcher.group("timestamp"));
+				}
+				catch (ParseException pe) {
+					throw new RuntimeException(
+						"Unable to parse timestamp in " + line, pe);
+				}
+
+				String stopWatchName = matcher.group("name");
+
+				stopWatchRecordsGroup.add(
+					new StopWatchRecord(
+						stopWatchName, timestamp.getTime(), this));
+
+				continue;
+			}
+
+			matcher = stopWatchPattern.matcher(line);
+
+			if (matcher.matches()) {
+				long duration = Long.parseLong(matcher.group("milliseconds"));
+
+				String seconds = matcher.group("seconds");
+
+				if (seconds != null) {
+					duration += Long.parseLong(seconds) * 1000L;
+				}
+
+				String minutes = matcher.group("minutes");
+
+				if (minutes != null) {
+					duration += Long.parseLong(minutes) * 60L * 1000L;
+				}
+
+				String stopWatchName = matcher.group("name");
+
+				StopWatchRecord stopWatchRecord = stopWatchRecordsGroup.get(
+					stopWatchName);
+
+				if (stopWatchRecord != null) {
+					stopWatchRecord.setDuration(duration);
+				}
+			}
+		}
+
+		stopWatchRecordConsoleReadCursor = consoleTextLength;
+
+		return stopWatchRecordsGroup;
+	}
+
 	protected Map<String, String> getTempMap(String tempMapName) {
 		String tempMapURL = getTempMapURL(tempMapName);
 
@@ -2293,7 +2671,9 @@ public abstract class BaseBuild implements Build {
 				Object value = parameterJSONObject.opt("value");
 
 				if (value instanceof String) {
-					if (!value.toString().isEmpty()) {
+					String valueString = value.toString();
+
+					if (!valueString.isEmpty()) {
 						_parameters.put(
 							parameterJSONObject.getString("name"),
 							value.toString());
@@ -2355,11 +2735,11 @@ public abstract class BaseBuild implements Build {
 				"Unable to decode " + buildURL, uee);
 		}
 
-		try {
-			BaseBuild parentBuild = (BaseBuild)getParentBuild();
+		Build parentBuild = getParentBuild();
 
+		try {
 			if (parentBuild != null) {
-				fromArchive = parentBuild.fromArchive;
+				fromArchive = parentBuild.isFromArchive();
 			}
 			else {
 				String archiveMarkerContent = JenkinsResultsParserUtil.toString(
@@ -2374,9 +2754,13 @@ public abstract class BaseBuild implements Build {
 			fromArchive = false;
 		}
 
+		Pattern buildURLPattern = getBuildURLPattern();
+
 		Matcher matcher = buildURLPattern.matcher(buildURL);
 
 		if (!matcher.find()) {
+			Pattern archiveBuildURLPattern = getArchiveBuildURLPattern();
+
 			matcher = archiveBuildURLPattern.matcher(buildURL);
 
 			if (!matcher.find()) {
@@ -2387,16 +2771,22 @@ public abstract class BaseBuild implements Build {
 			archiveName = matcher.group("archiveName");
 		}
 
-		setJobName(matcher.group("jobName"));
-		setJenkinsMaster(new JenkinsMaster(matcher.group("master")));
-
-		_buildNumber = Integer.parseInt(matcher.group("buildNumber"));
+		extractBuildURLComponents(matcher);
 
 		loadParametersFromBuildJSONObject();
 
 		consoleReadCursor = 0;
 
 		setStatus("running");
+
+		if (parentBuild != null) {
+			fromCompletedBuild = parentBuild.isFromCompletedBuild();
+		}
+		else {
+			String consoleText = getConsoleText();
+
+			fromCompletedBuild = consoleText.contains("stop-current-job:");
+		}
 	}
 
 	protected void setInvocationURL(String invocationURL) {
@@ -2510,17 +2900,6 @@ public abstract class BaseBuild implements Build {
 	protected static final String UPSTREAM_FAILURES_JOB_BASE_URL =
 		"https://test-1-0.liferay.com/userContent/testResults/";
 
-	protected static final Pattern archiveBuildURLPattern = Pattern.compile(
-		JenkinsResultsParserUtil.combine(
-			"(", Pattern.quote("${dependencies.url}"), "|",
-			Pattern.quote(JenkinsResultsParserUtil.DEPENDENCIES_URL_FILE), "|",
-			Pattern.quote(JenkinsResultsParserUtil.DEPENDENCIES_URL_HTTP),
-			")/*(?<archiveName>.*)/(?<master>[^/]+)/+(?<jobName>[^/]+)",
-			".*/(?<buildNumber>\\d+)/?"));
-	protected static final Pattern buildURLPattern = Pattern.compile(
-		JenkinsResultsParserUtil.combine(
-			"\\w+://(?<master>[^/]+)/+job/+(?<jobName>[^/]+).*/(?<buildNumber>",
-			"\\d+)/?"));
 	protected static final Pattern downstreamBuildURLPattern = Pattern.compile(
 		"[\\'\\\"].*[\\'\\\"] started at (?<url>.+)\\.");
 	protected static final Pattern invocationURLPattern = Pattern.compile(
@@ -2529,6 +2908,18 @@ public abstract class BaseBuild implements Build {
 			"buildWithParameters\\?(?<queryString>.*)"));
 	protected static final Pattern jobNamePattern = Pattern.compile(
 		"(?<baseJob>[^\\(]+)\\((?<branchName>[^\\)]+)\\)");
+	protected static final Pattern stopWatchPattern = Pattern.compile(
+		JenkinsResultsParserUtil.combine(
+			"\\s*\\[stopwatch\\]\\s*\\[(?<name>[^:]+): ",
+			"((?<minutes>\\d+):)?((?<seconds>\\d+))?\\.",
+			"(?<milliseconds>\\d+) sec\\]"));
+	protected static final Pattern stopWatchStartTimestampPattern =
+		Pattern.compile(
+			JenkinsResultsParserUtil.combine(
+				"\\s*\\[echo\\] (?<name>.*)\\.start\\.timestamp: ",
+				"(?<timestamp>.*)$"));
+	protected static final SimpleDateFormat stopWatchTimestampSimpleDateFormat =
+		new SimpleDateFormat("MM-dd-yyyy HH:mm:ss:SSS z");
 
 	protected String archiveName;
 	protected List<Integer> badBuildNumbers = new ArrayList<>();
@@ -2536,6 +2927,7 @@ public abstract class BaseBuild implements Build {
 	protected int consoleReadCursor;
 	protected List<Build> downstreamBuilds = new ArrayList<>();
 	protected boolean fromArchive;
+	protected boolean fromCompletedBuild;
 	protected String gitRepositoryName;
 	protected Long invokedTime;
 	protected String jobName;
@@ -2546,6 +2938,9 @@ public abstract class BaseBuild implements Build {
 	protected Long startTime;
 	protected Map<String, Long> statusDurations = new HashMap<>();
 	protected long statusModifiedTime;
+	protected int stopWatchRecordConsoleReadCursor;
+	protected StopWatchRecordsGroup stopWatchRecordsGroup =
+		new StopWatchRecordsGroup();
 	protected Element upstreamJobFailureMessageElement;
 
 	protected static class TimelineData {
@@ -2684,6 +3079,18 @@ public abstract class BaseBuild implements Build {
 	};
 
 	private static final String _JENKINS_REPORT_TIME_ZONE_NAME;
+
+	private static final Pattern _archiveBuildURLPattern = Pattern.compile(
+		JenkinsResultsParserUtil.combine(
+			"(", Pattern.quote("${dependencies.url}"), "|",
+			Pattern.quote(JenkinsResultsParserUtil.DEPENDENCIES_URL_FILE), "|",
+			Pattern.quote(JenkinsResultsParserUtil.DEPENDENCIES_URL_HTTP),
+			")/*(?<archiveName>.*)/(?<master>[^/]+)/+(?<jobName>[^/]+)",
+			".*/(?<buildNumber>\\d+)/?"));
+	private static final Pattern _buildURLPattern = Pattern.compile(
+		JenkinsResultsParserUtil.combine(
+			"\\w+://(?<master>[^/]+)/+job/+(?<jobName>[^/]+).*/(?<buildNumber>",
+			"\\d+)/?"));
 
 	static {
 		Properties properties = null;

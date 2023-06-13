@@ -19,7 +19,6 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
 import com.liferay.message.boards.constants.MBCategoryConstants;
 import com.liferay.message.boards.constants.MBPortletKeys;
 import com.liferay.message.boards.model.MBCategory;
@@ -89,48 +88,44 @@ public class MBEntriesManagementToolbarDisplayContext {
 					WebKeys.THEME_DISPLAY);
 
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.putData("action", "deleteEntries");
+					dropdownItem -> {
+						dropdownItem.putData("action", "deleteEntries");
 
-							boolean trashEnabled = _trashHelper.isTrashEnabled(
-								themeDisplay.getScopeGroupId());
+						boolean trashEnabled = _trashHelper.isTrashEnabled(
+							themeDisplay.getScopeGroupId());
 
-							dropdownItem.setIcon(
-								trashEnabled ? "trash" : "times");
+						dropdownItem.setIcon(trashEnabled ? "trash" : "times");
 
-							String label = "delete";
+						String label = "delete";
 
-							if (trashEnabled) {
-								label = "move-to-recycle-bin";
-							}
+						if (trashEnabled) {
+							label = "move-to-recycle-bin";
+						}
 
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, label));
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, label));
 
-							dropdownItem.setQuickAction(true);
-						}));
+						dropdownItem.setQuickAction(true);
+					});
 
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.putData("action", "lockEntries");
-							dropdownItem.setIcon("lock");
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "lock"));
+					dropdownItem -> {
+						dropdownItem.putData("action", "lockEntries");
+						dropdownItem.setIcon("lock");
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "lock"));
 
-							dropdownItem.setQuickAction(true);
-						}));
+						dropdownItem.setQuickAction(true);
+					});
 
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.putData("action", "unlockEntries");
-							dropdownItem.setIcon("unlock");
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "unlock"));
-							dropdownItem.setQuickAction(true);
-						}));
+					dropdownItem -> {
+						dropdownItem.putData("action", "unlockEntries");
+						dropdownItem.setIcon("unlock");
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "unlock"));
+						dropdownItem.setQuickAction(true);
+					});
 			}
 		};
 	}
@@ -250,14 +245,12 @@ public class MBEntriesManagementToolbarDisplayContext {
 		return new DropdownItemList() {
 			{
 				addGroup(
-					SafeConsumer.ignore(
-						dropdownGroupItem -> {
-							dropdownGroupItem.setDropdownItems(
-								_getFilterNavigationDropdownItems());
-							dropdownGroupItem.setLabel(
-								LanguageUtil.get(
-									_request, "filter-by-navigation"));
-						}));
+					dropdownGroupItem -> {
+						dropdownGroupItem.setDropdownItems(
+							_getFilterNavigationDropdownItems());
+						dropdownGroupItem.setLabel(
+							LanguageUtil.get(_request, "filter-by-navigation"));
+					});
 
 				String entriesNavigation = _getEntriesNavigation();
 
@@ -283,25 +276,20 @@ public class MBEntriesManagementToolbarDisplayContext {
 					entriesNavigation.equals("categories")) {
 
 					add(
-						SafeConsumer.ignore(
-							labelItem -> {
-								PortletURL removeLabelURL =
-									PortletURLUtil.clone(
-										_currentURLObj,
-										_liferayPortletResponse);
+						labelItem -> {
+							PortletURL removeLabelURL = PortletURLUtil.clone(
+								_currentURLObj, _liferayPortletResponse);
 
-								removeLabelURL.setParameter(
-									"entriesNavigation", (String)null);
+							removeLabelURL.setParameter(
+								"entriesNavigation", (String)null);
 
-								labelItem.putData(
-									"removeLabelURL",
-									removeLabelURL.toString());
+							labelItem.putData(
+								"removeLabelURL", removeLabelURL.toString());
 
-								labelItem.setCloseable(true);
-								labelItem.setLabel(
-									LanguageUtil.get(
-										_request, entriesNavigation));
-							}));
+							labelItem.setCloseable(true);
+							labelItem.setLabel(
+								LanguageUtil.get(_request, entriesNavigation));
+						});
 				}
 			}
 		};
@@ -501,58 +489,50 @@ public class MBEntriesManagementToolbarDisplayContext {
 		return new DropdownItemList() {
 			{
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setActive(
-								entriesNavigation.equals("all"));
+					dropdownItem -> {
+						dropdownItem.setActive(entriesNavigation.equals("all"));
 
-							PortletURL navigationPortletURL =
-								PortletURLUtil.clone(
-									_currentURLObj, _liferayPortletResponse);
+						PortletURL navigationPortletURL = PortletURLUtil.clone(
+							_currentURLObj, _liferayPortletResponse);
 
-							dropdownItem.setHref(
-								navigationPortletURL, "entriesNavigation",
-								"all");
+						dropdownItem.setHref(
+							navigationPortletURL, "entriesNavigation", "all");
 
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "all"));
-						}));
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "all"));
+					});
 
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setActive(
-								entriesNavigation.equals("threads"));
+					dropdownItem -> {
+						dropdownItem.setActive(
+							entriesNavigation.equals("threads"));
 
-							PortletURL navigationPortletURL =
-								PortletURLUtil.clone(
-									_currentURLObj, _liferayPortletResponse);
+						PortletURL navigationPortletURL = PortletURLUtil.clone(
+							_currentURLObj, _liferayPortletResponse);
 
-							dropdownItem.setHref(
-								navigationPortletURL, "entriesNavigation",
-								"threads");
+						dropdownItem.setHref(
+							navigationPortletURL, "entriesNavigation",
+							"threads");
 
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "threads"));
-						}));
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "threads"));
+					});
 
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setActive(
-								entriesNavigation.equals("categories"));
+					dropdownItem -> {
+						dropdownItem.setActive(
+							entriesNavigation.equals("categories"));
 
-							PortletURL navigationPortletURL =
-								PortletURLUtil.clone(
-									_currentURLObj, _liferayPortletResponse);
+						PortletURL navigationPortletURL = PortletURLUtil.clone(
+							_currentURLObj, _liferayPortletResponse);
 
-							dropdownItem.setHref(
-								navigationPortletURL, "entriesNavigation",
-								"categories");
+						dropdownItem.setHref(
+							navigationPortletURL, "entriesNavigation",
+							"categories");
 
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "categories"));
-						}));
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "categories"));
+					});
 			}
 		};
 	}
@@ -561,27 +541,24 @@ public class MBEntriesManagementToolbarDisplayContext {
 		return new DropdownItemList() {
 			{
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setActive(
-								"title".equals(getOrderByCol()));
-							dropdownItem.setHref(
-								_getCurrentSortingURL(), "orderByCol", "title");
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "title"));
-						}));
+					dropdownItem -> {
+						dropdownItem.setActive("title".equals(getOrderByCol()));
+						dropdownItem.setHref(
+							_getCurrentSortingURL(), "orderByCol", "title");
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "title"));
+					});
 
 				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setActive(
-								"modified-date".equals(getOrderByCol()));
-							dropdownItem.setHref(
-								_getCurrentSortingURL(), "orderByCol",
-								"modified-date");
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "modified-date"));
-						}));
+					dropdownItem -> {
+						dropdownItem.setActive(
+							"modified-date".equals(getOrderByCol()));
+						dropdownItem.setHref(
+							_getCurrentSortingURL(), "orderByCol",
+							"modified-date");
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "modified-date"));
+					});
 			}
 		};
 	}

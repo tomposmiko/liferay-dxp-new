@@ -40,8 +40,10 @@ import java.util.Map;
  * @generated
  */
 @ProviderType
-public interface KaleoDefinitionModel extends BaseModel<KaleoDefinition>,
-	GroupedModel, LocalizedModel, MVCCModel, ShardedModel {
+public interface KaleoDefinitionModel
+	extends BaseModel<KaleoDefinition>, GroupedModel, LocalizedModel, MVCCModel,
+			ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -396,4 +398,5 @@ public interface KaleoDefinitionModel extends BaseModel<KaleoDefinition>,
 	@Override
 	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
 		throws LocaleException;
+
 }

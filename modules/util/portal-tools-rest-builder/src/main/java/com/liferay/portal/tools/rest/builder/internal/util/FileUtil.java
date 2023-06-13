@@ -14,6 +14,9 @@
 
 package com.liferay.portal.tools.rest.builder.internal.util;
 
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.tools.java.parser.JavaParser;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -71,7 +74,15 @@ public class FileUtil {
 
 					String content = read(file);
 
-					if (!content.contains("@generated")) {
+					if (StringUtil.endsWith(file.getName(), ".java") &&
+						!content.contains("@generated")) {
+
+						return FileVisitResult.CONTINUE;
+					}
+
+					if (StringUtil.endsWith(file.getName(), ".properties") &&
+						!content.contains("# This is a generated file.")) {
+
 						return FileVisitResult.CONTINUE;
 					}
 
@@ -133,13 +144,19 @@ public class FileUtil {
 
 		String oldContent = read(file);
 
-		String newContent = FormatUtil.fixWhitespace(file, content);
+		Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
 
-		Files.write(file.toPath(), newContent.getBytes(StandardCharsets.UTF_8));
-
-		if (!oldContent.equals(FormatUtil.format(file))) {
+		if (!oldContent.equals(_format(file))) {
 			System.out.println("Writing " + file.getCanonicalPath());
 		}
+	}
+
+	private static String _format(File file) throws Exception {
+		if (StringUtil.endsWith(file.getName(), ".java")) {
+			JavaParser.parse(file, 80);
+		}
+
+		return read(file);
 	}
 
 }

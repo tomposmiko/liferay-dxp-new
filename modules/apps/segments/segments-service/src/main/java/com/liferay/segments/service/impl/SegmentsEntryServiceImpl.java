@@ -68,6 +68,19 @@ public class SegmentsEntryServiceImpl extends SegmentsEntryServiceBaseImpl {
 
 	@Override
 	public List<SegmentsEntry> getSegmentsEntries(
+		long groupId, boolean includeAncestorSegmentsEntries) {
+
+		if (!includeAncestorSegmentsEntries) {
+			return segmentsEntryPersistence.filterFindByGroupId(groupId);
+		}
+
+		return segmentsEntryPersistence.filterFindByGroupId(
+			ArrayUtil.append(
+				PortalUtil.getAncestorSiteGroupIds(groupId), groupId));
+	}
+
+	@Override
+	public List<SegmentsEntry> getSegmentsEntries(
 		long groupId, boolean includeAncestorSegmentsEntries, int start,
 		int end, OrderByComparator<SegmentsEntry> orderByComparator) {
 
@@ -99,10 +112,13 @@ public class SegmentsEntryServiceImpl extends SegmentsEntryServiceBaseImpl {
 	public SegmentsEntry getSegmentsEntry(long segmentsEntryId)
 		throws PortalException {
 
+		SegmentsEntry segmentsEntry =
+			segmentsEntryLocalService.getSegmentsEntry(segmentsEntryId);
+
 		_segmentsEntryResourcePermission.check(
 			getPermissionChecker(), segmentsEntryId, ActionKeys.VIEW);
 
-		return segmentsEntryLocalService.getSegmentsEntry(segmentsEntryId);
+		return segmentsEntry;
 	}
 
 	@Override

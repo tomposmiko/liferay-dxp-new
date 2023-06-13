@@ -67,7 +67,7 @@ definition {
 		PageTemplatesAdmin.addPageTemplate(pageTemplateName = "Test");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -138,7 +138,7 @@ definition {
 		Navigator.gotoSitePage(pageName = "Home", siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -171,7 +171,7 @@ definition {
 		);
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -331,7 +331,7 @@ definition {
 
 		for (var page : list "Home,Wiki") {
 			ProductMenu.gotoPortlet(
-				category = "Build",
+				category = "Site Builder",
 				panel = "Site Administration",
 				portlet = "Pages"
 			);
@@ -493,7 +493,7 @@ definition {
 		var page2URL = Navigator.getCurrentURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content"
 		);
@@ -532,11 +532,13 @@ definition {
 
 		Pause(locator1 = "5000");
 
-		AssertLocation(value1 = "http://${portalURL}/web/site-name/page2-name");
+		AssertLocation(value1 = "${portalURL}/web/site-name/page2-name");
 	}
 
 	@priority = "3"
 	test SitesTemplateResourceInheritance {
+		property portal.release = "false";
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
@@ -655,7 +657,7 @@ definition {
 		Site.addCP(siteName = "Export", siteType = "Blank");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -667,7 +669,7 @@ definition {
 		AssertTextEquals(locator1 = "TextInput#FRIENDLY_URL", value1 = "/1");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -679,7 +681,7 @@ definition {
 		AssertTextEquals(locator1 = "TextInput#FRIENDLY_URL", value1 = "/2");
 
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);
@@ -698,6 +700,10 @@ definition {
 
 		LAR.exportSiteCP(larFileName = "Export");
 
+		Pause(locator1 = "3000");
+
+		var larFileName = LAR.getLarFileName();
+
 		LAR.downloadLar();
 
 		ProductMenu.gotoPortlet(
@@ -705,8 +711,6 @@ definition {
 			panel = "Control Panel",
 			portlet = "Site Templates"
 		);
-
-		Refresh();
 
 		SiteTemplates.addCP(siteTemplateName = "Template Site");
 
@@ -719,14 +723,12 @@ definition {
 		Site.addCP(siteName = "New Site", siteType = "Template");
 
 		LAR.importSiteCP(
-			larFileName = "Export",
+			larFileName = "${larFileName}",
 			siteName = "New Site"
 		);
 
-		Refresh();
-
 		ProductMenu.gotoPortlet(
-			category = "Build",
+			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages"
 		);

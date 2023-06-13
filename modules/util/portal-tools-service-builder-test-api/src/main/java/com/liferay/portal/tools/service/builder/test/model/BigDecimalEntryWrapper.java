@@ -17,7 +17,6 @@ package com.liferay.portal.tools.service.builder.test.model;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -39,8 +38,9 @@ import java.util.Objects;
  * @generated
  */
 @ProviderType
-public class BigDecimalEntryWrapper implements BigDecimalEntry,
-	ModelWrapper<BigDecimalEntry> {
+public class BigDecimalEntryWrapper
+	implements BigDecimalEntry, ModelWrapper<BigDecimalEntry> {
+
 	public BigDecimalEntryWrapper(BigDecimalEntry bigDecimalEntry) {
 		_bigDecimalEntry = bigDecimalEntry;
 	}
@@ -60,6 +60,7 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("bigDecimalEntryId", getBigDecimalEntryId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("bigDecimalValue", getBigDecimalValue());
 
 		return attributes;
@@ -73,8 +74,14 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 			setBigDecimalEntryId(bigDecimalEntryId);
 		}
 
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
 		BigDecimal bigDecimalValue = (BigDecimal)attributes.get(
-				"bigDecimalValue");
+			"bigDecimalValue");
 
 		if (bigDecimalValue != null) {
 			setBigDecimalValue(bigDecimalValue);
@@ -83,7 +90,8 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 
 	@Override
 	public Object clone() {
-		return new BigDecimalEntryWrapper((BigDecimalEntry)_bigDecimalEntry.clone());
+		return new BigDecimalEntryWrapper(
+			(BigDecimalEntry)_bigDecimalEntry.clone());
 	}
 
 	@Override
@@ -92,23 +100,33 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 	}
 
 	/**
-	* Returns the big decimal entry ID of this big decimal entry.
-	*
-	* @return the big decimal entry ID of this big decimal entry
-	*/
+	 * Returns the big decimal entry ID of this big decimal entry.
+	 *
+	 * @return the big decimal entry ID of this big decimal entry
+	 */
 	@Override
 	public long getBigDecimalEntryId() {
 		return _bigDecimalEntry.getBigDecimalEntryId();
 	}
 
 	/**
-	* Returns the big decimal value of this big decimal entry.
-	*
-	* @return the big decimal value of this big decimal entry
-	*/
+	 * Returns the big decimal value of this big decimal entry.
+	 *
+	 * @return the big decimal value of this big decimal entry
+	 */
 	@Override
 	public BigDecimal getBigDecimalValue() {
 		return _bigDecimalEntry.getBigDecimalValue();
+	}
+
+	/**
+	 * Returns the company ID of this big decimal entry.
+	 *
+	 * @return the company ID of this big decimal entry
+	 */
+	@Override
+	public long getCompanyId() {
+		return _bigDecimalEntry.getCompanyId();
 	}
 
 	@Override
@@ -117,10 +135,10 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 	}
 
 	/**
-	* Returns the primary key of this big decimal entry.
-	*
-	* @return the primary key of this big decimal entry
-	*/
+	 * Returns the primary key of this big decimal entry.
+	 *
+	 * @return the primary key of this big decimal entry
+	 */
 	@Override
 	public long getPrimaryKey() {
 		return _bigDecimalEntry.getPrimaryKey();
@@ -152,20 +170,20 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 	}
 
 	/**
-	* Sets the big decimal entry ID of this big decimal entry.
-	*
-	* @param bigDecimalEntryId the big decimal entry ID of this big decimal entry
-	*/
+	 * Sets the big decimal entry ID of this big decimal entry.
+	 *
+	 * @param bigDecimalEntryId the big decimal entry ID of this big decimal entry
+	 */
 	@Override
 	public void setBigDecimalEntryId(long bigDecimalEntryId) {
 		_bigDecimalEntry.setBigDecimalEntryId(bigDecimalEntryId);
 	}
 
 	/**
-	* Sets the big decimal value of this big decimal entry.
-	*
-	* @param bigDecimalValue the big decimal value of this big decimal entry
-	*/
+	 * Sets the big decimal value of this big decimal entry.
+	 *
+	 * @param bigDecimalValue the big decimal value of this big decimal entry
+	 */
 	@Override
 	public void setBigDecimalValue(BigDecimal bigDecimalValue) {
 		_bigDecimalEntry.setBigDecimalValue(bigDecimalValue);
@@ -176,9 +194,20 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 		_bigDecimalEntry.setCachedModel(cachedModel);
 	}
 
+	/**
+	 * Sets the company ID of this big decimal entry.
+	 *
+	 * @param companyId the company ID of this big decimal entry
+	 */
+	@Override
+	public void setCompanyId(long companyId) {
+		_bigDecimalEntry.setCompanyId(companyId);
+	}
+
 	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+
 		_bigDecimalEntry.setExpandoBridgeAttributes(baseModel);
 	}
 
@@ -198,10 +227,10 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 	}
 
 	/**
-	* Sets the primary key of this big decimal entry.
-	*
-	* @param primaryKey the primary key of this big decimal entry
-	*/
+	 * Sets the primary key of this big decimal entry.
+	 *
+	 * @param primaryKey the primary key of this big decimal entry
+	 */
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_bigDecimalEntry.setPrimaryKey(primaryKey);
@@ -213,7 +242,9 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.CacheModel<BigDecimalEntry> toCacheModel() {
+	public com.liferay.portal.kernel.model.CacheModel<BigDecimalEntry>
+		toCacheModel() {
+
 		return _bigDecimalEntry.toCacheModel();
 	}
 
@@ -247,10 +278,12 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 			return false;
 		}
 
-		BigDecimalEntryWrapper bigDecimalEntryWrapper = (BigDecimalEntryWrapper)obj;
+		BigDecimalEntryWrapper bigDecimalEntryWrapper =
+			(BigDecimalEntryWrapper)obj;
 
-		if (Objects.equals(_bigDecimalEntry,
-					bigDecimalEntryWrapper._bigDecimalEntry)) {
+		if (Objects.equals(
+				_bigDecimalEntry, bigDecimalEntryWrapper._bigDecimalEntry)) {
+
 			return true;
 		}
 
@@ -278,4 +311,5 @@ public class BigDecimalEntryWrapper implements BigDecimalEntry,
 	}
 
 	private final BigDecimalEntry _bigDecimalEntry;
+
 }

@@ -32,8 +32,9 @@ import com.liferay.document.library.sync.service.DLSyncEventLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class DLSyncEventBaseImpl extends DLSyncEventModelImpl
-	implements DLSyncEvent {
+public abstract class DLSyncEventBaseImpl
+	extends DLSyncEventModelImpl implements DLSyncEvent {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class DLSyncEventBaseImpl extends DLSyncEventModelImpl
 			DLSyncEventLocalServiceUtil.updateDLSyncEvent(this);
 		}
 	}
+
 }

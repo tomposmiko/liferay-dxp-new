@@ -63,12 +63,14 @@ import java.rmi.RemoteException;
  */
 @ProviderType
 public class BackgroundTaskServiceSoap {
-	public static int getBackgroundTasksCount(long groupId,
-		String taskExecutorClassName, String completed)
+
+	public static int getBackgroundTasksCount(
+			long groupId, String taskExecutorClassName, String completed)
 		throws RemoteException {
+
 		try {
-			int returnValue = BackgroundTaskServiceUtil.getBackgroundTasksCount(groupId,
-					taskExecutorClassName, completed);
+			int returnValue = BackgroundTaskServiceUtil.getBackgroundTasksCount(
+				groupId, taskExecutorClassName, completed);
 
 			return returnValue;
 		}
@@ -81,8 +83,11 @@ public class BackgroundTaskServiceSoap {
 
 	public static String getBackgroundTaskStatusJSON(long backgroundTaskId)
 		throws RemoteException {
+
 		try {
-			String returnValue = BackgroundTaskServiceUtil.getBackgroundTaskStatusJSON(backgroundTaskId);
+			String returnValue =
+				BackgroundTaskServiceUtil.getBackgroundTaskStatusJSON(
+					backgroundTaskId);
 
 			return returnValue;
 		}
@@ -93,5 +98,7 @@ public class BackgroundTaskServiceSoap {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(BackgroundTaskServiceSoap.class);
+	private static Log _log = LogFactoryUtil.getLog(
+		BackgroundTaskServiceSoap.class);
+
 }

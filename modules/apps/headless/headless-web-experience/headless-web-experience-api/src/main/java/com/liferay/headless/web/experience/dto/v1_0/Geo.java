@@ -14,40 +14,155 @@
 
 package com.liferay.headless.web.experience.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface Geo {
+@GraphQLName("Geo")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "Geo")
+public class Geo {
 
-	public Long getId();
+	public Long getId() {
+		return id;
+	}
 
-	public void setId(
-			Long id);
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public Number getLatitude();
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
+
+	public Number getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(Number latitude) {
+		this.latitude = latitude;
+	}
+
+	@JsonIgnore
 	public void setLatitude(
-			Number latitude);
+		UnsafeSupplier<Number, Exception> latitudeUnsafeSupplier) {
 
-	public void setLatitude(
-			UnsafeSupplier<Number, Throwable>
-				latitudeUnsafeSupplier);
-	public Number getLongitude();
+		try {
+			latitude = latitudeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Number latitude;
+
+	public Number getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Number longitude) {
+		this.longitude = longitude;
+	}
+
+	@JsonIgnore
 	public void setLongitude(
-			Number longitude);
+		UnsafeSupplier<Number, Exception> longitudeUnsafeSupplier) {
 
-	public void setLongitude(
-			UnsafeSupplier<Number, Throwable>
-				longitudeUnsafeSupplier);
+		try {
+			longitude = longitudeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Number longitude;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof Geo)) {
+			return false;
+		}
+
+		Geo geo = (Geo)object;
+
+		return Objects.equals(toString(), geo.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"latitude\": ");
+
+		sb.append(latitude);
+		sb.append(", ");
+
+		sb.append("\"longitude\": ");
+
+		sb.append(longitude);
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

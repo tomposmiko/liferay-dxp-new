@@ -30,12 +30,15 @@ import java.util.List;
  */
 @ProviderType
 public class SiteNavigationMenuItemSoap implements Serializable {
+
 	public static SiteNavigationMenuItemSoap toSoapModel(
 		SiteNavigationMenuItem model) {
+
 		SiteNavigationMenuItemSoap soapModel = new SiteNavigationMenuItemSoap();
 
 		soapModel.setUuid(model.getUuid());
-		soapModel.setSiteNavigationMenuItemId(model.getSiteNavigationMenuItemId());
+		soapModel.setSiteNavigationMenuItemId(
+			model.getSiteNavigationMenuItemId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
@@ -43,7 +46,8 @@ public class SiteNavigationMenuItemSoap implements Serializable {
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setSiteNavigationMenuId(model.getSiteNavigationMenuId());
-		soapModel.setParentSiteNavigationMenuItemId(model.getParentSiteNavigationMenuItemId());
+		soapModel.setParentSiteNavigationMenuItemId(
+			model.getParentSiteNavigationMenuItemId());
 		soapModel.setName(model.getName());
 		soapModel.setType(model.getType());
 		soapModel.setTypeSettings(model.getTypeSettings());
@@ -55,7 +59,9 @@ public class SiteNavigationMenuItemSoap implements Serializable {
 
 	public static SiteNavigationMenuItemSoap[] toSoapModels(
 		SiteNavigationMenuItem[] models) {
-		SiteNavigationMenuItemSoap[] soapModels = new SiteNavigationMenuItemSoap[models.length];
+
+		SiteNavigationMenuItemSoap[] soapModels =
+			new SiteNavigationMenuItemSoap[models.length];
 
 		for (int i = 0; i < models.length; i++) {
 			soapModels[i] = toSoapModel(models[i]);
@@ -66,10 +72,12 @@ public class SiteNavigationMenuItemSoap implements Serializable {
 
 	public static SiteNavigationMenuItemSoap[][] toSoapModels(
 		SiteNavigationMenuItem[][] models) {
+
 		SiteNavigationMenuItemSoap[][] soapModels = null;
 
 		if (models.length > 0) {
-			soapModels = new SiteNavigationMenuItemSoap[models.length][models[0].length];
+			soapModels =
+				new SiteNavigationMenuItemSoap[models.length][models[0].length];
 		}
 		else {
 			soapModels = new SiteNavigationMenuItemSoap[0][0];
@@ -84,13 +92,16 @@ public class SiteNavigationMenuItemSoap implements Serializable {
 
 	public static SiteNavigationMenuItemSoap[] toSoapModels(
 		List<SiteNavigationMenuItem> models) {
-		List<SiteNavigationMenuItemSoap> soapModels = new ArrayList<SiteNavigationMenuItemSoap>(models.size());
+
+		List<SiteNavigationMenuItemSoap> soapModels =
+			new ArrayList<SiteNavigationMenuItemSoap>(models.size());
 
 		for (SiteNavigationMenuItem model : models) {
 			soapModels.add(toSoapModel(model));
 		}
 
-		return soapModels.toArray(new SiteNavigationMenuItemSoap[soapModels.size()]);
+		return soapModels.toArray(
+			new SiteNavigationMenuItemSoap[soapModels.size()]);
 	}
 
 	public SiteNavigationMenuItemSoap() {
@@ -182,6 +193,7 @@ public class SiteNavigationMenuItemSoap implements Serializable {
 
 	public void setParentSiteNavigationMenuItemId(
 		long parentSiteNavigationMenuItemId) {
+
 		_parentSiteNavigationMenuItemId = parentSiteNavigationMenuItemId;
 	}
 
@@ -240,4 +252,5 @@ public class SiteNavigationMenuItemSoap implements Serializable {
 	private String _typeSettings;
 	private int _order;
 	private Date _lastPublishDate;
+
 }

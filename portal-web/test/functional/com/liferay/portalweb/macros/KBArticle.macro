@@ -209,7 +209,7 @@ definition {
 		}
 	}
 
-	macro addCPWithBooleanCustomField {
+	macro addCPWithTextFieldCustomField {
 		LexiconEntry.gotoAdd();
 
 		MenuItem.click(menuItem = "Basic Article");
@@ -223,10 +223,7 @@ definition {
 
 		Panel.expandPanel(panel = "Custom Fields");
 
-		Select(
-			locator1 = "KnowledgeBaseArticle#CUSTOM_FIELD_BOOLEAN",
-			value1 = "${selectBoolean}"
-		);
+		Type(locator1 = "TextInput#CUSTOM_FIELD", value1 = "${customFieldText}");
 
 		PortletEntry.publish();
 	}
@@ -626,13 +623,10 @@ definition {
 			KBArticle.selectAttachmentCP(kbArticleAttachment = "${kbArticleAttachment}");
 		}
 
-		if (isSet(selectBoolean)) {
+		if (isSet(customFieldTextEdit)) {
 			Panel.expandPanel(panel = "Custom Fields");
 
-			Select(
-				locator1 = "KnowledgeBaseArticle#CUSTOM_FIELD_BOOLEAN",
-				value1 = "${selectBoolean}"
-			);
+			Type(locator1 = "TextInput#CUSTOM_FIELD", value1 = "${customFieldTextEdit}");
 		}
 
 		if ("${cancel}" == "true") {
@@ -990,10 +984,10 @@ definition {
 			Click(locator1 = "KnowledgeBaseArticle#ATTACHMENTS_HEADER_COLLAPSED");
 		}
 
-		AssertClick(locator1 = "Button#SELECT_FILES", value1 = "Select Files");
+		AssertElementPresent(locator1 = "Button#SELECT_FILES");
 
-		SikuliUploadCommonFile(
-			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			locator1 = "TextInput#FILE",
 			value1 = "${kbArticleAttachment}"
 		);
 	}
@@ -1103,7 +1097,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Knowledge Base"
 		);

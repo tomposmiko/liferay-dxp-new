@@ -89,7 +89,9 @@ public class BNDExportsCheck extends BaseFileCheck {
 		}
 
 		if (fileName.endsWith("/test-bnd.bnd") ||
-			absolutePath.contains("-api/") || absolutePath.contains("-spi/") ||
+			absolutePath.contains("-api/") ||
+			absolutePath.contains("-client/") ||
+			absolutePath.contains("-spi/") ||
 			absolutePath.contains("-taglib/") ||
 			absolutePath.contains("-test-util/") ||
 			!content.contains("Export-Package")) {

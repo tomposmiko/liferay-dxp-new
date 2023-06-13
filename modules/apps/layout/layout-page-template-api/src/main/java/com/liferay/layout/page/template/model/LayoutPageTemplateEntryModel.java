@@ -37,8 +37,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface LayoutPageTemplateEntryModel extends BaseModel<LayoutPageTemplateEntry>,
-	ShardedModel, StagedGroupedModel, TypedModel, WorkflowedModel {
+public interface LayoutPageTemplateEntryModel
+	extends BaseModel<LayoutPageTemplateEntry>, ShardedModel,
+			StagedGroupedModel, TypedModel, WorkflowedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -510,4 +512,5 @@ public interface LayoutPageTemplateEntryModel extends BaseModel<LayoutPageTempla
 	 */
 	@Override
 	public boolean isScheduled();
+
 }

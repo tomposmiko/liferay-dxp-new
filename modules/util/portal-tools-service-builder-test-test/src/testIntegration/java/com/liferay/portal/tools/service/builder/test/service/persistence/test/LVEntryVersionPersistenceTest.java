@@ -15,7 +15,6 @@
 package com.liferay.portal.tools.service.builder.test.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -35,15 +34,6 @@ import com.liferay.portal.tools.service.builder.test.model.LVEntryVersion;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntryVersionPersistence;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntryVersionUtil;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -54,16 +44,27 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class LVEntryVersionPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.portal.tools.service.builder.test.service"));
 
 	@Before
@@ -103,7 +104,8 @@ public class LVEntryVersionPersistenceTest {
 
 		_persistence.remove(newLVEntryVersion);
 
-		LVEntryVersion existingLVEntryVersion = _persistence.fetchByPrimaryKey(newLVEntryVersion.getPrimaryKey());
+		LVEntryVersion existingLVEntryVersion = _persistence.fetchByPrimaryKey(
+			newLVEntryVersion.getPrimaryKey());
 
 		Assert.assertNull(existingLVEntryVersion);
 	}
@@ -127,27 +129,39 @@ public class LVEntryVersionPersistenceTest {
 
 		newLVEntryVersion.setLvEntryId(RandomTestUtil.nextLong());
 
+		newLVEntryVersion.setCompanyId(RandomTestUtil.nextLong());
+
 		newLVEntryVersion.setGroupId(RandomTestUtil.nextLong());
 
 		newLVEntryVersion.setUniqueGroupKey(RandomTestUtil.randomString());
 
 		_lvEntryVersions.add(_persistence.update(newLVEntryVersion));
 
-		LVEntryVersion existingLVEntryVersion = _persistence.findByPrimaryKey(newLVEntryVersion.getPrimaryKey());
+		LVEntryVersion existingLVEntryVersion = _persistence.findByPrimaryKey(
+			newLVEntryVersion.getPrimaryKey());
 
-		Assert.assertEquals(existingLVEntryVersion.getLvEntryVersionId(),
+		Assert.assertEquals(
+			existingLVEntryVersion.getLvEntryVersionId(),
 			newLVEntryVersion.getLvEntryVersionId());
-		Assert.assertEquals(existingLVEntryVersion.getVersion(),
+		Assert.assertEquals(
+			existingLVEntryVersion.getVersion(),
 			newLVEntryVersion.getVersion());
-		Assert.assertEquals(existingLVEntryVersion.getUuid(),
-			newLVEntryVersion.getUuid());
-		Assert.assertEquals(existingLVEntryVersion.getDefaultLanguageId(),
+		Assert.assertEquals(
+			existingLVEntryVersion.getUuid(), newLVEntryVersion.getUuid());
+		Assert.assertEquals(
+			existingLVEntryVersion.getDefaultLanguageId(),
 			newLVEntryVersion.getDefaultLanguageId());
-		Assert.assertEquals(existingLVEntryVersion.getLvEntryId(),
+		Assert.assertEquals(
+			existingLVEntryVersion.getLvEntryId(),
 			newLVEntryVersion.getLvEntryId());
-		Assert.assertEquals(existingLVEntryVersion.getGroupId(),
+		Assert.assertEquals(
+			existingLVEntryVersion.getCompanyId(),
+			newLVEntryVersion.getCompanyId());
+		Assert.assertEquals(
+			existingLVEntryVersion.getGroupId(),
 			newLVEntryVersion.getGroupId());
-		Assert.assertEquals(existingLVEntryVersion.getUniqueGroupKey(),
+		Assert.assertEquals(
+			existingLVEntryVersion.getUniqueGroupKey(),
 			newLVEntryVersion.getUniqueGroupKey());
 	}
 
@@ -160,8 +174,8 @@ public class LVEntryVersionPersistenceTest {
 
 	@Test
 	public void testCountByLvEntryId_Version() throws Exception {
-		_persistence.countByLvEntryId_Version(RandomTestUtil.nextLong(),
-			RandomTestUtil.nextInt());
+		_persistence.countByLvEntryId_Version(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
 
 		_persistence.countByLvEntryId_Version(0L, 0);
 	}
@@ -195,12 +209,31 @@ public class LVEntryVersionPersistenceTest {
 
 	@Test
 	public void testCountByUUID_G_Version() throws Exception {
-		_persistence.countByUUID_G_Version("", RandomTestUtil.nextLong(),
-			RandomTestUtil.nextInt());
+		_persistence.countByUUID_G_Version(
+			"", RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
 
 		_persistence.countByUUID_G_Version("null", 0L, 0);
 
 		_persistence.countByUUID_G_Version((String)null, 0L, 0);
+	}
+
+	@Test
+	public void testCountByUuid_C() throws Exception {
+		_persistence.countByUuid_C("", RandomTestUtil.nextLong());
+
+		_persistence.countByUuid_C("null", 0L);
+
+		_persistence.countByUuid_C((String)null, 0L);
+	}
+
+	@Test
+	public void testCountByUuid_C_Version() throws Exception {
+		_persistence.countByUuid_C_Version(
+			"", RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
+
+		_persistence.countByUuid_C_Version("null", 0L, 0);
+
+		_persistence.countByUuid_C_Version((String)null, 0L, 0);
 	}
 
 	@Test
@@ -212,8 +245,8 @@ public class LVEntryVersionPersistenceTest {
 
 	@Test
 	public void testCountByGroupId_Version() throws Exception {
-		_persistence.countByGroupId_Version(RandomTestUtil.nextLong(),
-			RandomTestUtil.nextInt());
+		_persistence.countByGroupId_Version(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
 
 		_persistence.countByGroupId_Version(0L, 0);
 	}
@@ -229,8 +262,8 @@ public class LVEntryVersionPersistenceTest {
 
 	@Test
 	public void testCountByG_UGK_Version() throws Exception {
-		_persistence.countByG_UGK_Version(RandomTestUtil.nextLong(), "",
-			RandomTestUtil.nextInt());
+		_persistence.countByG_UGK_Version(
+			RandomTestUtil.nextLong(), "", RandomTestUtil.nextInt());
 
 		_persistence.countByG_UGK_Version(0L, "null", 0);
 
@@ -241,7 +274,8 @@ public class LVEntryVersionPersistenceTest {
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		LVEntryVersion newLVEntryVersion = addLVEntryVersion();
 
-		LVEntryVersion existingLVEntryVersion = _persistence.findByPrimaryKey(newLVEntryVersion.getPrimaryKey());
+		LVEntryVersion existingLVEntryVersion = _persistence.findByPrimaryKey(
+			newLVEntryVersion.getPrimaryKey());
 
 		Assert.assertEquals(existingLVEntryVersion, newLVEntryVersion);
 	}
@@ -255,22 +289,23 @@ public class LVEntryVersionPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<LVEntryVersion> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("LVEntryVersion",
-			"lvEntryVersionId", true, "version", true, "uuid", true,
-			"defaultLanguageId", true, "lvEntryId", true, "groupId", true,
-			"uniqueGroupKey", true);
+		return OrderByComparatorFactoryUtil.create(
+			"LVEntryVersion", "lvEntryVersionId", true, "version", true, "uuid",
+			true, "defaultLanguageId", true, "lvEntryId", true, "companyId",
+			true, "groupId", true, "uniqueGroupKey", true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		LVEntryVersion newLVEntryVersion = addLVEntryVersion();
 
-		LVEntryVersion existingLVEntryVersion = _persistence.fetchByPrimaryKey(newLVEntryVersion.getPrimaryKey());
+		LVEntryVersion existingLVEntryVersion = _persistence.fetchByPrimaryKey(
+			newLVEntryVersion.getPrimaryKey());
 
 		Assert.assertEquals(existingLVEntryVersion, newLVEntryVersion);
 	}
@@ -279,7 +314,8 @@ public class LVEntryVersionPersistenceTest {
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		LVEntryVersion missingLVEntryVersion = _persistence.fetchByPrimaryKey(pk);
+		LVEntryVersion missingLVEntryVersion = _persistence.fetchByPrimaryKey(
+			pk);
 
 		Assert.assertNull(missingLVEntryVersion);
 	}
@@ -287,6 +323,7 @@ public class LVEntryVersionPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		LVEntryVersion newLVEntryVersion1 = addLVEntryVersion();
 		LVEntryVersion newLVEntryVersion2 = addLVEntryVersion();
 
@@ -295,18 +332,22 @@ public class LVEntryVersionPersistenceTest {
 		primaryKeys.add(newLVEntryVersion1.getPrimaryKey());
 		primaryKeys.add(newLVEntryVersion2.getPrimaryKey());
 
-		Map<Serializable, LVEntryVersion> lvEntryVersions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LVEntryVersion> lvEntryVersions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, lvEntryVersions.size());
-		Assert.assertEquals(newLVEntryVersion1,
+		Assert.assertEquals(
+			newLVEntryVersion1,
 			lvEntryVersions.get(newLVEntryVersion1.getPrimaryKey()));
-		Assert.assertEquals(newLVEntryVersion2,
+		Assert.assertEquals(
+			newLVEntryVersion2,
 			lvEntryVersions.get(newLVEntryVersion2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -316,7 +357,8 @@ public class LVEntryVersionPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, LVEntryVersion> lvEntryVersions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LVEntryVersion> lvEntryVersions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(lvEntryVersions.isEmpty());
 	}
@@ -324,6 +366,7 @@ public class LVEntryVersionPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		LVEntryVersion newLVEntryVersion = addLVEntryVersion();
 
 		long pk = RandomTestUtil.nextLong();
@@ -333,51 +376,55 @@ public class LVEntryVersionPersistenceTest {
 		primaryKeys.add(newLVEntryVersion.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, LVEntryVersion> lvEntryVersions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LVEntryVersion> lvEntryVersions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, lvEntryVersions.size());
-		Assert.assertEquals(newLVEntryVersion,
+		Assert.assertEquals(
+			newLVEntryVersion,
 			lvEntryVersions.get(newLVEntryVersion.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, LVEntryVersion> lvEntryVersions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LVEntryVersion> lvEntryVersions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(lvEntryVersions.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		LVEntryVersion newLVEntryVersion = addLVEntryVersion();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newLVEntryVersion.getPrimaryKey());
 
-		Map<Serializable, LVEntryVersion> lvEntryVersions = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LVEntryVersion> lvEntryVersions =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, lvEntryVersions.size());
-		Assert.assertEquals(newLVEntryVersion,
+		Assert.assertEquals(
+			newLVEntryVersion,
 			lvEntryVersions.get(newLVEntryVersion.getPrimaryKey()));
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		LVEntryVersion newLVEntryVersion = addLVEntryVersion();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LVEntryVersion.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LVEntryVersion.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("lvEntryVersionId",
-				newLVEntryVersion.getLvEntryVersionId()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"lvEntryVersionId", newLVEntryVersion.getLvEntryVersionId()));
 
-		List<LVEntryVersion> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<LVEntryVersion> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
@@ -388,32 +435,34 @@ public class LVEntryVersionPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LVEntryVersion.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LVEntryVersion.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("lvEntryVersionId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"lvEntryVersionId", RandomTestUtil.nextLong()));
 
-		List<LVEntryVersion> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<LVEntryVersion> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		LVEntryVersion newLVEntryVersion = addLVEntryVersion();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LVEntryVersion.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LVEntryVersion.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"lvEntryVersionId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("lvEntryVersionId"));
 
 		Object newLvEntryVersionId = newLVEntryVersion.getLvEntryVersionId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("lvEntryVersionId",
-				new Object[] { newLvEntryVersionId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"lvEntryVersionId", new Object[] {newLvEntryVersionId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -426,14 +475,15 @@ public class LVEntryVersionPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LVEntryVersion.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LVEntryVersion.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"lvEntryVersionId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("lvEntryVersionId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("lvEntryVersionId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"lvEntryVersionId", new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -446,35 +496,48 @@ public class LVEntryVersionPersistenceTest {
 
 		_persistence.clearCache();
 
-		LVEntryVersion existingLVEntryVersion = _persistence.findByPrimaryKey(newLVEntryVersion.getPrimaryKey());
+		LVEntryVersion existingLVEntryVersion = _persistence.findByPrimaryKey(
+			newLVEntryVersion.getPrimaryKey());
 
-		Assert.assertEquals(Long.valueOf(existingLVEntryVersion.getLvEntryId()),
-			ReflectionTestUtil.<Long>invoke(existingLVEntryVersion,
-				"getOriginalLvEntryId", new Class<?>[0]));
-		Assert.assertEquals(Integer.valueOf(existingLVEntryVersion.getVersion()),
-			ReflectionTestUtil.<Integer>invoke(existingLVEntryVersion,
-				"getOriginalVersion", new Class<?>[0]));
+		Assert.assertEquals(
+			Long.valueOf(existingLVEntryVersion.getLvEntryId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingLVEntryVersion, "getOriginalLvEntryId",
+				new Class<?>[0]));
+		Assert.assertEquals(
+			Integer.valueOf(existingLVEntryVersion.getVersion()),
+			ReflectionTestUtil.<Integer>invoke(
+				existingLVEntryVersion, "getOriginalVersion", new Class<?>[0]));
 
-		Assert.assertTrue(Objects.equals(existingLVEntryVersion.getUuid(),
-				ReflectionTestUtil.invoke(existingLVEntryVersion,
-					"getOriginalUuid", new Class<?>[0])));
-		Assert.assertEquals(Long.valueOf(existingLVEntryVersion.getGroupId()),
-			ReflectionTestUtil.<Long>invoke(existingLVEntryVersion,
-				"getOriginalGroupId", new Class<?>[0]));
-		Assert.assertEquals(Integer.valueOf(existingLVEntryVersion.getVersion()),
-			ReflectionTestUtil.<Integer>invoke(existingLVEntryVersion,
-				"getOriginalVersion", new Class<?>[0]));
+		Assert.assertTrue(
+			Objects.equals(
+				existingLVEntryVersion.getUuid(),
+				ReflectionTestUtil.invoke(
+					existingLVEntryVersion, "getOriginalUuid",
+					new Class<?>[0])));
+		Assert.assertEquals(
+			Long.valueOf(existingLVEntryVersion.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingLVEntryVersion, "getOriginalGroupId", new Class<?>[0]));
+		Assert.assertEquals(
+			Integer.valueOf(existingLVEntryVersion.getVersion()),
+			ReflectionTestUtil.<Integer>invoke(
+				existingLVEntryVersion, "getOriginalVersion", new Class<?>[0]));
 
-		Assert.assertEquals(Long.valueOf(existingLVEntryVersion.getGroupId()),
-			ReflectionTestUtil.<Long>invoke(existingLVEntryVersion,
-				"getOriginalGroupId", new Class<?>[0]));
-		Assert.assertTrue(Objects.equals(
+		Assert.assertEquals(
+			Long.valueOf(existingLVEntryVersion.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				existingLVEntryVersion, "getOriginalGroupId", new Class<?>[0]));
+		Assert.assertTrue(
+			Objects.equals(
 				existingLVEntryVersion.getUniqueGroupKey(),
-				ReflectionTestUtil.invoke(existingLVEntryVersion,
-					"getOriginalUniqueGroupKey", new Class<?>[0])));
-		Assert.assertEquals(Integer.valueOf(existingLVEntryVersion.getVersion()),
-			ReflectionTestUtil.<Integer>invoke(existingLVEntryVersion,
-				"getOriginalVersion", new Class<?>[0]));
+				ReflectionTestUtil.invoke(
+					existingLVEntryVersion, "getOriginalUniqueGroupKey",
+					new Class<?>[0])));
+		Assert.assertEquals(
+			Integer.valueOf(existingLVEntryVersion.getVersion()),
+			ReflectionTestUtil.<Integer>invoke(
+				existingLVEntryVersion, "getOriginalVersion", new Class<?>[0]));
 	}
 
 	protected LVEntryVersion addLVEntryVersion() throws Exception {
@@ -490,6 +553,8 @@ public class LVEntryVersionPersistenceTest {
 
 		lvEntryVersion.setLvEntryId(RandomTestUtil.nextLong());
 
+		lvEntryVersion.setCompanyId(RandomTestUtil.nextLong());
+
 		lvEntryVersion.setGroupId(RandomTestUtil.nextLong());
 
 		lvEntryVersion.setUniqueGroupKey(RandomTestUtil.randomString());
@@ -499,7 +564,9 @@ public class LVEntryVersionPersistenceTest {
 		return lvEntryVersion;
 	}
 
-	private List<LVEntryVersion> _lvEntryVersions = new ArrayList<LVEntryVersion>();
+	private List<LVEntryVersion> _lvEntryVersions =
+		new ArrayList<LVEntryVersion>();
 	private LVEntryVersionPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

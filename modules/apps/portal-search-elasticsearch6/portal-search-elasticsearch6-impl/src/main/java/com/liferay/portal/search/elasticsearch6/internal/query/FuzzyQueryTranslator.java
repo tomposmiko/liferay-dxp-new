@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query;
 
-import com.liferay.portal.kernel.search.generic.FuzzyQuery;
+import com.liferay.portal.search.query.FuzzyQuery;
 
 import org.elasticsearch.index.query.QueryBuilder;
 

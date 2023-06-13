@@ -35,6 +35,7 @@ import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalSer
 public abstract class OAuth2ApplicationScopeAliasesBaseImpl
 	extends OAuth2ApplicationScopeAliasesModelImpl
 	implements OAuth2ApplicationScopeAliases {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -43,10 +44,13 @@ public abstract class OAuth2ApplicationScopeAliasesBaseImpl
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			OAuth2ApplicationScopeAliasesLocalServiceUtil.addOAuth2ApplicationScopeAliases(this);
+			OAuth2ApplicationScopeAliasesLocalServiceUtil.
+				addOAuth2ApplicationScopeAliases(this);
 		}
 		else {
-			OAuth2ApplicationScopeAliasesLocalServiceUtil.updateOAuth2ApplicationScopeAliases(this);
+			OAuth2ApplicationScopeAliasesLocalServiceUtil.
+				updateOAuth2ApplicationScopeAliases(this);
 		}
 	}
+
 }

@@ -189,6 +189,11 @@ public abstract class BaseBuildData implements BuildData {
 	}
 
 	@Override
+	public String getJobURL() {
+		return optString("job_url");
+	}
+
+	@Override
 	public JSONObject getJSONObject() {
 		return _jsonObject;
 	}
@@ -265,6 +270,7 @@ public abstract class BaseBuildData implements BuildData {
 		put("build_url", buildURL);
 		put("cohort_name", matcher.group("cohortName"));
 		put("hostname", _getHostname());
+		put("job_url", matcher.group("jobURL"));
 		put("master_hostname", matcher.group("masterHostname"));
 		put("start_time", _getStartTime());
 		put("type", getType());
@@ -282,12 +288,9 @@ public abstract class BaseBuildData implements BuildData {
 
 	@Override
 	public void setWorkspaceDir(File workspaceDir) {
-		try {
-			put("workspace_dir", workspaceDir.getCanonicalPath());
-		}
-		catch (IOException ioe) {
-			throw new RuntimeException(ioe);
-		}
+		put(
+			"workspace_dir",
+			JenkinsResultsParserUtil.getCanonicalPath(workspaceDir));
 	}
 
 	protected static boolean isValidJSONObject(
@@ -484,9 +487,9 @@ public abstract class BaseBuildData implements BuildData {
 
 	private static final Pattern _buildURLPattern = Pattern.compile(
 		JenkinsResultsParserUtil.combine(
-			"https?://(?<masterHostname>(?<cohortName>test-\\d+)-\\d+)",
-			"(\\.liferay\\.com)?/job/(?<jobName>[^/]+)/(.*/)?",
-			"(?<buildNumber>\\d+)/?"));
+			"(?<jobURL>https?://(?<masterHostname>",
+			"(?<cohortName>test-\\d+)-\\d+)(\\.liferay\\.com)?/job/",
+			"(?<jobName>[^/]+)/(.*/)?)(?<buildNumber>\\d+)/?"));
 
 	private Map<String, String> _buildParameters;
 	private Host _host;

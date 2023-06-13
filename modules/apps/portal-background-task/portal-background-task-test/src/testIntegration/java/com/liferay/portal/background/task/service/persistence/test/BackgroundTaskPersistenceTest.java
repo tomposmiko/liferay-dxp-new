@@ -15,7 +15,6 @@
 package com.liferay.portal.background.task.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.background.task.exception.NoSuchBackgroundTaskException;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalServiceUtil;
@@ -38,15 +37,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -57,16 +47,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class BackgroundTaskPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.portal.background.task.service"));
 
 	@Before
@@ -106,7 +107,8 @@ public class BackgroundTaskPersistenceTest {
 
 		_persistence.remove(newBackgroundTask);
 
-		BackgroundTask existingBackgroundTask = _persistence.fetchByPrimaryKey(newBackgroundTask.getPrimaryKey());
+		BackgroundTask existingBackgroundTask = _persistence.fetchByPrimaryKey(
+			newBackgroundTask.getPrimaryKey());
 
 		Assert.assertNull(existingBackgroundTask);
 	}
@@ -140,9 +142,11 @@ public class BackgroundTaskPersistenceTest {
 
 		newBackgroundTask.setServletContextNames(RandomTestUtil.randomString());
 
-		newBackgroundTask.setTaskExecutorClassName(RandomTestUtil.randomString());
+		newBackgroundTask.setTaskExecutorClassName(
+			RandomTestUtil.randomString());
 
-		newBackgroundTask.setTaskContextMap(new HashMap<String, Serializable>());
+		newBackgroundTask.setTaskContextMap(
+			new HashMap<String, Serializable>());
 
 		newBackgroundTask.setCompleted(RandomTestUtil.randomBoolean());
 
@@ -154,42 +158,53 @@ public class BackgroundTaskPersistenceTest {
 
 		_backgroundTasks.add(_persistence.update(newBackgroundTask));
 
-		BackgroundTask existingBackgroundTask = _persistence.findByPrimaryKey(newBackgroundTask.getPrimaryKey());
+		BackgroundTask existingBackgroundTask = _persistence.findByPrimaryKey(
+			newBackgroundTask.getPrimaryKey());
 
-		Assert.assertEquals(existingBackgroundTask.getMvccVersion(),
+		Assert.assertEquals(
+			existingBackgroundTask.getMvccVersion(),
 			newBackgroundTask.getMvccVersion());
-		Assert.assertEquals(existingBackgroundTask.getBackgroundTaskId(),
+		Assert.assertEquals(
+			existingBackgroundTask.getBackgroundTaskId(),
 			newBackgroundTask.getBackgroundTaskId());
-		Assert.assertEquals(existingBackgroundTask.getGroupId(),
+		Assert.assertEquals(
+			existingBackgroundTask.getGroupId(),
 			newBackgroundTask.getGroupId());
-		Assert.assertEquals(existingBackgroundTask.getCompanyId(),
+		Assert.assertEquals(
+			existingBackgroundTask.getCompanyId(),
 			newBackgroundTask.getCompanyId());
-		Assert.assertEquals(existingBackgroundTask.getUserId(),
-			newBackgroundTask.getUserId());
-		Assert.assertEquals(existingBackgroundTask.getUserName(),
+		Assert.assertEquals(
+			existingBackgroundTask.getUserId(), newBackgroundTask.getUserId());
+		Assert.assertEquals(
+			existingBackgroundTask.getUserName(),
 			newBackgroundTask.getUserName());
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingBackgroundTask.getCreateDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingBackgroundTask.getCreateDate()),
 			Time.getShortTimestamp(newBackgroundTask.getCreateDate()));
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingBackgroundTask.getModifiedDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingBackgroundTask.getModifiedDate()),
 			Time.getShortTimestamp(newBackgroundTask.getModifiedDate()));
-		Assert.assertEquals(existingBackgroundTask.getName(),
-			newBackgroundTask.getName());
-		Assert.assertEquals(existingBackgroundTask.getServletContextNames(),
+		Assert.assertEquals(
+			existingBackgroundTask.getName(), newBackgroundTask.getName());
+		Assert.assertEquals(
+			existingBackgroundTask.getServletContextNames(),
 			newBackgroundTask.getServletContextNames());
-		Assert.assertEquals(existingBackgroundTask.getTaskExecutorClassName(),
+		Assert.assertEquals(
+			existingBackgroundTask.getTaskExecutorClassName(),
 			newBackgroundTask.getTaskExecutorClassName());
-		Assert.assertEquals(existingBackgroundTask.getTaskContextMap(),
+		Assert.assertEquals(
+			existingBackgroundTask.getTaskContextMap(),
 			newBackgroundTask.getTaskContextMap());
-		Assert.assertEquals(existingBackgroundTask.isCompleted(),
+		Assert.assertEquals(
+			existingBackgroundTask.isCompleted(),
 			newBackgroundTask.isCompleted());
-		Assert.assertEquals(Time.getShortTimestamp(
-				existingBackgroundTask.getCompletionDate()),
+		Assert.assertEquals(
+			Time.getShortTimestamp(existingBackgroundTask.getCompletionDate()),
 			Time.getShortTimestamp(newBackgroundTask.getCompletionDate()));
-		Assert.assertEquals(existingBackgroundTask.getStatus(),
-			newBackgroundTask.getStatus());
-		Assert.assertEquals(existingBackgroundTask.getStatusMessage(),
+		Assert.assertEquals(
+			existingBackgroundTask.getStatus(), newBackgroundTask.getStatus());
+		Assert.assertEquals(
+			existingBackgroundTask.getStatusMessage(),
 			newBackgroundTask.getStatusMessage());
 	}
 
@@ -232,14 +247,17 @@ public class BackgroundTaskPersistenceTest {
 
 	@Test
 	public void testCountByG_TArrayable() throws Exception {
-		_persistence.countByG_T(new long[] { RandomTestUtil.nextLong(), 0L },
-			new String[] { RandomTestUtil.randomString(), "", "null", null, null });
+		_persistence.countByG_T(
+			new long[] {RandomTestUtil.nextLong(), 0L},
+			new String[] {
+				RandomTestUtil.randomString(), "", "null", null, null
+			});
 	}
 
 	@Test
 	public void testCountByG_S() throws Exception {
-		_persistence.countByG_S(RandomTestUtil.nextLong(),
-			RandomTestUtil.nextInt());
+		_persistence.countByG_S(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
 
 		_persistence.countByG_S(0L, 0);
 	}
@@ -255,9 +273,11 @@ public class BackgroundTaskPersistenceTest {
 
 	@Test
 	public void testCountByT_SArrayable() throws Exception {
-		_persistence.countByT_S(new String[] {
+		_persistence.countByT_S(
+			new String[] {
 				RandomTestUtil.randomString(), "", "null", null, null
-			}, RandomTestUtil.nextInt());
+			},
+			RandomTestUtil.nextInt());
 	}
 
 	@Test
@@ -271,33 +291,39 @@ public class BackgroundTaskPersistenceTest {
 
 	@Test
 	public void testCountByG_N_TArrayable() throws Exception {
-		_persistence.countByG_N_T(new long[] { RandomTestUtil.nextLong(), 0L },
+		_persistence.countByG_N_T(
+			new long[] {RandomTestUtil.nextLong(), 0L},
 			RandomTestUtil.randomString(),
-			new String[] { RandomTestUtil.randomString(), "", "null", null, null });
+			new String[] {
+				RandomTestUtil.randomString(), "", "null", null, null
+			});
 	}
 
 	@Test
 	public void testCountByG_T_C() throws Exception {
-		_persistence.countByG_T_C(RandomTestUtil.nextLong(), "",
-			RandomTestUtil.randomBoolean());
+		_persistence.countByG_T_C(
+			RandomTestUtil.nextLong(), "", RandomTestUtil.randomBoolean());
 
 		_persistence.countByG_T_C(0L, "null", RandomTestUtil.randomBoolean());
 
-		_persistence.countByG_T_C(0L, (String)null,
-			RandomTestUtil.randomBoolean());
+		_persistence.countByG_T_C(
+			0L, (String)null, RandomTestUtil.randomBoolean());
 	}
 
 	@Test
 	public void testCountByG_T_CArrayable() throws Exception {
-		_persistence.countByG_T_C(new long[] { RandomTestUtil.nextLong(), 0L },
-			new String[] { RandomTestUtil.randomString(), "", "null", null, null },
+		_persistence.countByG_T_C(
+			new long[] {RandomTestUtil.nextLong(), 0L},
+			new String[] {
+				RandomTestUtil.randomString(), "", "null", null, null
+			},
 			RandomTestUtil.randomBoolean());
 	}
 
 	@Test
 	public void testCountByG_T_S() throws Exception {
-		_persistence.countByG_T_S(RandomTestUtil.nextLong(), "",
-			RandomTestUtil.nextInt());
+		_persistence.countByG_T_S(
+			RandomTestUtil.nextLong(), "", RandomTestUtil.nextInt());
 
 		_persistence.countByG_T_S(0L, "null", 0);
 
@@ -306,26 +332,30 @@ public class BackgroundTaskPersistenceTest {
 
 	@Test
 	public void testCountByG_T_SArrayable() throws Exception {
-		_persistence.countByG_T_S(RandomTestUtil.nextLong(),
-			new String[] { RandomTestUtil.randomString(), "", "null", null, null },
+		_persistence.countByG_T_S(
+			RandomTestUtil.nextLong(),
+			new String[] {
+				RandomTestUtil.randomString(), "", "null", null, null
+			},
 			RandomTestUtil.nextInt());
 	}
 
 	@Test
 	public void testCountByG_N_T_C() throws Exception {
-		_persistence.countByG_N_T_C(RandomTestUtil.nextLong(), "", "",
-			RandomTestUtil.randomBoolean());
+		_persistence.countByG_N_T_C(
+			RandomTestUtil.nextLong(), "", "", RandomTestUtil.randomBoolean());
 
-		_persistence.countByG_N_T_C(0L, "null", "null",
-			RandomTestUtil.randomBoolean());
+		_persistence.countByG_N_T_C(
+			0L, "null", "null", RandomTestUtil.randomBoolean());
 
-		_persistence.countByG_N_T_C(0L, (String)null, (String)null,
-			RandomTestUtil.randomBoolean());
+		_persistence.countByG_N_T_C(
+			0L, (String)null, (String)null, RandomTestUtil.randomBoolean());
 	}
 
 	@Test
 	public void testCountByG_N_T_CArrayable() throws Exception {
-		_persistence.countByG_N_T_C(new long[] { RandomTestUtil.nextLong(), 0L },
+		_persistence.countByG_N_T_C(
+			new long[] {RandomTestUtil.nextLong(), 0L},
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomBoolean());
 	}
@@ -334,7 +364,8 @@ public class BackgroundTaskPersistenceTest {
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		BackgroundTask newBackgroundTask = addBackgroundTask();
 
-		BackgroundTask existingBackgroundTask = _persistence.findByPrimaryKey(newBackgroundTask.getPrimaryKey());
+		BackgroundTask existingBackgroundTask = _persistence.findByPrimaryKey(
+			newBackgroundTask.getPrimaryKey());
 
 		Assert.assertEquals(existingBackgroundTask, newBackgroundTask);
 	}
@@ -348,24 +379,25 @@ public class BackgroundTaskPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<BackgroundTask> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("BackgroundTask",
-			"mvccVersion", true, "backgroundTaskId", true, "groupId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "name", true, "servletContextNames",
-			true, "taskExecutorClassName", true, "completed", true,
-			"completionDate", true, "status", true);
+		return OrderByComparatorFactoryUtil.create(
+			"BackgroundTask", "mvccVersion", true, "backgroundTaskId", true,
+			"groupId", true, "companyId", true, "userId", true, "userName",
+			true, "createDate", true, "modifiedDate", true, "name", true,
+			"servletContextNames", true, "taskExecutorClassName", true,
+			"completed", true, "completionDate", true, "status", true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		BackgroundTask newBackgroundTask = addBackgroundTask();
 
-		BackgroundTask existingBackgroundTask = _persistence.fetchByPrimaryKey(newBackgroundTask.getPrimaryKey());
+		BackgroundTask existingBackgroundTask = _persistence.fetchByPrimaryKey(
+			newBackgroundTask.getPrimaryKey());
 
 		Assert.assertEquals(existingBackgroundTask, newBackgroundTask);
 	}
@@ -374,7 +406,8 @@ public class BackgroundTaskPersistenceTest {
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		BackgroundTask missingBackgroundTask = _persistence.fetchByPrimaryKey(pk);
+		BackgroundTask missingBackgroundTask = _persistence.fetchByPrimaryKey(
+			pk);
 
 		Assert.assertNull(missingBackgroundTask);
 	}
@@ -382,6 +415,7 @@ public class BackgroundTaskPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		BackgroundTask newBackgroundTask1 = addBackgroundTask();
 		BackgroundTask newBackgroundTask2 = addBackgroundTask();
 
@@ -390,18 +424,22 @@ public class BackgroundTaskPersistenceTest {
 		primaryKeys.add(newBackgroundTask1.getPrimaryKey());
 		primaryKeys.add(newBackgroundTask2.getPrimaryKey());
 
-		Map<Serializable, BackgroundTask> backgroundTasks = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, BackgroundTask> backgroundTasks =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, backgroundTasks.size());
-		Assert.assertEquals(newBackgroundTask1,
+		Assert.assertEquals(
+			newBackgroundTask1,
 			backgroundTasks.get(newBackgroundTask1.getPrimaryKey()));
-		Assert.assertEquals(newBackgroundTask2,
+		Assert.assertEquals(
+			newBackgroundTask2,
 			backgroundTasks.get(newBackgroundTask2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -411,7 +449,8 @@ public class BackgroundTaskPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, BackgroundTask> backgroundTasks = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, BackgroundTask> backgroundTasks =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(backgroundTasks.isEmpty());
 	}
@@ -419,6 +458,7 @@ public class BackgroundTaskPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		BackgroundTask newBackgroundTask = addBackgroundTask();
 
 		long pk = RandomTestUtil.nextLong();
@@ -428,36 +468,39 @@ public class BackgroundTaskPersistenceTest {
 		primaryKeys.add(newBackgroundTask.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, BackgroundTask> backgroundTasks = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, BackgroundTask> backgroundTasks =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, backgroundTasks.size());
-		Assert.assertEquals(newBackgroundTask,
+		Assert.assertEquals(
+			newBackgroundTask,
 			backgroundTasks.get(newBackgroundTask.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, BackgroundTask> backgroundTasks = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, BackgroundTask> backgroundTasks =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(backgroundTasks.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		BackgroundTask newBackgroundTask = addBackgroundTask();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newBackgroundTask.getPrimaryKey());
 
-		Map<Serializable, BackgroundTask> backgroundTasks = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, BackgroundTask> backgroundTasks =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, backgroundTasks.size());
-		Assert.assertEquals(newBackgroundTask,
+		Assert.assertEquals(
+			newBackgroundTask,
 			backgroundTasks.get(newBackgroundTask.getPrimaryKey()));
 	}
 
@@ -465,15 +508,19 @@ public class BackgroundTaskPersistenceTest {
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = BackgroundTaskLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			BackgroundTaskLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<BackgroundTask>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<BackgroundTask>() {
+
 				@Override
 				public void performAction(BackgroundTask backgroundTask) {
 					Assert.assertNotNull(backgroundTask);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -482,17 +529,18 @@ public class BackgroundTaskPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		BackgroundTask newBackgroundTask = addBackgroundTask();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(BackgroundTask.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			BackgroundTask.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("backgroundTaskId",
-				newBackgroundTask.getBackgroundTaskId()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"backgroundTaskId", newBackgroundTask.getBackgroundTaskId()));
 
-		List<BackgroundTask> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<BackgroundTask> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
@@ -503,32 +551,34 @@ public class BackgroundTaskPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(BackgroundTask.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			BackgroundTask.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("backgroundTaskId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"backgroundTaskId", RandomTestUtil.nextLong()));
 
-		List<BackgroundTask> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<BackgroundTask> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		BackgroundTask newBackgroundTask = addBackgroundTask();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(BackgroundTask.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			BackgroundTask.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"backgroundTaskId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("backgroundTaskId"));
 
 		Object newBackgroundTaskId = newBackgroundTask.getBackgroundTaskId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("backgroundTaskId",
-				new Object[] { newBackgroundTaskId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"backgroundTaskId", new Object[] {newBackgroundTaskId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -541,14 +591,15 @@ public class BackgroundTaskPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(BackgroundTask.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			BackgroundTask.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"backgroundTaskId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("backgroundTaskId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("backgroundTaskId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"backgroundTaskId", new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -595,7 +646,9 @@ public class BackgroundTaskPersistenceTest {
 		return backgroundTask;
 	}
 
-	private List<BackgroundTask> _backgroundTasks = new ArrayList<BackgroundTask>();
+	private List<BackgroundTask> _backgroundTasks =
+		new ArrayList<BackgroundTask>();
 	private BackgroundTaskPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

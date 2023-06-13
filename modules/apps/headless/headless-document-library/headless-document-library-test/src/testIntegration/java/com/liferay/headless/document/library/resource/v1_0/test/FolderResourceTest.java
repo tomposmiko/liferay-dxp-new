@@ -16,153 +16,31 @@ package com.liferay.headless.document.library.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.document.library.dto.v1_0.Folder;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portlet.documentlibrary.util.test.DLAppTestUtil;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Javier Gamarra
  */
-@Ignore
 @RunWith(Arquillian.class)
 public class FolderResourceTest extends BaseFolderResourceTestCase {
 
-	@Test
-	public void testDeleteFolder() throws Exception {
-		Folder postFolder = invokePostContentSpaceFolder(
-			testGroup.getGroupId(), randomFolder());
-
-		assertResponseCode(200, invokeDeleteFolderResponse(postFolder.getId()));
-
-		assertResponseCode(404, invokeGetFolderResponse(postFolder.getId()));
-	}
-
-	@Test
-	public void testGetContentSpaceFoldersPage() throws Exception {
-		Folder randomFolder1 = randomFolder();
-
-		invokePostContentSpaceFolder(testGroup.getGroupId(), randomFolder1);
-
-		Folder randomFolder2 = randomFolder();
-
-		invokePostContentSpaceFolder(testGroup.getGroupId(), randomFolder2);
-
-		Page<Folder> page = invokeGetContentSpaceFoldersPage(
-			testGroup.getGroupId(), Pagination.of(2, 1));
-
-		assertEquals(
-			Arrays.asList(randomFolder1, randomFolder2),
-			(List<Folder>)page.getItems());
-		assertValid(page);
-	}
-
-	@Test
-	public void testGetFolder() throws Exception {
-		Folder postFolder = invokePostContentSpaceFolder(
-			testGroup.getGroupId(), randomFolder());
-
-		Folder getFolder = invokeGetFolder(postFolder.getId());
-
-		assertEquals(postFolder, getFolder);
-		assertValid(getFolder);
-	}
-
-	@Test
-	public void testGetFolderFoldersPage() throws Exception {
-		Folder postContentSpaceFolder = invokePostContentSpaceFolder(
-			testGroup.getGroupId(), randomFolder());
-		Folder randomFolder1 = randomFolder();
-
-		invokePostFolderFolder(postContentSpaceFolder.getId(), randomFolder1);
-
-		Folder randomFolder2 = randomFolder();
-
-		invokePostFolderFolder(postContentSpaceFolder.getId(), randomFolder2);
-
-		Page<Folder> page = invokeGetFolderFoldersPage(
-			postContentSpaceFolder.getId(), Pagination.of(2, 1));
-
-		assertEquals(
-			Arrays.asList(randomFolder1, randomFolder2),
-			(List<Folder>)page.getItems());
-		assertValid(page);
-	}
-
-	@Test
-	public void testPostContentSpaceFolder() throws Exception {
-		Folder randomFolder = randomFolder();
-
-		Folder postFolder = invokePostContentSpaceFolder(
-			testGroup.getGroupId(), randomFolder);
-
-		assertEquals(randomFolder, postFolder);
-		assertValid(postFolder);
-	}
-
-	@Test
-	public void testPostFolderFolder() throws Exception {
-		Folder randomFolder = randomFolder();
-
-		Folder postContentSpaceFolder = invokePostContentSpaceFolder(
-			testGroup.getGroupId(), randomFolder);
-
-		Folder postFolderFolder = invokePostFolderFolder(
-			postContentSpaceFolder.getId(), randomFolder);
-
-		assertEquals(randomFolder, postFolderFolder);
-		assertValid(postFolderFolder);
-	}
-
-	@Test
-	public void testPutFolder() throws Exception {
-		Folder postFolder = invokePostContentSpaceFolder(
-			testGroup.getGroupId(), randomFolder());
-
-		Folder randomFolder = randomFolder();
-
-		Folder putFolder = invokePutFolder(postFolder.getId(), randomFolder);
-
-		assertEquals(randomFolder, putFolder);
-		assertValid(putFolder);
-
-		Folder getFolder = invokeGetFolder(putFolder.getId());
-
-		assertEquals(randomFolder, getFolder);
-		assertValid(getFolder);
-	}
-
+	@Override
 	protected void assertValid(Folder folder) {
 		boolean valid = false;
 
-		if ((folder.getDateCreated() != null) &&
-			(folder.getDateModified() != null) && (folder.getId() != null) &&
-			Objects.equals(folder.getRepositoryId(), testGroup.getGroupId())) {
-
-			valid = true;
-		}
-
-		Assert.assertTrue(valid);
-	}
-
-	protected void assertValid(Page<Folder> page) {
-		boolean valid = false;
-
-		Collection<Folder> folders = page.getItems();
-
-		int size = folders.size();
-
-		if ((page.getItemsPerPage() > 0) && (page.getLastPageNumber() > 0) &&
-			(page.getPageNumber() > 0) && (page.getTotalCount() > 0) &&
-			(size > 0)) {
+		if (Objects.equals(
+				folder.getContentSpaceId(), testGroup.getGroupId()) &&
+			(folder.getDateCreated() != null) &&
+			(folder.getDateModified() != null) && (folder.getId() != null)) {
 
 			valid = true;
 		}
@@ -184,12 +62,103 @@ public class FolderResourceTest extends BaseFolderResourceTestCase {
 
 	@Override
 	protected Folder randomFolder() {
-		return new FolderImpl() {
+		return new Folder() {
 			{
 				description = RandomTestUtil.randomString();
 				name = RandomTestUtil.randomString();
 			}
 		};
+	}
+
+	protected Folder randomPatchFolder() {
+		return new Folder() {
+			{
+				description = RandomTestUtil.randomString();
+			}
+		};
+	}
+
+	@Override
+	protected Folder testDeleteFolder_addFolder() throws Exception {
+		return invokePostContentSpaceFolder(
+			testGroup.getGroupId(), randomFolder());
+	}
+
+	@Override
+	protected Folder testGetContentSpaceFoldersPage_addFolder(
+			Long contentSpaceId, Folder folder)
+		throws Exception {
+
+		return invokePostContentSpaceFolder(contentSpaceId, folder);
+	}
+
+	@Override
+	protected Folder testGetFolder_addFolder() throws Exception {
+		Folder postFolder = invokePostContentSpaceFolder(
+			testGroup.getGroupId(), randomFolder());
+
+		Assert.assertEquals(0, postFolder.getNumberOfDocuments());
+
+		DLAppTestUtil.addFileEntryWithWorkflow(
+			UserLocalServiceUtil.getDefaultUserId(testGroup.getCompanyId()),
+			testGroup.getGroupId(), postFolder.getId(), StringPool.BLANK,
+			RandomTestUtil.randomString(10), true, new ServiceContext());
+
+		Folder getFolder = invokeGetFolder(postFolder.getId());
+
+		Assert.assertEquals(1, getFolder.getNumberOfDocuments());
+
+		return postFolder;
+	}
+
+	@Override
+	protected Folder testGetFolderFoldersPage_addFolder(
+			Long folderId, Folder folder)
+		throws Exception {
+
+		return invokePostFolderFolder(folderId, folder);
+	}
+
+	@Override
+	protected Long testGetFolderFoldersPage_getFolderId() throws Exception {
+		Folder folder = invokePostContentSpaceFolder(
+			testGroup.getGroupId(), randomFolder());
+
+		return folder.getId();
+	}
+
+	@Override
+	protected Folder testPatchFolder_addFolder() throws Exception {
+		return invokePostContentSpaceFolder(
+			testGroup.getGroupId(), randomFolder());
+	}
+
+	@Override
+	protected Folder testPostContentSpaceFolder_addFolder(Folder folder)
+		throws Exception {
+
+		Folder postFolder = invokePostContentSpaceFolder(
+			testGroup.getGroupId(), folder);
+
+		Assert.assertEquals(0, postFolder.getNumberOfDocuments());
+
+		return postFolder;
+	}
+
+	@Override
+	protected Folder testPostFolderFolder_addFolder(Folder folder)
+		throws Exception {
+
+		Folder parentFolder = invokePostContentSpaceFolder(
+			testGroup.getGroupId(), randomFolder());
+
+		return invokePostFolderFolder(parentFolder.getId(), folder);
+	}
+
+	@Override
+	protected Folder testPutFolder_addFolder() throws Exception {
+		return invokePostContentSpaceFolder(
+			testGroup.getGroupId(), randomFolder());
 	}
 
 }

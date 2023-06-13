@@ -19,7 +19,6 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.dynamic.data.lists.model.DDLRecordSetVersion;
 import com.liferay.dynamic.data.lists.service.DDLRecordSetVersionLocalService;
 import com.liferay.dynamic.data.lists.service.persistence.DDLRecordSetVersionPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -63,8 +62,9 @@ import javax.sql.DataSource;
  */
 @ProviderType
 public abstract class DDLRecordSetVersionLocalServiceBaseImpl
-	extends BaseLocalServiceImpl implements DDLRecordSetVersionLocalService,
-		IdentifiableOSGiService {
+	extends BaseLocalServiceImpl
+	implements DDLRecordSetVersionLocalService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -81,6 +81,7 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	@Override
 	public DDLRecordSetVersion addDDLRecordSetVersion(
 		DDLRecordSetVersion ddlRecordSetVersion) {
+
 		ddlRecordSetVersion.setNew(true);
 
 		return ddlRecordSetVersionPersistence.update(ddlRecordSetVersion);
@@ -96,6 +97,7 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	@Transactional(enabled = false)
 	public DDLRecordSetVersion createDDLRecordSetVersion(
 		long recordSetVersionId) {
+
 		return ddlRecordSetVersionPersistence.create(recordSetVersionId);
 	}
 
@@ -109,7 +111,9 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public DDLRecordSetVersion deleteDDLRecordSetVersion(
-		long recordSetVersionId) throws PortalException {
+			long recordSetVersionId)
+		throws PortalException {
+
 		return ddlRecordSetVersionPersistence.remove(recordSetVersionId);
 	}
 
@@ -123,6 +127,7 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	@Override
 	public DDLRecordSetVersion deleteDDLRecordSetVersion(
 		DDLRecordSetVersion ddlRecordSetVersion) {
+
 		return ddlRecordSetVersionPersistence.remove(ddlRecordSetVersion);
 	}
 
@@ -130,8 +135,8 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(DDLRecordSetVersion.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			DDLRecordSetVersion.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -142,7 +147,8 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 */
 	@Override
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery) {
-		return ddlRecordSetVersionPersistence.findWithDynamicQuery(dynamicQuery);
+		return ddlRecordSetVersionPersistence.findWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -158,10 +164,11 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return ddlRecordSetVersionPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return ddlRecordSetVersionPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -178,10 +185,12 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return ddlRecordSetVersionPersistence.findWithDynamicQuery(dynamicQuery,
-			start, end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return ddlRecordSetVersionPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -192,7 +201,8 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 */
 	@Override
 	public long dynamicQueryCount(DynamicQuery dynamicQuery) {
-		return ddlRecordSetVersionPersistence.countWithDynamicQuery(dynamicQuery);
+		return ddlRecordSetVersionPersistence.countWithDynamicQuery(
+			dynamicQuery);
 	}
 
 	/**
@@ -203,15 +213,19 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return ddlRecordSetVersionPersistence.countWithDynamicQuery(dynamicQuery,
-			projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return ddlRecordSetVersionPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
-	public DDLRecordSetVersion fetchDDLRecordSetVersion(long recordSetVersionId) {
-		return ddlRecordSetVersionPersistence.fetchByPrimaryKey(recordSetVersionId);
+	public DDLRecordSetVersion fetchDDLRecordSetVersion(
+		long recordSetVersionId) {
+
+		return ddlRecordSetVersionPersistence.fetchByPrimaryKey(
+			recordSetVersionId);
 	}
 
 	/**
@@ -224,14 +238,18 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	@Override
 	public DDLRecordSetVersion getDDLRecordSetVersion(long recordSetVersionId)
 		throws PortalException {
-		return ddlRecordSetVersionPersistence.findByPrimaryKey(recordSetVersionId);
+
+		return ddlRecordSetVersionPersistence.findByPrimaryKey(
+			recordSetVersionId);
 	}
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
-		actionableDynamicQuery.setBaseLocalService(ddlRecordSetVersionLocalService);
+		actionableDynamicQuery.setBaseLocalService(
+			ddlRecordSetVersionLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDLRecordSetVersion.class);
 
@@ -241,12 +259,17 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(ddlRecordSetVersionLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			ddlRecordSetVersionLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
-		indexableActionableDynamicQuery.setModelClass(DDLRecordSetVersion.class);
+		indexableActionableDynamicQuery.setModelClass(
+			DDLRecordSetVersion.class);
 
 		indexableActionableDynamicQuery.setPrimaryKeyPropertyName(
 			"recordSetVersionId");
@@ -256,7 +279,9 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
-		actionableDynamicQuery.setBaseLocalService(ddlRecordSetVersionLocalService);
+
+		actionableDynamicQuery.setBaseLocalService(
+			ddlRecordSetVersionLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(DDLRecordSetVersion.class);
 
@@ -269,12 +294,15 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-		return ddlRecordSetVersionLocalService.deleteDDLRecordSetVersion((DDLRecordSetVersion)persistedModel);
+
+		return ddlRecordSetVersionLocalService.deleteDDLRecordSetVersion(
+			(DDLRecordSetVersion)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return ddlRecordSetVersionPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -290,7 +318,9 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 * @return the range of ddl record set versions
 	 */
 	@Override
-	public List<DDLRecordSetVersion> getDDLRecordSetVersions(int start, int end) {
+	public List<DDLRecordSetVersion> getDDLRecordSetVersions(
+		int start, int end) {
+
 		return ddlRecordSetVersionPersistence.findAll(start, end);
 	}
 
@@ -314,6 +344,7 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	@Override
 	public DDLRecordSetVersion updateDDLRecordSetVersion(
 		DDLRecordSetVersion ddlRecordSetVersion) {
+
 		return ddlRecordSetVersionPersistence.update(ddlRecordSetVersion);
 	}
 
@@ -322,7 +353,9 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 *
 	 * @return the ddl record set version local service
 	 */
-	public DDLRecordSetVersionLocalService getDDLRecordSetVersionLocalService() {
+	public DDLRecordSetVersionLocalService
+		getDDLRecordSetVersionLocalService() {
+
 		return ddlRecordSetVersionLocalService;
 	}
 
@@ -333,6 +366,7 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 */
 	public void setDDLRecordSetVersionLocalService(
 		DDLRecordSetVersionLocalService ddlRecordSetVersionLocalService) {
+
 		this.ddlRecordSetVersionLocalService = ddlRecordSetVersionLocalService;
 	}
 
@@ -352,6 +386,7 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 */
 	public void setDDLRecordSetVersionPersistence(
 		DDLRecordSetVersionPersistence ddlRecordSetVersionPersistence) {
+
 		this.ddlRecordSetVersionPersistence = ddlRecordSetVersionPersistence;
 	}
 
@@ -360,7 +395,9 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -370,12 +407,15 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.dynamic.data.lists.model.DDLRecordSetVersion",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.dynamic.data.lists.model.DDLRecordSetVersion",
 			ddlRecordSetVersionLocalService);
 	}
 
@@ -409,15 +449,16 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = ddlRecordSetVersionPersistence.getDataSource();
+			DataSource dataSource =
+				ddlRecordSetVersionPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -428,10 +469,18 @@ public abstract class DDLRecordSetVersionLocalServiceBaseImpl
 
 	@BeanReference(type = DDLRecordSetVersionLocalService.class)
 	protected DDLRecordSetVersionLocalService ddlRecordSetVersionLocalService;
+
 	@BeanReference(type = DDLRecordSetVersionPersistence.class)
 	protected DDLRecordSetVersionPersistence ddlRecordSetVersionPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
+
 }

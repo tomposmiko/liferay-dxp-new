@@ -15,18 +15,24 @@
 package com.liferay.portal.servlet.filters.secure;
 
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
+import com.liferay.portal.kernel.cluster.ClusterNodeResponse;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
+import com.liferay.portal.kernel.cluster.FutureClusterResponses;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.util.PropsValues;
 
-import java.io.Serializable;
-
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +61,7 @@ public class NonceUtil {
 		String nonce = DigesterUtil.digestHex(
 			Digester.MD5, remoteAddress, String.valueOf(timestamp), companyKey);
 
-		_addNonceAndNotify(new NonceDelayed(nonce));
+		_nonceDelayQueue.put(new NonceDelayed(nonce));
 
 		return nonce;
 	}
@@ -63,65 +69,84 @@ public class NonceUtil {
 	public static boolean verify(String nonce) {
 		_cleanUp();
 
-		return _removeNonceAndNotify(new NonceDelayed(nonce));
-	}
+		if (_verifyInLocalNode(nonce) || _verifyInCluster(nonce)) {
+			return true;
+		}
 
-	@SuppressWarnings("unused")
-	private static void _addNonce(NonceDelayed nonceDelayed) {
-		_nonceDelayQueue.put(nonceDelayed);
-	}
-
-	private static void _addNonceAndNotify(NonceDelayed nonceDelayed) {
-		_nonceDelayQueue.put(nonceDelayed);
-
-		_notifyNodes(_addNonceMethodKey, nonceDelayed);
+		return false;
 	}
 
 	private static void _cleanUp() {
 		while (_nonceDelayQueue.poll() != null);
 	}
 
-	private static void _notifyNodes(MethodKey methodKey, Object... arguments) {
+	private static boolean _verifyInCluster(String nonce) {
 		if (!ClusterExecutorUtil.isEnabled()) {
-			return;
+			return false;
 		}
 
-		MethodHandler methodHandler = new MethodHandler(methodKey, arguments);
+		MethodHandler methodHandler = new MethodHandler(
+			_verifyInLocalNode, nonce);
 
 		ClusterRequest clusterRequest = ClusterRequest.createMulticastRequest(
 			methodHandler, true);
 
-		clusterRequest.setFireAndForget(true);
+		FutureClusterResponses futureClusterResponses =
+			ClusterExecutorUtil.execute(clusterRequest);
 
-		ClusterExecutorUtil.execute(clusterRequest);
+		BlockingQueue<ClusterNodeResponse> clusterNodeResponses =
+			futureClusterResponses.getPartialResults();
+
+		try {
+			while (!(clusterNodeResponses.isEmpty() &&
+					 futureClusterResponses.isDone())) {
+
+				ClusterNodeResponse clusterNodeResponse =
+					clusterNodeResponses.poll(
+						_NONCE_CLUSTER_TIMEOUT, TimeUnit.MILLISECONDS);
+
+				if (clusterNodeResponse == null) {
+					_log.error(
+						"Timeout waiting for nonce verification in the " +
+							"cluster");
+
+					return false;
+				}
+
+				if (GetterUtil.getBoolean(clusterNodeResponse.getResult())) {
+					return true;
+				}
+			}
+		}
+		catch (InterruptedException ie) {
+			_log.error(
+				"Interrupted while waiting for nonce verification in the " +
+					"cluster");
+		}
+
+		return false;
 	}
 
-	@SuppressWarnings("unused")
-	private static boolean _removeNonce(NonceDelayed nonceDelayed) {
+	private static boolean _verifyInLocalNode(String nonce) {
 		_cleanUp();
 
-		return _nonceDelayQueue.remove(nonceDelayed);
+		return _nonceDelayQueue.remove(new NonceDelayed(nonce));
 	}
 
-	private static boolean _removeNonceAndNotify(NonceDelayed nonceDelayed) {
-		boolean removed = _nonceDelayQueue.remove(nonceDelayed);
-
-		_notifyNodes(_removeNonceMethodKey, nonceDelayed);
-
-		return removed;
-	}
+	private static final long _NONCE_CLUSTER_TIMEOUT = GetterUtil.getLong(
+		PropsUtil.get(PropsKeys.WEBDAV_NONCE_CLUSTER_TIMEOUT), 10000);
 
 	private static final long _NONCE_EXPIRATION =
 		PropsValues.WEBDAV_NONCE_EXPIRATION * Time.MINUTE;
 
-	private static final MethodKey _addNonceMethodKey = new MethodKey(
-		NonceUtil.class, "_addNonce", NonceDelayed.class);
+	private static final Log _log = LogFactoryUtil.getLog(NonceUtil.class);
+
 	private static final DelayQueue<NonceDelayed> _nonceDelayQueue =
 		new DelayQueue<>();
-	private static final MethodKey _removeNonceMethodKey = new MethodKey(
-		NonceUtil.class, "_removeNonce", NonceDelayed.class);
+	private static final MethodKey _verifyInLocalNode = new MethodKey(
+		NonceUtil.class, "_verifyInLocalNode", String.class);
 
-	private static class NonceDelayed implements Delayed, Serializable {
+	private static class NonceDelayed implements Delayed {
 
 		public NonceDelayed(String nonce) {
 			if (nonce == null) {

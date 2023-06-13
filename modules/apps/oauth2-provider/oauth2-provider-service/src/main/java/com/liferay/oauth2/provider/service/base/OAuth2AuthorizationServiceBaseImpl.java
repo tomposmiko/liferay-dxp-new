@@ -19,7 +19,6 @@ import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
 import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationPersistence;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPersistence;
-
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -30,9 +29,9 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
 
-import org.osgi.service.component.annotations.Reference;
-
 import javax.sql.DataSource;
+
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the o auth2 authorization remote service.
@@ -45,8 +44,10 @@ import javax.sql.DataSource;
  * @see com.liferay.oauth2.provider.service.impl.OAuth2AuthorizationServiceImpl
  * @generated
  */
-public abstract class OAuth2AuthorizationServiceBaseImpl extends BaseServiceImpl
+public abstract class OAuth2AuthorizationServiceBaseImpl
+	extends BaseServiceImpl
 	implements OAuth2AuthorizationService, AopService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -89,15 +90,16 @@ public abstract class OAuth2AuthorizationServiceBaseImpl extends BaseServiceImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = oAuth2AuthorizationPersistence.getDataSource();
+			DataSource dataSource =
+				oAuth2AuthorizationPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -107,14 +109,23 @@ public abstract class OAuth2AuthorizationServiceBaseImpl extends BaseServiceImpl
 	}
 
 	@Reference
-	protected com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService oAuth2AuthorizationLocalService;
+	protected
+		com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService
+			oAuth2AuthorizationLocalService;
+
 	protected OAuth2AuthorizationService oAuth2AuthorizationService;
+
 	@Reference
 	protected OAuth2AuthorizationPersistence oAuth2AuthorizationPersistence;
+
 	@Reference
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 	@Reference
 	protected OAuth2ScopeGrantPersistence oAuth2ScopeGrantPersistence;
+
 	@Reference
 	protected OAuth2ScopeGrantFinder oAuth2ScopeGrantFinder;
+
 }

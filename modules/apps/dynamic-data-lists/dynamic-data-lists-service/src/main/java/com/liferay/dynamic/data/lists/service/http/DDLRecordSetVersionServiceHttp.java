@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.lists.service.http;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.service.DDLRecordSetVersionServiceUtil;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.HttpPrincipal;
@@ -54,16 +53,20 @@ import com.liferay.portal.kernel.util.MethodKey;
  */
 @ProviderType
 public class DDLRecordSetVersionServiceHttp {
-	public static com.liferay.dynamic.data.lists.model.DDLRecordSetVersion getLatestRecordSetVersion(
-		HttpPrincipal httpPrincipal, long recordSetId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDLRecordSetVersionServiceUtil.class,
-					"getLatestRecordSetVersion",
-					_getLatestRecordSetVersionParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					recordSetId);
+	public static com.liferay.dynamic.data.lists.model.DDLRecordSetVersion
+			getLatestRecordSetVersion(
+				HttpPrincipal httpPrincipal, long recordSetId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDLRecordSetVersionServiceUtil.class,
+				"getLatestRecordSetVersion",
+				_getLatestRecordSetVersionParameterTypes0);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, recordSetId);
 
 			Object returnObj = null;
 
@@ -71,14 +74,19 @@ public class DDLRecordSetVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.lists.model.DDLRecordSetVersion)returnObj;
+			return (com.liferay.dynamic.data.lists.model.DDLRecordSetVersion)
+				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -87,15 +95,18 @@ public class DDLRecordSetVersionServiceHttp {
 		}
 	}
 
-	public static com.liferay.dynamic.data.lists.model.DDLRecordSetVersion getRecordSetVersion(
-		HttpPrincipal httpPrincipal, long recordSetVersionId)
+	public static com.liferay.dynamic.data.lists.model.DDLRecordSetVersion
+			getRecordSetVersion(
+				HttpPrincipal httpPrincipal, long recordSetVersionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDLRecordSetVersionServiceUtil.class,
-					"getRecordSetVersion", _getRecordSetVersionParameterTypes1);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					recordSetVersionId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDLRecordSetVersionServiceUtil.class, "getRecordSetVersion",
+				_getRecordSetVersionParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, recordSetVersionId);
 
 			Object returnObj = null;
 
@@ -103,14 +114,19 @@ public class DDLRecordSetVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (com.liferay.dynamic.data.lists.model.DDLRecordSetVersion)returnObj;
+			return (com.liferay.dynamic.data.lists.model.DDLRecordSetVersion)
+				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -119,16 +135,23 @@ public class DDLRecordSetVersionServiceHttp {
 		}
 	}
 
-	public static java.util.List<com.liferay.dynamic.data.lists.model.DDLRecordSetVersion> getRecordSetVersions(
-		HttpPrincipal httpPrincipal, long recordSetId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.dynamic.data.lists.model.DDLRecordSetVersion> orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDLRecordSetVersionServiceUtil.class,
-					"getRecordSetVersions", _getRecordSetVersionsParameterTypes2);
+	public static java.util.List
+		<com.liferay.dynamic.data.lists.model.DDLRecordSetVersion>
+				getRecordSetVersions(
+					HttpPrincipal httpPrincipal, long recordSetId, int start,
+					int end,
+					com.liferay.portal.kernel.util.OrderByComparator
+						<com.liferay.dynamic.data.lists.model.
+							DDLRecordSetVersion> orderByComparator)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					recordSetId, start, end, orderByComparator);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDLRecordSetVersionServiceUtil.class, "getRecordSetVersions",
+				_getRecordSetVersionsParameterTypes2);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, recordSetId, start, end, orderByComparator);
 
 			Object returnObj = null;
 
@@ -136,14 +159,20 @@ public class DDLRecordSetVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
-			return (java.util.List<com.liferay.dynamic.data.lists.model.DDLRecordSetVersion>)returnObj;
+			return (java.util.List
+				<com.liferay.dynamic.data.lists.model.DDLRecordSetVersion>)
+					returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
 			_log.error(se, se);
@@ -152,16 +181,18 @@ public class DDLRecordSetVersionServiceHttp {
 		}
 	}
 
-	public static int getRecordSetVersionsCount(HttpPrincipal httpPrincipal,
-		long recordSetId)
+	public static int getRecordSetVersionsCount(
+			HttpPrincipal httpPrincipal, long recordSetId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		try {
-			MethodKey methodKey = new MethodKey(DDLRecordSetVersionServiceUtil.class,
-					"getRecordSetVersionsCount",
-					_getRecordSetVersionsCountParameterTypes3);
 
-			MethodHandler methodHandler = new MethodHandler(methodKey,
-					recordSetId);
+		try {
+			MethodKey methodKey = new MethodKey(
+				DDLRecordSetVersionServiceUtil.class,
+				"getRecordSetVersionsCount",
+				_getRecordSetVersionsCountParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, recordSetId);
 
 			Object returnObj = null;
 
@@ -169,11 +200,15 @@ public class DDLRecordSetVersionServiceHttp {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
 			catch (Exception e) {
-				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
-					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				if (e instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						e;
 				}
 
-				throw new com.liferay.portal.kernel.exception.SystemException(e);
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
 			}
 
 			return ((Integer)returnObj).intValue();
@@ -185,18 +220,19 @@ public class DDLRecordSetVersionServiceHttp {
 		}
 	}
 
-	private static Log _log = LogFactoryUtil.getLog(DDLRecordSetVersionServiceHttp.class);
-	private static final Class<?>[] _getLatestRecordSetVersionParameterTypes0 = new Class[] {
-			long.class
-		};
-	private static final Class<?>[] _getRecordSetVersionParameterTypes1 = new Class[] {
-			long.class
-		};
-	private static final Class<?>[] _getRecordSetVersionsParameterTypes2 = new Class[] {
+	private static Log _log = LogFactoryUtil.getLog(
+		DDLRecordSetVersionServiceHttp.class);
+
+	private static final Class<?>[] _getLatestRecordSetVersionParameterTypes0 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getRecordSetVersionParameterTypes1 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getRecordSetVersionsParameterTypes2 =
+		new Class[] {
 			long.class, int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getRecordSetVersionsCountParameterTypes3 = new Class[] {
-			long.class
-		};
+	private static final Class<?>[] _getRecordSetVersionsCountParameterTypes3 =
+		new Class[] {long.class};
+
 }

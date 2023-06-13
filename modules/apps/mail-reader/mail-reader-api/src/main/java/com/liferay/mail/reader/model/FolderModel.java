@@ -35,8 +35,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface FolderModel extends AuditedModel, BaseModel<Folder>,
-	ShardedModel {
+public interface FolderModel
+	extends AuditedModel, BaseModel<Folder>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -225,4 +226,5 @@ public interface FolderModel extends AuditedModel, BaseModel<Folder>,
 	 * @param remoteMessageCount the remote message count of this folder
 	 */
 	public void setRemoteMessageCount(int remoteMessageCount);
+
 }

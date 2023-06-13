@@ -30,6 +30,14 @@ List<LayoutTemplate> layoutTemplates = (List<LayoutTemplate>)request.getAttribut
 
 		for (int i = 0; i < layoutTemplates.size(); i++) {
 			LayoutTemplate layoutTemplate = layoutTemplates.get(i);
+
+			String templateId = layoutTemplate.getLayoutTemplateId();
+
+			// LPS-90259
+
+			if (templateId.equals("1_column_dynamic")) {
+				continue;
+			}
 		%>
 
 			<li class="col-lg-3 col-md-4 col-sm-6 lfr-layout-template">

@@ -15,7 +15,6 @@
 package com.liferay.portal.tools.service.builder.test.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -37,15 +36,6 @@ import com.liferay.portal.tools.service.builder.test.service.LocalizedEntryLocal
 import com.liferay.portal.tools.service.builder.test.service.persistence.LocalizedEntryPersistence;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LocalizedEntryUtil;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-
-import org.junit.runner.RunWith;
-
 import java.io.Serializable;
 
 import java.util.ArrayList;
@@ -55,16 +45,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @generated
  */
 @RunWith(Arquillian.class)
 public class LocalizedEntryPersistenceTest {
+
 	@ClassRule
 	@Rule
-	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
-			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED,
+	public static final AggregateTestRule aggregateTestRule =
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(), PersistenceTestRule.INSTANCE,
+			new TransactionalTestRule(
+				Propagation.REQUIRED,
 				"com.liferay.portal.tools.service.builder.test.service"));
 
 	@Before
@@ -104,7 +105,8 @@ public class LocalizedEntryPersistenceTest {
 
 		_persistence.remove(newLocalizedEntry);
 
-		LocalizedEntry existingLocalizedEntry = _persistence.fetchByPrimaryKey(newLocalizedEntry.getPrimaryKey());
+		LocalizedEntry existingLocalizedEntry = _persistence.fetchByPrimaryKey(
+			newLocalizedEntry.getPrimaryKey());
 
 		Assert.assertNull(existingLocalizedEntry);
 	}
@@ -124,11 +126,14 @@ public class LocalizedEntryPersistenceTest {
 
 		_localizedEntries.add(_persistence.update(newLocalizedEntry));
 
-		LocalizedEntry existingLocalizedEntry = _persistence.findByPrimaryKey(newLocalizedEntry.getPrimaryKey());
+		LocalizedEntry existingLocalizedEntry = _persistence.findByPrimaryKey(
+			newLocalizedEntry.getPrimaryKey());
 
-		Assert.assertEquals(existingLocalizedEntry.getDefaultLanguageId(),
+		Assert.assertEquals(
+			existingLocalizedEntry.getDefaultLanguageId(),
 			newLocalizedEntry.getDefaultLanguageId());
-		Assert.assertEquals(existingLocalizedEntry.getLocalizedEntryId(),
+		Assert.assertEquals(
+			existingLocalizedEntry.getLocalizedEntryId(),
 			newLocalizedEntry.getLocalizedEntryId());
 	}
 
@@ -136,7 +141,8 @@ public class LocalizedEntryPersistenceTest {
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		LocalizedEntry newLocalizedEntry = addLocalizedEntry();
 
-		LocalizedEntry existingLocalizedEntry = _persistence.findByPrimaryKey(newLocalizedEntry.getPrimaryKey());
+		LocalizedEntry existingLocalizedEntry = _persistence.findByPrimaryKey(
+			newLocalizedEntry.getPrimaryKey());
 
 		Assert.assertEquals(existingLocalizedEntry, newLocalizedEntry);
 	}
@@ -150,20 +156,22 @@ public class LocalizedEntryPersistenceTest {
 
 	@Test
 	public void testFindAll() throws Exception {
-		_persistence.findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			getOrderByComparator());
+		_persistence.findAll(
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
 	protected OrderByComparator<LocalizedEntry> getOrderByComparator() {
-		return OrderByComparatorFactoryUtil.create("LocalizedEntry",
-			"defaultLanguageId", true, "localizedEntryId", true);
+		return OrderByComparatorFactoryUtil.create(
+			"LocalizedEntry", "defaultLanguageId", true, "localizedEntryId",
+			true);
 	}
 
 	@Test
 	public void testFetchByPrimaryKeyExisting() throws Exception {
 		LocalizedEntry newLocalizedEntry = addLocalizedEntry();
 
-		LocalizedEntry existingLocalizedEntry = _persistence.fetchByPrimaryKey(newLocalizedEntry.getPrimaryKey());
+		LocalizedEntry existingLocalizedEntry = _persistence.fetchByPrimaryKey(
+			newLocalizedEntry.getPrimaryKey());
 
 		Assert.assertEquals(existingLocalizedEntry, newLocalizedEntry);
 	}
@@ -172,7 +180,8 @@ public class LocalizedEntryPersistenceTest {
 	public void testFetchByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
-		LocalizedEntry missingLocalizedEntry = _persistence.fetchByPrimaryKey(pk);
+		LocalizedEntry missingLocalizedEntry = _persistence.fetchByPrimaryKey(
+			pk);
 
 		Assert.assertNull(missingLocalizedEntry);
 	}
@@ -180,6 +189,7 @@ public class LocalizedEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereAllPrimaryKeysExist()
 		throws Exception {
+
 		LocalizedEntry newLocalizedEntry1 = addLocalizedEntry();
 		LocalizedEntry newLocalizedEntry2 = addLocalizedEntry();
 
@@ -188,18 +198,22 @@ public class LocalizedEntryPersistenceTest {
 		primaryKeys.add(newLocalizedEntry1.getPrimaryKey());
 		primaryKeys.add(newLocalizedEntry2.getPrimaryKey());
 
-		Map<Serializable, LocalizedEntry> localizedEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LocalizedEntry> localizedEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(2, localizedEntries.size());
-		Assert.assertEquals(newLocalizedEntry1,
+		Assert.assertEquals(
+			newLocalizedEntry1,
 			localizedEntries.get(newLocalizedEntry1.getPrimaryKey()));
-		Assert.assertEquals(newLocalizedEntry2,
+		Assert.assertEquals(
+			newLocalizedEntry2,
 			localizedEntries.get(newLocalizedEntry2.getPrimaryKey()));
 	}
 
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereNoPrimaryKeysExist()
 		throws Exception {
+
 		long pk1 = RandomTestUtil.nextLong();
 
 		long pk2 = RandomTestUtil.nextLong();
@@ -209,7 +223,8 @@ public class LocalizedEntryPersistenceTest {
 		primaryKeys.add(pk1);
 		primaryKeys.add(pk2);
 
-		Map<Serializable, LocalizedEntry> localizedEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LocalizedEntry> localizedEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(localizedEntries.isEmpty());
 	}
@@ -217,6 +232,7 @@ public class LocalizedEntryPersistenceTest {
 	@Test
 	public void testFetchByPrimaryKeysWithMultiplePrimaryKeysWhereSomePrimaryKeysExist()
 		throws Exception {
+
 		LocalizedEntry newLocalizedEntry = addLocalizedEntry();
 
 		long pk = RandomTestUtil.nextLong();
@@ -226,36 +242,39 @@ public class LocalizedEntryPersistenceTest {
 		primaryKeys.add(newLocalizedEntry.getPrimaryKey());
 		primaryKeys.add(pk);
 
-		Map<Serializable, LocalizedEntry> localizedEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LocalizedEntry> localizedEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, localizedEntries.size());
-		Assert.assertEquals(newLocalizedEntry,
+		Assert.assertEquals(
+			newLocalizedEntry,
 			localizedEntries.get(newLocalizedEntry.getPrimaryKey()));
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithNoPrimaryKeys()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithNoPrimaryKeys() throws Exception {
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
-		Map<Serializable, LocalizedEntry> localizedEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LocalizedEntry> localizedEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertTrue(localizedEntries.isEmpty());
 	}
 
 	@Test
-	public void testFetchByPrimaryKeysWithOnePrimaryKey()
-		throws Exception {
+	public void testFetchByPrimaryKeysWithOnePrimaryKey() throws Exception {
 		LocalizedEntry newLocalizedEntry = addLocalizedEntry();
 
 		Set<Serializable> primaryKeys = new HashSet<Serializable>();
 
 		primaryKeys.add(newLocalizedEntry.getPrimaryKey());
 
-		Map<Serializable, LocalizedEntry> localizedEntries = _persistence.fetchByPrimaryKeys(primaryKeys);
+		Map<Serializable, LocalizedEntry> localizedEntries =
+			_persistence.fetchByPrimaryKeys(primaryKeys);
 
 		Assert.assertEquals(1, localizedEntries.size());
-		Assert.assertEquals(newLocalizedEntry,
+		Assert.assertEquals(
+			newLocalizedEntry,
 			localizedEntries.get(newLocalizedEntry.getPrimaryKey()));
 	}
 
@@ -263,15 +282,19 @@ public class LocalizedEntryPersistenceTest {
 	public void testActionableDynamicQuery() throws Exception {
 		final IntegerWrapper count = new IntegerWrapper();
 
-		ActionableDynamicQuery actionableDynamicQuery = LocalizedEntryLocalServiceUtil.getActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			LocalizedEntryLocalServiceUtil.getActionableDynamicQuery();
 
-		actionableDynamicQuery.setPerformActionMethod(new ActionableDynamicQuery.PerformActionMethod<LocalizedEntry>() {
+		actionableDynamicQuery.setPerformActionMethod(
+			new ActionableDynamicQuery.PerformActionMethod<LocalizedEntry>() {
+
 				@Override
 				public void performAction(LocalizedEntry localizedEntry) {
 					Assert.assertNotNull(localizedEntry);
 
 					count.increment();
 				}
+
 			});
 
 		actionableDynamicQuery.performActions();
@@ -280,17 +303,18 @@ public class LocalizedEntryPersistenceTest {
 	}
 
 	@Test
-	public void testDynamicQueryByPrimaryKeyExisting()
-		throws Exception {
+	public void testDynamicQueryByPrimaryKeyExisting() throws Exception {
 		LocalizedEntry newLocalizedEntry = addLocalizedEntry();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LocalizedEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LocalizedEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("localizedEntryId",
-				newLocalizedEntry.getLocalizedEntryId()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"localizedEntryId", newLocalizedEntry.getLocalizedEntryId()));
 
-		List<LocalizedEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<LocalizedEntry> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(1, result.size());
 
@@ -301,32 +325,34 @@ public class LocalizedEntryPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByPrimaryKeyMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LocalizedEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LocalizedEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.add(RestrictionsFactoryUtil.eq("localizedEntryId",
-				RandomTestUtil.nextLong()));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"localizedEntryId", RandomTestUtil.nextLong()));
 
-		List<LocalizedEntry> result = _persistence.findWithDynamicQuery(dynamicQuery);
+		List<LocalizedEntry> result = _persistence.findWithDynamicQuery(
+			dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
 	}
 
 	@Test
-	public void testDynamicQueryByProjectionExisting()
-		throws Exception {
+	public void testDynamicQueryByProjectionExisting() throws Exception {
 		LocalizedEntry newLocalizedEntry = addLocalizedEntry();
 
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LocalizedEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LocalizedEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"localizedEntryId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("localizedEntryId"));
 
 		Object newLocalizedEntryId = newLocalizedEntry.getLocalizedEntryId();
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("localizedEntryId",
-				new Object[] { newLocalizedEntryId }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"localizedEntryId", new Object[] {newLocalizedEntryId}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -339,14 +365,15 @@ public class LocalizedEntryPersistenceTest {
 
 	@Test
 	public void testDynamicQueryByProjectionMissing() throws Exception {
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(LocalizedEntry.class,
-				_dynamicQueryClassLoader);
+		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
+			LocalizedEntry.class, _dynamicQueryClassLoader);
 
-		dynamicQuery.setProjection(ProjectionFactoryUtil.property(
-				"localizedEntryId"));
+		dynamicQuery.setProjection(
+			ProjectionFactoryUtil.property("localizedEntryId"));
 
-		dynamicQuery.add(RestrictionsFactoryUtil.in("localizedEntryId",
-				new Object[] { RandomTestUtil.nextLong() }));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.in(
+				"localizedEntryId", new Object[] {RandomTestUtil.nextLong()}));
 
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
@@ -365,7 +392,9 @@ public class LocalizedEntryPersistenceTest {
 		return localizedEntry;
 	}
 
-	private List<LocalizedEntry> _localizedEntries = new ArrayList<LocalizedEntry>();
+	private List<LocalizedEntry> _localizedEntries =
+		new ArrayList<LocalizedEntry>();
 	private LocalizedEntryPersistence _persistence;
 	private ClassLoader _dynamicQueryClassLoader;
+
 }

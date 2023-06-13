@@ -14,40 +14,125 @@
 
 package com.liferay.headless.workflow.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.string.StringBundler;
+
+import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
+
+import java.util.Objects;
 
 import javax.annotation.Generated;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Javier Gamarra
  * @generated
  */
 @Generated("")
-public interface ObjectReviewed {
+@GraphQLName("ObjectReviewed")
+@JsonFilter("Liferay.Vulcan")
+@XmlRootElement(name = "ObjectReviewed")
+public class ObjectReviewed {
 
-	public Long getId();
+	public Long getId() {
+		return id;
+	}
 
-	public void setId(
-			Long id);
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-	public void setId(
-			UnsafeSupplier<Long, Throwable>
-				idUnsafeSupplier);
-	public String getIdentifier();
+	@JsonIgnore
+	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+		try {
+			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-	public void setIdentifier(
-			String identifier);
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long id;
 
-	public void setIdentifier(
-			UnsafeSupplier<String, Throwable>
-				identifierUnsafeSupplier);
-	public String getResourceType();
+	public String getResourceType() {
+		return resourceType;
+	}
 
+	public void setResourceType(String resourceType) {
+		this.resourceType = resourceType;
+	}
+
+	@JsonIgnore
 	public void setResourceType(
-			String resourceType);
+		UnsafeSupplier<String, Exception> resourceTypeUnsafeSupplier) {
 
-	public void setResourceType(
-			UnsafeSupplier<String, Throwable>
-				resourceTypeUnsafeSupplier);
+		try {
+			resourceType = resourceTypeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String resourceType;
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		}
+
+		if (!(object instanceof ObjectReviewed)) {
+			return false;
+		}
+
+		ObjectReviewed objectReviewed = (ObjectReviewed)object;
+
+		return Objects.equals(toString(), objectReviewed.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		String string = toString();
+
+		return string.hashCode();
+	}
+
+	public String toString() {
+		StringBundler sb = new StringBundler();
+
+		sb.append("{");
+
+		sb.append("\"id\": ");
+
+		sb.append(id);
+		sb.append(", ");
+
+		sb.append("\"resourceType\": ");
+
+		sb.append("\"");
+		sb.append(resourceType);
+		sb.append("\"");
+
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 }

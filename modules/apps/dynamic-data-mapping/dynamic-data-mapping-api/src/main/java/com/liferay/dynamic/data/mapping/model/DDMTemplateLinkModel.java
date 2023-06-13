@@ -32,8 +32,9 @@ import com.liferay.portal.kernel.model.ShardedModel;
  * @generated
  */
 @ProviderType
-public interface DDMTemplateLinkModel extends AttachedModel,
-	BaseModel<DDMTemplateLink>, ShardedModel {
+public interface DDMTemplateLinkModel
+	extends AttachedModel, BaseModel<DDMTemplateLink>, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -139,4 +140,5 @@ public interface DDMTemplateLinkModel extends AttachedModel,
 	 * @param templateId the template ID of this ddm template link
 	 */
 	public void setTemplateId(long templateId);
+
 }

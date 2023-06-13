@@ -17,10 +17,8 @@ package com.liferay.dynamic.data.lists.model.impl;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordVersion;
-
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 
@@ -38,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class DDLRecordVersionCacheModel implements CacheModel<DDLRecordVersion>,
-	Externalizable, MVCCModel {
+public class DDLRecordVersionCacheModel
+	implements CacheModel<DDLRecordVersion>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -50,10 +49,12 @@ public class DDLRecordVersionCacheModel implements CacheModel<DDLRecordVersion>,
 			return false;
 		}
 
-		DDLRecordVersionCacheModel ddlRecordVersionCacheModel = (DDLRecordVersionCacheModel)obj;
+		DDLRecordVersionCacheModel ddlRecordVersionCacheModel =
+			(DDLRecordVersionCacheModel)obj;
 
 		if ((recordVersionId == ddlRecordVersionCacheModel.recordVersionId) &&
-				(mvccVersion == ddlRecordVersionCacheModel.mvccVersion)) {
+			(mvccVersion == ddlRecordVersionCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -218,8 +219,7 @@ public class DDLRecordVersionCacheModel implements CacheModel<DDLRecordVersion>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(recordVersionId);
@@ -292,4 +292,5 @@ public class DDLRecordVersionCacheModel implements CacheModel<DDLRecordVersion>,
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+
 }

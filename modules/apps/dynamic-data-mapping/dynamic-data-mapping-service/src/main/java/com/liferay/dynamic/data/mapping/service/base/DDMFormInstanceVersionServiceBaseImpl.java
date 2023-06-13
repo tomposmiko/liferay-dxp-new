@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.service.base;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionService;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceVersionPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -43,8 +42,9 @@ import javax.sql.DataSource;
  * @generated
  */
 public abstract class DDMFormInstanceVersionServiceBaseImpl
-	extends BaseServiceImpl implements DDMFormInstanceVersionService,
-		IdentifiableOSGiService {
+	extends BaseServiceImpl
+	implements DDMFormInstanceVersionService, IdentifiableOSGiService {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -56,7 +56,11 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	 *
 	 * @return the ddm form instance version local service
 	 */
-	public com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService getDDMFormInstanceVersionLocalService() {
+	public
+		com.liferay.dynamic.data.mapping.service.
+			DDMFormInstanceVersionLocalService
+				getDDMFormInstanceVersionLocalService() {
+
 		return ddmFormInstanceVersionLocalService;
 	}
 
@@ -66,8 +70,12 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	 * @param ddmFormInstanceVersionLocalService the ddm form instance version local service
 	 */
 	public void setDDMFormInstanceVersionLocalService(
-		com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService) {
-		this.ddmFormInstanceVersionLocalService = ddmFormInstanceVersionLocalService;
+		com.liferay.dynamic.data.mapping.service.
+			DDMFormInstanceVersionLocalService
+				ddmFormInstanceVersionLocalService) {
+
+		this.ddmFormInstanceVersionLocalService =
+			ddmFormInstanceVersionLocalService;
 	}
 
 	/**
@@ -86,6 +94,7 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	 */
 	public void setDDMFormInstanceVersionService(
 		DDMFormInstanceVersionService ddmFormInstanceVersionService) {
+
 		this.ddmFormInstanceVersionService = ddmFormInstanceVersionService;
 	}
 
@@ -94,7 +103,9 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	 *
 	 * @return the ddm form instance version persistence
 	 */
-	public DDMFormInstanceVersionPersistence getDDMFormInstanceVersionPersistence() {
+	public DDMFormInstanceVersionPersistence
+		getDDMFormInstanceVersionPersistence() {
+
 		return ddmFormInstanceVersionPersistence;
 	}
 
@@ -105,7 +116,9 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	 */
 	public void setDDMFormInstanceVersionPersistence(
 		DDMFormInstanceVersionPersistence ddmFormInstanceVersionPersistence) {
-		this.ddmFormInstanceVersionPersistence = ddmFormInstanceVersionPersistence;
+
+		this.ddmFormInstanceVersionPersistence =
+			ddmFormInstanceVersionPersistence;
 	}
 
 	/**
@@ -113,7 +126,9 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -123,7 +138,9 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
 	}
 
@@ -158,15 +175,16 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	 */
 	protected void runSQL(String sql) {
 		try {
-			DataSource dataSource = ddmFormInstanceVersionPersistence.getDataSource();
+			DataSource dataSource =
+				ddmFormInstanceVersionPersistence.getDataSource();
 
 			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -175,12 +193,25 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService.class)
-	protected com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService;
+	@BeanReference(
+		type = com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService.class
+	)
+	protected
+		com.liferay.dynamic.data.mapping.service.
+			DDMFormInstanceVersionLocalService
+				ddmFormInstanceVersionLocalService;
+
 	@BeanReference(type = DDMFormInstanceVersionService.class)
 	protected DDMFormInstanceVersionService ddmFormInstanceVersionService;
+
 	@BeanReference(type = DDMFormInstanceVersionPersistence.class)
-	protected DDMFormInstanceVersionPersistence ddmFormInstanceVersionPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	protected DDMFormInstanceVersionPersistence
+		ddmFormInstanceVersionPersistence;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
 }

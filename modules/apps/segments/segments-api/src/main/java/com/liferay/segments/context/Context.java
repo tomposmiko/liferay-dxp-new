@@ -32,6 +32,8 @@ public class Context {
 
 	public static final String BROWSER = "browser";
 
+	public static final String COOKIES = "cookies";
+
 	public static final String DEVICE_BRAND = "deviceBrand";
 
 	public static final String DEVICE_MODEL = "deviceModel";
@@ -47,6 +49,8 @@ public class Context {
 	public static final String LAST_SIGN_IN_DATE_TIME = "lastSignInDateTime";
 
 	public static final String LOCAL_DATE = "localDate";
+
+	public static final String REFERRER_URL = "referrerURL";
 
 	public static final String SIGNED_IN = "signedIn";
 

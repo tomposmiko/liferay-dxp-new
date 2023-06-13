@@ -26,29 +26,39 @@ import com.liferay.portal.kernel.util.Accessor;
  * @see FriendlyURLEntryMappingModel
  * @generated
  */
-@ImplementationClassName("com.liferay.friendly.url.model.impl.FriendlyURLEntryMappingImpl")
+@ImplementationClassName(
+	"com.liferay.friendly.url.model.impl.FriendlyURLEntryMappingImpl"
+)
 @ProviderType
 public interface FriendlyURLEntryMapping extends FriendlyURLEntryMappingModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.friendly.url.model.impl.FriendlyURLEntryMappingImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
-	public static final Accessor<FriendlyURLEntryMapping, Long> FRIENDLY_URL_ENTRY_MAPPING_ID_ACCESSOR =
-		new Accessor<FriendlyURLEntryMapping, Long>() {
-			@Override
-			public Long get(FriendlyURLEntryMapping friendlyURLEntryMapping) {
-				return friendlyURLEntryMapping.getFriendlyURLEntryMappingId();
-			}
+	public static final Accessor<FriendlyURLEntryMapping, Long>
+		FRIENDLY_URL_ENTRY_MAPPING_ID_ACCESSOR =
+			new Accessor<FriendlyURLEntryMapping, Long>() {
 
-			@Override
-			public Class<Long> getAttributeClass() {
-				return Long.class;
-			}
+				@Override
+				public Long get(
+					FriendlyURLEntryMapping friendlyURLEntryMapping) {
 
-			@Override
-			public Class<FriendlyURLEntryMapping> getTypeClass() {
-				return FriendlyURLEntryMapping.class;
-			}
-		};
+					return friendlyURLEntryMapping.
+						getFriendlyURLEntryMappingId();
+				}
+
+				@Override
+				public Class<Long> getAttributeClass() {
+					return Long.class;
+				}
+
+				@Override
+				public Class<FriendlyURLEntryMapping> getTypeClass() {
+					return FriendlyURLEntryMapping.class;
+				}
+
+			};
+
 }

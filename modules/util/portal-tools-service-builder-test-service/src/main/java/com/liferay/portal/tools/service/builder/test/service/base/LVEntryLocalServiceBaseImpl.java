@@ -46,6 +46,7 @@ import com.liferay.portal.tools.service.builder.test.model.LVEntryLocalization;
 import com.liferay.portal.tools.service.builder.test.model.LVEntryLocalizationVersion;
 import com.liferay.portal.tools.service.builder.test.model.LVEntryVersion;
 import com.liferay.portal.tools.service.builder.test.service.LVEntryLocalService;
+import com.liferay.portal.tools.service.builder.test.service.persistence.BigDecimalEntryPersistence;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntryLocalizationPersistence;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntryLocalizationVersionPersistence;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntryPersistence;
@@ -75,9 +76,11 @@ import javax.sql.DataSource;
  * @generated
  */
 @ProviderType
-public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
+public abstract class LVEntryLocalServiceBaseImpl
+	extends BaseLocalServiceImpl
 	implements LVEntryLocalService, IdentifiableOSGiService,
-		VersionService<LVEntry, LVEntryVersion> {
+			   VersionService<LVEntry, LVEntryVersion> {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -106,7 +109,8 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	@Transactional(enabled = false)
 	public LVEntry create() {
-		long primaryKey = counterLocalService.increment(LVEntry.class.getName());
+		long primaryKey = counterLocalService.increment(
+			LVEntry.class.getName());
 
 		LVEntry draftLVEntry = lvEntryPersistence.create(primaryKey);
 
@@ -157,8 +161,8 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	public DynamicQuery dynamicQuery() {
 		Class<?> clazz = getClass();
 
-		return DynamicQueryFactoryUtil.forClass(LVEntry.class,
-			clazz.getClassLoader());
+		return DynamicQueryFactoryUtil.forClass(
+			LVEntry.class, clazz.getClassLoader());
 	}
 
 	/**
@@ -185,9 +189,11 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @return the range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end) {
-		return lvEntryPersistence.findWithDynamicQuery(dynamicQuery, start, end);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end) {
+
+		return lvEntryPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end);
 	}
 
 	/**
@@ -204,10 +210,12 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @return the ordered range of matching rows
 	 */
 	@Override
-	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
-		int end, OrderByComparator<T> orderByComparator) {
-		return lvEntryPersistence.findWithDynamicQuery(dynamicQuery, start,
-			end, orderByComparator);
+	public <T> List<T> dynamicQuery(
+		DynamicQuery dynamicQuery, int start, int end,
+		OrderByComparator<T> orderByComparator) {
+
+		return lvEntryPersistence.findWithDynamicQuery(
+			dynamicQuery, start, end, orderByComparator);
 	}
 
 	/**
@@ -229,9 +237,11 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @return the number of rows matching the dynamic query
 	 */
 	@Override
-	public long dynamicQueryCount(DynamicQuery dynamicQuery,
-		Projection projection) {
-		return lvEntryPersistence.countWithDynamicQuery(dynamicQuery, projection);
+	public long dynamicQueryCount(
+		DynamicQuery dynamicQuery, Projection projection) {
+
+		return lvEntryPersistence.countWithDynamicQuery(
+			dynamicQuery, projection);
 	}
 
 	@Override
@@ -253,7 +263,8 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@Override
 	public ActionableDynamicQuery getActionableDynamicQuery() {
-		ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
+		ActionableDynamicQuery actionableDynamicQuery =
+			new DefaultActionableDynamicQuery();
 
 		actionableDynamicQuery.setBaseLocalService(lvEntryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
@@ -265,10 +276,14 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	@Override
-	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
-		IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
+	public IndexableActionableDynamicQuery
+		getIndexableActionableDynamicQuery() {
 
-		indexableActionableDynamicQuery.setBaseLocalService(lvEntryLocalService);
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+			new IndexableActionableDynamicQuery();
+
+		indexableActionableDynamicQuery.setBaseLocalService(
+			lvEntryLocalService);
 		indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 		indexableActionableDynamicQuery.setModelClass(LVEntry.class);
 
@@ -279,6 +294,7 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	protected void initActionableDynamicQuery(
 		ActionableDynamicQuery actionableDynamicQuery) {
+
 		actionableDynamicQuery.setBaseLocalService(lvEntryLocalService);
 		actionableDynamicQuery.setClassLoader(getClassLoader());
 		actionableDynamicQuery.setModelClass(LVEntry.class);
@@ -292,12 +308,14 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
+
 		return lvEntryLocalService.deleteLVEntry((LVEntry)persistedModel);
 	}
 
 	@Override
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
+
 		return lvEntryPersistence.findByPrimaryKey(primaryKeyObj);
 	}
 
@@ -335,23 +353,178 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public LVEntry updateLVEntry(LVEntry draftLVEntry)
-		throws PortalException {
+	public LVEntry updateLVEntry(LVEntry draftLVEntry) throws PortalException {
 		return updateDraft(draftLVEntry);
 	}
 
+	/**
+	 */
 	@Override
-	public LVEntryLocalization fetchLVEntryLocalization(long lvEntryId,
-		String languageId) {
-		return lvEntryLocalizationPersistence.fetchByLvEntryId_LanguageId(lvEntryId,
-			languageId);
+	public void addBigDecimalEntryLVEntry(
+		long bigDecimalEntryId, long lvEntryId) {
+
+		bigDecimalEntryPersistence.addLVEntry(bigDecimalEntryId, lvEntryId);
+	}
+
+	/**
+	 */
+	@Override
+	public void addBigDecimalEntryLVEntry(
+		long bigDecimalEntryId, LVEntry lvEntry) {
+
+		bigDecimalEntryPersistence.addLVEntry(bigDecimalEntryId, lvEntry);
+	}
+
+	/**
+	 */
+	@Override
+	public void addBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, long[] lvEntryIds) {
+
+		bigDecimalEntryPersistence.addLVEntries(bigDecimalEntryId, lvEntryIds);
+	}
+
+	/**
+	 */
+	@Override
+	public void addBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, List<LVEntry> lvEntries) {
+
+		bigDecimalEntryPersistence.addLVEntries(bigDecimalEntryId, lvEntries);
+	}
+
+	/**
+	 */
+	@Override
+	public void clearBigDecimalEntryLVEntries(long bigDecimalEntryId) {
+		bigDecimalEntryPersistence.clearLVEntries(bigDecimalEntryId);
+	}
+
+	/**
+	 */
+	@Override
+	public void deleteBigDecimalEntryLVEntry(
+		long bigDecimalEntryId, long lvEntryId) {
+
+		bigDecimalEntryPersistence.removeLVEntry(bigDecimalEntryId, lvEntryId);
+	}
+
+	/**
+	 */
+	@Override
+	public void deleteBigDecimalEntryLVEntry(
+		long bigDecimalEntryId, LVEntry lvEntry) {
+
+		bigDecimalEntryPersistence.removeLVEntry(bigDecimalEntryId, lvEntry);
+	}
+
+	/**
+	 */
+	@Override
+	public void deleteBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, long[] lvEntryIds) {
+
+		bigDecimalEntryPersistence.removeLVEntries(
+			bigDecimalEntryId, lvEntryIds);
+	}
+
+	/**
+	 */
+	@Override
+	public void deleteBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, List<LVEntry> lvEntries) {
+
+		bigDecimalEntryPersistence.removeLVEntries(
+			bigDecimalEntryId, lvEntries);
+	}
+
+	/**
+	 * Returns the bigDecimalEntryIds of the big decimal entries associated with the lv entry.
+	 *
+	 * @param lvEntryId the lvEntryId of the lv entry
+	 * @return long[] the bigDecimalEntryIds of big decimal entries associated with the lv entry
+	 */
+	@Override
+	public long[] getBigDecimalEntryPrimaryKeys(long lvEntryId) {
+		return lvEntryPersistence.getBigDecimalEntryPrimaryKeys(lvEntryId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<LVEntry> getBigDecimalEntryLVEntries(long bigDecimalEntryId) {
+		return bigDecimalEntryPersistence.getLVEntries(bigDecimalEntryId);
+	}
+
+	/**
+	 */
+	@Override
+	public List<LVEntry> getBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, int start, int end) {
+
+		return bigDecimalEntryPersistence.getLVEntries(
+			bigDecimalEntryId, start, end);
+	}
+
+	/**
+	 */
+	@Override
+	public List<LVEntry> getBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, int start, int end,
+		OrderByComparator<LVEntry> orderByComparator) {
+
+		return bigDecimalEntryPersistence.getLVEntries(
+			bigDecimalEntryId, start, end, orderByComparator);
+	}
+
+	/**
+	 */
+	@Override
+	public int getBigDecimalEntryLVEntriesCount(long bigDecimalEntryId) {
+		return bigDecimalEntryPersistence.getLVEntriesSize(bigDecimalEntryId);
+	}
+
+	/**
+	 */
+	@Override
+	public boolean hasBigDecimalEntryLVEntry(
+		long bigDecimalEntryId, long lvEntryId) {
+
+		return bigDecimalEntryPersistence.containsLVEntry(
+			bigDecimalEntryId, lvEntryId);
+	}
+
+	/**
+	 */
+	@Override
+	public boolean hasBigDecimalEntryLVEntries(long bigDecimalEntryId) {
+		return bigDecimalEntryPersistence.containsLVEntries(bigDecimalEntryId);
+	}
+
+	/**
+	 */
+	@Override
+	public void setBigDecimalEntryLVEntries(
+		long bigDecimalEntryId, long[] lvEntryIds) {
+
+		bigDecimalEntryPersistence.setLVEntries(bigDecimalEntryId, lvEntryIds);
 	}
 
 	@Override
-	public LVEntryLocalization getLVEntryLocalization(long lvEntryId,
-		String languageId) throws PortalException {
-		return lvEntryLocalizationPersistence.findByLvEntryId_LanguageId(lvEntryId,
-			languageId);
+	public LVEntryLocalization fetchLVEntryLocalization(
+		long lvEntryId, String languageId) {
+
+		return lvEntryLocalizationPersistence.fetchByLvEntryId_LanguageId(
+			lvEntryId, languageId);
+	}
+
+	@Override
+	public LVEntryLocalization getLVEntryLocalization(
+			long lvEntryId, String languageId)
+		throws PortalException {
+
+		return lvEntryLocalizationPersistence.findByLvEntryId_LanguageId(
+			lvEntryId, languageId);
 	}
 
 	@Override
@@ -360,35 +533,45 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	@Override
-	public LVEntryLocalization updateLVEntryLocalization(LVEntry draftLVEntry,
-		String languageId, String title, String content)
+	public LVEntryLocalization updateLVEntryLocalization(
+			LVEntry draftLVEntry, String languageId, String title,
+			String content)
 		throws PortalException {
-		draftLVEntry = lvEntryPersistence.findByPrimaryKey(draftLVEntry.getPrimaryKey());
+
+		draftLVEntry = lvEntryPersistence.findByPrimaryKey(
+			draftLVEntry.getPrimaryKey());
 
 		if (draftLVEntry.isHead()) {
-			throw new IllegalArgumentException("Can only update draft entries " +
-				draftLVEntry.getPrimaryKey());
+			throw new IllegalArgumentException(
+				"Can only update draft entries " +
+					draftLVEntry.getPrimaryKey());
 		}
 
-		LVEntryLocalization lvEntryLocalization = lvEntryLocalizationPersistence.fetchByLvEntryId_LanguageId(draftLVEntry.getLvEntryId(),
-				languageId);
+		LVEntryLocalization lvEntryLocalization =
+			lvEntryLocalizationPersistence.fetchByLvEntryId_LanguageId(
+				draftLVEntry.getLvEntryId(), languageId);
 
-		return _updateLVEntryLocalization(draftLVEntry, lvEntryLocalization,
-			languageId, title, content);
+		return _updateLVEntryLocalization(
+			draftLVEntry, lvEntryLocalization, languageId, title, content);
 	}
 
 	@Override
 	public List<LVEntryLocalization> updateLVEntryLocalizations(
-		LVEntry draftLVEntry, Map<String, String> titleMap,
-		Map<String, String> contentMap) throws PortalException {
-		draftLVEntry = lvEntryPersistence.findByPrimaryKey(draftLVEntry.getPrimaryKey());
+			LVEntry draftLVEntry, Map<String, String> titleMap,
+			Map<String, String> contentMap)
+		throws PortalException {
+
+		draftLVEntry = lvEntryPersistence.findByPrimaryKey(
+			draftLVEntry.getPrimaryKey());
 
 		if (draftLVEntry.isHead()) {
-			throw new IllegalArgumentException("Can only update draft entries " +
-				draftLVEntry.getPrimaryKey());
+			throw new IllegalArgumentException(
+				"Can only update draft entries " +
+					draftLVEntry.getPrimaryKey());
 		}
 
-		Map<String, String[]> localizedValuesMap = new HashMap<String, String[]>();
+		Map<String, String[]> localizedValuesMap =
+			new HashMap<String, String[]>();
 
 		for (Map.Entry<String, String> entry : titleMap.entrySet()) {
 			String languageId = entry.getKey();
@@ -418,63 +601,80 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 			localizedValues[1] = entry.getValue();
 		}
 
-		List<LVEntryLocalization> lvEntryLocalizations = new ArrayList<LVEntryLocalization>(localizedValuesMap.size());
+		List<LVEntryLocalization> lvEntryLocalizations =
+			new ArrayList<LVEntryLocalization>(localizedValuesMap.size());
 
-		for (LVEntryLocalization lvEntryLocalization : lvEntryLocalizationPersistence.findByLvEntryId(
-				draftLVEntry.getLvEntryId())) {
-			String[] localizedValues = localizedValuesMap.remove(lvEntryLocalization.getLanguageId());
+		for (LVEntryLocalization lvEntryLocalization :
+				lvEntryLocalizationPersistence.findByLvEntryId(
+					draftLVEntry.getLvEntryId())) {
+
+			String[] localizedValues = localizedValuesMap.remove(
+				lvEntryLocalization.getLanguageId());
 
 			if (localizedValues == null) {
 				lvEntryLocalizationPersistence.remove(lvEntryLocalization);
 			}
 			else {
+				lvEntryLocalization.setCompanyId(draftLVEntry.getCompanyId());
+
 				lvEntryLocalization.setTitle(localizedValues[0]);
 				lvEntryLocalization.setContent(localizedValues[1]);
 
-				lvEntryLocalizations.add(lvEntryLocalizationPersistence.update(
-						lvEntryLocalization));
+				lvEntryLocalizations.add(
+					lvEntryLocalizationPersistence.update(lvEntryLocalization));
 			}
 		}
 
-		long batchCounter = counterLocalService.increment(LVEntryLocalization.class.getName(),
+		long batchCounter =
+			counterLocalService.increment(
+				LVEntryLocalization.class.getName(),
 				localizedValuesMap.size()) - localizedValuesMap.size();
 
-		for (Map.Entry<String, String[]> entry : localizedValuesMap.entrySet()) {
+		for (Map.Entry<String, String[]> entry :
+				localizedValuesMap.entrySet()) {
+
 			String languageId = entry.getKey();
 			String[] localizedValues = entry.getValue();
 
-			LVEntryLocalization lvEntryLocalization = lvEntryLocalizationPersistence.create(++batchCounter);
+			LVEntryLocalization lvEntryLocalization =
+				lvEntryLocalizationPersistence.create(++batchCounter);
 
 			lvEntryLocalization.setHeadId(lvEntryLocalization.getPrimaryKey());
 
 			lvEntryLocalization.setLvEntryId(draftLVEntry.getLvEntryId());
+			lvEntryLocalization.setCompanyId(draftLVEntry.getCompanyId());
 
 			lvEntryLocalization.setLanguageId(languageId);
 
 			lvEntryLocalization.setTitle(localizedValues[0]);
 			lvEntryLocalization.setContent(localizedValues[1]);
 
-			lvEntryLocalizations.add(lvEntryLocalizationPersistence.update(
-					lvEntryLocalization));
+			lvEntryLocalizations.add(
+				lvEntryLocalizationPersistence.update(lvEntryLocalization));
 		}
 
 		return lvEntryLocalizations;
 	}
 
 	private LVEntryLocalization _updateLVEntryLocalization(
-		LVEntry draftLVEntry, LVEntryLocalization lvEntryLocalization,
-		String languageId, String title, String content)
+			LVEntry draftLVEntry, LVEntryLocalization lvEntryLocalization,
+			String languageId, String title, String content)
 		throws PortalException {
-		if (lvEntryLocalization == null) {
-			long lvEntryLocalizationId = counterLocalService.increment(LVEntryLocalization.class.getName());
 
-			lvEntryLocalization = lvEntryLocalizationPersistence.create(lvEntryLocalizationId);
+		if (lvEntryLocalization == null) {
+			long lvEntryLocalizationId = counterLocalService.increment(
+				LVEntryLocalization.class.getName());
+
+			lvEntryLocalization = lvEntryLocalizationPersistence.create(
+				lvEntryLocalizationId);
 
 			lvEntryLocalization.setLvEntryId(draftLVEntry.getLvEntryId());
 			lvEntryLocalization.setLanguageId(languageId);
 		}
 
 		lvEntryLocalization.setHeadId(lvEntryLocalization.getPrimaryKey());
+
+		lvEntryLocalization.setCompanyId(draftLVEntry.getCompanyId());
 
 		lvEntryLocalization.setTitle(title);
 		lvEntryLocalization.setContent(content);
@@ -496,7 +696,9 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param lvEntryLocalService the lv entry local service
 	 */
-	public void setLVEntryLocalService(LVEntryLocalService lvEntryLocalService) {
+	public void setLVEntryLocalService(
+		LVEntryLocalService lvEntryLocalService) {
+
 		this.lvEntryLocalService = lvEntryLocalService;
 	}
 
@@ -523,7 +725,9 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the counter local service
 	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
 		return counterLocalService;
 	}
 
@@ -533,8 +737,30 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param counterLocalService the counter local service
 	 */
 	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
 		this.counterLocalService = counterLocalService;
+	}
+
+	/**
+	 * Returns the big decimal entry persistence.
+	 *
+	 * @return the big decimal entry persistence
+	 */
+	public BigDecimalEntryPersistence getBigDecimalEntryPersistence() {
+		return bigDecimalEntryPersistence;
+	}
+
+	/**
+	 * Sets the big decimal entry persistence.
+	 *
+	 * @param bigDecimalEntryPersistence the big decimal entry persistence
+	 */
+	public void setBigDecimalEntryPersistence(
+		BigDecimalEntryPersistence bigDecimalEntryPersistence) {
+
+		this.bigDecimalEntryPersistence = bigDecimalEntryPersistence;
 	}
 
 	/**
@@ -553,6 +779,7 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 */
 	public void setLVEntryVersionPersistence(
 		LVEntryVersionPersistence lvEntryVersionPersistence) {
+
 		this.lvEntryVersionPersistence = lvEntryVersionPersistence;
 	}
 
@@ -572,6 +799,7 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 */
 	public void setLVEntryLocalizationPersistence(
 		LVEntryLocalizationPersistence lvEntryLocalizationPersistence) {
+
 		this.lvEntryLocalizationPersistence = lvEntryLocalizationPersistence;
 	}
 
@@ -580,7 +808,9 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @return the lv entry localization version persistence
 	 */
-	public LVEntryLocalizationVersionPersistence getLVEntryLocalizationVersionPersistence() {
+	public LVEntryLocalizationVersionPersistence
+		getLVEntryLocalizationVersionPersistence() {
+
 		return lvEntryLocalizationVersionPersistence;
 	}
 
@@ -590,12 +820,16 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 * @param lvEntryLocalizationVersionPersistence the lv entry localization version persistence
 	 */
 	public void setLVEntryLocalizationVersionPersistence(
-		LVEntryLocalizationVersionPersistence lvEntryLocalizationVersionPersistence) {
-		this.lvEntryLocalizationVersionPersistence = lvEntryLocalizationVersionPersistence;
+		LVEntryLocalizationVersionPersistence
+			lvEntryLocalizationVersionPersistence) {
+
+		this.lvEntryLocalizationVersionPersistence =
+			lvEntryLocalizationVersionPersistence;
 	}
 
 	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.portal.tools.service.builder.test.model.LVEntry",
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.portal.tools.service.builder.test.model.LVEntry",
 			lvEntryLocalService);
 
 		registerListener(new LVEntryLocalizationVersionServiceListener());
@@ -610,18 +844,20 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public LVEntry checkout(LVEntry publishedLVEntry, int version)
 		throws PortalException {
+
 		if (!publishedLVEntry.isHead()) {
 			throw new IllegalArgumentException(
 				"Unable to checkout with unpublished changes " +
-				publishedLVEntry.getHeadId());
+					publishedLVEntry.getHeadId());
 		}
 
-		LVEntry draftLVEntry = lvEntryPersistence.fetchByHeadId(publishedLVEntry.getPrimaryKey());
+		LVEntry draftLVEntry = lvEntryPersistence.fetchByHeadId(
+			publishedLVEntry.getPrimaryKey());
 
 		if (draftLVEntry != null) {
 			throw new IllegalArgumentException(
 				"Unable to checkout with unpublished changes " +
-				publishedLVEntry.getPrimaryKey());
+					publishedLVEntry.getPrimaryKey());
 		}
 
 		LVEntryVersion lvEntryVersion = getVersion(publishedLVEntry, version);
@@ -632,7 +868,9 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 		draftLVEntry = lvEntryPersistence.update(draftLVEntry);
 
-		for (VersionServiceListener<LVEntry, LVEntryVersion> versionServiceListener : _versionServiceListeners) {
+		for (VersionServiceListener<LVEntry, LVEntryVersion>
+				versionServiceListener : _versionServiceListeners) {
+
 			versionServiceListener.afterCheckout(draftLVEntry, version);
 		}
 
@@ -643,11 +881,12 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public LVEntry delete(LVEntry publishedLVEntry) throws PortalException {
 		if (!publishedLVEntry.isHead()) {
-			throw new IllegalArgumentException("LVEntry is a draft " +
-				publishedLVEntry.getPrimaryKey());
+			throw new IllegalArgumentException(
+				"LVEntry is a draft " + publishedLVEntry.getPrimaryKey());
 		}
 
-		LVEntry draftLVEntry = lvEntryPersistence.fetchByHeadId(publishedLVEntry.getPrimaryKey());
+		LVEntry draftLVEntry = lvEntryPersistence.fetchByHeadId(
+			publishedLVEntry.getPrimaryKey());
 
 		if (draftLVEntry != null) {
 			deleteDraft(draftLVEntry);
@@ -659,7 +898,9 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 		lvEntryPersistence.remove(publishedLVEntry);
 
-		for (VersionServiceListener<LVEntry, LVEntryVersion> versionServiceListener : _versionServiceListeners) {
+		for (VersionServiceListener<LVEntry, LVEntryVersion>
+				versionServiceListener : _versionServiceListeners) {
+
 			versionServiceListener.afterDelete(publishedLVEntry);
 		}
 
@@ -670,13 +911,15 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public LVEntry deleteDraft(LVEntry draftLVEntry) throws PortalException {
 		if (draftLVEntry.isHead()) {
-			throw new IllegalArgumentException("LVEntry is not a draft " +
-				draftLVEntry.getPrimaryKey());
+			throw new IllegalArgumentException(
+				"LVEntry is not a draft " + draftLVEntry.getPrimaryKey());
 		}
 
 		lvEntryPersistence.remove(draftLVEntry);
 
-		for (VersionServiceListener<LVEntry, LVEntryVersion> versionServiceListener : _versionServiceListeners) {
+		for (VersionServiceListener<LVEntry, LVEntryVersion>
+				versionServiceListener : _versionServiceListeners) {
+
 			versionServiceListener.afterDeleteDraft(draftLVEntry);
 		}
 
@@ -686,18 +929,22 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public LVEntryVersion deleteVersion(LVEntryVersion lvEntryVersion)
 		throws PortalException {
-		LVEntryVersion latestLVEntryVersion = lvEntryVersionPersistence.findByLvEntryId_First(lvEntryVersion.getVersionedModelId(),
-				null);
+
+		LVEntryVersion latestLVEntryVersion =
+			lvEntryVersionPersistence.findByLvEntryId_First(
+				lvEntryVersion.getVersionedModelId(), null);
 
 		if (latestLVEntryVersion.getVersion() == lvEntryVersion.getVersion()) {
 			throw new IllegalArgumentException(
 				"Unable to delete latest version " +
-				lvEntryVersion.getVersion());
+					lvEntryVersion.getVersion());
 		}
 
 		lvEntryVersion = lvEntryVersionPersistence.remove(lvEntryVersion);
 
-		for (VersionServiceListener<LVEntry, LVEntryVersion> versionServiceListener : _versionServiceListeners) {
+		for (VersionServiceListener<LVEntry, LVEntryVersion>
+				versionServiceListener : _versionServiceListeners) {
+
 			versionServiceListener.afterDeleteVersion(lvEntryVersion);
 		}
 
@@ -726,7 +973,8 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 			primaryKey = lvEntry.getPrimaryKey();
 		}
 
-		return lvEntryVersionPersistence.fetchByLvEntryId_First(primaryKey, null);
+		return lvEntryVersionPersistence.fetchByLvEntryId_First(
+			primaryKey, null);
 	}
 
 	@Override
@@ -747,7 +995,8 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 		LVEntry lvEntry = lvEntryPersistence.fetchByPrimaryKey(primaryKey);
 
 		if ((lvEntry == null) ||
-				(lvEntry.getHeadId() == lvEntry.getPrimaryKey())) {
+			(lvEntry.getHeadId() == lvEntry.getPrimaryKey())) {
+
 			return null;
 		}
 
@@ -760,10 +1009,12 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 			return lvEntry;
 		}
 
-		LVEntry draftLVEntry = lvEntryPersistence.fetchByHeadId(lvEntry.getPrimaryKey());
+		LVEntry draftLVEntry = lvEntryPersistence.fetchByHeadId(
+			lvEntry.getPrimaryKey());
 
 		if (draftLVEntry == null) {
-			draftLVEntry = lvEntryLocalService.updateDraft(_createDraft(lvEntry));
+			draftLVEntry = lvEntryLocalService.updateDraft(
+				_createDraft(lvEntry));
 		}
 
 		return draftLVEntry;
@@ -776,7 +1027,8 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 		if (draftLVEntry == null) {
 			LVEntry lvEntry = lvEntryPersistence.findByPrimaryKey(primaryKey);
 
-			draftLVEntry = lvEntryLocalService.updateDraft(_createDraft(lvEntry));
+			draftLVEntry = lvEntryLocalService.updateDraft(
+				_createDraft(lvEntry));
 		}
 
 		return draftLVEntry;
@@ -785,14 +1037,15 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public LVEntryVersion getVersion(LVEntry lvEntry, int version)
 		throws PortalException {
+
 		long primaryKey = lvEntry.getHeadId();
 
 		if (lvEntry.isHead()) {
 			primaryKey = lvEntry.getPrimaryKey();
 		}
 
-		return lvEntryVersionPersistence.findByLvEntryId_Version(primaryKey,
-			version);
+		return lvEntryVersionPersistence.findByLvEntryId_Version(
+			primaryKey, version);
 	}
 
 	@Override
@@ -814,8 +1067,8 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public LVEntry publishDraft(LVEntry draftLVEntry) throws PortalException {
 		if (draftLVEntry.isHead()) {
-			throw new IllegalArgumentException("Can only publish drafts " +
-				draftLVEntry.getPrimaryKey());
+			throw new IllegalArgumentException(
+				"Can only publish drafts " + draftLVEntry.getPrimaryKey());
 		}
 
 		LVEntry headLVEntry = null;
@@ -828,16 +1081,18 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 			draftLVEntry.setHeadId(headLVEntry.getPrimaryKey());
 		}
 		else {
-			headLVEntry = lvEntryPersistence.findByPrimaryKey(draftLVEntry.getHeadId());
+			headLVEntry = lvEntryPersistence.findByPrimaryKey(
+				draftLVEntry.getHeadId());
 
-			LVEntryVersion latestLVEntryVersion = lvEntryVersionPersistence.findByLvEntryId_First(draftLVEntry.getHeadId(),
-					null);
+			LVEntryVersion latestLVEntryVersion =
+				lvEntryVersionPersistence.findByLvEntryId_First(
+					draftLVEntry.getHeadId(), null);
 
 			version = latestLVEntryVersion.getVersion() + 1;
 		}
 
-		LVEntryVersion lvEntryVersion = lvEntryVersionPersistence.create(counterLocalService.increment(
-					LVEntryVersion.class.getName()));
+		LVEntryVersion lvEntryVersion = lvEntryVersionPersistence.create(
+			counterLocalService.increment(LVEntryVersion.class.getName()));
 
 		lvEntryVersion.setVersion(version);
 		lvEntryVersion.setVersionedModelId(headLVEntry.getPrimaryKey());
@@ -852,7 +1107,9 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 		headLVEntry = lvEntryPersistence.update(headLVEntry);
 
-		for (VersionServiceListener<LVEntry, LVEntryVersion> versionServiceListener : _versionServiceListeners) {
+		for (VersionServiceListener<LVEntry, LVEntryVersion>
+				versionServiceListener : _versionServiceListeners) {
+
 			versionServiceListener.afterPublishDraft(draftLVEntry, version);
 		}
 
@@ -863,13 +1120,17 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@Override
 	public void registerListener(
-		VersionServiceListener<LVEntry, LVEntryVersion> versionServiceListener) {
+		VersionServiceListener<LVEntry, LVEntryVersion>
+			versionServiceListener) {
+
 		_versionServiceListeners.add(versionServiceListener);
 	}
 
 	@Override
 	public void unregisterListener(
-		VersionServiceListener<LVEntry, LVEntryVersion> versionServiceListener) {
+		VersionServiceListener<LVEntry, LVEntryVersion>
+			versionServiceListener) {
+
 		_versionServiceListeners.remove(versionServiceListener);
 	}
 
@@ -877,21 +1138,27 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Override
 	public LVEntry updateDraft(LVEntry draftLVEntry) throws PortalException {
 		if (draftLVEntry.isHead()) {
-			throw new IllegalArgumentException("Can only update draft entries " +
-				draftLVEntry.getPrimaryKey());
+			throw new IllegalArgumentException(
+				"Can only update draft entries " +
+					draftLVEntry.getPrimaryKey());
 		}
 
-		LVEntry previousLVEntry = lvEntryPersistence.fetchByPrimaryKey(draftLVEntry.getPrimaryKey());
+		LVEntry previousLVEntry = lvEntryPersistence.fetchByPrimaryKey(
+			draftLVEntry.getPrimaryKey());
 
 		draftLVEntry = lvEntryPersistence.update(draftLVEntry);
 
 		if (previousLVEntry == null) {
-			for (VersionServiceListener<LVEntry, LVEntryVersion> versionServiceListener : _versionServiceListeners) {
+			for (VersionServiceListener<LVEntry, LVEntryVersion>
+					versionServiceListener : _versionServiceListeners) {
+
 				versionServiceListener.afterCreateDraft(draftLVEntry);
 			}
 		}
 		else {
-			for (VersionServiceListener<LVEntry, LVEntryVersion> versionServiceListener : _versionServiceListeners) {
+			for (VersionServiceListener<LVEntry, LVEntryVersion>
+					versionServiceListener : _versionServiceListeners) {
+
 				versionServiceListener.afterUpdateDraft(draftLVEntry);
 			}
 		}
@@ -901,11 +1168,14 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	private LVEntry _createDraft(LVEntry publishedLVEntry)
 		throws PortalException {
+
 		LVEntry draftLVEntry = create();
 
 		draftLVEntry.setUuid(publishedLVEntry.getUuid());
 		draftLVEntry.setHeadId(publishedLVEntry.getPrimaryKey());
-		draftLVEntry.setDefaultLanguageId(publishedLVEntry.getDefaultLanguageId());
+		draftLVEntry.setDefaultLanguageId(
+			publishedLVEntry.getDefaultLanguageId());
+		draftLVEntry.setCompanyId(publishedLVEntry.getCompanyId());
 		draftLVEntry.setGroupId(publishedLVEntry.getGroupId());
 		draftLVEntry.setUniqueGroupKey(publishedLVEntry.getUniqueGroupKey());
 
@@ -914,8 +1184,10 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 		return draftLVEntry;
 	}
 
-	private final Set<VersionServiceListener<LVEntry, LVEntryVersion>> _versionServiceListeners =
-		Collections.newSetFromMap(new ConcurrentHashMap<VersionServiceListener<LVEntry, LVEntryVersion>, Boolean>());
+	private final Set<VersionServiceListener<LVEntry, LVEntryVersion>>
+		_versionServiceListeners = Collections.newSetFromMap(
+			new ConcurrentHashMap
+				<VersionServiceListener<LVEntry, LVEntryVersion>, Boolean>());
 
 	/**
 	 * Returns the OSGi service identifier.
@@ -949,8 +1221,8 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource,
-					sql);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(
+				dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -961,45 +1233,74 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 	@BeanReference(type = LVEntryLocalService.class)
 	protected LVEntryLocalService lvEntryLocalService;
+
 	@BeanReference(type = LVEntryPersistence.class)
 	protected LVEntryPersistence lvEntryPersistence;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
-	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
+	protected com.liferay.counter.kernel.service.CounterLocalService
+		counterLocalService;
+
+	@BeanReference(type = BigDecimalEntryPersistence.class)
+	protected BigDecimalEntryPersistence bigDecimalEntryPersistence;
+
 	@BeanReference(type = LVEntryVersionPersistence.class)
 	protected LVEntryVersionPersistence lvEntryVersionPersistence;
+
 	@BeanReference(type = LVEntryLocalizationPersistence.class)
 	protected LVEntryLocalizationPersistence lvEntryLocalizationPersistence;
+
 	@BeanReference(type = LVEntryLocalizationVersionPersistence.class)
-	protected LVEntryLocalizationVersionPersistence lvEntryLocalizationVersionPersistence;
+	protected LVEntryLocalizationVersionPersistence
+		lvEntryLocalizationVersionPersistence;
+
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
 
 	private class LVEntryLocalizationVersionServiceListener
 		implements VersionServiceListener<LVEntry, LVEntryVersion> {
+
 		@Override
 		public void afterCheckout(LVEntry draftLVEntry, int version)
 			throws PortalException {
-			Map<String, LVEntryLocalization> publishedLVEntryLocalizationMap = new HashMap<String, LVEntryLocalization>();
 
-			for (LVEntryLocalization publishedLVEntryLocalization : lvEntryLocalizationPersistence.findByLvEntryId(
-					draftLVEntry.getHeadId())) {
-				publishedLVEntryLocalizationMap.put(publishedLVEntryLocalization.getLanguageId(),
+			Map<String, LVEntryLocalization> publishedLVEntryLocalizationMap =
+				new HashMap<String, LVEntryLocalization>();
+
+			for (LVEntryLocalization publishedLVEntryLocalization :
+					lvEntryLocalizationPersistence.findByLvEntryId(
+						draftLVEntry.getHeadId())) {
+
+				publishedLVEntryLocalizationMap.put(
+					publishedLVEntryLocalization.getLanguageId(),
 					publishedLVEntryLocalization);
 			}
 
-			List<LVEntryLocalizationVersion> lvEntryLocalizationVersions = lvEntryLocalizationVersionPersistence.findByLvEntryId_Version(draftLVEntry.getHeadId(),
-					version);
+			List<LVEntryLocalizationVersion> lvEntryLocalizationVersions =
+				lvEntryLocalizationVersionPersistence.findByLvEntryId_Version(
+					draftLVEntry.getHeadId(), version);
 
-			long lvEntryLocalizationVersionBatchCounter = counterLocalService.increment(LVEntryLocalizationVersion.class.getName(),
+			long lvEntryLocalizationVersionBatchCounter =
+				counterLocalService.increment(
+					LVEntryLocalizationVersion.class.getName(),
 					lvEntryLocalizationVersions.size()) -
-				lvEntryLocalizationVersions.size();
+						lvEntryLocalizationVersions.size();
 
-			for (LVEntryLocalizationVersion lvEntryLocalizationVersion : lvEntryLocalizationVersions) {
-				LVEntryLocalization draftLVEntryLocalization = lvEntryLocalizationPersistence.create(++lvEntryLocalizationVersionBatchCounter);
+			for (LVEntryLocalizationVersion lvEntryLocalizationVersion :
+					lvEntryLocalizationVersions) {
+
+				LVEntryLocalization draftLVEntryLocalization =
+					lvEntryLocalizationPersistence.create(
+						++lvEntryLocalizationVersionBatchCounter);
 
 				long headId = draftLVEntryLocalization.getPrimaryKey();
 
-				LVEntryLocalization publishedLVEntryLocalization = publishedLVEntryLocalizationMap.get(lvEntryLocalizationVersion.getLanguageId());
+				LVEntryLocalization publishedLVEntryLocalization =
+					publishedLVEntryLocalizationMap.get(
+						lvEntryLocalizationVersion.getLanguageId());
 
 				if (publishedLVEntryLocalization != null) {
 					headId = publishedLVEntryLocalization.getPrimaryKey();
@@ -1007,11 +1308,15 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 
 				draftLVEntryLocalization.setHeadId(headId);
 
-				draftLVEntryLocalization.setLvEntryId(draftLVEntry.getPrimaryKey());
-				draftLVEntryLocalization.setLanguageId(lvEntryLocalizationVersion.getLanguageId());
+				draftLVEntryLocalization.setLvEntryId(
+					draftLVEntry.getPrimaryKey());
+				draftLVEntryLocalization.setLanguageId(
+					lvEntryLocalizationVersion.getLanguageId());
 
-				draftLVEntryLocalization.setTitle(lvEntryLocalizationVersion.getTitle());
-				draftLVEntryLocalization.setContent(lvEntryLocalizationVersion.getContent());
+				draftLVEntryLocalization.setTitle(
+					lvEntryLocalizationVersion.getTitle());
+				draftLVEntryLocalization.setContent(
+					lvEntryLocalizationVersion.getContent());
 
 				lvEntryLocalizationPersistence.update(draftLVEntryLocalization);
 			}
@@ -1020,13 +1325,17 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 		@Override
 		public void afterCreateDraft(LVEntry draftLVEntry)
 			throws PortalException {
+
 			if (draftLVEntry.getHeadId() == draftLVEntry.getPrimaryKey()) {
 				return;
 			}
 
-			for (LVEntryLocalization publishedLVEntryLocalization : lvEntryLocalizationPersistence.findByLvEntryId(
-					draftLVEntry.getHeadId())) {
-				_updateLVEntryLocalization(draftLVEntry, null,
+			for (LVEntryLocalization publishedLVEntryLocalization :
+					lvEntryLocalizationPersistence.findByLvEntryId(
+						draftLVEntry.getHeadId())) {
+
+				_updateLVEntryLocalization(
+					draftLVEntry, null,
 					publishedLVEntryLocalization.getLanguageId(),
 					publishedLVEntryLocalization.getTitle(),
 					publishedLVEntryLocalization.getContent());
@@ -1036,75 +1345,110 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 		@Override
 		public void afterDelete(LVEntry publishedLVEntry)
 			throws PortalException {
-			lvEntryLocalizationPersistence.removeByLvEntryId(publishedLVEntry.getPrimaryKey());
-			lvEntryLocalizationVersionPersistence.removeByLvEntryId(publishedLVEntry.getPrimaryKey());
+
+			lvEntryLocalizationPersistence.removeByLvEntryId(
+				publishedLVEntry.getPrimaryKey());
+			lvEntryLocalizationVersionPersistence.removeByLvEntryId(
+				publishedLVEntry.getPrimaryKey());
 		}
 
 		@Override
 		public void afterDeleteDraft(LVEntry draftLVEntry)
 			throws PortalException {
-			lvEntryLocalizationPersistence.removeByLvEntryId(draftLVEntry.getPrimaryKey());
+
+			lvEntryLocalizationPersistence.removeByLvEntryId(
+				draftLVEntry.getPrimaryKey());
 		}
 
 		@Override
 		public void afterDeleteVersion(LVEntryVersion lvEntryVersion)
 			throws PortalException {
-			lvEntryLocalizationVersionPersistence.removeByLvEntryId_Version(lvEntryVersion.getVersionedModelId(),
+
+			lvEntryLocalizationVersionPersistence.removeByLvEntryId_Version(
+				lvEntryVersion.getVersionedModelId(),
 				lvEntryVersion.getVersion());
 		}
 
 		@Override
 		public void afterPublishDraft(LVEntry draftLVEntry, int version)
 			throws PortalException {
-			Map<String, LVEntryLocalization> draftLVEntryLocalizationMap = new HashMap<String, LVEntryLocalization>();
 
-			for (LVEntryLocalization draftLVEntryLocalization : lvEntryLocalizationPersistence.findByLvEntryId(
-					draftLVEntry.getPrimaryKey())) {
-				draftLVEntryLocalizationMap.put(draftLVEntryLocalization.getLanguageId(),
+			Map<String, LVEntryLocalization> draftLVEntryLocalizationMap =
+				new HashMap<String, LVEntryLocalization>();
+
+			for (LVEntryLocalization draftLVEntryLocalization :
+					lvEntryLocalizationPersistence.findByLvEntryId(
+						draftLVEntry.getPrimaryKey())) {
+
+				draftLVEntryLocalizationMap.put(
+					draftLVEntryLocalization.getLanguageId(),
 					draftLVEntryLocalization);
 			}
 
-			long lvEntryLocalizationVersionBatchCounter = counterLocalService.increment(LVEntryLocalizationVersion.class.getName(),
+			long lvEntryLocalizationVersionBatchCounter =
+				counterLocalService.increment(
+					LVEntryLocalizationVersion.class.getName(),
 					draftLVEntryLocalizationMap.size()) -
-				draftLVEntryLocalizationMap.size();
+						draftLVEntryLocalizationMap.size();
 
-			for (LVEntryLocalization publishedLVEntryLocalization : lvEntryLocalizationPersistence.findByLvEntryId(
-					draftLVEntry.getHeadId())) {
-				LVEntryLocalization draftLVEntryLocalization = draftLVEntryLocalizationMap.remove(publishedLVEntryLocalization.getLanguageId());
+			for (LVEntryLocalization publishedLVEntryLocalization :
+					lvEntryLocalizationPersistence.findByLvEntryId(
+						draftLVEntry.getHeadId())) {
+
+				LVEntryLocalization draftLVEntryLocalization =
+					draftLVEntryLocalizationMap.remove(
+						publishedLVEntryLocalization.getLanguageId());
 
 				if (draftLVEntryLocalization == null) {
-					lvEntryLocalizationPersistence.remove(publishedLVEntryLocalization);
+					lvEntryLocalizationPersistence.remove(
+						publishedLVEntryLocalization);
 				}
 				else {
-					publishedLVEntryLocalization.setHeadId(-publishedLVEntryLocalization.getPrimaryKey());
+					publishedLVEntryLocalization.setHeadId(
+						-publishedLVEntryLocalization.getPrimaryKey());
 
-					publishedLVEntryLocalization.setTitle(draftLVEntryLocalization.getTitle());
-					publishedLVEntryLocalization.setContent(draftLVEntryLocalization.getContent());
+					publishedLVEntryLocalization.setTitle(
+						draftLVEntryLocalization.getTitle());
+					publishedLVEntryLocalization.setContent(
+						draftLVEntryLocalization.getContent());
 
-					lvEntryLocalizationPersistence.update(publishedLVEntryLocalization);
+					lvEntryLocalizationPersistence.update(
+						publishedLVEntryLocalization);
 
-					_publishLVEntryLocalizationVersion(publishedLVEntryLocalization,
+					_publishLVEntryLocalizationVersion(
+						publishedLVEntryLocalization,
 						++lvEntryLocalizationVersionBatchCounter, version);
 				}
 			}
 
-			long lvEntryLocalizationBatchCounter = counterLocalService.increment(LVEntryLocalization.class.getName(),
+			long lvEntryLocalizationBatchCounter =
+				counterLocalService.increment(
+					LVEntryLocalization.class.getName(),
 					draftLVEntryLocalizationMap.size()) -
-				draftLVEntryLocalizationMap.size();
+						draftLVEntryLocalizationMap.size();
 
-			for (LVEntryLocalization draftLVEntryLocalization : draftLVEntryLocalizationMap.values()) {
-				LVEntryLocalization lvEntryLocalization = lvEntryLocalizationPersistence.create(++lvEntryLocalizationBatchCounter);
+			for (LVEntryLocalization draftLVEntryLocalization :
+					draftLVEntryLocalizationMap.values()) {
 
-				lvEntryLocalization.setHeadId(lvEntryLocalization.getPrimaryKey());
+				LVEntryLocalization lvEntryLocalization =
+					lvEntryLocalizationPersistence.create(
+						++lvEntryLocalizationBatchCounter);
+
+				lvEntryLocalization.setHeadId(
+					lvEntryLocalization.getPrimaryKey());
 				lvEntryLocalization.setLvEntryId(draftLVEntry.getHeadId());
-				lvEntryLocalization.setLanguageId(draftLVEntryLocalization.getLanguageId());
+				lvEntryLocalization.setLanguageId(
+					draftLVEntryLocalization.getLanguageId());
 
-				lvEntryLocalization.setTitle(draftLVEntryLocalization.getTitle());
-				lvEntryLocalization.setContent(draftLVEntryLocalization.getContent());
+				lvEntryLocalization.setTitle(
+					draftLVEntryLocalization.getTitle());
+				lvEntryLocalization.setContent(
+					draftLVEntryLocalization.getContent());
 
 				lvEntryLocalizationPersistence.update(lvEntryLocalization);
 
-				_publishLVEntryLocalizationVersion(lvEntryLocalization,
+				_publishLVEntryLocalizationVersion(
+					lvEntryLocalization,
 					++lvEntryLocalizationVersionBatchCounter, version);
 			}
 		}
@@ -1116,14 +1460,21 @@ public abstract class LVEntryLocalServiceBaseImpl extends BaseLocalServiceImpl
 		private void _publishLVEntryLocalizationVersion(
 			LVEntryLocalization lvEntryLocalization, long primaryKey,
 			int version) {
-			LVEntryLocalizationVersion lvEntryLocalizationVersion = lvEntryLocalizationVersionPersistence.create(primaryKey);
+
+			LVEntryLocalizationVersion lvEntryLocalizationVersion =
+				lvEntryLocalizationVersionPersistence.create(primaryKey);
 
 			lvEntryLocalizationVersion.setVersion(version);
-			lvEntryLocalizationVersion.setVersionedModelId(lvEntryLocalization.getPrimaryKey());
+			lvEntryLocalizationVersion.setVersionedModelId(
+				lvEntryLocalization.getPrimaryKey());
 
-			lvEntryLocalization.populateVersionModel(lvEntryLocalizationVersion);
+			lvEntryLocalization.populateVersionModel(
+				lvEntryLocalizationVersion);
 
-			lvEntryLocalizationVersionPersistence.update(lvEntryLocalizationVersion);
+			lvEntryLocalizationVersionPersistence.update(
+				lvEntryLocalizationVersion);
 		}
+
 	}
+
 }

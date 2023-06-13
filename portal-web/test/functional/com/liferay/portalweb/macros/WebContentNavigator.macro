@@ -36,7 +36,9 @@ definition {
 	}
 
 	macro gotoAddPGViaWCD {
-		Click.clickNoWaitForVisible(locator1 = "WCD#ADD_WEB_CONTENT");
+		Portlet.clickPortletPlusIconPG(
+			portletName = "Web Content Display"
+		);
 
 		if (!(contains("${structureName}", "{structureName}"))) {
 			var structureName = "${structureName}";
@@ -51,8 +53,6 @@ definition {
 			locator1 = "WCD#ADD_STRUCTURED_WEB_CONTENT",
 			value1 = "${structureName}"
 		);
-
-		SelectFrame(locator1 = "IFrame#MODAL_IFRAME");
 
 		AssertVisible(locator1 = "TextInput#TITLE");
 	}
@@ -111,8 +111,6 @@ definition {
 		);
 
 		MenuItem.click(menuItem = "${menuItem}");
-
-		IFrame.selectEditAssetFrame();
 
 		AssertVisible(locator1 = "TextInput#TITLE");
 	}

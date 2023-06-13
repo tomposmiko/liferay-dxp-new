@@ -34,6 +34,7 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalServic
 @ProviderType
 public abstract class DDMFormInstanceRecordBaseImpl
 	extends DDMFormInstanceRecordModelImpl implements DDMFormInstanceRecord {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -42,10 +43,13 @@ public abstract class DDMFormInstanceRecordBaseImpl
 	@Override
 	public void persist() {
 		if (this.isNew()) {
-			DDMFormInstanceRecordLocalServiceUtil.addDDMFormInstanceRecord(this);
+			DDMFormInstanceRecordLocalServiceUtil.addDDMFormInstanceRecord(
+				this);
 		}
 		else {
-			DDMFormInstanceRecordLocalServiceUtil.updateDDMFormInstanceRecord(this);
+			DDMFormInstanceRecordLocalServiceUtil.updateDDMFormInstanceRecord(
+				this);
 		}
 	}
+
 }

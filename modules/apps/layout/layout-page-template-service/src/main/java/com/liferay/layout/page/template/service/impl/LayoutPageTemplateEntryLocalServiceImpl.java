@@ -19,7 +19,6 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.dynamic.data.mapping.model.DDMStructureLink;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.layout.constants.LayoutConstants;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.exception.DuplicateLayoutPageTemplateEntryException;
 import com.liferay.layout.page.template.exception.LayoutPageTemplateEntryNameException;
@@ -30,6 +29,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -170,8 +170,13 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		// Resources
 
-		resourceLocalService.addModelResources(
-			layoutPageTemplateEntry, serviceContext);
+		resourceLocalService.addResources(
+			layoutPageTemplateEntry.getCompanyId(),
+			layoutPageTemplateEntry.getGroupId(),
+			layoutPageTemplateEntry.getUserId(),
+			LayoutPageTemplateEntry.class.getName(),
+			layoutPageTemplateEntry.getLayoutPageTemplateEntryId(), false, true,
+			true);
 
 		return layoutPageTemplateEntry;
 	}
@@ -321,6 +326,13 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		return layoutPageTemplateEntryPersistence.fetchByPrimaryKey(
 			layoutPageTemplateEntryId);
+	}
+
+	@Override
+	public LayoutPageTemplateEntry fetchLayoutPageTemplateEntry(
+		long groupId, String name) {
+
+		return layoutPageTemplateEntryPersistence.fetchByG_N(groupId, name);
 	}
 
 	@Override
@@ -633,8 +645,25 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		layoutPageTemplateEntry.setModifiedDate(new Date());
 		layoutPageTemplateEntry.setName(name);
 
-		return layoutPageTemplateEntryLocalService.
-			updateLayoutPageTemplateEntry(layoutPageTemplateEntry);
+		layoutPageTemplateEntry =
+			layoutPageTemplateEntryLocalService.updateLayoutPageTemplateEntry(
+				layoutPageTemplateEntry);
+
+		Map<Locale, String> titleMap = Collections.singletonMap(
+			LocaleUtil.getSiteDefault(), name);
+
+		Layout layout = layoutLocalService.getLayout(
+			layoutPageTemplateEntry.getPlid());
+
+		layoutLocalService.updateLayout(
+			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
+			layout.getParentLayoutId(), titleMap, titleMap,
+			layout.getDescriptionMap(), layout.getKeywordsMap(),
+			layout.getRobotsMap(), layout.getType(), layout.isHidden(),
+			layout.getFriendlyURLMap(), layout.getIconImage(), null,
+			ServiceContextThreadLocal.getServiceContext());
+
+		return layoutPageTemplateEntry;
 	}
 
 	@Override
@@ -705,6 +734,13 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 				"Name must not be null for group " + groupId);
 		}
 
+		for (char c : _BLACKLIST_CHAR) {
+			if (name.indexOf(c) >= 0) {
+				throw new LayoutPageTemplateEntryNameException(
+					"Invalid character in name");
+			}
+		}
+
 		int nameMaxLength = ModelHintsUtil.getMaxLength(
 			LayoutPageTemplateEntry.class.getName(), "name");
 
@@ -743,20 +779,37 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 					LocaleUtil.getSiteDefault(), classTypeId));
 		}
 
-		String layoutType = LayoutConstants.LAYOUT_TYPE_ASSET_DISPLAY;
+		String layoutType = LayoutConstants.TYPE_ASSET_DISPLAY;
 
 		if (type == LayoutPageTemplateEntryTypeConstants.TYPE_BASIC) {
-			layoutType = LayoutConstants.LAYOUT_TYPE_CONTENT;
+			layoutType = LayoutConstants.TYPE_CONTENT;
 		}
 
 		serviceContext.setAttribute(
 			"layout.instanceable.allowed", Boolean.TRUE);
 
-		return layoutLocalService.addLayout(
+		Layout layout = layoutLocalService.addLayout(
 			userId, groupId, false, 0, titleMap, titleMap, null, null, null,
 			layoutType, StringPool.BLANK, true, true, new HashMap<>(),
 			serviceContext);
+
+		serviceContext.setModifiedDate(layout.getModifiedDate());
+
+		layoutLocalService.addLayout(
+			userId, groupId, false, layout.getParentLayoutId(),
+			classNameLocalService.getClassNameId(Layout.class),
+			layout.getPlid(), layout.getNameMap(), titleMap,
+			layout.getDescriptionMap(), layout.getKeywordsMap(),
+			layout.getRobotsMap(), layoutType, StringPool.BLANK, true, true,
+			Collections.emptyMap(), serviceContext);
+
+		return layout;
 	}
+
+	private static final char[] _BLACKLIST_CHAR = {
+		';', '/', '?', ':', '@', '=', '&', '\"', '<', '>', '#', '%', '{', '}',
+		'|', '\\', '^', '~', '[', ']', '`'
+	};
 
 	@ServiceReference(type = CompanyLocalService.class)
 	private CompanyLocalService _companyLocalService;

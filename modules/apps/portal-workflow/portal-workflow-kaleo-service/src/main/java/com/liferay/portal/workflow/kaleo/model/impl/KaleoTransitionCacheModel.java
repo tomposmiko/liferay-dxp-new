@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.workflow.kaleo.model.KaleoTransition;
@@ -37,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
-	Externalizable, MVCCModel {
+public class KaleoTransitionCacheModel
+	implements CacheModel<KaleoTransition>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -49,10 +49,13 @@ public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
 			return false;
 		}
 
-		KaleoTransitionCacheModel kaleoTransitionCacheModel = (KaleoTransitionCacheModel)obj;
+		KaleoTransitionCacheModel kaleoTransitionCacheModel =
+			(KaleoTransitionCacheModel)obj;
 
-		if ((kaleoTransitionId == kaleoTransitionCacheModel.kaleoTransitionId) &&
-				(mvccVersion == kaleoTransitionCacheModel.mvccVersion)) {
+		if ((kaleoTransitionId ==
+				kaleoTransitionCacheModel.kaleoTransitionId) &&
+			(mvccVersion == kaleoTransitionCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -150,7 +153,8 @@ public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
 			kaleoTransitionImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
-		kaleoTransitionImpl.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
+		kaleoTransitionImpl.setKaleoDefinitionVersionId(
+			kaleoDefinitionVersionId);
 		kaleoTransitionImpl.setKaleoNodeId(kaleoNodeId);
 
 		if (name == null) {
@@ -223,8 +227,7 @@ public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(kaleoTransitionId);
@@ -301,4 +304,5 @@ public class KaleoTransitionCacheModel implements CacheModel<KaleoTransition>,
 	public long targetKaleoNodeId;
 	public String targetKaleoNodeName;
 	public boolean defaultTransition;
+
 }

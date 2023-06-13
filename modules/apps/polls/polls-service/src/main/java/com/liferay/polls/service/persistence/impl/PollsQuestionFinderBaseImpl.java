@@ -16,21 +16,30 @@ package com.liferay.polls.service.persistence.impl;
 
 import com.liferay.polls.model.PollsQuestion;
 import com.liferay.polls.service.persistence.PollsQuestionPersistence;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
  * @generated
  */
-public class PollsQuestionFinderBaseImpl extends BasePersistenceImpl<PollsQuestion> {
+public class PollsQuestionFinderBaseImpl
+	extends BasePersistenceImpl<PollsQuestion> {
+
 	public PollsQuestionFinderBaseImpl() {
 		setModelClass(PollsQuestion.class);
+
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
+		setDBColumnNames(dbColumnNames);
 	}
 
 	@Override
@@ -54,10 +63,14 @@ public class PollsQuestionFinderBaseImpl extends BasePersistenceImpl<PollsQuesti
 	 */
 	public void setPollsQuestionPersistence(
 		PollsQuestionPersistence pollsQuestionPersistence) {
+
 		this.pollsQuestionPersistence = pollsQuestionPersistence;
 	}
 
 	@BeanReference(type = PollsQuestionPersistence.class)
 	protected PollsQuestionPersistence pollsQuestionPersistence;
-	private static final Log _log = LogFactoryUtil.getLog(PollsQuestionFinderBaseImpl.class);
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PollsQuestionFinderBaseImpl.class);
+
 }

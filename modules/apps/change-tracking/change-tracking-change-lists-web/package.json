@@ -1,14 +1,12 @@
 {
 	"dependencies": {
-		"clay-checkbox": "^2.6.0",
+		"clay-checkbox": "2.11.1",
+		"clay-icon": "2.11.1",
 		"metal-component": "^2.16.3",
 		"metal-dom": "^2.6.4",
 		"metal-modal": "^2.0.1",
 		"metal-soy": "^2.13.2",
 		"metal-state": "^2.13.2"
-	},
-	"devDependencies": {
-		"liferay-npm-scripts": "^1.2.0"
 	},
 	"name": "change-tracking-change-lists-web",
 	"scripts": {

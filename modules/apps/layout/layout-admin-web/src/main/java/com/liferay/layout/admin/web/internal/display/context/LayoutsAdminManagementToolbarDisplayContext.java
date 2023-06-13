@@ -18,9 +18,6 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchCon
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -33,7 +30,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
@@ -108,15 +104,14 @@ public class LayoutsAdminManagementToolbarDisplayContext
 					 !_layoutsAdminDisplayContext.hasLayouts())) {
 
 					addPrimaryDropdownItem(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.setHref(
-									_layoutsAdminDisplayContext.
-										getSelectLayoutPageTemplateEntryURL(
-											firstLayoutPageTemplateCollectionId,
-											selPlid, false));
-								dropdownItem.setLabel(_getLabel(false));
-							}));
+						dropdownItem -> {
+							dropdownItem.setHref(
+								_layoutsAdminDisplayContext.
+									getSelectLayoutPageTemplateEntryURL(
+										firstLayoutPageTemplateCollectionId,
+										selPlid, false));
+							dropdownItem.setLabel(_getLabel(false));
+						});
 				}
 
 				if (_layoutsAdminDisplayContext.isPrivateLayout() ||
@@ -124,15 +119,14 @@ public class LayoutsAdminManagementToolbarDisplayContext
 					!_layoutsAdminDisplayContext.hasLayouts()) {
 
 					addPrimaryDropdownItem(
-						SafeConsumer.ignore(
-							dropdownItem -> {
-								dropdownItem.setHref(
-									_layoutsAdminDisplayContext.
-										getSelectLayoutPageTemplateEntryURL(
-											firstLayoutPageTemplateCollectionId,
-											selPlid, true));
-								dropdownItem.setLabel(_getLabel(true));
-							}));
+						dropdownItem -> {
+							dropdownItem.setHref(
+								_layoutsAdminDisplayContext.
+									getSelectLayoutPageTemplateEntryURL(
+										firstLayoutPageTemplateCollectionId,
+										selPlid, true));
+							dropdownItem.setLabel(_getLabel(true));
+						});
 				}
 			}
 		};
@@ -141,6 +135,10 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	@Override
 	public String getSearchActionURL() {
 		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"privateLayout",
+			String.valueOf(_layoutsAdminDisplayContext.isPrivateLayout()));
 
 		return portletURL.toString();
 	}
@@ -165,27 +163,14 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	}
 
 	@Override
-	public List<ViewTypeItem> getViewTypeItems() {
-		return new ViewTypeItemList(getPortletURL(), getDisplayStyle()) {
-			{
-				addTableViewTypeItem();
+	public Boolean isDisabled() {
+		String displayStyle = _layoutsAdminDisplayContext.getDisplayStyle();
 
-				ViewTypeItem viewTypeItem = new ViewTypeItem();
+		if (Objects.equals(displayStyle, "miller-columns")) {
+			return false;
+		}
 
-				viewTypeItem.setActive(
-					Objects.equals(
-						_layoutsAdminDisplayContext.getDisplayStyle(),
-						"miller-columns"));
-				viewTypeItem.setIcon("columns");
-				viewTypeItem.setHref(
-					getPortletURL(), "displayStyle", "miller-columns");
-				viewTypeItem.setLabel(
-					LanguageUtil.get(
-						LocaleUtil.getMostRelevantLocale(), "columns"));
-
-				add(viewTypeItem);
-			}
-		};
+		return super.isDisabled();
 	}
 
 	@Override
@@ -219,10 +204,6 @@ public class LayoutsAdminManagementToolbarDisplayContext
 
 		if (_layoutsAdminDisplayContext.isSearch()) {
 			return new String[] {"create-date"};
-		}
-
-		if (_layoutsAdminDisplayContext.isFlattenedView()) {
-			return new String[] {"create-date", "path"};
 		}
 
 		return super.getOrderByKeys();

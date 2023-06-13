@@ -133,30 +133,19 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 					<c:choose>
 						<c:when test='<%= displayStyle.equals("descriptive") %>'>
 							<c:choose>
-								<c:when test="<%= fileShortcut != null %>">
-									<liferay-ui:search-container-column-icon
-										icon="shortcut"
-										toggleRowChecker="<%= true %>"
-									/>
-								</c:when>
 								<c:when test="<%= Validator.isNotNull(thumbnailSrc) %>">
 									<liferay-ui:search-container-column-image
 										src="<%= thumbnailSrc %>"
 										toggleRowChecker="<%= true %>"
 									/>
 								</c:when>
-								<c:when test="<%= Validator.isNotNull(latestFileVersion.getExtension()) %>">
-									<liferay-ui:search-container-column-text>
-										<div class="sticker sticker-secondary <%= dlViewFileVersionDisplayContext.getCssClassFileMimeType() %>">
-											<%= StringUtil.shorten(StringUtil.upperCase(latestFileVersion.getExtension()), 3, StringPool.BLANK) %>
-										</div>
-									</liferay-ui:search-container-column-text>
-								</c:when>
 								<c:otherwise>
-									<liferay-ui:search-container-column-icon
-										icon="documents-and-media"
-										toggleRowChecker="<%= true %>"
-									/>
+									<liferay-ui:search-container-column-text>
+										<liferay-document-library:mime-type-sticker
+											cssClass="sticker-secondary"
+											fileVersion="<%= latestFileVersion %>"
+										/>
+									</liferay-ui:search-container-column-text>
 								</c:otherwise>
 							</c:choose>
 
@@ -200,7 +189,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 										<liferay-frontend:html-vertical-card
 											actionJsp="/document_library/file_entry_action.jsp"
 											actionJspServletContext="<%= application %>"
-											cssClass="entry-display-style"
+											cssClass="entry-display-style file-card"
 											html="<%= customThumbnailHtml %>"
 											resultRow="<%= row %>"
 											rowChecker="<%= entriesChecker %>"
@@ -214,7 +203,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 										<liferay-frontend:icon-vertical-card
 											actionJsp="/document_library/file_entry_action.jsp"
 											actionJspServletContext="<%= application %>"
-											cssClass="entry-display-style"
+											cssClass="entry-display-style file-card"
 											icon="documents-and-media"
 											resultRow="<%= row %>"
 											rowChecker="<%= entriesChecker %>"
@@ -228,7 +217,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 										<liferay-frontend:vertical-card
 											actionJsp="/document_library/file_entry_action.jsp"
 											actionJspServletContext="<%= application %>"
-											cssClass="entry-display-style"
+											cssClass="entry-display-style file-card"
 											imageUrl="<%= thumbnailSrc %>"
 											resultRow="<%= row %>"
 											rowChecker="<%= entriesChecker %>"
@@ -256,6 +245,11 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 									cssClass="table-cell-expand table-cell-minw-200 table-title"
 									name="title"
 								>
+									<liferay-document-library:mime-type-sticker
+										cssClass="sticker-secondary"
+										fileVersion="<%= latestFileVersion %>"
+									/>
+
 									<aui:a href="<%= rowURL.toString() %>"><%= latestFileVersion.getTitle() %></aui:a>
 
 									<c:if test="<%= fileEntry.hasLock() || fileEntry.isCheckedOut() %>">

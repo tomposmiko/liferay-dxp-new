@@ -146,18 +146,13 @@
 </tr>
 <!--SEARCH_INSIGHTS_PORTLET-->
 <tr>
-	<td>SEARCH_INSIGHTS_PORTLET_STRING_QUERY</td>
-	<td>//div[@class='full-query']/code[1]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY</td>
-	<td>//div[@class='full-query')]/code[2]</td>
+	<td>//div[contains(@id,'insightsResponsePanel')]//code</td>
 	<td></td>
 </tr>
 <tr>
-	<td></td>
-	<td></td>
+	<td>SEARCH_INSIGHTS_PORTLET_STRING_QUERY</td>
+	<td>//div[contains(@id,'insightsRequestPanel')]//code</td>
 	<td></td>
 </tr>
 <!--CUSTOM_FACET-->

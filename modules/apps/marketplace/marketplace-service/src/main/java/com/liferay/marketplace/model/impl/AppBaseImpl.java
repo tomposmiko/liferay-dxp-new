@@ -33,6 +33,7 @@ import com.liferay.marketplace.service.AppLocalServiceUtil;
  */
 @ProviderType
 public abstract class AppBaseImpl extends AppModelImpl implements App {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -47,4 +48,5 @@ public abstract class AppBaseImpl extends AppModelImpl implements App {
 			AppLocalServiceUtil.updateApp(this);
 		}
 	}
+
 }

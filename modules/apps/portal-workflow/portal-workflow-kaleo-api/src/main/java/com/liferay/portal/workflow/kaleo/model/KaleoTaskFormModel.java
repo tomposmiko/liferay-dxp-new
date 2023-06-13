@@ -36,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface KaleoTaskFormModel extends BaseModel<KaleoTaskForm>,
-	GroupedModel, MVCCModel, ShardedModel {
+public interface KaleoTaskFormModel
+	extends BaseModel<KaleoTaskForm>, GroupedModel, MVCCModel, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -388,4 +389,5 @@ public interface KaleoTaskFormModel extends BaseModel<KaleoTaskForm>,
 	 * @param priority the priority of this kaleo task form
 	 */
 	public void setPriority(int priority);
+
 }

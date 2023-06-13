@@ -32,8 +32,9 @@ import com.liferay.knowledge.base.service.KBArticleLocalServiceUtil;
  * @generated
  */
 @ProviderType
-public abstract class KBArticleBaseImpl extends KBArticleModelImpl
-	implements KBArticle {
+public abstract class KBArticleBaseImpl
+	extends KBArticleModelImpl implements KBArticle {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class KBArticleBaseImpl extends KBArticleModelImpl
 			KBArticleLocalServiceUtil.updateKBArticle(this);
 		}
 	}
+
 }

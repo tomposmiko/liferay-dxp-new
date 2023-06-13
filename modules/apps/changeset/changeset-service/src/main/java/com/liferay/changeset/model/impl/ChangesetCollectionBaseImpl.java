@@ -34,6 +34,7 @@ import com.liferay.changeset.service.ChangesetCollectionLocalServiceUtil;
 @ProviderType
 public abstract class ChangesetCollectionBaseImpl
 	extends ChangesetCollectionModelImpl implements ChangesetCollection {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -48,4 +49,5 @@ public abstract class ChangesetCollectionBaseImpl
 			ChangesetCollectionLocalServiceUtil.updateChangesetCollection(this);
 		}
 	}
+
 }

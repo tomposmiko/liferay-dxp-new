@@ -16,6 +16,8 @@ package com.liferay.headless.foundation.resource.v1_0;
 
 import com.liferay.headless.foundation.dto.v1_0.Organization;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -33,20 +35,23 @@ import javax.annotation.Generated;
 public interface OrganizationResource {
 
 	public Page<Organization> getMyUserAccountOrganizationsPage(
-				Long myUserAccountId,Pagination pagination)
-			throws Exception;
+			Long userAccountId, Pagination pagination)
+		throws Exception;
+
 	public Page<Organization> getOrganizationsPage(
-				Pagination pagination)
-			throws Exception;
-	public Organization getOrganization(
-				Long organizationId)
-			throws Exception;
+			String search, Filter filter, Pagination pagination, Sort[] sorts)
+		throws Exception;
+
+	public Organization getOrganization(Long organizationId) throws Exception;
+
 	public Page<Organization> getOrganizationOrganizationsPage(
-				Long organizationId,Pagination pagination)
-			throws Exception;
+			Long organizationId, String search, Filter filter,
+			Pagination pagination, Sort[] sorts)
+		throws Exception;
+
 	public Page<Organization> getUserAccountOrganizationsPage(
-				Long userAccountId,Pagination pagination)
-			throws Exception;
+			Long userAccountId, Pagination pagination)
+		throws Exception;
 
 	public void setContextCompany(Company contextCompany);
 

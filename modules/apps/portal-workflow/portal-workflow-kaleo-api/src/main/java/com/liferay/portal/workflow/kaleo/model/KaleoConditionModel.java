@@ -36,8 +36,9 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface KaleoConditionModel extends BaseModel<KaleoCondition>,
-	GroupedModel, MVCCModel, ShardedModel {
+public interface KaleoConditionModel
+	extends BaseModel<KaleoCondition>, GroupedModel, MVCCModel, ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -273,4 +274,5 @@ public interface KaleoConditionModel extends BaseModel<KaleoCondition>,
 	 * @param scriptRequiredContexts the script required contexts of this kaleo condition
 	 */
 	public void setScriptRequiredContexts(String scriptRequiredContexts);
+
 }

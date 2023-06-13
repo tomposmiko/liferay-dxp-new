@@ -39,9 +39,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface BookmarksFolderModel extends BaseModel<BookmarksFolder>,
-	ContainerModel, ShardedModel, StagedGroupedModel, TrashedModel,
-	WorkflowedModel {
+public interface BookmarksFolderModel
+	extends BaseModel<BookmarksFolder>, ContainerModel, ShardedModel,
+			StagedGroupedModel, TrashedModel, WorkflowedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -514,4 +515,5 @@ public interface BookmarksFolderModel extends BaseModel<BookmarksFolder>,
 	 */
 	@Override
 	public void setParentContainerModelId(long parentContainerModelId);
+
 }

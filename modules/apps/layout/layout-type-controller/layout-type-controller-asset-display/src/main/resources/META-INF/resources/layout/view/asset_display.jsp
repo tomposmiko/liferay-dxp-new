@@ -24,7 +24,9 @@ LayoutPageTemplateStructure layoutPageTemplateStructure = null;
 JSONArray structureJSONArray = null;
 
 if (assetEntry != null) {
-	layoutPageTemplateStructure = LayoutPageTemplateStructureLocalServiceUtil.fetchLayoutPageTemplateStructure(assetEntry.getGroupId(), PortalUtil.getClassNameId(LayoutPageTemplateEntry.class.getName()), assetDisplayLayoutTypeControllerDisplayContext.getLayoutPageTemplateEntryId(), true);
+	LayoutPageTemplateEntry layoutPageTemplateEntry = LayoutPageTemplateEntryLocalServiceUtil.getLayoutPageTemplateEntry(assetDisplayLayoutTypeControllerDisplayContext.getLayoutPageTemplateEntryId());
+
+	layoutPageTemplateStructure = LayoutPageTemplateStructureLocalServiceUtil.fetchLayoutPageTemplateStructure(assetEntry.getGroupId(), PortalUtil.getClassNameId(Layout.class.getName()), layoutPageTemplateEntry.getPlid(), true);
 
 	String data = layoutPageTemplateStructure.getData();
 
@@ -45,7 +47,7 @@ if (assetEntry != null) {
 		try {
 			request.setAttribute(WebKeys.PORTLET_DECORATE, Boolean.FALSE);
 
-			long[] segmentsIds = GetterUtil.getLongValues(request.getAttribute(SegmentsWebKeys.SEGMENTS_ENTRY_IDS), new long[0]);
+			long[] segmentsExperienceIds = GetterUtil.getLongValues(request.getAttribute(SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS), new long[0]);
 		%>
 
 			<div class="layout-content" id="main-content" role="main">
@@ -105,7 +107,7 @@ if (assetEntry != null) {
 											}
 										%>
 
-											<%= FragmentEntryRenderUtil.renderFragmentEntryLink(fragmentEntryLink, FragmentEntryLinkConstants.ASSET_DISPLAY_PAGE, assetDisplayLayoutTypeControllerDisplayContext.getAssetDisplayFieldsValues(), locale, segmentsIds, request, response) %>
+											<%= FragmentEntryRenderUtil.renderFragmentEntryLink(fragmentEntryLink, FragmentEntryLinkConstants.ASSET_DISPLAY_PAGE, assetDisplayLayoutTypeControllerDisplayContext.getAssetDisplayFieldsValues(), locale, segmentsExperienceIds, request, response) %>
 
 										<%
 										}

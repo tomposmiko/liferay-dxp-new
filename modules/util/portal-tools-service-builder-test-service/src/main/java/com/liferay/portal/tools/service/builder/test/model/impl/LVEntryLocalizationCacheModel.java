@@ -34,8 +34,9 @@ import java.io.ObjectOutput;
  * @generated
  */
 @ProviderType
-public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocalization>,
-	Externalizable, MVCCModel {
+public class LVEntryLocalizationCacheModel
+	implements CacheModel<LVEntryLocalization>, Externalizable, MVCCModel {
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -46,10 +47,13 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 			return false;
 		}
 
-		LVEntryLocalizationCacheModel lvEntryLocalizationCacheModel = (LVEntryLocalizationCacheModel)obj;
+		LVEntryLocalizationCacheModel lvEntryLocalizationCacheModel =
+			(LVEntryLocalizationCacheModel)obj;
 
-		if ((lvEntryLocalizationId == lvEntryLocalizationCacheModel.lvEntryLocalizationId) &&
-				(mvccVersion == lvEntryLocalizationCacheModel.mvccVersion)) {
+		if ((lvEntryLocalizationId ==
+				lvEntryLocalizationCacheModel.lvEntryLocalizationId) &&
+			(mvccVersion == lvEntryLocalizationCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -75,7 +79,7 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(15);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -83,6 +87,8 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 		sb.append(headId);
 		sb.append(", lvEntryLocalizationId=");
 		sb.append(lvEntryLocalizationId);
+		sb.append(", companyId=");
+		sb.append(companyId);
 		sb.append(", lvEntryId=");
 		sb.append(lvEntryId);
 		sb.append(", languageId=");
@@ -98,11 +104,14 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 
 	@Override
 	public LVEntryLocalization toEntityModel() {
-		LVEntryLocalizationImpl lvEntryLocalizationImpl = new LVEntryLocalizationImpl();
+		LVEntryLocalizationImpl lvEntryLocalizationImpl =
+			new LVEntryLocalizationImpl();
 
 		lvEntryLocalizationImpl.setMvccVersion(mvccVersion);
 		lvEntryLocalizationImpl.setHeadId(headId);
+		lvEntryLocalizationImpl.setHead(head);
 		lvEntryLocalizationImpl.setLvEntryLocalizationId(lvEntryLocalizationId);
+		lvEntryLocalizationImpl.setCompanyId(companyId);
 		lvEntryLocalizationImpl.setLvEntryId(lvEntryId);
 
 		if (languageId == null) {
@@ -126,8 +135,6 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 			lvEntryLocalizationImpl.setContent(content);
 		}
 
-		lvEntryLocalizationImpl.setHead(head);
-
 		lvEntryLocalizationImpl.resetOriginalValues();
 
 		return lvEntryLocalizationImpl;
@@ -139,24 +146,29 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 
 		headId = objectInput.readLong();
 
+		head = objectInput.readBoolean();
+
 		lvEntryLocalizationId = objectInput.readLong();
+
+		companyId = objectInput.readLong();
 
 		lvEntryId = objectInput.readLong();
 		languageId = objectInput.readUTF();
 		title = objectInput.readUTF();
 		content = objectInput.readUTF();
-
-		head = objectInput.readBoolean();
 	}
 
 	@Override
-	public void writeExternal(ObjectOutput objectOutput)
-		throws IOException {
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
 		objectOutput.writeLong(headId);
 
+		objectOutput.writeBoolean(head);
+
 		objectOutput.writeLong(lvEntryLocalizationId);
+
+		objectOutput.writeLong(companyId);
 
 		objectOutput.writeLong(lvEntryId);
 
@@ -180,16 +192,16 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 		else {
 			objectOutput.writeUTF(content);
 		}
-
-		objectOutput.writeBoolean(head);
 	}
 
 	public long mvccVersion;
 	public long headId;
+	public boolean head;
 	public long lvEntryLocalizationId;
+	public long companyId;
 	public long lvEntryId;
 	public String languageId;
 	public String title;
 	public String content;
-	public boolean head;
+
 }

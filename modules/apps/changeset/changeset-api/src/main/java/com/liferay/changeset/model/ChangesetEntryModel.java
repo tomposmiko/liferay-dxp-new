@@ -36,8 +36,10 @@ import java.util.Date;
  * @generated
  */
 @ProviderType
-public interface ChangesetEntryModel extends AttachedModel,
-	BaseModel<ChangesetEntry>, GroupedModel, ShardedModel {
+public interface ChangesetEntryModel
+	extends AttachedModel, BaseModel<ChangesetEntry>, GroupedModel,
+			ShardedModel {
+
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -240,4 +242,5 @@ public interface ChangesetEntryModel extends AttachedModel,
 	 */
 	@Override
 	public void setClassPK(long classPK);
+
 }
