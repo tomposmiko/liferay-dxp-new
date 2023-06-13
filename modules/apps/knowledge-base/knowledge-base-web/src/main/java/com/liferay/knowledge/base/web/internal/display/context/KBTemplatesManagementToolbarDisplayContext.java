@@ -59,18 +59,16 @@ public class KBTemplatesManagementToolbarDisplayContext {
 	public KBTemplatesManagementToolbarDisplayContext(
 			HttpServletRequest httpServletRequest,
 			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse, String templatePath)
+			LiferayPortletResponse liferayPortletResponse)
 		throws PortalException {
 
 		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_templatePath = templatePath;
 
 		_currentURLObj = PortletURLUtil.getCurrent(
-			_liferayPortletRequest, _liferayPortletResponse);
-
-		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
+			liferayPortletRequest, liferayPortletResponse);
+		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		_createSearchContainer();
@@ -117,7 +115,7 @@ public class KBTemplatesManagementToolbarDisplayContext {
 					PortletURLBuilder.createRenderURL(
 						_liferayPortletResponse
 					).setMVCPath(
-						_templatePath + "edit_template.jsp"
+						"/admin/common/edit_template.jsp"
 					).setRedirect(
 						PortalUtil.getCurrentURL(_httpServletRequest)
 					).buildPortletURL());
@@ -267,7 +265,6 @@ public class KBTemplatesManagementToolbarDisplayContext {
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private SearchContainer<KBTemplate> _searchContainer;
-	private final String _templatePath;
 	private final ThemeDisplay _themeDisplay;
 
 }

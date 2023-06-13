@@ -68,7 +68,7 @@ definition {
 			var testCase = "";
 		}
 
-		if ("${testCase}" == "LPS-157601") {
+		if ("${testCase}" == "updateOneBlogPosting") {
 			var response = BlogPostingAPI._getBlogPostings();
 
 			var existingHeadline = BlogPostingAPI._getHeadlineOfExistingBlogPosting(response = "${response}");
@@ -241,6 +241,14 @@ definition {
 		var importTaskId = JSONUtil.getWithJSONPath("${response}", "$.id");
 
 		return "${importTaskId}";
+	}
+
+	macro getNumberOfBlogPostingsCreated {
+		var response = BlogPostingAPI._getBlogPostings();
+
+		var numberOfBlogPostingsCreated = JSONUtil.getWithJSONPath("${response}", "$.totalCount");
+
+		return "${numberOfBlogPostingsCreated}";
 	}
 
 }

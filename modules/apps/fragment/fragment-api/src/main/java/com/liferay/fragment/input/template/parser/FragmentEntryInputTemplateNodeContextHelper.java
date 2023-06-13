@@ -54,8 +54,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.portlet.PortletURL;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -173,14 +171,16 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 
 		InfoFieldType infoFieldType = infoField.getInfoFieldType();
 
+		String label = StringPool.BLANK;
 		String value = StringPool.BLANK;
 
-		Map<String, String> formParameterMap =
+		Map<String, String> infoFormParameterMap =
 			(Map<String, String>)SessionMessages.get(
 				httpServletRequest, "infoFormParameterMap");
 
-		if (formParameterMap != null) {
-			value = formParameterMap.get(infoField.getName());
+		if (infoFormParameterMap != null) {
+			label = infoFormParameterMap.get(infoField.getName() + "-label");
+			value = infoFormParameterMap.get(infoField.getName());
 		}
 
 		InputTemplateNode inputTemplateNode = new InputTemplateNode(
@@ -272,16 +272,14 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 							RequestBackedPortletURLFactoryUtil.create(
 								httpServletRequest);
 
-					PortletURL itemSelectorURL =
-						_itemSelector.getItemSelectorURL(
-							requestBackedPortletURLFactory,
-							fragmentEntryLink.getNamespace() +
-								"selectFileEntry",
-							fileItemSelectorCriterion);
-
 					inputTemplateNode.addAttribute(
 						"selectFromDocumentLibraryURL",
-						itemSelectorURL.toString());
+						String.valueOf(
+							_itemSelector.getItemSelectorURL(
+								requestBackedPortletURLFactory,
+								fragmentEntryLink.getNamespace() +
+									"selectFileEntry",
+								fileItemSelectorCriterion)));
 				}
 			}
 		}
@@ -341,6 +339,10 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 			inputTemplateNode.addAttribute(
 				"relationshipValueFieldName",
 				optionsValueFieldNameOptional.orElse(null));
+
+			if (Validator.isNotNull(label)) {
+				inputTemplateNode.addAttribute("selectedOptionLabel", label);
+			}
 		}
 		else if (infoField.getInfoFieldType() instanceof SelectInfoFieldType) {
 			List<InputTemplateNode.Option> options = new ArrayList<>();

@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.IOException;
@@ -55,8 +54,8 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.always-send-redirect=true",
 		"javax.portlet.init-param.copy-request-parameters=true",
-		"javax.portlet.init-param.template-path=/search/",
-		"javax.portlet.init-param.view-template=/search/view.jsp",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
+		"javax.portlet.init-param.view-template=/knowledge_base/view",
 		"javax.portlet.name=" + KBPortletKeys.KNOWLEDGE_BASE_SEARCH,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator,guest,power-user,user",
@@ -72,29 +71,14 @@ public class SearchPortlet extends BaseKBPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		String mvcPath = ParamUtil.getString(
-			renderRequest, "mvcPath", viewTemplate);
-
-		long assetCategoryId = ParamUtil.getLong(renderRequest, "categoryId");
-		String assetTagName = ParamUtil.getString(renderRequest, "tag");
-
-		if ((mvcPath.equals(viewTemplate) && (assetCategoryId > 0)) ||
-			(mvcPath.equals(viewTemplate) &&
-			 Validator.isNotNull(assetTagName))) {
-
-			String path = templatePath + "view_prp_articles.jsp";
-
-			include(path, renderRequest, renderResponse);
-		}
-		else if (SessionErrors.contains(
-					renderRequest, NoSuchArticleException.class.getName()) ||
-				 SessionErrors.contains(
-					 renderRequest, NoSuchCommentException.class.getName()) ||
-				 SessionErrors.contains(
-					 renderRequest,
-					 NoSuchSubscriptionException.class.getName()) ||
-				 SessionErrors.contains(
-					 renderRequest, PrincipalException.getNestedClasses())) {
+		if (SessionErrors.contains(
+				renderRequest, NoSuchArticleException.class.getName()) ||
+			SessionErrors.contains(
+				renderRequest, NoSuchCommentException.class.getName()) ||
+			SessionErrors.contains(
+				renderRequest, NoSuchSubscriptionException.class.getName()) ||
+			SessionErrors.contains(
+				renderRequest, PrincipalException.getNestedClasses())) {
 
 			include("/admin/common/error.jsp", renderRequest, renderResponse);
 		}

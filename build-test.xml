@@ -2970,6 +2970,123 @@ include-and-override=portal-liferay-online-limit.properties</echo>
 		</sequential>
 	</macrodef>
 
+	<macrodef name="prepare-read-write-database-configuration-properties">
+		<sequential>
+			<get-database-property property.name="database.driver" />
+			<get-database-property property.name="database.host" />
+			<get-database-property property.name="database.password" />
+			<get-database-property property.name="database.url" />
+			<get-database-property property.name="database.username" />
+
+			<set-app-server-properties />
+
+			<if>
+				<equals arg1="${configure.read.write.database}" arg2="jdbc" />
+				<then>
+					<replace
+						file="${test.app.server.classes.portal.dir}/portal-ext.properties"
+					>
+						<replacetoken>jdbc.default</replacetoken>
+						<replacevalue>jdbc.write</replacevalue>
+					</replace>
+
+					<replace
+						file="${test.app.server.classes.portal.dir}/portal-ext.properties"
+					>
+						<replacetoken>lportal</replacetoken>
+						<replacevalue>lportal1</replacevalue>
+					</replace>
+
+					<echo append="true" file="${test.app.server.classes.portal.dir}/portal-ext.properties">
+jdbc.read.driverClassName=${database.driver}
+jdbc.read.url=${database.url}
+jdbc.read.username=${database.username}
+jdbc.read.password=${database.password}</echo>
+				</then>
+				<elseif>
+					<equals arg1="${configure.read.write.database}" arg2="jndi" />
+					<then>
+						<prepare-database-jndi />
+
+						<replace
+							file="${app.server.dir}/conf/context.xml"
+						>
+							<replacetoken><![CDATA[<Context>]]></replacetoken>
+							<replacevalue>
+								<![CDATA[
+									<Context>
+										<ResourceLink name="jdbc/LiferayWritePool" global="jdbc/LiferayWritePool" type="javax.sql.DataSource" />
+								]]>
+							</replacevalue>
+						</replace>
+
+						<replace
+							file="${app.server.dir}/conf/server.xml"
+						>
+							<replacetoken><![CDATA[<GlobalNamingResources>]]></replacetoken>
+							<replacevalue expandproperties="true">
+								<![CDATA[
+									<GlobalNamingResources>
+										<Resource
+											auth="Container"
+											description="Global Address Database"
+											driverClassName="${database.driver}"
+											maxActive="40"
+											maxIdle="20"
+											maxWait="1000"
+											name="jdbc/LiferayWritePool"
+											password="${database.password}"
+											type="javax.sql.DataSource"
+											url="jdbc:mysql://${database.host}/lportal1?useUnicode=true&amp;characterEncoding=UTF-8&amp;useFastDateParsing=false&amp;serverTimezone=GMT&amp;dontTrackOpenResources=true&amp;holdResultsOpenOverStatementClose=true"
+											username="${database.username}"
+										/>
+								]]>
+							</replacevalue>
+						</replace>
+
+						<replace
+							file="${test.app.server.classes.portal.dir}/portal-ext.properties"
+						>
+							<replacetoken>jdbc.default.jndi.name=</replacetoken>
+							<replacevalue>jdbc.read.jndi.name=jdbc/LiferayPool</replacevalue>
+						</replace>
+
+						<echo append="true" file="${test.app.server.classes.portal.dir}/portal-ext.properties">
+jdbc.write.jndi.name=jdbc/LiferayWritePool</echo>
+					</then>
+				</elseif>
+			</if>
+
+			<loadproperties srcFile="${project.dir}/portal-impl/src/portal.properties">
+				<filterchain>
+					<tokenfilter>
+						<containsstring contains="spring" />
+					</tokenfilter>
+				</filterchain>
+			</loadproperties>
+
+			<propertycopy from="spring.configs" name="spring.configs.default" />
+			<propertycopy from="spring.infrastructure.configs" name="spring.infrastructure.configs.default" />
+
+			<echo append="true" file="${test.app.server.classes.portal.dir}/portal-ext.properties">
+				<![CDATA[
+counter.jdbc.prefix=jdbc.write.
+spring.configs=\
+	${spring.configs.default},/META-INF/dynamic-data-source-spring.xml
+spring.infrastructure.configs=\
+	${spring.infrastructure.configs.default}
+				]]>
+			</echo>
+
+			<replace
+				file="${test.app.server.classes.portal.dir}/portal-ext.properties"
+			>
+				<replacetoken><![CDATA[#/META-INF/dynamic-data-source-infrastructure-spring.xml]]></replacetoken>
+				<replacevalue><![CDATA[/META-INF/dynamic-data-source-infrastructure-spring.xml]]></replacevalue>
+			</replace>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="prepare-safari-driver">
 		<sequential>
 			<if>
@@ -9462,6 +9579,13 @@ virtualHostname="localhost"
 										</then>
 									</elseif>
 									<else>
+										<if>
+											<isset property="env.TEST_PORTAL_RELEASE_VERSION" />
+											<then>
+												<fail message="This release test is attempting to build Marketplace applications from source instead of deploying the latest released version from Marketplace." />
+											</then>
+										</if>
+
 										<echo>Deploying all relevant modules that make up ${Liferay-Releng-App-Title}.lpkg.</echo>
 
 										<local name="app.name" />
@@ -14417,6 +14541,15 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 			<equals arg1="${cluster.enabled}" arg2="true" />
 			<then>
 				<prepare-test-cluster-properties />
+			</then>
+		</if>
+
+		<get-testcase-property property.name="configure.read.write.database" />
+
+		<if>
+			<isset property="configure.read.write.database" />
+			<then>
+				<prepare-read-write-database-configuration-properties />
 			</then>
 		</if>
 

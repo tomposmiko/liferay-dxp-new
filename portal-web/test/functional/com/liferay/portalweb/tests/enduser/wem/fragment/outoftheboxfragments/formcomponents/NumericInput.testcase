@@ -225,6 +225,11 @@ definition {
 				PageEditor.addFragmentToFormContainer(
 					collectionName = "Form Components",
 					fragmentName = "Numeric Input",
+					targetFragmentName = "Numeric Input");
+
+				PageEditor.addFragmentToFormContainer(
+					collectionName = "Form Components",
+					fragmentName = "Numeric Input",
 					index = "2",
 					targetFragmentName = "Numeric Input");
 
@@ -236,13 +241,8 @@ definition {
 
 				PageEditor.addFragmentToFormContainer(
 					collectionName = "Form Components",
-					fragmentName = "Numeric Input",
-					index = "4",
-					targetFragmentName = "Numeric Input");
-
-				PageEditor.addFragmentToFormContainer(
-					collectionName = "Form Components",
 					fragmentName = "Submit Button",
+					index = "4",
 					targetFragmentName = "Numeric Input");
 			}
 

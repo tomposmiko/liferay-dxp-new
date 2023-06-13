@@ -72,6 +72,7 @@ import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
+import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.servlet.PortalWebResourceConstants;
 import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -964,8 +965,6 @@ public class ServicePreAction extends Action {
 
 		long plid = ParamUtil.getLong(httpServletRequest, "p_l_id");
 
-		boolean viewableSourceGroup = true;
-
 		if (plid > 0) {
 			layout = LayoutLocalServiceUtil.getLayout(plid);
 		}
@@ -982,23 +981,53 @@ public class ServicePreAction extends Action {
 			}
 		}
 
-		if ((layout != null) &&
-			((layout.isPrivateLayout() &&
-			  !PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_ENABLED) ||
-			 (layout.isPublicLayout() &&
-			  !PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_ENABLED))) {
-
+		if (layout != null) {
 			Group layoutGroup = layout.getGroup();
 
 			if (layoutGroup.isUser()) {
-				User layoutUser = UserLocalServiceUtil.getUserById(
-					company.getCompanyId(), layoutGroup.getClassPK());
+				if (!GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LPS-155692"))) {
 
-				_updateUserLayouts(layoutUser);
+					long originalPlid = ParamUtil.getLong(
+						PortalUtil.getOriginalServletRequest(
+							httpServletRequest),
+						"p_l_id");
 
-				layout = LayoutLocalServiceUtil.fetchLayout(layout.getPlid());
+					String method = httpServletRequest.getMethod();
+
+					if ((Objects.equals(method, HttpMethods.GET) &&
+						 (originalPlid == plid)) ||
+						(!Objects.equals(
+							method, HttpMethods.GET) && !signedIn)) {
+
+						String message =
+							"User layouts cannot be accessed via p_l_id";
+
+						if (_log.isWarnEnabled()) {
+							_log.warn(message);
+						}
+
+						throw new NoSuchLayoutException(message);
+					}
+				}
+
+				if ((layout.isPrivateLayout() &&
+					 !PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_ENABLED) ||
+					(layout.isPublicLayout() &&
+					 !PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_ENABLED)) {
+
+					User layoutUser = UserLocalServiceUtil.getUserById(
+						company.getCompanyId(), layoutGroup.getClassPK());
+
+					_updateUserLayouts(layoutUser);
+
+					layout = LayoutLocalServiceUtil.fetchLayout(
+						layout.getPlid());
+				}
 			}
 		}
+
+		boolean viewableSourceGroup = true;
 
 		if (layout != null) {
 			long sourceGroupId = ParamUtil.getLong(

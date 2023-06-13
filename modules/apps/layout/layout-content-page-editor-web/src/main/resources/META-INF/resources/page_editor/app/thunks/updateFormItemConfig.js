@@ -12,35 +12,66 @@
  * details.
  */
 
+import {openToast} from 'frontend-js-web';
+
 import updateFormItemConfigAction from '../actions/updateFormItemConfig';
 import updateItemLocalConfig from '../actions/updateItemLocalConfig';
 import FormService from '../services/FormService';
 
 export default function updateFormItemConfig({itemConfig, itemId}) {
+	const isMapping = Boolean(itemConfig.classNameId);
+
 	return (dispatch, getState) => {
-		dispatch(
-			updateItemLocalConfig({
-				disableUndo: true,
-				itemConfig: {
-					loading: true,
-				},
-				itemId,
-			})
-		);
+		if (isMapping) {
+			dispatch(
+				updateItemLocalConfig({
+					disableUndo: true,
+					itemConfig: {
+						loading: true,
+					},
+					itemId,
+				})
+			);
+		}
 
 		return FormService.updateFormItemConfig({
 			itemConfig,
 			itemId,
 			onNetworkStatus: dispatch,
 			segmentsExperienceId: getState().segmentsExperienceId,
-		}).then((layoutData) => {
-			dispatch(
-				updateFormItemConfigAction({
-					itemId,
-					layoutData,
-					overridePreviousConfig: true,
-				})
-			);
-		});
+		}).then(
+			({
+				addedFragmentEntryLinks,
+				errorMessage,
+				layoutData,
+				removedFragmentEntryLinkIds,
+			}) => {
+				dispatch(
+					updateFormItemConfigAction({
+						addedFragmentEntryLinks,
+						isMapping,
+						itemId,
+						layoutData,
+						overridePreviousConfig: true,
+						removedFragmentEntryLinkIds,
+					})
+				);
+
+				if (errorMessage) {
+					openToast({
+						message: errorMessage,
+						type: 'danger',
+					});
+				}
+				else if (isMapping && itemConfig.classNameId !== '0') {
+					openToast({
+						message: Liferay.Language.get(
+							'your-form-has-been-successfully-loaded'
+						),
+						type: 'success',
+					});
+				}
+			}
+		);
 	};
 }
