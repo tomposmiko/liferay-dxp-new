@@ -14,7 +14,6 @@
 
 package com.liferay.site.internal.struts;
 
-import com.liferay.layout.admin.kernel.util.SitemapUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.NoSuchLayoutSetException;
 import com.liferay.portal.kernel.log.Log;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.site.util.Sitemap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -125,7 +125,7 @@ public class SitemapStrutsAction implements StrutsAction {
 				String layoutUuid = ParamUtil.getString(
 					httpServletRequest, "layoutUuid");
 
-				String sitemap = SitemapUtil.getSitemap(
+				String sitemap = _sitemap.getSitemap(
 					layoutUuid, layoutSet.getGroupId(),
 					layoutSet.isPrivateLayout(), themeDisplay);
 
@@ -170,6 +170,9 @@ public class SitemapStrutsAction implements StrutsAction {
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private Sitemap _sitemap;
 
 	@Reference
 	private VirtualHostLocalService _virtualHostLocalService;

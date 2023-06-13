@@ -1,11 +1,17 @@
 definition {
 
 	macro assertCompanyLogContent {
-		var companyId = JSONCompany.getCompanyId(portalInstanceName = ${portalInstanceName});
+		var groupId = JSONCompany.getCompanyGroupIdByGroupKey(
+			groupKey = "Guest",
+			portalInstanceName = ${portalInstanceName});
 
-		if (!(contains(${logContent}, "companyId=${companyId}")) && !(contains(${logContent}, "#${companyId}"))) {
-			fail("The ${portalInstanceName} company log file content does not contain the company ID.");
+		if (!(contains(${logContent}, "for group ${groupId}"))) {
+			fail("The ${portalInstanceName} company log file content does not contain the group ID.");
 		}
+
+		AssertTextPresent(
+			locator1 = "CompanyLogging#COMPANY_LOG_CONTENT",
+			value1 = "for group ${groupId}");
 	}
 
 	macro assertCompanyLogIsolated {
@@ -22,9 +28,11 @@ definition {
 		ListUtil.remove(${portalInstanceNames}, ${portalInstanceName});
 
 		for (var additionalPortalInstanceName : list ${portalInstanceNames}) {
-			var companyId = JSONCompany.getCompanyId(portalInstanceName = ${additionalPortalInstanceName});
+			var groupId = JSONCompany.getCompanyGroupIdByGroupKey(
+				groupKey = "Guest",
+				portalInstanceName = ${additionalPortalInstanceName});
 
-			if (contains(${logContent}, "companyId=${companyId}")) {
+			if (contains(${logContent}, "for group ${groupId}")) {
 				fail("The ${portalInstanceName} company log file contains logs from the ${additionalPortalInstanceName} company");
 			}
 		}
@@ -40,8 +48,12 @@ definition {
 		var logName = CompanyLogging.getCompanyLogName(portalInstanceName = ${portalInstanceName});
 
 		Click(
-			key_virtualHost = ${portalInstanceName},
+			key_logName = ${logName},
 			locator1 = "CompanyLogging#COMPANY_LOG_NAME");
+
+		Click(
+			ariaLabel = "Download",
+			locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
 		DownloadTempFile();
 
@@ -76,6 +88,12 @@ definition {
 		var logName = FileUtil.getFileName(${companyLogDirPath});
 
 		return ${logName};
+	}
+
+	macro openServerLogsAdmin {
+		Navigator.openWithAppendToBaseURL(
+			baseURL = ${baseURL},
+			urlAppend = "group/guest/~/control_panel/manage?p_p_id=com_liferay_portal_company_log_web_internal_portlet_PortalCompanyLogPortlet");
 	}
 
 }

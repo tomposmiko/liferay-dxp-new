@@ -19,6 +19,8 @@ import ClayIcon from '@clayui/icon';
 import {getOpener, sub} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
+import './../css/tree.scss';
+
 const nodeByName = (items, name) => {
 	return items.reduce(function reducer(acc, item) {
 		if (item.name?.toLowerCase().includes(name.toLowerCase())) {
@@ -44,13 +46,17 @@ function visit(nodes, callback) {
 
 export function AssetCategoryTree({
 	filterQuery,
+	inheritSelection,
 	itemSelectedEventName,
 	items,
 	multiSelection,
 	onItems,
 	onSelectedItemsCount,
+	selectedCategoryIds,
 }) {
-	const [selectedKeys, setSelectionChange] = useState(new Set());
+	const [selectedKeys, setSelectionChange] = useState(
+		new Set(selectedCategoryIds)
+	);
 
 	const filteredItems = useMemo(() => {
 		if (!filterQuery) {
@@ -71,7 +77,7 @@ export function AssetCategoryTree({
 	}, [items]);
 
 	useEffect(() => {
-		const selectedItems = [];
+		const selectedItems = {};
 
 		selectedKeys.forEach((key) => {
 			const item = itemsById[key];
@@ -80,28 +86,26 @@ export function AssetCategoryTree({
 				return;
 			}
 
-			selectedItems.push({
+			selectedItems[item.id] = {
+				categoryId: item.vocabulary ? 0 : item.id,
 				className: item.className,
 				classNameId: item.classNameId,
 				classPK: item.id,
+				nodePath: item.nodePath,
 				title: item.name,
-			});
+				value: item.name,
+				vocabularyId: item.vocabulary ? item.id : 0,
+			};
 		});
 
 		if (onSelectedItemsCount) {
-			onSelectedItemsCount(selectedItems.length);
-		}
-
-		let data = selectedItems;
-
-		if (!multiSelection) {
-			data = selectedItems[0];
+			onSelectedItemsCount(selectedKeys.size);
 		}
 
 		requestAnimationFrame(() => {
-			if (data) {
+			if (Object.keys(selectedItems).length) {
 				getOpener().Liferay.fire(itemSelectedEventName, {
-					data,
+					data: selectedItems,
 				});
 			}
 		});
@@ -176,7 +180,13 @@ export function AssetCategoryTree({
 				onItemsChange={(items) => onItems(items)}
 				onSelectionChange={(keys) => setSelectionChange(keys)}
 				selectedKeys={selectedKeys}
-				selectionMode={multiSelection ? 'multiple' : 'single'}
+				selectionMode={
+					inheritSelection
+						? 'multiple-recursive'
+						: multiSelection
+						? 'multiple'
+						: 'single'
+				}
 				showExpanderOnHover={false}
 			>
 				{(item, selection, expand) => (

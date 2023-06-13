@@ -4,7 +4,7 @@ definition {
 	property custom.properties = "feature.flag.LPS-162765=true";
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Content Pages";
+	property testray.main.component.name = "Utility Pages";
 
 	setUp {
 		task ("Set up instance and sign in") {
@@ -498,7 +498,7 @@ definition {
 				text = "Resource Not Found");
 
 			ContentPages.viewFragmentText(
-				fragmentName = "paragragh",
+				fragmentName = "paragraph",
 				id = "element-text",
 				text = "Status Code: 404");
 		}
@@ -547,10 +547,6 @@ definition {
 
 			PagesAdmin.addUtilityPage(pageName = "404 Error Utility Page");
 
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading");
-
 			PageEditor.editFragmentText(
 				fragmentName = "Heading",
 				id = "element-text",
@@ -586,10 +582,7 @@ definition {
 				pageName = "Non Exist Page",
 				siteName = "Test Site Name");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Page Not Found");
+			AssertTextPresent(value1 = "The requested resource could not be found.");
 		}
 	}
 

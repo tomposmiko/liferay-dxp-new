@@ -111,7 +111,7 @@ public class SegmentsContextVocabularyCompanyConfigurationModelListener
 		throws ConfigurationModelListenerException {
 
 		try {
-			Stream<Configuration> companyConfigurationsStream = Stream.of(
+			return Stream.of(
 				Optional.ofNullable(
 					_configurationAdmin.listConfigurations(
 						StringBundler.concat(
@@ -121,27 +121,12 @@ public class SegmentsContextVocabularyCompanyConfigurationModelListener
 							")"))
 				).orElse(
 					new Configuration[0]
-				));
-			Stream<Configuration> configurationsStream = Stream.of(
-				Optional.ofNullable(
-					_configurationAdmin.listConfigurations(
-						StringBundler.concat(
-							"(", ConfigurationAdmin.SERVICE_FACTORYPID, "=",
-							SegmentsContextVocabularyCompanyConfiguration.class.
-								getCanonicalName(),
-							")"))
-				).orElse(
-					new Configuration[0]
-				));
-
-			return Stream.concat(
-				companyConfigurationsStream, configurationsStream
-			).filter(
+				)
+			).anyMatch(
 				configuration -> _isDefined(
 					assetVocabularyName, companyId, configuration,
 					entityFieldName)
-			).findFirst(
-			).isPresent();
+			);
 		}
 		catch (Exception exception) {
 			throw new ConfigurationModelListenerException(
