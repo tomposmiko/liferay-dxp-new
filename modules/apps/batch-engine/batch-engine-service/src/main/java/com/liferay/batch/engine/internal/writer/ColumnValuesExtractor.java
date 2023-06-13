@@ -144,8 +144,31 @@ public class ColumnValuesExtractor {
 		int index = fieldName.indexOf(CharPool.UNDERLINE);
 
 		if (index == -1) {
-			throw new IllegalArgumentException(
-				"Invalid field name : " + fieldName);
+			Field propertiesField = fieldMap.get("properties");
+
+			if (!ItemClassIndexUtil.isObjectEntryProperties(propertiesField)) {
+				throw new IllegalArgumentException(
+					"Invalid field name : " + fieldName);
+			}
+
+			_unsafeFunctions.add(
+				item -> {
+					Map<?, ?> map = (Map<?, ?>)propertiesField.get(item);
+
+					Object value = map.get(fieldName);
+
+					if (value == null) {
+						return StringPool.BLANK;
+					}
+
+					if (value instanceof String) {
+						return CSVUtil.encode(value);
+					}
+
+					return value;
+				});
+
+			return;
 		}
 
 		String prefixFieldName = fieldName.substring(0, index);

@@ -20,27 +20,19 @@ import com.liferay.jenkins.results.parser.testray.TestrayRoutine;
 import java.io.IOException;
 
 import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -67,19 +59,24 @@ public class CISystemStatusReportUtil {
 		List<Callable<String>> callables = new ArrayList<>();
 
 		for (LocalDate localDate : _recentTestrayBuilds.keySet()) {
-			List<TestrayBuild> builds = testrayRoutine.getTestrayBuilds(
+			List<TestrayBuild> testrayBuilds = testrayRoutine.getTestrayBuilds(
 				200, localDate.toString(), nameFilter);
 
-			_recentTestrayBuilds.put(localDate, builds);
+			_recentTestrayBuilds.put(localDate, testrayBuilds);
 
-			for (final TestrayBuild testrayBuild : builds) {
+			for (final TestrayBuild testrayBuild : testrayBuilds) {
 				callables.add(
 					new Callable<String>() {
 
 						@Override
 						public String call() throws Exception {
 							try {
-								return testrayBuild.getResult();
+								TopLevelBuildReport topLevelBuildReport =
+									testrayBuild.getTopLevelBuildReport();
+
+								if (topLevelBuildReport != null) {
+									return topLevelBuildReport.getResult();
+								}
 							}
 							catch (Exception exception) {
 								System.out.println(
@@ -143,25 +140,31 @@ public class CISystemStatusReportUtil {
 		JSONArray datesJSONArray = new JSONArray();
 		JSONArray durationsJSONArray = new JSONArray();
 
-		List<LocalDate> dates = new ArrayList<>(_recentTestrayBuilds.keySet());
+		List<LocalDate> localDates = new ArrayList<>(
+			_recentTestrayBuilds.keySet());
 
-		Collections.sort(dates);
+		Collections.sort(localDates);
 
-		for (LocalDate date : dates) {
+		for (LocalDate localDate : localDates) {
 			List<Long> durations = new ArrayList<>();
 
-			for (TestrayBuild testrayBuild : _recentTestrayBuilds.get(date)) {
-				List<Long> downstreamDurations =
-					testrayBuild.getDownstreamBuildDurations();
+			for (TestrayBuild testrayBuild :
+					_recentTestrayBuilds.get(localDate)) {
 
-				if (downstreamDurations == null) {
+				TopLevelBuildReport topLevelBuildReport =
+					testrayBuild.getTopLevelBuildReport();
+
+				if (topLevelBuildReport == null) {
 					continue;
 				}
 
-				for (Long downstreamDuration : downstreamDurations) {
-					if ((downstreamDuration == null) ||
-						(downstreamDuration < 0)) {
+				for (DownstreamBuildReport downstreamBuildReport :
+						topLevelBuildReport.getDownstreamBuildReports()) {
 
+					long downstreamDuration =
+						downstreamBuildReport.getDuration();
+
+					if (downstreamDuration < 0) {
 						continue;
 					}
 
@@ -172,7 +175,7 @@ public class CISystemStatusReportUtil {
 			durations.removeAll(Collections.singleton(null));
 
 			if (durations.isEmpty()) {
-				datesJSONArray.put(date.toString());
+				datesJSONArray.put(localDate.toString());
 			}
 			else {
 				String meanDuration = JenkinsResultsParserUtil.combine(
@@ -181,7 +184,7 @@ public class CISystemStatusReportUtil {
 						JenkinsResultsParserUtil.getAverage(durations)));
 
 				datesJSONArray.put(
-					new String[] {date.toString(), meanDuration});
+					new String[] {localDate.toString(), meanDuration});
 			}
 
 			Collections.sort(durations);
@@ -203,17 +206,27 @@ public class CISystemStatusReportUtil {
 		JSONArray passedBuildsJSONArray = new JSONArray();
 		JSONArray unstableBuildsJSONArray = new JSONArray();
 
-		List<LocalDate> dates = new ArrayList<>(_recentTestrayBuilds.keySet());
+		List<LocalDate> localDates = new ArrayList<>(
+			_recentTestrayBuilds.keySet());
 
-		Collections.sort(dates);
+		Collections.sort(localDates);
 
-		for (LocalDate date : dates) {
+		for (LocalDate localDate : localDates) {
 			int failedBuilds = 0;
 			int passedBuilds = 0;
 			int unstableBuilds = 0;
 
-			for (TestrayBuild testrayBuild : _recentTestrayBuilds.get(date)) {
-				String result = testrayBuild.getResult();
+			for (TestrayBuild testrayBuild :
+					_recentTestrayBuilds.get(localDate)) {
+
+				TopLevelBuildReport topLevelBuildReport =
+					testrayBuild.getTopLevelBuildReport();
+
+				if (topLevelBuildReport == null) {
+					continue;
+				}
+
+				String result = topLevelBuildReport.getResult();
 
 				if (result.equals("FAILURE")) {
 					failedBuilds++;
@@ -232,7 +245,7 @@ public class CISystemStatusReportUtil {
 				}
 			}
 
-			datesJSONArray.put(date.toString());
+			datesJSONArray.put(localDate.toString());
 			passedBuildsJSONArray.put(passedBuilds);
 			failedBuildsJSONArray.put(failedBuilds);
 			unstableBuildsJSONArray.put(unstableBuilds);
@@ -307,29 +320,16 @@ public class CISystemStatusReportUtil {
 			for (TestrayBuild testrayBuild :
 					_recentTestrayBuilds.get(localDate)) {
 
-				String testrayBuildName = testrayBuild.getName();
+				TopLevelBuildReport topLevelBuildReport =
+					testrayBuild.getTopLevelBuildReport();
 
-				Matcher matcher = _dateTimePattern.matcher(testrayBuildName);
-
-				if (!matcher.find()) {
+				if (topLevelBuildReport == null) {
 					continue;
 				}
 
-				Date date;
-
-				try {
-					date = _simpleDateFormat.parse(matcher.group("date"));
-				}
-				catch (ParseException parseException) {
-					throw new RuntimeException(parseException);
-				}
-
-				Instant instant = Instant.ofEpochMilli(date.getTime());
-
-				ZonedDateTime zonedDateTime = instant.atZone(
-					ZoneId.systemDefault());
-
-				LocalDateTime localDateTime = zonedDateTime.toLocalDateTime();
+				LocalDateTime localDateTime =
+					JenkinsResultsParserUtil.getLocalDateTime(
+						topLevelBuildReport.getStartDate());
 
 				if ((startLocalDateTime.compareTo(localDateTime) >= 0) ||
 					(endLocalDateTime.compareTo(localDateTime) <= 0)) {
@@ -337,7 +337,7 @@ public class CISystemStatusReportUtil {
 					continue;
 				}
 
-				String testrayBuildResult = testrayBuild.getResult();
+				String testrayBuildResult = topLevelBuildReport.getResult();
 
 				if (testrayBuildResult.equals("FAILURE")) {
 					failedBuilds++;
@@ -384,9 +384,16 @@ public class CISystemStatusReportUtil {
 			List<Long> durations = new ArrayList<>();
 
 			for (TestrayBuild testrayBuild : _recentTestrayBuilds.get(date)) {
-				Long duration = testrayBuild.getTopLevelActiveBuildDuration();
+				TopLevelBuildReport topLevelBuildReport =
+					testrayBuild.getTopLevelBuildReport();
 
-				if ((duration == null) || (duration < 0)) {
+				if (topLevelBuildReport == null) {
+					continue;
+				}
+
+				long duration = topLevelBuildReport.getTopLevelActiveDuration();
+
+				if (duration < 0) {
 					continue;
 				}
 
@@ -433,9 +440,16 @@ public class CISystemStatusReportUtil {
 			List<Long> durations = new ArrayList<>();
 
 			for (TestrayBuild testrayBuild : _recentTestrayBuilds.get(date)) {
-				Long duration = testrayBuild.getTopLevelBuildDuration();
+				TopLevelBuildReport topLevelBuildReport =
+					testrayBuild.getTopLevelBuildReport();
 
-				if ((duration == null) || (duration < 0)) {
+				if (topLevelBuildReport == null) {
+					continue;
+				}
+
+				long duration = topLevelBuildReport.getDuration();
+
+				if (duration < 0) {
 					continue;
 				}
 
@@ -470,14 +484,10 @@ public class CISystemStatusReportUtil {
 
 	private static final int _DAYS_PER_WEEK = 7;
 
-	private static final Pattern _dateTimePattern = Pattern.compile(
-		".*(?<date>\\d{4}-\\d{2}-\\d{2}\\[\\d{2}:\\d{2}:\\d{2}\\]).*");
 	private static final ExecutorService _executorService =
 		JenkinsResultsParserUtil.getNewThreadPoolExecutor(25, true);
 	private static final HashMap<LocalDate, List<TestrayBuild>>
 		_recentTestrayBuilds;
-	private static final SimpleDateFormat _simpleDateFormat =
-		new SimpleDateFormat("yyyy-MM-dd[HH:mm:ss]");
 
 	static {
 		_recentTestrayBuilds = new HashMap<LocalDate, List<TestrayBuild>>() {

@@ -987,6 +987,9 @@ public class LayoutStagedModelDataHandler
 
 		_fixImportTypeSettings(importedLayout);
 
+		_updateLastMergeLayoutModifiedTime(
+			layoutElement, importedLayout, portletDataContext);
+
 		importedLayout = _layoutLocalService.updateLayout(importedLayout);
 
 		_importTheme(portletDataContext, layout, importedLayout);
@@ -2573,13 +2576,14 @@ public class LayoutStagedModelDataHandler
 		}
 
 		Date existingLayoutModifiedDate = existingLayout.getModifiedDate();
-		long lastMergeTime = GetterUtil.getLong(
-			existingLayout.getTypeSettingsProperty(Sites.LAST_MERGE_TIME));
+		long lastMergeLayoutModifiedTime = GetterUtil.getLong(
+			existingLayout.getTypeSettingsProperty(
+				Sites.LAST_MERGE_LAYOUT_MODIFIED_TIME));
 		Date layoutModifiedDate = layout.getModifiedDate();
 
 		if ((existingLayoutModifiedDate == null) ||
 			(layoutModifiedDate == null) ||
-			(layoutModifiedDate.getTime() > lastMergeTime)) {
+			(layoutModifiedDate.getTime() > lastMergeLayoutModifiedTime)) {
 
 			return true;
 		}
@@ -2827,6 +2831,38 @@ public class LayoutStagedModelDataHandler
 		}
 
 		return importedLayout;
+	}
+
+	private void _updateLastMergeLayoutModifiedTime(
+		Element exportedLayoutElement, Layout importedLayout,
+		PortletDataContext portletDataContext) {
+
+		String layoutsImportMode = MapUtil.getString(
+			portletDataContext.getParameterMap(),
+			PortletDataHandlerKeys.LAYOUTS_IMPORT_MODE,
+			PortletDataHandlerKeys.LAYOUTS_IMPORT_MODE_MERGE_BY_LAYOUT_UUID);
+
+		if (!layoutsImportMode.equals(
+				PortletDataHandlerKeys.
+					LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE)) {
+
+			return;
+		}
+
+		Layout exportedLayout = (Layout)portletDataContext.getZipEntryAsObject(
+			exportedLayoutElement.attributeValue("path"));
+
+		UnicodeProperties importedLayoutTypeSettingsUnicodeProperties =
+			importedLayout.getTypeSettingsProperties();
+
+		Date exportedLayoutModifiedDate = exportedLayout.getModifiedDate();
+
+		importedLayoutTypeSettingsUnicodeProperties.setProperty(
+			Sites.LAST_MERGE_LAYOUT_MODIFIED_TIME,
+			String.valueOf(exportedLayoutModifiedDate.getTime()));
+
+		importedLayout.setTypeSettingsProperties(
+			importedLayoutTypeSettingsUnicodeProperties);
 	}
 
 	private void _updateTypeSettings(Layout importedLayout, Layout layout)

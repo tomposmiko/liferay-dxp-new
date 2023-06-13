@@ -61,14 +61,33 @@ public class RowLayoutStructureItemImporter
 			return rowStyledLayoutStructureItem;
 		}
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147511")) &&
-			definitionMap.containsKey("cssClasses")) {
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147511"))) {
+			if (definitionMap.containsKey("cssClasses")) {
+				List<String> cssClasses = (List<String>)definitionMap.get(
+					"cssClasses");
 
-			List<String> cssClasses = (List<String>)definitionMap.get(
-				"cssClasses");
+				rowStyledLayoutStructureItem.setCssClasses(
+					new HashSet<>(cssClasses));
+			}
 
-			rowStyledLayoutStructureItem.setCssClasses(
-				new HashSet<>(cssClasses));
+			if (definitionMap.containsKey("customCSS")) {
+				rowStyledLayoutStructureItem.setCustomCSS(
+					String.valueOf(definitionMap.get("customCSS")));
+			}
+
+			if (definitionMap.containsKey("customCSSViewports")) {
+				List<Map<String, Object>> customCSSViewports =
+					(List<Map<String, Object>>)definitionMap.get(
+						"customCSSViewports");
+
+				for (Map<String, Object> customCSSViewport :
+						customCSSViewports) {
+
+					rowStyledLayoutStructureItem.setCustomCSSViewport(
+						(String)customCSSViewport.get("id"),
+						(String)customCSSViewport.get("customCSS"));
+				}
+			}
 		}
 
 		rowStyledLayoutStructureItem.setGutters(

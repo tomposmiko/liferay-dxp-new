@@ -14,9 +14,10 @@
 
 package com.liferay.fragment.internal.renderer;
 
-import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.input.template.parser.FragmentEntryInputTemplateNodeContextHelper;
+import com.liferay.fragment.input.template.parser.InputTemplateNode;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.DefaultFragmentEntryProcessorContext;
@@ -37,6 +38,7 @@ import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
@@ -50,6 +52,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -136,16 +139,58 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			fragmentEntryLink.setCss(fragmentEntry.getCss());
 			fragmentEntryLink.setHtml(fragmentEntry.getHtml());
 			fragmentEntryLink.setJs(fragmentEntry.getJs());
+			fragmentEntryLink.setType(fragmentEntry.getType());
 		}
 
 		return fragmentEntryLink;
+	}
+
+	private String _getFragmentEntryName(FragmentEntryLink fragmentEntryLink) {
+		FragmentEntry fragmentEntry = null;
+
+		if (Validator.isNotNull(fragmentEntryLink.getRendererKey())) {
+			fragmentEntry =
+				_fragmentCollectionContributorTracker.getFragmentEntry(
+					fragmentEntryLink.getRendererKey());
+		}
+
+		if (fragmentEntry == null) {
+			fragmentEntry = _fragmentEntryLocalService.fetchFragmentEntry(
+				fragmentEntryLink.getFragmentEntryId());
+		}
+
+		if (fragmentEntry == null) {
+			return StringPool.BLANK;
+		}
+
+		return fragmentEntry.getName();
+	}
+
+	private JSONObject _getInputJSONObject(
+		FragmentEntryLink fragmentEntryLink,
+		HttpServletRequest httpServletRequest,
+		Optional<InfoForm> infoFormOptional, Locale locale) {
+
+		FragmentEntryInputTemplateNodeContextHelper
+			fragmentEntryInputTemplateNodeContextHelper =
+				new FragmentEntryInputTemplateNodeContextHelper(
+					_getFragmentEntryName(fragmentEntryLink),
+					_fragmentEntryConfigurationParser);
+
+		InputTemplateNode inputTemplateNode =
+			fragmentEntryInputTemplateNodeContextHelper.toInputTemplateNode(
+				fragmentEntryLink, httpServletRequest, infoFormOptional,
+				locale);
+
+		return inputTemplateNode.toJSONObject();
 	}
 
 	private boolean _isCacheable(
 		FragmentEntryLink fragmentEntryLink,
 		FragmentRendererContext fragmentRendererContext) {
 
-		if (!Objects.equals(
+		if (fragmentEntryLink.isTypeInput() ||
+			!Objects.equals(
 				fragmentRendererContext.getMode(),
 				FragmentEntryLinkConstants.VIEW) ||
 			(fragmentRendererContext.getPreviewClassPK() > 0) ||
@@ -180,12 +225,6 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 				fragmentEntryLink.getFragmentEntryId());
 		}
 
-		if ((fragmentEntry != null) &&
-			(fragmentEntry.getType() == FragmentConstants.TYPE_INPUT)) {
-
-			return false;
-		}
-
 		if (fragmentEntry == null) {
 			return fragmentEntryLink.isCacheable();
 		}
@@ -194,22 +233,23 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 	}
 
 	private String _renderFragmentEntry(
-		long fragmentEntryId, String css, String html, String js,
-		String configuration, String namespace, String fragmentElementId,
-		String mode, HttpServletRequest httpServletRequest) {
+		String configuration, String css,
+		FragmentRendererContext fragmentRendererContext, String html,
+		HttpServletRequest httpServletRequest) {
 
-		StringBundler sb = new StringBundler(20);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("<div id=\"");
 
-		sb.append(fragmentElementId);
+		sb.append(fragmentRendererContext.getFragmentElementId());
 
 		sb.append("\" >");
 		sb.append(html);
 		sb.append("</div>");
 
 		if (Validator.isNotNull(css)) {
-			String outputKey = fragmentEntryId + "_CSS";
+			String outputKey =
+				fragmentRendererContext.getFragmentElementId() + "_CSS";
 
 			OutputData outputData = (OutputData)httpServletRequest.getAttribute(
 				WebKeys.OUTPUT_DATA);
@@ -233,7 +273,9 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			}
 
 			if (!cssLoaded ||
-				Objects.equals(mode, FragmentEntryLinkConstants.EDIT)) {
+				Objects.equals(
+					fragmentRendererContext.getMode(),
+					FragmentEntryLinkConstants.EDIT)) {
 
 				sb.append("<style>");
 				sb.append(css);
@@ -249,21 +291,36 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			}
 		}
 
-		if (Validator.isNotNull(js)) {
+		FragmentEntryLink fragmentEntryLink =
+			fragmentRendererContext.getFragmentEntryLink();
+
+		if (Validator.isNotNull(fragmentEntryLink.getJs())) {
 			sb.append("<script>(function() {");
 			sb.append("var configuration = ");
 			sb.append(configuration);
 			sb.append("; var fragmentElement = document.querySelector('#");
-			sb.append(fragmentElementId);
+			sb.append(fragmentRendererContext.getFragmentElementId());
 			sb.append("'); var fragmentNamespace = '");
-			sb.append(namespace);
-			sb.append("'; var layoutMode = '");
+			sb.append(fragmentEntryLink.getNamespace());
+			sb.append("'");
+
+			if (fragmentEntryLink.isTypeInput()) {
+				sb.append("; var input = ");
+				sb.append(
+					JSONUtil.toString(
+						_getInputJSONObject(
+							fragmentEntryLink, httpServletRequest,
+							fragmentRendererContext.getInfoFormOptional(),
+							fragmentRendererContext.getLocale())));
+			}
+
+			sb.append("; var layoutMode = '");
 			sb.append(
 				ParamUtil.getString(
 					_portal.getOriginalServletRequest(httpServletRequest),
 					"p_l_mode", Constants.VIEW));
 			sb.append("';");
-			sb.append(js);
+			sb.append(fragmentEntryLink.getJs());
 			sb.append(";}());</script>");
 		}
 
@@ -373,11 +430,8 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		}
 
 		content = _renderFragmentEntry(
-			fragmentEntryLink.getFragmentEntryId(), css, html,
-			fragmentEntryLink.getJs(), configurationJSONObject.toString(),
-			fragmentEntryLink.getNamespace(),
-			fragmentRendererContext.getFragmentElementId(),
-			fragmentRendererContext.getMode(), httpServletRequest);
+			configurationJSONObject.toString(), css, fragmentRendererContext,
+			html, httpServletRequest);
 
 		if (_isCacheable(fragmentEntryLink, fragmentRendererContext)) {
 			portalCache.put(cacheKeySB.toString(), content);

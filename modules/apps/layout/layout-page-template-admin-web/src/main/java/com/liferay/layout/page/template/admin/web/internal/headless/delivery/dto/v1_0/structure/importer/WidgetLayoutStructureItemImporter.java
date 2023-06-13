@@ -14,6 +14,7 @@
 
 package com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0.structure.importer;
 
+import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
@@ -86,14 +87,33 @@ public class WidgetLayoutStructureItemImporter
 			return fragmentStyledLayoutStructureItem;
 		}
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147511")) &&
-			definitionMap.containsKey("cssClasses")) {
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147511"))) {
+			if (definitionMap.containsKey("cssClasses")) {
+				List<String> cssClasses = (List<String>)definitionMap.get(
+					"cssClasses");
 
-			List<String> cssClasses = (List<String>)definitionMap.get(
-				"cssClasses");
+				fragmentStyledLayoutStructureItem.setCssClasses(
+					new HashSet<>(cssClasses));
+			}
 
-			fragmentStyledLayoutStructureItem.setCssClasses(
-				new HashSet<>(cssClasses));
+			if (definitionMap.containsKey("customCSS")) {
+				fragmentStyledLayoutStructureItem.setCustomCSS(
+					String.valueOf(definitionMap.get("customCSS")));
+			}
+
+			if (definitionMap.containsKey("customCSSViewports")) {
+				List<Map<String, Object>> customCSSViewports =
+					(List<Map<String, Object>>)definitionMap.get(
+						"customCSSViewports");
+
+				for (Map<String, Object> customCSSViewport :
+						customCSSViewports) {
+
+					fragmentStyledLayoutStructureItem.setCustomCSSViewport(
+						(String)customCSSViewport.get("id"),
+						(String)customCSSViewport.get("customCSS"));
+				}
+			}
 		}
 
 		Map<String, Object> fragmentStyleMap =
@@ -197,6 +217,7 @@ public class WidgetLayoutStructureItemImporter
 			layout.getPlid(), StringPool.BLANK, StringPool.BLANK,
 			StringPool.BLANK, StringPool.BLANK,
 			editableValueJSONObject.toString(), widgetInstanceId, 0, null,
+			FragmentConstants.TYPE_PORTLET,
 			ServiceContextThreadLocal.getServiceContext());
 	}
 

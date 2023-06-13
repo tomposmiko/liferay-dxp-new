@@ -110,14 +110,33 @@ public class ContainerLayoutStructureItemImporter
 			stylesJSONObject.put("backgroundImage", jsonObject);
 		}
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147511")) &&
-			definitionMap.containsKey("cssClasses")) {
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147511"))) {
+			if (definitionMap.containsKey("cssClasses")) {
+				List<String> cssClasses = (List<String>)definitionMap.get(
+					"cssClasses");
 
-			List<String> cssClasses = (List<String>)definitionMap.get(
-				"cssClasses");
+				containerStyledLayoutStructureItem.setCssClasses(
+					new HashSet<>(cssClasses));
+			}
 
-			containerStyledLayoutStructureItem.setCssClasses(
-				new HashSet<>(cssClasses));
+			if (definitionMap.containsKey("customCSS")) {
+				containerStyledLayoutStructureItem.setCustomCSS(
+					String.valueOf(definitionMap.get("customCSS")));
+			}
+
+			if (definitionMap.containsKey("customCSSViewports")) {
+				List<Map<String, Object>> customCSSViewports =
+					(List<Map<String, Object>>)definitionMap.get(
+						"customCSSViewports");
+
+				for (Map<String, Object> customCSSViewport :
+						customCSSViewports) {
+
+					containerStyledLayoutStructureItem.setCustomCSSViewport(
+						(String)customCSSViewport.get("id"),
+						(String)customCSSViewport.get("customCSS"));
+				}
+			}
 		}
 
 		Map<String, Object> containerHtmlProperties =

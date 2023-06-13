@@ -28,4 +28,7 @@ public class FDSSampleFDSNames {
 	public static final String MINIMUM =
 		FDSSamplePortletKeys.FDS_SAMPLE + "-minimum";
 
+	public static final String REACT =
+		FDSSamplePortletKeys.FDS_SAMPLE + "-react";
+
 }

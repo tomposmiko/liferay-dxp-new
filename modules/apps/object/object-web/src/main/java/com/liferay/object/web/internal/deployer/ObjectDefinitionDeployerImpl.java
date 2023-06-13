@@ -38,6 +38,7 @@ import com.liferay.layout.page.template.info.item.capability.EditPageInfoItemCap
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerServicesTracker;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
@@ -109,6 +110,13 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	public List<ServiceRegistration<?>> deploy(
 		ObjectDefinition objectDefinition) {
 
+		InfoItemFormProvider<ObjectEntry> infoItemFormProvider =
+			new ObjectEntryInfoItemFormProvider(
+				objectDefinition, _infoItemFieldReaderFieldSetProvider,
+				_objectDefinitionLocalService, _objectFieldLocalService,
+				_objectRelationshipLocalService,
+				_templateInfoItemFieldSetProvider);
+
 		List<ServiceRegistration<?>> serviceRegistrations = ListUtil.fromArray(
 			_bundleContext.registerService(
 				AssetRendererFactory.class,
@@ -138,8 +146,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_bundleContext.registerService(
 				InfoItemCreator.class,
 				new ObjectEntryInfoItemCreator(
-					_groupLocalService, objectDefinition, _objectEntryService,
-					_objectScopeProviderRegistry),
+					_groupLocalService, infoItemFormProvider, objectDefinition,
+					_objectEntryService, _objectScopeProviderRegistry),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"item.class.name", objectDefinition.getClassName()
 				).build()),
@@ -163,12 +171,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					"item.class.name", objectDefinition.getClassName()
 				).build()),
 			_bundleContext.registerService(
-				InfoItemFormProvider.class,
-				new ObjectEntryInfoItemFormProvider(
-					objectDefinition, _infoItemFieldReaderFieldSetProvider,
-					_objectDefinitionLocalService, _objectFieldLocalService,
-					_objectRelationshipLocalService,
-					_templateInfoItemFieldSetProvider),
+				InfoItemFormProvider.class, infoItemFormProvider,
 				HashMapDictionaryBuilder.<String, Object>put(
 					Constants.SERVICE_RANKING, 10
 				).put(

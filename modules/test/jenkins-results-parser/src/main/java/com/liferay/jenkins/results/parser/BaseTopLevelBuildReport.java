@@ -214,6 +214,59 @@ public abstract class BaseTopLevelBuildReport
 		return buildReportJSONObject.optString("testSuiteName");
 	}
 
+	@Override
+	public long getTopLevelActiveDuration() {
+		long topLevelPassiveBuildDuration = getTopLevelPassiveDuration();
+
+		if (topLevelPassiveBuildDuration == 0L) {
+			return 0L;
+		}
+
+		return getDuration() - topLevelPassiveBuildDuration;
+	}
+
+	@Override
+	public long getTopLevelPassiveDuration() {
+		StopWatchRecordsGroup stopWatchRecordsGroup =
+			getStopWatchRecordsGroup();
+
+		if (stopWatchRecordsGroup == null) {
+			return 0L;
+		}
+
+		StopWatchRecord waitForInvokedJobsStopWatchRecord =
+			stopWatchRecordsGroup.get("wait.for.invoked.jobs");
+		StopWatchRecord waitForInvokedSmokeJobsStopWatchRecord =
+			stopWatchRecordsGroup.get("wait.for.invoked.smoke.jobs");
+
+		if ((waitForInvokedJobsStopWatchRecord != null) ||
+			(waitForInvokedSmokeJobsStopWatchRecord != null)) {
+
+			long topLevelPassiveBuildDuration = 0L;
+
+			if (waitForInvokedJobsStopWatchRecord != null) {
+				topLevelPassiveBuildDuration +=
+					waitForInvokedJobsStopWatchRecord.getDuration();
+			}
+
+			if (waitForInvokedSmokeJobsStopWatchRecord != null) {
+				topLevelPassiveBuildDuration +=
+					waitForInvokedSmokeJobsStopWatchRecord.getDuration();
+			}
+
+			return topLevelPassiveBuildDuration;
+		}
+
+		StopWatchRecord invokeDownstreamBuildsStopWatchRecord =
+			stopWatchRecordsGroup.get("invoke.downstream.builds");
+
+		if (invokeDownstreamBuildsStopWatchRecord != null) {
+			return invokeDownstreamBuildsStopWatchRecord.getDuration();
+		}
+
+		return 0L;
+	}
+
 	protected BaseTopLevelBuildReport(JSONObject buildReportJSONObject) {
 		super(buildReportJSONObject);
 
@@ -377,6 +430,7 @@ public abstract class BaseTopLevelBuildReport
 
 				JSONObject buildJSONObject = new JSONObject();
 
+				buildJSONObject.put("axisName", jsonObject.opt("axisName"));
 				buildJSONObject.put("buildURL", jsonObject.get("buildURL"));
 				buildJSONObject.put("duration", jsonObject.get("duration"));
 				buildJSONObject.put("result", jsonObject.get("result"));
@@ -389,6 +443,11 @@ public abstract class BaseTopLevelBuildReport
 
 					StopWatchRecord stopWatchRecord = stopWatchRecordsGroup.get(
 						"start.current.job");
+
+					if (stopWatchRecord == null) {
+						stopWatchRecord = stopWatchRecordsGroup.get(
+							"run.current.job");
+					}
 
 					if (stopWatchRecord == null) {
 						continue;

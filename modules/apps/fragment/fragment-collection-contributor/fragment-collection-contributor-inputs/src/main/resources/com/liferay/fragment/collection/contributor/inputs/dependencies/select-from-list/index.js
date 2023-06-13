@@ -8,7 +8,7 @@ const wrapper = fragmentElement;
 const button = wrapper.querySelector('.form-control');
 const buttonLabel = button.querySelector('.forms-select-from-list-label');
 const dropdown = wrapper.querySelector('.dropdown-menu');
-const input = wrapper.querySelector('input');
+const inputElement = wrapper.querySelector('input');
 const listbox = wrapper.querySelector('.list-unstyled');
 const loadingResultsMessage = wrapper.querySelector(
 	'.forms-select-from-list-loading-results'
@@ -18,22 +18,10 @@ const noResultsMessage = wrapper.querySelector(
 );
 const searchInput = wrapper.querySelector('.forms-select-from-list-search');
 
-// LPS-155167 This will be replaced with real input when feature is ready
-
-const mockInput = {
-	queryOptionsURL: `${location.origin}/o/headless-admin-list-type/v1.0/list-type-definitions/41166/list-type-entries`,
-};
-
 let currentSearch = {
 	abortController: new AbortController(),
 	query: '',
 };
-
-const baseListboxItems = Array.from(listbox.children).map((child) => ({
-	label: child.textContent,
-	optionId: child.id,
-	value: child.dataset.optionValue,
-}));
 
 function debounce(fn, delay) {
 	let debounceId = null;
@@ -45,21 +33,33 @@ function debounce(fn, delay) {
 }
 
 function repositionDropdown() {
-	if (document.body.contains(wrapper)) {
-		if (wrapper.contains(dropdown)) {
-			document.body.appendChild(dropdown);
-		}
-	}
-	else if (document.body.contains(dropdown)) {
-		document.body.removeChild(dropdown);
-	}
-
 	const buttonRect = button.getBoundingClientRect();
 
-	dropdown.style.transform = `
-		translateX(${buttonRect.left + window.scrollX}px)
-		translateY(${buttonRect.bottom + window.scrollY}px)
-	`;
+	if (layoutMode === 'edit') {
+		dropdown.style.position = 'fixed';
+
+		dropdown.style.transform = `
+			translateX(${buttonRect.left}px)
+			translateY(${buttonRect.bottom}px)
+		`;
+	}
+	else {
+		if (document.body.contains(wrapper)) {
+			if (wrapper.contains(dropdown)) {
+				document.body.appendChild(dropdown);
+			}
+		}
+		else if (document.body.contains(dropdown)) {
+			dropdown.parentNode.removeChild(dropdown);
+		}
+
+		dropdown.style.position = 'absolute';
+
+		dropdown.style.transform = `
+			translateX(${buttonRect.left + window.scrollX}px)
+			translateY(${buttonRect.bottom + window.scrollY}px)
+		`;
+	}
 }
 
 function showDropdown() {
@@ -71,10 +71,6 @@ function showDropdown() {
 function hideDropdown() {
 	button.removeAttribute('aria-expanded');
 	dropdown.classList.remove('show');
-
-	if (searchInput) {
-		searchInput.value = '';
-	}
 }
 
 function getActiveDesdendant() {
@@ -93,7 +89,7 @@ function setActiveDescendant(item) {
 
 	buttonLabel.textContent = item.textContent;
 	listbox.setAttribute('aria-activedescendant', item.id);
-	input.value = item.dataset.optionValue;
+	inputElement.value = item.dataset.optionValue;
 
 	item.classList.add('active');
 	item.setAttribute('aria-selected', 'true');
@@ -113,6 +109,10 @@ function handleButtonClick() {
 
 		if (searchInput) {
 			searchInput.focus();
+
+			if (searchInput) {
+				searchInput.setSelectionRange(0, searchInput.value.length);
+			}
 		}
 		else {
 			listbox.focus();
@@ -238,6 +238,47 @@ function handleWindowResizeOrScroll() {
 	}
 }
 
+function filterLocalOptions() {
+	const preferedItems = [];
+	const restItems = [];
+
+	for (const item of input.options) {
+		if (preferedItems.length + restItems.length === 10) {
+			break;
+		}
+
+		const label = item.label.trim().toLowerCase();
+
+		if (label.startsWith(currentSearch.query)) {
+			preferedItems.push(item);
+		}
+		else if (label.includes(currentSearch.query)) {
+			restItems.push(item);
+		}
+	}
+
+	return Promise.resolve({
+		items: [...preferedItems, ...restItems].slice(0, 10).map((item) => ({
+			key: item.value,
+			name: item.label,
+		})),
+	});
+}
+
+function fetchRemoteOptions() {
+	const url = new URL(input.attributes.autocompleteURL);
+	url.searchParams.set('search', currentSearch.query);
+
+	return Liferay.Util.fetch(url, {
+		headers: new Headers({
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+		}),
+		method: 'GET',
+		signal: currentSearch.abortController.signal,
+	}).then((response) => response.json());
+}
+
 function handleSearchKeyup() {
 	if (searchInput.value === currentSearch.query) {
 		return;
@@ -258,7 +299,7 @@ function handleSearchKeyup() {
 
 			element.classList.add('dropdown-item');
 			element.dataset.optionValue = item.value;
-			element.id = item.optionId;
+			element.id = `${fragmentNamespace}-option-${item.value}`;
 			element.setAttribute('role', 'option');
 			element.textContent = item.label;
 
@@ -274,7 +315,7 @@ function handleSearchKeyup() {
 		listbox.innerHTML = '';
 	}
 	else {
-		setListboxItems(baseListboxItems);
+		setListboxItems(input.options);
 
 		return;
 	}
@@ -282,23 +323,15 @@ function handleSearchKeyup() {
 	loadingResultsMessage.classList.remove('d-none');
 	loadingResultsMessage.removeAttribute('aria-hidden');
 
-	const url = new URL(mockInput.queryOptionsURL);
-	url.searchParams.set('search', currentSearch.query);
+	const fetcher = input.attributes.autocompleteURL
+		? fetchRemoteOptions
+		: filterLocalOptions;
 
-	Liferay.Util.fetch(url, {
-		headers: new Headers({
-			'Accept': 'application/json',
-			'Content-Type': 'application/json',
-		}),
-		method: 'GET',
-		signal: currentSearch.abortController.signal,
-	})
-		.then((response) => response.json())
+	fetcher()
 		.then((result) => {
 			setListboxItems(
 				result.items.map((entry) => ({
 					label: entry.name,
-					optionId: entry.key,
 					value: entry.key,
 				}))
 			);
@@ -346,7 +379,6 @@ if (listbox.children.length) {
 	}
 
 	dropdown.style.left = '0';
-	dropdown.style.position = 'absolute';
 	dropdown.style.top = '0';
 
 	repositionDropdown();

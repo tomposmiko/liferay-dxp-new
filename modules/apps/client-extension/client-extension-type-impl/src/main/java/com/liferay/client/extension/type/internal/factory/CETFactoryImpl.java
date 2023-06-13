@@ -36,6 +36,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import javax.portlet.PortletRequest;
@@ -48,6 +50,34 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = CETFactory.class)
 public class CETFactoryImpl implements CETFactory {
+
+	public CETFactoryImpl() {
+		_cetImplFactories = HashMapBuilder.<String, CETImplFactory>put(
+			ClientExtensionEntryConstants.TYPE_CUSTOM_ELEMENT,
+			new CustomElementCETImplFactoryImpl()
+		).put(
+			ClientExtensionEntryConstants.TYPE_GLOBAL_CSS,
+			new GlobalCSSCETImplFactoryImpl()
+		).put(
+			ClientExtensionEntryConstants.TYPE_GLOBAL_JS,
+			new GlobalJSCETImplFactoryImpl()
+		).put(
+			ClientExtensionEntryConstants.TYPE_IFRAME,
+			new IFrameCETImplFactoryImpl()
+		).put(
+			ClientExtensionEntryConstants.TYPE_THEME_CSS,
+			new ThemeCSSCETImplFactoryImpl()
+		).put(
+			ClientExtensionEntryConstants.TYPE_THEME_FAVICON,
+			new ThemeFaviconCETImplFactoryImpl()
+		).put(
+			ClientExtensionEntryConstants.TYPE_THEME_JS,
+			new ThemeJSCETImplFactoryImpl()
+		).build();
+
+		_types = Collections.unmodifiableSortedSet(
+			new TreeSet<>(_cetImplFactories.keySet()));
+	}
 
 	@Override
 	public CET create(
@@ -103,7 +133,7 @@ public class CETFactoryImpl implements CETFactory {
 
 	@Override
 	public Collection<String> getTypes() {
-		return Collections.unmodifiableSet(_cetImplFactories.keySet());
+		return _types;
 	}
 
 	@Override
@@ -164,31 +194,11 @@ public class CETFactoryImpl implements CETFactory {
 		return typeSettingsUnicodeProperties;
 	}
 
-	private final Map<String, CETImplFactory> _cetImplFactories =
-		HashMapBuilder.<String, CETImplFactory>put(
-			ClientExtensionEntryConstants.TYPE_CUSTOM_ELEMENT,
-			new CustomElementCETImplFactoryImpl()
-		).put(
-			ClientExtensionEntryConstants.TYPE_GLOBAL_CSS,
-			new GlobalCSSCETImplFactoryImpl()
-		).put(
-			ClientExtensionEntryConstants.TYPE_GLOBAL_JS,
-			new GlobalJSCETImplFactoryImpl()
-		).put(
-			ClientExtensionEntryConstants.TYPE_IFRAME,
-			new IFrameCETImplFactoryImpl()
-		).put(
-			ClientExtensionEntryConstants.TYPE_THEME_CSS,
-			new ThemeCSSCETImplFactoryImpl()
-		).put(
-			ClientExtensionEntryConstants.TYPE_THEME_FAVICON,
-			new ThemeFaviconCETImplFactoryImpl()
-		).put(
-			ClientExtensionEntryConstants.TYPE_THEME_JS,
-			new ThemeJSCETImplFactoryImpl()
-		).build();
+	private final Map<String, CETImplFactory> _cetImplFactories;
 
 	@Reference
 	private Portal _portal;
+
+	private final Set<String> _types;
 
 }

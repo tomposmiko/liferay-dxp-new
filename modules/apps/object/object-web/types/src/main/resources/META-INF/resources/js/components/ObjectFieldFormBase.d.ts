@@ -18,8 +18,10 @@ import './ObjectFieldFormBase.scss';
 export default function ObjectFieldFormBase({
 	children,
 	disabled,
+	editingField,
 	errors,
 	handleChange,
+	objectDefinitionId,
 	objectField: values,
 	objectFieldTypes,
 	objectName,
@@ -34,6 +36,7 @@ export declare function useObjectFieldForm({
 }: IUseObjectFieldForm): {
 	errors: FormError<
 		ObjectField & {
+			function: any;
 			maxLength: any;
 			acceptedFileExtensions: any;
 			fileSource: any;
@@ -41,6 +44,8 @@ export declare function useObjectFieldForm({
 			showCounter: any;
 			showFilesInDocumentsAndMedia: any;
 			storageDLFolderPath: any;
+			relationship: any;
+			summarizeField: any;
 		}
 	>;
 	handleChange: React.ChangeEventHandler<HTMLInputElement>;
@@ -58,8 +63,10 @@ interface IUseObjectFieldForm {
 interface IProps {
 	children?: ReactNode;
 	disabled?: boolean;
+	editingField?: boolean;
 	errors: ObjectFieldErrors;
 	handleChange: ChangeEventHandler<HTMLInputElement>;
+	objectDefinitionId: number;
 	objectField: Partial<ObjectField>;
 	objectFieldTypes: ObjectFieldType[];
 	objectName: string;

@@ -15,6 +15,7 @@
 package com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0.structure.importer;
 
 import com.liferay.document.library.util.DLURLHelperUtil;
+import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.entry.processor.constants.FragmentEntryProcessorConstants;
@@ -121,14 +122,33 @@ public class FragmentLayoutStructureItemImporter
 			return fragmentStyledLayoutStructureItem;
 		}
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147511")) &&
-			definitionMap.containsKey("cssClasses")) {
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147511"))) {
+			if (definitionMap.containsKey("cssClasses")) {
+				List<String> cssClasses = (List<String>)definitionMap.get(
+					"cssClasses");
 
-			List<String> cssClasses = (List<String>)definitionMap.get(
-				"cssClasses");
+				fragmentStyledLayoutStructureItem.setCssClasses(
+					new HashSet<>(cssClasses));
+			}
 
-			fragmentStyledLayoutStructureItem.setCssClasses(
-				new HashSet<>(cssClasses));
+			if (definitionMap.containsKey("customCSS")) {
+				fragmentStyledLayoutStructureItem.setCustomCSS(
+					String.valueOf(definitionMap.get("customCSS")));
+			}
+
+			if (definitionMap.containsKey("customCSSViewports")) {
+				List<Map<String, Object>> customCSSViewports =
+					(List<Map<String, Object>>)definitionMap.get(
+						"customCSSViewports");
+
+				for (Map<String, Object> customCSSViewport :
+						customCSSViewports) {
+
+					fragmentStyledLayoutStructureItem.setCustomCSSViewport(
+						(String)customCSSViewport.get("id"),
+						(String)customCSSViewport.get("customCSS"));
+				}
+			}
 		}
 
 		Map<String, Object> fragmentStyleMap =
@@ -261,6 +281,7 @@ public class FragmentLayoutStructureItemImporter
 		String js = StringPool.BLANK;
 		String css = StringPool.BLANK;
 		String configuration = StringPool.BLANK;
+		int type = FragmentConstants.TYPE_COMPONENT;
 
 		JSONObject defaultEditableValuesJSONObject =
 			JSONFactoryUtil.createJSONObject();
@@ -270,6 +291,7 @@ public class FragmentLayoutStructureItemImporter
 			js = fragmentEntry.getJs();
 			css = fragmentEntry.getCss();
 			configuration = fragmentEntry.getConfiguration();
+			type = fragmentEntry.getType();
 
 			FragmentCollection fragmentCollection =
 				_fragmentCollectionService.fetchFragmentCollection(
@@ -280,7 +302,7 @@ public class FragmentLayoutStructureItemImporter
 					getDefaultEditableValuesJSONObject(
 						_getProcessedHTML(
 							fragmentEntry.getCompanyId(), configuration,
-							fragmentCollection, html, fragmentKey),
+							fragmentCollection, html, fragmentKey, type),
 						configuration);
 		}
 
@@ -346,7 +368,7 @@ public class FragmentLayoutStructureItemImporter
 				layout.getUserId(), layout.getGroupId(), 0, fragmentEntryId,
 				segmentsExperienceId, layout.getPlid(), css, html, js,
 				configuration, jsonObject.toString(), StringUtil.randomId(),
-				position, fragmentKey,
+				position, fragmentKey, type,
 				ServiceContextThreadLocal.getServiceContext());
 
 		List<Object> widgetInstances = (List<Object>)definitionMap.get(
@@ -728,7 +750,7 @@ public class FragmentLayoutStructureItemImporter
 	private String _getProcessedHTML(
 			long companyId, String configuration,
 			FragmentCollection fragmentCollection, String html,
-			String rendererKey)
+			String rendererKey, int type)
 		throws Exception {
 
 		String processedHTML = _replaceResources(fragmentCollection, html);
@@ -740,6 +762,7 @@ public class FragmentLayoutStructureItemImporter
 		fragmentEntryLink.setHtml(processedHTML);
 		fragmentEntryLink.setConfiguration(configuration);
 		fragmentEntryLink.setRendererKey(rendererKey);
+		fragmentEntryLink.setType(type);
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();

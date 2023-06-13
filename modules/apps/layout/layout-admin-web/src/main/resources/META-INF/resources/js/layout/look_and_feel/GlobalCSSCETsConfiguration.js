@@ -12,11 +12,12 @@
  * details.
  */
 
-import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
-import {ClayDropDownWithItems} from '@clayui/drop-down';
+import ClayButton from '@clayui/button';
 import ClayTable from '@clayui/table';
 import {openSelectionModal} from 'frontend-js-web';
 import React, {useState} from 'react';
+
+import {GlobalCETOptionsDropDown} from './GlobalCETOptionsDropDown';
 
 export default function GlobalCSSCETsConfiguration({
 	globalCSSCETSelectorURL,
@@ -35,6 +36,9 @@ export default function GlobalCSSCETsConfiguration({
 			)
 		);
 	};
+
+	const getDropDownButtonId = (globalCSSCET) =>
+		`${portletNamespace}_GlobalCSSCETsConfigurationOptionsButton_${globalCSSCET.cetExternalReferenceCode}`;
 
 	const getDropDownItems = (globalCSSCET) => {
 		return [
@@ -132,15 +136,13 @@ export default function GlobalCSSCETsConfiguration({
 								</ClayTable.Cell>
 
 								<ClayTable.Cell>
-									<ClayDropDownWithItems
-										items={getDropDownItems(globalCSSCET)}
-										trigger={
-											<ClayButtonWithIcon
-												displayType="unstyled"
-												small
-												symbol="ellipsis-v"
-											/>
-										}
+									<GlobalCETOptionsDropDown
+										dropdownItems={getDropDownItems(
+											globalCSSCET
+										)}
+										dropdownTriggerId={getDropDownButtonId(
+											globalCSSCET
+										)}
 									/>
 								</ClayTable.Cell>
 							</ClayTable.Row>

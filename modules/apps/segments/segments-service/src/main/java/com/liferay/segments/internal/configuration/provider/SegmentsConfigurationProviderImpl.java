@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.segments.configuration.SegmentsCompanyConfiguration;
 import com.liferay.segments.configuration.SegmentsConfiguration;
@@ -66,9 +67,18 @@ public class SegmentsConfigurationProviderImpl
 			_portal.getUser(httpServletRequest));
 
 		if (permissionChecker.isCompanyAdmin()) {
-			String configurationPid =
+			String factoryPid =
 				"com.liferay.segments.configuration." +
 					"SegmentsCompanyConfiguration";
+
+			String pid = factoryPid;
+
+			Configuration configuration = _getSegmentsCompanyConfiguration(
+				_portal.getCompanyId(httpServletRequest));
+
+			if (configuration != null) {
+				pid = configuration.getPid();
+			}
 
 			return PortletURLBuilder.create(
 				_portal.getControlPanelPortletURL(
@@ -78,11 +88,13 @@ public class SegmentsConfigurationProviderImpl
 			).setMVCRenderCommandName(
 				"/configuration_admin/edit_configuration"
 			).setRedirect(
-				_portal.getCurrentCompleteURL(httpServletRequest)
+				ParamUtil.getString(
+					httpServletRequest, "backURL",
+					_portal.getCurrentCompleteURL(httpServletRequest))
 			).setParameter(
-				"factoryPid", configurationPid
+				"factoryPid", factoryPid
 			).setParameter(
-				"pid", configurationPid
+				"pid", pid
 			).buildString();
 		}
 
@@ -153,6 +165,24 @@ public class SegmentsConfigurationProviderImpl
 		}
 
 		return false;
+	}
+
+	public void resetSegmentsCompanyConfiguration(long companyId)
+		throws ConfigurationException {
+
+		Configuration configuration = _getSegmentsCompanyConfiguration(
+			companyId);
+
+		while (configuration != null) {
+			try {
+				configuration.delete();
+			}
+			catch (IOException ioException) {
+				throw new ConfigurationException(ioException);
+			}
+
+			configuration = _getSegmentsCompanyConfiguration(companyId);
+		}
 	}
 
 	@Override

@@ -23,15 +23,10 @@ public class AccountEntryUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		if (!hasColumn("AccountEntry", "defaultDeliveryCTermEntryId")) {
-			alterTableAddColumn(
-				"AccountEntry", "defaultDeliveryCTermEntryId", "LONG");
-		}
-
-		if (!hasColumn("AccountEntry", "defaultPaymentCTermEntryId")) {
-			alterTableAddColumn(
-				"AccountEntry", "defaultPaymentCTermEntryId", "LONG");
-		}
+		alterTableAddColumn(
+			"AccountEntry", "defaultDeliveryCTermEntryId", "LONG");
+		alterTableAddColumn(
+			"AccountEntry", "defaultPaymentCTermEntryId", "LONG");
 	}
 
 }

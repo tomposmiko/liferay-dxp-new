@@ -167,6 +167,34 @@ public class ObjectField implements Serializable {
 	protected BusinessType businessType;
 
 	@Schema
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	@JsonIgnore
+	public void setDefaultValue(
+		UnsafeSupplier<String, Exception> defaultValueUnsafeSupplier) {
+
+		try {
+			defaultValue = defaultValueUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String defaultValue;
+
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -616,6 +644,20 @@ public class ObjectField implements Serializable {
 			sb.append("\"");
 		}
 
+		if (defaultValue != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"defaultValue\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(defaultValue));
+
+			sb.append("\"");
+		}
+
 		if (externalReferenceCode != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -791,11 +833,11 @@ public class ObjectField implements Serializable {
 	@GraphQLName("BusinessType")
 	public static enum BusinessType {
 
-		ATTACHMENT("Attachment"), BOOLEAN("Boolean"), DATE("Date"),
-		DECIMAL("Decimal"), INTEGER("Integer"), LONG_INTEGER("LongInteger"),
-		LONG_TEXT("LongText"), PICKLIST("Picklist"),
-		PRECISION_DECIMAL("PrecisionDecimal"), RELATIONSHIP("Relationship"),
-		RICH_TEXT("RichText"), TEXT("Text");
+		AGGREGATION("Aggregation"), ATTACHMENT("Attachment"),
+		BOOLEAN("Boolean"), DATE("Date"), DECIMAL("Decimal"),
+		INTEGER("Integer"), LONG_INTEGER("LongInteger"), LONG_TEXT("LongText"),
+		PICKLIST("Picklist"), PRECISION_DECIMAL("PrecisionDecimal"),
+		RELATIONSHIP("Relationship"), RICH_TEXT("RichText"), TEXT("Text");
 
 		@JsonCreator
 		public static BusinessType create(String value) {

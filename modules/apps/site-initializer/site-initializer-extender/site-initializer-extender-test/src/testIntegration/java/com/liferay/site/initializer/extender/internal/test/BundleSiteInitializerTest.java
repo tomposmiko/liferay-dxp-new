@@ -68,6 +68,8 @@ import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinition;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowDefinitionResource;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductSpecification;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductSpecificationResource;
+import com.liferay.headless.delivery.dto.v1_0.SitePage;
+import com.liferay.headless.delivery.resource.v1_0.SitePageResource;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalArticleLocalService;
@@ -127,7 +129,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.comparator.LayoutPriorityComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
@@ -165,6 +166,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Brian Wing Shun Chan
@@ -222,15 +224,15 @@ public class BundleSiteInitializerTest {
 			_assertCommerceSpecificationProducts(serviceContext);
 			_assertCPDefinition(group);
 			_assertCPInstanceProperties(group);
-			_assertCustomFields(serviceContext);
 			_assertDDMStructure(group);
 			_assertDDMTemplate(group);
 			_assertDLFileEntry(group);
-			_assertFragmentEntries(group);
+			_assertExpandoColumns(serviceContext);
+			_assertFragmentEntries(group, serviceContext);
 			_assertJournalArticles(group);
 			_assertKBArticles(group);
 			_assertLayoutPageTemplateEntry(group);
-			_assertLayouts(group);
+			_assertLayouts(group, serviceContext);
 			_assertLayoutSets(group);
 			_assertListTypeDefinitions(serviceContext);
 			_assertObjectDefinitions(group, serviceContext);
@@ -629,19 +631,6 @@ public class BundleSiteInitializerTest {
 			cpDefinitionOptionRels.size());
 	}
 
-	private void _assertCustomFields(ServiceContext serviceContext) {
-		ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(
-			serviceContext.getCompanyId(),
-			"com.liferay.account.model.AccountEntry");
-
-		Assert.assertNotNull(expandoBridge);
-		Assert.assertNotNull(
-			expandoBridge.getAttribute("Test Expando Column 1"));
-		Assert.assertNotNull(
-			expandoBridge.getAttribute("Test Expando Column 2"));
-		Assert.assertNull(expandoBridge.getAttribute("Test Expando Column 3"));
-	}
-
 	private void _assertDDMStructure(Group group) {
 		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
 			group.getGroupId(),
@@ -679,10 +668,8 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(productLayoutUuid);
 
-		List<Layout> publicLayouts = _layoutLocalService.getLayouts(
-			group.getGroupId(), false);
-
-		Layout publicLayout = publicLayouts.get(0);
+		Layout publicLayout = _layoutLocalService.getLayoutByFriendlyURL(
+			group.getGroupId(), false, "/test-public-layout");
 
 		Assert.assertEquals(productLayoutUuid, publicLayout.getUuid());
 	}
@@ -703,10 +690,30 @@ public class BundleSiteInitializerTest {
 		Assert.assertTrue(string.contains("1. Revelation"));
 	}
 
-	private void _assertFragmentEntries(Group group) {
+	private void _assertExpandoColumns(ServiceContext serviceContext) {
+		ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(
+			serviceContext.getCompanyId(),
+			"com.liferay.commerce.product.model.CPDefinition");
+
+		Assert.assertNotNull(expandoBridge);
+		Assert.assertEquals(
+			expandoBridge.getAttribute("Test Expando Column 1"), 0.1);
+		Assert.assertEquals(
+			"Test Expando Column Value 2",
+			expandoBridge.getAttribute("Test Expando Column 2"));
+		Assert.assertNull(expandoBridge.getAttribute("Test Expando Column 3"));
+	}
+
+	private void _assertFragmentEntries(
+			Group group, ServiceContext serviceContext)
+		throws Exception {
+
+		Group companyGroup = _groupLocalService.getCompanyGroup(
+			serviceContext.getCompanyId());
+
 		FragmentEntry testFragmentEntry1 =
 			_fragmentEntryLocalService.fetchFragmentEntry(
-				group.getGroupId(), "test-fragment-entry-1");
+				companyGroup.getGroupId(), "test-fragment-entry-1");
 
 		Assert.assertNotNull(testFragmentEntry1);
 		Assert.assertEquals(
@@ -811,9 +818,11 @@ public class BundleSiteInitializerTest {
 			"Test Master Page", layoutPageTemplateEntry.getName());
 	}
 
-	private void _assertLayouts(Group group) throws Exception {
+	private void _assertLayouts(Group group, ServiceContext serviceContext)
+		throws Exception {
+
 		_assertPrivateLayouts(group);
-		_assertPublicLayouts(group);
+		_assertPublicLayouts(group, serviceContext);
 	}
 
 	private void _assertLayoutSets(Group group) throws Exception {
@@ -1060,6 +1069,16 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(organization1);
 
+		UserAccountResource.Builder userAccountResourceBuilder =
+			_userAccountResourceFactory.create();
+
+		UserAccountResource userAccountResource =
+			userAccountResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
+
+		_assertUserOrganizations(organization1.getId(), 1, userAccountResource);
+
 		Page<Organization> organizationsPage2 =
 			organizationResource.getOrganizationsPage(
 				null, null,
@@ -1071,6 +1090,8 @@ public class BundleSiteInitializerTest {
 		Assert.assertNotNull(organization2);
 		Assert.assertTrue(organization2.getNumberOfOrganizations() == 1);
 
+		_assertUserOrganizations(organization2.getId(), 1, userAccountResource);
+
 		Page<Organization> organizationsPage3 =
 			organizationResource.getOrganizationChildOrganizationsPage(
 				organization2.getId(), null, null, null, null, null);
@@ -1079,6 +1100,8 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(organization3);
 		Assert.assertEquals("Test Organization 3", organization3.getName());
+
+		_assertUserOrganizations(organization3.getId(), 0, userAccountResource);
 	}
 
 	private void _assertPermissions(Group group) throws Exception {
@@ -1125,15 +1148,17 @@ public class BundleSiteInitializerTest {
 			privateChildLayout.getName(LocaleUtil.getSiteDefault()));
 	}
 
-	private void _assertPublicLayouts(Group group) {
-		List<Layout> publicLayouts = _layoutLocalService.getLayouts(
-			group.getGroupId(), false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
-			false, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			new LayoutPriorityComparator());
+	private void _assertPublicLayouts(
+			Group group, ServiceContext serviceContext)
+		throws Exception {
 
-		Assert.assertTrue(publicLayouts.size() == 2);
+		int publicLayoutsCount = _layoutLocalService.getLayoutsCount(
+			group, false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
-		Layout publicLayout = publicLayouts.get(0);
+		Assert.assertTrue(publicLayoutsCount == 3);
+
+		Layout publicLayout = _layoutLocalService.getLayoutByFriendlyURL(
+			group.getGroupId(), false, "/test-public-layout");
 
 		Assert.assertFalse(publicLayout.isHidden());
 		Assert.assertEquals(
@@ -1151,7 +1176,8 @@ public class BundleSiteInitializerTest {
 			"Test Public Child Layout",
 			publicChildLayout.getName(LocaleUtil.getSiteDefault()));
 
-		publicLayout = publicLayouts.get(1);
+		publicLayout = _layoutLocalService.getLayoutByFriendlyURL(
+			group.getGroupId(), false, "/home");
 
 		Assert.assertEquals(
 			PropsUtil.get("default.guest.public.layout.name"),
@@ -1163,6 +1189,31 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals(
 			PropsUtil.get("default.guest.public.layout.friendly.url"),
 			publicLayout.getFriendlyURL(LocaleUtil.getSiteDefault()));
+
+		SitePageResource.Builder sitePageResourceBuilder =
+			_sitePageResourceFactory.create();
+
+		SitePageResource sitePageResource =
+			sitePageResourceBuilder.httpServletRequest(
+				serviceContext.getRequest()
+			).httpServletResponse(
+				new MockHttpServletResponse()
+			).user(
+				serviceContext.fetchUser()
+			).build();
+
+		SitePage sitePage = sitePageResource.getSiteSitePage(
+			group.getGroupId(), "test-objects-layout");
+
+		String pageDefinitionString = String.valueOf(
+			sitePage.getPageDefinition());
+
+		Assert.assertFalse(
+			pageDefinitionString.contains(
+				"[$TestObjectDefinition3#Test_Object_Entry_1$]"));
+		Assert.assertFalse(
+			pageDefinitionString.contains(
+				"[$OBJECT_DEFINITION_ID:TestObjectDefinition3$]"));
 	}
 
 	private void _assertResourcePermission(Group group) throws Exception {
@@ -1337,6 +1388,19 @@ public class BundleSiteInitializerTest {
 
 		Page<UserAccount> page = userAccountResource.getAccountUserAccountsPage(
 			accountId, null, null, null, null);
+
+		Assert.assertNotNull(page);
+		Assert.assertEquals(totalCount, page.getTotalCount());
+	}
+
+	private void _assertUserOrganizations(
+			String organizationId, int totalCount,
+			UserAccountResource userAccountResource)
+		throws Exception {
+
+		Page<UserAccount> page =
+			userAccountResource.getOrganizationUserAccountsPage(
+				organizationId, null, null, null, null);
 
 		Assert.assertNotNull(page);
 		Assert.assertEquals(totalCount, page.getTotalCount());
@@ -1580,6 +1644,9 @@ public class BundleSiteInitializerTest {
 
 	@Inject
 	private SiteNavigationMenuLocalService _siteNavigationMenuLocalService;
+
+	@Inject
+	private SitePageResource.Factory _sitePageResourceFactory;
 
 	@Inject
 	private StyleBookEntryLocalService _styleBookEntryLocalService;

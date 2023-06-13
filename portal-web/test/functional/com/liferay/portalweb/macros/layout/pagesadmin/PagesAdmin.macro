@@ -999,12 +999,40 @@ definition {
 	}
 
 	macro selectFavicon {
+		WaitForEditable(
+			key_text = "Change Favicon",
+			locator1 = "Button#ANY");
+
+		Click(
+			key_text = "Change Favicon",
+			locator1 = "Button#ANY");
+
 		if (isSet(imageFileName)) {
 			ItemSelector.selectDMImage(imageFileName = "${imageFileName}");
 		}
 		else {
 			ItemSelector.uploadFile(uploadFileName = "${uploadFileName}");
 		}
+
+		SelectFrameTop();
+	}
+
+	macro selectFaviconExtension {
+		WaitForEditable(
+			key_text = "Change Favicon",
+			locator1 = "Button#ANY");
+
+		Click(
+			key_text = "Change Favicon",
+			locator1 = "Button#ANY");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		Navigator.gotoNavTab(navTab = "Extensions");
+
+		Click(
+			key_listEntry = "${extensionName}",
+			locator1 = "LexiconList#LIST_ENTRY_TITLE");
 
 		SelectFrameTop();
 	}

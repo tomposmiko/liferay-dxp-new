@@ -14,20 +14,16 @@
 
 package com.liferay.fragment.internal.renderer;
 
-import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.exception.FragmentEntryContentException;
-import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
-import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
-import com.liferay.fragment.validator.FragmentEntryValidator;
 import com.liferay.layout.adaptive.media.LayoutAdaptiveMediaProcessor;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
@@ -193,18 +189,10 @@ public class FragmentRendererControllerImpl
 				fragmentEntryLink.getRendererKey());
 		}
 
-		if (fragmentRenderer == null) {
-			FragmentEntry fragmentEntry =
-				_fragmentEntryLocalService.fetchFragmentEntry(
-					fragmentEntryLink.getFragmentEntryId());
-
-			if ((fragmentEntry != null) &&
-				(fragmentEntry.getType() == FragmentConstants.TYPE_REACT)) {
-
-				fragmentRenderer = _fragmentRendererTracker.getFragmentRenderer(
-					FragmentRendererConstants.
-						FRAGMENT_ENTRY_FRAGMENT_RENDERER_KEY_REACT);
-			}
+		if ((fragmentRenderer == null) && fragmentEntryLink.isTypeReact()) {
+			fragmentRenderer = _fragmentRendererTracker.getFragmentRenderer(
+				FragmentRendererConstants.
+					FRAGMENT_ENTRY_FRAGMENT_RENDERER_KEY_REACT);
 		}
 
 		if (fragmentRenderer == null) {
@@ -240,12 +228,6 @@ public class FragmentRendererControllerImpl
 
 	@Reference
 	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
-
-	@Reference
-	private FragmentEntryLocalService _fragmentEntryLocalService;
-
-	@Reference
-	private FragmentEntryValidator _fragmentEntryValidator;
 
 	@Reference
 	private FragmentRendererTracker _fragmentRendererTracker;

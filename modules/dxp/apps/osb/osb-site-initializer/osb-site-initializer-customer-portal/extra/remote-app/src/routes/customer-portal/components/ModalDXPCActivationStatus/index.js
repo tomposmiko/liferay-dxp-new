@@ -13,8 +13,8 @@ import ClayForm, {ClayInput} from '@clayui/form';
 import ClayModal from '@clayui/modal';
 import classNames from 'classnames';
 import {useState} from 'react';
-import client from '../../../../apolloClient';
 import {Badge, Button} from '../../../../common/components';
+import {useAppPropertiesContext} from '../../../../common/contexts/AppPropertiesContext';
 import {
 	getDXPCloudEnvironment,
 	updateAccountSubscriptionGroups,
@@ -39,7 +39,8 @@ const ModalDXPCActivationStatus = ({
 }) => {
 	const [hasError, setHasError] = useState();
 
-	const [{subscriptionGroups}, dispatch] = useCustomerPortal();
+	const [{project, subscriptionGroups}, dispatch] = useCustomerPortal();
+	const {client} = useAppPropertiesContext();
 
 	const handleOnConfirm = () => {
 		const errorMessageProductId = isLowercaseAndNumbers(projectIdValue);
@@ -63,6 +64,7 @@ const ModalDXPCActivationStatus = ({
 			mutation: updateAccountSubscriptionGroups,
 			variables: {
 				accountSubscriptionGroup: {
+					accountKey: project.accountKey,
 					activationStatus: STATUS_TAG_TYPE_NAMES.active,
 				},
 				id: dxpCloudSubscriptionGroup?.accountSubscriptionGroupId,

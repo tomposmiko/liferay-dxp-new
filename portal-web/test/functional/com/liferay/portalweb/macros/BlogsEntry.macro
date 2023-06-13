@@ -101,7 +101,7 @@ definition {
 					videoShortcutTitle = "${videoShortcutTitle}");
 
 				if (isSet(viewInternalVideoPreview)) {
-					Pause(locator1 = "5000");
+					WaitForElementPresent(locator1 = "IFrame#EMBEDDED_VIDEO_IFRAME");
 
 					DMDocument.viewInternalVideoPreview(videoName = "${videoName}");
 				}
@@ -1007,9 +1007,6 @@ definition {
 		var key_entryContent = "${entryContent}";
 		var key_entrySubtitle = "${entrySubtitle}";
 		var key_entryTitle = "${entryTitle}";
-
-		Pause(locator1 = "3000");
-
 		var browserType = PropsUtil.get("browser.type");
 
 		if ("${browserType}" == "safari") {
@@ -1181,6 +1178,12 @@ definition {
 				value1 = "${entryContentBold}");
 		}
 
+		if (isSet(entryContentCite)) {
+			AssertTextEquals.assertPartialText(
+				locator1 = "BlogsEntry#CONTENT_HTML_CITE",
+				value1 = "${entryContentCite}");
+		}
+
 		if (isSet(entryContentHtml)) {
 			AssertTextEquals.assertPartialText(
 				locator1 = "BlogsEntry#CONTENT_HTML_H2",
@@ -1242,7 +1245,14 @@ definition {
 	macro viewInlineImage {
 		var key_uploadFileName = "${uploadFileName}";
 
-		AssertVisible(locator1 = "BlogsEntry#CONTENT_INLINE_IMAGE");
+		if (isSet(entryContent)) {
+			AssertVisible(
+				key_entryContent = "${entryContent}",
+				locator1 = "BlogsEntry#CONTENT_INLINE_IMAGE_SPECIFIC");
+		}
+		else {
+			AssertVisible(locator1 = "BlogsEntry#CONTENT_INLINE_IMAGE");
+		}
 	}
 
 	macro viewNoAddPermissions {
@@ -1440,39 +1450,6 @@ definition {
 		AssertTextEquals(
 			locator1 = "BlogsEntry#RELATED_ASSETS_TITLE",
 			value1 = "${assetTitle}");
-	}
-
-	macro viewRSS {
-		var key_text = "RSS";
-
-		AssertClick(
-			locator1 = "Button#ANY",
-			value1 = "RSS");
-
-		Pause(locator1 = "3000");
-
-		SelectWindow.selectPopUp(locator1 = "null");
-
-		AssertLocation.assertPartialLocation(value1 = "blogs/rss");
-
-		AssertTextEquals(
-			locator1 = "RSS#FEED_TITLE",
-			value1 = "${siteName}");
-
-		AssertTextEquals(
-			locator1 = "RSS#FEED_SUBTITLE",
-			value1 = "${siteName}");
-
-		var key_entryContent = "${entryContent}";
-		var key_entryTitle = "${entryTitle}";
-
-		AssertTextEquals(
-			locator1 = "RSS#ENTRY_TITLE",
-			value1 = "${entryTitle}");
-
-		AssertTextEquals(
-			locator1 = "RSS#ENTRY_CONTENT",
-			value1 = "${entryContent}");
 	}
 
 	macro viewSharedAsset {
@@ -1706,7 +1683,7 @@ definition {
 			locator1 = "BlogsEntry#TITLE_LINK",
 			value1 = "${entryTitle}");
 
-		Pause(locator1 = "3000");
+		WaitForVisible(locator1 = "BlogsEntry#TITLE");
 
 		AssertTextEquals(
 			locator1 = "BlogsEntry#TITLE",

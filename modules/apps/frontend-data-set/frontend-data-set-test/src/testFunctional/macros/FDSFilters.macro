@@ -1,0 +1,49 @@
+definition {
+
+	macro disableStatusFilters {
+		if (IsElementPresent(key_filter = "Status", locator1 = "FrontendDataSet#FILTER_OPTION")) {
+			Click(
+				key_filter = "Status",
+				locator1 = "FrontendDataSet#FILTER_OPTION");
+		}
+
+		for (var status : list "${key_status}") {
+			Uncheck.uncheckNotVisible(
+				key_status = "${status}",
+				locator1 = "FrontendDataSet#STATUS_FILTER_CHECKBOX");
+		}
+	}
+
+	macro enableStatusFilters {
+		if (IsElementPresent(key_filter = "Status", locator1 = "FrontendDataSet#FILTER_OPTION")) {
+			Click(
+				key_filter = "Status",
+				locator1 = "FrontendDataSet#FILTER_OPTION");
+		}
+
+		for (var status : list "${key_status}") {
+			Check.checkNotVisibleNoErrors(
+				key_status = "${status}",
+				locator1 = "FrontendDataSet#STATUS_FILTER_CHECKBOX");
+		}
+	}
+
+	macro openFilters {
+		if (IsElementNotPresent(locator1 = "FrontendDataSet#FILTER_DROPDOWN")) {
+			Click(locator1 = "FrontendDataSet#FILTER_BUTTON");
+		}
+	}
+
+	macro searchFilter {
+		VerifyElementPresent(locator1 = "ObjectPortlet#COLUMN_SEARCH_FIELD");
+
+		VerifyElementPresent(locator1 = "FrontendDataSet#FILTER_SEARCH_BUTTON");
+
+		Type(
+			locator1 = "ObjectPortlet#COLUMN_SEARCH_FIELD",
+			value1 = "${searchTerm}");
+
+		ClickNoError(locator1 = "FrontendDataSet#FILTER_SEARCH_BUTTON");
+	}
+
+}

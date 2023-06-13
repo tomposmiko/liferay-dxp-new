@@ -1,12 +1,13 @@
 Bundle-Name: Liferay Fragment API
 Bundle-SymbolicName: com.liferay.fragment.api
-Bundle-Version: 16.2.1
+Bundle-Version: 17.0.2
 Export-Package:\
 	com.liferay.fragment.configuration,\
 	com.liferay.fragment.constants,\
 	com.liferay.fragment.contributor,\
 	com.liferay.fragment.exception,\
 	com.liferay.fragment.importer,\
+	com.liferay.fragment.input.template.parser,\
 	com.liferay.fragment.listener,\
 	com.liferay.fragment.model,\
 	com.liferay.fragment.processor,\
@@ -14,7 +15,6 @@ Export-Package:\
 	com.liferay.fragment.renderer.constants,\
 	com.liferay.fragment.service,\
 	com.liferay.fragment.service.persistence,\
-	com.liferay.fragment.util,\
 	com.liferay.fragment.util.comparator,\
 	com.liferay.fragment.util.configuration,\
 	com.liferay.fragment.validator

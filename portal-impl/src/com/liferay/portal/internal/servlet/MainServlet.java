@@ -91,6 +91,7 @@ import com.liferay.portal.struts.TilesUtil;
 import com.liferay.portal.struts.model.ActionForward;
 import com.liferay.portal.struts.model.ActionMapping;
 import com.liferay.portal.struts.model.ModuleConfig;
+import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.MaintenanceUtil;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsUtil;
@@ -137,8 +138,6 @@ public class MainServlet extends HttpServlet {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Destroy plugins");
 		}
-
-		DependencyManagerSyncUtil.sync();
 
 		_portalInitializedModuleServiceLifecycleServiceRegistration.
 			unregister();
@@ -386,6 +385,12 @@ public class MainServlet extends HttpServlet {
 			_log.error(exception);
 		}
 
+		if (PropsValues.UPGRADE_DATABASE_AUTO_RUN) {
+			DBUpgrader.upgradeModules();
+
+			StartupHelperUtil.setUpgrading(false);
+		}
+
 		servletContext.setAttribute(WebKeys.STARTUP_FINISHED, Boolean.TRUE);
 
 		StartupHelperUtil.setStartupFinished(true);
@@ -420,6 +425,8 @@ public class MainServlet extends HttpServlet {
 		}
 
 		ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
+
+		DependencyManagerSyncUtil.sync();
 	}
 
 	@Override

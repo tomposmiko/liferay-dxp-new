@@ -29,6 +29,8 @@ interface ObjectAction {
 	objectActionTriggerKey: string;
 	objectDefinitionsRelationshipsURL: string;
 	parameters?: ObjectActionParameters;
+	predefinedValues: Map<string, string>[];
+	script?: string;
 }
 
 interface ObjectActionParameters {
@@ -46,7 +48,12 @@ type ObjectFieldBusinessType =
 	| 'LongText'
 	| 'Picklist'
 	| 'Relationship'
-	| 'Text';
+	| 'Text'
+	| 'Aggregation'
+	| 'LongInteger'
+	| 'Integer'
+	| 'Decimal'
+	| 'PrecisionDecimal';
 interface ObjectFieldType {
 	businessType: ObjectFieldBusinessType;
 	dbType: string;
@@ -56,7 +63,7 @@ interface ObjectFieldType {
 interface ObjectField {
 	DBType: string;
 	businessType: ObjectFieldBusinessType;
-	defaultValue: number;
+	defaultValue?: string;
 	externalReferenceCode?: string;
 	id?: number;
 	indexed: boolean;
@@ -108,7 +115,10 @@ type ObjectFieldSettingName =
 	| 'maxLength'
 	| 'showCounter'
 	| 'showFilesInDocumentsAndMedia'
-	| 'storageDLFolderPath';
+	| 'storageDLFolderPath'
+	| 'relationship'
+	| 'function'
+	| 'summarizeField';
 
 interface ObjectValidation {
 	active: boolean;
@@ -135,7 +145,10 @@ interface ObjectRelationship {
 	type: string;
 }
 
-interface PickListItems extends ItemIdName {}
+interface PickListItem {
+	key: string;
+	name: string;
+}
 
 type ObjectValidationType = {
 	label: string;
@@ -145,6 +158,11 @@ type ObjectValidationType = {
 interface PredefinedValue {
 	inputAsValue: boolean;
 	name: string;
+	value: string;
+}
+
+interface LabelValueObject {
+	label: string;
 	value: string;
 }
 

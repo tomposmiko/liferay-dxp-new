@@ -363,7 +363,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.admin.taxonomy.client', and version '4.0.14'."
+        'com.liferay.headless.admin.taxonomy.client', and version '4.0.15'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -381,6 +381,18 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
                 - in: query
                   name: filter
                   schema:
@@ -453,6 +465,18 @@ paths:
                       format: int64
                       type: integer
                 - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
+                - in: query
                   name: roleNames
                   schema:
                       type: string
@@ -487,6 +511,18 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
                 - in: query
                   name: filter
                   schema:
@@ -646,6 +682,18 @@ paths:
                       format: int64
                       type: integer
                 - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
+                - in: query
                   name: roleNames
                   schema:
                       type: string
@@ -674,6 +722,18 @@ paths:
         get:
             operationId: getKeywordsRankedPage
             parameters:
+                - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
                 - in: query
                   name: siteId
                   schema:
@@ -819,6 +879,18 @@ paths:
                       format: int64
                       type: integer
                 - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
+                - in: query
                   name: filter
                   schema:
                       type: string
@@ -892,6 +964,18 @@ paths:
                       format: int64
                       type: integer
                 - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
+                - in: query
                   name: roleNames
                   schema:
                       type: string
@@ -928,6 +1012,18 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
                 - in: query
                   name: filter
                   schema:
@@ -1089,6 +1185,18 @@ paths:
                       format: int64
                       type: integer
                 - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
+                - in: query
                   name: roleNames
                   schema:
                       type: string
@@ -1117,6 +1225,18 @@ paths:
         get:
             operationId: getTaxonomyCategoriesRankedPage
             parameters:
+                - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
                 - in: query
                   name: siteId
                   schema:
@@ -1154,6 +1274,18 @@ paths:
                 - in: path
                   name: parentTaxonomyCategoryId
                   required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
                   schema:
                       type: string
                 - in: query
@@ -1322,6 +1454,18 @@ paths:
                   schema:
                       type: string
                 - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
+                - in: query
                   name: roleNames
                   schema:
                       type: string
@@ -1454,6 +1598,18 @@ paths:
                       format: int64
                       type: integer
                 - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
+                - in: query
                   name: roleNames
                   schema:
                       type: string
@@ -1490,6 +1646,18 @@ paths:
                   schema:
                       format: int64
                       type: integer
+                - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: nestedFields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
                 - in: query
                   name: filter
                   schema:

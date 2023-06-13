@@ -18,6 +18,7 @@ import {openSelectionModal} from 'frontend-js-web';
 import React, {useState} from 'react';
 
 export default function ThemeCSSReplacementSelector({
+	placeholder,
 	portletNamespace,
 	selectThemeCSSClientExtensionEventName,
 	selectThemeCSSClientExtensionURL,
@@ -62,9 +63,7 @@ export default function ThemeCSSReplacementSelector({
 						<ClayInput
 							id={`${portletNamespace}themeCSSReplacementExtension`}
 							onClick={onClick}
-							placeholder={Liferay.Language.get(
-								'no-theme-css-extension-loaded'
-							)}
+							placeholder={placeholder}
 							readOnly
 							type="text"
 							value={extensionName}
@@ -75,6 +74,7 @@ export default function ThemeCSSReplacementSelector({
 						{extensionName ? (
 							<>
 								<ClayButtonWithIcon
+									aria-label={Liferay.Language.get('replace')}
 									className="mr-2"
 									displayType="secondary"
 									onClick={onClick}
@@ -83,6 +83,7 @@ export default function ThemeCSSReplacementSelector({
 								/>
 
 								<ClayButtonWithIcon
+									aria-label={Liferay.Language.get('delete')}
 									displayType="secondary"
 									onClick={() => {
 										setExtensionName('');
@@ -94,6 +95,7 @@ export default function ThemeCSSReplacementSelector({
 							</>
 						) : (
 							<ClayButtonWithIcon
+								aria-label={Liferay.Language.get('select')}
 								displayType="secondary"
 								onClick={onClick}
 								small

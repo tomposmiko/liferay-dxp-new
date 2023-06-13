@@ -669,6 +669,11 @@
 	<td>xpath=(//div[@aria-label='Form Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>FORM_CONTAINER_CONTAINER_NESTED_ELEMENT</td>
+	<td>xpath=(//div[@aria-label='Form Container'])[${key_position}]/div[contains(@class,'page-editor__topper__content')]/div[contains(@class,'page-editor__container')]${key_elementHeader}</td>
+	<td></td>
+</tr>
 
 <!--LAYOUT ELEMENTS-->
 
@@ -900,6 +905,11 @@
 <tr>
 	<td>NAV_ITEM_BUTTON</td>
 	<td>//div[contains(@class,'page-structure')]//button[contains(@class,'nav-link')][normalize-space()='${key_navItem}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LABEL_ITEM</td>
+	<td>//div[label[normalize-space(text())='${fieldLabel}']]//span[contains(@class,'label-item')][normalize-space()='${itemName}']</td>
 	<td></td>
 </tr>
 </tbody>

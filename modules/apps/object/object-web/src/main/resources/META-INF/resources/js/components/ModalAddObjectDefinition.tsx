@@ -48,7 +48,7 @@ const ModalAddObjectDefinition: React.FC<IProps> = ({
 		label: '',
 		name: undefined,
 		pluralLabel: '',
-		storageType: 'default',
+		storageType: storageTypes[0],
 	};
 	const [error, setError] = useState<string>('');
 

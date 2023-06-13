@@ -70,6 +70,7 @@ import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Delete;
+import org.gradle.api.tasks.TaskInputs;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.Zip;
 
@@ -339,6 +340,14 @@ public class ClientExtensionProjectConfigurator
 		TaskProvider<CreateClientExtensionConfigTask>
 			createClientExtensionConfigTaskProvider,
 		TaskProvider<Zip> zipTaskProvider) {
+
+		createClientExtensionConfigTaskProvider.configure(
+			createClientExtensionConfigTask -> {
+				TaskInputs taskInputs =
+					createClientExtensionConfigTask.getInputs();
+
+				taskInputs.file(project.file(_CLIENT_EXTENSION_YAML));
+			});
 
 		zipTaskProvider.configure(
 			zip -> {

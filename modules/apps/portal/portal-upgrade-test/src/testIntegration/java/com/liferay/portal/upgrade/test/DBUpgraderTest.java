@@ -15,6 +15,7 @@
 package com.liferay.portal.upgrade.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.events.StartupHelperUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.model.ReleaseConstants;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -63,7 +64,13 @@ public class DBUpgraderTest {
 			ReleaseInfo.RELEASE_7_1_0_BUILD_NUMBER,
 			ReleaseConstants.STATE_GOOD);
 
-		DBUpgrader.upgrade();
+		boolean upgrading = StartupHelperUtil.isUpgrading();
+
+		StartupHelperUtil.setUpgrading(true);
+
+		DBUpgrader.upgradePortal();
+
+		StartupHelperUtil.setUpgrading(upgrading);
 	}
 
 	@Test
@@ -72,12 +79,19 @@ public class DBUpgraderTest {
 			ReleaseInfo.RELEASE_6_2_0_BUILD_NUMBER,
 			ReleaseConstants.STATE_UPGRADE_FAILURE);
 
+		boolean upgrading = StartupHelperUtil.isUpgrading();
+
+		StartupHelperUtil.setUpgrading(true);
+
 		try {
-			DBUpgrader.upgrade();
+			DBUpgrader.upgradePortal();
 
 			Assert.fail();
 		}
 		catch (IllegalStateException illegalStateException) {
+		}
+		finally {
+			StartupHelperUtil.setUpgrading(upgrading);
 		}
 	}
 
@@ -87,7 +101,13 @@ public class DBUpgraderTest {
 			ReleaseInfo.RELEASE_7_1_0_BUILD_NUMBER,
 			ReleaseConstants.STATE_UPGRADE_FAILURE);
 
-		DBUpgrader.upgrade();
+		boolean upgrading = StartupHelperUtil.isUpgrading();
+
+		StartupHelperUtil.setUpgrading(true);
+
+		DBUpgrader.upgradePortal();
+
+		StartupHelperUtil.setUpgrading(upgrading);
 	}
 
 	private static int _getReleaseColumnValue(String columnName) {

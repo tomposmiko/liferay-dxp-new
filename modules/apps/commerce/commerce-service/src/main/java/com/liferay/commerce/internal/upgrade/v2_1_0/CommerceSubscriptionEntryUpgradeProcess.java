@@ -75,15 +75,13 @@ public class CommerceSubscriptionEntryUpgradeProcess
 				preparedStatement.setLong(1, cpDefinition.getCProductId());
 
 				preparedStatement.setString(2, cpInstance.getCPInstanceUuid());
-
 				preparedStatement.setLong(3, cpInstanceId);
 
 				preparedStatement.execute();
 			}
 		}
 
-		runSQL(
-			"alter table CommerceSubscriptionEntry drop column CPInstanceId");
+		alterTableDropColumn("CommerceSubscriptionEntry", "CPInstanceId");
 	}
 
 	private void _addIndexes(String tableName) throws Exception {

@@ -20,10 +20,13 @@ import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionService;
+import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
 import com.liferay.object.web.internal.configuration.activator.FFOneToOneRelationshipConfigurationActivator;
 import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -49,7 +52,9 @@ public class ObjectDefinitionsRelationshipsDisplayContext
 		HttpServletRequest httpServletRequest,
 		ModelResourcePermission<ObjectDefinition>
 			objectDefinitionModelResourcePermission,
-		ObjectDefinitionService objectDefinitionService) {
+		ObjectDefinitionService objectDefinitionService,
+		SystemObjectDefinitionMetadataTracker
+			systemObjectDefinitionMetadataTracker) {
 
 		super(httpServletRequest, objectDefinitionModelResourcePermission);
 
@@ -58,6 +63,8 @@ public class ObjectDefinitionsRelationshipsDisplayContext
 		_objectDefinitionModelResourcePermission =
 			objectDefinitionModelResourcePermission;
 		_objectDefinitionService = objectDefinitionService;
+		_systemObjectDefinitionMetadataTracker =
+			systemObjectDefinitionMetadataTracker;
 
 		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
 	}
@@ -143,8 +150,34 @@ public class ObjectDefinitionsRelationshipsDisplayContext
 		);
 	}
 
+	public String getRESTContextPath(ObjectDefinition objectDefinition) {
+		if (!objectDefinition.isSystem()) {
+			return objectDefinition.getRESTContextPath();
+		}
+
+		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+			_systemObjectDefinitionMetadataTracker.
+				getSystemObjectDefinitionMetadata(objectDefinition.getName());
+
+		if (systemObjectDefinitionMetadata == null) {
+			return StringPool.BLANK;
+		}
+
+		return systemObjectDefinitionMetadata.getRESTContextPath();
+	}
+
 	public boolean isFFOneToOneRelationshipConfigurationEnabled() {
 		return _ffOneToOneRelationshipConfigurationActivator.enabled();
+	}
+
+	public boolean isParameterRequired(ObjectDefinition objectDefinition) {
+		String restContextPath = getRESTContextPath(objectDefinition);
+
+		if (restContextPath.matches(".*/\\{\\w+}/.*")) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -172,5 +205,7 @@ public class ObjectDefinitionsRelationshipsDisplayContext
 		_objectDefinitionModelResourcePermission;
 	private final ObjectDefinitionService _objectDefinitionService;
 	private final ObjectRequestHelper _objectRequestHelper;
+	private final SystemObjectDefinitionMetadataTracker
+		_systemObjectDefinitionMetadataTracker;
 
 }

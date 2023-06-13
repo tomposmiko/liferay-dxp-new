@@ -14,11 +14,9 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
-import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.entry.processor.constants.FragmentEntryProcessorConstants;
 import com.liferay.fragment.exception.NoSuchEntryLinkException;
-import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
@@ -313,7 +311,7 @@ public class DuplicateItemMVCActionCommand
 				namespace);
 		}
 
-		if (_isInputFragmentEntryType(fragmentEntryLink)) {
+		if (fragmentEntryLink.isTypeInput()) {
 			JSONObject freemarkerFragmentEntryProcessorJSONObject =
 				editableValuesJSONObject.getJSONObject(
 					FragmentEntryProcessorConstants.
@@ -332,7 +330,8 @@ public class DuplicateItemMVCActionCommand
 				fragmentEntryLink.getHtml(), fragmentEntryLink.getJs(),
 				fragmentEntryLink.getConfiguration(),
 				editableValuesJSONObject.toString(), namespace, 0,
-				fragmentEntryLink.getRendererKey(), serviceContext);
+				fragmentEntryLink.getRendererKey(), fragmentEntryLink.getType(),
+				serviceContext);
 
 		return duplicatedFragmentEntryLink.getFragmentEntryLinkId();
 	}
@@ -364,31 +363,6 @@ public class DuplicateItemMVCActionCommand
 		}
 
 		return jsonArray;
-	}
-
-	private boolean _isInputFragmentEntryType(
-		FragmentEntryLink fragmentEntryLink) {
-
-		FragmentEntry fragmentEntry = null;
-
-		if (Validator.isNotNull(fragmentEntryLink.getRendererKey())) {
-			fragmentEntry =
-				_fragmentCollectionContributorTracker.getFragmentEntry(
-					fragmentEntryLink.getRendererKey());
-		}
-
-		if (fragmentEntry == null) {
-			fragmentEntry = _fragmentEntryLocalService.fetchFragmentEntry(
-				fragmentEntryLink.getFragmentEntryId());
-		}
-
-		if ((fragmentEntry != null) &&
-			(fragmentEntry.getType() == FragmentConstants.TYPE_INPUT)) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	@Reference
