@@ -20,6 +20,7 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
+import com.liferay.object.exception.ObjectDefinitionActiveException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryHistoryException;
 import com.liferay.object.exception.ObjectDefinitionLabelException;
 import com.liferay.object.exception.ObjectDefinitionNameException;
@@ -29,6 +30,7 @@ import com.liferay.object.exception.ObjectDefinitionStatusException;
 import com.liferay.object.exception.ObjectDefinitionVersionException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.field.builder.ObjectFieldBuilder;
+import com.liferay.object.field.builder.TextObjectFieldBuilder;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryTable;
@@ -40,6 +42,8 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.system.BaseSystemObjectDefinitionManager;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
+import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.string.StringPool;
@@ -62,6 +66,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -85,6 +90,7 @@ import org.junit.runner.RunWith;
  * @author Marco Leo
  * @author Brian Wing Shun Chan
  */
+@FeatureFlags("LPS-167253")
 @RunWith(Arquillian.class)
 public class ObjectDefinitionLocalServiceTest {
 
@@ -98,110 +104,50 @@ public class ObjectDefinitionLocalServiceTest {
 
 		// Label is null
 
-		try {
-			_testAddCustomObjectDefinition("", "Test", "Tests");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionLabelException objectDefinitionLabelException) {
-			Assert.assertEquals(
-				"Label is null for locale " + LocaleUtil.US.getDisplayName(),
-				objectDefinitionLabelException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionLabelException.class,
+			"Label is null for locale " + LocaleUtil.US.getDisplayName(),
+			() -> _addCustomObjectDefinition("", "Test", "Tests"));
 
 		// Name is null
 
-		try {
-			_testAddCustomObjectDefinition("Test", "", "Tests");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"Name is null", objectDefinitionNameException.getMessage());
-		}
-
-		// Plural label is null
-
-		try {
-			_testAddCustomObjectDefinition("Test", "Test", "");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionPluralLabelException
-					objectDefinitionPluralLabelException) {
-
-			Assert.assertEquals(
-				"Plural label is null for locale " +
-					LocaleUtil.US.getDisplayName(),
-				objectDefinitionPluralLabelException.getMessage());
-		}
-
-		// Custom object definition names are automatically prepended with
-		// with "C_"
-
-		try {
-			_testAddCustomObjectDefinition("Test");
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			throw objectDefinitionNameException;
-		}
+		_assertFailure(
+			ObjectDefinitionNameException.class, "Name is null",
+			() -> _addCustomObjectDefinition("Test", "", "Tests"));
 
 		// Name must only contain letters and digits
 
-		_testAddCustomObjectDefinition(" Test ");
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_addCustomObjectDefinition(" Test "));
 
-		try {
-			_testAddCustomObjectDefinition("Tes t");
+		_assertFailure(
+			ObjectDefinitionNameException.class,
+			"Name must only contain letters and digits",
+			() -> _addCustomObjectDefinition("Tes t"));
 
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"Name must only contain letters and digits",
-				objectDefinitionNameException.getMessage());
-		}
-
-		try {
-			_testAddCustomObjectDefinition("Tes-t");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"Name must only contain letters and digits",
-				objectDefinitionNameException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionNameException.class,
+			"Name must only contain letters and digits",
+			() -> _addCustomObjectDefinition("Tes-t"));
 
 		// The first character of a name must be an upper case letter
 
-		try {
-			_testAddCustomObjectDefinition("test");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"The first character of a name must be an upper case letter",
-				objectDefinitionNameException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionNameException.class,
+			"The first character of a name must be an upper case letter",
+			() -> _addCustomObjectDefinition("test"));
 
 		// Name must be less than 41 characters
 
-		_testAddCustomObjectDefinition(
-			"A123456789a123456789a123456789a1234567891");
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_addCustomObjectDefinition(
+				"A123456789a123456789a123456789a1234567891"));
 
-		try {
-			_testAddCustomObjectDefinition(
-				"A123456789a123456789a123456789a12345678912");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"Name must be less than 41 characters",
-				objectDefinitionNameException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionNameException.class,
+			"Name must be less than 41 characters",
+			() -> _addCustomObjectDefinition(
+				"A123456789a123456789a123456789a12345678912"));
 
 		// Duplicate name
 
@@ -224,23 +170,24 @@ public class ObjectDefinitionLocalServiceTest {
 				TestPropsValues.getUserId(),
 				objectDefinition.getObjectDefinitionId());
 
-		try {
-			_testAddCustomObjectDefinition("Test");
-		}
-		catch (ObjectDefinitionNameException.MustNotBeDuplicate
-					objectDefinitionNameException) {
-
-			Assert.assertEquals(
-				"Duplicate name C_Test",
-				objectDefinitionNameException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionNameException.class, "Duplicate name C_Test",
+			() -> _addCustomObjectDefinition("Test"));
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
+		// Plural label is null
+
+		_assertFailure(
+			ObjectDefinitionPluralLabelException.class,
+			"Plural label is null for locale " + LocaleUtil.US.getDisplayName(),
+			() -> _addCustomObjectDefinition("Test", "Test", ""));
+
 		// Scope is null
 
-		try {
-			_objectDefinitionLocalService.addCustomObjectDefinition(
+		_assertFailure(
+			ObjectDefinitionScopeException.class, "Scope is null",
+			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), false, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
@@ -250,21 +197,17 @@ public class ObjectDefinitionLocalServiceTest {
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
-						RandomTestUtil.randomString(), StringUtil.randomId())));
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionScopeException objectDefinitionScopeException) {
-			Assert.assertEquals(
-				"Scope is null", objectDefinitionScopeException.getMessage());
-		}
+						RandomTestUtil.randomString(),
+						StringUtil.randomId()))));
 
 		// No object scope provider found with key
 
 		String scope = RandomTestUtil.randomString();
 
-		try {
-			_objectDefinitionLocalService.addCustomObjectDefinition(
+		_assertFailure(
+			ObjectDefinitionScopeException.class,
+			"No object scope provider found with key " + scope,
+			() -> _objectDefinitionLocalService.addCustomObjectDefinition(
 				TestPropsValues.getUserId(), false, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"Test", null, null,
@@ -274,17 +217,10 @@ public class ObjectDefinitionLocalServiceTest {
 					ObjectFieldUtil.createObjectField(
 						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 						ObjectFieldConstants.DB_TYPE_STRING,
-						RandomTestUtil.randomString(), StringUtil.randomId())));
+						RandomTestUtil.randomString(),
+						StringUtil.randomId()))));
 
-			Assert.fail();
-		}
-		catch (ObjectDefinitionScopeException objectDefinitionScopeException) {
-			Assert.assertEquals(
-				"No object scope provider found with key " + scope,
-				objectDefinitionScopeException.getMessage());
-		}
-
-		// Database table, resources, and status
+		// Name, database table, resources, and status
 
 		objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
@@ -311,6 +247,11 @@ public class ObjectDefinitionLocalServiceTest {
 			ObjectFieldConstants.DB_TYPE_STRING, false, false, null,
 			LocalizedMapUtil.getLocalizedMap("Charlie"), false, "charlie", true,
 			false, Collections.emptyList());
+
+		// Custom object definition names are automatically prepended with
+		// with "C_"
+
+		Assert.assertEquals("C_Test", objectDefinition.getName());
 
 		// Before publish, database table
 
@@ -750,229 +691,158 @@ public class ObjectDefinitionLocalServiceTest {
 
 		// Label is null
 
-		try {
-			_testAddSystemObjectDefinition("", "Test");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionLabelException objectDefinitionLabelException) {
-			Assert.assertEquals(
-				"Label is null for locale " + LocaleUtil.US.getDisplayName(),
-				objectDefinitionLabelException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionLabelException.class,
+			"Label is null for locale " + LocaleUtil.US.getDisplayName(),
+			() -> _addSystemObjectDefinition(
+				"", "Test", RandomTestUtil.randomString()));
 
 		// Name is null
 
-		try {
-			_testAddSystemObjectDefinition("");
+		_assertFailure(
+			ObjectDefinitionNameException.class, "Name is null",
+			() -> _addSystemObjectDefinition(""));
 
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"Name is null", objectDefinitionNameException.getMessage());
-		}
+		// Name must not start with "C_"
 
-		// System object definition names must not start with "C_"
+		_assertFailure(
+			ObjectDefinitionNameException.class,
+			"System object definition names must not start with \"C_\"",
+			() -> _addSystemObjectDefinition("C_Test"));
 
-		try {
-			_testAddSystemObjectDefinition("C_Test");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"System object definition names must not start with \"C_\"",
-				objectDefinitionNameException.getMessage());
-		}
-
-		try {
-			_testAddSystemObjectDefinition("c_Test");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"System object definition names must not start with \"C_\"",
-				objectDefinitionNameException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionNameException.class,
+			"System object definition names must not start with \"C_\"",
+			() -> _addSystemObjectDefinition("c_Test"));
 
 		// Name must only contain letters and digits
 
-		_testAddSystemObjectDefinition(" Test ");
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_addSystemObjectDefinition(" Test "));
 
-		try {
-			_testAddSystemObjectDefinition("Tes t");
+		_assertFailure(
+			ObjectDefinitionNameException.class,
+			"Name must only contain letters and digits",
+			() -> _addSystemObjectDefinition("Tes t"));
 
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"Name must only contain letters and digits",
-				objectDefinitionNameException.getMessage());
-		}
-
-		try {
-			_testAddSystemObjectDefinition("Tes-t");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"Name must only contain letters and digits",
-				objectDefinitionNameException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionNameException.class,
+			"Name must only contain letters and digits",
+			() -> _addSystemObjectDefinition("Tes-t"));
 
 		// The first character of a name must be an upper case letter
 
-		try {
-			_testAddSystemObjectDefinition("test");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"The first character of a name must be an upper case letter",
-				objectDefinitionNameException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionNameException.class,
+			"The first character of a name must be an upper case letter",
+			() -> _addSystemObjectDefinition("test"));
 
 		// Name must be less than 41 characters
 
-		_testAddSystemObjectDefinition(
-			"A123456789a123456789a123456789a1234567891");
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			_addSystemObjectDefinition(
+				"A123456789a123456789a123456789a1234567891"));
 
-		try {
-			_testAddSystemObjectDefinition(
-				"A123456789a123456789a123456789a12345678912");
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionNameException objectDefinitionNameException) {
-			Assert.assertEquals(
-				"Name must be less than 41 characters",
-				objectDefinitionNameException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionNameException.class,
+			"Name must be less than 41 characters",
+			() -> _addSystemObjectDefinition(
+				"A123456789a123456789a123456789a12345678912"));
 
 		// Duplicate name
 
-		ObjectDefinition objectDefinition =
-			ObjectDefinitionTestUtil.addSystemObjectDefinition(
-				TestPropsValues.getUserId(), "Test", null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				false, "Test", null, null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
-				_objectDefinitionLocalService,
-				Arrays.asList(
-					ObjectFieldUtil.createObjectField(
-						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-						ObjectFieldConstants.DB_TYPE_STRING,
-						RandomTestUtil.randomString(), StringUtil.randomId())));
+		ObjectDefinition objectDefinition = _addSystemObjectDefinition("Test");
 
-		try {
-			_testAddSystemObjectDefinition("Test");
-		}
-		catch (ObjectDefinitionNameException.MustNotBeDuplicate
-					objectDefinitionNameException) {
-
-			Assert.assertEquals(
-				"Duplicate name Test",
-				objectDefinitionNameException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionNameException.class, "Duplicate name Test",
+			() -> _addSystemObjectDefinition("Test"));
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
+		// Plural label is null
+
+		_assertFailure(
+			ObjectDefinitionPluralLabelException.class,
+			"Plural label is null for locale " + LocaleUtil.US.getDisplayName(),
+			() -> _addSystemObjectDefinition(
+				RandomTestUtil.randomString(), "Test", ""));
+
 		// Scope is null
 
-		try {
-			ObjectDefinitionTestUtil.addSystemObjectDefinition(
-				TestPropsValues.getUserId(), "Test", null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				false, "Test", null, null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"", null, 1, _objectDefinitionLocalService,
-				Arrays.asList(
-					ObjectFieldUtil.createObjectField(
-						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-						ObjectFieldConstants.DB_TYPE_STRING,
-						RandomTestUtil.randomString(), StringUtil.randomId())));
-
-			Assert.fail();
-		}
-		catch (ObjectDefinitionScopeException objectDefinitionScopeException) {
-			Assert.assertEquals(
-				"Scope is null", objectDefinitionScopeException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionScopeException.class, "Scope is null",
+			() ->
+				ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
+					TestPropsValues.getUserId(), "Test", null,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					"Test", null, null,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					"", null, 1, _objectDefinitionLocalService,
+					Collections.emptyList()));
 
 		// No object scope provider found with key
 
 		String scope = RandomTestUtil.randomString();
 
-		try {
-			ObjectDefinitionTestUtil.addSystemObjectDefinition(
-				TestPropsValues.getUserId(), "Test", null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				false, "Test", null, null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				scope, null, 1, _objectDefinitionLocalService,
-				Collections.<ObjectField>emptyList());
+		_assertFailure(
+			ObjectDefinitionScopeException.class,
+			"No object scope provider found with key " + scope,
+			() ->
+				ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
+					TestPropsValues.getUserId(), "Test", null,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					"Test", null, null,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					scope, null, 1, _objectDefinitionLocalService,
+					Collections.emptyList()));
 
-			Assert.fail();
-		}
-		catch (ObjectDefinitionScopeException objectDefinitionScopeException) {
-			Assert.assertEquals(
-				"No object scope provider found with key " + scope,
-				objectDefinitionScopeException.getMessage());
-		}
+		// Version must greater than 0
 
-		// System object definition versions must greater than 0
+		_assertFailure(
+			ObjectDefinitionVersionException.class,
+			"System object definition versions must greater than 0",
+			() ->
+				ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
+					TestPropsValues.getUserId(), "Test", null,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					"Test", null, null,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					ObjectDefinitionConstants.SCOPE_COMPANY, null, -1,
+					_objectDefinitionLocalService,
+					Collections.<ObjectField>emptyList()));
 
-		try {
-			ObjectDefinitionTestUtil.addSystemObjectDefinition(
-				TestPropsValues.getUserId(), "Test", null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				false, "Test", null, null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				ObjectDefinitionConstants.SCOPE_COMPANY, null, -1,
-				_objectDefinitionLocalService,
-				Collections.<ObjectField>emptyList());
-		}
-		catch (ObjectDefinitionVersionException
-					objectDefinitionVersionException) {
-
-			Assert.assertEquals(
-				"System object definition versions must greater than 0",
-				objectDefinitionVersionException.getMessage());
-		}
-
-		try {
-			ObjectDefinitionTestUtil.addSystemObjectDefinition(
-				TestPropsValues.getUserId(), "Test", null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				false, "Test", null, null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				ObjectDefinitionConstants.SCOPE_COMPANY, null, 0,
-				_objectDefinitionLocalService,
-				Collections.<ObjectField>emptyList());
-		}
-		catch (ObjectDefinitionVersionException
-					objectDefinitionVersionException) {
-
-			Assert.assertEquals(
-				"System object definition versions must greater than 0",
-				objectDefinitionVersionException.getMessage());
-		}
+		_assertFailure(
+			ObjectDefinitionVersionException.class,
+			"System object definition versions must greater than 0",
+			() ->
+				ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
+					TestPropsValues.getUserId(), "Test", null,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					"Test", null, null,
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString()),
+					ObjectDefinitionConstants.SCOPE_COMPANY, null, 0,
+					_objectDefinitionLocalService,
+					Collections.<ObjectField>emptyList()));
 
 		// Database table, messaging, resources, and status
 
-		objectDefinition = ObjectDefinitionTestUtil.addSystemObjectDefinition(
-			TestPropsValues.getUserId(), "Test", null,
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			false, "Test", null, null,
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
-			_objectDefinitionLocalService,
-			Collections.<ObjectField>emptyList());
+		objectDefinition =
+			ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
+				TestPropsValues.getUserId(), "Test", null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"Test", null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
+				_objectDefinitionLocalService,
+				Collections.<ObjectField>emptyList());
 
 		_objectFieldLocalService.addCustomObjectField(
 			null, TestPropsValues.getUserId(), 0,
@@ -1034,10 +904,52 @@ public class ObjectDefinitionLocalServiceTest {
 
 		// Status
 
-		Assert.assertEquals(
-			WorkflowConstants.STATUS_APPROVED, objectDefinition.getStatus());
+		Assert.assertTrue(objectDefinition.isApproved());
 
-		// Publish
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+
+		// Publish modifiable system object definition
+
+		objectDefinition =
+			ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
+				TestPropsValues.getUserId(), null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"Test", null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionConstants.SCOPE_SITE, null, 1,
+				_objectDefinitionLocalService,
+				Arrays.asList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING,
+						RandomTestUtil.randomString(), StringUtil.randomId())));
+
+		objectDefinition =
+			_objectDefinitionLocalService.publishSystemObjectDefinition(
+				TestPropsValues.getUserId(),
+				objectDefinition.getObjectDefinitionId());
+
+		Assert.assertTrue(objectDefinition.isApproved());
+		Assert.assertTrue(objectDefinition.isEnableCategorization());
+		Assert.assertTrue(objectDefinition.isModifiable());
+		Assert.assertTrue(objectDefinition.isSystem());
+		Assert.assertTrue(_hasTable(objectDefinition.getDBTableName()));
+		Assert.assertTrue(
+			_hasTable(objectDefinition.getExtensionDBTableName()));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+
+		objectDefinition =
+			ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
+				TestPropsValues.getUserId(), "Test", null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"Test", null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
+				_objectDefinitionLocalService,
+				Collections.<ObjectField>emptyList());
+
+		// Publish unmodifiable system object definition
 
 		try {
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
@@ -1196,14 +1108,15 @@ public class ObjectDefinitionLocalServiceTest {
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
 
-		objectDefinition = ObjectDefinitionTestUtil.addSystemObjectDefinition(
-			TestPropsValues.getUserId(), "Test", null,
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			false, "Test", null, null,
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
-			_objectDefinitionLocalService,
-			Collections.<ObjectField>emptyList());
+		objectDefinition =
+			ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
+				TestPropsValues.getUserId(), "Test", null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"Test", null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
+				_objectDefinitionLocalService,
+				Collections.<ObjectField>emptyList());
 
 		_testSystemObjectFields(objectDefinition);
 
@@ -1374,6 +1287,132 @@ public class ObjectDefinitionLocalServiceTest {
 	}
 
 	@Test
+	public void testUpdateSystemObjectDefinition() throws Exception {
+
+		// Before update, assert validations criterias
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionTestUtil.addModifiableSystemObjectDefinition(
+				TestPropsValues.getUserId(), null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"Test", null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionConstants.SCOPE_SITE, null, 1,
+				_objectDefinitionLocalService,
+				Arrays.asList(
+					ObjectFieldUtil.createObjectField(
+						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+						ObjectFieldConstants.DB_TYPE_STRING,
+						RandomTestUtil.randomString(), StringUtil.randomId())));
+
+		// Modifiable system object definition must be published to be actived
+
+		_assertFailure(
+			ObjectDefinitionActiveException.class,
+			"Object definitions must be published before being activated",
+			objectDefinition,
+			objectDefinitionId ->
+				_objectDefinitionLocalService.updateCustomObjectDefinition(
+					null, objectDefinitionId, 0, 0, 0, false, true, false, true,
+					false, false, LocalizedMapUtil.getLocalizedMap("Charlie"),
+					"Charlie", null, null, false,
+					LocalizedMapUtil.getLocalizedMap("Charlies"),
+					ObjectDefinitionConstants.SCOPE_SITE));
+
+		// Label is null
+
+		_assertFailure(
+			ObjectDefinitionLabelException.class,
+			"Label is null for locale " + LocaleUtil.US.getDisplayName(),
+			objectDefinition,
+			objectDefinitionId ->
+				_objectDefinitionLocalService.updateCustomObjectDefinition(
+					null, objectDefinitionId, 0, 0, 0, false, false, false,
+					true, false, false, null, "Charlie", null, null, false,
+					LocalizedMapUtil.getLocalizedMap("Charlie"),
+					ObjectDefinitionConstants.SCOPE_SITE));
+
+		// Plural label is null
+
+		_assertFailure(
+			ObjectDefinitionPluralLabelException.class,
+			"Plural label is null for locale " + LocaleUtil.US.getDisplayName(),
+			objectDefinition,
+			objectDefinitionId ->
+				_objectDefinitionLocalService.updateCustomObjectDefinition(
+					null, objectDefinitionId, 0, 0, 0, false, false, false,
+					true, false, false,
+					LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie",
+					null, null, false, null,
+					ObjectDefinitionConstants.SCOPE_SITE));
+
+		// After Update a modifiable system object definition check its
+		// properties
+
+		objectDefinition =
+			_objectDefinitionLocalService.publishSystemObjectDefinition(
+				TestPropsValues.getUserId(),
+				objectDefinition.getObjectDefinitionId());
+
+		objectDefinition =
+			_objectDefinitionLocalService.updateCustomObjectDefinition(
+				null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, false,
+				true, false, true, false, false,
+				LocalizedMapUtil.getLocalizedMap("Charlie"), "Charlie", null,
+				null, false, LocalizedMapUtil.getLocalizedMap("Charlies"),
+				objectDefinition.getScope());
+
+		Assert.assertFalse(objectDefinition.isEnableCategorization());
+		Assert.assertTrue(objectDefinition.isEnableComments());
+		Assert.assertEquals(
+			LocalizedMapUtil.getLocalizedMap("Charlie"),
+			objectDefinition.getLabelMap());
+		Assert.assertEquals("C_Test", objectDefinition.getName());
+		Assert.assertEquals(
+			LocalizedMapUtil.getLocalizedMap("Charlies"),
+			objectDefinition.getPluralLabelMap());
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+
+		// After Update an unmodifiable system object definition check its
+		// properties
+
+		objectDefinition =
+			ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
+				TestPropsValues.getUserId(), "Test", null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"Test", null, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
+				_objectDefinitionLocalService,
+				Collections.<ObjectField>emptyList());
+
+		ObjectField objectField = _objectFieldLocalService.addCustomObjectField(
+			null, TestPropsValues.getUserId(), 0,
+			objectDefinition.getObjectDefinitionId(),
+			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+			ObjectFieldConstants.DB_TYPE_STRING, false, false, null,
+			LocalizedMapUtil.getLocalizedMap("Able"), false, "able", true,
+			false, Collections.emptyList());
+
+		String externalReferenceCode = RandomTestUtil.randomString();
+
+		objectDefinition =
+			_objectDefinitionLocalService.updateSystemObjectDefinition(
+				externalReferenceCode, objectDefinition.getObjectDefinitionId(),
+				objectField.getObjectFieldId());
+
+		Assert.assertEquals(
+			objectField.getObjectFieldId(),
+			objectDefinition.getTitleObjectFieldId());
+
+		Assert.assertEquals(
+			externalReferenceCode, objectDefinition.getExternalReferenceCode());
+
+		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
+	@Test
 	public void testUpdateTitleObjectFieldId() throws Exception {
 		ObjectDefinition objectDefinition =
 			ObjectDefinitionTestUtil.addObjectDefinition(
@@ -1409,6 +1448,88 @@ public class ObjectDefinitionLocalServiceTest {
 			objectDefinition.getTitleObjectFieldId());
 
 		_objectDefinitionLocalService.deleteObjectDefinition(objectDefinition);
+	}
+
+	private ObjectDefinition _addCustomObjectDefinition(String name)
+		throws Exception {
+
+		return _addCustomObjectDefinition(name, name, name);
+	}
+
+	private ObjectDefinition _addCustomObjectDefinition(
+			String label, String name, String pluralLabel)
+		throws Exception {
+
+		return _objectDefinitionLocalService.addCustomObjectDefinition(
+			TestPropsValues.getUserId(), false, false,
+			LocalizedMapUtil.getLocalizedMap(label), name, null, null,
+			LocalizedMapUtil.getLocalizedMap(pluralLabel),
+			ObjectDefinitionConstants.SCOPE_COMPANY,
+			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
+			Arrays.asList(
+				ObjectFieldUtil.createObjectField(
+					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+					ObjectFieldConstants.DB_TYPE_STRING,
+					RandomTestUtil.randomString(), StringUtil.randomId())));
+	}
+
+	private ObjectDefinition _addSystemObjectDefinition(String name)
+		throws Exception {
+
+		return _addSystemObjectDefinition(
+			RandomTestUtil.randomString(), name, RandomTestUtil.randomString());
+	}
+
+	private ObjectDefinition _addSystemObjectDefinition(
+			String label, String name, String pluralLabel)
+		throws Exception {
+
+		return ObjectDefinitionTestUtil.addUnmodifiableSystemObjectDefinition(
+			TestPropsValues.getUserId(), name, null,
+			LocalizedMapUtil.getLocalizedMap(label), name, null, null,
+			LocalizedMapUtil.getLocalizedMap(pluralLabel),
+			ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
+			_objectDefinitionLocalService,
+			Arrays.asList(
+				new TextObjectFieldBuilder(
+				).labelMap(
+					LocalizedMapUtil.getLocalizedMap(
+						RandomTestUtil.randomString())
+				).name(
+					StringUtil.randomId()
+				).objectFieldSettings(
+					Collections.emptyList()
+				).build()));
+	}
+
+	private void _assertFailure(
+		Class<?> clazz, String message, ObjectDefinition objectDefinition,
+		UnsafeConsumer<Long, Exception> unsafeConsumer) {
+
+		try {
+			unsafeConsumer.accept(objectDefinition.getObjectDefinitionId());
+
+			Assert.fail();
+		}
+		catch (Exception exception) {
+			Assert.assertTrue(clazz.isInstance(exception));
+			Assert.assertEquals(exception.getMessage(), message);
+		}
+	}
+
+	private void _assertFailure(
+		Class<?> clazz, String message,
+		UnsafeSupplier<Object, Exception> unsafeSupplier) {
+
+		try {
+			unsafeSupplier.get();
+
+			Assert.fail();
+		}
+		catch (Exception exception) {
+			Assert.assertTrue(clazz.isInstance(exception));
+			Assert.assertEquals(exception.getMessage(), message);
+		}
 	}
 
 	private void _assertObjectField(
@@ -1470,78 +1591,6 @@ public class ObjectDefinitionLocalServiceTest {
 			DBInspector dbInspector = new DBInspector(connection);
 
 			return dbInspector.hasTable(tableName);
-		}
-	}
-
-	private void _testAddCustomObjectDefinition(String name) throws Exception {
-		_testAddCustomObjectDefinition(name, name, name);
-	}
-
-	private void _testAddCustomObjectDefinition(
-			String label, String name, String pluralLabel)
-		throws Exception {
-
-		ObjectDefinition objectDefinition = null;
-
-		try {
-			objectDefinition =
-				_objectDefinitionLocalService.addCustomObjectDefinition(
-					TestPropsValues.getUserId(), false, false,
-					LocalizedMapUtil.getLocalizedMap(label), name, null, null,
-					LocalizedMapUtil.getLocalizedMap(pluralLabel),
-					ObjectDefinitionConstants.SCOPE_COMPANY,
-					ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-					Arrays.asList(
-						ObjectFieldUtil.createObjectField(
-							ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-							ObjectFieldConstants.DB_TYPE_STRING,
-							RandomTestUtil.randomString(),
-							StringUtil.randomId())));
-
-			objectDefinition =
-				_objectDefinitionLocalService.publishCustomObjectDefinition(
-					TestPropsValues.getUserId(),
-					objectDefinition.getObjectDefinitionId());
-		}
-		finally {
-			if (objectDefinition != null) {
-				_objectDefinitionLocalService.deleteObjectDefinition(
-					objectDefinition);
-			}
-		}
-	}
-
-	private void _testAddSystemObjectDefinition(String name) throws Exception {
-		_testAddSystemObjectDefinition("Test", name);
-	}
-
-	private void _testAddSystemObjectDefinition(String label, String name)
-		throws Exception {
-
-		ObjectDefinition objectDefinition = null;
-
-		try {
-			objectDefinition =
-				ObjectDefinitionTestUtil.addSystemObjectDefinition(
-					TestPropsValues.getUserId(), name, null,
-					LocalizedMapUtil.getLocalizedMap(label), false, name, null,
-					null,
-					LocalizedMapUtil.getLocalizedMap(
-						RandomTestUtil.randomString()),
-					ObjectDefinitionConstants.SCOPE_COMPANY, null, 1,
-					_objectDefinitionLocalService,
-					Arrays.asList(
-						ObjectFieldUtil.createObjectField(
-							ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-							ObjectFieldConstants.DB_TYPE_STRING,
-							RandomTestUtil.randomString(),
-							StringUtil.randomId())));
-		}
-		finally {
-			if (objectDefinition != null) {
-				_objectDefinitionLocalService.deleteObjectDefinition(
-					objectDefinition);
-			}
 		}
 	}
 

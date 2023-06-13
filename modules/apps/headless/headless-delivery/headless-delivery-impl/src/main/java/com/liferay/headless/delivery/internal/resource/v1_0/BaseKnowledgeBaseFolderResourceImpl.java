@@ -265,20 +265,8 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 		KnowledgeBaseFolder existingKnowledgeBaseFolder =
 			getKnowledgeBaseFolder(knowledgeBaseFolderId);
 
-		if (knowledgeBaseFolder.getActions() != null) {
-			existingKnowledgeBaseFolder.setActions(
-				knowledgeBaseFolder.getActions());
-		}
-
-		if (knowledgeBaseFolder.getDateCreated() != null) {
-			existingKnowledgeBaseFolder.setDateCreated(
-				knowledgeBaseFolder.getDateCreated());
-		}
-
-		if (knowledgeBaseFolder.getDateModified() != null) {
-			existingKnowledgeBaseFolder.setDateModified(
-				knowledgeBaseFolder.getDateModified());
-		}
+		existingKnowledgeBaseFolder.setCustomFields(
+			knowledgeBaseFolder.getCustomFields());
 
 		if (knowledgeBaseFolder.getDescription() != null) {
 			existingKnowledgeBaseFolder.setDescription(
@@ -294,24 +282,9 @@ public abstract class BaseKnowledgeBaseFolderResourceImpl
 			existingKnowledgeBaseFolder.setName(knowledgeBaseFolder.getName());
 		}
 
-		if (knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles() != null) {
-			existingKnowledgeBaseFolder.setNumberOfKnowledgeBaseArticles(
-				knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles());
-		}
-
-		if (knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders() != null) {
-			existingKnowledgeBaseFolder.setNumberOfKnowledgeBaseFolders(
-				knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders());
-		}
-
 		if (knowledgeBaseFolder.getParentKnowledgeBaseFolderId() != null) {
 			existingKnowledgeBaseFolder.setParentKnowledgeBaseFolderId(
 				knowledgeBaseFolder.getParentKnowledgeBaseFolderId());
-		}
-
-		if (knowledgeBaseFolder.getSiteId() != null) {
-			existingKnowledgeBaseFolder.setSiteId(
-				knowledgeBaseFolder.getSiteId());
 		}
 
 		if (knowledgeBaseFolder.getViewableBy() != null) {

@@ -520,6 +520,11 @@
 			<category name="Bug Prevention" />
 			<description name="Finds missing empty lines before `removedService` or `addingService` calls." />
 		</check>
+		<check name="JavaNewProblemInstantiationParametersCheck">
+			<category name="Bug Prevention" />
+			<description name="Finds cases where `new Problem` can be simplified." />
+			<property name="enabled" value="false" />
+		</check>
 		<check name="JavaPackagePathCheck">
 			<category name="Bug Prevention" />
 			<description name="Checks that the package name matches the file location." />
@@ -1558,6 +1563,10 @@
 		<check name="UpgradeVelocityCommentMigrationCheck">
 			<category name="Upgrade" />
 			<description name="Run code migration of comments from a Velocity file to a Freemarker file with the syntax replacements" />
+		</check>
+		<check name="UpgradeVelocityVariableSetMigrationCheck">
+			<category name="Upgrade" />
+			<description name="Run code migration of set variables from a Velocity file to a Freemarker file with the syntax replacements" />
 		</check>
 	</source-processor>
 	<source-processor name="XMLSourceProcessor">

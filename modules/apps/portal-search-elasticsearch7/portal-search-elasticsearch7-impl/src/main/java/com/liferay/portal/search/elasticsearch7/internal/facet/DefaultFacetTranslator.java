@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.FilterTranslator;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -116,10 +117,16 @@ public class DefaultFacetTranslator implements FacetTranslator {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext,
-			(Class<FacetProcessor<SearchRequestBuilder>>)
-				(Class<?>)FacetProcessor.class,
-			"class.name");
+			bundleContext, FacetProcessor.class,
+			"(&(class.name=*)(!(class.name=DEFAULT)))",
+			(serviceReference, emitter) -> {
+				List<String> classNames = StringUtil.asList(
+					serviceReference.getProperty("class.name"));
+
+				for (String className : classNames) {
+					emitter.emit(className);
+				}
+			});
 	}
 
 	@Deactivate
@@ -232,7 +239,7 @@ public class DefaultFacetTranslator implements FacetTranslator {
 	@Reference(target = "(search.engine.impl=Elasticsearch)")
 	private FilterTranslator<QueryBuilder> _filterTranslator;
 
-	private ServiceTrackerMap<String, FacetProcessor<SearchRequestBuilder>>
-		_serviceTrackerMap;
+	@SuppressWarnings("rawtypes")
+	private ServiceTrackerMap<String, FacetProcessor> _serviceTrackerMap;
 
 }

@@ -69,9 +69,9 @@ import com.liferay.journal.internal.upgrade.v4_4_3.JournalArticleLayoutClassedMo
 import com.liferay.journal.internal.upgrade.v4_4_4.JournalFeedTypeUpgradeProcess;
 import com.liferay.journal.internal.upgrade.v5_1_0.JournalArticleDDMStructureIdUpgradeProcess;
 import com.liferay.journal.internal.upgrade.v5_1_1.JournalArticleAssetEntryClassTypeIdUpgradeProcess;
+import com.liferay.journal.internal.upgrade.v5_2_0.JournalFeedDDMStructureIdUpgradeProcess;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.util.JournalConverter;
-import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
 import com.liferay.portal.change.tracking.store.CTStoreFactory;
 import com.liferay.portal.configuration.upgrade.PrefsPropsToConfigurationUpgradeHelper;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -94,7 +94,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.SystemEventLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.settings.SettingsFactory;
+import com.liferay.portal.kernel.settings.SettingsLocatorHelper;
 import com.liferay.portal.kernel.upgrade.BaseExternalReferenceCodeUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.BaseSQLServerDatetimeUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.CTModelUpgradeProcess;
@@ -148,7 +148,7 @@ public class JournalServiceUpgradeStepRegistrator
 				_portletPreferencesLocalService),
 			new UpgradeJournalDisplayPreferences(),
 			new UpgradeLastPublishDate(),
-			new UpgradePortletSettings(_settingsFactory),
+			new UpgradePortletSettings(_settingsLocatorHelper),
 			dbProcessContext -> {
 				try {
 					_deleteTempImages();
@@ -380,6 +380,16 @@ public class JournalServiceUpgradeStepRegistrator
 			"5.1.0", "5.1.1",
 			new JournalArticleAssetEntryClassTypeIdUpgradeProcess(
 				_classNameLocalService));
+
+		registry.register(
+			"5.1.1", "5.2.0",
+			new JournalFeedDDMStructureIdUpgradeProcess(
+				_classNameLocalService, _siteConnectedGroupGroupProvider));
+
+		registry.register(
+			"5.2.0", "5.2.1",
+			new com.liferay.journal.internal.upgrade.v5_2_1.
+				JournalArticleLayoutClassedModelUsageUpgradeProcess());
 	}
 
 	private void _deleteTempImages() throws Exception {
@@ -469,10 +479,6 @@ public class JournalServiceUpgradeStepRegistrator
 	private Language _language;
 
 	@Reference
-	private LayoutClassedModelUsageLocalService
-		_layoutClassedModelUsageLocalService;
-
-	@Reference
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference
@@ -513,7 +519,7 @@ public class JournalServiceUpgradeStepRegistrator
 	private ResourceLocalService _resourceLocalService;
 
 	@Reference
-	private SettingsFactory _settingsFactory;
+	private SettingsLocatorHelper _settingsLocatorHelper;
 
 	@Reference
 	private SiteConnectedGroupGroupProvider _siteConnectedGroupGroupProvider;

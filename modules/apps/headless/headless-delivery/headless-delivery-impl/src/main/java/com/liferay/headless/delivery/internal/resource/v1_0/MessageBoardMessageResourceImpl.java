@@ -81,7 +81,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
@@ -177,8 +176,7 @@ public class MessageBoardMessageResourceImpl
 			).build();
 
 		if ((search == null) && (filter == null)) {
-			OrderByComparator<MBMessage> orderByComparator =
-				_getMBMessageOrderByComparator(sorts);
+			flatten = GetterUtil.getBoolean(flatten);
 
 			int status = WorkflowConstants.STATUS_APPROVED;
 
@@ -191,16 +189,14 @@ public class MessageBoardMessageResourceImpl
 				status = WorkflowConstants.STATUS_ANY;
 			}
 
+			OrderByComparator<MBMessage> orderByComparator =
+				_getMBMessageOrderByComparator(sorts);
+
 			return Page.of(
 				actions,
 				transform(
 					_mbMessageService.getChildMessages(
-						mbMessage.getMessageId(),
-						Optional.ofNullable(
-							flatten
-						).orElse(
-							false
-						),
+						mbMessage.getMessageId(), flatten,
 						new QueryDefinition<>(
 							status, contextUser.getUserId(), true,
 							pagination.getStartPosition(),
@@ -208,12 +204,7 @@ public class MessageBoardMessageResourceImpl
 					this::_toMessageBoardMessage),
 				pagination,
 				_mbMessageService.getChildMessagesCount(
-					mbMessage.getMessageId(),
-					Optional.ofNullable(
-						flatten
-					).orElse(
-						false
-					),
+					mbMessage.getMessageId(), flatten,
 					new QueryDefinition<>(
 						status, contextUser.getUserId(), true,
 						pagination.getStartPosition(),

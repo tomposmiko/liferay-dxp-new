@@ -11,7 +11,7 @@ import {
 import {PublishedAppsDashboardTableRow} from '../../components/DashboardTable/PublishedAppsDashboardTableRow';
 import {MemberProfile} from '../../components/MemberProfile/MemberProfile';
 import {
-	getAccounts,
+	getAccountInfoFromCommerce,
 	getMyUserAccount,
 	getProductSpecifications,
 	getProducts,
@@ -22,14 +22,15 @@ import {
 	DashboardListItems,
 	DashboardPage,
 } from '../DashBoardPage/DashboardPage';
-
 import {
 	AccountBriefProps,
 	MemberProps,
 	ProductResponseProps,
 	ProductSpecificationProps,
 	UserAccountProps,
+	customerRoles,
 	initialDashboardNavigationItems,
+	publisherRoles,
 } from './PublishedDashboardPageUtil';
 
 import './PublishedAppsDashboardPage.scss';
@@ -43,6 +44,7 @@ const appTableHeaders = [
 	{
 		iconSymbol: 'order-arrow',
 		title: 'Name',
+		style: {width: '2%'},
 	},
 	{
 		title: 'Version',
@@ -73,10 +75,11 @@ const memberTableHeaders = [
 
 const initialAccountsState: Account[] = [
 	{
-		customFields: {CatalogId: 0},
 		externalReferenceCode: '',
 		id: 0,
 		name: '',
+		description: '',
+		type: '',
 	},
 ];
 
@@ -88,6 +91,7 @@ interface PublishedAppTable {
 
 export function PublishedAppsDashboardPage() {
 	const [accounts, setAccounts] = useState<Account[]>(initialAccountsState);
+	const [commerceAccount, setCommerceAccount] = useState<CommerceAccount>();
 	const [apps, setApps] = useState<AppProps[]>(Array<AppProps>());
 	const [selectedApp, setSelectedApp] = useState<AppProps>();
 	const [dashboardNavigationItems, setDashboardNavigationItems] = useState(
@@ -100,12 +104,9 @@ export function PublishedAppsDashboardPage() {
 		useState('Apps');
 	const [members, setMembers] = useState<MemberProps[]>(Array<MemberProps>());
 	const [selectedMember, setSelectedMember] = useState<MemberProps>();
-	const [selectedAccount, setSelectedAccount] = useState<Account>({
-		customFields: {CatalogId: 0},
-		externalReferenceCode: '',
-		id: 0,
-		name: '',
-	});
+	const [selectedAccount, setSelectedAccount] = useState<Account>(
+		initialAccountsState[0]
+	);
 
 	const appMessages = {
 		description: 'Manage and publish apps on the Marketplace',
@@ -218,31 +219,50 @@ export function PublishedAppsDashboardPage() {
 	}
 
 	useEffect(() => {
-		(async () => {
-			const accountsResponse = await getAccounts();
+		const makeFetch = async () => {
+			const userAccountsResponse = await getUserAccounts();
 
-			const accountsList = accountsResponse.items.map(
-				(account: Account) => {
+			const userAccount = userAccountsResponse.items.map(
+				(accountBrief: AccountBriefProps) => {
 					return {
-						customFields: account.customFields,
-						externalReferenceCode: account.externalReferenceCode,
-						id: account.id,
-						name: account.name,
+						externalReferenceCode: accountBrief.externalReferenceCode,
+						id: accountBrief.id,
+						name: accountBrief.name,
 					} as Account;
 				}
 			);
 
-			setAccounts(accountsList);
-			setSelectedAccount(accountsList[0]);
-		})();
+			const businessAccounts = userAccountsResponse.items[0].accountBriefs.map(
+				(accountBrief: AccountBriefProps) => {
+					return {
+						externalReferenceCode: accountBrief.externalReferenceCode,
+						id: accountBrief.id,
+						name: accountBrief.name,
+					} as Account;
+				}
+			);
+
+			const accounts = [...userAccount, ...businessAccounts]
+
+			setAccounts(accounts);
+			setSelectedAccount(accounts[0]);
+		};
+
+		makeFetch();
 	}, []);
 
 	useEffect(() => {
 		(async () => {
-			const accountCatalogId = selectedAccount.customFields?.CatalogId;
+			const accountCustomField = selectedAccount.customFields?.find(
+				(customField) => customField.name === 'CatalogId'
+			);
 
-			if (accountCatalogId) {
-				if (accountCatalogId !== 0) {
+			if (accountCustomField) {
+				const accountCatalogId = Number(
+					accountCustomField.customValue.data
+				);
+
+				if (accountCatalogId && accountCatalogId !== 0) {
 					const appList = await getProducts();
 
 					const appListProductIds: number[] =
@@ -284,6 +304,11 @@ export function PublishedAppsDashboardPage() {
 							}
 						}
 					);
+
+					const commerceAccountResponse =
+						await getAccountInfoFromCommerce(selectedAccount.id);
+
+					setCommerceAccount(commerceAccountResponse);
 
 					setApps(newAppList);
 
@@ -348,20 +373,6 @@ export function PublishedAppsDashboardPage() {
 						(accountBrief: {name: string}) =>
 							accountBrief.name === selectedAccount.name
 					).roleBriefs;
-
-				const customerRoles = [
-					'Account Administrator',
-					'Project Installer',
-					'Account Buyer',
-					'Account Member',
-				];
-
-				const publisherRoles = [
-					'Owner',
-					'Account Administrator',
-					'App Editor',
-					'Sales Manager',
-				];
 
 				customerRoles.forEach((customerRole) => {
 					if (
@@ -441,13 +452,13 @@ export function PublishedAppsDashboardPage() {
 				setMembers(filteredMembersList);
 			}
 		})();
-	}, [selectedNavigationItem, selectedAccount]);
+	}, [selectedAccount]);
 
 	return (
 		<div className="published-apps-dashboard-page-container">
 			<DashboardNavigation
 				accountAppsNumber={apps.length.toString()}
-				accountIcon={accountLogo}
+				accountIcon={commerceAccount?.logoURL ?? accountLogo}
 				accounts={accounts}
 				currentAccount={selectedAccount}
 				dashboardNavigationItems={dashboardNavigationItems}
@@ -524,7 +535,16 @@ export function PublishedAppsDashboardPage() {
 				</DashboardPage>
 			)}
 
-			{selectedNavigationItem === 'Account' && <AccountDetailsPage />}
+			{selectedNavigationItem === 'Account' && (
+				<AccountDetailsPage
+					commerceAccount={commerceAccount}
+					dashboardNavigationItems={dashboardNavigationItems}
+					selectedAccount={selectedAccount}
+					setDashboardNavigationItems={setDashboardNavigationItems}
+					totalApps={apps.length}
+					totalMembers={members.length}
+				/>
+			)}
 		</div>
 	);
 }

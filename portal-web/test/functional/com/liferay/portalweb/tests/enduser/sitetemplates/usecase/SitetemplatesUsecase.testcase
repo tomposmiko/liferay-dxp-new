@@ -118,9 +118,8 @@ definition {
 			SiteTemplatesNavigator.openSiteTemplatesAdmin();
 
 			SiteTemplates.addChildPageViaSiteTemplateCP(
-				childSitepageName = "true",
-				pageName = "Site Page Name",
-				siteChildPageName = "Site Child Page Name",
+				childPageName = "Site Child Page Name",
+				parentPageName = "Site Page Name",
 				siteTemplateName = "Site Template Name");
 		}
 
@@ -221,6 +220,50 @@ definition {
 			Navigator.gotoSitePage(
 				pageName = "Page1 Name",
 				siteName = "Site Name");
+		}
+	}
+
+	@description = "This is a use case for LPS-180299. Change localization after Site Template is added in virtual instance."
+	@priority = 4
+	test ChangeLocalizationAfterSiteTemplateIsAddedInVirtualInstance {
+		property test.name.skip.portal.instance = "SitetemplatesUsecase#ChangeLocalizationAfterSiteTemplateIsAddedInVirtualInstance";
+
+		task ("Given: Add virtual instance able.com") {
+			HeadlessPortalInstanceAPI.addPortalInstance(
+				domain = "www.able.com",
+				portalInstanceId = "www.able.com",
+				virtualHost = "www.able.com");
+
+			User.firstLoginPG(
+				password = "test",
+				userEmailAddress = "test@www.able.com",
+				virtualHostsURL = "http://www.able.com:8080");
+		}
+
+		task ("And: Remove all the locales for the virtual instance except the default locale") {
+			PortalSettings.gotoConfiguration(
+				baseURL = "http://www.able.com:8080",
+				configurationCategory = "Localization",
+				configurationName = "Language",
+				configurationScope = "Virtual Instance Scope");
+
+			PortalSettings.configureCurrentLanguagesCP(currentPortalLanguages = "English (United States)");
+		}
+
+		task ("When: Create a site template") {
+			SiteTemplates.addCP(
+				baseURL = "http://www.able.com:8080",
+				siteTemplateName = "Site Template Name");
+		}
+
+		task ("Then: User is able to add new locale in virtual instance") {
+			PortalSettings.gotoConfiguration(
+				baseURL = "http://www.able.com:8080",
+				configurationCategory = "Localization",
+				configurationName = "Language",
+				configurationScope = "Virtual Instance Scope");
+
+			PortalSettings.configureCurrentLanguagesCP(currentPortalLanguages = "English (United States),Spanish (Spain)");
 		}
 	}
 

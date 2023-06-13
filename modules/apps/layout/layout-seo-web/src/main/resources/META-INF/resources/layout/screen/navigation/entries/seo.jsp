@@ -48,7 +48,7 @@ UnicodeProperties layoutTypeSettingsUnicodeProperties = selLayout.getTypeSetting
 <aui:form action="<%= editSEOURL %>" method="post" name="fm">
 	<clay:sheet>
 		<clay:sheet-header>
-			<h2 class="sheet-title"><liferay-ui:message key="seo" /></h2>
+			<h2 class="mb-4 text-7"><liferay-ui:message key="seo" /></h2>
 		</clay:sheet-header>
 
 		<clay:sheet-section>
@@ -244,10 +244,10 @@ UnicodeProperties layoutTypeSettingsUnicodeProperties = selLayout.getTypeSetting
 				type="submit"
 			/>
 
-			<clay:link
+			<clay:button
 				displayType="secondary"
-				href="<%= backURL %>"
 				label='<%= LanguageUtil.get(request, "cancel") %>'
+				onClick='<%= "Liferay.Util.navigate('" + HtmlUtil.escape(backURL) + "')" %>'
 				type="button"
 			/>
 		</clay:sheet-footer>

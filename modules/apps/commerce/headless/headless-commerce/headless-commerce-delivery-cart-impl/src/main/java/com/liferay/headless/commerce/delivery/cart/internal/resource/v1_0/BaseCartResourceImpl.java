@@ -192,7 +192,7 @@ public abstract class BaseCartResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "customFields": ___, "errorMessages": ___, "notes": ___, "orderTypeExternalReferenceCode": ___, "orderTypeId": ___, "paymentMethod": ___, "printedNote": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "customFields": ___, "errorMessages": ___, "notes": ___, "orderTypeExternalReferenceCode": ___, "orderTypeId": ___, "paymentMethod": ___, "printedNote": ___, "purchaseOrderNumber": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -220,32 +220,16 @@ public abstract class BaseCartResourceImpl
 
 		Cart existingCart = getCart(cartId);
 
-		if (cart.getAccount() != null) {
-			existingCart.setAccount(cart.getAccount());
-		}
-
 		if (cart.getAccountId() != null) {
 			existingCart.setAccountId(cart.getAccountId());
-		}
-
-		if (cart.getAuthor() != null) {
-			existingCart.setAuthor(cart.getAuthor());
 		}
 
 		if (cart.getBillingAddressId() != null) {
 			existingCart.setBillingAddressId(cart.getBillingAddressId());
 		}
 
-		if (cart.getChannelId() != null) {
-			existingCart.setChannelId(cart.getChannelId());
-		}
-
 		if (cart.getCouponCode() != null) {
 			existingCart.setCouponCode(cart.getCouponCode());
-		}
-
-		if (cart.getCreateDate() != null) {
-			existingCart.setCreateDate(cart.getCreateDate());
 		}
 
 		if (cart.getCurrencyCode() != null) {
@@ -260,14 +244,6 @@ public abstract class BaseCartResourceImpl
 			existingCart.setErrorMessages(cart.getErrorMessages());
 		}
 
-		if (cart.getLastPriceUpdateDate() != null) {
-			existingCart.setLastPriceUpdateDate(cart.getLastPriceUpdateDate());
-		}
-
-		if (cart.getModifiedDate() != null) {
-			existingCart.setModifiedDate(cart.getModifiedDate());
-		}
-
 		if (cart.getOrderTypeExternalReferenceCode() != null) {
 			existingCart.setOrderTypeExternalReferenceCode(
 				cart.getOrderTypeExternalReferenceCode());
@@ -277,24 +253,8 @@ public abstract class BaseCartResourceImpl
 			existingCart.setOrderTypeId(cart.getOrderTypeId());
 		}
 
-		if (cart.getOrderUUID() != null) {
-			existingCart.setOrderUUID(cart.getOrderUUID());
-		}
-
 		if (cart.getPaymentMethod() != null) {
 			existingCart.setPaymentMethod(cart.getPaymentMethod());
-		}
-
-		if (cart.getPaymentMethodLabel() != null) {
-			existingCart.setPaymentMethodLabel(cart.getPaymentMethodLabel());
-		}
-
-		if (cart.getPaymentStatus() != null) {
-			existingCart.setPaymentStatus(cart.getPaymentStatus());
-		}
-
-		if (cart.getPaymentStatusLabel() != null) {
-			existingCart.setPaymentStatusLabel(cart.getPaymentStatusLabel());
 		}
 
 		if (cart.getPrintedNote() != null) {
@@ -317,16 +277,8 @@ public abstract class BaseCartResourceImpl
 			existingCart.setShippingOption(cart.getShippingOption());
 		}
 
-		if (cart.getStatus() != null) {
-			existingCart.setStatus(cart.getStatus());
-		}
-
 		if (cart.getUseAsBilling() != null) {
 			existingCart.setUseAsBilling(cart.getUseAsBilling());
-		}
-
-		if (cart.getValid() != null) {
-			existingCart.setValid(cart.getValid());
 		}
 
 		preparePatch(cart, existingCart);
@@ -337,7 +289,7 @@ public abstract class BaseCartResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "customFields": ___, "errorMessages": ___, "notes": ___, "orderTypeExternalReferenceCode": ___, "orderTypeId": ___, "paymentMethod": ___, "printedNote": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "customFields": ___, "errorMessages": ___, "notes": ___, "orderTypeExternalReferenceCode": ___, "orderTypeId": ___, "paymentMethod": ___, "printedNote": ___, "purchaseOrderNumber": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -572,7 +524,7 @@ public abstract class BaseCartResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/channels/{channelId}/carts' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "customFields": ___, "errorMessages": ___, "notes": ___, "orderTypeExternalReferenceCode": ___, "orderTypeId": ___, "paymentMethod": ___, "printedNote": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/channels/{channelId}/carts' -d $'{"accountId": ___, "billingAddress": ___, "billingAddressId": ___, "cartItems": ___, "couponCode": ___, "currencyCode": ___, "customFields": ___, "errorMessages": ___, "notes": ___, "orderTypeExternalReferenceCode": ___, "orderTypeId": ___, "paymentMethod": ___, "printedNote": ___, "purchaseOrderNumber": ___, "shippingAddress": ___, "shippingAddressId": ___, "shippingMethod": ___, "shippingOption": ___, "summary": ___, "useAsBilling": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {

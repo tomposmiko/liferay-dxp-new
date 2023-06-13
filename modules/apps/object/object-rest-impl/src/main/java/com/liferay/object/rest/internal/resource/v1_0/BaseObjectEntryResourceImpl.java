@@ -344,21 +344,12 @@ public abstract class BaseObjectEntryResourceImpl
 		ObjectEntry existingObjectEntry = getByExternalReferenceCode(
 			externalReferenceCode);
 
-		if (objectEntry.getActions() != null) {
-			existingObjectEntry.setActions(objectEntry.getActions());
-		}
-
 		if (objectEntry.getDateCreated() != null) {
 			existingObjectEntry.setDateCreated(objectEntry.getDateCreated());
 		}
 
 		if (objectEntry.getDateModified() != null) {
 			existingObjectEntry.setDateModified(objectEntry.getDateModified());
-		}
-
-		if (objectEntry.getExternalReferenceCode() != null) {
-			existingObjectEntry.setExternalReferenceCode(
-				objectEntry.getExternalReferenceCode());
 		}
 
 		if (objectEntry.getKeywords() != null) {
@@ -372,10 +363,6 @@ public abstract class BaseObjectEntryResourceImpl
 			properties.putAll(objectEntry.getProperties());
 
 			existingObjectEntry.setProperties(properties);
-		}
-
-		if (objectEntry.getScopeKey() != null) {
-			existingObjectEntry.setScopeKey(objectEntry.getScopeKey());
 		}
 
 		if (objectEntry.getTaxonomyCategoryIds() != null) {
@@ -568,21 +555,12 @@ public abstract class BaseObjectEntryResourceImpl
 			getScopeScopeKeyByExternalReferenceCode(
 				scopeKey, externalReferenceCode);
 
-		if (objectEntry.getActions() != null) {
-			existingObjectEntry.setActions(objectEntry.getActions());
-		}
-
 		if (objectEntry.getDateCreated() != null) {
 			existingObjectEntry.setDateCreated(objectEntry.getDateCreated());
 		}
 
 		if (objectEntry.getDateModified() != null) {
 			existingObjectEntry.setDateModified(objectEntry.getDateModified());
-		}
-
-		if (objectEntry.getExternalReferenceCode() != null) {
-			existingObjectEntry.setExternalReferenceCode(
-				objectEntry.getExternalReferenceCode());
 		}
 
 		if (objectEntry.getKeywords() != null) {
@@ -596,10 +574,6 @@ public abstract class BaseObjectEntryResourceImpl
 			properties.putAll(objectEntry.getProperties());
 
 			existingObjectEntry.setProperties(properties);
-		}
-
-		if (objectEntry.getScopeKey() != null) {
-			existingObjectEntry.setScopeKey(objectEntry.getScopeKey());
 		}
 
 		if (objectEntry.getTaxonomyCategoryIds() != null) {
@@ -816,21 +790,12 @@ public abstract class BaseObjectEntryResourceImpl
 
 		ObjectEntry existingObjectEntry = getObjectEntry(objectEntryId);
 
-		if (objectEntry.getActions() != null) {
-			existingObjectEntry.setActions(objectEntry.getActions());
-		}
-
 		if (objectEntry.getDateCreated() != null) {
 			existingObjectEntry.setDateCreated(objectEntry.getDateCreated());
 		}
 
 		if (objectEntry.getDateModified() != null) {
 			existingObjectEntry.setDateModified(objectEntry.getDateModified());
-		}
-
-		if (objectEntry.getExternalReferenceCode() != null) {
-			existingObjectEntry.setExternalReferenceCode(
-				objectEntry.getExternalReferenceCode());
 		}
 
 		if (objectEntry.getKeywords() != null) {
@@ -844,10 +809,6 @@ public abstract class BaseObjectEntryResourceImpl
 			properties.putAll(objectEntry.getProperties());
 
 			existingObjectEntry.setProperties(properties);
-		}
-
-		if (objectEntry.getScopeKey() != null) {
-			existingObjectEntry.setScopeKey(objectEntry.getScopeKey());
 		}
 
 		if (objectEntry.getTaxonomyCategoryIds() != null) {

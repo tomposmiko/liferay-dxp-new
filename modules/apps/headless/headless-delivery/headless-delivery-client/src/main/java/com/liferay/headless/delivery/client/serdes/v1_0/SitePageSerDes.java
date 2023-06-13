@@ -15,6 +15,7 @@
 package com.liferay.headless.delivery.client.serdes.v1_0;
 
 import com.liferay.headless.delivery.client.dto.v1_0.CustomField;
+import com.liferay.headless.delivery.client.dto.v1_0.PagePermission;
 import com.liferay.headless.delivery.client.dto.v1_0.SitePage;
 import com.liferay.headless.delivery.client.dto.v1_0.TaxonomyCategoryBrief;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
@@ -258,6 +259,26 @@ public class SitePageSerDes {
 			sb.append(String.valueOf(sitePage.getPageDefinition()));
 		}
 
+		if (sitePage.getPagePermissions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"pagePermissions\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < sitePage.getPagePermissions().length; i++) {
+				sb.append(String.valueOf(sitePage.getPagePermissions()[i]));
+
+				if ((i + 1) < sitePage.getPagePermissions().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		if (sitePage.getPageSettings() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -280,6 +301,16 @@ public class SitePageSerDes {
 			sb.append(_escape(sitePage.getPageType()));
 
 			sb.append("\"");
+		}
+
+		if (sitePage.getParentSitePage() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentSitePage\": ");
+
+			sb.append(String.valueOf(sitePage.getParentSitePage()));
 		}
 
 		if (sitePage.getRenderedPage() != null) {
@@ -531,6 +562,15 @@ public class SitePageSerDes {
 				"pageDefinition", String.valueOf(sitePage.getPageDefinition()));
 		}
 
+		if (sitePage.getPagePermissions() == null) {
+			map.put("pagePermissions", null);
+		}
+		else {
+			map.put(
+				"pagePermissions",
+				String.valueOf(sitePage.getPagePermissions()));
+		}
+
 		if (sitePage.getPageSettings() == null) {
 			map.put("pageSettings", null);
 		}
@@ -543,6 +583,14 @@ public class SitePageSerDes {
 		}
 		else {
 			map.put("pageType", String.valueOf(sitePage.getPageType()));
+		}
+
+		if (sitePage.getParentSitePage() == null) {
+			map.put("parentSitePage", null);
+		}
+		else {
+			map.put(
+				"parentSitePage", String.valueOf(sitePage.getParentSitePage()));
 		}
 
 		if (sitePage.getRenderedPage() == null) {
@@ -725,6 +773,22 @@ public class SitePageSerDes {
 							(String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "pagePermissions")) {
+				if (jsonParserFieldValue != null) {
+					Object[] jsonParserFieldValues =
+						(Object[])jsonParserFieldValue;
+
+					PagePermission[] pagePermissionsArray =
+						new PagePermission[jsonParserFieldValues.length];
+
+					for (int i = 0; i < pagePermissionsArray.length; i++) {
+						pagePermissionsArray[i] = PagePermissionSerDes.toDTO(
+							(String)jsonParserFieldValues[i]);
+					}
+
+					sitePage.setPagePermissions(pagePermissionsArray);
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "pageSettings")) {
 				if (jsonParserFieldValue != null) {
 					sitePage.setPageSettings(
@@ -734,6 +798,13 @@ public class SitePageSerDes {
 			else if (Objects.equals(jsonParserFieldName, "pageType")) {
 				if (jsonParserFieldValue != null) {
 					sitePage.setPageType((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "parentSitePage")) {
+				if (jsonParserFieldValue != null) {
+					sitePage.setParentSitePage(
+						ParentSitePageSerDes.toDTO(
+							(String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "renderedPage")) {

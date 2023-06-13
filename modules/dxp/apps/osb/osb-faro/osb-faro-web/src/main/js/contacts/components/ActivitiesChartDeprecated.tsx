@@ -39,10 +39,12 @@ interface IChartProps<T> extends React.HTMLAttributes<HTMLElement> {
 	history: Array<T>;
 	interval?: Interval;
 	onAfterInit?: () => void;
-	onPointSelect: ({index: number}) => void;
+	onPointSelect: ({index}) => void;
 	rangeSelectors?: RangeSelectors;
 	selectedPoint: number;
-	tooltipRenderRows?: (data: T) => Array<{
+	tooltipRenderRows?: (
+		data: T
+	) => Array<{
 		label: string;
 		value: any;
 	}>;

@@ -18,7 +18,7 @@ import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.commerce.constants.CommerceAddressConstants;
-import com.liferay.commerce.constants.CommercePaymentConstants;
+import com.liferay.commerce.constants.CommercePaymentMethodConstants;
 import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.context.CommerceContextFactory;
@@ -135,7 +135,7 @@ public class CartResourceImpl extends BaseCartResourceImpl {
 		sb.append(_portal.getPortalURL(contextHttpServletRequest));
 		sb.append(_portal.getPathModule());
 		sb.append(CharPool.SLASH);
-		sb.append(CommercePaymentConstants.SERVLET_PATH);
+		sb.append(CommercePaymentMethodConstants.SERVLET_PATH);
 		sb.append("?groupId=");
 		sb.append(commerceOrder.getGroupId());
 		sb.append(StringPool.AMPERSAND);
@@ -713,6 +713,17 @@ public class CartResourceImpl extends BaseCartResourceImpl {
 				commerceShippingMethod.getCommerceShippingMethodId();
 		}
 
+		String purchaseOrderNumber = StringPool.BLANK;
+
+		if (commerceOrder.isOpen()) {
+			purchaseOrderNumber = GetterUtil.get(
+				cart.getPurchaseOrderNumber(),
+				commerceOrder.getPurchaseOrderNumber());
+		}
+		else {
+			purchaseOrderNumber = commerceOrder.getPurchaseOrderNumber();
+		}
+
 		CommerceContext commerceContext = _commerceContextFactory.create(
 			contextCompany.getCompanyId(), commerceOrder.getGroupId(),
 			contextUser.getUserId(), commerceOrder.getCommerceOrderId(),
@@ -732,8 +743,7 @@ public class CartResourceImpl extends BaseCartResourceImpl {
 			GetterUtil.get(
 				cart.getPaymentMethod(),
 				commerceOrder.getCommercePaymentMethodKey()),
-			commerceOrder.getPurchaseOrderNumber(),
-			commerceOrder.getShippingAmount(),
+			purchaseOrderNumber, commerceOrder.getShippingAmount(),
 			GetterUtil.get(
 				cart.getShippingOption(),
 				commerceOrder.getShippingOptionName()),

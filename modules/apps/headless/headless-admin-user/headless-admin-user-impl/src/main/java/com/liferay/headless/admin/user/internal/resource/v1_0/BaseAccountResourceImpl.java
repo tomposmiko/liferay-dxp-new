@@ -372,9 +372,7 @@ public abstract class BaseAccountResourceImpl
 		Account existingAccount = getAccountByExternalReferenceCode(
 			externalReferenceCode);
 
-		if (account.getActions() != null) {
-			existingAccount.setActions(account.getActions());
-		}
+		existingAccount.setCustomFields(account.getCustomFields());
 
 		if (account.getDescription() != null) {
 			existingAccount.setDescription(account.getDescription());
@@ -391,10 +389,6 @@ public abstract class BaseAccountResourceImpl
 
 		if (account.getName() != null) {
 			existingAccount.setName(account.getName());
-		}
-
-		if (account.getNumberOfUsers() != null) {
-			existingAccount.setNumberOfUsers(account.getNumberOfUsers());
 		}
 
 		if (account.getOrganizationIds() != null) {
@@ -595,9 +589,7 @@ public abstract class BaseAccountResourceImpl
 
 		Account existingAccount = getAccount(accountId);
 
-		if (account.getActions() != null) {
-			existingAccount.setActions(account.getActions());
-		}
+		existingAccount.setCustomFields(account.getCustomFields());
 
 		if (account.getDescription() != null) {
 			existingAccount.setDescription(account.getDescription());
@@ -614,10 +606,6 @@ public abstract class BaseAccountResourceImpl
 
 		if (account.getName() != null) {
 			existingAccount.setName(account.getName());
-		}
-
-		if (account.getNumberOfUsers() != null) {
-			existingAccount.setNumberOfUsers(account.getNumberOfUsers());
 		}
 
 		if (account.getOrganizationIds() != null) {

@@ -1,3 +1,5 @@
+// @ts-nocheck - Fix it at this LRAC-13388
+
 import Checkbox from 'shared/components/Checkbox';
 import ComposedChartWithEmptyState from 'shared/components/ComposedChartWithEmptyState';
 import MetricStateRenderer from './MetricStateRenderer';
@@ -62,10 +64,10 @@ export const MetricChart: React.FC<IMetricChartProps> = ({
 		format,
 		intervals,
 		timeline
-	} = useMemo(
-		() => getActiveItem(data, compareToPrevious),
-		[compareToPrevious, data]
-	);
+	} = useMemo(() => getActiveItem(data, compareToPrevious), [
+		compareToPrevious,
+		data
+	]);
 
 	const dataIds = chartData.map(item => item.id);
 

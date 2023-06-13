@@ -46,7 +46,7 @@ function refresh_liferay_sample_workspace {
 
 	pushd ${temp_dir}
 
-	${BLADE_PATH} init --liferay-version dxp-7.4-u71
+	${BLADE_PATH} init --liferay-version dxp-7.4-u72
 
 	echo -en "\n**/dist\n**/node_modules_cache\n.DS_Store" >> .gitignore
 
@@ -64,7 +64,7 @@ function refresh_liferay_sample_workspace {
 
 	mv gradle.properties.tmp gradle.properties
 
-	sed -i 's/name: "com.liferay.gradle.plugins.workspace", version: ".*"/name: "com.liferay.gradle.plugins.workspace", version: "4.3.7"/' settings.gradle
+	sed -i 's/name: "com.liferay.gradle.plugins.workspace", version: ".*"/name: "com.liferay.gradle.plugins.workspace", version: "5.0.3"/' settings.gradle
 
 	popd
 
@@ -81,12 +81,12 @@ function refresh_liferay_sample_workspace {
 
 	mkdir -p liferay-sample-workspace/modules
 
-	echo "Client extensions are the recommended way of customizing Liferay. Modules and" > liferay-sample-workspace/modules/README.txt
-	echo "themes are supported for backwards compatibility." >> liferay-sample-workspace/modules/README.txt
+	echo "Client extensions are the recommended way of customizing Liferay. Modules and" > liferay-sample-workspace/modules/README.markdown
+	echo "themes are supported for backwards compatibility." >> liferay-sample-workspace/modules/README.markdown
 
 	mkdir -p liferay-sample-workspace/themes
 
-	cp liferay-sample-workspace/modules/README.txt liferay-sample-workspace/themes
+	cp liferay-sample-workspace/modules/README.markdown liferay-sample-workspace/themes
 
 	#
 	# Client Extension: Sample Custom Element 2

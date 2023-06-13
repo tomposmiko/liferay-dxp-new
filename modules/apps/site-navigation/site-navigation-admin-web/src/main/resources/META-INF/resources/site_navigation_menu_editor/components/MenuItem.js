@@ -46,7 +46,6 @@ export function MenuItem({item, onMenuItemRemoved}) {
 	const setSidebarPanelId = useSetSidebarPanelId();
 	const {
 		editSiteNavigationMenuItemParentURL,
-		languageId,
 		portletNamespace,
 	} = useConstants();
 
@@ -76,17 +75,24 @@ export function MenuItem({item, onMenuItemRemoved}) {
 		[items, item]
 	);
 
-	const updateMenuItemParent = (itemId, parentId) => {
-		const order = getOrder({
-			items,
-			parentSiteNavigationMenuItemId: parentId,
-			siteNavigationMenuItemId: itemId,
-		});
+	const updateMenuItemParent = (itemId, parentId, order) => {
+		let computedOrder;
+
+		if (Liferay.FeatureFlags['LPS-134527']) {
+			computedOrder = order;
+		}
+		else {
+			computedOrder = getOrder({
+				items,
+				parentSiteNavigationMenuItemId: parentId,
+				siteNavigationMenuItemId: itemId,
+			});
+		}
 
 		updateMenuItem({
 			editSiteNavigationMenuItemParentURL,
 			itemId,
-			order,
+			order: computedOrder,
 			parentId,
 			portletNamespace,
 		})
@@ -112,7 +118,7 @@ export function MenuItem({item, onMenuItemRemoved}) {
 	const keyboardDragLayer = useDragLayer();
 	const setKeyboardDragLayer = useSetDragLayer();
 	const {handlerRef, isDragging} = useDragItem(item, updateMenuItemParent);
-	const {targetRef} = useDropTarget(item);
+	const {isOver, nestingLevel, targetRef} = useDropTarget(item);
 
 	const isKeyboardDragging = useMemo(
 		() =>
@@ -128,10 +134,11 @@ export function MenuItem({item, onMenuItemRemoved}) {
 		]
 	);
 
-	const rtl = Liferay.Language.direction[languageId] === 'rtl';
-	const itemStyle = rtl
-		? {marginRight: (itemPath.length - 1) * NESTING_MARGIN}
-		: {marginLeft: (itemPath.length - 1) * NESTING_MARGIN};
+	const itemStyle = {
+		'--nesting-level': itemPath.length,
+		'--nesting-margin': NESTING_MARGIN,
+		'--over-nesting-level': nestingLevel,
+	};
 
 	const parentItemId =
 		itemPath.length > 1 ? itemPath[itemPath.length - 2] : '0';
@@ -178,7 +185,7 @@ export function MenuItem({item, onMenuItemRemoved}) {
 			}
 			else {
 				setKeyboardDragLayer(items, {
-					eventKey: 'ArrowDown',
+					eventKey: event.key,
 					menuItemTitle: title,
 					menuItemType: type,
 					order,
@@ -272,11 +279,13 @@ export function MenuItem({item, onMenuItemRemoved}) {
 				className={classNames(
 					'focusable-menu-item site_navigation_menu_editor_MenuItem',
 					{
-						active: selected,
-						dragging: isDragging || isKeyboardDragging,
+						'active': selected,
+						'dragging': isDragging || isKeyboardDragging,
+						'is-over': isOver,
 					}
 				)}
 				data-item-id={item.siteNavigationMenuItemId}
+				data-nesting-level={nestingLevel}
 				data-parent-item-id={parentItemId}
 				onBlur={onBlur}
 				onClick={(event) => {
@@ -406,7 +415,7 @@ export function MenuItem({item, onMenuItemRemoved}) {
 															: '-1'
 													}
 													title={Liferay.Language.get(
-														'add-item'
+														'add-item-at-the-same-level'
 													)}
 												/>
 											}
@@ -443,7 +452,7 @@ export function MenuItem({item, onMenuItemRemoved}) {
 															: '-1'
 													}
 													title={Liferay.Language.get(
-														'add-item'
+														'add-item-at-the-same-level'
 													)}
 												/>
 											}

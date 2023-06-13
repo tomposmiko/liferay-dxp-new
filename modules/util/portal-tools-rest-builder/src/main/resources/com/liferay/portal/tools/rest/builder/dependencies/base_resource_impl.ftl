@@ -366,7 +366,7 @@ public abstract class Base${schemaName}ResourceImpl
 					</#list>
 				);
 
-				<#assign properties = freeMarkerTool.getDTOProperties(configYAML, openAPIYAML, schema) />
+				<#assign properties = freeMarkerTool.getWritableDTOProperties(configYAML, openAPIYAML, schema) />
 
 				<#list properties?keys as propertyName>
 					<#if !freeMarkerTool.isDTOSchemaProperty(openAPIYAML, propertyName, schema) && !stringUtil.equals(propertyName, "id")>
@@ -383,6 +383,8 @@ public abstract class Base${schemaName}ResourceImpl
 								existing${schemaName}.set${propertyName?cap_first}(${schemaVarName}.get${propertyName?cap_first}());
 							</#if>
 						}
+					<#elseif stringUtil.equals(properties[propertyName], "CustomField[]")>
+						existing${schemaName}.set${propertyName?cap_first}(${schemaVarName}.get${propertyName?cap_first}());
 					</#if>
 				</#list>
 

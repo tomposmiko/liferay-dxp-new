@@ -250,10 +250,6 @@ public abstract class BaseBlogPostingResourceImpl
 
 		BlogPosting existingBlogPosting = getBlogPosting(blogPostingId);
 
-		if (blogPosting.getActions() != null) {
-			existingBlogPosting.setActions(blogPosting.getActions());
-		}
-
 		if (blogPosting.getAlternativeHeadline() != null) {
 			existingBlogPosting.setAlternativeHeadline(
 				blogPosting.getAlternativeHeadline());
@@ -263,13 +259,7 @@ public abstract class BaseBlogPostingResourceImpl
 			existingBlogPosting.setArticleBody(blogPosting.getArticleBody());
 		}
 
-		if (blogPosting.getDateCreated() != null) {
-			existingBlogPosting.setDateCreated(blogPosting.getDateCreated());
-		}
-
-		if (blogPosting.getDateModified() != null) {
-			existingBlogPosting.setDateModified(blogPosting.getDateModified());
-		}
+		existingBlogPosting.setCustomFields(blogPosting.getCustomFields());
 
 		if (blogPosting.getDatePublished() != null) {
 			existingBlogPosting.setDatePublished(
@@ -278,11 +268,6 @@ public abstract class BaseBlogPostingResourceImpl
 
 		if (blogPosting.getDescription() != null) {
 			existingBlogPosting.setDescription(blogPosting.getDescription());
-		}
-
-		if (blogPosting.getEncodingFormat() != null) {
-			existingBlogPosting.setEncodingFormat(
-				blogPosting.getEncodingFormat());
 		}
 
 		if (blogPosting.getExternalReferenceCode() != null) {
@@ -301,15 +286,6 @@ public abstract class BaseBlogPostingResourceImpl
 
 		if (blogPosting.getKeywords() != null) {
 			existingBlogPosting.setKeywords(blogPosting.getKeywords());
-		}
-
-		if (blogPosting.getNumberOfComments() != null) {
-			existingBlogPosting.setNumberOfComments(
-				blogPosting.getNumberOfComments());
-		}
-
-		if (blogPosting.getSiteId() != null) {
-			existingBlogPosting.setSiteId(blogPosting.getSiteId());
 		}
 
 		if (blogPosting.getTaxonomyCategoryIds() != null) {

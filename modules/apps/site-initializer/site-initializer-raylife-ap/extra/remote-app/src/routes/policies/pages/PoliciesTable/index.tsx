@@ -46,7 +46,7 @@ type Policy = {
 	termPremium: number;
 };
 
-type TableContent = {[keys: string]: string};
+type TableContent = {[keys: string]: string | boolean};
 
 type TableItemType = {
 	centered?: boolean;
@@ -568,7 +568,7 @@ const PoliciesTable = () => {
 					policiesList.push({
 						commission: `$${commissionValue.toFixed(2)}`,
 						externalReferenceCode,
-						isClickable: 'true',
+						isClickable: productName === 'Auto' ? true : false,
 						isExpiring: (renewalDue < 0).toString(),
 						isRedLine: (
 							renewalDue >= 0 &&
@@ -668,6 +668,7 @@ const PoliciesTable = () => {
 								onKeyDown={handleKeyDown}
 								placeholder="Search for..."
 								type="text"
+								value={searchInput}
 							/>
 						</ClayInput.GroupItem>
 
@@ -722,7 +723,7 @@ const PoliciesTable = () => {
 											checked={
 												checkedStateProduct[
 													checkedIndex
-												]
+												] ?? false
 											}
 											key={checkedIndex}
 											label={
@@ -761,7 +762,9 @@ const PoliciesTable = () => {
 									) => (
 										<ClayCheckbox
 											checked={
-												checkedStateStatus[checkedIndex]
+												checkedStateStatus[
+													checkedIndex
+												] ?? false
 											}
 											key={checkedIndex}
 											label={
