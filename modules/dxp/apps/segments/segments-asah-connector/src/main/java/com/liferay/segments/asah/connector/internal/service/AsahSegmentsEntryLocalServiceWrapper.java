@@ -65,18 +65,10 @@ public class AsahSegmentsEntryLocalServiceWrapper
 		SegmentsEntry segmentsEntry = super.recalculateSegmentsEntry(
 			segmentsEntryId);
 
-		try {
-			if (!FeatureFlagManagerUtil.isEnabled("LPS-172194") ||
-				!_analyticsSettingsManager.isAnalyticsEnabled(
-					segmentsEntry.getCompanyId()) ||
-				!SegmentsEntryConstants.SOURCE_ASAH_FARO_BACKEND.equals(
-					segmentsEntry.getSource())) {
-
-				return segmentsEntry;
-			}
-		}
-		catch (Exception exception) {
-			_log.error(exception);
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-172194") ||
+			!_isAnalyticsEnabled(segmentsEntry.getCompanyId()) ||
+			!SegmentsEntryConstants.SOURCE_ASAH_FARO_BACKEND.equals(
+				segmentsEntry.getSource())) {
 
 			return segmentsEntry;
 		}
@@ -105,9 +97,44 @@ public class AsahSegmentsEntryLocalServiceWrapper
 		Criteria criteria = expressionContext.accept(
 			new IndividualSegmentsExpressionVisitorImpl());
 
-		return updateSegmentsEntry(
+		return super.updateSegmentsEntry(
 			segmentsEntry.getSegmentsEntryId(), individualSegment.getId(),
 			nameMap, null, true, _serialize(criteria), serviceContext);
+	}
+
+	@Override
+	public SegmentsEntry updateSegmentsEntry(
+			long segmentsEntryId, String segmentsEntryKey,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			boolean active, String criteria, ServiceContext serviceContext)
+		throws PortalException {
+
+		SegmentsEntry segmentsEntry =
+			_segmentsEntryLocalService.getSegmentsEntry(segmentsEntryId);
+
+		if (FeatureFlagManagerUtil.isEnabled("LPS-172194") &&
+			_isAnalyticsEnabled(segmentsEntry.getCompanyId()) &&
+			SegmentsEntryConstants.SOURCE_ASAH_FARO_BACKEND.equals(
+				segmentsEntry.getSource())) {
+
+			IndividualSegment individualSegment =
+				_asahFaroBackendClient.getIndividualSegment(
+					segmentsEntry.getCompanyId(),
+					segmentsEntry.getSegmentsEntryKey());
+
+			individualSegment.setFilter(criteria);
+			individualSegment.setName(
+				nameMap.get(
+					_portal.getSiteDefaultLocale(
+						serviceContext.getScopeGroupId())));
+
+			_asahFaroBackendClient.updateIndividualSegment(
+				segmentsEntry.getCompanyId(), individualSegment);
+		}
+
+		return super.updateSegmentsEntry(
+			segmentsEntryId, segmentsEntryKey, nameMap, descriptionMap, active,
+			criteria, serviceContext);
 	}
 
 	@Activate
@@ -135,6 +162,17 @@ public class AsahSegmentsEntryLocalServiceWrapper
 		serviceContext.setUserId(user.getUserId());
 
 		return serviceContext;
+	}
+
+	private boolean _isAnalyticsEnabled(long companyId) {
+		try {
+			return _analyticsSettingsManager.isAnalyticsEnabled(companyId);
+		}
+		catch (Exception exception) {
+			_log.error(exception);
+		}
+
+		return false;
 	}
 
 	private String _serialize(Criteria criteria) {

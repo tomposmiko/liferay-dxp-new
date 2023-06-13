@@ -2,6 +2,9 @@
 [#assign objectRequest = (request.getAttribute("INFO_ITEM_REFERENCE"))! /]
 [#assign organizationId = objectRequest.classPK! /]
 [#assign URL = (layoutURL?substring(0,layoutURL?lastIndexOf('/')))! /]
+[#assign approvedRoles =["Administrator", "Finance User"]/]
+[#assign approvedRolesForOrganization =["Administrator", "EVP Manager"]/]
+[#assign userRoles = permissionChecker.getUserBag().getRoles()/]
 
 [#if organizationId?? && organizationId?hasContent]
 	[#assign organizationStatus = (restClient.get("/c/evporganizations/" + organizationId).organizationStatus.key) ! /]
@@ -9,7 +12,6 @@
 	[#assign organizationStatusListing = ["rejected","awaitingFinanceApproval","verified"] /]
 
 	<input class="organizationID" id="${organizationId}" type="hidden" value="${organizationId}" />
-
 	<span class="organizationName" hidden>${organizationName}</span>
 
 	<div id="evp-organization-kebab-button">
@@ -24,14 +26,27 @@
 				url=URL + "/l/" + organizationId
 			/]
 
-			[#if !organizationStatusListing?seqContains(organizationStatus)]
-				<div class="btnOpenModal">
+			[#list userRoles as role]
+				[#if role.name == "Administrator" || role.name == "EVP Manager" && organizationStatus == "verified" ||
+					role.name == "Finance User" && organizationStatus == "awaitingFinanceApproval"
+				]
+
 					[@liferay_ui["icon"]
-						message="Approve or Reject"
-						url="#${organizationId}"
+						message="Edit"
+						url=URL + "/edit-organization-form?id=" + organizationId
 					/]
-				</div>
-			[/#if]
+
+				[/#if]
+
+				[#if approvedRolesForOrganization?seqContains(role.name) && !organizationStatusListing?seqContains(organizationStatus)]
+					<div class="btnOpenModal">
+						[@liferay_ui["icon"]
+							message="Approve or Reject"
+							url="#${organizationId}"
+						/]
+					</div>
+				[/#if]
+			[/#list]
 		[/@]
 	</div>
 [/#if]

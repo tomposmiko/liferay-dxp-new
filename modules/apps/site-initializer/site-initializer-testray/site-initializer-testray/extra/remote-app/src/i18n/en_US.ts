@@ -110,6 +110,7 @@ export default {
 	'complete-test': 'Complete Test',
 	'complete-x': 'Complete {0}',
 	'component': 'Component',
+	'component-name': 'Component Name',
 	'components': 'Components',
 	'confirm-password': 'Confirm Password',
 	'copy-x': 'Copy - {0}',
@@ -179,6 +180,8 @@ export default {
 	'export-csv': 'Export CSV',
 	'failed': 'Failed',
 	'filter-results': 'Filter Results',
+	'filters-pinned-successfully': 'Filters pinned successfully.',
+	'filters-unpinned-successfully': 'Filters unpinned successfully.',
 	'first-name': 'First Name',
 	'git-hash': 'Git Hash',
 	'github-compare-urls': 'GitHub Compare URLs',
@@ -445,6 +448,8 @@ export default {
 		'You do not have permissions to access this app. Contact the app administrator to request the access.',
 	'you-must-have-at-least-one-column-selected':
 		'You must have at least one column selected',
+	'you-must-select-one-or-more-filters-before-pinning':
+		'You must select one or more filters before pinning.',
 	'your-request-completed-successfully':
 		'Your request completed successfully',
 };

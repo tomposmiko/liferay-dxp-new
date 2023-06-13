@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
@@ -87,6 +88,10 @@ public class ObjectEntryResourceTest {
 			UnicodePropertiesBuilder.setProperty(
 				"feature.flag.LPS-164801", "true"
 			).build());
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-176651", "true"
+			).build());
 	}
 
 	@AfterClass
@@ -98,6 +103,10 @@ public class ObjectEntryResourceTest {
 		PropsUtil.addProperties(
 			UnicodePropertiesBuilder.setProperty(
 				"feature.flag.LPS-164801", "false"
+			).build());
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-176651", "false"
 			).build());
 	}
 
@@ -201,6 +210,96 @@ public class ObjectEntryResourceTest {
 			UnicodePropertiesBuilder.setProperty(
 				"feature.flag.LPS-161364", "false"
 			).build());
+	}
+
+	@Test
+	public void testGetObjectEntryFilteredByKeywords() throws Exception {
+		_postObjectEntryWithKeywords("tag1");
+		_postObjectEntryWithKeywords("tag1", "tag2");
+		_postObjectEntryWithKeywords("tag1", "tag2", "tag3");
+
+		_assertFilteredObjectEntries(3, "keywords/any(k:k eq 'tag1')");
+		_assertFilteredObjectEntries(2, "keywords/any(k:k eq 'tag2')");
+		_assertFilteredObjectEntries(1, "keywords/any(k:k eq 'tag3')");
+		_assertFilteredObjectEntries(0, "keywords/any(k:k eq '1234')");
+
+		_assertFilteredObjectEntries(2, "keywords/any(k:k ne 'tag1')");
+		_assertFilteredObjectEntries(3, "keywords/any(k:k ne 'tag2')");
+		_assertFilteredObjectEntries(3, "keywords/any(k:k ne 'tag3')");
+
+		_assertFilteredObjectEntries(2, "keywords/any(k:k gt 'tag1')");
+		_assertFilteredObjectEntries(1, "keywords/any(k:k gt 'tag2')");
+		_assertFilteredObjectEntries(0, "keywords/any(k:k gt 'tag3')");
+
+		_assertFilteredObjectEntries(3, "keywords/any(k:k ge 'tag1')");
+		_assertFilteredObjectEntries(2, "keywords/any(k:k ge 'tag2')");
+		_assertFilteredObjectEntries(1, "keywords/any(k:k ge 'tag3')");
+
+		_assertFilteredObjectEntries(0, "keywords/any(k:k lt 'tag1')");
+		_assertFilteredObjectEntries(3, "keywords/any(k:k lt 'tag2')");
+		_assertFilteredObjectEntries(3, "keywords/any(k:k lt 'tag3')");
+
+		_assertFilteredObjectEntries(3, "keywords/any(k:k le 'tag1')");
+		_assertFilteredObjectEntries(3, "keywords/any(k:k le 'tag2')");
+		_assertFilteredObjectEntries(3, "keywords/any(k:k le 'tag3')");
+
+		_assertFilteredObjectEntries(3, "keywords/any(k:startswith(k,'t'))");
+		_assertFilteredObjectEntries(3, "keywords/any(k:startswith(k,'ta'))");
+		_assertFilteredObjectEntries(3, "keywords/any(k:startswith(k,'tag'))");
+		_assertFilteredObjectEntries(3, "keywords/any(k:startswith(k,'tag1'))");
+		_assertFilteredObjectEntries(2, "keywords/any(k:startswith(k,'tag2'))");
+		_assertFilteredObjectEntries(1, "keywords/any(k:startswith(k,'tag3'))");
+		_assertFilteredObjectEntries(0, "keywords/any(k:startswith(k,'1234'))");
+
+		_assertFilteredObjectEntries(3, "keywords/any(k:contains(k,'tag'))");
+		_assertFilteredObjectEntries(3, "keywords/any(k:contains(k,'ag1'))");
+		_assertFilteredObjectEntries(2, "keywords/any(k:contains(k,'ag2'))");
+		_assertFilteredObjectEntries(1, "keywords/any(k:contains(k,'ag3'))");
+		_assertFilteredObjectEntries(0, "keywords/any(k:contains(k,'1234'))");
+
+		_assertFilteredObjectEntries(3, "keywords/any(k:k in ('tag1','tag2'))");
+		_assertFilteredObjectEntries(2, "keywords/any(k:k in ('tag2','tag3'))");
+		_assertFilteredObjectEntries(0, "keywords/any(k:k in ('1234','5678'))");
+	}
+
+	@Test
+	public void testGetObjectEntryWithKeywords() throws Exception {
+		JSONObject jsonObject = HTTPTestUtil.invoke(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_1, "value"
+			).put(
+				"keywords", JSONUtil.putAll("tag1", "tag2")
+			).toString(),
+			_objectDefinition1.getRESTContextPath(), Http.Method.POST);
+
+		jsonObject = HTTPTestUtil.invoke(
+			null,
+			_objectDefinition1.getRESTContextPath() + StringPool.SLASH +
+				jsonObject.getString("id"),
+			Http.Method.GET);
+
+		JSONArray keywordsJSONArray = jsonObject.getJSONArray("keywords");
+
+		Assert.assertEquals("tag1", keywordsJSONArray.get(0));
+		Assert.assertEquals("tag2", keywordsJSONArray.get(1));
+
+		jsonObject = HTTPTestUtil.invoke(
+			JSONUtil.put(
+				"keywords", JSONUtil.putAll("tag1", "tag2", "tag3")
+			).toString(),
+			_objectDefinition1.getRESTContextPath(), Http.Method.POST);
+
+		jsonObject = HTTPTestUtil.invoke(
+			null,
+			_objectDefinition1.getRESTContextPath() + StringPool.SLASH +
+				jsonObject.getString("id"),
+			Http.Method.GET);
+
+		keywordsJSONArray = jsonObject.getJSONArray("keywords");
+
+		Assert.assertEquals("tag1", keywordsJSONArray.get(0));
+		Assert.assertEquals("tag2", keywordsJSONArray.get(1));
+		Assert.assertEquals("tag3", keywordsJSONArray.get(2));
 	}
 
 	@Test
@@ -309,6 +408,57 @@ public class ObjectEntryResourceTest {
 		Assert.assertEquals(
 			itemJSONObject.getLong("id"),
 			_siteScopedObjectEntry1.getObjectEntryId());
+	}
+
+	@Test
+	public void testPatchObjectEntryWithKeywords() throws Exception {
+		JSONObject jsonObject = HTTPTestUtil.invoke(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_1, "value"
+			).put(
+				"keywords", JSONUtil.putAll("tag1", "tag2")
+			).toString(),
+			_objectDefinition1.getRESTContextPath(), Http.Method.POST);
+
+		HTTPTestUtil.invoke(
+			JSONUtil.put(
+				"keywords", JSONUtil.putAll("tag1", "tag2", "tag3")
+			).toString(),
+			_objectDefinition1.getRESTContextPath() + StringPool.SLASH +
+				jsonObject.getString("id"),
+			Http.Method.PATCH);
+
+		jsonObject = HTTPTestUtil.invoke(
+			null,
+			_objectDefinition1.getRESTContextPath() + StringPool.SLASH +
+				jsonObject.getString("id"),
+			Http.Method.GET);
+
+		JSONArray keywordsJSONArray = jsonObject.getJSONArray("keywords");
+
+		Assert.assertEquals("tag1", keywordsJSONArray.get(0));
+		Assert.assertEquals("tag2", keywordsJSONArray.get(1));
+		Assert.assertEquals("tag3", keywordsJSONArray.get(2));
+	}
+
+	@Test
+	public void testPatchSiteScopedObject() throws Exception {
+		String newObjectFieldValue = RandomTestUtil.randomString();
+
+		JSONObject objectEntryJSONObject = JSONUtil.put(
+			_OBJECT_FIELD_NAME_1, newObjectFieldValue);
+
+		JSONObject jsonObject = HTTPTestUtil.invoke(
+			objectEntryJSONObject.toString(),
+			StringBundler.concat(
+				_siteScopedObjectDefinition1.getRESTContextPath(), "/scopes/",
+				String.valueOf(TestPropsValues.getGroupId()),
+				"/by-external-reference-code/",
+				_siteScopedObjectEntry1.getExternalReferenceCode()),
+			Http.Method.PATCH);
+
+		Assert.assertEquals(
+			jsonObject.getString(_OBJECT_FIELD_NAME_1), newObjectFieldValue);
 	}
 
 	@Test
@@ -760,6 +910,21 @@ public class ObjectEntryResourceTest {
 		return objectRelationship;
 	}
 
+	private void _assertFilteredObjectEntries(
+			int expectedObjectEntryCount, String filter)
+		throws Exception {
+
+		JSONObject jsonObject = HTTPTestUtil.invoke(
+			null,
+			_objectDefinition1.getRESTContextPath() + "?filter=" +
+				URLCodec.encodeURL(filter),
+			Http.Method.GET);
+
+		JSONArray itemsJSONArray = jsonObject.getJSONArray("items");
+
+		Assert.assertEquals(expectedObjectEntryCount, itemsJSONArray.length());
+	}
+
 	private void _assertObjectEntryField(
 		JSONObject objectEntryJSONObject, String objectFieldName,
 		String objectFieldValue) {
@@ -793,6 +958,18 @@ public class ObjectEntryResourceTest {
 		}
 
 		return jsonArray;
+	}
+
+	private void _postObjectEntryWithKeywords(String... keywords)
+		throws Exception {
+
+		HTTPTestUtil.invoke(
+			JSONUtil.put(
+				_OBJECT_FIELD_NAME_1, RandomTestUtil.randomString()
+			).put(
+				"keywords", JSONUtil.putAll(keywords)
+			).toString(),
+			_objectDefinition1.getRESTContextPath(), Http.Method.POST);
 	}
 
 	private void _testFilterByRelatedObjectDefinitionSystemObjectField(

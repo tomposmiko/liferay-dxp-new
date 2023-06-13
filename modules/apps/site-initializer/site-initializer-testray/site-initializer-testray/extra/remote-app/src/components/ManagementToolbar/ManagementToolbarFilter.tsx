@@ -12,9 +12,10 @@
  * details.
  */
 
-import ClayButton from '@clayui/button';
+import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayPopover from '@clayui/popover';
+import classNames from 'classnames';
 import {
 	useCallback,
 	useContext,
@@ -36,13 +37,19 @@ type ManagementToolbarFilterProps = {
 	filterSchema?: FilterSchema;
 };
 
-type FilterBody = {
+type FilterBodyProps = {
 	buttonRef: React.RefObject<HTMLButtonElement>;
 	filterSchema: FilterSchema | undefined;
 	setPosition: React.Dispatch<React.SetStateAction<number>>;
+	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const FilterBody = ({buttonRef, filterSchema, setPosition}: FilterBody) => {
+const FilterBody: React.FC<FilterBodyProps> = ({
+	buttonRef,
+	filterSchema,
+	setPosition,
+	setVisible,
+}) => {
 	const [filter, setFilter] = useState('');
 
 	const fields = useMemo(() => filterSchema?.fields as RendererFields[], [
@@ -91,8 +98,8 @@ const FilterBody = ({buttonRef, filterSchema, setPosition}: FilterBody) => {
 		setForm(initialFilters);
 	};
 
-	const clearDisabled = Object.entries(form).every(
-		(value) => !value[1] || !value[1].length
+	const clearDisabled = Object.values(form).every(
+		(value) => !value || !value.length
 	);
 
 	const onApply = useCallback(() => {
@@ -112,25 +119,40 @@ const FilterBody = ({buttonRef, filterSchema, setPosition}: FilterBody) => {
 
 		dispatch({
 			payload: {filters: {entries, filter: filterCleaned}},
-			type: ListViewTypes.SET_UPDATE_FILTERS_AND_SORT,
+			type: ListViewTypes.SET_FILTERS,
 		});
-	}, [dispatch, fields, form]);
+
+		setVisible(false);
+	}, [dispatch, fields, form, setVisible]);
 
 	return (
 		<div className="align-content-between d-flex flex-column">
 			<div className="dropdown-header">
-				<p className="font-weight-bold my-2">
-					{i18n.translate('filter-results')}
-				</p>
+				{fields.length > 1 && (
+					<>
+						<p className="font-weight-bold my-2">
+							{i18n.translate('filter-results')}
+						</p>
 
-				<Form.Input
-					name="search-filter"
-					onChange={({target: {value}}) => setFilter(value)}
-					placeholder={i18n.translate('search-filters')}
-					value={filter}
-				/>
+						<Form.Input
+							name="search-filter"
+							onChange={({target: {value}}) => setFilter(value)}
+							placeholder={i18n.translate('search-filters')}
+							value={filter}
+						/>
 
-				<Form.Divider />
+						<ClayButtonWithIcon
+							aria-label={i18n.translate('clear')}
+							className="clear-button"
+							displayType="unstyled"
+							onClick={() => setFilter('')}
+							symbol="times"
+							title={i18n.translate('clear')}
+						/>
+
+						<Form.Divider />
+					</>
+				)}
 			</div>
 
 			<div className="management-toolbar-body">
@@ -149,7 +171,7 @@ const FilterBody = ({buttonRef, filterSchema, setPosition}: FilterBody) => {
 			<div className="popover-footer">
 				<Form.Divider />
 
-				<ClayButton onClick={onApply}>
+				<ClayButton disabled={clearDisabled} onClick={onApply}>
 					{i18n.translate('apply')}
 				</ClayButton>
 
@@ -171,6 +193,7 @@ const MENU_POPOVER_HEIGHT = 580;
 const ManagementToolbarFilter: React.FC<ManagementToolbarFilterProps> = ({
 	filterSchema,
 }) => {
+	const [visible, setVisible] = useState(false);
 	const ref = useRef<HTMLButtonElement>(null);
 
 	const [position, setPosition] = useState<number>(MENU_POPOVER_HEIGHT);
@@ -181,13 +204,17 @@ const ManagementToolbarFilter: React.FC<ManagementToolbarFilterProps> = ({
 	return (
 		<ClayPopover
 			alignPosition={popoverAlignPosition}
-			className="popover-management-toolbar"
+			className={classNames('popover-management-toolbar', {
+				'popover-management-toolbar-small':
+					filterSchema?.fields?.length === 1,
+			})}
 			closeOnClickOutside
 			disableScroll
-			show={position !== undefined}
+			onShowChange={setVisible}
+			show={visible && position > 0}
 			trigger={
 				<ClayButton
-					className="filter-button nav-link"
+					className="management-toolbar-buttons nav-link"
 					displayType="unstyled"
 					ref={ref}
 				>
@@ -208,6 +235,7 @@ const ManagementToolbarFilter: React.FC<ManagementToolbarFilterProps> = ({
 				buttonRef={ref}
 				filterSchema={filterSchema}
 				setPosition={setPosition}
+				setVisible={setVisible}
 			/>
 		</ClayPopover>
 	);

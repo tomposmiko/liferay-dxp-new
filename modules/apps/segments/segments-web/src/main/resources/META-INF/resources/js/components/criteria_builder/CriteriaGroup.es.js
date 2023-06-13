@@ -20,13 +20,16 @@ import {DragSource as dragSource} from 'react-dnd';
 
 import {
 	CONJUNCTIONS,
+	PROPERTY_TYPES,
+	SUPPORTED_EVENT_OPERATORS,
 	SUPPORTED_OPERATORS,
 	SUPPORTED_PROPERTY_TYPES,
 } from '../../utils/constants';
-import {DragTypes} from '../../utils/drag-types.es';
+import {DragTypes} from '../../utils/drag-types';
 import {
 	generateGroupId,
 	getChildGroupIds,
+	getSupportedOperatorsFromEvent,
 	getSupportedOperatorsFromType,
 	insertAtIndex,
 	replaceAtIndex,
@@ -133,11 +136,22 @@ class CriteriaGroup extends Component {
 
 		const criterionValue = value || defaultValue;
 
-		const operators = getSupportedOperatorsFromType(
-			SUPPORTED_OPERATORS,
-			SUPPORTED_PROPERTY_TYPES,
-			type
-		);
+		let operators = [];
+
+		if (type === PROPERTY_TYPES.EVENT) {
+			operators = getSupportedOperatorsFromEvent(
+				SUPPORTED_EVENT_OPERATORS,
+				SUPPORTED_PROPERTY_TYPES,
+				'INTEGER'
+			);
+		}
+		else {
+			operators = getSupportedOperatorsFromType(
+				SUPPORTED_OPERATORS,
+				SUPPORTED_PROPERTY_TYPES,
+				type
+			);
+		}
 
 		const newCriterion = {
 			operatorName: operatorName ? operatorName : operators[0].name,

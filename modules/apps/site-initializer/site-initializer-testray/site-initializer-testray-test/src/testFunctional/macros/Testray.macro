@@ -123,6 +123,19 @@ definition {
 			locator1 = "Testray#ITEMS_PER_PAGE_SELECT");
 	}
 
+	macro changeTeamToComponent {
+		TestrayContextMenu.clickContextMenuProjects(name = ${currentTeam});
+
+		TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Edit");
+
+		Select(
+			key_fieldLabel = "Team",
+			locator1 = "Select#GENERIC_SELECT_FIELD",
+			value1 = ${newTeamName});
+
+		Button.clickSave();
+	}
+
 	macro checkSuccessAlertAppearsAndDisappears {
 		WaitForElementPresent(locator1 = "Message#SUCCESS");
 
@@ -222,9 +235,11 @@ definition {
 
 		TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Edit");
 
-		Type(
-			locator1 = "TestrayManage#NEW_OPTION_NAME",
-			value1 = ${newComponentName});
+		if (isSet(newComponentName)) {
+			Type(
+				locator1 = "TestrayManage#NEW_OPTION_NAME",
+				value1 = ${newComponentName});
+		}
 
 		if (isSet(newTeamName)) {
 			Select(
@@ -282,6 +297,18 @@ definition {
 		Click(
 			key_navTabName = ${navTabName},
 			locator1 = "Testray#PROJECT_NAVIGATOR_TAB_BUTTON");
+	}
+
+	macro selectUsers {
+		Button.click(button = "Assign Users");
+
+		for (var userName : list ${listUserName}) {
+			Click.clickAtNotVisible(
+				key_checkboxOption = ${userName},
+				locator1 = "Checkbox#SPECIFIC_CHECKBOX_IN_TABLE");
+		}
+
+		Button.click(button = "Select Users");
 	}
 
 	macro signOutTestray {

@@ -29,6 +29,7 @@ import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.GuestOrUserUtil;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
@@ -87,6 +88,7 @@ public class RelatedObjectEntryResourceImpl
 		ObjectRelatedModelsProvider objectRelatedModelsProvider =
 			_objectRelatedModelsProviderRegistry.getObjectRelatedModelsProvider(
 				systemObjectDefinition.getClassName(),
+				systemObjectDefinition.getCompanyId(),
 				objectRelationship.getType());
 
 		objectRelatedModelsProvider.disassociateRelatedModels(
@@ -287,7 +289,8 @@ public class RelatedObjectEntryResourceImpl
 			_getSystemObjectDefinitionMetadata(previousPath);
 
 		ObjectDefinition systemObjectDefinition =
-			_objectDefinitionLocalService.fetchSystemObjectDefinition(
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				CompanyThreadLocal.getCompanyId(),
 				systemObjectDefinitionMetadata.getName());
 
 		if (systemObjectDefinition != null) {

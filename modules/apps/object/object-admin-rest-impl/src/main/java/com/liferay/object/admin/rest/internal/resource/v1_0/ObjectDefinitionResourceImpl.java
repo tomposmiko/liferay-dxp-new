@@ -246,6 +246,32 @@ public class ObjectDefinitionResourceImpl
 		_addListTypeDefinition(objectDefinition);
 
 		com.liferay.object.model.ObjectDefinition
+			serviceBuilderObjectDefinition;
+
+		if (GetterUtil.getBoolean(objectDefinition.getSystem()) &&
+			FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
+
+			serviceBuilderObjectDefinition =
+				_objectDefinitionService.addSystemObjectDefinition(
+					contextUser.getUserId(),
+					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
+					LocalizedMapUtil.getLocalizedMap(
+						objectDefinition.getLabel()),
+					objectDefinition.getName(),
+					objectDefinition.getPanelAppOrder(),
+					objectDefinition.getPanelCategoryKey(),
+					LocalizedMapUtil.getLocalizedMap(
+						objectDefinition.getPluralLabel()),
+					objectDefinition.getScope(),
+					transformToList(
+						objectDefinition.getObjectFields(),
+						objectField -> ObjectFieldUtil.toObjectField(
+							_listTypeDefinitionLocalService, objectField,
+							_objectFieldLocalService,
+							_objectFieldSettingLocalService,
+							_objectFilterLocalService)));
+		}
+		else {
 			serviceBuilderObjectDefinition =
 				_objectDefinitionService.addCustomObjectDefinition(
 					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
@@ -270,6 +296,7 @@ public class ObjectDefinitionResourceImpl
 							_objectFieldLocalService,
 							_objectFieldSettingLocalService,
 							_objectFilterLocalService)));
+		}
 
 		if (!Validator.isBlank(objectDefinition.getExternalReferenceCode())) {
 			serviceBuilderObjectDefinition =
@@ -338,8 +365,21 @@ public class ObjectDefinitionResourceImpl
 	public void postObjectDefinitionPublish(Long objectDefinitionId)
 		throws Exception {
 
-		_objectDefinitionService.publishCustomObjectDefinition(
-			objectDefinitionId);
+		com.liferay.object.model.ObjectDefinition
+			serviceBuilderObjectDefinition =
+				_objectDefinitionService.getObjectDefinition(
+					objectDefinitionId);
+
+		if (GetterUtil.getBoolean(serviceBuilderObjectDefinition.getSystem()) &&
+			FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
+
+			_objectDefinitionService.publishSystemObjectDefinition(
+				objectDefinitionId);
+		}
+		else {
+			_objectDefinitionService.publishCustomObjectDefinition(
+				objectDefinitionId);
+		}
 	}
 
 	@Override

@@ -373,6 +373,8 @@ definition {
 	@description = "LPS-175197 - Verify if actions works with oldValue function when trigger is On After Add (Notification) using any field."
 	@priority = 5
 	test CanCreateActionNotificationUsingOldValueWithOnAfterAddTrigger {
+		property portal.acceptance = "true";
+
 		task ("Given: A notification template is created") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Notifications",
@@ -456,6 +458,8 @@ definition {
 	@description = "LPS-175192 - Verify if actions works with oldValue function when trigger is On After Delete (Notification) using any field."
 	@priority = 5
 	test CanCreateActionNotificationUsingOldValueWithOnAfterDeleteTrigger {
+		property portal.acceptance = "true";
+
 		task ("Given: A notification template is created") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Notifications",
@@ -543,6 +547,8 @@ definition {
 	@description = "LPS-175191 - Verify if actions works with oldValue function when trigger is On After Update (Notification) using any field"
 	@priority = 5
 	test CanCreateActionNotificationUsingOldValueWithOnAfterUpdateTrigger {
+		property portal.acceptance = "true";
+
 		task ("Given: A notification template is created") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Notifications",
@@ -633,6 +639,8 @@ definition {
 	@description = "LPS-175198 - Verify if actions works with oldValue function when trigger is On Order Status Update (Notification) with order status field"
 	@priority = 5
 	test CanCreateActionNotificationUsingOldValueWithOnOrderStatusUpdateInSystemObject {
+		property portal.acceptance = "true";
+
 		task ("Given: A notification template is created") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Notifications",
@@ -953,6 +961,8 @@ definition {
 	@description = "LPS-175182 - Verify if actions works with oldValue function when trigger is On After Update (Update an object Entry) using any field"
 	@priority = 5
 	test CanCreateActionUpdateAnObjectEntryUsingOldValueWithOnAfterUpdateTrigger {
+		property portal.acceptance = "true";
+
 		task ("Given: An object with a field is created") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object 175182",
@@ -1100,6 +1110,8 @@ definition {
 	@description = "LPS-175185 - Verify if actions works with oldValue function when trigger is On After Add (Add an Object Entry) using Picklist field"
 	@priority = 5
 	test CanCreateActionUsingOldValueWithOnAfterAddTrigger {
+		property portal.acceptance = "true";
+
 		task ("Given: A picklist with two items is created (via API)") {
 			Picklist.addPicklistViaAPI(picklistName = "Status");
 
@@ -1374,9 +1386,86 @@ definition {
 		}
 	}
 
+	@description = "LPS-175201 - Verify if is possible create a validation using the oldValue function with the Text Field using a system object"
+	@priority = 5
+	test CanCreateValidationUsingOldValueFunctionInSystemObject {
+		property portal.acceptance = "true";
+
+		task ("Given: an account is created with a custom validation using the oldValue function") {
+			JSONAccountEntry.addAccountEntry(
+				accountEntryName = "Accounts Name",
+				accountEntryType = "Business");
+
+			Account.openAccountsAdmin();
+
+			LexiconEntry.gotoEntry(rowEntry = "Accounts Name");
+
+			Account.gotoAssigneeTab(assigneeTab = "Addresses");
+
+			Account.addAddress(
+				addressCity = "Diamond Bar",
+				addressCountry = "United States",
+				addressName = "Name Test",
+				addressPostalCode = 91765,
+				addressRegion = "California",
+				addressStreet1 = "1400 Montefino Ave",
+				addressType = "Billing");
+
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Postal Address");
+
+			ObjectAdmin.goToValidationsTab();
+
+			ObjectCustomValidation.addObjectValidation(
+				validationName = "Custom Validation",
+				validationType = "Expression Builder");
+
+			ObjectCustomValidation.gotoCustomValidation(validationName = "Custom Validation");
+
+			ObjectCustomValidation.activeValidation();
+
+			ObjectCustomValidation.gotoTab(tabName = "Conditions");
+
+			ObjectCustomValidation.insertScriptOnValidation(scriptValidation = "oldValue('Name') == 'Test'");
+
+			ObjectCustomValidation.addErrorMessage(errorMessage = "Invalid Value");
+
+			PortletEntry.save();
+		}
+
+		task ("When: the address from created account is edited") {
+			Account.openAccountsAdmin();
+
+			LexiconEntry.gotoEntry(rowEntry = "Accounts Name");
+
+			Account.gotoAssigneeTab(assigneeTab = "Addresses");
+
+			LexiconEntry.gotoEntry(rowEntry = "Name Test");
+
+			Account._inputAddressDetails(
+				addressCity = "Diamond Bar",
+				addressCountry = "United States",
+				addressName = "Name Test 2",
+				addressPostalCode = 91765,
+				addressRegion = "California",
+				addressStreet1 = "1400 Montefino Ave",
+				addressStreet1 = "1400 Montefino Ave",
+				addressType = "Billing");
+
+			PortletEntry.save();
+		}
+
+		task ("Then: the error message appears on the log") {
+			AssertConsoleTextPresent(value1 = "Invalid Value");
+		}
+	}
+
 	@description = "LPS-175196 - Verify if is possible create a validation using the oldValue function using the Picklist field"
 	@priority = 5
 	test CanCreateValidationUsingOldValueFunctionWithPicklistField {
+		property portal.acceptance = "true";
+
 		task ("Given: A picklist with two items is created (via API)") {
 			Picklist.addPicklistViaAPI(picklistName = "Status");
 

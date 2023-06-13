@@ -850,7 +850,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-101448 Given the personalized variations list of a Dynamic Collection Then the variations list always contains the ""Anyone"" variation"
 	@priority = 4
 	test DefaultVariationForDynamicCollection {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -893,7 +893,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-101448 Given the personalized variations list of a Manual Collection Then the variations list always contains the ""Anyone"" variation"
 	@priority = 4
 	test DefaultVariationForManualCollection {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -966,7 +966,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-101448 Given the personalized variations list of a Dynamic Collection When the user opens the elipsis menu of a variation and clicks on Delete Then the variation name is removed from the list of personalized variations"
 	@priority = 3
 	test DeleteVariationForDynamicCollection {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -1010,7 +1010,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-101448 Given the personalized variations list of a Manual Collection When the user opens the elipsis menu of a variation and clicks on Delete Then the variation name is removed from the list of personalized variations"
 	@priority = 3
 	test DeleteVariationForManualCollection {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -1054,7 +1054,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-101448 Given the personalized variations list of a Dynamic Collection When the user opens the elipsis menu of the last variation of the list Then the Deprioritize option of the elipsis menu is disabled"
 	@priority = 3
 	test DeprioritizeDisabledForDynamicCollection {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -1096,7 +1096,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-101448 Given the personalized variations list of a Dynamic Collection When the user opens the elipsis menu of a variation and clicks on Deprioritize Then the variation name is moved downwards in the list of personalized variations (unless is the last variation of the list)"
 	@priority = 3
 	test DeprioritizeVariationForDynamicCollection {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -1153,7 +1153,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-101448 Given the personalized variations list of a Manual Collection When the user opens the elipsis menu of a variation and clicks on Deprioritize Then the variation name is moved downwards in the list of personalized variations (unless is the last variation of the list)"
 	@priority = 3
 	test DeprioritizeVariationForManualCollection {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -1210,7 +1210,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 When there's a variation of a dynamic collection targeting segment 1, and it is not prioritized above the Anyone variation Then the user belonging to that segment will see only the assets included in 'Anyone' in Asset Publisher"
 	@priority = 3
 	test DynamicCollectionInAssetPublisherSegmentNotPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -1319,7 +1319,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 When there's a variation of a dynamic collection targeting segment 1, and it is prioritized above the Anyone variation Then the user belonging to that segment will see only the assets included in that variation in Asset Publisher"
 	@priority = 4
 	test DynamicCollectionInAssetPublisherSegmentPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -1433,7 +1433,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 and Segment 2 When there's a variation of a dynamic collection targeting segment 2, and it is prioritized above the variation targeting segment 1 And both are prioritized above the anyone variation Then the user will see only the assets included in the variation targeting segment 2 in Asset Publisher"
 	@priority = 3
 	test DynamicCollectionInAssetPublisherSegmentTwoPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -1549,7 +1549,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 When there's a variation of a dynamic collection targeting segment 1, and it is not prioritized above the Anyone variation Then the user belonging to that segment will see only the assets included in 'Anyone' in Collection Display Fragment"
 	@priority = 3
 	test DynamicCollectionInCollectionDisplaySegmentNotPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -1664,7 +1664,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 When there's a variation of a dynamic collection targeting segment 1, and it is prioritized above the Anyone variation Then the user belonging to that segment will see only the assets included in that variation in Collection Display Fragment"
 	@priority = 4
 	test DynamicCollectionInCollectionDisplaySegmentPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -1784,7 +1784,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 and Segment 2 When there's a variation of a dynamic collection targeting segment 2, and it is prioritized above the variation targeting segment 1 And both are prioritized above the anyone variation Then the user will see only the assets included in the variation targeting segment 2 in Collection Display Fragment"
 	@priority = 3
 	test DynamicCollectionInCollectionDisplaySegmentTwoPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -2004,7 +2004,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 When there's a variation of a manual collection targeting segment 1, and it is not prioritized above the Anyone variation Then the user belonging to that segment will see only the assets included in 'Anyone' in Asset Publisher"
 	@priority = 3
 	test ManualCollectionInAssetPublisherSegmentNotPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -2087,7 +2087,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 When there's a variation of a manual collection targeting segment 1, and it is prioritized above the Anyone variation Then the user belonging to that segment will see only the assets included in that variation in Asset Publisher"
 	@priority = 4
 	test ManualCollectionInAssetPublisherSegmentPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -2173,7 +2173,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 and Segment 2 When there's a variation of a manual collection targeting segment 2, and it is prioritized above the variation targeting segment 1 And both are prioritized above the anyone variation Then the user will see only the assets included in the variation targeting segment 2 in Asset Publisher"
 	@priority = 3
 	test ManualCollectionInAssetPublisherSegmentTwoPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -2278,7 +2278,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 When there's a variation of a manual collection targeting segment 1, and it is not prioritized above the Anyone variation Then the user belonging to that segment will see only the assets included in 'Anyone' in Collection Display Fragment"
 	@priority = 3
 	test ManualCollectionInCollectionDisplaySegmentNotPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -2367,7 +2367,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 When there's a variation of a manual collection targeting segment 1, and it is prioritized above the Anyone variation Then the user belonging to that segment will see only the assets included in that variation in Collection Display Fragment"
 	@priority = 4
 	test ManualCollectionInCollectionDisplaySegmentPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -2459,7 +2459,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-141797 Given a user belonging to Segment 1 and Segment 2 When there's a variation of a manual collection targeting segment 2, and it is prioritized above the variation targeting segment 1 And both are prioritized above the anyone variation Then the user will see only the assets included in the variation targeting segment 2 in Collection Display Fragment"
 	@priority = 3
 	test ManualCollectionInCollectionDisplaySegmentTwoPrioritized {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -2570,7 +2570,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-101448 Given the personalized variations list of a Dynamic Collection When the user creates a new variation Then the new variation is positioned at the end of the variations list"
 	@priority = 4
 	test NewVariationPriorityForDynamicCollection {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -2612,7 +2612,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-101448 Given the personalized variations list of a Manual Collection When the user creates a new variation Then the new variation is positioned at the end of the variations list"
 	@priority = 4
 	test NewVariationPriorityForManualCollection {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -2923,7 +2923,7 @@ definition {
 		}
 	}
 
-	@description = ""
+	@description = "LPS-101448 Given the personalized variations list of a Dynamic Collection When the user opens the elipsis menu of the first variation of the list Then the Prioritize option of the elipsis menu is disabled"
 	@priority = 3
 	test PrioritizeDisabledForDynamicCollection {
 		property osgi.module.configuration.file.names = "com.liferay.asset.list.web.internal.configuration.FFCollectionsVariationsPrioritizationConfiguration.config";
@@ -3686,11 +3686,7 @@ definition {
 		}
 	}
 
-	@description = "LPS-169312: Given a user belonging to Segment 1 and Segment 2
-	And the configuration to combine assets is enabled
-	When there's a variation of a dynamic collection targeting segment 1 and segment 2, and both are prioritized above the anyone variation
-	And there is an asset present in both variations**
-	Then the user will see the asset only once in Asset Publisher"
+	@description = "LPS-169312: https://issues.liferay.com/browse/LPS-169312"
 	@priority = "3"
 	test ViewCombineContentForMultisegmentDynamicCollectionInAssetPublisher {
 		property test.name.skip.portal.instance = "Collections#ViewCombineContentForMultisegmentDynamicCollectionInAssetPublisher";
@@ -3791,11 +3787,7 @@ definition {
 		}
 	}
 
-	@description = "LPS-169312: Given a user belonging to Segment 1 and Segment 2
-	And the configuration to combine assets is enabled
-	When there's a variation of a dynamic collection targeting segment 1 and segment 2, and both are prioritized above the anyone variation
-	And there is an asset present in both variations**
-	Then the user will see the asset only once in Collection Display Fragment"
+	@description = "LPS-169312: https://issues.liferay.com/browse/LPS-169312"
 	@priority = "3"
 	test ViewCombineContentForMultisegmentDynamicCollectionInCollectionDisplayFragment {
 		property test.name.skip.portal.instance = "Collections#ViewCombineContentForMultisegmentDynamicCollectionInCollectionDisplayFragment";
@@ -3906,11 +3898,7 @@ definition {
 		}
 	}
 
-	@description = "LPS-169312: Given a user belonging to Segment 1 and Segment 2
-	And the configuration to combine assets is enabled
-	When there's a variation of a manual collection targeting segment 1 and segment 2, and both are prioritized above the anyone variation
-	And there is an asset present in both variations
-	Then the user will see the asset only once in Asset Publisher"
+	@description = "LPS-169312: https://issues.liferay.com/browse/LPS-169312"
 	@priority = "3"
 	test ViewCombineContentForMultisegmentManualCollectionInAssetPublisher {
 		property test.name.skip.portal.instance = "Collections#ViewCombineContentForMultisegmentManualCollectionInAssetPublisher";
@@ -4012,11 +4000,7 @@ definition {
 		}
 	}
 
-	@description = "LPS-169312: Given a user belonging to Segment 1 and Segment 2
-	And the configuration to combine assets is enabled
-	When there's a variation of a manual collection targeting segment 1 and segment 2, and both are prioritized above the anyone variation
-	And there is an asset present in both variations
-	Then the user will see the asset only once in Collection Display Fragment"
+	@description = "LPS-169312: https://issues.liferay.com/browse/LPS-169312"
 	@priority = "3"
 	test ViewCombineContentForMultisegmentManualCollectionInCollectionDisplayFragment {
 		property test.name.skip.portal.instance = "Collections#ViewCombineContentForMultisegmentManualCollectionInCollectionDisplayFragment";
@@ -4129,13 +4113,7 @@ definition {
 		}
 	}
 
-	@description = "LPS-169312: Given a user belonging to Segment 1 and Segment 2
-	And the configuration to combine assets is enabled
-	When there's a variation of a dynamic collection targeting segment 1 and segment 2, and both are prioritized above the anyone variation
-	And there are some assets present in both variations**
-	Then the assets shown to the user will be ordered according to:
-	The asset priority (different from the variation priority)
-	The creationDate of the asset"
+	@description = "LPS-169312: https://issues.liferay.com/browse/LPS-169312"
 	@priority = "3"
 	test ViewCombineContentOrderForMultisegmentDynamicCollection {
 		property test.name.skip.portal.instance = "Collections#ViewCombineContentOrderForMultisegmentDynamicCollection";
@@ -4258,13 +4236,7 @@ definition {
 		}
 	}
 
-	@description = "LPS-169312: Given a user belonging to Segment 1 and Segment 2
-	And the configuration to combine assets is enabled
-	When there's a variation of a manual collection targeting segment 1 and segment 2, and both are prioritized above the anyone variation
-	And there are some assets present in both variations**
-	Then the assets shown to the user will be ordered according to:
-	The priority of the Variation
-	The priority of the asset established in the Variation"
+	@description = "LPS-169312: https://issues.liferay.com/browse/LPS-169312"
 	@priority = "3"
 	test ViewCombineContentOrderForMultisegmentManualCollection {
 		property test.name.skip.portal.instance = "Collections#ViewCombineContentOrderForMultisegmentManualCollection";

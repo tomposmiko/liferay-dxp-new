@@ -43,6 +43,7 @@ import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -568,14 +569,17 @@ public class ObjectActionLocalServiceImpl
 			}
 
 			if ((objectDefinition == null) || !objectDefinition.isActive() ||
-				!objectDefinition.isApproved() || objectDefinition.isSystem()) {
+				!objectDefinition.isApproved() ||
+				(!FeatureFlagManagerUtil.isEnabled(
+					objectDefinition.getCompanyId(), "LPS-173537") &&
+				 objectDefinition.isSystem())) {
 
 				errorMessageKeys.put("objectDefinitionId", "invalid");
 			}
 			else {
 				_validatePredefinedValues(
 					errorMessageKeys, objectActionExecutorKey,
-					objectDefinitionId,
+					objectDefinition.getObjectDefinitionId(),
 					_jsonFactory.createJSONArray(
 						parametersUnicodeProperties.get("predefinedValues")));
 			}

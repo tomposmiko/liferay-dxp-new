@@ -2831,6 +2831,11 @@ public abstract class BaseUserAccountResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	@Test
+	public void testPostUserAccountImage() throws Exception {
+		Assert.assertTrue(false);
+	}
+
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 

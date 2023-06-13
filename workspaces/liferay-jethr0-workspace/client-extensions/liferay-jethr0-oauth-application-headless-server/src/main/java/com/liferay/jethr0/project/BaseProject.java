@@ -14,6 +14,11 @@
 
 package com.liferay.jethr0.project;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
+
 import org.json.JSONObject;
 
 /**
@@ -22,8 +27,37 @@ import org.json.JSONObject;
 public abstract class BaseProject implements Project {
 
 	@Override
-	public long getID() {
+	public Date getCreatedDate() {
+		return _createdDate;
+	}
+
+	@Override
+	public long getId() {
 		return _id;
+	}
+
+	@Override
+	public JSONObject getJSONObject() {
+		JSONObject jsonObject = new JSONObject();
+
+		Project.State state = getState();
+		Project.Type type = getType();
+
+		jsonObject.put(
+			"dateCreated", _simpleDateFormat.format(getCreatedDate())
+		).put(
+			"id", getId()
+		).put(
+			"name", getName()
+		).put(
+			"priority", getPriority()
+		).put(
+			"state", state.getJSONObject()
+		).put(
+			"type", type.getJSONObject()
+		);
+
+		return jsonObject;
 	}
 
 	@Override
@@ -63,24 +97,18 @@ public abstract class BaseProject implements Project {
 
 	@Override
 	public String toString() {
-		JSONObject jsonObject = new JSONObject();
-
-		jsonObject.put(
-			"id", getID()
-		).put(
-			"name", getName()
-		).put(
-			"priority", getPriority()
-		).put(
-			"state", getState()
-		).put(
-			"type", getType()
-		);
-
-		return jsonObject.toString();
+		return String.valueOf(getJSONObject());
 	}
 
 	protected BaseProject(JSONObject jsonObject) {
+		try {
+			_createdDate = _simpleDateFormat.parse(
+				jsonObject.getString("dateCreated"));
+		}
+		catch (ParseException parseException) {
+			throw new RuntimeException(parseException);
+		}
+
 		_id = jsonObject.getLong("id");
 		_name = jsonObject.getString("name");
 		_priority = jsonObject.optInt("priority");
@@ -88,6 +116,10 @@ public abstract class BaseProject implements Project {
 		_type = Type.get(jsonObject.getJSONObject("type"));
 	}
 
+	private static final SimpleDateFormat _simpleDateFormat =
+		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+	private final Date _createdDate;
 	private final long _id;
 	private String _name;
 	private int _priority;

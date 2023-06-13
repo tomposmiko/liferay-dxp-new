@@ -24,31 +24,23 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Ivica Cardic
  */
 public class ObjectWriterFactory {
 
-	public static ObjectWriter getObjectWriter(
-		Set<String> allFieldNames, List<String> includeFieldNames) {
-
+	public static ObjectWriter getObjectWriter(List<String> includeFieldNames) {
 		SimpleFilterProvider simpleFilterProvider = new SimpleFilterProvider();
 
 		if (includeFieldNames.isEmpty()) {
 			simpleFilterProvider.setFailOnUnknownId(false);
 		}
 		else {
-			Set<String> excludeFieldNames = new HashSet<>(allFieldNames);
-
-			excludeFieldNames.removeAll(includeFieldNames);
-
-			SimpleBeanPropertyFilter simpleBeanPropertyFilter =
-				SimpleBeanPropertyFilter.serializeAllExcept(excludeFieldNames);
-
 			simpleFilterProvider.addFilter(
-				"Liferay.Vulcan", simpleBeanPropertyFilter);
+				"Liferay.Vulcan",
+				SimpleBeanPropertyFilter.filterOutAllExcept(
+					new HashSet<>(includeFieldNames)));
 		}
 
 		return _objectMapper.writer(simpleFilterProvider);

@@ -169,8 +169,8 @@ definition {
 			ACUtils.viewGenericText(textValueList = "No user groups were found.");
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the people page in the sidebar") {
@@ -775,8 +775,8 @@ definition {
 				itemValueList = ${accountGroupPageListDown});
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the people page in the sidebar") {
@@ -885,8 +885,8 @@ definition {
 				itemValueList = ${orgNamePageListDown});
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the people page in the sidebar") {
@@ -999,8 +999,8 @@ definition {
 				itemValueList = ${userGroupPageListDown});
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the people page in the sidebar") {
@@ -1119,8 +1119,8 @@ definition {
 			ACDXPSettings.viewGenericListItemNotPresent(itemValueList = ${firstPageList});
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the people page in the sidebar") {

@@ -28,8 +28,8 @@ interface ThenContainerProps {
 	objectDefinitionExternalReferenceCode: string;
 	objectDefinitionId: number;
 	objectDefinitionsRelationshipsURL: string;
+	setAddObjectEntryDefinitions: (values: AddObjectEntryDefinitions[]) => void;
 	setCurrentObjectDefinitionFields: (values: ObjectField[]) => void;
-	setRelationships: (values: ObjectDefinitionsRelationship[]) => void;
 	setValues: (values: Partial<ObjectAction>) => void;
 	systemObject: boolean;
 	updateParameters: (value: string) => Promise<void>;
@@ -43,8 +43,8 @@ export declare function ThenContainer({
 	objectDefinitionExternalReferenceCode,
 	objectDefinitionId,
 	objectDefinitionsRelationshipsURL,
+	setAddObjectEntryDefinitions,
 	setCurrentObjectDefinitionFields,
-	setRelationships,
 	setValues,
 	systemObject,
 	updateParameters,

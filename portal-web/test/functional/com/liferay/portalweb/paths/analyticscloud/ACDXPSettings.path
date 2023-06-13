@@ -32,8 +32,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>CONNECT_DISCONNECT_BUTTON</td>
-	<td>//button[@type='button' and text()='Connect'] | //button[@type='button' and text()='Disconnect']</td>
+	<td>CONNECT_BUTTON</td>
+	<td>//button[@type='button' and text()='Connect']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DISCONNECT_BUTTON</td>
+	<td>//button[@type='button' and text()='Disconnect']</td>
 	<td></td>
 </tr>
 <tr>
@@ -117,7 +122,7 @@
 </tr>
 <tr>
 	<td>ASSIGN_MODAL_NEXT_PAGE</td>
-	<td>//div[contains(@class,'fade show')]//button[@aria-label='Next']</td>
+	<td>//div[contains(@class,'fade show')]//a[contains(@aria-label,'next')]</td>
 	<td></td>
 </tr>
 <tr>

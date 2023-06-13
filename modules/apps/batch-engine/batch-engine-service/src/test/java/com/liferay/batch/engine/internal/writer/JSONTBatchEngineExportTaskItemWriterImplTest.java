@@ -78,9 +78,10 @@ public class JSONTBatchEngineExportTaskItemWriterImplTest
 		sb.append("\"/o/headless-batch-engine/v1.0/import-task/");
 		sb.append(batchEngineUnitConfiguration.getClassName());
 		sb.append("\", \"method\": \"POST\"}},");
-		sb.append("\"configuration\": {\"className\": \"");
+		sb.append(
+			"\"configuration\": {\"callbackURL\": null, \"className\": \"");
 		sb.append(batchEngineUnitConfiguration.getClassName());
-		sb.append("\",\n\"companyId\" :");
+		sb.append("\",\n\"companyId\": ");
 		sb.append(batchEngineUnitConfiguration.getCompanyId());
 		sb.append(",\n\"userId\": ");
 		sb.append(batchEngineUnitConfiguration.getUserId());
@@ -124,8 +125,8 @@ public class JSONTBatchEngineExportTaskItemWriterImplTest
 		try (JSONTBatchEngineExportTaskItemWriterImpl
 				jsontBatchEngineExportTaskItemWriterImpl =
 					new JSONTBatchEngineExportTaskItemWriterImpl(
-						fieldsMap.keySet(), batchEngineUnitConfiguration,
-						fieldNames, unsyncByteArrayOutputStream)) {
+						batchEngineUnitConfiguration, fieldNames,
+						unsyncByteArrayOutputStream)) {
 
 			for (Item[] items : getItemGroups()) {
 				jsontBatchEngineExportTaskItemWriterImpl.write(

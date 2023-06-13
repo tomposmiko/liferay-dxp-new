@@ -73,8 +73,8 @@ definition {
 			ACDXPSettings.viewGenericListItem(itemValueList = "${secondPageList},${autoGeneratePropertyName}");
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the properties page in the sidebar") {
@@ -137,8 +137,8 @@ definition {
 			AssertElementPresent(locator1 = "ACDXPSettings#CONNECT_BUTTON_DISABLED");
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the properties page in the sidebar") {
@@ -202,8 +202,8 @@ definition {
 			ACUtils.viewGenericText(textValueList = "No properties were found.");
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the properties page in the sidebar") {
@@ -297,8 +297,8 @@ definition {
 				itemValueList = ${propertyNameListByAvailablePropertiesDown});
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the properties page in the sidebar") {
@@ -458,7 +458,7 @@ definition {
 		}
 
 		task ("Go to AC > Go to Settings > Go to Properties") {
-			ACUtils.launchAC(workspaceName = "New AC Workspace");
+			ACUtils.launchAC(workspaceName = "New AC Property List Empty State Workspace");
 
 			ACNavigation.goToSettings();
 
@@ -521,8 +521,8 @@ definition {
 				expected = ${propertyName1});
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the properties page in the sidebar") {

@@ -45,8 +45,8 @@ interface ThenContainerProps {
 	objectDefinitionExternalReferenceCode: string;
 	objectDefinitionId: number;
 	objectDefinitionsRelationshipsURL: string;
+	setAddObjectEntryDefinitions: (values: AddObjectEntryDefinitions[]) => void;
 	setCurrentObjectDefinitionFields: (values: ObjectField[]) => void;
-	setRelationships: (values: ObjectDefinitionsRelationship[]) => void;
 	setValues: (values: Partial<ObjectAction>) => void;
 	systemObject: boolean;
 	updateParameters: (value: string) => Promise<void>;
@@ -61,8 +61,8 @@ export function ThenContainer({
 	objectDefinitionExternalReferenceCode,
 	objectDefinitionId,
 	objectDefinitionsRelationshipsURL,
+	setAddObjectEntryDefinitions,
 	setCurrentObjectDefinitionFields,
-	setRelationships,
 	setValues,
 	systemObject,
 	updateParameters,
@@ -125,12 +125,13 @@ export function ThenContainer({
 		}
 
 		if (values.objectActionExecutorKey === 'add-object-entry') {
-			fetchObjectDefinitions(
+			fetchObjectDefinitions({
 				objectDefinitionsRelationshipsURL,
+				setAddObjectEntryDefinitions,
+				setObjectOptions,
+				setSelectedObjectDefinition,
 				values,
-				setRelationships,
-				setObjectOptions
-			);
+			});
 
 			fetchObjectDefinitionFields(
 				objectDefinitionId,
@@ -157,15 +158,6 @@ export function ThenContainer({
 				<SingleSelect
 					error={errors.objectActionExecutorKey}
 					onChange={({value}) => {
-						if (value === 'add-object-entry') {
-							fetchObjectDefinitions(
-								objectDefinitionsRelationshipsURL,
-								values,
-								setRelationships,
-								setObjectOptions
-							);
-						}
-
 						if (values.objectActionExecutorKey !== value) {
 							return setValues({
 								objectActionExecutorKey: value,

@@ -12,9 +12,13 @@ definition {
 		}
 
 		if (${addContributor} == "true") {
-			Click.javaScriptClick(
-				key_text = "Add Contributor",
+			Click.mouseDownMouseUp(
+				key_text = "Add Suggestions",
 				locator1 = "Button#ANY");
+		}
+
+		if (${deleteBasicContributor} == "true") {
+			Click(locator1 = "SearchBarSuggestions#DELETE_SUGGESTION_CONTRIBUTOR");
 		}
 
 		if (!(isSet(suggestionContributorOrder))) {
@@ -36,6 +40,10 @@ definition {
 			Click(
 				key_suggestionContributorOrder = ${suggestionContributorOrder},
 				locator1 = "SearchBarSuggestions#SUGGESTION_CONTRIBUTOR_SELECT_BLUEPRINT");
+
+			WaitForElementPresent(
+				blueprintTitle = ${suggestionContributorBlueprint},
+				locator1 = "Blueprints#BLUEPRINTS_OPTION_WIDGET_SELECT_BLUEPRINT");
 
 			Click(
 				blueprintTitle = ${suggestionContributorBlueprint},

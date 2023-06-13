@@ -157,45 +157,47 @@ export function AggregationFormBase({
 						aggregationFunction.value === settings.function
 				);
 
-				const relatedFields = await API.getObjectFieldsByExternalReferenceCode(
-					currentRelatedObjectRelationship.objectDefinitionExternalReferenceCode2
-				);
-
-				const currentSummarizeField = relatedFields.find(
-					(relatedField) =>
-						relatedField.name === settings.objectFieldName
-				) as ObjectField;
-
-				if (onRelationshipChange) {
-					onRelationshipChange(
+				if (currentRelatedObjectRelationship) {
+					const relatedFields = await API.getObjectFieldsByExternalReferenceCode(
 						currentRelatedObjectRelationship.objectDefinitionExternalReferenceCode2
 					);
-				}
 
-				setObjectRelationshipFields(
-					relatedFields.filter(
-						(objectField) =>
-							objectField.businessType === 'Integer' ||
-							objectField.businessType === 'LongInteger' ||
-							objectField.businessType === 'Decimal' ||
-							objectField.businessType === 'PrecisionDecimal'
-					)
-				);
+					const currentSummarizeField = relatedFields.find(
+						(relatedField) =>
+							relatedField.name === settings.objectFieldName
+					) as ObjectField;
 
-				setSelectRelatedObjectRelationship(
-					currentRelatedObjectRelationship
-				);
+					if (onRelationshipChange) {
+						onRelationshipChange(
+							currentRelatedObjectRelationship.objectDefinitionExternalReferenceCode2
+						);
+					}
 
-				setSelectedAggregationFunction(currentFunction);
-
-				if (currentSummarizeField) {
-					setSelectedSummarizeField(
-						getLocalizableLabel(
-							creationLanguageId2 as Liferay.Language.Locale,
-							currentSummarizeField.label,
-							currentSummarizeField.name
+					setObjectRelationshipFields(
+						relatedFields.filter(
+							(objectField) =>
+								objectField.businessType === 'Integer' ||
+								objectField.businessType === 'LongInteger' ||
+								objectField.businessType === 'Decimal' ||
+								objectField.businessType === 'PrecisionDecimal'
 						)
 					);
+
+					setSelectRelatedObjectRelationship(
+						currentRelatedObjectRelationship
+					);
+
+					setSelectedAggregationFunction(currentFunction);
+
+					if (currentSummarizeField) {
+						setSelectedSummarizeField(
+							getLocalizableLabel(
+								creationLanguageId2 as Liferay.Language.Locale,
+								currentSummarizeField.label,
+								currentSummarizeField.name
+							)
+						);
+					}
 				}
 			};
 

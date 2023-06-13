@@ -12,7 +12,7 @@
  * details.
  */
 
-import {API} from '@liferay/object-js-components-web';
+import {API, getLocalizableLabel} from '@liferay/object-js-components-web';
 
 export type ObjectsOptionsList = {
 	label: string;
@@ -30,20 +30,29 @@ function fillSelect(
 	}
 }
 
-export async function fetchObjectDefinitions(
-	objectDefinitionsRelationshipsURL: string,
-	values: Partial<ObjectAction>,
-	setRelationships: (values: ObjectDefinitionsRelationship[]) => void,
-	setObjectOptions: (values: ObjectsOptionsList) => void
-) {
-	const relationships = await API.fetchJSON<ObjectDefinitionsRelationship[]>(
-		objectDefinitionsRelationshipsURL
-	);
+interface FetchObjectDefinitionsProps {
+	objectDefinitionsRelationshipsURL: string;
+	setAddObjectEntryDefinitions: (values: AddObjectEntryDefinitions[]) => void;
+	setObjectOptions: (values: ObjectsOptionsList) => void;
+	setSelectedObjectDefinition?: (value: string) => void;
+	values: Partial<ObjectAction>;
+}
+
+export async function fetchObjectDefinitions({
+	objectDefinitionsRelationshipsURL,
+	setAddObjectEntryDefinitions,
+	setObjectOptions,
+	setSelectedObjectDefinition,
+	values,
+}: FetchObjectDefinitionsProps) {
+	const addObjectEntryDefinitions = await API.fetchJSON<
+		AddObjectEntryDefinitions[]
+	>(objectDefinitionsRelationshipsURL);
 
 	const relatedObjects: LabelValueObject[] = [];
 	const unrelatedObjects: LabelValueObject[] = [];
 
-	relationships?.forEach((object) => {
+	addObjectEntryDefinitions?.forEach((object) => {
 		const {externalReferenceCode, id, label, system} = object;
 
 		const target = object.related ? relatedObjects : unrelatedObjects;
@@ -65,8 +74,26 @@ export async function fetchObjectDefinitions(
 		objectsOptionsList
 	);
 
+	const {
+		objectDefinitionExternalReferenceCode,
+	} = values.parameters as ObjectActionParameters;
+
+	if (setSelectedObjectDefinition && objectDefinitionExternalReferenceCode) {
+		const {
+			defaultLanguageId,
+			label,
+			name,
+		} = await API.getObjectDefinitionByExternalReferenceCode(
+			objectDefinitionExternalReferenceCode
+		);
+
+		setSelectedObjectDefinition(
+			getLocalizableLabel(defaultLanguageId, label, name)
+		);
+	}
+
 	setObjectOptions(objectsOptionsList);
-	setRelationships(relationships);
+	setAddObjectEntryDefinitions(addObjectEntryDefinitions);
 }
 
 export async function fetchObjectDefinitionFields(

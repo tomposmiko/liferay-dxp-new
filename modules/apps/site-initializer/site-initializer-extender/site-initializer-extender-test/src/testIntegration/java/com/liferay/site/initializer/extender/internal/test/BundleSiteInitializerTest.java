@@ -109,7 +109,6 @@ import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
@@ -1037,10 +1036,6 @@ public class BundleSiteInitializerTest {
 	}
 
 	private void _assertLayoutUtilityPageEntries() {
-		if (!FeatureFlagManagerUtil.isEnabled("LPS-162765")) {
-			return;
-		}
-
 		LayoutUtilityPageEntry defaultLayoutUtilityPageEntry =
 			_layoutUtilityPageEntryLocalService.
 				fetchDefaultLayoutUtilityPageEntry(
@@ -1067,7 +1062,7 @@ public class BundleSiteInitializerTest {
 			layoutUtilityPageEntry.isDefaultLayoutUtilityPageEntry());
 	}
 
-	private void _assertListTypeDefinitions() throws Exception {
+	private void _assertListTypeDefinitions1() throws Exception {
 		ListTypeDefinitionResource.Builder listTypeDefinitionResourceBuilder =
 			_listTypeDefinitionResourceFactory.create();
 
@@ -1076,30 +1071,123 @@ public class BundleSiteInitializerTest {
 				_serviceContext.fetchUser()
 			).build();
 
-		Page<ListTypeDefinition> listTypeDefinitionsPage =
-			listTypeDefinitionResource.getListTypeDefinitionsPage(
-				null, null,
-				listTypeDefinitionResource.toFilter(
-					"name eq 'Test List Type Definition'"),
-				null, null);
+		ListTypeDefinition listTypeDefinition1 =
+			listTypeDefinitionResource.
+				getListTypeDefinitionByExternalReferenceCode(
+					"TESTLISTTYPEDEFINITION1");
 
-		ListTypeDefinition listTypeDefinition =
-			listTypeDefinitionsPage.fetchFirstItem();
+		Assert.assertEquals(
+			"Test List Type Definition 1", listTypeDefinition1.getName());
 
-		Assert.assertNotNull(listTypeDefinition);
+		ListTypeEntry[] listTypeEntries1 =
+			listTypeDefinition1.getListTypeEntries();
 
-		ListTypeEntry[] listTypeEntries =
-			listTypeDefinition.getListTypeEntries();
+		ListTypeEntry listTypeEntry1 = listTypeEntries1[0];
 
-		ListTypeEntry listTypeEntry1 = listTypeEntries[0];
-
-		Assert.assertNotNull(listTypeEntry1);
 		Assert.assertEquals("testlisttypeentry1", listTypeEntry1.getKey());
+		Assert.assertEquals("Test List Type Entry 1", listTypeEntry1.getName());
 
-		ListTypeEntry listTypeEntry2 = listTypeEntries[1];
+		ListTypeEntry listTypeEntry2 = listTypeEntries1[1];
 
-		Assert.assertNotNull(listTypeEntry2);
 		Assert.assertEquals("testlisttypeentry2", listTypeEntry2.getKey());
+		Assert.assertEquals("Test List Type Entry 2", listTypeEntry2.getName());
+
+		ListTypeDefinition listTypeDefinition2 =
+			listTypeDefinitionResource.
+				getListTypeDefinitionByExternalReferenceCode(
+					"TESTLISTTYPEDEFINITION2");
+
+		Assert.assertEquals(
+			"Test List Type Definition 2", listTypeDefinition2.getName());
+
+		ListTypeEntry[] listTypeEntries2 =
+			listTypeDefinition2.getListTypeEntries();
+
+		ListTypeEntry listTypeEntry3 = listTypeEntries2[0];
+
+		Assert.assertEquals("testlisttypeentry3", listTypeEntry3.getKey());
+		Assert.assertEquals("Test List Type Entry 3", listTypeEntry3.getName());
+
+		ListTypeEntry listTypeEntry4 = listTypeEntries2[1];
+
+		Assert.assertEquals("testlisttypeentry4", listTypeEntry4.getKey());
+		Assert.assertEquals("Test List Type Entry 4", listTypeEntry4.getName());
+	}
+
+	private void _assertListTypeDefinitions2() throws Exception {
+		ListTypeDefinitionResource.Builder listTypeDefinitionResourceBuilder =
+			_listTypeDefinitionResourceFactory.create();
+
+		ListTypeDefinitionResource listTypeDefinitionResource =
+			listTypeDefinitionResourceBuilder.user(
+				_serviceContext.fetchUser()
+			).build();
+
+		ListTypeDefinition listTypeDefinition1 =
+			listTypeDefinitionResource.
+				getListTypeDefinitionByExternalReferenceCode(
+					"TESTLISTTYPEDEFINITION1");
+
+		Assert.assertEquals(
+			"Test List Type Definition 1 Update",
+			listTypeDefinition1.getName());
+
+		ListTypeEntry[] listTypeEntries1 =
+			listTypeDefinition1.getListTypeEntries();
+
+		ListTypeEntry listTypeEntry1 = listTypeEntries1[0];
+
+		Assert.assertEquals("testlisttypeentry1", listTypeEntry1.getKey());
+		Assert.assertEquals(
+			"Test List Type Entry 1 Update", listTypeEntry1.getName());
+
+		ListTypeEntry listTypeEntry2 = listTypeEntries1[1];
+
+		Assert.assertEquals("testlisttypeentry2", listTypeEntry2.getKey());
+		Assert.assertEquals(
+			"Test List Type Entry 2 Update", listTypeEntry2.getName());
+
+		ListTypeDefinition listTypeDefinition2 =
+			listTypeDefinitionResource.
+				getListTypeDefinitionByExternalReferenceCode(
+					"TESTLISTTYPEDEFINITION2");
+
+		Assert.assertEquals(
+			"Test List Type Definition 2", listTypeDefinition2.getName());
+
+		ListTypeEntry[] listTypeEntries2 =
+			listTypeDefinition2.getListTypeEntries();
+
+		ListTypeEntry listTypeEntry3 = listTypeEntries2[0];
+
+		Assert.assertEquals("testlisttypeentry3", listTypeEntry3.getKey());
+		Assert.assertEquals("Test List Type Entry 3", listTypeEntry3.getName());
+
+		ListTypeEntry listTypeEntry4 = listTypeEntries2[1];
+
+		Assert.assertEquals("testlisttypeentry4", listTypeEntry4.getKey());
+		Assert.assertEquals("Test List Type Entry 4", listTypeEntry4.getName());
+
+		ListTypeDefinition listTypeDefinition3 =
+			listTypeDefinitionResource.
+				getListTypeDefinitionByExternalReferenceCode(
+					"TESTLISTTYPEDEFINITION3");
+
+		Assert.assertEquals(
+			"Test List Type Definition 3", listTypeDefinition3.getName());
+
+		ListTypeEntry[] listTypeEntries3 =
+			listTypeDefinition3.getListTypeEntries();
+
+		ListTypeEntry listTypeEntry5 = listTypeEntries3[0];
+
+		Assert.assertEquals("testlisttypeentry5", listTypeEntry5.getKey());
+		Assert.assertEquals("Test List Type Entry 5", listTypeEntry5.getName());
+
+		ListTypeEntry listTypeEntry6 = listTypeEntries3[1];
+
+		Assert.assertEquals("testlisttypeentry6", listTypeEntry6.getKey());
+		Assert.assertEquals("Test List Type Entry 6", listTypeEntry6.getName());
 	}
 
 	private void _assertNotificationTemplate() throws Exception {
@@ -2063,7 +2151,7 @@ public class BundleSiteInitializerTest {
 		_assertLayoutSets();
 		_assertLayouts();
 		_assertLayoutUtilityPageEntries();
-		_assertListTypeDefinitions();
+		_assertListTypeDefinitions1();
 		_assertNotificationTemplate();
 		_assertObjectDefinitions();
 		_assertOrganizations();
@@ -2084,6 +2172,7 @@ public class BundleSiteInitializerTest {
 		siteInitializer.initialize(_group.getGroupId());
 
 		_assertAccounts2();
+		_assertListTypeDefinitions2();
 	}
 
 	@Inject

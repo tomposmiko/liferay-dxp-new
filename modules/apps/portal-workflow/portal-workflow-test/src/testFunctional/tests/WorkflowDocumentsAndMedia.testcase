@@ -89,7 +89,7 @@ definition {
 			dmDocumentFile = "Document_2.pdf",
 			dmDocumentTitle = "Document_2");
 
-		Button.clickSubmitForPublication();
+		Button.clickSubmitForWorkflow();
 
 		DMDocument.viewStatus(
 			dmDocumentStatus = "Pending",
@@ -442,8 +442,6 @@ definition {
 
 	@priority = 4
 	test ConfigureFolderWorkflow {
-		property portal.upstream = "quarantine";
-
 		var siteName = TestCase.getSiteName(siteName = ${siteName});
 
 		ProductMenu.gotoPortlet(
@@ -556,7 +554,7 @@ definition {
 			dmDocumentFile = "Document_2.jpg",
 			dmDocumentTitle = "Document_2.jpg");
 
-		Button.clickSubmitForPublication();
+		Button.clickSubmitForWorkflow();
 
 		Navigator.openURL();
 
@@ -645,7 +643,7 @@ definition {
 			categoryNameList = "legal,Other",
 			vocabularyName = "Vocabulary Name");
 
-		Button.clickSubmitForPublication();
+		Button.clickSubmitForWorkflow();
 
 		Alert.viewSuccessMessage();
 

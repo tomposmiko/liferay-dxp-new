@@ -40,6 +40,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
@@ -47,6 +48,7 @@ import com.liferay.object.web.internal.info.item.ObjectEntryInfoItemFields;
 import com.liferay.object.web.internal.util.ObjectFieldDBTypeUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -63,12 +65,11 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.template.info.item.provider.TemplateInfoItemFieldSetProvider;
-
-import java.io.Serializable;
 
 import java.text.Format;
 
@@ -94,6 +95,7 @@ public class ObjectEntryInfoItemFieldValuesProvider
 		JSONFactory jsonFactory,
 		ListTypeEntryLocalService listTypeEntryLocalService,
 		ObjectDefinition objectDefinition,
+		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectEntryManagerRegistry objectEntryManagerRegistry,
 		ObjectFieldLocalService objectFieldLocalService,
@@ -111,6 +113,7 @@ public class ObjectEntryInfoItemFieldValuesProvider
 		_jsonFactory = jsonFactory;
 		_listTypeEntryLocalService = listTypeEntryLocalService;
 		_objectDefinition = objectDefinition;
+		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectEntryManagerRegistry = objectEntryManagerRegistry;
 		_objectFieldLocalService = objectFieldLocalService;
@@ -137,100 +140,94 @@ public class ObjectEntryInfoItemFieldValuesProvider
 	}
 
 	private List<InfoFieldValue<Object>> _getAttachmentInfoFieldValues(
-		List<ObjectField> objectFields, Map<String, ?> values) {
+		ObjectField objectField, Map<String, ?> values) {
 
-		if (!FeatureFlagManagerUtil.isEnabled("LPS-176083")) {
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-176083") ||
+			!Objects.equals(
+				objectField.getBusinessType(),
+				ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
+
+			return Collections.emptyList();
+		}
+
+		long fileEntryId = GetterUtil.getLong(
+			values.get(objectField.getName()));
+
+		if (fileEntryId == GetterUtil.DEFAULT_LONG) {
 			return Collections.emptyList();
 		}
 
 		List<InfoFieldValue<Object>> infoFieldValues = new ArrayList<>();
 
-		for (ObjectField objectField : objectFields) {
-			if (!Objects.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
+		try {
+			FileEntry fileEntry = _dlAppLocalService.getFileEntry(fileEntryId);
 
-				continue;
+			if (fileEntry == null) {
+				return Collections.emptyList();
 			}
 
-			long fileEntryId = GetterUtil.getLong(
-				values.get(objectField.getName()));
-
-			if (fileEntryId == GetterUtil.DEFAULT_LONG) {
-				continue;
-			}
-
-			try {
-				FileEntry fileEntry = _dlAppLocalService.getFileEntry(
-					fileEntryId);
-
-				if (fileEntry == null) {
-					continue;
-				}
-
-				infoFieldValues.add(
-					new InfoFieldValue<>(
-						InfoField.builder(
-						).infoFieldType(
-							URLInfoFieldType.INSTANCE
-						).namespace(
-							ObjectField.class.getSimpleName()
-						).name(
-							objectField.getObjectFieldId() + "#downloadURL"
-						).labelInfoLocalizedValue(
-							InfoLocalizedValue.localize(
-								ObjectEntryInfoItemFields.class, "download-url")
-						).build(),
-						_dlURLHelper.getDownloadURL(
-							fileEntry, fileEntry.getFileVersion(), null,
-							StringPool.BLANK)));
-				infoFieldValues.add(
-					new InfoFieldValue<>(
-						InfoField.builder(
-						).infoFieldType(
-							TextInfoFieldType.INSTANCE
-						).namespace(
-							ObjectField.class.getSimpleName()
-						).name(
-							objectField.getObjectFieldId() + "#fileName"
-						).labelInfoLocalizedValue(
-							InfoLocalizedValue.localize(
-								ObjectEntryInfoItemFields.class, "file-name")
-						).build(),
-						fileEntry.getFileName()));
-				infoFieldValues.add(
-					new InfoFieldValue<>(
-						InfoField.builder(
-						).infoFieldType(
-							TextInfoFieldType.INSTANCE
-						).namespace(
-							ObjectField.class.getSimpleName()
-						).name(
-							objectField.getObjectFieldId() + "#mimeType"
-						).labelInfoLocalizedValue(
-							InfoLocalizedValue.localize(
-								ObjectEntryInfoItemFields.class, "mime-type")
-						).build(),
-						fileEntry.getMimeType()));
-				infoFieldValues.add(
-					new InfoFieldValue<>(
-						InfoField.builder(
-						).infoFieldType(
-							TextInfoFieldType.INSTANCE
-						).namespace(
-							ObjectField.class.getSimpleName()
-						).name(
-							objectField.getObjectFieldId() + "#size"
-						).labelInfoLocalizedValue(
-							InfoLocalizedValue.localize(
-								ObjectEntryInfoItemFields.class, "size")
-						).build(),
-						fileEntry.getSize()));
-			}
-			catch (Exception exception) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
-				}
+			infoFieldValues.add(
+				new InfoFieldValue<>(
+					InfoField.builder(
+					).infoFieldType(
+						URLInfoFieldType.INSTANCE
+					).namespace(
+						ObjectField.class.getSimpleName()
+					).name(
+						objectField.getObjectFieldId() + "#downloadURL"
+					).labelInfoLocalizedValue(
+						InfoLocalizedValue.localize(
+							ObjectEntryInfoItemFields.class, "download-url")
+					).build(),
+					_dlURLHelper.getDownloadURL(
+						fileEntry, fileEntry.getFileVersion(), null,
+						StringPool.BLANK)));
+			infoFieldValues.add(
+				new InfoFieldValue<>(
+					InfoField.builder(
+					).infoFieldType(
+						TextInfoFieldType.INSTANCE
+					).namespace(
+						ObjectField.class.getSimpleName()
+					).name(
+						objectField.getObjectFieldId() + "#fileName"
+					).labelInfoLocalizedValue(
+						InfoLocalizedValue.localize(
+							ObjectEntryInfoItemFields.class, "file-name")
+					).build(),
+					fileEntry.getFileName()));
+			infoFieldValues.add(
+				new InfoFieldValue<>(
+					InfoField.builder(
+					).infoFieldType(
+						TextInfoFieldType.INSTANCE
+					).namespace(
+						ObjectField.class.getSimpleName()
+					).name(
+						objectField.getObjectFieldId() + "#mimeType"
+					).labelInfoLocalizedValue(
+						InfoLocalizedValue.localize(
+							ObjectEntryInfoItemFields.class, "mime-type")
+					).build(),
+					fileEntry.getMimeType()));
+			infoFieldValues.add(
+				new InfoFieldValue<>(
+					InfoField.builder(
+					).infoFieldType(
+						TextInfoFieldType.INSTANCE
+					).namespace(
+						ObjectField.class.getSimpleName()
+					).name(
+						objectField.getObjectFieldId() + "#size"
+					).labelInfoLocalizedValue(
+						InfoLocalizedValue.localize(
+							ObjectEntryInfoItemFields.class, "size")
+					).build(),
+					fileEntry.getSize()));
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
 			}
 		}
 
@@ -309,33 +306,11 @@ public class ObjectEntryInfoItemFieldValuesProvider
 					_getDisplayPageURL(objectEntry, themeDisplay)));
 		}
 
-		Map<String, Serializable> values = objectEntry.getValues();
-
-		List<ObjectField> objectFields =
-			_objectFieldLocalService.getObjectFields(
-				objectEntry.getObjectDefinitionId(), false);
-
 		objectEntryFieldValues.addAll(
-			TransformUtil.transform(
-				objectFields,
-				objectField -> new InfoFieldValue<>(
-					InfoField.builder(
-					).infoFieldType(
-						ObjectFieldDBTypeUtil.getInfoFieldType(objectField)
-					).namespace(
-						ObjectField.class.getSimpleName()
-					).name(
-						objectField.getName()
-					).labelInfoLocalizedValue(
-						InfoLocalizedValue.<String>builder(
-						).values(
-							objectField.getLabelMap()
-						).build()
-					).build(),
-					_getValue(objectField, values))));
-
-		objectEntryFieldValues.addAll(
-			_getAttachmentInfoFieldValues(objectFields, values));
+			_getObjectFieldsInfoFieldValues(
+				_objectFieldLocalService.getObjectFields(
+					objectEntry.getObjectDefinitionId(), false),
+				objectEntry.getValues()));
 
 		return objectEntryFieldValues;
 	}
@@ -382,17 +357,25 @@ public class ObjectEntryInfoItemFieldValuesProvider
 			new InfoFieldValue<>(
 				ObjectEntryInfoItemFields.displayPageURLInfoField,
 				_getDisplayPageURL(serviceBuilderObjectEntry, themeDisplay)));
-
-		Map<String, Object> properties = objectEntry.getProperties();
-
-		List<ObjectField> objectFields =
-			_objectFieldLocalService.getObjectFields(
-				serviceBuilderObjectEntry.getObjectDefinitionId());
-
 		objectEntryFieldValues.addAll(
-			TransformUtil.transform(
-				objectFields,
-				objectField -> new InfoFieldValue<>(
+			_getObjectFieldsInfoFieldValues(
+				_objectFieldLocalService.getObjectFields(
+					serviceBuilderObjectEntry.getObjectDefinitionId(), false),
+				objectEntry.getProperties()));
+
+		return objectEntryFieldValues;
+	}
+
+	private List<InfoFieldValue<Object>> _getObjectFieldsInfoFieldValues(
+			List<ObjectField> objectFields, Map<String, ?> values)
+		throws Exception {
+
+		List<InfoFieldValue<Object>> objectFieldsInfoFieldValues =
+			new ArrayList<>();
+
+		for (ObjectField objectField : objectFields) {
+			objectFieldsInfoFieldValues.add(
+				new InfoFieldValue<>(
 					InfoField.builder(
 					).infoFieldType(
 						ObjectFieldDBTypeUtil.getInfoFieldType(objectField)
@@ -406,12 +389,78 @@ public class ObjectEntryInfoItemFieldValuesProvider
 							objectField.getLabelMap()
 						).build()
 					).build(),
-					_getValue(objectField, properties))));
+					_getValue(objectField, values)));
 
-		objectEntryFieldValues.addAll(
-			_getAttachmentInfoFieldValues(objectFields, properties));
+			List<InfoFieldValue<Object>> attachmentInfoFieldValues =
+				_getAttachmentInfoFieldValues(objectField, values);
 
-		return objectEntryFieldValues;
+			if (ListUtil.isNotEmpty(attachmentInfoFieldValues)) {
+				objectFieldsInfoFieldValues.addAll(attachmentInfoFieldValues);
+			}
+
+			List<InfoFieldValue<Object>> relatedObjectEntryInfoFieldValues =
+				_getRelatedObjectEntryFieldValues(objectField, values);
+
+			if (ListUtil.isNotEmpty(relatedObjectEntryInfoFieldValues)) {
+				objectFieldsInfoFieldValues.addAll(
+					relatedObjectEntryInfoFieldValues);
+			}
+		}
+
+		return objectFieldsInfoFieldValues;
+	}
+
+	private List<InfoFieldValue<Object>> _getRelatedObjectEntryFieldValues(
+			ObjectField objectField, Map<String, ?> values)
+		throws Exception {
+
+		Object value = values.get(objectField.getName());
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-176083") ||
+			Validator.isNull(objectField.getRelationshipType()) ||
+			(GetterUtil.getLong(value) == 0)) {
+
+			return Collections.emptyList();
+		}
+
+		ObjectEntry relatedObjectEntry =
+			_objectEntryLocalService.fetchObjectEntry((Long)value);
+
+		if (relatedObjectEntry == null) {
+			return Collections.emptyList();
+		}
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				relatedObjectEntry.getObjectDefinitionId());
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.
+				fetchObjectRelationshipByObjectFieldId2(
+					objectField.getObjectFieldId());
+		Map<String, ?> relatedObjectEntryValues =
+			relatedObjectEntry.getValues();
+
+		return TransformUtil.transform(
+			_objectFieldLocalService.getObjectFields(
+				relatedObjectEntry.getObjectDefinitionId(), false),
+			relatedObjectField -> new InfoFieldValue<>(
+				InfoField.builder(
+				).infoFieldType(
+					ObjectFieldDBTypeUtil.getInfoFieldType(relatedObjectField)
+				).namespace(
+					StringBundler.concat(
+						ObjectRelationship.class.getSimpleName(),
+						StringPool.POUND, objectDefinition.getName(),
+						StringPool.POUND, objectRelationship.getName())
+				).name(
+					relatedObjectField.getName()
+				).labelInfoLocalizedValue(
+					InfoLocalizedValue.<String>builder(
+					).values(
+						relatedObjectField.getLabelMap()
+					).build()
+				).build(),
+				_getValue(relatedObjectField, relatedObjectEntryValues)));
 	}
 
 	private ThemeDisplay _getThemeDisplay() {
@@ -455,6 +504,40 @@ public class ObjectEntryInfoItemFieldValuesProvider
 			return webImage;
 		}
 		else if (objectField.getListTypeDefinitionId() != 0) {
+			if (Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
+
+				List<KeyLocalizedLabelPair> keyLocalizedLabelPairs =
+					new ArrayList<>();
+
+				for (String key :
+						StringUtil.split(
+							(String)values.get(objectField.getName()),
+							StringPool.COMMA_AND_SPACE)) {
+
+					ListTypeEntry listTypeEntry =
+						_listTypeEntryLocalService.fetchListTypeEntry(
+							objectField.getListTypeDefinitionId(), key);
+
+					if (listTypeEntry == null) {
+						continue;
+					}
+
+					keyLocalizedLabelPairs.add(
+						new KeyLocalizedLabelPair(
+							listTypeEntry.getName(serviceContext.getLocale()),
+							InfoLocalizedValue.<String>builder(
+							).defaultLocale(
+								serviceContext.getLocale()
+							).values(
+								listTypeEntry.getNameMap()
+							).build()));
+				}
+
+				return keyLocalizedLabelPairs;
+			}
+
 			ListTypeEntry listTypeEntry =
 				_listTypeEntryLocalService.fetchListTypeEntry(
 					objectField.getListTypeDefinitionId(),
@@ -557,6 +640,7 @@ public class ObjectEntryInfoItemFieldValuesProvider
 	private final JSONFactory _jsonFactory;
 	private final ListTypeEntryLocalService _listTypeEntryLocalService;
 	private final ObjectDefinition _objectDefinition;
+	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 	private final ObjectFieldLocalService _objectFieldLocalService;
