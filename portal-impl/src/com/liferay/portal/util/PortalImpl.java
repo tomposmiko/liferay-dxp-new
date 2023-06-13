@@ -192,6 +192,7 @@ import com.liferay.portal.kernel.util.PortalInetSocketAddressEventListener;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletCategoryKeys;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
@@ -1437,7 +1438,11 @@ public class PortalImpl implements Portal {
 			layout.getLayoutSet(), themeDisplay, true,
 			layout.isTypeControlPanel());
 
-		if (PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 2) {
+		int localePrependFriendlyURLStyle = PrefsPropsUtil.getInteger(
+			themeDisplay.getCompanyId(),
+			PropsKeys.LOCALE_PREPEND_FRIENDLY_URL_STYLE);
+
+		if (localePrependFriendlyURLStyle == 2) {
 			String groupFriendlyURLDomain = HttpComponentsUtil.getDomain(
 				groupFriendlyURL);
 
@@ -3667,8 +3672,12 @@ public class PortalImpl implements Portal {
 
 		boolean appendI18nPath = true;
 
-		if ((PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 0) ||
-			((PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 1) &&
+		int localePrependFriendlyURLStyle = PrefsPropsUtil.getInteger(
+			getCompanyId(httpServletRequest),
+			PropsKeys.LOCALE_PREPEND_FRIENDLY_URL_STYLE);
+
+		if ((localePrependFriendlyURLStyle == 0) ||
+			((localePrependFriendlyURLStyle == 1) &&
 			 locale.equals(LocaleUtil.getDefault()))) {
 
 			appendI18nPath = false;
@@ -7939,11 +7948,14 @@ public class PortalImpl implements Portal {
 		String i18nPath = null;
 
 		Set<String> languageIds = I18nFilter.getLanguageIds();
+		int localePrependFriendlyURLStyle = PrefsPropsUtil.getInteger(
+			themeDisplay.getCompanyId(),
+			PropsKeys.LOCALE_PREPEND_FRIENDLY_URL_STYLE);
 
 		if ((languageIds.contains(locale.toString()) &&
-			 (PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 1) &&
+			 (localePrependFriendlyURLStyle == 1) &&
 			 !locale.equals(LocaleUtil.getDefault())) ||
-			(PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 2)) {
+			(localePrependFriendlyURLStyle == 2)) {
 
 			i18nPath = _buildI18NPath(locale, themeDisplay.getSiteGroup());
 		}
@@ -8152,9 +8164,13 @@ public class PortalImpl implements Portal {
 		Locale siteDefaultLocale = getSiteDefaultLocale(layout.getGroupId());
 
 		if ((pos <= 0) || (pos >= canonicalURL.length())) {
+			int localePrependFriendlyURLStyle = PrefsPropsUtil.getInteger(
+				themeDisplay.getCompanyId(),
+				PropsKeys.LOCALE_PREPEND_FRIENDLY_URL_STYLE);
+
 			for (Locale locale : availableLocales) {
 				if (siteDefaultLocale.equals(locale) &&
-					(PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE != 2)) {
+					(localePrependFriendlyURLStyle != 2)) {
 
 					alternateURLs.put(locale, canonicalURL);
 				}
@@ -8210,13 +8226,15 @@ public class PortalImpl implements Portal {
 		}
 
 		String canonicalURLPrefix = canonicalURL.substring(0, pos);
-
 		String canonicalURLSuffix = canonicalURL.substring(pos);
 
+		int localePrependFriendlyURLStyle = PrefsPropsUtil.getInteger(
+			themeDisplay.getCompanyId(),
+			PropsKeys.LOCALE_PREPEND_FRIENDLY_URL_STYLE);
 		String siteDefaultLocaleI18nPath = _buildI18NPath(
 			siteDefaultLocale, layout.getGroup());
 
-		if ((PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 2) &&
+		if ((localePrependFriendlyURLStyle == 2) &&
 			canonicalURLSuffix.startsWith(siteDefaultLocaleI18nPath)) {
 
 			canonicalURLSuffix = canonicalURLSuffix.substring(
@@ -8317,8 +8335,8 @@ public class PortalImpl implements Portal {
 				languageId, locale, themeDisplay.getSiteGroup());
 
 			if (!alternateURLSuffix.startsWith(i18NPath) &&
-				((PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 2) ||
-				 ((PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE != 0) &&
+				((localePrependFriendlyURLStyle == 2) ||
+				 ((localePrependFriendlyURLStyle != 0) &&
 				  !siteDefaultLocale.equals(locale)))) {
 
 				alternateURL =

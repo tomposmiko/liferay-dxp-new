@@ -180,6 +180,12 @@ public class DLViewEntriesDisplayContext {
 			availableActions.add("download");
 		}
 
+		if (DLFolderPermission.contains(
+				permissionChecker, folder, ActionKeys.PERMISSIONS)) {
+
+			availableActions.add("permissions");
+		}
+
 		return availableActions;
 	}
 
@@ -235,7 +241,7 @@ public class DLViewEntriesDisplayContext {
 			_dlAdminDisplayContext.getSearchContainer();
 
 		EntriesChecker entriesChecker = new EntriesChecker(
-			_liferayPortletRequest, _liferayPortletResponse);
+			_liferayPortletResponse);
 
 		entriesChecker.setCssClass("entry-selector");
 		entriesChecker.setRememberCheckBoxStateURLRegex(

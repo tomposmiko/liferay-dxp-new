@@ -22,7 +22,6 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -83,15 +82,6 @@ public class GoogleDocsDLViewFileVersionDisplayContext
 		_googleDocsUIItemsProcessor.processDropdownItems(actionDropdownItems);
 
 		return actionDropdownItems;
-	}
-
-	@Override
-	public List<ToolbarItem> getToolbarItems() throws PortalException {
-		List<ToolbarItem> toolbarItems = super.getToolbarItems();
-
-		_googleDocsUIItemsProcessor.processToolbarItems(toolbarItems);
-
-		return toolbarItems;
 	}
 
 	@Override

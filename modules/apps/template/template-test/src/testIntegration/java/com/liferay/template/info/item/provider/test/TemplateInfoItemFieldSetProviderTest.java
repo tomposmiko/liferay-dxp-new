@@ -26,13 +26,13 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
-import com.liferay.dynamic.data.mapping.service.DDMFieldLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesToFieldsConverter;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldSet;
 import com.liferay.info.field.InfoFieldValue;
+import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
@@ -77,6 +77,7 @@ import com.liferay.template.test.util.TemplateTestUtil;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -160,13 +161,18 @@ public class TemplateInfoItemFieldSetProviderTest {
 
 		Assert.assertEquals(infoFields.toString(), 1, infoFields.size());
 
-		InfoField<?> infoField = infoFields.get(0);
+		InfoField infoField = infoFields.get(0);
 
 		Assert.assertEquals(
 			infoFields.toString(),
 			PortletDisplayTemplate.DISPLAY_STYLE_PREFIX +
 				journalArticleTemplateEntry.getTemplateEntryId(),
 			infoField.getName());
+
+		Optional<Boolean> optional = infoField.getAttributeOptional(
+			TextInfoFieldType.HTML);
+
+		Assert.assertTrue(optional.orElse(false));
 	}
 
 	@Test
@@ -199,13 +205,18 @@ public class TemplateInfoItemFieldSetProviderTest {
 
 		Assert.assertEquals(infoFields.toString(), 1, infoFields.size());
 
-		InfoField<?> infoField = infoFields.get(0);
+		InfoField infoField = infoFields.get(0);
 
 		Assert.assertEquals(
 			infoFields.toString(),
 			PortletDisplayTemplate.DISPLAY_STYLE_PREFIX +
 				categoryTemplateEntry.getTemplateEntryId(),
 			infoField.getName());
+
+		Optional<Boolean> optional = infoField.getAttributeOptional(
+			TextInfoFieldType.HTML);
+
+		Assert.assertTrue(optional.orElse(false));
 	}
 
 	@Test
@@ -222,10 +233,7 @@ public class TemplateInfoItemFieldSetProviderTest {
 	public void testGetInfoFieldValuesByClassNameAndVariationKeyWhenTemplateEntryExists()
 		throws PortalException {
 
-		DDMStructure ddmStructure = _journalArticle.getDDMStructure();
-
-		DDMFormValues ddmFormValues = DDMFieldLocalServiceUtil.getDDMFormValues(
-			ddmStructure.getDDMForm(), _journalArticle.getId());
+		DDMFormValues ddmFormValues = _journalArticle.getDDMFormValues();
 
 		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
 			ddmFormValues.getDDMFormFieldValuesMap(false);
@@ -257,7 +265,7 @@ public class TemplateInfoItemFieldSetProviderTest {
 
 		InfoFieldValue<Object> infoFieldValue = infoFieldValues.get(0);
 
-		InfoField<?> infoField = infoFieldValue.getInfoField();
+		InfoField infoField = infoFieldValue.getInfoField();
 
 		Assert.assertEquals(
 			infoField.toString(),
@@ -270,6 +278,11 @@ public class TemplateInfoItemFieldSetProviderTest {
 			nameValue.getString(
 				_portal.getSiteDefaultLocale(_group.getGroupId())),
 			infoFieldValue.getValue());
+
+		Optional<Boolean> optional = infoField.getAttributeOptional(
+			TextInfoFieldType.HTML);
+
+		Assert.assertTrue(optional.orElse(false));
 	}
 
 	@Test

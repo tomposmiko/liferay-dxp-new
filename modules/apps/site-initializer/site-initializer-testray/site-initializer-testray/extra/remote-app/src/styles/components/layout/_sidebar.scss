@@ -9,6 +9,7 @@ $normal-transition: opacity 1s ease;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	max-height: 100vh;
 	padding: 20px 0 0;
 	transition: $normal-transition-width;
 	width: 80px;

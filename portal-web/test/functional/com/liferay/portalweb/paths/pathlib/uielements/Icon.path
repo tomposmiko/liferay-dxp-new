@@ -22,7 +22,7 @@
 </tr>
 <tr>
 	<td>ANGLE_LEFT_BACK</td>
-	<td>//div[contains(@class,'taglib-header')]//span[contains(.,'Back')]/a | //a[span//*[name()='svg'][contains(@class,'icon-angle-left')]]</td>
+	<td>//div[contains(@class,'taglib-header')]//span[contains(.,'Back')]/a | //a[*[name()='svg'][contains(@class,'icon-angle-left')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -268,6 +268,11 @@
 <tr>
 	<td>INFO</td>
 	<td>//a[contains(@class,'btn')][normalize-space()='Info'] | //div[contains(@class,'management-bar-default')]//a[contains(@class,'infoPanelToggler')] | //button[contains(@class,'btn')]//*[name()='svg'][contains(@class,'lexicon-icon-info')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INFO_DM</td>
+	<td>//*[*[name()='svg'][contains(@class,'lexicon-icon-info-circle-open')]]</td>
 	<td></td>
 </tr>
 <tr>

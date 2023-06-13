@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.redirect.configuration.RedirectPatternConfigurationProvider;
 
 import java.util.ArrayList;
@@ -46,18 +47,10 @@ public class RedirectPatternConfigurationDisplayContext {
 			redirectPatternConfigurationProvider;
 	}
 
-	public String getRedirectPatternConfigurationURL() {
-		return PortletURLBuilder.createActionURL(
-			_liferayPortletResponse
-		).setActionName(
-			"/redirect/edit_redirect_patterns"
-		).setRedirect(
-			PortalUtil.getCurrentURL(_httpServletRequest)
-		).buildString();
-	}
-
 	public Map<String, Object> getRedirectPatterns() {
 		return HashMapBuilder.<String, Object>put(
+			"actionUrl", _getRedirectPatternConfigurationURL()
+		).put(
 			"patterns",
 			() -> {
 				List<Map<String, Object>> list = new ArrayList<>();
@@ -82,7 +75,25 @@ public class RedirectPatternConfigurationDisplayContext {
 			}
 		).put(
 			"portletNamespace", _liferayPortletResponse.getNamespace()
+		).put(
+			"strings",
+			HashMapBuilder.put(
+				"absoluteURL", PortalUtil.getPortalURL(_httpServletRequest)
+			).put(
+				"relativeURL",
+				PropsValues.DEFAULT_GUEST_PUBLIC_LAYOUT_FRIENDLY_URL
+			).build()
 		).build();
+	}
+
+	private String _getRedirectPatternConfigurationURL() {
+		return PortletURLBuilder.createActionURL(
+			_liferayPortletResponse
+		).setActionName(
+			"/redirect/edit_redirect_patterns"
+		).setRedirect(
+			PortalUtil.getCurrentURL(_httpServletRequest)
+		).buildString();
 	}
 
 	private final HttpServletRequest _httpServletRequest;

@@ -14,16 +14,16 @@
 
 package com.liferay.object.rest.internal.manager.v1_0;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
+import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
@@ -38,6 +38,7 @@ import com.liferay.object.rest.internal.util.ObjectEntryValuesUtil;
 import com.liferay.object.rest.manager.v1_0.BaseObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.petra.sql.dsl.expression.FilterPredicateFactory;
+import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
@@ -58,7 +59,6 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
 import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -80,6 +80,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.aggregation.Aggregations;
@@ -356,38 +357,6 @@ public class DefaultObjectEntryManagerImpl
 
 		long groupId = getGroupId(objectDefinition, scopeKey);
 
-		long[] accountEntryIds = {_NONEXISTING_ACCOUNT_ENTRY_ID};
-
-		if (objectDefinition.isAccountEntryRestricted()) {
-			List<AccountEntry> accountEntries = null;
-
-			if (_roleLocalService.hasUserRole(
-					dtoConverterContext.getUserId(), companyId,
-					RoleConstants.ADMINISTRATOR, true)) {
-
-				accountEntries = _accountEntryLocalService.getAccountEntries(
-					companyId, WorkflowConstants.STATUS_APPROVED,
-					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-			}
-			else {
-				accountEntries =
-					_accountEntryLocalService.getUserAccountEntries(
-						dtoConverterContext.getUserId(),
-						AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, null,
-						new String[] {
-							AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
-							AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON
-						},
-						WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
-						QueryUtil.ALL_POS);
-			}
-
-			if (!accountEntries.isEmpty()) {
-				accountEntryIds = ListUtil.toLongArray(
-					accountEntries, AccountEntry::getAccountEntryId);
-			}
-		}
-
 		int start = QueryUtil.ALL_POS;
 		int end = QueryUtil.ALL_POS;
 
@@ -474,8 +443,9 @@ public class DefaultObjectEntryManagerImpl
 			facets,
 			TransformUtil.transform(
 				_objectEntryLocalService.getValuesList(
-					objectDefinition.getObjectDefinitionId(), groupId,
-					accountEntryIds, predicate, search, start, end,
+					groupId, companyId, dtoConverterContext.getUserId(),
+					objectDefinition.getObjectDefinitionId(), predicate, search,
+					start, end,
 					OrderByExpressionUtil.getOrderByExpressions(
 						objectDefinition.getObjectDefinitionId(),
 						_objectFieldLocalService, sorts)),
@@ -483,8 +453,8 @@ public class DefaultObjectEntryManagerImpl
 					dtoConverterContext, objectDefinition, values)),
 			pagination,
 			_objectEntryLocalService.getValuesListCount(
-				objectDefinition.getObjectDefinitionId(), groupId,
-				accountEntryIds, predicate, search));
+				groupId, companyId, dtoConverterContext.getUserId(),
+				objectDefinition.getObjectDefinitionId(), predicate, search));
 	}
 
 	@Override
@@ -649,6 +619,19 @@ public class DefaultObjectEntryManagerImpl
 				_createServiceContext(
 					objectEntry.getProperties(),
 					dtoConverterContext.getUserId())));
+	}
+
+	private Map<String, String> _addAction(
+			String actionName, String methodName,
+			com.liferay.object.model.ObjectEntry objectEntry, UriInfo uriInfo)
+		throws Exception {
+
+		return ActionUtil.addAction(
+			actionName, ObjectEntryResourceImpl.class,
+			objectEntry.getObjectEntryId(), methodName, null,
+			objectEntry.getUserId(),
+			_getObjectEntryPermissionName(objectEntry.getObjectDefinitionId()),
+			objectEntry.getGroupId(), uriInfo);
 	}
 
 	private void _checkObjectEntryObjectDefinitionId(
@@ -941,53 +924,49 @@ public class DefaultObjectEntryManagerImpl
 						return null;
 					}
 
-					return ActionUtil.addAction(
-						ActionKeys.DELETE, ObjectEntryResourceImpl.class,
-						objectEntry.getObjectEntryId(), "deleteObjectEntry",
-						null, objectEntry.getUserId(),
-						_getObjectEntryPermissionName(
-							objectEntry.getObjectDefinitionId()),
-						objectEntry.getGroupId(),
+					return _addAction(
+						ActionKeys.DELETE, "deleteObjectEntry", objectEntry,
 						dtoConverterContext.getUriInfo());
 				}
 			).put(
 				"get",
-				ActionUtil.addAction(
-					ActionKeys.VIEW, ObjectEntryResourceImpl.class,
-					objectEntry.getObjectEntryId(), "getObjectEntry", null,
-					objectEntry.getUserId(),
-					_getObjectEntryPermissionName(
-						objectEntry.getObjectDefinitionId()),
-					objectEntry.getGroupId(), dtoConverterContext.getUriInfo())
+				_addAction(
+					ActionKeys.VIEW, "getObjectEntry", objectEntry,
+					dtoConverterContext.getUriInfo())
 			).put(
 				"permissions",
-				ActionUtil.addAction(
-					ActionKeys.PERMISSIONS, ObjectEntryResourceImpl.class,
-					objectEntry.getObjectEntryId(),
-					"getObjectEntryPermissionsPage", null,
-					objectEntry.getUserId(),
-					_getObjectEntryPermissionName(
-						objectEntry.getObjectDefinitionId()),
-					objectEntry.getGroupId(), dtoConverterContext.getUriInfo())
+				_addAction(
+					ActionKeys.PERMISSIONS, "getObjectEntryPermissionsPage",
+					objectEntry, dtoConverterContext.getUriInfo())
 			).put(
 				"replace",
-				ActionUtil.addAction(
-					ActionKeys.UPDATE, ObjectEntryResourceImpl.class,
-					objectEntry.getObjectEntryId(), "putObjectEntry", null,
-					objectEntry.getUserId(),
-					_getObjectEntryPermissionName(
-						objectEntry.getObjectDefinitionId()),
-					objectEntry.getGroupId(), dtoConverterContext.getUriInfo())
+				_addAction(
+					ActionKeys.UPDATE, "putObjectEntry", objectEntry,
+					dtoConverterContext.getUriInfo())
 			).put(
 				"update",
-				ActionUtil.addAction(
-					ActionKeys.UPDATE, ObjectEntryResourceImpl.class,
-					objectEntry.getObjectEntryId(), "patchObjectEntry", null,
-					objectEntry.getUserId(),
-					_getObjectEntryPermissionName(
-						objectEntry.getObjectDefinitionId()),
-					objectEntry.getGroupId(), dtoConverterContext.getUriInfo())
+				_addAction(
+					ActionKeys.UPDATE, "patchObjectEntry", objectEntry,
+					dtoConverterContext.getUriInfo())
 			).build();
+
+			if (GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-148804"))) {
+
+				for (ObjectAction objectAction :
+						_objectActionLocalService.getObjectActions(
+							objectDefinition.getObjectDefinitionId(),
+							ObjectActionTriggerConstants.KEY_STANDALONE)) {
+
+					actions.put(
+						objectAction.getName(),
+						_addAction(
+							ActionKeys.VIEW,
+							"putByExternalReferenceCodeObjectEntryExternal" +
+								"ReferenceCodeObjectActionObjectActionName",
+							objectEntry, dtoConverterContext.getUriInfo()));
+				}
+			}
 		}
 
 		DefaultDTOConverterContext defaultDTOConverterContext =
@@ -1074,8 +1053,6 @@ public class DefaultObjectEntryManagerImpl
 		return values;
 	}
 
-	private static final long _NONEXISTING_ACCOUNT_ENTRY_ID = -1;
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		DefaultObjectEntryManagerImpl.class);
 
@@ -1093,6 +1070,9 @@ public class DefaultObjectEntryManagerImpl
 
 	@Reference
 	private FilterPredicateFactory _filterPredicateFactory;
+
+	@Reference
+	private ObjectActionLocalService _objectActionLocalService;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;

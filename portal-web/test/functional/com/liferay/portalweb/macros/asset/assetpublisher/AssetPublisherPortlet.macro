@@ -34,8 +34,6 @@ definition {
 
 		MenuItem.click(menuItem = "Other Site or Asset Library...");
 
-		SelectFrame(value1 = "relative=top");
-
 		SelectFrame(locator1 = "IFrame#SELECT_SITES");
 
 		Navigator.gotoNavTab(navTab = "Sites That I Administer");
@@ -437,8 +435,6 @@ definition {
 
 			MenuItem.click(menuItem = "Other Site or Asset Library...");
 
-			SelectFrame(value1 = "relative=top");
-
 			SelectFrame(locator1 = "IFrame#SELECT_SITES");
 
 			Navigator.gotoNavTab(navTab = "Asset Libraries");
@@ -469,9 +465,7 @@ definition {
 
 			var key_assetType = "${assetType}";
 
-			AssertClick(
-				locator1 = "APConfiguration#ASSET_SELECTION_MANUAL_ASSET_ENTRIES_ASSET",
-				value1 = "${assetType}");
+			MenuItem.click(menuItem = "${assetType}");
 
 			WaitForElementPresent(locator1 = "APConfigurationManual#ASSET_SELECTION_MANUAL_SELECT_ASSET_ENTRIES_DIALOG");
 
@@ -553,8 +547,6 @@ definition {
 		if (isSet(otherSite)) {
 			MenuItem.click(menuItem = "Other Site or Asset Library...");
 
-			SelectFrame(value1 = "relative=top");
-
 			SelectFrame(locator1 = "IFrame#SELECT_SITES");
 
 			Navigator.gotoNavTab(navTab = "Sites That I Administer");
@@ -564,8 +556,6 @@ definition {
 
 		if (isSet(depotName)) {
 			MenuItem.click(menuItem = "Other Site or Asset Library...");
-
-			SelectFrame(value1 = "relative=top");
 
 			SelectFrame(locator1 = "IFrame#SELECT_SITES");
 
@@ -675,8 +665,6 @@ definition {
 		}
 		else {
 			MenuItem.click(menuItem = "Other Site or Asset Library...");
-
-			SelectFrame(value1 = "relative=top");
 
 			SelectFrame(locator1 = "IFrame#SELECT_SITES");
 
@@ -1298,8 +1286,6 @@ definition {
 
 			MenuItem.click(menuItem = "Other Site or Asset Library...");
 
-			SelectFrame(value1 = "relative=top");
-
 			SelectFrame(locator1 = "IFrame#SELECT_SITES");
 
 			AssertClick.assertPartialTextClickAt(
@@ -1558,7 +1544,7 @@ definition {
 
 		Panel.expandPanel(panel = "Asset Entries");
 
-		Click(locator1 = "APConfigurationManual#ASSET_SELECTION_MANUAL_ASSET_ENTRIES_SELECT");
+		Click(locator1 = "APConfiguration#ASSET_SELECTION_MANUAL_ASSET_ENTRIES_SELECT_BUTTON");
 
 		for (var assetEntryType : list "${assetEntryTypes}") {
 			AssertTextEquals.assertPartialText(

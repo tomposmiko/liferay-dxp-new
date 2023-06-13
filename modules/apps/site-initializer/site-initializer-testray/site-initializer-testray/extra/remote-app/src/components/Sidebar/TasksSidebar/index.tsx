@@ -14,10 +14,11 @@
 
 import classNames from 'classnames';
 import {Fragment} from 'react';
+import {Link} from 'react-router-dom';
 
 import {useSidebarTask} from '../../../hooks/useSidebarTask';
 import i18n from '../../../i18n';
-import {TestraySubTask, TestrayTaskUser} from '../../../services/rest';
+import {TestraySubTask} from '../../../services/rest';
 import {StatusesProgressScore, chartClassNames} from '../../../util/constants';
 import TaskbarProgress from '../../ProgressBar/TaskbarProgress';
 
@@ -64,13 +65,25 @@ const SubtaskCard: React.FC<SubtaskCardProps> = ({expanded, subtask}) => (
 );
 
 const TaskSidebar: React.FC<TaskSidebarProps> = ({expanded}) => {
-	const {displayTask, setSelectedTask, subTasks, tasks} = useSidebarTask();
+	const {
+		filteredTasks,
+		selectedTask,
+		setSelectedTask,
+		subTasks,
+		tasks,
+	} = useSidebarTask();
 
 	const justifyContentSidebar = {
 		'justify-content-between': expanded,
 		'justify-content-center': !expanded,
 	};
-	if (!tasks) {
+
+	const sidebarItemVisibility = {
+		'sidebar-item-hidden': !expanded,
+		'sidebar-item-visible': expanded,
+	};
+
+	if (!tasks.length) {
 		return null;
 	}
 
@@ -82,11 +95,14 @@ const TaskSidebar: React.FC<TaskSidebarProps> = ({expanded}) => {
 					justifyContentSidebar
 				)}
 			>
-				{expanded && (
-					<span className="font-weight-bold">
-						{i18n.translate('tasks')}
-					</span>
-				)}
+				<span
+					className={classNames(
+						'font-weight-bold',
+						sidebarItemVisibility
+					)}
+				>
+					{i18n.translate('tasks')}
+				</span>
 
 				<TaskBadge count={tasks.length} />
 			</div>
@@ -99,50 +115,82 @@ const TaskSidebar: React.FC<TaskSidebarProps> = ({expanded}) => {
 						className={classNames({
 							'mr-3': expanded,
 						})}
-						count={subTasks.length as number}
+						count={subTasks.length}
 					/>
 
-					<div>{displayTask?.task?.name}</div>
+					<Link
+						className={classNames(
+							'd-flex justify-content-between',
+							sidebarItemVisibility
+						)}
+						onClick={() => setSelectedTask(selectedTask)}
+						to={`testflow/${selectedTask?.id}`}
+					>
+						{selectedTask?.name}
+					</Link>
 				</div>
 
-				<div>{displayTask?.task?.build?.name}</div>
+				{expanded && (
+					<Link
+						className="sidebar-link"
+						onClick={() => setSelectedTask(selectedTask)}
+						to={`/project/${selectedTask?.build?.project?.id}/routines/${selectedTask?.build?.routine?.id}/build/${selectedTask?.build?.id}`}
+					>
+						{selectedTask?.build?.name}
+					</Link>
+				)}
 
 				<TaskbarProgress
 					displayTotalCompleted
 					items={[
-						[StatusesProgressScore.SELF, 60],
-						[StatusesProgressScore.INCOMPLETE, Number(30)],
+						[StatusesProgressScore.SELF, 0],
+						[
+							StatusesProgressScore.OTHER,
+							Number(selectedTask?.subtaskScoreCompleted ?? 0),
+						],
+						[
+							StatusesProgressScore.INCOMPLETE,
+							Number(selectedTask?.subtaskScoreIncomplete ?? 0),
+						],
 					]}
 					taskbarClassNames={chartClassNames}
 				/>
 			</div>
 
-			{subTasks.map((subtask: TestraySubTask, index) => (
-				<div key={index}>
-					<SubtaskCard
-						expanded={expanded}
-						subtask={{
-							name: subtask?.name,
-							score: subtask.score,
-						}}
-					/>
-				</div>
-			))}
+			{expanded && (
+				<div>
+					{subTasks.map((subtask: TestraySubTask, index) => (
+						<SubtaskCard
+							expanded={expanded}
+							key={index}
+							subtask={{
+								name: subtask?.name,
+								score: subtask.score,
+							}}
+						/>
+					))}
 
-			{tasks.map((taskUser: TestrayTaskUser, index) => (
-				<div className="mb-5 mt-6" key={index}>
-					{expanded && (
-						<div
-							className="d-flex justify-content-between"
-							onClick={() => setSelectedTask(taskUser.id)}
-						>
-							<span>{taskUser?.task?.name}</span>
+					{filteredTasks.map((task, index) => (
+						<div className="mb-5 mt-6c sidebar-link" key={index}>
+							<Link
+								className="d-flex justify-content-between"
+								onClick={() => setSelectedTask(task)}
+								to={`testflow/${task.id}`}
+							>
+								{task.name}
+							</Link>
+
+							<Link
+								className="sidebar-link"
+								onClick={() => setSelectedTask(task)}
+								to={`/project/${task?.build?.project?.id}/routines/${task?.build?.routine?.id}/build/${task?.build?.id}`}
+							>
+								{task.build?.name}
+							</Link>
 						</div>
-					)}
-
-					{expanded && <div>{taskUser?.task?.build?.name}</div>}
+					))}
 				</div>
-			))}
+			)}
 		</div>
 	);
 };

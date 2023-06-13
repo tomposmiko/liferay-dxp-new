@@ -33,13 +33,15 @@ CommerceWishList commerceWishList = commerceWishListDisplayContext.getCommerceWi
 
 	<aui:model-context bean="<%= commerceWishList %>" model="<%= CommerceWishList.class %>" />
 
-	<aui:fieldset-group markupView="lexicon">
-		<aui:fieldset>
-			<aui:input name="name" />
+	<div class="sheet">
+		<div class="panel-group panel-group-flush">
+			<aui:fieldset>
+				<aui:input name="name" />
 
-			<aui:input checked='<%= BeanParamUtil.getBoolean(commerceWishList, request, "defaultWishList") %>' inlineLabel="right" label="default" labelCssClass="simple-toggle-switch" name="defaultWishList" type="toggle-switch" />
-		</aui:fieldset>
-	</aui:fieldset-group>
+				<aui:input checked='<%= BeanParamUtil.getBoolean(commerceWishList, request, "defaultWishList") %>' inlineLabel="right" label="default" labelCssClass="simple-toggle-switch" name="defaultWishList" type="toggle-switch" />
+			</aui:fieldset>
+		</div>
+	</div>
 
 	<aui:button-row>
 		<liferay-frontend:edit-form-buttons

@@ -15,8 +15,6 @@
 package com.liferay.layout.taglib.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.data.engine.rest.dto.v2_0.DataDefinition;
-import com.liferay.data.engine.rest.resource.v2_0.DataDefinitionResource;
 import com.liferay.info.exception.InfoFormException;
 import com.liferay.info.exception.InfoFormValidationException;
 import com.liferay.info.field.InfoField;
@@ -25,11 +23,6 @@ import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.info.test.util.MockInfoServiceRegistrationHolder;
 import com.liferay.info.test.util.model.MockObject;
-import com.liferay.journal.constants.JournalArticleConstants;
-import com.liferay.journal.constants.JournalContentPortletKeys;
-import com.liferay.journal.constants.JournalFolderConstants;
-import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.page.template.info.item.capability.EditPageInfoItemCapability;
 import com.liferay.layout.provider.LayoutStructureProvider;
 import com.liferay.layout.taglib.servlet.taglib.RenderLayoutStructureTag;
@@ -60,8 +53,6 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -376,112 +367,6 @@ public class RenderLayoutStructureTagTest {
 		}
 	}
 
-	@Test
-	public void testRenderLayoutTypePortletWithComplexData() throws Exception {
-		DataDefinition dataDefinition = DataDefinition.toDTO(
-			_readFileToString("dependencies/complex_data_definition.json"));
-
-		dataDefinition.setName(
-			HashMapBuilder.<String, Object>put(
-				String.valueOf(LocaleUtil.SPAIN), "TMX_Main_Menu"
-			).build());
-
-		DataDefinitionResource.Builder dataDefinitionResourcedBuilder =
-			_dataDefinitionResourceFactory.create();
-
-		DataDefinitionResource dataDefinitionResource =
-			dataDefinitionResourcedBuilder.user(
-				TestPropsValues.getUser()
-			).build();
-
-		dataDefinition =
-			dataDefinitionResource.postSiteDataDefinitionByContentType(
-				_group.getGroupId(), "journal", dataDefinition);
-
-		JournalArticle journalArticle =
-			JournalTestUtil.addArticleWithXMLContent(
-				_group.getGroupId(),
-				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-				JournalArticleConstants.CLASS_NAME_ID_DEFAULT,
-				_readFileToString("dependencies/complex_journal_content.xml"),
-				dataDefinition.getDataDefinitionKey(), null, LocaleUtil.SPAIN);
-
-		LayoutTestUtil.addPortletToLayout(
-			TestPropsValues.getUserId(), _layout,
-			JournalContentPortletKeys.JOURNAL_CONTENT, "column-1",
-			HashMapBuilder.put(
-				"articleId", new String[] {journalArticle.getArticleId()}
-			).put(
-				"groupId",
-				new String[] {String.valueOf(journalArticle.getGroupId())}
-			).put(
-				"showAvailableLocales", new String[] {Boolean.TRUE.toString()}
-			).build());
-
-		MockHttpServletRequest mockHttpServletRequest =
-			_getMockHttpServletRequest();
-
-		MockHttpServletResponse mockHttpServletResponse =
-			new MockHttpServletResponse();
-
-		RenderLayoutStructureTag renderLayoutStructureTag =
-			new RenderLayoutStructureTag();
-
-		renderLayoutStructureTag.setLayoutStructure(
-			_getDefaultMasterLayoutStructure());
-		renderLayoutStructureTag.setPageContext(
-			new MockPageContext(
-				null, mockHttpServletRequest, mockHttpServletResponse));
-
-		renderLayoutStructureTag.doTag(
-			mockHttpServletRequest, mockHttpServletResponse);
-
-		String content = mockHttpServletResponse.getContentAsString();
-
-		Assert.assertTrue(content.contains("Paquetes de Internet"));
-	}
-
-	@Test
-	public void testRenderLayoutTypePortletWithSimpleData() throws Exception {
-		JournalArticle journalArticle = JournalTestUtil.addArticle(
-			_group.getGroupId(),
-			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-
-		LayoutTestUtil.addPortletToLayout(
-			TestPropsValues.getUserId(), _layout,
-			JournalContentPortletKeys.JOURNAL_CONTENT, "column-1",
-			HashMapBuilder.put(
-				"articleId", new String[] {journalArticle.getArticleId()}
-			).put(
-				"groupId",
-				new String[] {String.valueOf(journalArticle.getGroupId())}
-			).put(
-				"showAvailableLocales", new String[] {Boolean.TRUE.toString()}
-			).build());
-
-		MockHttpServletRequest mockHttpServletRequest =
-			_getMockHttpServletRequest();
-
-		MockHttpServletResponse mockHttpServletResponse =
-			new MockHttpServletResponse();
-
-		RenderLayoutStructureTag renderLayoutStructureTag =
-			new RenderLayoutStructureTag();
-
-		renderLayoutStructureTag.setLayoutStructure(
-			_getDefaultMasterLayoutStructure());
-		renderLayoutStructureTag.setPageContext(
-			new MockPageContext(
-				null, mockHttpServletRequest, mockHttpServletResponse));
-
-		renderLayoutStructureTag.doTag(
-			mockHttpServletRequest, mockHttpServletResponse);
-
-		String content = mockHttpServletResponse.getContentAsString();
-
-		Assert.assertFalse(content.contains("Paquetes de Internet"));
-	}
-
 	private void _assertErrorMessage(
 		String content, String expectedErrorMessage) {
 
@@ -634,15 +519,8 @@ public class RenderLayoutStructureTagTest {
 		return renderLayoutStructureTag;
 	}
 
-	private String _readFileToString(String s) throws Exception {
-		return new String(FileUtil.getBytes(getClass(), s));
-	}
-
 	@Inject
 	private CompanyLocalService _companyLocalService;
-
-	@Inject
-	private DataDefinitionResource.Factory _dataDefinitionResourceFactory;
 
 	@Inject
 	private EditPageInfoItemCapability _editPageInfoItemCapability;

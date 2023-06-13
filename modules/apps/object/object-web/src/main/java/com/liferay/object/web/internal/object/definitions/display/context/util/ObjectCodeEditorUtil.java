@@ -71,6 +71,17 @@ public class ObjectCodeEditorUtil {
 						"label", objectField.getLabel(locale)
 					).build()),
 				"fields", locale));
+		codeEditorElements.add(
+			_createCodeEditorElement(
+				Collections.singletonList(
+					HashMapBuilder.put(
+						"content", "currentUserId"
+					).put(
+						"helpText", StringPool.BLANK
+					).put(
+						"label", LanguageUtil.get(locale, "current-user")
+					).build()),
+				"general-variables", locale));
 
 		if (includeDDMExpressionBuilderElements) {
 			Collections.addAll(

@@ -54,7 +54,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  */
 @Component(
-	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-site-facet",
@@ -148,6 +147,8 @@ public class SiteFacetPortlet extends MVCPortlet {
 			_getLocale(portletSharedSearchResponse, renderRequest));
 		scopeSearchFacetDisplayContextBuilder.setMaxTerms(
 			siteFacetPortletPreferences.getMaxTerms());
+		scopeSearchFacetDisplayContextBuilder.setOrder(
+			siteFacetPortletPreferences.getOrder());
 		scopeSearchFacetDisplayContextBuilder.setPaginationStartParameterName(
 			_getPaginationStartParameterName(portletSharedSearchResponse));
 

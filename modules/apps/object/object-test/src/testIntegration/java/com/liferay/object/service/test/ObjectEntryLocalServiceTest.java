@@ -38,6 +38,7 @@ import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.field.util.ObjectFieldFormulaEvaluatorUtil;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -660,7 +661,7 @@ public class ObjectEntryLocalServiceTest {
 					"output", ObjectFieldConstants.BUSINESS_TYPE_TEXT)));
 
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				"com.liferay.object.service.impl.ObjectEntryLocalServiceImpl",
+				ObjectFieldFormulaEvaluatorUtil.class.getName(),
 				LoggerTestUtil.ERROR)) {
 
 			_addObjectEntry(
@@ -1737,7 +1738,8 @@ public class ObjectEntryLocalServiceTest {
 	public void testGetValuesList() throws Exception {
 		List<Map<String, Serializable>> valuesList =
 			_objectEntryLocalService.getValuesList(
-				_objectDefinition.getObjectDefinitionId(), 0, null, null, null,
+				0, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+				_objectDefinition.getObjectDefinitionId(), null, null,
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Assert.assertEquals(valuesList.toString(), 0, valuesList.size());
@@ -1754,7 +1756,8 @@ public class ObjectEntryLocalServiceTest {
 			).build());
 
 		valuesList = _objectEntryLocalService.getValuesList(
-			_objectDefinition.getObjectDefinitionId(), 0, null, null, null,
+			0, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(), null, null,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Assert.assertEquals(valuesList.toString(), 1, valuesList.size());
@@ -1784,7 +1787,8 @@ public class ObjectEntryLocalServiceTest {
 			).build());
 
 		valuesList = _objectEntryLocalService.getValuesList(
-			_objectDefinition.getObjectDefinitionId(), 0, null, null, null,
+			0, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(), null, null,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Assert.assertEquals(valuesList.toString(), 2, valuesList.size());
@@ -1821,7 +1825,8 @@ public class ObjectEntryLocalServiceTest {
 			).build());
 
 		valuesList = _objectEntryLocalService.getValuesList(
-			_objectDefinition.getObjectDefinitionId(), 0, null, null, null,
+			0, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(), null, null,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Assert.assertEquals(valuesList.toString(), 3, valuesList.size());
@@ -1859,8 +1864,9 @@ public class ObjectEntryLocalServiceTest {
 			values.toString(), expectedValuesSize, values.size());
 
 		valuesList = _objectEntryLocalService.getValuesList(
-			_irrelevantObjectDefinition.getObjectDefinitionId(), 0, null, null,
-			null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+			0, TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+			_irrelevantObjectDefinition.getObjectDefinitionId(), null, null,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Assert.assertEquals(valuesList.toString(), 0, valuesList.size());
 	}

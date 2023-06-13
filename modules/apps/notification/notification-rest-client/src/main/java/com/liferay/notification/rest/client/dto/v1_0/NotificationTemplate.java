@@ -58,6 +58,32 @@ public class NotificationTemplate implements Cloneable, Serializable {
 
 	protected Map<String, Map<String, String>> actions;
 
+	public String[] getAttachmentObjectFieldExternalReferenceCodes() {
+		return attachmentObjectFieldExternalReferenceCodes;
+	}
+
+	public void setAttachmentObjectFieldExternalReferenceCodes(
+		String[] attachmentObjectFieldExternalReferenceCodes) {
+
+		this.attachmentObjectFieldExternalReferenceCodes =
+			attachmentObjectFieldExternalReferenceCodes;
+	}
+
+	public void setAttachmentObjectFieldExternalReferenceCodes(
+		UnsafeSupplier<String[], Exception>
+			attachmentObjectFieldExternalReferenceCodesUnsafeSupplier) {
+
+		try {
+			attachmentObjectFieldExternalReferenceCodes =
+				attachmentObjectFieldExternalReferenceCodesUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String[] attachmentObjectFieldExternalReferenceCodes;
+
 	public Long[] getAttachmentObjectFieldIds() {
 		return attachmentObjectFieldIds;
 	}
@@ -194,6 +220,27 @@ public class NotificationTemplate implements Cloneable, Serializable {
 
 	protected EditorType editorType;
 
+	public String getExternalReferenceCode() {
+		return externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		this.externalReferenceCode = externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(
+		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
+
+		try {
+			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String externalReferenceCode;
+
 	public Long getId() {
 		return id;
 	}
@@ -253,6 +300,32 @@ public class NotificationTemplate implements Cloneable, Serializable {
 	}
 
 	protected Map<String, String> name_i18n;
+
+	public String getObjectDefinitionExternalReferenceCode() {
+		return objectDefinitionExternalReferenceCode;
+	}
+
+	public void setObjectDefinitionExternalReferenceCode(
+		String objectDefinitionExternalReferenceCode) {
+
+		this.objectDefinitionExternalReferenceCode =
+			objectDefinitionExternalReferenceCode;
+	}
+
+	public void setObjectDefinitionExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			objectDefinitionExternalReferenceCodeUnsafeSupplier) {
+
+		try {
+			objectDefinitionExternalReferenceCode =
+				objectDefinitionExternalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String objectDefinitionExternalReferenceCode;
 
 	public Long getObjectDefinitionId() {
 		return objectDefinitionId;

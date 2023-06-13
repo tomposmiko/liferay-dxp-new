@@ -14,6 +14,10 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.account.constants.AccountConstants;
+import com.liferay.account.model.AccountEntryOrganizationRelTable;
+import com.liferay.account.model.AccountEntryTable;
+import com.liferay.account.model.AccountEntryUserRelTable;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetLinkConstants;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
@@ -32,6 +36,7 @@ import com.liferay.object.configuration.ObjectConfiguration;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
+import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
@@ -50,6 +55,8 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectFilter;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.model.ObjectState;
+import com.liferay.object.model.ObjectStateFlow;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
@@ -58,6 +65,8 @@ import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
+import com.liferay.object.service.ObjectStateFlowLocalService;
+import com.liferay.object.service.ObjectStateLocalService;
 import com.liferay.object.service.base.ObjectEntryLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
@@ -80,6 +89,7 @@ import com.liferay.petra.sql.dsl.query.GroupByStep;
 import com.liferay.petra.sql.dsl.query.JoinStep;
 import com.liferay.petra.sql.dsl.query.sort.OrderByExpression;
 import com.liferay.petra.sql.dsl.spi.ast.DefaultASTNodeListener;
+import com.liferay.petra.sql.dsl.spi.expression.Scalar;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -98,15 +108,19 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.OrganizationTable;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.Users_OrgsTable;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -122,6 +136,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.ResourceLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
@@ -140,6 +155,7 @@ import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
+import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
@@ -211,7 +227,7 @@ public class ObjectEntryLocalServiceImpl
 		User user = _userLocalService.getUser(userId);
 
 		_validateValues(
-			user.isDefaultUser(), objectDefinitionId,
+			user.isDefaultUser(), objectDefinitionId, null,
 			objectDefinition.getPortletId(), serviceContext, userId, values);
 
 		_fillBusinessTypePicklistDefaultValue(
@@ -298,7 +314,8 @@ public class ObjectEntryLocalServiceImpl
 
 		_validateValues(
 			user.isDefaultUser(), objectDefinition.getObjectDefinitionId(),
-			objectDefinition.getClassName(), serviceContext, userId, values);
+			null, objectDefinition.getClassName(), serviceContext, userId,
+			values);
 
 		insertIntoOrUpdateExtensionTable(
 			objectDefinition.getObjectDefinitionId(), primaryKey, values);
@@ -887,7 +904,7 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public List<Map<String, Serializable>> getValuesList(
-			long objectDefinitionId, long groupId, long[] accountEntryIds,
+			long groupId, long companyId, long userId, long objectDefinitionId,
 			Predicate predicate, String search, int start, int end,
 			OrderByExpression[] orderByExpressions)
 		throws PortalException {
@@ -932,7 +949,7 @@ public class ObjectEntryLocalServiceImpl
 					}
 				).and(
 					_fillAccountEntriesPredicate(
-						objectDefinitionId, accountEntryIds)
+						companyId, userId, objectDefinitionId)
 				).and(
 					_fillPredicate(objectDefinitionId, predicate, search)
 				).and(
@@ -958,7 +975,7 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public int getValuesListCount(
-			long objectDefinitionId, long groupId, long[] accountEntryIds,
+			long groupId, long companyId, long userId, long objectDefinitionId,
 			Predicate predicate, String search)
 		throws PortalException {
 
@@ -994,7 +1011,7 @@ public class ObjectEntryLocalServiceImpl
 				}
 			).and(
 				_fillAccountEntriesPredicate(
-					objectDefinitionId, accountEntryIds)
+					companyId, userId, objectDefinitionId)
 			).and(
 				_fillPredicate(objectDefinitionId, predicate, search)
 			).and(
@@ -1151,7 +1168,8 @@ public class ObjectEntryLocalServiceImpl
 
 		_validateValues(
 			user.isDefaultUser(), objectEntry.getObjectDefinitionId(),
-			objectDefinition.getPortletId(), serviceContext, userId, values);
+			objectEntry, objectDefinition.getPortletId(), serviceContext,
+			userId, values);
 
 		Map<String, Serializable> transientValues = objectEntry.getValues();
 
@@ -1497,7 +1515,7 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private Predicate _fillAccountEntriesPredicate(
-			long objectDefinitionId, long[] accountEntryIds)
+			long companyId, long userId, long objectDefinitionId)
 		throws PortalException {
 
 		ObjectDefinition objectDefinition =
@@ -1516,7 +1534,89 @@ public class ObjectEntryLocalServiceImpl
 		Column<?, Long> column = (Column<?, Long>)table.getColumn(
 			objectField.getDBColumnName());
 
-		return column.in(ArrayUtil.toLongArray(accountEntryIds));
+		JoinStep joinStep = DSLQueryFactoryUtil.select(
+			AccountEntryTable.INSTANCE.accountEntryId
+		).from(
+			AccountEntryTable.INSTANCE
+		);
+
+		if (_roleLocalService.hasUserRole(
+				userId, companyId, RoleConstants.ADMINISTRATOR, true)) {
+
+			return column.in(
+				joinStep.where(
+					AccountEntryTable.INSTANCE.companyId.eq(
+						companyId
+					).and(
+						AccountEntryTable.INSTANCE.status.eq(
+							WorkflowConstants.STATUS_APPROVED)
+					)));
+		}
+
+		Table<OrganizationTable> tempOrganizationTable =
+			DSLQueryFactoryUtil.select(
+				OrganizationTable.INSTANCE.companyId,
+				OrganizationTable.INSTANCE.treePath
+			).from(
+				OrganizationTable.INSTANCE
+			).innerJoinON(
+				Users_OrgsTable.INSTANCE,
+				Users_OrgsTable.INSTANCE.organizationId.eq(
+					OrganizationTable.INSTANCE.organizationId)
+			).where(
+				Users_OrgsTable.INSTANCE.userId.eq(userId)
+			).as(
+				"tempOrganizationTable", OrganizationTable.INSTANCE
+			);
+
+		return column.in(
+			joinStep.innerJoinON(
+				AccountEntryOrganizationRelTable.INSTANCE,
+				AccountEntryOrganizationRelTable.INSTANCE.accountEntryId.eq(
+					AccountEntryTable.INSTANCE.accountEntryId)
+			).where(
+				AccountEntryOrganizationRelTable.INSTANCE.organizationId.in(
+					DSLQueryFactoryUtil.selectDistinct(
+						OrganizationTable.INSTANCE.organizationId
+					).from(
+						OrganizationTable.INSTANCE
+					).innerJoinON(
+						tempOrganizationTable,
+						OrganizationTable.INSTANCE.companyId.eq(
+							tempOrganizationTable.getColumn(
+								"companyId", Long.class)
+						).and(
+							OrganizationTable.INSTANCE.treePath.like(
+								DSLFunctionFactoryUtil.concat(
+									DSLFunctionFactoryUtil.castText(
+										tempOrganizationTable.getColumn(
+											"treePath", String.class)),
+									new Scalar<>(StringPool.PERCENT)))
+						)
+					)
+				).and(
+					_getAccountEntryWherePredicate()
+				)
+			).union(
+				joinStep.where(
+					AccountEntryTable.INSTANCE.userId.eq(
+						userId
+					).and(
+						_getAccountEntryWherePredicate()
+					))
+			).union(
+				joinStep.innerJoinON(
+					AccountEntryUserRelTable.INSTANCE,
+					AccountEntryUserRelTable.INSTANCE.accountEntryId.eq(
+						AccountEntryTable.INSTANCE.accountEntryId)
+				).where(
+					AccountEntryUserRelTable.INSTANCE.accountUserId.eq(
+						userId
+					).and(
+						_getAccountEntryWherePredicate()
+					)
+				)
+			));
 	}
 
 	private void _fillBusinessTypePicklistDefaultValue(
@@ -1586,6 +1686,21 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		return predicate.and(searchPredicate.withParentheses());
+	}
+
+	private Predicate _getAccountEntryWherePredicate() {
+		return AccountEntryTable.INSTANCE.parentAccountEntryId.eq(
+			AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT
+		).and(
+			AccountEntryTable.INSTANCE.status.eq(
+				WorkflowConstants.STATUS_APPROVED)
+		).and(
+			AccountEntryTable.INSTANCE.type.in(
+				new String[] {
+					AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
+					AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON
+				})
+		);
 	}
 
 	private DLFolder _getDLFolder(
@@ -2182,6 +2297,17 @@ public class ObjectEntryLocalServiceImpl
 			List<String> oDataFilterStrings = TransformUtil.transform(
 				(List<ObjectFilter>)objectFieldSettingsValues.get("filters"),
 				objectFilter -> {
+					if (StringUtil.equals(
+							objectFilter.getFilterType(),
+							ObjectFilterConstants.TYPE_CURRENT_USER)) {
+
+						objectFilter.setJSON(
+							JSONUtil.put(
+								"currentUserId",
+								PrincipalThreadLocal.getUserId()
+							).toString());
+					}
+
 					ObjectFilterParser objectFilterParser =
 						_objectFilterParserServiceRegistry.
 							getObjectFilterParser(objectFilter.getFilterType());
@@ -2663,7 +2789,12 @@ public class ObjectEntryLocalServiceImpl
 			// Remove the first [ and the last ] in
 			// "[pickListEntryKey1, pickListEntryKey2, pickListEntryKey3]"
 
-			valueString = valueString.substring(1, valueString.length() - 1);
+			if (StringUtil.endsWith(valueString, StringPool.CLOSE_BRACKET) &&
+				StringUtil.startsWith(valueString, StringPool.OPEN_BRACKET)) {
+
+				valueString = valueString.substring(
+					1, valueString.length() - 1);
+			}
 
 			_setColumn(
 				preparedStatement, index, column.getSQLType(), valueString);
@@ -2777,8 +2908,12 @@ public class ObjectEntryLocalServiceImpl
 			_objectDefinitionPersistence.findByPrimaryKey(
 				objectEntry.getObjectDefinitionId());
 
+		boolean workflowEnabled = WorkflowThreadLocal.isEnabled();
+
 		try {
 			_skipModelListeners.set(true);
+
+			WorkflowThreadLocal.setEnabled(true);
 
 			WorkflowHandlerRegistryUtil.startWorkflowInstance(
 				objectEntry.getCompanyId(), objectEntry.getNonzeroGroupId(),
@@ -2787,6 +2922,8 @@ public class ObjectEntryLocalServiceImpl
 		}
 		finally {
 			_skipModelListeners.set(false);
+
+			WorkflowThreadLocal.setEnabled(workflowEnabled);
 		}
 	}
 
@@ -2982,6 +3119,55 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	private void _validateObjectStateTransition(
+			Map.Entry<String, Serializable> entry, long listTypeDefinitionId,
+			ObjectEntry objectEntry, long objectFieldId)
+		throws PortalException {
+
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		ListTypeEntry originalListTypeEntry =
+			_listTypeEntryLocalService.getListTypeEntry(
+				listTypeDefinitionId,
+				_getValue(String.valueOf(values.get(entry.getKey()))));
+
+		ObjectStateFlow objectStateFlow =
+			_objectStateFlowLocalService.fetchObjectFieldObjectStateFlow(
+				objectFieldId);
+
+		ObjectState sourceObjectState =
+			_objectStateLocalService.getObjectStateFlowObjectState(
+				originalListTypeEntry.getListTypeEntryId(),
+				objectStateFlow.getObjectStateFlowId());
+
+		ListTypeEntry listTypeEntry =
+			_listTypeEntryLocalService.getListTypeEntry(
+				listTypeDefinitionId, String.valueOf(entry.getValue()));
+
+		boolean invalidObjectStateTransition = true;
+
+		for (ObjectState nextObjectState :
+				_objectStateLocalService.getNextObjectStates(
+					sourceObjectState.getObjectStateId())) {
+
+			if (nextObjectState.getListTypeEntryId() ==
+					listTypeEntry.getListTypeEntryId()) {
+
+				invalidObjectStateTransition = false;
+			}
+		}
+
+		if (invalidObjectStateTransition) {
+			ObjectState targetObjectState =
+				_objectStateLocalService.getObjectStateFlowObjectState(
+					listTypeEntry.getListTypeEntryId(),
+					objectStateFlow.getObjectStateFlowId());
+
+			throw new ObjectEntryValuesException.InvalidObjectStateTransition(
+				sourceObjectState, targetObjectState);
+		}
+	}
+
 	private void _validateOneToOneInsert(
 			String dbColumnName, long dbColumnValue,
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable)
@@ -3079,21 +3265,22 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _validateValues(
-			boolean defaultUser, long objectDefinitionId, String portletId,
+			boolean defaultUser, long objectDefinitionId,
+			ObjectEntry objectEntry, String portletId,
 			ServiceContext serviceContext, long userId,
 			Map<String, Serializable> values)
 		throws PortalException {
 
 		for (Map.Entry<String, Serializable> entry : values.entrySet()) {
 			_validateValues(
-				defaultUser, entry, objectDefinitionId, portletId,
+				defaultUser, entry, objectDefinitionId, objectEntry, portletId,
 				serviceContext, userId, values);
 		}
 	}
 
 	private void _validateValues(
 			boolean defaultUser, Map.Entry<String, Serializable> entry,
-			long objectDefinitionId, String portletId,
+			long objectDefinitionId, ObjectEntry objectEntry, String portletId,
 			ServiceContext serviceContext, long userId,
 			Map<String, Serializable> values)
 		throws PortalException {
@@ -3234,6 +3421,12 @@ public class ObjectEntryLocalServiceImpl
 				throw new ObjectEntryValuesException.ListTypeEntry(
 					entry.getKey());
 			}
+
+			if ((objectEntry != null) && objectField.isState()) {
+				_validateObjectStateTransition(
+					entry, objectField.getListTypeDefinitionId(), objectEntry,
+					objectField.getObjectFieldId());
+			}
 		}
 	}
 
@@ -3325,6 +3518,12 @@ public class ObjectEntryLocalServiceImpl
 	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 	@Reference
+	private ObjectStateFlowLocalService _objectStateFlowLocalService;
+
+	@Reference
+	private ObjectStateLocalService _objectStateLocalService;
+
+	@Reference
 	private PersistedModelLocalServiceRegistry
 		_persistedModelLocalServiceRegistry;
 
@@ -3333,6 +3532,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private ResourceLocalService _resourceLocalService;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private Searcher _searcher;

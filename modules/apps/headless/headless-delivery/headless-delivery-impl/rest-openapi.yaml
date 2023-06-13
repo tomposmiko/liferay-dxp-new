@@ -2921,6 +2921,10 @@ components:
                     items:
                         type: string
                     type: array
+                lastPostDate:
+                    format: date-time
+                    readOnly: true
+                    type: string
                 locked:
                     # @review
                     description:
@@ -5038,7 +5042,7 @@ components:
                     # @review
                     description:
                         The utility page template type.
-                    enum: [Error, TermsOfUse]
+                    enum: [Error, ErrorCode404, TermsOfUse]
                     type: string
             type: object
         WidgetInstance:
@@ -5351,7 +5355,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.delivery.client', and version '4.0.43'."
+        'com.liferay.headless.delivery.client', and version '4.0.44'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"

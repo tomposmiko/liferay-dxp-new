@@ -30,6 +30,8 @@ import React, {useEffect, useMemo, useState} from 'react';
 import ActionBuilder from './tabs/ActionBuilder';
 import BasicInfo from './tabs/BasicInfo';
 
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
+
 const REQUIRED_MSG = Liferay.Language.get('required');
 
 const TABS = [
@@ -38,6 +40,7 @@ const TABS = [
 ];
 
 export default function Action({
+	isApproved,
 	objectAction: initialValues,
 	objectActionCodeEditorElements,
 	objectActionExecutors,
@@ -144,8 +147,11 @@ export default function Action({
 			<ClayTabs.Content activeIndex={activeIndex} fade>
 				<ClayTabs.TabPane>
 					<BasicInfo
-						errors={errors}
+						errors={
+							Object.keys(errors).length ? errors : backEndErrors
+						}
 						handleChange={handleChange}
+						isApproved={isApproved!}
 						readOnly={readOnly}
 						setValues={setValues}
 						values={values}
@@ -157,6 +163,7 @@ export default function Action({
 						errors={
 							Object.keys(errors).length ? errors : backEndErrors
 						}
+						isApproved={isApproved!}
 						objectActionCodeEditorElements={
 							objectActionCodeEditorElements
 						}
@@ -194,6 +201,14 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 
 	const validate = (values: Partial<ObjectAction>) => {
 		const errors: ActionError = {};
+
+		if (
+			Liferay.FeatureFlags['LPS-148804'] &&
+			invalidateRequired(values.label?.[defaultLanguageId])
+		) {
+			errors.label = REQUIRED_MSG;
+		}
+
 		if (invalidateRequired(values.name)) {
 			errors.name = REQUIRED_MSG;
 		}
@@ -246,6 +261,12 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 				});
 			}
 		}
+		else if (
+			values.objectActionTriggerKey === 'standalone' &&
+			invalidateRequired(values.errorMessage?.[defaultLanguageId])
+		) {
+			errors.errorMessage = REQUIRED_MSG;
+		}
 
 		if (
 			typeof values.conditionExpression === 'string' &&
@@ -297,6 +318,7 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 }
 
 interface IProps {
+	isApproved?: boolean;
 	objectAction: Partial<ObjectAction>;
 	objectActionCodeEditorElements: SidebarCategory[];
 	objectActionExecutors: CustomItem[];
