@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
@@ -805,6 +807,38 @@ public abstract class BaseBuild implements Build {
 		return longestRunningTest;
 	}
 
+	public Map<String, String> getMetricLabels() {
+		if (_parentBuild != null) {
+			return _parentBuild.getMetricLabels();
+		}
+
+		return new TreeMap<>();
+	}
+
+	@Override
+	public List<Build> getModifiedDownstreamBuilds() {
+		return getModifiedDownstreamBuildsByStatus(null);
+	}
+
+	@Override
+	public List<Build> getModifiedDownstreamBuildsByStatus(String status) {
+		List<Build> modifiedDownstreamBuilds = new ArrayList<>();
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			if (downstreamBuild.isBuildModified() ||
+				downstreamBuild.hasModifiedDownstreamBuilds()) {
+
+				modifiedDownstreamBuilds.add(downstreamBuild);
+			}
+		}
+
+		if (status != null) {
+			modifiedDownstreamBuilds.retainAll(getDownstreamBuilds(status));
+		}
+
+		return modifiedDownstreamBuilds;
+	}
+
 	@Override
 	public String getOperatingSystem() {
 		return null;
@@ -876,6 +910,15 @@ public abstract class BaseBuild implements Build {
 	@Override
 	public long getStatusAge() {
 		return System.currentTimeMillis() - statusModifiedTime;
+	}
+
+	@Override
+	public long getStatusDuration(String status) {
+		if (statusDurations.containsKey(status)) {
+			return statusDurations.get(status);
+		}
+
+		return 0;
 	}
 
 	@Override
@@ -1057,10 +1100,40 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public int getTotalSlavesUsedCount() {
+		return getTotalSlavesUsedCount(null, false);
+	}
+
+	@Override
+	public int getTotalSlavesUsedCount(
+		String status, boolean modifiedBuildsOnly) {
+
+		return getTotalSlavesUsedCount(status, modifiedBuildsOnly, false);
+	}
+
+	@Override
+	public int getTotalSlavesUsedCount(
+		String status, boolean modifiedBuildsOnly, boolean ignoreCurrentBuild) {
+
 		int totalSlavesUsedCount = 1;
 
-		for (Build downstreamBuild : getDownstreamBuilds(null)) {
-			totalSlavesUsedCount += downstreamBuild.getTotalSlavesUsedCount();
+		if (ignoreCurrentBuild || (modifiedBuildsOnly && !isBuildModified()) ||
+			((status != null) && !_status.equals(status))) {
+
+			totalSlavesUsedCount = 0;
+		}
+
+		List<Build> downstreamBuilds;
+
+		if (modifiedBuildsOnly) {
+			downstreamBuilds = getModifiedDownstreamBuildsByStatus(status);
+		}
+		else {
+			downstreamBuilds = getDownstreamBuilds(status);
+		}
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			totalSlavesUsedCount += downstreamBuild.getTotalSlavesUsedCount(
+				status, modifiedBuildsOnly);
 		}
 
 		return totalSlavesUsedCount;
@@ -1082,8 +1155,19 @@ public abstract class BaseBuild implements Build {
 		if (thisBuildURL != null) {
 			thisBuildURL = JenkinsResultsParserUtil.getLocalURL(thisBuildURL);
 
-			if (thisBuildURL.equals(buildURL)) {
-				return true;
+			try {
+				if (URLCompareUtil.matches(
+						new URL(buildURL), new URL(thisBuildURL))) {
+
+					return true;
+				}
+			}
+			catch (MalformedURLException murle) {
+				throw new RuntimeException(
+					JenkinsResultsParserUtil.combine(
+						"Unable to compare urls ", buildURL, " and ",
+						thisBuildURL),
+					murle);
 			}
 		}
 
@@ -1094,6 +1178,22 @@ public abstract class BaseBuild implements Build {
 		}
 
 		return false;
+	}
+
+	@Override
+	public boolean hasModifiedDownstreamBuilds() {
+		for (Build downstreamBuild : downstreamBuilds) {
+			if (downstreamBuild.isBuildModified()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isBuildModified() {
+		return !_status.equals(_previousStatus);
 	}
 
 	@Override
@@ -1264,7 +1364,11 @@ public abstract class BaseBuild implements Build {
 	public void update() {
 		String status = getStatus();
 
-		if (!status.equals("completed")) {
+		if ((status.equals("completed") && isBuildModified()) ||
+			!status.equals("completed")) {
+
+			_previousStatus = _status;
+
 			try {
 				if (status.equals("missing") || status.equals("queued") ||
 					status.equals("starting")) {
@@ -1291,8 +1395,6 @@ public abstract class BaseBuild implements Build {
 						}
 					}
 				}
-
-				status = getStatus();
 
 				if (downstreamBuilds != null) {
 					List<Callable<Object>> callables = new ArrayList<>();
@@ -2360,7 +2462,13 @@ public abstract class BaseBuild implements Build {
 		if (_isDifferent(status, _status)) {
 			_status = status;
 
+			long previousStatusModifiedTime = statusModifiedTime;
+
 			statusModifiedTime = System.currentTimeMillis();
+
+			statusDurations.put(
+				_previousStatus,
+				statusModifiedTime - previousStatusModifiedTime);
 
 			if (isParentBuildRoot()) {
 				System.out.println(getBuildMessage());
@@ -2436,6 +2544,7 @@ public abstract class BaseBuild implements Build {
 	protected List<SlaveOfflineRule> slaveOfflineRules =
 		SlaveOfflineRule.getSlaveOfflineRules();
 	protected Long startTime;
+	protected Map<String, Long> statusDurations = new HashMap<>();
 	protected long statusModifiedTime;
 	protected Element upstreamJobFailureMessageElement;
 
@@ -2595,6 +2704,7 @@ public abstract class BaseBuild implements Build {
 	private JenkinsSlave _jenkinsSlave;
 	private Map<String, String> _parameters = new HashMap<>();
 	private final Build _parentBuild;
+	private String _previousStatus;
 	private String _result;
 	private String _status;
 

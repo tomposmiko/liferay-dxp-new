@@ -23,8 +23,10 @@ import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.service.base.FragmentEntryLocalServiceBaseImpl;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -32,6 +34,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
@@ -336,6 +339,29 @@ public class FragmentEntryLocalServiceImpl
 			userId, groupId, fragmentCollectionId, fragmentEntryKey, name, css,
 			html, js, previewFileEntryId,
 			FragmentEntryTypeConstants.TYPE_SECTION, status, serviceContext);
+	}
+
+	@Override
+	public FragmentEntry copyFragmentEntry(
+			long userId, long groupId, long fragmentEntryId,
+			long fragmentCollectionId, ServiceContext serviceContext)
+		throws PortalException {
+
+		FragmentEntry fragmentEntry = getFragmentEntry(fragmentEntryId);
+
+		StringBundler sb = new StringBundler(5);
+
+		sb.append(fragmentEntry.getName());
+		sb.append(StringPool.SPACE);
+		sb.append(StringPool.OPEN_PARENTHESIS);
+		sb.append(LanguageUtil.get(LocaleUtil.getMostRelevantLocale(), "copy"));
+		sb.append(StringPool.CLOSE_PARENTHESIS);
+
+		return addFragmentEntry(
+			userId, groupId, fragmentCollectionId, null, sb.toString(),
+			fragmentEntry.getCss(), fragmentEntry.getHtml(),
+			fragmentEntry.getJs(), fragmentEntry.getPreviewFileEntryId(),
+			fragmentEntry.getType(), fragmentEntry.getStatus(), serviceContext);
 	}
 
 	@Override

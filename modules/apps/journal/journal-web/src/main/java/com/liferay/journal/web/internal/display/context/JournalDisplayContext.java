@@ -42,7 +42,7 @@ import com.liferay.journal.web.internal.portlet.action.ActionUtil;
 import com.liferay.journal.web.internal.search.EntriesChecker;
 import com.liferay.journal.web.internal.search.EntriesMover;
 import com.liferay.journal.web.internal.search.JournalSearcher;
-import com.liferay.journal.web.internal.servlet.taglib.util.JournalArticleActionDropdownItems;
+import com.liferay.journal.web.internal.servlet.taglib.util.JournalArticleActionDropdownItemsProvider;
 import com.liferay.journal.web.internal.servlet.taglib.util.JournalFolderActionDropdownItems;
 import com.liferay.journal.web.util.JournalPortletUtil;
 import com.liferay.message.boards.model.MBMessage;
@@ -176,12 +176,13 @@ public class JournalDisplayContext {
 			JournalArticle article)
 		throws Exception {
 
-		JournalArticleActionDropdownItems articleActionDropdownItems =
-			new JournalArticleActionDropdownItems(
-				article, _liferayPortletRequest, _liferayPortletResponse,
-				_trashHelper);
+		JournalArticleActionDropdownItemsProvider
+			articleActionDropdownItemsProvider =
+				new JournalArticleActionDropdownItemsProvider(
+					article, _liferayPortletRequest, _liferayPortletResponse,
+					_trashHelper);
 
-		return articleActionDropdownItems.getActionDropdownItems();
+		return articleActionDropdownItemsProvider.getActionDropdownItems();
 	}
 
 	public JournalArticleDisplay getArticleDisplay() throws Exception {
@@ -215,12 +216,13 @@ public class JournalDisplayContext {
 			JournalArticle article)
 		throws Exception {
 
-		JournalArticleActionDropdownItems articleActionDropdownItems =
-			new JournalArticleActionDropdownItems(
-				article, _liferayPortletRequest, _liferayPortletResponse,
-				_trashHelper);
+		JournalArticleActionDropdownItemsProvider
+			articleActionDropdownItemsProvider =
+				new JournalArticleActionDropdownItemsProvider(
+					article, _liferayPortletRequest, _liferayPortletResponse,
+					_trashHelper);
 
-		return articleActionDropdownItems.
+		return articleActionDropdownItemsProvider.
 			getArticleHistoryActionDropdownItems();
 	}
 
@@ -235,12 +237,13 @@ public class JournalDisplayContext {
 			JournalArticle article)
 		throws Exception {
 
-		JournalArticleActionDropdownItems articleActionDropdownItems =
-			new JournalArticleActionDropdownItems(
-				article, _liferayPortletRequest, _liferayPortletResponse,
-				_trashHelper);
+		JournalArticleActionDropdownItemsProvider
+			articleActionDropdownItemsProvider =
+				new JournalArticleActionDropdownItemsProvider(
+					article, _liferayPortletRequest, _liferayPortletResponse,
+					_trashHelper);
 
-		return articleActionDropdownItems.
+		return articleActionDropdownItemsProvider.
 			getArticleVersionActionDropdownItems();
 	}
 
@@ -297,6 +300,16 @@ public class JournalDisplayContext {
 			getCommentsSearchContainer();
 
 		return commentsSearchContainer.getTotal();
+	}
+
+	public Map<String, Object> getComponentContext() throws Exception {
+		Map<String, Object> componentContext = new HashMap<>();
+
+		componentContext.put(
+			"trashEnabled",
+			_trashHelper.isTrashEnabled(_themeDisplay.getScopeGroupId()));
+
+		return componentContext;
 	}
 
 	public String getDDMStructureKey() {
@@ -395,13 +408,6 @@ public class JournalDisplayContext {
 			_displayStyle = portalPreferences.getValue(
 				JournalPortletKeys.JOURNAL, "display-style",
 				_journalWebConfiguration.defaultDisplayView());
-		}
-		else if (ArrayUtil.contains(displayViews, _displayStyle)) {
-			portalPreferences.setValue(
-				JournalPortletKeys.JOURNAL, "display-style", _displayStyle);
-
-			_request.setAttribute(
-				WebKeys.SINGLE_PAGE_APPLICATION_CLEAR_CACHE, Boolean.TRUE);
 		}
 
 		if (!ArrayUtil.contains(displayViews, _displayStyle)) {

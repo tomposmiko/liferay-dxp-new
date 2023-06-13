@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.Optional;
@@ -48,35 +49,24 @@ public class BuildRESTTask extends JavaExec {
 		return GradleUtil.toFile(getProject(), _copyrightFile);
 	}
 
-	@InputFile
-	@Optional
-	public File getRESTConfigFile() {
-		return GradleUtil.toFile(getProject(), _restConfigFile);
-	}
-
-	@InputFile
-	public File getRESTOpenAPIFile() {
-		return GradleUtil.toFile(getProject(), _restOpenAPIFile);
+	@InputDirectory
+	public File getRESTConfigDir() {
+		return GradleUtil.toFile(getProject(), _restConfigDir);
 	}
 
 	public void setCopyrightFile(Object copyrightFile) {
 		_copyrightFile = copyrightFile;
 	}
 
-	public void setRESTConfigFile(Object restConfigFile) {
-		_restConfigFile = restConfigFile;
-	}
-
-	public void setRESTOpenAPIFile(Object restOpenAPIFile) {
-		_restOpenAPIFile = restOpenAPIFile;
+	public void setRESTConfigDir(Object restConfigDir) {
+		_restConfigDir = restConfigDir;
 	}
 
 	private List<String> _getCompleteArgs() {
 		List<String> args = new ArrayList<>(getArgs());
 
 		args.add("copyright.file=" + _relativize(getCopyrightFile()));
-		args.add("rest.config.file=" + _relativize(getRESTConfigFile()));
-		args.add("rest.openapi.file=" + _relativize(getRESTOpenAPIFile()));
+		args.add("rest.config.dir=" + _relativize(getRESTConfigDir()));
 
 		return args;
 	}
@@ -92,7 +82,6 @@ public class BuildRESTTask extends JavaExec {
 	}
 
 	private Object _copyrightFile;
-	private Object _restConfigFile;
-	private Object _restOpenAPIFile;
+	private Object _restConfigDir;
 
 }

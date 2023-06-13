@@ -33,6 +33,12 @@ import com.liferay.portal.search.elasticsearch6.internal.facet.FacetCollectorFac
 import com.liferay.portal.search.elasticsearch6.internal.facet.FacetUtil;
 import com.liferay.portal.search.elasticsearch6.internal.groupby.GroupByTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.stats.StatsTranslator;
+import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
+import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.legacy.stats.StatsRequestBuilderFactory;
+import com.liferay.portal.search.legacy.stats.StatsResultsTranslator;
+import com.liferay.portal.search.stats.StatsRequest;
+import com.liferay.portal.search.stats.StatsRequestBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,29 +66,37 @@ public class DefaultSearchResponseTranslator
 	implements SearchResponseTranslator {
 
 	@Override
-	public Hits translate(
-		SearchResponse searchResponse, Map<String, Facet> facetMap,
-		GroupBy groupBy, Map<String, Stats> statsMap,
-		String alternateUidFieldName, String[] highlightFieldNames,
-		Locale locale) {
+	public void populate(
+		SearchSearchResponse searchSearchResponse,
+		SearchResponse searchResponse,
+		SearchSearchRequest searchSearchRequest) {
 
 		SearchHits searchHits = searchResponse.getHits();
 
 		Hits hits = new HitsImpl();
 
-		updateFacetCollectors(searchResponse, facetMap);
+		updateFacetCollectors(searchResponse, searchSearchRequest.getFacets());
+
 		updateGroupedHits(
-			searchResponse, groupBy, hits, alternateUidFieldName,
-			highlightFieldNames, locale);
-		updateStatsResults(searchResponse, hits, statsMap);
+			searchResponse, searchSearchRequest.getGroupBy(), hits,
+			searchSearchRequest.getAlternateUidFieldName(),
+			searchSearchRequest.getHighlightFieldNames(),
+			searchSearchRequest.getLocale());
+
+		updateStatsResults(
+			hits, searchResponse.getAggregations(),
+			searchSearchRequest.getStats());
 
 		TimeValue timeValue = searchResponse.getTook();
 
 		hits.setSearchTime((float)timeValue.getSecondsFrac());
 
-		return processSearchHits(
-			searchHits, hits, alternateUidFieldName, highlightFieldNames,
-			locale);
+		processSearchHits(
+			searchHits, hits, searchSearchRequest.getAlternateUidFieldName(),
+			searchSearchRequest.getHighlightFieldNames(),
+			searchSearchRequest.getLocale());
+
+		searchSearchResponse.setHits(hits);
 	}
 
 	protected void addSnippets(
@@ -139,6 +153,14 @@ public class DefaultSearchResponseTranslator
 			aggregationsMap.get(FacetUtil.getAggregationName(facet)));
 	}
 
+	protected StatsResults getStatsResults(
+		Map<String, Aggregation> aggregationsMap, Stats stats) {
+
+		return _statsResultsTranslator.translate(
+			_statsTranslator.translateResponse(
+				aggregationsMap, translate(stats)));
+	}
+
 	protected void populateUID(
 		Document document, String alternateUidFieldName) {
 
@@ -164,7 +186,7 @@ public class DefaultSearchResponseTranslator
 	protected Document processSearchHit(
 		SearchHit searchHit, String alternateUidFieldName) {
 
-		Document document = searchHitDocumentTranslator.translate(searchHit);
+		Document document = _searchHitDocumentTranslator.translate(searchHit);
 
 		populateUID(document, alternateUidFieldName);
 
@@ -199,6 +221,39 @@ public class DefaultSearchResponseTranslator
 		hits.setScores(ArrayUtil.toFloatArray(scores));
 
 		return hits;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchHitDocumentTranslator(
+		SearchHitDocumentTranslator searchHitDocumentTranslator) {
+
+		_searchHitDocumentTranslator = searchHitDocumentTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setStatsRequestBuilderFactory(
+		StatsRequestBuilderFactory statsRequestBuilderFactory) {
+
+		_statsRequestBuilderFactory = statsRequestBuilderFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setStatsResultsTranslator(
+		StatsResultsTranslator statsResultsTranslator) {
+
+		_statsResultsTranslator = statsResultsTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setStatsTranslator(StatsTranslator statsTranslator) {
+		_statsTranslator = statsTranslator;
+	}
+
+	protected StatsRequest translate(Stats stats) {
+		StatsRequestBuilder statsRequestBuilder =
+			_statsRequestBuilderFactory.getStatsRequestBuilder(stats);
+
+		return statsRequestBuilder.build();
 	}
 
 	protected void updateFacetCollectors(
@@ -259,36 +314,27 @@ public class DefaultSearchResponseTranslator
 	}
 
 	protected void updateStatsResults(
-		SearchResponse searchResponse, Hits hits, Map<String, Stats> statsMap) {
+		Hits hits, Aggregations aggregations, Map<String, Stats> statsMap) {
 
-		if ((statsMap == null) || statsMap.isEmpty()) {
-			return;
-		}
-
-		Aggregations aggregations = searchResponse.getAggregations();
-
-		if (aggregations == null) {
-			return;
-		}
-
-		Map<String, Aggregation> aggregationsMap = aggregations.getAsMap();
-
-		for (Stats stats : statsMap.values()) {
-			if (!stats.isEnabled()) {
-				continue;
-			}
-
-			StatsResults statsResults = statsTranslator.translate(
-				aggregationsMap, stats);
-
-			hits.addStatsResults(statsResults);
+		if (aggregations != null) {
+			updateStatsResults(hits, aggregations.getAsMap(), statsMap);
 		}
 	}
 
-	@Reference
-	protected SearchHitDocumentTranslator searchHitDocumentTranslator;
+	protected void updateStatsResults(
+		Hits hits, Map<String, Aggregation> aggregationsMap,
+		Map<String, Stats> statsMap) {
 
-	@Reference
-	protected StatsTranslator statsTranslator;
+		if (!MapUtil.isEmpty(statsMap)) {
+			for (Stats stats : statsMap.values()) {
+				hits.addStatsResults(getStatsResults(aggregationsMap, stats));
+			}
+		}
+	}
+
+	private SearchHitDocumentTranslator _searchHitDocumentTranslator;
+	private StatsRequestBuilderFactory _statsRequestBuilderFactory;
+	private StatsResultsTranslator _statsResultsTranslator;
+	private StatsTranslator _statsTranslator;
 
 }

@@ -1803,6 +1803,19 @@ public class LayoutStagedModelDataHandler
 			layoutElement.addAttribute(
 				"layout-prototype-name",
 				layoutPrototype.getName(LocaleUtil.getDefault()));
+
+			boolean layoutPrototypeGlobal = false;
+
+			Group companyGroup = _groupLocalService.getCompanyGroup(
+				layoutPrototype.getCompanyId());
+
+			if (layoutPrototype.getGroupId() == companyGroup.getGroupId()) {
+				layoutPrototypeGlobal = true;
+			}
+
+			layoutElement.addAttribute(
+				"layout-prototype-global",
+				String.valueOf(layoutPrototypeGlobal));
 		}
 	}
 

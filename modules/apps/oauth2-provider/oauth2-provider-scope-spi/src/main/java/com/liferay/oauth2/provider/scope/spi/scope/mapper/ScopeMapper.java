@@ -28,7 +28,7 @@ import java.util.Set;
 @ProviderType
 public interface ScopeMapper {
 
-	public static final ScopeMapper PASSTHROUGH_SCOPEMAPPER =
+	public static final ScopeMapper PASS_THROUGH_SCOPE_MAPPER =
 		Collections::singleton;
 
 	/**

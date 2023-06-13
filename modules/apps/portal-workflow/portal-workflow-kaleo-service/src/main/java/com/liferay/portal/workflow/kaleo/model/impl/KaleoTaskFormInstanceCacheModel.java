@@ -20,6 +20,7 @@ import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance;
 
 import java.io.Externalizable;
@@ -33,12 +34,11 @@ import java.util.Date;
  * The cache model class for representing KaleoTaskFormInstance in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoTaskFormInstance
  * @generated
  */
 @ProviderType
 public class KaleoTaskFormInstanceCacheModel implements CacheModel<KaleoTaskFormInstance>,
-	Externalizable {
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -51,7 +51,8 @@ public class KaleoTaskFormInstanceCacheModel implements CacheModel<KaleoTaskForm
 
 		KaleoTaskFormInstanceCacheModel kaleoTaskFormInstanceCacheModel = (KaleoTaskFormInstanceCacheModel)obj;
 
-		if (kaleoTaskFormInstanceId == kaleoTaskFormInstanceCacheModel.kaleoTaskFormInstanceId) {
+		if ((kaleoTaskFormInstanceId == kaleoTaskFormInstanceCacheModel.kaleoTaskFormInstanceId) &&
+				(mvccVersion == kaleoTaskFormInstanceCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -60,14 +61,28 @@ public class KaleoTaskFormInstanceCacheModel implements CacheModel<KaleoTaskForm
 
 	@Override
 	public int hashCode() {
-		return HashUtil.hash(0, kaleoTaskFormInstanceId);
+		int hashCode = HashUtil.hash(0, kaleoTaskFormInstanceId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
+	public long getMvccVersion() {
+		return mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		this.mvccVersion = mvccVersion;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(35);
+		StringBundler sb = new StringBundler(37);
 
-		sb.append("{kaleoTaskFormInstanceId=");
+		sb.append("{mvccVersion=");
+		sb.append(mvccVersion);
+		sb.append(", kaleoTaskFormInstanceId=");
 		sb.append(kaleoTaskFormInstanceId);
 		sb.append(", groupId=");
 		sb.append(groupId);
@@ -110,6 +125,7 @@ public class KaleoTaskFormInstanceCacheModel implements CacheModel<KaleoTaskForm
 	public KaleoTaskFormInstance toEntityModel() {
 		KaleoTaskFormInstanceImpl kaleoTaskFormInstanceImpl = new KaleoTaskFormInstanceImpl();
 
+		kaleoTaskFormInstanceImpl.setMvccVersion(mvccVersion);
 		kaleoTaskFormInstanceImpl.setKaleoTaskFormInstanceId(kaleoTaskFormInstanceId);
 		kaleoTaskFormInstanceImpl.setGroupId(groupId);
 		kaleoTaskFormInstanceImpl.setCompanyId(companyId);
@@ -173,6 +189,8 @@ public class KaleoTaskFormInstanceCacheModel implements CacheModel<KaleoTaskForm
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
+		mvccVersion = objectInput.readLong();
+
 		kaleoTaskFormInstanceId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
@@ -205,6 +223,8 @@ public class KaleoTaskFormInstanceCacheModel implements CacheModel<KaleoTaskForm
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
+		objectOutput.writeLong(mvccVersion);
+
 		objectOutput.writeLong(kaleoTaskFormInstanceId);
 
 		objectOutput.writeLong(groupId);
@@ -259,6 +279,7 @@ public class KaleoTaskFormInstanceCacheModel implements CacheModel<KaleoTaskForm
 		}
 	}
 
+	public long mvccVersion;
 	public long kaleoTaskFormInstanceId;
 	public long groupId;
 	public long companyId;

@@ -16,10 +16,11 @@ package com.liferay.journal.change.tracking.internal.configuration;
 
 import com.liferay.change.tracking.configuration.CTConfigurationRegistrar;
 import com.liferay.change.tracking.configuration.builder.CTConfigurationBuilder;
+import com.liferay.change.tracking.function.CTFunctions;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleResource;
-import com.liferay.journal.service.persistence.JournalArticleResourceUtil;
-import com.liferay.journal.service.persistence.JournalArticleUtil;
+import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.journal.service.JournalArticleResourceLocalService;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import org.osgi.service.component.annotations.Activate;
@@ -43,12 +44,15 @@ public class JournalCTConfigurationRegistrar {
 			).setEntityClasses(
 				JournalArticleResource.class, JournalArticle.class
 			).setResourceEntityByResourceEntityIdFunction(
-				JournalArticleResourceUtil::fetchByPrimaryKey
+				_journalArticleResourceLocalService::fetchJournalArticleResource
 			).setEntityIdsFromResourceEntityFunctions(
 				JournalArticleResource::getResourcePrimKey,
 				JournalArticleResource::getLatestArticlePK
 			).setVersionEntityByVersionEntityIdFunction(
-				JournalArticleUtil::fetchByPrimaryKey
+				_journalArticleLocalService::fetchJournalArticle
+			).setVersionEntityDetails(
+				CTFunctions.getFetchSiteNameFunction(),
+				JournalArticle::getTitle, JournalArticle::getVersion
 			).setEntityIdsFromVersionEntityFunctions(
 				JournalArticle::getResourcePrimKey, JournalArticle::getId
 			).setVersionEntityStatusInfo(
@@ -66,5 +70,12 @@ public class JournalCTConfigurationRegistrar {
 
 	@Reference
 	private CTConfigurationRegistrar _ctConfigurationRegistrar;
+
+	@Reference
+	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Reference
+	private JournalArticleResourceLocalService
+		_journalArticleResourceLocalService;
 
 }

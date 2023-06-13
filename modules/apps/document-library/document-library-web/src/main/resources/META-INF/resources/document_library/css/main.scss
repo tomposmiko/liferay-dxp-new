@@ -1,6 +1,8 @@
 @import "bourbon";
 @import "mixins";
 
+@import "upper_tbar";
+
 .portlet-document-library, .portlet-document-library-display {
 	@import "document_library_preview";
 
@@ -60,7 +62,7 @@
 		}
 	}
 
-	.clay-multi-select {
+	.edit-tags .clay-multi-select {
 		margin-top: 1em;
 
 		.input-group-item-shrink {
@@ -121,8 +123,15 @@
 		margin-top: 1em;
 	}
 
-	.modal .edit-tags small {
-		padding-left: 25px;
+	.modal .edit-categories, .modal .edit-tags {
+		.modal-content {
+			height: 445px;
+		}
+
+		small {
+			color: #6B6C7E;
+			padding-left: 25px;
+		}
 	}
 
 	.move-list {

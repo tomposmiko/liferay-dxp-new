@@ -20,6 +20,7 @@ import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.workflow.kaleo.model.KaleoCondition;
 
 import java.io.Externalizable;
@@ -33,12 +34,11 @@ import java.util.Date;
  * The cache model class for representing KaleoCondition in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see KaleoCondition
  * @generated
  */
 @ProviderType
 public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
-	Externalizable {
+	Externalizable, MVCCModel {
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -51,7 +51,8 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 
 		KaleoConditionCacheModel kaleoConditionCacheModel = (KaleoConditionCacheModel)obj;
 
-		if (kaleoConditionId == kaleoConditionCacheModel.kaleoConditionId) {
+		if ((kaleoConditionId == kaleoConditionCacheModel.kaleoConditionId) &&
+				(mvccVersion == kaleoConditionCacheModel.mvccVersion)) {
 			return true;
 		}
 
@@ -60,14 +61,28 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 
 	@Override
 	public int hashCode() {
-		return HashUtil.hash(0, kaleoConditionId);
+		int hashCode = HashUtil.hash(0, kaleoConditionId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
+	public long getMvccVersion() {
+		return mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		this.mvccVersion = mvccVersion;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(27);
 
-		sb.append("{kaleoConditionId=");
+		sb.append("{mvccVersion=");
+		sb.append(mvccVersion);
+		sb.append(", kaleoConditionId=");
 		sb.append(kaleoConditionId);
 		sb.append(", groupId=");
 		sb.append(groupId);
@@ -100,6 +115,7 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 	public KaleoCondition toEntityModel() {
 		KaleoConditionImpl kaleoConditionImpl = new KaleoConditionImpl();
 
+		kaleoConditionImpl.setMvccVersion(mvccVersion);
 		kaleoConditionImpl.setKaleoConditionId(kaleoConditionId);
 		kaleoConditionImpl.setGroupId(groupId);
 		kaleoConditionImpl.setCompanyId(companyId);
@@ -157,6 +173,8 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
+		mvccVersion = objectInput.readLong();
+
 		kaleoConditionId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
@@ -179,6 +197,8 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
+		objectOutput.writeLong(mvccVersion);
+
 		objectOutput.writeLong(kaleoConditionId);
 
 		objectOutput.writeLong(groupId);
@@ -223,6 +243,7 @@ public class KaleoConditionCacheModel implements CacheModel<KaleoCondition>,
 		}
 	}
 
+	public long mvccVersion;
 	public long kaleoConditionId;
 	public long groupId;
 	public long companyId;

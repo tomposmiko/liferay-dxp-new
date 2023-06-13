@@ -93,8 +93,7 @@ public class DESaveDataDefinitionDataFetcher
 					).build());
 
 			DataDefinition dataDefinition = createDataDefinition(
-				deDataDefinitionSaveResponse.getDEDataDefinitionId(),
-				deDataDefinition);
+				deDataDefinitionSaveResponse.getDEDataDefinition());
 
 			saveDataDefinitionType.setDataDefinition(dataDefinition);
 		}
@@ -158,8 +157,6 @@ public class DESaveDataDefinitionDataFetcher
 			MapUtil.getBoolean(fieldProperties, "localizable", false));
 		deDataDefinitionField.setRepeatable(
 			MapUtil.getBoolean(fieldProperties, "repeatable", false));
-		deDataDefinitionField.setRequired(
-			MapUtil.getBoolean(fieldProperties, "required", false));
 
 		Map<String, String> tips = getLocalizedValues(
 			(List<Map<String, Object>>)fieldProperties.get("tips"));

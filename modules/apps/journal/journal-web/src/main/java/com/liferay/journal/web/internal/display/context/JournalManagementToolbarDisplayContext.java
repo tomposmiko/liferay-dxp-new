@@ -22,12 +22,15 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.journal.constants.JournalPortletKeys;
+import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFolder;
+import com.liferay.journal.model.JournalFolderConstants;
+import com.liferay.journal.web.configuration.JournalWebConfiguration;
+import com.liferay.journal.web.internal.security.permission.resource.JournalArticlePermission;
 import com.liferay.journal.web.internal.security.permission.resource.JournalFolderPermission;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -36,11 +39,11 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -49,7 +52,9 @@ import com.liferay.staging.StagingGroupHelperUtil;
 import com.liferay.trash.TrashHelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.portlet.PortletURL;
@@ -77,6 +82,9 @@ public class JournalManagementToolbarDisplayContext
 		_journalDisplayContext = journalDisplayContext;
 		_trashHelper = trashHelper;
 
+		_journalWebConfiguration =
+			(JournalWebConfiguration)request.getAttribute(
+				JournalWebConfiguration.class.getName());
 		_themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
@@ -129,6 +137,58 @@ public class JournalManagementToolbarDisplayContext
 		};
 	}
 
+	public String getAvailableActions(JournalArticle article)
+		throws PortalException {
+
+		List<String> availableActions = new ArrayList<>();
+
+		if (JournalArticlePermission.contains(
+				_themeDisplay.getPermissionChecker(), article,
+				ActionKeys.DELETE)) {
+
+			availableActions.add("deleteEntries");
+		}
+
+		if (JournalArticlePermission.contains(
+				_themeDisplay.getPermissionChecker(), article,
+				ActionKeys.EXPIRE) &&
+			(article.getStatus() == WorkflowConstants.STATUS_APPROVED)) {
+
+			availableActions.add("expireEntries");
+		}
+
+		if (JournalArticlePermission.contains(
+				_themeDisplay.getPermissionChecker(), article,
+				ActionKeys.UPDATE)) {
+
+			availableActions.add("moveEntries");
+		}
+
+		return StringUtil.merge(availableActions, StringPool.COMMA);
+	}
+
+	public String getAvailableActions(JournalFolder folder)
+		throws PortalException {
+
+		List<String> availableActions = new ArrayList<>();
+
+		if (JournalFolderPermission.contains(
+				_themeDisplay.getPermissionChecker(), folder,
+				ActionKeys.UPDATE)) {
+
+			availableActions.add("deleteEntries");
+		}
+
+		if (JournalFolderPermission.contains(
+				_themeDisplay.getPermissionChecker(), folder,
+				ActionKeys.DELETE)) {
+
+			availableActions.add("moveEntries");
+		}
+
+		return StringUtil.merge(availableActions, StringPool.COMMA);
+	}
+
 	@Override
 	public String getClearResultsURL() {
 		PortletURL clearResultsURL = getPortletURL();
@@ -139,6 +199,65 @@ public class JournalManagementToolbarDisplayContext
 			"status", String.valueOf(WorkflowConstants.STATUS_ANY));
 
 		return clearResultsURL.toString();
+	}
+
+	public Map<String, Object> getComponentContext() throws Exception {
+		Map<String, Object> componentContext = new HashMap<>();
+
+		PortletURL addArticleURL = liferayPortletResponse.createRenderURL();
+
+		addArticleURL.setParameter("mvcPath", "/edit_article.jsp");
+		addArticleURL.setParameter("redirect", _themeDisplay.getURLCurrent());
+		addArticleURL.setParameter(
+			"groupId", String.valueOf(_themeDisplay.getScopeGroupId()));
+		addArticleURL.setParameter(
+			"folderId", String.valueOf(_journalDisplayContext.getFolderId()));
+
+		componentContext.put("addArticleURL", addArticleURL.toString());
+
+		componentContext.put(
+			"folderId",
+			String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID));
+
+		PortletURL openViewMoreStructuresURL =
+			liferayPortletResponse.createRenderURL();
+
+		openViewMoreStructuresURL.setParameter(
+			"mvcPath", "/view_more_menu_items.jsp");
+		openViewMoreStructuresURL.setParameter(
+			"folderId", String.valueOf(_journalDisplayContext.getFolderId()));
+		openViewMoreStructuresURL.setParameter(
+			"eventName",
+			liferayPortletResponse.getNamespace() + "selectAddMenuItem");
+		openViewMoreStructuresURL.setWindowState(LiferayWindowState.POP_UP);
+
+		componentContext.put(
+			"openViewMoreStructuresURL", openViewMoreStructuresURL.toString());
+
+		PortletURL selectEntityURL = liferayPortletResponse.createRenderURL();
+
+		selectEntityURL.setParameter("mvcPath", "/select_ddm_structure.jsp");
+		selectEntityURL.setWindowState(LiferayWindowState.POP_UP);
+
+		componentContext.put("selectEntityURL", selectEntityURL.toString());
+
+		componentContext.put(
+			"trashEnabled",
+			_trashHelper.isTrashEnabled(_themeDisplay.getScopeGroupId()));
+
+		PortletURL viewDDMStructureArticlesURL =
+			liferayPortletResponse.createRenderURL();
+
+		viewDDMStructureArticlesURL.setParameter("navigation", "structure");
+		viewDDMStructureArticlesURL.setParameter(
+			"folderId",
+			String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID));
+
+		componentContext.put(
+			"viewDDMStructureArticlesURL",
+			viewDDMStructureArticlesURL.toString());
+
+		return componentContext;
 	}
 
 	@Override
@@ -359,44 +478,12 @@ public class JournalManagementToolbarDisplayContext
 
 	@Override
 	public String getSearchContainerId() {
-		String searchContainerId = ParamUtil.getString(
-			request, "searchContainerId");
-
-		return searchContainerId;
+		return "articles";
 	}
 
 	@Override
 	public String getSearchFormName() {
 		return "fm1";
-	}
-
-	@Override
-	public List<ViewTypeItem> getViewTypeItems() {
-		return new ViewTypeItemList(
-			getPortletURL(), _journalDisplayContext.getDisplayStyle()) {
-
-			{
-				if (ArrayUtil.contains(
-						_journalDisplayContext.getDisplayViews(), "icon")) {
-
-					addCardViewTypeItem();
-				}
-
-				if (ArrayUtil.contains(
-						_journalDisplayContext.getDisplayViews(),
-						"descriptive")) {
-
-					addListViewTypeItem();
-				}
-
-				if (ArrayUtil.contains(
-						_journalDisplayContext.getDisplayViews(), "list")) {
-
-					addTableViewTypeItem();
-				}
-			}
-
-		};
 	}
 
 	@Override
@@ -436,6 +523,16 @@ public class JournalManagementToolbarDisplayContext
 	@Override
 	public Boolean isShowInfoButton() {
 		return _journalDisplayContext.isShowInfoButton();
+	}
+
+	@Override
+	protected String getDefaultDisplayStyle() {
+		return _journalWebConfiguration.defaultDisplayView();
+	}
+
+	@Override
+	protected String[] getDisplayViews() {
+		return _journalDisplayContext.getDisplayViews();
 	}
 
 	@Override
@@ -547,6 +644,7 @@ public class JournalManagementToolbarDisplayContext
 		JournalManagementToolbarDisplayContext.class);
 
 	private final JournalDisplayContext _journalDisplayContext;
+	private final JournalWebConfiguration _journalWebConfiguration;
 	private final ThemeDisplay _themeDisplay;
 	private final TrashHelper _trashHelper;
 

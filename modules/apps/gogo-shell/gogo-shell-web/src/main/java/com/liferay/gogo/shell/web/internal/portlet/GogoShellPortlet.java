@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.TransientValue;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -51,6 +52,7 @@ import javax.portlet.RenderResponse;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
+import org.apache.felix.service.command.Converter;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -88,8 +90,7 @@ public class GogoShellPortlet extends MVCPortlet {
 		initCommandSession(renderRequest);
 
 		CommandSession commandSession = _getSessionAttribute(
-			renderRequest, CommandSession.class,
-			GogoShellWebKeys.COMMAND_SESSION);
+			renderRequest, GogoShellWebKeys.COMMAND_SESSION);
 
 		SessionMessages.add(
 			renderRequest, "prompt", commandSession.get("prompt"));
@@ -109,33 +110,34 @@ public class GogoShellPortlet extends MVCPortlet {
 		initCommandSession(actionRequest);
 
 		CommandSession commandSession = _getSessionAttribute(
-			actionRequest, CommandSession.class,
-			GogoShellWebKeys.COMMAND_SESSION);
+			actionRequest, GogoShellWebKeys.COMMAND_SESSION);
 
 		UnsyncByteArrayOutputStream outputUnsyncByteArrayOutputStream =
 			_getSessionAttribute(
-				actionRequest, UnsyncByteArrayOutputStream.class,
-				GogoShellWebKeys.COMMAND_SESSION_OUTPUT_STREAM);
+				actionRequest, GogoShellWebKeys.COMMAND_SESSION_OUTPUT_STREAM);
 		UnsyncByteArrayOutputStream errorUnsyncByteArrayOutputStream =
 			_getSessionAttribute(
-				actionRequest, UnsyncByteArrayOutputStream.class,
-				GogoShellWebKeys.COMMAND_SESSION_ERROR_STREAM);
+				actionRequest, GogoShellWebKeys.COMMAND_SESSION_ERROR_STREAM);
 		PrintStream outputPrintStream = _getSessionAttribute(
-			actionRequest, PrintStream.class,
+			actionRequest,
 			GogoShellWebKeys.COMMAND_SESSION_OUTPUT_PRINT_STREAM);
 		PrintStream errorPrintStream = _getSessionAttribute(
-			actionRequest, PrintStream.class,
-			GogoShellWebKeys.COMMAND_SESSION_ERROR_PRINT_STREAM);
+			actionRequest, GogoShellWebKeys.COMMAND_SESSION_ERROR_PRINT_STREAM);
 
 		try {
 			SessionMessages.add(actionRequest, "command", command);
 
 			checkCommand(command, themeDisplay);
 
-			commandSession.execute(command);
+			Object result = commandSession.execute(command);
 
-			outputPrintStream.flush();
+			if (result != null) {
+				outputPrintStream.print(
+					commandSession.format(result, Converter.INSPECT));
+			}
+
 			errorPrintStream.flush();
+			outputPrintStream.flush();
 
 			SessionMessages.add(
 				actionRequest, "commandOutput",
@@ -231,31 +233,35 @@ public class GogoShellPortlet extends MVCPortlet {
 		commandSession.put("prompt", "g!");
 
 		portletSession.setAttribute(
-			GogoShellWebKeys.COMMAND_SESSION, commandSession);
+			GogoShellWebKeys.COMMAND_SESSION,
+			new TransientValue<>(commandSession));
 
 		portletSession.setAttribute(
 			GogoShellWebKeys.COMMAND_SESSION_ERROR_PRINT_STREAM,
-			errorPrintStream);
+			new TransientValue<>(errorPrintStream));
 		portletSession.setAttribute(
 			GogoShellWebKeys.COMMAND_SESSION_ERROR_STREAM,
-			errorUnsyncByteArrayOutputStream);
+			new TransientValue<>(errorUnsyncByteArrayOutputStream));
 		portletSession.setAttribute(
 			GogoShellWebKeys.COMMAND_SESSION_OUTPUT_PRINT_STREAM,
-			outputPrintStream);
+			new TransientValue<>(outputPrintStream));
 		portletSession.setAttribute(
 			GogoShellWebKeys.COMMAND_SESSION_OUTPUT_STREAM,
-			outputUnsyncByteArrayOutputStream);
+			new TransientValue<>(outputUnsyncByteArrayOutputStream));
 	}
 
 	private static <T> T _getSessionAttribute(
-		PortletRequest portletRequest, Class<T> clazz, String name) {
+		PortletRequest portletRequest, String name) {
 
 		PortletSession portletSession = portletRequest.getPortletSession();
 
 		Object sessionAttribute = portletSession.getAttribute(name);
 
-		if (sessionAttribute != null) {
-			return clazz.cast(sessionAttribute);
+		if (sessionAttribute instanceof TransientValue) {
+			TransientValue<T> transientValue =
+				(TransientValue<T>)sessionAttribute;
+
+			return transientValue.getValue();
 		}
 
 		return null;

@@ -25,10 +25,19 @@ public class UnbalancedCodeException extends PoshiScriptParserException {
 		_processLine(index, code);
 	}
 
+	@Override
+	public String getErrorSnippet() {
+		return _errorSnippet;
+	}
+
+	public void setErrorSnippet(String errorSnippet) {
+		_errorSnippet = errorSnippet;
+	}
+
 	private static String _getLine(int lineNumber, String code) {
 		String[] lines = code.split("\n");
 
-		return lines[lineNumber - 1];
+		return lines[lineNumber - 1].replace("\t", "    ");
 	}
 
 	private void _processLine(int index, String code) {
@@ -44,7 +53,7 @@ public class UnbalancedCodeException extends PoshiScriptParserException {
 			}
 		}
 
-		setLineNumber(lineNumber);
+		setErrorLineNumber(lineNumber);
 
 		int column = 1;
 
@@ -69,7 +78,9 @@ public class UnbalancedCodeException extends PoshiScriptParserException {
 
 		sb.append("^");
 
-		setErrorDetails(sb.toString());
+		setErrorSnippet(sb.toString());
 	}
+
+	private String _errorSnippet = "";
 
 }

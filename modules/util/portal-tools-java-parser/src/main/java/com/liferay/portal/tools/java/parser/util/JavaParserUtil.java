@@ -85,6 +85,16 @@ import java.util.List;
  */
 public class JavaParserUtil {
 
+	public static String getLastLine(String s) {
+		int x = s.lastIndexOf("\n");
+
+		if (x != -1) {
+			return s.substring(x + 1);
+		}
+
+		return s;
+	}
+
 	public static JavaTerm parseJavaTerm(DetailAST detailAST) {
 		JavaTerm javaTerm = null;
 
@@ -1160,18 +1170,9 @@ public class JavaParserUtil {
 						_parseJavaExpression(exprDetailAST));
 				}
 			}
-			else {
-				List<DetailAST> variableDefinitionASTList =
-					DetailASTUtil.getAllChildTokens(
-						forInitDetailAST, false, TokenTypes.VARIABLE_DEF);
-
-				for (DetailAST variableDefinitionDetailAST :
-						variableDefinitionASTList) {
-
-					initializationJavaTerms.add(
-						_parseJavaVariableDefinition(
-							variableDefinitionDetailAST));
-				}
+			else if (firstChildDetailAST.getType() == TokenTypes.VARIABLE_DEF) {
+				initializationJavaTerms.add(
+					_parseJavaVariableDefinition(firstChildDetailAST));
 			}
 		}
 
@@ -1558,8 +1559,14 @@ public class JavaParserUtil {
 		JavaSwitchCaseStatement javaSwitchCaseStatement =
 			new JavaSwitchCaseStatement(false);
 
-		javaSwitchCaseStatement.setSwitchCaseJavaExpression(
-			_parseJavaExpression(firstChildDetailAST.getFirstChild()));
+		List<DetailAST> literalCaseDetailASTList =
+			DetailASTUtil.getAllChildTokens(
+				caseGroupDetailAST, false, TokenTypes.LITERAL_CASE);
+
+		for (DetailAST literalCaseDetailAST : literalCaseDetailASTList) {
+			javaSwitchCaseStatement.addSwitchCaseJavaExpression(
+				_parseJavaExpression(literalCaseDetailAST.getFirstChild()));
+		}
 
 		return javaSwitchCaseStatement;
 	}
@@ -1715,20 +1722,37 @@ public class JavaParserUtil {
 
 		JavaVariableDefinition javaVariableDefinition =
 			new JavaVariableDefinition(
-				_getName(detailAST), _parseJavaAnnotations(modifiersDetailAST),
+				_parseJavaAnnotations(modifiersDetailAST),
 				_parseModifiers(modifiersDetailAST));
 
 		javaVariableDefinition.setJavaType(
 			_parseJavaType(detailAST.findFirstToken(TokenTypes.TYPE)));
 
-		DetailAST assignDetailAST = detailAST.findFirstToken(TokenTypes.ASSIGN);
+		while (true) {
+			String name = _getName(detailAST);
 
-		if (assignDetailAST != null) {
-			javaVariableDefinition.setAssignValueJavaExpression(
-				_parseJavaExpression(assignDetailAST.getFirstChild()));
+			DetailAST assignDetailAST = detailAST.findFirstToken(
+				TokenTypes.ASSIGN);
+
+			if (assignDetailAST == null) {
+				javaVariableDefinition.addVariable(name);
+			}
+			else {
+				javaVariableDefinition.addVariable(
+					name,
+					_parseJavaExpression(assignDetailAST.getFirstChild()));
+			}
+
+			detailAST = detailAST.getNextSibling();
+
+			if ((detailAST == null) ||
+				(detailAST.getType() != TokenTypes.COMMA)) {
+
+				return javaVariableDefinition;
+			}
+
+			detailAST = detailAST.getNextSibling();
 		}
-
-		return javaVariableDefinition;
 	}
 
 	private static JavaWhileStatement _parseJavaWhileStatement(

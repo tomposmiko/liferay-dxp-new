@@ -32,6 +32,7 @@ class SegmentEdit extends Component {
 				}
 			)
 		),
+		errors: PropTypes.object,
 		formId: PropTypes.string,
 		handleBlur: PropTypes.func,
 		handleChange: PropTypes.func,
@@ -46,6 +47,7 @@ class SegmentEdit extends Component {
 		requestMembersCountURL: PropTypes.string,
 		setValues: PropTypes.func,
 		source: PropTypes.string,
+		validateForm: PropTypes.func,
 		values: PropTypes.object
 	};
 
@@ -53,7 +55,6 @@ class SegmentEdit extends Component {
 		contributors: [],
 		initialMembersCount: 0,
 		initialSegmentActive: true,
-		initialSegmentName: DEFAULT_SEGMENT_NAME,
 		portletNamespace: ''
 	};
 
@@ -116,19 +117,8 @@ class SegmentEdit extends Component {
 
 	_handleSegmentNameBlur = event => {
 		const {
-			handleBlur,
-			setValues,
-			values
+			handleBlur
 		} = this.props;
-
-		if (values.name === '') {
-			setValues(
-				{
-					...values,
-					name: DEFAULT_SEGMENT_NAME
-				}
-			);
-		}
 
 		handleBlur(event);
 	};
@@ -182,6 +172,45 @@ class SegmentEdit extends Component {
 			}
 		);
 	}
+
+	/**
+	 * Validates fields with validation and prevents the default form submission
+	 * if there are any errors.
+	 *
+	 * Form submission is defined by the action attribute on the <form> element
+	 * outside of this component. Since we are leveraging the <aui:form> taglib
+	 * to handle submission and formik to handle value changes and validation,
+	 * this method uses formik to validate and prevents the taglib form action
+	 * from being called.
+	 * @param {Class} event Event to prevent a form submission from occurring.
+	 */
+	_handleValidate = event => {
+		const {validateForm} = this.props;
+
+		event.persist();
+
+		validateForm().then(
+			errors => {
+				const errorMessages = Object.values(errors);
+
+				if (errorMessages.length) {
+					event.preventDefault();
+
+					errorMessages.forEach(
+						message => {
+							Liferay.Util.openToast(
+								{
+									message,
+									title: Liferay.Language.get('error'),
+									type: 'danger'
+								}
+							);
+						}
+					);
+				}
+			}
+		);
+	};
 
 	render() {
 		const {
@@ -255,23 +284,17 @@ class SegmentEdit extends Component {
 										size="sm"
 									/>
 
-									<div className="members-count mr-3">
-										{getPluralMessage(
+									<ClayButton
+										className="members-count-button"
+										label={getPluralMessage(
 											Liferay.Language.get('x-member'),
 											Liferay.Language.get('x-members'),
 											membersCount
 										)}
-									</div>
-
-									{previewMembersURL &&
-										<ClayButton
-											borderless
-											label={Liferay.Language.get('preview-members')}
-											onClick={this._handlePreviewClick(previewMembersURL)}
-											size="sm"
-											type="button"
-										/>
-									}
+										onClick={this._handlePreviewClick(previewMembersURL)}
+										size="sm"
+										type="button"
+									/>
 								</div>
 							</div>
 
@@ -288,6 +311,7 @@ class SegmentEdit extends Component {
 									<ClayButton
 										disabled={this._isQueryEmpty()}
 										label={Liferay.Language.get('save')}
+										onClick={this._handleValidate}
 										size="sm"
 										style="primary"
 										type="submit"
@@ -315,8 +339,17 @@ export default withFormik(
 			{
 				active: props.initialSegmentActive || true,
 				contributors: props.contributors || [],
-				name: props.initialSegmentName || DEFAULT_SEGMENT_NAME
+				name: props.initialSegmentName
 			}
-		)
+		),
+		validate: values => {
+			const errors = {};
+
+			if (!values.name) {
+				errors.name = Liferay.Language.get('segment-name-is-required');
+			}
+
+			return errors;
+		}
 	}
 )(SegmentEdit);

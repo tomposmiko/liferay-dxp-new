@@ -33,6 +33,7 @@ export const RELATIONAL_OPERATORS = {
 export const PROPERTY_TYPES = {
 	BOOLEAN: 'boolean',
 	DATE: 'date',
+	DATE_TIME: 'date-time',
 	DOUBLE: 'double',
 	ID: 'id',
 	INTEGER: 'integer',
@@ -47,7 +48,7 @@ const {AND, OR} = CONJUNCTIONS;
 const {EQ, GE, GT, LE, LT} = RELATIONAL_OPERATORS;
 const {NOT_CONTAINS, NOT_EQ} = NOT_OPERATORS;
 const {CONTAINS} = FUNCTIONAL_OPERATORS;
-const {BOOLEAN, DATE, DOUBLE, ID, INTEGER, STRING} = PROPERTY_TYPES;
+const {BOOLEAN, DATE, DATE_TIME, DOUBLE, ID, INTEGER, STRING} = PROPERTY_TYPES;
 
 export const SUPPORTED_CONJUNCTIONS = [
 	{
@@ -98,6 +99,7 @@ export const SUPPORTED_OPERATORS = [
 export const SUPPORTED_PROPERTY_TYPES = {
 	[BOOLEAN]: [EQ, NOT_EQ],
 	[DATE]: [EQ, GE, GT, LE, LT, NOT_EQ],
+	[DATE_TIME]: [EQ, GE, GT, LE, LT, NOT_EQ],
 	[DOUBLE]: [EQ, GE, GT, LE, LT, NOT_EQ],
 	[ID]: [EQ, NOT_EQ],
 	[INTEGER]: [EQ, GE, GT, LE, LT, NOT_EQ],
@@ -122,12 +124,12 @@ export const BOOLEAN_OPTIONS = [
 export const SOURCES = {
 	ASAH_FARO_BACKEND: {
 		icon: '/ac-icon.svg',
-		label: Liferay.Language.get('analytics-cloud'),
+		label: Liferay.Language.get('source.analytics-cloud'),
 		name: 'ASAH_FARO_BACKEND'
 	},
 	DEFAULT: {
 		icon: '/dxp-icon.svg',
-		label: Liferay.Language.get('dxp'),
+		label: Liferay.Language.get('source.dxp'),
 		name: 'DEFAULT'
 	}
 };

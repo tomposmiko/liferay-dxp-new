@@ -8,7 +8,18 @@ definition {
 		}
 	}
 
-	macro add {
+	macro addCollection {
+		PageTemplatesAdmin._gotoAddCollection();
+
+		Collection.editCollection(
+			collectionDescription = "${collectionDescription}",
+			collectionName = "${collectionName}"
+		);
+
+		Button.clickSave();
+	}
+
+	macro addPageTemplate {
 		if (isSet(pageTemplateType)) {
 			var menuItem = "${pageTemplateType}";
 		}
@@ -19,17 +30,6 @@ definition {
 		LexiconEntry.gotoAddMenuItem(menuItem = "${menuItem}");
 
 		PortletEntry.inputName(name = "${pageTemplateName}");
-
-		Button.clickSave();
-	}
-
-	macro addCollection {
-		PageTemplatesAdmin._gotoAddCollection();
-
-		Collection.editCollection(
-			collectionDescription = "${collectionDescription}",
-			collectionName = "${collectionName}"
-		);
 
 		Button.clickSave();
 	}
@@ -45,17 +45,45 @@ definition {
 		PortletEntry.save();
 	}
 
+	macro deletePageTemplate {
+		LexiconCard.delete(
+			card = "${pageTemplateName}"
+		);
+	}
+
+	macro gotoPageTemplateEllipsisItem {
+		LexiconCard.clickEllipsisItem(
+			card = "${pageTemplateName}",
+			item = "${item}"
+		);
+	}
+
 	macro openPageTemplatesAdmin {
 		Navigator.openWithAppendToBaseURL(
 			urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_layout_admin_web_portlet_GroupPagesPortlet&amp;_com_liferay_layout_admin_web_portlet_GroupPagesPortlet_tabs1=page-templates"
 		);
 	}
 
-	macro rename {
-		LexiconEntry.gotoEntryMenuItem(menuItem = "Rename", rowEntry = "${rowEntry}");
+	macro renamePageTemplate {
+		PageTemplatesAdmin.gotoPageTemplateEllipsisItem(
+			item = "Rename",
+			pageTemplateName = "${pageTemplateName}"
+		);
 
-		PortletEntry.inputName(name = "${pageTemplateName}");
+		PortletEntry.inputName(name = "${newPageTemplateName}");
 
 		Modal.save();
+	}
+
+	macro viewPageTemplateNotPresent {
+		LexiconCard.viewCardNotPresent(
+			card = "${pageTemplateName}"
+		);
+	}
+
+	macro viewPageTemplatePresent {
+		LexiconCard.viewCardPresent(
+			card = "${pageTemplateName}"
+		);
 	}
 }

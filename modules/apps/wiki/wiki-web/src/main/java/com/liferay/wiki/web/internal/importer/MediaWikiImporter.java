@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.wiki.configuration.WikiGroupServiceConfiguration;
-import com.liferay.wiki.engine.WikiEngineRenderer;
 import com.liferay.wiki.exception.ImportFilesException;
 import com.liferay.wiki.exception.NoSuchPageException;
 import com.liferay.wiki.importer.WikiImporter;
@@ -65,12 +64,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,8 +86,6 @@ import org.osgi.service.component.annotations.Reference;
 public class MediaWikiImporter implements WikiImporter {
 
 	public static final String FORMAT_CREOLE = "creole";
-
-	public static final String FORMAT_MEDIAWIKI = "mediawiki";
 
 	public static final String OPTIONS_FRONT_PAGE = "OPTIONS_FRONT_PAGE";
 
@@ -200,29 +195,15 @@ public class MediaWikiImporter implements WikiImporter {
 			long authorUserId = getUserId(userId, node, author, usersMap);
 
 			String parentTitle = readParentTitle(content);
+
 			String redirectTitle = readRedirectTitle(content);
-
-			String format = FORMAT_MEDIAWIKI;
-
-			Collection<String> supportedFormats =
-				_wikiEngineRenderer.getFormats();
 
 			if (Validator.isNotNull(redirectTitle)) {
 				content = getCreoleRedirectContent(redirectTitle);
-				format = FORMAT_CREOLE;
-			}
-			else if (supportedFormats.contains(FORMAT_MEDIAWIKI) &&
-					 Objects.equals(
-						 _wikiGroupServiceConfiguration.defaultFormat(),
-						 FORMAT_MEDIAWIKI)) {
-
-				content = translateMediaWikiImagePaths(content);
 			}
 			else {
 				content = translateMediaWikiToCreole(content, strictImportMode);
 				content = translateMediaLinks(node, content);
-
-				format = FORMAT_CREOLE;
 			}
 
 			ServiceContext serviceContext = new ServiceContext();
@@ -245,8 +226,8 @@ public class MediaWikiImporter implements WikiImporter {
 
 			_wikiPageLocalService.updatePage(
 				authorUserId, node.getNodeId(), title, page.getVersion(),
-				content, summary, true, format, parentTitle, redirectTitle,
-				serviceContext);
+				content, summary, true, FORMAT_CREOLE, parentTitle,
+				redirectTitle, serviceContext);
 		}
 		catch (Exception e) {
 			throw new PortalException("Error importing page " + title, e);
@@ -335,14 +316,6 @@ public class MediaWikiImporter implements WikiImporter {
 		categoryName = _toWord(categoryName.trim());
 
 		return StringUtil.shorten(categoryName, length);
-	}
-
-	protected String normalizeDescription(String description) {
-		Matcher matcher = _categoriesPattern.matcher(description);
-
-		description = matcher.replaceAll(StringPool.BLANK);
-
-		return normalize(description, 255);
 	}
 
 	protected void processImages(
@@ -766,13 +739,6 @@ public class MediaWikiImporter implements WikiImporter {
 		}
 	}
 
-	protected String translateMediaWikiImagePaths(String content) {
-		return content.replaceAll(
-			_imagesPattern.pattern(),
-			StringBundler.concat(
-				"$1$2", SHARED_IMAGES_TITLE, StringPool.SLASH, "$3$4"));
-	}
-
 	protected String translateMediaWikiToCreole(
 		String content, boolean strictImportMode) {
 
@@ -812,8 +778,6 @@ public class MediaWikiImporter implements WikiImporter {
 
 	private static final Pattern _categoriesPattern = Pattern.compile(
 		"\\[\\[[Cc]ategory:([^\\]]*)\\]\\][\\n]*");
-	private static final Pattern _imagesPattern = Pattern.compile(
-		"(\\[\\[Image|File)(:)([^\\]]*)(\\]\\])", Pattern.DOTALL);
 	private static final Pattern _mediaLinkPattern = Pattern.compile(
 		"\\[\\[(Media:)([^\\]\\|]*)(\\|[^\\]]*)?\\]\\]", Pattern.DOTALL);
 	private static final Pattern _parentPattern = Pattern.compile(
@@ -837,9 +801,6 @@ public class MediaWikiImporter implements WikiImporter {
 
 	@Reference
 	private UserLocalService _userLocalService;
-
-	@Reference
-	private WikiEngineRenderer _wikiEngineRenderer;
 
 	@Reference
 	private WikiGroupServiceConfiguration _wikiGroupServiceConfiguration;

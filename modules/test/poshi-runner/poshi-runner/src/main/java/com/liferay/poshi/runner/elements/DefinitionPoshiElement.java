@@ -15,8 +15,9 @@
 package com.liferay.poshi.runner.elements;
 
 import com.liferay.poshi.runner.script.PoshiScriptParserException;
+import com.liferay.poshi.runner.util.StringUtil;
 
-import java.io.File;
+import java.net.URL;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -36,9 +37,9 @@ public class DefinitionPoshiElement extends PoshiElement {
 		return clone(element, null);
 	}
 
-	public PoshiElement clone(Element element, File file) {
+	public PoshiElement clone(Element element, URL url) {
 		if (isElementType(getElementName(), element)) {
-			return new DefinitionPoshiElement(element, file);
+			return new DefinitionPoshiElement(element, url);
 		}
 
 		return null;
@@ -52,11 +53,11 @@ public class DefinitionPoshiElement extends PoshiElement {
 		return clone(poshiScript, null);
 	}
 
-	public PoshiElement clone(String poshiScript, File file)
+	public PoshiElement clone(String poshiScript, URL url)
 		throws PoshiScriptParserException {
 
 		if (isElementType(poshiScript)) {
-			return new DefinitionPoshiElement(poshiScript, file);
+			return new DefinitionPoshiElement(poshiScript, url);
 		}
 
 		return null;
@@ -72,6 +73,16 @@ public class DefinitionPoshiElement extends PoshiElement {
 
 	public String getFilePath() {
 		return _filePath;
+	}
+
+	@Override
+	public int getPoshiScriptLineNumber() {
+		String poshiScript = getPoshiScript();
+
+		String blockName = getBlockName(poshiScript);
+
+		return super.getPoshiScriptLineNumber() +
+			StringUtil.count(blockName, "\n");
 	}
 
 	@Override
@@ -121,8 +132,8 @@ public class DefinitionPoshiElement extends PoshiElement {
 	protected DefinitionPoshiElement() {
 	}
 
-	protected DefinitionPoshiElement(Element element, File file) {
-		super(_ELEMENT_NAME, element, file);
+	protected DefinitionPoshiElement(Element element, URL url) {
+		super(_ELEMENT_NAME, element, url);
 	}
 
 	protected DefinitionPoshiElement(
@@ -138,10 +149,10 @@ public class DefinitionPoshiElement extends PoshiElement {
 		super(_ELEMENT_NAME, parentPoshiElement, poshiScript);
 	}
 
-	protected DefinitionPoshiElement(String poshiScript, File file)
+	protected DefinitionPoshiElement(String poshiScript, URL url)
 		throws PoshiScriptParserException {
 
-		super(_ELEMENT_NAME, null, poshiScript, file);
+		super(_ELEMENT_NAME, null, poshiScript, url);
 	}
 
 	@Override
@@ -172,8 +183,8 @@ public class DefinitionPoshiElement extends PoshiElement {
 		return isValidPoshiScriptBlock(_blockNamePattern, poshiScript);
 	}
 
-	protected void setFilePath(File file) {
-		_filePath = file.getAbsolutePath();
+	protected void setFilePath(URL url) {
+		_filePath = url.getFile();
 	}
 
 	private static final String _ELEMENT_NAME = "definition";

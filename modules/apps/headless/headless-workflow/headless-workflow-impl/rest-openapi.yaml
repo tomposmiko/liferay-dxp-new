@@ -9,8 +9,10 @@ components:
         commentLog:
           type: string
         dateCreated:
+          format: date-time
           type: string
         id:
+          format: int64
           type: integer
         person:
           format: uri
@@ -20,13 +22,16 @@ components:
           type: string
         previousState:
           type: string
-        self:
-          format: uri
-          type: string
         state:
           type: string
         task:
-          $ref: "#/components/schemas/WorkflowTask"
+          allOf:
+            - $ref: "#/components/schemas/WorkflowTask"
+          readOnly: true
+        taskId:
+          format: int64
+          type: integer
+          writeOnly: true
         type:
           type: string
       type: object
@@ -36,50 +41,60 @@ components:
         completed:
           type: boolean
         dateCompleted:
+          format: date-time
           type: string
         dateCreated:
+          format: date-time
           type: string
         definitionName:
           type: string
         description:
           type: string
         dueDate:
+          format: date-time
           type: string
         id:
+          format: int64
           type: integer
         logs:
-          $ref: "#/components/schemas/WorkflowLog"
+          items:
+            $ref: "#/components/schemas/WorkflowLog"
+          readOnly: true
+          type: array
+        logsIds:
+          items:
+            format: int64
+            type: integer
+          type: array
+          writeOnly: true
         name:
           type: string
-        object:
-          description: https://www.schema.org/Object
-          properties:
-            id:
-              type: integer
-            identifier:
-              format: uri
-              type: string
-            resourceType:
-              type: string
-            self:
-              format: uri
-              type: string
-          type: object
-        self:
-          format: uri
-          type: string
+        objectReviewed:
+         $ref: "#/components/schemas/ObjectReviewed"
         transitions:
           items:
             type: string
           type: array
       type: object
+    ObjectReviewed:
+      description: https://www.schema.org/ObjectReviewed
+      properties:
+        id:
+          format: int64
+          type: integer
+        identifier:
+          format: uri
+          type: string
+        resourceType:
+          type: string
+      type: object
 info:
   description: ""
   title: ""
-  version: 1.0.0
+  version: v1.0
 openapi: 3.0.1
 paths:
-  "/roles/{parent-id}/workflow-tasks":
+  "/roles/{role-id}/workflow-tasks":
     get:
       parameters:
         - in: query
@@ -87,39 +102,42 @@ paths:
           schema:
             type: integer
         - in: query
-          name: per_page
+          name: pageSize
           schema:
             type: integer
         - in: path
-          name: parent-id
+          name: role-id
           required: true
           schema:
-            format: uri
-            type: string
+            format: int64
+            type: integer
       responses:
         200:
           content:
-            "*/*":
+            application/json:
               schema:
                 items:
                   $ref: "#/components/schemas/WorkflowTask"
                 type: array
           description: ""
-  "/workflow-logs/{id}":
+      tags: ["WorkflowTask"]
+  "/workflow-logs/{workflow-log-id}":
     get:
       parameters:
         - in: path
-          name: id
+          name: workflow-log-id
           required: true
           schema:
+            format: int64
             type: integer
       responses:
         200:
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowLog"
           description: ""
+      tags: ["WorkflowLog"]
   "/workflow-tasks":
     get:
       parameters:
@@ -128,119 +146,125 @@ paths:
           schema:
             type: integer
         - in: query
-          name: per_page
+          name: pageSize
           schema:
             type: integer
-        - in: path
-          name: genericparentid
-          required: true
-          schema:
-            type: object
       responses:
         200:
           content:
-            "*/*":
+            application/json:
               schema:
                 items:
                   $ref: "#/components/schemas/WorkflowTask"
                 type: array
           description: ""
-  "/workflow-tasks/{id}":
+      tags: ["WorkflowTask"]
+  "/workflow-tasks/{workflow-task-id}":
     get:
       parameters:
         - in: path
-          name: id
+          name: workflow-task-id
           required: true
           schema:
+            format: int64
             type: integer
       responses:
         200:
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowTask"
           description: ""
-  "/workflow-tasks/{id}/assign-to-me":
+      tags: ["WorkflowTask"]
+  "/workflow-tasks/{workflow-task-id}/assign-to-me":
     post:
       parameters:
         - in: path
-          name: id
+          name: workflow-task-id
           required: true
           schema:
+            format: int64
             type: integer
       requestBody:
         content:
-          "*/*":
+          application/json:
             schema:
               $ref: "#/components/schemas/WorkflowTask"
       responses:
         200:
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowTask"
           description: ""
-  "/workflow-tasks/{id}/assign-to-user":
+      tags: ["WorkflowTask"]
+  "/workflow-tasks/{workflow-task-id}/assign-to-user":
     post:
       parameters:
         - in: path
-          name: id
+          name: workflow-task-id
           required: true
           schema:
+            format: int64
             type: integer
       requestBody:
         content:
-          "*/*":
+          application/json:
             schema:
               $ref: "#/components/schemas/WorkflowTask"
       responses:
         200:
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowTask"
           description: ""
-  "/workflow-tasks/{id}/change-transition":
+      tags: ["WorkflowTask"]
+  "/workflow-tasks/{workflow-task-id}/change-transition":
     post:
       parameters:
         - in: path
-          name: id
+          name: workflow-task-id
           required: true
           schema:
+            format: int64
             type: integer
       requestBody:
         content:
-          "*/*":
+          application/json:
             schema:
               $ref: "#/components/schemas/WorkflowTask"
       responses:
         200:
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowTask"
           description: ""
-  "/workflow-tasks/{id}/update-due-date":
+      tags: ["WorkflowTask"]
+  "/workflow-tasks/{workflow-task-id}/update-due-date":
     post:
       parameters:
         - in: path
-          name: id
+          name: workflow-task-id
           required: true
           schema:
+            format: int64
             type: integer
       requestBody:
         content:
-          "*/*":
+          application/json:
             schema:
               $ref: "#/components/schemas/WorkflowTask"
       responses:
         200:
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowTask"
           description: ""
-  "/workflow-tasks/{parent-id}/workflow-logs":
+      tags: ["WorkflowTask"]
+  "/workflow-tasks/{workflow-task-id}/workflow-logs":
     get:
       parameters:
         - in: query
@@ -248,20 +272,22 @@ paths:
           schema:
             type: integer
         - in: query
-          name: per_page
+          name: pageSize
           schema:
             type: integer
         - in: path
-          name: parent-id
+          name: workflow-task-id
           required: true
           schema:
-            $ref: "#/components/schemas/WorkflowTask"
+            format: int64
+            type: integer
       responses:
         200:
           content:
-            "*/*":
+            application/json:
               schema:
                 items:
                   $ref: "#/components/schemas/WorkflowLog"
                 type: array
           description: ""
+      tags: ["WorkflowLog"]

@@ -168,7 +168,7 @@
 			tabindex="0"
 			type="button"
 
-			{if $layoutColumnIndex == 0}
+			{if $layoutColumnIndex == 0 or $layoutColumnItem.plid == 0}
 				data-layout-column-item-url="{$layoutColumnItem.url}"
 			{/if}
 		{/let}

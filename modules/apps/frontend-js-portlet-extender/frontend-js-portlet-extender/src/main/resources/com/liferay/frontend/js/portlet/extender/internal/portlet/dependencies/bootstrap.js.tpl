@@ -12,12 +12,16 @@
 			}
 
 			if (initializer) {
+				var settings = JSON.parse('[$SETTINGS$]');
+
 				initializer(
 					{
-						configuration: [$CONFIGURATION],
-						contextPath: "[$CONTEXT_PATH$]",
-						portletElementId: "[$PORTLET_ELEMENT_ID$]",
-						portletNamespace: "[$PORTLET_NAMESPACE$]"
+						configuration: settings,
+						contextPath: '[$CONTEXT_PATH$]',
+						portletElementId: '[$PORTLET_ELEMENT_ID$]',
+						portletNamespace: '[$PORTLET_NAMESPACE$]',
+						preferences: JSON.parse('[$PORTLET_PREFERENCES$]'),
+						settings: settings
 					});
 			}
 			else {

@@ -29,6 +29,10 @@
 		<!--This is a multiline
 			comment.-->
 
+		<!-- End with a ; -->
+
+		<!-- End with a } -->
+
 		<property name="portal.release" value="false" />
 
 		<var name="specialCharacters" value="&quot;\&quot;" />
@@ -215,6 +219,26 @@
 			<contains string="testing" substring="test" />
 			<then>
 				<echo message="String contains substring" />
+			</then>
+		</if>
+
+		<if>
+			<or>
+				<and>
+					<isset var="A" />
+					<isset var="B" />
+				</and>
+				<and>
+					<not>
+						<isset var="B" />
+					</not>
+					<not>
+						<isset var="A" />
+					</not>
+				</and>
+			</or>
+			<then>
+				<fail message="${failMessage}" />
 			</then>
 		</if>
 

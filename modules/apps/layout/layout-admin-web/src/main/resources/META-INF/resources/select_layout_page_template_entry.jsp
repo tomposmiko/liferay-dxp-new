@@ -132,50 +132,10 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 								row.setCssClass("entry-card lfr-asset-item " + row.getCssClass());
 								%>
 
-								<portlet:renderURL var="addLayoutURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-									<portlet:param name="mvcRenderCommandName" value="/layout/add_layout" />
-									<portlet:param name="layoutPageTemplateEntryId" value="<%= String.valueOf(layoutPageTemplateEntry.getLayoutPageTemplateEntryId()) %>" />
-								</portlet:renderURL>
-
 								<liferay-ui:search-container-column-text>
-
-									<%
-									Map<String, Object> addLayoutData = new HashMap<>();
-
-									addLayoutData.put("add-layout-url", addLayoutURL);
-
-									String imagePreviewURL = layoutPageTemplateEntry.getImagePreviewURL(themeDisplay);
-									%>
-
-									<c:choose>
-										<c:when test="<%= Validator.isNotNull(imagePreviewURL) %>">
-											<liferay-frontend:vertical-card
-												cssClass="add-layout-action-option"
-												data="<%= addLayoutData %>"
-												imageCSSClass="aspect-ratio-bg-contain"
-												imageUrl="<%= imagePreviewURL %>"
-												title="<%= layoutPageTemplateEntry.getName() %>"
-												url="javascript:;"
-											>
-												<liferay-frontend:vertical-card-header>
-													<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - layoutPageTemplateEntry.getCreateDate().getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
-												</liferay-frontend:vertical-card-header>
-											</liferay-frontend:vertical-card>
-										</c:when>
-										<c:otherwise>
-											<liferay-frontend:icon-vertical-card
-												cssClass="add-layout-action-option"
-												data="<%= addLayoutData %>"
-												icon='<%= Objects.equals(layoutPageTemplateEntry.getType(), LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE) ? "page-template" : "page" %>'
-												title="<%= layoutPageTemplateEntry.getName() %>"
-												url="javascript:;"
-											>
-												<liferay-frontend:vertical-card-header>
-													<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - layoutPageTemplateEntry.getCreateDate().getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
-												</liferay-frontend:vertical-card-header>
-											</liferay-frontend:icon-vertical-card>
-										</c:otherwise>
-									</c:choose>
+									<clay:vertical-card
+										verticalCard="<%= new SelectLayoutPageTemplateEntryVerticalCard(layoutPageTemplateEntry, renderRequest, renderResponse) %>"
+									/>
 								</liferay-ui:search-container-column-text>
 							</liferay-ui:search-container-row>
 
@@ -184,41 +144,6 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 								markupView="lexicon"
 							/>
 						</liferay-ui:search-container>
-
-						<aui:script use="aui-base">
-							var addLayoutActionOptionQueryClickHandler = A.one('#<portlet:namespace />layoutPageTemplateEntries').delegate(
-								'click',
-								function(event) {
-									var actionElement = event.currentTarget;
-
-									Liferay.Util.openWindow(
-										{
-											dialog: {
-												destroyOnHide: true,
-												height: 480,
-												resizable: false,
-												width: 640
-											},
-											dialogIframe: {
-												bodyCssClass: 'dialog-with-footer'
-											},
-											id: '<portlet:namespace />addLayoutDialog',
-											title: '<liferay-ui:message key="add-page" />',
-											uri: actionElement.getData('add-layout-url')
-										}
-									);
-								},
-								'.add-layout-action-option'
-							);
-
-							function handleDestroyPortlet () {
-								addLayoutActionOptionQueryClickHandler.detach();
-
-								Liferay.detach('destroyPortlet', handleDestroyPortlet);
-							}
-
-							Liferay.on('destroyPortlet', handleDestroyPortlet);
-						</aui:script>
 					</c:when>
 					<c:when test="<%= selectLayoutPageTemplateEntryDisplayContext.isBasicPages() %>">
 						<liferay-util:include page="/select_basic_pages.jsp" servletContext="<%= application %>" />
@@ -231,3 +156,38 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 		</div>
 	</div>
 </div>
+
+<aui:script use="aui-base">
+	var addLayoutActionOptionQueryClickHandler = A.one('#<portlet:namespace />layoutPageTemplateEntries').delegate(
+		'click',
+		function(event) {
+			var actionElement = event.currentTarget;
+
+			Liferay.Util.openWindow(
+				{
+					dialog: {
+						destroyOnHide: true,
+						height: 480,
+						resizable: false,
+						width: 640
+					},
+					dialogIframe: {
+						bodyCssClass: 'dialog-with-footer'
+					},
+					id: '<portlet:namespace />addLayoutDialog',
+					title: '<liferay-ui:message key="add-page" />',
+					uri: actionElement.getData('add-layout-url')
+				}
+			);
+		},
+		'.add-layout-action-option'
+	);
+
+	function handleDestroyPortlet() {
+		addLayoutActionOptionQueryClickHandler.detach();
+
+		Liferay.detach('destroyPortlet', handleDestroyPortlet);
+	}
+
+	Liferay.on('destroyPortlet', handleDestroyPortlet);
+</aui:script>

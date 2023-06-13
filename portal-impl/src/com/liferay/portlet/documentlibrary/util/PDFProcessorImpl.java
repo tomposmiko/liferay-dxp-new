@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.image.GhostscriptUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.repository.event.FileVersionPreviewEventListener;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -90,7 +91,7 @@ public class PDFProcessorImpl
 	extends DLPreviewableProcessor implements PDFProcessor {
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 		FileUtil.mkdirs(DECRYPT_TMP_PATH);
 		FileUtil.mkdirs(PREVIEW_TMP_PATH);
 		FileUtil.mkdirs(THUMBNAIL_TMP_PATH);
@@ -600,11 +601,15 @@ public class PDFProcessorImpl
 				errorMessage += " resulted in a canceled timeout for " + future;
 			}
 
+			_fileVersionPreviewEventListener.onFailure(fileVersion);
+
 			_log.error(errorMessage);
 
 			throw te;
 		}
 		catch (Exception e) {
+			_fileVersionPreviewEventListener.onFailure(fileVersion);
+
 			_log.error(e, e);
 
 			throw e;
@@ -633,6 +638,8 @@ public class PDFProcessorImpl
 						fileVersion.getCompanyId(), PREVIEW_PATH,
 						getPreviewFilePath(fileVersion, i + 1),
 						previewTempFile);
+
+					_fileVersionPreviewEventListener.onSuccess(fileVersion);
 				}
 				finally {
 					FileUtil.delete(previewTempFile);
@@ -671,6 +678,8 @@ public class PDFProcessorImpl
 			_log.error(
 				"Unable to decrypt PDF document for file version " +
 					fileVersion.getFileVersionId());
+
+			_fileVersionPreviewEventListener.onFailure(fileVersion);
 
 			return;
 		}
@@ -775,10 +784,14 @@ public class PDFProcessorImpl
 
 				_log.error(errorMessage);
 
+				_fileVersionPreviewEventListener.onFailure(fileVersion);
+
 				throw te;
 			}
 			catch (Exception e) {
 				_log.error(e, e);
+
+				_fileVersionPreviewEventListener.onFailure(fileVersion);
 
 				throw e;
 			}
@@ -816,6 +829,8 @@ public class PDFProcessorImpl
 						fileVersion.getCompanyId(), PREVIEW_PATH,
 						getPreviewFilePath(fileVersion, index + 1),
 						previewFile);
+
+					_fileVersionPreviewEventListener.onSuccess(fileVersion);
 				}
 				finally {
 					FileUtil.delete(previewFile);
@@ -963,9 +978,7 @@ public class PDFProcessorImpl
 		return false;
 	}
 
-	private boolean _isGenerateThumbnail(FileVersion fileVersion)
-		throws Exception {
-
+	private boolean _isGenerateThumbnail(FileVersion fileVersion) {
 		if (PropsValues.DL_FILE_ENTRY_THUMBNAIL_ENABLED &&
 			!hasThumbnail(fileVersion, THUMBNAIL_INDEX_DEFAULT)) {
 
@@ -1016,6 +1029,11 @@ public class PDFProcessorImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		PDFProcessorImpl.class);
 
+	private static volatile FileVersionPreviewEventListener
+		_fileVersionPreviewEventListener =
+			ServiceProxyFactory.newServiceTrackedInstance(
+				FileVersionPreviewEventListener.class, PDFProcessorImpl.class,
+				"_fileVersionPreviewEventListener", false, false);
 	private static volatile ProcessExecutor _processExecutor =
 		ServiceProxyFactory.newServiceTrackedInstance(
 			ProcessExecutor.class, PDFProcessorImpl.class, "_processExecutor",

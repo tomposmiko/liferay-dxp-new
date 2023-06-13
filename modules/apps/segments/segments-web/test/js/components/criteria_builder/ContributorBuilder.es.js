@@ -14,6 +14,7 @@ const initialContributors = [
 ];
 
 const propertyGroups = [{
+	entityName: 'User',
 	name: 'User',
 	properties: [{
 		label: 'Ancestor Organization IDs',
@@ -66,11 +67,6 @@ const propertyGroups = [{
 		type: 'string'
 	},
 	{
-		label: 'Organization Count',
-		name: 'organizationCount',
-		type: 'string'
-	},
-	{
 		label: 'Organization IDs',
 		name: 'organizationIds',
 		type: 'string'
@@ -112,6 +108,7 @@ const propertyGroups = [{
 	}],
 	propertyKey: 'user'
 }, {
+	entityName: 'User Organization',
 	name: 'User Organization',
 	properties: [{
 		label: 'Class PK',

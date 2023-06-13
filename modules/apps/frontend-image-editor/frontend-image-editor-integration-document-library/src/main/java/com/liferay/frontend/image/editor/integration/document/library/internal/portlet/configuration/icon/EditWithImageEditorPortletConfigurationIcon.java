@@ -16,6 +16,7 @@ package com.liferay.frontend.image.editor.integration.document.library.internal.
 
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.frontend.image.editor.integration.document.library.internal.constants.ImageEditorIntegrationDLWebKeys;
 import com.liferay.frontend.image.editor.integration.document.library.internal.display.context.logic.ImageEditorDLDisplayContextHelper;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -106,7 +107,8 @@ public class EditWithImageEditorPortletConfigurationIcon
 
 			ImageEditorDLDisplayContextHelper
 				imageEditorDLDisplayContextHelper =
-					new ImageEditorDLDisplayContextHelper(fileVersion, request);
+					new ImageEditorDLDisplayContextHelper(
+						fileVersion, request, _dlurlHelper);
 
 			if (imageEditorDLDisplayContextHelper.isShowImageEditorAction()) {
 				return true;
@@ -159,6 +161,9 @@ public class EditWithImageEditorPortletConfigurationIcon
 	}
 
 	private DLAppService _dlAppService;
+
+	@Reference
+	private DLURLHelper _dlurlHelper;
 
 	@Reference
 	private Portal _portal;

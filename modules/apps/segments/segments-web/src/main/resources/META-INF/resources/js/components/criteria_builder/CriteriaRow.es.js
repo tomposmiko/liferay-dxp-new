@@ -3,17 +3,25 @@ import {PropTypes} from 'prop-types';
 import ClayButton from '../shared/ClayButton.es';
 import ClayIcon from '../shared/ClayIcon.es';
 import ClaySelect from '../shared/ClaySelect.es';
-import {CONJUNCTIONS, PROPERTY_TYPES} from '../../utils/constants.es';
+import DecimalInput from '../inputs/DecimalInput.es';
+import DateInput from '../inputs/DateInput.es';
+import DateTimeInput from '../inputs/DateTimeInput.es';
+import BooleanInput from '../inputs/BooleanInput.es';
+import SelectEntityInput from '../inputs/SelectEntityInput.es';
+import IntegerInput from '../inputs/IntegerInput.es';
+import StringInput from '../inputs/StringInput.es';
+import ThemeContext from '../../ThemeContext.es';
 import {DragSource as dragSource, DropTarget as dropTarget} from 'react-dnd';
 import {DragTypes} from '../../utils/drag-types.es';
+import {PROPERTY_TYPES} from '../../utils/constants.es';
 import getCN from 'classnames';
 import {
+	createNewGroup,
 	dateToInternationalHuman,
-	generateGroupId,
 	getSupportedOperatorsFromType,
+	objectToFormData,
 	sub
 } from '../../utils/utils.es';
-import TypedInput from './TypedInput.es';
 
 const acceptedDragTypes = [
 	DragTypes.CRITERIA_ROW,
@@ -21,17 +29,28 @@ const acceptedDragTypes = [
 ];
 
 /**
- * Prevents rows from dropping onto itself.
+ * Prevents rows from dropping onto itself and adding properties to not matching
+ * contributors.
  * This method must be called `canDrop`.
  * @param {Object} props Component's current props.
  * @param {DropTargetMonitor} monitor
  * @returns {boolean} True if the target should accept the item.
  */
 function canDrop(props, monitor) {
-	const {groupId: destGroupId, index: destIndex} = props;
-	const {groupId: startGroupId, index: startIndex} = monitor.getItem();
+	const {
+		groupId: destGroupId,
+		index: destIndex,
+		propertyKey: contributorPropertyKey
+	} = props;
 
-	return destGroupId !== startGroupId || destIndex !== startIndex;
+	const {
+		groupId: startGroupId,
+		index: startIndex,
+		propertyKey: sidebarItemPropertyKey
+	} = monitor.getItem();
+
+	return (destGroupId !== startGroupId || destIndex !== startIndex) &&
+		contributorPropertyKey === sidebarItemPropertyKey;
 }
 
 /**
@@ -60,6 +79,7 @@ function drop(props, monitor) {
 
 	const {
 		defaultValue,
+		displayValue,
 		operatorName,
 		propertyName,
 		type,
@@ -75,6 +95,7 @@ function drop(props, monitor) {
 	);
 
 	const newCriterion = {
+		displayValue,
 		operatorName: operatorName ?
 			operatorName :
 			operators[0].name,
@@ -82,13 +103,9 @@ function drop(props, monitor) {
 		value: droppedCriterionValue
 	};
 
-	const newGroup = {
-		conjunctionName: CONJUNCTIONS.AND,
-		groupId: generateGroupId(),
-		items: [criterion, newCriterion]
-	};
-
 	const itemType = monitor.getItemType();
+
+	const newGroup = createNewGroup([criterion, newCriterion]);
 
 	if (itemType === DragTypes.PROPERTY) {
 		onChange(newGroup);
@@ -111,11 +128,13 @@ function drop(props, monitor) {
  * @param {Object} props Component's current props
  * @returns {Object} The props to be passed to the drop target.
  */
-function beginDrag({criterion, groupId, index}) {
-	return {criterion, groupId, index};
+function beginDrag({criterion, groupId, index, propertyKey}) {
+	return {criterion, groupId, index, propertyKey};
 }
 
 class CriteriaRow extends Component {
+	static contextType = ThemeContext;
+
 	static propTypes = {
 		canDrop: PropTypes.bool,
 		connectDragPreview: PropTypes.func,
@@ -124,6 +143,7 @@ class CriteriaRow extends Component {
 		criterion: PropTypes.object,
 		dragging: PropTypes.bool,
 		editing: PropTypes.bool,
+		entityName: PropTypes.string,
 		groupId: PropTypes.string.isRequired,
 		hover: PropTypes.bool,
 		index: PropTypes.number.isRequired,
@@ -132,6 +152,7 @@ class CriteriaRow extends Component {
 		onChange: PropTypes.func.isRequired,
 		onDelete: PropTypes.func.isRequired,
 		onMove: PropTypes.func.isRequired,
+		propertyKey: PropTypes.string.isRequired,
 		supportedOperators: PropTypes.array,
 		supportedProperties: PropTypes.array,
 		supportedPropertyTypes: PropTypes.object
@@ -145,6 +166,56 @@ class CriteriaRow extends Component {
 		supportedPropertyTypes: {}
 	};
 
+	componentDidMount() {
+		const {
+			criterion: {displayValue, propertyName, value},
+			supportedProperties
+		} = this.props;
+
+		this._selectedProperty = this._getSelectedItem(
+			supportedProperties,
+			propertyName
+		);
+
+		if (this._selectedProperty.type === PROPERTY_TYPES.ID &&
+			value &&
+			!displayValue
+		) {
+			this._fetchEntityName();
+		}
+	}
+
+	_fetchEntityName = () => {
+		const {criterion, entityName, onChange} = this.props;
+
+		const {propertyName, value} = criterion;
+
+		const data = Liferay.Util.ns(
+			this.context.namespace,
+			{
+				entityName,
+				fieldName: propertyName,
+				fieldValue: value
+			}
+		);
+
+		fetch(
+			this.context.requestFieldValueNameURL,
+			{
+				body: objectToFormData(data),
+				method: 'POST'
+			}
+		)
+			.then(
+				response => response.text()
+			)
+			.then(
+				displayValue => {
+					onChange({...criterion, displayValue});
+				}
+			);
+	}
+
 	_getReadableCriteriaString = (
 		modelLabel,
 		propertyLabel,
@@ -152,7 +223,7 @@ class CriteriaRow extends Component {
 		value,
 		type
 	) => {
-		const parsedValue = (type === PROPERTY_TYPES.DATE) ?
+		const parsedValue = (type === PROPERTY_TYPES.DATE ||  type === PROPERTY_TYPES.DATE_TIME) ?
 			dateToInternationalHuman(value) :
 			value;
 
@@ -226,12 +297,49 @@ class CriteriaRow extends Component {
 	_handleTypedInputChange = (value, type) => {
 		const {criterion, onChange} = this.props;
 
-		onChange(
-			{
-				...criterion,
-				type,
-				value
-			}
+		if (Array.isArray(value)) {
+			const items = value.map(
+				item => ({
+					...criterion,
+					...item
+				})
+			);
+
+			onChange(createNewGroup(items));
+		}
+		else {
+			onChange(
+				{
+					...criterion,
+					type,
+					value
+				}
+			);
+		}
+	}
+
+	_renderValueInput = (selectedProperty, value) => {
+		const inputComponentsMap = {
+			[PROPERTY_TYPES.BOOLEAN]: BooleanInput,
+			[PROPERTY_TYPES.DATE]: DateInput,
+			[PROPERTY_TYPES.DATE_TIME]: DateTimeInput,
+			[PROPERTY_TYPES.DOUBLE]: DecimalInput,
+			[PROPERTY_TYPES.ID]: SelectEntityInput,
+			[PROPERTY_TYPES.INTEGER]: IntegerInput,
+			[PROPERTY_TYPES.STRING]: StringInput
+		};
+
+		const InputComponent = inputComponentsMap[selectedProperty.type] ||
+			inputComponentsMap[PROPERTY_TYPES.STRING];
+
+		return (
+			<InputComponent
+				displayValue={this.props.criterion.displayValue || ''}
+				onChange={this._handleTypedInputChange}
+				options={selectedProperty.options}
+				selectEntity={selectedProperty.selectEntity}
+				value={value}
+			/>
 		);
 	}
 
@@ -263,6 +371,7 @@ class CriteriaRow extends Component {
 
 		const operatorLabel = selectedOperator ? selectedOperator.label : '';
 		const propertyLabel = selectedProperty ? selectedProperty.label : '';
+
 		const value = criterion ? criterion.value : '';
 
 		const propertyType = selectedProperty ? selectedProperty.type : '';
@@ -323,13 +432,7 @@ class CriteriaRow extends Component {
 								selected={selectedOperator && selectedOperator.name}
 							/>
 
-							<TypedInput
-								onChange={this._handleTypedInputChange}
-								options={selectedProperty.options}
-								selectEntity={selectedProperty.selectEntity}
-								type={selectedProperty.type}
-								value={value}
-							/>
+							{this._renderValueInput(selectedProperty, value)}
 
 							<ClayButton
 								borderless
@@ -353,7 +456,7 @@ class CriteriaRow extends Component {
 									modelLabel,
 									propertyLabel,
 									operatorLabel,
-									value,
+									criterion.displayValue || value,
 									selectedProperty.type
 								)}
 							</span>

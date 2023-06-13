@@ -2807,25 +2807,33 @@ public class PortalImpl implements Portal {
 	public String getLayoutActualURL(Layout layout, String mainPath) {
 		Map<String, String> variables = new HashMap<>();
 
-		layout = getBrowsableLayout(layout);
+		Layout browsableLayout = getBrowsableLayout(layout);
 
-		variables.put("liferay:groupId", String.valueOf(layout.getGroupId()));
+		String groupIdString = String.valueOf(browsableLayout.getGroupId());
+
+		variables.put("liferay:groupId", groupIdString);
+
+		variables.put(
+			"liferay:layoutId", String.valueOf(browsableLayout.getLayoutId()));
 
 		variables.put("liferay:mainPath", mainPath);
-		variables.put("liferay:plid", String.valueOf(layout.getPlid()));
 
-		if (layout instanceof VirtualLayout) {
-			variables.put(
-				"liferay:pvlsgid", String.valueOf(layout.getGroupId()));
+		variables.put(
+			"liferay:plid", String.valueOf(browsableLayout.getPlid()));
+
+		variables.put(
+			"liferay:privateLayout",
+			String.valueOf(browsableLayout.isPrivateLayout()));
+
+		String pvlsgid = "0";
+
+		if (browsableLayout instanceof VirtualLayout) {
+			pvlsgid = groupIdString;
 		}
-		else {
-			variables.put("liferay:pvlsgid", "0");
-		}
 
-		UnicodeProperties typeSettingsProperties =
-			layout.getTypeSettingsProperties();
+		variables.put("liferay:pvlsgid", pvlsgid);
 
-		variables.putAll(typeSettingsProperties);
+		variables.putAll(layout.getTypeSettingsProperties());
 
 		LayoutTypeController layoutTypeController =
 			LayoutTypeControllerTracker.getLayoutTypeController(

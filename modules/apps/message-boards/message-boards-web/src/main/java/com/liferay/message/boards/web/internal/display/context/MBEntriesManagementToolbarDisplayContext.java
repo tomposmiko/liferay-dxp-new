@@ -17,6 +17,8 @@ package com.liferay.message.boards.web.internal.display.context;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
 import com.liferay.message.boards.constants.MBCategoryConstants;
 import com.liferay.message.boards.constants.MBPortletKeys;
@@ -25,8 +27,7 @@ import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.util.comparator.CategoryModifiedDateComparator;
 import com.liferay.message.boards.util.comparator.CategoryTitleComparator;
-import com.liferay.message.boards.util.comparator.MBObjectsModifiedDateComparator;
-import com.liferay.message.boards.util.comparator.MBObjectsTitleComparator;
+import com.liferay.message.boards.util.comparator.MBObjectsComparator;
 import com.liferay.message.boards.util.comparator.ThreadModifiedDateComparator;
 import com.liferay.message.boards.util.comparator.ThreadTitleComparator;
 import com.liferay.message.boards.web.internal.security.permission.MBCategoryPermission;
@@ -120,6 +121,7 @@ public class MBEntriesManagementToolbarDisplayContext {
 
 							dropdownItem.setQuickAction(true);
 						}));
+
 				add(
 					SafeConsumer.ignore(
 						dropdownItem -> {
@@ -256,13 +258,51 @@ public class MBEntriesManagementToolbarDisplayContext {
 								LanguageUtil.get(
 									_request, "filter-by-navigation"));
 						}));
-				addGroup(
-					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItems(
-							_getOrderByDropdownItems());
-						dropdownGroupItem.setLabel(
-							LanguageUtil.get(_request, "order-by"));
-					});
+
+				String entriesNavigation = _getEntriesNavigation();
+
+				if (!entriesNavigation.equals("all")) {
+					addGroup(
+						dropdownGroupItem -> {
+							dropdownGroupItem.setDropdownItems(
+								_getOrderByDropdownItems());
+							dropdownGroupItem.setLabel(
+								LanguageUtil.get(_request, "order-by"));
+						});
+				}
+			}
+		};
+	}
+
+	public List<LabelItem> getFilterLabelItems() {
+		return new LabelItemList() {
+			{
+				String entriesNavigation = _getEntriesNavigation();
+
+				if (entriesNavigation.equals("threads") ||
+					entriesNavigation.equals("categories")) {
+
+					add(
+						SafeConsumer.ignore(
+							labelItem -> {
+								PortletURL removeLabelURL =
+									PortletURLUtil.clone(
+										_currentURLObj,
+										_liferayPortletResponse);
+
+								removeLabelURL.setParameter(
+									"entriesNavigation", (String)null);
+
+								labelItem.putData(
+									"removeLabelURL",
+									removeLabelURL.toString());
+
+								labelItem.setCloseable(true);
+								labelItem.setLabel(
+									LanguageUtil.get(
+										_request, entriesNavigation));
+							}));
+				}
 			}
 		};
 	}
@@ -303,7 +343,7 @@ public class MBEntriesManagementToolbarDisplayContext {
 		}
 		else {
 			orderByType = _portalPreferences.getValue(
-				MBPortletKeys.MESSAGE_BOARDS_ADMIN, "order-by-type", "desc");
+				MBPortletKeys.MESSAGE_BOARDS_ADMIN, "order-by-type", "asc");
 		}
 
 		_orderByType = orderByType;
@@ -392,17 +432,10 @@ public class MBEntriesManagementToolbarDisplayContext {
 			orderByAsc = true;
 		}
 
-		String entriesNavigation = ParamUtil.getString(
-			_request, "entriesNavigation", "all");
+		String entriesNavigation = _getEntriesNavigation();
 
 		if (entriesNavigation.equals("all")) {
-			if (orderByCol.equals("modified-date")) {
-				orderByComparator = new MBObjectsModifiedDateComparator(
-					orderByAsc);
-			}
-			else if (orderByCol.equals("title")) {
-				orderByComparator = new MBObjectsTitleComparator(orderByAsc);
-			}
+			orderByComparator = new MBObjectsComparator(orderByAsc);
 		}
 		else if (entriesNavigation.equals("threads")) {
 			if (orderByCol.equals("modified-date")) {
@@ -458,9 +491,12 @@ public class MBEntriesManagementToolbarDisplayContext {
 		return sortingURL;
 	}
 
+	private String _getEntriesNavigation() {
+		return ParamUtil.getString(_request, "entriesNavigation", "all");
+	}
+
 	private List<DropdownItem> _getFilterNavigationDropdownItems() {
-		final String entriesNavigation = ParamUtil.getString(
-			_request, "entriesNavigation", "all");
+		String entriesNavigation = _getEntriesNavigation();
 
 		return new DropdownItemList() {
 			{

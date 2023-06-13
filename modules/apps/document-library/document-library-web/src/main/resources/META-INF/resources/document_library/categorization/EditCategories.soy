@@ -1,0 +1,136 @@
+{namespace EditCategories}
+
+{template .render}
+	{@param dataSource: string|[]|list<?>}
+	{@param loading: bool}
+	{@param spritemap: string}
+	{@param? vocabularies: list<?>}
+	{@param? description: string}
+	{@param? multiple: bool}
+	{@param? portletNamespace: string}
+	{@param? selectCategoriesUrl: string}
+	{@param? _handleRadioChange: any}
+	{@param? _handleSaveBtnClick: any}
+
+	{call liferay.frontend.Modal.render}
+		{param body kind="html"}
+			{if $loading}
+				{call .loading /}
+			{else}
+				{call .categories}
+					{param description: $description /}
+					{param dataSource: $dataSource /}
+					{param multiple: $multiple /}
+					{param portletNamespace: $portletNamespace /}
+					{param selectCategoriesUrl: $selectCategoriesUrl /}
+					{param spritemap: $spritemap /}
+					{param vocabularies: $vocabularies /}
+					{param _handleRadioChange: $_handleRadioChange /}
+				{/call}
+			{/if}
+		{/param}
+
+		{param dialogClasses: 'edit-categories modal-dialog-sm' /}
+
+		{param header kind="html"}
+			{msg desc=""}edit-categories{/msg}
+		{/param}
+
+		{param footer kind="html"}
+			<button class="btn btn-secondary" data-onclick="hide" type="button">{msg desc=""}cancel{/msg}</button>
+			<button class="btn btn-primary" data-onclick="{$_handleSaveBtnClick}" type="button">{msg desc=""}save{/msg}</button>
+		{/param}
+
+		{param ref: 'modal' /}
+
+		{param spritemap: $spritemap /}
+
+		{param visible: true /}
+	{/call}
+{/template}
+
+{template .loading}
+	<div class="loading-indicator">
+		<span aria-hidden="true" class="loading-animation loading-animation-sm"></span>
+	</div>
+{/template}
+
+{template .categories}
+	{@param dataSource: string|[]|list<?>}
+	{@param? vocabularies: list<?>}
+	{@param? portletNamespace: string}
+	{@param? selectCategoriesUrl: string}
+	{@param spritemap: string}
+	{@param? description: string}
+	{@param? multiple: bool}
+	{@param? _handleRadioChange: any}
+
+	<p>{$description} {if $multiple} {msg desc=""}select-append-or-replace-current-categories{/msg} {/if}</p>
+
+	{if $multiple}
+		{call ClayRadio.render}
+			{param checked: true /}
+			{param events: [
+				'change': $_handleRadioChange,
+			] /}
+			{param label kind="text"} {msg desc=""}append{/msg} {/param}
+			{param name: 'add-replace' /}
+			{param value: 'add' /}
+		{/call}
+
+		<p>
+			<small class="text-default">{msg desc=""}add-new-categories-to-the-existing-categories{/msg}</small>
+		</p>
+
+		{call ClayRadio.render}
+			{param events: [
+				'change': $_handleRadioChange,
+			] /}
+			{param label kind="text"} {msg desc=""}replace{/msg} {/param}
+			{param name: 'add-replace' /}
+			{param value: 'replace' /}
+		{/call}
+
+		<p>
+			<small class="text-default">{msg desc=""}new-categories-replace-all-existing-categories{/msg}</small>
+		</p>
+	{/if}
+
+	{if $vocabularies and length($vocabularies) > 0}
+		{foreach $vocabulary in $vocabularies}
+			{call .categorySelector}
+				{param vocabularyId: $vocabulary.id /}
+				{param vocabularyName: $vocabulary.name /}
+				{param multiValued: $vocabulary.multiValued /}
+				{param categories: $vocabulary.categories /}
+				{param dataSource: $dataSource /}
+				{param portletNamespace: $portletNamespace /}
+				{param selectCategoriesUrl: $selectCategoriesUrl /}
+				{param spritemap: $spritemap /}
+			{/call}
+		{/foreach}
+	{/if}
+{/template}
+
+{template .categorySelector}
+	{@param categories: list<?>}
+	{@param dataSource: string|[]|list<?>}
+	{@param multiValued: bool}
+	{@param spritemap: string}
+	{@param vocabularyId: number}
+	{@param vocabularyName: string}
+	{@param? portletNamespace: string}
+	{@param? selectCategoriesUrl: string}
+
+	{call InputCategoriesSelector.render}
+		{param categories: $categories /}
+		{param dataSource: $dataSource /}
+		{param dialogClasses: 'modal-dialog-sm' /}
+		{param eventName: $portletNamespace + 'selectCategories' /}
+		{param multiValued: $multiValued /}
+		{param selectCategoriesUrl: $selectCategoriesUrl /}
+		{param spritemap: $spritemap /}
+		{param vocabularyId: $vocabularyId /}
+		{param vocabularyName: $vocabularyName /}
+	{/call}
+{/template}

@@ -29,6 +29,7 @@ import com.liferay.site.navigation.type.SiteNavigationMenuItemType;
 import com.liferay.site.navigation.type.SiteNavigationMenuItemTypeRegistry;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +42,35 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = {})
 public class NavItemUtil {
+
+	public static List<NavItem> getBranchNavItems(HttpServletRequest request)
+		throws PortalException {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Layout layout = themeDisplay.getLayout();
+
+		if (layout.isRootLayout()) {
+			return Collections.singletonList(
+				new NavItem(request, themeDisplay, layout, null));
+		}
+
+		List<Layout> ancestorLayouts = layout.getAncestors();
+
+		List<NavItem> navItems = new ArrayList<>(ancestorLayouts.size() + 1);
+
+		for (int i = ancestorLayouts.size() - 1; i >= 0; i--) {
+			Layout ancestorLayout = ancestorLayouts.get(i);
+
+			navItems.add(
+				new NavItem(request, themeDisplay, ancestorLayout, null));
+		}
+
+		navItems.add(new NavItem(request, themeDisplay, layout, null));
+
+		return navItems;
+	}
 
 	public static List<NavItem> getChildNavItems(
 		HttpServletRequest request, long siteNavigationMenuId,
@@ -110,20 +140,15 @@ public class NavItemUtil {
 			if ((rootLayoutLevel >= 0) &&
 				(rootLayoutLevel <= (branchNavItems.size() + 1))) {
 
-				int absoluteLevel = _getAbsoluteLevel(
-					rootLayoutLevel, branchNavItems, themeDisplay);
+				int absoluteLevel = branchNavItems.size() - 1 - rootLayoutLevel;
 
-				if (absoluteLevel == 0) {
+				if (absoluteLevel == -1) {
 					navItems = NavItem.fromLayouts(request, themeDisplay, null);
 				}
-				else if ((absoluteLevel > 0) &&
-						 (absoluteLevel <= branchNavItems.size())) {
+				else if ((absoluteLevel >= 0) &&
+						 (absoluteLevel < branchNavItems.size())) {
 
-					rootNavItem = branchNavItems.get(absoluteLevel - 1);
-				}
-				else if (absoluteLevel == (branchNavItems.size() + 1)) {
-					rootNavItem = new NavItem(
-						request, themeDisplay, themeDisplay.getLayout(), null);
+					rootNavItem = branchNavItems.get(absoluteLevel);
 				}
 			}
 		}
@@ -176,21 +201,6 @@ public class NavItemUtil {
 
 		_siteNavigationMenuItemTypeRegistry =
 			siteNavigationMenuItemTypeRegistry;
-	}
-
-	private static int _getAbsoluteLevel(
-		int rootLayoutLevel, List<NavItem> branchNavItems,
-		ThemeDisplay themeDisplay) {
-
-		int absoluteLevel = branchNavItems.size() - (rootLayoutLevel - 1);
-
-		Layout layout = themeDisplay.getLayout();
-
-		if (layout.isFirstParent()) {
-			absoluteLevel -= 1;
-		}
-
-		return absoluteLevel;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(NavItemUtil.class);

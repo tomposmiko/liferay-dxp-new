@@ -22,15 +22,8 @@
 		%>
 
 		<liferay-ui:search-container-column-text>
-			<liferay-frontend:vertical-card
-				actionJsp='<%= !selectOrganizations ? "/organization_action.jsp" : StringPool.BLANK %>'
-				actionJspServletContext="<%= application %>"
-				cssClass="entry-display-style"
-				imageUrl='<%= themeDisplay.getPathImage() + "/organization_logo?img_id=" + organization.getLogoId() + "&t=" + WebServerServletTokenUtil.getToken(organization.getLogoId()) %>'
-				resultRow="<%= row %>"
-				rowChecker="<%= searchContainer.getRowChecker() %>"
-				subtitle="<%= LanguageUtil.get(request, organization.getType()) %>"
-				title="<%= organization.getName() %>"
+			<clay:vertical-card
+				verticalCard="<%= new OrganizationsVerticalCard(organization, !selectOrganizations, renderRequest, renderResponse, searchContainer.getRowChecker()) %>"
 			/>
 		</liferay-ui:search-container-column-text>
 	</c:when>
@@ -61,9 +54,17 @@
 		</liferay-ui:search-container-column-text>
 
 		<c:if test="<%= !selectOrganizations %>">
-			<liferay-ui:search-container-column-jsp
-				path="/organization_action.jsp"
-			/>
+
+			<%
+			OrganizationActionDropdownItemsProvider organizationActionDropdownItemsProvider = new OrganizationActionDropdownItemsProvider(organization, renderRequest, renderResponse);
+			%>
+
+			<liferay-ui:search-container-column-text>
+				<clay:dropdown-actions
+					defaultEventHandler="<%= SiteMembershipWebKeys.ORGANIZATION_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+					dropdownItems="<%= organizationActionDropdownItemsProvider.getActionDropdownItems() %>"
+				/>
+			</liferay-ui:search-container-column-text>
 		</c:if>
 	</c:when>
 	<c:otherwise>
@@ -106,9 +107,17 @@
 		/>
 
 		<c:if test="<%= !selectOrganizations %>">
-			<liferay-ui:search-container-column-jsp
-				path="/organization_action.jsp"
-			/>
+
+			<%
+			OrganizationActionDropdownItemsProvider organizationActionDropdownItemsProvider = new OrganizationActionDropdownItemsProvider(organization, renderRequest, renderResponse);
+			%>
+
+			<liferay-ui:search-container-column-text>
+				<clay:dropdown-actions
+					defaultEventHandler="<%= SiteMembershipWebKeys.ORGANIZATION_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+					dropdownItems="<%= organizationActionDropdownItemsProvider.getActionDropdownItems() %>"
+				/>
+			</liferay-ui:search-container-column-text>
 		</c:if>
 	</c:otherwise>
 </c:choose>

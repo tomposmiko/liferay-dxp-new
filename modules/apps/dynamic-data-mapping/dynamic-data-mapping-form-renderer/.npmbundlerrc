@@ -1,4 +1,5 @@
 {
-    "output": "classes/META-INF/resources",
-    "preset": "liferay-npm-bundler-preset-standard"
+    "ignore": [
+		"**/js/*.js"
+	]
 }

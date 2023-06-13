@@ -14,7 +14,9 @@
 
 package com.liferay.segments.internal.odata.entity;
 
+import com.liferay.portal.odata.entity.BooleanEntityField;
 import com.liferay.portal.odata.entity.DateEntityField;
+import com.liferay.portal.odata.entity.DateTimeEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.IntegerEntityField;
@@ -39,23 +41,31 @@ public class ContextEntityModel implements EntityModel {
 
 	public ContextEntityModel(List<EntityField> customEntityFields) {
 		_entityFieldsMap = Stream.of(
-			new StringEntityField(Context.BROWSER, locale -> Context.BROWSER),
-			new StringEntityField(
-				Context.DEVICE_BRAND, locale -> Context.DEVICE_BRAND),
-			new StringEntityField(
-				Context.DEVICE_MODEL, locale -> Context.DEVICE_MODEL),
+			new BooleanEntityField(
+				Context.SIGNED_IN, locale -> Context.SIGNED_IN),
+			new DateEntityField(
+				Context.LOCAL_DATE, locale -> Context.LOCAL_DATE,
+				locale -> Context.LOCAL_DATE),
+			new DateTimeEntityField(
+				Context.LAST_SIGN_IN_DATE_TIME,
+				locale -> Context.LAST_SIGN_IN_DATE_TIME,
+				locale -> Context.LAST_SIGN_IN_DATE_TIME),
 			new IntegerEntityField(
 				Context.DEVICE_SCREEN_RESOLUTION_HEIGHT,
 				locale -> Context.DEVICE_SCREEN_RESOLUTION_HEIGHT),
 			new IntegerEntityField(
 				Context.DEVICE_SCREEN_RESOLUTION_WIDTH,
 				locale -> Context.DEVICE_SCREEN_RESOLUTION_WIDTH),
+			new StringEntityField(Context.BROWSER, locale -> Context.BROWSER),
+			new StringEntityField(
+				Context.DEVICE_BRAND, locale -> Context.DEVICE_BRAND),
+			new StringEntityField(
+				Context.DEVICE_MODEL, locale -> Context.DEVICE_MODEL),
 			new StringEntityField(
 				Context.LANGUAGE_ID, locale -> Context.LANGUAGE_ID),
-			new DateEntityField(
-				Context.LOCAL_DATE, locale -> Context.LOCAL_DATE,
-				locale -> Context.LOCAL_DATE),
-			new StringEntityField(Context.URL, locale -> Context.URL)
+			new StringEntityField(Context.URL, locale -> Context.URL),
+			new StringEntityField(
+				Context.USER_AGENT, locale -> Context.USER_AGENT)
 		).collect(
 			Collectors.toMap(EntityField::getName, Function.identity())
 		);

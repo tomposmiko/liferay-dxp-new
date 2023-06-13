@@ -35,6 +35,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.aggregation.Aggregation;
+import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
 import com.liferay.portal.search.constants.SearchContextAttributes;
 import com.liferay.portal.search.elasticsearch6.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch6.constants.ElasticsearchSearchContextAttributes;
@@ -74,7 +76,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 	@Override
 	public String getQueryString(SearchContext searchContext, Query query) {
-		return searchEngineAdapter.getQueryString(query);
+		return _searchEngineAdapter.getQueryString(query);
 	}
 
 	@Override
@@ -98,7 +100,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 			if (end == QueryUtil.ALL_POS) {
 				end = GetterUtil.getInteger(
-					props.get(PropsKeys.INDEX_SEARCH_LIMIT));
+					_props.get(PropsKeys.INDEX_SEARCH_LIMIT));
 			}
 			else if (end < 0) {
 				throw new IllegalArgumentException("Invalid end " + end);
@@ -114,7 +116,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 					createSearchSearchRequest(searchContext, query, start, end);
 
 				SearchSearchResponse searchSearchResponse =
-					searchEngineAdapter.execute(searchSearchRequest);
+					_searchEngineAdapter.execute(searchSearchRequest);
 
 				if (_log.isInfoEnabled()) {
 					_log.info(
@@ -185,7 +187,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 				searchContext, query);
 
 			CountSearchResponse countSearchResponse =
-				searchEngineAdapter.execute(countSearchRequest);
+				_searchEngineAdapter.execute(countSearchRequest);
 
 			if (_log.isInfoEnabled()) {
 				_log.info(
@@ -246,7 +248,9 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 		CountSearchRequest countSearchRequest = new CountSearchRequest();
 
-		prepare(countSearchRequest, query, searchContext);
+		prepare(
+			countSearchRequest, getSearchRequest(searchContext), query,
+			searchContext);
 
 		return countSearchRequest;
 	}
@@ -256,7 +260,9 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
-		prepare(searchSearchRequest, query, searchContext);
+		SearchRequest searchRequest = getSearchRequest(searchContext);
+
+		prepare(searchSearchRequest, searchRequest, query, searchContext);
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
 
@@ -311,8 +317,18 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 		searchSearchRequest.setSorts(searchContext.getSorts());
 		searchSearchRequest.setStats(searchContext.getStats());
+		searchSearchRequest.setStatsRequests(searchRequest.getStatsRequests());
 
 		return searchSearchRequest;
+	}
+
+	protected SearchRequest getSearchRequest(SearchContext searchContext) {
+		SearchRequestBuilder searchRequestBuilder = _getSearchRequestBuilder(
+			searchContext);
+
+		SearchRequest searchRequest = searchRequestBuilder.build();
+
+		return searchRequest;
 	}
 
 	protected String[] getSelectedIndexNames(
@@ -324,7 +340,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			return selectedIndexNames;
 		}
 
-		String indexName = indexNameBuilder.getIndexName(
+		String indexName = _indexNameBuilder.getIndexName(
 			searchContext.getCompanyId());
 
 		return new String[] {indexName};
@@ -358,16 +374,20 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		BaseSearchResponse baseSearchResponse,
 		SearchResponseBuilder searchResponseBuilder) {
 
-		searchResponseBuilder.requestString(
+		searchResponseBuilder.aggregationResultsMap(
+			baseSearchResponse.getAggregationResultsMap()
+		).requestString(
 			baseSearchResponse.getSearchRequestString()
 		).responseString(
 			baseSearchResponse.getSearchResponseString()
+		).statsResponseMap(
+			baseSearchResponse.getStatsResponseMap()
 		);
 	}
 
 	protected void prepare(
-		BaseSearchRequest baseSearchRequest, Query query,
-		SearchContext searchContext) {
+		BaseSearchRequest baseSearchRequest, SearchRequest searchRequest,
+		Query query, SearchContext searchContext) {
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
 
@@ -378,43 +398,79 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		baseSearchRequest.setPostFilter(query.getPostFilter());
 		baseSearchRequest.setQuery(query);
 
-		SearchRequestBuilder searchRequestBuilder = _getSearchRequestBuilder(
-			searchContext);
-
-		SearchRequest searchRequest = searchRequestBuilder.build();
-
 		baseSearchRequest.setExplain(searchRequest.isExplain());
 		baseSearchRequest.setIncludeResponseString(
 			searchRequest.isIncludeResponseString());
 		baseSearchRequest.setRescoreQuery(searchRequest.getRescoreQuery());
+		baseSearchRequest.setStatsRequests(searchRequest.getStatsRequests());
+
+		setAggregations(baseSearchRequest, searchRequest);
+		setPipelineAggregations(baseSearchRequest, searchRequest);
 	}
 
-	@Reference
-	protected IndexNameBuilder indexNameBuilder;
+	protected void setAggregations(
+		BaseSearchRequest baseSearchRequest, SearchRequest searchRequest) {
 
-	@Reference
-	protected Props props;
+		Map<String, Aggregation> map = searchRequest.getAggregationsMap();
 
-	@Reference(target = "(search.engine.impl=Elasticsearch)")
-	protected SearchEngineAdapter searchEngineAdapter;
+		for (Aggregation aggregation : map.values()) {
+			baseSearchRequest.addAggregation(aggregation);
+		}
+	}
 
-	@Reference
-	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
+	@Reference(unbind = "-")
+	protected void setIndexNameBuilder(IndexNameBuilder indexNameBuilder) {
+		_indexNameBuilder = indexNameBuilder;
+	}
 
-	@Reference
-	protected SearchResponseBuilderFactory searchResponseBuilderFactory;
+	protected void setPipelineAggregations(
+		BaseSearchRequest baseSearchRequest, SearchRequest searchRequest) {
+
+		Map<String, PipelineAggregation> map =
+			searchRequest.getPipelineAggregationsMap();
+
+		for (PipelineAggregation aggregation : map.values()) {
+			baseSearchRequest.addPipelineAggregation(aggregation);
+		}
+	}
+
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
+		_props = props;
+	}
+
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setSearchEngineAdapter(
+		SearchEngineAdapter searchEngineAdapter) {
+
+		_searchEngineAdapter = searchEngineAdapter;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchRequestBuilderFactory(
+		SearchRequestBuilderFactory searchRequestBuilderFactory) {
+
+		_searchRequestBuilderFactory = searchRequestBuilderFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchResponseBuilderFactory(
+		SearchResponseBuilderFactory searchResponseBuilderFactory) {
+
+		_searchResponseBuilderFactory = searchResponseBuilderFactory;
+	}
 
 	private SearchRequestBuilder _getSearchRequestBuilder(
 		SearchContext searchContext) {
 
-		return searchRequestBuilderFactory.getSearchRequestBuilder(
+		return _searchRequestBuilderFactory.getSearchRequestBuilder(
 			searchContext);
 	}
 
 	private SearchResponseBuilder _getSearchResponseBuilder(
 		SearchContext searchContext) {
 
-		return searchResponseBuilderFactory.getSearchResponseBuilder(
+		return _searchResponseBuilderFactory.getSearchResponseBuilder(
 			searchContext);
 	}
 
@@ -422,6 +478,11 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		ElasticsearchIndexSearcher.class);
 
 	private volatile ElasticsearchConfiguration _elasticsearchConfiguration;
+	private IndexNameBuilder _indexNameBuilder;
 	private boolean _logExceptionsOnly;
+	private Props _props;
+	private SearchEngineAdapter _searchEngineAdapter;
+	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
+	private SearchResponseBuilderFactory _searchResponseBuilderFactory;
 
 }

@@ -19,8 +19,15 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.search.aggregation.Aggregation;
+import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
+import com.liferay.portal.search.stats.StatsRequest;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +35,21 @@ import java.util.Map;
  */
 @ProviderType
 public abstract class BaseSearchRequest {
+
+	public void addAggregation(Aggregation aggregation) {
+		_aggregationsMap.put(aggregation.getName(), aggregation);
+	}
+
+	public void addPipelineAggregation(
+		PipelineAggregation pipelineAggregation) {
+
+		_pipelineAggregationsMap.put(
+			pipelineAggregation.getName(), pipelineAggregation);
+	}
+
+	public Map<String, Aggregation> getAggregationsMap() {
+		return Collections.unmodifiableMap(_aggregationsMap);
+	}
 
 	public Map<String, Facet> getFacets() {
 		return _facets;
@@ -41,6 +63,10 @@ public abstract class BaseSearchRequest {
 		return _minimumScore;
 	}
 
+	public Map<String, PipelineAggregation> getPipelineAggregationsMap() {
+		return Collections.unmodifiableMap(_pipelineAggregationsMap);
+	}
+
 	public Filter getPostFilter() {
 		return _postFilter;
 	}
@@ -51,6 +77,10 @@ public abstract class BaseSearchRequest {
 
 	public Query getRescoreQuery() {
 		return _rescoreQuery;
+	}
+
+	public List<StatsRequest> getStatsRequests() {
+		return Collections.unmodifiableList(_statsRequests);
 	}
 
 	public long getTimeoutInMilliseconds() {
@@ -77,8 +107,8 @@ public abstract class BaseSearchRequest {
 		return _trackTotalHits;
 	}
 
-	public void putAllFacets(Map<String, Facet> faects) {
-		_facets.putAll(faects);
+	public void putAllFacets(Map<String, Facet> facets) {
+		_facets.putAll(facets);
 	}
 
 	public void putFacet(String fieldName, Facet facet) {
@@ -121,6 +151,10 @@ public abstract class BaseSearchRequest {
 		_rescoreQuery = rescoreQuery;
 	}
 
+	public void setStatsRequests(Collection<StatsRequest> statsRequests) {
+		_statsRequests = new ArrayList<>(statsRequests);
+	}
+
 	public void setTimeoutInMilliseconds(long timeoutInMilliseconds) {
 		_timeoutInMilliseconds = timeoutInMilliseconds;
 	}
@@ -129,16 +163,21 @@ public abstract class BaseSearchRequest {
 		_trackTotalHits = trackTotalHits;
 	}
 
+	private final Map<String, Aggregation> _aggregationsMap =
+		new LinkedHashMap<>();
 	private boolean _basicFacetSelection;
 	private boolean _explain;
-	private final Map<String, Facet> _facets = new HashMap<>();
+	private final Map<String, Facet> _facets = new LinkedHashMap<>();
 	private boolean _includeResponseString;
 	private String[] _indexNames;
 	private float _minimumScore;
+	private final Map<String, PipelineAggregation> _pipelineAggregationsMap =
+		new LinkedHashMap<>();
 	private Filter _postFilter;
 	private Query _query;
 	private boolean _requestCache;
 	private Query _rescoreQuery;
+	private List<StatsRequest> _statsRequests = Collections.emptyList();
 	private long _timeoutInMilliseconds;
 	private boolean _trackTotalHits = true;
 

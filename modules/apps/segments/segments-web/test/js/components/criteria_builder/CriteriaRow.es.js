@@ -25,6 +25,7 @@ describe(
 						onChange={jest.fn()}
 						onDelete={jest.fn()}
 						onMove={jest.fn()}
+						propertyKey="user"
 					/>
 				);
 

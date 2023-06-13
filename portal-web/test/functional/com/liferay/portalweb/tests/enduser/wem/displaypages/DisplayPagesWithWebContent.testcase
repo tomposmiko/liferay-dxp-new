@@ -26,7 +26,7 @@ definition {
 		task ("Add a display page with fragments mapped to Basic Web Content") {
 			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-			DisplayPagesAdmin.add(displayPageName = "Display Page Name");
+			DisplayPagesAdmin.addDisplayPage(displayPageName = "Display Page Name");
 
 			PageEditor.addFragment(
 				collectionName = "Collection Name",
@@ -56,6 +56,8 @@ definition {
 			);
 
 			Button.clickPublish();
+
+			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 		}
 	}
 
@@ -124,9 +126,9 @@ definition {
 				siteURLKey = "test-site-name"
 			);
 
-			LexiconEntry.gotoEntryMenuItem(
-				menuItem = "Configure",
-				rowEntry = "Display Page Name"
+			DisplayPagesAdmin.gotoDisplayPageEllipsisItem(
+				displayPageName = "Display Page Name",
+				item = "Configure"
 			);
 
 			Navigator.gotoNavTab(navTab = "Look and Feel");
@@ -217,9 +219,9 @@ definition {
 				siteURLKey = "test-site-name"
 			);
 
-			LexiconEntry.gotoEntryMenuItem(
-				menuItem = "Configure",
-				rowEntry = "Display Page Name"
+			DisplayPagesAdmin.gotoDisplayPageEllipsisItem(
+				displayPageName = "Display Page Name",
+				item = "Configure"
 			);
 
 			Navigator.gotoNavTab(navTab = "Look and Feel");
@@ -230,9 +232,8 @@ definition {
 
 			SelectFrame(locator1 = "IFrame#DIALOG");
 
-			Click(
-				locator1 = "Card#SPECIFIC_LARGE_TEXT",
-				key_cardText = "Fjord"
+			LexiconCard.clickCard(
+				card = "Fjord"
 			);
 
 			SelectFrameTop(value1 = "relative=top");
@@ -261,7 +262,7 @@ definition {
 	@priority = "5"
 	test PreviewDraftWebContent {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(rowEntry = "Display Page Name");
+			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a draft status web content article") {
@@ -316,7 +317,7 @@ definition {
 	@priority = "5"
 	test PreviewPendingWebContent {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(rowEntry = "Display Page Name");
+			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Configure Web Content Article workflow to Single Approver") {
@@ -382,7 +383,7 @@ definition {
 	@priority = "5"
 	test PreviewPublishedWebContent {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(rowEntry = "Display Page Name");
+			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a web content article") {
@@ -435,7 +436,7 @@ definition {
 	@priority = "5"
 	test ViewDisplayPageMarkedAsDefault {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(rowEntry = "Display Page Name");
+			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a web content article") {
@@ -640,11 +641,11 @@ definition {
 	@priority = "5"
 	test ViewNonDefaultDisplayPage {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(rowEntry = "Display Page Name");
+			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a second display page that is mapped to Basic Web Content") {
-			DisplayPagesAdmin.add(displayPageName = "Non-Default Display Page");
+			DisplayPagesAdmin.addDisplayPage(displayPageName = "Non-Default Display Page");
 
 			PageEditor.addFragment(
 				collectionName = "Collection Name",
@@ -719,7 +720,7 @@ definition {
 	@priority = "4"
 	test ViewNoSelectedDisplayPage {
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(rowEntry = "Display Page Name");
+			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a web content article that has no display page selected") {

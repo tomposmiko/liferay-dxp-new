@@ -13,6 +13,7 @@ describe(
 				const {asFragment} = render(
 					<CriteriaBuilder
 						editing={false}
+						entityName="User"
 						id={0}
 						propertyKey="user"
 						supportedProperties={[]}

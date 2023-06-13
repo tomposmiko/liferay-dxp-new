@@ -16,26 +16,12 @@
 
 <%@ include file="/init.jsp" %>
 
-<clay:navigation-bar
-	inverted="<%= true %>"
-	navigationItems="<%= trashDisplayContext.getNavigationItems() %>"
-/>
+<%
+TrashManagementToolbarDisplayContext trashManagementToolbarDisplayContext = new TrashManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, trashDisplayContext);
+%>
 
 <clay:management-toolbar
-	actionDropdownItems="<%= trashDisplayContext.getActionDropdownItems() %>"
-	clearResultsURL="<%= trashDisplayContext.getClearResultsURL() %>"
-	componentId="trashWebManagementToolbar"
-	disabled="<%= trashDisplayContext.isDisabledManagementBar() %>"
-	filterDropdownItems="<%= trashDisplayContext.getFilterDropdownItems() %>"
-	infoPanelId="infoPanelId"
-	itemsTotal="<%= trashDisplayContext.getTotalItems() %>"
-	searchActionURL="<%= trashDisplayContext.getSearchActionURL() %>"
-	searchContainerId="trash"
-	searchFormName="searchFm"
-	showInfoButton="<%= true %>"
-	sortingOrder="<%= trashDisplayContext.getOrderByType() %>"
-	sortingURL="<%= trashDisplayContext.getSortingURL() %>"
-	viewTypeItems="<%= trashDisplayContext.getViewTypeItems() %>"
+	displayContext="<%= trashManagementToolbarDisplayContext %>"
 />
 
 <liferay-util:include page="/restore_path.jsp" servletContext="<%= application %>" />
@@ -92,10 +78,6 @@
 	</c:if>
 </liferay-ui:error>
 
-<portlet:actionURL name="deleteEntries" var="deleteEntriesURL">
-	<portlet:param name="redirect" value="<%= currentURL %>" />
-</portlet:actionURL>
-
 <div class="closed container-fluid container-fluid-max-xl sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
 	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/trash/info_panel" var="sidebarPanelURL" />
 
@@ -113,7 +95,11 @@
 			/>
 		</c:if>
 
-		<aui:form action="<%= deleteEntriesURL %>" name="fm">
+		<portlet:actionURL name="deleteEntries" var="deleteTrashEntriesURL">
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+		</portlet:actionURL>
+
+		<aui:form action="<%= deleteTrashEntriesURL %>" name="fm">
 			<liferay-ui:search-container
 				id="trash"
 				searchContainer="<%= trashDisplayContext.getEntrySearch() %>"
@@ -148,18 +134,11 @@
 						viewContentURLString = viewContentURL.toString();
 					}
 
-					String actionPath = "/view_content_action.jsp";
+					Map<String, Object> rowData = new HashMap<>();
 
-					if (Validator.isNotNull(trashRenderer.renderActions(renderRequest, renderResponse))) {
-						actionPath = trashRenderer.renderActions(renderRequest, renderResponse);
-					}
-					else if (trashEntry.getRootEntry() == null) {
-						actionPath = "/entry_action.jsp";
-					}
-					else {
-						request.setAttribute("view.jsp-className", trashRenderer.getClassName());
-						request.setAttribute("view.jsp-classPK", String.valueOf(trashRenderer.getClassPK()));
-					}
+					rowData.put("actions", trashManagementToolbarDisplayContext.getAvailableActions(trashEntry));
+
+					row.setData(rowData);
 					%>
 
 					<c:choose>
@@ -187,9 +166,12 @@
 								</h6>
 							</liferay-ui:search-container-column-text>
 
-							<liferay-ui:search-container-column-jsp
-								path="<%= actionPath %>"
-							/>
+							<liferay-ui:search-container-column-text>
+								<clay:dropdown-actions
+									defaultEventHandler="<%= TrashWebKeys.TRASH_ENTRIES_DEFAULT_EVENT_HANDLER %>"
+									dropdownItems="<%= trashDisplayContext.getTrashEntryActionDropdownItems(trashEntry) %>"
+								/>
+							</liferay-ui:search-container-column-text>
 						</c:when>
 						<c:when test="<%= trashDisplayContext.isIconView() %>">
 
@@ -198,17 +180,9 @@
 							%>
 
 							<liferay-ui:search-container-column-text>
-								<liferay-frontend:icon-vertical-card
-									actionJsp="<%= actionPath %>"
-									actionJspServletContext="<%= application %>"
-									icon="<%= trashRenderer.getIconCssClass() %>"
-									resultRow="<%= row %>"
-									rowChecker="<%= searchContainer.getRowChecker() %>"
-									title="<%= HtmlUtil.escape(trashRenderer.getTitle(locale)) %>"
-									url="<%= viewContentURLString %>"
-								>
-									<%@ include file="/trash_entry_vertical_card.jspf" %>
-								</liferay-frontend:icon-vertical-card>
+								<clay:vertical-card
+									verticalCard="<%= new TrashEntryVerticalCard(trashEntry, trashRenderer, renderRequest, liferayPortletResponse, searchContainer.getRowChecker(), viewContentURLString) %>"
+								/>
 							</liferay-ui:search-container-column-text>
 						</c:when>
 						<c:when test="<%= trashDisplayContext.isListView() %>">
@@ -274,9 +248,12 @@
 								value="<%= HtmlUtil.escape(trashEntry.getUserName()) %>"
 							/>
 
-							<liferay-ui:search-container-column-jsp
-								path="<%= actionPath %>"
-							/>
+							<liferay-ui:search-container-column-text>
+								<clay:dropdown-actions
+									defaultEventHandler="<%= TrashWebKeys.TRASH_ENTRIES_DEFAULT_EVENT_HANDLER %>"
+									dropdownItems="<%= trashDisplayContext.getTrashEntryActionDropdownItems(trashEntry) %>"
+								/>
+							</liferay-ui:search-container-column-text>
 						</c:when>
 					</c:choose>
 				</liferay-ui:search-container-row>
@@ -291,33 +268,12 @@
 	</div>
 </div>
 
-<aui:script>
-	var deleteSelectedEntries = function() {
-		if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-			var form = document.getElementById('<portlet:namespace />fm');
+<liferay-frontend:component
+	componentId="<%= trashManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+	module="js/ManagementToolbarDefaultEventHandler.es"
+/>
 
-			if (form) {
-				submitForm(form);
-			}
-		}
-	}
-
-	var ACTIONS = {
-		'deleteSelectedEntries': deleteSelectedEntries
-	};
-
-	Liferay.componentReady('trashWebManagementToolbar').then(
-		function(managementToolbar) {
-			managementToolbar.on(
-				'actionItemClicked',
-				function(event) {
-					var itemData = event.data.item.data;
-
-					if (itemData && itemData.action && ACTIONS[itemData.action]) {
-						ACTIONS[itemData.action]();
-					}
-				}
-			);
-		}
-	);
-</aui:script>
+<liferay-frontend:component
+	componentId="<%= TrashWebKeys.TRASH_ENTRIES_DEFAULT_EVENT_HANDLER %>"
+	module="js/EntriesDefaultEventHandler.es"
+/>

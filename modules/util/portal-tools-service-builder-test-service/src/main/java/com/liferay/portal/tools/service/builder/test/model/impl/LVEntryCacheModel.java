@@ -31,7 +31,6 @@ import java.io.ObjectOutput;
  * The cache model class for representing LVEntry in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see LVEntry
  * @generated
  */
 @ProviderType
@@ -76,10 +75,12 @@ public class LVEntryCacheModel implements CacheModel<LVEntry>, Externalizable,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(11);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
+		sb.append(", uuid=");
+		sb.append(uuid);
 		sb.append(", headId=");
 		sb.append(headId);
 		sb.append(", defaultLanguageId=");
@@ -88,6 +89,8 @@ public class LVEntryCacheModel implements CacheModel<LVEntry>, Externalizable,
 		sb.append(lvEntryId);
 		sb.append(", groupId=");
 		sb.append(groupId);
+		sb.append(", uniqueGroupKey=");
+		sb.append(uniqueGroupKey);
 		sb.append("}");
 
 		return sb.toString();
@@ -98,6 +101,14 @@ public class LVEntryCacheModel implements CacheModel<LVEntry>, Externalizable,
 		LVEntryImpl lvEntryImpl = new LVEntryImpl();
 
 		lvEntryImpl.setMvccVersion(mvccVersion);
+
+		if (uuid == null) {
+			lvEntryImpl.setUuid("");
+		}
+		else {
+			lvEntryImpl.setUuid(uuid);
+		}
+
 		lvEntryImpl.setHeadId(headId);
 
 		if (defaultLanguageId == null) {
@@ -110,6 +121,15 @@ public class LVEntryCacheModel implements CacheModel<LVEntry>, Externalizable,
 		lvEntryImpl.setLvEntryId(lvEntryId);
 		lvEntryImpl.setGroupId(groupId);
 
+		if (uniqueGroupKey == null) {
+			lvEntryImpl.setUniqueGroupKey("");
+		}
+		else {
+			lvEntryImpl.setUniqueGroupKey(uniqueGroupKey);
+		}
+
+		lvEntryImpl.setHead(head);
+
 		lvEntryImpl.resetOriginalValues();
 
 		return lvEntryImpl;
@@ -118,6 +138,7 @@ public class LVEntryCacheModel implements CacheModel<LVEntry>, Externalizable,
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
+		uuid = objectInput.readUTF();
 
 		headId = objectInput.readLong();
 		defaultLanguageId = objectInput.readUTF();
@@ -125,12 +146,22 @@ public class LVEntryCacheModel implements CacheModel<LVEntry>, Externalizable,
 		lvEntryId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
+		uniqueGroupKey = objectInput.readUTF();
+
+		head = objectInput.readBoolean();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
 		objectOutput.writeLong(mvccVersion);
+
+		if (uuid == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(uuid);
+		}
 
 		objectOutput.writeLong(headId);
 
@@ -144,11 +175,23 @@ public class LVEntryCacheModel implements CacheModel<LVEntry>, Externalizable,
 		objectOutput.writeLong(lvEntryId);
 
 		objectOutput.writeLong(groupId);
+
+		if (uniqueGroupKey == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(uniqueGroupKey);
+		}
+
+		objectOutput.writeBoolean(head);
 	}
 
 	public long mvccVersion;
+	public String uuid;
 	public long headId;
 	public String defaultLanguageId;
 	public long lvEntryId;
 	public long groupId;
+	public String uniqueGroupKey;
+	public boolean head;
 }

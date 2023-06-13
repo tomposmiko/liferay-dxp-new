@@ -32,6 +32,10 @@ definition {
 		/*This is a multiline
 			comment.*/
 
+		// End with a ;
+
+		// End with a }
+
 		property portal.release = "false";
 		var specialCharacters = "&quot;\&quot;";
 		var userEmailAddress = "userea@liferay.com";
@@ -174,6 +178,10 @@ definition {
 
 		if (contains("testing", "test")) {
 			echo("String contains substring");
+		}
+
+		if (((isSet(A)) && (isSet(B))) || ((!(isSet(B))) && (!(isSet(A))))) {
+			fail("${failMessage}");
 		}
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");

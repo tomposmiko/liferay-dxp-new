@@ -121,7 +121,7 @@ StagingGroupHelper stagingGroupHelper = StagingGroupHelperUtil.getStagingGroupHe
 										<div class="autofit-padded-no-gutters autofit-row">
 											<div class="autofit-col lfr-discussion-details">
 												<liferay-ui:user-portrait
-													cssClass="user-icon-lg"
+													cssClass="sticker-lg"
 													user="<%= user %>"
 												/>
 											</div>
@@ -347,6 +347,8 @@ StagingGroupHelper stagingGroupHelper = StagingGroupHelperUtil.getStagingGroupHe
 								Liferay.Util.ns(
 									'<%= namespace %>',
 									{
+										className: '<%= discussionTaglibHelper.getClassName() %>',
+										classPK: '<%= discussionTaglibHelper.getClassPK() %>',
 										skipEditorLoading: true
 									}
 								),

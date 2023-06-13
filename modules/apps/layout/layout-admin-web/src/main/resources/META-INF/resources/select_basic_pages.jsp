@@ -30,41 +30,27 @@ SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplay
 
 			<%
 			for (String primaryType : selectLayoutPageTemplateEntryDisplayContext.getPrimaryTypes()) {
-				LayoutTypeController layoutTypeController = LayoutTypeControllerTracker.getLayoutTypeController(primaryType);
-
-				ResourceBundle layoutTypeResourceBundle = ResourceBundleUtil.getBundle("content.Language", locale, layoutTypeController.getClass());
+				SelectBasicPagesVerticalCard selectBasicPagesVerticalCard = new SelectBasicPagesVerticalCard(primaryType, renderRequest, renderResponse);
 			%>
 
 				<div class="col-md-4">
-					<div class="card card-type-asset">
+					<div class="add-layout-action-option card card-type-asset image-card" <%= AUIUtil.buildData(selectBasicPagesVerticalCard.getDataLink()) %>>
 						<div class="aspect-ratio">
 							<div class="aspect-ratio-item-center-middle aspect-ratio-item-fluid layout-type-img">
-								<img src="<%= PortalUtil.getPathContext(request) %>/images/<%= primaryType %>.svg" />
+								<img src="<%= selectBasicPagesVerticalCard.getImageSrc() %>" />
 							</div>
 						</div>
 
 						<div class="card-body">
 							<div class="card-row">
 								<div class="autofit-col autofit-col-expand">
-									<section class="autofit-section">
-										<h3 class="card-title">
-											<span class="text-truncate-inline">
-												<portlet:renderURL var="addLayoutURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-													<portlet:param name="mvcRenderCommandName" value="/layout/add_layout" />
-													<portlet:param name="backURL" value="<%= selectLayoutPageTemplateEntryDisplayContext.getRedirect() %>" />
-													<portlet:param name="type" value="<%= primaryType %>" />
-												</portlet:renderURL>
+									<div class="card-title text-truncate">
+										<%= selectBasicPagesVerticalCard.getTitle() %>
+									</div>
 
-												<a class="add-layout-action-option" data-add-layout-url="<%= addLayoutURL %>" href="javascript:;"><%= LanguageUtil.get(request, layoutTypeResourceBundle, "layout.types." + primaryType) %></a>
-											</span>
-										</h3>
-
-										<p class="card-subtitle">
-											<span class="text-truncate-inline">
-												<%= LanguageUtil.get(request, layoutTypeResourceBundle, "layout.types." + primaryType + ".description") %>
-											</span>
-										</p>
-									</section>
+									<div class="card-subtitle text-truncate-inline">
+										<%= selectBasicPagesVerticalCard.getSubtitle() %>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -87,41 +73,12 @@ SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplay
 
 			<%
 			for (String type : selectLayoutPageTemplateEntryDisplayContext.getTypes()) {
-				LayoutTypeController layoutTypeController = LayoutTypeControllerTracker.getLayoutTypeController(type);
-
-				ResourceBundle layoutTypeResourceBundle = ResourceBundleUtil.getBundle("content.Language", locale, layoutTypeController.getClass());
 			%>
 
 				<div class="col-md-4">
-					<div class="card card-horizontal card-type-directory">
-						<div class="card-body">
-							<div class="card-row">
-								<div class="autofit-col">
-									<span class="sticker">
-										<svg aria-hidden="true" class="lexicon-icon lexicon-icon-page">
-											<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg#page" />
-										</svg>
-									</span>
-								</div>
-
-								<div class="autofit-col autofit-col-expand autofit-col-gutters">
-									<section class="autofit-section">
-										<h3 class="card-title">
-											<span class="text-truncate-inline">
-												<portlet:renderURL var="addLayoutURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-													<portlet:param name="mvcRenderCommandName" value="/layout/add_layout" />
-													<portlet:param name="backURL" value="<%= selectLayoutPageTemplateEntryDisplayContext.getRedirect() %>" />
-													<portlet:param name="type" value="<%= type %>" />
-												</portlet:renderURL>
-
-												<a class="add-layout-action-option text-truncate" data-add-layout-url="<%= addLayoutURL %>" href="javascript:;" title="<%= LanguageUtil.get(request, layoutTypeResourceBundle, "layout.types." + type) %>"><%= LanguageUtil.get(request, layoutTypeResourceBundle, "layout.types." + type) %></a>
-											</span>
-										</h3>
-									</section>
-								</div>
-							</div>
-						</div>
-					</div>
+					<clay:horizontal-card
+						horizontalCard="<%= new SelectBasicPagesHorizontalCard(type, renderRequest, renderResponse) %>"
+					/>
 				</div>
 
 			<%
@@ -131,38 +88,3 @@ SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplay
 		</div>
 	</c:if>
 </div>
-
-<aui:script use="aui-base">
-	var addLayoutActionOptionQueryClickHandler = A.one('#<portlet:namespace/>layoutTypes').delegate(
-		'click',
-		function(event) {
-			var actionElement = event.target;
-
-			Liferay.Util.openWindow(
-				{
-					dialog: {
-						destroyOnHide: true,
-						height: 480,
-						resizable: false,
-						width: 640
-					},
-					dialogIframe: {
-						bodyCssClass: 'dialog-with-footer'
-					},
-					id: '<portlet:namespace />addLayoutDialog',
-					title: '<liferay-ui:message key="add-page" />',
-					uri: actionElement.getData('add-layout-url')
-				}
-			);
-		},
-		'.add-layout-action-option'
-	);
-
-	function handleDestroyPortlet () {
-		addLayoutActionOptionQueryClickHandler.detach();
-
-		Liferay.detach('destroyPortlet', handleDestroyPortlet);
-	}
-
-	Liferay.on('destroyPortlet', handleDestroyPortlet);
-</aui:script>

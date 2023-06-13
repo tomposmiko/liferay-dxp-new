@@ -171,6 +171,7 @@
 		<suppress checks="JavaInnerClassImportsCheck" files="modules/apps/commerce/.*" />
 		<suppress checks="JavaInnerClassImportsCheck" files="modules/private/.*" />
 		<suppress checks="JavaInnerClassImportsCheck" files="modules/test/poshi-runner/.*" />
+		<suppress checks="JSONDeprecatedPackagesCheck" files="modules/private/.*" />
 		<suppress checks="JSONLineBreakCheck" files="modules/apps/apio-architect/.*" />
 		<suppress checks="JSONLineBreakCheck" files="modules/apps/commerce/.*" />
 		<suppress checks="JSONLineBreakCheck" files="modules/private/apps/commerce/.*" />
@@ -181,5 +182,11 @@
 		<suppress checks="XMLLookAndFeelCompatibilityVersionCheck" files="modules/private/apio-architect/.*" />
 		<suppress checks="XMLLookAndFeelCompatibilityVersionCheck" files="modules/private/commerce/.*" />
 		<suppress checks="XMLServiceReferenceCheck" files="modules/private/.*" />
+
+		<!-- Temporary suppressions. Chema, please fix -->
+
+		<suppress checks="JSONDeprecatedPackagesCheck" files="modules/sdk/project-templates/project-templates-form-field/src/main/resources/archetype-resources/package\.json" />
+		<suppress checks="JSONDeprecatedPackagesCheck" files="modules/sdk/project-templates/project-templates-soy-portlet/src/main/resources/archetype-resources/package\.json" />
+		<suppress checks="JSONScriptsCheck" files="modules/apps/hello-soy/hello-soy-web/package\.json" />
 	</source-check>
 </suppressions>

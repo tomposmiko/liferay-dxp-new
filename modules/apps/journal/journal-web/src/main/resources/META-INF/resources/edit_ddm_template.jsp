@@ -40,7 +40,6 @@ renderResponse.setTitle(journalEditDDMTemplateDisplayContext.getTitle());
 <liferay-frontend:edit-form
 	action="<%= (ddmTemplate == null) ? addDDMTemplateURL : updateDDMTemplateURL %>"
 	enctype="multipart/form-data"
-	fluid="<%= true %>"
 	method="post"
 	name="fm"
 	onSubmit='<%= "event.preventDefault();" %>'
@@ -140,9 +139,7 @@ renderResponse.setTitle(journalEditDDMTemplateDisplayContext.getTitle());
 						<aui:input name="webDavURL" type="resource" value="<%= ddmTemplate.getWebDavURL(themeDisplay, WebDAVUtil.getStorageToken(portlet)) %>" />
 					</c:if>
 
-					<c:if test="<%= journalEditDDMTemplateDisplayContext.isShowCacheableInput() %>">
-						<aui:input helpMessage="journal-template-cacheable-help" name="cacheable" value="<%= journalEditDDMTemplateDisplayContext.isCacheable() %>" />
-					</c:if>
+					<aui:input helpMessage="journal-template-cacheable-help" name="cacheable" value="<%= journalEditDDMTemplateDisplayContext.isCacheable() %>" />
 
 					<div id="<portlet:namespace />smallImageContainer">
 						<div class="lfr-ddm-small-image-header">

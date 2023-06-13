@@ -19,6 +19,8 @@ import com.liferay.adaptive.media.web.internal.constants.AMWebKeys;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -80,6 +82,39 @@ public class AMManagementToolbarDisplayContext {
 		};
 	}
 
+	public List<LabelItem> getFilterLabelItems() {
+		final String entriesNavigation = _getEntriesNavigation();
+
+		return new LabelItemList() {
+			{
+				if (entriesNavigation.equals("enabled") ||
+					entriesNavigation.equals("disabled")) {
+
+					add(
+						SafeConsumer.ignore(
+							labelItem -> {
+								PortletURL removeLabelURL =
+									PortletURLUtil.clone(
+										_currentURLObj,
+										_liferayPortletResponse);
+
+								removeLabelURL.setParameter(
+									"entriesNavigation", (String)null);
+
+								labelItem.putData(
+									"removeLabelURL",
+									removeLabelURL.toString());
+
+								labelItem.setCloseable(true);
+								labelItem.setLabel(
+									LanguageUtil.get(
+										_request, entriesNavigation));
+							}));
+				}
+			}
+		};
+	}
+
 	public List<AMImageConfigurationEntry> getSelectedConfigurationEntries() {
 		return (List)_request.getAttribute(
 			AMWebKeys.CONFIGURATION_ENTRIES_LIST);
@@ -96,8 +131,7 @@ public class AMManagementToolbarDisplayContext {
 		List<AMImageConfigurationEntry> selectedConfigurationEntries =
 			getSelectedConfigurationEntries();
 
-		String entriesNavigation = ParamUtil.getString(
-			_request, "entriesNavigation", "all");
+		String entriesNavigation = _getEntriesNavigation();
 
 		if ((selectedConfigurationEntries.size() <= 0) &&
 			entriesNavigation.equals("all")) {
@@ -108,9 +142,12 @@ public class AMManagementToolbarDisplayContext {
 		return false;
 	}
 
+	private String _getEntriesNavigation() {
+		return ParamUtil.getString(_request, "entriesNavigation", "all");
+	}
+
 	private List<DropdownItem> _getFilterNavigationDropdownItems() {
-		final String entriesNavigation = ParamUtil.getString(
-			_request, "entriesNavigation", "all");
+		final String entriesNavigation = _getEntriesNavigation();
 
 		return new DropdownItemList() {
 			{

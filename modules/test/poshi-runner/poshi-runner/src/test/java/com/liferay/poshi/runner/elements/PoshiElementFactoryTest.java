@@ -138,7 +138,7 @@ public class PoshiElementFactoryTest {
 
 	@Test
 	public void testPoshiXMLFunctionToPoshiScript() throws Exception {
-		String expected = FileUtil.read(_BASE_DIR + "PoshiScript.function");
+		String expected = FileUtil.read(_getFile("PoshiScript.function"));
 
 		PoshiElement poshiElement = _getPoshiElement("PoshiSyntax.function");
 
@@ -162,7 +162,7 @@ public class PoshiElementFactoryTest {
 
 	@Test
 	public void testPoshiXMLMacroToPoshiScript() throws Exception {
-		String expected = FileUtil.read(_BASE_DIR + "PoshiScript.macro");
+		String expected = FileUtil.read(_getFile("PoshiScript.macro"));
 
 		PoshiElement poshiElement = _getPoshiElement("PoshiSyntax.macro");
 
@@ -175,7 +175,7 @@ public class PoshiElementFactoryTest {
 
 	@Test
 	public void testPoshiXMLTestToPoshiScript() throws Exception {
-		String expected = FileUtil.read(_BASE_DIR + "PoshiScript.testcase");
+		String expected = FileUtil.read(_getFile("PoshiScript.testcase"));
 
 		PoshiElement poshiElement = _getPoshiElement("PoshiSyntax.testcase");
 
@@ -194,9 +194,11 @@ public class PoshiElementFactoryTest {
 
 		String poshiScript = poshiElement.toPoshiScript();
 
+		PoshiNodeFactory.setValidatePoshiScript(false);
+
 		PoshiElement actualElement =
 			(PoshiElement)PoshiNodeFactory.newPoshiNode(
-				poshiScript, _getFile(fileName));
+				poshiScript, FileUtil.getURL(_getFile(fileName)));
 
 		Element expectedElement = _getDom4JElement("PoshiSyntax.testcase");
 
@@ -278,8 +280,10 @@ public class PoshiElementFactoryTest {
 	private static PoshiElement _getPoshiElement(String fileName)
 		throws Exception {
 
+		File file = _getFile(fileName);
+
 		return (PoshiElement)PoshiNodeFactory.newPoshiNodeFromFile(
-			_BASE_DIR + fileName);
+			FileUtil.getURL(file));
 	}
 
 	private static final String _BASE_DIR =

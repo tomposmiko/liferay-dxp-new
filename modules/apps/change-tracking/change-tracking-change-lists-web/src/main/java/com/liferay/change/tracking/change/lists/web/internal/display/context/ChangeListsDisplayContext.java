@@ -14,28 +14,45 @@
 
 package com.liferay.change.tracking.change.lists.web.internal.display.context;
 
+import com.liferay.change.tracking.CTEngineManager;
+import com.liferay.change.tracking.constants.CTPortletKeys;
+import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.dao.orm.QueryDefinition;
+import com.liferay.portal.kernel.dao.search.DisplayTerms;
+import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
+import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.template.soy.util.SoyContext;
 import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
+import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Máté Thurzó
@@ -43,9 +60,11 @@ import javax.servlet.http.HttpServletRequest;
 public class ChangeListsDisplayContext {
 
 	public ChangeListsDisplayContext(
-		HttpServletRequest httpServletRequest, RenderResponse renderResponse) {
+		HttpServletRequest httpServletRequest, RenderRequest renderRequest,
+		RenderResponse renderResponse) {
 
 		_httpServletRequest = httpServletRequest;
+		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
@@ -55,38 +74,29 @@ public class ChangeListsDisplayContext {
 	public SoyContext getChangeListsContext() {
 		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
 
-		soyContext.put("portletNamespace", _renderResponse.getNamespace());
 		soyContext.put(
 			"spritemap",
 			_themeDisplay.getPathThemeImages() + "/lexicon/icons.svg");
-
-		// Translations
-
-		Map<String, String> translations = new HashMap<>();
-
-		translations.put(
-			"description",
-			LanguageUtil.get(_httpServletRequest, "description"));
-		translations.put(
-			"production-view",
-			LanguageUtil.get(_httpServletRequest, "production-view"));
-		translations.put(
-			"published-by",
-			LanguageUtil.get(_httpServletRequest, "published-by"));
-		translations.put(
-			"published-change-list",
-			LanguageUtil.get(_httpServletRequest, "published-change-list"));
-
-		soyContext.put("translations", translations);
-
-		// URLs
-
 		soyContext.put(
-			"urlProductionCollection",
+			"urlActiveCollection",
 			_themeDisplay.getPortalURL() +
-				"/o/change-tracking/collections/production/" +
-					_themeDisplay.getCompanyId());
+				"/o/change-tracking/collections?type=active&userId=" +
+					_themeDisplay.getUserId());
+		soyContext.put(
+			"urlProductionInformation",
+			StringBundler.concat(
+				_themeDisplay.getPortalURL(),
+				"/o/change-tracking/processes?companyId=",
+				_themeDisplay.getCompanyId(), "&published=true"));
 		soyContext.put("urlProductionView", _themeDisplay.getPortalURL());
+
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			_renderRequest, CTPortletKeys.CHANGE_LISTS,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter("select", "true");
+
+		soyContext.put("urlSelectChangeList", portletURL.toString());
 
 		return soyContext;
 	}
@@ -96,9 +106,17 @@ public class ChangeListsDisplayContext {
 
 		creationMenu.addDropdownItem(
 			dropdownItem -> {
-				dropdownItem.setHref(
-					_renderResponse.createRenderURL(), "mvcRenderCommandName",
-					"/change_lists/add_change_tracking_collection");
+				PortletURL portletURL = PortletURLFactoryUtil.create(
+					_httpServletRequest, CTPortletKeys.CHANGE_LISTS,
+					PortletRequest.RENDER_PHASE);
+
+				portletURL.setParameter(
+					"mvcRenderCommandName", "/change_lists/add_ct_collection");
+				portletURL.setParameter(
+					"backURL", _themeDisplay.getURLCurrent());
+
+				dropdownItem.setHref(portletURL);
+
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "add-change-list"));
 			});
@@ -149,6 +167,45 @@ public class ChangeListsDisplayContext {
 		return _orderByType;
 	}
 
+	public SearchContainer<CTCollection> getSearchContainer() {
+		SearchContainer<CTCollection> searchContainer = new SearchContainer<>(
+			_renderRequest, new DisplayTerms(_renderRequest), null,
+			SearchContainer.DEFAULT_CUR_PARAM, 0, SearchContainer.DEFAULT_DELTA,
+			_getIteratorURL(), null, "there-are-no-change-lists");
+
+		CTEngineManager ctEngineManager = _serviceTracker.getService();
+
+		QueryDefinition<CTCollection> queryDefinition = new QueryDefinition<>();
+
+		DisplayTerms displayTerms = searchContainer.getDisplayTerms();
+
+		queryDefinition.setAttribute("keywords", displayTerms.getKeywords());
+
+		OrderByComparator<CTCollection> orderByComparator =
+			OrderByComparatorFactoryUtil.create(
+				"CTCollection", _getOrderByCol(),
+				getOrderByType().equals("asc"));
+
+		queryDefinition.setOrderByComparator(orderByComparator);
+
+		List<CTCollection> ctCollections = ctEngineManager.searchByKeywords(
+			_themeDisplay.getCompanyId(), queryDefinition);
+
+		Stream<CTCollection> stream = ctCollections.stream();
+
+		ctCollections = stream.filter(
+			ctCollection -> !ctCollection.isProduction()
+		).collect(
+			Collectors.toList()
+		);
+
+		searchContainer.setResults(ctCollections);
+
+		searchContainer.setTotal(ctCollections.size());
+
+		return searchContainer;
+	}
+
 	public String getSortingURL() {
 		PortletURL sortingURL = _getPortletURL();
 
@@ -157,6 +214,15 @@ public class ChangeListsDisplayContext {
 			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
 
 		return sortingURL.toString();
+	}
+
+	public String getViewSearchActionURL() {
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		portletURL.setParameter("mvcRenderCommandName", "/change_lists/view");
+		portletURL.setParameter("select", "true");
+
+		return portletURL.toString();
 	}
 
 	public List<ViewTypeItem> getViewTypeItems() {
@@ -227,13 +293,25 @@ public class ChangeListsDisplayContext {
 		};
 	}
 
+	private PortletURL _getIteratorURL() {
+		PortletURL currentURL = PortletURLUtil.getCurrent(
+			_renderRequest, _renderResponse);
+
+		PortletURL iteratorURL = _renderResponse.createRenderURL();
+
+		iteratorURL.setParameter("mvcPath", "/view_categories.jsp");
+		iteratorURL.setParameter("redirect", currentURL.toString());
+
+		return iteratorURL;
+	}
+
 	private String _getOrderByCol() {
 		if (_orderByCol != null) {
 			return _orderByCol;
 		}
 
 		_orderByCol = ParamUtil.getString(
-			_httpServletRequest, "orderByCol", "create-date");
+			_httpServletRequest, "orderByCol", "name");
 
 		return _orderByCol;
 	}
@@ -244,9 +322,9 @@ public class ChangeListsDisplayContext {
 				add(
 					dropdownItem -> {
 						dropdownItem.setActive(
-							Objects.equals(_getOrderByCol(), "modified-date"));
+							Objects.equals(_getOrderByCol(), "modifiedDate"));
 						dropdownItem.setHref(
-							_getPortletURL(), "orderByCol", "modified-date");
+							_getPortletURL(), "orderByCol", "modifiedDate");
 						dropdownItem.setLabel(
 							LanguageUtil.get(
 								_httpServletRequest, "modified-date"));
@@ -289,11 +367,27 @@ public class ChangeListsDisplayContext {
 		return portletURL;
 	}
 
+	private static ServiceTracker<CTEngineManager, CTEngineManager>
+		_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(CTEngineManager.class);
+
+		ServiceTracker<CTEngineManager, CTEngineManager> serviceTracker =
+			new ServiceTracker<>(
+				bundle.getBundleContext(), CTEngineManager.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
+
 	private String _displayStyle;
 	private String _filterByStatus;
 	private final HttpServletRequest _httpServletRequest;
 	private String _orderByCol;
 	private String _orderByType;
+	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private final ThemeDisplay _themeDisplay;
 

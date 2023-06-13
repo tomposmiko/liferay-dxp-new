@@ -14,36 +14,36 @@
 
 package com.liferay.blogs.web.internal.display.context;
 
-import com.liferay.blogs.constants.BlogsPortletKeys;
-import com.liferay.blogs.model.BlogsEntry;
-import com.liferay.blogs.web.internal.security.permission.resource.BlogsEntryPermission;
 import com.liferay.blogs.web.internal.security.permission.resource.BlogsPermission;
+import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.PortalPreferences;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.trash.TrashHelper;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-import javax.portlet.PortletException;
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,37 +51,37 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Sergio González
  */
-public class BlogEntriesManagementToolbarDisplayContext {
+public class BlogEntriesManagementToolbarDisplayContext
+	extends SearchContainerManagementToolbarDisplayContext {
 
 	public BlogEntriesManagementToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest request, PortletURL currentURLObj,
-		TrashHelper trashHelper) {
+		HttpServletRequest request, SearchContainer searchContainer,
+		TrashHelper trashHelper, String displayStyle) {
 
-		_liferayPortletRequest = liferayPortletRequest;
-		_liferayPortletResponse = liferayPortletResponse;
-		_request = request;
-		_currentURLObj = currentURLObj;
+		super(
+			liferayPortletRequest, liferayPortletResponse, request,
+			searchContainer);
+
 		_trashHelper = trashHelper;
+		_displayStyle = displayStyle;
 
-		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
-			liferayPortletRequest);
+		_themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
 	}
 
+	@Override
 	public List<DropdownItem> getActionDropdownItems() {
 		return new DropdownItemList() {
 			{
-				ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
 				add(
 					SafeConsumer.ignore(
 						dropdownItem -> {
 							dropdownItem.putData("action", "deleteEntries");
 
 							boolean trashEnabled = _trashHelper.isTrashEnabled(
-								themeDisplay.getScopeGroupId());
+								_themeDisplay.getScopeGroupId());
 
 							dropdownItem.setIcon(
 								trashEnabled ? "trash" : "times");
@@ -93,7 +93,7 @@ public class BlogEntriesManagementToolbarDisplayContext {
 							}
 
 							dropdownItem.setLabel(
-								LanguageUtil.get(_request, label));
+								LanguageUtil.get(request, label));
 
 							dropdownItem.setQuickAction(true);
 						}));
@@ -101,109 +101,105 @@ public class BlogEntriesManagementToolbarDisplayContext {
 		};
 	}
 
-	public List<String> getAvailableActionDropdownItems(BlogsEntry blogsEntry)
-		throws PortalException {
-
-		List<String> availableActionDropdownItems = new ArrayList<>();
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		PermissionChecker permissionChecker =
-			themeDisplay.getPermissionChecker();
-
-		if (BlogsEntryPermission.contains(
-				permissionChecker, blogsEntry, ActionKeys.DELETE)) {
-
-			availableActionDropdownItems.add("deleteEntries");
-		}
-
-		return availableActionDropdownItems;
+	@Override
+	public String getClearResultsURL() {
+		return getSearchActionURL();
 	}
 
-	public CreationMenu getCreationMenu() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+	public Map<String, Object> getComponentContext() throws PortalException {
+		Map<String, Object> context = new HashMap<>();
 
+		String cmd = Constants.DELETE;
+
+		if (_trashHelper.isTrashEnabled(_themeDisplay.getScopeGroup())) {
+			cmd = Constants.MOVE_TO_TRASH;
+		}
+
+		context.put("deleteEntriesCmd", cmd);
+
+		PortletURL deleteEntriesURL = liferayPortletResponse.createActionURL();
+
+		deleteEntriesURL.setParameter(
+			ActionRequest.ACTION_NAME, "/blogs/edit_entry");
+
+		context.put("deleteEntriesURL", deleteEntriesURL.toString());
+
+		context.put(
+			"trashEnabled",
+			_trashHelper.isTrashEnabled(_themeDisplay.getScopeGroupId()));
+
+		return context;
+	}
+
+	@Override
+	public CreationMenu getCreationMenu() {
 		if (!BlogsPermission.contains(
-				themeDisplay.getPermissionChecker(),
-				themeDisplay.getScopeGroupId(), ActionKeys.ADD_ENTRY)) {
+				_themeDisplay.getPermissionChecker(),
+				_themeDisplay.getScopeGroupId(), ActionKeys.ADD_ENTRY)) {
 
 			return null;
 		}
 
-		CreationMenu creationMenu = new CreationMenu();
-
-		creationMenu.addDropdownItem(
-			dropdownItem -> {
-				dropdownItem.setHref(
-					_liferayPortletResponse.createRenderURL(),
-					"mvcRenderCommandName", "/blogs/edit_entry", "redirect",
-					_currentURLObj.toString());
-				dropdownItem.setLabel(
-					LanguageUtil.get(_request, "add-blog-entry"));
-			});
-
-		return creationMenu;
-	}
-
-	public String getDisplayStyle() {
-		String displayStyle = ParamUtil.getString(_request, "displayStyle");
-
-		if (Validator.isNull(displayStyle)) {
-			displayStyle = _portalPreferences.getValue(
-				BlogsPortletKeys.BLOGS_ADMIN, "entries-display-style", "icon");
-		}
-		else {
-			_portalPreferences.setValue(
-				BlogsPortletKeys.BLOGS_ADMIN, "entries-display-style",
-				displayStyle);
-
-			_request.setAttribute(
-				WebKeys.SINGLE_PAGE_APPLICATION_CLEAR_CACHE, Boolean.TRUE);
-		}
-
-		return displayStyle;
-	}
-
-	public List<DropdownItem> getFilterDropdownItems() {
-		return new DropdownItemList() {
+		return new CreationMenu() {
 			{
-				addGroup(
-					SafeConsumer.ignore(
-						dropdownGroupItem -> {
-							dropdownGroupItem.setDropdownItems(
-								_getFilterNavigationDropdownItems());
-							dropdownGroupItem.setLabel(
-								LanguageUtil.get(
-									_request, "filter-by-navigation"));
-						}));
-				addGroup(
-					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItems(
-							_getOrderByDropdownItems());
-						dropdownGroupItem.setLabel(
-							LanguageUtil.get(_request, "order-by"));
+				addDropdownItem(
+					dropdownItem -> {
+						dropdownItem.setHref(
+							liferayPortletResponse.createRenderURL(),
+							"mvcRenderCommandName", "/blogs/edit_entry",
+							"redirect", currentURLObj.toString());
+						dropdownItem.setLabel(
+							LanguageUtil.get(request, "add-blog-entry"));
 					});
 			}
 		};
 	}
 
-	public String getOrderByCol() {
-		return ParamUtil.getString(_request, "orderByCol", "title");
+	@Override
+	public String getDefaultEventHandler() {
+		return "BLOG_ENTRIES_MANAGEMENT_TOOLBAR_DEFAULT_EVENT_HANDLER";
 	}
 
-	public String getOrderByType() {
-		return ParamUtil.getString(_request, "orderByType", "desc");
+	@Override
+	public List<LabelItem> getFilterLabelItems() {
+		if (!Objects.equals(getNavigation(), "mine")) {
+			return null;
+		}
+
+		return new LabelItemList() {
+			{
+				add(
+					labelItem -> {
+						PortletURL removeLabelURL = getPortletURL();
+
+						removeLabelURL.setParameter(
+							"entriesNavigation", (String)null);
+
+						labelItem.putData(
+							"removeLabelURL", removeLabelURL.toString());
+
+						labelItem.setCloseable(true);
+
+						User user = _themeDisplay.getUser();
+
+						String label = String.format(
+							"%s: %s", LanguageUtil.get(request, "owner"),
+							user.getFullName());
+
+						labelItem.setLabel(label);
+					});
+			}
+		};
 	}
 
+	@Override
 	public String getSearchActionURL() {
-		PortletURL searchURL = _liferayPortletResponse.createRenderURL();
+		PortletURL searchURL = liferayPortletResponse.createRenderURL();
 
 		searchURL.setParameter("mvcRenderCommandName", "/blogs/view");
 
 		String navigation = ParamUtil.getString(
-			_request, "navigation", "entries");
+			request, "navigation", "entries");
 
 		searchURL.setParameter("navigation", navigation);
 
@@ -213,49 +209,29 @@ public class BlogEntriesManagementToolbarDisplayContext {
 		return searchURL.toString();
 	}
 
-	public PortletURL getSortingURL() throws PortletException {
-		PortletURL sortingURL = _getCurrentSortingURL();
-
-		sortingURL.setParameter(
-			"orderByType",
-			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
-
-		return sortingURL;
-	}
-
-	public ViewTypeItemList getViewTypes() {
-		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
+	@Override
+	public List<ViewTypeItem> getViewTypeItems() {
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
 		portletURL.setParameter("mvcRenderCommandName", "/blogs/view");
 
-		int delta = ParamUtil.getInteger(
-			_request, SearchContainer.DEFAULT_DELTA_PARAM);
-
-		if (delta > 0) {
-			portletURL.setParameter("delta", String.valueOf(delta));
+		if (searchContainer.getDelta() > 0) {
+			portletURL.setParameter(
+				"delta", String.valueOf(searchContainer.getDelta()));
 		}
 
-		String orderByCol = ParamUtil.getString(
-			_request, "orderByCol", "title");
-		String orderByType = ParamUtil.getString(
-			_request, "orderByType", "asc");
+		portletURL.setParameter("orderBycol", searchContainer.getOrderByCol());
+		portletURL.setParameter(
+			"orderByType", searchContainer.getOrderByType());
 
-		portletURL.setParameter("orderBycol", orderByCol);
-		portletURL.setParameter("orderByType", orderByType);
+		portletURL.setParameter("entriesNavigation", getNavigation());
 
-		String entriesNavigation = ParamUtil.getString(
-			_request, "entriesNavigation", "all");
-
-		portletURL.setParameter("entriesNavigation", entriesNavigation);
-
-		int cur = ParamUtil.getInteger(
-			_request, SearchContainer.DEFAULT_CUR_PARAM);
-
-		if (cur > 0) {
-			portletURL.setParameter("cur", String.valueOf(cur));
+		if (searchContainer.getCur() > 0) {
+			portletURL.setParameter(
+				"cur", String.valueOf(searchContainer.getCur()));
 		}
 
-		return new ViewTypeItemList(portletURL, getDisplayStyle()) {
+		return new ViewTypeItemList(portletURL, _displayStyle) {
 			{
 				addCardViewTypeItem();
 
@@ -266,68 +242,18 @@ public class BlogEntriesManagementToolbarDisplayContext {
 		};
 	}
 
-	private PortletURL _getCurrentSortingURL() throws PortletException {
-		PortletURL sortingURL = PortletURLUtil.clone(
-			_currentURLObj, _liferayPortletResponse);
-
-		sortingURL.setParameter("mvcRenderCommandName", "/blogs/view");
-
-		sortingURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
-
-		String keywords = ParamUtil.getString(_request, "keywords");
-
-		if (Validator.isNotNull(keywords)) {
-			sortingURL.setParameter("keywords", keywords);
-		}
-
-		return sortingURL;
+	@Override
+	protected String[] getNavigationKeys() {
+		return new String[] {"all", "mine"};
 	}
 
-	private List<DropdownItem> _getFilterNavigationDropdownItems() {
-		final String entriesNavigation = ParamUtil.getString(
-			_request, "entriesNavigation", "all");
-
-		return new DropdownItemList() {
-			{
-				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setActive(
-								entriesNavigation.equals("all"));
-
-							PortletURL navigationPortletURL =
-								PortletURLUtil.clone(
-									_currentURLObj, _liferayPortletResponse);
-
-							dropdownItem.setHref(
-								navigationPortletURL, "entriesNavigation",
-								"all");
-
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "all"));
-						}));
-				add(
-					SafeConsumer.ignore(
-						dropdownItem -> {
-							dropdownItem.setActive(
-								entriesNavigation.equals("mine"));
-
-							PortletURL navigationPortletURL =
-								PortletURLUtil.clone(
-									_currentURLObj, _liferayPortletResponse);
-
-							dropdownItem.setHref(
-								navigationPortletURL, "entriesNavigation",
-								"mine");
-
-							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "mine"));
-						}));
-			}
-		};
+	@Override
+	protected String getNavigationParam() {
+		return "entriesNavigation";
 	}
 
-	private List<DropdownItem> _getOrderByDropdownItems() {
+	@Override
+	protected List<DropdownItem> getOrderByDropdownItems() {
 		return new DropdownItemList() {
 			{
 				add(
@@ -338,7 +264,7 @@ public class BlogEntriesManagementToolbarDisplayContext {
 							dropdownItem.setHref(
 								_getCurrentSortingURL(), "orderByCol", "title");
 							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "title"));
+								LanguageUtil.get(request, "title"));
 						}));
 
 				add(
@@ -350,17 +276,30 @@ public class BlogEntriesManagementToolbarDisplayContext {
 								_getCurrentSortingURL(), "orderByCol",
 								"display-date");
 							dropdownItem.setLabel(
-								LanguageUtil.get(_request, "display-date"));
+								LanguageUtil.get(request, "display-date"));
 						}));
 			}
 		};
 	}
 
-	private final PortletURL _currentURLObj;
-	private final LiferayPortletRequest _liferayPortletRequest;
-	private final LiferayPortletResponse _liferayPortletResponse;
-	private final PortalPreferences _portalPreferences;
-	private final HttpServletRequest _request;
+	private PortletURL _getCurrentSortingURL() {
+		PortletURL sortingURL = getPortletURL();
+
+		sortingURL.setParameter("mvcRenderCommandName", "/blogs/view");
+
+		sortingURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
+
+		String keywords = ParamUtil.getString(request, "keywords");
+
+		if (Validator.isNotNull(keywords)) {
+			sortingURL.setParameter("keywords", keywords);
+		}
+
+		return sortingURL;
+	}
+
+	private final String _displayStyle;
+	private final ThemeDisplay _themeDisplay;
 	private final TrashHelper _trashHelper;
 
 }

@@ -1,7 +1,17 @@
 definition {
 	@description = "Configures Liferay SAML as the IdP and Liferay SAML as the SP."
 	macro configureLiferaySAMLAsIdP {
-		// Configure IdP (Identity Provider) on http://localhost:8080 with database lportal and saml deployed
+		// Configure IdP (Identity Provider) on specific Portal URL or default to current URL
+
+		if (isSet(idpURL)) {
+			User.loginPG(
+				password = "test",
+				specificURL = "${idpURL}",
+				userEmailAddress = "test@liferay.com"
+			);
+
+			Navigator.openSpecificURL(url = "${idpURL}");
+		}
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
@@ -29,14 +39,6 @@ definition {
 
 		SAMLRole.enable(samlEntityID = "${samlEntityID}");
 
-		// Navigate away from SAML portlet after enabling SAML in order to avoid LPS-65869
-
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "SAML Admin"
-		);
-
 		SAMLNavigation.gotoIdentityProvider();
 
 		SAMLPortlet.configureIdentityProvider();
@@ -44,14 +46,9 @@ definition {
 
 	macro configureLiferaySAMLAsSP {
 		User.loginPG(
-			authenticationMethod = "${authenticationMethod}",
-			nodePort = "${nodePort}",
 			password = "test",
-			rememberMeChecked = "false",
 			specificURL = "${spURL}",
-			syntaxCheckingEnabled = "${syntaxCheckingEnabled}",
-			userEmailAddress = "test@liferay.com",
-			userScreenName = "${userScreenName}"
+			userEmailAddress = "test@liferay.com"
 		);
 
 		Navigator.openSpecificURL(url = "${spURL}");
@@ -69,33 +66,61 @@ definition {
 
 		SAMLRole.configureCertificateAndPrivateKey(samlKeyPassword = "${samlEntityID}");
 
+		SAML.connectSPAndIdP(
+			attributes = "${attributes}",
+			idpEntityID = "samlidp",
+			idpURL = "http://localhost:8080",
+			nameIdentifierAttributeName = "${nameIdentifierAttributeName}",
+			nameIdentifierFormat = "${nameIdentifierFormat}",
+			spEntityID = "${samlEntityID}",
+			spURL = "${spURL}"
+		);
+	}
+
+	macro connectSPAndIdP {
+		// Add a configured IdP connection to an SP
+
+		Navigator.openSpecificURL(url = "${spURL}");
+
+		if (IsElementNotPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
+			User.loginPG(
+				specificURL = "${spURL}",
+				password = "test",
+				userEmailAddress = "test@liferay.com"
+			);
+		}
+
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
 			portlet = "SAML Admin"
 		);
 
-		SAMLNavigation.gotoIdentityProviderConnection();
+		SAMLNavigation.gotoIdentityProviderConnections();
 
-		SAMLPortlet.configureIdentityProviderConnection(
-			IdpEntityID = "samlidp",
-			IdpMetadataURL = "http://localhost:8080/c/portal/saml/metadata",
-			IdpNameID = "samlidp",
+		SAMLPortlet.addIdentityProviderConnection(
+			idpEntityID = "${idpEntityID}",
+			idpMetadataURL = "${idpURL}/c/portal/saml/metadata",
+			idpNameID = "${idpEntityID}",
 			nameIdentifierFormat = "${nameIdentifierFormat}"
 		);
 
 		SAMLNavigation.gotoGeneral();
 
-		SAMLRole.enable(samlEntityID = "${samlEntityID}");
+		SAMLRole.enable(samlEntityID = "${spEntityID}");
 
-		User.logoutPG(nodePort = "${nodePort}", specificURL = "${spURL}");
+		User.logoutPG(specificURL = "${spURL}");
 
-		// Add the configured SP connection to the IdP
+		// Add a configured SP connection to an IdP
 
-		Navigator.openURL();
+		Navigator.openSpecificURL(url = "${idpURL}");
 
 		if (IsElementNotPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
-			User.loginPG(password = "test", userEmailAddress = "test@liferay.com");
+			User.loginPG(
+				specificURL = "${idpURL}",
+				password = "test",
+				userEmailAddress = "test@liferay.com"
+			);
 		}
 
 		ProductMenu.gotoPortlet(
@@ -107,29 +132,25 @@ definition {
 		SAMLNavigation.gotoServiceProviderConnection();
 
 		SAMLPortlet.addServiceProviderConnection(
-			Attributes = "${Attributes}",
+			attributes = "${attributes}",
 			nameIdentifierAttributeName = "${nameIdentifierAttributeName}",
 			nameIdentifierFormat = "${nameIdentifierFormat}",
-			SPEntityID = "${samlEntityID}",
-			SPMetadataURL = "${spURL}/c/portal/saml/metadata",
-			SPNameID = "${samlEntityID}"
+			spEntityID = "${spEntityID}",
+			spMetadataURL = "${spURL}/c/portal/saml/metadata",
+			spNameID = "${spEntityID}"
 		);
 	}
 
 	@description = "Sign into portal by executing a IdP initiated SSO login. The IdP will redirect to the SP. If the same users with the same email address are present on both instances, it will authenticate and show the SP. SAML can authenticate across major portal versions, that is, the IdP can be Portal 6.1 EE GA3 and the SP can be Portal 6.2. EE GA1. For testing purposes, it is obvious if the authentication succeeds or fails if the IdP and SP are different portal versions."
 	macro executeIdPInitiatedSSO {
 		User.loginPG(
-			authenticationMethod = "${authenticationMethod}",
-			nodePort = "${nodePort}",
 			password = "${password}",
 			samlEnabled = "true",
 			specificURL = "${idpInitiatedSSOURL}",
-			syntaxCheckingEnabled = "${syntaxCheckingEnabled}",
-			userEmailAddress = "${userEmailAddress}",
-			userScreenName = "${userScreenName}"
+			userEmailAddress = "${userEmailAddress}"
 		);
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = "2000");
 
 		AssertLocation.assertPartialLocation(value1 = "${spURL}");
 	}
@@ -137,17 +158,15 @@ definition {
 	@description = "Sign into portal by executing a SP initiated SSO login. In the SP, click on the Sign In button to."
 	macro executeSPInitiatedSSO {
 		User.loginPG(
-			authenticationMethod = "${authenticationMethod}",
-			nodePort = "${nodePort}",
-			password = "${password}",
+			idpName = "${idpName}",
+			password = "test",
 			rememberMeChecked = "${rememberMeChecked}",
+			samlMultiIdPs = "${samlMultiIdPs}",
 			specificURL = "${specificURL}",
-			syntaxCheckingEnabled = "${syntaxCheckingEnabled}",
-			userEmailAddress = "test@liferay.com",
-			userScreenName = "${userScreenName}"
+			userEmailAddress = "test@liferay.com"
 		);
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = "2000");
 
 		AssertLocation.assertPartialLocation(value1 = "${specificURL}");
 	}

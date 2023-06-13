@@ -95,7 +95,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 
 		<c:choose>
 			<c:when test="<%= selLayoutType.isURLFriendliable() %>">
-				<div class="form-group">
+				<div class="form-group friendly-url">
 					<label for="<portlet:namespace />friendlyURL"><liferay-ui:message key="friendly-url" /> <liferay-ui:icon-help message='<%= LanguageUtil.format(request, "for-example-x", "<em>/news</em>", false) %>' /></label>
 
 					<liferay-ui:input-localized

@@ -43,7 +43,6 @@ import com.liferay.portal.kernel.util.ServiceLoader;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
-import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.module.framework.ModuleFramework;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.Registry;
@@ -617,6 +616,15 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		return urls;
 	}
 
+	private static String _getLPKGLocation(File lpkgFile) {
+		URI uri = lpkgFile.toURI();
+
+		String uriString = uri.toString();
+
+		return StringUtil.replace(
+			uriString, CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
+	}
+
 	private Bundle _addBundle(
 			String location, InputStream inputStream, boolean checkPermission)
 		throws PortalException {
@@ -720,7 +728,14 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			PropsValues.MODULE_FRAMEWORK_RESOLVER_REVISION_BATCH_SIZE);
 		properties.put("java.security.manager", null);
 		properties.put("org.osgi.framework.security", null);
-		properties.put("osgi.home", PropsValues.LIFERAY_HOME);
+
+		File file = new File(PropsValues.LIFERAY_HOME);
+
+		URI uri = file.toURI();
+
+		uri = uri.normalize();
+
+		properties.put("osgi.home", uri.toString());
 
 		ProtectionDomain protectionDomain = clazz.getProtectionDomain();
 
@@ -887,13 +902,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		Map<String, Bundle> bundles = new HashMap<>();
 
-		URI uri = file.toURI();
-
-		URL url = uri.toURL();
-
-		String path = url.getPath();
-
-		path = URLCodec.decodeURL(path);
+		String path = _getLPKGLocation(file);
 
 		try (ZipFile zipFile = new ZipFile(file)) {
 			Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
@@ -1442,7 +1451,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		for (Path jarPath : jarPaths) {
 			try (InputStream inputStream = Files.newInputStream(jarPath)) {
-				URI uri = jarPath.toUri();
+				File file = jarPath.toFile();
+
+				URI uri = file.toURI();
 
 				String uriString = uri.toString();
 

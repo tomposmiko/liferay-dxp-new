@@ -32,7 +32,7 @@ definition {
 		task ("Add a display page with fragments mapped to Basic Web Content") {
 			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-staging");
 
-			DisplayPagesAdmin.add(displayPageName = "Display Page Name");
+			DisplayPagesAdmin.addDisplayPage(displayPageName = "Display Page Name");
 
 			PageEditor.addFragment(
 				collectionName = "Collection Name",
@@ -61,7 +61,9 @@ definition {
 				itemName = "Content"
 			);
 
-			PortletEntry.publish();
+			Button.clickPublish();
+
+			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-staging");
 		}
 	}
 
@@ -215,7 +217,7 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(rowEntry = "Display Page Name");
+			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a web content article") {
@@ -292,7 +294,7 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Mark the display page as default") {
-			DisplayPagesAdmin.markDisplayPageAsDefault(rowEntry = "Display Page Name");
+			DisplayPagesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Add a web content article") {
@@ -305,7 +307,7 @@ definition {
 				webContentTitle = "Webcontent Title"
 			);
 
-			PortletEntry.publish();
+			Button.clickPublish();
 		}
 
 		task ("Publish the site to live") {
@@ -317,9 +319,9 @@ definition {
 		task ("Add a Content fragment to the display page and map it to the Basic Web Content Title") {
 			DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-staging");
 
-			LexiconEntry.gotoEntryMenuItem(
-				menuItem = "Edit",
-				rowEntry = "Display Page Name"
+			DisplayPagesAdmin.gotoDisplayPageEllipsisItem(
+				displayPageName = "Display Page Name",
+				item = "Edit"
 			);
 
 			PageEditor.addFragment(
@@ -333,7 +335,7 @@ definition {
 				itemName = "Title"
 			);
 
-			PortletEntry.publish();
+			Button.clickPublish();
 		}
 
 		task ("Assert the web content article displays with the additional Content fragment in the staging site") {

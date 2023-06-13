@@ -17,6 +17,9 @@ package com.liferay.portal.search.searcher;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.search.Query;
+import com.liferay.portal.search.aggregation.Aggregation;
+import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
+import com.liferay.portal.search.stats.StatsRequest;
 
 /**
  * Builds a search request to be used when performing a search.
@@ -27,6 +30,10 @@ import com.liferay.portal.kernel.search.Query;
  */
 @ProviderType
 public interface SearchRequestBuilder {
+
+	public void addAggregation(Aggregation aggregation);
+
+	public void addPipelineAggregation(PipelineAggregation pipelineAggregation);
 
 	/**
 	 * Adds fields to include in search results as a map of keys and values.
@@ -78,5 +85,17 @@ public interface SearchRequestBuilder {
 	 * @review
 	 */
 	public SearchRequestBuilder rescoreQuery(Query rescoreQuery);
+
+	/**
+	 * Provides a map of field names and the metric aggregations that are to be
+	 * computed for each field.
+	 *
+	 * @param statsMap the map containing the stats that are enabled for each
+	 *        field.
+	 * @return the same builder
+	 *
+	 * @review
+	 */
+	public SearchRequestBuilder statsRequests(StatsRequest... statsRequests);
 
 }

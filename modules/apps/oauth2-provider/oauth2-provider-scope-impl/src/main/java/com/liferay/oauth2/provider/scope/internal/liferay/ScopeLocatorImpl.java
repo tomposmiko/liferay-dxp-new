@@ -196,7 +196,7 @@ public class ScopeLocatorImpl implements ScopeLocator {
 					}
 
 					return propertyAccessor ->
-						PrefixHandler.PASSTHROUGH_PREFIXHANDLER;
+						PrefixHandler.PASS_THROUGH_PREFIX_HANDLER;
 				}));
 		setScopedScopeFinders(
 			_scopedServiceTrackerMapFactory.create(
@@ -213,7 +213,7 @@ public class ScopeLocatorImpl implements ScopeLocator {
 						return scopeMapper;
 					}
 
-					return ScopeMapper.PASSTHROUGH_SCOPEMAPPER;
+					return ScopeMapper.PASS_THROUGH_SCOPE_MAPPER;
 				}));
 		setScopedScopeMatcherFactories(
 			ServiceTrackerMapFactory.openSingleValueMap(

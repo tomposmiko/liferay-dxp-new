@@ -15,7 +15,7 @@
 --%>
 
 <%
-String thumbnailSrc = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
+String thumbnailSrc = DLURLHelperUtil.getThumbnailSrc(fileEntry, themeDisplay);
 %>
 
 <c:choose>
@@ -52,9 +52,16 @@ String thumbnailSrc = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
 			</h4>
 		</liferay-ui:search-container-column-text>
 
-		<liferay-ui:search-container-column-jsp
-			path="/blogs_admin/image_action.jsp"
-		/>
+		<liferay-ui:search-container-column-text>
+
+			<%
+			BlogsEntryImageActionDropdownItemsProvider blogsEntryImageActionDropdownItemsProvider = new BlogsEntryImageActionDropdownItemsProvider(fileEntry, renderRequest, renderResponse);
+			%>
+
+			<clay:dropdown-actions
+				dropdownItems="<%= blogsEntryImageActionDropdownItemsProvider.getActionDropdownItems() %>"
+			/>
+		</liferay-ui:search-container-column-text>
 	</c:when>
 	<c:when test='<%= displayStyle.equals("icon") %>'>
 
@@ -63,40 +70,9 @@ String thumbnailSrc = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
 		%>
 
 		<liferay-ui:search-container-column-text>
-			<c:choose>
-				<c:when test="<%= Validator.isNull(thumbnailSrc) %>">
-					<liferay-frontend:icon-vertical-card
-						actionJsp="/blogs_admin/image_action.jsp"
-						actionJspServletContext="<%= application %>"
-						icon="documents-and-media"
-						resultRow="<%= row %>"
-						rowChecker="<%= searchContainer.getRowChecker() %>"
-						title="<%= fileEntry.getTitle() %>"
-					>
-						<liferay-frontend:vertical-card-sticker-bottom>
-							<div class="sticker sticker-bottom <%= dlMimeTypeDisplayContext.getCssClassFileMimeType(fileEntry.getMimeType()) %>">
-								<%= StringUtil.shorten(StringUtil.upperCase(fileEntry.getExtension()), 3, StringPool.BLANK) %>
-							</div>
-						</liferay-frontend:vertical-card-sticker-bottom>
-					</liferay-frontend:icon-vertical-card>
-				</c:when>
-				<c:otherwise>
-					<liferay-frontend:vertical-card
-						actionJsp="/blogs_admin/image_action.jsp"
-						actionJspServletContext="<%= application %>"
-						imageUrl="<%= thumbnailSrc %>"
-						resultRow="<%= row %>"
-						rowChecker="<%= searchContainer.getRowChecker() %>"
-						title="<%= fileEntry.getTitle() %>"
-					>
-						<liferay-frontend:vertical-card-sticker-bottom>
-							<div class="sticker sticker-bottom <%= dlMimeTypeDisplayContext.getCssClassFileMimeType(fileEntry.getMimeType()) %>">
-								<%= StringUtil.shorten(StringUtil.upperCase(fileEntry.getExtension()), 3, StringPool.BLANK) %>
-							</div>
-						</liferay-frontend:vertical-card-sticker-bottom>
-					</liferay-frontend:vertical-card>
-				</c:otherwise>
-			</c:choose>
+			<clay:vertical-card
+				verticalCard="<%= new BlogsEntryImageVerticalCard(fileEntry, renderRequest, renderResponse, searchContainer.getRowChecker()) %>"
+			/>
 		</liferay-ui:search-container-column-text>
 	</c:when>
 	<c:otherwise>
@@ -120,8 +96,15 @@ String thumbnailSrc = DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
 			<liferay-ui:message arguments="<%= new String[] {LanguageUtil.getTimeDescription(locale, System.currentTimeMillis() - fileEntry.getModifiedDate().getTime(), true), HtmlUtil.escape(fileEntry.getUserName())} %>" key="x-ago-by-x" translateArguments="<%= false %>" />
 		</liferay-ui:search-container-column-text>
 
-		<liferay-ui:search-container-column-jsp
-			path="/blogs_admin/image_action.jsp"
-		/>
+		<liferay-ui:search-container-column-text>
+
+			<%
+			BlogsEntryImageActionDropdownItemsProvider blogsEntryImageActionDropdownItemsProvider = new BlogsEntryImageActionDropdownItemsProvider(fileEntry, renderRequest, renderResponse);
+			%>
+
+			<clay:dropdown-actions
+				dropdownItems="<%= blogsEntryImageActionDropdownItemsProvider.getActionDropdownItems() %>"
+			/>
+		</liferay-ui:search-container-column-text>
 	</c:otherwise>
 </c:choose>

@@ -14,6 +14,8 @@
 
 package com.liferay.segments.context;
 
+import aQute.bnd.annotation.ProviderType;
+
 import java.io.Serializable;
 
 import java.util.HashMap;
@@ -25,6 +27,7 @@ import java.util.Map;
  * @author Eduardo García
  * @review
  */
+@ProviderType
 public class Context {
 
 	public static final String BROWSER = "browser";
@@ -41,9 +44,15 @@ public class Context {
 
 	public static final String LANGUAGE_ID = "languageId";
 
+	public static final String LAST_SIGN_IN_DATE_TIME = "lastSignInDateTime";
+
 	public static final String LOCAL_DATE = "localDate";
 
+	public static final String SIGNED_IN = "signedIn";
+
 	public static final String URL = "url";
+
+	public static final String USER_AGENT = "userAgent";
 
 	public Serializable get(String key) {
 		return _map.get(key);

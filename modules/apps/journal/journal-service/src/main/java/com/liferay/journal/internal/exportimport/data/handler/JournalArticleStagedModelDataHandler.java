@@ -356,8 +356,9 @@ public class JournalArticleStagedModelDataHandler
 			portletDataContext, article, ddmStructure,
 			PortletDataContext.REFERENCE_TYPE_STRONG);
 
-		if (article.getClassNameId() != _portal.getClassNameId(
-				DDMStructure.class)) {
+		if ((article.getClassNameId() != _portal.getClassNameId(
+				DDMStructure.class)) &&
+			Validator.isNotNull(article.getDDMTemplateKey())) {
 
 			DDMTemplate ddmTemplate = _ddmTemplateLocalService.getTemplate(
 				article.getGroupId(),

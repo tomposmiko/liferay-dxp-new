@@ -69,6 +69,7 @@ import javax.enterprise.context.Initialized;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
+import javax.enterprise.event.ObservesAsync;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
@@ -278,13 +279,9 @@ public class BeanPortletExtension implements Extension {
 	}
 
 	@SuppressWarnings({"serial", "unchecked"})
-	public void step4ApplicationScopedInitialized(
-		@Initialized(ApplicationScoped.class) @Observes ServletContext
-			servletContext,
-		BeanManager beanManager) {
-
-		BundleContext bundleContext =
-			(BundleContext)servletContext.getAttribute("osgi-bundlecontext");
+	public void step4ApplicationScopedInitializedAsync(
+		@ObservesAsync ServletContext servletContext, BeanManager beanManager,
+		BundleContext bundleContext) {
 
 		Bundle bundle = bundleContext.getBundle();
 
@@ -479,6 +476,15 @@ public class BeanPortletExtension implements Extension {
 
 				},
 				properties));
+	}
+
+	public void step4ApplicationScopedInitializedSync(
+		@Initialized(ApplicationScoped.class) @Observes ServletContext
+			servletContext,
+		BeanManager beanManager,
+		javax.enterprise.event.Event<ServletContext> servletContextEvent) {
+
+		servletContextEvent.fireAsync(servletContext);
 	}
 
 	public void step5SessionScopeBeforeDestroyed(

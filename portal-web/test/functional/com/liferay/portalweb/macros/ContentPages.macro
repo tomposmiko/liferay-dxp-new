@@ -1,4 +1,21 @@
 definition {
+	macro _selectCard {
+		if (isSet(collectionName)) {
+			Navigator.gotoNavNested(navNested = "${collectionName}");
+
+			LexiconCard.clickCard(
+				card = "${pageTemplateName}"
+			);
+		}
+		else {
+			Navigator.gotoNavNested(navNested = "Basic Pages");
+
+			LexiconCard.clickCard(
+				card = "Content Page"
+			);
+		}
+	}
+
 	macro addPage {
 		var key_breadcrumbName="Pages";
 
@@ -6,7 +23,8 @@ definition {
 			SitePages.gotoAddFirstPage(
 				pageType = "Public Page"
 			);
-		} else {
+		}
+		else {
 			AssertClick(
 				locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
 				value1="Pages"
@@ -15,24 +33,16 @@ definition {
 			LexiconEntry.gotoAddMenuItem(menuItem = "Public Page");
 		}
 
-		if (!(isSet(collectionName))) {
-			var collectionName = "Basic Pages";
-		}
-
-		Navigator.gotoNavNested(navNested = "${collectionName}");
-
-		if (isSet(pageTemplateName)) {
-			LexiconEntry.gotoEntry(rowEntry = "${pageTemplateName}");
-		}
-		else {
-			Card.clickSitePagesCardLink(cardName = "Content Page");
-		}
+		ContentPages._selectCard(
+			collectionName = "${collectionName}",
+			pageTemplateName = "${pageTemplateName}"
+		);
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
 		PortletEntry.inputName(name = "${pageName}");
 
-		Button.click(button = "Save");
+		Button.clickAdd();
 
 		SelectFrame.selectFrameTop();
 	}

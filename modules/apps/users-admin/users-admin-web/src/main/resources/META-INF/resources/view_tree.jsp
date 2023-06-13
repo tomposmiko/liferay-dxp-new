@@ -80,6 +80,7 @@ if (organization != null) {
 			componentId="viewTreeManagementToolbar"
 			creationMenu="<%= viewTreeManagementToolbarDisplayContext.getCreationMenu() %>"
 			filterDropdownItems="<%= viewTreeManagementToolbarDisplayContext.getFilterDropdownItems() %>"
+			filterLabelItems="<%= viewTreeManagementToolbarDisplayContext.getFilterLabelItems() %>"
 			itemsTotal="<%= searchContainer.getTotal() %>"
 			searchActionURL="<%= viewTreeManagementToolbarDisplayContext.getSearchActionURL() %>"
 			searchContainerId="organizationUsers"
@@ -137,14 +138,21 @@ if (organization != null) {
 
 					<%
 					Organization curOrganization = null;
+					Map<String, Object> rowData = new HashMap<String, Object>();
 					User user2 = null;
 
 					if (result instanceof Organization) {
 						curOrganization = (Organization)result;
+
+						rowData.put("actions", String.join(StringPool.COMMA, viewTreeManagementToolbarDisplayContext.getAvailableActionDropdownItems(curOrganization)));
 					}
 					else {
 						user2 = (User)result;
+
+						rowData.put("actions", String.join(StringPool.COMMA, viewTreeManagementToolbarDisplayContext.getAvailableActionDropdownItems(user2)));
 					}
+
+					row.setData(rowData);
 					%>
 
 					<%@ include file="/organization/organization_user_search_columns.jspf" %>

@@ -9,17 +9,16 @@ configurations {
 
 dependencies {
 	compileInclude group: "com.carrotsearch", name: "hppc", version: "0.7.1"
-	compileInclude group: "com.fasterxml.jackson.core", name: "jackson-core", version: "2.8.10"
-	compileInclude group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-cbor", version: "2.8.10"
-	compileInclude group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-smile", version: "2.8.10"
-	compileInclude group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "2.8.10"
+	compileInclude group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-cbor", version: "2.9.8"
+	compileInclude group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-smile", version: "2.9.8"
+	compileInclude group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "2.9.8"
 	compileInclude group: "com.liferay", name: "org.elasticsearch.analysis.common", version: elasticsearchVersion
 	compileInclude group: "com.liferay", name: "org.elasticsearch.client.xpack.transport", version: elasticsearchVersion
 	compileInclude group: "com.liferay", name: "org.elasticsearch.plugin.classloader", version: elasticsearchVersion
 	compileInclude group: "com.liferay", name: "org.elasticsearch.plugin.cli", version: elasticsearchVersion
 	compileInclude group: "com.liferay", name: "org.elasticsearch.secure.sm", version: elasticsearchVersion
 	compileInclude group: "com.liferay", name: "org.elasticsearch.xpack.core", version: elasticsearchVersion
-	compileInclude group: "com.tdunning", name: "t-digest", version: "3.0"
+	compileInclude group: "com.tdunning", name: "t-digest", version: "3.2"
 	compileInclude group: "com.twitter", name: "jsr166e", version: "1.1.0"
 	compileInclude group: "com.unboundid", name: "unboundid-ldapsdk", version: "4.0.2"
 	compileInclude group: "com.vividsolutions", name: "jts", version: "1.13"
@@ -66,6 +65,7 @@ dependencies {
 	compileInclude group: "org.yaml", name: "snakeyaml", version: "1.17"
 
 	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
+	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-core", version: "2.9.8"
 	compileOnly group: "com.ibm.icu", name: "icu4j", version: "61.1"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"

@@ -22,14 +22,16 @@ import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.RegexUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 
-import java.io.File;
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,6 +70,10 @@ public abstract class PoshiElement
 		throws PoshiScriptParserException {
 
 		return clone(null, poshiScript);
+	}
+
+	public int getDefaultPoshiScriptLineNumber() {
+		return getPoshiScriptLineNumber();
 	}
 
 	public String getPoshiLogDescriptor() {
@@ -144,10 +150,10 @@ public abstract class PoshiElement
 		_addNodes(element);
 	}
 
-	protected PoshiElement(String name, Element element, File file) {
+	protected PoshiElement(String name, Element element, URL url) {
 		this(name, element);
 
-		setFilePath(file);
+		setFilePath(url);
 	}
 
 	protected PoshiElement(
@@ -177,12 +183,12 @@ public abstract class PoshiElement
 
 	protected PoshiElement(
 			String name, PoshiElement parentPoshiElement, String poshiScript,
-			File file)
+			URL url)
 		throws PoshiScriptParserException {
 
 		super(name);
 
-		setFilePath(file);
+		setFilePath(url);
 
 		setParent(parentPoshiElement);
 
@@ -359,7 +365,25 @@ public abstract class PoshiElement
 	}
 
 	protected List<String> getMethodParameters(String content) {
+		try {
+			return getMethodParameters(content, null);
+		}
+		catch (PoshiScriptParserException pspe) {
+			pspe.printStackTrace();
+
+			return new ArrayList<>();
+		}
+	}
+
+	protected List<String> getMethodParameters(
+			String content, Pattern parameterPattern)
+		throws PoshiScriptParserException {
+
 		List<String> methodParameters = new ArrayList<>();
+
+		if (content.length() == 0) {
+			return methodParameters;
+		}
 
 		StringBuilder sb = new StringBuilder();
 
@@ -367,7 +391,17 @@ public abstract class PoshiElement
 
 		for (char c : content.toCharArray()) {
 			if ((c == ',') && isBalancedPoshiScript(methodParameter)) {
-				methodParameters.add(methodParameter.trim());
+				if (parameterPattern != null) {
+					Matcher matcher = parameterPattern.matcher(methodParameter);
+
+					if (!matcher.matches()) {
+						sb.append(c);
+
+						continue;
+					}
+				}
+
+				methodParameters.add(methodParameter);
 
 				sb.setLength(0);
 
@@ -379,7 +413,16 @@ public abstract class PoshiElement
 			methodParameter = sb.toString();
 		}
 
-		methodParameters.add(methodParameter.trim());
+		if (parameterPattern != null) {
+			Matcher matcher = parameterPattern.matcher(methodParameter);
+
+			if (!matcher.matches()) {
+				throw new PoshiScriptParserException(
+					"Invalid Poshi Script parameter syntax", this);
+			}
+		}
+
+		methodParameters.add(methodParameter);
 
 		return methodParameters;
 	}
@@ -392,6 +435,56 @@ public abstract class PoshiElement
 		name = name.replace("property ", "");
 
 		return name.replace("var ", "");
+	}
+
+	protected List<String> getNestedConditions(
+		String poshiScript, String operator) {
+
+		List<String> nestedConditions = new ArrayList<>();
+
+		Set<Integer> tokenIndices = new TreeSet<>();
+
+		int index = poshiScript.indexOf(operator);
+
+		while (index >= 0) {
+			tokenIndices.add(index);
+
+			index = poshiScript.indexOf(operator, index + 1);
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		char[] chars = poshiScript.toCharArray();
+
+		for (int i = 0; i < chars.length; i++) {
+			char c = chars[i];
+
+			if (tokenIndices.contains(i)) {
+				if (isBalancedPoshiScript(sb.toString())) {
+					nestedConditions.add(sb.toString());
+
+					sb.setLength(0);
+
+					i++;
+
+					continue;
+				}
+			}
+
+			if (i == (chars.length - 1)) {
+				sb.append(c);
+
+				if (isBalancedPoshiScript(sb.toString()) &&
+					!nestedConditions.isEmpty()) {
+
+					nestedConditions.add(sb.toString());
+				}
+			}
+
+			sb.append(c);
+		}
+
+		return nestedConditions;
 	}
 
 	protected String getPad() {
@@ -659,16 +752,6 @@ public abstract class PoshiElement
 		return false;
 	}
 
-	protected boolean isMultilinePoshiScriptComment(String poshiScript) {
-		poshiScript = poshiScript.trim();
-
-		if (poshiScript.endsWith("*/") && poshiScript.startsWith("/*")) {
-			return true;
-		}
-
-		return false;
-	}
-
 	protected boolean isValidFunctionFileName(String poshiScriptInvocation) {
 		for (String functionFileName :
 				PoshiRunnerContext.getFunctionFileNames()) {
@@ -821,7 +904,7 @@ public abstract class PoshiElement
 		return sb.toString();
 	}
 
-	protected void setFilePath(File file) {
+	protected void setFilePath(URL url) {
 	}
 
 	protected String singleQuoteContent(String content) {
@@ -889,14 +972,8 @@ public abstract class PoshiElement
 	protected static final String VAR_NAME_REGEX =
 		"(static[\\s]*|)var([\\s]*[A-Z][\\w]*|)[\\s]*[\\w]*";
 
-	protected static final Pattern nestedVarAssignmentPattern = Pattern.compile(
-		"(\\w*\\s*=\\s*\".*?\"|\\w*\\s*=\\s*'''.*?'''|" +
-			"\\w*\\s=\\s*[\\w\\.]*\\(.*?\\))($|\\s|,)",
-		Pattern.DOTALL);
 	protected static final Pattern poshiScriptAnnotationPattern =
 		Pattern.compile("@[\\w-]*[\\s]*?=[\\s]\".*?\"", Pattern.DOTALL);
-	protected static final Pattern poshiScriptBlockNamePattern =
-		Pattern.compile("[\\s\\S]*");
 	protected static final Pattern poshiScriptBlockPattern = Pattern.compile(
 		"^[^{]*\\{[\\s\\S]*\\}$");
 
@@ -927,7 +1004,8 @@ public abstract class PoshiElement
 		}
 
 		if (poshiScript.contains("//")) {
-			poshiScript = poshiScript.replaceAll("(?s)\n[\\s]*//.*?\n", "//\n");
+			poshiScript = poshiScript.replaceAll(
+				"(?s)\n[\\s]*//.*?(\n|$)", "//\n");
 		}
 
 		return poshiScript.trim();

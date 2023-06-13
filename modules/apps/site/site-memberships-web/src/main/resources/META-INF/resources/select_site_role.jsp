@@ -21,19 +21,7 @@ SelectSiteRolesDisplayContext selectSiteRolesDisplayContext = new SelectSiteRole
 %>
 
 <clay:management-toolbar
-	clearResultsURL="<%= selectSiteRolesDisplayContext.getClearResultsURL() %>"
-	componentId="siteRolesManagementToolbar"
-	disabled="<%= selectSiteRolesDisplayContext.isDisabledManagementBar() %>"
-	filterDropdownItems="<%= selectSiteRolesDisplayContext.getFilterDropdownItems() %>"
-	itemsTotal="<%= selectSiteRolesDisplayContext.getTotalItems() %>"
-	searchActionURL="<%= selectSiteRolesDisplayContext.getSearchActionURL() %>"
-	searchContainerId="siteRoles"
-	searchFormName="searchFm"
-	selectable="<%= false %>"
-	showSearch="<%= selectSiteRolesDisplayContext.isShowSearch() %>"
-	sortingOrder="<%= selectSiteRolesDisplayContext.getOrderByType() %>"
-	sortingURL="<%= selectSiteRolesDisplayContext.getSortingURL() %>"
-	viewTypeItems="<%= selectSiteRolesDisplayContext.getViewTypeItems() %>"
+	displayContext="<%= new SelectSiteRolesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, selectSiteRolesDisplayContext) %>"
 />
 
 <aui:form cssClass="container-fluid-1280 portlet-site-memberships-assign-site-roles" name="fm">
@@ -62,13 +50,8 @@ SelectSiteRolesDisplayContext selectSiteRolesDisplayContext = new SelectSiteRole
 					%>
 
 					<liferay-ui:search-container-column-text>
-						<liferay-frontend:icon-vertical-card
-							cssClass="selector-button"
-							data="<%= data %>"
-							icon="users"
-							resultRow="<%= row %>"
-							subtitle="<%= LanguageUtil.get(request, role.getTypeLabel()) %>"
-							title="<%= HtmlUtil.escape(role.getTitle(locale)) %>"
+						<clay:vertical-card
+							verticalCard="<%= new SelectSiteRoleVerticalCard(role, renderRequest) %>"
 						/>
 					</liferay-ui:search-container-column-text>
 				</c:when>

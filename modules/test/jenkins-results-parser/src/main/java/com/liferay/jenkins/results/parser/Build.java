@@ -106,6 +106,12 @@ public interface Build {
 
 	public TestResult getLongestRunningTest();
 
+	public Map<String, String> getMetricLabels();
+
+	public List<Build> getModifiedDownstreamBuilds();
+
+	public List<Build> getModifiedDownstreamBuildsByStatus(String status);
+
 	public String getOperatingSystem();
 
 	public Map<String, String> getParameters();
@@ -123,6 +129,8 @@ public interface Build {
 	public String getStatus();
 
 	public long getStatusAge();
+
+	public long getStatusDuration(String status);
 
 	public String getStatusReport();
 
@@ -142,7 +150,17 @@ public interface Build {
 
 	public int getTotalSlavesUsedCount();
 
+	public int getTotalSlavesUsedCount(
+		String status, boolean modifiedBuildsOnly);
+
+	public int getTotalSlavesUsedCount(
+		String status, boolean modifiedBuildsOnly, boolean ignoreCurrentBuild);
+
 	public boolean hasBuildURL(String buildURL);
+
+	public boolean hasModifiedDownstreamBuilds();
+
+	public boolean isBuildModified();
 
 	public void reinvoke();
 

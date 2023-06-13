@@ -31,7 +31,7 @@ if (status != WorkflowConstants.STATUS_ANY) {
 
 Map<String, Object> context = new HashMap<>();
 
-context.put("imageURL", DLUtil.getPreviewURL(fileVersion.getFileEntry(), fileVersion, themeDisplay, previewQueryString));
+context.put("imageURL", DLURLHelperUtil.getPreviewURL(fileVersion.getFileEntry(), fileVersion, themeDisplay, previewQueryString));
 context.put("spritemap", themeDisplay.getPathThemeImages() + "/lexicon/icons.svg");
 %>
 

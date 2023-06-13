@@ -22,7 +22,7 @@ import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationPersis
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPersistence;
 
-import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
@@ -40,11 +40,12 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
-import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
+
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.Serializable;
 
@@ -61,17 +62,16 @@ import javax.sql.DataSource;
  *
  * @author Brian Wing Shun Chan
  * @see com.liferay.oauth2.provider.service.impl.OAuth2ScopeGrantLocalServiceImpl
- * @see com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalServiceUtil
  * @generated
  */
 @ProviderType
 public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	extends BaseLocalServiceImpl implements OAuth2ScopeGrantLocalService,
-		IdentifiableOSGiService {
+		AopService, IdentifiableOSGiService {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this class directly. Always use {@link com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalServiceUtil} to access the o auth2 scope grant local service.
+	 * Never modify or reference this class directly. Use <code>OAuth2ScopeGrantLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalServiceUtil</code>.
 	 */
 
 	/**
@@ -151,7 +151,7 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns a range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -170,7 +170,7 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	 * Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param dynamicQuery the dynamic query
@@ -284,7 +284,7 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	 * Returns a range of all the o auth2 scope grants.
 	 *
 	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.oauth2.provider.model.impl.OAuth2ScopeGrantModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	 * </p>
 	 *
 	 * @param start the lower bound of the range of o auth2 scope grants
@@ -415,7 +415,7 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	@Override
 	public List<OAuth2ScopeGrant> getOAuth2AuthorizationOAuth2ScopeGrants(
 		long oAuth2AuthorizationId) {
-		return oAuth2AuthorizationPersistence.getOAuth2ScopeGrants(oAuth2AuthorizationId);
+		return oAuth2ScopeGrantPersistence.getOAuth2AuthorizationOAuth2ScopeGrants(oAuth2AuthorizationId);
 	}
 
 	/**
@@ -423,7 +423,7 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	@Override
 	public List<OAuth2ScopeGrant> getOAuth2AuthorizationOAuth2ScopeGrants(
 		long oAuth2AuthorizationId, int start, int end) {
-		return oAuth2AuthorizationPersistence.getOAuth2ScopeGrants(oAuth2AuthorizationId,
+		return oAuth2ScopeGrantPersistence.getOAuth2AuthorizationOAuth2ScopeGrants(oAuth2AuthorizationId,
 			start, end);
 	}
 
@@ -433,7 +433,7 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	public List<OAuth2ScopeGrant> getOAuth2AuthorizationOAuth2ScopeGrants(
 		long oAuth2AuthorizationId, int start, int end,
 		OrderByComparator<OAuth2ScopeGrant> orderByComparator) {
-		return oAuth2AuthorizationPersistence.getOAuth2ScopeGrants(oAuth2AuthorizationId,
+		return oAuth2ScopeGrantPersistence.getOAuth2AuthorizationOAuth2ScopeGrants(oAuth2AuthorizationId,
 			start, end, orderByComparator);
 	}
 
@@ -471,128 +471,17 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 			oAuth2ScopeGrantIds);
 	}
 
-	/**
-	 * Returns the o auth2 scope grant local service.
-	 *
-	 * @return the o auth2 scope grant local service
-	 */
-	public OAuth2ScopeGrantLocalService getOAuth2ScopeGrantLocalService() {
-		return oAuth2ScopeGrantLocalService;
+	@Override
+	public Class<?>[] getAopInterfaces() {
+		return new Class<?>[] {
+			OAuth2ScopeGrantLocalService.class, IdentifiableOSGiService.class,
+			PersistedModelLocalService.class
+		};
 	}
 
-	/**
-	 * Sets the o auth2 scope grant local service.
-	 *
-	 * @param oAuth2ScopeGrantLocalService the o auth2 scope grant local service
-	 */
-	public void setOAuth2ScopeGrantLocalService(
-		OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService) {
-		this.oAuth2ScopeGrantLocalService = oAuth2ScopeGrantLocalService;
-	}
-
-	/**
-	 * Returns the o auth2 scope grant persistence.
-	 *
-	 * @return the o auth2 scope grant persistence
-	 */
-	public OAuth2ScopeGrantPersistence getOAuth2ScopeGrantPersistence() {
-		return oAuth2ScopeGrantPersistence;
-	}
-
-	/**
-	 * Sets the o auth2 scope grant persistence.
-	 *
-	 * @param oAuth2ScopeGrantPersistence the o auth2 scope grant persistence
-	 */
-	public void setOAuth2ScopeGrantPersistence(
-		OAuth2ScopeGrantPersistence oAuth2ScopeGrantPersistence) {
-		this.oAuth2ScopeGrantPersistence = oAuth2ScopeGrantPersistence;
-	}
-
-	/**
-	 * Returns the o auth2 scope grant finder.
-	 *
-	 * @return the o auth2 scope grant finder
-	 */
-	public OAuth2ScopeGrantFinder getOAuth2ScopeGrantFinder() {
-		return oAuth2ScopeGrantFinder;
-	}
-
-	/**
-	 * Sets the o auth2 scope grant finder.
-	 *
-	 * @param oAuth2ScopeGrantFinder the o auth2 scope grant finder
-	 */
-	public void setOAuth2ScopeGrantFinder(
-		OAuth2ScopeGrantFinder oAuth2ScopeGrantFinder) {
-		this.oAuth2ScopeGrantFinder = oAuth2ScopeGrantFinder;
-	}
-
-	/**
-	 * Returns the counter local service.
-	 *
-	 * @return the counter local service
-	 */
-	public com.liferay.counter.kernel.service.CounterLocalService getCounterLocalService() {
-		return counterLocalService;
-	}
-
-	/**
-	 * Sets the counter local service.
-	 *
-	 * @param counterLocalService the counter local service
-	 */
-	public void setCounterLocalService(
-		com.liferay.counter.kernel.service.CounterLocalService counterLocalService) {
-		this.counterLocalService = counterLocalService;
-	}
-
-	/**
-	 * Returns the o auth2 authorization local service.
-	 *
-	 * @return the o auth2 authorization local service
-	 */
-	public com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService getOAuth2AuthorizationLocalService() {
-		return oAuth2AuthorizationLocalService;
-	}
-
-	/**
-	 * Sets the o auth2 authorization local service.
-	 *
-	 * @param oAuth2AuthorizationLocalService the o auth2 authorization local service
-	 */
-	public void setOAuth2AuthorizationLocalService(
-		com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService oAuth2AuthorizationLocalService) {
-		this.oAuth2AuthorizationLocalService = oAuth2AuthorizationLocalService;
-	}
-
-	/**
-	 * Returns the o auth2 authorization persistence.
-	 *
-	 * @return the o auth2 authorization persistence
-	 */
-	public OAuth2AuthorizationPersistence getOAuth2AuthorizationPersistence() {
-		return oAuth2AuthorizationPersistence;
-	}
-
-	/**
-	 * Sets the o auth2 authorization persistence.
-	 *
-	 * @param oAuth2AuthorizationPersistence the o auth2 authorization persistence
-	 */
-	public void setOAuth2AuthorizationPersistence(
-		OAuth2AuthorizationPersistence oAuth2AuthorizationPersistence) {
-		this.oAuth2AuthorizationPersistence = oAuth2AuthorizationPersistence;
-	}
-
-	public void afterPropertiesSet() {
-		persistedModelLocalServiceRegistry.register("com.liferay.oauth2.provider.model.OAuth2ScopeGrant",
-			oAuth2ScopeGrantLocalService);
-	}
-
-	public void destroy() {
-		persistedModelLocalServiceRegistry.unregister(
-			"com.liferay.oauth2.provider.model.OAuth2ScopeGrant");
+	@Override
+	public void setAopProxy(Object aopProxy) {
+		oAuth2ScopeGrantLocalService = (OAuth2ScopeGrantLocalService)aopProxy;
 	}
 
 	/**
@@ -637,18 +526,13 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 		}
 	}
 
-	@BeanReference(type = OAuth2ScopeGrantLocalService.class)
 	protected OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService;
-	@BeanReference(type = OAuth2ScopeGrantPersistence.class)
+	@Reference
 	protected OAuth2ScopeGrantPersistence oAuth2ScopeGrantPersistence;
-	@BeanReference(type = OAuth2ScopeGrantFinder.class)
+	@Reference
 	protected OAuth2ScopeGrantFinder oAuth2ScopeGrantFinder;
-	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
-	@BeanReference(type = com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService.class)
-	protected com.liferay.oauth2.provider.service.OAuth2AuthorizationLocalService oAuth2AuthorizationLocalService;
-	@BeanReference(type = OAuth2AuthorizationPersistence.class)
+	@Reference
 	protected OAuth2AuthorizationPersistence oAuth2AuthorizationPersistence;
-	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
-	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

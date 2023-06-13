@@ -21,18 +21,7 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 %>
 
 <clay:management-toolbar
-	clearResultsURL="<%= selectUsersDisplayContext.getClearResultsURL() %>"
-	componentId="selectUsersWebManagementToolbar"
-	disabled="<%= selectUsersDisplayContext.isDisabledManagementBar() %>"
-	filterDropdownItems="<%= selectUsersDisplayContext.getFilterDropdownItems() %>"
-	itemsTotal="<%= selectUsersDisplayContext.getTotalItems() %>"
-	searchActionURL="<%= selectUsersDisplayContext.getSearchActionURL() %>"
-	searchContainerId="users"
-	searchFormName="searchFm"
-	showSearch="<%= selectUsersDisplayContext.isShowSearch() %>"
-	sortingOrder="<%= selectUsersDisplayContext.getOrderByType() %>"
-	sortingURL="<%= selectUsersDisplayContext.getSortingURL() %>"
-	viewTypeItems="<%= selectUsersDisplayContext.getViewTypeItems() %>"
+	displayContext="<%= new SelectUsersManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, selectUsersDisplayContext) %>"
 />
 
 <aui:form cssClass="container-fluid-1280 portlet-site-teams-select-users" name="selectUserFm">
@@ -56,13 +45,8 @@ SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayCont
 					%>
 
 					<liferay-ui:search-container-column-text>
-						<liferay-frontend:user-vertical-card
-							cssClass="entry-display-style"
-							resultRow="<%= row %>"
-							rowChecker="<%= searchContainer.getRowChecker() %>"
-							subtitle="<%= user2.getScreenName() %>"
-							title="<%= user2.getFullName() %>"
-							userId="<%= user2.getUserId() %>"
+						<clay:user-card
+							userCard="<%= new SelectUserUserCard(user2, renderRequest, searchContainer.getRowChecker()) %>"
 						/>
 					</liferay-ui:search-container-column-text>
 				</c:when>

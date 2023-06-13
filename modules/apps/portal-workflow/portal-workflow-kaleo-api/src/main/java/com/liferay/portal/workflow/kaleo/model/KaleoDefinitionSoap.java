@@ -26,7 +26,6 @@ import java.util.List;
  * This class is used by SOAP remote services, specifically {@link com.liferay.portal.workflow.kaleo.service.http.KaleoDefinitionServiceSoap}.
  *
  * @author Brian Wing Shun Chan
- * @see com.liferay.portal.workflow.kaleo.service.http.KaleoDefinitionServiceSoap
  * @generated
  */
 @ProviderType
@@ -34,6 +33,7 @@ public class KaleoDefinitionSoap implements Serializable {
 	public static KaleoDefinitionSoap toSoapModel(KaleoDefinition model) {
 		KaleoDefinitionSoap soapModel = new KaleoDefinitionSoap();
 
+		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setKaleoDefinitionId(model.getKaleoDefinitionId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
@@ -99,6 +99,14 @@ public class KaleoDefinitionSoap implements Serializable {
 
 	public void setPrimaryKey(long pk) {
 		setKaleoDefinitionId(pk);
+	}
+
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	public long getKaleoDefinitionId() {
@@ -209,6 +217,7 @@ public class KaleoDefinitionSoap implements Serializable {
 		_active = active;
 	}
 
+	private long _mvccVersion;
 	private long _kaleoDefinitionId;
 	private long _groupId;
 	private long _companyId;

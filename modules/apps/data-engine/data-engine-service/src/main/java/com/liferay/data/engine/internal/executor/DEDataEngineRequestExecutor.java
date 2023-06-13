@@ -14,40 +14,97 @@
 
 package com.liferay.data.engine.internal.executor;
 
-import com.liferay.data.engine.exception.DEDataDefinitionFieldsDeserializerException;
-import com.liferay.data.engine.internal.io.DEDataDefinitionFieldsDeserializerTracker;
-import com.liferay.data.engine.io.DEDataDefinitionFieldsDeserializer;
-import com.liferay.data.engine.io.DEDataDefinitionFieldsDeserializerApplyRequest;
-import com.liferay.data.engine.io.DEDataDefinitionFieldsDeserializerApplyResponse;
+import com.liferay.data.engine.exception.DEDataDefinitionDeserializerException;
+import com.liferay.data.engine.exception.DEDataRecordCollectionException;
+import com.liferay.data.engine.internal.io.DEDataDefinitionDeserializerTracker;
+import com.liferay.data.engine.internal.storage.DEDataStorageTracker;
+import com.liferay.data.engine.io.DEDataDefinitionDeserializer;
+import com.liferay.data.engine.io.DEDataDefinitionDeserializerApplyRequest;
+import com.liferay.data.engine.io.DEDataDefinitionDeserializerApplyResponse;
 import com.liferay.data.engine.model.DEDataDefinition;
-import com.liferay.data.engine.model.DEDataDefinitionField;
+import com.liferay.data.engine.model.DEDataRecord;
+import com.liferay.data.engine.model.DEDataRecordCollection;
+import com.liferay.data.engine.storage.DEDataStorage;
+import com.liferay.data.engine.storage.DEDataStorageGetRequest;
+import com.liferay.data.engine.storage.DEDataStorageGetResponse;
+import com.liferay.data.engine.storage.DEDataStorageRequestBuilder;
+import com.liferay.dynamic.data.lists.model.DDLRecord;
+import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-
-import java.util.List;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
- * @author Jeyvison Nascimento
+ * @author Leonardo Barros
  */
 public class DEDataEngineRequestExecutor {
 
 	public DEDataEngineRequestExecutor(
-		DEDataDefinitionFieldsDeserializerTracker
-			deDataDefinitionFieldsDeserializerTracker) {
+		DEDataDefinitionDeserializerTracker deDataDefinitionDeserializerTracker,
+		DEDataStorageTracker deDataStorageTracker) {
 
-		this.deDataDefinitionFieldsDeserializerTracker =
-			deDataDefinitionFieldsDeserializerTracker;
+		_deDataDefinitionDeserializerTracker =
+			deDataDefinitionDeserializerTracker;
+		_deDataStorageTracker = deDataStorageTracker;
+	}
+
+	public DEDataRecord map(DDLRecord ddlRecord) throws PortalException {
+		DEDataRecordCollection deDataRecordCollection = map(
+			ddlRecord.getRecordSet());
+
+		DEDataDefinition deDataDefinition =
+			deDataRecordCollection.getDEDataDefinition();
+
+		DEDataStorage deDataStorage = _deDataStorageTracker.getDEDataStorage(
+			deDataDefinition.getStorageType());
+
+		if (deDataStorage == null) {
+			throw new DEDataRecordCollectionException.NoSuchDataStorage(
+				deDataDefinition.getStorageType());
+		}
+
+		DEDataStorageGetRequest deDataStorageGetRequest =
+			DEDataStorageRequestBuilder.getBuilder(
+				ddlRecord.getDDMStorageId(), deDataDefinition
+			).build();
+
+		DEDataStorageGetResponse deDataStorageGetResponse = deDataStorage.get(
+			deDataStorageGetRequest);
+
+		DEDataRecord deDataRecord = new DEDataRecord();
+
+		deDataRecord.setDEDataRecordCollection(deDataRecordCollection);
+		deDataRecord.setDEDataRecordId(ddlRecord.getRecordId());
+		deDataRecord.setValues(deDataStorageGetResponse.getValues());
+
+		return deDataRecord;
+	}
+
+	public DEDataRecordCollection map(DDLRecordSet ddlRecordSet)
+		throws PortalException {
+
+		DEDataRecordCollection deDataRecordCollection =
+			new DEDataRecordCollection();
+
+		deDataRecordCollection.setDEDataDefinition(
+			map(ddlRecordSet.getDDMStructure()));
+		deDataRecordCollection.setDEDataRecordCollectionId(
+			ddlRecordSet.getRecordSetId());
+		deDataRecordCollection.addDescriptions(
+			ddlRecordSet.getDescriptionMap());
+		deDataRecordCollection.addNames(ddlRecordSet.getNameMap());
+
+		return deDataRecordCollection;
 	}
 
 	public DEDataDefinition map(DDMStructure ddmStructure)
-		throws DEDataDefinitionFieldsDeserializerException {
+		throws DEDataDefinitionDeserializerException {
 
-		DEDataDefinition deDataDefinition = new DEDataDefinition();
+		DEDataDefinition deDataDefinition = deserialize(
+			ddmStructure.getDefinition());
 
 		deDataDefinition.addDescriptions(ddmStructure.getDescriptionMap());
 		deDataDefinition.addNames(ddmStructure.getNameMap());
 		deDataDefinition.setCreateDate(ddmStructure.getCreateDate());
-		deDataDefinition.setDEDataDefinitionFields(
-			deserialize(ddmStructure.getDefinition()));
 		deDataDefinition.setDEDataDefinitionId(ddmStructure.getStructureId());
 		deDataDefinition.setModifiedDate(ddmStructure.getModifiedDate());
 		deDataDefinition.setStorageType(ddmStructure.getStorageType());
@@ -56,30 +113,29 @@ public class DEDataEngineRequestExecutor {
 		return deDataDefinition;
 	}
 
-	protected List<DEDataDefinitionField> deserialize(String content)
-		throws DEDataDefinitionFieldsDeserializerException {
+	protected DEDataDefinition deserialize(String content)
+		throws DEDataDefinitionDeserializerException {
 
-		DEDataDefinitionFieldsDeserializer deDataDefinitionFieldsDeserializer =
-			deDataDefinitionFieldsDeserializerTracker.
-				getDEDataDefinitionFieldsDeserializer("json");
+		DEDataDefinitionDeserializer deDataDefinitionDeserializer =
+			_deDataDefinitionDeserializerTracker.
+				getDEDataDefinitionDeserializer("json");
 
-		DEDataDefinitionFieldsDeserializerApplyRequest
-			deDataDefinitionFieldsDeserializerApplyRequest =
-				DEDataDefinitionFieldsDeserializerApplyRequest.Builder.
-					newBuilder(
-						content
-					).build();
+		DEDataDefinitionDeserializerApplyRequest
+			deDataDefinitionDeserializerApplyRequest =
+				DEDataDefinitionDeserializerApplyRequest.Builder.newBuilder(
+					content
+				).build();
 
-		DEDataDefinitionFieldsDeserializerApplyResponse
-			deDataDefinitionFieldsDeserializerApplyResponse =
-				deDataDefinitionFieldsDeserializer.apply(
-					deDataDefinitionFieldsDeserializerApplyRequest);
+		DEDataDefinitionDeserializerApplyResponse
+			deDataDefinitionDeserializerApplyResponse =
+				deDataDefinitionDeserializer.apply(
+					deDataDefinitionDeserializerApplyRequest);
 
-		return deDataDefinitionFieldsDeserializerApplyResponse.
-			getDeDataDefinitionFields();
+		return deDataDefinitionDeserializerApplyResponse.getDEDataDefinition();
 	}
 
-	protected DEDataDefinitionFieldsDeserializerTracker
-		deDataDefinitionFieldsDeserializerTracker;
+	private final DEDataDefinitionDeserializerTracker
+		_deDataDefinitionDeserializerTracker;
+	private final DEDataStorageTracker _deDataStorageTracker;
 
 }

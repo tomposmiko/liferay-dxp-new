@@ -40,11 +40,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>DESCRIPTIVE_VIEW_ENTRY_OPTIONS_DROPDOWN</td>
-	<td>//li[@data-qa-id='row' and contains(.,'${key_entryTitle}')]/div//a[span/*[name()='svg'][contains(@class,'icon-ellipsis-v')]]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>DESCRIPTIVE_VIEW_ENTRY_STATUS</td>
 	<td>//*[@data-qa-id='rowItemContent' and contains(.,'${key_entryTitle}')]//span[contains(@class,'status')]</td>
 	<td></td>
@@ -63,6 +58,17 @@
 <tr>
 	<td>ICON_VIEW_ENTRY_STATUS</td>
 	<td>//div[contains(@id,'blogEntriesSearchContainer')]//li[contains(.,'${key_entryTitle}')]//span[contains(@class,'status')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--WIDGET_VIEW-->
+<tr>
+	<td>WIDGET_VIEW_ENTRY_ELLIPSIS</td>
+	<td>//div[contains(@class,'widget-mode-simple')][contains(.,'${key_entryTitle}')]//button[contains(@class,'dropdown-toggle')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -1073,6 +1073,10 @@ public interface PropsKeys {
 	public static final String DL_FILE_ENTRY_THUMBNAIL_VIDEO_FRAME_PERCENTAGE =
 		"dl.file.entry.thumbnail.video.frame.percentage";
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String
 		DL_FILE_ENTRY_TYPE_IG_IMAGE_AUTO_CREATE_ON_UPGRADE =
 			"dl.file.entry.type.ig.image.auto.create.on.upgrade";
@@ -3006,9 +3010,6 @@ public interface PropsKeys {
 	@Deprecated
 	public static final String SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA =
 		"search.container.show.pagination.top.delta";
-
-	public static final String SEGMENTS_SEGMENTATION_ENABLED =
-		"segments.segmentation.enabled";
 
 	public static final String SERVLET_CONTEXT_CLASS_LOADER_POOL_FALLBACK =
 		"servlet.context.class.loader.pool.fallback";

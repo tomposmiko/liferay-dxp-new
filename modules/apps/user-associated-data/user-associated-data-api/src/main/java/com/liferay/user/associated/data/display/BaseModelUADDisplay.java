@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -89,6 +90,15 @@ public abstract class BaseModelUADDisplay<T extends BaseModel>
 	@Override
 	public String getTypeName(Locale locale) {
 		return getTypeClass().getSimpleName();
+	}
+
+	@Override
+	public boolean isSiteScoped() {
+		if (GroupedModel.class.isAssignableFrom(getTypeClass())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -208,7 +218,7 @@ public abstract class BaseModelUADDisplay<T extends BaseModel>
 
 		DynamicQuery dynamicQuery = getDynamicQuery(userId);
 
-		if (ArrayUtil.isNotEmpty(groupIds)) {
+		if (isSiteScoped() && ArrayUtil.isNotEmpty(groupIds)) {
 			dynamicQuery.add(
 				RestrictionsFactoryUtil.in(
 					"groupId", ArrayUtil.toLongArray(groupIds)));

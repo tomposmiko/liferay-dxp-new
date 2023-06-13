@@ -21,6 +21,7 @@ describe(
 						groupId="group_01"
 						onCriterionAdd={jest.fn()}
 						onMove={jest.fn()}
+						propertyKey="user"
 					/>
 				);
 

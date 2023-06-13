@@ -16,7 +16,7 @@ package com.liferay.change.tracking.site.change.lists.web.internal.application.l
 
 import com.liferay.application.list.BasePanelApp;
 import com.liferay.application.list.PanelApp;
-import com.liferay.application.list.constants.PanelCategoryKeys;
+import com.liferay.change.tracking.constants.CTPanelCategoryKeys;
 import com.liferay.change.tracking.constants.CTPortletKeys;
 import com.liferay.portal.kernel.model.Portlet;
 
@@ -24,13 +24,13 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Zoltan Csaszi
+ * @author Laszlo Pap
  */
 @Component(
 	immediate = true,
 	property = {
 		"panel.app.order:Integer=10",
-		"panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION_PUBLISHING
+		"panel.category.key=" + CTPanelCategoryKeys.CONTROL_PANEL_SITE_CHANGE_LISTS
 	},
 	service = PanelApp.class
 )

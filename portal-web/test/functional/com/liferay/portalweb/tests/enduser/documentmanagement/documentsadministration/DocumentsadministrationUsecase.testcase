@@ -3,6 +3,7 @@ definition {
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property custom.properties = "default.layout.template.id=1_column";
+	property test.assert.warning.exceptions = "true";
 	property testray.main.component.name = "Documents Management";
 
 	setUp {
@@ -630,7 +631,11 @@ definition {
 
 		ScrollWebElementIntoView(locator1 = "TextArea#ANY", key_text = "fileExtensions");
 
-		Type(locator1 = "TextArea#ANY", value1 = ".doc", key_text = "fileExtensions");
+		Type(
+			locator1 = "TextArea#ANY",
+			value1 = ".doc",
+			key_text = "fileExtensions"
+		);
 
 		SystemSettings.saveConfiguration();
 

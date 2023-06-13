@@ -25,6 +25,9 @@ import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderFactoryImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderFactoryImpl;
+import com.liferay.portal.search.internal.legacy.stats.StatsRequestBuilderFactoryImpl;
+import com.liferay.portal.search.internal.legacy.stats.StatsResultsTranslatorImpl;
+import com.liferay.portal.search.internal.stats.StatsResponseBuilderFactoryImpl;
 import com.liferay.portal.search.solr7.internal.connection.SolrClientManager;
 import com.liferay.portal.search.solr7.internal.connection.TestSolrClientManager;
 import com.liferay.portal.search.solr7.internal.document.DefaultSolrDocumentFactory;
@@ -193,7 +196,7 @@ public class SolrIndexingFixture implements IndexingFixture {
 	protected FacetProcessor createFacetProcessor() {
 		return new DefaultFacetProcessor() {
 			{
-				jsonFactory = _jsonFactory;
+				setJSONFactory(_jsonFactory);
 			}
 		};
 	}
@@ -203,20 +206,27 @@ public class SolrIndexingFixture implements IndexingFixture {
 
 		return new SolrIndexSearcher() {
 			{
-				jsonFactory = _jsonFactory;
-				props = createProps();
-				searchRequestBuilderFactory =
-					new SearchRequestBuilderFactoryImpl();
-				searchResponseBuilderFactory =
-					new SearchResponseBuilderFactoryImpl();
-
 				setFacetProcessor(_facetProcessor);
 				setFilterTranslator(createSolrFilterTranslator());
 				setGroupByTranslator(new DefaultGroupByTranslator());
+				setProps(createProps());
 				setQuerySuggester(createSolrQuerySuggester(solrClientManager));
 				setQueryTranslator(createSolrQueryTranslator());
+				setSearchRequestBuilderFactory(
+					new SearchRequestBuilderFactoryImpl());
+				setSearchResponseBuilderFactory(
+					new SearchResponseBuilderFactoryImpl());
 				setSolrClientManager(solrClientManager);
-				setStatsTranslator(new DefaultStatsTranslator());
+				setStatsRequestBuilderFactory(
+					new StatsRequestBuilderFactoryImpl());
+				setStatsResultsTranslator(new StatsResultsTranslatorImpl());
+				setStatsTranslator(
+					new DefaultStatsTranslator() {
+						{
+							setStatsResponseBuilderFactory(
+								new StatsResponseBuilderFactoryImpl());
+						}
+					});
 
 				activate(_properties);
 			}
@@ -288,7 +298,7 @@ public class SolrIndexingFixture implements IndexingFixture {
 
 		return new SolrQuerySuggester() {
 			{
-				localization = _localization;
+				setLocalization(_localization);
 
 				setNGramQueryBuilder(createNGramQueryBuilder());
 				setSolrClientManager(solrClientManager);

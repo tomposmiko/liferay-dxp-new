@@ -1,9 +1,35 @@
 import * as Utils from 'utils/utils.es';
+import uniqueId from 'lodash.uniqueid';
+import {CONJUNCTIONS} from 'utils/constants.es';
 import {mockCriteria, mockCriteriaNested} from 'test/data';
+
+jest.mock('lodash.uniqueid');
+
+const GROUP_ID = 'group_01';
+
+uniqueId.mockReturnValue(GROUP_ID);
 
 describe(
 	'utils',
 	() => {
+		describe(
+			'createNewGroup',
+			() => {
+				it(
+					'should return a new group object with the passed in items',
+					() => {
+						expect(Utils.createNewGroup([])).toEqual(
+							{
+								conjunctionName: CONJUNCTIONS.AND,
+								groupId: GROUP_ID,
+								items: []
+							}
+						);
+					}
+				);
+			}
+		);
+
 		describe(
 			'getChildGroupIds',
 			() => {
@@ -104,6 +130,26 @@ describe(
 					() => {
 						expect(Utils.insertAtIndex('c', ['a', 'b'], 2))
 							.toEqual(['a', 'b', 'c']);
+					}
+				);
+			}
+		);
+
+		describe(
+			'objectToFormData',
+			() => {
+				it(
+					'should take an object of key value pairs and return a form data object with the same values',
+					() => {
+						const testData = {
+							bar: 'bar',
+							foo: 'foo'
+						};
+
+						const formData = Utils.objectToFormData(testData);
+
+						expect(formData.get('bar')).toEqual('bar');
+						expect(formData.get('foo')).toEqual('foo');
 					}
 				);
 			}

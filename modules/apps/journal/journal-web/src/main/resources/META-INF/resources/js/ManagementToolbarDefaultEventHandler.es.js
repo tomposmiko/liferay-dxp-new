@@ -1,7 +1,7 @@
-import PortletBase from 'frontend-js-web/liferay/PortletBase.es';
+import DefaultEventHandler from 'frontend-js-web/liferay/DefaultEventHandler.es';
 import {Config} from 'metal-state';
 
-class ManagementToolbarDefaultEventHandler extends PortletBase {
+class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 	created() {
 		Liferay.on(
 			this.ns('selectAddMenuItem'),
@@ -11,22 +11,14 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 		);
 	}
 
-	callAction(event) {
-		var itemData = event.data.item.data;
-
-		if (itemData && itemData.action && this[itemData.action]) {
-			this[itemData.action]();
-		}
-	}
-
 	deleteEntries() {
-		let message = 'are-you-sure-you-want-to-delete-the-selected-entries';
+		let message = Liferay.Language.get('are-you-sure-you-want-to-delete-the-selected-entries');
 
 		if (this.trashEnabled) {
-			message = 'are-you-sure-you-want-to-move-the-selected-entries-to-the-recycle-bin';
+			message = Liferay.Language.get('are-you-sure-you-want-to-move-the-selected-entries-to-the-recycle-bin');
 		}
 
-		if (confirm(Liferay.Language.get(message))) {
+		if (confirm(message)) {
 			Liferay.fire(
 				this.ns('editEntry'),
 				{
@@ -45,10 +37,6 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 		);
 	}
 
-	handleActionItemClicked(event) {
-		this.callAction(event);
-	}
-
 	handleCreationMenuMoreButtonClicked() {
 		Liferay.Util.openWindow(
 			{
@@ -61,10 +49,6 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 				uri: this.openViewMoreStructuresURL
 			}
 		);
-	}
-
-	handleFilterItemClicked(event) {
-		this.callAction(event);
 	}
 
 	moveEntries() {

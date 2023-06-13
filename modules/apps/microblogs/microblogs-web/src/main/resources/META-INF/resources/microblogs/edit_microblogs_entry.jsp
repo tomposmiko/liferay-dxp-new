@@ -95,14 +95,14 @@ if (comment) {
 						<c:when test="<%= (receiverUser != null) && receiverUser.isActive() %>">
 							<a href="<%= receiverUser.getDisplayURL(themeDisplay) %>">
 								<liferay-ui:user-portrait
-									cssClass="user-icon-xs"
+									cssClass="sticker-sm"
 									userId="<%= (microblogsEntry != null) ? microblogsEntry.getUserId() : 0 %>"
 								/>
 							</a>
 						</c:when>
 						<c:otherwise>
 							<liferay-ui:user-portrait
-								cssClass="user-icon-xs"
+								cssClass="sticker-sm"
 								userId="<%= (microblogsEntry != null) ? microblogsEntry.getUserId() : 0 %>"
 							/>
 						</c:otherwise>
@@ -156,7 +156,7 @@ if (comment) {
 		<c:if test="<%= comment %>">
 			<span class="thumbnail">
 				<liferay-ui:user-portrait
-					cssClass="user-icon-xs"
+					cssClass="sticker-sm"
 					user="<%= user %>"
 				/>
 			</span>
@@ -442,34 +442,41 @@ if (comment) {
 			autocompleteDiv.hide();
 		};
 
+		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/microblogs/autocomplete_user_mentions" var="userIdURL">
+			<portlet:param name="userId" value="<%= String.valueOf(user.getUserId()) %>" />
+		</liferay-portlet:resourceURL>
+
 		var createAutocomplete = function(contentTextarea) {
-			AUI.$.ajax(
-				'<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/microblogs/autocomplete_user_mentions" />',
+			fetch(
+				'<%= HtmlUtil.escapeJS(userIdURL.toString()) %>',
 				{
-					data: {
-						userId: <%= user.getUserId() %>
-					},
-					success: function(responseData) {
-						autocompleteDiv = new A.AutoComplete(
-							{
-								inputNode: contentTextarea,
-								maxResults: 5,
+					credentials: 'include'
+				}
+			).then(
+				function(response) {
+					return response.json();
+				}
+			).then(
+				function(response) {
+					autocompleteDiv = new A.AutoComplete(
+						{
+							inputNode: contentTextarea,
+							maxResults: 5,
 								on: {
 									clear: function() {
-										var highlighterContent = A.one('#<portlet:namespace />highlighterContent<%= formId %>');
+									var highlighterContent = A.one('#<portlet:namespace />highlighterContent<%= formId %>');
 
-										highlighterContent.html('');
-									},
-									query: updateHighlightDivContent,
-									select: updateContentTextbox
+									highlighterContent.html('');
 								},
-								resultFilters: 'phraseMatch',
-								resultFormatter: resultFormatter,
-								resultTextLocator: 'fullName',
-								source: responseData
-							}
-						).render();
-					}
+								query: updateHighlightDivContent,
+								select: updateContentTextbox
+								},
+							resultFilters: 'phraseMatch',
+							resultFormatter: resultFormatter,
+							resultTextLocator: 'fullName',
+							source: response
+						}
+					).render();
 				}
 			);
 		};

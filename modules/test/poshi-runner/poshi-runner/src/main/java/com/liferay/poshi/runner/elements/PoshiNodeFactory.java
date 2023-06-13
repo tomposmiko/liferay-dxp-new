@@ -21,10 +21,11 @@ import com.liferay.poshi.runner.script.UnbalancedCodeException;
 import com.liferay.poshi.runner.util.Dom4JUtil;
 import com.liferay.poshi.runner.util.FileUtil;
 
-import java.io.File;
 import java.io.IOException;
 
 import java.lang.reflect.Modifier;
+
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,17 +93,37 @@ public abstract class PoshiNodeFactory {
 			"Invalid Poshi Script syntax", poshiScript, parentPoshiNode);
 	}
 
-	public static PoshiNode<?, ?> newPoshiNode(String poshiScript, File file) {
+	public static PoshiNode<?, ?> newPoshiNode(String content, URL url) {
 		try {
-			if (_definitionPoshiElement.isBalancedPoshiScript(
-					poshiScript, true)) {
+			content = content.trim();
 
-				return _definitionPoshiElement.clone(poshiScript, file);
+			if (content.startsWith("<definition")) {
+				Document document = Dom4JUtil.parse(content);
+
+				Element rootElement = document.getRootElement();
+
+				return _definitionPoshiElement.clone(rootElement, url);
 			}
+
+			if (_definitionPoshiElement.isBalancedPoshiScript(content, true)) {
+				PoshiElement poshiElement = _definitionPoshiElement.clone(
+					content, url);
+
+				if (!hasPoshiScriptParserException(url)) {
+					validatePoshiScriptContent(poshiElement, url);
+				}
+
+				return poshiElement;
+			}
+		}
+		catch (DocumentException | IOException e) {
+			throw new RuntimeException(
+				"Unable to parse Poshi XML file: " + url.getFile(),
+				e.getCause());
 		}
 		catch (PoshiScriptParserException pspe) {
 			if (pspe instanceof UnbalancedCodeException) {
-				pspe.setFilePath(file.getAbsolutePath());
+				pspe.setFilePath(url.getFile());
 			}
 
 			System.out.println(pspe.getMessage());
@@ -111,31 +132,55 @@ public abstract class PoshiNodeFactory {
 		return null;
 	}
 
-	public static PoshiNode<?, ?> newPoshiNodeFromFile(String filePath) {
+	public static PoshiNode<?, ?> newPoshiNodeFromFile(URL url) {
 		try {
-			File file = new File(filePath);
+			String content = FileUtil.read(url);
 
-			String content = FileUtil.read(file);
-
-			content = content.trim();
-
-			if (content.startsWith("<definition")) {
-				Document document = Dom4JUtil.parse(content);
-
-				Element rootElement = document.getRootElement();
-
-				return _definitionPoshiElement.clone(rootElement, file);
-			}
-
-			return newPoshiNode(content, file);
-		}
-		catch (DocumentException de) {
-			throw new RuntimeException(
-				"Unable to parse Poshi XML file: " + filePath, de.getCause());
+			return newPoshiNode(content, url);
 		}
 		catch (IOException ioe) {
 			throw new RuntimeException(
-				"Unable to read file: " + filePath, ioe.getCause());
+				"Unable to read file: " + url.getFile(), ioe.getCause());
+		}
+	}
+
+	public static void setValidatePoshiScript(boolean validate) {
+		_validatePoshiScript = validate;
+	}
+
+	protected static boolean hasPoshiScriptParserException(URL url) {
+		List<String> failingFilePaths =
+			PoshiScriptParserException.getFailingFilePaths();
+
+		return failingFilePaths.contains(url.getFile());
+	}
+
+	protected static void validatePoshiScriptContent(
+			PoshiElement poshiElement, URL url)
+		throws DocumentException, IOException, PoshiScriptParserException {
+
+		if (!_validatePoshiScript) {
+			return;
+		}
+
+		String poshiXMLString = Dom4JUtil.format(poshiElement);
+
+		PoshiNode newPoshiElement = newPoshiNode(poshiXMLString, url);
+
+		String newPoshiScript = newPoshiElement.toPoshiScript();
+
+		String poshiScript = FileUtil.read(url);
+
+		poshiScript = poshiScript.replaceAll("\\s+", "");
+
+		if (!poshiScript.equals(newPoshiScript.replaceAll("\\s+", ""))) {
+			PoshiScriptParserException pspe = new PoshiScriptParserException(
+				"Data loss has occurred while parsing Poshi Script",
+				newPoshiElement);
+
+			pspe.setPoshiScriptSnippet(newPoshiScript);
+
+			throw pspe;
 		}
 	}
 
@@ -206,6 +251,7 @@ public abstract class PoshiNodeFactory {
 	private static final DefinitionPoshiElement _definitionPoshiElement;
 	private static final List<PoshiComment> _poshiComments = new ArrayList<>();
 	private static final List<PoshiElement> _poshiElements = new ArrayList<>();
+	private static boolean _validatePoshiScript = true;
 
 	static {
 		try {

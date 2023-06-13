@@ -17,9 +17,126 @@ package com.liferay.data.engine.service;
 import com.liferay.data.engine.exception.DEDataRecordCollectionException;
 
 /**
+ * Provides the remote service interface for DEDataRecordCollection.
+ *
  * @author Leonardo Barros
+ * @review
  */
 public interface DEDataRecordCollectionService {
+
+	/**
+	 * Execute the Delete Model Permissions Request which can revoke a
+	 * permission to a role to not perform actions involving a Data Record
+	 * Collection model
+	 *
+	 * @param deDataRecordCollectionSaveModelPermissionsRequest
+	 * @return {@link DEDataRecordCollectionSaveModelPermissionsResponse}
+	 * @review
+	 */
+	public DEDataRecordCollectionDeleteModelPermissionsResponse execute(
+			DEDataRecordCollectionDeleteModelPermissionsRequest
+				deDataRecordCollectionDeleteModelPermissionsRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
+	 * Execute the Delete Permissions Request which can revoke permission to
+	 * a role to not perform actions involving a Data Record Collection
+	 *
+	 * @param deDataRecordCollectionSavePermissionsRequest
+	 * @return {@link DEDataRecordCollectionSavePermissionsResponse}
+	 * @review
+	 */
+	public DEDataRecordCollectionDeletePermissionsResponse execute(
+			DEDataRecordCollectionDeletePermissionsRequest
+				deDataRecordCollectionDeletePermissionsRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
+	 * Removes a {@link DEDataRecord} from the database corresponding to the
+	 * ID passed as a parameter on the request.
+	 * @param deDataRecordCollectionDeleteRecordRequest request to delete
+	 * a {@link DEDataRecord}
+	 * @return {@link DEDataRecordCollectionDeleteRecordResponse} Response
+	 * of the delete request
+	 * @review
+	 */
+	public DEDataRecordCollectionDeleteRecordResponse execute(
+			DEDataRecordCollectionDeleteRecordRequest
+				deDataRecordCollectionDeleteRecordRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
+	 * Removes a {@link DEDataRecordCollection} from the database corresponding to the
+	 * ID passed as a parameter on the request.
+	 * @param deDataRecordCollectionDeleteRequest request to delete
+	 * a {@link DEDataRecordCollection }
+	 * @return {@link DEDataRecordCollectionDeleteResponse } Response
+	 * of the delete request
+	 * @review
+	 */
+	public DEDataRecordCollectionDeleteResponse execute(
+			DEDataRecordCollectionDeleteRequest
+				deDataRecordCollectionDeleteRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
+	 * Get a {@link DEDataRecord} from the database corresponding to the
+	 * ID passed as a parameter on the request.
+	 * @param DEDataRecordCollectionGetRecordRequest request to get a
+	 * {@link DEDataRecord}
+	 * @return {@link DEDataRecordCollectionGetRecordResponse} Response
+	 * of the get request
+	 * @review
+	 */
+	public DEDataRecordCollectionGetRecordResponse execute(
+			DEDataRecordCollectionGetRecordRequest
+				deDataRecordCollectionGetRecordRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
+	 * Retrieves a {@link DEDataRecordCollection } from the database corresponding to the
+	 * ID passed as a parameter on the request.
+	 *
+	 * @param deDataRecordCollectionDeleteRequest request to retrieve
+	 * a {@link DEDataRecordCollection }
+	 * @return {@link DEDataRecordCollectionDeleteResponse } Response
+	 * of the delete request
+	 * @review
+	 */
+	public DEDataRecordCollectionGetResponse execute(
+			DEDataRecordCollectionGetRequest deDataRecordCollectionGetRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
+	 * Execute the Save Model Permissions Request which can grant permission
+	 * to a role to perform actions involving a Data Record Collection model
+	 *
+	 * @param deDataRecordCollectionSaveModelPermissionsRequest
+	 * @return {@link DEDataRecordCollectionSaveModelPermissionsResponse}
+	 * @review
+	 */
+	public DEDataRecordCollectionSaveModelPermissionsResponse execute(
+			DEDataRecordCollectionSaveModelPermissionsRequest
+				deDataRecordCollectionSaveModelPermissionsRequest)
+		throws DEDataRecordCollectionException;
+
+	/**
+	 * Execute the Save Permissions Request which can grant permission to a
+	 * role to perform actions involving a Data Record Collection
+	 *
+	 * @param deDataRecordCollectionSavePermissionsRequest
+	 * @return {@link DEDataRecordCollectionSavePermissionsResponse}
+	 * @review
+	 */
+	public DEDataRecordCollectionSavePermissionsResponse execute(
+			DEDataRecordCollectionSavePermissionsRequest
+				deDataRecordCollectionSavePermissionsRequest)
+		throws DEDataRecordCollectionException;
+
+	public DEDataRecordCollectionSaveRecordResponse execute(
+			DEDataRecordCollectionSaveRecordRequest
+				deDataRecordCollectionSaveRecordRequest)
+		throws DEDataRecordCollectionException;
 
 	public DEDataRecordCollectionSaveResponse execute(
 			DEDataRecordCollectionSaveRequest deDataRecordCollectionSaveRequest)

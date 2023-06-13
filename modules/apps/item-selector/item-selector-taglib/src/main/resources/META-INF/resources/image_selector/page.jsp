@@ -35,7 +35,7 @@ String imageURL = null;
 if (fileEntryId != 0) {
 	FileEntry fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
 
-	imageURL = DLUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK);
+	imageURL = DLURLHelperUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK);
 }
 %>
 

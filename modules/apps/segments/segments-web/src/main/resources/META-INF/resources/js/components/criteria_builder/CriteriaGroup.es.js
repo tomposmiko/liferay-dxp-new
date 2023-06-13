@@ -59,6 +59,7 @@ class CriteriaGroup extends Component {
 		criteria: PropTypes.object,
 		dragging: PropTypes.bool,
 		editing: PropTypes.bool,
+		entityName: PropTypes.string,
 		groupId: PropTypes.string,
 		index: PropTypes.number,
 		modelLabel: PropTypes.string,
@@ -170,16 +171,14 @@ class CriteriaGroup extends Component {
 	}
 
 	_handleCriterionChange = index => newCriterion => {
-		const {criteria, editing, onChange} = this.props;
+		const {criteria, onChange} = this.props;
 
-		if (editing) {
-			onChange(
-				{
-					...criteria,
-					items: replaceAtIndex(newCriterion, criteria.items, index)
-				}
-			);
-		}
+		onChange(
+			{
+				...criteria,
+				items: replaceAtIndex(newCriterion, criteria.items, index)
+			}
+		);
 	}
 
 	_handleCriterionDelete = index => {
@@ -207,6 +206,7 @@ class CriteriaGroup extends Component {
 			editing,
 			groupId,
 			onMove,
+			propertyKey,
 			supportedConjunctions
 		} = this.props;
 
@@ -217,6 +217,7 @@ class CriteriaGroup extends Component {
 					groupId={groupId}
 					onCriterionAdd={this._handleCriterionAdd}
 					onMove={onMove}
+					propertyKey={propertyKey}
 				/>
 
 				<Conjunction
@@ -232,6 +233,7 @@ class CriteriaGroup extends Component {
 					groupId={groupId}
 					onCriterionAdd={this._handleCriterionAdd}
 					onMove={onMove}
+					propertyKey={propertyKey}
 				/>
 			</Fragment>
 		);
@@ -240,6 +242,7 @@ class CriteriaGroup extends Component {
 	_renderCriterion = (criterion, index) => {
 		const {
 			editing,
+			entityName,
 			groupId,
 			modelLabel,
 			onMove,
@@ -264,6 +267,7 @@ class CriteriaGroup extends Component {
 					<this.NestedCriteriaGroupWithDrag
 						criteria={criterion}
 						editing={editing}
+						entityName={entityName}
 						groupId={criterion.groupId}
 						index={index}
 						modelLabel={modelLabel}
@@ -280,6 +284,7 @@ class CriteriaGroup extends Component {
 					<CriteriaRow
 						criterion={criterion}
 						editing={editing}
+						entityName={entityName}
 						groupId={groupId}
 						index={index}
 						modelLabel={modelLabel}
@@ -287,6 +292,7 @@ class CriteriaGroup extends Component {
 						onChange={this._handleCriterionChange(index)}
 						onDelete={this._handleCriterionDelete}
 						onMove={onMove}
+						propertyKey={propertyKey}
 						root={root}
 						supportedOperators={supportedOperators}
 						supportedProperties={supportedProperties}
@@ -299,6 +305,7 @@ class CriteriaGroup extends Component {
 					groupId={groupId}
 					onCriterionAdd={this._handleCriterionAdd}
 					onMove={onMove}
+					propertyKey={propertyKey}
 				/>
 			</div>
 		);
@@ -333,6 +340,7 @@ class CriteriaGroup extends Component {
 				{this._isCriteriaEmpty() ?
 					<EmptyDropZone
 						onCriterionAdd={this._handleCriterionAdd}
+						propertyKey={propertyKey}
 					/> :
 					<Fragment>
 						<DropZone
@@ -341,6 +349,7 @@ class CriteriaGroup extends Component {
 							groupId={groupId}
 							onCriterionAdd={this._handleCriterionAdd}
 							onMove={onMove}
+							propertyKey={propertyKey}
 						/>
 
 						{editing && !root && connectDragSource(

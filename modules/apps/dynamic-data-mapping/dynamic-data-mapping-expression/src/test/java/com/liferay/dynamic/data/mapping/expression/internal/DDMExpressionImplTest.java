@@ -25,6 +25,7 @@ import com.liferay.dynamic.data.mapping.expression.internal.functions.SquareFunc
 import com.liferay.dynamic.data.mapping.expression.internal.functions.ZeroFunction;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,7 +83,8 @@ public class DDMExpressionImplTest extends PowerMockito {
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"6 / 3");
 
-		Assert.assertEquals(new BigDecimal(2), ddmExpression.evaluate());
+		Assert.assertEquals(
+			new BigDecimal(2).setScale(2), ddmExpression.evaluate());
 	}
 
 	@Test
@@ -90,7 +92,18 @@ public class DDMExpressionImplTest extends PowerMockito {
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"15 / 2");
 
-		Assert.assertEquals(new BigDecimal(7.5), ddmExpression.evaluate());
+		Assert.assertEquals(
+			new BigDecimal(7.5).setScale(2), ddmExpression.evaluate());
+	}
+
+	@Test
+	public void testDivision3() throws Exception {
+		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
+			"10 / 9");
+
+		Assert.assertEquals(
+			new BigDecimal(1.11).setScale(2, RoundingMode.FLOOR),
+			ddmExpression.evaluate());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -377,7 +390,8 @@ public class DDMExpressionImplTest extends PowerMockito {
 		DDMExpressionImpl<BigDecimal> ddmExpression = createDDMExpression(
 			"(8 + 2) / 2.5");
 
-		Assert.assertEquals(new BigDecimal(4), ddmExpression.evaluate());
+		Assert.assertEquals(
+			new BigDecimal(4).setScale(2), ddmExpression.evaluate());
 	}
 
 	@Test

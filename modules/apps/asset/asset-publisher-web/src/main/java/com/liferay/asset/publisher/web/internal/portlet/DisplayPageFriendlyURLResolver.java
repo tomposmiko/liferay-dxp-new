@@ -17,6 +17,7 @@ package com.liferay.asset.publisher.web.internal.portlet;
 import com.liferay.asset.display.contributor.AssetDisplayContributor;
 import com.liferay.asset.display.contributor.AssetDisplayContributorTracker;
 import com.liferay.asset.display.contributor.constants.AssetDisplayWebKeys;
+import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
 import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.asset.display.page.util.AssetDisplayPageHelper;
@@ -34,6 +35,8 @@ import com.liferay.journal.exception.NoSuchArticleException;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -90,10 +93,8 @@ public class DisplayPageFriendlyURLResolver implements FriendlyURLResolver {
 		String urlTitle = friendlyURL.substring(
 			JournalArticleConstants.CANONICAL_URL_SEPARATOR.length());
 
-		String decodedUrlTitle = _http.decodePath(urlTitle);
-
 		String normalizedUrlTitle =
-			FriendlyURLNormalizerUtil.normalizeWithEncoding(decodedUrlTitle);
+			FriendlyURLNormalizerUtil.normalizeWithEncoding(urlTitle);
 
 		JournalArticle journalArticle =
 			_journalArticleLocalService.fetchLatestArticleByUrlTitle(
@@ -175,10 +176,8 @@ public class DisplayPageFriendlyURLResolver implements FriendlyURLResolver {
 		String urlTitle = friendlyURL.substring(
 			JournalArticleConstants.CANONICAL_URL_SEPARATOR.length());
 
-		String decodedUrlTitle = _http.decodePath(urlTitle);
-
 		String normalizedUrlTitle =
-			FriendlyURLNormalizerUtil.normalizeWithEncoding(decodedUrlTitle);
+			FriendlyURLNormalizerUtil.normalizeWithEncoding(urlTitle);
 
 		JournalArticle journalArticle =
 			_journalArticleLocalService.fetchLatestArticleByUrlTitle(
@@ -239,7 +238,24 @@ public class DisplayPageFriendlyURLResolver implements FriendlyURLResolver {
 			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
 				groupId, assetEntry.getClassNameId(), assetEntry.getClassPK());
 
-		return _layoutLocalService.getLayout(assetDisplayPageEntry.getPlid());
+		if (assetDisplayPageEntry.getType() !=
+				AssetDisplayPageConstants.TYPE_DEFAULT) {
+
+			return _layoutLocalService.fetchLayout(
+				assetDisplayPageEntry.getPlid());
+		}
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryService.fetchDefaultLayoutPageTemplateEntry(
+				groupId, assetEntry.getClassNameId(),
+				assetEntry.getClassTypeId());
+
+		if (layoutPageTemplateEntry != null) {
+			return _layoutLocalService.fetchLayout(
+				layoutPageTemplateEntry.getPlid());
+		}
+
+		return null;
 	}
 
 	private String _getBasicLayoutURL(
@@ -442,6 +458,9 @@ public class DisplayPageFriendlyURLResolver implements FriendlyURLResolver {
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private LayoutPageTemplateEntryService _layoutPageTemplateEntryService;
 
 	@Reference
 	private Portal _portal;

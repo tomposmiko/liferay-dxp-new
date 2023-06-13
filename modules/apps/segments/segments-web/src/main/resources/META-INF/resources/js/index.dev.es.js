@@ -29,6 +29,7 @@ const altProps = {
 	portletNamespace: '_com_liferay_segments_web_internal_portlet_SegmentsPortlet_',
 	propertyGroups: [
 		{
+			entityName: 'User',
 			name: 'User',
 			properties: [
 				{
@@ -124,11 +125,6 @@ const altProps = {
 					type: 'string'
 				},
 				{
-					label: 'Organization Count',
-					name: 'organizationCount',
-					type: 'string'
-				},
-				{
 					label: 'Organization IDs',
 					name: 'organizationIds',
 					type: 'string'
@@ -172,7 +168,8 @@ const altProps = {
 			propertyKey: 'user'
 		},
 		{
-			name: 'User Organization',
+			entityName: 'Organization',
+			name: 'Organization',
 			properties: [
 				{
 					label: 'Class PK',

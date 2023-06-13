@@ -1,8 +1,21 @@
 import uniqueId from 'lodash.uniqueid';
+import {CONJUNCTIONS} from 'utils/constants.es';
+import dateFns from 'date-fns';
 
 const GROUP_ID_NAMESPACE = 'group_';
 
 const SPLIT_REGEX = /({\d+})/g;
+
+/**
+ * Creates a new group object with items.
+ * @param {Array} items The items to add to the new group.
+ * @return {Object} The new group object.
+ */
+export const createNewGroup = items => ({
+	conjunctionName: CONJUNCTIONS.AND,
+	groupId: generateGroupId(),
+	items
+});
 
 /**
  * Generates a unique group id.
@@ -78,6 +91,23 @@ export function getSupportedOperatorsFromType(operators, propertyTypes, type) {
  */
 export function insertAtIndex(item, list, index) {
 	return [...list.slice(0, index), item, ...list.slice(index, list.length)];
+}
+
+/**
+ * Converts an object of key value pairs to a form data object for passing
+ * into a fetch body.
+ * @param {Object} dataObject The data to be converted.
+ */
+export function objectToFormData(dataObject) {
+	const formData = new FormData();
+
+	Object.keys(dataObject).forEach(
+		key => {
+			formData.set(key, dataObject[key]);
+		}
+	);
+
+	return formData;
 }
 
 /**
@@ -158,4 +188,17 @@ export function dateToInternationalHuman(
 	const intl = new Intl.DateTimeFormat(localeKey, options);
 
 	return intl.format(date);
+}
+
+/**
+ * Returns a YYYY-MM-DD date
+ * based on a JS Date object
+ *
+ * @export
+ * @param {Date} dateJsObject
+ * @returns {string}
+ */
+export function jsDatetoYYYYMMDD(dateJsObject) {
+	const DATE_FORMAT = 'YYYY-MM-DD';
+	return dateFns.format(dateJsObject, DATE_FORMAT);
 }

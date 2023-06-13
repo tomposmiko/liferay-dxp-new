@@ -18,6 +18,8 @@
 
 <%
 PortletConfigurationTemplatesDisplayContext portletConfigurationTemplatesDisplayContext = new PortletConfigurationTemplatesDisplayContext(request, renderRequest, renderResponse);
+
+PortletConfigurationTemplatesManagementToolbarDisplayContext portletConfigurationTemplatesManagementToolbarDisplayContext = new PortletConfigurationTemplatesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, portletConfigurationTemplatesDisplayContext);
 %>
 
 <div class="portlet-configuration-edit-templates">
@@ -31,16 +33,7 @@ PortletConfigurationTemplatesDisplayContext portletConfigurationTemplatesDisplay
 	<aui:form action="<%= deleteArchivedSetupsURL %>" name="fm">
 		<div class="portlet-configuration-body-content">
 			<clay:management-toolbar
-				actionDropdownItems="<%= portletConfigurationTemplatesDisplayContext.getActionDropdownItems() %>"
-				componentId="archivedSettingsManagementToolbar"
-				disabled="<%= portletConfigurationTemplatesDisplayContext.isDisabledManagementBar() %>"
-				filterDropdownItems="<%= portletConfigurationTemplatesDisplayContext.getFilterDropdownItems() %>"
-				itemsTotal="<%= portletConfigurationTemplatesDisplayContext.getTotalItems() %>"
-				searchContainerId="archivedSettings"
-				showSearch="<%= false %>"
-				sortingOrder="<%= portletConfigurationTemplatesDisplayContext.getOrderByType() %>"
-				sortingURL="<%= portletConfigurationTemplatesDisplayContext.getSortingURL() %>"
-				viewTypeItems="<%= portletConfigurationTemplatesDisplayContext.getViewTypeItems() %>"
+				displayContext="<%= portletConfigurationTemplatesManagementToolbarDisplayContext %>"
 			/>
 
 			<div class="container-fluid-1280">
@@ -83,9 +76,12 @@ PortletConfigurationTemplatesDisplayContext portletConfigurationTemplatesDisplay
 									</h5>
 								</liferay-ui:search-container-column-text>
 
-								<liferay-ui:search-container-column-jsp
-									path="/configuration_template_action.jsp"
-								/>
+								<liferay-ui:search-container-column-text>
+									<clay:dropdown-actions
+										defaultEventHandler="<%= PortletConfigurationWebKeys.ARCHIVED_SETUPS_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+										dropdownItems="<%= portletConfigurationTemplatesDisplayContext.getActionDropdownItems(archivedSettings) %>"
+									/>
+								</liferay-ui:search-container-column-text>
 							</c:when>
 							<c:when test='<%= Objects.equals(portletConfigurationTemplatesDisplayContext.getDisplayStyle(), "icon") %>'>
 
@@ -94,17 +90,9 @@ PortletConfigurationTemplatesDisplayContext portletConfigurationTemplatesDisplay
 								%>
 
 								<liferay-ui:search-container-column-text>
-									<liferay-frontend:icon-vertical-card
-										actionJsp="/configuration_template_action.jsp"
-										actionJspServletContext="<%= application %>"
-										icon="archive"
-										resultRow="<%= row %>"
-										title="<%= archivedSettings.getName() %>"
-									>
-										<liferay-frontend:vertical-card-header>
-											<liferay-ui:message arguments="<%= new String[] {LanguageUtil.getTimeDescription(locale, System.currentTimeMillis() - archivedSettings.getModifiedDate().getTime(), true), HtmlUtil.escape(archivedSettings.getUserName())} %>" key="x-ago-by-x" translateArguments="<%= false %>" />
-										</liferay-frontend:vertical-card-header>
-									</liferay-frontend:icon-vertical-card>
+									<clay:vertical-card
+										verticalCard="<%= new ArchivedSettingsVerticalCard(archivedSettings, renderRequest, renderResponse) %>"
+									/>
 								</liferay-ui:search-container-column-text>
 							</c:when>
 							<c:when test='<%= Objects.equals(portletConfigurationTemplatesDisplayContext.getDisplayStyle(), "list") %>'>
@@ -127,9 +115,12 @@ PortletConfigurationTemplatesDisplayContext portletConfigurationTemplatesDisplay
 									property="modifiedDate"
 								/>
 
-								<liferay-ui:search-container-column-jsp
-									path="/configuration_template_action.jsp"
-								/>
+								<liferay-ui:search-container-column-text>
+									<clay:dropdown-actions
+										defaultEventHandler="<%= PortletConfigurationWebKeys.ARCHIVED_SETUPS_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+										dropdownItems="<%= portletConfigurationTemplatesDisplayContext.getActionDropdownItems(archivedSettings) %>"
+									/>
+								</liferay-ui:search-container-column-text>
 							</c:when>
 						</c:choose>
 					</liferay-ui:search-container-row>
@@ -144,33 +135,32 @@ PortletConfigurationTemplatesDisplayContext portletConfigurationTemplatesDisplay
 	</aui:form>
 </div>
 
-<aui:script sandbox="<%= true %>">
-	var deleteArchivedSettings = function() {
-		if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-			var form = document.getElementById('<portlet:namespace />fm');
-
-			if (form) {
-				submitForm(form);
+<aui:script require='<%= portletConfigurationTemplatesDisplayContext.getModuleName() + "/js/ArchivedSetuptsDropdownDefaultEventHandler.es as ArchivedSetuptsDropdownDefaultEventHandler" %>'>
+	Liferay.component(
+		'<%= PortletConfigurationWebKeys.ARCHIVED_SETUPS_DROPDOWN_DEFAULT_EVENT_HANDLER %>',
+		new ArchivedSetuptsDropdownDefaultEventHandler.default(
+			{
+				namespace: '<portlet:namespace />'
 			}
+		),
+		{
+			destroyOnNavigate: true,
+			portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>'
 		}
-	}
+	);
+</aui:script>
 
-	var ACTIONS = {
-		'deleteArchivedSettings': deleteArchivedSettings
-	};
-
-	Liferay.componentReady('archivedSettingsManagementToolbar').then(
-		function(managementToolbar) {
-			managementToolbar.on(
-				'actionItemClicked',
-					function(event) {
-					var itemData = event.data.item.data;
-
-					if (itemData && itemData.action && ACTIONS[itemData.action]) {
-						ACTIONS[itemData.action]();
-					}
-				}
-			);
+<aui:script require='<%= portletConfigurationTemplatesDisplayContext.getModuleName() + "/js/ManagementToolbarDefaultEventHandler.es as ManagementToolbarDefaultEventHandler" %>'>
+	Liferay.component(
+		'<%= portletConfigurationTemplatesManagementToolbarDisplayContext.getDefaultEventHandler() %>',
+		new ManagementToolbarDefaultEventHandler.default(
+			{
+				namespace: '<portlet:namespace />'
+			}
+		),
+		{
+			destroyOnNavigate: true,
+			portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>'
 		}
 	);
 </aui:script>

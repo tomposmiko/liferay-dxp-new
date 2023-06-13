@@ -1,423 +1,536 @@
-components: 
-  schemas: 
-    Document: 
-      description: "https://www.schema.org/Document"
-      properties: 
-        adaptedMedia: 
-          description: "https://www.schema.org/ImageObject"
-          properties: 
-            contentUrl: 
-              type: string
-            height: 
-              type: number
-            id: 
-              type: integer
-            resolutionName: 
-              type: string
-            self: 
-              type: string
-            sizeInBytes: 
-              type: number
-            width: 
-              type: number
-          type: object
-        contentUrl: 
+components:
+  schemas:
+    AggregateRating:
+      description: https://www.schema.org/AggregateRating
+      properties:
+        bestRating:
+          type: number
+        ratingCount:
+          type: number
+        ratingValue:
+          type: number
+        worstRating:
+          type: number
+      type: object
+    Comment:
+      description: https://www.schema.org/Comment
+      properties:
+        comments:
+          items:
+            $ref: "#/components/schemas/Comment"
+          type: array
+        creator:
+          $ref: "#/components/schemas/Creator"
+        dateCreated:
+          format: date-time
           type: string
-        creator: 
+        dateModified:
+          format: date-time
+          type: string
+        hasComments:
+          type: boolean
+        id:
+          format: int64
+          type: integer
+        text:
+          type: string
+      type: object
+    Creator:
+      description: https://www.schema.org/Creator
+      properties:
+        additionalName:
+          type: string
+        familyName:
+          type: string
+        givenName:
+          type: string
+        id:
+          format: int64
+          type: integer
+        image:
           format: uri
           type: string
-        dateCreated: 
+        name:
           type: string
-        dateModified: 
+        profileURL:
+          format: uri
           type: string
-        description: 
+      type: object
+    Document:
+      description: https://www.schema.org/Document
+      properties:
+        adaptedImages:
+          description: https://www.schema.org/ImageObject
+          items:
+            properties:
+              contentUrl:
+                format: uri
+                type: string
+              height:
+                type: number
+              id:
+                format: int64
+                type: integer
+              resolutionName:
+                type: string
+              sizeInBytes:
+                type: number
+              width:
+                type: number
+            type: object
+          type: array
+        aggregateRating:
+          $ref: "#/components/schemas/AggregateRating"
+        categories:
+          items:
+            properties:
+              categoryId:
+                format: int64
+                type: integer
+              categoryName:
+                type: string
+            type: object
+          readOnly: true
+          type: array
+        categoryIds:
+          items:
+            format: int64
+            type: integer
+          type: array
+          writeOnly: true
+        contentUrl:
+          format: binary
           type: string
-        encodingFormat: 
+        creator:
+          $ref: "#/components/schemas/Creator"
+        dateCreated:
+          format: date-time
           type: string
-        fileExtension: 
+        dateModified:
+          format: date-time
           type: string
-        folder: 
-          $ref: "#/components/schemas/Folder"
-        id: 
+        description:
+          type: string
+        encodingFormat:
+          type: string
+        fileExtension:
+          type: string
+        folderId:
+          format: int64
           type: integer
-        keywords: 
-          items: 
+        id:
+          format: int64
+          type: integer
+        keywords:
+          items:
             type: string
           type: array
-        self: 
-          type: string
-        sizeInBytes: 
+        sizeInBytes:
           type: number
-        title: 
+        title:
           type: string
       type: object
-    Folder: 
-      description: "https://www.schema.org/Folder"
-      properties: 
-        dateCreated: 
+    Folder:
+      description: https://www.schema.org/Folder
+      properties:
+        dateCreated:
+          format: date-time
           type: string
-        dateModified: 
+        dateModified:
+          format: date-time
           type: string
-        description: 
+        description:
           type: string
-        documents: 
-          $ref: "#/components/schemas/Document"
-        documentsRepository: 
-          $ref: "#/components/schemas/Folder"
-        id: 
+        hasDocuments:
+          type: boolean
+        hasFolders:
+          type: boolean
+        id:
+          format: int64
           type: integer
-        name: 
+        name:
           type: string
-        self: 
-          type: string
-        subFolders: 
-          $ref: "#/components/schemas/Folder"
+        repositoryId:
+          format: int64
+          type: integer
       type: object
-info: 
+info:
   description: ""
   title: ""
-  version: "1.0.0"
-openapi: "3.0.1"
-paths: 
-  "/document/{id}": 
-    delete: 
-      parameters: 
+  version: v1.0
+openapi: 3.0.1
+paths:
+  "/comments/{comment-id}":
+    get:
+      parameters:
         - in: path
-          name: id
+          name: comment-id
           required: true
-          schema: 
+          schema:
+            format: int64
             type: integer
-      responses: 
-        204: 
-          content: 
-            "*/*": {}
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
           description: ""
-    get: 
-      parameters: 
-        - in: path
-          name: id
-          required: true
-          schema: 
-            type: integer
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                $ref: "#/components/schemas/Document"
-          description: ""
-  "/documents-repository/{id}": 
-    get: 
-      parameters: 
-        - in: path
-          name: id
-          required: true
-          schema: 
-            type: integer
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                $ref: "#/components/schemas/Folder"
-          description: ""
-  "/documents-repository/{parent-id}/document": 
-    get: 
-      parameters: 
+      tags: ["Comment"]
+  "/comments/{comment-id}/comments":
+    get:
+      parameters:
         - in: query
           name: page
-          schema: 
+          schema:
             type: integer
         - in: query
-          name: per_page
-          schema: 
+          name: pageSize
+          schema:
             type: integer
         - in: path
-          name: parent-id
+          name: comment-id
           required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                items: 
+          schema:
+            format: int64
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Comment"
+                type: array
+          description: ""
+      tags: ["Comment"]
+  "/content-spaces/{content-space-id}/documents":
+    get:
+      parameters:
+        - in: path
+          name: content-space-id
+          required: true
+          schema:
+            format: int64
+            type: integer
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+        - in: query
+          name: filter
+          schema:
+            type: string
+        - in: query
+          name: sort
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
                   $ref: "#/components/schemas/Document"
                 type: array
           description: ""
-    post: 
-      parameters: 
+      tags: ["Document"]
+    post:
+      parameters:
         - in: path
-          name: parent-id
+          name: content-space-id
           required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      requestBody: 
-        content: 
-          "*/*": 
-            schema: 
-              $ref: "#/components/schemas/Document"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                document:
+                  $ref: "#/components/schemas/Document"
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/Document"
           description: ""
-  "/documents-repository/{parent-id}/document/batch-create": 
-    post: 
-      parameters: 
+      tags: ["Document"]
+  "/content-spaces/{content-space-id}/folders":
+    get:
+      parameters:
         - in: path
-          name: parent-id
+          name: content-space-id
           required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      requestBody: 
-        content: 
-          "*/*": 
-            schema: 
-              $ref: "#/components/schemas/Document"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                $ref: "#/components/schemas/Document"
-          description: ""
-  "/documents-repository/{parent-id}/folder": 
-    get: 
-      parameters: 
+          schema:
+            format: int64
+            type: integer
         - in: query
           name: page
-          schema: 
+          schema:
             type: integer
         - in: query
-          name: per_page
-          schema: 
+          name: pageSize
+          schema:
             type: integer
-        - in: path
-          name: parent-id
-          required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                items: 
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
                   $ref: "#/components/schemas/Folder"
                 type: array
           description: ""
-    post: 
-      parameters: 
+      tags: ["Folder"]
+    post:
+      parameters:
         - in: path
-          name: parent-id
+          name: content-space-id
           required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      requestBody: 
-        content: 
-          "*/*": 
-            schema: 
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
               $ref: "#/components/schemas/Folder"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/Folder"
           description: ""
-  "/documents-repository/{parent-id}/folder/batch-create": 
-    post: 
-      parameters: 
+      tags: ["Folder"]
+  "/documents/{document-id}":
+    delete:
+      parameters:
         - in: path
-          name: parent-id
+          name: document-id
           required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      requestBody: 
-        content: 
-          "*/*": 
-            schema: 
-              $ref: "#/components/schemas/Folder"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                $ref: "#/components/schemas/Folder"
-          description: ""
-  "/folder/{id}": 
-    delete: 
-      parameters: 
-        - in: path
-          name: id
-          required: true
-          schema: 
+          schema:
+            format: int64
             type: integer
-      responses: 
-        204: 
-          content: 
-            "*/*": {}
+      responses:
+        204:
+          content:
+            application/json: {}
           description: ""
-    get: 
-      parameters: 
+      tags: ["Document"]
+    get:
+      parameters:
         - in: path
-          name: id
+          name: document-id
           required: true
-          schema: 
+          schema:
+            format: int64
             type: integer
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                $ref: "#/components/schemas/Folder"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
           description: ""
-    put: 
-      parameters: 
-        - in: path
-          name: id
-          required: true
-          schema: 
-            type: integer
-      requestBody: 
-        content: 
-          "*/*": {}
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                $ref: "#/components/schemas/Folder"
-          description: ""
-  "/folder/{parent-id}/document": 
-    get: 
-      parameters: 
+      tags: ["Document"]
+  "/documents/{document-id}/comments":
+    get:
+      parameters:
         - in: query
           name: page
-          schema: 
+          schema:
             type: integer
         - in: query
-          name: per_page
-          schema: 
+          name: pageSize
+          schema:
             type: integer
         - in: path
-          name: parent-id
+          name: document-id
           required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                items: 
+          schema:
+            format: int64
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Comment"
+                type: array
+          description: ""
+      tags: ["Comment"]
+  "/folders/{folder-id}":
+    delete:
+      parameters:
+        - in: path
+          name: folder-id
+          required: true
+          schema:
+            format: int64
+            type: integer
+      responses:
+        204:
+          content:
+            application/json: {}
+          description: ""
+      tags: ["Folder"]
+    get:
+      parameters:
+        - in: path
+          name: folder-id
+          required: true
+          schema:
+            format: int64
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Folder"
+          description: ""
+      tags: ["Folder"]
+    put:
+      parameters:
+        - in: path
+          name: folder-id
+          required: true
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Folder"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Folder"
+          description: ""
+      tags: ["Folder"]
+  "/folders/{folder-id}/documents":
+    get:
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+        - in: path
+          name: folder-id
+          required: true
+          schema:
+            format: int64
+            type: integer
+        - in: query
+          name: filter
+          schema:
+            type: string
+        - in: query
+          name: sort
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
                   $ref: "#/components/schemas/Document"
                 type: array
           description: ""
-    post: 
-      parameters: 
+      tags: ["Document"]
+    post:
+      parameters:
         - in: path
-          name: parent-id
+          name: folder-id
           required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      requestBody: 
-        content: 
-          "*/*": 
-            schema: 
-              $ref: "#/components/schemas/Document"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                document:
+                  $ref: "#/components/schemas/Document"
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/Document"
           description: ""
-  "/folder/{parent-id}/document/batch-create": 
-    post: 
-      parameters: 
-        - in: path
-          name: parent-id
-          required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      requestBody: 
-        content: 
-          "*/*": 
-            schema: 
-              $ref: "#/components/schemas/Document"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                $ref: "#/components/schemas/Document"
-          description: ""
-  "/folder/{parent-id}/folder": 
-    get: 
-      parameters: 
+      tags: ["Document"]
+  "/folders/{folder-id}/folders":
+    get:
+      parameters:
         - in: query
           name: page
-          schema: 
+          schema:
             type: integer
         - in: query
-          name: per_page
-          schema: 
+          name: pageSize
+          schema:
             type: integer
         - in: path
-          name: parent-id
+          name: folder-id
           required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                items: 
+          schema:
+            format: int64
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                items:
                   $ref: "#/components/schemas/Folder"
                 type: array
           description: ""
-    post: 
-      parameters: 
+      tags: ["Folder"]
+    post:
+      parameters:
         - in: path
-          name: parent-id
+          name: folder-id
           required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      requestBody: 
-        content: 
-          "*/*": 
-            schema: 
+          schema:
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
               $ref: "#/components/schemas/Folder"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/Folder"
           description: ""
-  "/folder/{parent-id}/folder/batch-create": 
-    post: 
-      parameters: 
-        - in: path
-          name: parent-id
-          required: true
-          schema: 
-            $ref: "#/components/schemas/Folder"
-      requestBody: 
-        content: 
-          "*/*": 
-            schema: 
-              $ref: "#/components/schemas/Folder"
-      responses: 
-        200: 
-          content: 
-            "*/*": 
-              schema: 
-                $ref: "#/components/schemas/Folder"
-          description: ""
+      tags: ["Folder"]

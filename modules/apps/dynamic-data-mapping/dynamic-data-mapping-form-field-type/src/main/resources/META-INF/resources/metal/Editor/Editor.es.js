@@ -1,9 +1,9 @@
+import '../FieldBase/index.es';
 import './EditorRegister.soy.js';
-import 'dynamic-data-mapping-form-field-type/metal/FieldBase/index.es';
+import {Config} from 'metal-state';
 import Component from 'metal-component';
 import Soy from 'metal-soy';
 import templates from './Editor.soy.js';
-import {Config} from 'metal-state';
 
 class Editor extends Component {
 	static STATE = {
@@ -181,6 +181,7 @@ class Editor extends Component {
 				editorConfig: {
 					extraPlugins: 'ae_placeholder,ae_selectionregion,ae_uicore',
 					removePlugins: 'contextmenu,elementspath,image,link,liststyle,resize,tabletools,toolbar',
+					spritemap: `${Liferay.ThemeDisplay.getPathThemeImages()}/lexicon/icons.svg`,
 					srcNode: A.one(editorNode),
 					toolbars: {
 						add: {

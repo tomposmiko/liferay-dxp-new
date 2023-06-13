@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +45,20 @@ public final class DEDataDefinition implements ClassedModel, Serializable {
 		List<DEDataDefinitionField> deDataDefinitionFields) {
 
 		_deDataDefinitionFields.addAll(deDataDefinitionFields);
+	}
+
+	public void addDEDataDefinitionRule(
+		DEDataDefinitionRule deDataDefinitionRule) {
+
+		_deDataDefinitionRules.add(deDataDefinitionRule);
+	}
+
+	public void addDEDataDefinitionRules(
+		List<DEDataDefinitionRule> deDataDefinitionRules) {
+
+		if (deDataDefinitionRules != null) {
+			_deDataDefinitionRules.addAll(deDataDefinitionRules);
+		}
 	}
 
 	public void addDescription(Locale locale, String description) {
@@ -105,6 +120,10 @@ public final class DEDataDefinition implements ClassedModel, Serializable {
 
 	public long getDEDataDefinitionId() {
 		return _deDataDefinitionId;
+	}
+
+	public List<DEDataDefinitionRule> getDEDataDefinitionRules() {
+		return Collections.unmodifiableList(_deDataDefinitionRules);
 	}
 
 	public Map<String, String> getDescription() {
@@ -176,6 +195,16 @@ public final class DEDataDefinition implements ClassedModel, Serializable {
 		_deDataDefinitionId = deDataDefinitionId;
 	}
 
+	public void setDEDataDefinitionRules(
+		List<DEDataDefinitionRule> deDataDefinitionRules) {
+
+		_deDataDefinitionRules = new ArrayList<>();
+
+		if (deDataDefinitionRules != null) {
+			_deDataDefinitionRules.addAll(deDataDefinitionRules);
+		}
+	}
+
 	public void setDescription(Map<String, String> description) {
 		_description = description;
 
@@ -213,6 +242,8 @@ public final class DEDataDefinition implements ClassedModel, Serializable {
 	private List<DEDataDefinitionField> _deDataDefinitionFields =
 		new ArrayList<>();
 	private long _deDataDefinitionId;
+	private List<DEDataDefinitionRule> _deDataDefinitionRules =
+		new ArrayList<>();
 	private Map<String, String> _description = new HashMap<>();
 	private Date _modifiedDate;
 	private Map<String, String> _name = new HashMap<>();

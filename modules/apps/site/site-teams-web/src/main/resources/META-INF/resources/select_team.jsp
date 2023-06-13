@@ -21,18 +21,7 @@ SelectTeamDisplayContext selectTeamDisplayContext = new SelectTeamDisplayContext
 %>
 
 <clay:management-toolbar
-	clearResultsURL="<%= selectTeamDisplayContext.getClearResultsURL() %>"
-	componentId="selectTeamWebManagementToolbar"
-	disabled="<%= selectTeamDisplayContext.isDisabledManagementBar() %>"
-	filterDropdownItems="<%= selectTeamDisplayContext.getFilterDropdownItems() %>"
-	itemsTotal="<%= selectTeamDisplayContext.getTotalItems() %>"
-	searchActionURL="<%= selectTeamDisplayContext.getSearchActionURL() %>"
-	searchFormName="searchFm"
-	selectable="<%= false %>"
-	showSearch="<%= selectTeamDisplayContext.isShowSearch() %>"
-	sortingOrder="<%= selectTeamDisplayContext.getOrderByType() %>"
-	sortingURL="<%= selectTeamDisplayContext.getSortingURL() %>"
-	viewTypeItems="<%= selectTeamDisplayContext.getViewTypeItems() %>"
+	displayContext="<%= new SelectTeamManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, selectTeamDisplayContext) %>"
 />
 
 <aui:form cssClass="container-fluid-1280" name="selectTeamFm">
@@ -88,23 +77,6 @@ SelectTeamDisplayContext selectTeamDisplayContext = new SelectTeamDisplayContext
 						<h6 class="text-default">
 							<span><%= HtmlUtil.escape(curTeam.getDescription()) %></span>
 						</h6>
-					</liferay-ui:search-container-column-text>
-				</c:when>
-				<c:when test='<%= Objects.equals(selectTeamDisplayContext.getDisplayStyle(), "icon") %>'>
-
-					<%
-					row.setCssClass("entry-card lfr-asset-item");
-					%>
-
-					<liferay-ui:search-container-column-text>
-						<liferay-frontend:icon-vertical-card
-							cssClass='<%= disabled ? StringPool.BLANK : "selector-button" %>'
-							data="<%= data %>"
-							icon="users"
-							resultRow="<%= row %>"
-							subtitle="<%= curTeam.getDescription() %>"
-							title="<%= curTeam.getName() %>"
-						/>
 					</liferay-ui:search-container-column-text>
 				</c:when>
 				<c:when test='<%= Objects.equals(selectTeamDisplayContext.getDisplayStyle(), "list") %>'>

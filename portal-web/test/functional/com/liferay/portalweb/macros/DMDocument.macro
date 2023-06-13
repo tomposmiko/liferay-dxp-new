@@ -817,7 +817,7 @@ definition {
 		);
 
 		if (isSet(versioning)) {
-			Panel.expandPanel(panel = "Categorization");
+			Panel.expandPanel(panel = "Versioning");
 
 			Check.checkToggleSwitch(
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH",
@@ -928,6 +928,45 @@ definition {
 		Alert.viewSuccessMessage();
 	}
 
+	macro editTags {
+		SelectFrame(value1 = "relative=top");
+
+		AssertTextEquals(locator1 = "Modal#HEADER", value1 = "Edit Tags");
+
+		if ("${multipleDocuments}" == "true") {
+			AssertTextEquals.assertPartialText(
+				locator1 = "Modal#BODY",
+				value1 = "These changes will be applied to ${itemNumber} items. Select append or replace current tags."
+			);
+
+			Click(locator1 = "Modal#BODY");
+
+			if ("${editAction}" == "Append") {
+				FormFields.selectRadioOption(fieldName = "add", radioOption = "Add");
+			}
+			else if ("${editAction}" == "Replace") {
+				FormFields.selectRadioOption(fieldName = "replace", radioOption = "Replace");
+			}
+		}
+
+		else {
+			AssertTextEquals.assertPartialText(
+				locator1 = "Modal#BODY",
+				value1 = "These changes will be applied to &quot;${dmDocumentTitle}&quot;."
+			);
+		}
+
+		Type(locator1 = "DocumentsAndMedia#EDIT_TAGS_FIELD", value1 = "${tagName}");
+
+		KeyPress(locator1 = "DocumentsAndMedia#EDIT_TAGS_FIELD", value1 = "\RETURN");
+
+		Button.clickSave();
+
+		SelectFrame(value1 = "relative=top");
+
+		Alert.viewSuccessMessageText(successMessage = "Changes saved.");
+	}
+
 	macro enableActionsMenuOnPortlet {
 		Portlet.gotoPortletOptions(portletOption = "Configuration");
 
@@ -943,7 +982,9 @@ definition {
 	}
 
 	macro expandInfo {
-		Click(locator1 = "Icon#INFO");
+		if (IsElementNotPresent(locator1 = "Icon#INFO_ACTIVE")) {
+			Click(locator1 = "Icon#INFO");
+		}
 
 		AssertVisible(locator1 = "Icon#INFO_ACTIVE");
 	}
@@ -1204,6 +1245,12 @@ definition {
 			locator1 = "DocumentsAndMediaShare#INVITE_TO_COLLABORATE_INPUT",
 			value1 = "${userEmailAddress}"
 		);
+
+		Click(locator1 = "DocumentsAndMediaShare#INVITE_TO_COLLABORATE_DROPDOWN");
+
+		var key_userName = "${userName}";
+
+		AssertElementPresent(locator1 = "DocumentsAndMediaShare#INVITE_TO_COLLABORATE_TAG");
 
 		if (isSet(shareable)) {
 			FormFields.enableCheckbox(fieldName = "shareable");
@@ -1519,7 +1566,7 @@ definition {
 		var key_dmDocumentSize = "${dmDocumentSize}";
 
 		AssertElementPresent(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_DOWNLOAD_DOCUMENT"
+			locator1 = "Button#DOWNLOAD"
 		);
 
 		AssertElementPresent(
@@ -1567,7 +1614,7 @@ definition {
 			value1 = "${dmDocumentTitle}"
 		);
 
-		Click(locator1 = "Button#INFO");
+		DMDocument.expandInfo();
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "Link#DOWNLOAD",
@@ -1609,9 +1656,7 @@ definition {
 			Refresh();
 		}
 
-		if (IsElementNotPresent(locator1 = "Icon#INFO_ACTIVE")) {
-			Click(locator1 = "Button#INFO");
-		}
+		DMDocument.expandInfo();
 
 		if (isSet(booleanValue)) {
 			var key_booleanValue = "${booleanValue}";
@@ -1669,7 +1714,7 @@ definition {
 	}
 
 	macro viewDocumentVersionNumberCmdPG {
-		Click(locator1 = "Button#INFO");
+		DMDocument.expandInfo();
 
 		if (!(contains("${dmDocumentVersionNumber}", "{dmDocumentVersionNumber}"))) {
 			AssertTextEquals(
@@ -1808,11 +1853,9 @@ definition {
 			value1 = "${dmDocumentTitle}"
 		);
 
-		DMDocument.viewDocumentTitleCmdPG(dmDocumentTitle = "${dmDocumentTitle}");
+		DMDocument.expandInfo();
 
-		AssertElementPresent(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_THUMBNAIL"
-		);
+		DMDocument.viewDocumentTitleCmdPG(dmDocumentTitle = "${dmDocumentTitle}");
 
 		if ("${dmRepositoryName}" == "true") {
 			AssertElementNotPresent(
@@ -1826,6 +1869,8 @@ definition {
 		}
 
 		if (isSet(dmDocumentDescription)) {
+			ScrollWebElementIntoView(locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_DESCRIPTION");
+
 			AssertTextEquals(
 				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_DESCRIPTION",
 				value1 = "${dmDocumentDescription}"
@@ -1895,7 +1940,7 @@ definition {
 
 		AssertTextEquals(locator1 = "Button#SUBSCRIBE", value1 = "Subscribe");
 
-		Click(locator1 = "Button#INFO");
+		DMDocument.expandInfo();
 
 		var key_dmDocumentSize = "${dmDocumentSize}";
 		var key_dmDocumentUploader = "${dmDocumentUploader}";
@@ -2132,6 +2177,8 @@ definition {
 	}
 
 	macro viewTag {
+		DMDocument.expandInfo();
+
 		if (isSet(tagNameList)) {
 			for (var tagName : list "${tagNameList}") {
 				var tagName = StringUtil.lowerCase("${tagName}");
@@ -2141,8 +2188,8 @@ definition {
 			}
 		}
 		else {
-			var tagName = StringUtil.lowerCase("${tagName}");
 			var key_tagName = "${tagName}";
+			var tagName = StringUtil.upperCase("${tagName}");
 
 			AssertTextEquals(locator1 = "DocumentsAndMedia#TAG", value1 = "${tagName}");
 		}

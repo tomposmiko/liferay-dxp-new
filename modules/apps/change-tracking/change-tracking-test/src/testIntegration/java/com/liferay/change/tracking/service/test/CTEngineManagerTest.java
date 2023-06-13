@@ -52,7 +52,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.Serializable;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -112,58 +111,6 @@ public class CTEngineManagerTest {
 			_ctEngineManager.disableChangeTracking(
 				TestPropsValues.getCompanyId());
 		}
-	}
-
-	@Test
-	public void testChangeTrackingPublishWithBackgroundTask() throws Exception {
-		_ctEngineManager.enableChangeTracking(
-			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
-
-		ServiceContext serviceContext = new ServiceContext();
-
-		Optional<CTCollection> ctCollectionOptional =
-			_ctEngineManager.createCTCollection(
-				TestPropsValues.getUserId(), "testCollection",
-				"testCollection");
-
-		CTCollection ctCollection = ctCollectionOptional.get();
-
-		_ctEntryLocalService.addCTEntry(
-			TestPropsValues.getUserId(), 1, 1, 1,
-			ctCollection.getCtCollectionId(), serviceContext);
-
-		Optional<CTCollection> productionCTCollectionOptional =
-			_ctEngineManager.getProductionCTCollectionOptional(
-				TestPropsValues.getCompanyId());
-
-		CTCollection productionCTCollection =
-			productionCTCollectionOptional.get();
-
-		List<CTEntry> ctEntries = _ctEntryLocalService.getCTCollectionCTEntries(
-			productionCTCollection.getCtCollectionId());
-
-		int count = ctEntries.size();
-
-		Map<String, Serializable> taskContextMap = new HashMap<>();
-
-		taskContextMap.put("ctCollectionId", ctCollection.getCtCollectionId());
-		taskContextMap.put("userId", ctCollection.getUserId());
-
-		_backgroundTaskManager.addBackgroundTask(
-			_user.getUserId(), TestPropsValues.getGroupId(),
-			ctCollection.getName(),
-			"com.liferay.change.tracking.internal.background.task." +
-				"CTPublishBackgroundTaskExecutor",
-			taskContextMap, serviceContext);
-
-		ctEntries = _ctEntryLocalService.getCTCollectionCTEntries(
-			productionCTCollection.getCtCollectionId());
-
-		Assert.assertEquals(
-			"Number of entries in productionCTCollection", count + 1,
-			ctEntries.size());
-
-		_ctCollectionLocalService.deleteCTCollection(ctCollection);
 	}
 
 	@Test
@@ -302,13 +249,35 @@ public class CTEngineManagerTest {
 	}
 
 	@Test
+	public void testDeleteProductionCTCollection() throws Exception {
+		_ctEngineManager.enableChangeTracking(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+
+		Optional<CTCollection> ctCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(
+				TestPropsValues.getCompanyId());
+
+		Assert.assertTrue(ctCollectionOptional.isPresent());
+
+		CTCollection ctCollection = ctCollectionOptional.get();
+
+		_ctEngineManager.deleteCTCollection(ctCollection.getCtCollectionId());
+
+		ctCollection = _ctCollectionLocalService.fetchCTCollection(
+			ctCollection.getCtCollectionId());
+
+		Assert.assertNotNull(
+			"Change tracking collection must have a value", ctCollection);
+	}
+
+	@Test
 	public void testDisableChangeTracking() throws PortalException {
 		_ctEngineManager.enableChangeTracking(
 			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
 
 		List<CTCollection> ctCollections =
 			_ctCollectionLocalService.getCTCollections(
-				TestPropsValues.getCompanyId());
+				TestPropsValues.getCompanyId(), null);
 
 		Assert.assertEquals(
 			"Change tracking collections must have one entry", 1,
@@ -317,7 +286,7 @@ public class CTEngineManagerTest {
 		_ctEngineManager.disableChangeTracking(TestPropsValues.getCompanyId());
 
 		ctCollections = _ctCollectionLocalService.getCTCollections(
-			TestPropsValues.getCompanyId());
+			TestPropsValues.getCompanyId(), null);
 
 		Assert.assertTrue(
 			"Change tracking collection must not exist",
@@ -353,7 +322,7 @@ public class CTEngineManagerTest {
 
 		List<CTCollection> ctCollections =
 			_ctCollectionLocalService.getCTCollections(
-				TestPropsValues.getCompanyId());
+				TestPropsValues.getCompanyId(), null);
 
 		Assert.assertEquals(
 			"Change tracking collections must have one entry", 1,
@@ -438,6 +407,87 @@ public class CTEngineManagerTest {
 		Assert.assertFalse(
 			"Change tracking collection must be null",
 			activeCTCollectionOptional.isPresent());
+	}
+
+	@Test
+	public void testGetCollidingCTEntriesWhenCollision() throws Exception {
+		_ctEngineManager.enableChangeTracking(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+
+		CTCollection ctCollection = _ctCollectionLocalService.addCTCollection(
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), new ServiceContext());
+
+		long resourcePrimKey = RandomTestUtil.nextLong();
+
+		CTEntry ctEntry = _ctEntryLocalService.addCTEntry(
+			TestPropsValues.getUserId(), 0, 1, resourcePrimKey,
+			CTConstants.CT_CHANGE_TYPE_ADDITION,
+			ctCollection.getCtCollectionId(), new ServiceContext());
+
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(
+				TestPropsValues.getCompanyId());
+
+		long productionCTCollectionId = productionCTCollectionOptional.map(
+			CTCollection::getCtCollectionId
+		).orElse(
+			0L
+		);
+
+		_ctEntryLocalService.addCTEntry(
+			TestPropsValues.getUserId(), 0, 2, resourcePrimKey,
+			CTConstants.CT_CHANGE_TYPE_ADDITION, productionCTCollectionId,
+			new ServiceContext());
+
+		List<CTEntry> collidingCTEntries =
+			_ctEngineManager.getCollidingCTEntries(
+				ctCollection.getCtCollectionId());
+
+		Assert.assertTrue(
+			"There must be a colliding change entry",
+			ListUtil.isNotEmpty(collidingCTEntries));
+		Assert.assertEquals(ctEntry, collidingCTEntries.get(0));
+	}
+
+	@Test
+	public void testGetCollidingCTEntriesWhenNoCollision() throws Exception {
+		_ctEngineManager.enableChangeTracking(
+			TestPropsValues.getCompanyId(), TestPropsValues.getUserId());
+
+		CTCollection ctCollection = _ctCollectionLocalService.addCTCollection(
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), new ServiceContext());
+
+		long resourcePrimKey = RandomTestUtil.nextLong();
+
+		_ctEntryLocalService.addCTEntry(
+			TestPropsValues.getUserId(), 0, 2, resourcePrimKey,
+			CTConstants.CT_CHANGE_TYPE_ADDITION,
+			ctCollection.getCtCollectionId(), new ServiceContext());
+
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(
+				TestPropsValues.getCompanyId());
+
+		long productionCTCollectionId = productionCTCollectionOptional.map(
+			CTCollection::getCtCollectionId
+		).orElse(
+			0L
+		);
+
+		_ctEntryLocalService.addCTEntry(
+			TestPropsValues.getUserId(), 0, 1, resourcePrimKey,
+			CTConstants.CT_CHANGE_TYPE_ADDITION, productionCTCollectionId,
+			new ServiceContext());
+
+		List<CTEntry> collidingCTEntries =
+			_ctEngineManager.getCollidingCTEntries(
+				ctCollection.getCtCollectionId());
+
+		Assert.assertTrue(
+			"There must not be any colliding change entries",
+			ListUtil.isEmpty(collidingCTEntries));
 	}
 
 	@Test
@@ -536,6 +586,7 @@ public class CTEngineManagerTest {
 
 		CTEntry ctEntry = _ctEntryLocalService.addCTEntry(
 			TestPropsValues.getUserId(), 0, 0, 0,
+			CTConstants.CT_CHANGE_TYPE_ADDITION,
 			ctCollection.getCtCollectionId(), new ServiceContext());
 
 		ctEntries = _ctEngineManager.getCTEntries(
@@ -649,6 +700,9 @@ public class CTEngineManagerTest {
 				testResource -> 0L, testResource -> 0L
 			).setVersionEntityByVersionEntityIdFunction(
 				id -> new TestVersionClass()
+			).setVersionEntityDetails(
+				o -> RandomTestUtil.randomString(),
+				o -> RandomTestUtil.randomString(), o -> 1L
 			).setEntityIdsFromVersionEntityFunctions(
 				testVersion -> 0L, testVersion -> 0L
 			).setVersionEntityStatusInfo(
@@ -699,6 +753,7 @@ public class CTEngineManagerTest {
 
 		CTEntry ctEntry = _ctEntryLocalService.addCTEntry(
 			TestPropsValues.getUserId(), 0, 0, 0,
+			CTConstants.CT_CHANGE_TYPE_ADDITION,
 			ctCollection.getCtCollectionId(), new ServiceContext());
 
 		Optional<CTCollection> productionCTCollectionOptional =

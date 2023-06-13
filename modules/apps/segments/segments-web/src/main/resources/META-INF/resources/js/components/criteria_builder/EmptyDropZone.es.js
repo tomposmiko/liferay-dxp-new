@@ -6,6 +6,20 @@ import ThemeContext from '../../ThemeContext.es';
 import getCN from 'classnames';
 
 /**
+ * Prevents items from being dropped from other contributors.
+ * This method must be called `canDrop`.
+ * @param {Object} props Component's current props.
+ * @param {DropTargetMonitor} monitor
+ * @returns {boolean} True if the target should accept the item.
+ */
+function canDrop(props, monitor) {
+	const {propertyKey: destPropertyKey} = props;
+	const {propertyKey: startPropertyKey} = monitor.getItem();
+
+	return destPropertyKey === startPropertyKey;
+}
+
+/**
  * Implements the behavior of what will occur when an item is dropped.
  * Adds the criterion dropped.
  * This method must be called `drop`.
@@ -22,13 +36,16 @@ class EmptyDropZone extends Component {
 	static contextType = ThemeContext;
 
 	static propTypes = {
+		canDrop: PropTypes.bool,
 		connectDropTarget: PropTypes.func,
 		hover: PropTypes.bool,
-		onCriterionAdd: PropTypes.func.isRequired
+		onCriterionAdd: PropTypes.func.isRequired,
+		propertyKey: PropTypes.string.isRequired
 	};
 
 	render() {
 		const {
+			canDrop,
 			connectDropTarget,
 			hover
 		} = this.props;
@@ -38,7 +55,7 @@ class EmptyDropZone extends Component {
 		const targetClasses = getCN(
 			'empty-drop-zone-target',
 			{
-				'dnd-hover': hover
+				'dnd-hover': canDrop && hover
 			}
 		);
 
@@ -83,9 +100,11 @@ class EmptyDropZone extends Component {
 export default dropTarget(
 	DragTypes.PROPERTY,
 	{
+		canDrop,
 		drop
 	},
 	(connect, monitor) => ({
+		canDrop: monitor.canDrop(),
 		connectDropTarget: connect.dropTarget(),
 		hover: monitor.isOver()
 	})

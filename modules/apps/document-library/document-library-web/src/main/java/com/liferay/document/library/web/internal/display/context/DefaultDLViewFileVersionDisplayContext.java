@@ -23,7 +23,10 @@ import com.liferay.document.library.kernel.service.DLFileEntryMetadataLocalServi
 import com.liferay.document.library.kernel.versioning.VersioningStrategy;
 import com.liferay.document.library.preview.DLPreviewRenderer;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
+import com.liferay.document.library.preview.exception.DLFileEntryPreviewGenerationException;
 import com.liferay.document.library.preview.exception.DLPreviewGenerationInProcessException;
+import com.liferay.document.library.preview.exception.DLPreviewSizeException;
+import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.document.library.web.internal.constants.DLWebKeys;
 import com.liferay.document.library.web.internal.display.context.logic.DLPortletInstanceSettingsHelper;
 import com.liferay.document.library.web.internal.display.context.logic.FileEntryDisplayContextHelper;
@@ -76,13 +79,14 @@ public class DefaultDLViewFileVersionDisplayContext
 			ResourceBundle resourceBundle, StorageEngine storageEngine,
 			DLTrashUtil dlTrashUtil,
 			DLPreviewRendererProvider dlPreviewRendererProvider,
-			VersioningStrategy versioningStrategy)
+			VersioningStrategy versioningStrategy, DLURLHelper dlurlHelper)
 		throws PortalException {
 
 		this(
 			request, fileShortcut.getFileVersion(), fileShortcut,
 			dlMimeTypeDisplayContext, resourceBundle, storageEngine,
-			dlTrashUtil, dlPreviewRendererProvider, versioningStrategy);
+			dlTrashUtil, dlPreviewRendererProvider, versioningStrategy,
+			dlurlHelper);
 	}
 
 	public DefaultDLViewFileVersionDisplayContext(
@@ -92,12 +96,12 @@ public class DefaultDLViewFileVersionDisplayContext
 		ResourceBundle resourceBundle, StorageEngine storageEngine,
 		DLTrashUtil dlTrashUtil,
 		DLPreviewRendererProvider dlPreviewRendererProvider,
-		VersioningStrategy versioningStrategy) {
+		VersioningStrategy versioningStrategy, DLURLHelper dlurlHelper) {
 
 		this(
 			request, fileVersion, null, dlMimeTypeDisplayContext,
 			resourceBundle, storageEngine, dlTrashUtil,
-			dlPreviewRendererProvider, versioningStrategy);
+			dlPreviewRendererProvider, versioningStrategy, dlurlHelper);
 	}
 
 	@Override
@@ -179,6 +183,7 @@ public class DefaultDLViewFileVersionDisplayContext
 		menu.setMenuItems(_getMenuItems());
 		menu.setScroll(false);
 		menu.setShowWhenSingleIcon(true);
+		menu.setTriggerCssClass("component-action");
 
 		return menu;
 	}
@@ -256,6 +261,11 @@ public class DefaultDLViewFileVersionDisplayContext
 	}
 
 	@Override
+	public boolean isSharingLinkVisible() {
+		return false;
+	}
+
+	@Override
 	public boolean isVersionInfoVisible() {
 		return true;
 	}
@@ -293,7 +303,7 @@ public class DefaultDLViewFileVersionDisplayContext
 		ResourceBundle resourceBundle, StorageEngine storageEngine,
 		DLTrashUtil dlTrashUtil,
 		DLPreviewRendererProvider dlPreviewRendererProvider,
-		VersioningStrategy versioningStrategy) {
+		VersioningStrategy versioningStrategy, DLURLHelper dlurlHelper) {
 
 		try {
 			_fileVersion = fileVersion;
@@ -317,12 +327,12 @@ public class DefaultDLViewFileVersionDisplayContext
 			if (fileShortcut == null) {
 				_uiItemsBuilder = new UIItemsBuilder(
 					request, fileVersion, _resourceBundle, dlTrashUtil,
-					versioningStrategy);
+					versioningStrategy, dlurlHelper);
 			}
 			else {
 				_uiItemsBuilder = new UIItemsBuilder(
 					request, fileShortcut, _resourceBundle, dlTrashUtil,
-					versioningStrategy);
+					versioningStrategy, dlurlHelper);
 			}
 		}
 		catch (PortalException pe) {
@@ -386,7 +396,15 @@ public class DefaultDLViewFileVersionDisplayContext
 				dlPreviewRenderer.render(request, response);
 			}
 			catch (Exception e) {
-				if (!(e instanceof DLPreviewGenerationInProcessException)) {
+				if (e instanceof DLFileEntryPreviewGenerationException ||
+					e instanceof DLPreviewGenerationInProcessException ||
+					e instanceof DLPreviewSizeException) {
+
+					if (_log.isWarnEnabled()) {
+						_log.warn(e, e);
+					}
+				}
+				else {
 					_log.error(
 						"Unable to render preview for file version: " +
 							_fileVersion.getTitle(),

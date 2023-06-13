@@ -14,14 +14,17 @@
 
 package com.liferay.document.library.preview.video.internal;
 
+import com.liferay.document.library.constants.DLFileVersionPreviewConstants;
 import com.liferay.document.library.kernel.util.DLProcessorRegistryUtil;
-import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.kernel.util.VideoProcessorUtil;
 import com.liferay.document.library.preview.DLPreviewRenderer;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
+import com.liferay.document.library.preview.exception.DLFileEntryPreviewGenerationException;
 import com.liferay.document.library.preview.exception.DLPreviewGenerationInProcessException;
 import com.liferay.document.library.preview.exception.DLPreviewSizeException;
 import com.liferay.document.library.preview.video.internal.constants.DLPreviewVideoWebKeys;
+import com.liferay.document.library.service.DLFileVersionPreviewLocalService;
+import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -31,7 +34,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +48,12 @@ import javax.servlet.http.HttpServletRequest;
 public class VideoDLPreviewRendererProvider
 	implements DLPreviewRendererProvider {
 
-	public VideoDLPreviewRendererProvider(ServletContext servletContext) {
+	public VideoDLPreviewRendererProvider(
+		DLFileVersionPreviewLocalService dlFileVersionPreviewLocalService,
+		DLURLHelper dlurlHelper, ServletContext servletContext) {
+
+		_dlFileVersionPreviewLocalService = dlFileVersionPreviewLocalService;
+		_dlurlHelper = dlurlHelper;
 		_servletContext = servletContext;
 	}
 
@@ -59,15 +67,7 @@ public class VideoDLPreviewRendererProvider
 
 		return Optional.of(
 			(request, response) -> {
-				if (!VideoProcessorUtil.hasVideo(fileVersion)) {
-					if (!DLProcessorRegistryUtil.isPreviewableSize(
-							fileVersion)) {
-
-						throw new DLPreviewSizeException();
-					}
-
-					throw new DLPreviewGenerationInProcessException();
-				}
+				checkForPreviewGenerationExceptions(fileVersion);
 
 				RequestDispatcher requestDispatcher =
 					_servletContext.getRequestDispatcher("/preview/view.jsp");
@@ -94,6 +94,25 @@ public class VideoDLPreviewRendererProvider
 		FileVersion fileVersion) {
 
 		return Optional.empty();
+	}
+
+	protected void checkForPreviewGenerationExceptions(FileVersion fileVersion)
+		throws PortalException {
+
+		if (_dlFileVersionPreviewLocalService.hasDLFileVersionPreview(
+				fileVersion.getFileEntryId(), fileVersion.getFileVersionId(),
+				DLFileVersionPreviewConstants.STATUS_FAILURE)) {
+
+			throw new DLFileEntryPreviewGenerationException();
+		}
+
+		if (!VideoProcessorUtil.hasVideo(fileVersion)) {
+			if (!DLProcessorRegistryUtil.isPreviewableSize(fileVersion)) {
+				throw new DLPreviewSizeException();
+			}
+
+			throw new DLPreviewGenerationInProcessException();
+		}
 	}
 
 	private List<String> _getPreviewFileURLs(
@@ -125,7 +144,7 @@ public class VideoDLPreviewRendererProvider
 								0) {
 
 						previewFileURLs.add(
-							DLUtil.getPreviewURL(
+							_dlurlHelper.getPreviewURL(
 								fileVersion.getFileEntry(), fileVersion,
 								themeDisplay,
 								previewQueryString + "&type=" +
@@ -134,7 +153,7 @@ public class VideoDLPreviewRendererProvider
 				}
 
 				if (previewFileURLs.isEmpty()) {
-					throw new PortalException(
+					throw new DLFileEntryPreviewGenerationException(
 						"No preview available for " + fileVersion.getTitle());
 				}
 
@@ -145,7 +164,7 @@ public class VideoDLPreviewRendererProvider
 			}
 		}
 		else {
-			return Arrays.asList(videoPosterURL);
+			return Collections.singletonList(videoPosterURL);
 		}
 	}
 
@@ -153,11 +172,14 @@ public class VideoDLPreviewRendererProvider
 			FileVersion fileVersion, ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		return DLUtil.getPreviewURL(
+		return _dlurlHelper.getPreviewURL(
 			fileVersion.getFileEntry(), fileVersion, themeDisplay,
 			"&videoThumbnail=1");
 	}
 
+	private final DLFileVersionPreviewLocalService
+		_dlFileVersionPreviewLocalService;
+	private final DLURLHelper _dlurlHelper;
 	private final ServletContext _servletContext;
 
 }

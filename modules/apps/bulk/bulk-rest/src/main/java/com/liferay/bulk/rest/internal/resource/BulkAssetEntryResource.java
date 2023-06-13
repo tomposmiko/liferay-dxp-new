@@ -14,28 +14,35 @@
 
 package com.liferay.bulk.rest.internal.resource;
 
+import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetTag;
+import com.liferay.asset.kernel.model.AssetVocabulary;
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
+import com.liferay.asset.kernel.service.AssetTagService;
+import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.bulk.rest.internal.model.BulkActionResponseModel;
-import com.liferay.bulk.rest.internal.model.BulkAssetEntryCommonTagsActionModel;
+import com.liferay.bulk.rest.internal.model.BulkAssetEntryActionModel;
+import com.liferay.bulk.rest.internal.model.BulkAssetEntryCommonCategoriesModel;
 import com.liferay.bulk.rest.internal.model.BulkAssetEntryCommonTagsModel;
 import com.liferay.bulk.rest.internal.model.BulkAssetEntryUpdateCategoriesActionModel;
 import com.liferay.bulk.rest.internal.model.BulkAssetEntryUpdateTagsActionModel;
 import com.liferay.bulk.selection.BulkSelection;
 import com.liferay.bulk.selection.BulkSelectionFactory;
+import com.liferay.bulk.selection.BulkSelectionFactoryRegistry;
+import com.liferay.bulk.selection.BulkSelectionInputParameters;
 import com.liferay.bulk.selection.BulkSelectionRunner;
 import com.liferay.document.library.bulk.selection.EditCategoriesBulkSelectionAction;
 import com.liferay.document.library.bulk.selection.EditTagsBulkSelectionAction;
-import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.BaseModelPermissionCheckerUtil;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
@@ -43,16 +50,22 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.osgi.service.component.annotations.Component;
@@ -73,24 +86,72 @@ import org.osgi.service.component.annotations.Reference;
 public class BulkAssetEntryResource {
 
 	@Consumes(ContentTypes.APPLICATION_JSON)
+	@Path("/categories/{groupId}/{classNameId}/common")
+	@POST
+	@Produces(ContentTypes.APPLICATION_JSON)
+	public BulkAssetEntryCommonCategoriesModel
+		getBulkAssetEntryCommonCategoriesModel(
+			@Context User user, @Context Locale locale,
+			@PathParam("groupId") long groupId,
+			@PathParam("classNameId") long classNameId,
+			BulkAssetEntryActionModel bulkAssetEntryActionModel) {
+
+		try {
+			BulkSelectionFactory<?> bulkSelectionFactory =
+				_bulkSelectionFactoryRegistry.getBulkSelectionFactory(
+					classNameId);
+
+			BulkSelection<?> bulkSelection = bulkSelectionFactory.create(
+				bulkAssetEntryActionModel.getParameterMap());
+
+			BulkSelection<AssetEntry> assetEntryBulkSelection =
+				bulkSelection.toAssetEntryBulkSelection();
+
+			Stream<AssetEntry> stream = assetEntryBulkSelection.stream();
+
+			Set<AssetCategory> commonCategories = stream.map(
+				_getAssetEntryCategoriesFunction(
+					PermissionCheckerFactoryUtil.create(user))
+			).reduce(
+				SetUtil::intersect
+			).orElse(
+				Collections.emptySet()
+			);
+
+			return new BulkAssetEntryCommonCategoriesModel(
+				bulkSelection.describe(locale),
+				_groupByAssetVocabulary(
+					groupId, classNameId, commonCategories));
+		}
+		catch (Exception e) {
+			return new BulkAssetEntryCommonCategoriesModel(e);
+		}
+	}
+
+	@Consumes(ContentTypes.APPLICATION_JSON)
 	@Path("/tags/{classNameId}/common")
 	@POST
 	@Produces(ContentTypes.APPLICATION_JSON)
 	public BulkAssetEntryCommonTagsModel getBulkAssetEntryCommonTagsModel(
 		@Context User user, @Context Locale locale,
 		@PathParam("classNameId") long classNameId,
-		BulkAssetEntryCommonTagsActionModel
-			bulkAssetEntryCommonTagsActionModel) {
+		BulkAssetEntryActionModel bulkAssetEntryActionModel) {
 
 		try {
-			BulkSelection<FileEntry> bulkSelection =
-				_bulkSelectionFactory.create(
-					bulkAssetEntryCommonTagsActionModel.getParameterMap());
+			BulkSelectionFactory<?> bulkSelectionFactory =
+				_bulkSelectionFactoryRegistry.getBulkSelectionFactory(
+					classNameId);
 
-			Stream<FileEntry> stream = bulkSelection.stream();
+			BulkSelection<?> bulkSelection = bulkSelectionFactory.create(
+				bulkAssetEntryActionModel.getParameterMap());
+
+			BulkSelection<AssetEntry> assetEntryBulkSelection =
+				bulkSelection.toAssetEntryBulkSelection();
+
+			Stream<AssetEntry> stream = assetEntryBulkSelection.stream();
 
 			Set<String> commonTags = stream.map(
-				_getFileEntryTagsFunction(
+				_getAssetEntryTagsFunction(
 					PermissionCheckerFactoryUtil.create(user))
 			).reduce(
 				SetUtil::intersect
@@ -99,11 +160,32 @@ public class BulkAssetEntryResource {
 			);
 
 			return new BulkAssetEntryCommonTagsModel(
-				bulkSelection.describe(locale), new ArrayList<>(commonTags));
+				assetEntryBulkSelection.describe(locale),
+				new ArrayList<>(commonTags));
 		}
 		catch (Exception e) {
 			return new BulkAssetEntryCommonTagsModel(e);
 		}
+	}
+
+	@GET
+	@Path("/tags/{groupId}/search")
+	@Produces(ContentTypes.APPLICATION_JSON)
+	public List<String> searchTags(
+			@PathParam("groupId") long groupId, @QueryParam("name") String name)
+		throws PortalException {
+
+		List<AssetTag> assetTags = _assetTagService.getTags(
+			_portal.getCurrentAndAncestorSiteGroupIds(groupId),
+			"%" + name + "%", 0, 20);
+
+		Stream<AssetTag> stream = assetTags.stream();
+
+		return stream.map(
+			AssetTag::getName
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Consumes(ContentTypes.APPLICATION_JSON)
@@ -117,29 +199,35 @@ public class BulkAssetEntryResource {
 				bulkAssetEntryUpdateCategoriesActionModel) {
 
 		try {
-			BulkSelection<FileEntry> bulkSelection =
-				_bulkSelectionFactory.create(
-					bulkAssetEntryUpdateCategoriesActionModel.
-						getParameterMap());
+			BulkSelectionFactory<?> bulkSelectionFactory =
+				_bulkSelectionFactoryRegistry.getBulkSelectionFactory(
+					classNameId);
+
+			BulkSelection<?> bulkSelection = bulkSelectionFactory.create(
+				bulkAssetEntryUpdateCategoriesActionModel.getParameterMap());
+
+			BulkSelection<AssetEntry> assetEntryBulkSelection =
+				bulkSelection.toAssetEntryBulkSelection();
+
+			Map<String, Serializable> inputMap = new HashMap<>(4);
+
+			inputMap.put(
+				BulkSelectionInputParameters.ASSET_ENTRY_BULK_SELECTION, true);
+			inputMap.put(
+				"append",
+				bulkAssetEntryUpdateCategoriesActionModel.getAppend());
+			inputMap.put(
+				"toAddCategoryIds",
+				bulkAssetEntryUpdateCategoriesActionModel.
+					getToAddCategoryIds());
+			inputMap.put(
+				"toRemoveCategoryIds",
+				bulkAssetEntryUpdateCategoriesActionModel.
+					getToRemoveCategoryIds());
 
 			_bulkSelectionRunner.run(
-				user, bulkSelection, _editCategoriesBulkSelectionAction,
-				new HashMap<String, Serializable>() {
-					{
-						put(
-							"append",
-							bulkAssetEntryUpdateCategoriesActionModel.
-								getAppend());
-						put(
-							"toAddCategoryIds",
-							bulkAssetEntryUpdateCategoriesActionModel.
-								getToAddCategoryIds());
-						put(
-							"toRemoveCategoryIds",
-							bulkAssetEntryUpdateCategoriesActionModel.
-								getToRemoveCategoryIds());
-					}
-				});
+				user, assetEntryBulkSelection,
+				_editCategoriesBulkSelectionAction, inputMap);
 
 			return BulkActionResponseModel.SUCCESS;
 		}
@@ -158,27 +246,32 @@ public class BulkAssetEntryResource {
 			bulkAssetEntryUpdateTagsActionModel) {
 
 		try {
-			BulkSelection<FileEntry> bulkSelection =
-				_bulkSelectionFactory.create(
-					bulkAssetEntryUpdateTagsActionModel.getParameterMap());
+			BulkSelectionFactory<?> bulkSelectionFactory =
+				_bulkSelectionFactoryRegistry.getBulkSelectionFactory(
+					classNameId);
+
+			BulkSelection<?> bulkSelection = bulkSelectionFactory.create(
+				bulkAssetEntryUpdateTagsActionModel.getParameterMap());
+
+			BulkSelection<AssetEntry> assetEntryBulkSelection =
+				bulkSelection.toAssetEntryBulkSelection();
+
+			Map<String, Serializable> inputMap = new HashMap<>(4);
+
+			inputMap.put(
+				BulkSelectionInputParameters.ASSET_ENTRY_BULK_SELECTION, true);
+			inputMap.put(
+				"append", bulkAssetEntryUpdateTagsActionModel.getAppend());
+			inputMap.put(
+				"toAddTagNames",
+				bulkAssetEntryUpdateTagsActionModel.getToAddTagNames());
+			inputMap.put(
+				"toRemoveTagNames",
+				bulkAssetEntryUpdateTagsActionModel.getToRemoveTagNames());
 
 			_bulkSelectionRunner.run(
-				user, bulkSelection, _editTagsBulkSelectionAction,
-				new HashMap<String, Serializable>() {
-					{
-						put(
-							"append",
-							bulkAssetEntryUpdateTagsActionModel.getAppend());
-						put(
-							"toAddTagNames",
-							bulkAssetEntryUpdateTagsActionModel.
-								getToAddTagNames());
-						put(
-							"toRemoveTagNames",
-							bulkAssetEntryUpdateTagsActionModel.
-								getToRemoveTagNames());
-					}
-				});
+				user, assetEntryBulkSelection, _editTagsBulkSelectionAction,
+				inputMap);
 
 			return BulkActionResponseModel.SUCCESS;
 		}
@@ -187,42 +280,103 @@ public class BulkAssetEntryResource {
 		}
 	}
 
-	private Function<FileEntry, Set<String>> _getFileEntryTagsFunction(
-		PermissionChecker permissionChecker) {
+	private Function<AssetEntry, Set<AssetCategory>>
+		_getAssetEntryCategoriesFunction(PermissionChecker permissionChecker) {
 
-		return fileEntry -> {
-			try {
-				if (_fileEntryModelResourcePermission.contains(
-						permissionChecker, fileEntry, ActionKeys.UPDATE)) {
+		return assetEntry -> {
+			if (BaseModelPermissionCheckerUtil.containsBaseModelPermission(
+					permissionChecker, assetEntry.getGroupId(),
+					assetEntry.getClassName(), assetEntry.getClassPK(),
+					ActionKeys.UPDATE)) {
 
-					return SetUtil.fromArray(
-						_assetTagLocalService.getTagNames(
-							DLFileEntryConstants.getClassName(),
-							fileEntry.getFileEntryId()));
-				}
-
-				return Collections.emptySet();
+				return new HashSet<>(
+					_assetCategoryLocalService.getCategories(
+						assetEntry.getClassName(), assetEntry.getClassPK()));
 			}
-			catch (PortalException pe) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(pe, pe);
-				}
 
-				return Collections.emptySet();
-			}
+			return Collections.emptySet();
 		};
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BulkAssetEntryResource.class);
+	private Function<AssetEntry, Set<String>> _getAssetEntryTagsFunction(
+		PermissionChecker permissionChecker) {
+
+		return assetEntry -> {
+			if (BaseModelPermissionCheckerUtil.containsBaseModelPermission(
+					permissionChecker, assetEntry.getGroupId(),
+					assetEntry.getClassName(), assetEntry.getClassPK(),
+					ActionKeys.UPDATE)) {
+
+				return SetUtil.fromArray(
+					_assetTagLocalService.getTagNames(
+						assetEntry.getClassName(), assetEntry.getClassPK()));
+			}
+
+			return Collections.emptySet();
+		};
+	}
+
+	private List<AssetVocabulary> _getAssetVocabularies(
+			long groupId, long classNameId)
+		throws PortalException {
+
+		List<AssetVocabulary> assetVocabularies =
+			_assetVocabularyLocalService.getGroupVocabularies(
+				_portal.getCurrentAndAncestorSiteGroupIds(groupId));
+
+		Stream<AssetVocabulary> stream = assetVocabularies.stream();
+
+		return stream.filter(
+			assetVocabulary -> assetVocabulary.isAssociatedToClassNameId(
+				classNameId)
+		).filter(
+			assetVocabulary ->
+				_assetCategoryLocalService.getVocabularyCategoriesCount(
+					assetVocabulary.getVocabularyId()) > 0
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	private Map<AssetVocabulary, List<AssetCategory>> _groupByAssetVocabulary(
+			long groupId, long classNameId, Set<AssetCategory> commonCategories)
+		throws PortalException {
+
+		List<AssetVocabulary> assetVocabularies = _getAssetVocabularies(
+			groupId, classNameId);
+
+		Stream<AssetCategory> assetCategoryStream = commonCategories.stream();
+
+		Map<Long, List<AssetCategory>> assetVocabularyIdMap =
+			assetCategoryStream.collect(
+				Collectors.groupingBy(
+					assetCategory -> assetCategory.getVocabularyId()));
+
+		Stream<AssetVocabulary> assetVocabularyStream =
+			assetVocabularies.stream();
+
+		return assetVocabularyStream.collect(
+			Collectors.toMap(
+				Function.identity(),
+				assetVocabulary -> assetVocabularyIdMap.computeIfAbsent(
+					assetVocabulary.getVocabularyId(),
+					key -> new ArrayList<>())));
+	}
+
+	@Reference
+	private AssetCategoryLocalService _assetCategoryLocalService;
 
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.portal.kernel.repository.model.FileEntry)"
-	)
-	private BulkSelectionFactory<FileEntry> _bulkSelectionFactory;
+	@Reference
+	private AssetTagService _assetTagService;
+
+	@Reference
+	private AssetVocabularyLocalService _assetVocabularyLocalService;
+
+	@Reference
+	private BulkSelectionFactoryRegistry _bulkSelectionFactoryRegistry;
 
 	@Reference
 	private BulkSelectionRunner _bulkSelectionRunner;
@@ -234,10 +388,7 @@ public class BulkAssetEntryResource {
 	@Reference
 	private EditTagsBulkSelectionAction _editTagsBulkSelectionAction;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.portal.kernel.repository.model.FileEntry)"
-	)
-	private ModelResourcePermission<FileEntry>
-		_fileEntryModelResourcePermission;
+	@Reference
+	private Portal _portal;
 
 }

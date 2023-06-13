@@ -23,7 +23,9 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.segments.constants.SegmentsActionKeys;
 import com.liferay.segments.constants.SegmentsConstants;
 import com.liferay.segments.model.SegmentsEntry;
@@ -66,36 +68,31 @@ public class SegmentsEntryServiceImpl extends SegmentsEntryServiceBaseImpl {
 
 	@Override
 	public List<SegmentsEntry> getSegmentsEntries(
-			long groupId, boolean active, String type, int start, int end,
-			OrderByComparator<SegmentsEntry> orderByComparator)
-		throws PortalException {
+		long groupId, boolean includeAncestorSegmentsEntries, int start,
+		int end, OrderByComparator<SegmentsEntry> orderByComparator) {
 
-		_portletResourcePermission.check(
-			getPermissionChecker(), groupId, ActionKeys.VIEW);
-
-		return segmentsEntryPersistence.filterFindByG_A_T(
-			groupId, active, type, start, end, orderByComparator);
-	}
-
-	@Override
-	public List<SegmentsEntry> getSegmentsEntries(
-			long groupId, int start, int end,
-			OrderByComparator<SegmentsEntry> orderByComparator)
-		throws PortalException {
-
-		_portletResourcePermission.check(
-			getPermissionChecker(), groupId, ActionKeys.VIEW);
+		if (!includeAncestorSegmentsEntries) {
+			return segmentsEntryPersistence.filterFindByGroupId(
+				groupId, start, end, orderByComparator);
+		}
 
 		return segmentsEntryPersistence.filterFindByGroupId(
-			groupId, start, end, orderByComparator);
+			ArrayUtil.append(
+				PortalUtil.getAncestorSiteGroupIds(groupId), groupId),
+			start, end, orderByComparator);
 	}
 
 	@Override
-	public int getSegmentsEntriesCount(long groupId) throws PortalException {
-		_portletResourcePermission.check(
-			getPermissionChecker(), groupId, ActionKeys.VIEW);
+	public int getSegmentsEntriesCount(
+		long groupId, boolean includeAncestorSegmentsEntries) {
 
-		return segmentsEntryPersistence.filterCountByGroupId(groupId);
+		if (!includeAncestorSegmentsEntries) {
+			return segmentsEntryPersistence.filterCountByGroupId(groupId);
+		}
+
+		return segmentsEntryPersistence.filterCountByGroupId(
+			ArrayUtil.append(
+				PortalUtil.getAncestorSiteGroupIds(groupId), groupId));
 	}
 
 	@Override
@@ -110,7 +107,8 @@ public class SegmentsEntryServiceImpl extends SegmentsEntryServiceBaseImpl {
 
 	@Override
 	public BaseModelSearchResult<SegmentsEntry> searchSegmentsEntries(
-			long companyId, long groupId, String keywords, int start, int end,
+			long companyId, long groupId, String keywords,
+			boolean includeAncestorSegmentsEntries, int start, int end,
 			Sort sort)
 		throws PortalException {
 
@@ -118,7 +116,8 @@ public class SegmentsEntryServiceImpl extends SegmentsEntryServiceBaseImpl {
 			getPermissionChecker(), groupId, ActionKeys.VIEW);
 
 		return segmentsEntryLocalService.searchSegmentsEntries(
-			companyId, groupId, keywords, start, end, sort);
+			companyId, groupId, keywords, includeAncestorSegmentsEntries, start,
+			end, sort);
 	}
 
 	@Override

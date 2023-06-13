@@ -37,8 +37,8 @@ if (Validator.isNotNull(backURL)) {
 renderResponse.setTitle(editSegmentsEntryDisplayContext.getTitle(locale));
 %>
 
-<liferay-ui:error exception="<%= SegmentsEntryCriteriaException.class %>" message="invalid-criteria" />
-<liferay-ui:error exception="<%= SegmentsEntryKeyException.class %>" message="key-is-already-used" />
+<liferay-ui:error embed="<%= false %>" exception="<%= SegmentsEntryCriteriaException.class %>" message="invalid-criteria" />
+<liferay-ui:error embed="<%= false %>" exception="<%= SegmentsEntryKeyException.class %>" message="key-is-already-used" />
 
 <portlet:actionURL name="updateSegmentsEntry" var="updateSegmentsEntryActionURL" />
 
@@ -60,6 +60,7 @@ renderResponse.setTitle(editSegmentsEntryDisplayContext.getTitle(locale));
 	</portlet:renderURL>
 
 	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="getSegmentsEntryClassPKsCount" var="getSegmentsEntryClassPKsCountURL" />
+	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="getSegmentsFieldValueName" var="getSegmentsFieldValueNameURL" />
 
 	<aui:script require='<%= npmResolvedPackageName + "/js/index.es as SegmentEdit" %>'>
 		SegmentEdit.default(
@@ -80,6 +81,8 @@ renderResponse.setTitle(editSegmentsEntryDisplayContext.getTitle(locale));
 			},
 			{
 				assetsPath: '<%= PortalUtil.getPathContext(request) + "/assets" %>',
+				namespace: '<portlet:namespace />',
+				requestFieldValueNameURL: '<%= getSegmentsFieldValueNameURL %>',
 				spritemap: '<%= themeDisplay.getPathThemeImages() + "/lexicon/icons.svg" %>'
 			}
 		);

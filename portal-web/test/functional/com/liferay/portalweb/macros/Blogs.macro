@@ -355,9 +355,23 @@ definition {
 			value1 = "${entryTitle}"
 		);
 
-		Click(locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_OPTIONS_DROPDOWN");
+		Click(
+			locator1 = "LexiconList#LIST_ENTRY_ELLIPSIS",
+			key_listEntry = "${entryTitle}"
+		);
 
 		MenuItem.viewNotPresent(menuItem = "Publish to Live");
+	}
+
+	macro clickEllipsisItemPG {
+		Click(
+			locator1 = "Blogs#WIDGET_VIEW_ENTRY_ELLIPSIS",
+			key_entryTitle = "${entryTitle}"
+		);
+
+		MenuItem.clickNoError(
+			menuItem = "${item}"
+		);
 	}
 
 	macro disableSocialBookmarkSites {
@@ -535,6 +549,12 @@ definition {
 		var key_text = "RSS";
 
 		AssertTextEquals(locator1 = "Button#ANY", value1 = "RSS");
+	}
+
+	macro viewEntryPresent {
+		LexiconCard.viewCardPresent(
+			card = "${entryTitle}"
+		);
 	}
 
 	macro viewNoEntryCP {

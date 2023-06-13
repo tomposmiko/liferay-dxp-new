@@ -654,9 +654,9 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		LexiconEntry.gotoEntryMenuItemNoWaitNoError(
-			menuItem = "Delete",
-			rowEntry = "${configurationName}"
+		LexiconTable.clickEllipsisItem(
+			item = "Delete",
+			tableEntry = "${configurationName}"
 		);
 
 		AssertConfirm.waitForConfirmation(
@@ -692,7 +692,7 @@ definition {
 
 		SelectFrame(value1 = "relative=top");
 
-		AssertClick(locator1 = "Button#DONE", value1 = "Done");
+		AssertClick(locator1 = "Button#ADD", value1 = "Add");
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
@@ -831,9 +831,9 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		LexiconEntry.gotoEntryMenuItemNoWait(
-			menuItem = "Apply",
-			rowEntry = "${configurationName}"
+		LexiconTable.clickEllipsisItem(
+			item = "Apply",
+			tableEntry = "${configurationName}"
 		);
 
 		Alert.viewSuccessMessage();
@@ -876,7 +876,7 @@ definition {
 			portletOption = "Configuration"
 		);
 
-		var assetListName = "${assetListName}";
+		var key_title = "${assetListName}";
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
@@ -894,7 +894,7 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		Click(locator1 = "APConfiguration#ASSET_LIST_CHOOSE_BUTTON");
+		Click(locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
 
 		SelectFrameTop();
 

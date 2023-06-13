@@ -101,6 +101,12 @@ module.framework.properties.osgi.console=11312</echo>
 
 					<var name="tstamp.value" unset="true" />
 				</then>
+				<elseif>
+					<isset property="update.properties" />
+					<then>
+						<print-file file.name="${test.app.server.classes.portal.dir}/portal-ext.properties" />
+					</then>
+				</elseif>
 				<else>
 					<copy
 						file="portal-impl/src/portal-ext.properties"
@@ -428,6 +434,33 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		</sequential>
 	</macrodef>
 
+	<macrodef name="get-java-jdk-bundle-type">
+		<attribute default="" name="test.batch.name" />
+
+		<sequential>
+			<local name="test.batch.name" />
+
+			<condition else="@{test.batch.name}" property="test.batch.name" value="${env.TEST_BATCH_NAME}">
+				<contains string="@{test.batch.name}" substring="{test.batch.name}" />
+			</condition>
+
+			<var name="java.jdk.bundle.type" unset="true" />
+
+			<propertyregex
+				input="${test.batch.name}"
+				property="java.jdk.bundle.type"
+				regexp="-jdk[0-9]+_(\w+)"
+				select="\1"
+			/>
+
+			<condition property="java.jdk.bundle.type" value="oracle">
+				<matches pattern="-jdk[0-9]+$" string="${test.batch.name}" />
+			</condition>
+
+			<property name="java.jdk.bundle.type" value="oracle" />
+		</sequential>
+	</macrodef>
+
 	<macrodef name="get-java-jdk-bundle-version">
 		<attribute default="" name="test.batch.name" />
 
@@ -440,66 +473,38 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 
 			<var name="java.jdk.bundle.version" unset="true" />
 
-			<if>
-				<contains string="${test.batch.name}" substring="-jdk7" />
-				<then>
-					<property name="java.jdk.bundle.version" value="1.7" />
-				</then>
-				<elseif>
-					<contains string="${test.batch.name}" substring="-jdk8" />
-					<then>
-						<property name="java.jdk.bundle.version" value="1.8" />
-					</then>
-				</elseif>
-				<elseif>
-					<contains string="${test.batch.name}" substring="-open11" />
-					<then>
-						<property name="java.jdk.bundle.version" value="1.11" />
-					</then>
-				</elseif>
-			</if>
+			<propertyregex
+				input="${test.batch.name}"
+				property="java.jdk.bundle.version"
+				regexp="-jdk([0-9]+)(_(adopt|open|oracle|redhat|zulu))?"
+				select="1.\1"
+			/>
 
 			<property name="java.jdk.bundle.version" value="${ant.java.version}" />
 		</sequential>
 	</macrodef>
 
 	<macrodef name="get-java-jdk-home">
-		<attribute default="x64" name="architecture" />
+		<attribute default="${java.jdk.architecture}" name="architecture" />
+		<attribute default="oracle" name="type" />
 		<attribute default="${ant.java.version}" name="version" />
 
 		<sequential>
 			<var name="java.jdk.home" unset="true" />
 
-			<if>
-				<and>
-					<equals arg1="@{version}" arg2="1.7" />
-					<isset property="java.jdk.7.@{architecture}.home" />
-				</and>
-				<then>
-					<property name="java.jdk.home" value="${java.jdk.7.@{architecture}.home}" />
-				</then>
-				<elseif>
-					<and>
-						<equals arg1="@{version}" arg2="1.8" />
-						<isset property="java.jdk.8.@{architecture}.home" />
-					</and>
-					<then>
-						<property name="java.jdk.home" value="${java.jdk.8.@{architecture}.home}" />
-					</then>
-				</elseif>
-				<elseif>
-					<and>
-						<equals arg1="@{version}" arg2="1.11" />
-						<isset property="java.jdk.11.@{architecture}.home" />
-					</and>
-					<then>
-						<property name="java.jdk.home" value="${java.jdk.11.@{architecture}.home}" />
-					</then>
-				</elseif>
-				<else>
-					<property name="java.jdk.home" value="${java.home}" />
-				</else>
-			</if>
+			<local name="version" />
+
+			<propertyregex
+				defaultValue="@{version}"
+				input="@{version}"
+				property="version"
+				regexp="1\.([0-9]+)"
+				select="\1"
+			/>
+
+			<propertycopy from="java.jdk.home[${version}][@{architecture}][@{type}]" property="java.jdk.home" silent="true" />
+
+			<property name="java.jdk.home" value="${java.home}" />
 
 			<if>
 				<not>
@@ -508,7 +513,7 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 				<then>
 					<var name="java.jdk.home" unset="true" />
 
-					<var name="java.jdk.home" value="${java.home}" />
+					<property name="java.jdk.home" value="${java.home}" />
 				</then>
 			</if>
 		</sequential>
@@ -3335,6 +3340,7 @@ go</echo>
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.0.10.7" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.0.10.8" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.0.10.9" />
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.0.10.10" />
 					</or>
 					<then>
 						<var name="app.server.tomcat.version" value="8.0.32" />
@@ -3923,7 +3929,9 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 					<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-					<get-java-jdk-home version="${java.jdk.bundle.version}" />
+					<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
+
+					<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
 
 					<if>
 						<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
@@ -4111,7 +4119,9 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 			<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-			<get-java-jdk-home version="${java.jdk.bundle.version}" />
+			<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
+
+			<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
 
 			<parallel>
 				<daemons>
@@ -4813,7 +4823,10 @@ war.path=${app.server.portal.dir}/</echo>
 				<if>
 					<and>
 						<isset property="databases.size" />
-						<equals arg1="${database.type}" arg2="mysql" />
+						<or>
+							<equals arg1="${database.type}" arg2="mysql" />
+							<equals arg1="${database.type}" arg2="mariadb" />
+						</or>
 					</and>
 					<then>
 						<var name="database.index" value="1" />
@@ -4838,6 +4851,22 @@ create database lportal${database.index} character set utf8;</echo>
 
 						<var name="database.index" unset="true" />
 					</then>
+					<elseif>
+						<and>
+							<isset property="databases.size" />
+							<equals arg1="${database.type}" arg2="postgresql" />
+						</and>
+						<then>
+							<echo file="create.sql">
+drop database lportal;
+create database lportal encoding = 'UNICODE';</echo>
+
+							<echo append="true" file="create.sql">
+
+drop database lportal${databases.size};
+create database lportal${databases.size} encoding = 'UNICODE';</echo>
+						</then>
+					</elseif>
 					<else>
 						<if>
 							<or>
@@ -4910,6 +4939,18 @@ connect to lportal;</replacevalue>
 							<replacetoken>create database lportal pagesize 8192;</replacetoken>
 							<replacevalue>create database lportal pagesize 32768 temporary tablespace managed by automatic storage;</replacevalue>
 						</replace>
+
+						<if>
+							<isset property="databases.size" />
+							<then>
+								<echo append="true" file="create.sql">
+
+disconnect lportal;
+create database lportal${databases.size} pagesize 32768 temporary tablespace managed by automatic storage;
+update db cfg for lportal${databases.size} using logprimary 2;
+update db cfg for lportal${databases.size} using logsecond 254;</echo>
+							</then>
+						</if>
 					</then>
 					<elseif>
 						<equals arg1="${database.type}" arg2="oracle" />
@@ -4921,6 +4962,32 @@ connect to lportal;</replacevalue>
 								<replacevalue>grant connect,resource to &amp;1;
 	grant unlimited tablespace to &amp;1;</replacevalue>
 							</replace>
+
+							<if>
+								<isset property="databases.size" />
+								<then>
+									<replace
+										file="create.sql"
+									>
+										<replacetoken>grant connect,resource to &amp;1;
+	grant unlimited tablespace to &amp;1;</replacetoken>
+										<replacevalue>grant all privileges to &amp;1;</replacevalue>
+									</replace>
+									<replace
+										file="create.sql"
+									>
+										<replacetoken>quit</replacetoken>
+										<replacevalue></replacevalue>
+									</replace>
+
+									<echo append="true" file="create.sql">
+	drop user lportal1 cascade;
+	create user lportal1 identified by lportal1;
+	grant connect,resource to lportal1;
+	grant unlimited tablespace to lportal1;
+	quit</echo>
+								</then>
+							</if>
 						</then>
 					</elseif>
 					<elseif>
@@ -4942,6 +5009,40 @@ use lportal</replacetoken>
 go]]></replacevalue>
 								</replacefilter>
 							</replace>
+
+							<if>
+								<isset property="databases.size" />
+								<then>
+									<echo append="true" file="create.sql">
+
+use master
+go
+
+drop database lportal${databases.size}
+go
+
+create database lportal${databases.size}
+go
+
+alter database lportal${databases.size} on default=1400
+go
+
+alter database lportal${databases.size} with override
+go
+
+exec sp_dboption 'lportal${databases.size}', 'allow nulls by default' , true
+go
+
+exec sp_dboption 'lportal${databases.size}', 'select into/bulkcopy/pllsort' , true
+go
+
+use lportal${databases.size}
+go
+
+checkpoint
+go</echo>
+								</then>
+							</if>
 						</then>
 					</elseif>
 				</if>
@@ -6557,14 +6658,35 @@ go]]></replacevalue>
 
 	<target name="portal-ext-properties-update">
 		<if>
+			<not>
+				<isset property="app.server.bundle.index" />
+			</not>
+			<then>
+				<var name="app.server.bundle.index" value="0" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${app.server.bundle.index}" arg2="0" />
+			<then>
+				<var name="test.app.server.classes.portal.dir" value="${app.server.classes.portal.dir}" />
+			</then>
+			<else>
+				<antelope:stringutil property="test.app.server.classes.portal.dir" string="${app.server.classes.portal.dir}">
+					<antelope:replace regex="(${app.server.parent.dir})(.*)" replacement="$1-${app.server.bundle.index}$2" />
+				</antelope:stringutil>
+			</else>
+		</if>
+
+		<if>
 			<equals arg1="${add.new.properties}" arg2="true" />
 			<then>
-				<echo append="true" file="portal-impl/src/portal-ext.properties">
+				<echo append="true" file="${test.app.server.classes.portal.dir}/portal-ext.properties">
 ${update.properties}</echo>
 			</then>
 			<else>
 				<replace
-					file="portal-impl/src/portal-ext.properties"
+					file="${test.app.server.classes.portal.dir}/portal-ext.properties"
 					token="${update.properties.original}"
 					value="${update.properties}"
 				/>
@@ -7569,25 +7691,25 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			</then>
 		</if>
 
+		<for list="${test.case.available.property.names}" param="test.case.available.property.name">
+			<sequential>
+				<if>
+					<isset property="test.case.available.property.values[@{test.case.available.property.name}]" />
+					<then>
+						<echo append="true" file="${test.ext.properties.file}">
+							test.case.available.property.values[@{test.case.available.property.name}]=${test.case.available.property.values[@{test.case.available.property.name}]}
+						</echo>
+					</then>
+				</if>
+			</sequential>
+		</for>
+
 		<if>
 			<isset property="test.case.required.property.names" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
 					test.case.required.property.names=${test.case.required.property.names}
 				</echo>
-
-				<for list="${test.case.required.property.names}" param="test.case.required.property.name">
-					<sequential>
-						<if>
-							<isset property="test.case.available.property.values[@{test.case.required.property.name}]" />
-							<then>
-								<echo append="true" file="${test.ext.properties.file}">
-									test.case.available.property.values[@{test.case.required.property.name}]=${test.case.available.property.values[@{test.case.required.property.name}]}
-								</echo>
-							</then>
-						</if>
-					</sequential>
-				</for>
 			</then>
 		</if>
 
@@ -9382,6 +9504,8 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 				<if>
 					<equals arg1="${database.type}" arg2="db2" />
 					<then>
+						<get-testcase-property property.name="databases.size" />
+
 						<if>
 							<os family="windows" />
 							<then>
@@ -9392,6 +9516,15 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 								<exec executable="${db2.executable}">
 									<arg line="/c /w db2 drop db lportal" />
 								</exec>
+
+								<if>
+									<isset property="databases.size" />
+									<then>
+										<exec executable="${db2.executable}">
+											<arg line="/c /w db2 drop db lportal${databases.size}" />
+										</exec>
+									</then>
+								</if>
 
 								<exec executable="${db2.executable}">
 									<arg line="/c /w db2 -fcreate.sql -td;" />
@@ -9405,6 +9538,15 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 								<exec executable="${db2.executable}">
 									<arg line="drop db lportal" />
 								</exec>
+
+								<if>
+									<isset property="databases.size" />
+									<then>
+										<exec executable="${db2.executable}">
+											<arg line="drop db lportal${databases.size}" />
+										</exec>
+									</then>
+								</if>
 
 								<exec executable="${db2.executable}" failonerror="true">
 									<arg value="-fcreate.sql" />
@@ -11099,12 +11241,38 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 		<uninstall-patches patching.tool.dir="${patching.tool.dir}" />
 	</target>
 
+	<target name="update-osgi-module-configuration">
+		<local name="osgi.configs.dir" />
+
+		<condition else="${app.server.parent.dir}-${install.patch.cluster.node.index}/osgi/configs" property="osgi.configs.dir" value="${app.server.parent.dir}/osgi/configs">
+			<or>
+				<not>
+					<isset property="install.patch.cluster.node.index" />
+				</not>
+				<equals arg1="${install.patch.cluster.node.index}" arg2="0" />
+			</or>
+		</condition>
+
+		<get-testcase-property property.name="osgi.module.configurations" />
+		<get-testcase-property property.name="osgi.module.configuration.file.names" />
+
+		<replace
+			file="${osgi.configs.dir}/${osgi.module.configuration.file.names}"
+			token="${osgi.module.configurations}"
+			value="${update.configuration}"
+		/>
+
+		<echo message="osgi.module.configurations= ${update.configuration}" />
+	</target>
+
 	<target name="upgrade-legacy-database">
 		<prepare-database-upgrade-configuration />
 
 		<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
 
-		<get-java-jdk-home version="${java.jdk.bundle.version}" />
+		<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
+
+		<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
 
 		<trycatch property="upgrade.error">
 			<try>

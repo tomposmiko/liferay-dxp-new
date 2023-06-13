@@ -18,6 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
+import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.model.BaseModel;
 
 import java.util.List;
@@ -85,6 +86,29 @@ public interface CTEngineManager {
 	public Optional<CTCollection> getActiveCTCollectionOptional(long userId);
 
 	/**
+	 * Returns all the change entries associated with the given change
+	 * collection what collide with any of the production change collection
+	 * entries.
+	 *
+	 * @param  ctCollectionId the primary key of the change collection
+	 * @return the list of the colliding change entries
+	 */
+	public List<CTEntry> getCollidingCTEntries(long ctCollectionId);
+
+	/**
+	 * Returns all the change entries associated with the source change
+	 * collection what collide with any of the target change collection entries.
+	 *
+	 * @param  sourceCTCollectionId the primary key of the source change
+	 *         collection
+	 * @param  targetCTCollectionId the primary key of the target change
+	 *         collection
+	 * @return the list of the colliding change entries
+	 */
+	public List<CTEntry> getCollidingCTEntries(
+		long sourceCTCollectionId, long targetCTCollectionId);
+
+	/**
 	 * Returns the change tracking collection identified by the primary key.
 	 *
 	 * @param  ctCollectionId the primary key of the change collection
@@ -102,6 +126,18 @@ public interface CTEngineManager {
 	public List<CTCollection> getCTCollections(long companyId);
 
 	/**
+	 * Returns all the change tracking collection associated with the given
+	 * company.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  queryDefinition the object contains settings regarding
+	 *         pagination, order and filter
+	 * @return the list of change tracking collections
+	 */
+	public List<CTCollection> getCTCollections(
+		long companyId, QueryDefinition<CTCollection> queryDefinition);
+
+	/**
 	 * Returns all the change entries associated with the given change
 	 * collection.
 	 *
@@ -109,6 +145,27 @@ public interface CTEngineManager {
 	 * @return the list of change entries
 	 */
 	public List<CTEntry> getCTEntries(long ctCollectionId);
+
+	/**
+	 * Returns all the change entries associated with the given change
+	 * collection.
+	 *
+	 * @param  ctCollectionId the primary key of the change collection
+	 * @param  queryDefinition the object contains settings regarding
+	 *         pagination, order and filter
+	 * @return the list of change entries
+	 */
+	public List<CTEntry> getCTEntries(
+		long ctCollectionId, QueryDefinition<CTEntry> queryDefinition);
+
+	/**
+	 * Returns the number of all the change entries associated with the given
+	 * change collection.
+	 *
+	 * @param  ctCollectionId the primary key of the change collection
+	 * @return the list of change entries
+	 */
+	public int getCTEntriesCount(long ctCollectionId);
 
 	/**
 	 * Returns the special change tracking collection which is called production
@@ -161,5 +218,17 @@ public interface CTEngineManager {
 	 * @param ctCollectionId the primary key of the change collection
 	 */
 	public void publishCTCollection(long userId, long ctCollectionId);
+
+	/**
+	 * Returns all the change tracking collection associated with the given
+	 * company and keywords.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  queryDefinition the object contains settings regarding
+	 *         pagination, order and filter (keywords)
+	 * @return the list of change tracking collections
+	 */
+	public List<CTCollection> searchByKeywords(
+		long companyId, QueryDefinition<CTCollection> queryDefinition);
 
 }

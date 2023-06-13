@@ -29,6 +29,24 @@ public class DEDataDefinitionRequestBuilder {
 		return new DEDataDefinitionDeleteRequest.Builder();
 	}
 
+	public static DEDataDefinitionDeleteModelPermissionsRequest.Builder
+		deleteModelPermissionsBuilder(
+			long companyId, long scopedGroupId, long deDataRecordCollectionId,
+			String[] actionIds, String[] roleNames) {
+
+		return new DEDataDefinitionDeleteModelPermissionsRequest.Builder(
+			companyId, scopedGroupId, deDataRecordCollectionId, actionIds,
+			roleNames);
+	}
+
+	public static DEDataDefinitionDeletePermissionsRequest.Builder
+		deletePermissionsBuilder(
+			long companyId, long scopedGroupId, String[] roleNames) {
+
+		return new DEDataDefinitionDeletePermissionsRequest.Builder(
+			companyId, scopedGroupId, roleNames);
+	}
+
 	public static DEDataDefinitionGetRequest.Builder getBuilder() {
 		return new DEDataDefinitionGetRequest.Builder();
 	}
@@ -45,15 +63,17 @@ public class DEDataDefinitionRequestBuilder {
 
 	public static DEDataDefinitionSaveModelPermissionsRequest.Builder
 		saveModelPermissionsBuilder(
-			long companyId, long scopedGroupId, long deDataDefinitionId) {
+			long companyId, long groupId, long scopedUserId, long scopedGroupId,
+			long deDataDefinitionId, String[] roleNames) {
 
 		return new DEDataDefinitionSaveModelPermissionsRequest.Builder(
-			companyId, scopedGroupId, deDataDefinitionId);
+			companyId, groupId, scopedUserId, scopedGroupId, deDataDefinitionId,
+			roleNames);
 	}
 
 	public static DEDataDefinitionSavePermissionsRequest.Builder
 		savePermissionsBuilder(
-			long companyId, long scopedGroupId, String... roleNames) {
+			long companyId, long scopedGroupId, String[] roleNames) {
 
 		return new DEDataDefinitionSavePermissionsRequest.Builder(
 			companyId, scopedGroupId, roleNames);

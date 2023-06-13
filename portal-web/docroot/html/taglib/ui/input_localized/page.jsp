@@ -19,7 +19,7 @@
 <div class="input-group input-localized input-localized-<%= type %>" id="<portlet:namespace /><%= id %>BoundingBox">
 	<c:if test="<%= Validator.isNotNull(inputAddon) %>">
 		<div class="input-group-item input-group-item-shrink input-group-prepend">
-			<span class="input-group-text" id="<portlet:namespace /><%= id %>InputAddon">
+			<span class="input-group-text text-truncate" id="<portlet:namespace /><%= id %>InputAddon">
 				<liferay-ui:message key="<%= StringUtil.shorten(inputAddon, 40) %>" />
 			</span>
 		</div>

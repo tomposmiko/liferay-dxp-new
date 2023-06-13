@@ -9,6 +9,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import ${beanLocatorUtil};
@@ -41,6 +42,7 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.service.Base${sessionTypeName}ServiceImpl;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistryUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -62,6 +64,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Reference;
 
 <#if entity.hasEntityColumns()>
 	<#if entity.hasCompoundPK()>
@@ -123,7 +128,6 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
  *
  * @author ${author}
  * @see ${packagePath}.service.impl.${entity.name}LocalServiceImpl
- * @see ${apiPackagePath}.service.${entity.name}LocalServiceUtil
 <#if classDeprecated>
  * @deprecated ${classDeprecatedComment}
 </#if>
@@ -135,7 +139,12 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 </#if>
 
 	@ProviderType
-	public abstract class ${entity.name}LocalServiceBaseImpl extends BaseLocalServiceImpl implements ${entity.name}LocalService, IdentifiableOSGiService
+	public abstract class ${entity.name}LocalServiceBaseImpl extends BaseLocalServiceImpl implements ${entity.name}LocalService,
+	<#if dependencyInjectorDS>
+		AopService,
+	</#if>
+
+	IdentifiableOSGiService
 
 	<#if entity.versionEntity??>
 		<#assign versionEntity = entity.versionEntity />
@@ -147,7 +156,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 		/*
 		 * NOTE FOR DEVELOPERS:
 		 *
-		 * Never modify or reference this class directly. Always use {@link ${apiPackagePath}.service.${entity.name}LocalServiceUtil} to access the ${entity.humanName} local service.
+		 * Never modify or reference this class directly. Use <code>${apiPackagePath}.service.${entity.name}LocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>${apiPackagePath}.service.${entity.name}LocalServiceUtil</code>.
 		 */
 <#else>
 /**
@@ -159,7 +168,6 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
  *
  * @author ${author}
  * @see ${packagePath}.service.impl.${entity.name}ServiceImpl
- * @see ${apiPackagePath}.service.${entity.name}ServiceUtil
 <#if classDeprecated>
  * @deprecated ${classDeprecatedComment}
 </#if>
@@ -170,12 +178,17 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 	@Deprecated
 </#if>
 
-	public abstract class ${entity.name}ServiceBaseImpl extends BaseServiceImpl implements ${entity.name}Service, IdentifiableOSGiService {
+	public abstract class ${entity.name}ServiceBaseImpl extends BaseServiceImpl implements ${entity.name}Service,
+		<#if dependencyInjectorDS>
+			AopService,
+		</#if>
+
+		IdentifiableOSGiService {
 
 		/*
 		 * NOTE FOR DEVELOPERS:
 		 *
-		 * Never modify or reference this class directly. Always use {@link ${apiPackagePath}.service.${entity.name}ServiceUtil} to access the ${entity.humanName} remote service.
+		 * Never modify or reference this class directly. Use <code>${apiPackagePath}.service.${entity.name}Service</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>${apiPackagePath}.service.${entity.name}ServiceUtil</code>.
 		 */
 </#if>
 
@@ -389,7 +402,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			return ${entity.varName}Persistence.fetchByPrimaryKey(${entity.PKVarName});
 		}
 
-		<#if entity.hasUuid() && entity.hasEntityColumn("companyId") && (!entity.hasEntityColumn("groupId") || stringUtil.equals(entity.name, "Group"))>
+		<#if entity.hasUuid() && entity.hasEntityColumn("companyId") && (!entity.hasEntityColumn("groupId") || stringUtil.equals(entity.name, "Group")) && !entity.versionEntity??>
 			/**
 			 * Returns the ${entity.humanName} with the matching UUID and company.
 			 *
@@ -406,7 +419,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			}
 		</#if>
 
-		<#if entity.hasUuid() && entity.hasEntityColumn("groupId") && !stringUtil.equals(entity.name, "Group")>
+		<#if entity.hasUuid() && entity.hasEntityColumn("groupId") && !stringUtil.equals(entity.name, "Group") && !entity.versionEntity??>
 			<#if stringUtil.equals(entity.name, "Layout")>
 				/**
 				 * Returns the ${entity.humanName} matching the UUID, group, and privacy.
@@ -441,7 +454,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			</#if>
 		</#if>
 
-		<#if entity.hasExternalReferenceCode() && entity.hasEntityColumn("companyId")>
+		<#if entity.hasExternalReferenceCode() && entity.hasEntityColumn("companyId") && !entity.versionEntity??>
 			/**
 			 * Returns the ${entity.humanName} with the matching external reference code and company.
 			 *
@@ -706,7 +719,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			}
 		</#if>
 
-		<#if entity.hasUuid() && entity.hasEntityColumn("companyId")>
+		<#if entity.hasUuid() && entity.hasEntityColumn("companyId") && !entity.versionEntity??>
 			<#if entity.hasEntityColumn("groupId") && !stringUtil.equals(entity.name, "Group")>
 				/**
 				 * Returns all the ${entity.humanNames} matching the UUID and company.
@@ -756,7 +769,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			</#if>
 		</#if>
 
-		<#if entity.hasUuid() && entity.hasEntityColumn("groupId") && !stringUtil.equals(entity.name, "Group")>
+		<#if entity.hasUuid() && entity.hasEntityColumn("groupId") && !stringUtil.equals(entity.name, "Group") && !entity.versionEntity??>
 			<#if stringUtil.equals(entity.name, "Layout")>
 				/**
 				 * Returns the ${entity.humanName} matching the UUID, group, and privacy.
@@ -1003,7 +1016,11 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 				 */
 				@Override
 				public List<${entity.name}> get${referenceEntity.name}${entity.names}(${referenceEntity.PKClassName} ${referenceEntity.PKVarName}) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
-					return ${referenceEntity.varName}Persistence.get${entity.names}(${referenceEntity.PKVarName});
+					<#if dependencyInjectorDS>
+						return ${entity.varName}Persistence.get${referenceEntity.name}${entity.names}(${referenceEntity.PKVarName});
+					<#else>
+						return ${referenceEntity.varName}Persistence.get${entity.names}(${referenceEntity.PKVarName});
+					</#if>
 				}
 
 				<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "get" + referenceEntity.name + entity.names, [referenceEntity.PKClassName, "int", "int"], []) />
@@ -1015,7 +1032,11 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 				 */
 				@Override
 				public List<${entity.name}> get${referenceEntity.name}${entity.names}(${referenceEntity.PKClassName} ${referenceEntity.PKVarName}, int start, int end) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
-					return ${referenceEntity.varName}Persistence.get${entity.names}(${referenceEntity.PKVarName}, start, end);
+					<#if dependencyInjectorDS>
+						return ${entity.varName}Persistence.get${referenceEntity.name}${entity.names}(${referenceEntity.PKVarName}, start, end);
+					<#else>
+						return ${referenceEntity.varName}Persistence.get${entity.names}(${referenceEntity.PKVarName}, start, end);
+					</#if>
 				}
 
 				<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "get" + referenceEntity.name + entity.names, [referenceEntity.PKClassName, "int", "int", "com.liferay.portal.kernel.util.OrderByComparator"], []) />
@@ -1027,7 +1048,11 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 				 */
 				@Override
 				public List<${entity.name}> get${referenceEntity.name}${entity.names}(${referenceEntity.PKClassName} ${referenceEntity.PKVarName}, int start, int end, OrderByComparator<${entity.name}> orderByComparator) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
-					return ${referenceEntity.varName}Persistence.get${entity.names}(${referenceEntity.PKVarName}, start, end, orderByComparator);
+					<#if dependencyInjectorDS>
+						return ${entity.varName}Persistence.get${referenceEntity.name}${entity.names}(${referenceEntity.PKVarName}, start, end, orderByComparator);
+					<#else>
+						return ${referenceEntity.varName}Persistence.get${entity.names}(${referenceEntity.PKVarName}, start, end, orderByComparator);
+					</#if>
 				}
 
 				<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "get" + referenceEntity.name + entity.names + "Count", [referenceEntity.PKClassName], []) />
@@ -1292,133 +1317,162 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 		}
 	</#if>
 
-	<#list referenceEntities as referenceEntity>
-		<#if referenceEntity.hasLocalService()>
-			/**
-			 * Returns the ${referenceEntity.humanName} local service.
-			 *
-			 * @return the ${referenceEntity.humanName} local service
-			 */
+	<#if !dependencyInjectorDS>
+		<#list referenceEntities as referenceEntity>
+			<#if referenceEntity.hasLocalService()>
+				/**
+				 * Returns the ${referenceEntity.humanName} local service.
+				 *
+				 * @return the ${referenceEntity.humanName} local service
+				 */
 
-			<#if !classDeprecated && referenceEntity.isDeprecated()>
-				@SuppressWarnings("deprecation")
+				<#if !classDeprecated && referenceEntity.isDeprecated()>
+					@SuppressWarnings("deprecation")
+				</#if>
+
+				public ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}LocalService get${referenceEntity.name}LocalService() {
+					return ${referenceEntity.varName}LocalService;
+				}
+
+				/**
+				 * Sets the ${referenceEntity.humanName} local service.
+				 *
+				 * @param ${referenceEntity.varName}LocalService the ${referenceEntity.humanName} local service
+				 */
+
+				<#if !classDeprecated && referenceEntity.isDeprecated()>
+					@SuppressWarnings("deprecation")
+				</#if>
+
+				public void set${referenceEntity.name}LocalService(${referenceEntity.apiPackagePath}.service.${referenceEntity.name}LocalService ${referenceEntity.varName}LocalService) {
+					this.${referenceEntity.varName}LocalService = ${referenceEntity.varName}LocalService;
+				}
 			</#if>
 
-			public ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}LocalService get${referenceEntity.name}LocalService() {
-				return ${referenceEntity.varName}LocalService;
-			}
+			<#if !stringUtil.equals(sessionTypeName, "Local") && referenceEntity.hasRemoteService()>
+				/**
+				 * Returns the ${referenceEntity.humanName} remote service.
+				 *
+				 * @return the ${referenceEntity.humanName} remote service
+				 */
 
-			/**
-			 * Sets the ${referenceEntity.humanName} local service.
-			 *
-			 * @param ${referenceEntity.varName}LocalService the ${referenceEntity.humanName} local service
-			 */
+				<#if !classDeprecated && referenceEntity.isDeprecated()>
+					@SuppressWarnings("deprecation")
+				</#if>
 
-			<#if !classDeprecated && referenceEntity.isDeprecated()>
-				@SuppressWarnings("deprecation")
+				public ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}Service get${referenceEntity.name}Service() {
+					return ${referenceEntity.varName}Service;
+				}
+
+				/**
+				 * Sets the ${referenceEntity.humanName} remote service.
+				 *
+				 * @param ${referenceEntity.varName}Service the ${referenceEntity.humanName} remote service
+				 */
+
+				<#if !classDeprecated && referenceEntity.isDeprecated()>
+					@SuppressWarnings("deprecation")
+				</#if>
+
+				public void set${referenceEntity.name}Service(${referenceEntity.apiPackagePath}.service.${referenceEntity.name}Service ${referenceEntity.varName}Service) {
+					this.${referenceEntity.varName}Service = ${referenceEntity.varName}Service;
+				}
 			</#if>
 
-			public void set${referenceEntity.name}LocalService(${referenceEntity.apiPackagePath}.service.${referenceEntity.name}LocalService ${referenceEntity.varName}LocalService) {
-				this.${referenceEntity.varName}LocalService = ${referenceEntity.varName}LocalService;
-			}
-		</#if>
+			<#if referenceEntity.hasEntityColumns() && referenceEntity.hasPersistence()>
+				/**
+				 * Returns the ${referenceEntity.humanName} persistence.
+				 *
+				 * @return the ${referenceEntity.humanName} persistence
+				 */
+				public ${referenceEntity.name}Persistence get${referenceEntity.name}Persistence() {
+					return ${referenceEntity.varName}Persistence;
+				}
 
-		<#if !stringUtil.equals(sessionTypeName, "Local") && referenceEntity.hasRemoteService()>
-			/**
-			 * Returns the ${referenceEntity.humanName} remote service.
-			 *
-			 * @return the ${referenceEntity.humanName} remote service
-			 */
-
-			<#if !classDeprecated && referenceEntity.isDeprecated()>
-				@SuppressWarnings("deprecation")
+				/**
+				 * Sets the ${referenceEntity.humanName} persistence.
+				 *
+				 * @param ${referenceEntity.varName}Persistence the ${referenceEntity.humanName} persistence
+				 */
+				public void set${referenceEntity.name}Persistence(${referenceEntity.name}Persistence ${referenceEntity.varName}Persistence) {
+					this.${referenceEntity.varName}Persistence = ${referenceEntity.varName}Persistence;
+				}
 			</#if>
 
-			public ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}Service get${referenceEntity.name}Service() {
-				return ${referenceEntity.varName}Service;
-			}
+			<#if referenceEntity.hasFinderClassName() && (stringUtil.equals(entity.name, "Counter") || !stringUtil.equals(referenceEntity.name, "Counter"))>
+				/**
+				 * Returns the ${referenceEntity.humanName} finder.
+				 *
+				 * @return the ${referenceEntity.humanName} finder
+				 */
+				public ${referenceEntity.name}Finder get${referenceEntity.name}Finder() {
+					return ${referenceEntity.varName}Finder;
+				}
 
-			/**
-			 * Sets the ${referenceEntity.humanName} remote service.
-			 *
-			 * @param ${referenceEntity.varName}Service the ${referenceEntity.humanName} remote service
-			 */
-
-			<#if !classDeprecated && referenceEntity.isDeprecated()>
-				@SuppressWarnings("deprecation")
+				/**
+				 * Sets the ${referenceEntity.humanName} finder.
+				 *
+				 * @param ${referenceEntity.varName}Finder the ${referenceEntity.humanName} finder
+				 */
+				public void set${referenceEntity.name}Finder(${referenceEntity.name}Finder ${referenceEntity.varName}Finder) {
+					this.${referenceEntity.varName}Finder = ${referenceEntity.varName}Finder;
+				}
 			</#if>
+		</#list>
+	</#if>
 
-			public void set${referenceEntity.name}Service(${referenceEntity.apiPackagePath}.service.${referenceEntity.name}Service ${referenceEntity.varName}Service) {
-				this.${referenceEntity.varName}Service = ${referenceEntity.varName}Service;
-			}
-		</#if>
+	<#if dependencyInjectorDS>
+		@Override
+		public Class<?>[] getAopInterfaces() {
+			return new Class<?>[] {
+				${entity.name}${sessionTypeName}Service.class, IdentifiableOSGiService.class
 
-		<#if referenceEntity.hasEntityColumns() && referenceEntity.hasPersistence()>
-			/**
-			 * Returns the ${referenceEntity.humanName} persistence.
-			 *
-			 * @return the ${referenceEntity.humanName} persistence
-			 */
-			public ${referenceEntity.name}Persistence get${referenceEntity.name}Persistence() {
-				return ${referenceEntity.varName}Persistence;
-			}
+				<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasEntityColumns() && entity.hasPersistence()>
+					, PersistedModelLocalService.class
+				</#if>
+			};
+		}
 
-			/**
-			 * Sets the ${referenceEntity.humanName} persistence.
-			 *
-			 * @param ${referenceEntity.varName}Persistence the ${referenceEntity.humanName} persistence
-			 */
-			public void set${referenceEntity.name}Persistence(${referenceEntity.name}Persistence ${referenceEntity.varName}Persistence) {
-				this.${referenceEntity.varName}Persistence = ${referenceEntity.varName}Persistence;
-			}
-		</#if>
-
-		<#if referenceEntity.hasFinderClassName() && (stringUtil.equals(entity.name, "Counter") || !stringUtil.equals(referenceEntity.name, "Counter"))>
-			/**
-			 * Returns the ${referenceEntity.humanName} finder.
-			 *
-			 * @return the ${referenceEntity.humanName} finder
-			 */
-			public ${referenceEntity.name}Finder get${referenceEntity.name}Finder() {
-				return ${referenceEntity.varName}Finder;
-			}
-
-			/**
-			 * Sets the ${referenceEntity.humanName} finder.
-			 *
-			 * @param ${referenceEntity.varName}Finder the ${referenceEntity.humanName} finder
-			 */
-			public void set${referenceEntity.name}Finder(${referenceEntity.name}Finder ${referenceEntity.varName}Finder) {
-				this.${referenceEntity.varName}Finder = ${referenceEntity.varName}Finder;
-			}
-		</#if>
-	</#list>
-
-	public void afterPropertiesSet() {
-		<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasEntityColumns() && entity.hasPersistence()>
-			<#if validator.isNotNull(pluginName)>
-				PersistedModelLocalServiceRegistryUtil.register("${apiPackagePath}.model.${entity.name}", ${entity.varName}LocalService);
-			<#else>
-				persistedModelLocalServiceRegistry.register("${apiPackagePath}.model.${entity.name}", ${entity.varName}LocalService);
-			</#if>
-		</#if>
+		@Override
+		public void setAopProxy(Object aopProxy) {
+			${entity.varName}${sessionTypeName}Service = (${entity.name}${sessionTypeName}Service)aopProxy;
+		}
 
 		<#if stringUtil.equals(sessionTypeName, "Local") && entity.localizedEntity?? && entity.versionEntity?? && entity.hasPersistence()>
 			<#assign localizedEntity = entity.localizedEntity />
 
-			registerListener(new ${localizedEntity.name}VersionServiceListener());
+			@Activate
+			protected void activate() {
+				registerListener(new ${localizedEntity.name}VersionServiceListener());
+			}
 		</#if>
-	}
-
-	public void destroy() {
-		<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasEntityColumns() && entity.hasPersistence()>
-			<#if validator.isNotNull(pluginName)>
-				PersistedModelLocalServiceRegistryUtil.unregister("${apiPackagePath}.model.${entity.name}");
-			<#else>
-				persistedModelLocalServiceRegistry.unregister("${apiPackagePath}.model.${entity.name}");
+	<#else>
+		public void afterPropertiesSet() {
+			<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasEntityColumns() && entity.hasPersistence()>
+				<#if validator.isNotNull(pluginName)>
+					PersistedModelLocalServiceRegistryUtil.register("${apiPackagePath}.model.${entity.name}", ${entity.varName}LocalService);
+				<#else>
+					persistedModelLocalServiceRegistry.register("${apiPackagePath}.model.${entity.name}", ${entity.varName}LocalService);
+				</#if>
 			</#if>
-		</#if>
-	}
+
+			<#if stringUtil.equals(sessionTypeName, "Local") && entity.localizedEntity?? && entity.versionEntity?? && entity.hasPersistence()>
+				<#assign localizedEntity = entity.localizedEntity />
+
+				registerListener(new ${localizedEntity.name}VersionServiceListener());
+			</#if>
+		}
+
+		public void destroy() {
+			<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasEntityColumns() && entity.hasPersistence()>
+				<#if validator.isNotNull(pluginName)>
+					PersistedModelLocalServiceRegistryUtil.unregister("${apiPackagePath}.model.${entity.name}");
+				<#else>
+					persistedModelLocalServiceRegistry.unregister("${apiPackagePath}.model.${entity.name}");
+				</#if>
+			</#if>
+		}
+	</#if>
 
 	<#if stringUtil.equals(sessionTypeName, "Local") && entity.versionEntity?? && entity.hasPersistence()>
 		<#assign
@@ -1776,55 +1830,75 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 
 	<#list referenceEntities as referenceEntity>
 		<#if referenceEntity.hasLocalService()>
-			<#if osgiModule && (referenceEntity.apiPackagePath != apiPackagePath)>
-				@ServiceReference(type = ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}LocalService.class)
-			<#else>
-				@BeanReference(type = ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}LocalService.class)
-			</#if>
+			<#if !dependencyInjectorDS || (referenceEntity.apiPackagePath != apiPackagePath) || (entity == referenceEntity)>
+				<#if dependencyInjectorDS>
+					<#if !stringUtil.equals(sessionTypeName, "Local") || (entity != referenceEntity)>
+						@Reference
+					</#if>
+				<#elseif osgiModule && (referenceEntity.apiPackagePath != apiPackagePath)>
+					@ServiceReference(type = ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}LocalService.class)
+				<#else>
+					@BeanReference(type = ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}LocalService.class)
+				</#if>
 
-			<#if !classDeprecated && referenceEntity.isDeprecated()>
-				@SuppressWarnings("deprecation")
-			</#if>
+				<#if !classDeprecated && referenceEntity.isDeprecated()>
+					@SuppressWarnings("deprecation")
+				</#if>
 
-			protected ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}LocalService ${referenceEntity.varName}LocalService;
+				protected ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}LocalService ${referenceEntity.varName}LocalService;
+			</#if>
 		</#if>
 
 		<#if !stringUtil.equals(sessionTypeName, "Local") && referenceEntity.hasRemoteService()>
-			<#if osgiModule && (referenceEntity.apiPackagePath != apiPackagePath)>
-				@ServiceReference(type = ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}Service.class)
-			<#else>
-				@BeanReference(type = ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}Service.class)
-			</#if>
+			<#if !dependencyInjectorDS || (referenceEntity.apiPackagePath != apiPackagePath) || (entity == referenceEntity)>
+				<#if dependencyInjectorDS>
+					<#if entity != referenceEntity>
+						@Reference
+					</#if>
+				<#elseif osgiModule && (referenceEntity.apiPackagePath != apiPackagePath)>
+					@ServiceReference(type = ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}Service.class)
+				<#else>
+					@BeanReference(type = ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}Service.class)
+				</#if>
 
-			<#if !classDeprecated && referenceEntity.isDeprecated()>
-				@SuppressWarnings("deprecation")
-			</#if>
+				<#if !classDeprecated && referenceEntity.isDeprecated()>
+					@SuppressWarnings("deprecation")
+				</#if>
 
-			protected ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}Service ${referenceEntity.varName}Service;
+				protected ${referenceEntity.apiPackagePath}.service.${referenceEntity.name}Service ${referenceEntity.varName}Service;
+			</#if>
 		</#if>
 
 		<#if referenceEntity.hasEntityColumns() && referenceEntity.hasPersistence()>
-			<#if osgiModule && (referenceEntity.apiPackagePath != apiPackagePath)>
-				@ServiceReference(type = ${referenceEntity.name}Persistence.class)
-			<#else>
-				@BeanReference(type = ${referenceEntity.name}Persistence.class)
-			</#if>
+			<#if !dependencyInjectorDS || (referenceEntity.apiPackagePath == apiPackagePath)>
+				<#if dependencyInjectorDS>
+					@Reference
+				<#elseif osgiModule && (referenceEntity.apiPackagePath != apiPackagePath)>
+					@ServiceReference(type = ${referenceEntity.name}Persistence.class)
+				<#else>
+					@BeanReference(type = ${referenceEntity.name}Persistence.class)
+				</#if>
 
-			protected ${referenceEntity.name}Persistence ${referenceEntity.varName}Persistence;
+				protected ${referenceEntity.name}Persistence ${referenceEntity.varName}Persistence;
+			</#if>
 		</#if>
 
 		<#if referenceEntity.hasFinderClassName() && (stringUtil.equals(entity.name, "Counter") || !stringUtil.equals(referenceEntity.name, "Counter"))>
-			<#if osgiModule && (referenceEntity.apiPackagePath != apiPackagePath)>
-				@ServiceReference(type = ${referenceEntity.name}Finder.class)
-			<#else>
-				@BeanReference(type = ${referenceEntity.name}Finder.class)
-			</#if>
+			<#if !dependencyInjectorDS || (referenceEntity.apiPackagePath == apiPackagePath)>
+				<#if dependencyInjectorDS>
+					@Reference
+				<#elseif osgiModule && (referenceEntity.apiPackagePath != apiPackagePath)>
+					@ServiceReference(type = ${referenceEntity.name}Finder.class)
+				<#else>
+					@BeanReference(type = ${referenceEntity.name}Finder.class)
+				</#if>
 
-			protected ${referenceEntity.name}Finder ${referenceEntity.varName}Finder;
+				protected ${referenceEntity.name}Finder ${referenceEntity.varName}Finder;
+			</#if>
 		</#if>
 	</#list>
 
-	<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasEntityColumns() && entity.hasPersistence()>
+	<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasEntityColumns() && entity.hasPersistence() && !dependencyInjectorDS>
 		<#if validator.isNull(pluginName)>
 			<#if osgiModule>
 				@ServiceReference(type = PersistedModelLocalServiceRegistry.class)

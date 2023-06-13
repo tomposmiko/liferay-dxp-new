@@ -160,9 +160,9 @@ public class ServiceConfigurationInitializer {
 
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
-		properties.put(
-			"configuration.bundle.symbolic.name", _bundle.getSymbolicName());
 		properties.put("name", name);
+		properties.put(
+			"origin.bundle.symbolic.name", _bundle.getSymbolicName());
 
 		_serviceRegistrations.add(
 			bundleContext.registerService(

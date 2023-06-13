@@ -140,6 +140,10 @@ public class DDMStructureLayoutPersistenceTest {
 
 		newDDMStructureLayout.setStructureVersionId(RandomTestUtil.nextLong());
 
+		newDDMStructureLayout.setName(RandomTestUtil.randomString());
+
+		newDDMStructureLayout.setDescription(RandomTestUtil.randomString());
+
 		newDDMStructureLayout.setDefinition(RandomTestUtil.randomString());
 
 		_ddmStructureLayouts.add(_persistence.update(newDDMStructureLayout));
@@ -166,6 +170,10 @@ public class DDMStructureLayoutPersistenceTest {
 			Time.getShortTimestamp(newDDMStructureLayout.getModifiedDate()));
 		Assert.assertEquals(existingDDMStructureLayout.getStructureVersionId(),
 			newDDMStructureLayout.getStructureVersionId());
+		Assert.assertEquals(existingDDMStructureLayout.getName(),
+			newDDMStructureLayout.getName());
+		Assert.assertEquals(existingDDMStructureLayout.getDescription(),
+			newDDMStructureLayout.getDescription());
 		Assert.assertEquals(existingDDMStructureLayout.getDefinition(),
 			newDDMStructureLayout.getDefinition());
 	}
@@ -470,6 +478,10 @@ public class DDMStructureLayoutPersistenceTest {
 		ddmStructureLayout.setModifiedDate(RandomTestUtil.nextDate());
 
 		ddmStructureLayout.setStructureVersionId(RandomTestUtil.nextLong());
+
+		ddmStructureLayout.setName(RandomTestUtil.randomString());
+
+		ddmStructureLayout.setDescription(RandomTestUtil.randomString());
 
 		ddmStructureLayout.setDefinition(RandomTestUtil.randomString());
 

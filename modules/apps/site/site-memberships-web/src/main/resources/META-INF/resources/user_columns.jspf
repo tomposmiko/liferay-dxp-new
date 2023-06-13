@@ -38,31 +38,9 @@ names.addAll(ListUtil.toList(teams, Team.NAME_ACCESSOR));
 		%>
 
 		<liferay-ui:search-container-column-text>
-			<liferay-frontend:user-vertical-card
-				actionJsp='<%= !selectUsers ? "/user_action.jsp" : StringPool.BLANK %>'
-				actionJspServletContext="<%= application %>"
-				cssClass="entry-display-style"
-				resultRow="<%= row %>"
-				rowChecker="<%= searchContainer.getRowChecker() %>"
-				subtitle="<%= user2.getScreenName() %>"
-				title="<%= user2.getFullName() %>"
-				userId="<%= user2.getUserId() %>"
-			>
-				<c:if test="<%= !selectUsers %>">
-					<liferay-frontend:vertical-card-footer>
-						<span class="text-default">
-							<c:choose>
-								<c:when test="<%= !SetUtil.isEmpty(names) %>">
-									<%= HtmlUtil.escape(StringUtil.merge(names, StringPool.COMMA_AND_SPACE)) %>
-								</c:when>
-								<c:otherwise>
-									&nbsp;
-								</c:otherwise>
-							</c:choose>
-						</span>
-					</liferay-frontend:vertical-card-footer>
-				</c:if>
-			</liferay-frontend:user-vertical-card>
+			<clay:user-card
+				userCard="<%= new UsersUserCard(user2, !selectUsers, renderRequest, renderResponse, searchContainer.getRowChecker()) %>"
+			/>
 		</liferay-ui:search-container-column-text>
 	</c:when>
 	<c:when test='<%= displayStyle.equals("descriptive") %>'>
@@ -89,9 +67,17 @@ names.addAll(ListUtil.toList(teams, Team.NAME_ACCESSOR));
 		</liferay-ui:search-container-column-text>
 
 		<c:if test="<%= !selectUsers %>">
-			<liferay-ui:search-container-column-jsp
-				path="/user_action.jsp"
-			/>
+
+			<%
+			UserActionDropdownItemsProvider userActionDropdownItemsProvider = new UserActionDropdownItemsProvider(user2, renderRequest, renderResponse);
+			%>
+
+			<liferay-ui:search-container-column-text>
+				<clay:dropdown-actions
+					defaultEventHandler="<%= SiteMembershipWebKeys.USER_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+					dropdownItems="<%= userActionDropdownItemsProvider.getActionDropdownItems() %>"
+				/>
+			</liferay-ui:search-container-column-text>
 		</c:if>
 	</c:when>
 	<c:otherwise>
@@ -115,9 +101,16 @@ names.addAll(ListUtil.toList(teams, Team.NAME_ACCESSOR));
 				value="<%= HtmlUtil.escape(StringUtil.merge(names, StringPool.COMMA_AND_SPACE)) %>"
 			/>
 
-			<liferay-ui:search-container-column-jsp
-				path="/user_action.jsp"
-			/>
+			<%
+			UserActionDropdownItemsProvider userActionDropdownItemsProvider = new UserActionDropdownItemsProvider(user2, renderRequest, renderResponse);
+			%>
+
+			<liferay-ui:search-container-column-text>
+				<clay:dropdown-actions
+					defaultEventHandler="<%= SiteMembershipWebKeys.USER_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+					dropdownItems="<%= userActionDropdownItemsProvider.getActionDropdownItems() %>"
+				/>
+			</liferay-ui:search-container-column-text>
 		</c:if>
 	</c:otherwise>
 </c:choose>

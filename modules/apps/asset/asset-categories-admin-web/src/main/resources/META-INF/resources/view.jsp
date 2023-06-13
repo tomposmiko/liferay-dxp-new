@@ -16,25 +16,17 @@
 
 <%@ include file="/init.jsp" %>
 
+<%
+AssetVocabulariesManagementToolbarDisplayContext assetVocabulariesManagementToolbarDisplayContext = new AssetVocabulariesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, assetCategoriesDisplayContext);
+%>
+
 <clay:navigation-bar
 	inverted="<%= true %>"
 	navigationItems="<%= assetCategoriesDisplayContext.getAssetVocabulariesNavigationItems() %>"
 />
 
 <clay:management-toolbar
-	actionDropdownItems="<%= assetCategoriesDisplayContext.getVocabulariesActionItemsDropdownItems() %>"
-	clearResultsURL="<%= assetCategoriesDisplayContext.getVocabulariesClearResultsURL() %>"
-	componentId="assetVocabulariesManagementToolbar"
-	creationMenu="<%= assetCategoriesDisplayContext.isShowVocabulariesAddButton() ? assetCategoriesDisplayContext.getVocabulariesCreationMenu() : null %>"
-	disabled="<%= assetCategoriesDisplayContext.isDisabledVocabulariesManagementBar() %>"
-	filterDropdownItems="<%= assetCategoriesDisplayContext.getVocabulariesFilterItemsDropdownItems() %>"
-	itemsTotal="<%= assetCategoriesDisplayContext.getVocabulariesTotalItems() %>"
-	searchActionURL="<%= assetCategoriesDisplayContext.getVocabulariesSearchActionURL() %>"
-	searchContainerId="assetVocabularies"
-	searchFormName="searchFm"
-	sortingOrder="<%= assetCategoriesDisplayContext.getOrderByType() %>"
-	sortingURL="<%= assetCategoriesDisplayContext.getVocabulariesSortingURL() %>"
-	viewTypeItems="<%= assetCategoriesDisplayContext.getVocabulariesViewTypeItems() %>"
+	displayContext="<%= assetVocabulariesManagementToolbarDisplayContext %>"
 />
 
 <portlet:actionURL name="deleteVocabulary" var="deleteVocabularyURL">
@@ -55,6 +47,15 @@
 			keyProperty="vocabularyId"
 			modelVar="vocabulary"
 		>
+
+			<%
+			Map<String, Object> rowData = new HashMap<>();
+
+			rowData.put("actions", assetVocabulariesManagementToolbarDisplayContext.getAvailableActions(vocabulary));
+
+			row.setData(rowData);
+			%>
+
 			<portlet:renderURL var="rowURL">
 				<portlet:param name="mvcPath" value="/view_categories.jsp" />
 				<portlet:param name="vocabularyId" value="<%= String.valueOf(vocabulary.getVocabularyId()) %>" />
@@ -158,29 +159,7 @@
 	</liferay-ui:search-container>
 </aui:form>
 
-<aui:script>
-	var deleteSelectedVocabularies = function() {
-		if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-			submitForm(document.querySelector('#<portlet:namespace />fm'));
-		}
-	}
-
-	var ACTIONS = {
-		'deleteSelectedVocabularies': deleteSelectedVocabularies
-	};
-
-	Liferay.componentReady('assetVocabulariesManagementToolbar').then(
-		function(managementToolbar) {
-			managementToolbar.on(
-				['actionItemClicked'],
-				function(event) {
-					var itemData = event.data.item.data;
-
-					if (itemData && itemData.action && ACTIONS[itemData.action]) {
-						ACTIONS[itemData.action]();
-					}
-				}
-			);
-		}
-	);
-</aui:script>
+<liferay-frontend:component
+	componentId="<%= assetVocabulariesManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+	module="js/AssetVocabulariesManagementToolbarDefaultEventHandler.es"
+/>

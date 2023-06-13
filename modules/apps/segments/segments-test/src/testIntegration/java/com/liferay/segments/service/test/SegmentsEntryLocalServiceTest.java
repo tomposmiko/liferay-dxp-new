@@ -15,8 +15,10 @@
 package com.liferay.segments.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -90,7 +92,7 @@ public class SegmentsEntryLocalServiceTest {
 		Assert.assertEquals(
 			1,
 			_segmentsEntryLocalService.getSegmentsEntriesCount(
-				_group.getGroupId()));
+				_group.getGroupId(), false));
 	}
 
 	@Test(expected = SegmentsEntryKeyException.class)
@@ -99,6 +101,19 @@ public class SegmentsEntryLocalServiceTest {
 
 		SegmentsTestUtil.addSegmentsEntry(_group.getGroupId(), key);
 		SegmentsTestUtil.addSegmentsEntry(_group.getGroupId(), key);
+	}
+
+	@Test(expected = SegmentsEntryKeyException.class)
+	public void testAddSegmentsEntryWithExistingKeyInAncestorGroup()
+		throws Exception {
+
+		String key = RandomTestUtil.randomString();
+
+		SegmentsTestUtil.addSegmentsEntry(_group.getGroupId(), key);
+
+		Group childGroup = GroupTestUtil.addGroup(_group.getGroupId());
+
+		SegmentsTestUtil.addSegmentsEntry(childGroup.getGroupId(), key);
 	}
 
 	@Test
@@ -112,7 +127,7 @@ public class SegmentsEntryLocalServiceTest {
 		Assert.assertEquals(
 			0,
 			_segmentsEntryLocalService.getSegmentsEntriesCount(
-				_group.getGroupId()));
+				_group.getGroupId(), false));
 	}
 
 	@Test
@@ -126,14 +141,14 @@ public class SegmentsEntryLocalServiceTest {
 		Assert.assertEquals(
 			count,
 			_segmentsEntryLocalService.getSegmentsEntriesCount(
-				_group.getGroupId()));
+				_group.getGroupId(), false));
 
 		_segmentsEntryLocalService.deleteSegmentsEntries(_group.getGroupId());
 
 		Assert.assertEquals(
 			0,
 			_segmentsEntryLocalService.getSegmentsEntriesCount(
-				_group.getGroupId()));
+				_group.getGroupId(), false));
 	}
 
 	@Test
@@ -167,6 +182,54 @@ public class SegmentsEntryLocalServiceTest {
 
 		Assert.assertEquals(
 			segmentsEntryRels.toString(), 0, segmentsEntryRels.size());
+	}
+
+	@Test
+	public void testGetSegmentsEntriesCountWithIncludeAncestorSegmentsEntries()
+		throws Exception {
+
+		SegmentsTestUtil.addSegmentsEntry(_group.getGroupId());
+
+		Group childGroup = GroupTestUtil.addGroup(_group.getGroupId());
+
+		int segmentsEntriesCount =
+			_segmentsEntryLocalService.getSegmentsEntriesCount(
+				childGroup.getGroupId(), true);
+
+		Assert.assertTrue(segmentsEntriesCount > 0);
+
+		segmentsEntriesCount =
+			_segmentsEntryLocalService.getSegmentsEntriesCount(
+				childGroup.getGroupId(), false);
+
+		Assert.assertEquals(0, segmentsEntriesCount);
+
+		_groupLocalService.deleteGroup(childGroup);
+	}
+
+	@Test
+	public void testGetSegmentsEntriesWithIncludeAncestorSegmentsEntries()
+		throws Exception {
+
+		SegmentsEntry segmentsEntry = SegmentsTestUtil.addSegmentsEntry(
+			_group.getGroupId());
+
+		Group childGroup = GroupTestUtil.addGroup(_group.getGroupId());
+
+		List<SegmentsEntry> segmentsEntries =
+			_segmentsEntryLocalService.getSegmentsEntries(
+				childGroup.getGroupId(), true, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
+
+		Assert.assertTrue(segmentsEntries.contains(segmentsEntry));
+
+		segmentsEntries = _segmentsEntryLocalService.getSegmentsEntries(
+			childGroup.getGroupId(), false, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+
+		Assert.assertFalse(segmentsEntries.contains(segmentsEntry));
+
+		_groupLocalService.deleteGroup(childGroup);
 	}
 
 	@Test
@@ -207,7 +270,7 @@ public class SegmentsEntryLocalServiceTest {
 		Assert.assertEquals(
 			1,
 			_segmentsEntryLocalService.getSegmentsEntriesCount(
-				_group.getGroupId()));
+				_group.getGroupId(), false));
 	}
 
 	@Test(expected = SegmentsEntryKeyException.class)
@@ -230,6 +293,9 @@ public class SegmentsEntryLocalServiceTest {
 
 	@DeleteAfterTestRun
 	private Group _group;
+
+	@Inject
+	private GroupLocalService _groupLocalService;
 
 	@Inject
 	private SegmentsEntryLocalService _segmentsEntryLocalService;

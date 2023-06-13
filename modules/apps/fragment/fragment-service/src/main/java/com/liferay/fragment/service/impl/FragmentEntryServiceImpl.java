@@ -159,6 +159,21 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 	}
 
 	@Override
+	public FragmentEntry copyFragmentEntry(
+			long groupId, long fragmentEntryId, long fragmentCollectionId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_portletResourcePermission.check(
+			getPermissionChecker(), groupId,
+			FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
+
+		return fragmentEntryLocalService.copyFragmentEntry(
+			getUserId(), groupId, fragmentEntryId, fragmentCollectionId,
+			serviceContext);
+	}
+
+	@Override
 	public void deleteFragmentEntries(long[] fragmentEntriesIds)
 		throws PortalException {
 
@@ -226,7 +241,7 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 
 		return fragmentEntryPersistence.countByG_FCI_LikeN(
 			groupId, fragmentCollectionId,
-			_customSQL.keywords(name, WildcardMode.SURROUND)[0]);
+			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0]);
 	}
 
 	@Override
@@ -235,7 +250,7 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 
 		return fragmentEntryPersistence.countByG_FCI_LikeN_S(
 			groupId, fragmentCollectionId,
-			_customSQL.keywords(name, WildcardMode.SURROUND)[0], status);
+			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], status);
 	}
 
 	@Override
@@ -295,8 +310,8 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 
 		return fragmentEntryPersistence.findByG_FCI_LikeN_S(
 			groupId, fragmentCollectionId,
-			_customSQL.keywords(name, WildcardMode.SURROUND)[0], status, start,
-			end, orderByComparator);
+			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], status,
+			start, end, orderByComparator);
 	}
 
 	@Override
@@ -306,8 +321,8 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 
 		return fragmentEntryPersistence.findByG_FCI_LikeN(
 			groupId, fragmentCollectionId,
-			_customSQL.keywords(name, WildcardMode.SURROUND)[0], start, end,
-			orderByComparator);
+			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], start,
+			end, orderByComparator);
 	}
 
 	@Override

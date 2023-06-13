@@ -239,7 +239,12 @@
 <!--UPLOAD_IMAGE-->
 <tr>
 	<td>UPLOAD_IMAGE_SELECT</td>
-	<td>//label[@id='uploadImage']</td>
+	<td>//label[contains(@id,'uploadImage')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
 	<td></td>
 </tr>
 <!--CONTACT-->

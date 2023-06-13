@@ -18,7 +18,12 @@
 
 <%
 User selUser = userDisplayContext.getSelectedUser();
-List<Group> groups = userDisplayContext.getGroups();
+
+List<Group> groups = new ArrayList<>();
+
+groups.addAll(userDisplayContext.getGroups());
+groups.addAll(userDisplayContext.getInheritedSites());
+
 List<Organization> organizations = userDisplayContext.getOrganizations();
 Long[] organizationIds = UsersAdminUtil.getOrganizationIds(organizations);
 List<Role> roles = userDisplayContext.getRoles();
@@ -232,7 +237,7 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 			<span class="heading-text"><liferay-ui:message key="organization-roles" /></span>
 		</span>
 
-		<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
+		<c:if test="<%= !portletName.equals(myAccountPortletId) && (!organizations.isEmpty() || !organizationRoles.isEmpty()) %>">
 			<span class="autofit-col">
 				<span class="heading-end">
 					<liferay-ui:icon
@@ -430,7 +435,7 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 			<span class="heading-text"><liferay-ui:message key="site-roles" /></span>
 		</span>
 
-		<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
+		<c:if test="<%= !portletName.equals(myAccountPortletId) && (!groups.isEmpty() || !siteRoles.isEmpty()) %>">
 			<span class="autofit-col">
 				<span class="heading-end">
 					<liferay-ui:icon
@@ -447,7 +452,7 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 		</c:if>
 	</h3>
 
-	<c:if test="<%= organizations.isEmpty() && organizationRoles.isEmpty() %>">
+	<c:if test="<%= groups.isEmpty() && siteRoles.isEmpty() %>">
 		<div class="text-muted"><liferay-ui:message key="this-user-does-not-belong-to-a-site-to-which-a-site-role-can-be-assigned" /></div>
 	</c:if>
 

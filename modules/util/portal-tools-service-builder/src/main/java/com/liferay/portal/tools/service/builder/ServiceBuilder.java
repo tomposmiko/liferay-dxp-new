@@ -586,9 +586,9 @@ public class ServiceBuilder {
 			_uadDirName = _normalize(uadDirName);
 			_build = build;
 
-			_badTableNames = _readLines(_tplBadTableNames);
 			_badAliasNames = _readLines(_tplBadAliasNames);
 			_badColumnNames = _readLines(_tplBadColumnNames);
+			_badTableNames = _readLines(_tplBadTableNames);
 
 			_commercialPlugin = _isCommercialPlugin(Paths.get("."));
 
@@ -613,6 +613,19 @@ public class ServiceBuilder {
 			}
 
 			_compatProperties = _getCompatProperties(matcher.group(1));
+
+			Collections.addAll(
+				_badAliasNames,
+				StringUtil.split(
+					_compatProperties.getProperty("bad.alias.names.extra")));
+			Collections.addAll(
+				_badColumnNames,
+				StringUtil.split(
+					_compatProperties.getProperty("bad.column.names.extra")));
+			Collections.addAll(
+				_badTableNames,
+				StringUtil.split(
+					_compatProperties.getProperty("bad.table.names.extra")));
 
 			Element rootElement = document.getRootElement();
 
@@ -655,6 +668,35 @@ public class ServiceBuilder {
 			_autoNamespaceTables = GetterUtil.getBoolean(
 				rootElement.attributeValue("auto-namespace-tables"),
 				_autoNamespaceTables);
+
+			String dependencyInjector = rootElement.attributeValue(
+				"dependency-injector");
+
+			File springFile = new File(_springFileName);
+
+			if ((dependencyInjector != null) || !_osgiModule ||
+				isVersionLTE_7_1_0() || springFile.exists()) {
+
+				_dependencyInjectorDS = StringUtil.equalsIgnoreCase(
+					dependencyInjector, "ds");
+			}
+			else {
+				_dependencyInjectorDS = true;
+			}
+
+			if (_dependencyInjectorDS) {
+				if (isVersionLTE_7_1_0()) {
+					throw new IllegalArgumentException(
+						"Cannot use dependency-injector=\"ds\" without using " +
+							"at least DTD version 7.2.0");
+				}
+
+				if (!_osgiModule) {
+					throw new IllegalArgumentException(
+						"Cannot use dependency-injector=\"ds\" with a WAR");
+				}
+			}
+
 			_mvccEnabled = GetterUtil.getBoolean(
 				rootElement.attributeValue("mvcc-enabled"));
 
@@ -878,6 +920,8 @@ public class ServiceBuilder {
 
 				_createExceptions(exceptionList);
 
+				_createPersistenceConstants();
+
 				_createServicePropsUtil();
 				_createServletContextUtil();
 
@@ -983,8 +1027,11 @@ public class ServiceBuilder {
 		return sb.toString();
 	}
 
-	public String getCompatProperty(String key) {
-		return _compatProperties.getProperty(key);
+	public String getCompatJavaClassName(String key) {
+		return _compatProperties.getProperty(
+			StringBundler.concat(
+				"java.class.name", StringPool.OPEN_BRACKET, key,
+				StringPool.CLOSE_BRACKET));
 	}
 
 	public String getCreateMappingTableSQL(EntityMapping entityMapping)
@@ -1594,9 +1641,15 @@ public class ServiceBuilder {
 
 		if (methodName.equals("clearCache") ||
 			methodName.equals("fetchByPrimaryKeys") ||
-			methodName.equals("findWithDynamicQuery")) {
+			methodName.equals("findWithDynamicQuery") ||
+			methodName.equals("setConfiguration") ||
+			methodName.equals("setDataSource") ||
+			methodName.equals("setSessionFactory")) {
 
 			return true;
+		}
+		else if (methodName.equals("getBadColumnNames")) {
+			return !isVersionLTE_7_1_0();
 		}
 		else if (methodName.equals("findByPrimaryKey") ||
 				 methodName.equals("fetchByPrimaryKey") ||
@@ -1635,13 +1688,17 @@ public class ServiceBuilder {
 	public boolean isCustomMethod(JavaMethod method) {
 		String methodName = method.getName();
 
-		if (methodName.equals("afterPropertiesSet") ||
-			methodName.equals("clearService") || methodName.equals("destroy") ||
-			methodName.equals("equals") || methodName.equals("getClass") ||
-			methodName.equals("getService") ||
+		if (methodName.equals("activate") ||
+			methodName.equals("afterPropertiesSet") ||
+			methodName.equals("clearService") ||
+			methodName.equals("deactivate") || methodName.equals("destroy") ||
+			methodName.equals("equals") ||
+			methodName.equals("getAopInterfaces") ||
+			methodName.equals("getClass") || methodName.equals("getService") ||
 			methodName.equals("getWrappedService") ||
 			methodName.equals("hashCode") || methodName.equals("notify") ||
 			methodName.equals("notifyAll") ||
+			methodName.equals("setAopProxy") ||
 			methodName.equals("setWrappedService") ||
 			methodName.equals("toString") || methodName.equals("wait")) {
 
@@ -2459,6 +2516,7 @@ public class ServiceBuilder {
 		Map<String, Object> context = _getContext();
 
 		context.put("entity", entity);
+		context.put("persistence", Boolean.FALSE);
 
 		context = _putDeprecatedKeys(context, javaClass);
 
@@ -2874,6 +2932,22 @@ public class ServiceBuilder {
 		}
 	}
 
+	private void _createPersistenceConstants() throws Exception {
+		if (!_dependencyInjectorDS) {
+			return;
+		}
+
+		File file = new File(
+			StringBundler.concat(
+				_outputPath, "/service/persistence/impl/constants/",
+				_portletShortName, "PersistenceConstants.java"));
+
+		String content = _processTemplate(
+			_tplPersistenceConstants, _getContext());
+
+		_write(file, content, AUTHOR, _jalopySettings, _modifiedFileNames);
+	}
+
 	private void _createPersistenceImpl(Entity entity) throws Exception {
 		File file = new File(
 			StringBundler.concat(
@@ -2884,6 +2958,7 @@ public class ServiceBuilder {
 			Map<String, Object> context = _getContext();
 
 			context.put("entity", entity);
+			context.put("persistence", Boolean.TRUE);
 			context.put("referenceEntities", _mergeReferenceEntities(entity));
 
 			JavaClass modelImplJavaClass = _getJavaClass(
@@ -3219,6 +3294,16 @@ public class ServiceBuilder {
 				_implDirName, "/", StringUtil.replace(_propsUtil, '.', '/'),
 				".java"));
 
+		if (_dependencyInjectorDS) {
+			if (file.exists()) {
+				file.delete();
+
+				System.out.println("Removing " + file);
+			}
+
+			return;
+		}
+
 		Map<String, Object> context = _getContext();
 
 		int index = _propsUtil.lastIndexOf(".");
@@ -3328,13 +3413,23 @@ public class ServiceBuilder {
 			return;
 		}
 
+		File xmlFile = new File(_springFileName);
+
+		if (_dependencyInjectorDS) {
+			if (xmlFile.exists()) {
+				xmlFile.delete();
+
+				System.out.println("Removing " + xmlFile);
+			}
+
+			return;
+		}
+
 		Map<String, Object> context = _getContext();
 
 		context.put("entities", _entities);
 
 		String content = _processTemplate(_tplSpringXml, context);
-
-		File xmlFile = new File(_springFileName);
 
 		StringBundler sb = new StringBundler(11);
 
@@ -3772,15 +3867,20 @@ public class ServiceBuilder {
 			if (Validator.isNotNull(createTableSQL)) {
 				_createSQLTables(sqlFile, createTableSQL, entity, true);
 
-				List<Path> updateSQLFilePaths = _getUpdateSQLFilePaths();
+				if (GetterUtil.getBoolean(
+						_compatProperties.getProperty(
+							"update.sql.file.auto.update"))) {
 
-				for (Path updateSQLFilePath : updateSQLFilePaths) {
-					if ((updateSQLFilePath != null) &&
-						Files.exists(updateSQLFilePath)) {
+					List<Path> updateSQLFilePaths = _getUpdateSQLFilePaths();
 
-						_createSQLTables(
-							updateSQLFilePath.toFile(), createTableSQL, entity,
-							false);
+					for (Path updateSQLFilePath : updateSQLFilePaths) {
+						if ((updateSQLFilePath != null) &&
+							Files.exists(updateSQLFilePath)) {
+
+							_createSQLTables(
+								updateSQLFilePath.toFile(), createTableSQL,
+								entity, false);
+						}
 					}
 				}
 			}
@@ -4245,6 +4345,7 @@ public class ServiceBuilder {
 		context.put("apiPackagePath", _apiPackagePath);
 		context.put("author", _author);
 		context.put("beanLocatorUtil", _beanLocatorUtil);
+		context.put("dependencyInjectorDS", _dependencyInjectorDS);
 		context.put("modelHintsUtil", ModelHintsUtil.getModelHints());
 		context.put("osgiModule", _osgiModule);
 		context.put("packagePath", _packagePath);
@@ -4469,10 +4570,10 @@ public class ServiceBuilder {
 	}
 
 	private String _getCreateTableSQL(Entity entity) {
-		List<EntityColumn> regularEntityColumns =
-			entity.getRegularEntityColumns();
+		List<EntityColumn> databaseRegularEntityColumns =
+			entity.getDatabaseRegularEntityColumns();
 
-		if (regularEntityColumns.isEmpty()) {
+		if (databaseRegularEntityColumns.isEmpty()) {
 			return null;
 		}
 
@@ -4501,8 +4602,8 @@ public class ServiceBuilder {
 
 		sb.append(" (\n");
 
-		for (int i = 0; i < regularEntityColumns.size(); i++) {
-			EntityColumn entityColumn = regularEntityColumns.get(i);
+		for (int i = 0; i < databaseRegularEntityColumns.size(); i++) {
+			EntityColumn entityColumn = databaseRegularEntityColumns.get(i);
 
 			String dbName = entityColumn.getDBName();
 
@@ -4617,7 +4718,7 @@ public class ServiceBuilder {
 				sb.append(" default 0 not null");
 			}
 
-			if (((i + 1) != regularEntityColumns.size()) ||
+			if (((i + 1) != databaseRegularEntityColumns.size()) ||
 				entity.hasCompoundPK()) {
 
 				sb.append(",");
@@ -5811,12 +5912,16 @@ public class ServiceBuilder {
 
 			String finderWhere = finderElement.attributeValue("where");
 
+			String finderDBWhere = finderWhere;
+
 			if (Validator.isNotNull(finderWhere)) {
 				for (EntityColumn column : entityColumns) {
 					String name = column.getName();
 
 					finderWhere = StringUtil.replace(
 						finderWhere, name, alias + "." + name);
+					finderDBWhere = StringUtil.replace(
+						finderDBWhere, name, alias + "." + column.getDBName());
 				}
 			}
 
@@ -5863,7 +5968,7 @@ public class ServiceBuilder {
 			entityFinders.add(
 				new EntityFinder(
 					finderName, finderReturn, finderUnique, finderWhere,
-					finderDBIndex, finderEntityColumns));
+					finderDBWhere, finderDBIndex, finderEntityColumns));
 		}
 
 		List<Entity> referenceEntities = new ArrayList<>();
@@ -5989,6 +6094,49 @@ public class ServiceBuilder {
 			}
 		}
 
+		if (versioned) {
+			EntityColumn headEntityColumn = new EntityColumn(
+				"head", "head", "boolean", false, false, false, null, null,
+				null, null, true, false, false, false, false, false, null,
+				false);
+
+			headEntityColumn.setComparator("=");
+			headEntityColumn.setFinderPath(true);
+			headEntityColumn.setInterfaceColumn(false);
+
+			List<EntityColumn> databaseRegularEntityColumns =
+				entity.getDatabaseRegularEntityColumns();
+
+			databaseRegularEntityColumns.add(headEntityColumn);
+
+			List<EntityColumn> entityFinderColumns =
+				entity.getFinderEntityColumns();
+
+			entityFinderColumns.add(headEntityColumn);
+
+			Collections.sort(entityFinderColumns);
+
+			String localizedPKEntityColumn = entityElement.attributeValue(
+				"localized-pk-entity-column");
+
+			for (EntityFinder entityFinder : entityFinders) {
+				String finderName = entityFinder.getName();
+
+				if (entityFinder.isUnique() && !finderName.equals("HeadId")) {
+					if ((localizedPKEntityColumn != null) &&
+						entityFinder.hasEntityColumn(localizedPKEntityColumn)) {
+
+						continue;
+					}
+
+					List<EntityColumn> finderEntityColumns =
+						entityFinder.getEntityColumns();
+
+					finderEntityColumns.add(headEntityColumn);
+				}
+			}
+		}
+
 		return entity;
 	}
 
@@ -6087,6 +6235,11 @@ public class ServiceBuilder {
 		}
 
 		EntityColumn pkEntityColumn = pkEntityColumns.get(0);
+
+		if (entity.getVersionEntity() != null) {
+			newLocalizedEntityElement.addAttribute(
+				"localized-pk-entity-column", pkEntityColumn.getName());
+		}
 
 		newLocalizedColumnElement = newLocalizedEntityElement.addElement(
 			"column");
@@ -6941,6 +7094,7 @@ public class ServiceBuilder {
 	private Properties _compatProperties;
 	private String _currentTplName;
 	private int _databaseNameMaxLength = 30;
+	private boolean _dependencyInjectorDS;
 	private Version _dtdVersion;
 	private List<Entity> _entities;
 	private Map<String, EntityMapping> _entityMappings;
@@ -6999,6 +7153,8 @@ public class ServiceBuilder {
 	private String _tplModelSoap = _TPL_ROOT + "model_soap.ftl";
 	private String _tplModelWrapper = _TPL_ROOT + "model_wrapper.ftl";
 	private String _tplPersistence = _TPL_ROOT + "persistence.ftl";
+	private String _tplPersistenceConstants =
+		_TPL_ROOT + "persistence_constants.ftl";
 	private String _tplPersistenceImpl = _TPL_ROOT + "persistence_impl.ftl";
 	private String _tplPersistenceTest = _TPL_ROOT + "persistence_test.ftl";
 	private String _tplPersistenceUtil = _TPL_ROOT + "persistence_util.ftl";

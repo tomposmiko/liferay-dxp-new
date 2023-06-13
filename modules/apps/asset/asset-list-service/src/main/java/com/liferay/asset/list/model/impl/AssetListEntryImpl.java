@@ -102,15 +102,17 @@ public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 		boolean anyAssetType = GetterUtil.getBoolean(
 			properties.getProperty("anyAssetType", null), true);
 
-		if (!anyAssetType) {
-			long[] availableClassNameIds =
-				AssetRendererFactoryRegistryUtil.getClassNameIds(
-					getCompanyId());
+		long[] availableClassNameIds =
+			AssetRendererFactoryRegistryUtil.getClassNameIds(getCompanyId());
 
+		if (!anyAssetType) {
 			long[] classNameIds = _getClassNameIds(
 				properties, availableClassNameIds);
 
 			assetEntryQuery.setClassNameIds(classNameIds);
+		}
+		else {
+			assetEntryQuery.setClassNameIds(availableClassNameIds);
 		}
 
 		long[] classTypeIds = GetterUtil.getLongValues(

@@ -6,8 +6,8 @@ import ${apiPackagePath}.model.${entity.name};
 	import ${apiPackagePath}.service.persistence.${entity.name}PK;
 </#if>
 
-import ${serviceBuilder.getCompatProperty("HashUtil")};
-import ${serviceBuilder.getCompatProperty("StringBundler")};
+import ${serviceBuilder.getCompatJavaClassName("HashUtil")};
+import ${serviceBuilder.getCompatJavaClassName("StringBundler")};
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -29,7 +29,6 @@ import java.util.Map;
  * The cache model class for representing ${entity.name} in entity cache.
  *
  * @author ${author}
- * @see ${entity.name}
 <#if classDeprecated>
  * @deprecated ${classDeprecatedComment}
 </#if>
@@ -130,7 +129,7 @@ public class ${entity.name}CacheModel implements CacheModel<${entity.name}>, Ext
 	public ${entity.name} toEntityModel() {
 		${entity.name}Impl ${entity.varName}Impl = new ${entity.name}Impl();
 
-		<#list entity.regularEntityColumns as entityColumn>
+		<#list entity.databaseRegularEntityColumns as entityColumn>
 			<#if !stringUtil.equals(entityColumn.type, "Blob")>
 				<#if stringUtil.equals(entityColumn.type, "Date")>
 					if (${entityColumn.name} == Long.MIN_VALUE) {
@@ -169,7 +168,7 @@ public class ${entity.name}CacheModel implements CacheModel<${entity.name}>, Ext
 	public void readExternal(ObjectInput objectInput) throws
 		<#assign throwsClassNotFoundException = false />
 
-		<#list entity.regularEntityColumns as entityColumn>
+		<#list entity.databaseRegularEntityColumns as entityColumn>
 			<#if entityColumn.primitiveType>
 			<#elseif stringUtil.equals(entityColumn.type, "Date")>
 			<#elseif stringUtil.equals(entityColumn.type, "String")>
@@ -188,7 +187,7 @@ public class ${entity.name}CacheModel implements CacheModel<${entity.name}>, Ext
 
 		IOException {
 
-		<#list entity.regularEntityColumns as entityColumn>
+		<#list entity.databaseRegularEntityColumns as entityColumn>
 			<#if entityColumn.primitiveType>
 				<#assign entityColumnPrimitiveType = serviceBuilder.getPrimitiveType(entityColumn.genericizedType) />
 
@@ -223,7 +222,7 @@ public class ${entity.name}CacheModel implements CacheModel<${entity.name}>, Ext
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
-		<#list entity.regularEntityColumns as entityColumn>
+		<#list entity.databaseRegularEntityColumns as entityColumn>
 			<#if entityColumn.primitiveType>
 				<#assign entityColumnPrimitiveType = serviceBuilder.getPrimitiveType(entityColumn.genericizedType) />
 
@@ -247,7 +246,7 @@ public class ${entity.name}CacheModel implements CacheModel<${entity.name}>, Ext
 		</#list>
 	}
 
-	<#list entity.regularEntityColumns as entityColumn>
+	<#list entity.databaseRegularEntityColumns as entityColumn>
 		<#if !stringUtil.equals(entityColumn.type, "Blob")>
 			<#if stringUtil.equals(entityColumn.type, "Date")>
 				public long ${entityColumn.name};

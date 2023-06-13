@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,10 +54,13 @@ public class PoshiRunnerValidation {
 	public static void main(String[] args) throws Exception {
 		PoshiRunnerContext.readFiles();
 
-		if (PoshiScriptParserException.getExceptionCount() > 0) {
+		List<String> failingFilePaths =
+			PoshiScriptParserException.getFailingFilePaths();
+
+		if (!failingFilePaths.isEmpty()) {
 			throw new RuntimeException(
-				"Found " + PoshiScriptParserException.getExceptionCount() +
-					" Poshi Script parsing errors");
+				"Found " + failingFilePaths.size() + " Poshi Script parsing " +
+					"errors");
 		}
 
 		validate();
@@ -879,26 +883,36 @@ public class PoshiRunnerValidation {
 
 			if (requiredPropertyNames.contains(propertyName)) {
 				requiredPropertyNames.remove(propertyName);
-
-				String testCaseAvailablePropertyValues = PropsUtil.get(
-					"test.case.available.property.values[" + propertyName +
-						"]");
-
-				if (Validator.isNotNull(testCaseAvailablePropertyValues)) {
-					List<String> possiblePropertyValues = Arrays.asList(
-						StringUtil.split(testCaseAvailablePropertyValues));
-
-					validatePossiblePropertyValues(
-						propertyElement, possiblePropertyValues, filePath);
-				}
 			}
 		}
 
-		if (!requiredPropertyNames.isEmpty()) {
-			_exceptions.add(
-				new ValidationException(
-					"Missing required properties ",
-					requiredPropertyNames.toString(), "\n", filePath));
+		if (requiredPropertyNames.isEmpty()) {
+			return;
+		}
+
+		String namespace = PoshiRunnerContext.getNamespaceFromFilePath(
+			filePath);
+
+		String className = PoshiRunnerGetterUtil.getClassNameFromFilePath(
+			filePath);
+
+		String commandName = element.attributeValue("name");
+
+		String namespacedClassCommandName =
+			namespace + "." + className + "#" + commandName;
+
+		Properties properties =
+			PoshiRunnerContext.getNamespacedClassCommandNameProperties(
+				namespacedClassCommandName);
+
+		for (String requiredPropertyName : requiredPropertyNames) {
+			if (!properties.containsKey(requiredPropertyName)) {
+				_exceptions.add(
+					new ValidationException(
+						className + "#" + commandName +
+							" is missing required properties ",
+						requiredPropertyNames.toString(), "\n", filePath));
+			}
 		}
 	}
 
@@ -1325,17 +1339,28 @@ public class PoshiRunnerValidation {
 	}
 
 	protected static void validatePossiblePropertyValues(
-		Element element, List<String> possiblePropertyValues, String filePath) {
+		Element propertyElement, String filePath) {
 
-		List<String> propertyValues = Arrays.asList(
-			StringUtil.split(element.attributeValue("value")));
+		String propertyName = propertyElement.attributeValue("name");
 
-		for (String propertyValue : propertyValues) {
-			if (!possiblePropertyValues.contains(propertyValue.trim())) {
-				_exceptions.add(
-					new ValidationException(
-						element, "Invalid ", propertyValue.trim(),
-						" property value\n", filePath));
+		String testCaseAvailablePropertyValues = PropsUtil.get(
+			"test.case.available.property.values[" + propertyName + "]");
+
+		if (Validator.isNotNull(testCaseAvailablePropertyValues)) {
+			List<String> possiblePropertyValues = Arrays.asList(
+				StringUtil.split(testCaseAvailablePropertyValues));
+
+			List<String> propertyValues = Arrays.asList(
+				StringUtil.split(propertyElement.attributeValue("value")));
+
+			for (String propertyValue : propertyValues) {
+				if (!possiblePropertyValues.contains(propertyValue.trim())) {
+					_exceptions.add(
+						new ValidationException(
+							propertyElement, "Invalid property value '",
+							propertyValue.trim(), "' for property name '",
+							propertyName.trim(), "'\n", filePath));
+				}
 			}
 		}
 	}
@@ -1361,6 +1386,8 @@ public class PoshiRunnerValidation {
 					element, "Invalid property name ", propertyName, "\n",
 					filePath));
 		}
+
+		validatePossiblePropertyValues(element, filePath);
 	}
 
 	protected static void validateRequiredAttributeNames(
@@ -1477,8 +1504,6 @@ public class PoshiRunnerValidation {
 			validateRequiredChildElementName(element, "command", filePath);
 		}
 
-		validateHasRequiredPropertyElements(element, filePath);
-
 		List<String> possibleTagElementNames = Arrays.asList(
 			"command", "property", "set-up", "tear-down", "var");
 
@@ -1500,6 +1525,7 @@ public class PoshiRunnerValidation {
 					"name", "priority");
 
 				validateHasChildElements(childElement, filePath);
+				validateHasRequiredPropertyElements(childElement, filePath);
 				validatePossibleAttributeNames(
 					childElement, possibleAttributeNames, filePath);
 				validateRequiredAttributeNames(

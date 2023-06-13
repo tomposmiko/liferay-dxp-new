@@ -39,19 +39,25 @@ public class JobFactory {
 	}
 
 	public static Job newJob(String jobName) {
-		return newJob(jobName, null, null);
+		return newJob(jobName, null, null, null);
 	}
 
 	public static Job newJob(String jobName, String testSuiteName) {
-		return newJob(jobName, testSuiteName, null);
+		return newJob(jobName, testSuiteName, null, null);
 	}
 
 	public static Job newJob(
 		String jobName, String testSuiteName, String portalBranchName) {
 
-		Job job = _newJob(jobName, testSuiteName, portalBranchName);
+		return newJob(jobName, testSuiteName, portalBranchName, null);
+	}
 
-		job.readJobProperties();
+	public static Job newJob(
+		String jobName, String testSuiteName, String portalBranchName,
+		String repositoryName) {
+
+		Job job = _newJob(
+			jobName, testSuiteName, portalBranchName, repositoryName);
 
 		return job;
 	}
@@ -76,28 +82,13 @@ public class JobFactory {
 	}
 
 	private static Job _newJob(
-		String jobName, String testSuiteName, String portalBranchName) {
+		String jobName, String testSuiteName, String portalBranchName,
+		String repositoryName) {
 
 		Job job = _jobs.get(jobName);
 
 		if (job != null) {
 			return job;
-		}
-
-		if (jobName.equals("root-cause-analysis-tool")) {
-			_jobs.put(
-				jobName,
-				new RootCauseAnalysisToolJob(jobName, portalBranchName));
-
-			return _jobs.get(jobName);
-		}
-
-		if (jobName.equals("root-cause-analysis-tool-batch")) {
-			_jobs.put(
-				jobName,
-				new RootCauseAnalysisToolBatchJob(jobName, portalBranchName));
-
-			return _jobs.get(jobName);
 		}
 
 		if (jobName.equals("js-test-csv-report") ||
@@ -121,7 +112,23 @@ public class JobFactory {
 			return _jobs.get(jobName);
 		}
 
-		if (jobName.contains("test-plugins-acceptance-pullrequest(")) {
+		if (jobName.equals("root-cause-analysis-tool")) {
+			_jobs.put(
+				jobName,
+				new RootCauseAnalysisToolJob(jobName, portalBranchName));
+
+			return _jobs.get(jobName);
+		}
+
+		if (jobName.equals("root-cause-analysis-tool-batch")) {
+			_jobs.put(
+				jobName,
+				new RootCauseAnalysisToolBatchJob(jobName, portalBranchName));
+
+			return _jobs.get(jobName);
+		}
+
+		if (jobName.startsWith("test-plugins-acceptance-pullrequest(")) {
 			PluginsGitRepositoryJob pluginsGitRepositoryJob =
 				new PluginsGitRepositoryJob(jobName);
 
@@ -130,7 +137,7 @@ public class JobFactory {
 			return pluginsGitRepositoryJob;
 		}
 
-		if (jobName.contains("test-portal-acceptance-pullrequest(")) {
+		if (jobName.startsWith("test-portal-acceptance-pullrequest(")) {
 			PortalAcceptancePullRequestJob portalAcceptancePullRequestJob =
 				new PortalAcceptancePullRequestJob(jobName, testSuiteName);
 
@@ -147,7 +154,7 @@ public class JobFactory {
 			return portalAcceptancePullRequestJob;
 		}
 
-		if (jobName.contains("test-portal-acceptance-upstream(")) {
+		if (jobName.startsWith("test-portal-acceptance-upstream(")) {
 			_jobs.put(jobName, new PortalAcceptanceUpstreamJob(jobName));
 
 			return _jobs.get(jobName);
@@ -174,15 +181,17 @@ public class JobFactory {
 			return _jobs.get(jobName);
 		}
 
-		if (jobName.contains("test-portal-upstream(")) {
+		if (jobName.startsWith("test-portal-upstream(")) {
 			_jobs.put(jobName, new PortalUpstreamJob(jobName));
 
 			return _jobs.get(jobName);
 		}
 
-		if (jobName.contains("test-subrepository-acceptance-pullrequest(")) {
+		if (jobName.startsWith("test-subrepository-acceptance-pullrequest(")) {
 			_jobs.put(
-				jobName, new GitSubrepositoryAcceptancePullRequestJob(jobName));
+				jobName,
+				new SubrepositoryAcceptancePullRequestJob(
+					jobName, testSuiteName, repositoryName));
 
 			return _jobs.get(jobName);
 		}

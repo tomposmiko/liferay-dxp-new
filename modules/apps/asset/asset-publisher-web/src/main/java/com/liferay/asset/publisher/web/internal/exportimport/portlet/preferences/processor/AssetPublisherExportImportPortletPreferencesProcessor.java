@@ -113,7 +113,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
-	configurationPid = "com.liferay.asset.publisher.web.configuration.AssetPublisherWebConfiguration",
+	configurationPid = "com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration",
 	immediate = true,
 	property = "javax.portlet.name=" + AssetPublisherPortletKeys.ASSET_PUBLISHER,
 	service = ExportImportPortletPreferencesProcessor.class
@@ -155,14 +155,13 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 				portletPreferences);
 		}
 		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to update portlet preferences while exporting " +
-						portletDataContext.getPortletId(),
-					e);
-			}
+			PortletDataException pde = new PortletDataException(
+				"Unable to update portlet preferences during export", e);
 
-			return portletPreferences;
+			pde.setPortletId(AssetPublisherPortletKeys.ASSET_PUBLISHER);
+			pde.setType(PortletDataException.EXPORT_PORTLET_DATA);
+
+			throw pde;
 		}
 	}
 
@@ -181,14 +180,13 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 				portletDataContext, portletPreferences);
 		}
 		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to update portlet preferences while importing " +
-						portletDataContext.getPortletId(),
-					e);
-			}
+			PortletDataException pde = new PortletDataException(
+				"Unable to update portlet preferences during import", e);
 
-			return portletPreferences;
+			pde.setPortletId(AssetPublisherPortletKeys.ASSET_PUBLISHER);
+			pde.setType(PortletDataException.IMPORT_PORTLET_DATA);
+
+			throw pde;
 		}
 	}
 

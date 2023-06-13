@@ -5,10 +5,13 @@ create table BigDecimalEntry (
 
 create table LVEntry (
 	mvccVersion LONG default 0 not null,
+	uuid_ VARCHAR(75) null,
 	headId LONG,
 	defaultLanguageId VARCHAR(75) null,
 	lvEntryId LONG not null primary key,
-	groupId LONG
+	groupId LONG,
+	uniqueGroupKey VARCHAR(75) null,
+	head BOOLEAN
 );
 
 create table LVEntryLocalization (
@@ -18,7 +21,8 @@ create table LVEntryLocalization (
 	lvEntryId LONG,
 	languageId VARCHAR(75) null,
 	title VARCHAR(75) null,
-	content VARCHAR(75) null
+	content VARCHAR(75) null,
+	head BOOLEAN
 );
 
 create table LVEntryLocalizationVersion (
@@ -34,9 +38,11 @@ create table LVEntryLocalizationVersion (
 create table LVEntryVersion (
 	lvEntryVersionId LONG not null primary key,
 	version INTEGER,
+	uuid_ VARCHAR(75) null,
 	defaultLanguageId VARCHAR(75) null,
 	lvEntryId LONG,
-	groupId LONG
+	groupId LONG,
+	uniqueGroupKey VARCHAR(75) null
 );
 
 create table LocalizedEntry (
@@ -53,11 +59,19 @@ create table LocalizedEntryLocalization (
 	content VARCHAR(75) null
 );
 
+create table UADPartialEntry (
+	uadPartialEntryId LONG not null primary key,
+	userId LONG,
+	userName VARCHAR(75) null,
+	message VARCHAR(75) null
+);
+
 create table VersionedEntry (
 	mvccVersion LONG default 0 not null,
 	headId LONG,
 	versionedEntryId LONG not null primary key,
-	groupId LONG
+	groupId LONG,
+	head BOOLEAN
 );
 
 create table VersionedEntryVersion (

@@ -39,6 +39,15 @@ plugin services.
 >
 
 <!--
+The dependency-injector value specifies which dependency injector to use. Valid
+values are "spring" and "ds". For new OSGi modules, the default value is "ds",
+for existing modules or WARs, the default value is "spring".
+-->
+<!ATTLIST service-builder
+	dependency-injector CDATA #IMPLIED
+>
+
+<!--
 The mvcc-enabled value specifies whether or not to enable MVCC by default for
 entities to prevent lost updates. The default value is false.
 -->

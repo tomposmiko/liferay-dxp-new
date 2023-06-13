@@ -1,0 +1,9 @@
+{
+	"cssPath": "index.css",
+	"fragmentEntryKey": "card-deck-2",
+	"htmlPath": "index.html",
+	"jsPath": "index.js",
+	"name": "Card deck - 2",
+	"thumbnail": "card_deck_2.png",
+	"type": "section"
+}

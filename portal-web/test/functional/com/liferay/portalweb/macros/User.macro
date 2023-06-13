@@ -1042,7 +1042,7 @@ definition {
 
 		AssertVisible(
 			locator1 = "UsersAndOrganizationsEditUser#DETAILS_PROFILE_IMAGE",
-			key_imageName = "user_male_portrait"
+			key_imageName = "user_portrait"
 		);
 	}
 
@@ -1509,6 +1509,16 @@ definition {
 
 		if (!("${samlEnabled}" == "true")) {
 			User.loginLocalizationPG(localization = "${localization}");
+		}
+
+		if ("${samlMultiIdPs}" == "true") {
+			Select(
+				locator1 = "Select#GENERIC_SELECT_FIELD",
+				value1 = "${idpName}",
+				key_fieldLabel = "Identity Provider"
+			);
+
+			Button.click(button = "Sign In");
 		}
 
 		if ((isSet(authenticationMethod)) && ("${authenticationMethod}" == "By Screen Name")) {

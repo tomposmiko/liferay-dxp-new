@@ -14,23 +14,34 @@
 
 package com.liferay.portal.tools.rest.builder;
 
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.StringUtil_IW;
+import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.Validator_IW;
 import com.liferay.portal.tools.ArgumentsUtil;
-import com.liferay.portal.tools.rest.builder.internal.freemarker.FreeMarkerConstants;
+import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.FreeMarkerTool;
+import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaMethodSignature;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.util.FreeMarkerUtil;
+import com.liferay.portal.tools.rest.builder.internal.freemarker.util.OpenAPIUtil;
 import com.liferay.portal.tools.rest.builder.internal.util.CamelCaseUtil;
 import com.liferay.portal.tools.rest.builder.internal.util.FileUtil;
-import com.liferay.portal.tools.rest.builder.internal.yaml.ConfigYAML;
-import com.liferay.portal.tools.rest.builder.internal.yaml.OpenAPIYAML;
-import com.liferay.portal.tools.rest.builder.internal.yaml.config.Application;
-import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.Components;
-import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.Schema;
-import com.liferay.portal.tools.rest.builder.internal.yaml.util.YAMLUtil;
+import com.liferay.portal.vulcan.yaml.YAMLUtil;
+import com.liferay.portal.vulcan.yaml.config.Application;
+import com.liferay.portal.vulcan.yaml.config.ConfigYAML;
+import com.liferay.portal.vulcan.yaml.openapi.Components;
+import com.liferay.portal.vulcan.yaml.openapi.Info;
+import com.liferay.portal.vulcan.yaml.openapi.OpenAPIYAML;
+import com.liferay.portal.vulcan.yaml.openapi.Schema;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,68 +52,146 @@ public class RESTBuilder {
 	public static void main(String[] args) throws Exception {
 		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
 
-		String copyrightFileName = arguments.get("copyright.file");
-		String restConfigFileName = arguments.get("rest.config.file");
-		String restOpenAPIFileName = arguments.get("rest.openapi.file");
+		String copyrightFileName = GetterUtil.getString(
+			arguments.get("copyright.file"));
+		String restConfigDirName = GetterUtil.getString(
+			arguments.get("rest.config.dir"),
+			RESTBuilderArgs.REST_CONFIG_DIR_NAME);
 
 		try {
-			new RESTBuilder(
-				copyrightFileName, restConfigFileName, restOpenAPIFileName);
+			new RESTBuilder(copyrightFileName, restConfigDirName);
 		}
 		catch (Exception e) {
 			ArgumentsUtil.processMainException(arguments, e);
 		}
 	}
 
-	public RESTBuilder(
-			String copyrightFileName, String restConfigFileName,
-			String restOpenAPIFileName)
+	public RESTBuilder(String copyrightFileName, String restConfigDirName)
 		throws Exception {
 
-		ConfigYAML configYAML = YAMLUtil.loadConfigYAML(restConfigFileName);
+		_copyrightFileName = copyrightFileName;
 
-		OpenAPIYAML openAPIYAML = YAMLUtil.loadOpenAPIYAML(restOpenAPIFileName);
+		_configDir = new File(restConfigDirName);
 
-		Components components = openAPIYAML.getComponents();
+		File configFile = new File(_configDir, "rest-config.yaml");
 
-		Map<String, Schema> schemas = components.getSchemas();
-
-		for (Map.Entry<String, Schema> entry : schemas.entrySet()) {
-			String schemaName = entry.getKey();
-			Schema schema = entry.getValue();
-
-			_createDTOFile(configYAML, copyrightFileName, schema, schemaName);
-
-			_createResourceFile(
-				configYAML, copyrightFileName, openAPIYAML, schemaName);
-
-			_createResourceImplFile(
-				configYAML, copyrightFileName, openAPIYAML, schemaName);
+		try (InputStream is = new FileInputStream(configFile)) {
+			_configYAML = YAMLUtil.loadConfigYAML(StringUtil.read(is));
 		}
 
-		_createApplicationFile(configYAML, copyrightFileName);
+		Map<String, Object> context = new HashMap<>();
 
-		_createRESTCollectionFile(configYAML, copyrightFileName, openAPIYAML);
+		context.put("configYAML", _configYAML);
 
-		System.out.println(YAMLUtil.dump(openAPIYAML));
+		FreeMarkerTool freeMarkerTool = FreeMarkerTool.getInstance();
+
+		context.put("freeMarkerTool", freeMarkerTool);
+
+		context.put("stringUtil", StringUtil_IW.getInstance());
+		context.put("validator", Validator_IW.getInstance());
+
+		_createApplicationFile(context);
+
+		File[] files = FileUtil.getFiles(_configDir, "rest-openapi", ".yaml");
+
+		for (File file : files) {
+			OpenAPIYAML openAPIYAML = null;
+
+			try (InputStream is = new FileInputStream(file)) {
+				openAPIYAML = YAMLUtil.loadOpenAPIYAML(StringUtil.read(is));
+			}
+
+			Info info = openAPIYAML.getInfo();
+
+			if (Validator.isNull(info.getVersion())) {
+				continue;
+			}
+
+			Components components = openAPIYAML.getComponents();
+
+			Map<String, Schema> schemas = components.getSchemas();
+
+			Map<String, Schema> allSchemas = OpenAPIUtil.getAllSchemas(
+				openAPIYAML);
+
+			context.put("allSchemas", allSchemas);
+
+			context.put("openAPIYAML", openAPIYAML);
+
+			String versionDirName = OpenAPIUtil.getVersionDirName(openAPIYAML);
+
+			context.put("versionDirName", versionDirName);
+
+			_createGraphQLMutationFile(context, versionDirName);
+			_createGraphQLQueryFile(context, versionDirName);
+			_createGraphQLServletDataFile(context, versionDirName);
+			_createObjectMapperContextResolver(context, versionDirName);
+
+			for (Map.Entry<String, Schema> entry : schemas.entrySet()) {
+				String schemaName = entry.getKey();
+
+				List<JavaMethodSignature> javaMethodSignatures =
+					freeMarkerTool.getResourceJavaMethodSignatures(
+						_configYAML, openAPIYAML, schemaName, false);
+
+				if (javaMethodSignatures.isEmpty()) {
+					continue;
+				}
+
+				Schema schema = entry.getValue();
+
+				_putSchema(context, schema, schemaName);
+
+				_createBaseResourceImplFile(
+					context, schemaName, versionDirName);
+				_createPropertiesFile(context, schemaName, versionDirName);
+				_createResourceFile(context, schemaName, versionDirName);
+				_createResourceImplFile(context, schemaName, versionDirName);
+
+				if (Validator.isNotNull(_configYAML.getTestDir())) {
+					_createBaseResourceTestCaseFile(
+						context, schemaName, versionDirName);
+					_createResourceTestFile(
+						context, schemaName, versionDirName);
+				}
+			}
+
+			for (Map.Entry<String, Schema> entry : allSchemas.entrySet()) {
+				Schema schema = entry.getValue();
+				String schemaName = entry.getKey();
+
+				_putSchema(context, schema, schemaName);
+
+				_createDTOFile(context, schemaName, versionDirName);
+				_createDTOImplFile(context, schemaName, versionDirName);
+			}
+		}
+
+		FileUtil.deleteFiles(_configYAML.getApiDir(), _files);
+		FileUtil.deleteFiles(_configYAML.getImplDir(), _files);
+		FileUtil.deleteFiles(
+			_configYAML.getImplDir() + "/../resources/OSGI-INF/", _files);
+
+		if (Validator.isNotNull(_configYAML.getTestDir())) {
+			FileUtil.deleteFiles(_configYAML.getTestDir(), _files);
+		}
 	}
 
-	private File _createApplicationFile(
-			ConfigYAML configYAML, String copyrightFileName)
+	private void _createApplicationFile(Map<String, Object> context)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(configYAML.getImplDir());
+		sb.append(_configYAML.getImplDir());
 		sb.append("/");
 
-		String apiPackagePath = configYAML.getApiPackagePath();
+		String apiPackagePath = _configYAML.getApiPackagePath();
 
 		sb.append(apiPackagePath.replace('.', '/'));
 
-		sb.append("/internal/application/");
+		sb.append("/internal/jaxrs/application/");
 
-		Application application = configYAML.getApplication();
+		Application application = _configYAML.getApplication();
 
 		sb.append(application.getClassName());
 
@@ -110,161 +199,378 @@ public class RESTBuilder {
 
 		File file = new File(sb.toString());
 
-		Map<String, Object> context = new HashMap<>();
+		_files.add(file);
 
-		context.put("configYAML", configYAML);
-		context.put("stringUtil", StringUtil_IW.getInstance());
-		context.put("validator", Validator_IW.getInstance());
-
-		String content = FreeMarkerUtil.processTemplate(
-			copyrightFileName, FreeMarkerConstants.APPLICATION_FTL, context);
-
-		FileUtil.write(content, file);
-
-		return file;
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "application", context));
 	}
 
-	private File _createDTOFile(
-			ConfigYAML configYAML, String copyrightFileName, Schema schema,
-			String schemaName)
+	private void _createBaseResourceImplFile(
+			Map<String, Object> context, String schemaName,
+			String versionDirName)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(configYAML.getApiDir());
+		sb.append(_configYAML.getImplDir());
 		sb.append("/");
 
-		String apiPackagePath = configYAML.getApiPackagePath();
-
-		sb.append(apiPackagePath.replace('.', '/'));
-
-		sb.append("/dto/");
-		sb.append(schemaName);
-		sb.append(".java");
-
-		File file = new File(sb.toString());
-
-		Map<String, Object> context = new HashMap<>();
-
-		context.put("configYAML", configYAML);
-		context.put("schema", schema);
-		context.put("schemaName", schemaName);
-		context.put("stringUtil", StringUtil_IW.getInstance());
-		context.put("validator", Validator_IW.getInstance());
-
-		String content = FreeMarkerUtil.processTemplate(
-			copyrightFileName, FreeMarkerConstants.DTO_FTL, context);
-
-		FileUtil.write(content, file);
-
-		return file;
-	}
-
-	private File _createResourceFile(
-			ConfigYAML configYAML, String copyrightFileName,
-			OpenAPIYAML openAPIYAML, String schemaName)
-		throws Exception {
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(configYAML.getApiDir());
-		sb.append("/");
-
-		String apiPackagePath = configYAML.getApiPackagePath();
-
-		sb.append(apiPackagePath.replace('.', '/'));
-
-		sb.append("/resource/");
-		sb.append(schemaName);
-		sb.append("Resource.java");
-
-		File file = new File(sb.toString());
-
-		Map<String, Object> context = new HashMap<>();
-
-		context.put("configYAML", configYAML);
-		context.put("openAPIYAML", openAPIYAML);
-		context.put("schemaName", schemaName);
-		context.put("schemaPath", CamelCaseUtil.fromCamelCase(schemaName));
-		context.put("stringUtil", StringUtil_IW.getInstance());
-		context.put("validator", Validator_IW.getInstance());
-
-		String content = FreeMarkerUtil.processTemplate(
-			copyrightFileName, FreeMarkerConstants.RESOURCE_FTL, context);
-
-		FileUtil.write(content, file);
-
-		return file;
-	}
-
-	private File _createResourceImplFile(
-			ConfigYAML configYAML, String copyrightFileName,
-			OpenAPIYAML openAPIYAML, String schemaName)
-		throws Exception {
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(configYAML.getImplDir());
-		sb.append("/");
-
-		String apiPackagePath = configYAML.getApiPackagePath();
+		String apiPackagePath = _configYAML.getApiPackagePath();
 
 		sb.append(apiPackagePath.replace('.', '/'));
 
 		sb.append("/internal/resource/");
+		sb.append(versionDirName);
+		sb.append("/Base");
 		sb.append(schemaName);
 		sb.append("ResourceImpl.java");
 
 		File file = new File(sb.toString());
 
-		Map<String, Object> context = new HashMap<>();
+		_files.add(file);
 
-		context.put("configYAML", configYAML);
-		context.put("openAPIYAML", openAPIYAML);
-		context.put("schemaName", schemaName);
-		context.put("stringUtil", StringUtil_IW.getInstance());
-		context.put("validator", Validator_IW.getInstance());
-
-		String content = FreeMarkerUtil.processTemplate(
-			copyrightFileName, FreeMarkerConstants.RESOURCE_IMPL_FTL, context);
-
-		FileUtil.write(content, file);
-
-		return file;
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "base_resource_impl", context));
 	}
 
-	private File _createRESTCollectionFile(
-			ConfigYAML configYAML, String copyrightFileName,
-			OpenAPIYAML openAPIYAML)
+	private void _createBaseResourceTestCaseFile(
+			Map<String, Object> context, String schemaName,
+			String versionDirName)
 		throws Exception {
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append(configYAML.getApiDir());
+		sb.append(_configYAML.getTestDir());
 		sb.append("/");
 
-		String apiPackagePath = configYAML.getApiPackagePath();
+		String apiPackagePath = _configYAML.getApiPackagePath();
 
 		sb.append(apiPackagePath.replace('.', '/'));
 
-		sb.append("/dto/RESTCollection.java");
+		sb.append("/resource/");
+		sb.append(versionDirName);
+		sb.append("/test/Base");
+		sb.append(schemaName);
+		sb.append("ResourceTestCase.java");
 
 		File file = new File(sb.toString());
 
-		Map<String, Object> context = new HashMap<>();
+		_files.add(file);
 
-		context.put("configYAML", configYAML);
-		context.put("openAPIYAML", openAPIYAML);
-		context.put("stringUtil", StringUtil_IW.getInstance());
-		context.put("validator", Validator_IW.getInstance());
-
-		String content = FreeMarkerUtil.processTemplate(
-			copyrightFileName, FreeMarkerConstants.REST_COLLECTION_FTL,
-			context);
-
-		FileUtil.write(content, file);
-
-		return file;
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "base_resource_test_case", context));
 	}
+
+	private void _createDTOFile(
+			Map<String, Object> context, String schemaName,
+			String versionDirName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getApiDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/dto/");
+		sb.append(versionDirName);
+		sb.append("/");
+		sb.append(schemaName);
+		sb.append(".java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(_copyrightFileName, "dto", context));
+	}
+
+	private void _createDTOImplFile(
+			Map<String, Object> context, String schemaName,
+			String versionDirName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getImplDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/internal/dto/");
+		sb.append(versionDirName);
+		sb.append("/");
+		sb.append(schemaName);
+		sb.append("Impl.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "dto_impl", context));
+	}
+
+	private void _createGraphQLMutationFile(
+			Map<String, Object> context, String versionDirName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getImplDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/internal/graphql/mutation/");
+		sb.append(versionDirName);
+		sb.append("/Mutation.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "graphql_mutation", context));
+	}
+
+	private void _createGraphQLQueryFile(
+			Map<String, Object> context, String versionDirName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getImplDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/internal/graphql/query/");
+		sb.append(versionDirName);
+		sb.append("/Query.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "graphql_query", context));
+	}
+
+	private void _createGraphQLServletDataFile(
+			Map<String, Object> context, String versionDirName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getImplDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/internal/graphql/servlet/");
+		sb.append(versionDirName);
+		sb.append("/ServletDataImpl.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "graphql_servlet_data", context));
+	}
+
+	private void _createObjectMapperContextResolver(
+			Map<String, Object> context, String versionDirName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getImplDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/internal/jaxrs/context/resolver/");
+		sb.append(versionDirName);
+		sb.append("/ObjectMapperContextResolver.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "object_mapper_context_resolver", context));
+	}
+
+	private void _createPropertiesFile(
+			Map<String, Object> context, String schemaName,
+			String versionDirName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getImplDir());
+		sb.append("/../resources/OSGI-INF/liferay/rest/");
+		sb.append(versionDirName);
+		sb.append("/");
+		sb.append(CamelCaseUtil.fromCamelCase(schemaName));
+		sb.append(".properties");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file, FreeMarkerUtil.processTemplate(null, "properties", context));
+	}
+
+	private void _createResourceFile(
+			Map<String, Object> context, String schemaName,
+			String versionDirName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getApiDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/resource/");
+		sb.append(versionDirName);
+		sb.append("/");
+		sb.append(schemaName);
+		sb.append("Resource.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "resource", context));
+	}
+
+	private void _createResourceImplFile(
+			Map<String, Object> context, String schemaName,
+			String versionDirName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getImplDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/internal/resource/");
+		sb.append(versionDirName);
+		sb.append("/");
+		sb.append(schemaName);
+		sb.append("ResourceImpl.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		if (file.exists()) {
+			return;
+		}
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "resource_impl", context));
+	}
+
+	private void _createResourceTestFile(
+			Map<String, Object> context, String schemaName,
+			String versionDirName)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_configYAML.getTestDir());
+		sb.append("/");
+
+		String apiPackagePath = _configYAML.getApiPackagePath();
+
+		sb.append(apiPackagePath.replace('.', '/'));
+
+		sb.append("/resource/");
+		sb.append(versionDirName);
+		sb.append("/test/");
+		sb.append(schemaName);
+		sb.append("ResourceTest.java");
+
+		File file = new File(sb.toString());
+
+		_files.add(file);
+
+		if (file.exists()) {
+			return;
+		}
+
+		FileUtil.write(
+			file,
+			FreeMarkerUtil.processTemplate(
+				_copyrightFileName, "resource_test", context));
+	}
+
+	private void _putSchema(
+		Map<String, Object> context, Schema schema, String schemaName) {
+
+		context.put("schema", schema);
+		context.put("schemaName", schemaName);
+		context.put("schemaPath", CamelCaseUtil.fromCamelCase(schemaName));
+
+		String schemaVarName = StringUtil.lowerCaseFirstLetter(schemaName);
+
+		context.put("schemaVarName", schemaVarName);
+		context.put(
+			"schemaVarNames", TextFormatter.formatPlural(schemaVarName));
+	}
+
+	private final File _configDir;
+	private final ConfigYAML _configYAML;
+	private final String _copyrightFileName;
+	private final List<File> _files = new ArrayList<>();
 
 }

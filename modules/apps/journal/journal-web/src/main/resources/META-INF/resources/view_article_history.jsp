@@ -31,6 +31,8 @@ JournalArticle article = journalDisplayContext.getArticle();
 		<%
 		JournalHistoryDisplayContext journalHistoryDisplayContext = new JournalHistoryDisplayContext(renderRequest, renderResponse, journalDisplayContext.getArticle());
 
+		JournalHistoryManagementToolbarDisplayContext journalHistoryManagementToolbarDisplayContext = new JournalHistoryManagementToolbarDisplayContext(article, liferayPortletRequest, liferayPortletResponse, request, journalHistoryDisplayContext);
+
 		portletDisplay.setShowBackIcon(true);
 		portletDisplay.setURLBack(journalHistoryDisplayContext.getBackURL());
 
@@ -43,15 +45,7 @@ JournalArticle article = journalDisplayContext.getArticle();
 		/>
 
 		<clay:management-toolbar
-			actionDropdownItems="<%= journalHistoryDisplayContext.getActionItemsDropdownItems() %>"
-			componentId="journalHistoryManagementToolbar"
-			filterDropdownItems="<%= journalHistoryDisplayContext.getFilterItemsDropdownItems() %>"
-			itemsTotal="<%= journalHistoryDisplayContext.getTotalItems() %>"
-			searchContainerId="articleVersions"
-			showSearch="<%= false %>"
-			sortingOrder="<%= journalHistoryDisplayContext.getOrderByType() %>"
-			sortingURL="<%= journalHistoryDisplayContext.getSortingURL() %>"
-			viewTypeItems="<%= journalHistoryDisplayContext.getViewTypeItems() %>"
+			displayContext="<%= journalHistoryManagementToolbarDisplayContext %>"
 		/>
 
 		<%
@@ -72,6 +66,12 @@ JournalArticle article = journalDisplayContext.getArticle();
 				>
 
 					<%
+					Map<String, Object> rowData = new HashMap<>();
+
+					rowData.put("actions", journalHistoryManagementToolbarDisplayContext.getAvailableActions(articleVersion));
+
+					row.setData(rowData);
+
 					row.setPrimaryKey(articleVersion.getArticleId() + JournalPortlet.VERSION_SEPARATOR + articleVersion.getVersion());
 					%>
 
@@ -186,59 +186,15 @@ JournalArticle article = journalDisplayContext.getArticle();
 			</liferay-ui:search-container>
 		</aui:form>
 
-		<aui:script require='<%= npmResolvedPackageName + "/js/ElementsDefaultEventHandler.es as ElementsDefaultEventHandler" %>'>
-			Liferay.component(
-				'<%= JournalWebConstants.JOURNAL_ELEMENTS_DEFAULT_EVENT_HANDLER %>',
-				new ElementsDefaultEventHandler.default(
-					{
-						namespace: '<%= renderResponse.getNamespace() %>',
-						trashEnabled: <%= trashHelper.isTrashEnabled(scopeGroupId) %>
-					}
-				),
-				{
-					destroyOnNavigate: true,
-					portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>'
-				}
-			);
-		</aui:script>
+		<liferay-frontend:component
+			componentId="<%= JournalWebConstants.JOURNAL_ELEMENTS_DEFAULT_EVENT_HANDLER %>"
+			context="<%= journalDisplayContext.getComponentContext() %>"
+			module="js/ElementsDefaultEventHandler.es"
+		/>
 
-		<aui:script>
-			var ACTIONS = {};
-
-			<c:if test="<%= JournalArticlePermission.contains(permissionChecker, article, ActionKeys.DELETE) %>">
-				ACTIONS.deleteArticles = function() {
-					if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-version") %>')) {
-						var form = AUI.$(document.<portlet:namespace />fm);
-
-						submitForm(form, '<portlet:actionURL name="deleteArticles"><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:actionURL>');
-					}
-				};
-			</c:if>
-
-			<c:if test="<%= JournalArticlePermission.contains(permissionChecker, article, ActionKeys.EXPIRE) %>">
-				ACTIONS.expireArticles = function() {
-					if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-expire-the-selected-version") %>')) {
-						var form = AUI.$(document.<portlet:namespace />fm);
-
-						submitForm(form, '<portlet:actionURL name="expireArticles"><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:actionURL>');
-					}
-				};
-			</c:if>
-
-			Liferay.componentReady('journalHistoryManagementToolbar').then(
-				function(managementToolbar) {
-					managementToolbar.on(
-						'actionItemClicked',
-						function(event) {
-							var itemData = event.data.item.data;
-
-							if (itemData && itemData.action && ACTIONS[itemData.action]) {
-								ACTIONS[itemData.action]();
-							}
-						}
-					);
-				}
-			);
-		</aui:script>
+		<liferay-frontend:component
+			componentId="<%= journalHistoryManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+			module="js/ArticleHistoryManagementToolbarDefaultEventHandler.es"
+		/>
 	</c:otherwise>
 </c:choose>

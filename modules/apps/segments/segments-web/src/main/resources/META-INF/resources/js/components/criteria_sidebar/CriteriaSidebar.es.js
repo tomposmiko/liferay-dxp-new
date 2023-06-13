@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import CriteriaSidebarSearchBar from './CriteriaSidebarSearchBar.es';
 import CriteriaSidebarItem from './CriteriaSidebarItem.es';
 import {PROPERTY_TYPES} from '../../utils/constants.es';
+import {jsDatetoYYYYMMDD} from '../../utils/utils.es';
 
 /**
- * Returns a default value for a property provided
- *
- * @param {*} property
+ * Returns a default value for a property provided.
+ * @param {Object} property
  * @returns
  */
 function getDefaultValue(property) {
@@ -19,6 +19,9 @@ function getDefaultValue(property) {
 		defaultValue = options[0].value;
 	}
 	else if (type === PROPERTY_TYPES.DATE) {
+		defaultValue = jsDatetoYYYYMMDD((new Date()));
+	}
+	else if (type === PROPERTY_TYPES.DATE_TIME) {
 		defaultValue = (new Date()).toISOString();
 	}
 	else if (type === PROPERTY_TYPES.BOOLEAN) {
@@ -106,6 +109,7 @@ class CriteriaSidebar extends Component {
 										key={name}
 										label={label}
 										name={name}
+										propertyKey={propertyKey}
 										type={type}
 									/>
 								);

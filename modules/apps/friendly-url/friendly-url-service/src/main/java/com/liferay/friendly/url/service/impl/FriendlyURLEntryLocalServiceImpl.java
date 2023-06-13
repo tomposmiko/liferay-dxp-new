@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
-import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
@@ -350,10 +349,8 @@ public class FriendlyURLEntryLocalServiceImpl
 				Math.min(
 					maxLength - suffix.length(), normalizedUrlTitle.length()));
 
-			String decodedUrlTitle = HttpUtil.decodePath(prefix + suffix);
-
 			curUrlTitle = FriendlyURLNormalizerUtil.normalizeWithEncoding(
-				decodedUrlTitle);
+				prefix + suffix);
 		}
 
 		return curUrlTitle;
@@ -453,8 +450,8 @@ public class FriendlyURLEntryLocalServiceImpl
 		int maxLength = ModelHintsUtil.getMaxLength(
 			FriendlyURLEntryLocalization.class.getName(), "urlTitle");
 
-		String normalizedUrlTitle = FriendlyURLNormalizerUtil.normalize(
-			urlTitle);
+		String normalizedUrlTitle =
+			FriendlyURLNormalizerUtil.normalizeWithEncoding(urlTitle);
 
 		if (normalizedUrlTitle.length() > maxLength) {
 			throw new FriendlyURLLengthException(
@@ -501,7 +498,7 @@ public class FriendlyURLEntryLocalServiceImpl
 		}
 
 		for (Map.Entry<String, String> entry : urlTitleMap.entrySet()) {
-			String urlTitle = FriendlyURLNormalizerUtil.normalize(
+			String urlTitle = FriendlyURLNormalizerUtil.normalizeWithEncoding(
 				entry.getValue());
 
 			if (!urlTitle.equals(existUrlTitleMap.get(entry.getKey()))) {
@@ -518,14 +515,13 @@ public class FriendlyURLEntryLocalServiceImpl
 		throws PortalException {
 
 		for (Map.Entry<String, String> entry : urlTitleMap.entrySet()) {
-			String urlTitle = HttpUtil.decodePath(entry.getValue());
+			String normalizedUrlTitle =
+				FriendlyURLNormalizerUtil.normalizeWithEncoding(
+					entry.getValue());
 
-			if (Validator.isNull(urlTitle)) {
+			if (Validator.isNull(normalizedUrlTitle)) {
 				continue;
 			}
-
-			String normalizedUrlTitle =
-				FriendlyURLNormalizerUtil.normalizeWithEncoding(urlTitle);
 
 			FriendlyURLEntryLocalization existingFriendlyURLEntryLocalization =
 				friendlyURLEntryLocalizationPersistence.fetchByG_C_U(
@@ -535,6 +531,23 @@ public class FriendlyURLEntryLocalServiceImpl
 			if ((existingFriendlyURLEntryLocalization != null) &&
 				(existingFriendlyURLEntryLocalization.getClassPK() ==
 					classPK)) {
+
+				String existingLanguageId =
+					existingFriendlyURLEntryLocalization.getLanguageId();
+
+				if (!existingLanguageId.equals(entry.getKey())) {
+					String existingUrlTitle =
+						existingFriendlyURLEntryLocalization.getUrlTitle();
+
+					if (existingUrlTitle.equals(
+							urlTitleMap.get(existingLanguageId))) {
+
+						continue;
+					}
+
+					existingFriendlyURLEntryLocalization.setLanguageId(
+						entry.getKey());
+				}
 
 				existingFriendlyURLEntryLocalization.setFriendlyURLEntryId(
 					friendlyURLEntry.getFriendlyURLEntryId());

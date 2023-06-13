@@ -61,7 +61,9 @@ definition {
 				var siteTemplateName = "${siteType} Site";
 			}
 
-			LexiconEntry.gotoEntry(rowEntry = "${siteTemplateName}");
+			LexiconCard.clickCard(
+				card = "${siteTemplateName}"
+			);
 
 			PortletEntry.inputName(name = "${siteName}");
 
@@ -199,7 +201,10 @@ definition {
 			value1 = "Please allow me to join the Restricted Site."
 		);
 
-		Click(locator1 = "SiteMembershipsViewMembershipRequests#REPLY");
+		LexiconTable.clickEllipsisItem(
+			item = "Reply",
+			tableEntry = "${userFirstName} ${userLastName}"
+		);
 
 		Select(
 			locator1 = "SiteMembershipsViewMembershipRequests#STATUS",
@@ -216,6 +221,8 @@ definition {
 		AssertElementPresent(locator1 = "Message#SUCCESS");
 
 		Navigator.gotoNavItem(navItem = "Approved");
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "table");
 
 		AssertTextEquals(
 			locator1 = "SiteMembershipsViewMembershipRequests#USER_NAME",
@@ -290,7 +297,7 @@ definition {
 	}
 
 	macro assignOrganizationAsMemberCP {
-		var key_cardText = "${orgName}";
+		var key_card = "${orgName}";
 
 		Navigator.gotoNavItem(navItem = "Organizations");
 
@@ -298,9 +305,11 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		AssertTextEquals(locator1 = "Card#SPECIFIC_LARGE_TEXT", value1 = "${orgName}");
+		AssertTextEquals(locator1 = "LexiconCard#CARD_TITLE", value1 = "${orgName}");
 
-		Check(locator1 = "Card#SPECIFIC_CHECKBOX");
+		LexiconCard.checkCardCheckbox(
+			card = "${orgName}"
+		);
 
 		SelectFrameTop();
 
@@ -310,14 +319,16 @@ definition {
 	}
 
 	macro assignSiteRoleCP {
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Assign Site Roles",
-			rowEntry = "${resourceName}"
+		LexiconCard.clickEllipsisItem(
+			card = "${resourceName}",
+			item = "Assign Site Roles"
 		);
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		Check(locator1 = "Card#SPECIFIC_CHECKBOX", key_cardText = "${roleTitle}");
+		LexiconCard.checkCardCheckbox(
+			card = "${roleTitle}"
+		);
 
 		SelectFrameTop();
 
@@ -369,21 +380,15 @@ definition {
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
 		if (isSet(userMiddleName)) {
-			AssertTextEquals(
-				locator1 = "Card#SPECIFIC_LARGE_TEXT",
-				value1 = "${userFirstName} ${userMiddleName} ${userLastName}"
+			LexiconCard.checkCardCheckbox(
+				card = "${userFirstName} ${userMiddleName} ${userLastName}"
 			);
 		}
 		else {
-			AssertTextEquals(
-				locator1 = "Card#SPECIFIC_LARGE_TEXT",
-				value1 = "${userFirstName} ${userLastName}"
+			LexiconCard.checkCardCheckbox(
+				card = "${userFirstName} ${userLastName}"
 			);
 		}
-
-		AssertTextEquals(locator1 = "Card#SPECIFIC_TEXT", value1 = "${userScreenName}");
-
-		Check(locator1 = "Card#SPECIFIC_CHECKBOX");
 
 		SelectFrameTop();
 
@@ -544,9 +549,10 @@ definition {
 			value1 = "${siteName}"
 		);
 
-		LexiconEntry.openEntryMenu(rowEntry = "${siteName}");
-
-		MenuItem.clickNoError(menuItem = "Deactivate");
+		LexiconTable.clickEllipsisItem(
+			item = "Deactivate",
+			tableEntry = "${siteName}"
+		);
 
 		AssertConfirm(value1 = "Are you sure you want to deactivate this?");
 
@@ -681,10 +687,8 @@ definition {
 	}
 
 	macro gotoSiteViaMySitesPG {
-		AssertClick(
-			locator1 = "ListGroupItem#ITEM_NAME_LINK",
-			value1 = "${siteName}",
-			key_itemName = "${siteName}"
+		LexiconList.clickListEntryTitle(
+			listEntry = "${siteName}"
 		);
 	}
 
@@ -733,27 +737,23 @@ definition {
 		Pause(locator1 = "3000");
 
 		if ("${membershipType}" == "Private") {
-			AssertElementNotPresent(
-				locator1 = "ListGroupItem#ITEM_NAME",
-				key_itemName = "${siteName}"
+			LexiconList.viewListEntryNotPresent(
+				listEntry = "${siteName}"
 			);
 		}
 		else if ("${membershipType}" == "Restricted") {
-			AssertTextEquals(
-				locator1 = "ListGroupItem#ITEM_NAME",
-				value1 = "${siteName}",
-				key_itemName = "${siteName}"
+			LexiconList.viewListEntryTitle(
+				listEntry = "${siteName}"
 			);
 
-			AssertTextEquals(
-				locator1 = "ListGroupItem#ITEM_SUB_INFO",
-				value1 = "Members: 1",
-				key_itemName = "${siteName}"
+			LexiconList.viewListEntrySubtitle(
+				listEntry = "${siteName}",
+				listEntrySubtitle = "Members: 1"
 			);
 
-			LexiconEntry.gotoEntryMenuItem(
-				menuItem = "Request Membership",
-				rowEntry = "${siteName}"
+			LexiconList.clickEllipsisItem(
+				item = "Request Membership",
+				listEntry = "${siteName}"
 			);
 
 			Type(
@@ -770,35 +770,34 @@ definition {
 			MySites.viewMembershipRequested(siteName = "${siteName}");
 		}
 		else {
-			AssertTextEquals(
-				locator1 = "ListGroupItem#ITEM_NAME",
-				value1 = "${siteName}",
-				key_itemName = "${siteName}"
+			LexiconList.viewListEntryTitle(
+				listEntry = "${siteName}"
 			);
 
-			AssertTextEquals(
-				locator1 = "ListGroupItem#ITEM_SUB_INFO",
-				value1 = "Members: 1",
-				key_itemName = "${siteName}"
+			LexiconList.viewListEntrySubtitle(
+				listEntry = "${siteName}",
+				listEntrySubtitle = "Members: 1"
 			);
 
-			LexiconEntry.gotoEntryMenuItem(menuItem = "Join", rowEntry = "${siteName}");
+			LexiconList.clickEllipsisItem(
+				item = "Join",
+				listEntry = "${siteName}"
+			);
 
 			Alert.viewSuccessMessage();
 
-			AssertTextEquals(
-				locator1 = "ListGroupItem#ITEM_NAME",
-				value1 = "${siteName}",
-				key_itemName = "${siteName}"
+			LexiconList.viewListEntryTitle(
+				listEntry = "${siteName}"
 			);
 
-			AssertTextEquals(
-				locator1 = "ListGroupItem#ITEM_SUB_INFO",
-				value1 = "Members: 2",
-				key_itemName = "${siteName}"
+			LexiconList.viewListEntrySubtitle(
+				listEntry = "${siteName}",
+				listEntrySubtitle = "Members: 2"
 			);
 
-			LexiconEntry.openEntryMenu(rowEntry = "${siteName}");
+			LexiconList.clickEllipsis(
+				listEntry = "${siteName}"
+			);
 
 			AssertVisible(
 				locator1 = "MenuItem#ANY_MENU_ITEM",
@@ -809,49 +808,45 @@ definition {
 	}
 
 	macro leaveViaMySitesPG {
-		AssertTextEquals(
-			locator1 = "ListGroupItem#ITEM_NAME",
-			value1 = "${siteName}",
-			key_itemName = "${siteName}"
+		LexiconList.viewListEntryTitle(
+			listEntry = "${siteName}"
 		);
 
-		AssertTextEquals(
-			locator1 = "ListGroupItem#ITEM_SUB_INFO",
-			value1 = "Members: 2",
-			key_itemName = "${siteName}"
+		LexiconList.viewListEntrySubtitle(
+			listEntry = "${siteName}",
+			listEntrySubtitle = "Members: 2"
 		);
 
 		Navigator.gotoNavItem(navItem = "Available Sites");
 
-		AssertTextEquals(
-			locator1 = "ListGroupItem#ITEM_NAME",
-			value1 = "${siteName}",
-			key_itemName = "${siteName}"
+		LexiconList.viewListEntryTitle(
+			listEntry = "${siteName}"
 		);
 
-		AssertTextEquals(
-			locator1 = "ListGroupItem#ITEM_SUB_INFO",
-			value1 = "Members: 2",
-			key_itemName = "${siteName}"
+		LexiconList.viewListEntrySubtitle(
+			listEntry = "${siteName}",
+			listEntrySubtitle = "Members: 2"
 		);
 
-		LexiconEntry.gotoEntryMenuItem(menuItem = "Leave", rowEntry = "${siteName}");
+		LexiconList.clickEllipsisItem(
+			item = "Leave",
+			listEntry = "${siteName}"
+		);
 
 		Alert.viewSuccessMessage();
 
-		AssertTextEquals(
-			locator1 = "ListGroupItem#ITEM_NAME",
-			value1 = "${siteName}",
-			key_itemName = "${siteName}"
+		LexiconList.viewListEntryTitle(
+			listEntry = "${siteName}"
 		);
 
-		AssertTextEquals(
-			locator1 = "ListGroupItem#ITEM_SUB_INFO",
-			value1 = "Members: 1",
-			key_itemName = "${siteName}"
+		LexiconList.viewListEntrySubtitle(
+			listEntry = "${siteName}",
+			listEntrySubtitle = "Members: 1"
 		);
 
-		LexiconEntry.openEntryMenu(rowEntry = "${siteName}");
+		LexiconList.clickEllipsis(
+			listEntry = "${siteName}"
+		);
 
 		AssertVisible(
 			locator1 = "MenuItem#ANY_MENU_ITEM",
@@ -932,28 +927,27 @@ definition {
 		Search.searchCP(searchTerm = "${userScreenName}");
 
 		if (isSet(userMiddleName)) {
-			AssertTextEquals.assertPartialText(
-				locator1 = "Card#SPECIFIC_LARGE_TEXT",
-				value1 = "${userFirstName} ${userMiddleName} ${userLastName}"
+			LexiconCard.viewCardTitle(
+				card = "${userFirstName} ${userMiddleName} ${userLastName}"
 			);
 		}
 		else {
-			AssertTextEquals.assertPartialText(
-				locator1 = "Card#SPECIFIC_LARGE_TEXT",
-				value1 = "${userFirstName} ${userLastName}"
+			LexiconCard.viewCardTitle(
+				card = "${userFirstName} ${userLastName}"
 			);
 		}
 
-		AssertTextEquals(locator1 = "Card#SPECIFIC_TEXT", value1 = "${userScreenName}");
-
-		LexiconEntry.gotoEntryMenuItemNoError(
-			menuItem = "Remove Membership",
-			rowEntry = "${userScreenName}"
+		LexiconCard.viewCardSubtitle(
+			card = "${userFirstName} ${userLastName}",
+			cardSubtitle = "${userScreenName}"
 		);
 
-		AssertConfirm.waitForConfirmation(
-			value1 = "Are you sure you want to delete this? It will be deleted immediately."
+		LexiconCard.clickEllipsisItem(
+			card = "${userScreenName}",
+			item = "Remove Membership"
 		);
+
+		Confirm();
 
 		Alert.viewSuccessMessage();
 	}
@@ -1022,7 +1016,9 @@ definition {
 			AssertElementPresent(locator1 = "Message#EMPTY_INFO");
 		}
 		else {
-			LexiconEntry.viewEntryName(rowEntry = StringUtil.unquote("${searchValue}"));
+			LexiconCard.viewCardTitle(
+				card = StringUtil.unquote("${searchValue}")
+			);
 		}
 	}
 
@@ -1158,9 +1154,17 @@ definition {
 			);
 		}
 
-		AssertTextEquals(locator1 = "Sites#SITE_TABLE_ACTIVE", value1 = "Yes");
+		AssertTextEquals(
+			locator1 = "LexiconTable#TABLE_ENTRY_TEXT",
+			value1 = "Yes",
+			key_tableEntry = "${siteName}",
+			key_tableEntryText = "Yes"
+		);
 
-		AssertElementPresent(locator1 = "Sites#SITE_TABLE_ACTIONS");
+		AssertVisible(
+			locator1 = "LexiconTable#TABLE_ENTRY_ELLIPSIS",
+			key_tableEntry = "${siteName}"
+		);
 	}
 
 	macro viewCurrentLanguagesCP {
@@ -1239,18 +1243,23 @@ definition {
 	}
 
 	macro viewMemberCP {
-		var key_cardText = "${userScreenName}";
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Card#SPECIFIC_LARGE_TEXT",
-			value1 = "${userFirstName} ${userLastName}"
+		LexiconCard.viewCardPresent(
+			card = "${userFirstName} ${userLastName}"
 		);
 
-		AssertTextEquals(locator1 = "Card#SPECIFIC_TEXT", value1 = "${userScreenName}");
+		LexiconCard.viewCardTitle(
+			card = "${userFirstName} ${userLastName}"
+		);
 
-		var key_rowEntry = "${key_cardText}";
+		LexiconCard.viewCardSubtitle(
+			card = "${userFirstName} ${userLastName}",
+			cardSubtitle = "${userScreenName}"
+		);
 
-		AssertVisible(locator1 = "Icon#ROW_VERTICAL_ELLIPSIS");
+		AssertVisible(
+			locator1 = "LexiconCard#CARD_ELLIPSIS",
+			key_card = "${userFirstName} ${userLastName}"
+		);
 	}
 
 	macro viewMemberListCP {
@@ -1266,12 +1275,12 @@ definition {
 	}
 
 	macro viewMemberOrganizationCP {
-		var key_cardText = "${orgName}";
+		var key_card = "${orgName}";
 
 		Navigator.gotoNavItem(navItem = "Organizations");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "Card#SPECIFIC_LARGE_TEXT",
+			locator1 = "LexiconCard#CARD_TITLE",
 			value1 = "${orgName}"
 		);
 
@@ -1302,33 +1311,19 @@ definition {
 			key_navItem = "My Sites"
 		);
 
-		AssertTextEquals(
-			locator1 = "ListGroupItem#ITEM_NAME",
-			value1 = "${siteName}",
-			key_itemName = "${siteName}"
+		LexiconList.viewListEntryTitle(
+			listEntry = "${siteName}"
 		);
 
-		AssertTextEquals(
-			locator1 = "ListGroupItem#ITEM_SUB_INFO",
-			value1 = "Members: ${memberCount}",
-			key_itemName = "${siteName}"
+		LexiconList.viewListEntrySubtitle(
+			listEntry = "${siteName}",
+			listEntrySubtitle = "Members: ${memberCount}"
 		);
 	}
 
 	macro viewNoMySitesViaMySitesPG {
-		AssertElementNotPresent(
-			locator1 = "ListGroupItem#ITEM_NAME",
-			key_itemName = "${siteName}"
-		);
-
-		AssertElementNotPresent(
-			locator1 = "ListGroupItem#ITEM_SUB_INFO",
-			key_itemName = "${siteName}"
-		);
-
-		AssertElementNotPresent(
-			locator1 = "Icon#ROW_VERTICAL_ELLIPSIS",
-			key_rowEntry = "${siteName}"
+		LexiconList.viewListEntryNotPresent(
+			listEntry = "${siteName}"
 		);
 	}
 
@@ -1368,18 +1363,29 @@ definition {
 	macro viewSearchResultsCP {
 		var key_siteName = "${siteName}";
 
-		AssertElementPresent(locator1 = "Sites#SITE_TABLE_CHECKBOX");
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Sites#SITE_TABLE_NAME",
-			value1 = "${siteName}"
+		AssertElementPresent(
+			locator1 = "LexiconTable#TABLE_ENTRY_CHECKBOX",
+			key_tableEntry = "${siteName}"
 		);
 
-		AssertTextEquals(locator1 = "Sites#SITE_TABLE_TYPE", value1 = "${siteType}");
+		LexiconTable.viewTableEntryTitle(
+			tableEntry = "${siteName}"
+		);
 
-		AssertTextEquals(locator1 = "Sites#SITE_TABLE_ACTIVE", value1 = "Yes");
+		LexiconTable.viewTableEntryText(
+			tableEntry = "${siteName}",
+			tableEntryText = "${siteType}"
+		);
 
-		AssertVisible(locator1 = "Sites#SITE_TABLE_ACTIONS");
+		LexiconTable.viewTableEntryText(
+			tableEntry = "${siteName}",
+			tableEntryText = "Yes"
+		);
+
+		AssertVisible(
+			locator1 = "LexiconTable#TABLE_ENTRY_ELLIPSIS",
+			key_tableEntry = "${siteName}"
+		);
 	}
 
 	macro viewSiteAdminPermissionsCP {

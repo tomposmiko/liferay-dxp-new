@@ -168,6 +168,14 @@ String navigation = ParamUtil.getString(request, "navigation");
 				}
 			}
 		}
+
+		PortletURL selectCategoriesURL = PortletProviderUtil.getPortletURL(request, AssetCategory.class.getName(), PortletProvider.Action.BROWSE);
+
+		selectCategoriesURL.setParameter("eventName", liferayPortletResponse.getNamespace() + "selectCategories");
+		selectCategoriesURL.setParameter("selectedCategories", "{selectedCategories}");
+		selectCategoriesURL.setParameter("singleSelect", "{singleSelect}");
+		selectCategoriesURL.setParameter("vocabularyIds", "{vocabularyIds}");
+		selectCategoriesURL.setWindowState(LiferayWindowState.POP_UP);
 		%>
 
 		<aui:script>
@@ -228,9 +236,9 @@ String navigation = ParamUtil.getString(request, "navigation");
 						},
 						maxFileSize: <%= dlConfiguration.fileMaxSize() %>,
 						moveEntryUrl: '<portlet:renderURL><portlet:param name="mvcRenderCommandName" value="/document_library/move_entry" /><portlet:param name="redirect" value="<%= currentURL %>" /><portlet:param name="newFolderId" value="<%= String.valueOf(folderId) %>" /></portlet:renderURL>',
-						editTagsUrl: '<portlet:renderURL><portlet:param name="mvcRenderCommandName" value="/document_library/edit_tags" /><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:renderURL>',
 						namespace: '<portlet:namespace />',
 						npmResolvedPackageName: '<%= npmResolvedPackageName %>',
+						pathModule: '<%= PortalUtil.getPathModule() %>',
 						portletId: '<%= HtmlUtil.escapeJS(portletId) %>',
 						redirect: encodeURIComponent('<%= currentURL %>'),
 						repositories: [
@@ -255,6 +263,7 @@ String navigation = ParamUtil.getString(request, "navigation");
 							%>
 
 						],
+						selectCategoriesURL: '<%= selectCategoriesURL.toString() %>',
 						selectFileEntryTypeURL: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/document_library/select_file_entry_type.jsp" /><portlet:param name="fileEntryTypeId" value="<%= String.valueOf(fileEntryTypeId) %>" /></portlet:renderURL>',
 						scopeGroupId: <%= scopeGroupId %>,
 						searchContainerId: 'entries',

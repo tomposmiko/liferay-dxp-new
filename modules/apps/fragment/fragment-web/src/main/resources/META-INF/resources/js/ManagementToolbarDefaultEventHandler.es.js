@@ -1,8 +1,8 @@
 import OpenSimpleInputModal from 'frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es';
-import PortletBase from 'frontend-js-web/liferay/PortletBase.es';
+import DefaultEventHandler from 'frontend-js-web/liferay/DefaultEventHandler.es';
 import {Config} from 'metal-state';
 
-class ManagementToolbarDefaultEventHandler extends PortletBase {
+class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 	addFragmentEntry(itemData) {
 		OpenSimpleInputModal(
 			{
@@ -17,12 +17,16 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 		);
 	}
 
-	callAction(event) {
-		var itemData = event.data.item.data;
+	copySelectedFragmentEntries() {
+		const fragmentEntryIds = Liferay.Util.listCheckedExcept(
+			this.one('#fm'),
+			this.ns('allRowIds')
+		);
 
-		if (itemData && itemData.action && this[itemData.action]) {
-			this[itemData.action](itemData);
-		}
+		this.one('#fragmentCollectionId').value = this.fragmentCollectionId;
+		this.one('#fragmentEntryIds').value = fragmentEntryIds;
+
+		submitForm(this.one('#fragmentEntryFm'), this.copyFragmentEntryURL);
 	}
 
 	deleteSelectedFragmentEntries() {
@@ -33,14 +37,6 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 
 	exportSelectedFragmentEntries() {
 		submitForm(this.one('#fm'), this.exportFragmentEntriesURL);
-	}
-
-	handleActionItemClicked(event) {
-		this.callAction(event);
-	}
-
-	handleCreationMenuItemClicked(event) {
-		this.callAction(event);
 	}
 
 	moveSelectedFragmentEntries() {
@@ -66,7 +62,7 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 					this.one('#fragmentCollectionId').value = selectedItem.id;
 					this.one('#fragmentEntryIds').value = fragmentEntryIds;
 
-					submitForm(this.one('#moveFragmentEntryFm'));
+					submitForm(this.one('#fragmentEntryFm'), this.moveFragmentEntryURL);
 				}
 			}.bind(this)
 		);
@@ -74,9 +70,11 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 }
 
 ManagementToolbarDefaultEventHandler.STATE = {
+	copyFragmentEntryURL: Config.string(),
 	deleteFragmentEntriesURL: Config.string(),
 	exportFragmentEntriesURL: Config.string(),
-	namespace: Config.string(),
+	fragmentCollectionId: Config.string(),
+	moveFragmentEntryURL: Config.string(),
 	selectFragmentCollectionURL: Config.string(),
 	spritemap: Config.string()
 };

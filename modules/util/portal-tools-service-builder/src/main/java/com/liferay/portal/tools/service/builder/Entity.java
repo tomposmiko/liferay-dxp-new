@@ -162,6 +162,14 @@ public class Entity implements Comparable<Entity> {
 			sessionFactory, _SESSION_FACTORY_DEFAULT);
 		_txManager = GetterUtil.getString(txManager, _TX_MANAGER_DEFAULT);
 
+		if (_entityColumns == null) {
+			_databaseRegularEntityColumns = null;
+		}
+		else {
+			_databaseRegularEntityColumns = new ArrayList<>(
+				regularEntityColumns);
+		}
+
 		if (_entityFinders != null) {
 			Set<EntityColumn> finderEntityColumns = new HashSet<>();
 
@@ -288,6 +296,10 @@ public class Entity implements Comparable<Entity> {
 	public String getConstantName() {
 		return TextFormatter.format(
 			TextFormatter.format(_name, TextFormatter.H), TextFormatter.A);
+	}
+
+	public List<EntityColumn> getDatabaseRegularEntityColumns() {
+		return _databaseRegularEntityColumns;
 	}
 
 	public String getDataSource() {
@@ -1239,6 +1251,7 @@ public class Entity implements Comparable<Entity> {
 	private final boolean _cacheEnabled;
 	private final List<EntityColumn> _collectionEntityColumns;
 	private final boolean _containerModel;
+	private final List<EntityColumn> _databaseRegularEntityColumns;
 	private final String _dataSource;
 	private final boolean _deprecated;
 	private final boolean _dynamicUpdateEnabled;

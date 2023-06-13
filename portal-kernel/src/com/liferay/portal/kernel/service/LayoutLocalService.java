@@ -59,8 +59,6 @@ import java.util.Map;
  *
  * @author Brian Wing Shun Chan
  * @see LayoutLocalServiceUtil
- * @see com.liferay.portal.service.base.LayoutLocalServiceBaseImpl
- * @see com.liferay.portal.service.impl.LayoutLocalServiceImpl
  * @generated
  */
 @ProviderType
@@ -71,7 +69,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
-	 * Never modify or reference this interface directly. Always use {@link LayoutLocalServiceUtil} to access the layout local service. Add custom service methods to {@link com.liferay.portal.service.impl.LayoutLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * Never modify or reference this interface directly. Always use {@link LayoutLocalServiceUtil} to access the layout local service. Add custom service methods to <code>com.liferay.portal.service.impl.LayoutLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 
 	/**
@@ -96,7 +94,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	* @param userId the primary key of the user
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout (optionally
+	* @param parentLayoutId the layout ID of the parent layout (optionally
 	{@link LayoutConstants#DEFAULT_PARENT_LAYOUT_ID})
 	* @param nameMap the layout's locales and localized names
 	* @param titleMap the layout's locales and localized titles
@@ -152,7 +150,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	* @param userId the primary key of the user
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout (optionally
+	* @param parentLayoutId the layout ID of the parent layout (optionally
 	{@link LayoutConstants#DEFAULT_PARENT_LAYOUT_ID})
 	* @param nameMap the layout's locales and localized names
 	* @param titleMap the layout's locales and localized titles
@@ -208,7 +206,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	* @param userId the primary key of the user
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout (optionally
+	* @param parentLayoutId the layout ID of the parent layout (optionally
 	{@link LayoutConstants#DEFAULT_PARENT_LAYOUT_ID}). The possible
 	values can be found in {@link LayoutConstants}.
 	* @param name the layout's name (optionally {@link
@@ -261,7 +259,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	* @param userId the primary key of the user
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout (optionally
+	* @param parentLayoutId the layout ID of the parent layout (optionally
 	{@link LayoutConstants#DEFAULT_PARENT_LAYOUT_ID}). The possible
 	values can be found in {@link LayoutConstants}.
 	* @param name the layout's name (optionally {@link
@@ -342,12 +340,12 @@ public interface LayoutLocalService extends BaseLocalService,
 	public Layout deleteLayout(long plid) throws PortalException;
 
 	/**
-	* Deletes the layout with the primary key, also deleting the layout's child
+	* Deletes the layout with the layout ID, also deleting the layout's child
 	* layouts, and associated resources.
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param serviceContext the service context to be applied
 	* @throws PortalException if a portal exception occurred
 	*/
@@ -403,7 +401,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	* Performs a dynamic query on the database and returns a range of the matching rows.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.LayoutModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param dynamicQuery the dynamic query
@@ -419,7 +417,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	* Performs a dynamic query on the database and returns an ordered range of the matching rows.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.LayoutModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param dynamicQuery the dynamic query
@@ -453,11 +451,11 @@ public interface LayoutLocalService extends BaseLocalService,
 		Projection projection);
 
 	/**
-	* Exports layouts with the primary keys and criteria as a byte array.
+	* Exports layouts with the layout IDs and criteria as a byte array.
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutIds the primary keys of the layouts to be exported
+	* @param layoutIds the layout IDs of the layouts to be exported
 	* @param parameterMap the mapping of parameters indicating which
 	information to export. For information on the keys used in
 	the map see {@link
@@ -505,11 +503,11 @@ public interface LayoutLocalService extends BaseLocalService,
 		throws PortalException;
 
 	/**
-	* Exports the layouts that match the primary keys and criteria as a file.
+	* Exports the layouts that match the layout IDs and criteria as a file.
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutIds the primary keys of the layouts to be exported
+	* @param layoutIds the layout IDs of the layouts to be exported
 	(optionally <code>null</code>)
 	* @param parameterMap the mapping of parameters indicating which
 	information to export. For information on the keys used in
@@ -786,12 +784,12 @@ public interface LayoutLocalService extends BaseLocalService,
 	public Layout getLayout(long plid) throws PortalException;
 
 	/**
-	* Returns the layout matching the primary key, group, and privacy; throws a
+	* Returns the layout matching the layout ID, group, and privacy; throws a
 	* {@link NoSuchLayoutException} otherwise.
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @return the matching layout
 	* @throws PortalException if a portal exception occurred
 	*/
@@ -824,15 +822,24 @@ public interface LayoutLocalService extends BaseLocalService,
 	public Layout getLayoutByUuidAndGroupId(String uuid, long groupId,
 		boolean privateLayout) throws PortalException;
 
+	/**
+	* @deprecated As of Judson (7.1.x), replaced by {@link
+	#getLayoutChildLayouts(List)}
+	*/
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Map<Long, List<Layout>> getLayoutChildLayouts(LayoutSet layoutSet,
+		List<Layout> parentLayouts);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Map<Long, List<Layout>> getLayoutChildLayouts(
 		List<Layout> parentLayouts);
 
 	/**
 	* Returns a range of all the layouts.
 	*
 	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.LayoutModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>com.liferay.portal.model.impl.LayoutModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
 	* </p>
 	*
 	* @param start the lower bound of the range of layouts
@@ -877,7 +884,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout
+	* @param parentLayoutId the layout ID of the parent layout
 	* @return the matching layouts, or <code>null</code> if no matches were
 	found
 	*/
@@ -900,7 +907,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout
+	* @param parentLayoutId the layout ID of the parent layout
 	* @param incomplete whether the layout is incomplete
 	* @param start the lower bound of the range of layouts
 	* @param end the upper bound of the range of layouts (not inclusive)
@@ -926,7 +933,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout
+	* @param parentLayoutId the layout ID of the parent layout
 	* @param start the lower bound of the range of layouts
 	* @param end the upper bound of the range of layouts (not inclusive)
 	* @param obc the comparator to order the layouts
@@ -944,7 +951,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutIds the primary keys of the layouts
+	* @param layoutIds the layout IDs of the layouts
 	* @return the matching layouts, or an empty list if no matches were found
 	* @throws PortalException if a portal exception occurred
 	*/
@@ -984,6 +991,20 @@ public interface LayoutLocalService extends BaseLocalService,
 		String keywords, String[] types, int start, int end,
 		OrderByComparator<Layout> obc) throws PortalException;
 
+	/**
+	* Returns a range of all the layouts belonging to the group.
+	*
+	* @param groupId the primary key of the group
+	* @param start the lower bound of the range of layouts
+	* @param end the upper bound of the range of layouts (not inclusive)
+	* @param obc the comparator to order the layouts
+	* @return the matching layouts, or <code>null</code> if no matches were
+	found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Layout> getLayouts(long groupId, int start, int end,
+		OrderByComparator<Layout> obc);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Layout> getLayouts(long groupId, long leftPlid, long rightPlid,
 		boolean privateLayout, int start, int end, OrderByComparator<Layout> obc);
@@ -1001,6 +1022,23 @@ public interface LayoutLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public LayoutReference[] getLayouts(long companyId, String portletId,
 		String preferencesKey, String preferencesValue);
+
+	/**
+	* Returns a range of all the layouts belonging to the group.
+	*
+	* @param groupId the primary key of the group
+	* @param keywords keywords
+	* @param types layout types
+	* @param start the lower bound of the range of layouts
+	* @param end the upper bound of the range of layouts (not inclusive)
+	* @param obc the comparator to order the layouts
+	* @return the matching layouts, or <code>null</code> if no matches were
+	found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Layout> getLayouts(long groupId, String keywords,
+		String[] types, int start, int end, OrderByComparator<Layout> obc)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Layout> getLayoutsByLayoutPrototypeUuid(
@@ -1063,8 +1101,15 @@ public interface LayoutLocalService extends BaseLocalService,
 		String keywords, String[] types) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getLayoutsCount(long groupId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getLayoutsCount(long groupId, long leftPlid, long rightPlid,
 		boolean privateLayout);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getLayoutsCount(long groupId, String keywords, String[] types)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getLayoutsCount(User user, boolean privateLayout)
@@ -1075,11 +1120,11 @@ public interface LayoutLocalService extends BaseLocalService,
 		boolean includeUserGroups) throws PortalException;
 
 	/**
-	* Returns the primary key to use for the next layout.
+	* Returns the layout ID to use for the next layout.
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @return the primary key to use for the next layout
+	* @return the layout ID to use for the next layout
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getNextLayoutId(long groupId, boolean privateLayout);
@@ -1168,7 +1213,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout
+	* @param parentLayoutId the layout ID of the parent layout
 	* @return <code>true</code> if the group has any layouts;
 	<code>false</code> otherwise
 	*/
@@ -1484,8 +1529,8 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout
-	* @param layoutIds the primary keys of the layouts
+	* @param parentLayoutId the layout ID of the parent layout
+	* @param layoutIds the layout IDs of the layouts
 	* @param serviceContext the service context to be applied
 	* @throws PortalException if a portal exception occurred
 	*/
@@ -1544,8 +1589,8 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
-	* @param parentLayoutId the primary key of the layout's new parent layout
+	* @param layoutId the layout ID of the layout
+	* @param parentLayoutId the layout ID of the layout's new parent layout
 	* @param nameMap the locales and localized names to merge (optionally
 	<code>null</code>)
 	* @param titleMap the locales and localized titles to merge (optionally
@@ -1590,7 +1635,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param typeSettings the settings to load the unicode properties object.
 	See {@link UnicodeProperties #fastLoad(String)}.
 	* @return the updated layout
@@ -1604,7 +1649,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param themeId the primary key of the layout's new theme
 	* @param colorSchemeId the primary key of the layout's new color scheme
 	* @param css the layout's new CSS
@@ -1634,7 +1679,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param name the layout's new name
 	* @param languageId the primary key of the language. For more information
 	see {@link Locale}.
@@ -1664,8 +1709,8 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
-	* @param parentLayoutId the primary key to be assigned to the parent
+	* @param layoutId the layout ID of the layout
+	* @param parentLayoutId the layout ID to be assigned to the parent
 	layout
 	* @return the matching layout
 	* @throws PortalException if a portal exception occurred
@@ -1726,7 +1771,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param priority the layout's new priority
 	* @return the updated layout
 	* @throws PortalException if a portal exception occurred
@@ -1741,9 +1786,9 @@ public interface LayoutLocalService extends BaseLocalService,
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
-	* @param nextLayoutId the primary key of the next layout
-	* @param previousLayoutId the primary key of the previous layout
+	* @param layoutId the layout ID of the layout
+	* @param nextLayoutId the layout ID of the next layout
+	* @param previousLayoutId the layout ID of the previous layout
 	* @return the updated layout
 	* @throws PortalException if a portal exception occurred
 	*/

@@ -14,13 +14,14 @@
 
 package com.liferay.document.library.internal.bulk.selection;
 
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.bulk.selection.BaseMultipleEntryBulkSelection;
 import com.liferay.bulk.selection.BulkSelection;
 import com.liferay.bulk.selection.BulkSelectionFactory;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.petra.reflect.ReflectionUtil;
-import com.liferay.petra.string.StringPool;
-import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
@@ -28,42 +29,24 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 
-import java.io.Serializable;
-
-import java.util.Arrays;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 /**
  * @author Adolfo Pérez
  */
 public class MultipleFileEntryBulkSelection
-	implements BulkSelection<FileEntry> {
+	extends BaseMultipleEntryBulkSelection<FileEntry> {
 
 	public MultipleFileEntryBulkSelection(
 		long[] fileEntryIds, Map<String, String[]> parameterMap,
 		ResourceBundleLoader resourceBundleLoader, Language language,
-		DLAppService dlAppService) {
+		DLAppService dlAppService,
+		AssetEntryLocalService assetEntryLocalService) {
 
-		_fileEntryIds = fileEntryIds;
-		_parameterMap = parameterMap;
-		_resourceBundleLoader = resourceBundleLoader;
-		_language = language;
+		super(fileEntryIds, parameterMap, resourceBundleLoader, language);
+
 		_dlAppService = dlAppService;
-	}
-
-	@Override
-	public String describe(Locale locale) {
-		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(locale);
-
-		return _language.format(
-			resourceBundle, "these-changes-will-be-applied-to-x-items",
-			_fileEntryIds.length);
+		_assetEntryLocalService = assetEntryLocalService;
 	}
 
 	@Override
@@ -74,32 +57,13 @@ public class MultipleFileEntryBulkSelection
 	}
 
 	@Override
-	public Map<String, String[]> getParameterMap() {
-		return _parameterMap;
+	public BulkSelection<AssetEntry> toAssetEntryBulkSelection() {
+		return new FileEntryAssetEntryBulkSelection(
+			this, _assetEntryLocalService);
 	}
 
 	@Override
-	public boolean isMultiple() {
-		return true;
-	}
-
-	@Override
-	public Serializable serialize() {
-		return StringUtil.merge(_fileEntryIds, StringPool.COMMA);
-	}
-
-	@Override
-	public Stream<FileEntry> stream() {
-		LongStream longStream = Arrays.stream(_fileEntryIds);
-
-		return longStream.mapToObj(
-			this::_fetchFileEntry
-		).filter(
-			Objects::nonNull
-		);
-	}
-
-	private FileEntry _fetchFileEntry(long fileEntryId) {
+	protected FileEntry fetchEntry(long fileEntryId) {
 		try {
 			return _dlAppService.getFileEntry(fileEntryId);
 		}
@@ -118,10 +82,7 @@ public class MultipleFileEntryBulkSelection
 	private static final Log _log = LogFactoryUtil.getLog(
 		MultipleFileEntryBulkSelection.class);
 
+	private final AssetEntryLocalService _assetEntryLocalService;
 	private final DLAppService _dlAppService;
-	private final long[] _fileEntryIds;
-	private final Language _language;
-	private final Map<String, String[]> _parameterMap;
-	private final ResourceBundleLoader _resourceBundleLoader;
 
 }

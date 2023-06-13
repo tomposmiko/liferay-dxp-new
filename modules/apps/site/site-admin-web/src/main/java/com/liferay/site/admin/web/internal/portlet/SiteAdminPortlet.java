@@ -53,8 +53,6 @@ import com.liferay.portal.kernel.model.MembershipRequestConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.Team;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
-import com.liferay.portal.kernel.portlet.PortalPreferences;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -106,7 +104,6 @@ import com.liferay.site.constants.SiteWebKeys;
 import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.initializer.SiteInitializerRegistry;
 import com.liferay.site.util.GroupSearchProvider;
-import com.liferay.site.util.GroupURLProvider;
 import com.liferay.sites.kernel.util.Sites;
 import com.liferay.sites.kernel.util.SitesUtil;
 
@@ -213,21 +210,6 @@ public class SiteAdminPortlet extends MVCPortlet {
 			groupExceptionRequestHandler.handlePortalException(
 				actionRequest, actionResponse, pe);
 		}
-	}
-
-	public void changeDisplayStyle(
-		ActionRequest actionRequest, ActionResponse actionResponse) {
-
-		hideDefaultSuccessMessage(actionRequest);
-
-		String displayStyle = ParamUtil.getString(
-			actionRequest, "displayStyle");
-
-		PortalPreferences portalPreferences =
-			PortletPreferencesFactoryUtil.getPortalPreferences(actionRequest);
-
-		portalPreferences.setValue(
-			SiteAdminPortletKeys.SITE_ADMIN, "display-style", displayStyle);
 	}
 
 	public void deactivate(
@@ -399,9 +381,6 @@ public class SiteAdminPortlet extends MVCPortlet {
 
 		renderRequest.setAttribute(
 			SiteWebKeys.GROUP_SEARCH_PROVIDER, groupSearchProvider);
-
-		renderRequest.setAttribute(
-			SiteWebKeys.GROUP_URL_PROVIDER, groupURLProvider);
 
 		renderRequest.setAttribute(
 			SiteWebKeys.SITE_INITIALIZER_REGISTRY, siteInitializerRegistry);
@@ -589,11 +568,6 @@ public class SiteAdminPortlet extends MVCPortlet {
 	}
 
 	@Reference(unbind = "-")
-	protected void setGroupURLProvider(GroupURLProvider groupURLProvider) {
-		this.groupURLProvider = groupURLProvider;
-	}
-
-	@Reference(unbind = "-")
 	protected void setLayoutLocalService(
 		LayoutLocalService layoutLocalService) {
 
@@ -689,9 +663,14 @@ public class SiteAdminPortlet extends MVCPortlet {
 
 		long liveGroupId = ParamUtil.getLong(actionRequest, "liveGroupId");
 
+		long defaultParentGroupId = ParamUtil.getLong(
+			actionRequest, "parentGroupId",
+			GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
 		long parentGroupId = ParamUtil.getLong(
 			actionRequest, "parentGroupSearchContainerPrimaryKeys",
-			GroupConstants.DEFAULT_PARENT_GROUP_ID);
+			defaultParentGroupId);
+
 		Map<Locale, String> nameMap = null;
 		Map<Locale, String> descriptionMap = null;
 		int type = 0;
@@ -890,14 +869,29 @@ public class SiteAdminPortlet extends MVCPortlet {
 			PropertiesParamUtil.getProperties(
 				actionRequest, "TypeSettingsProperties--");
 
-		if (GetterUtil.getBoolean(
-				formTypeSettingsProperties.getProperty("inheritLocales"))) {
+		boolean inheritLocales = GetterUtil.getBoolean(
+			typeSettingsProperties.getProperty("inheritLocales"));
 
+		if (formTypeSettingsProperties.containsKey("inheritLocales")) {
+			inheritLocales = GetterUtil.getBoolean(
+				formTypeSettingsProperties.getProperty("inheritLocales"));
+		}
+
+		if (inheritLocales) {
 			formTypeSettingsProperties.setProperty(
 				PropsKeys.LOCALES,
 				StringUtil.merge(
 					LocaleUtil.toLanguageIds(
 						LanguageUtil.getAvailableLocales())));
+		}
+
+		if (formTypeSettingsProperties.containsKey(PropsKeys.LOCALES) &&
+			Validator.isNull(
+				formTypeSettingsProperties.getProperty(PropsKeys.LOCALES))) {
+
+			throw new LocaleException(
+				LocaleException.TYPE_DEFAULT,
+				"Must have at least one valid locale for site " + liveGroupId);
 		}
 
 		typeSettingsProperties.putAll(formTypeSettingsProperties);
@@ -1088,7 +1082,6 @@ public class SiteAdminPortlet extends MVCPortlet {
 	protected GroupLocalService groupLocalService;
 	protected GroupSearchProvider groupSearchProvider;
 	protected GroupService groupService;
-	protected GroupURLProvider groupURLProvider;
 
 	@Reference
 	protected Http http;

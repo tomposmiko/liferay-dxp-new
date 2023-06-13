@@ -15,12 +15,9 @@
 				<action-key>ADD_DATA_RECORD_COLLECTION</action-key>
 				<action-key>DEFINE_PERMISSIONS</action-key>
 			</supports>
-			<site-member-defaults>
-				<action-key>ADD_DATA_DEFINITION</action-key>
-				<action-key>ADD_DATA_RECORD_COLLECTION</action-key>
-			</site-member-defaults>
 			<guest-unsupported>
 				<action-key>ADD_DATA_DEFINITION</action-key>
+				<action-key>ADD_DATA_RECORD_COLLECTION</action-key>
 				<action-key>DEFINE_PERMISSIONS</action-key>
 			</guest-unsupported>
 		</permissions>
@@ -39,15 +36,15 @@
 				<action-key>VIEW</action-key>
 			</supports>
 			<site-member-defaults>
-				<action-key>DELETE</action-key>
-				<action-key>UPDATE</action-key>
 				<action-key>VIEW</action-key>
 			</site-member-defaults>
 			<guest-defaults>
 				<action-key>VIEW</action-key>
 			</guest-defaults>
 			<guest-unsupported>
+				<action-key>DELETE</action-key>
 				<action-key>PERMISSIONS</action-key>
+				<action-key>UPDATE</action-key>
 			</guest-unsupported>
 		</permissions>
 	</model-resource>
@@ -59,21 +56,30 @@
 		<weight>3</weight>
 		<permissions>
 			<supports>
+				<action-key>ADD_DATA_RECORD</action-key>
 				<action-key>DELETE</action-key>
+				<action-key>DELETE_DATA_RECORD</action-key>
 				<action-key>PERMISSIONS</action-key>
 				<action-key>UPDATE</action-key>
+				<action-key>UPDATE_DATA_RECORD</action-key>
 				<action-key>VIEW</action-key>
+				<action-key>VIEW_DATA_RECORD</action-key>
 			</supports>
 			<site-member-defaults>
-				<action-key>DELETE</action-key>
-				<action-key>UPDATE</action-key>
 				<action-key>VIEW</action-key>
+				<action-key>VIEW_DATA_RECORD</action-key>
 			</site-member-defaults>
 			<guest-defaults>
 				<action-key>VIEW</action-key>
+				<action-key>VIEW_DATA_RECORD</action-key>
 			</guest-defaults>
 			<guest-unsupported>
+				<action-key>ADD_DATA_RECORD</action-key>
+				<action-key>DELETE</action-key>
+				<action-key>DELETE_DATA_RECORD</action-key>
 				<action-key>PERMISSIONS</action-key>
+				<action-key>UPDATE</action-key>
+				<action-key>UPDATE_DATA_RECORD</action-key>
 			</guest-unsupported>
 		</permissions>
 	</model-resource>

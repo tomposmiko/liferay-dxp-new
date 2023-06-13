@@ -1,3 +1,5 @@
 {
-	"presets": ["es2015", "liferay-project"]
+    "ignore": [
+		"**/js/*.js"
+	]
 }

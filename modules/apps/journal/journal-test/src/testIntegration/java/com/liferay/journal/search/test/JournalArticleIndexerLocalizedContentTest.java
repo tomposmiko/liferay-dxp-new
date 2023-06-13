@@ -21,6 +21,7 @@ import com.liferay.journal.test.util.search.JournalArticleBlueprint;
 import com.liferay.journal.test.util.search.JournalArticleContent;
 import com.liferay.journal.test.util.search.JournalArticleSearchFixture;
 import com.liferay.journal.test.util.search.JournalArticleTitle;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -98,22 +99,24 @@ public class JournalArticleIndexerLocalizedContentTest {
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					groupId = _group.getGroupId();
-					journalArticleContent = new JournalArticleContent() {
-						{
-							name = "content";
-							defaultLocale = LocaleUtil.US;
+					setGroupId(_group.getGroupId());
+					setJournalArticleContent(
+						new JournalArticleContent() {
+							{
+								put(LocaleUtil.US, originalContent);
+								put(LocaleUtil.HUNGARY, translatedContent);
 
-							put(LocaleUtil.US, originalContent);
-							put(LocaleUtil.HUNGARY, translatedContent);
-						}
-					};
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(LocaleUtil.US, originalTitle);
-							put(LocaleUtil.HUNGARY, translatedTitle);
-						}
-					};
+								setDefaultLocale(LocaleUtil.US);
+								setName("content");
+							}
+						});
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(LocaleUtil.US, originalTitle);
+								put(LocaleUtil.HUNGARY, translatedTitle);
+							}
+						});
 				}
 			});
 
@@ -134,19 +137,18 @@ public class JournalArticleIndexerLocalizedContentTest {
 		Map<String, String> localizedTitleStrings = _withSortableValues(
 			new HashMap<String, String>() {
 				{
-					put("localized_title_en_US", originalTitle);
-					put("localized_title_hu_HU", translatedTitle);
+					Set<Locale> locales = LanguageUtil.getAvailableLocales();
 
-					put("localized_title_ca_ES", originalTitle);
-					put("localized_title_de_DE", originalTitle);
-					put("localized_title_es_ES", originalTitle);
-					put("localized_title_fi_FI", originalTitle);
-					put("localized_title_fr_FR", originalTitle);
-					put("localized_title_iw_IL", originalTitle);
-					put("localized_title_ja_JP", originalTitle);
-					put("localized_title_nl_NL", originalTitle);
-					put("localized_title_pt_BR", originalTitle);
-					put("localized_title_zh_CN", originalTitle);
+					locales.forEach(
+						locale -> {
+							String mapKey =
+								"localized_title_" + locale.getLanguage() +
+									"_" + locale.getCountry();
+
+							put(mapKey, originalTitle);
+						});
+
+					put("localized_title_hu_HU", translatedTitle);
 				}
 			});
 
@@ -172,20 +174,22 @@ public class JournalArticleIndexerLocalizedContentTest {
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					groupId = _group.getGroupId();
-					journalArticleContent = new JournalArticleContent() {
-						{
-							name = "content";
-							defaultLocale = LocaleUtil.US;
+					setGroupId(_group.getGroupId());
+					setJournalArticleContent(
+						new JournalArticleContent() {
+							{
+								put(LocaleUtil.US, "alpha");
 
-							put(LocaleUtil.US, "alpha");
-						}
-					};
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(LocaleUtil.US, "gamma");
-						}
-					};
+								setDefaultLocale(LocaleUtil.US);
+								setName("content");
+							}
+						});
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(LocaleUtil.US, "gamma");
+							}
+						});
 				}
 			});
 
@@ -204,14 +208,15 @@ public class JournalArticleIndexerLocalizedContentTest {
 		JournalArticle journalArticle = _journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					groupId = _group.getGroupId();
-					journalArticleContent = new JournalArticleContent();
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(LocaleUtil.US, originalTitle);
-							put(LocaleUtil.BRAZIL, translatedTitle);
-						}
-					};
+					setGroupId(_group.getGroupId());
+					setJournalArticleContent(new JournalArticleContent());
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(LocaleUtil.US, originalTitle);
+								put(LocaleUtil.BRAZIL, translatedTitle);
+							}
+						});
 				}
 			});
 
@@ -224,19 +229,18 @@ public class JournalArticleIndexerLocalizedContentTest {
 		Map<String, String> localizedTitleStrings = _withSortableValues(
 			new HashMap<String, String>() {
 				{
-					put("localized_title_en_US", originalTitle);
-					put("localized_title_pt_BR", translatedTitle);
+					Set<Locale> locales = LanguageUtil.getAvailableLocales();
 
-					put("localized_title_ca_ES", originalTitle);
-					put("localized_title_de_DE", originalTitle);
-					put("localized_title_es_ES", originalTitle);
-					put("localized_title_fi_FI", originalTitle);
-					put("localized_title_fr_FR", originalTitle);
-					put("localized_title_hu_HU", originalTitle);
-					put("localized_title_iw_IL", originalTitle);
-					put("localized_title_ja_JP", originalTitle);
-					put("localized_title_nl_NL", originalTitle);
-					put("localized_title_zh_CN", originalTitle);
+					locales.forEach(
+						locale -> {
+							String mapKey =
+								"localized_title_" + locale.getLanguage() +
+									"_" + locale.getCountry();
+
+							put(mapKey, originalTitle);
+						});
+
+					put("localized_title_pt_BR", translatedTitle);
 				}
 			});
 
@@ -271,20 +275,22 @@ public class JournalArticleIndexerLocalizedContentTest {
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					groupId = _group.getGroupId();
-					journalArticleContent = new JournalArticleContent() {
-						{
-							name = "content";
-							defaultLocale = LocaleUtil.JAPAN;
+					setGroupId(_group.getGroupId());
+					setJournalArticleContent(
+						new JournalArticleContent() {
+							{
+								put(LocaleUtil.JAPAN, content);
 
-							put(LocaleUtil.JAPAN, content);
-						}
-					};
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(LocaleUtil.JAPAN, title);
-						}
-					};
+								setDefaultLocale(LocaleUtil.JAPAN);
+								setName("content");
+							}
+						});
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(LocaleUtil.JAPAN, title);
+							}
+						});
 				}
 			});
 
@@ -297,19 +303,16 @@ public class JournalArticleIndexerLocalizedContentTest {
 		Map<String, String> localizedTitleStrings = _withSortableValues(
 			new HashMap<String, String>() {
 				{
-					put("localized_title_ja_JP", title);
+					Set<Locale> locales = LanguageUtil.getAvailableLocales();
 
-					put("localized_title_ca_ES", title);
-					put("localized_title_de_DE", title);
-					put("localized_title_en_US", title);
-					put("localized_title_es_ES", title);
-					put("localized_title_fi_FI", title);
-					put("localized_title_fr_FR", title);
-					put("localized_title_hu_HU", title);
-					put("localized_title_iw_IL", title);
-					put("localized_title_nl_NL", title);
-					put("localized_title_pt_BR", title);
-					put("localized_title_zh_CN", title);
+					locales.forEach(
+						locale -> {
+							String mapKey =
+								"localized_title_" + locale.getLanguage() +
+									"_" + locale.getCountry();
+
+							put(mapKey, title);
+						});
 				}
 			});
 
@@ -352,22 +355,24 @@ public class JournalArticleIndexerLocalizedContentTest {
 			title -> _journalArticleSearchFixture.addArticle(
 				new JournalArticleBlueprint() {
 					{
-						groupId = _group.getGroupId();
-						journalArticleContent = new JournalArticleContent() {
-							{
-								name = "content";
-								defaultLocale = LocaleUtil.JAPAN;
+						setGroupId(_group.getGroupId());
+						setJournalArticleContent(
+							new JournalArticleContent() {
+								{
+									put(
+										LocaleUtil.JAPAN,
+										RandomTestUtil.randomString());
 
-								put(
-									LocaleUtil.JAPAN,
-									RandomTestUtil.randomString());
-							}
-						};
-						journalArticleTitle = new JournalArticleTitle() {
-							{
-								put(LocaleUtil.JAPAN, title);
-							}
-						};
+									setDefaultLocale(LocaleUtil.JAPAN);
+									setName("content");
+								}
+							});
+						setJournalArticleTitle(
+							new JournalArticleTitle() {
+								{
+									put(LocaleUtil.JAPAN, title);
+								}
+							});
 					}
 				})
 		);

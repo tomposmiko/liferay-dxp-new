@@ -14,7 +14,11 @@
 
 package com.liferay.change.tracking.rest.internal.model.collection;
 
+import com.liferay.change.tracking.model.CTCollection;
+import com.liferay.change.tracking.rest.internal.model.links.ModelLinkModel;
+
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -25,8 +29,34 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class CTCollectionModel {
 
-	public static CTCollectionModel.Builder forCompany(long companyId) {
-		return new Builder(companyId);
+	public static final CTCollectionModel EMPTY_CT_COLLECTION_MODEL =
+		new CTCollectionModel();
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static Builder forCTCollection(CTCollection ctCollection) {
+		Builder builder = new Builder();
+
+		return builder.setCompanyId(
+			ctCollection.getCompanyId()
+		).setCtCollectionId(
+			ctCollection.getCtCollectionId()
+		).setDescription(
+			ctCollection.getDescription()
+		).setName(
+			ctCollection.getName()
+		).setStatusByUserName(
+			ctCollection.getStatusByUserName()
+		).setStatusDate(
+			ctCollection.getStatusDate()
+		);
+	}
+
+	@XmlElement
+	public long getAdditionCount() {
+		return _additionCount;
 	}
 
 	@XmlElement
@@ -35,8 +65,36 @@ public class CTCollectionModel {
 	}
 
 	@XmlElement
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	@XmlElement
+	public long getDeletionCount() {
+		return _deletionCount;
+	}
+
+	@XmlElement
 	public String getDescription() {
 		return _description;
+	}
+
+	@XmlElement
+	public List<ModelLinkModel> getLinks() {
+		ModelLinkModel.Builder builder = new ModelLinkModel.Builder();
+
+		return builder.addModelLinkModel(
+			"/o/change-tracking/collections/" + _ctCollectionId + "/entries",
+			"entries", "GET"
+		).addModelLinkModel(
+			"/o/change-tracking/collections/" + _ctCollectionId + "/publish",
+			"publish", "POST"
+		).build();
+	}
+
+	@XmlElement
+	public long getModificationCount() {
+		return _modificationCount;
 	}
 
 	@XmlElement
@@ -60,8 +118,38 @@ public class CTCollectionModel {
 			return _ctCollectionModel;
 		}
 
+		public Builder setAdditionCount(long additionCount) {
+			_ctCollectionModel._additionCount = additionCount;
+
+			return this;
+		}
+
+		public Builder setCompanyId(long companyId) {
+			_ctCollectionModel._companyId = companyId;
+
+			return this;
+		}
+
+		public Builder setCtCollectionId(long ctCollectionId) {
+			_ctCollectionModel._ctCollectionId = ctCollectionId;
+
+			return this;
+		}
+
+		public Builder setDeletionCount(long deletionCount) {
+			_ctCollectionModel._deletionCount = deletionCount;
+
+			return this;
+		}
+
 		public Builder setDescription(String description) {
 			_ctCollectionModel._description = description;
+
+			return this;
+		}
+
+		public Builder setModificationCount(long modificationCount) {
+			_ctCollectionModel._modificationCount = modificationCount;
 
 			return this;
 		}
@@ -84,10 +172,8 @@ public class CTCollectionModel {
 			return this;
 		}
 
-		private Builder(long companyId) {
+		private Builder() {
 			_ctCollectionModel = new CTCollectionModel();
-
-			_ctCollectionModel._companyId = companyId;
 		}
 
 		private final CTCollectionModel _ctCollectionModel;
@@ -97,8 +183,12 @@ public class CTCollectionModel {
 	private CTCollectionModel() {
 	}
 
+	private long _additionCount;
 	private long _companyId;
+	private long _ctCollectionId;
+	private long _deletionCount;
 	private String _description;
+	private long _modificationCount;
 	private String _name;
 	private String _statusByUserName;
 	private Date _statusDate;

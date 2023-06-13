@@ -1,6 +1,42 @@
 definition {
+	macro checkCardCheckbox {
+		LexiconCard.clickCard(
+			card = "${card}"
+		);
+
+		AssertChecked.assertCheckedNotVisible(
+			locator1 = "LexiconCard#CARD_CHECKBOX",
+			key_card = "${card}"
+		);
+	}
+
+	macro clickCard {
+		Click(
+			locator1 = "LexiconCard#CARD",
+			key_card = "${card}"
+		);
+	}
+
+	macro clickCardTitle {
+		Click(
+			locator1 = "LexiconCard#CARD_TITLE",
+			key_card = "${card}"
+		);
+	}
+
+	macro clickEllipsisItem {
+		Click(
+			locator1 = "LexiconCard#CARD_ELLIPSIS",
+			key_card = "${card}"
+		);
+
+		MenuItem.clickNoError(
+			menuItem = "${item}"
+		);
+	}
+
 	macro delete {
-		LexiconCard.gotoEllipsisItem(
+		LexiconCard.clickEllipsisItem(
 			card = "${card}",
 			item = "Delete"
 		);
@@ -8,28 +44,24 @@ definition {
 		Confirm();
 	}
 
-	macro gotoCard {
-		Click(
-			locator1 = "LexiconCard#CARD_TITLE",
-			key_card = "${card}"
-		);
-	}
-
-	macro gotoEllipsisItem {
-		Click(
-			locator1 = "LexiconCard#CARD_ELLIPSIS",
-			key_card = "${card}"
-		);
-
-		Button.click(
-			button = "${item}"
-		);
-	}
-
 	macro viewCardLabel {
 		AssertTextEquals(
 			locator1 = "LexiconCard#CARD_LABEL",
 			value1 = "${cardLabel}",
+			key_card = "${card}"
+		);
+	}
+
+	macro viewCardNotPresent {
+		AssertElementNotPresent(
+			locator1 = "LexiconCard#CARD",
+			key_card = "${card}"
+		);
+	}
+
+	macro viewCardPresent {
+		AssertVisible(
+			locator1 = "LexiconCard#CARD",
 			key_card = "${card}"
 		);
 	}
@@ -46,13 +78,6 @@ definition {
 		AssertTextEquals(
 			locator1 = "LexiconCard#CARD_TITLE",
 			value1 = "${card}",
-			key_card = "${card}"
-		);
-	}
-
-	macro viewCardNotPresent {
-		AssertElementNotPresent(
-			locator1 = "LexiconCard#CARD_TITLE",
 			key_card = "${card}"
 		);
 	}

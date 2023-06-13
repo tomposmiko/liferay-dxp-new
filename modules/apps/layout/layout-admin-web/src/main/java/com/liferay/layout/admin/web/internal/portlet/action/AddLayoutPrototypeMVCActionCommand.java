@@ -19,6 +19,7 @@ import com.liferay.layout.page.template.exception.DuplicateLayoutPageTemplateEnt
 import com.liferay.layout.page.template.exception.LayoutPageTemplateEntryNameException;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.portal.kernel.exception.LayoutNameException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -137,18 +138,18 @@ public class AddLayoutPrototypeMVCActionCommand extends BaseMVCActionCommand {
 				layoutPrototypeGroup.getDisplayURL(themeDisplay, true));
 		}
 		catch (Throwable t) {
-			_log.error(t, t);
+			if (_log.isDebugEnabled()) {
+				_log.debug(t, t);
+			}
 
 			String errorMessage = "an-unexpected-error-occurred";
 
-			Throwable cause = t.getCause();
+			if (t instanceof LayoutNameException ||
+				t instanceof LayoutPageTemplateEntryNameException) {
 
-			if (cause instanceof LayoutPageTemplateEntryNameException) {
 				errorMessage = "please-enter-a-valid-name";
 			}
-			else if (cause instanceof
-						DuplicateLayoutPageTemplateEntryException) {
-
+			else if (t instanceof DuplicateLayoutPageTemplateEntryException) {
 				errorMessage =
 					"a-page-template-entry-with-that-name-already-exists";
 			}

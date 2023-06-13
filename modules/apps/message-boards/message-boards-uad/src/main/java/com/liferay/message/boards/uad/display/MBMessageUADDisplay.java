@@ -21,6 +21,8 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.user.associated.data.display.UADDisplay;
 
+import java.io.Serializable;
+
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
@@ -30,7 +32,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(immediate = true, service = UADDisplay.class)
+@Component(
+	immediate = true, service = {MBMessageUADDisplay.class, UADDisplay.class}
+)
 public class MBMessageUADDisplay extends BaseMBMessageUADDisplay {
 
 	@Override
@@ -64,6 +68,11 @@ public class MBMessageUADDisplay extends BaseMBMessageUADDisplay {
 			"messageId", String.valueOf(mbMessage.getMessageId()));
 
 		return portletURL.toString();
+	}
+
+	@Override
+	public Serializable getParentContainerId(MBMessage mbMessage) {
+		return mbMessage.getThreadId();
 	}
 
 	@Reference

@@ -14,32 +14,42 @@
 
 package com.liferay.poshi.runner.script;
 
+import com.liferay.poshi.runner.elements.PoshiElement;
 import com.liferay.poshi.runner.elements.PoshiNode;
 import com.liferay.poshi.runner.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Kenji Heigel
  */
 public class PoshiScriptParserException extends Exception {
 
-	public static int getExceptionCount() {
-		return exceptionCount;
+	public static List<String> getFailingFilePaths() {
+		return failingFilePaths;
 	}
 
 	public PoshiScriptParserException(String msg) {
 		super(msg);
-
-		exceptionCount++;
 	}
 
 	public PoshiScriptParserException(String msg, PoshiNode poshiNode) {
 		super(msg);
 
-		setErrorDetails(poshiNode.getPoshiScript());
+		setErrorLineNumber(poshiNode.getPoshiScriptLineNumber());
 		setFilePath(poshiNode.getFilePath());
-		setLineNumber(poshiNode.getPoshiScriptLineNumber());
+		setPoshiScriptSnippet(poshiNode.getPoshiScript());
 
-		exceptionCount++;
+		if (poshiNode instanceof PoshiElement) {
+			PoshiElement poshiElement = (PoshiElement)poshiNode;
+
+			setStartingLineNumber(
+				poshiElement.getDefaultPoshiScriptLineNumber());
+		}
+		else {
+			setStartingLineNumber(poshiNode.getPoshiScriptLineNumber());
+		}
 	}
 
 	public PoshiScriptParserException(
@@ -51,31 +61,71 @@ public class PoshiScriptParserException extends Exception {
 
 		String parentPoshiScript = parentPoshiNode.getPoshiScript();
 
-		setErrorDetails(parentPoshiScript);
+		parentPoshiScript = parentPoshiScript.replaceFirst("^[\\n\\r]*", "");
 
-		parentPoshiScript = parentPoshiScript.trim();
+		setPoshiScriptSnippet(parentPoshiScript);
+
+		int startingLineNumber = parentPoshiNode.getPoshiScriptLineNumber();
+
+		if (parentPoshiNode instanceof PoshiElement) {
+			PoshiElement parentPoshiElement = (PoshiElement)parentPoshiNode;
+
+			startingLineNumber =
+				parentPoshiElement.getDefaultPoshiScriptLineNumber();
+		}
+
+		setStartingLineNumber(startingLineNumber);
 
 		int index = parentPoshiScript.indexOf(poshiScript.trim());
 
-		int lineNumber =
-			parentPoshiNode.getPoshiScriptLineNumber() +
-				StringUtil.count(parentPoshiScript, "\n", index);
-
-		setLineNumber(lineNumber);
-
-		exceptionCount++;
+		setErrorLineNumber(
+			startingLineNumber +
+				StringUtil.count(parentPoshiScript, "\n", index));
 	}
 
-	public String getErrorDetails() {
-		return _errorDetails;
+	public int getErrorLineNumber() {
+		return _errorLineNumber;
+	}
+
+	public String getErrorSnippet() {
+		StringBuilder sb = new StringBuilder();
+
+		String poshiScript = getPoshiScriptSnippet();
+
+		int startingLineNumber = getStartingLineNumber();
+
+		String lineNumberString = String.valueOf(
+			startingLineNumber + StringUtil.count(poshiScript, "\n"));
+
+		int pad = lineNumberString.length() + 2;
+
+		for (String line : poshiScript.split("\n")) {
+			StringBuilder prefix = new StringBuilder();
+
+			if (startingLineNumber == getErrorLineNumber()) {
+				prefix.append(">");
+			}
+			else {
+				prefix.append(" ");
+			}
+
+			prefix.append(" ");
+
+			prefix.append(startingLineNumber);
+
+			sb.append(String.format("%" + pad + "s", prefix.toString()));
+			sb.append(" |");
+			sb.append(line.replace("\t", "    "));
+			sb.append("\n");
+
+			startingLineNumber++;
+		}
+
+		return sb.toString();
 	}
 
 	public String getFilePath() {
 		return _filePath;
-	}
-
-	public int getLineNumber() {
-		return _lineNumber;
 	}
 
 	@Override
@@ -86,29 +136,44 @@ public class PoshiScriptParserException extends Exception {
 		sb.append(" at:\n");
 		sb.append(getFilePath());
 		sb.append(":");
-		sb.append(getLineNumber());
+		sb.append(getErrorLineNumber());
 		sb.append("\n");
-		sb.append(getErrorDetails());
+		sb.append(getErrorSnippet());
 
 		return sb.toString();
 	}
 
-	public void setErrorDetails(String errorDetails) {
-		_errorDetails = errorDetails;
+	public String getPoshiScriptSnippet() {
+		return _poshiScriptSnippet;
+	}
+
+	public int getStartingLineNumber() {
+		return _startingLineNumber;
+	}
+
+	public void setErrorLineNumber(int errorLineNumber) {
+		_errorLineNumber = errorLineNumber;
 	}
 
 	public void setFilePath(String filePath) {
 		_filePath = filePath;
+
+		failingFilePaths.add(filePath);
 	}
 
-	public void setLineNumber(int lineNumber) {
-		_lineNumber = lineNumber;
+	public void setPoshiScriptSnippet(String poshiScriptSnippet) {
+		_poshiScriptSnippet = poshiScriptSnippet;
 	}
 
-	protected static int exceptionCount;
+	public void setStartingLineNumber(int startingLineNumber) {
+		_startingLineNumber = startingLineNumber;
+	}
 
-	private String _errorDetails = "";
+	protected static List<String> failingFilePaths = new ArrayList<>();
+
+	private int _errorLineNumber;
 	private String _filePath = "Unknown file";
-	private int _lineNumber;
+	private String _poshiScriptSnippet = "";
+	private int _startingLineNumber;
 
 }

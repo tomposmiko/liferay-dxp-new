@@ -7,7 +7,8 @@ function ${namespace}sharing(sharingURL, title) {
 				cssClass: 'sharing-dialog',
 				destroyOnHide: true,
 				modal: true,
-				width: 800
+				height: 540,
+				width: 600
 			},
 			id: '${sharingDialogId}',
 			title: title,

@@ -66,7 +66,11 @@ definition {
 
 			var rowEntry = "${pageTemplateName}";
 
-			LexiconEntry.gotoEntry(rowEntry = "${rowEntry}");
+			AssertClick(
+				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
+				value1 = "${rowEntry}",
+				key_rowEntry = "${rowEntry}"
+			);
 		}
 		else {
 			Card.clickSitePagesCardLink(cardName = "${rowEntry}");
@@ -80,7 +84,7 @@ definition {
 			Uncheck(locator1 = "Checkbox#ADD_TO_NAVIGATION_MENU");
 		}
 
-		Button.click(button = "Save");
+		Button.click(button = "Add");
 
 		SelectFrame.selectFrameTop();
 

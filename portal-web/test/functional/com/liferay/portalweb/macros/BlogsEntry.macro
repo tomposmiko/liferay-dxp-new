@@ -53,12 +53,14 @@ definition {
 
 			Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT_CONFIRM");
 
-			Click(
+			SelectFrame(
 				locator1 = "BlogsEntry#CONTENT_VIDEO",
 				key_service = "${videoService}"
 			);
 
-			AssertTextEquals(locator1 = "BlogsEntry#VIDEO_EMBED_HELP_MESSAGE", value1 = "Video playback is disabled during edit mode.");
+			SelectFrameTop();
+
+			AssertTextEquals(locator1 = "BlogsEntry#VIDEO_EMBED_HELP_MESSAGE", value1 = "Video playback is disabled during edit mode");
 		}
 	}
 
@@ -292,7 +294,10 @@ definition {
 
 		Portlet.mouseOverPortletTitle(portletTitleName = "Blogs");
 
-		Click(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
+		Click(
+			locator1 = "Blogs#WIDGET_VIEW_ENTRY_ELLIPSIS",
+			key_entryTitle = "${entryTitle}"
+		);
 
 		MenuItem.viewNotPresent(menuItem = "Edit");
 	}
@@ -379,7 +384,10 @@ definition {
 			value1 = "${entryTitle}"
 		);
 
-		Click(locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_OPTIONS_DROPDOWN");
+		Click(
+			locator1 = "LexiconList#LIST_ENTRY_ELLIPSIS",
+			key_listEntry = "${entryTitle}"
+		);
 
 		PortletEntry.clickMoveToRecycleBin();
 
@@ -399,7 +407,10 @@ definition {
 			value1 = "Draft"
 		);
 
-		Click(locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_OPTIONS_DROPDOWN");
+		Click(
+			locator1 = "LexiconList#LIST_ENTRY_ELLIPSIS",
+			key_listEntry = "${entryTitle}"
+		);
 
 		PortletEntry.clickMoveToRecycleBin();
 
@@ -420,7 +431,12 @@ definition {
 
 		Portlet.mouseOverPortletTitle(portletTitleName = "Blogs");
 
-		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Move to Recycle Bin");
+		Blogs.clickEllipsisItemPG(
+			entryTitle = "${entryTitle}",
+			item = "Move to Recycle Bin"
+		);
+
+		Confirm();
 
 		AssertElementPresent(locator1 = "Message#SUCCESS");
 
@@ -503,9 +519,12 @@ definition {
 
 		Portlet.mouseOverPortletTitle(portletTitleName = "Blogs");
 
-		Click(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
+		var key_entryTitle = "${entryTitle}";
 
-		MenuItem.click(menuItem = "Permissions");
+		Blogs.clickEllipsisItemPG(
+			entryTitle = "${entryTitle}",
+			item = "Permissions"
+		);
 
 		IFrame.selectPermissionsFrame();
 
@@ -1008,7 +1027,7 @@ definition {
 				AssertClick(locator1 = "BlogsEntry#TAG", value1 = "${tagName}");
 
 				AssertTextEquals.assertPartialText(
-					locator1 = "AssetCategorization#TAG_FILTER_TITLE",
+					locator1 = "BlogsEntry#TAG_FILTER_TITLE",
 					value1 = "Entries with tag ${tagName}"
 				);
 
@@ -1024,7 +1043,7 @@ definition {
 			AssertClick(locator1 = "BlogsEntry#TAG", value1 = "${tagName}");
 
 			AssertTextEquals.assertPartialText(
-				locator1 = "AssetCategorization#TAG_FILTER_TITLE",
+				locator1 = "BlogsEntry#TAG_FILTER_TITLE",
 				value1 = "Entries with tag ${tagName}"
 			);
 
@@ -1043,7 +1062,7 @@ definition {
 				AssertClick(locator1 = "BlogsEntry#TAG", value1 = "${tagName}");
 
 				AssertTextEquals.assertPartialText(
-					locator1 = "AssetCategorization#TAG_FILTER_TITLE",
+					locator1 = "BlogsEntry#TAG_FILTER_TITLE",
 					value1 = "Entries with tag ${tagName}"
 				);
 
@@ -1051,13 +1070,13 @@ definition {
 			}
 		}
 		else {
-			var tagName = StringUtil.lowerCase("${tagName}");
 			var key_tagName = "${tagName}";
+			var tagName = StringUtil.upperCase("${tagName}");
 
-			AssertClick(locator1 = "BlogsEntry#TAG", value1 = "${tagName}");
+			AssertClick.assertTextClickCaseInsensitive(locator1 = "BlogsEntry#TAG", value1 = "${tagName}");
 
 			AssertTextEquals.assertPartialText(
-				locator1 = "AssetCategorization#TAG_FILTER_TITLE",
+				locator1 = "BlogsEntry#TAG_FILTER_TITLE",
 				value1 = "${tagName}"
 			);
 

@@ -29,7 +29,9 @@ create table CTEntry (
 	modifiedDate DATE null,
 	classNameId LONG,
 	classPK LONG,
-	resourcePrimKey LONG
+	resourcePrimKey LONG,
+	changeType INTEGER,
+	status INTEGER
 );
 
 create table CTProcess (

@@ -44,6 +44,8 @@ if (assetEntry != null) {
 
 		try {
 			request.setAttribute(WebKeys.PORTLET_DECORATE, Boolean.FALSE);
+
+			long[] segmentsIds = GetterUtil.getLongValues(request.getAttribute(SegmentsWebKeys.SEGMENTS_ENTRY_IDS), new long[0]);
 		%>
 
 			<div class="layout-content" id="main-content" role="main">
@@ -54,7 +56,7 @@ if (assetEntry != null) {
 
 					JSONObject rowConfigJSONObject = rowJSONObject.getJSONObject("config");
 
-					String backgroundColor = StringPool.BLANK;
+					String backgroundColorCssClass = StringPool.BLANK;
 					String backgroundImage = StringPool.BLANK;
 					boolean columnSpacing = true;
 					String containerType = StringPool.BLANK;
@@ -62,7 +64,7 @@ if (assetEntry != null) {
 					long paddingVertical = 3L;
 
 					if (rowConfigJSONObject != null) {
-						backgroundColor = rowConfigJSONObject.getString("backgroundColor");
+						backgroundColorCssClass = rowConfigJSONObject.getString("backgroundColorCssClass");
 						backgroundImage = rowConfigJSONObject.getString("backgroundImage");
 						columnSpacing = GetterUtil.getBoolean(rowConfigJSONObject.getString("columnSpacing"), true);
 						containerType = rowConfigJSONObject.getString("containerType");
@@ -71,7 +73,7 @@ if (assetEntry != null) {
 					}
 				%>
 
-					<div class="container-fluid px-<%= paddingHorizontal %> py-<%= paddingVertical %>" style="<%= Validator.isNotNull(backgroundColor) ? "background-color:" + backgroundColor + ";" : StringPool.BLANK %> <%= Validator.isNotNull(backgroundImage) ? "background-image: url(" + backgroundImage + "); background-position: 50% 50%; background-repeat: no-repeat; background-size: cover;" : StringPool.BLANK %>">
+					<div class="container-fluid bg-palette-<%= backgroundColorCssClass %> px-<%= paddingHorizontal %> py-<%= paddingVertical %>" style="<%= Validator.isNotNull(backgroundImage) ? "background-image: url(" + backgroundImage + "); background-position: 50% 50%; background-repeat: no-repeat; background-size: cover;" : StringPool.BLANK %>">
 						<div class="<%= Objects.equals(containerType, "fixed") ? "container" : "container-fluid" %> p-0">
 							<div class="row <%= columnSpacing ? StringPool.BLANK : "no-gutters" %>">
 
@@ -103,7 +105,7 @@ if (assetEntry != null) {
 											}
 										%>
 
-											<%= FragmentEntryRenderUtil.renderFragmentEntryLink(fragmentEntryLink, FragmentEntryLinkConstants.ASSET_DISPLAY_PAGE, assetDisplayLayoutTypeControllerDisplayContext.getAssetDisplayFieldsValues(), request, response, locale) %>
+											<%= FragmentEntryRenderUtil.renderFragmentEntryLink(fragmentEntryLink, FragmentEntryLinkConstants.ASSET_DISPLAY_PAGE, assetDisplayLayoutTypeControllerDisplayContext.getAssetDisplayFieldsValues(), locale, segmentsIds, request, response) %>
 
 										<%
 										}

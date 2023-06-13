@@ -146,9 +146,7 @@ AUI.add(
 
 							var calendar = datePicker.getCalendar();
 
-							var popover = datePicker.getPopover();
-
-							if (calendar.get('boundingBox').contains(node) || popover.get('visible')) {
+							if (calendar.get('boundingBox').contains(node)) {
 								hasFocus = true;
 							}
 						}
@@ -280,6 +278,7 @@ AUI.add(
 						var instance = this;
 
 						if (!instance.hasFocus(document.activeElement)) {
+							instance.showErrorMessage();
 							instance._fireBlurEvent();
 						}
 					},

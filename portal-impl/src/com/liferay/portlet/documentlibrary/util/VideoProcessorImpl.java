@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.repository.event.FileVersionPreviewEventListener;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -318,8 +319,7 @@ public class VideoProcessorImpl
 	}
 
 	private void _generateThumbnailXuggler(
-			FileVersion fileVersion, File file, int height, int width)
-		throws Exception {
+		FileVersion fileVersion, File file, int height, int width) {
 
 		StopWatch stopWatch = new StopWatch();
 
@@ -436,6 +436,9 @@ public class VideoProcessorImpl
 						file = liferayFileVersion.getFile(false);
 					}
 					catch (UnsupportedOperationException uoe) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(uoe, uoe);
+						}
 					}
 				}
 
@@ -468,6 +471,9 @@ public class VideoProcessorImpl
 						destinationFileVersion, file, previewTempFiles);
 				}
 				catch (Exception e) {
+					_fileVersionPreviewEventListener.onFailure(
+						destinationFileVersion);
+
 					_log.error(e, e);
 				}
 			}
@@ -488,6 +494,8 @@ public class VideoProcessorImpl
 			if (_log.isDebugEnabled()) {
 				_log.debug(nsfee, nsfee);
 			}
+
+			_fileVersionPreviewEventListener.onFailure(destinationFileVersion);
 		}
 		finally {
 			_fileVersionIds.remove(destinationFileVersion.getFileVersionId());
@@ -540,6 +548,8 @@ public class VideoProcessorImpl
 				futures.put(processIdentity, future);
 
 				future.get();
+
+				_fileVersionPreviewEventListener.onSuccess(fileVersion);
 			}
 			else {
 				LiferayConverter liferayConverter = new LiferayVideoConverter(
@@ -550,6 +560,8 @@ public class VideoProcessorImpl
 					PropsUtil.getProperties(PropsKeys.XUGGLER_FFPRESET, true));
 
 				liferayConverter.convert();
+
+				_fileVersionPreviewEventListener.onSuccess(fileVersion);
 			}
 		}
 		catch (Exception e) {
@@ -559,6 +571,8 @@ public class VideoProcessorImpl
 					String.valueOf(fileVersion.getFileVersionId()), " ",
 					fileVersion.getTitle(), "."),
 				e);
+
+			_fileVersionPreviewEventListener.onFailure(fileVersion);
 		}
 
 		addFileToStore(
@@ -592,9 +606,13 @@ public class VideoProcessorImpl
 						String.valueOf(fileVersion.getFileVersionId()), " ",
 						fileVersion.getTitle()));
 			}
+
+			_fileVersionPreviewEventListener.onFailure(fileVersion);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
+
+			_fileVersionPreviewEventListener.onFailure(fileVersion);
 		}
 	}
 
@@ -633,6 +651,11 @@ public class VideoProcessorImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		VideoProcessorImpl.class);
 
+	private static volatile FileVersionPreviewEventListener
+		_fileVersionPreviewEventListener =
+			ServiceProxyFactory.newServiceTrackedInstance(
+				FileVersionPreviewEventListener.class, VideoProcessorImpl.class,
+				"_fileVersionPreviewEventListener", false, false);
 	private static volatile ProcessExecutor _processExecutor =
 		ServiceProxyFactory.newServiceTrackedInstance(
 			ProcessExecutor.class, VideoProcessorImpl.class, "_processExecutor",

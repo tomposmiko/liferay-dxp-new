@@ -14,7 +14,10 @@
 
 package com.liferay.project.templates;
 
+import aQute.bnd.header.Attrs;
+import aQute.bnd.header.Parameters;
 import aQute.bnd.main.bnd;
+import aQute.bnd.osgi.Domain;
 
 import com.liferay.maven.executor.MavenExecutor;
 import com.liferay.project.templates.internal.ProjectGenerator;
@@ -188,6 +191,21 @@ public class ProjectTemplatesTest {
 			"-DclassName=BarActivator", "-Dpackage=bar.activator");
 
 		_buildProjects(gradleProjectDir, mavenProjectDir);
+
+		if (_isBuildProjects()) {
+			File jarFile = _testExists(
+				gradleProjectDir, "build/libs/bar.activator-1.0.0.jar");
+
+			Domain domain = Domain.domain(jarFile);
+
+			Parameters parameters = domain.getImportPackage();
+
+			Assert.assertNotNull(parameters);
+
+			Attrs attrs = parameters.get("org.osgi.framework");
+
+			Assert.assertNotNull(attrs);
+		}
 	}
 
 	@Test
@@ -230,6 +248,20 @@ public class ProjectTemplatesTest {
 			"api", "foo", "com.test", "-DclassName=Foo", "-Dpackage=foo");
 
 		_buildProjects(gradleProjectDir, mavenProjectDir);
+
+		if (_isBuildProjects()) {
+			File jarFile = _testExists(
+				gradleProjectDir, "build/libs/foo-1.0.0.jar");
+
+			Domain domain = Domain.domain(jarFile);
+
+			Parameters parameters = domain.getExportPackage();
+
+			Assert.assertNotNull(parameters);
+
+			Assert.assertNotNull(
+				parameters.toString(), parameters.get("foo.api"));
+		}
 	}
 
 	@Test
@@ -739,10 +771,22 @@ public class ProjectTemplatesTest {
 				"\"com.liferay.login.web\", version: \"1.0.0\"",
 			"apply plugin: \"com.liferay.osgi.ext.plugin\"");
 
-		_executeGradle(gradleProjectDir, _GRADLE_TASK_PATH_BUILD);
+		if (_isBuildProjects()) {
+			_executeGradle(gradleProjectDir, _GRADLE_TASK_PATH_BUILD);
 
-		_testExists(
-			gradleProjectDir, "build/libs/com.liferay.login.web-1.0.0.ext.jar");
+			File jarFile = _testExists(
+				gradleProjectDir,
+				"build/libs/com.liferay.login.web-1.0.0.ext.jar");
+
+			Domain domain = Domain.domain(jarFile);
+
+			Map.Entry<String, Attrs> bundleSymbolicName =
+				domain.getBundleSymbolicName();
+
+			Assert.assertEquals(
+				bundleSymbolicName.toString(), "com.liferay.login.web",
+				bundleSymbolicName.getKey());
+		}
 	}
 
 	@Test
@@ -1003,6 +1047,21 @@ public class ProjectTemplatesTest {
 			"-DhostBundleVersion=1.0.0", "-Dpackage=loginhook");
 
 		_buildProjects(gradleProjectDir, mavenProjectDir);
+
+		if (_isBuildProjects()) {
+			File jarFile = _testExists(
+				gradleProjectDir, "build/libs/loginhook-1.0.0.jar");
+
+			Domain domain = Domain.domain(jarFile);
+
+			Map.Entry<String, Attrs> fragmentHost = domain.getFragmentHost();
+
+			Assert.assertNotNull(fragmentHost);
+
+			Assert.assertEquals(
+				fragmentHost.toString(), "com.liferay.login.web",
+				fragmentHost.getKey());
+		}
 	}
 
 	@Test
@@ -1183,9 +1242,7 @@ public class ProjectTemplatesTest {
 			"originalModule group: \"com.liferay\", ",
 			"name: \"com.liferay.login.web\", version: \"2.0.4\"");
 
-		if (Validator.isNotNull(_BUILD_PROJECTS) &&
-			_BUILD_PROJECTS.equals("true")) {
-
+		if (_isBuildProjects()) {
 			_executeGradle(gradleProjectDir, _GRADLE_TASK_PATH_BUILD);
 
 			File gradleOutputDir = new File(gradleProjectDir, "build/libs");
@@ -2628,9 +2685,7 @@ public class ProjectTemplatesTest {
 
 		_buildProjects(gradleProjectDir, mavenProjectDir);
 
-		if (Validator.isNotNull(_BUILD_PROJECTS) &&
-			_BUILD_PROJECTS.equals("true")) {
-
+		if (_isBuildProjects()) {
 			_testSoyOutputFiles(gradleProjectDir, mavenProjectDir);
 		}
 	}
@@ -2685,9 +2740,7 @@ public class ProjectTemplatesTest {
 
 		_buildProjects(gradleProjectDir, mavenProjectDir);
 
-		if (Validator.isNotNull(_BUILD_PROJECTS) &&
-			_BUILD_PROJECTS.equals("true")) {
-
+		if (_isBuildProjects()) {
 			_testSoyOutputFiles(gradleProjectDir, mavenProjectDir);
 		}
 	}
@@ -2753,9 +2806,7 @@ public class ProjectTemplatesTest {
 
 		_buildProjects(gradleProjectDir, mavenProjectDir);
 
-		if (Validator.isNotNull(_BUILD_PROJECTS) &&
-			_BUILD_PROJECTS.equals("true")) {
-
+		if (_isBuildProjects()) {
 			_testSpringMVCOutputs(gradleProjectDir);
 		}
 	}
@@ -2775,9 +2826,7 @@ public class ProjectTemplatesTest {
 
 		_buildProjects(gradleProjectDir, mavenProjectDir);
 
-		if (Validator.isNotNull(_BUILD_PROJECTS) &&
-			_BUILD_PROJECTS.equals("true")) {
-
+		if (_isBuildProjects()) {
 			_testSpringMVCOutputs(gradleProjectDir);
 		}
 	}
@@ -3101,17 +3150,19 @@ public class ProjectTemplatesTest {
 		_testNotContains(
 			workspaceProjectDir, "build.gradle", true, "^repositories \\{.*");
 
-		_executeGradle(gradleProjectDir, _GRADLE_TASK_PATH_BUILD);
+		if (_isBuildProjects()) {
+			_executeGradle(gradleProjectDir, _GRADLE_TASK_PATH_BUILD);
 
-		File gradleWarFile = _testExists(
-			gradleProjectDir, "build/libs/theme-test.war");
+			File gradleWarFile = _testExists(
+				gradleProjectDir, "build/libs/theme-test.war");
 
-		_executeGradle(workspaceDir, ":wars:theme-test:build");
+			_executeGradle(workspaceDir, ":wars:theme-test:build");
 
-		File workspaceWarFile = _testExists(
-			workspaceProjectDir, "build/libs/theme-test.war");
+			File workspaceWarFile = _testExists(
+				workspaceProjectDir, "build/libs/theme-test.war");
 
-		_testWarsDiff(gradleWarFile, workspaceWarFile);
+			_testWarsDiff(gradleWarFile, workspaceWarFile);
+		}
 	}
 
 	@Test
@@ -3470,7 +3521,7 @@ public class ProjectTemplatesTest {
 
 		_testContains(
 			gradleWorkspaceProjectDir, "gradle.properties", true,
-			".*liferay.workspace.bundle.url=.*liferay.com/portal/7.1.1-.*");
+			".*liferay.workspace.bundle.url=.*liferay.com/portal/7.1.2-.*");
 
 		File gradlePropertiesFile = new File(
 			gradleWorkspaceProjectDir, "gradle.properties");
@@ -3484,7 +3535,7 @@ public class ProjectTemplatesTest {
 
 		_testContains(
 			mavenWorkspaceProjectDir, "pom.xml",
-			"<liferay.workspace.bundle.url>", "liferay.com/portal/7.1.1-");
+			"<liferay.workspace.bundle.url>", "liferay.com/portal/7.1.2-");
 	}
 
 	@Test
@@ -3736,9 +3787,7 @@ public class ProjectTemplatesTest {
 			File mavenOutputDir, String... gradleTaskPath)
 		throws Exception {
 
-		if (Validator.isNotNull(_BUILD_PROJECTS) &&
-			_BUILD_PROJECTS.equals("true")) {
-
+		if (_isBuildProjects()) {
 			_executeGradle(gradleProjectDir, gradleTaskPath);
 
 			Path gradleOutputPath = FileTestUtil.getFile(
@@ -4079,14 +4128,8 @@ public class ProjectTemplatesTest {
 			String content = FileUtil.read(buildFilePath);
 
 			if (!content.contains("allprojects")) {
-				StringBuilder sb = new StringBuilder();
-
-				sb.append(content);
-				sb.append("allprojects {\n");
-				sb.append("repositories {");
-				sb.append("mavenLocal()}}");
-
-				content = sb.toString();
+				content +=
+					"allprojects {\n\trepositories {\n\t\tmavenLocal()\n\t}\n}";
 
 				Files.write(
 					buildFilePath, content.getBytes(StandardCharsets.UTF_8));
@@ -4261,6 +4304,16 @@ public class ProjectTemplatesTest {
 		throws Exception {
 
 		return _executeMaven(projectDir, false, args);
+	}
+
+	private static boolean _isBuildProjects() {
+		if (Validator.isNotNull(_BUILD_PROJECTS) &&
+			_BUILD_PROJECTS.equals("true")) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static List<String> _sanitizeLines(List<String> lines) {
@@ -5418,9 +5471,7 @@ public class ProjectTemplatesTest {
 		_testNotContains(
 			workspaceProjectDir, "build.gradle", true, "^repositories \\{.*");
 
-		if (Validator.isNotNull(_BUILD_PROJECTS) &&
-			_BUILD_PROJECTS.equals("true")) {
-
+		if (_isBuildProjects()) {
 			_executeGradle(gradleProjectDir, _GRADLE_TASK_PATH_BUILD);
 
 			_testExists(gradleProjectDir, jarFilePath);

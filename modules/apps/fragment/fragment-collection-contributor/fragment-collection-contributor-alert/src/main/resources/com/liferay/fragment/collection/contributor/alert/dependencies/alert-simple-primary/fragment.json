@@ -1,0 +1,9 @@
+{
+	"cssPath": "index.css",
+	"fragmentEntryKey": "alert-simple-primary",
+	"htmlPath": "index.html",
+	"jsPath": "index.js",
+	"name": "Alert simple primary",
+	"thumbnail": "alert_simple_primary.png",
+	"type": "section"
+}

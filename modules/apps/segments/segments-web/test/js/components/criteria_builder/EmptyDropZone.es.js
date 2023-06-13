@@ -18,6 +18,7 @@ describe(
 					<OriginalEmptyDropZone
 						connectDropTarget={connectDnd}
 						onCriterionAdd={jest.fn()}
+						propertyKey="user"
 					/>
 				);
 

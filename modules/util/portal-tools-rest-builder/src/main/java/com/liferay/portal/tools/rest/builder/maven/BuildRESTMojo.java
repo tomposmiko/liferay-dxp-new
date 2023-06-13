@@ -50,15 +50,8 @@ public class BuildRESTMojo extends AbstractMojo {
 	/**
 	 * @parameter
 	 */
-	public void setRESTConfigFileName(String restConfigFileName) {
-		_restBuilderArgs.setRESTConfigFileName(restConfigFileName);
-	}
-
-	/**
-	 * @parameter
-	 */
-	public void setRESTOpenAPIFileName(String restOpenAPIFileName) {
-		_restBuilderArgs.setRESTOpenAPIFileName(restOpenAPIFileName);
+	public void setRESTConfigDirName(String restConfigDirName) {
+		_restBuilderArgs.setRESTConfigDirName(restConfigDirName);
 	}
 
 	/**

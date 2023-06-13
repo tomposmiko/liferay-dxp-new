@@ -27,7 +27,11 @@ public class FreeMarkerUtil {
 			String copyrightFileName, String name, Map<String, Object> context)
 		throws Exception {
 
-		return _freeMarker.processTemplate(copyrightFileName, name, context);
+		return _freeMarker.processTemplate(
+			copyrightFileName,
+			"com/liferay/portal/tools/rest/builder/dependencies/" + name +
+				".ftl",
+			context);
 	}
 
 	private static final FreeMarker _freeMarker = new FreeMarker();

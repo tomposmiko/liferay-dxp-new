@@ -15,6 +15,7 @@
 package com.liferay.dynamic.data.mapping.service.impl;
 
 import com.liferay.dynamic.data.mapping.background.task.DDMStructureIndexerBackgroundTaskExecutor;
+import com.liferay.dynamic.data.mapping.background.task.DDMStructureIndexerTracker;
 import com.liferay.dynamic.data.mapping.exception.InvalidParentStructureException;
 import com.liferay.dynamic.data.mapping.exception.InvalidStructureVersionException;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
@@ -66,8 +67,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.DDMStructureIndexer;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -1107,6 +1106,16 @@ public class DDMStructureLocalServiceImpl
 
 	@Override
 	public List<DDMStructure> getStructures(
+		long companyId, long[] groupIds, long classNameId, int start, int end,
+		OrderByComparator<DDMStructure> orderByComparator) {
+
+		return ddmStructureFinder.filterFindByC_G_C_S(
+			companyId, groupIds, classNameId, WorkflowConstants.STATUS_ANY,
+			start, end, orderByComparator);
+	}
+
+	@Override
+	public List<DDMStructure> getStructures(
 		long groupId, String name, String description) {
 
 		return ddmStructurePersistence.findByG_N_D(groupId, name, description);
@@ -1164,6 +1173,16 @@ public class DDMStructureLocalServiceImpl
 
 		return ddmStructurePersistence.findByG_C(
 			groupIds, classNameId, start, end);
+	}
+
+	@Override
+	public List<DDMStructure> getStructures(
+		long[] groupIds, long classNameId,
+		OrderByComparator<DDMStructure> orderByComparator) {
+
+		return ddmStructurePersistence.findByG_C(
+			groupIds, classNameId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			orderByComparator);
 	}
 
 	/**
@@ -2049,10 +2068,11 @@ public class DDMStructureLocalServiceImpl
 			return;
 		}
 
-		Indexer<?> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-			structure.getClassName());
+		DDMStructureIndexer ddmStructureIndexer =
+			ddmStructureIndexerTracker.getDDMStructureIndexer(
+				structure.getClassName());
 
-		if (!(indexer instanceof DDMStructureIndexer)) {
+		if (ddmStructureIndexer == null) {
 			return;
 		}
 
@@ -2284,6 +2304,9 @@ public class DDMStructureLocalServiceImpl
 
 	@ServiceReference(type = DDMSearchHelper.class)
 	protected DDMSearchHelper ddmSearchHelper;
+
+	@ServiceReference(type = DDMStructureIndexerTracker.class)
+	protected DDMStructureIndexerTracker ddmStructureIndexerTracker;
 
 	@ServiceReference(type = DDMXML.class)
 	protected DDMXML ddmXML;

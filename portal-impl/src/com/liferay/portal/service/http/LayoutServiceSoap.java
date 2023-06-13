@@ -28,19 +28,20 @@ import java.util.Map;
 
 /**
  * Provides the SOAP utility for the
- * {@link LayoutServiceUtil} service utility. The
- * static methods of this class calls the same methods of the service utility.
- * However, the signatures are different because it is difficult for SOAP to
- * support certain types.
+ * <code>LayoutServiceUtil</code> service
+ * utility. The static methods of this class call the same methods of the
+ * service utility. However, the signatures are different because it is
+ * difficult for SOAP to support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a {@link java.util.List}, that
- * is translated to an array of {@link com.liferay.portal.kernel.model.LayoutSoap}.
- * If the method in the service utility returns a
- * {@link com.liferay.portal.kernel.model.Layout}, that is translated to a
- * {@link com.liferay.portal.kernel.model.LayoutSoap}. Methods that SOAP cannot
- * safely wire are skipped.
+ * if the method in the service utility returns a <code>java.util.List</code>,
+ * that is translated to an array of
+ * <code>com.liferay.portal.kernel.model.LayoutSoap</code>. If the method in the
+ * service utility returns a
+ * <code>com.liferay.portal.kernel.model.Layout</code>, that is translated to a
+ * <code>com.liferay.portal.kernel.model.LayoutSoap</code>. Methods that SOAP
+ * cannot safely wire are skipped.
  * </p>
  *
  * <p>
@@ -62,8 +63,6 @@ import java.util.Map;
  *
  * @author Brian Wing Shun Chan
  * @see LayoutServiceHttp
- * @see com.liferay.portal.kernel.model.LayoutSoap
- * @see LayoutServiceUtil
  * @generated
  */
 @ProviderType
@@ -80,7 +79,7 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout (optionally
+	* @param parentLayoutId the layout ID of the parent layout (optionally
 	{@link LayoutConstants#DEFAULT_PARENT_LAYOUT_ID})
 	* @param localeNamesMap the layout's locales and localized names
 	* @param localeTitlesMap the layout's locales and localized titles
@@ -159,7 +158,7 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout (optionally
+	* @param parentLayoutId the layout ID of the parent layout (optionally
 	{@link LayoutConstants#DEFAULT_PARENT_LAYOUT_ID})
 	* @param name the layout's locales and localized names
 	* @param title the layout's locales and localized titles
@@ -207,7 +206,7 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param serviceContext the service context to be applied
 	* @throws PortalException if a portal exception occurred
 	*/
@@ -436,7 +435,7 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param languageId the primary key of the language. For more information
 	See {@link Locale}.
 	* @return the layout's name
@@ -705,7 +704,7 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param parentLayoutId the primary key of the parent layout
+	* @param parentLayoutId the layout ID of the parent layout
 	* @param layoutIds the primary keys of the layouts
 	* @param serviceContext the service context to be applied
 	* @throws PortalException if a portal exception occurred
@@ -791,8 +790,8 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
-	* @param parentLayoutId the primary key of the layout's new parent layout
+	* @param layoutId the layout ID of the layout
+	* @param parentLayoutId the layout ID of the layout's new parent layout
 	* @param localeNamesMap the layout's locales and localized names
 	* @param localeTitlesMap the layout's locales and localized titles
 	* @param descriptionMap the locales and localized descriptions to merge
@@ -861,7 +860,7 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param typeSettings the settings to load the unicode properties object.
 	See {@link com.liferay.portal.kernel.util.UnicodeProperties
 	#fastLoad(String)}.
@@ -889,7 +888,7 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param themeId the primary key of the layout's new theme
 	* @param colorSchemeId the primary key of the layout's new color scheme
 	* @param css the layout's new CSS
@@ -918,7 +917,7 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param name the layout's new name
 	* @param languageId the primary key of the language. For more information
 	see {@link Locale}.
@@ -972,8 +971,8 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
-	* @param parentLayoutId the primary key to be assigned to the parent
+	* @param layoutId the layout ID of the layout
+	* @param parentLayoutId the layout ID to be assigned to the parent
 	layout
 	* @return the matching layout
 	* @throws PortalException if a portal exception occurred
@@ -1050,7 +1049,7 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
+	* @param layoutId the layout ID of the layout
 	* @param priority the layout's new priority
 	* @return the updated layout
 	* @throws PortalException if a portal exception occurred
@@ -1078,9 +1077,9 @@ public class LayoutServiceSoap {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout
-	* @param nextLayoutId the primary key of the next layout
-	* @param previousLayoutId the primary key of the previous layout
+	* @param layoutId the layout ID of the layout
+	* @param nextLayoutId the layout ID of the next layout
+	* @param previousLayoutId the layout ID of the previous layout
 	* @return the updated layout
 	* @throws PortalException if a portal exception occurred
 	*/

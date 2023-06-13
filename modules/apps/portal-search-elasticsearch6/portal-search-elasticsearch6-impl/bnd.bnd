@@ -11,7 +11,7 @@ Import-Package:\
 	!com.conversantmedia.util.concurrent.*,\
 	\
 	!com.fasterxml.aalto.*,\
-	!com.fasterxml.jackson.*,\
+	!com.fasterxml.jackson.dataformat.*,\
 	\
 	!com.github.mustachejava.*,\
 	\
@@ -28,8 +28,6 @@ Import-Package:\
 	\
 	!com.sun.jna.*,\
 	!com.sun.nio.sctp.*,\
-	\
-	!com.tdunning.math.stats.*,\
 	\
 	!com.thoughtworks.qdox.*,\
 	!com.thoughtworks.xstream.*,\

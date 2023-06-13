@@ -78,7 +78,6 @@ public class SharedWithMeViewDisplayContext {
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 		_request = request;
-		_resourceBundle = resourceBundle;
 		_sharingEntryLocalService = sharingEntryLocalService;
 		_sharingEntryInterpreterFunction = sharingEntryInterpreterFunction;
 		_sharedWithMeFilterItems = sharedWithMeFilterItems;
@@ -155,7 +154,7 @@ public class SharedWithMeViewDisplayContext {
 			menuItems.add(
 				_sharingMenuItemFactory.createShareMenuItem(
 					sharingEntry.getClassName(), sharingEntry.getClassPK(),
-					_request, _resourceBundle));
+					_request));
 		}
 
 		menu.setMenuItems(menuItems);
@@ -292,7 +291,6 @@ public class SharedWithMeViewDisplayContext {
 
 	private List<DropdownItem> _getFilterNavigationDropdownItems() {
 		return new DropdownItemList() {
-
 			{
 				String className = ParamUtil.getString(_request, "className");
 
@@ -396,7 +394,6 @@ public class SharedWithMeViewDisplayContext {
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final HttpServletRequest _request;
-	private final ResourceBundle _resourceBundle;
 	private final List<SharedWithMeFilterItem> _sharedWithMeFilterItems;
 	private final Function<SharingEntry, SharingEntryInterpreter>
 		_sharingEntryInterpreterFunction;

@@ -136,18 +136,8 @@
 	/>
 </liferay-ui:search-container>
 
-<aui:script require='<%= npmResolvedPackageName + "/js/ElementsDefaultEventHandler.es as ElementsDefaultEventHandler" %>'>
-	Liferay.component(
-		'<%= JournalWebConstants.JOURNAL_ELEMENTS_DEFAULT_EVENT_HANDLER %>',
-		new ElementsDefaultEventHandler.default(
-			{
-				namespace: '<%= renderResponse.getNamespace() %>',
-				trashEnabled: <%= trashHelper.isTrashEnabled(scopeGroupId) %>
-			}
-		),
-		{
-			destroyOnNavigate: true,
-			portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>'
-		}
-	);
-</aui:script>
+<liferay-frontend:component
+	componentId="<%= JournalWebConstants.JOURNAL_ELEMENTS_DEFAULT_EVENT_HANDLER %>"
+	context="<%= journalDisplayContext.getComponentContext() %>"
+	module="js/ElementsDefaultEventHandler.es"
+/>

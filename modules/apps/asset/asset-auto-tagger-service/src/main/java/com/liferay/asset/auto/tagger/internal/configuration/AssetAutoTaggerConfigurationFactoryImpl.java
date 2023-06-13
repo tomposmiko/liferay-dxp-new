@@ -48,7 +48,37 @@ public class AssetAutoTaggerConfigurationFactoryImpl
 	implements AssetAutoTaggerConfigurationFactory {
 
 	@Override
-	public AssetAutoTaggerConfiguration getAssetAutoTaggerConfiguration() {
+	public AssetAutoTaggerConfiguration getCompanyAssetAutoTaggerConfiguration(
+		Company company) {
+
+		try {
+			return new CompanyAssetAutoTaggerConfiguration(company);
+		}
+		catch (ConfigurationException ce) {
+			_log.error(ce, ce);
+
+			return getSystemAssetAutoTaggerConfiguration();
+		}
+	}
+
+	@Override
+	public AssetAutoTaggerConfiguration getGroupAssetAutoTaggerConfiguration(
+		Group group) {
+
+		try {
+			return new GroupAssetAutoTaggerConfiguration(group);
+		}
+		catch (PortalException pe) {
+			_log.error(pe, pe);
+
+			return getSystemAssetAutoTaggerConfiguration();
+		}
+	}
+
+	@Override
+	public AssetAutoTaggerConfiguration
+		getSystemAssetAutoTaggerConfiguration() {
+
 		return new AssetAutoTaggerConfiguration() {
 
 			@Override
@@ -68,34 +98,6 @@ public class AssetAutoTaggerConfigurationFactoryImpl
 			}
 
 		};
-	}
-
-	@Override
-	public AssetAutoTaggerConfiguration getAssetAutoTaggerConfiguration(
-		Company company) {
-
-		try {
-			return new CompanyAssetAutoTaggerConfiguration(company);
-		}
-		catch (ConfigurationException ce) {
-			_log.error(ce, ce);
-
-			return getAssetAutoTaggerConfiguration();
-		}
-	}
-
-	@Override
-	public AssetAutoTaggerConfiguration getAssetAutoTaggerConfiguration(
-		Group group) {
-
-		try {
-			return new GroupAssetAutoTaggerConfiguration(group);
-		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
-
-			return getAssetAutoTaggerConfiguration();
-		}
 	}
 
 	@Activate
@@ -167,7 +169,7 @@ public class AssetAutoTaggerConfigurationFactoryImpl
 			return _assetAutoTaggerCompanyConfiguration.enabled();
 		}
 
-		private AssetAutoTaggerCompanyConfiguration
+		private final AssetAutoTaggerCompanyConfiguration
 			_assetAutoTaggerCompanyConfiguration;
 
 	}
@@ -230,7 +232,7 @@ public class AssetAutoTaggerConfigurationFactoryImpl
 			}
 		}
 
-		private AssetAutoTaggerConfiguration
+		private final AssetAutoTaggerConfiguration
 			_assetAutoTaggerCompanyConfiguration;
 		private final Group _group;
 

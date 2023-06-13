@@ -67,12 +67,6 @@ SegmentsDisplayContext segmentsDisplayContext = (SegmentsDisplayContext)request.
 
 			<liferay-ui:search-container-column-text
 				cssClass="table-cell-expand-smallest table-cell-minw-150"
-				name="type"
-				value="<%= ResourceActionsUtil.getModelResource(locale, segmentsEntry.getType()) %>"
-			/>
-
-			<liferay-ui:search-container-column-text
-				cssClass="table-cell-expand-smallest table-cell-minw-150"
 				name="active"
 				value='<%= LanguageUtil.get(request, segmentsEntry.isActive() ? "yes" : "no") %>'
 			/>
@@ -82,17 +76,34 @@ SegmentsDisplayContext segmentsDisplayContext = (SegmentsDisplayContext)request.
 				name="source"
 			>
 				<c:choose>
-					<c:when test="<%= segmentsEntry.getSource() == SegmentsConstants.SOURCE_ASAH_FARO_BACKEND %>">
+					<c:when test="<%= Objects.equals(segmentsEntry.getSource(), SegmentsConstants.SOURCE_ASAH_FARO_BACKEND) %>">
 						<liferay-ui:icon
-							message="analytics-cloud"
+							message="source.analytics-cloud"
 							src='<%= PortalUtil.getPathContext(request) + "/assets/ac-icon.svg" %>'
 						/>
 					</c:when>
 					<c:otherwise>
 						<liferay-ui:icon
-							message="dxp"
+							message="source.dxp"
 							src='<%= PortalUtil.getPathContext(request) + "/assets/dxp-icon.svg" %>'
 						/>
+					</c:otherwise>
+				</c:choose>
+			</liferay-ui:search-container-column-text>
+
+			<liferay-ui:search-container-column-text
+				cssClass="table-cell-expand-smallest table-cell-minw-150"
+				name="scope"
+			>
+				<c:choose>
+					<c:when test="<%= segmentsEntry.getGroupId() == themeDisplay.getCompanyGroupId() %>">
+						<liferay-ui:message key="global" />
+					</c:when>
+					<c:when test="<%= segmentsEntry.getGroupId() == themeDisplay.getScopeGroupId() %>">
+						<liferay-ui:message key="current-site" />
+					</c:when>
+					<c:otherwise>
+						<liferay-ui:message key="parent-site" />
 					</c:otherwise>
 				</c:choose>
 			</liferay-ui:search-container-column-text>

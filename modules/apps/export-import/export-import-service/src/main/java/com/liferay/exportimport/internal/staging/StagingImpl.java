@@ -162,6 +162,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
 
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -449,18 +450,12 @@ public class StagingImpl implements Staging {
 		Map<String, Serializable> settingsMap =
 			exportImportConfiguration.getSettingsMap();
 
-		long targetGroupId = MapUtil.getLong(settingsMap, "targetGroupId");
 		String remoteAddress = MapUtil.getString(settingsMap, "remoteAddress");
 		int remotePort = MapUtil.getInteger(settingsMap, "remotePort");
 		String remotePathContext = MapUtil.getString(
 			settingsMap, "remotePathContext");
 		boolean secureConnection = MapUtil.getBoolean(
 			settingsMap, "secureConnection");
-
-		_groupLocalService.validateRemote(
-			exportImportConfiguration.getGroupId(), remoteAddress, remotePort,
-			remotePathContext, secureConnection, targetGroupId);
-
 		boolean remotePrivateLayout = MapUtil.getBoolean(
 			settingsMap, "remotePrivateLayout");
 
@@ -524,10 +519,6 @@ public class StagingImpl implements Staging {
 			int remotePort, String remotePathContext, boolean secureConnection,
 			long remoteGroupId, boolean remotePrivateLayout)
 		throws PortalException {
-
-		_groupLocalService.validateRemote(
-			sourceGroupId, remoteAddress, remotePort, remotePathContext,
-			secureConnection, remoteGroupId);
 
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -755,7 +746,25 @@ public class StagingImpl implements Staging {
 
 		Throwable cause = e.getCause();
 
-		if (e instanceof DuplicateFileEntryException) {
+		if (e.getCause() instanceof ConnectException) {
+			Map settingsMap = exportImportConfiguration.getSettingsMap();
+
+			String remoteAddress = MapUtil.getString(
+				settingsMap, "remoteAddress");
+			String remotePort = MapUtil.getString(settingsMap, "remotePort");
+
+			String argument = remoteAddress + ":" + remotePort;
+
+			errorMessage = LanguageUtil.format(
+				resourceBundle,
+				"could-not-connect-to-address-x.-please-verify-that-the-" +
+					"specified-port-is-correct-and-that-the-remote-server-is-" +
+						"configured-to-accept-requests-from-this-server",
+				argument);
+
+			errorType = ServletResponseConstants.SC_FILE_CUSTOM_EXCEPTION;
+		}
+		else if (e instanceof DuplicateFileEntryException) {
 			errorMessage = LanguageUtil.get(
 				locale, "please-enter-a-unique-document-name");
 			errorType = ServletResponseConstants.SC_DUPLICATE_FILE_EXCEPTION;

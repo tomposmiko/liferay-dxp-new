@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.settings.TypedSettings;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.sharing.configuration.SharingConfiguration;
 import com.liferay.sharing.display.context.util.SharingMenuItemFactory;
 import com.liferay.sharing.display.context.util.SharingToolbarItemFactory;
 import com.liferay.sharing.document.library.internal.security.permission.SharingPermissionHelper;
@@ -55,25 +56,26 @@ public class SharingDLViewFileVersionDisplayContext
 		ResourceBundle resourceBundle,
 		SharingMenuItemFactory sharingMenuItemFactory,
 		SharingToolbarItemFactory sharingToolbarItemFactory,
-		SharingPermissionHelper sharingPermissionHelper) {
+		SharingPermissionHelper sharingPermissionHelper,
+		SharingConfiguration sharingConfiguration) {
 
 		super(_UUID, parentDLDisplayContext, request, response, fileVersion);
 
 		_request = request;
 		_fileEntry = fileEntry;
-		_resourceBundle = resourceBundle;
 		_themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 		_sharingMenuItemFactory = sharingMenuItemFactory;
 		_sharingToolbarItemFactory = sharingToolbarItemFactory;
 		_sharingPermissionHelper = sharingPermissionHelper;
+		_sharingConfiguration = sharingConfiguration;
 	}
 
 	@Override
 	public Menu getMenu() throws PortalException {
 		Menu menu = super.getMenu();
 
-		if (!_isShowShareAction()) {
+		if (!_isShowShareAction() || !_sharingConfiguration.isEnabled()) {
 			return menu;
 		}
 
@@ -82,7 +84,7 @@ public class SharingDLViewFileVersionDisplayContext
 		menuItems.add(
 			_sharingMenuItemFactory.createShareMenuItem(
 				DLFileEntryConstants.getClassName(),
-				_fileEntry.getFileEntryId(), _request, _resourceBundle));
+				_fileEntry.getFileEntryId(), _request));
 
 		return menu;
 	}
@@ -91,16 +93,29 @@ public class SharingDLViewFileVersionDisplayContext
 	public List<ToolbarItem> getToolbarItems() throws PortalException {
 		List<ToolbarItem> toolbarItems = super.getToolbarItems();
 
-		if (!_isShowShareAction()) {
+		if (!_isShowShareAction() || !_sharingConfiguration.isEnabled()) {
 			return toolbarItems;
 		}
 
 		toolbarItems.add(
 			_sharingToolbarItemFactory.createShareToolbarItem(
 				DLFileEntryConstants.getClassName(),
-				_fileEntry.getFileEntryId(), _request, _resourceBundle));
+				_fileEntry.getFileEntryId(), _request));
 
 		return toolbarItems;
+	}
+
+	@Override
+	public boolean isSharingLinkVisible() {
+		if (_sharingConfiguration.isEnabled() &&
+			_sharingPermissionHelper.isShareable(
+				_themeDisplay.getPermissionChecker(),
+				_fileEntry.getFileEntryId())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _isShowActions() throws PortalException {
@@ -144,7 +159,7 @@ public class SharingDLViewFileVersionDisplayContext
 
 	private final FileEntry _fileEntry;
 	private final HttpServletRequest _request;
-	private final ResourceBundle _resourceBundle;
+	private final SharingConfiguration _sharingConfiguration;
 	private final SharingMenuItemFactory _sharingMenuItemFactory;
 	private final SharingPermissionHelper _sharingPermissionHelper;
 	private final SharingToolbarItemFactory _sharingToolbarItemFactory;

@@ -18,8 +18,20 @@ import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.search.aggregation.Aggregation;
+import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
+import com.liferay.portal.search.stats.StatsRequest;
+
+import java.io.Serializable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author André de Oliveira
@@ -28,6 +40,22 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 
 	public SearchRequestBuilderImpl(SearchContext searchContext) {
 		_searchContext = searchContext;
+	}
+
+	@Override
+	public void addAggregation(Aggregation aggregation) {
+		Map<String, Aggregation> map = getAggregationsMap();
+
+		map.put(aggregation.getName(), aggregation);
+	}
+
+	@Override
+	public void addPipelineAggregation(
+		PipelineAggregation pipelineAggregation) {
+
+		Map<String, PipelineAggregation> map = getPipelineAggregationsMap();
+
+		map.put(pipelineAggregation.getName(), pipelineAggregation);
 	}
 
 	@Override
@@ -70,7 +98,41 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 		return this;
 	}
 
+	@Override
+	public SearchRequestBuilder statsRequests(StatsRequest... statsRequests) {
+		_searchContext.setAttribute(
+			_STATS_REQUESTS, new ArrayList<>(Arrays.asList(statsRequests)));
+
+		return this;
+	}
+
 	public class SearchRequestImpl implements SearchRequest {
+
+		@Override
+		public Map<String, Aggregation> getAggregationsMap() {
+			Map<String, Aggregation> map =
+				(Map<String, Aggregation>)_searchContext.getAttribute(
+					_AGGREGATIONS_MAP);
+
+			if (map == null) {
+				return Collections.emptyMap();
+			}
+
+			return map;
+		}
+
+		@Override
+		public Map<String, PipelineAggregation> getPipelineAggregationsMap() {
+			Map<String, PipelineAggregation> map =
+				(Map<String, PipelineAggregation>)_searchContext.getAttribute(
+					_PIPELINE_AGGREGATIONS_MAP);
+
+			if (map == null) {
+				return Collections.emptyMap();
+			}
+
+			return map;
+		}
 
 		@Override
 		public Query getRescoreQuery() {
@@ -79,6 +141,18 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 
 		public SearchContext getSearchContext() {
 			return _searchContext;
+		}
+
+		@Override
+		public List<StatsRequest> getStatsRequests() {
+			Serializable serializable = _searchContext.getAttribute(
+				_STATS_REQUESTS);
+
+			if (serializable != null) {
+				return (List<StatsRequest>)serializable;
+			}
+
+			return Collections.emptyList();
 		}
 
 		@Override
@@ -94,12 +168,56 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 
 	}
 
+	protected Map<String, Aggregation> getAggregationsMap() {
+		synchronized (_searchContext) {
+			LinkedHashMap<String, Aggregation> linkedHashMap =
+				(LinkedHashMap<String, Aggregation>)_searchContext.getAttribute(
+					_AGGREGATIONS_MAP);
+
+			if (linkedHashMap != null) {
+				return linkedHashMap;
+			}
+
+			linkedHashMap = new LinkedHashMap<>();
+
+			_searchContext.setAttribute(_AGGREGATIONS_MAP, linkedHashMap);
+
+			return linkedHashMap;
+		}
+	}
+
+	protected Map<String, PipelineAggregation> getPipelineAggregationsMap() {
+		synchronized (_searchContext) {
+			LinkedHashMap<String, PipelineAggregation> linkedHashMap =
+				(LinkedHashMap<String, PipelineAggregation>)
+					_searchContext.getAttribute(_PIPELINE_AGGREGATIONS_MAP);
+
+			if (linkedHashMap != null) {
+				return linkedHashMap;
+			}
+
+			linkedHashMap = new LinkedHashMap<>();
+
+			_searchContext.setAttribute(
+				_PIPELINE_AGGREGATIONS_MAP, linkedHashMap);
+
+			return linkedHashMap;
+		}
+	}
+
+	private static final String _AGGREGATIONS_MAP = "aggregations.map";
+
 	private static final String _EXPLAIN = "explain";
 
 	private static final String _INCLUDE_RESPONSE_STRING =
 		"include.response.string";
 
+	private static final String _PIPELINE_AGGREGATIONS_MAP =
+		"pipeline.aggregations.map";
+
 	private static final String _RESCORE_QUERY = "rescore.query";
+
+	private static final String _STATS_REQUESTS = "stats.requests";
 
 	private final SearchContext _searchContext;
 

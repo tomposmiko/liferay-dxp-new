@@ -16,6 +16,7 @@ package com.liferay.asset.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.model.AssetVocabulary;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.search.test.util.IndexedFieldsFixture;
@@ -175,7 +177,6 @@ public class AssetVocabularyIndexerIndexedFieldsTest {
 			StringUtil.lowerCase(assetVocabulary.getUserName()));
 		map.put(
 			"name_sortable", StringUtil.lowerCase(assetVocabulary.getName()));
-		map.put("title_ja_JP", assetVocabulary.getName());
 		map.put(
 			"title_sortable", StringUtil.lowerCase(assetVocabulary.getName()));
 
@@ -185,6 +186,7 @@ public class AssetVocabularyIndexerIndexedFieldsTest {
 
 		_populateDates(assetVocabulary, map);
 		_populateRoles(assetVocabulary, map);
+		_populateTitles(assetVocabulary.getTitle(), map);
 
 		return map;
 	}
@@ -206,6 +208,25 @@ public class AssetVocabularyIndexerIndexedFieldsTest {
 			assetVocabulary.getCompanyId(), AssetVocabulary.class.getName(),
 			assetVocabulary.getVocabularyId(), assetVocabulary.getGroupId(),
 			null, map);
+	}
+
+	private void _populateTitles(String title, Map<String, String> map) {
+		map.put(Field.TITLE, title);
+
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("title_");
+			sb.append(locale.getLanguage());
+			sb.append("_");
+			sb.append(locale.getCountry());
+
+			map.put(sb.toString(), title);
+
+			sb.append("_sortable");
+
+			map.put(sb.toString(), title);
+		}
 	}
 
 	@DeleteAfterTestRun

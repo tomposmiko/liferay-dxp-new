@@ -16,9 +16,16 @@ const CRITERIA_GROUP_SHAPE = {
 };
 
 const CRITERION_SHAPE = {
+	displayValue: PropTypes.string,
 	operatorName: PropTypes.string,
 	propertyName: PropTypes.string,
-	value: PropTypes.oneOfType([PropTypes.string, PropTypes.array])
+	value: PropTypes.oneOfType(
+		[
+			PropTypes.array,
+			PropTypes.number,
+			PropTypes.string
+		]
+	)
 };
 
 class CriteriaBuilder extends Component {
@@ -38,7 +45,22 @@ class CriteriaBuilder extends Component {
 			}
 		),
 		editing: PropTypes.bool.isRequired,
+
+		/**
+		 * Name of the entity that a set of properties belongs to, for example,
+		 * "User". This value it not displayed anywhere. Only used in
+		 * CriteriaRow for requesting a field value's name.
+		 * @default undefined
+		 * @type {?(string|undefined)}
+		 */
+		entityName: PropTypes.string.isRequired,
 		id: PropTypes.number.isRequired,
+
+		/**
+		 * Name displayed to label a contributor and its' properties.
+		 * @default undefined
+		 * @type {?(string|undefined)}
+		 */
 		modelLabel: PropTypes.string,
 		onChange: PropTypes.func,
 		onEditToggle: PropTypes.func,
@@ -64,10 +86,6 @@ class CriteriaBuilder extends Component {
 			)
 		).isRequired,
 		supportedPropertyTypes: PropTypes.object
-	};
-
-	static defaultProps = {
-		readOnly: false
 	};
 
 	/**
@@ -246,6 +264,7 @@ class CriteriaBuilder extends Component {
 		const {
 			criteria,
 			editing,
+			entityName,
 			modelLabel,
 			propertyKey,
 			supportedConjunctions,
@@ -255,7 +274,7 @@ class CriteriaBuilder extends Component {
 		} = this.props;
 
 		return (
-			<div className="sheet sheet-lg">
+			<div className="criteria-builder-root sheet">
 				<div className="criteria-builder-toolbar">
 					<div className="criteria-model-label">
 						{sub(
@@ -276,6 +295,7 @@ class CriteriaBuilder extends Component {
 				<CriteriaGroup
 					criteria={criteria}
 					editing={editing}
+					entityName={entityName}
 					groupId={criteria && criteria.groupId}
 					modelLabel={modelLabel}
 					onChange={this._handleCriteriaChange}

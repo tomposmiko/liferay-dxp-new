@@ -69,6 +69,8 @@
 		<column name="classNameId" type="long" />
 		<column name="classPK" type="long" />
 		<column name="resourcePrimKey" type="long" />
+		<column name="changeType" type="int" />
+		<column name="status" type="int" />
 
 		<!-- Relationships -->
 

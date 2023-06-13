@@ -18,23 +18,12 @@
 
 <%
 SiteTeamsDisplayContext siteTeamsDisplayContext = new SiteTeamsDisplayContext(renderRequest, renderResponse, request);
+
+SiteTeamsManagementToolbarDisplayContext siteTeamsManagementToolbarDisplayContext = new SiteTeamsManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, siteTeamsDisplayContext);
 %>
 
 <clay:management-toolbar
-	actionDropdownItems="<%= siteTeamsDisplayContext.getActionDropdownItems() %>"
-	clearResultsURL="<%= siteTeamsDisplayContext.getClearResultsURL() %>"
-	componentId="teamsManagementToolbar"
-	creationMenu="<%= siteTeamsDisplayContext.isShowAddButton() ? siteTeamsDisplayContext.getCreationMenu() : null %>"
-	disabled="<%= siteTeamsDisplayContext.isDisabledManagementBar() %>"
-	filterDropdownItems="<%= siteTeamsDisplayContext.getFilterDropdownItems() %>"
-	itemsTotal="<%= siteTeamsDisplayContext.getTotalItems() %>"
-	searchActionURL="<%= siteTeamsDisplayContext.getSearchActionURL() %>"
-	searchContainerId="teams"
-	searchFormName="searchFm"
-	showSearch="<%= siteTeamsDisplayContext.isSearchEnabled() %>"
-	sortingOrder="<%= siteTeamsDisplayContext.getOrderByType() %>"
-	sortingURL="<%= siteTeamsDisplayContext.getSortingURL() %>"
-	viewTypeItems="<%= siteTeamsDisplayContext.getViewTypeItems() %>"
+	displayContext="<%= siteTeamsManagementToolbarDisplayContext %>"
 />
 
 <portlet:actionURL name="deleteTeams" var="deleteTeamsURL">
@@ -62,6 +51,12 @@ SiteTeamsDisplayContext siteTeamsDisplayContext = new SiteTeamsDisplayContext(re
 				rowURL.setParameter("mvcPath", "/edit_team_assignments.jsp");
 				rowURL.setParameter("teamId", String.valueOf(team.getTeamId()));
 			}
+
+			Map<String, Object> rowData = new HashMap<>();
+
+			rowData.put("actions", siteTeamsManagementToolbarDisplayContext.getAvailableActions(team));
+
+			row.setData(rowData);
 			%>
 
 			<c:choose>
@@ -86,26 +81,6 @@ SiteTeamsDisplayContext siteTeamsDisplayContext = new SiteTeamsDisplayContext(re
 					<liferay-ui:search-container-column-jsp
 						path="/team_action.jsp"
 					/>
-				</c:when>
-				<c:when test="<%= siteTeamsDisplayContext.isIconView() %>">
-
-					<%
-					row.setCssClass("entry-card lfr-asset-item");
-					%>
-
-					<liferay-ui:search-container-column-text>
-						<liferay-frontend:icon-vertical-card
-							actionJsp="/team_action.jsp"
-							actionJspServletContext="<%= application %>"
-							cssClass="entry-display-style"
-							icon="users"
-							resultRow="<%= row %>"
-							rowChecker="<%= searchContainer.getRowChecker() %>"
-							subtitle="<%= team.getDescription() %>"
-							title="<%= team.getName() %>"
-							url="<%= (rowURL != null) ? rowURL.toString() : null %>"
-						/>
-					</liferay-ui:search-container-column-text>
 				</c:when>
 				<c:when test="<%= siteTeamsDisplayContext.isListView() %>">
 					<liferay-ui:search-container-column-text
@@ -136,29 +111,7 @@ SiteTeamsDisplayContext siteTeamsDisplayContext = new SiteTeamsDisplayContext(re
 	</liferay-ui:search-container>
 </aui:form>
 
-<aui:script sandbox="<%= true %>">
-	var deleteSelectedTeams = function() {
-		if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-			submitForm($(document.<portlet:namespace />fm));
-		}
-	}
-
-	var ACTIONS = {
-		'deleteSelectedTeams': deleteSelectedTeams
-	};
-
-	Liferay.componentReady('teamsManagementToolbar').then(
-		function(managementToolbar) {
-			managementToolbar.on(
-				'actionItemClicked',
-				function(event) {
-					var itemData = event.data.item.data;
-
-					if (itemData && itemData.action && ACTIONS[itemData.action]) {
-						ACTIONS[itemData.action]();
-					}
-				}
-			);
-		}
-	);
-</aui:script>
+<liferay-frontend:component
+	componentId="<%= siteTeamsManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+	module="js/SiteTeamsManagementToolbarDefaultEventHandler.es"
+/>

@@ -51,6 +51,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 				<%
 				Map<String, Object> rowData = new HashMap<String, Object>();
 
+				rowData.put("actions", journalManagementToolbarlDisplayContext.getAvailableActions(curArticle));
 				rowData.put("draggable", JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.DELETE) || JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.UPDATE));
 
 				String title = curArticle.getTitle(locale);
@@ -230,6 +231,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 				<%
 				Map<String, Object> rowData = new HashMap<String, Object>();
 
+				rowData.put("actions", journalManagementToolbarlDisplayContext.getAvailableActions(curFolder));
 				rowData.put("draggable", JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || JournalFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE));
 				rowData.put("folder", true);
 				rowData.put("folder-id", curFolder.getFolderId());
@@ -240,7 +242,6 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 
 				PortletURL rowURL = liferayPortletResponse.createRenderURL();
 
-				rowURL.setParameter("redirect", currentURL);
 				rowURL.setParameter("groupId", String.valueOf(curFolder.getGroupId()));
 				rowURL.setParameter("folderId", String.valueOf(curFolder.getFolderId()));
 				rowURL.setParameter("displayStyle", journalDisplayContext.getDisplayStyle());
@@ -369,18 +370,8 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 	/>
 </liferay-ui:search-container>
 
-<aui:script require='<%= npmResolvedPackageName + "/js/ElementsDefaultEventHandler.es as ElementsDefaultEventHandler" %>'>
-	Liferay.component(
-		'<%= JournalWebConstants.JOURNAL_ELEMENTS_DEFAULT_EVENT_HANDLER %>',
-		new ElementsDefaultEventHandler.default(
-			{
-				namespace: '<%= renderResponse.getNamespace() %>',
-				trashEnabled: <%= trashHelper.isTrashEnabled(scopeGroupId) %>
-			}
-		),
-		{
-			destroyOnNavigate: true,
-			portletId: '<%= HtmlUtil.escapeJS(portletDisplay.getId()) %>'
-		}
-	);
-</aui:script>
+<liferay-frontend:component
+	componentId="<%= JournalWebConstants.JOURNAL_ELEMENTS_DEFAULT_EVENT_HANDLER %>"
+	context="<%= journalDisplayContext.getComponentContext() %>"
+	module="js/ElementsDefaultEventHandler.es"
+/>

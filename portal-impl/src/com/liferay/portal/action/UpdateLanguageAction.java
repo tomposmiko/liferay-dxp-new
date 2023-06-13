@@ -124,6 +124,11 @@ public class UpdateLanguageAction implements Action {
 					layout.getLayoutSet(), themeDisplay, locale);
 			}
 		}
+		else if (layout.isTypeControlPanel() && themeDisplay.isI18n()) {
+			String i18nPath = themeDisplay.getI18nPath();
+
+			redirect = redirect.substring(i18nPath.length());
+		}
 		else {
 			if (PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 0) {
 				redirect = PortalUtil.getLayoutURL(

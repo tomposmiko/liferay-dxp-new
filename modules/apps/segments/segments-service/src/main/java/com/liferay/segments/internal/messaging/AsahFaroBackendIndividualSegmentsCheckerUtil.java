@@ -90,7 +90,8 @@ public class AsahFaroBackendIndividualSegmentsCheckerUtil {
 
 		SegmentsEntry segmentsEntry =
 			_segmentsEntryLocalService.fetchSegmentsEntry(
-				serviceContext.getScopeGroupId(), individualSegment.getId());
+				serviceContext.getScopeGroupId(), individualSegment.getId(),
+				true);
 
 		try {
 			if (segmentsEntry == null) {
@@ -201,8 +202,6 @@ public class AsahFaroBackendIndividualSegmentsCheckerUtil {
 				"Unable to retrieve individuals for individual segment " +
 					segmentsEntry.getKey(),
 				re);
-
-			return;
 		}
 	}
 

@@ -23,11 +23,14 @@ buildAlloyEditor {
 
 classes {
 	dependsOn buildAlloyEditor
-	dependsOn npmRunWebpack
 }
 
 clean {
 	delete "tmp"
+}
+
+configJSModules {
+	enabled = false
 }
 
 dependencies {

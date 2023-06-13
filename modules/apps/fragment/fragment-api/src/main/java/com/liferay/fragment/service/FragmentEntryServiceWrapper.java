@@ -117,6 +117,15 @@ public class FragmentEntryServiceWrapper implements FragmentEntryService,
 	}
 
 	@Override
+	public com.liferay.fragment.model.FragmentEntry copyFragmentEntry(
+		long groupId, long fragmentEntryId, long fragmentCollectionId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _fragmentEntryService.copyFragmentEntry(groupId,
+			fragmentEntryId, fragmentCollectionId, serviceContext);
+	}
+
+	@Override
 	public void deleteFragmentEntries(long[] fragmentEntriesIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		_fragmentEntryService.deleteFragmentEntries(fragmentEntriesIds);

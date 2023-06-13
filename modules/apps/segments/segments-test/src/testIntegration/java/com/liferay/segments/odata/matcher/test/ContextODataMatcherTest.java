@@ -24,6 +24,8 @@ import com.liferay.segments.odata.matcher.ODataMatcher;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.junit.Assert;
@@ -42,6 +44,21 @@ public class ContextODataMatcherTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
+
+	@Test
+	public void testMatchesBooleanEquals() throws Exception {
+		Context context = new Context() {
+			{
+				put(Context.SIGNED_IN, true);
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.SIGNED_IN, " eq ", Boolean.TRUE, ")"),
+				context));
+	}
 
 	@Test
 	public void testMatchesDateEquals() throws Exception {
@@ -72,6 +89,240 @@ public class ContextODataMatcherTest {
 	}
 
 	@Test
+	public void testMatchesDateGreater() throws Exception {
+		LocalDate localDate = LocalDate.of(2018, Month.JANUARY, 1);
+
+		Context context = new Context() {
+			{
+				put(Context.LOCAL_DATE, LocalDate.of(2019, Month.JANUARY, 1));
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LOCAL_DATE, " gt ",
+					localDate.format(DateTimeFormatter.ISO_LOCAL_DATE), ")"),
+				context));
+	}
+
+	@Test
+	public void testMatchesDateGreaterOrEquals() throws Exception {
+		LocalDate localDate = LocalDate.of(2019, Month.JANUARY, 1);
+
+		Context context = new Context() {
+			{
+				put(Context.LOCAL_DATE, localDate);
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LOCAL_DATE, " ge ",
+					localDate.format(DateTimeFormatter.ISO_LOCAL_DATE), ")"),
+				context));
+
+		LocalDate yesterdayLocalDate = localDate.minusDays(1);
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LOCAL_DATE, " ge ",
+					yesterdayLocalDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+					")"),
+				context));
+	}
+
+	@Test
+	public void testMatchesDateLesser() throws Exception {
+		LocalDate localDate = LocalDate.of(2019, Month.JANUARY, 1);
+
+		Context context = new Context() {
+			{
+				put(Context.LOCAL_DATE, LocalDate.of(2018, Month.JANUARY, 1));
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LOCAL_DATE, " lt ",
+					localDate.format(DateTimeFormatter.ISO_LOCAL_DATE), ")"),
+				context));
+	}
+
+	@Test
+	public void testMatchesDateLesserOrEquals() throws Exception {
+		LocalDate localDate = LocalDate.of(2019, Month.JANUARY, 1);
+
+		Context context = new Context() {
+			{
+				put(Context.LOCAL_DATE, localDate);
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LOCAL_DATE, " le ",
+					localDate.format(DateTimeFormatter.ISO_LOCAL_DATE), ")"),
+				context));
+
+		LocalDate tomorrowLocalDate = localDate.plusDays(1);
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LOCAL_DATE, " le ",
+					tomorrowLocalDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+					")"),
+				context));
+	}
+
+	@Test
+	public void testMatchesDateTimeEquals() throws Exception {
+		ZonedDateTime zonedDateTime = ZonedDateTime.of(
+			2019, 1, 1, 10, 30, 0, 0, ZoneOffset.UTC);
+
+		Context context = new Context() {
+			{
+				put(Context.LAST_SIGN_IN_DATE_TIME, zonedDateTime);
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LAST_SIGN_IN_DATE_TIME, " eq ",
+					zonedDateTime.format(
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+					")"),
+				context));
+
+		ZonedDateTime nextHourZonedDateTime = zonedDateTime.plusHours(1);
+
+		Assert.assertFalse(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LAST_SIGN_IN_DATE_TIME, " eq ",
+					nextHourZonedDateTime.format(
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+					")"),
+				context));
+	}
+
+	@Test
+	public void testMatchesDateTimeGreater() throws Exception {
+		ZonedDateTime zonedDateTime = ZonedDateTime.of(
+			2019, 1, 1, 10, 30, 0, 0, ZoneOffset.UTC);
+
+		Context context = new Context() {
+			{
+				put(
+					Context.LAST_SIGN_IN_DATE_TIME,
+					ZonedDateTime.of(2019, 1, 1, 11, 30, 0, 0, ZoneOffset.UTC));
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LAST_SIGN_IN_DATE_TIME, " gt ",
+					zonedDateTime.format(
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+					")"),
+				context));
+	}
+
+	@Test
+	public void testMatchesDateTimeGreaterOrEquals() throws Exception {
+		ZonedDateTime zonedDateTime = ZonedDateTime.of(
+			2019, 1, 1, 10, 30, 0, 0, ZoneOffset.UTC);
+
+		Context context = new Context() {
+			{
+				put(Context.LAST_SIGN_IN_DATE_TIME, zonedDateTime);
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LAST_SIGN_IN_DATE_TIME, " ge ",
+					zonedDateTime.format(
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+					")"),
+				context));
+
+		ZonedDateTime pastHourZonedDateTime = zonedDateTime.minusHours(1);
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LAST_SIGN_IN_DATE_TIME, " ge ",
+					pastHourZonedDateTime.format(
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+					")"),
+				context));
+	}
+
+	@Test
+	public void testMatchesDateTimeLesser() throws Exception {
+		ZonedDateTime zonedDateTime = ZonedDateTime.of(
+			2019, 1, 1, 10, 30, 0, 0, ZoneOffset.UTC);
+
+		Context context = new Context() {
+			{
+				put(
+					Context.LAST_SIGN_IN_DATE_TIME,
+					ZonedDateTime.of(2019, 1, 1, 9, 30, 0, 0, ZoneOffset.UTC));
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LAST_SIGN_IN_DATE_TIME, " lt ",
+					zonedDateTime.format(
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+					")"),
+				context));
+	}
+
+	@Test
+	public void testMatchesDateTimeLesserOrEquals() throws Exception {
+		ZonedDateTime zonedDateTime = ZonedDateTime.of(
+			2019, 1, 1, 10, 30, 0, 0, ZoneOffset.UTC);
+
+		Context context = new Context() {
+			{
+				put(Context.LAST_SIGN_IN_DATE_TIME, zonedDateTime);
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LAST_SIGN_IN_DATE_TIME, " le ",
+					zonedDateTime.format(
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+					")"),
+				context));
+
+		ZonedDateTime nextHourZonedDateTime = zonedDateTime.plusHours(1);
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.LAST_SIGN_IN_DATE_TIME, " le ",
+					nextHourZonedDateTime.format(
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+					")"),
+				context));
+	}
+
+	@Test
 	public void testMatchesIntegerEquals() throws Exception {
 		Context context = new Context() {
 			{
@@ -92,20 +343,168 @@ public class ContextODataMatcherTest {
 	}
 
 	@Test
-	public void testMatchesStringEquals() throws Exception {
+	public void testMatchesIntegerGreater() throws Exception {
 		Context context = new Context() {
 			{
-				put(Context.LANGUAGE_ID, "en");
+				put(Context.DEVICE_SCREEN_RESOLUTION_WIDTH, 1000);
 			}
 		};
 
 		Assert.assertTrue(
 			_contextODataMatcher.matches(
-				StringBundler.concat("(", Context.LANGUAGE_ID, " eq 'en')"),
+				StringBundler.concat(
+					"(", Context.DEVICE_SCREEN_RESOLUTION_WIDTH, " gt 900)"),
+				context));
+	}
+
+	@Test
+	public void testMatchesIntegerGreaterOrEquals() throws Exception {
+		Context context = new Context() {
+			{
+				put(Context.DEVICE_SCREEN_RESOLUTION_WIDTH, 1000);
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.DEVICE_SCREEN_RESOLUTION_WIDTH, " ge 900)"),
+				context));
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.DEVICE_SCREEN_RESOLUTION_WIDTH, " ge 1000)"),
+				context));
+	}
+
+	@Test
+	public void testMatchesIntegerLesser() throws Exception {
+		Context context = new Context() {
+			{
+				put(Context.DEVICE_SCREEN_RESOLUTION_WIDTH, 1000);
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.DEVICE_SCREEN_RESOLUTION_WIDTH, " lt 1100)"),
+				context));
+	}
+
+	@Test
+	public void testMatchesIntegerLesserOrEquals() throws Exception {
+		Context context = new Context() {
+			{
+				put(Context.DEVICE_SCREEN_RESOLUTION_WIDTH, 1000);
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.DEVICE_SCREEN_RESOLUTION_WIDTH, " le 1100)"),
+				context));
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.DEVICE_SCREEN_RESOLUTION_WIDTH, " le 1000)"),
+				context));
+	}
+
+	@Test
+	public void testMatchesStringContains() throws Exception {
+		Context context = new Context() {
+			{
+				put(Context.URL, "http://www.liferay.com");
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat("contains(", Context.URL, ", 'liferay')"),
 				context));
 		Assert.assertFalse(
 			_contextODataMatcher.matches(
-				StringBundler.concat("(", Context.LANGUAGE_ID, " eq 'fr')"),
+				StringBundler.concat("contains(", Context.URL, ", 'google')"),
+				context));
+	}
+
+	@Test
+	public void testMatchesStringEquals() throws Exception {
+		Context context = new Context() {
+			{
+				put(Context.URL, "http://www.liferay.com");
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.URL, " eq 'http://www.liferay.com')"),
+				context));
+		Assert.assertFalse(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"(", Context.URL, " eq 'http://localhost')"),
+				context));
+	}
+
+	@Test
+	public void testMatchesStringEqualsWithUppercase() throws Exception {
+		Context context = new Context() {
+			{
+				put(Context.LANGUAGE_ID, "de_DE");
+			}
+		};
+
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat("(", Context.LANGUAGE_ID, " eq 'de_DE')"),
+				context));
+		Assert.assertFalse(
+			_contextODataMatcher.matches(
+				StringBundler.concat("(", Context.LANGUAGE_ID, " eq 'fr_FR')"),
+				context));
+	}
+
+	@Test
+	public void testMatchesStringNotContains() throws Exception {
+		Context context = new Context() {
+			{
+				put(Context.URL, "http://www.liferay.com");
+			}
+		};
+
+		Assert.assertFalse(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"not (contains(", Context.URL, ", 'liferay'))"),
+				context));
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"not (contains(", Context.URL, ", 'google'))"),
+				context));
+	}
+
+	@Test
+	public void testMatchesStringNotEquals() throws Exception {
+		Context context = new Context() {
+			{
+				put(Context.LANGUAGE_ID, "en_US");
+			}
+		};
+
+		Assert.assertFalse(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"not (", Context.LANGUAGE_ID, " eq 'en_US')"),
+				context));
+		Assert.assertTrue(
+			_contextODataMatcher.matches(
+				StringBundler.concat(
+					"not (", Context.LANGUAGE_ID, " eq 'fr_FR')"),
 				context));
 	}
 
@@ -113,7 +512,7 @@ public class ContextODataMatcherTest {
 	public void testMatchesWithAnd() throws Exception {
 		Context context = new Context() {
 			{
-				put(Context.LANGUAGE_ID, "en");
+				put(Context.LANGUAGE_ID, "en_US");
 				put(Context.BROWSER, "chrome");
 			}
 		};
@@ -121,13 +520,13 @@ public class ContextODataMatcherTest {
 		Assert.assertTrue(
 			_contextODataMatcher.matches(
 				StringBundler.concat(
-					"(", Context.LANGUAGE_ID, " eq 'en') and (",
+					"(", Context.LANGUAGE_ID, " eq 'en_US') and (",
 					Context.BROWSER, " eq 'chrome')"),
 				context));
 		Assert.assertFalse(
 			_contextODataMatcher.matches(
 				StringBundler.concat(
-					"(", Context.LANGUAGE_ID, " eq 'en') and (",
+					"(", Context.LANGUAGE_ID, " eq 'en_US') and (",
 					Context.BROWSER, " eq 'firefox')"),
 				context));
 	}
@@ -136,7 +535,7 @@ public class ContextODataMatcherTest {
 	public void testMatchesWithOr() throws Exception {
 		Context context = new Context() {
 			{
-				put(Context.LANGUAGE_ID, "en");
+				put(Context.LANGUAGE_ID, "en_US");
 				put(Context.BROWSER, "chrome");
 			}
 		};
@@ -144,19 +543,19 @@ public class ContextODataMatcherTest {
 		Assert.assertTrue(
 			_contextODataMatcher.matches(
 				StringBundler.concat(
-					"(", Context.LANGUAGE_ID, " eq 'en') or (", Context.BROWSER,
-					" eq 'firefox')"),
+					"(", Context.LANGUAGE_ID, " eq 'en_US') or (",
+					Context.BROWSER, " eq 'firefox')"),
 				context));
 		Assert.assertTrue(
 			_contextODataMatcher.matches(
 				StringBundler.concat(
-					"(", Context.LANGUAGE_ID, " eq 'fr') or (", Context.BROWSER,
-					" eq 'chrome')"),
+					"(", Context.LANGUAGE_ID, " eq 'fr_FR') or (",
+					Context.BROWSER, " eq 'chrome')"),
 				context));
 		Assert.assertFalse(
 			_contextODataMatcher.matches(
 				StringBundler.concat(
-					"(", Context.LANGUAGE_ID, " eq 'fr') and (",
+					"(", Context.LANGUAGE_ID, " eq 'fr_FR') and (",
 					Context.BROWSER, " eq 'firefox')"),
 				context));
 	}

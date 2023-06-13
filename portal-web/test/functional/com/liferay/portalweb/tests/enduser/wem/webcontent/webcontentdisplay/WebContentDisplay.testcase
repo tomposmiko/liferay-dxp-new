@@ -41,7 +41,7 @@ definition {
 	test AddAudioViaWebContent {
 		property custom.properties = "editor.wysiwyg.portal-impl.portlet.ddm.text_html.ftl=ckeditor${line.separator}xuggler.enabled=true";
 		property dummy.socket.proxy.disabled = "true";
-		property portal.acceptance = "false";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "WebContentDisplay#AddAudioViaWebContent";
 		property testray.component.names = "Training,Web Content Administration";
 
@@ -940,18 +940,6 @@ definition {
 	test UndeployWebContentDisplayModuleViaGogoShell {
 		property test.name.skip.portal.instance = "WebContentDisplay#UndeployWebContentDisplayModuleViaGogoShell";
 
-		JSONLayout.addPublicLayout(
-			groupName = "Test Site Name",
-			layoutName = "Web Content Display Page"
-		);
-
-		Navigator.gotoSitePage(
-			pageName = "Web Content Display Page",
-			siteName = "Test Site Name"
-		);
-
-		Portlet.addPG(portletName = "Web Content Display");
-
 		GogoShell.openGogoShellAdmin();
 
 		var moduleID = GogoShell.getModuleID(moduleName = "com.liferay.journal.content.web");
@@ -969,6 +957,8 @@ definition {
 		);
 
 		Portlet.viewUndeployMessage();
+
+		Click(locator1 = "Portlet#PORTLET_CONTENT");
 
 		Portlet.deletePG(
 			portletName = "com_liferay_journal_content_web_portlet_JournalContentPortlet"

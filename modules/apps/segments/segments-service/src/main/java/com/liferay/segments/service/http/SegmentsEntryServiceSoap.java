@@ -29,19 +29,20 @@ import java.util.Map;
 
 /**
  * Provides the SOAP utility for the
- * {@link SegmentsEntryServiceUtil} service utility. The
- * static methods of this class calls the same methods of the service utility.
- * However, the signatures are different because it is difficult for SOAP to
- * support certain types.
+ * <code>SegmentsEntryServiceUtil</code> service
+ * utility. The static methods of this class call the same methods of the
+ * service utility. However, the signatures are different because it is
+ * difficult for SOAP to support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a {@link java.util.List}, that
- * is translated to an array of {@link com.liferay.segments.model.SegmentsEntrySoap}.
- * If the method in the service utility returns a
- * {@link com.liferay.segments.model.SegmentsEntry}, that is translated to a
- * {@link com.liferay.segments.model.SegmentsEntrySoap}. Methods that SOAP cannot
- * safely wire are skipped.
+ * if the method in the service utility returns a <code>java.util.List</code>,
+ * that is translated to an array of
+ * <code>com.liferay.segments.model.SegmentsEntrySoap</code>. If the method in the
+ * service utility returns a
+ * <code>com.liferay.segments.model.SegmentsEntry</code>, that is translated to a
+ * <code>com.liferay.segments.model.SegmentsEntrySoap</code>. Methods that SOAP
+ * cannot safely wire are skipped.
  * </p>
  *
  * <p>
@@ -63,8 +64,6 @@ import java.util.Map;
  *
  * @author Eduardo Garcia
  * @see SegmentsEntryServiceHttp
- * @see com.liferay.segments.model.SegmentsEntrySoap
- * @see SegmentsEntryServiceUtil
  * @generated
  */
 @ProviderType
@@ -110,13 +109,15 @@ public class SegmentsEntryServiceSoap {
 	}
 
 	public static com.liferay.segments.model.SegmentsEntrySoap[] getSegmentsEntries(
-		long groupId, boolean active, String type, int start, int end,
+		long groupId, boolean includeAncestorSegmentsEntries, int start,
+		int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.segments.model.SegmentsEntry> orderByComparator)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.segments.model.SegmentsEntry> returnValue =
-				SegmentsEntryServiceUtil.getSegmentsEntries(groupId, active,
-					type, start, end, orderByComparator);
+				SegmentsEntryServiceUtil.getSegmentsEntries(groupId,
+					includeAncestorSegmentsEntries, start, end,
+					orderByComparator);
 
 			return com.liferay.segments.model.SegmentsEntrySoap.toSoapModels(returnValue);
 		}
@@ -127,28 +128,11 @@ public class SegmentsEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.segments.model.SegmentsEntrySoap[] getSegmentsEntries(
-		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.segments.model.SegmentsEntry> orderByComparator)
-		throws RemoteException {
+	public static int getSegmentsEntriesCount(long groupId,
+		boolean includeAncestorSegmentsEntries) throws RemoteException {
 		try {
-			java.util.List<com.liferay.segments.model.SegmentsEntry> returnValue =
-				SegmentsEntryServiceUtil.getSegmentsEntries(groupId, start,
-					end, orderByComparator);
-
-			return com.liferay.segments.model.SegmentsEntrySoap.toSoapModels(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static int getSegmentsEntriesCount(long groupId)
-		throws RemoteException {
-		try {
-			int returnValue = SegmentsEntryServiceUtil.getSegmentsEntriesCount(groupId);
+			int returnValue = SegmentsEntryServiceUtil.getSegmentsEntriesCount(groupId,
+					includeAncestorSegmentsEntries);
 
 			return returnValue;
 		}

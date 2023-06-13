@@ -177,6 +177,10 @@ public class PoshiRunnerContext {
 		return getDefaultNamespace();
 	}
 
+	public static List<String> getNamespaces() {
+		return _namespaces;
+	}
+
 	public static String getOverrideClassName(String namespacedClassName) {
 		return _overrideClassNames.get(namespacedClassName);
 	}
@@ -290,7 +294,11 @@ public class PoshiRunnerContext {
 	}
 
 	public static void readFiles() throws Exception {
-		_readPoshiFiles();
+		readFiles(PoshiRunnerContext.POSHI_TEST_FILE_INCLUDES);
+	}
+
+	public static void readFiles(String[] testFileIncludes) throws Exception {
+		_readPoshiFiles(testFileIncludes);
 		_readSeleniumFiles();
 	}
 
@@ -307,6 +315,13 @@ public class PoshiRunnerContext {
 
 		_testCaseNamespacedClassCommandName =
 			testCaseNamespacedClassCommandName;
+	}
+
+	protected static Properties getNamespacedClassCommandNameProperties(
+		String testCaseNamespacedClassCommandName) {
+
+		return _namespacedClassCommandNamePropertiesMap.get(
+			testCaseNamespacedClassCommandName);
 	}
 
 	private static int _getAllocatedTestGroupSize(int testCount) {
@@ -1009,24 +1024,25 @@ public class PoshiRunnerContext {
 		}
 	}
 
-	private static void _readPoshiFiles() throws Exception {
+	private static void _readPoshiFiles(String[] testFileIncludes)
+		throws Exception {
+
+		String[] poshiFileIncludes = ArrayUtils.addAll(
+			POSHI_SUPPORT_FILE_INCLUDES, testFileIncludes);
+
+		_readPoshiFilesFromClassPath(poshiFileIncludes, "testFunctional");
+
 		if (Validator.isNotNull(PropsValues.TEST_INCLUDE_DIR_NAMES)) {
 			_readPoshiFiles(
 				POSHI_SUPPORT_FILE_INCLUDES,
 				PropsValues.TEST_INCLUDE_DIR_NAMES);
 		}
 
-		String[] poshiFileIncludes = ArrayUtils.addAll(
-			PoshiRunnerContext.POSHI_SUPPORT_FILE_INCLUDES,
-			PoshiRunnerContext.POSHI_TEST_FILE_INCLUDES);
-
-		_readPoshiFilesFromClassPath(poshiFileIncludes, "testFunctional");
+		_readPoshiFiles(poshiFileIncludes, _TEST_BASE_DIR_NAME);
 
 		if (Validator.isNotNull(PropsValues.TEST_SUBREPO_DIRS)) {
 			_readPoshiFiles(poshiFileIncludes, PropsValues.TEST_SUBREPO_DIRS);
 		}
-
-		_readPoshiFiles(poshiFileIncludes, _TEST_BASE_DIR_NAME);
 
 		_initComponentCommandNamesMap();
 
@@ -1425,6 +1441,9 @@ public class PoshiRunnerContext {
 
 				if (fileName.endsWith(".function")) {
 					_functionFileNames.add(fileName.replace(".function", ""));
+
+					_functionFileNames.add(
+						namespace + "." + fileName.replace(".function", ""));
 				}
 			}
 		}
@@ -1590,7 +1609,7 @@ public class PoshiRunnerContext {
 	private static final Map<String, String> _pathLocators = new HashMap<>();
 	private static final Pattern _poshiResourceJarNamePattern = Pattern.compile(
 		"jar:.*\\/(?<namespace>\\w+)\\-(?<branchName>\\w+" +
-			"([\\-\\.]\\w+)*)\\-(?<timestamp>\\d+)\\-(?<sha>\\w+)\\.jar.*");
+			"([\\-\\.]\\w+)*)\\-.*?\\.jar.*");
 	private static final Map<String, Element> _rootElements = new HashMap<>();
 	private static final Map<String, List<Element>> _rootVarElements =
 		new HashMap<>();

@@ -22,6 +22,7 @@ import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.dynamic.data.mapping.exception.NoSuchTemplateException;
 import com.liferay.dynamic.data.mapping.exception.StructureDefinitionException;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
@@ -460,9 +461,7 @@ public class JournalArticleLocalServiceImpl
 
 		// Friendly URLs
 
-		friendlyURLEntryLocalService.addFriendlyURLEntry(
-			groupId, classNameLocalService.getClassNameId(JournalArticle.class),
-			resourcePrimKey, urlTitleMap, serviceContext);
+		updateFriendlyURLs(article, urlTitleMap, serviceContext);
 
 		// Article localization
 
@@ -2801,8 +2800,21 @@ public class JournalArticleLocalServiceImpl
 		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
 			status, start, end, obc);
 
-		return journalArticleFinder.findByG_C_S(
-			groupId, classNameId, ddmStructureKey, queryDefinition);
+		return journalArticleFinder.findByG_C_S_L(
+			groupId, classNameId, ddmStructureKey,
+			LocaleUtil.getMostRelevantLocale(), queryDefinition);
+	}
+
+	@Override
+	public List<JournalArticle> getArticlesByStructureId(
+		long groupId, long classNameId, String ddmStructureKey, Locale locale,
+		int status, int start, int end, OrderByComparator<JournalArticle> obc) {
+
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			status, start, end, obc);
+
+		return journalArticleFinder.findByG_C_S_L(
+			groupId, classNameId, ddmStructureKey, locale, queryDefinition);
 	}
 
 	@Override
@@ -2813,9 +2825,10 @@ public class JournalArticleLocalServiceImpl
 		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
 			status, start, end, obc);
 
-		return journalArticleFinder.findByG_C_S(
+		return journalArticleFinder.findByG_C_S_L(
 			groupId, JournalArticleConstants.CLASSNAME_ID_DEFAULT,
-			ddmStructureKey, queryDefinition);
+			ddmStructureKey, LocaleUtil.getMostRelevantLocale(),
+			queryDefinition);
 	}
 
 	@Override
@@ -2826,6 +2839,19 @@ public class JournalArticleLocalServiceImpl
 		return getArticlesByStructureId(
 			groupId, ddmStructureKey, WorkflowConstants.STATUS_ANY, start, end,
 			obc);
+	}
+
+	@Override
+	public List<JournalArticle> getArticlesByStructureId(
+		long groupId, String ddmStructureKey, Locale locale, int status,
+		int start, int end, OrderByComparator<JournalArticle> obc) {
+
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			status, start, end, obc);
+
+		return journalArticleFinder.findByG_C_S_L(
+			groupId, JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+			ddmStructureKey, locale, queryDefinition);
 	}
 
 	/**
@@ -3135,6 +3161,41 @@ public class JournalArticleLocalServiceImpl
 			return getStructureArticles(ddmStructureKeys);
 		}
 
+		List<JournalArticle> articles = new ArrayList<>();
+
+		QueryDefinition<JournalArticle> approvedQueryDefinition =
+			new QueryDefinition<>(
+				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, new ArticleVersionComparator());
+
+		articles.addAll(
+			journalArticleFinder.findByG_C_S_L(
+				0, JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				ddmStructureKeys, LocaleUtil.getMostRelevantLocale(),
+				approvedQueryDefinition));
+
+		QueryDefinition<JournalArticle> trashQueryDefinition =
+			new QueryDefinition<>(
+				WorkflowConstants.STATUS_IN_TRASH, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, new ArticleVersionComparator());
+
+		articles.addAll(
+			journalArticleFinder.findByG_C_S_L(
+				0, JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				ddmStructureKeys, LocaleUtil.getMostRelevantLocale(),
+				trashQueryDefinition));
+
+		return articles;
+	}
+
+	@Override
+	public List<JournalArticle> getIndexableArticlesByDDMStructureKey(
+		String[] ddmStructureKeys, Locale locale) {
+
+		if (isReindexAllArticleVersions()) {
+			return getStructureArticles(ddmStructureKeys);
+		}
+
 		QueryDefinition<JournalArticle> approvedQueryDefinition =
 			new QueryDefinition<>(
 				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
@@ -3143,9 +3204,9 @@ public class JournalArticleLocalServiceImpl
 		List<JournalArticle> articles = new ArrayList<>();
 
 		articles.addAll(
-			journalArticleFinder.findByG_C_S(
+			journalArticleFinder.findByG_C_S_L(
 				0, JournalArticleConstants.CLASSNAME_ID_DEFAULT,
-				ddmStructureKeys, approvedQueryDefinition));
+				ddmStructureKeys, locale, approvedQueryDefinition));
 
 		QueryDefinition<JournalArticle> trashQueryDefinition =
 			new QueryDefinition<>(
@@ -3153,9 +3214,9 @@ public class JournalArticleLocalServiceImpl
 				QueryUtil.ALL_POS, new ArticleVersionComparator());
 
 		articles.addAll(
-			journalArticleFinder.findByG_C_S(
+			journalArticleFinder.findByG_C_S_L(
 				0, JournalArticleConstants.CLASSNAME_ID_DEFAULT,
-				ddmStructureKeys, trashQueryDefinition));
+				ddmStructureKeys, locale, trashQueryDefinition));
 
 		return articles;
 	}
@@ -5718,20 +5779,7 @@ public class JournalArticleLocalServiceImpl
 
 		// Friendly URLs
 
-		List<FriendlyURLEntry> friendlyURLEntries =
-			friendlyURLEntryLocalService.getFriendlyURLEntries(
-				groupId,
-				classNameLocalService.getClassNameId(JournalArticle.class),
-				article.getResourcePrimKey());
-
-		for (FriendlyURLEntry friendlyURLEntry : friendlyURLEntries) {
-			friendlyURLEntryLocalService.deleteFriendlyURLEntry(
-				friendlyURLEntry);
-		}
-
-		friendlyURLEntryLocalService.addFriendlyURLEntry(
-			groupId, classNameLocalService.getClassNameId(JournalArticle.class),
-			article.getResourcePrimKey(), urlTitleMap, serviceContext);
+		updateFriendlyURLs(article, urlTitleMap, serviceContext);
 
 		// Asset
 
@@ -7165,27 +7213,7 @@ public class JournalArticleLocalServiceImpl
 	protected void checkStructure(JournalArticle article)
 		throws PortalException {
 
-		DDMStructure ddmStructure = article.getDDMStructure();
-
-		try {
-			checkStructure(article, ddmStructure);
-		}
-		catch (StructureDefinitionException sde) {
-			if (_log.isWarnEnabled()) {
-				StringBundler sb = new StringBundler(8);
-
-				sb.append("Article {groupId=");
-				sb.append(article.getGroupId());
-				sb.append(", articleId=");
-				sb.append(article.getArticleId());
-				sb.append(", version=");
-				sb.append(article.getVersion());
-				sb.append("} has content that does not match its structure: ");
-				sb.append(sde.getMessage());
-
-				_log.warn(sb.toString());
-			}
-		}
+		checkStructure(article, article.getDDMStructure());
 	}
 
 	protected void checkStructure(
@@ -7269,7 +7297,7 @@ public class JournalArticleLocalServiceImpl
 						newArticle.getGroupId(), folder.getFolderId(),
 						fileName);
 
-				String previewURL = DLUtil.getPreviewURL(
+				String previewURL = _dlurlHelper.getPreviewURL(
 					fileEntry, fileEntry.getFileVersion(), null,
 					StringPool.BLANK, false, true);
 
@@ -8536,6 +8564,35 @@ public class JournalArticleLocalServiceImpl
 		}
 	}
 
+	protected void updateFriendlyURLs(
+			JournalArticle article, Map<String, String> urlTitleMap,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		List<FriendlyURLEntry> friendlyURLEntries =
+			friendlyURLEntryLocalService.getFriendlyURLEntries(
+				article.getGroupId(),
+				classNameLocalService.getClassNameId(JournalArticle.class),
+				article.getResourcePrimKey());
+
+		FriendlyURLEntry newFriendlyURLEntry =
+			friendlyURLEntryLocalService.addFriendlyURLEntry(
+				article.getGroupId(),
+				classNameLocalService.getClassNameId(JournalArticle.class),
+				article.getResourcePrimKey(), urlTitleMap, serviceContext);
+
+		for (FriendlyURLEntry friendlyURLEntry : friendlyURLEntries) {
+			if (newFriendlyURLEntry.getFriendlyURLEntryId() ==
+					friendlyURLEntry.getFriendlyURLEntryId()) {
+
+				continue;
+			}
+
+			friendlyURLEntryLocalService.deleteFriendlyURLEntry(
+				friendlyURLEntry);
+		}
+	}
+
 	protected void updatePreviousApprovedArticle(JournalArticle article)
 		throws PortalException {
 
@@ -8944,6 +9001,9 @@ public class JournalArticleLocalServiceImpl
 
 	@ServiceReference(type = CommentManager.class)
 	private CommentManager _commentManager;
+
+	@ServiceReference(type = DLURLHelper.class)
+	private DLURLHelper _dlurlHelper;
 
 	@ServiceReference(type = JournalDefaultTemplateProvider.class)
 	private JournalDefaultTemplateProvider _journalDefaultTemplateProvider;

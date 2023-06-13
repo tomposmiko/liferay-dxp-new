@@ -1,37 +1,21 @@
-package ${configYAML.apiPackagePath}.internal.resource;
+package ${configYAML.apiPackagePath}.internal.resource.${versionDirName};
 
-import ${configYAML.apiPackagePath}.dto.RESTCollection;
-import ${configYAML.apiPackagePath}.dto.${schemaName};
-import ${configYAML.apiPackagePath}.resource.${schemaName}Resource;
+import ${configYAML.apiPackagePath}.resource.${versionDirName}.${schemaName}Resource;
 
-import com.liferay.rest.booster.apio.context.Pagination;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
 
-import java.util.Collections;
-
-import javax.annotation.Generated;
+import java.util.Date;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * @author ${configYAML.author}
- * @generated
  */
 @Component(
-	property = {
-		JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT + "=(osgi.jaxrs.name=${configYAML.application.name}.rest)",
-		JaxrsWhiteboardConstants.JAX_RS_RESOURCE + "=true", "api.version=${openAPIYAML.info.version}"
-	},
-	scope = ServiceScope.PROTOTYPE, service = ${schemaName}Resource.class)
-@Generated("")
-public class ${schemaName}ResourceImpl implements ${schemaName}Resource {
-
-	@Override
-	public RESTCollection<${schemaName}> get${schemaName}s(String size, Pagination pagination)
-		throws Exception {
-
-		return new RESTCollection(Collections.emptyList(), 0);
-	}
-
+	properties = "OSGI-INF/liferay/rest/${versionDirName}/${schemaPath}.properties",
+	scope = ServiceScope.PROTOTYPE, service = ${schemaName}Resource.class
+)
+public class ${schemaName}ResourceImpl extends Base${schemaName}ResourceImpl {
 }

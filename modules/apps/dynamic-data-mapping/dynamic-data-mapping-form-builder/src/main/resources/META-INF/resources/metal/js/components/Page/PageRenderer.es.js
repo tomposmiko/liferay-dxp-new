@@ -4,7 +4,6 @@ import 'clay-modal';
 import {Config} from 'metal-state';
 import {dom} from 'metal-dom';
 import {pageStructure} from '../../util/config.es';
-import {setLocalizedValue} from '../../util/i18n.es';
 import {sub} from '../../util/strings.es';
 import Component from 'metal-component';
 import core from 'metal';
@@ -71,7 +70,7 @@ class PageRenderer extends Component {
 		 * @type {?number}
 		 */
 
-		pageId: Config.number().value(0),
+		pageIndex: Config.number().value(0),
 
 		/**
 		 * @default undefined
@@ -116,24 +115,7 @@ class PageRenderer extends Component {
 	}
 
 	/**
-	 * @param {Object} event
-	 * @param {String} pageProperty
-	 * @private
-	 */
-
-	_changePageForm({delegateTarget}, pageProperty) {
-		const {value} = delegateTarget;
-
-		const languageId = themeDisplay.getLanguageId();
-		const page = {...this.page};
-
-		setLocalizedValue(page, languageId, pageProperty, value);
-
-		return page;
-	}
-
-	/**
-	 * @param {number} pageId
+	 * @param {number} pageIndex
 	 * @private
 	 */
 
@@ -141,7 +123,7 @@ class PageRenderer extends Component {
 		return sub(
 			Liferay.Language.get('untitled-page-x-of-x'),
 			[
-				this.pageId + 1,
+				this.pageIndex + 1,
 				this.total
 			]
 		);
@@ -179,13 +161,12 @@ class PageRenderer extends Component {
 	 * @private
 	 */
 
-	_handleModal(event) {
-		event.stopPropagation();
+	_handleDeleteButtonClicked(event) {
 		const index = FormSupport.getIndexes(
 			dom.closest(event.target, '.col-ddm')
 		);
 
-		this.emit('deleteFieldClicked', index);
+		this.emit('deleteButtonClicked', index);
 	}
 
 	/**
@@ -201,17 +182,22 @@ class PageRenderer extends Component {
 	 */
 
 	_handlePageDescriptionChanged(event) {
-		const page = this._changePageForm(event, 'description');
-		const {delegateTarget: {dataset}} = event;
-		let {pageId} = dataset;
-
-		pageId = parseInt(pageId, 10);
+		const {page} = this;
+		const {delegateTarget: {dataset, value}} = event;
+		const pageIndex = parseInt(dataset.pageIndex, 10);
 
 		this.emit(
 			'updatePage',
 			{
-				page,
-				pageId
+				page: {
+					...page,
+					description: value,
+					localizedDescription: {
+						...page.localizedDescription,
+						[themeDisplay.getLanguageId()]: value
+					}
+				},
+				pageIndex
 			}
 		);
 	}
@@ -222,17 +208,22 @@ class PageRenderer extends Component {
 	 */
 
 	_handlePageTitleChanged(event) {
-		const page = this._changePageForm(event, 'title');
-		const {delegateTarget: {dataset}} = event;
-		let {pageId} = dataset;
-
-		pageId = parseInt(pageId, 10);
+		const {page} = this;
+		const {delegateTarget: {dataset, value}} = event;
+		const pageIndex = parseInt(dataset.pageIndex, 10);
 
 		this.emit(
 			'updatePage',
 			{
-				page,
-				pageId
+				page: {
+					...page,
+					localizedTitle: {
+						...page.localizedTitle,
+						[themeDisplay.getLanguageId()]: value
+					},
+					title: value
+				},
+				pageIndex
 			}
 		);
 	}
@@ -291,6 +282,7 @@ class PageRenderer extends Component {
 				title: page.title[themeDisplay.getLanguageId()]
 			};
 		}
+
 		return page;
 	}
 }

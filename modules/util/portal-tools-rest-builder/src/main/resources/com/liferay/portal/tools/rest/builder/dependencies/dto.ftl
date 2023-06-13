@@ -1,25 +1,33 @@
-package ${configYAML.apiPackagePath}.dto;
+package ${configYAML.apiPackagePath}.dto.${versionDirName};
+
+<#compress>
+	<#list openAPIYAML.components.schemas?keys as schemaName>
+		import ${configYAML.apiPackagePath}.dto.${versionDirName}.${schemaName};
+	</#list>
+</#compress>
+
+import com.liferay.petra.function.UnsafeSupplier;
+
+import java.util.Date;
 
 import javax.annotation.Generated;
-
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author ${configYAML.author}
  * @generated
  */
 @Generated("")
-@XmlRootElement(name = "${schemaName}")
-public class ${schemaName} {
+public interface ${schemaName} {
 
-	public long getId() {
-		return _id;
-	}
+	<#list freeMarkerTool.getDTOJavaParameters(configYAML, openAPIYAML, schema, false) as javaParameter>
+		public ${javaParameter.parameterType} get${javaParameter.parameterName?cap_first}();
 
-	public void setId(long id) {
-		_id = id;
-	}
+		public void set${javaParameter.parameterName?cap_first}(
+			${javaParameter.parameterType} ${javaParameter.parameterName});
 
-	private long _id;
+		public void set${javaParameter.parameterName?cap_first}(
+			UnsafeSupplier<${javaParameter.parameterType}, Throwable>
+				${javaParameter.parameterName}UnsafeSupplier);
+	</#list>
 
 }

@@ -18,14 +18,28 @@ import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.filter.FilterTranslator;
 import com.liferay.portal.kernel.search.query.QueryTranslator;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.search.aggregation.Aggregation;
+import com.liferay.portal.search.aggregation.AggregationTranslator;
+import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
+import com.liferay.portal.search.aggregation.pipeline.PipelineAggregationTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.facet.FacetTranslator;
+import com.liferay.portal.search.elasticsearch6.internal.stats.StatsTranslator;
 import com.liferay.portal.search.engine.adapter.search.BaseSearchRequest;
+import com.liferay.portal.search.stats.StatsRequest;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.PipelineAggregationBuilder;
 import org.elasticsearch.search.rescore.QueryRescorerBuilder;
 
 import org.osgi.service.component.annotations.Component;
@@ -45,43 +59,19 @@ public class CommonSearchRequestBuilderAssemblerImpl
 		SearchRequestBuilder searchRequestBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
-		searchRequestBuilder.setExplain(baseSearchRequest.isExplain());
-		searchRequestBuilder.setIndices(baseSearchRequest.getIndexNames());
-
-		if (baseSearchRequest.getMinimumScore() > 0) {
-			searchRequestBuilder.setMinScore(
-				baseSearchRequest.getMinimumScore());
-		}
-
-		if (baseSearchRequest.getPostFilter() != null) {
-			QueryBuilder postFilterQueryBuilder = filterTranslator.translate(
-				baseSearchRequest.getPostFilter(), null);
-
-			searchRequestBuilder.setPostFilter(postFilterQueryBuilder);
-		}
-
-		searchRequestBuilder.setQuery(getQueryBuilder(baseSearchRequest));
-
-		if (baseSearchRequest.isRequestCache()) {
-			searchRequestBuilder.setRequestCache(
-				baseSearchRequest.isRequestCache());
-		}
-
-		if (baseSearchRequest.getTimeoutInMilliseconds() > 0) {
-			searchRequestBuilder.setTimeout(
-				TimeValue.timeValueMillis(
-					baseSearchRequest.getTimeoutInMilliseconds()));
-		}
-
-		searchRequestBuilder.setTrackTotalHits(
-			baseSearchRequest.isTrackTotalHits());
-
+		setAggregations(searchRequestBuilder, baseSearchRequest);
+		setExplain(searchRequestBuilder, baseSearchRequest);
+		setFacets(searchRequestBuilder, baseSearchRequest);
+		setIndices(searchRequestBuilder, baseSearchRequest);
+		setMinScore(searchRequestBuilder, baseSearchRequest);
+		setPipelineAggregations(searchRequestBuilder, baseSearchRequest);
+		setPostFilter(searchRequestBuilder, baseSearchRequest);
+		setQuery(searchRequestBuilder, baseSearchRequest);
+		setRequestCache(searchRequestBuilder, baseSearchRequest);
 		setRescorer(searchRequestBuilder, baseSearchRequest);
-
-		facetTranslator.translate(
-			searchRequestBuilder, baseSearchRequest.getQuery(),
-			baseSearchRequest.getFacets(),
-			baseSearchRequest.isBasicFacetSelection());
+		setStatsRequests(searchRequestBuilder, baseSearchRequest);
+		setTimeout(searchRequestBuilder, baseSearchRequest);
+		setTrackTotalHits(searchRequestBuilder, baseSearchRequest);
 	}
 
 	protected QueryBuilder getQueryBuilder(
@@ -89,7 +79,7 @@ public class CommonSearchRequestBuilderAssemblerImpl
 
 		Query query = searchSearchRequest.getQuery();
 
-		QueryBuilder queryBuilder = queryTranslator.translate(query, null);
+		QueryBuilder queryBuilder = _queryTranslator.translate(query, null);
 
 		if ((query.getPreBooleanFilter() == null) ||
 			(query instanceof BooleanQuery)) {
@@ -106,10 +96,150 @@ public class CommonSearchRequestBuilderAssemblerImpl
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
 		boolQueryBuilder.filter(
-			filterTranslator.translate(query.getPreBooleanFilter(), null));
+			_filterTranslator.translate(query.getPreBooleanFilter(), null));
 		boolQueryBuilder.must(queryBuilder);
 
 		return boolQueryBuilder;
+	}
+
+	protected void setAggregations(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		Map<String, Aggregation> aggregationsMap =
+			baseSearchRequest.getAggregationsMap();
+
+		if (MapUtil.isNotEmpty(aggregationsMap)) {
+			Collection<Aggregation> aggregations = aggregationsMap.values();
+
+			aggregations.forEach(
+				aggregation -> {
+					AggregationBuilder aggregationBuilder =
+						_aggregationTranslator.translate(aggregation);
+
+					searchRequestBuilder.addAggregation(aggregationBuilder);
+				});
+		}
+	}
+
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setAggregationTranslator(
+		AggregationTranslator<AggregationBuilder> aggregationTranslator) {
+
+		_aggregationTranslator = aggregationTranslator;
+	}
+
+	protected void setExplain(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		searchRequestBuilder.setExplain(baseSearchRequest.isExplain());
+	}
+
+	protected void setFacets(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		_facetTranslator.translate(
+			searchRequestBuilder, baseSearchRequest.getQuery(),
+			baseSearchRequest.getFacets(),
+			baseSearchRequest.isBasicFacetSelection());
+	}
+
+	@Reference(unbind = "-")
+	protected void setFacetTranslator(FacetTranslator facetTranslator) {
+		_facetTranslator = facetTranslator;
+	}
+
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setFilterTranslator(
+		FilterTranslator<QueryBuilder> filterTranslator) {
+
+		_filterTranslator = filterTranslator;
+	}
+
+	protected void setIndices(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		searchRequestBuilder.setIndices(baseSearchRequest.getIndexNames());
+	}
+
+	protected void setMinScore(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		if (baseSearchRequest.getMinimumScore() > 0) {
+			searchRequestBuilder.setMinScore(
+				baseSearchRequest.getMinimumScore());
+		}
+	}
+
+	protected void setPipelineAggregations(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		Map<String, PipelineAggregation> pipelineAggregationsMap =
+			baseSearchRequest.getPipelineAggregationsMap();
+
+		if (MapUtil.isNotEmpty(pipelineAggregationsMap)) {
+			Collection<PipelineAggregation> pipelineAggregations =
+				pipelineAggregationsMap.values();
+
+			pipelineAggregations.forEach(
+				pipelineAggregation -> {
+					PipelineAggregationBuilder pipelineAggregationBuilder =
+						_pipelineAggregationTranslator.translate(
+							pipelineAggregation);
+
+					searchRequestBuilder.addAggregation(
+						pipelineAggregationBuilder);
+				});
+		}
+	}
+
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setPipelineAggregationTranslator(
+		PipelineAggregationTranslator<PipelineAggregationBuilder>
+			pipelineAggregationTranslator) {
+
+		_pipelineAggregationTranslator = pipelineAggregationTranslator;
+	}
+
+	protected void setPostFilter(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		if (baseSearchRequest.getPostFilter() != null) {
+			QueryBuilder postFilterQueryBuilder = _filterTranslator.translate(
+				baseSearchRequest.getPostFilter(), null);
+
+			searchRequestBuilder.setPostFilter(postFilterQueryBuilder);
+		}
+	}
+
+	protected void setQuery(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		searchRequestBuilder.setQuery(getQueryBuilder(baseSearchRequest));
+	}
+
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setQueryTranslator(
+		QueryTranslator<QueryBuilder> queryTranslator) {
+
+		_queryTranslator = queryTranslator;
+	}
+
+	protected void setRequestCache(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		if (baseSearchRequest.isRequestCache()) {
+			searchRequestBuilder.setRequestCache(
+				baseSearchRequest.isRequestCache());
+		}
 	}
 
 	protected void setRescorer(
@@ -123,16 +253,52 @@ public class CommonSearchRequestBuilderAssemblerImpl
 		}
 
 		searchRequestBuilder.setRescorer(
-			new QueryRescorerBuilder(queryTranslator.translate(query, null)));
+			new QueryRescorerBuilder(_queryTranslator.translate(query, null)));
 	}
 
-	@Reference
-	protected FacetTranslator facetTranslator;
+	protected void setStatsRequests(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
 
-	@Reference(target = "(search.engine.impl=Elasticsearch)")
-	protected FilterTranslator<QueryBuilder> filterTranslator;
+		List<StatsRequest> statsRequests = baseSearchRequest.getStatsRequests();
 
-	@Reference(target = "(search.engine.impl=Elasticsearch)")
-	protected QueryTranslator<QueryBuilder> queryTranslator;
+		if (!ListUtil.isEmpty(statsRequests)) {
+			statsRequests.forEach(
+				statsRequest -> _statsTranslator.populateRequest(
+					searchRequestBuilder, statsRequest));
+		}
+	}
+
+	@Reference(unbind = "-")
+	protected void setStatsTranslator(StatsTranslator statsTranslator) {
+		_statsTranslator = statsTranslator;
+	}
+
+	protected void setTimeout(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		if (baseSearchRequest.getTimeoutInMilliseconds() > 0) {
+			searchRequestBuilder.setTimeout(
+				TimeValue.timeValueMillis(
+					baseSearchRequest.getTimeoutInMilliseconds()));
+		}
+	}
+
+	protected void setTrackTotalHits(
+		SearchRequestBuilder searchRequestBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		searchRequestBuilder.setTrackTotalHits(
+			baseSearchRequest.isTrackTotalHits());
+	}
+
+	private AggregationTranslator<AggregationBuilder> _aggregationTranslator;
+	private FacetTranslator _facetTranslator;
+	private FilterTranslator<QueryBuilder> _filterTranslator;
+	private PipelineAggregationTranslator<PipelineAggregationBuilder>
+		_pipelineAggregationTranslator;
+	private QueryTranslator<QueryBuilder> _queryTranslator;
+	private StatsTranslator _statsTranslator;
 
 }

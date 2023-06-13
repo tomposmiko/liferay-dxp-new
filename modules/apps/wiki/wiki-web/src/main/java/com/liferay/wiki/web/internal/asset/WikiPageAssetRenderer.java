@@ -43,7 +43,6 @@ import com.liferay.wiki.model.WikiPageConstants;
 import com.liferay.wiki.service.WikiPageLocalServiceUtil;
 import com.liferay.wiki.web.internal.security.permission.resource.WikiPagePermission;
 
-import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -134,15 +133,6 @@ public class WikiPageAssetRenderer
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public Date getDisplayDate() {
-		return _page.getModifiedDate();
-	}
-
 	@Override
 	public long getGroupId() {
 		return _page.getGroupId();
@@ -173,16 +163,15 @@ public class WikiPageAssetRenderer
 	public String getSummary(
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
-		String content = _page.getContent();
-
 		try {
-			content = HtmlUtil.extractText(
+			return HtmlUtil.extractText(
 				_wikiEngineRenderer.convert(_page, null, null, null));
 		}
 		catch (Exception e) {
-		}
+			_log.error(e, e);
 
-		return content;
+			return _page.getContent();
+		}
 	}
 
 	@Override
@@ -205,9 +194,8 @@ public class WikiPageAssetRenderer
 
 	@Override
 	public PortletURL getURLEdit(
-			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse)
-		throws Exception {
+		LiferayPortletRequest liferayPortletRequest,
+		LiferayPortletResponse liferayPortletResponse) {
 
 		Group group = GroupLocalServiceUtil.fetchGroup(_page.getGroupId());
 
@@ -232,9 +220,8 @@ public class WikiPageAssetRenderer
 
 	@Override
 	public PortletURL getURLExport(
-			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse)
-		throws Exception {
+		LiferayPortletRequest liferayPortletRequest,
+		LiferayPortletResponse liferayPortletResponse) {
 
 		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
 			liferayPortletRequest, WikiPortletKeys.WIKI,
@@ -321,13 +308,6 @@ public class WikiPageAssetRenderer
 	@Override
 	public String getUuid() {
 		return _page.getUuid();
-	}
-
-	public boolean hasDeletePermission(PermissionChecker permissionChecker)
-		throws PortalException {
-
-		return WikiPagePermission.contains(
-			permissionChecker, _page, ActionKeys.DELETE);
 	}
 
 	@Override

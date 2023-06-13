@@ -1084,11 +1084,16 @@ definition {
 			portlet = "App Manager"
 		);
 
-		AppManager.viewAppCP(appName = "Liferay Drools", appStatus = "Active");
+		AppManager.viewAppCP(
+			appName = "Liferay Drools",
+			appStatus = "Active",
+			searchTerm = "Drools"
+		);
 
 		AppManager.viewAppCP(
 			appName = "Liferay Portal Rules Engine Drools",
-			appStatus = "Active"
+			appStatus = "Active",
+			searchTerm = "Drools"
 		);
 	}
 
@@ -1321,12 +1326,12 @@ definition {
 
 		DMDocument.viewPG(dmDocumentTitle = "Document1");
 
+		DMDocument.expandInfo();
+
 		AssertTextEquals(
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_UPLOADED_BY",
 			value1 = "Test Test"
 		);
-
-		DMDocument.expandInfo();
 
 		AssertTextEquals(
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_VERSION",
@@ -1339,10 +1344,8 @@ definition {
 			value1 = "APPROVED"
 		);
 
-		AssertTextEquals(
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_DOWNLOAD",
-			value1 = "Download",
-			key_dmDocumentSize = "22KB"
+		AssertElementPresent(
+			locator1 = "Button#DOWNLOAD"
 		);
 
 		Navigator.gotoPage(pageName = "Message Boards");
@@ -1394,12 +1397,12 @@ definition {
 
 		DMDocument.viewPG(dmDocumentTitle = "Document1");
 
+		DMDocument.expandInfo();
+
 		AssertTextEquals(
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_UPLOADED_BY",
 			value1 = "Test Test"
 		);
-
-		DMDocument.expandInfo();
 
 		AssertTextEquals(
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_VERSION",

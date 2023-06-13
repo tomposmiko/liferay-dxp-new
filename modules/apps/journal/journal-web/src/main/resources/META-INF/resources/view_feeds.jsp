@@ -19,6 +19,8 @@
 <%
 JournalFeedsDisplayContext journalFeedsDisplayContext = new JournalFeedsDisplayContext(renderRequest, renderResponse);
 
+JournalFeedsManagementToolbarDisplayContext journalFeedsManagementToolbarDisplayContext = new JournalFeedsManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, journalFeedsDisplayContext);
+
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(journalFeedsDisplayContext.getRedirect());
 
@@ -31,20 +33,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 />
 
 <clay:management-toolbar
-	actionDropdownItems="<%= journalFeedsDisplayContext.getActionItemsDropdownItems() %>"
-	clearResultsURL="<%= journalFeedsDisplayContext.getClearResultsURL() %>"
-	componentId="journalFeedsManagementToolbar"
-	creationMenu="<%= JournalPermission.contains(permissionChecker, scopeGroupId, ActionKeys.ADD_FEED) ? journalFeedsDisplayContext.getCreationMenu() : null %>"
-	disabled="<%= journalFeedsDisplayContext.isDisabledManagementBar() %>"
-	filterDropdownItems="<%= journalFeedsDisplayContext.getFilterItemsDropdownItems() %>"
-	itemsTotal="<%= journalFeedsDisplayContext.getTotalItems() %>"
-	searchActionURL="<%= journalFeedsDisplayContext.getSearchActionURL() %>"
-	searchContainerId="feeds"
-	searchFormName="searchFm"
-	showSearch="<%= journalFeedsDisplayContext.isShowSearch() %>"
-	sortingOrder="<%= journalFeedsDisplayContext.getOrderByType() %>"
-	sortingURL="<%= journalFeedsDisplayContext.getSortingURL() %>"
-	viewTypeItems="<%= journalFeedsDisplayContext.getViewTypeItems() %>"
+	displayContext="<%= journalFeedsManagementToolbarDisplayContext %>"
 />
 
 <portlet:actionURL name="deleteFeeds" var="deleteFeedsURL">
@@ -76,12 +65,18 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 
 				editURL = editFeedURL.toString();
 			}
+
+			Map<String, Object> rowData = new HashMap<>();
+
+			rowData.put("actions", journalFeedsManagementToolbarDisplayContext.getAvailableActions(feed));
+
+			row.setData(rowData);
 			%>
 
 			<c:choose>
 				<c:when test='<%= Objects.equals(journalFeedsDisplayContext.getDisplayStyle(), "descriptive") %>'>
 					<liferay-ui:search-container-column-icon
-						icon="rss-svg"
+						icon="rss"
 						toggleRowChecker="<%= true %>"
 					/>
 
@@ -106,25 +101,6 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 					<liferay-ui:search-container-column-jsp
 						path="/feed_action.jsp"
 					/>
-				</c:when>
-				<c:when test='<%= Objects.equals(journalFeedsDisplayContext.getDisplayStyle(), "icon") %>'>
-
-					<%
-					row.setCssClass("entry-card lfr-asset-item");
-					%>
-
-					<liferay-ui:search-container-column-text>
-						<liferay-frontend:icon-vertical-card
-							actionJsp="/feed_action.jsp"
-							actionJspServletContext="<%= application %>"
-							icon="rss-svg"
-							resultRow="<%= row %>"
-							rowChecker="<%= searchContainer.getRowChecker() %>"
-							subtitle="<%= feed.getDescription() %>"
-							title="<%= feed.getName() %>"
-							url="<%= editURL %>"
-						/>
-					</liferay-ui:search-container-column-text>
 				</c:when>
 				<c:when test='<%= Objects.equals(journalFeedsDisplayContext.getDisplayStyle(), "list") %>'>
 					<liferay-ui:search-container-column-text
@@ -159,29 +135,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 	</liferay-ui:search-container>
 </aui:form>
 
-<aui:script sandbox="<%= true %>">
-	var deleteFeeds = function() {
-		if (confirm('<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-feeds") %>')) {
-			submitForm(document.<portlet:namespace />fm);
-		}
-	};
-
-	var ACTIONS = {
-		'deleteFeeds': deleteFeeds
-	};
-
-	Liferay.componentReady('journalFeedsManagementToolbar').then(
-		function(managementToolbar) {
-			managementToolbar.on(
-				'actionItemClicked',
-				function(event) {
-					var itemData = event.data.item.data;
-
-					if (itemData && itemData.action && ACTIONS[itemData.action]) {
-						ACTIONS[itemData.action]();
-					}
-				}
-			);
-		}
-	);
-</aui:script>
+<liferay-frontend:component
+	componentId="<%= journalFeedsManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+	module="js/FeedsManagementToolbarDefaultEventHandler.es"
+/>

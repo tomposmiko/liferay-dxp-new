@@ -60,20 +60,20 @@ public class EditArticleDisplayPageDisplayContext {
 			return ddmStructureId;
 		}
 
+		long groupId = ParamUtil.getLong(
+			_request, "groupId", themeDisplay.getSiteGroupId());
 		String ddmStructureKey = ParamUtil.getString(
 			_request, "ddmStructureKey");
 
 		DDMStructure ddmStructure = DDMStructureLocalServiceUtil.fetchStructure(
-			themeDisplay.getSiteGroupId(),
-			PortalUtil.getClassNameId(JournalArticle.class), ddmStructureKey,
-			true);
+			groupId, PortalUtil.getClassNameId(JournalArticle.class),
+			ddmStructureKey, true);
 
 		if (ddmStructure == null) {
 			JournalArticle article = _getArticle();
 
 			ddmStructure = DDMStructureLocalServiceUtil.fetchStructure(
-				themeDisplay.getSiteGroupId(),
-				PortalUtil.getClassNameId(JournalArticle.class),
+				groupId, PortalUtil.getClassNameId(JournalArticle.class),
 				article.getDDMStructureKey(), true);
 		}
 

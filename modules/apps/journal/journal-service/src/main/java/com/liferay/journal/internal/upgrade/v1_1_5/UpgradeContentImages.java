@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -52,7 +53,8 @@ public class UpgradeContentImages extends UpgradeProcess {
 	}
 
 	protected String convertTypeImageElements(
-			long userId, long groupId, String content, long resourcePrimKey)
+			long userId, long groupId, long companyId, String content,
+			long resourcePrimKey)
 		throws Exception {
 
 		Document contentDocument = SAXReaderUtil.read(content);
@@ -80,7 +82,7 @@ public class UpgradeContentImages extends UpgradeProcess {
 
 				if (Validator.isNotNull(id)) {
 					fileEntry = _getFileEntryById(
-						userId, groupId, resourcePrimKey, id);
+						userId, groupId, companyId, resourcePrimKey, id);
 				}
 				else if (fileEntryId > 0) {
 					fileEntry = _getFileEntryByFileEntryId(fileEntryId);
@@ -130,22 +132,24 @@ public class UpgradeContentImages extends UpgradeProcess {
 	protected void updateContentImages() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement ps1 = connection.prepareStatement(
-				"select content, groupId, id_, resourcePrimKey, userId from " +
-					"JournalArticle where content like ?")) {
+				"select id_, resourcePrimKey, groupId, companyId, userId, " +
+					"content from JournalArticle where content like ?")) {
 
 			ps1.setString(1, "%type=\"image\"%");
 
 			ResultSet rs1 = ps1.executeQuery();
 
 			while (rs1.next()) {
-				String content = rs1.getString(1);
-				long groupId = rs1.getLong(2);
-				long id = rs1.getLong(3);
-				long resourcePrimKey = rs1.getLong(4);
+				long id = rs1.getLong(1);
+
+				long resourcePrimKey = rs1.getLong(2);
+				long groupId = rs1.getLong(3);
+				long companyId = rs1.getLong(4);
 				long userId = rs1.getLong(5);
+				String content = rs1.getString(6);
 
 				String newContent = convertTypeImageElements(
-					userId, groupId, content, resourcePrimKey);
+					userId, groupId, companyId, content, resourcePrimKey);
 
 				try (PreparedStatement ps2 =
 						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
@@ -177,8 +181,11 @@ public class UpgradeContentImages extends UpgradeProcess {
 	}
 
 	private FileEntry _getFileEntryById(
-			long userId, long groupId, long resourcePrimKey, String id)
+			long userId, long groupId, long companyId, long resourcePrimKey,
+			String id)
 		throws PortalException {
+
+		userId = PortalUtil.getValidUserId(companyId, userId);
 
 		long folderId = _journalArticleImageUpgradeUtil.getFolderId(
 			userId, groupId, resourcePrimKey);

@@ -105,6 +105,26 @@ public interface UADDisplay<T> extends UADComponent<T> {
 	public Map<String, Object> getFieldValues(T t, String[] fieldNames);
 
 	/**
+	 * Returns the primary key of the parent container for the given
+	 * entity.
+	 *
+	 * This method is optional and only applies when the implementation
+	 * is returned from
+	 * {@link UADHierarchyDeclaration#getContainerUADDisplays()} or
+	 * {@link UADHierarchyDeclaration#getNoncontainerUADDisplays()}. It is
+	 * required for hierarchy display to function correctly, but not for
+	 * normal usage.
+	 *
+	 * @param t the entity to retrieve the parent container primary key for
+	 * @return the primary key of the parent container of the given entity.
+	 * @review
+	 * @see UADHierarchyDeclaration
+	 */
+	public default Serializable getParentContainerId(T t) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * Returns the primary key of the entity of type {@code T}.
 	 *
 	 * @param t the entity to retrieve the primary key for
@@ -134,6 +154,37 @@ public interface UADDisplay<T> extends UADComponent<T> {
 	public String[] getSortingFieldNames();
 
 	/**
+	 * Returns the entity of type {@code T} that satisfies two conditions:
+	 *
+	 * 1. It is an immediate child of the container identified by
+	 * {@code parentContainerClass} and {@code parentContainerId}.
+	 * 2. It is an ancestor of the childObject. It does not have to be an
+	 * immediate ancestor.
+	 *
+	 * If neither of these conditions are met, this method should return null.
+	 *
+	 * This method is optional and only applies when the implementation
+	 * is returned from
+	 * {@link UADHierarchyDeclaration#getContainerUADDisplays()}. It is
+	 * required for hierarchy display to function correctly, but not for
+	 * normal usage.
+	 *
+	 * @param parentContainerClass
+	 * @param parentContainerId
+	 * @param childObject
+	 * @return the highest level parent of childObject that is also a child of
+	 *         the given container type and primary key
+	 * @review
+	 * @see UADHierarchyDeclaration
+	 */
+	public default T getTopLevelContainer(
+		Class<?> parentContainerClass, Serializable parentContainerId,
+		Object childObject) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * Returns a localized string representing type {@code T}.
 	 *
 	 * @param locale the current locale
@@ -141,6 +192,17 @@ public interface UADDisplay<T> extends UADComponent<T> {
 	 * @review
 	 */
 	public String getTypeName(Locale locale);
+
+	/**
+	 * Returns <code>true</code> if entities of type {@code T} are scoped by
+	 * site.
+	 *
+	 * @return <code>true</code> if entities of type {@code T} are scoped by
+	 * 		   site; <code>false</code> otherwise
+	 */
+	public default boolean isSiteScoped() {
+		return false;
+	}
 
 	/**
 	 * Returns paginated sorted entities of type {@code T} related to a user,

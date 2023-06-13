@@ -14,6 +14,7 @@
 
 package com.liferay.message.boards.uad.test;
 
+import com.liferay.message.boards.constants.MBCategoryConstants;
 import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
@@ -47,9 +48,24 @@ public class MBThreadUADTestUtil {
 			userId, 0, RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), serviceContext);
 
+		return addMBThread(
+			mbMessageLocalService, mbThreadLocalService, userId,
+			mbCategory.getCategoryId());
+	}
+
+	public static MBThread addMBThread(
+			MBMessageLocalService mbMessageLocalService,
+			MBThreadLocalService mbThreadLocalService, long userId,
+			long parentMBCategoryId)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId());
+
 		MBMessage mbMessage = mbMessageLocalService.addMessage(
 			userId, RandomTestUtil.randomString(), TestPropsValues.getGroupId(),
-			mbCategory.getCategoryId(), RandomTestUtil.randomString(),
+			parentMBCategoryId, RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), serviceContext);
 
 		return mbThreadLocalService.getMBThread(mbMessage.getThreadId());
@@ -77,7 +93,13 @@ public class MBThreadUADTestUtil {
 		throws Exception {
 
 		for (MBThread mbThread : mbThreads) {
-			mbCategoryLocalService.deleteCategory(mbThread.getCategoryId());
+			long mbCategoryId = mbThread.getCategoryId();
+
+			if (mbCategoryId !=
+					MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) {
+
+				mbCategoryLocalService.deleteCategory(mbCategoryId);
+			}
 		}
 	}
 

@@ -1,11 +1,10 @@
-package ${configYAML.apiPackagePath}.internal.application;
+package ${configYAML.apiPackagePath}.internal.jaxrs.application;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.Application;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * @author ${configYAML.author}
@@ -13,14 +12,10 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  */
 @Component(
 	property = {
-		JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE + "=${configYAML.application.baseURI}",
-		JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT + "=(osgi.jaxrs.name=Liferay.OAuth2)",
-		JaxrsWhiteboardConstants.JAX_RS_NAME + "=${configYAML.application.name}.rest",
-		"auth.verifier.auth.verifier.BasicAuthHeaderAuthVerifier.urls.includes=/*",
-		"auth.verifier.auth.verifier.OAuth2RestAuthVerifier.urls.includes=/*",
-		"auth.verifier.auth.verifier.PortalSessionAuthVerifier.urls.includes=/*",
-		"auth.verifier.guest.allowed=true",
-		"oauth2.scopechecker.type=annotations"
+		"oauth2.scope.checker.type=annotations",
+		"osgi.jaxrs.application.base=${configYAML.application.baseURI}",
+		"osgi.jaxrs.extension.select=(osgi.jaxrs.name=Liferay.Vulcan)",
+		"osgi.jaxrs.name=${configYAML.application.name}"
 	},
 	service = Application.class
 )

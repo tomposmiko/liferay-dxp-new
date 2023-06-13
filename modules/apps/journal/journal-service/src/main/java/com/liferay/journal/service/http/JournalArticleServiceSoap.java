@@ -31,19 +31,20 @@ import java.util.Map;
 
 /**
  * Provides the SOAP utility for the
- * {@link JournalArticleServiceUtil} service utility. The
- * static methods of this class calls the same methods of the service utility.
- * However, the signatures are different because it is difficult for SOAP to
- * support certain types.
+ * <code>JournalArticleServiceUtil</code> service
+ * utility. The static methods of this class call the same methods of the
+ * service utility. However, the signatures are different because it is
+ * difficult for SOAP to support certain types.
  *
  * <p>
  * ServiceBuilder follows certain rules in translating the methods. For example,
- * if the method in the service utility returns a {@link java.util.List}, that
- * is translated to an array of {@link com.liferay.journal.model.JournalArticleSoap}.
- * If the method in the service utility returns a
- * {@link com.liferay.journal.model.JournalArticle}, that is translated to a
- * {@link com.liferay.journal.model.JournalArticleSoap}. Methods that SOAP cannot
- * safely wire are skipped.
+ * if the method in the service utility returns a <code>java.util.List</code>,
+ * that is translated to an array of
+ * <code>com.liferay.journal.model.JournalArticleSoap</code>. If the method in the
+ * service utility returns a
+ * <code>com.liferay.journal.model.JournalArticle</code>, that is translated to a
+ * <code>com.liferay.journal.model.JournalArticleSoap</code>. Methods that SOAP
+ * cannot safely wire are skipped.
  * </p>
  *
  * <p>
@@ -65,8 +66,6 @@ import java.util.Map;
  *
  * @author Brian Wing Shun Chan
  * @see JournalArticleServiceHttp
- * @see com.liferay.journal.model.JournalArticleSoap
- * @see JournalArticleServiceUtil
  * @generated
  */
 @ProviderType
@@ -760,6 +759,59 @@ public class JournalArticleServiceSoap {
 
 	/**
 	* Returns an ordered range of all the web content articles matching the
+	* group, class name ID, DDM structure key, and workflow status.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param classNameId the primary key of the DDMStructure class if the web
+	content article is related to a DDM structure, the primary key of
+	the class name associated with the article, or
+	JournalArticleConstants.CLASSNAME_ID_DEFAULT in the journal-api
+	module otherwise
+	* @param ddmStructureKey the primary key of the web content article's DDM
+	structure
+	* @param status the web content article's workflow status. For more
+	information see {@link WorkflowConstants} for constants starting
+	with the "STATUS_" prefix.
+	* @param start the lower bound of the range of web content articles to
+	return
+	* @param end the upper bound of the range of web content articles to
+	return (not inclusive)
+	* @param obc the comparator to order the web content articles
+	* @return the range of matching web content articles ordered by the
+	comparator
+	*/
+	public static com.liferay.journal.model.JournalArticleSoap[] getArticlesByStructureId(
+		long groupId, long classNameId, String ddmStructureKey, String locale,
+		int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.journal.model.JournalArticle> obc)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.journal.model.JournalArticle> returnValue =
+				JournalArticleServiceUtil.getArticlesByStructureId(groupId,
+					classNameId, ddmStructureKey,
+					LocaleUtil.fromLanguageId(locale), status, start, end, obc);
+
+			return com.liferay.journal.model.JournalArticleSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns an ordered range of all the web content articles matching the
 	* group, default class name ID, and DDM structure key.
 	*
 	* <p>
@@ -837,6 +889,55 @@ public class JournalArticleServiceSoap {
 			java.util.List<com.liferay.journal.model.JournalArticle> returnValue =
 				JournalArticleServiceUtil.getArticlesByStructureId(groupId,
 					ddmStructureKey, start, end, obc);
+
+			return com.liferay.journal.model.JournalArticleSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns an ordered range of all the web content articles matching the
+	* group, default class name ID, and DDM structure key.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param ddmStructureKey the primary key of the web content article's DDM
+	structure
+	* @param locale web content articles locale
+	* @param status the web content article's workflow status. For more
+	information see {@link WorkflowConstants} for constants starting
+	with the "STATUS_" prefix.
+	* @param start the lower bound of the range of web content articles to
+	return
+	* @param end the upper bound of the range of web content articles to
+	return (not inclusive)
+	* @param obc the comparator to order the web content articles
+	* @return the range of matching web content articles ordered by the
+	comparator
+	*/
+	public static com.liferay.journal.model.JournalArticleSoap[] getArticlesByStructureId(
+		long groupId, String ddmStructureKey, String locale, int status,
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.journal.model.JournalArticle> obc)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.journal.model.JournalArticle> returnValue =
+				JournalArticleServiceUtil.getArticlesByStructureId(groupId,
+					ddmStructureKey, LocaleUtil.fromLanguageId(locale), status,
+					start, end, obc);
 
 			return com.liferay.journal.model.JournalArticleSoap.toSoapModels(returnValue);
 		}
@@ -1083,6 +1184,50 @@ public class JournalArticleServiceSoap {
 			java.util.List<com.liferay.journal.model.JournalArticle> returnValue =
 				JournalArticleServiceUtil.getGroupArticles(groupId, userId,
 					rootFolderId, status, includeOwner, start, end,
+					orderByComparator);
+
+			return com.liferay.journal.model.JournalArticleSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* Returns an ordered range of all the web content articles matching the
+	* group, user, the root folder or any of its subfolders.
+	*
+	* @param groupId the primary key of the web content article's group
+	* @param userId the primary key of the user (optionally <code>0</code>)
+	* @param rootFolderId the primary key of the root folder to begin the
+	search
+	* @param status the web content article's workflow status. For more
+	information see {@link WorkflowConstants} for constants starting
+	with the "STATUS_" prefix.
+	* @param includeOwner whether to include the user's web content
+	* @param locale web content articles locale
+	* @param start the lower bound of the range of web content articles to
+	return
+	* @param end the upper bound of the range of web content articles to
+	return (not inclusive)
+	* @param orderByComparator the comparator to order the web content
+	articles
+	* @return the range of matching web content articles ordered by the
+	comparator
+	* @throws PortalException if a portal exception occurred
+	*/
+	public static com.liferay.journal.model.JournalArticleSoap[] getGroupArticles(
+		long groupId, long userId, long rootFolderId, int status,
+		boolean includeOwner, String locale, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.journal.model.JournalArticle> orderByComparator)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.journal.model.JournalArticle> returnValue =
+				JournalArticleServiceUtil.getGroupArticles(groupId, userId,
+					rootFolderId, status, includeOwner,
+					LocaleUtil.fromLanguageId(locale), start, end,
 					orderByComparator);
 
 			return com.liferay.journal.model.JournalArticleSoap.toSoapModels(returnValue);

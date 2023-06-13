@@ -68,7 +68,6 @@ public final class DEDataDefinitionField implements Serializable {
 			Objects.equals(_localizable, deDataDefinitionField._localizable) &&
 			Objects.equals(_name, deDataDefinitionField._name) &&
 			Objects.equals(_repeatable, deDataDefinitionField._repeatable) &&
-			Objects.equals(_required, deDataDefinitionField._required) &&
 			Objects.equals(_tip, deDataDefinitionField._tip) &&
 			Objects.equals(_type, deDataDefinitionField._type)) {
 
@@ -111,7 +110,6 @@ public final class DEDataDefinitionField implements Serializable {
 		hash = HashUtil.hash(hash, _localizable);
 		hash = HashUtil.hash(hash, _name.hashCode());
 		hash = HashUtil.hash(hash, _repeatable);
-		hash = HashUtil.hash(hash, _required);
 		hash = HashUtil.hash(hash, _tip.hashCode());
 
 		return HashUtil.hash(hash, _type.hashCode());
@@ -127,10 +125,6 @@ public final class DEDataDefinitionField implements Serializable {
 
 	public boolean isRepeatable() {
 		return _repeatable;
-	}
-
-	public boolean isRequired() {
-		return _required;
 	}
 
 	public void setDefaultValue(Object defaultValue) {
@@ -161,10 +155,6 @@ public final class DEDataDefinitionField implements Serializable {
 		_repeatable = repeatable;
 	}
 
-	public void setRequired(boolean required) {
-		_required = required;
-	}
-
 	public void setTip(Map<String, String> tip) {
 		_tip = tip;
 
@@ -183,7 +173,6 @@ public final class DEDataDefinitionField implements Serializable {
 	private boolean _localizable;
 	private String _name;
 	private boolean _repeatable;
-	private boolean _required;
 	private Map<String, String> _tip = new HashMap<>();
 	private String _type;
 

@@ -18,6 +18,7 @@ import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
+import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -31,6 +32,7 @@ import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.taglib.servlet.PipingServletResponse;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -45,6 +47,10 @@ import org.osgi.util.tracker.ServiceTracker;
  * @author Pablo Molina
  */
 public class FragmentEntryRenderUtil {
+
+	public static PortletRegistry getPortletRegistry() {
+		return _portletRegistryServiceTracler.getService();
+	}
 
 	public static FragmentEntryProcessorRegistry getService() {
 		return _serviceTracker.getService();
@@ -111,8 +117,7 @@ public class FragmentEntryRenderUtil {
 		throws PortalException {
 
 		return renderFragmentEntryLink(
-			fragmentEntryLink, mode, new HashMap<String, Object>(), request,
-			response);
+			fragmentEntryLink, mode, new HashMap<>(), request, response);
 	}
 
 	public static String renderFragmentEntryLink(
@@ -122,14 +127,25 @@ public class FragmentEntryRenderUtil {
 		throws PortalException {
 
 		return renderFragmentEntryLink(
-			fragmentEntryLink, mode, parameterMap, request, response,
-			LocaleUtil.getMostRelevantLocale());
+			fragmentEntryLink, mode, parameterMap,
+			LocaleUtil.getMostRelevantLocale(), request, response);
 	}
 
 	public static String renderFragmentEntryLink(
 			FragmentEntryLink fragmentEntryLink, String mode,
-			Map<String, Object> parameterMap, HttpServletRequest request,
-			HttpServletResponse response, Locale locale)
+			Map<String, Object> parameterMap, Locale locale,
+			HttpServletRequest request, HttpServletResponse response)
+		throws PortalException {
+
+		return renderFragmentEntryLink(
+			fragmentEntryLink, mode, parameterMap, locale, new long[0], request,
+			response);
+	}
+
+	public static String renderFragmentEntryLink(
+			FragmentEntryLink fragmentEntryLink, String mode,
+			Map<String, Object> parameterMap, Locale locale, long[] segmentsIds,
+			HttpServletRequest request, HttpServletResponse response)
 		throws PortalException {
 
 		FragmentEntryProcessorRegistry fragmentEntryProcessorRegistry =
@@ -140,7 +156,7 @@ public class FragmentEntryRenderUtil {
 
 		String html =
 			fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
-				fragmentEntryLink, mode, locale);
+				fragmentEntryLink, mode, locale, segmentsIds);
 
 		if ((request != null) && Validator.isNotNull(html)) {
 			html = _processTemplate(html, parameterMap, request, response);
@@ -149,6 +165,8 @@ public class FragmentEntryRenderUtil {
 		if (Validator.isNotNull(css)) {
 			css = _processTemplate(css, parameterMap, request, response);
 		}
+
+		html = _writePortletPaths(fragmentEntryLink, html, request, response);
 
 		return renderFragmentEntry(
 			fragmentEntryLink.getFragmentEntryId(),
@@ -192,6 +210,30 @@ public class FragmentEntryRenderUtil {
 		return unsyncStringWriter.toString();
 	}
 
+	private static String _writePortletPaths(
+			FragmentEntryLink fragmentEntryLink, String html,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws PortalException {
+
+		PortletRegistry portletRegistry = getPortletRegistry();
+
+		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
+
+		HttpServletResponse pipingHttpServletResponse =
+			new PipingServletResponse(httpServletResponse, unsyncStringWriter);
+
+		portletRegistry.writePortletPaths(
+			fragmentEntryLink, httpServletRequest, pipingHttpServletResponse);
+
+		unsyncStringWriter.append(html);
+
+		return unsyncStringWriter.toString();
+	}
+
+	private static final ServiceTracker<PortletRegistry, PortletRegistry>
+		_portletRegistryServiceTracler = ServiceTrackerFactory.open(
+			PortletRegistry.class);
 	private static final ServiceTracker
 		<FragmentEntryProcessorRegistry, FragmentEntryProcessorRegistry>
 			_serviceTracker = ServiceTrackerFactory.open(

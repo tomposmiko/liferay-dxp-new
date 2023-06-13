@@ -63,26 +63,18 @@ public class SegmentsEntryServiceWrapper implements SegmentsEntryService,
 
 	@Override
 	public java.util.List<com.liferay.segments.model.SegmentsEntry> getSegmentsEntries(
-		long groupId, boolean active, String type, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.segments.model.SegmentsEntry> orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _segmentsEntryService.getSegmentsEntries(groupId, active, type,
-			start, end, orderByComparator);
+		long groupId, boolean includeAncestorSegmentsEntries, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.segments.model.SegmentsEntry> orderByComparator) {
+		return _segmentsEntryService.getSegmentsEntries(groupId,
+			includeAncestorSegmentsEntries, start, end, orderByComparator);
 	}
 
 	@Override
-	public java.util.List<com.liferay.segments.model.SegmentsEntry> getSegmentsEntries(
-		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.segments.model.SegmentsEntry> orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _segmentsEntryService.getSegmentsEntries(groupId, start, end,
-			orderByComparator);
-	}
-
-	@Override
-	public int getSegmentsEntriesCount(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return _segmentsEntryService.getSegmentsEntriesCount(groupId);
+	public int getSegmentsEntriesCount(long groupId,
+		boolean includeAncestorSegmentsEntries) {
+		return _segmentsEntryService.getSegmentsEntriesCount(groupId,
+			includeAncestorSegmentsEntries);
 	}
 
 	@Override
@@ -94,11 +86,12 @@ public class SegmentsEntryServiceWrapper implements SegmentsEntryService,
 
 	@Override
 	public com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.segments.model.SegmentsEntry> searchSegmentsEntries(
-		long companyId, long groupId, String keywords, int start, int end,
+		long companyId, long groupId, String keywords,
+		boolean includeAncestorSegmentsEntries, int start, int end,
 		com.liferay.portal.kernel.search.Sort sort)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _segmentsEntryService.searchSegmentsEntries(companyId, groupId,
-			keywords, start, end, sort);
+			keywords, includeAncestorSegmentsEntries, start, end, sort);
 	}
 
 	@Override

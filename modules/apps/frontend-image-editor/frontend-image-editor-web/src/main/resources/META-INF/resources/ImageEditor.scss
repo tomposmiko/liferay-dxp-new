@@ -235,7 +235,7 @@ $gray-lighter: lighten($gray-base, 93.5%) !default; // #EEE
 			margin-top: 5px;
 			position: relative;
 
-			&::after {
+			&:after {
 				border: solid 1px $gray-light;
 				content: "";
 				left: 0;

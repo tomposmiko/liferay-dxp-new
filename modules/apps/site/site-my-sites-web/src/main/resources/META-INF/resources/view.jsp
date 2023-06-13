@@ -25,16 +25,7 @@
 />
 
 <clay:management-toolbar
-	clearResultsURL="<%= siteMySitesDisplayContext.getClearResultsURL() %>"
-	componentId="siteMySitesWebManagementToolbar"
-	filterDropdownItems="<%= siteMySitesDisplayContext.getFilterDropdownItems() %>"
-	itemsTotal="<%= siteMySitesDisplayContext.getTotalItems() %>"
-	searchActionURL="<%= siteMySitesDisplayContext.getSearchActionURL() %>"
-	searchFormName="searchFm"
-	selectable="<%= false %>"
-	sortingOrder="<%= siteMySitesDisplayContext.getOrderByType() %>"
-	sortingURL="<%= siteMySitesDisplayContext.getSortingURL() %>"
-	viewTypeItems="<%= siteMySitesDisplayContext.getViewTypeItems() %>"
+	displayContext="<%= new SiteMySitesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, siteMySitesDisplayContext) %>"
 />
 
 <aui:form action="<%= siteMySitesDisplayContext.getPortletURL() %>" cssClass="container-fluid-1280" method="get" name="fm">
@@ -116,9 +107,12 @@
 						</c:if>
 					</liferay-ui:search-container-column-text>
 
-					<liferay-ui:search-container-column-jsp
-						path="/site_action.jsp"
-					/>
+					<liferay-ui:search-container-column-text>
+						<clay:dropdown-actions
+							defaultEventHandler="<%= MySitesWebKeys.SITES_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+							dropdownItems="<%= siteMySitesDisplayContext.getArticleActionDropdownItems(group) %>"
+						/>
+					</liferay-ui:search-container-column-text>
 				</c:when>
 				<c:when test='<%= Objects.equals(siteMySitesDisplayContext.getDisplayStyle(), "icon") %>'>
 
@@ -127,38 +121,9 @@
 					%>
 
 					<liferay-ui:search-container-column-text>
-						<c:choose>
-							<c:when test="<%= Validator.isNotNull(siteImageURL) %>">
-								<liferay-frontend:vertical-card
-									actionJsp="/site_action.jsp"
-									actionJspServletContext="<%= application %>"
-									imageUrl="<%= siteImageURL %>"
-									resultRow="<%= row %>"
-									rowChecker="<%= searchContainer.getRowChecker() %>"
-									title="<%= group.getDescriptiveName(locale) %>"
-									url="<%= rowURL %>"
-								>
-									<liferay-frontend:vertical-card-footer>
-										<strong><liferay-ui:message key="members" /></strong>: <%= siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId()) %>
-									</liferay-frontend:vertical-card-footer>
-								</liferay-frontend:vertical-card>
-							</c:when>
-							<c:otherwise>
-								<liferay-frontend:icon-vertical-card
-									actionJsp="/site_action.jsp"
-									actionJspServletContext="<%= application %>"
-									icon="sites"
-									resultRow="<%= row %>"
-									rowChecker="<%= searchContainer.getRowChecker() %>"
-									title="<%= group.getDescriptiveName(locale) %>"
-									url="<%= rowURL %>"
-								>
-									<liferay-frontend:vertical-card-footer>
-										<strong><liferay-ui:message key="members" /></strong>: <%= siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId()) %>
-									</liferay-frontend:vertical-card-footer>
-								</liferay-frontend:icon-vertical-card>
-							</c:otherwise>
-						</c:choose>
+						<clay:vertical-card
+							verticalCard="<%= new SiteVerticalCard(group, renderRequest, renderResponse, siteMySitesDisplayContext.getTabs1(), siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId())) %>"
+						/>
 					</liferay-ui:search-container-column-text>
 				</c:when>
 				<c:when test='<%= Objects.equals(siteMySitesDisplayContext.getDisplayStyle(), "list") %>'>
@@ -206,9 +171,12 @@
 						/>
 					</liferay-ui:search-container-column-text>
 
-					<liferay-ui:search-container-column-jsp
-						path="/site_action.jsp"
-					/>
+					<liferay-ui:search-container-column-text>
+						<clay:dropdown-actions
+							defaultEventHandler="<%= MySitesWebKeys.SITES_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+							dropdownItems="<%= siteMySitesDisplayContext.getArticleActionDropdownItems(group) %>"
+						/>
+					</liferay-ui:search-container-column-text>
 				</c:when>
 			</c:choose>
 		</liferay-ui:search-container-row>
@@ -219,3 +187,8 @@
 		/>
 	</liferay-ui:search-container>
 </aui:form>
+
+<liferay-frontend:component
+	componentId="<%= MySitesWebKeys.SITES_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+	module="js/SiteDropdownDefaultEventHandler.es"
+/>

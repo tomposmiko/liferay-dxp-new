@@ -94,6 +94,7 @@ function valueParser(value, type) {
 	switch (type) {
 	case PROPERTY_TYPES.BOOLEAN:
 	case PROPERTY_TYPES.DATE:
+	case PROPERTY_TYPES.DATE_TIME:
 	case PROPERTY_TYPES.INTEGER:
 	case PROPERTY_TYPES.DOUBLE:
 		parsedValue = value;

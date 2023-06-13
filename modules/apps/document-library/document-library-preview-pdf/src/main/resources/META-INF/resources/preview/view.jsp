@@ -33,7 +33,7 @@ if (status != WorkflowConstants.STATUS_ANY) {
 
 String[] previewFileURLs = new String[1];
 
-previewFileURLs[0] = DLUtil.getPreviewURL(fileVersion.getFileEntry(), fileVersion, themeDisplay, previewQueryString);
+previewFileURLs[0] = DLURLHelperUtil.getPreviewURL(fileVersion.getFileEntry(), fileVersion, themeDisplay, previewQueryString);
 
 String previewFileURL = previewFileURLs[0];
 

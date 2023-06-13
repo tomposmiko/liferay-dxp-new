@@ -142,13 +142,12 @@ public class JournalContentDisplayContext {
 			return _article;
 		}
 
-		String previewArticleId = ParamUtil.getString(
+		long previewArticleId = ParamUtil.getLong(
 			_portletRequest, "previewArticleId");
 
-		if (Validator.isNotNull(previewArticleId)) {
-			_article = JournalArticleLocalServiceUtil.fetchLatestArticle(
-				getArticleGroupId(), previewArticleId,
-				WorkflowConstants.STATUS_ANY);
+		if (previewArticleId > 0) {
+			_article = JournalArticleLocalServiceUtil.fetchArticle(
+				previewArticleId);
 		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(
@@ -159,13 +158,6 @@ public class JournalContentDisplayContext {
 				themeDisplay.getPermissionChecker(), _article,
 				ActionKeys.UPDATE)) {
 
-			return _article;
-		}
-
-		_article = (JournalArticle)_portletRequest.getAttribute(
-			WebKeys.JOURNAL_ARTICLE);
-
-		if (_article != null) {
 			return _article;
 		}
 
@@ -193,13 +185,6 @@ public class JournalContentDisplayContext {
 	}
 
 	public JournalArticleDisplay getArticleDisplay() throws PortalException {
-		if (_articleDisplay != null) {
-			return _articleDisplay;
-		}
-
-		_articleDisplay = (JournalArticleDisplay)_portletRequest.getAttribute(
-			WebKeys.JOURNAL_ARTICLE_DISPLAY);
-
 		if (_articleDisplay != null) {
 			return _articleDisplay;
 		}
@@ -810,6 +795,34 @@ public class JournalContentDisplayContext {
 		return _expired;
 	}
 
+	public boolean isPreview() {
+		if (_preview != null) {
+			return _preview;
+		}
+
+		long previewArticleId = ParamUtil.getLong(
+			_portletRequest, "previewArticleId");
+
+		if (previewArticleId <= 0) {
+			_preview = false;
+
+			return _preview;
+		}
+
+		JournalArticle article = JournalArticleLocalServiceUtil.fetchArticle(
+			previewArticleId);
+
+		if (article == null) {
+			_preview = false;
+
+			return _preview;
+		}
+
+		_preview = true;
+
+		return _preview;
+	}
+
 	public boolean isShowArticle() throws PortalException {
 		if (_showArticle != null) {
 			return _showArticle;
@@ -831,9 +844,25 @@ public class JournalContentDisplayContext {
 			return _showArticle;
 		}
 
-		if (!hasViewPermission() || isExpired() || article.isScheduled() ||
-			article.isPending()) {
+		if (!hasViewPermission()) {
+			_showArticle = false;
 
+			return _showArticle;
+		}
+
+		if (isExpired()) {
+			_showArticle = false;
+
+			return _showArticle;
+		}
+
+		if (article.isScheduled() && !isPreview()) {
+			_showArticle = false;
+
+			return _showArticle;
+		}
+
+		if (article.isPending() && !isPreview()) {
 			_showArticle = false;
 
 			return _showArticle;
@@ -1053,6 +1082,7 @@ public class JournalContentDisplayContext {
 	private final PortletRequest _portletRequest;
 	private String _portletResource;
 	private final PortletResponse _portletResponse;
+	private Boolean _preview;
 	private Boolean _showArticle;
 	private Boolean _showEditArticleIcon;
 	private Boolean _showEditTemplateIcon;

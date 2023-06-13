@@ -1,32 +1,39 @@
-package ${configYAML.apiPackagePath}.resource;
+package ${configYAML.apiPackagePath}.resource.${versionDirName};
 
-import ${configYAML.apiPackagePath}.dto.RESTCollection;
-import ${configYAML.apiPackagePath}.dto.${schemaName};
+<#compress>
+	<#list openAPIYAML.components.schemas?keys as schemaName>
+		import ${configYAML.apiPackagePath}.dto.${versionDirName}.${schemaName};
+	</#list>
+</#compress>
 
-import com.liferay.oauth2.provider.scope.RequiresScope;
-import com.liferay.rest.booster.apio.context.Pagination;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.vulcan.multipart.MultipartBody;
+import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.pagination.Pagination;
+
+import java.util.Date;
 
 import javax.annotation.Generated;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-
 /**
+ * To access this resource, run:
+ *
+ *     curl -u your@email.com:yourpassword -D - http://localhost:8080/o${configYAML.application.baseURI}/${openAPIYAML.info.version}
+ *
  * @author ${configYAML.author}
  * @generated
  */
 @Generated("")
-@Path("/${openAPIYAML.info.version}/${schemaPath}")
 public interface ${schemaName}Resource {
 
-	@GET
-	@Produces("application/json")
-	@RequiresScope("${configYAML.application.name}.read")
-	public RESTCollection<${schemaName}> get${schemaName}s(
-			@QueryParam("size") String size, @Context Pagination pagination)
-		throws Exception;
+	<#list freeMarkerTool.getResourceJavaMethodSignatures(configYAML, openAPIYAML, schemaName, false) as javaMethodSignature>
+		public ${javaMethodSignature.returnType} ${javaMethodSignature.methodName}(
+				${freeMarkerTool.getResourceParameters(javaMethodSignature.javaParameters, false)})
+			throws Exception;
+	</#list>
+
+	public void setContextCompany(Company contextCompany);
 
 }

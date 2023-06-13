@@ -22,10 +22,6 @@ AUI.add(
 						validator: Lang.isString
 					},
 
-					editTagsUrl: {
-						validator: Lang.isString
-					},
-
 					form: {
 						validator: Lang.isObject
 					},
@@ -38,7 +34,15 @@ AUI.add(
 						validator: Lang.isString
 					},
 
+					pathModule: {
+						validator: Lang.isString
+					},
+
 					searchContainerId: {
+						validator: Lang.isString
+					},
+
+					selectCategoriesURL: {
 						validator: Lang.isString
 					},
 
@@ -96,12 +100,6 @@ AUI.add(
 							eventHandles.push(A.getDoc().once('dragenter', instance._plugUpload, instance, config));
 						}
 
-						Liferay.componentReady('entriesManagementToolbar').then(
-							function(managementToolbar) {
-								eventHandles.push(managementToolbar.on(['selectPageCheckboxChanged'], instance._handleSelectPageCheckboxChanged.bind(instance)));
-							}
-						);
-
 						instance._eventHandles = eventHandles;
 					},
 
@@ -128,6 +126,12 @@ AUI.add(
 
 						if (action === 'editTags') {
 							instance._openModalTags();
+
+							return;
+						}
+
+						if (action === 'editCategories') {
+							instance._openModalCategories();
 
 							return;
 						}
@@ -200,21 +204,6 @@ AUI.add(
 						else {
 							instance._selectedFileEntries = [];
 						}
-
-						instance._isSelectAllChecked = false;
-					},
-
-					_handleSelectPageCheckboxChanged: function(event) {
-						var instance = this;
-
-						var checked = event.data.checked;
-
-						setTimeout(
-							function() {
-								instance._isSelectAllChecked = checked;
-							},
-							100
-						);
 					},
 
 					_moveToFolder: function(obj) {
@@ -270,6 +259,49 @@ AUI.add(
 						);
 					},
 
+					_openModalCategories: function() {
+						var instance = this;
+
+						var editCategories = instance._editCategories;
+						var form = instance.get('form').node;
+						var namespace = instance.NS;
+
+						var bulkSelection = instance._searchContainer.select && instance._searchContainer.select.get('bulkSelection');
+
+						if (!editCategories) {
+							var pathModule = instance.get('pathModule');
+
+							var urlCategories = pathModule + '/bulk/asset/categories/' + instance._config.scopeGroupId + '/' + instance.get('classNameId') + '/common';
+							var urlUpdateCategories = pathModule + '/bulk/asset/categories/' + instance.get('classNameId');
+
+							Liferay.Loader.require(
+								instance.get('npmResolvedPackageName') + '/document_library/categorization/EditCategories.es',
+								function(EditCategories) {
+									instance._editCategories = new EditCategories.default(
+										{
+											fileEntries: instance._selectedFileEntries,
+											folderId: instance.getFolderId(),
+											portletNamespace: namespace,
+											repositoryId: parseFloat(form.get(namespace + 'repositoryId').val()),
+											selectAll: bulkSelection,
+											selectCategoriesUrl: instance.get('selectCategoriesURL'),
+											spritemap: themeDisplay.getPathThemeImages() + '/lexicon/icons.svg',
+											urlCategories: urlCategories,
+											urlUpdateCategories: urlUpdateCategories
+										},
+										'#' + instance.NS + 'documentLibraryModal'
+									);
+								}
+							);
+						}
+						else {
+							editCategories.fileEntries = instance._selectedFileEntries;
+							editCategories.selectAll = bulkSelection;
+							editCategories.folderId = instance.getFolderId();
+							editCategories.open();
+						}
+					},
+
 					_openModalTags: function() {
 						var instance = this;
 
@@ -277,12 +309,16 @@ AUI.add(
 						var form = instance.get('form').node;
 						var namespace = instance.NS;
 
+						var bulkSelection = instance._searchContainer.select && instance._searchContainer.select.get('bulkSelection');
+
 						if (!editTagsComponent) {
-							var urlTags = themeDisplay.getPortalURL() + '/o/bulk/asset/tags/' + instance.get('classNameId') + '/common';
-							var urlUpdateTags = themeDisplay.getPortalURL() + '/o/bulk/asset/tags/' + instance.get('classNameId');
+							var pathModule = instance.get('pathModule');
+							var urlSearchTags = pathModule +'/bulk/asset/tags/' + instance._config.scopeGroupId + '/search';
+							var urlTags = pathModule + '/bulk/asset/tags/' + instance.get('classNameId') + '/common';
+							var urlUpdateTags = pathModule + '/bulk/asset/tags/' + instance.get('classNameId');
 
 							Liferay.Loader.require(
-								instance.get('npmResolvedPackageName') + '/document_library/tags/EditTags.es',
+								instance.get('npmResolvedPackageName') + '/document_library/categorization/EditTags.es',
 								function(EditTags) {
 									instance._editTagsComponent = new EditTags.default(
 										{
@@ -290,8 +326,9 @@ AUI.add(
 											folderId: instance.getFolderId(),
 											portletNamespace: namespace,
 											repositoryId: parseFloat(form.get(namespace + 'repositoryId').val()),
-											selectAll: instance._isSelectAllChecked,
+											selectAll: bulkSelection,
 											spritemap: themeDisplay.getPathThemeImages() + '/lexicon/icons.svg',
+											urlSearchTags: urlSearchTags,
 											urlTags: urlTags,
 											urlUpdateTags: urlUpdateTags
 										},
@@ -302,7 +339,7 @@ AUI.add(
 						}
 						else {
 							editTagsComponent.fileEntries = instance._selectedFileEntries;
-							editTagsComponent.selectAll = instance._isSelectAllChecked;
+							editTagsComponent.selectAll = bulkSelection;
 							editTagsComponent.folderId = instance.getFolderId();
 							editTagsComponent.open();
 						}

@@ -291,6 +291,13 @@ public class JournalContentPortletLayoutListener
 			return;
 		}
 
+		int count = _assetEntryUsageLocalService.getAssetEntryUsagesCount(
+			assetEntry.getEntryId(), portletId);
+
+		if (count > 0) {
+			return;
+		}
+
 		_assetEntryUsageLocalService.addAssetEntryUsage(
 			PrincipalThreadLocal.getUserId(), layout.getGroupId(),
 			assetEntry.getEntryId(), _portal.getClassNameId(Layout.class),

@@ -17,6 +17,12 @@ package com.liferay.portal.search.searcher;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.search.Query;
+import com.liferay.portal.search.aggregation.Aggregation;
+import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
+import com.liferay.portal.search.stats.StatsRequest;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Holds parameters to be used when performing a search.
@@ -28,6 +34,10 @@ import com.liferay.portal.kernel.search.Query;
 @ProviderType
 public interface SearchRequest {
 
+	public Map<String, Aggregation> getAggregationsMap();
+
+	public Map<String, PipelineAggregation> getPipelineAggregationsMap();
+
 	/**
 	 * Provides a secondary query to reorder the top documents returned.
 	 *
@@ -36,6 +46,15 @@ public interface SearchRequest {
 	 * @review
 	 */
 	public Query getRescoreQuery();
+
+	/**
+	 * Provides the metric aggregations that are to be computed for each field.
+	 *
+	 * @return the stats that are enabled for each field.
+	 *
+	 * @review
+	 */
+	public List<StatsRequest> getStatsRequests();
 
 	/**
 	 * Enables explanation for each hit on how its score was computed.

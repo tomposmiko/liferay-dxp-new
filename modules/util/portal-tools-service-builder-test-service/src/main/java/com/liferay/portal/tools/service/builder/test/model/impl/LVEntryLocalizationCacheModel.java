@@ -31,7 +31,6 @@ import java.io.ObjectOutput;
  * The cache model class for representing LVEntryLocalization in entity cache.
  *
  * @author Brian Wing Shun Chan
- * @see LVEntryLocalization
  * @generated
  */
 @ProviderType
@@ -127,6 +126,8 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 			lvEntryLocalizationImpl.setContent(content);
 		}
 
+		lvEntryLocalizationImpl.setHead(head);
+
 		lvEntryLocalizationImpl.resetOriginalValues();
 
 		return lvEntryLocalizationImpl;
@@ -144,6 +145,8 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 		languageId = objectInput.readUTF();
 		title = objectInput.readUTF();
 		content = objectInput.readUTF();
+
+		head = objectInput.readBoolean();
 	}
 
 	@Override
@@ -177,6 +180,8 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 		else {
 			objectOutput.writeUTF(content);
 		}
+
+		objectOutput.writeBoolean(head);
 	}
 
 	public long mvccVersion;
@@ -186,4 +191,5 @@ public class LVEntryLocalizationCacheModel implements CacheModel<LVEntryLocaliza
 	public String languageId;
 	public String title;
 	public String content;
+	public boolean head;
 }

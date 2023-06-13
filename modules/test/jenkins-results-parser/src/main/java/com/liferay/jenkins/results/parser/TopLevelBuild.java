@@ -32,11 +32,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -233,6 +235,16 @@ public class TopLevelBuild extends BaseBuild {
 	}
 
 	@Override
+	public Map<String, String> getMetricLabels() {
+		Map<String, String> metricLabels = new TreeMap<>();
+
+		metricLabels.put("job_type", "top-level");
+		metricLabels.put("top_level_job_name", getJobName());
+
+		return metricLabels;
+	}
+
+	@Override
 	public String getResult() {
 		String result = super.getResult();
 
@@ -347,6 +359,10 @@ public class TopLevelBuild extends BaseBuild {
 		super.update();
 
 		_updateDuration = System.currentTimeMillis() - start;
+
+		if (_sendBuildMetrics) {
+			sendBuildMetricsOnModifiedBuilds();
+		}
 	}
 
 	protected TopLevelBuild(String url) {
@@ -355,6 +371,41 @@ public class TopLevelBuild extends BaseBuild {
 
 	protected TopLevelBuild(String url, TopLevelBuild topLevelBuild) {
 		super(url, topLevelBuild);
+
+		Properties buildProperties = null;
+
+		try {
+			buildProperties = JenkinsResultsParserUtil.getBuildProperties();
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException("Unable to get build.properties", ioe);
+		}
+
+		_sendBuildMetrics = Boolean.valueOf(
+			buildProperties.getProperty("build.metrics.send"));
+
+		if (_sendBuildMetrics) {
+			_metricsHostName = buildProperties.getProperty(
+				"build.metrics.host.name");
+
+			String metricsHostPortString = buildProperties.getProperty(
+				"build.metrics.host.port");
+
+			if ((_metricsHostName == null) || (metricsHostPortString == null)) {
+				throw new IllegalArgumentException(
+					"Properties \"build.metrics.host.name\" and " +
+						"\"build.metrics.host.port\" must be set to send " +
+							"build metrics");
+			}
+
+			try {
+				_metricsHostPort = Integer.parseInt(metricsHostPortString);
+			}
+			catch (NumberFormatException nfe) {
+				throw new IllegalArgumentException(
+					"Please set \"build.metrics.host.port\" to an integer");
+			}
+		}
 	}
 
 	@Override
@@ -637,6 +688,29 @@ public class TopLevelBuild extends BaseBuild {
 				".");
 
 			buildFailureElements.add(upstreamResultElement);
+
+			Map<String, String> startPropertiesTempMap =
+				getStartPropertiesTempMap();
+
+			String subrepositoryMergePullMentionUsers =
+				startPropertiesTempMap.get(
+					"SUBREPOSITORY_MERGE_PULL_MENTION_USERS");
+
+			if (subrepositoryMergePullMentionUsers != null) {
+				StringBuilder sb = new StringBuilder();
+
+				sb.append("cc");
+
+				for (String subrepositoryMergePullMentionUser :
+						subrepositoryMergePullMentionUsers.split(",")) {
+
+					sb.append(" @");
+					sb.append(subrepositoryMergePullMentionUser);
+				}
+
+				buildFailureElements.add(
+					Dom4JUtil.getNewElement("div", null, sb.toString()));
+			}
 		}
 
 		return buildFailureElements.toArray(
@@ -1330,8 +1404,88 @@ public class TopLevelBuild extends BaseBuild {
 		return _compareToUpstream;
 	}
 
+	protected void sendBuildMetrics(String message) {
+		if (_sendBuildMetrics) {
+			DatagramRequestUtil.send(
+				message.trim(), _metricsHostName, _metricsHostPort);
+		}
+	}
+
+	protected void sendBuildMetricsOnModifiedBuilds() {
+		StringBuilder sb = new StringBuilder();
+
+		Map<Map<String, String>, Integer> slaveUsages =
+			_getSlaveUsageByLabels();
+
+		for (Map.Entry<Map<String, String>, Integer> slaveUsageEntry :
+				slaveUsages.entrySet()) {
+
+			Map<String, String> metricLabels = slaveUsageEntry.getKey();
+			Integer slaveUsage = slaveUsageEntry.getValue();
+
+			String buildMetricMessage =
+				StatsDMetricsUtil.generateGaugeDeltaMetric(
+					"build_slave_usage_gauge", slaveUsage, metricLabels);
+
+			if (buildMetricMessage != null) {
+				sb.append(buildMetricMessage);
+				sb.append("\n");
+			}
+		}
+
+		if (sb.length() > 0) {
+			sendBuildMetrics(sb.toString());
+		}
+
+		sendBuildMetricsOnModifiedCompletedBuilds();
+	}
+
+	protected void sendBuildMetricsOnModifiedCompletedBuilds() {
+		List<Build> modifiedCompletedBuilds =
+			getModifiedDownstreamBuildsByStatus("completed");
+
+		for (Build modifiedCompletedBuild : modifiedCompletedBuilds) {
+			if (modifiedCompletedBuild instanceof BatchBuild) {
+				continue;
+			}
+
+			long duration = modifiedCompletedBuild.getDuration();
+
+			sendBuildMetrics(
+				StatsDMetricsUtil.generateTimerMetric(
+					"jenkins_job_build_duration", duration,
+					modifiedCompletedBuild.getMetricLabels()));
+		}
+	}
+
 	protected static final Pattern gitRepositoryTempMapNamePattern =
 		Pattern.compile("git\\.(?<gitRepositoryType>.*)\\.properties");
+
+	private Map<Map<String, String>, Integer> _getSlaveUsageByLabels() {
+		Map<Map<String, String>, Integer> slaveUsages = new HashMap<>();
+
+		List<Build> modifiedDownstreamBuilds = getModifiedDownstreamBuilds();
+
+		for (Build modifiedDownstreamBuild : modifiedDownstreamBuilds) {
+			Map<String, String> metricLabels =
+				modifiedDownstreamBuild.getMetricLabels();
+
+			Integer slaveUsage = slaveUsages.get(metricLabels);
+
+			if (slaveUsage == null) {
+				slaveUsage = 0;
+			}
+
+			slaveUsage += modifiedDownstreamBuild.getTotalSlavesUsedCount(
+				"running", true);
+			slaveUsage -= modifiedDownstreamBuild.getTotalSlavesUsedCount(
+				"completed", true);
+
+			slaveUsages.put(metricLabels, slaveUsage);
+		}
+
+		return slaveUsages;
+	}
 
 	private static final long _DOWNSTREAM_BUILDS_LISTING_INTERVAL =
 		1000 * 60 * 5;
@@ -1361,6 +1515,9 @@ public class TopLevelBuild extends BaseBuild {
 
 	private boolean _compareToUpstream = true;
 	private long _lastDownstreamBuildsListingTimestamp = -1L;
+	private String _metricsHostName;
+	private int _metricsHostPort;
+	private final boolean _sendBuildMetrics;
 	private long _updateDuration;
 
 }

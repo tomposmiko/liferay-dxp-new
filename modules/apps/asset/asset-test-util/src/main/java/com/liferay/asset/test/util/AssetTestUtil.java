@@ -43,19 +43,24 @@ import java.util.Map;
  */
 public class AssetTestUtil {
 
-	public static AssetEntry addAssetEntry(long groupId) throws Exception {
+	public static AssetEntry addAssetEntry(long groupId) {
 		return addAssetEntry(groupId, null);
 	}
 
-	public static AssetEntry addAssetEntry(long groupId, Date publishDate)
-		throws Exception {
+	public static AssetEntry addAssetEntry(long groupId, Date publishDate) {
+		return addAssetEntry(
+			groupId, publishDate, RandomTestUtil.randomString());
+	}
+
+	public static AssetEntry addAssetEntry(
+		long groupId, Date publishDate, String className) {
 
 		long assetEntryId = CounterLocalServiceUtil.increment();
 
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.createAssetEntry(
 			assetEntryId);
 
-		assetEntry.setClassName(RandomTestUtil.randomString());
+		assetEntry.setClassName(className);
 		assetEntry.setGroupId(groupId);
 		assetEntry.setClassPK(RandomTestUtil.randomLong());
 		assetEntry.setVisible(true);

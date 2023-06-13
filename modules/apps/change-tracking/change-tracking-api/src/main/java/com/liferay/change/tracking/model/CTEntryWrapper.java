@@ -52,6 +52,8 @@ public class CTEntryWrapper extends BaseModelWrapper<CTEntry> implements CTEntry
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
 		attributes.put("resourcePrimKey", getResourcePrimKey());
+		attributes.put("changeType", getChangeType());
+		attributes.put("status", getStatus());
 
 		return attributes;
 	}
@@ -111,6 +113,28 @@ public class CTEntryWrapper extends BaseModelWrapper<CTEntry> implements CTEntry
 		if (resourcePrimKey != null) {
 			setResourcePrimKey(resourcePrimKey);
 		}
+
+		Integer changeType = (Integer)attributes.get("changeType");
+
+		if (changeType != null) {
+			setChangeType(changeType);
+		}
+
+		Integer status = (Integer)attributes.get("status");
+
+		if (status != null) {
+			setStatus(status);
+		}
+	}
+
+	/**
+	* Returns the change type of this ct entry.
+	*
+	* @return the change type of this ct entry
+	*/
+	@Override
+	public int getChangeType() {
+		return model.getChangeType();
 	}
 
 	/**
@@ -204,6 +228,16 @@ public class CTEntryWrapper extends BaseModelWrapper<CTEntry> implements CTEntry
 	}
 
 	/**
+	* Returns the status of this ct entry.
+	*
+	* @return the status of this ct entry
+	*/
+	@Override
+	public int getStatus() {
+		return model.getStatus();
+	}
+
+	/**
 	* Returns the user ID of this ct entry.
 	*
 	* @return the user ID of this ct entry
@@ -241,6 +275,16 @@ public class CTEntryWrapper extends BaseModelWrapper<CTEntry> implements CTEntry
 	@Override
 	public void persist() {
 		model.persist();
+	}
+
+	/**
+	* Sets the change type of this ct entry.
+	*
+	* @param changeType the change type of this ct entry
+	*/
+	@Override
+	public void setChangeType(int changeType) {
+		model.setChangeType(changeType);
 	}
 
 	@Override
@@ -326,6 +370,16 @@ public class CTEntryWrapper extends BaseModelWrapper<CTEntry> implements CTEntry
 	@Override
 	public void setResourcePrimKey(long resourcePrimKey) {
 		model.setResourcePrimKey(resourcePrimKey);
+	}
+
+	/**
+	* Sets the status of this ct entry.
+	*
+	* @param status the status of this ct entry
+	*/
+	@Override
+	public void setStatus(int status) {
+		model.setStatus(status);
 	}
 
 	/**

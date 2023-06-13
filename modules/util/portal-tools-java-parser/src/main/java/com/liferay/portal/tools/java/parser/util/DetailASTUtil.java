@@ -43,9 +43,13 @@ public class DetailASTUtil {
 		}
 
 		if (detailAST.getType() == TokenTypes.CASE_GROUP) {
-			DetailAST firstChildDetailAST = detailAST.getFirstChild();
+			DetailAST slistDetailAST = detailAST.findFirstToken(
+				TokenTypes.SLIST);
 
-			return firstChildDetailAST.findFirstToken(TokenTypes.COLON);
+			DetailAST previousSiblingDetailAST =
+				slistDetailAST.getPreviousSibling();
+
+			return previousSiblingDetailAST.findFirstToken(TokenTypes.COLON);
 		}
 
 		if (detailAST.getType() == TokenTypes.DO_WHILE) {
@@ -104,7 +108,8 @@ public class DetailASTUtil {
 			return emptyStatDetailAST;
 		}
 
-		if ((detailAST.getType() == TokenTypes.LITERAL_IF) ||
+		if ((detailAST.getType() == TokenTypes.LITERAL_FOR) ||
+			(detailAST.getType() == TokenTypes.LITERAL_IF) ||
 			(detailAST.getType() == TokenTypes.LITERAL_WHILE)) {
 
 			return null;
@@ -163,7 +168,8 @@ public class DetailASTUtil {
 			rparenDetailAST = firstChildDetailAST.findFirstToken(
 				TokenTypes.RPAREN);
 		}
-		else if ((detailAST.getType() == TokenTypes.LITERAL_IF) ||
+		else if ((detailAST.getType() == TokenTypes.LITERAL_FOR) ||
+				 (detailAST.getType() == TokenTypes.LITERAL_IF) ||
 				 (detailAST.getType() == TokenTypes.LITERAL_WHILE)) {
 
 			rparenDetailAST = detailAST.findFirstToken(TokenTypes.RPAREN);

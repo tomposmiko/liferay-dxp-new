@@ -80,12 +80,12 @@
 </tr>
 <tr>
 	<td>CONTENT_HTML_BOLD</td>
-	<td>//div[contains(@class,'content')]//b</td>
+	<td>//div[contains(@class,'widget-mode-detail-text')]/b</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CONTENT_HTML_ITALICS</td>
-	<td>//div[contains(@class,'content')]//i</td>
+	<td>//div[contains(@class,'widget-mode-detail-text')]/i</td>
 	<td></td>
 </tr>
 <tr>
@@ -95,12 +95,17 @@
 </tr>
 <tr>
 	<td>CONTENT_VIDEO</td>
-	<td>//div[contains(@class,'embed')]/div[contains(@src,'${key_service}')]</td>
+	<td>//div[contains(@class,'embed')]//iframe[contains(@src,'${key_service}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>TAG</td>
 	<td>//div[contains(.,'${key_entryTitle}')]//span/a[contains(.,'${key_tagName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TAG_FILTER_TITLE</td>
+	<td>//h2[contains(@class,'taglib-categorization-filter') and contains (.,'${key_tagName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -130,7 +135,7 @@
 </tr>
 <tr>
 	<td>VIDEO_EMBED_HELP_MESSAGE</td>
-	<td>//div[@class='embed-help-message']//span]</td>
+	<td>//div[@class='embed-help-message']//span</td>
 	<td></td>
 </tr>
 </tbody>

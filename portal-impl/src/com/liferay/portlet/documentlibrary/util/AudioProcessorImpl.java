@@ -31,6 +31,7 @@ import com.liferay.portal.fabric.OutputResource;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.repository.event.FileVersionPreviewEventListener;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -305,6 +306,9 @@ public class AudioProcessorImpl
 						file = liferayFileVersion.getFile(false);
 					}
 					catch (UnsupportedOperationException uoe) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(uoe, uoe);
+						}
 					}
 				}
 
@@ -321,8 +325,14 @@ public class AudioProcessorImpl
 				try {
 					_generateAudioXuggler(
 						destinationFileVersion, file, previewTempFiles);
+
+					_fileVersionPreviewEventListener.onSuccess(
+						destinationFileVersion);
 				}
 				catch (Exception e) {
+					_fileVersionPreviewEventListener.onFailure(
+						destinationFileVersion);
+
 					_log.error(e, e);
 				}
 			}
@@ -331,6 +341,8 @@ public class AudioProcessorImpl
 			if (_log.isDebugEnabled()) {
 				_log.debug(nsfee, nsfee);
 			}
+
+			_fileVersionPreviewEventListener.onFailure(destinationFileVersion);
 		}
 		finally {
 			_fileVersionIds.remove(destinationFileVersion.getFileVersionId());
@@ -469,6 +481,11 @@ public class AudioProcessorImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		AudioProcessorImpl.class);
 
+	private static volatile FileVersionPreviewEventListener
+		_fileVersionPreviewEventListener =
+			ServiceProxyFactory.newServiceTrackedInstance(
+				FileVersionPreviewEventListener.class, AudioProcessorImpl.class,
+				"_fileVersionPreviewEventListener", false, false);
 	private static volatile ProcessExecutor _processExecutor =
 		ServiceProxyFactory.newServiceTrackedInstance(
 			ProcessExecutor.class, AudioProcessorImpl.class, "_processExecutor",

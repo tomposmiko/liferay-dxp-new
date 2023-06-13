@@ -31,7 +31,7 @@ public interface PrefixHandler {
 	 *
 	 * @review
 	 */
-	public static PrefixHandler PASSTHROUGH_PREFIXHANDLER =
+	public static PrefixHandler PASS_THROUGH_PREFIX_HANDLER =
 		new PrefixHandler() {
 
 			@Override

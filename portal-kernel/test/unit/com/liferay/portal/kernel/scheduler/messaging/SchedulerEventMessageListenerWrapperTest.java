@@ -27,6 +27,7 @@ import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -76,13 +77,17 @@ public class SchedulerEventMessageListenerWrapperTest {
 		schedulerEventMessageListenerWrapper.setMessageListener(
 			_testMessageListener);
 
-		FutureTask<Void> futureTask1 = _startThread(
-			schedulerEventMessageListenerWrapper, "Thread1", _testMessage1);
+		FutureTask<Void> futureTask1 = _createFutureTask(
+			schedulerEventMessageListenerWrapper, _testMessage1);
+
+		_startThread(futureTask1, "Thread1");
 
 		_testMessageListener.waitUntilBlock();
 
-		FutureTask<Void> futureTask2 = _startThread(
-			schedulerEventMessageListenerWrapper, "Thread2", _testMessage2);
+		FutureTask<Void> futureTask2 = _createFutureTask(
+			schedulerEventMessageListenerWrapper, _testMessage2);
+
+		_startThread(futureTask2, "Thread2");
 
 		try {
 			futureTask2.get(1000, TimeUnit.MICROSECONDS);
@@ -99,10 +104,10 @@ public class SchedulerEventMessageListenerWrapperTest {
 		futureTask2.get();
 
 		Assert.assertSame(
-			"Message is not processed", _testMessage1,
+			"Message is not processed", _testMessage1.getPayload(),
 			_testMessage1.getResponse());
 		Assert.assertSame(
-			"Message is not processed", _testMessage2,
+			"Message is not processed", _testMessage2.getPayload(),
 			_testMessage2.getResponse());
 	}
 
@@ -133,13 +138,17 @@ public class SchedulerEventMessageListenerWrapperTest {
 					return null;
 				}));
 
-		FutureTask<Void> futureTask1 = _startThread(
-			schedulerEventMessageListenerWrapper, "Thread1", _testMessage1);
+		FutureTask<Void> futureTask1 = _createFutureTask(
+			schedulerEventMessageListenerWrapper, _testMessage1);
+
+		_startThread(futureTask1, "Thread1");
 
 		_testMessageListener.waitUntilBlock();
 
-		FutureTask<Void> futureTask2 = _startThread(
-			schedulerEventMessageListenerWrapper, "Thread2", _testMessage2);
+		FutureTask<Void> futureTask2 = _createFutureTask(
+			schedulerEventMessageListenerWrapper, _testMessage2);
+
+		_startThread(futureTask2, "Thread2");
 
 		futureTask2.get();
 
@@ -151,21 +160,73 @@ public class SchedulerEventMessageListenerWrapperTest {
 		futureTask1.get();
 
 		Assert.assertSame(
-			"Message is not processed", _testMessage1,
+			"Message is not processed", _testMessage1.getPayload(),
 			_testMessage1.getResponse());
 	}
 
-	private FutureTask<Void> _startThread(
+	@Test
+	public void testConcurrentReceiveWithTimeoutAndInterrupted()
+		throws Exception {
+
+		PropsTestUtil.setProps(
+			PropsKeys.SCHEDULER_EVENT_MESSAGE_LISTENER_LOCK_TIMEOUT,
+			String.valueOf(Integer.MAX_VALUE));
+
+		SchedulerEventMessageListenerWrapper
+			schedulerEventMessageListenerWrapper =
+				new SchedulerEventMessageListenerWrapper();
+
+		schedulerEventMessageListenerWrapper.setMessageListener(
+			_testMessageListener);
+
+		FutureTask<Void> futureTask1 = _createFutureTask(
+			schedulerEventMessageListenerWrapper, _testMessage1);
+
+		_startThread(futureTask1, "Thread1");
+
+		_testMessageListener.waitUntilBlock();
+
+		FutureTask<Void> futureTask2 = _createFutureTask(
+			schedulerEventMessageListenerWrapper, _testMessage1);
+
+		Thread thread2 = _startThread(futureTask2, "Thread2");
+
+		while (thread2.getState() != Thread.State.TIMED_WAITING);
+
+		thread2.interrupt();
+
+		try {
+			futureTask2.get();
+		}
+		catch (ExecutionException ee) {
+			Assert.fail("Should not throw exception " + ee);
+		}
+
+		_testMessageListener.unblock();
+
+		futureTask1.get();
+
+		Assert.assertSame(
+			"Message is not processed", _testMessage1.getPayload(),
+			_testMessage1.getResponse());
+		Assert.assertNull(_testMessage2.getResponse());
+	}
+
+	private FutureTask<Void> _createFutureTask(
 		SchedulerEventMessageListenerWrapper
 			schedulerEventMessageListenerWrapper,
-		String threadName, Message message) {
+		Message message) {
 
-		FutureTask<Void> futureTask = new FutureTask<>(
+		return new FutureTask<>(
 			() -> {
 				schedulerEventMessageListenerWrapper.receive(message);
 
 				return null;
 			});
+	}
+
+	private Thread _startThread(
+		FutureTask<Void> futureTask, String threadName) {
 
 		Thread thread = new Thread(
 			futureTask,
@@ -174,7 +235,7 @@ public class SchedulerEventMessageListenerWrapperTest {
 
 		thread.start();
 
-		return futureTask;
+		return thread;
 	}
 
 	private Message _testMessage1;
@@ -191,7 +252,7 @@ public class SchedulerEventMessageListenerWrapperTest {
 
 					_blockCountDownLatch.await();
 
-					message.setResponse(message);
+					message.setResponse(message.getPayload());
 				}
 				catch (InterruptedException ie) {
 				}

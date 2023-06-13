@@ -321,11 +321,20 @@ public class JSONCurlUtil {
 			StringBuilder sb = new StringBuilder();
 
 			if (OSDetector.isWindows()) {
+				if (_isValidJSON(optionValue)) {
+					JSONObject jsonObject = new JSONObject(optionValue);
+
+					optionValue = jsonObject.toString();
+				}
+
 				sb.append("\"");
 
 				optionValue = optionValue.replaceAll(
 					"\\\\\"", "\\\\\\\\\\\\\\\"");
+
 				optionValue = optionValue.replaceAll("(?<!\\\\)\"", "\\\\\\\"");
+
+				optionValue = optionValue.replace("&", "^&");
 
 				sb.append(optionValue);
 
@@ -365,6 +374,17 @@ public class JSONCurlUtil {
 			}
 
 			return optionValue;
+		}
+
+		private boolean _isValidJSON(String jsonTestString) {
+			try {
+				new JSONObject(jsonTestString);
+
+				return true;
+			}
+			catch (JSONException jsone) {
+				return false;
+			}
 		}
 
 		private static Map<String, String> _customOptionsMap =

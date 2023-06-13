@@ -45,7 +45,7 @@
 
 		<div class="form-group">
 			<label class="toggle-switch">
-				<input class="toggle-switch-check" data-onchange="{$_handleCheck}" {if $changeTrackingEnabled}checked{/if} type="checkbox"/>
+				<input class="toggle-switch-check" data-onchange="{$_handleCheck}" data-qa-id="changelist-toggle" {if $changeTrackingEnabled}checked{/if} type="checkbox"/>
 				<span aria-hidden="true" class="toggle-switch-bar">
 					<span class="toggle-switch-handle"></span>
 				</span>

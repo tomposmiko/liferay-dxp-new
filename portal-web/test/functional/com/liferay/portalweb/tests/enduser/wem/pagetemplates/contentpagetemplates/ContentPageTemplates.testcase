@@ -45,7 +45,7 @@ definition {
 
 			Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-			PageTemplatesAdmin.add(pageTemplateName = "Page Template Name");
+			PageTemplatesAdmin.addPageTemplate(pageTemplateName = "Page Template Name");
 		}
 
 		task ("Add an Image fragment to the content page template") {
@@ -72,7 +72,7 @@ definition {
 
 			Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-			PageTemplatesAdmin.add(pageTemplateName = "Page Template Name");
+			PageTemplatesAdmin.addPageTemplate(pageTemplateName = "Page Template Name");
 		}
 
 		task ("Add a Content fragment to the content page template") {
@@ -125,7 +125,7 @@ definition {
 
 			Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-			PageTemplatesAdmin.add(pageTemplateName = "Page Template Name");
+			PageTemplatesAdmin.addPageTemplate(pageTemplateName = "Page Template Name");
 
 			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
@@ -133,11 +133,15 @@ definition {
 		}
 
 		task ("Delete the content page template") {
-			LexiconEntry.delete(rowEntry = "Page Template Name");
+			PageTemplatesAdmin.deletePageTemplate(
+				pageTemplateName = "Page Template Name"
+			);
 		}
 
 		task ("Assert the content page template was deleted") {
-			LexiconEntry.viewNoEntry(rowEntry = "Page Template Name");
+			PageTemplatesAdmin.viewPageTemplateNotPresent(
+				pageTemplateName = "Page Template Name"
+			);
 		}
 	}
 
@@ -172,7 +176,7 @@ definition {
 
 			Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-			PageTemplatesAdmin.add(pageTemplateName = "Page Template Name");
+			PageTemplatesAdmin.addPageTemplate(pageTemplateName = "Page Template Name");
 		}
 
 		task ("Rename the content page template") {
@@ -180,14 +184,16 @@ definition {
 
 			Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-			PageTemplatesAdmin.rename(
-				pageTemplateName = "Page Template Name New",
-				rowEntry = "Page Template Name"
+			PageTemplatesAdmin.renamePageTemplate(
+				pageTemplateName = "Page Template Name",
+				newPageTemplateName = "Page Template Name New"
 			);
 		}
 
 		task ("Assert the content page template was renamed") {
-			LexiconEntry.viewEntryName(rowEntry = "Page Template Name New");
+			PageTemplatesAdmin.viewPageTemplatePresent(
+				pageTemplateName = "Page Template Name New"
+			);
 		}
 	}
 
@@ -212,7 +218,7 @@ definition {
 
 			Navigator.gotoNavNested(navNested = "Page Template Collection");
 
-			PageTemplatesAdmin.add(pageTemplateName = "Page Template Name");
+			PageTemplatesAdmin.addPageTemplate(pageTemplateName = "Page Template Name");
 
 			PageEditor.viewCollectionNotPresent(collectionName = "New Collection");
 		}

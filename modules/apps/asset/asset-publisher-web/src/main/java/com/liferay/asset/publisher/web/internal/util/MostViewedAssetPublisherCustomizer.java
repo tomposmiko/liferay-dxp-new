@@ -14,12 +14,9 @@
 
 package com.liferay.asset.publisher.web.internal.util;
 
-import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.util.AssetEntryQueryProcessor;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.PortletPreferences;
 
@@ -31,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Pavel Savinov
  */
 @Component(
-	configurationPid = "com.liferay.asset.publisher.web.configuration.AssetPublisherWebConfiguration",
+	configurationPid = "com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration",
 	immediate = true, service = AssetPublisherCustomizer.class
 )
 public class MostViewedAssetPublisherCustomizer
@@ -104,22 +101,6 @@ public class MostViewedAssetPublisherCustomizer
 		}
 
 		return true;
-	}
-
-	@Override
-	public void setAssetEntryQueryOptions(
-		AssetEntryQuery assetEntryQuery, HttpServletRequest request) {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		PortletPreferences portletPreferences = getPortletPreferences(request);
-
-		long[] groupIds = assetPublisherHelper.getGroupIds(
-			portletPreferences, themeDisplay.getScopeGroupId(),
-			themeDisplay.getLayout());
-
-		assetEntryQuery.setGroupIds(groupIds);
 	}
 
 }

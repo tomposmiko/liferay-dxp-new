@@ -18,6 +18,8 @@
 
 <%
 JournalDDMStructuresDisplayContext journalDDMStructuresDisplayContext = new JournalDDMStructuresDisplayContext(renderRequest, renderResponse);
+
+JournalDDMStructuresManagementToolbarDisplayContext journalDDMStructuresManagementToolbarDisplayContext = new JournalDDMStructuresManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, journalDDMStructuresDisplayContext);
 %>
 
 <clay:navigation-bar
@@ -26,17 +28,7 @@ JournalDDMStructuresDisplayContext journalDDMStructuresDisplayContext = new Jour
 />
 
 <clay:management-toolbar
-	actionDropdownItems="<%= journalDDMStructuresDisplayContext.getActionItemsDropdownItems() %>"
-	clearResultsURL="<%= journalDDMStructuresDisplayContext.getClearResultsURL() %>"
-	componentId="ddmStructureManagementToolbar"
-	creationMenu="<%= journalDDMStructuresDisplayContext.isShowAddButton() ? journalDDMStructuresDisplayContext.getCreationMenu() : null %>"
-	disabled="<%= journalDDMStructuresDisplayContext.isDisabledManagementBar() %>"
-	filterDropdownItems="<%= journalDDMStructuresDisplayContext.getFilterItemsDropdownItems() %>"
-	itemsTotal="<%= journalDDMStructuresDisplayContext.getTotalItems() %>"
-	searchActionURL="<%= journalDDMStructuresDisplayContext.getSearchActionURL() %>"
-	searchContainerId="ddmStructures"
-	sortingOrder="<%= journalDDMStructuresDisplayContext.getOrderByType() %>"
-	sortingURL="<%= journalDDMStructuresDisplayContext.getSortingURL() %>"
+	displayContext="<%= journalDDMStructuresManagementToolbarDisplayContext %>"
 />
 
 <portlet:actionURL name="/journal/delete_ddm_structure" var="deleteDDMStructureURL">
@@ -76,6 +68,12 @@ JournalDDMStructuresDisplayContext journalDDMStructuresDisplayContext = new Jour
 
 				rowHREF = rowURL.toString();
 			}
+
+			Map<String, Object> rowData = new HashMap<>();
+
+			rowData.put("actions", journalDDMStructuresManagementToolbarDisplayContext.getAvailableActions(ddmStructure));
+
+			row.setData(rowData);
 			%>
 
 			<liferay-ui:search-container-column-text
@@ -120,29 +118,7 @@ JournalDDMStructuresDisplayContext journalDDMStructuresDisplayContext = new Jour
 	</liferay-ui:search-container>
 </aui:form>
 
-<aui:script sandbox="<%= true %>">
-	var deleteDDMStructures = function() {
-		if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
-			submitForm(document.querySelector('#<portlet:namespace />fm'));
-		}
-	};
-
-	var ACTIONS = {
-		'deleteDDMStructures': deleteDDMStructures
-	};
-
-	Liferay.componentReady('ddmStructureManagementToolbar').then(
-		function(managementToolbar) {
-			managementToolbar.on(
-				'actionItemClicked',
-				function(event) {
-					var itemData = event.data.item.data;
-
-					if (itemData && itemData.action && ACTIONS[itemData.action]) {
-						ACTIONS[itemData.action]();
-					}
-				}
-			);
-		}
-	);
-</aui:script>
+<liferay-frontend:component
+	componentId="<%= journalDDMStructuresManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+	module="js/DDMStructuresManagementToolbarDefaultEventHandler.es"
+/>
