@@ -93,16 +93,13 @@
 /portal/asm-tree.jar
 /portal/asm-util.jar
 /portal/asm.jar
-/portal/axis-ant.jar
 /portal/axis.jar
-/portal/bsf.jar
 /portal/c3p0.jar
 /portal/ccpp-ri.jar
 /portal/ccpp.jar
 /portal/cglib-nodep.jar
 /portal/closure-compiler.jar
 /portal/commons-beanutils.jar
-/portal/commons-chain.jar
 /portal/commons-codec.jar
 /portal/commons-collections.jar
 /portal/commons-collections4.jar
@@ -126,7 +123,6 @@
 /portal/dom4j.jar
 /portal/eclipse-core-runtime.jar
 /portal/fontbox.jar
-/portal/freshcookies-security.jar
 /portal/hessian.jar
 /portal/hibernate-core.jar
 /portal/hikaricp.jar
@@ -195,6 +191,13 @@
 /portal/nekohtml.jar
 /portal/netcdf.jar
 /portal/netty-all.jar
+/portal/netty-buffer.jar
+/portal/netty-codec.jar
+/portal/netty-codec-http.jar
+/portal/netty-common.jar
+/portal/netty-handler.jar
+/portal/netty-resolver.jar
+/portal/netty-transport.jar
 /portal/odmg.jar
 /portal/oro.jar
 /portal/pdfbox.jar
@@ -245,7 +248,6 @@
 /portal/tomcat-juli.jar
 /portal/transaction.jar
 /portal/unoil.jar
-/portal/urlrewritefilter.jar
 /portal/vorbis-java-core.jar
 /portal/vorbis-java-tika.jar
 /portal/wsdl4j.jar

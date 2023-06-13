@@ -84,6 +84,13 @@ definition {
 			objectName = "CustomObject",
 			pluralLabelName = "Custom Objects");
 
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
+
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
 
 		JSONRole.addRegularRole(
@@ -1085,7 +1092,6 @@ definition {
 	}
 
 	@description = "LPS-135390 - Verify it is not possible to add an Object entry without the Add Object Entry permission"
-	@ignore = "true"
 	@priority = "5"
 	test CannotAddObjectEntryWithoutAddPermission {
 		property portal.acceptance = "true";

@@ -206,10 +206,6 @@ public class SiteInitializerRegistrar {
 				"site.initializer.key", _bundle.getSymbolicName()));
 	}
 
-	protected void stop() {
-		_serviceRegistration.unregister();
-	}
-
 	private final AccountResource.Factory _accountResourceFactory;
 	private final AssetCategoryLocalService _assetCategoryLocalService;
 	private final AssetListEntryLocalService _assetListEntryLocalService;

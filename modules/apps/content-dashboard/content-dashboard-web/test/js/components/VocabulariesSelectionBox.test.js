@@ -12,7 +12,7 @@
  * details.
  */
 
-import {cleanup, fireEvent, render} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
 import React from 'react';
 
 import '@testing-library/jest-dom/extend-expect';
@@ -114,10 +114,6 @@ const mockPropsWithoutSelected = {
 };
 
 describe('VocabulariesSelectionBox', () => {
-	beforeEach(() => {
-		cleanup();
-	});
-
 	it('renders a VocabulariesSelectionBox with selected and not selected vocabularies', () => {
 		const {container, getByText} = render(
 			<VocabulariesSelectionBox {...mockProps} />
@@ -185,7 +181,7 @@ describe('VocabulariesSelectionBox', () => {
 		expect(disabledVocabularies.length).toBe(1);
 	});
 
-	it('moves a vocabulary from right to left enabling vocabularies from other sites', () => {
+	it('moves a vocabulary from right to left maintaining the vocabulary selected after moving it', () => {
 		const {container} = render(<VocabulariesSelectionBox {...mockProps} />);
 
 		const selectedSelect = container.querySelector(
@@ -204,13 +200,12 @@ describe('VocabulariesSelectionBox', () => {
 		expect(availableVocabulariesAfterRTL.length).toBe(4);
 		expect(selectedVocabulariesAfterRTL.length).toBe(1);
 
-		// There must be no disbled vocabularies because we have only one vocabulary selected
-		// and it is from Global site
+		// There must be one disbled vocabulary because Region is from site 2
 
 		const disabledVocabularies = container.querySelectorAll(
 			'#availableAssetVocabularyIds option:disabled'
 		);
-		expect(disabledVocabularies.length).toBe(0);
+		expect(disabledVocabularies.length).toBe(1);
 	});
 
 	it('prevents to move more than two vocabularies from Available to In Use', () => {

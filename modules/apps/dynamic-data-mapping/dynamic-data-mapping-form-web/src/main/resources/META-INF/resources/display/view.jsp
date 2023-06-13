@@ -82,8 +82,8 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 			<c:when test="<%= !preview && (expired || showSuccessPage || ddmFormDisplayContext.hasSubmittedAnEntry()) %>">
 
 				<%
-				String pageDescription;
-				String pageTitle;
+				String pageDescription = null;
+				String pageTitle = null;
 				boolean showPartialResultsToRespondents = ddmFormDisplayContext.isFFShowPartialResultsEnabled() && ddmFormDisplayContext.isShowPartialResultsToRespondents();
 
 				if (expired) {
