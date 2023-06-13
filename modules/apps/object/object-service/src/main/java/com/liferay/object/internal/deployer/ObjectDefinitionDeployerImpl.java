@@ -14,6 +14,8 @@
 
 package com.liferay.object.internal.deployer;
 
+import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
@@ -63,8 +65,11 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.PortletLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -97,6 +102,9 @@ import org.osgi.framework.ServiceRegistration;
 public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 	public ObjectDefinitionDeployerImpl(
+		AccountEntryLocalService accountEntryLocalService,
+		AccountEntryOrganizationRelLocalService
+			accountEntryOrganizationRelLocalService,
 		AssetCategoryLocalService assetCategoryLocalService,
 		AssetTagLocalService assetTagLocalService,
 		AssetVocabularyLocalService assetVocabularyLocalService,
@@ -115,11 +123,17 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
 		ObjectViewLocalService objectViewLocalService,
+		OrganizationLocalService organizationLocalService,
 		PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry,
 		PortletLocalService portletLocalService,
 		ResourceActions resourceActions, UserLocalService userLocalService,
-		ModelPreFilterContributor workflowStatusModelPreFilterContributor) {
+		ResourcePermissionLocalService resourcePermissionLocalService,
+		ModelPreFilterContributor workflowStatusModelPreFilterContributor,
+		UserGroupRoleLocalService userGroupRoleLocalService) {
 
+		_accountEntryLocalService = accountEntryLocalService;
+		_accountEntryOrganizationRelLocalService =
+			accountEntryOrganizationRelLocalService;
 		_assetCategoryLocalService = assetCategoryLocalService;
 		_assetTagLocalService = assetTagLocalService;
 		_assetVocabularyLocalService = assetVocabularyLocalService;
@@ -138,13 +152,16 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
 		_objectViewLocalService = objectViewLocalService;
+		_organizationLocalService = organizationLocalService;
 		_persistedModelLocalServiceRegistry =
 			persistedModelLocalServiceRegistry;
 		_portletLocalService = portletLocalService;
 		_resourceActions = resourceActions;
 		_userLocalService = userLocalService;
+		_resourcePermissionLocalService = resourcePermissionLocalService;
 		_workflowStatusModelPreFilterContributor =
 			workflowStatusModelPreFilterContributor;
+		_userGroupRoleLocalService = userGroupRoleLocalService;
 	}
 
 	@Override
@@ -176,7 +193,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		PortletResourcePermission portletResourcePermission =
 			PortletResourcePermissionFactory.create(
 				objectDefinition.getResourceName(),
-				new ObjectEntryPortletResourcePermissionLogic());
+				new ObjectEntryPortletResourcePermissionLogic(
+					_accountEntryLocalService, _groupLocalService,
+					_objectDefinitionLocalService, _organizationLocalService));
 
 		List<ServiceRegistration<?>> serviceRegistrations = ListUtil.fromArray(
 			_bundleContext.registerService(
@@ -224,8 +243,13 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_bundleContext.registerService(
 				ModelResourcePermission.class,
 				new ObjectEntryModelResourcePermission(
-					objectDefinition.getClassName(), _objectEntryLocalService,
-					portletResourcePermission),
+					_accountEntryLocalService,
+					_accountEntryOrganizationRelLocalService,
+					_groupLocalService, objectDefinition.getClassName(),
+					_objectDefinitionLocalService, _objectEntryLocalService,
+					_objectFieldLocalService, portletResourcePermission,
+					_resourcePermissionLocalService,
+					_userGroupRoleLocalService),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"com.liferay.object", "true"
 				).put(
@@ -392,6 +416,9 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			classLoader, document);
 	}
 
+	private final AccountEntryLocalService _accountEntryLocalService;
+	private final AccountEntryOrganizationRelLocalService
+		_accountEntryOrganizationRelLocalService;
 	private final AssetCategoryLocalService _assetCategoryLocalService;
 	private final AssetTagLocalService _assetTagLocalService;
 	private final AssetVocabularyLocalService _assetVocabularyLocalService;
@@ -411,10 +438,14 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 		_objectRelationshipLocalService;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 	private final ObjectViewLocalService _objectViewLocalService;
+	private final OrganizationLocalService _organizationLocalService;
 	private final PersistedModelLocalServiceRegistry
 		_persistedModelLocalServiceRegistry;
 	private final PortletLocalService _portletLocalService;
 	private final ResourceActions _resourceActions;
+	private final ResourcePermissionLocalService
+		_resourcePermissionLocalService;
+	private final UserGroupRoleLocalService _userGroupRoleLocalService;
 	private final UserLocalService _userLocalService;
 	private final ModelPreFilterContributor
 		_workflowStatusModelPreFilterContributor;

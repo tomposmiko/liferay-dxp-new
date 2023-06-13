@@ -57,6 +57,34 @@ public class DSRecipient implements Serializable {
 	}
 
 	@Schema
+	public String getDsClientUserId() {
+		return dsClientUserId;
+	}
+
+	public void setDsClientUserId(String dsClientUserId) {
+		this.dsClientUserId = dsClientUserId;
+	}
+
+	@JsonIgnore
+	public void setDsClientUserId(
+		UnsafeSupplier<String, Exception> dsClientUserIdUnsafeSupplier) {
+
+		try {
+			dsClientUserId = dsClientUserIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String dsClientUserId;
+
+	@Schema
 	public String getEmailAddress() {
 		return emailAddress;
 	}
@@ -190,6 +218,20 @@ public class DSRecipient implements Serializable {
 		StringBundler sb = new StringBundler();
 
 		sb.append("{");
+
+		if (dsClientUserId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dsClientUserId\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(dsClientUserId));
+
+			sb.append("\"");
+		}
 
 		if (emailAddress != null) {
 			if (sb.length() > 1) {

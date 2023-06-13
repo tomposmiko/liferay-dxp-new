@@ -27,6 +27,7 @@ import com.liferay.dynamic.data.mapping.model.DDMFormLayoutPage;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayoutRow;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
+import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.NumericDDMFormFieldUtil;
@@ -97,6 +98,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -953,6 +955,19 @@ public class ObjectEntryDisplayContext {
 
 						_setDDMFormFieldValueValue(
 							ddmFormField, ddmFormFieldValue, values);
+					}
+
+					// TODO Temporary workaround for LPS-171782
+
+					if (GetterUtil.getBoolean(
+							ddmFormField.getProperty(
+								"accountEntryRestrictedObjectField"))) {
+
+						Value value = ddmFormFieldValue.getValue();
+
+						ddmFormField.setReadOnly(
+							Validator.isNotNull(
+								value.getString(LocaleUtil.ROOT)));
 					}
 
 					return ddmFormFieldValue;

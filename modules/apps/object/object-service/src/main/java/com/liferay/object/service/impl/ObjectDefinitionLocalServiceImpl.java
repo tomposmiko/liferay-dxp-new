@@ -14,6 +14,8 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
@@ -96,10 +98,13 @@ import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -589,6 +594,8 @@ public class ObjectDefinitionLocalServiceImpl
 
 		_addingObjectDefinitionDeployer(
 			new ObjectDefinitionDeployerImpl(
+				_accountEntryLocalService,
+				_accountEntryOrganizationRelLocalService,
 				_assetCategoryLocalService, _assetTagLocalService,
 				_assetVocabularyLocalService, _bundleContext,
 				_dynamicQueryBatchIndexingActionableFactory, _groupLocalService,
@@ -597,9 +604,11 @@ public class ObjectDefinitionLocalServiceImpl
 				_objectEntryService, _objectFieldLocalService,
 				_objectLayoutLocalService, _objectRelationshipLocalService,
 				_objectScopeProviderRegistry, _objectViewLocalService,
-				_persistedModelLocalServiceRegistry, _portletLocalService,
-				_resourceActions, _userLocalService,
-				_workflowStatusModelPreFilterContributor));
+				_organizationLocalService, _persistedModelLocalServiceRegistry,
+				_portletLocalService, _resourceActions, _userLocalService,
+				_resourcePermissionLocalService,
+				_workflowStatusModelPreFilterContributor,
+				_userGroupRoleLocalService));
 
 		_objectDefinitionDeployerServiceTracker = new ServiceTracker<>(
 			_bundleContext, ObjectDefinitionDeployer.class,
@@ -1595,6 +1604,13 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectDefinition.class);
 
 	@Reference
+	private AccountEntryLocalService _accountEntryLocalService;
+
+	@Reference
+	private AccountEntryOrganizationRelLocalService
+		_accountEntryOrganizationRelLocalService;
+
+	@Reference
 	private AssetCategoryLocalService _assetCategoryLocalService;
 
 	@Reference
@@ -1677,6 +1693,9 @@ public class ObjectDefinitionLocalServiceImpl
 	private ObjectViewLocalService _objectViewLocalService;
 
 	@Reference
+	private OrganizationLocalService _organizationLocalService;
+
+	@Reference
 	private PersistedModelLocalServiceRegistry
 		_persistedModelLocalServiceRegistry;
 
@@ -1695,10 +1714,16 @@ public class ObjectDefinitionLocalServiceImpl
 	@Reference
 	private ResourceLocalService _resourceLocalService;
 
+	@Reference
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
 	private final Map
 		<ObjectDefinitionDeployer, Map<Long, List<ServiceRegistration<?>>>>
 			_serviceRegistrationsMaps = Collections.synchronizedMap(
 				new LinkedHashMap<>());
+
+	@Reference
+	private UserGroupRoleLocalService _userGroupRoleLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;
