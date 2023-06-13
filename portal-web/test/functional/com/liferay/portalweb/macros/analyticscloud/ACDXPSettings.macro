@@ -15,10 +15,6 @@ definition {
 			locator1 = "ACUtils#TOGGLE_ICON_ON_OFF");
 	}
 
-	macro cancelWizardConfiguration {
-		Click(locator1 = "Button#CANCEL");
-	}
-
 	macro changeAssignModalPagination {
 		Click(locator1 = "ACDXPSettings#ASSIGN_MODAL_PAGINATION");
 
@@ -41,6 +37,18 @@ definition {
 		WaitForPageLoad();
 	}
 
+	macro completeWizardConfiguration {
+		while (IsElementPresent(key_text = "Next", locator1 = "Button#ANY")) {
+			Click(
+				key_text = "Next",
+				locator1 = "Button#ANY");
+		}
+
+		Click(
+			key_text = "Finish",
+			locator1 = "Button#ANY");
+	}
+
 	macro connectAnalyticsCloud {
 		ACDXPSettings.disconnectDXPFromAnalyticsCloud();
 
@@ -50,7 +58,7 @@ definition {
 
 		WaitForElementNotPresent(locator1 = "ACDXPSettings#CONNECT_BUTTON_DISABLED");
 
-		Click(locator1 = "ACDXPSettings#CONNECT_DISCONNECT_BUTTON");
+		Click(locator1 = "ACDXPSettings#CONNECT_BUTTON");
 	}
 
 	macro connectDXPtoAnalyticsCloud {
@@ -136,8 +144,8 @@ definition {
 	macro disconnectDXPFromAnalyticsCloud {
 		ACDXPSettings.goToInstanceSettingsAC();
 
-		if (IsElementNotPresent(locator1 = "ACDXPSettings#CONNECT_BUTTON_DISABLED")) {
-			ClickNoError(locator1 = "ACDXPSettings#CONNECT_DISCONNECT_BUTTON");
+		if (IsElementPresent(locator1 = "ACDXPSettings#DISCONNECT_BUTTON")) {
+			ClickNoError(locator1 = "ACDXPSettings#DISCONNECT_BUTTON");
 
 			Click(locator1 = "ACSettings#DISCONNECT_CONFIRMATION_BUTTON");
 		}

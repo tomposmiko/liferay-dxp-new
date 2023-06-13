@@ -34,6 +34,7 @@ import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -481,13 +482,27 @@ public class ObjectEntryInfoItemFormProvider
 		).<NoSuchFormVariationException>infoFieldSetEntry(
 			unsafeConsumer -> {
 				if (objectDefinitionId != 0) {
+					ObjectDefinition objectDefinition =
+						_objectDefinitionLocalService.fetchObjectDefinition(
+							objectDefinitionId);
+
+					if (objectDefinition == null) {
+						throw new NoSuchFormVariationException(
+							String.valueOf(objectDefinitionId),
+							new NoSuchObjectDefinitionException());
+					}
+
 					unsafeConsumer.accept(
-						_getObjectDefinitionInfoFieldSet(objectDefinitionId));
+						_getObjectDefinitionInfoFieldSet(
+							ObjectField.class.getSimpleName(),
+							objectDefinition));
 				}
 			}
 		).infoFieldSetEntries(
 			_getAttachmentObjectDefinitionInfoFieldSetEntries(
 				objectDefinitionId)
+		).infoFieldSetEntries(
+			_getParentsInfoFieldSets(objectDefinitionId)
 		).infoFieldSetEntry(
 			_templateInfoItemFieldSetProvider.getInfoFieldSet(modelClassName)
 		).infoFieldSetEntry(
@@ -542,25 +557,14 @@ public class ObjectEntryInfoItemFormProvider
 	}
 
 	private InfoFieldSet _getObjectDefinitionInfoFieldSet(
-			long objectDefinitionId)
-		throws NoSuchFormVariationException {
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				objectDefinitionId);
-
-		if (objectDefinition == null) {
-			throw new NoSuchFormVariationException(
-				String.valueOf(objectDefinitionId),
-				new NoSuchObjectDefinitionException());
-		}
+		String namespace, ObjectDefinition objectDefinition) {
 
 		return InfoFieldSet.builder(
 		).infoFieldSetEntry(
 			unsafeConsumer -> {
 				for (ObjectField objectField :
 						_objectFieldLocalService.getObjectFields(
-							objectDefinitionId, false)) {
+							objectDefinition.getObjectDefinitionId(), false)) {
 
 					if (Validator.isNotNull(
 							objectField.getRelationshipType())) {
@@ -588,7 +592,7 @@ public class ObjectEntryInfoItemFormProvider
 								ObjectFieldDBTypeUtil.getInfoFieldType(
 									objectField)
 							).namespace(
-								ObjectField.class.getSimpleName()
+								namespace
 							).name(
 								objectField.getName()
 							).editable(
@@ -633,6 +637,51 @@ public class ObjectEntryInfoItemFormProvider
 		}
 
 		return options;
+	}
+
+	private List<InfoFieldSetEntry> _getParentsInfoFieldSets(
+			long objectDefinitionId2)
+		throws NoSuchFormVariationException {
+
+		List<InfoFieldSetEntry> infoFieldSetEntries = new ArrayList<>();
+
+		if (objectDefinitionId2 == 0) {
+			return infoFieldSetEntries;
+		}
+
+		List<ObjectRelationship> objectRelationships =
+			_objectRelationshipLocalService.getObjectRelationships(
+				objectDefinitionId2,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
+
+		for (ObjectRelationship objectRelationship : objectRelationships) {
+			ObjectDefinition objectDefinition1 =
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					objectRelationship.getObjectDefinitionId1());
+
+			if (objectDefinition1 == null) {
+				_log.error(
+					new NoSuchObjectDefinitionException(
+						String.valueOf(
+							objectRelationship.getObjectDefinitionId1())));
+
+				continue;
+			}
+
+			if (objectDefinition1.isSystem()) {
+				continue;
+			}
+
+			infoFieldSetEntries.add(
+				_getObjectDefinitionInfoFieldSet(
+					StringBundler.concat(
+						ObjectRelationship.class.getSimpleName(),
+						StringPool.POUND, objectDefinition1.getName(),
+						StringPool.POUND, objectRelationship.getName()),
+					objectDefinition1));
+		}
+
+		return infoFieldSetEntries;
 	}
 
 	private String _getRelationshipLabelFieldName(ObjectField objectField) {

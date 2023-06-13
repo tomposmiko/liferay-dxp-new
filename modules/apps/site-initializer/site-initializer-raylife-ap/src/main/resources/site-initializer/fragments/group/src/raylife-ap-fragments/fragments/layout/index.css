@@ -190,3 +190,19 @@
 .raylife-agent-portal-content .container-fluid {
 	padding: 0;
 }
+
+.layout-container .notification-open-side-bar {
+	opacity: 1 !important;
+	width: 450px !important;
+}
+
+.layout-container .notification-panel {
+	height: 100%;
+	opacity: 0;
+	overflow: hidden;
+	overflow-x: none;
+	overflow-y: auto;
+	top: 0;
+	transition: all 0.15s ease-in;
+	width: 0;
+}

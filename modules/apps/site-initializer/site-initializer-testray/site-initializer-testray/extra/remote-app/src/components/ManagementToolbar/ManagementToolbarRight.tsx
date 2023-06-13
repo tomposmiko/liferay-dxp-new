@@ -16,9 +16,10 @@ import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import ClayPopover from '@clayui/popover';
-import {ReactNode, useContext, useState} from 'react';
+import {ReactNode, useCallback, useContext, useState} from 'react';
+import {ListViewContext, ListViewTypes} from '~/context/ListViewContext';
+import {Liferay} from '~/services/liferay';
 
-import {ListViewContext, ListViewTypes} from '../../context/ListViewContext';
 import i18n from '../../i18n';
 import {FilterSchema} from '../../schema/filter';
 import {Column} from '../Table';
@@ -40,11 +41,11 @@ export type IItem = {
 	type?:
 		| 'checkbox'
 		| 'contextual'
+		| 'divider'
 		| 'group'
 		| 'item'
 		| 'radio'
-		| 'radiogroup'
-		| 'divider';
+		| 'radiogroup';
 	value?: string;
 };
 
@@ -68,8 +69,32 @@ const ManagementToolbarRight: React.FC<ManagementToolbarRightProps> = ({
 	columns,
 	filterSchema,
 }) => {
-	const [{pin}, dispatch] = useContext(ListViewContext);
+	const [{filters, pin}, dispatch] = useContext(ListViewContext);
 	const [columnsDropdownVisible, setColumnsDropdownVisible] = useState(false);
+
+	const hasAppliedFilters = !!filters.entries.length;
+
+	const onPin = useCallback(() => {
+		if (hasAppliedFilters) {
+			dispatch({type: ListViewTypes.SET_PIN});
+
+			return Liferay.Util.openToast({
+				message: i18n.translate(
+					pin
+						? 'filters-unpinned-successfully'
+						: 'filters-pinned-successfully'
+				),
+				type: 'success',
+			});
+		}
+
+		Liferay.Util.openToast({
+			message: i18n.translate(
+				'you-must-select-one-or-more-filters-before-pinning'
+			),
+			type: 'danger',
+		});
+	}, [dispatch, hasAppliedFilters, pin]);
 
 	return (
 		<ClayManagementToolbar.ItemList>
@@ -80,9 +105,7 @@ const ManagementToolbarRight: React.FC<ManagementToolbarRightProps> = ({
 							aria-label={i18n.translate('add-pin')}
 							className="nav-btn nav-btn-monospaced"
 							displayType="unstyled"
-							onClick={() =>
-								dispatch({type: ListViewTypes.SET_PIN})
-							}
+							onClick={onPin}
 							symbol={i18n.translate(pin ? 'unpin' : 'pin')}
 							title={i18n.translate(pin ? 'unpin' : 'pin')}
 						/>
@@ -101,7 +124,7 @@ const ManagementToolbarRight: React.FC<ManagementToolbarRightProps> = ({
 					show={columnsDropdownVisible}
 					trigger={
 						<ClayButton
-							className="d-flex nav-link"
+							className="d-flex management-toolbar-buttons nav-link"
 							displayType="unstyled"
 						>
 							<span className="navbar-breakpoint-down-d-none">

@@ -14,6 +14,7 @@
 
 package com.liferay.jethr0.project;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,11 @@ import org.json.JSONObject;
  */
 public interface Project {
 
-	public long getID();
+	public Date getCreatedDate();
+
+	public long getId();
+
+	public JSONObject getJSONObject();
 
 	public String getName();
 

@@ -35,16 +35,11 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
-import java.io.IOException;
-
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -63,8 +58,7 @@ public class AMImageRequestHandler
 
 	@Override
 	public AdaptiveMedia<AMImageProcessor> handleRequest(
-			HttpServletRequest httpServletRequest)
-		throws IOException, ServletException {
+		HttpServletRequest httpServletRequest) {
 
 		Tuple<FileVersion, AMImageAttributeMapping> interpretedPath =
 			_interpretPath(httpServletRequest.getPathInfo());
@@ -73,7 +67,7 @@ public class AMImageRequestHandler
 			return null;
 		}
 
-		AdaptiveMedia<AMImageProcessor> adaptiveMedia = _findAdaptiveMedia(
+		AdaptiveMedia<AMImageProcessor> adaptiveMedia = _getAdaptiveMedia(
 			interpretedPath.first, interpretedPath.second);
 
 		if (adaptiveMedia != null) {
@@ -100,6 +94,57 @@ public class AMImageRequestHandler
 	}
 
 	private AdaptiveMedia<AMImageProcessor> _findAdaptiveMedia(
+			FileVersion fileVersion,
+			AMImageConfigurationEntry amImageConfigurationEntry)
+		throws PortalException {
+
+		List<AdaptiveMedia<AMImageProcessor>> adaptiveMedias =
+			_amImageFinder.getAdaptiveMedias(
+				amImageQueryBuilder -> amImageQueryBuilder.forFileVersion(
+					fileVersion
+				).forConfiguration(
+					amImageConfigurationEntry.getUUID()
+				).done());
+
+		if (!adaptiveMedias.isEmpty()) {
+			return adaptiveMedias.get(0);
+		}
+
+		Map<String, String> properties =
+			amImageConfigurationEntry.getProperties();
+
+		Integer configurationWidth = GetterUtil.getInteger(
+			properties.get("max-width"));
+
+		Integer configurationHeight = GetterUtil.getInteger(
+			properties.get("max-height"));
+
+		try {
+			adaptiveMedias = _amImageFinder.getAdaptiveMedias(
+				amImageQueryBuilder -> amImageQueryBuilder.forFileVersion(
+					fileVersion
+				).with(
+					AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH,
+					configurationWidth
+				).with(
+					AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT,
+					configurationHeight
+				).done());
+
+			if (adaptiveMedias.isEmpty()) {
+				return null;
+			}
+
+			adaptiveMedias.sort(_getComparator(configurationWidth));
+
+			return adaptiveMedias.get(0);
+		}
+		catch (PortalException portalException) {
+			throw new AMRuntimeException(portalException);
+		}
+	}
+
+	private AdaptiveMedia<AMImageProcessor> _getAdaptiveMedia(
 		FileVersion fileVersion,
 		AMImageAttributeMapping amImageAttributeMapping) {
 
@@ -119,18 +164,11 @@ public class AMImageRequestHandler
 				return null;
 			}
 
-			Optional<AdaptiveMedia<AMImageProcessor>> adaptiveMediaOptional =
-				_findExactAdaptiveMedia(fileVersion, amImageConfigurationEntry);
-
-			if (adaptiveMediaOptional.isPresent()) {
-				return adaptiveMediaOptional.get();
-			}
-
-			adaptiveMediaOptional = _findClosestAdaptiveMedia(
+			AdaptiveMedia<AMImageProcessor> adaptiveMedia = _findAdaptiveMedia(
 				fileVersion, amImageConfigurationEntry);
 
-			if (adaptiveMediaOptional.isPresent()) {
-				return adaptiveMediaOptional.get();
+			if (adaptiveMedia != null) {
+				return adaptiveMedia;
 			}
 
 			return _createRawAdaptiveMedia(fileVersion);
@@ -138,66 +176,6 @@ public class AMImageRequestHandler
 		catch (PortalException portalException) {
 			throw new AMRuntimeException(portalException);
 		}
-	}
-
-	private Optional<AdaptiveMedia<AMImageProcessor>> _findClosestAdaptiveMedia(
-		FileVersion fileVersion,
-		AMImageConfigurationEntry amImageConfigurationEntry) {
-
-		Map<String, String> properties =
-			amImageConfigurationEntry.getProperties();
-
-		Integer configurationWidth = GetterUtil.getInteger(
-			properties.get("max-width"));
-
-		Integer configurationHeight = GetterUtil.getInteger(
-			properties.get("max-height"));
-
-		try {
-			List<AdaptiveMedia<AMImageProcessor>> adaptiveMedias =
-				_amImageFinder.getAdaptiveMedias(
-					amImageQueryBuilder -> amImageQueryBuilder.forFileVersion(
-						fileVersion
-					).with(
-						AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH,
-						configurationWidth
-					).with(
-						AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT,
-						configurationHeight
-					).done());
-
-			if (adaptiveMedias.isEmpty()) {
-				return Optional.empty();
-			}
-
-			Collections.sort(
-				adaptiveMedias, _getComparator(configurationWidth));
-
-			return Optional.of(adaptiveMedias.get(0));
-		}
-		catch (PortalException portalException) {
-			throw new AMRuntimeException(portalException);
-		}
-	}
-
-	private Optional<AdaptiveMedia<AMImageProcessor>> _findExactAdaptiveMedia(
-			FileVersion fileVersion,
-			AMImageConfigurationEntry amImageConfigurationEntry)
-		throws PortalException {
-
-		List<AdaptiveMedia<AMImageProcessor>> adaptiveMedias =
-			_amImageFinder.getAdaptiveMedias(
-				amImageQueryBuilder -> amImageQueryBuilder.forFileVersion(
-					fileVersion
-				).forConfiguration(
-					amImageConfigurationEntry.getUUID()
-				).done());
-
-		if (adaptiveMedias.isEmpty()) {
-			return Optional.empty();
-		}
-
-		return Optional.of(adaptiveMedias.get(0));
 	}
 
 	private Comparator<AdaptiveMedia<AMImageProcessor>> _getComparator(

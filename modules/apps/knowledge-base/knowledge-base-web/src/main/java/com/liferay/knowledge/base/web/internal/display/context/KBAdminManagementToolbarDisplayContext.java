@@ -93,7 +93,7 @@ public class KBAdminManagementToolbarDisplayContext {
 		_renderResponse = renderResponse;
 		_portletConfig = portletConfig;
 
-		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		_createSearchContainer();
@@ -405,6 +405,11 @@ public class KBAdminManagementToolbarDisplayContext {
 			_liferayPortletResponse
 		).setMVCPath(
 			"/admin/view.jsp"
+		).setParameter(
+			"parentResourcePrimKey",
+			ParamUtil.getLong(
+				_httpServletRequest, "parentResourcePrimKey",
+				KBFolderConstants.DEFAULT_PARENT_FOLDER_ID)
 		).buildPortletURL();
 
 		return new ViewTypeItemList(portletURL, getDisplayStyle()) {

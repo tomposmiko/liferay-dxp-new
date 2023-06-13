@@ -14,6 +14,7 @@
 						"marginLeft": 0,
 						"marginRight": 0,
 						"marginTop": 0,
+						"opacity": 100,
 						"paddingBottom": 0,
 						"paddingLeft": 0,
 						"paddingRight": 0,
@@ -25,7 +26,8 @@
 					{
 						"definition": {
 							"fragment": {
-								"key": "layout"
+								"key": "layout",
+								"siteKey": "Raylife AP"
 							},
 							"fragmentConfig": {
 								"layoutName": "Dashboard"
@@ -36,11 +38,53 @@
 						},
 						"pageElements": [
 							{
+								"definition": {
+								},
+								"pageElements": [
+									{
+										"definition": {
+											"indexed": true,
+											"layout": {
+												"borderWidth": 0,
+												"marginBottom": 0,
+												"marginLeft": 0,
+												"marginRight": 0,
+												"marginTop": 0,
+												"opacity": 100,
+												"paddingBottom": 0,
+												"paddingLeft": 0,
+												"paddingRight": 0,
+												"paddingTop": 0,
+												"widthType": "Fluid"
+											}
+										},
+										"pageElements": [
+											{
+												"definition": {
+													"widgetInstance": {
+														"widgetConfig": {
+															"properties": "route=notification-sidebar"
+														},
+														"widgetName": "[$CLIENT_EXTENSION_ENTRY_ID:RAYLIFEAGENTPORTAL$]"
+													}
+												},
+												"type": "Widget"
+											}
+										],
+										"type": "Section"
+									}
+								],
+								"type": "FragmentDropZone"
+							},
+							{
+								"definition": {
+								},
 								"pageElements": [
 									{
 										"definition": {
 											"fragment": {
-												"key": "dashboard-title"
+												"key": "dashboard-title",
+												"siteKey": "Raylife AP"
 											},
 											"fragmentConfig": {
 											},
@@ -54,9 +98,13 @@
 								"type": "FragmentDropZone"
 							},
 							{
+								"definition": {
+								},
 								"type": "FragmentDropZone"
 							},
 							{
+								"definition": {
+								},
 								"pageElements": [
 									{
 										"definition": {
@@ -75,6 +123,7 @@
 												"marginLeft": 0,
 												"marginRight": 0,
 												"marginTop": 0,
+												"opacity": 100,
 												"paddingBottom": 2,
 												"paddingLeft": 0,
 												"paddingRight": 0,
@@ -98,6 +147,7 @@
 														"marginLeft": 0,
 														"marginRight": 0,
 														"marginTop": 0,
+														"opacity": 100,
 														"paddingBottom": 0,
 														"paddingLeft": 0,
 														"paddingRight": 0,
@@ -242,6 +292,7 @@
 																								"marginLeft": 0,
 																								"marginRight": 0,
 																								"marginTop": 0,
+																								"opacity": 100,
 																								"paddingBottom": 0,
 																								"paddingLeft": 0,
 																								"paddingRight": 0,
@@ -253,7 +304,8 @@
 																							{
 																								"definition": {
 																									"fragment": {
-																										"key": "section"
+																										"key": "section",
+																										"siteKey": "Raylife AP"
 																									},
 																									"fragmentConfig": {
 																										"sectionId": "primary"
@@ -264,11 +316,14 @@
 																								},
 																								"pageElements": [
 																									{
+																										"definition": {
+																										},
 																										"pageElements": [
 																											{
 																												"definition": {
 																													"fragment": {
-																														"key": "dashboard-tasks"
+																														"key": "dashboard-tasks",
+																														"siteKey": "Raylife AP"
 																													},
 																													"fragmentConfig": {
 																														"textColor": ""
@@ -327,7 +382,8 @@
 																					{
 																						"definition": {
 																							"fragment": {
-																								"key": "section"
+																								"key": "section",
+																								"siteKey": "Raylife AP"
 																							},
 																							"fragmentConfig": {
 																								"sectionId": "primary"
@@ -342,11 +398,14 @@
 																						},
 																						"pageElements": [
 																							{
+																								"definition": {
+																								},
 																								"pageElements": [
 																									{
 																										"definition": {
 																											"fragment": {
-																												"key": "dashboard-whats-new"
+																												"key": "dashboard-whats-new",
+																												"siteKey": "Raylife AP"
 																											},
 																											"fragmentConfig": {
 																												"textColor": ""
@@ -453,7 +512,8 @@
 																					{
 																						"definition": {
 																							"fragment": {
-																								"key": "section"
+																								"key": "section",
+																								"siteKey": "Raylife AP"
 																							},
 																							"fragmentConfig": {
 																								"sectionId": "primary"
@@ -464,11 +524,14 @@
 																						},
 																						"pageElements": [
 																							{
+																								"definition": {
+																								},
 																								"pageElements": [
 																									{
 																										"definition": {
 																											"fragment": {
-																												"key": "dashboard-sales"
+																												"key": "dashboard-sales",
+																												"siteKey": "Raylife AP"
 																											},
 																											"fragmentConfig": {
 																												"textColor": ""
@@ -514,7 +577,8 @@
 																					{
 																						"definition": {
 																							"fragment": {
-																								"key": "section"
+																								"key": "section",
+																								"siteKey": "Raylife AP"
 																							},
 																							"fragmentConfig": {
 																								"sectionId": "primary"
@@ -525,11 +589,14 @@
 																						},
 																						"pageElements": [
 																							{
+																								"definition": {
+																								},
 																								"pageElements": [
 																									{
 																										"definition": {
 																											"fragment": {
-																												"key": "dashboard-commission"
+																												"key": "dashboard-commission",
+																												"siteKey": "Raylife AP"
 																											},
 																											"fragmentConfig": {
 																												"textColor": ""
@@ -567,6 +634,7 @@
 																				"marginLeft": 0,
 																				"marginRight": 0,
 																				"marginTop": 2,
+																				"opacity": 100,
 																				"paddingBottom": 0,
 																				"paddingLeft": 0,
 																				"paddingRight": 0,
@@ -578,7 +646,8 @@
 																			{
 																				"definition": {
 																					"fragment": {
-																						"key": "section"
+																						"key": "section",
+																						"siteKey": "Raylife AP"
 																					},
 																					"fragmentConfig": {
 																						"sectionId": "primary"
@@ -589,6 +658,8 @@
 																				},
 																				"pageElements": [
 																					{
+																						"definition": {
+																						},
 																						"pageElements": [
 																							{
 																								"definition": {
@@ -609,6 +680,16 @@
 																			}
 																		],
 																		"type": "Section"
+																	},
+																	{
+																		"definition": {
+																			"widgetInstance": {
+																				"widgetConfig": {
+																				},
+																				"widgetName": "[$CLIENT_EXTENSION_ENTRY_ID:RAYLIFEAGENTPORTAL$]"
+																			}
+																		},
+																		"type": "Widget"
 																	}
 																],
 																"type": "Column"
@@ -644,6 +725,7 @@
 														"marginLeft": 0,
 														"marginRight": 0,
 														"marginTop": 2,
+														"opacity": 100,
 														"paddingBottom": 0,
 														"paddingLeft": 0,
 														"paddingRight": 0,
@@ -706,7 +788,8 @@
 																	{
 																		"definition": {
 																			"fragment": {
-																				"key": "section"
+																				"key": "section",
+																				"siteKey": "Raylife AP"
 																			},
 																			"fragmentConfig": {
 																				"sectionId": "primary"
@@ -725,6 +808,8 @@
 																		},
 																		"pageElements": [
 																			{
+																				"definition": {
+																				},
 																				"pageElements": [
 																					{
 																						"definition": {
@@ -772,7 +857,8 @@
 																	{
 																		"definition": {
 																			"fragment": {
-																				"key": "section"
+																				"key": "section",
+																				"siteKey": "Raylife AP"
 																			},
 																			"fragmentConfig": {
 																				"sectionId": "primary"
@@ -783,11 +869,14 @@
 																		},
 																		"pageElements": [
 																			{
+																				"definition": {
+																				},
 																				"pageElements": [
 																					{
 																						"definition": {
 																							"fragment": {
-																								"key": "dashboard-active-claims"
+																								"key": "dashboard-active-claims",
+																								"siteKey": "Raylife AP"
 																							},
 																							"fragmentConfig": {
 																								"textColor": ""

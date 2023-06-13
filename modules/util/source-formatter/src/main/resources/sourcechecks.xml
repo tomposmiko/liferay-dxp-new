@@ -1522,6 +1522,16 @@
 		</check>
 	</source-processor>
 	<source-processor name="UpgradeSourceProcessor">
+		<check name="UpgradeBNDIncludeResourceCheck">
+			<category name="Upgrade" />
+			<description name="Checks if the property value `-includeresource` or `Include-Resource` exists and removes it" />
+			<weight>1</weight>
+		</check>
+		<check name="UpgradeGradleIncludeResourceCheck">
+			<category name="Upgrade" />
+			<description name="Replaces with `compileInclude` the configuration attribute for dependencies in `build.gradle` that are listed at `Include-Resource` property at `bnd.bnd` associated file." />
+			<weight>2</weight>
+		</check>
 		<check name="UpgradeJavaCheck">
 			<category name="Upgrade" />
 			<description name="Performs upgrade checks for `java` files" />

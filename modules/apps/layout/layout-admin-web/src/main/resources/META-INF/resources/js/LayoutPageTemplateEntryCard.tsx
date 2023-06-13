@@ -16,7 +16,7 @@ import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayCard from '@clayui/card';
 import ClayIcon from '@clayui/icon';
 import ClayModal, {useModal} from '@clayui/modal';
-import {createPortletURL, fetch} from 'frontend-js-web';
+import {createPortletURL, fetch, openModal} from 'frontend-js-web';
 import {
 	KeyboardEvent,
 	MouseEvent,
@@ -51,7 +51,7 @@ export default function LayoutPageTemplateEntryCard({
 	} = useModal();
 
 	const onClick = () => {
-		Liferay.Util.openModal({
+		openModal({
 			disableAutoClose: true,
 			height: '60vh',
 			id: 'addLayoutDialog',
@@ -72,6 +72,28 @@ export default function LayoutPageTemplateEntryCard({
 	const onPreviewClick = (event: MouseEvent) => {
 		event.stopPropagation();
 		onPreviewOpenChange(true);
+	};
+
+	const [entryIndex, setEntryIndex] = useState(0);
+	const [
+		layoutPageTemplateEntryList,
+		setLayoutPageTemplateEntryList,
+	] = useState<LayoutPageTemplateEntryList | null>(null);
+
+	const updateEntryIndex = (direction: 'previous' | 'next') => {
+		setEntryIndex((previousIndex) => {
+			if (!layoutPageTemplateEntryList) {
+				return previousIndex;
+			}
+
+			if (direction === 'previous') {
+				return previousIndex === 0
+					? layoutPageTemplateEntryList.length - 1
+					: previousIndex - 1;
+			}
+
+			return (previousIndex + 1) % layoutPageTemplateEntryList.length;
+		});
 	};
 
 	return (
@@ -132,7 +154,18 @@ export default function LayoutPageTemplateEntryCard({
 			</div>
 
 			{previewOpen && (
-				<ClayModal observer={previewObserver} size="full-screen">
+				<ClayModal
+					observer={previewObserver}
+					onKeyDown={(event) => {
+						if (event.key === 'ArrowLeft') {
+							updateEntryIndex('previous');
+						}
+						else if (event.key === 'ArrowRight') {
+							updateEntryIndex('next');
+						}
+					}}
+					size="full-screen"
+				>
 					<ClayModal.Header>
 						{Liferay.Language.get('preview-page-template')}
 					</ClayModal.Header>
@@ -140,13 +173,22 @@ export default function LayoutPageTemplateEntryCard({
 					<ClayModal.Body className="p-0">
 						<PreviewModalContent
 							addLayoutURL={addLayoutURL}
+							entryIndex={entryIndex}
 							getLayoutPageTemplateEntryListURL={
 								getLayoutPageTemplateEntryListURL
 							}
 							initialLayoutPageTemplateEntryId={
 								layoutPageTemplateEntryId
 							}
+							layoutPageTemplateEntryList={
+								layoutPageTemplateEntryList
+							}
 							onPreviewOpenChange={onPreviewOpenChange}
+							setEntryIndex={setEntryIndex}
+							setLayoutPageTemplateEntryList={
+								setLayoutPageTemplateEntryList
+							}
+							updateEntryIndex={updateEntryIndex}
 						/>
 					</ClayModal.Body>
 				</ClayModal>
@@ -165,44 +207,34 @@ type LayoutPageTemplateEntryList = LayoutPageTemplateEntry[];
 
 interface IPreviewModalContentProps {
 	addLayoutURL: string;
+	entryIndex: number;
 	getLayoutPageTemplateEntryListURL: string;
 	initialLayoutPageTemplateEntryId: string;
+	layoutPageTemplateEntryList: LayoutPageTemplateEntry[] | null;
 	onPreviewOpenChange: (open: boolean) => void;
+	setEntryIndex: (index: number) => void;
+	setLayoutPageTemplateEntryList: (
+		layoutPageTemplateEntries: LayoutPageTemplateEntry[]
+	) => void;
+	updateEntryIndex: (direction: 'previous' | 'next') => void;
 }
 
 function PreviewModalContent({
 	addLayoutURL,
+	entryIndex,
 	getLayoutPageTemplateEntryListURL,
 	initialLayoutPageTemplateEntryId,
+	layoutPageTemplateEntryList,
 	onPreviewOpenChange,
+	setEntryIndex,
+	setLayoutPageTemplateEntryList,
+	updateEntryIndex,
 }: IPreviewModalContentProps) {
-	const [entryIndex, setEntryIndex] = useState(0);
-	const [
-		layoutPageTemplateEntryList,
-		setLayoutPageTemplateEntryList,
-	] = useState<LayoutPageTemplateEntryList | null>(null);
-
-	const iframeRef = useRef() as React.MutableRefObject<HTMLIFrameElement>;
+	const iframeRef = useRef() as React.MutableRefObject<HTMLIFrameElement | null>;
 
 	const layoutPageTemplateEntry = layoutPageTemplateEntryList
 		? layoutPageTemplateEntryList[entryIndex]
 		: null;
-
-	const updateEntryIndex = (direction: 'previous' | 'next') => {
-		setEntryIndex((previousIndex) => {
-			if (!layoutPageTemplateEntryList) {
-				return previousIndex;
-			}
-
-			if (direction === 'previous') {
-				return previousIndex === 0
-					? layoutPageTemplateEntryList.length - 1
-					: previousIndex - 1;
-			}
-
-			return (previousIndex + 1) % layoutPageTemplateEntryList.length;
-		});
-	};
 
 	useEffect(() => {
 		fetch(getLayoutPageTemplateEntryListURL)
@@ -227,7 +259,12 @@ function PreviewModalContent({
 			.catch((error) => {
 				console.error(error);
 			});
-	}, [getLayoutPageTemplateEntryListURL, initialLayoutPageTemplateEntryId]);
+	}, [
+		getLayoutPageTemplateEntryListURL,
+		initialLayoutPageTemplateEntryId,
+		setEntryIndex,
+		setLayoutPageTemplateEntryList,
+	]);
 
 	if (!layoutPageTemplateEntryList || !layoutPageTemplateEntry) {
 		return null;
@@ -240,7 +277,7 @@ function PreviewModalContent({
 					onClick={() => {
 						onPreviewOpenChange(false);
 
-						Liferay.Util.openModal({
+						openModal({
 							disableAutoClose: true,
 							height: '60vh',
 							id: 'addLayoutDialog',
@@ -296,7 +333,11 @@ function PreviewModalContent({
 							);
 						}
 					}}
-					ref={iframeRef}
+					ref={(ref) => {
+						iframeRef.current = ref;
+
+						iframeRef.current?.setAttribute('inert', '');
+					}}
 					src={layoutPageTemplateEntry.previewLayoutURL}
 				/>
 

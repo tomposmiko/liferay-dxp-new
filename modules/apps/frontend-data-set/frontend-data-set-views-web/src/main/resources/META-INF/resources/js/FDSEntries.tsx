@@ -15,16 +15,17 @@
 import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
 import ClayForm, {ClayInput} from '@clayui/form';
-import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayModal from '@clayui/modal';
 import {FrontendDataSet} from '@liferay/frontend-data-set-web';
 import classNames from 'classnames';
-import {fetch, navigate, openModal} from 'frontend-js-web';
+import {fetch, navigate, openModal, openToast} from 'frontend-js-web';
 import fuzzy from 'fuzzy';
 import React, {useRef, useState} from 'react';
 
 import '../css/FDSEntries.scss';
+import {PAGINATION_PROPS} from './Constants';
+import RequiredMark from './RequiredMark';
 
 const FUZZY_OPTIONS = {
 	post: '</strong>',
@@ -87,17 +88,6 @@ const HeadlessResourceItem = ({
 		</ClayLayout.ContentRow>
 	);
 };
-
-const RequiredMark = () => (
-	<>
-		<span className="inline-item-after reference-mark text-warning">
-			<ClayIcon symbol="asterisk" />
-		</span>
-		<span className="hide-accessible sr-only">
-			{Liferay.Language.get('required')}
-		</span>
-	</>
-);
 
 interface IDropdownMenuProps {
 	headlessResources: Array<HeadlessResource>;
@@ -186,6 +176,12 @@ const FDSEntries = ({
 	);
 
 	type FDSEntry = {
+		actions: {
+			delete: {
+				href: string;
+				method: string;
+			};
+		};
 		entityClassName: string;
 		id: string;
 		label: string;
@@ -439,10 +435,62 @@ const FDSEntries = ({
 		navigate(url);
 	};
 
+	const onDeleteClick = ({
+		itemData,
+		loadData,
+	}: {
+		itemData: FDSEntry;
+		loadData: Function;
+	}) => {
+		openModal({
+			bodyHTML: Liferay.Language.get(
+				'deleting-a-dataset-is-an-action-that-cannot-be-reversed'
+			),
+			buttons: [
+				{
+					autoFocus: true,
+					displayType: 'secondary',
+					label: Liferay.Language.get('cancel'),
+					type: 'cancel',
+				},
+				{
+					displayType: 'danger',
+					label: Liferay.Language.get('delete'),
+					onClick: ({processClose}: {processClose: Function}) => {
+						processClose();
+
+						fetch(itemData.actions.delete.href, {
+							method: itemData.actions.delete.method,
+						})
+							.then(() => {
+								openToast({
+									message: Liferay.Language.get(
+										'your-request-completed-successfully'
+									),
+									type: 'success',
+								});
+
+								loadData();
+							})
+							.catch(() =>
+								openToast({
+									message: Liferay.Language.get(
+										'your-request-failed-to-complete'
+									),
+									type: 'danger',
+								})
+							);
+					},
+				},
+			],
+			status: 'danger',
+			title: Liferay.Language.get('delete-dataset'),
+		});
+	};
+
 	const views = [
 		{
 			contentRenderer: 'table',
-			label: Liferay.Language.get('table'),
 			name: 'table',
 			schema: {
 				fields: [
@@ -459,40 +507,33 @@ const FDSEntries = ({
 					},
 				],
 			},
-			thumbnail: 'table',
 		},
 	];
 
 	return (
-		<>
-			<FrontendDataSet
-				apiURL={apiURL}
-				creationMenu={creationMenu}
-				customDataRenderers={{
-					provider: ProviderRenderer,
-				}}
-				id={`${namespace}FDSEntries`}
-				itemsActions={[
-					{
-						icon: 'view',
-						label: Liferay.Language.get('view'),
-						onClick: onViewClick,
-					},
-				]}
-				pagination={{
-					deltas: [
-						{label: 4},
-						{label: 8},
-						{label: 20},
-						{label: 40},
-						{label: 60},
-					],
-					initialDelta: 10,
-				}}
-				style="fluid"
-				views={views}
-			/>
-		</>
+		<FrontendDataSet
+			apiURL={apiURL}
+			creationMenu={creationMenu}
+			customDataRenderers={{
+				provider: ProviderRenderer,
+			}}
+			id={`${namespace}FDSEntries`}
+			itemsActions={[
+				{
+					icon: 'view',
+					label: Liferay.Language.get('view'),
+					onClick: onViewClick,
+				},
+				{
+					icon: 'trash',
+					label: Liferay.Language.get('delete'),
+					onClick: onDeleteClick,
+				},
+			]}
+			style="fluid"
+			views={views}
+			{...PAGINATION_PROPS}
+		/>
 	);
 };
 

@@ -1,10 +1,10 @@
 import documentIcon from '../../assets/icons/document-icon.svg';
 import downloadIcon from '../../assets/icons/download-icon.svg';
-import {getCatalogId} from '../../utils/util';
 import {Header} from '../../components/Header/Header';
 import {NewAppPageFooterButtons} from '../../components/NewAppPageFooterButtons/NewAppPageFooterButtons';
 import {useAppContext} from '../../manage-app-state/AppManageState';
 import {TYPES} from '../../manage-app-state/actionTypes';
+import {getCatalogId} from '../../utils/util';
 
 import './CreateNewAppPage.scss';
 

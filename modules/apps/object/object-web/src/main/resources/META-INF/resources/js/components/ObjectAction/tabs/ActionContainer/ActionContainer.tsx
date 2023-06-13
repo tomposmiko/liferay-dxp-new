@@ -62,8 +62,8 @@ export function ActionContainer({
 	validateExpressionURL,
 	values,
 }: ActionContainerProps) {
-	const [relationships, setRelationships] = useState<
-		ObjectDefinitionsRelationship[]
+	const [addObjectEntryDefinitions, setAddObjectEntryDefinitions] = useState<
+		AddObjectEntryDefinitions[]
 	>([]);
 
 	const [creationLanguageId, setCreationLanguageId] = useState<
@@ -110,9 +110,9 @@ export function ActionContainer({
 
 			const isSystem = isObjectSystem === 'true';
 
-			const object = relationships.find(
-				(relationship) =>
-					relationship.externalReferenceCode === externalReferenceCode
+			const object = addObjectEntryDefinitions.find(
+				(definition) =>
+					definition.externalReferenceCode === externalReferenceCode
 			);
 
 			const parameters: ObjectActionParameters = {
@@ -177,7 +177,11 @@ export function ActionContainer({
 			}));
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[relationships, values.objectActionExecutorKey, values.parameters]
+		[
+			addObjectEntryDefinitions,
+			values.objectActionExecutorKey,
+			values.parameters,
+		]
 	);
 
 	useEffect(() => {
@@ -230,10 +234,10 @@ export function ActionContainer({
 				objectDefinitionsRelationshipsURL={
 					objectDefinitionsRelationshipsURL
 				}
+				setAddObjectEntryDefinitions={setAddObjectEntryDefinitions}
 				setCurrentObjectDefinitionFields={
 					setCurrentObjectDefinitionFields
 				}
-				setRelationships={setRelationships}
 				setValues={setValues}
 				systemObject={systemObject}
 				updateParameters={updateParameters}

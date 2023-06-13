@@ -82,9 +82,7 @@ definition {
 			webContentContent = ${webContentContent},
 			webContentTitle = ${webContentTitle});
 
-		Button.click(button = "Submit for Publication");
-
-		WaitForElementNotPresent(locator1 = "Button#SUBMIT_FOR_PUBLICATION");
+		Button.click(button = "Submit for Workflow");
 
 		AssertTextEquals(
 			locator1 = "Message#ERROR_3",

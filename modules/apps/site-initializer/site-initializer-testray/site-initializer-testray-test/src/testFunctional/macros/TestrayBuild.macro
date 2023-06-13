@@ -147,7 +147,7 @@ definition {
 		if (isSet(dropdownItem)) {
 			Click.javaScriptClick(
 				key_picklistOption = ${dropdownItem},
-				locator1 = "Picklist#PICKLIST_KEBAB_MENU_OPTION");
+				locator1 = "TestrayDropdown#PICKLIST_KEBAB_MENU_OPTION");
 		}
 
 		Type(
@@ -284,6 +284,19 @@ definition {
 
 	macro verifyPromoteBuild {
 		AssertElementPresent(locator1 = "TestrayBuild#PROMOTE_BUILD");
+	}
+
+	macro verifySpecificEnvironmentFactors {
+		AssertElementPresent(
+			key_environmentFactors = ${listCategory},
+			locator1 = "Testray#VERIFY_ENVIRONMENT_FACTORS_SELECTED");
+
+		Button.click(button = "Next");
+
+		AssertElementPresent(
+			key_fieldLabel = ${label},
+			locator1 = "Select#GENERIC_SELECT_FIELD",
+			value1 = ${listOption});
 	}
 
 	macro viewBuildDetails {

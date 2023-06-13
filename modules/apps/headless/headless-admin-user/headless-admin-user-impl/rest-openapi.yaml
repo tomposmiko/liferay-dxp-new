@@ -239,6 +239,12 @@ components:
                         The email address's type.
                     type: string
             type: object
+        Image:
+            properties:
+                image:
+                    format: binary
+                    type: string
+            type: object
         Organization:
             description:
                 Represents an organization. Organizations can contain other organizations (suborganizations). Properties
@@ -1097,7 +1103,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.admin.user.client', and version '4.0.38'."
+        'com.liferay.headless.admin.user.client', and version '4.0.39'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -4174,6 +4180,32 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Ticket"
             tags: ["Ticket"]
+    "/user-accounts/{userAccountId}/image":
+        post:
+            parameters:
+                - in: path
+                  name: userAccountId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            $ref: "#/components/schemas/Image"
+                required: true
+            responses:
+                201:
+                    description:
+                        Created
+                204:
+                    description:
+                        Updated
+                400:
+                    description:
+                        Invalid input
+            tags: ["UserAccount"]
     "/user-accounts/{userAccountId}/password-reset-ticket":
         get:
             description:

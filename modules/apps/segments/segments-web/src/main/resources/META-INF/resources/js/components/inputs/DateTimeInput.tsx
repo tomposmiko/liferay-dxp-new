@@ -14,25 +14,21 @@
 
 import ClayDatePicker from '@clayui/date-picker';
 import {format, isValid, parse} from 'date-fns';
-import {default as React, useRef, useState} from 'react';
+import {default as React, useEffect, useRef, useState} from 'react';
 
+import {DateValue} from '../../../types/Date';
 import {PROPERTY_TYPES} from '../../utils/constants';
 
 const INTERNAL_DATE_FORMAT = 'yyyy-MM-dd';
 const DISPLAY_DATE_FORMAT = 'yyyy/MM/dd';
 
-interface DateRange {
-	end: string;
-	start: string;
-}
-
 interface Props {
 	disabled?: boolean;
-	onChange: (payload: {type: string; value: DateRange | string}) => void;
+	onChange: (payload: {type: string; value: DateValue}) => void;
 	propertyLabel: string;
 	propertyType: string;
 	range?: boolean;
-	value?: DateRange | string;
+	value?: DateValue;
 }
 
 function DateTimeInput({
@@ -41,15 +37,25 @@ function DateTimeInput({
 	propertyLabel,
 	propertyType,
 	range,
-	value: initialValue,
+	value,
 }: Props) {
 	const [expanded, setExpanded] = useState(false);
 
-	const [displayDate, setDisplayDate] = useState<DateRange | string>(() =>
-		transformDate(initialValue || new Date().toISOString(), toDisplayDate)
+	const [displayDate, setDisplayDate] = useState<DateValue>(() =>
+		transformDate(value || new Date().toISOString(), toDisplayDate)
 	);
 
 	const previousDisplayDateRef = useRef(displayDate);
+
+	useEffect(() => {
+		const nextDisplayDate = transformDate(
+			value || new Date().toISOString(),
+			toDisplayDate
+		);
+
+		previousDisplayDateRef.current = nextDisplayDate;
+		setDisplayDate(nextDisplayDate);
+	}, [value]);
 
 	const saveDateTimeValue = () => {
 		const internalDate = transformDate(
@@ -145,7 +151,7 @@ function DateTimeInput({
 	);
 }
 
-function datesAreEqual(dateA: DateRange | string, dateB: DateRange | string) {
+function datesAreEqual(dateA: DateValue, dateB: DateValue) {
 	if (typeof dateA === 'object' && typeof dateB === 'object') {
 		return dateA.start === dateB.start && dateA.end === dateB.end;
 	}
@@ -188,10 +194,7 @@ function toInternalDateTime(displayOrIsoDate: string) {
 	return new Date(toInternalDate(displayOrIsoDate)).toISOString();
 }
 
-function transformDate(
-	date: DateRange | string,
-	transform: (date: string) => string
-) {
+function transformDate(date: DateValue, transform: (date: string) => string) {
 	if (typeof date === 'object') {
 		const end = transform(date.end);
 		const start = transform(date.start);

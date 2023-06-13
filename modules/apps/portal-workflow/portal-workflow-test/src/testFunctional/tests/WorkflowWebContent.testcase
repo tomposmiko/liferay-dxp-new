@@ -162,7 +162,7 @@ definition {
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "EXAMPLE");
 
-		PortletEntry.submitForPublication();
+		PortletEntry.submitForWorkflow();
 
 		WebContentNavigator.gotoViewStatus(
 			webContentStatus = "PENDING",
@@ -364,7 +364,6 @@ definition {
 	@description = "Verify that, when a Web Content is moved to a Folder, it's Workflow changes"
 	@priority = 4
 	test MoveWebContentToFolderChangeItsWorkflow {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "WorkflowWebContent#MoveWebContentToFolderChangeItsWorkflow";
 
 		Workflow.duplicateSingleApproverWorkflow(workflowName = "Copy of Single Approver");
@@ -443,7 +442,7 @@ definition {
 			key_webContentTitle = "Web Content Title",
 			locator1 = "WC#ENTRY_LIST_TITLE");
 
-		PortletEntry.submitForPublication();
+		PortletEntry.submitForWorkflow();
 
 		WorkflowMetrics.goToDashboardAllItemsWithFilter(
 			workflowFilterOption = "PENDING",

@@ -162,7 +162,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.search.document.Document;
-import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
@@ -196,8 +195,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 
@@ -485,6 +482,7 @@ public class ObjectEntryLocalServiceImpl
 				_objectRelatedModelsProviderRegistry.
 					getObjectRelatedModelsProvider(
 						objectDefinition2.getClassName(),
+						objectDefinition2.getCompanyId(),
 						objectRelationship.getType());
 
 			objectRelatedModelsProvider.deleteRelatedModel(
@@ -653,8 +651,7 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public List<ObjectEntry> getObjectEntries(
-			long groupId, long objectDefinitionId, int start, int end)
-		throws PortalException {
+		long groupId, long objectDefinitionId, int start, int end) {
 
 		return objectEntryPersistence.findByG_ODI(
 			groupId, objectDefinitionId, start, end);
@@ -662,9 +659,7 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public List<ObjectEntry> getObjectEntries(
-			long groupId, long objectDefinitionId, int status, int start,
-			int end)
-		throws PortalException {
+		long groupId, long objectDefinitionId, int status, int start, int end) {
 
 		return objectEntryPersistence.findByG_ODI_S(
 			groupId, objectDefinitionId, status, start, end);
@@ -1115,24 +1110,16 @@ public class ObjectEntryLocalServiceImpl
 
 		SearchHits searchHits = searchResponse.getSearchHits();
 
-		List<SearchHit> searchHitsList = searchHits.getSearchHits();
-
-		Stream<SearchHit> stream = searchHitsList.stream();
-
-		List<ObjectEntry> objectEntries = stream.map(
-			searchHit -> {
-				Document document = searchHit.getDocument();
-
-				long objectEntryId = document.getLong(Field.ENTRY_CLASS_PK);
-
-				return objectEntryPersistence.fetchByPrimaryKey(objectEntryId);
-			}
-		).collect(
-			Collectors.toList()
-		);
-
 		return new BaseModelSearchResult<>(
-			objectEntries, searchResponse.getTotalHits());
+			(List<ObjectEntry>)TransformUtil.transform(
+				searchHits.getSearchHits(),
+				searchHit -> {
+					Document document = searchHit.getDocument();
+
+					return objectEntryPersistence.fetchByPrimaryKey(
+						document.getLong(Field.ENTRY_CLASS_PK));
+				}),
+			searchResponse.getTotalHits());
 	}
 
 	@Override
@@ -2167,15 +2154,9 @@ public class ObjectEntryLocalServiceImpl
 					return column.eq(related ? primaryKey : 0L);
 				}
 			).and(
-				() -> {
-					if (objectRelationship.getObjectDefinitionId1() ==
-							objectRelationship.getObjectDefinitionId2()) {
-
-						return primaryKeyColumn.neq(primaryKey);
-					}
-
-					return null;
-				}
+				() ->
+					objectRelationship.isSelf() ?
+						primaryKeyColumn.neq(primaryKey) : null
 			).and(
 				() -> {
 					if (PermissionThreadLocal.getPermissionChecker() == null) {
@@ -3606,19 +3587,24 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		if (objectField.getListTypeDefinitionId() != 0) {
-			List<ListTypeEntry> listTypeEntries =
-				_listTypeEntryLocalService.getListTypeEntries(
-					objectField.getListTypeDefinitionId());
-
-			Stream<ListTypeEntry> stream = listTypeEntries.stream();
+			ListTypeEntry listTypeEntry = null;
 
 			String value = _getValue(
 				String.valueOf(values.get(entry.getKey())));
 
-			if ((!value.isEmpty() || objectField.isRequired()) &&
-				!stream.anyMatch(
-					listTypeEntry -> Objects.equals(
-						listTypeEntry.getKey(), value))) {
+			for (ListTypeEntry curListTypeEntry :
+					_listTypeEntryLocalService.getListTypeEntries(
+						objectField.getListTypeDefinitionId())) {
+
+				if (Objects.equals(value, curListTypeEntry.getKey())) {
+					listTypeEntry = curListTypeEntry;
+
+					break;
+				}
+			}
+
+			if ((listTypeEntry == null) &&
+				(!value.isEmpty() || objectField.isRequired())) {
 
 				throw new ObjectEntryValuesException.ListTypeEntry(
 					entry.getKey());

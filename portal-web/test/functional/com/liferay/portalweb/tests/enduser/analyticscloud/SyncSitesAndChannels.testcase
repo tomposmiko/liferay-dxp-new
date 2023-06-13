@@ -126,12 +126,12 @@ definition {
 			ACUtils.viewGenericText(textValueList = "No sites were found.");
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
-		task ("Go to the properties page in the sidebar") {
-			ACDXPSettings.navToSyncedSitesMenu();
+		task ("Go to the people page in the sidebar") {
+			ACDXPSettings.navToSyncedContactDataMenu();
 		}
 
 		task ("Click on the Assign button") {
@@ -450,8 +450,8 @@ definition {
 			ACDXPSettings.viewGenericListItem(itemValueList = ${secondSitesPageList});
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the properties page in the sidebar") {
@@ -664,8 +664,8 @@ definition {
 				itemValueList = ${sitesPageListDown});
 		}
 
-		task ("Cancel to exit the wizard") {
-			ACDXPSettings.cancelWizardConfiguration();
+		task ("Complete the wizard configuration") {
+			ACDXPSettings.completeWizardConfiguration();
 		}
 
 		task ("Go to the properties page in the sidebar") {

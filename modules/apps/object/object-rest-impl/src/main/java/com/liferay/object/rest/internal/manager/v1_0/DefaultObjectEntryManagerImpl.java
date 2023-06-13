@@ -30,6 +30,7 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
+import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.internal.dto.v1_0.converter.ObjectEntryDTOConverter;
 import com.liferay.object.rest.internal.petra.sql.dsl.expression.OrderByExpressionUtil;
@@ -151,8 +152,7 @@ public class DefaultObjectEntryManagerImpl
 					groupId, dtoConverterContext.getUserId(), objectDefinition,
 					objectEntry, 0L, dtoConverterContext.getLocale()),
 				_createServiceContext(
-					objectEntry.getProperties(),
-					dtoConverterContext.getUserId()));
+					objectEntry, dtoConverterContext.getUserId()));
 
 		if (FeatureFlagManagerUtil.isEnabled("LPS-153117")) {
 			_addOrUpdateNestedObjectEntries(
@@ -193,7 +193,7 @@ public class DefaultObjectEntryManagerImpl
 		long groupId = getGroupId(objectDefinition, scopeKey);
 
 		ServiceContext serviceContext = _createServiceContext(
-			objectEntry.getProperties(), dtoConverterContext.getUserId());
+			objectEntry, dtoConverterContext.getUserId());
 
 		serviceContext.setCompanyId(companyId);
 
@@ -566,6 +566,7 @@ public class DefaultObjectEntryManagerImpl
 		ObjectRelatedModelsProvider objectRelatedModelsProvider =
 			_objectRelatedModelsProviderRegistry.getObjectRelatedModelsProvider(
 				relatedObjectDefinition.getClassName(),
+				relatedObjectDefinition.getCompanyId(),
 				objectRelationship.getType());
 
 		if (objectDefinition.isSystem()) {
@@ -617,6 +618,7 @@ public class DefaultObjectEntryManagerImpl
 		ObjectRelatedModelsProvider objectRelatedModelsProvider =
 			_objectRelatedModelsProviderRegistry.getObjectRelatedModelsProvider(
 				relatedObjectDefinition.getClassName(),
+				relatedObjectDefinition.getCompanyId(),
 				objectRelationship.getType());
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
@@ -659,7 +661,7 @@ public class DefaultObjectEntryManagerImpl
 				serviceBuilderObjectEntry.getObjectEntryId(),
 				dtoConverterContext.getLocale()),
 			_createServiceContext(
-				objectEntry.getProperties(), dtoConverterContext.getUserId()));
+				objectEntry, dtoConverterContext.getUserId()));
 
 		if (FeatureFlagManagerUtil.isEnabled("LPS-153117")) {
 			_addOrUpdateNestedObjectEntries(
@@ -764,18 +766,26 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	private ServiceContext _createServiceContext(
-		Map<String, Object> properties, long userId) {
+		ObjectEntry objectEntry, long userId) {
 
 		ServiceContext serviceContext = new ServiceContext();
 
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
 
+		Map<String, Object> properties = objectEntry.getProperties();
+
 		if (properties.get("categoryIds") != null) {
 			serviceContext.setAssetCategoryIds(
 				ListUtil.toLongArray(
 					(List<String>)properties.get("categoryIds"),
 					Long::parseLong));
+		}
+
+		if (Validator.isNotNull(objectEntry.getKeywords()) &&
+			FeatureFlagManagerUtil.isEnabled("LPS-176651")) {
+
+			serviceContext.setAssetTagNames(objectEntry.getKeywords());
 		}
 
 		if (properties.get("tagNames") != null) {
@@ -970,6 +980,7 @@ public class DefaultObjectEntryManagerImpl
 				_objectRelatedModelsProviderRegistry.
 					getObjectRelatedModelsProvider(
 						objectDefinition2.getClassName(),
+						objectDefinition2.getCompanyId(),
 						objectRelationship.getType());
 
 			int count = objectRelatedModelsProvider.getRelatedModelsCount(
@@ -1234,12 +1245,20 @@ public class DefaultObjectEntryManagerImpl
 					objectField.getName(),
 					_toDate(locale, String.valueOf(value)));
 			}
-			else if ((objectField.getListTypeDefinitionId() != 0) &&
-					 (value instanceof Map)) {
+			else if (objectField.getListTypeDefinitionId() != 0) {
+				if (value instanceof Map) {
+					Map<String, String> map = (HashMap<String, String>)value;
 
-				Map<String, String> map = (HashMap<String, String>)value;
+					values.put(objectField.getName(), map.get("key"));
+				}
+				else if (value instanceof ListEntry) {
+					ListEntry listEntry = (ListEntry)value;
 
-				values.put(objectField.getName(), map.get("key"));
+					values.put(objectField.getName(), listEntry.getKey());
+				}
+				else {
+					values.put(objectField.getName(), (Serializable)value);
+				}
 			}
 			else {
 				values.put(objectField.getName(), (Serializable)value);

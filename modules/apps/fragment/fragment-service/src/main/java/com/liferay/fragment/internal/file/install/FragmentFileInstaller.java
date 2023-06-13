@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
@@ -40,7 +41,6 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.staging.StagingGroupHelper;
@@ -51,7 +51,6 @@ import java.io.IOException;
 import java.net.URL;
 
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -91,6 +90,7 @@ public class FragmentFileInstaller implements FileInstaller {
 
 	@Override
 	public URL transformURL(File file) throws Exception {
+		Long currentCompanyId = CompanyThreadLocal.getCompanyId();
 		PermissionChecker currentPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 		String currentName = PrincipalThreadLocal.getName();
@@ -103,6 +103,7 @@ public class FragmentFileInstaller implements FileInstaller {
 		finally {
 			file.delete();
 
+			CompanyThreadLocal.setCompanyId(currentCompanyId);
 			PermissionThreadLocal.setPermissionChecker(
 				currentPermissionChecker);
 			PrincipalThreadLocal.setName(currentName);
@@ -135,60 +136,34 @@ public class FragmentFileInstaller implements FileInstaller {
 		}
 
 		if ((company != null) && deployJSONObject.has("groupKey")) {
+			CompanyThreadLocal.setCompanyId(company.getCompanyId());
+
 			group = _getDeploymentGroup(
 				company.getCompanyId(), deployJSONObject.getString("groupKey"));
+
+			_importFragmentEntriesAndLayouts(company, file, group);
 		}
 		else if (company != null) {
+			CompanyThreadLocal.setCompanyId(company.getCompanyId());
+
 			group = _groupLocalService.getCompanyGroup(company.getCompanyId());
+
+			_importFragmentEntriesAndLayouts(company, file, group);
 		}
 		else {
-			List<Company> companies = _companyLocalService.getCompanies(0, 1);
+			_companyLocalService.forEachCompany(
+				currentCompany -> {
+					try {
+						CompanyThreadLocal.setCompanyId(
+							currentCompany.getCompanyId());
 
-			if (ListUtil.isEmpty(companies)) {
-				throw new Exception();
-			}
-
-			company = companies.get(0);
-		}
-
-		User user = _getUser(company, group);
-
-		if (user == null) {
-			throw new Exception();
-		}
-
-		PermissionThreadLocal.setPermissionChecker(
-			PermissionCheckerFactoryUtil.create(user));
-
-		PrincipalThreadLocal.setName(user.getUserId());
-
-		ServiceContext serviceContext = new ServiceContext();
-
-		if (company != null) {
-			serviceContext.setCompanyId(company.getCompanyId());
-		}
-		else {
-			serviceContext.setCompanyId(CompanyConstants.SYSTEM);
-		}
-
-		serviceContext.setUserId(user.getUserId());
-
-		ServiceContextThreadLocal.pushServiceContext(serviceContext);
-
-		long groupId = 0;
-
-		if (group != null) {
-			groupId = group.getGroupId();
-		}
-
-		_fragmentsImporter.importFragmentEntries(
-			user.getUserId(), groupId, 0, file, true);
-
-		if ((company != null) && (group != null) &&
-			(company.getGroupId() != group.getGroupId())) {
-
-			_layoutsImporter.importFile(
-				user.getUserId(), groupId, 0L, file, true);
+						_importFragmentEntriesAndLayouts(
+							currentCompany, file, null);
+					}
+					catch (Exception exception) {
+						_log.error(exception);
+					}
+				});
 		}
 	}
 
@@ -276,6 +251,51 @@ public class FragmentFileInstaller implements FileInstaller {
 		}
 
 		return user;
+	}
+
+	private void _importFragmentEntriesAndLayouts(
+			Company company, File file, Group group)
+		throws Exception {
+
+		User user = _getUser(company, group);
+
+		if (user == null) {
+			throw new Exception();
+		}
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(user));
+
+		PrincipalThreadLocal.setName(user.getUserId());
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		if (company != null) {
+			serviceContext.setCompanyId(company.getCompanyId());
+		}
+		else {
+			serviceContext.setCompanyId(CompanyConstants.SYSTEM);
+		}
+
+		serviceContext.setUserId(user.getUserId());
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+
+		long groupId = 0;
+
+		if (group != null) {
+			groupId = group.getGroupId();
+		}
+
+		_fragmentsImporter.importFragmentEntries(
+			user.getUserId(), groupId, 0, file, true);
+
+		if ((company != null) && (group != null) &&
+			(company.getGroupId() != group.getGroupId())) {
+
+			_layoutsImporter.importFile(
+				user.getUserId(), groupId, 0L, file, true);
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

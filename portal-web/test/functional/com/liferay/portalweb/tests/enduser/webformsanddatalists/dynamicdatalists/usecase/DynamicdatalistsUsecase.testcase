@@ -1562,7 +1562,7 @@ definition {
 			fieldFieldLabel = "Title",
 			fieldName = "title");
 
-		DDLRecord.submitForPublication();
+		DDLRecord.submitForWorkflow();
 
 		User.logoutPG();
 

@@ -1,7 +1,6 @@
 @component-name = "portal-wcm"
 definition {
 
-	property custom.properties = "feature.flag.LPS-162765=true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Utility Pages";
@@ -14,12 +13,7 @@ definition {
 		}
 
 		task ("Add a site") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Sites",
-				panel = "Control Panel",
-				portlet = "Sites");
-
-			Site.addBlankCP(siteName = "Test Site Name");
+			HeadlessSite.addSite(siteName = "Test Site Name");
 		}
 
 		task ("Enable local live") {
@@ -50,6 +44,10 @@ definition {
 			Navigator.gotoNavTab(navTab = "Utility Pages");
 
 			PagesAdmin.addUtilityPage(pageName = "404 Error Utility Page");
+
+			PageEditor.addFragment(
+				collectionName = "Basic Components",
+				fragmentName = "Heading");
 
 			PageEditor.editFragmentText(
 				fragmentName = "Heading",

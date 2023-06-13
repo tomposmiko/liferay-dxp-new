@@ -51,6 +51,7 @@ export type FilterSchema = {
 	fields: RendererFields[];
 	name?: string;
 	onApply?: (filterVariables: FilterVariables) => string;
+	placeholder?: string;
 };
 
 export type FilterSchemas = {
@@ -535,6 +536,16 @@ const filterSchema = {
 			baseFilters.hasRequirements,
 		] as RendererFields[],
 	},
+	components: {
+		fields: [
+			{
+				label: i18n.translate('component-name'),
+				name: 'name',
+				operator: 'contains',
+				type: 'text',
+			},
+		] as RendererFields[],
+	},
 	requirementCases: {
 		fields: [
 			baseFilters.priority,
@@ -647,12 +658,9 @@ const filterSchema = {
 		fields: [
 			{
 				label: i18n.translate('suite-name'),
-				name: 'suiteName',
-				type: 'text',
-			},
-			{
-				label: i18n.translate('description'),
-				name: 'description',
+				name: 'name',
+				operator: 'contains',
+				placeholder: i18n.translate('search'),
 				type: 'text',
 			},
 		] as RendererFields[],

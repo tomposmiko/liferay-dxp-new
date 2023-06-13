@@ -106,20 +106,22 @@ export function AggregationFilterContainer({
 	};
 
 	useEffect(() => {
-		const makeFetch = async () => {
-			const items = await API.getObjectFieldsByExternalReferenceCode(
-				objectDefinitionExternalReferenceCode2!
-			);
+		if (objectDefinitionExternalReferenceCode2) {
+			const makeFetch = async () => {
+				const items = await API.getObjectFieldsByExternalReferenceCode(
+					objectDefinitionExternalReferenceCode2!
+				);
 
-			const objectDefinition2 = await API.getObjectDefinitionByExternalReferenceCode(
-				objectDefinitionExternalReferenceCode2!
-			);
-			setCreationLanguageId2(objectDefinition2.defaultLanguageId);
+				const objectDefinition2 = await API.getObjectDefinitionByExternalReferenceCode(
+					objectDefinitionExternalReferenceCode2!
+				);
+				setCreationLanguageId2(objectDefinition2.defaultLanguageId);
 
-			setObjectFields(items);
-		};
+				setObjectFields(items);
+			};
 
-		makeFetch();
+			makeFetch();
+		}
 	}, [objectDefinitionExternalReferenceCode2, setCreationLanguageId2]);
 
 	useEffect(() => {

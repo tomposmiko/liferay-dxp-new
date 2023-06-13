@@ -28,7 +28,8 @@
 					{
 						"definition": {
 							"fragment": {
-								"key": "layout"
+								"key": "layout",
+								"siteKey": "Raylife AP 5"
 							},
 							"fragmentConfig": {
 								"layoutName": "Policies"
@@ -39,6 +40,26 @@
 						},
 						"pageElements": [
 							{
+								"definition": {
+								},
+								"pageElements": [
+									{
+										"definition": {
+											"widgetInstance": {
+												"widgetConfig": {
+													"properties": "route=notification-sidebar"
+												},
+												"widgetName": "[$CLIENT_EXTENSION_ENTRY_ID:RAYLIFEAGENTPORTAL$]"
+											}
+										},
+										"type": "Widget"
+									}
+								],
+								"type": "FragmentDropZone"
+							},
+							{
+								"definition": {
+								},
 								"pageElements": [
 									{
 										"definition": {
@@ -49,18 +70,6 @@
 												"headingLevel": "h3"
 											},
 											"fragmentFields": [
-												{
-													"id": "element-text",
-													"value": {
-														"fragmentLink": {
-														},
-														"text": {
-															"value_i18n": {
-																"en_US": "Policies"
-															}
-														}
-													}
-												}
 											],
 											"indexed": true
 										},
@@ -70,9 +79,13 @@
 								"type": "FragmentDropZone"
 							},
 							{
+								"definition": {
+								},
 								"type": "FragmentDropZone"
 							},
 							{
+								"definition": {
+								},
 								"pageElements": [
 									{
 										"definition": {
@@ -224,7 +237,8 @@
 																			{
 																				"definition": {
 																					"fragment": {
-																						"key": "section"
+																						"key": "section",
+																						"siteKey": "Raylife AP 5"
 																					},
 																					"fragmentConfig": {
 																						"sectionId": "primary"
@@ -235,11 +249,14 @@
 																				},
 																				"pageElements": [
 																					{
+																						"definition": {
+																						},
 																						"pageElements": [
 																							{
 																								"definition": {
 																									"fragment": {
-																										"key": "policies-total-active"
+																										"key": "policies-total-active",
+																										"siteKey": "Raylife AP 5"
 																									},
 																									"fragmentConfig": {
 																										"textColor": ""
@@ -293,7 +310,8 @@
 																			{
 																				"definition": {
 																					"fragment": {
-																						"key": "section"
+																						"key": "section",
+																						"siteKey": "Raylife AP 5"
 																					},
 																					"fragmentConfig": {
 																						"sectionId": "primary"
@@ -304,11 +322,14 @@
 																				},
 																				"pageElements": [
 																					{
+																						"definition": {
+																						},
 																						"pageElements": [
 																							{
 																								"definition": {
 																									"fragment": {
-																										"key": "policies-expiring"
+																										"key": "policies-expiring",
+																										"siteKey": "Raylife AP 5"
 																									},
 																									"fragmentConfig": {
 																										"textColor": ""
@@ -361,7 +382,8 @@
 															{
 																"definition": {
 																	"fragment": {
-																		"key": "section"
+																		"key": "section",
+																		"siteKey": "Raylife AP 5"
 																	},
 																	"fragmentConfig": {
 																		"sectionId": "primary"
@@ -372,11 +394,14 @@
 																},
 																"pageElements": [
 																	{
+																		"definition": {
+																		},
 																		"pageElements": [
 																			{
 																				"definition": {
 																					"fragment": {
-																						"key": "policies-total-premium-due"
+																						"key": "policies-total-premium-due",
+																						"siteKey": "Raylife AP 5"
 																					},
 																					"fragmentConfig": {
 																						"textColor": ""
@@ -429,7 +454,8 @@
 													{
 														"definition": {
 															"fragment": {
-																"key": "section"
+																"key": "section",
+																"siteKey": "Raylife AP 5"
 															},
 															"fragmentConfig": {
 																"sectionId": "primary"
@@ -440,6 +466,8 @@
 														},
 														"pageElements": [
 															{
+																"definition": {
+																},
 																"pageElements": [
 																	{
 																		"definition": {
@@ -465,9 +493,6 @@
 										"type": "Section"
 									}
 								],
-								"type": "FragmentDropZone"
-							},
-							{
 								"type": "FragmentDropZone"
 							}
 						],

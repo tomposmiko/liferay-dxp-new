@@ -15,6 +15,10 @@ definition {
 			User.firstLoginPG();
 		}
 
+		task ("Create a new Partner Portal Site") {
+			PRMUtils.addPRMSite();
+		}
+
 		task ("Add a partner user") {
 			JSONUser.addUser(
 				userEmailAddress = "partner@liferay.com",
@@ -52,10 +56,6 @@ definition {
 				userEmailAddress = "partner@liferay.com");
 		}
 
-		task ("Create a new Partner Portal Site") {
-			PRMUtils.addPRMSite();
-		}
-
 		task ("Go to Partner Portal and login with the created user") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "partner@liferay.com",
@@ -76,6 +76,10 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "test@liferay.com",
+				userLoginFullName = "Test Test");
+
 			JSONGroup.deleteGroupByName(groupName = "Partner Portal");
 
 			Account.tearDownCP();
@@ -535,6 +539,44 @@ definition {
 		}
 	}
 
+	@description = "This is for LPS-172427. Verify that the value of Total MDF Requested Amount* will be according to the Total cost and Claim percent"
+	@priority = 5
+	test RequestedValueIsEqualsTo50PercentOfTotalCost {
+		task ("Given a new MDF request") {
+			PRMMarketing.gotoAddNewMDF();
+
+			PRMMDFRequest.fillGoalsPage(
+				accountName = "Company Name 1",
+				campaignDescription = "Campaign Description",
+				campaignName = "Campaign Name",
+				countryName = "Global",
+				goalsOptions = "Lead generation",
+				targetMarketOptions = "Education,Energy",
+				targetRolesOptions = "Administrator");
+
+			Button.click(button = "Continue");
+		}
+
+		task ("When a new activity is added") {
+			PRMMDFRequest.addNewActivity();
+		}
+
+		task ("And when a new expense is added to the activity") {
+			var budgetValue = 5000;
+
+			PRMMDFRequest.fillExpenseFields(budgetList = "Sponsorship Fee-${budgetValue}");
+		}
+
+		task ("Then the 'Total MDF Requested Amount' value is equals to 50% of the budget value") {
+			var requestedAmound = ${budgetValue} / 2;
+			var actualValue = PRMMDFRequest.getRequestedAmoundValue();
+
+			TestUtils.assertPartialEquals(
+				actual = ${actualValue},
+				expected = ${requestedAmound});
+		}
+	}
+
 	@description = "This is a test for LPS-172957. Verify that the review page displays all the information the partner user entered to the activity"
 	@priority = 5
 	test ReviewPageDisplaysAllInputedInformation {
@@ -687,31 +729,11 @@ definition {
 	@description = "This is a test for LPS-169960. Verify that a submited MDF will be displayed on the list"
 	@priority = 5
 	test SubmittedMDFAppearsOnListing {
-		task ("Given I go to add a new MDF Request") {
-			PRMMarketing.gotoAddNewMDF();
+		task ("Given that a new MDF Request is submitted") {
+			JSONPRM.createMDFRequest();
 		}
 
-		task ("Given that a partner submit a new MDF Request") {
-			PRMMDFRequest.createNewRequest(
-				accountName = "Company Name 1",
-				activityDescription = "Activity Description",
-				activityName = "Activity Name 1",
-				budgetList = "Sponsorship Fee-2000",
-				campaignDescription = "Campaign Description",
-				campaignName = "Campaign Name",
-				countryName = "Global",
-				followUpStrategy = "test",
-				goalsOptions = "Lead generation",
-				leadFollowUpList = "Other",
-				leadList = "No",
-				tactic = "Other",
-				targetMarketOptions = "Education,Energy",
-				targetOfLeads = "test",
-				targetRolesOptions = "Administrator",
-				typeOfActivity = "Miscellaneous Marketing");
-		}
-
-		task ("Then the MDF status appears on list") {
+		task ("Then the MDF appears on listing page") {
 			PRMMDFListing.viewOnList(campaignName = "Campaign Name");
 		}
 	}
