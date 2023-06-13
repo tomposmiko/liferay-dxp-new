@@ -15,8 +15,11 @@
 import useFormModal from '../../../hooks/useFormModal';
 import useMutate from '../../../hooks/useMutate';
 import i18n from '../../../i18n';
-import {Security} from '../../../security';
-import {TestrayTeam, deleteResource} from '../../../services/rest';
+import {
+	TestrayTeam,
+	deleteResource,
+	getTeamsComponentsQuery,
+} from '../../../services/rest';
 import {Action} from '../../../types';
 
 const useTeamActions = () => {
@@ -31,18 +34,31 @@ const useTeamActions = () => {
 			permission: 'UPDATE',
 		},
 		{
-			action: ({id}: TestrayTeam, mutate) =>
-				deleteResource(`/teams/${id}`)
-					.then(() => removeItemFromList(mutate, id))
-					.then(modal.onSave)
-					.catch(modal.onError),
+			action: ({id}: TestrayTeam, mutate) => {
+				getTeamsComponentsQuery(id)
+					.then((response) => {
+						if (response?.items?.length) {
+							throw new Error(
+								i18n.translate(
+									'the-team-cannot-be-deleted-because-it-has-associated-components'
+								)
+							);
+						}
+						deleteResource(`/teams/${id}`)
+							?.then(() => removeItemFromList(mutate, id))
+							.then(modal.onSave)
+							.catch(modal.onError);
+					})
+					.catch(modal.onError);
+			},
+
 			name: i18n.translate('delete'),
 			permission: 'DELETE',
 		},
 	];
 
 	return {
-		actions: (row: any) => Security.filterActions(actions, row.actions),
+		actions,
 		formModal,
 	};
 };

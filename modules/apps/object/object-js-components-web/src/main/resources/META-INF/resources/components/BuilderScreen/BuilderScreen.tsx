@@ -27,7 +27,7 @@ import BuilderListItem from './BuilderListItem';
 
 import './BuilderScreen.scss';
 
-const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId() as Locale;
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 export function BuilderScreen({
 	defaultSort,
@@ -133,9 +133,7 @@ export function BuilderScreen({
 									hasDragAndDrop={hasDragAndDrop}
 									index={index}
 									label={viewColumn?.fieldLabel}
-									objectFieldName={
-										viewColumn?.objectFieldName
-									}
+									objectFieldName={viewColumn.objectFieldName}
 									onChangeColumnOrder={onChangeColumnOrder}
 									onDeleteColumn={onDeleteColumn}
 									onEditing={onEditing}

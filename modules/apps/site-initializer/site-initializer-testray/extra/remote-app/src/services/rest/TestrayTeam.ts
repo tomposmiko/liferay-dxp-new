@@ -12,7 +12,9 @@
  * details.
  */
 
+import i18n from '../../i18n';
 import yupSchema from '../../schema/yup';
+import {searchUtil} from '../../util/search';
 import fetcher from '../fetcher';
 import {APIResponse, TestrayTeam} from './types';
 
@@ -23,7 +25,17 @@ const adapter = ({name, projectId: r_projectToTeams_c_projectId}: Team) => ({
 	r_projectToTeams_c_projectId,
 });
 
-const createTeam = (team: Team) => fetcher.post('/teams', adapter(team));
+const createTeam = async (team: Team) => {
+	const response = await fetcher(
+		`/teams?filter=${searchUtil.eq('name', team.name)}`
+	);
+
+	if (response?.items.length) {
+		throw new Error(i18n.translate('the-team-name-already-exists'));
+	}
+
+	return fetcher.post('/teams', adapter(team));
+};
 
 const updateTeam = (id: number, team: Team) =>
 	fetcher.put(`/teams/${id}`, adapter(team));

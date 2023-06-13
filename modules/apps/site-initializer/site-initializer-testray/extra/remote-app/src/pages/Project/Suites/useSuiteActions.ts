@@ -17,7 +17,6 @@ import {useNavigate} from 'react-router-dom';
 import useFormModal from '../../../hooks/useFormModal';
 import useMutate from '../../../hooks/useMutate';
 import i18n from '../../../i18n';
-import {Security} from '../../../security';
 import {TestraySuite, deleteResource} from '../../../services/rest';
 import {Action} from '../../../types';
 
@@ -37,7 +36,7 @@ const useSuiteActions = () => {
 		{
 			action: ({id}: TestraySuite, mutate) =>
 				deleteResource(`/suites/${id}`)
-					.then(() => removeItemFromList(mutate, id))
+					?.then(() => removeItemFromList(mutate, id))
 					.catch(modal.onError),
 			name: i18n.translate('delete'),
 			permission: 'DELETE',
@@ -45,7 +44,7 @@ const useSuiteActions = () => {
 	];
 
 	return {
-		actions: (row: any) => Security.filterActions(actions, row.actions),
+		actions,
 		formModal,
 	};
 };

@@ -21,9 +21,9 @@ import {CollectionActiveItemContextProvider} from '../contexts/CollectionActiveI
 import {ControlsProvider} from '../contexts/ControlsContext';
 import {DisplayPagePreviewItemContextProvider} from '../contexts/DisplayPagePreviewItemContext';
 import {EditableProcessorContextProvider} from '../contexts/EditableProcessorContext';
+import {FormValidationContextProvider} from '../contexts/FormValidationContext';
 import {GlobalContextProvider} from '../contexts/GlobalContext';
 import {StoreContextProvider} from '../contexts/StoreContext';
-import {StyleErrorsContextProvider} from '../contexts/StyleErrorsContext';
 import {WidgetsContextProvider} from '../contexts/WidgetsContext';
 import {reducer} from '../reducers/index';
 import {DragAndDropContextProvider} from '../utils/drag-and-drop/useDragAndDrop';
@@ -54,7 +54,7 @@ export default function App({state}) {
 
 									<DragPreview />
 
-									<StyleErrorsContextProvider>
+									<FormValidationContextProvider>
 										<Toolbar />
 
 										<ShortcutManager />
@@ -74,7 +74,7 @@ export default function App({state}) {
 												)}
 											</StyleBookContextProvider>
 										</GlobalContextProvider>
-									</StyleErrorsContextProvider>
+									</FormValidationContextProvider>
 								</WidgetsContextProvider>
 							</DisplayPagePreviewItemContextProvider>
 						</EditableProcessorContextProvider>

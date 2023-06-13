@@ -20,6 +20,7 @@ import {
 	CustomItem,
 	FormError,
 	SidePanelForm,
+	SidebarCategory,
 	invalidateRequired,
 	openToast,
 	saveAndReload,
@@ -41,6 +42,7 @@ const TABS = [
 
 export default function Action({
 	objectAction: initialValues,
+	objectActionCodeEditorElements,
 	objectActionExecutors,
 	objectActionTriggers,
 	objectDefinitionsRelationshipsURL,
@@ -181,6 +183,9 @@ export default function Action({
 						errors={
 							Object.keys(errors).length ? errors : backEndErrors
 						}
+						objectActionCodeEditorElements={
+							objectActionCodeEditorElements
+						}
 						objectActionExecutors={objectActionExecutors}
 						objectActionTriggers={objectActionTriggers}
 						objectDefinitionsRelationshipsURL={
@@ -310,12 +315,13 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 
 interface IProps {
 	objectAction: Partial<ObjectAction>;
+	objectActionCodeEditorElements: SidebarCategory[];
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 	objectDefinitionsRelationshipsURL: string;
 	readOnly?: boolean;
 	requestParams: {
-		method: 'GET' | 'POST' | 'DELETE' | 'PUT';
+		method: 'POST' | 'PUT';
 		url: string;
 	};
 	successMessage: string;

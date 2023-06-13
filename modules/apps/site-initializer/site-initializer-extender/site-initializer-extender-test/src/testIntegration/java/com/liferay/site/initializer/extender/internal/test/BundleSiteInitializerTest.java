@@ -146,6 +146,8 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.segments.model.SegmentsEntry;
+import com.liferay.segments.service.SegmentsEntryLocalService;
 import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.initializer.SiteInitializerRegistry;
 import com.liferay.site.navigation.menu.item.layout.constants.SiteNavigationMenuItemTypeConstants;
@@ -257,6 +259,7 @@ public class BundleSiteInitializerTest {
 			_assertPortletSettings(group);
 			_assertClientExtension(group);
 			_assertSAPEntries(group);
+			_assertSegmentsEntries(group.getGroupId());
 			_assertSiteConfiguration(group.getGroupId());
 			_assertSiteSettings(group.getGroupId());
 			_assertSiteNavigationMenu(group);
@@ -1135,7 +1138,8 @@ public class BundleSiteInitializerTest {
 		Organization organization2 = organizationsPage2.fetchFirstItem();
 
 		Assert.assertNotNull(organization2);
-		Assert.assertTrue(organization2.getNumberOfOrganizations() == 1);
+
+		Assert.assertEquals(1, organizationsPage2.getTotalCount());
 
 		_assertUserOrganizations(organization2.getId(), 1, userAccountResource);
 
@@ -1204,7 +1208,7 @@ public class BundleSiteInitializerTest {
 		int publicLayoutsCount = _layoutLocalService.getLayoutsCount(
 			group, false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
-		Assert.assertTrue(publicLayoutsCount == 4);
+		Assert.assertEquals(4, publicLayoutsCount);
 
 		Layout publicLayout = _layoutLocalService.getLayoutByFriendlyURL(
 			group.getGroupId(), false, "/test-public-layout");
@@ -1381,6 +1385,36 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals(
 			allowedServiceSignatures2.toString(), 5,
 			allowedServiceSignatures2.size());
+	}
+
+	private void _assertSegmentsEntries(Long groupId) {
+		Assert.assertEquals(
+			2,
+			_segmentsEntryLocalService.getSegmentsEntriesCount(groupId, true));
+
+		SegmentsEntry segmentsEntry1 =
+			_segmentsEntryLocalService.fetchSegmentsEntry(
+				groupId, "TEST-SEGMENTS-ENTRY-1", true);
+
+		Assert.assertNotNull(segmentsEntry1);
+		Assert.assertTrue(segmentsEntry1.isActive());
+		Assert.assertEquals(
+			"Test Segments Entry 1",
+			segmentsEntry1.getName(LocaleUtil.getSiteDefault()));
+		Assert.assertEquals(
+			"com.liferay.portal.kernel.model.User", segmentsEntry1.getType());
+
+		SegmentsEntry segmentsEntry2 =
+			_segmentsEntryLocalService.fetchSegmentsEntry(
+				groupId, "TEST-SEGMENTS-ENTRY-2", true);
+
+		Assert.assertNotNull(segmentsEntry2);
+		Assert.assertFalse(segmentsEntry2.isActive());
+		Assert.assertEquals(
+			"Test Segments Entry 2",
+			segmentsEntry2.getName(LocaleUtil.getSiteDefault()));
+		Assert.assertEquals(
+			"com.liferay.portal.kernel.model.User", segmentsEntry2.getType());
 	}
 
 	private void _assertSiteConfiguration(Long groupId) {
@@ -1786,6 +1820,9 @@ public class BundleSiteInitializerTest {
 
 	@Inject
 	private SAPEntryLocalService _sapEntryLocalService;
+
+	@Inject
+	private SegmentsEntryLocalService _segmentsEntryLocalService;
 
 	@Inject
 	private ServletContext _servletContext;
