@@ -13,20 +13,7 @@
 				"en_US": "URL"
 			},
 			"name": "url",
-			"required": true,
-			"type": "String"
-		},
-		{
-			"DBType": "String",
-			"businessType": "Picklist",
-			"indexed": true,
-			"indexedAsKeyword": false,
-			"label": {
-				"en_US": "Type"
-			},
-			"listTypeDefinitionId": "[$LIST_TYPE_DEFINITION_ID:MDF Document Types$]",
-			"name": "type",
-			"required": true,
+			"required": false,
 			"type": "String"
 		},
 		{

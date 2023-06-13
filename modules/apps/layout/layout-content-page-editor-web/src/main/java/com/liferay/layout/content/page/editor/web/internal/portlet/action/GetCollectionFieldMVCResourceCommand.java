@@ -20,7 +20,6 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.model.AssetListEntryModel;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
-import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.fragment.entry.processor.helper.FragmentEntryProcessorHelper;
 import com.liferay.info.collection.provider.item.selector.criterion.InfoCollectionProviderItemSelectorCriterion;
 import com.liferay.info.collection.provider.item.selector.criterion.RelatedInfoItemCollectionProviderItemSelectorCriterion;
@@ -97,7 +96,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
-	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/get_collection_field"
@@ -254,8 +252,6 @@ public class GetCollectionFieldMVCResourceCommand
 				_portal.getUserId(httpServletRequest),
 				_requestContextMapper.map(httpServletRequest)));
 
-		// LPS-111037
-
 		Optional<AssetListEntry> assetListEntryOptional =
 			_getAssetListEntryOptional(listObjectReference);
 
@@ -357,8 +353,10 @@ public class GetCollectionFieldMVCResourceCommand
 
 		infoListItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new InfoListItemSelectorReturnType());
-		infoListItemSelectorCriterion.setItemTypes(
-			_getInfoItemFormProviderClassNames());
+
+		List<String> itemTypes = _getInfoItemFormProviderSearchClassNames();
+
+		infoListItemSelectorCriterion.setItemTypes(itemTypes);
 
 		InfoCollectionProviderItemSelectorCriterion
 			infoCollectionProviderItemSelectorCriterion =
@@ -367,8 +365,7 @@ public class GetCollectionFieldMVCResourceCommand
 		infoCollectionProviderItemSelectorCriterion.
 			setDesiredItemSelectorReturnTypes(
 				new InfoListProviderItemSelectorReturnType());
-		infoCollectionProviderItemSelectorCriterion.setItemTypes(
-			_getInfoItemFormProviderClassNames());
+		infoCollectionProviderItemSelectorCriterion.setItemTypes(itemTypes);
 
 		RelatedInfoItemCollectionProviderItemSelectorCriterion
 			relatedInfoItemCollectionProviderItemSelectorCriterion =
@@ -527,14 +524,15 @@ public class GetCollectionFieldMVCResourceCommand
 		return null;
 	}
 
-	private List<String> _getInfoItemFormProviderClassNames() {
-		List<String> infoItemClassNames =
-			_infoItemServiceTracker.getInfoItemClassNames(
-				InfoItemFormProvider.class);
+	private List<String> _getInfoItemFormProviderSearchClassNames() {
+		List<String> infoItemClassNames = new ArrayList<>();
 
-		if (infoItemClassNames.contains(FileEntry.class.getName())) {
-			infoItemClassNames.add(DLFileEntryConstants.getClassName());
-			infoItemClassNames.remove(FileEntry.class.getName());
+		for (String className :
+				_infoItemServiceTracker.getInfoItemClassNames(
+					InfoItemFormProvider.class)) {
+
+			infoItemClassNames.add(
+				_infoSearchClassMapperTracker.getSearchClassName(className));
 		}
 
 		return infoItemClassNames;

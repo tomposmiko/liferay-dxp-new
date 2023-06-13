@@ -14,7 +14,10 @@
 
 package com.liferay.poshi.runner.selenium;
 
-import com.deque.axe.AXE;
+import com.deque.html.axecore.results.Results;
+import com.deque.html.axecore.results.Rule;
+import com.deque.html.axecore.selenium.AxeBuilder;
+import com.deque.html.axecore.selenium.AxeReporter;
 
 import com.liferay.poshi.core.PoshiContext;
 import com.liferay.poshi.core.PoshiGetterUtil;
@@ -48,9 +51,6 @@ import java.awt.event.KeyEvent;
 
 import java.io.File;
 import java.io.StringReader;
-
-import java.net.URI;
-import java.net.URL;
 
 import java.nio.file.Paths;
 
@@ -86,9 +86,6 @@ import javax.xml.xpath.XPathFactory;
 import junit.framework.TestCase;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -218,29 +215,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public void assertAccessible() throws Exception {
-		WebDriver webDriver = WebDriverUtil.getWebDriver();
-
-		String sourceDirFilePath = LiferaySeleniumUtil.getSourceDirFilePath(
-			getTestDependenciesDirName());
-
-		File file = new File(sourceDirFilePath + "/axe.min.js");
-
-		URI uri = file.toURI();
-
-		URL url = uri.toURL();
-
-		AXE.Builder axeBuilder = new AXE.Builder(webDriver, url);
-
-		axeBuilder = axeBuilder.options(
-			PropsValues.ACCESSIBILITY_STANDARDS_JSON);
-
-		JSONObject jsonObject = axeBuilder.analyze();
-
-		JSONArray jsonArray = jsonObject.getJSONArray("violations");
-
-		if (jsonArray.length() != 0) {
-			throw new Exception(AXE.report(jsonArray));
-		}
+		assertElementAccessible(null);
 	}
 
 	@Override
@@ -365,6 +340,37 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		Condition editableCondition = getEditableCondition(locator);
 
 		editableCondition.assertTrue();
+	}
+
+	@Override
+	public void assertElementAccessible(String locator) throws Exception {
+		WebDriver webDriver = WebDriverUtil.getWebDriver();
+
+		AxeBuilder axeBuilder = new AxeBuilder();
+
+		axeBuilder.withTags(
+			Arrays.asList(PropsValues.ACCESSIBILITY_STANDARDS_TAGS.split(",")));
+
+		Results results = null;
+
+		if (Validator.isNotNull(locator)) {
+			results = axeBuilder.analyze(webDriver, getWebElement(locator));
+		}
+		else {
+			results = axeBuilder.analyze(webDriver);
+		}
+
+		List<Rule> rules = new ArrayList<>();
+
+		if (results != null) {
+			rules.addAll(results.getViolations());
+		}
+
+		if (!rules.isEmpty()) {
+			AxeReporter.getReadableAxeResults("analyze", webDriver, rules);
+
+			throw new Exception(AxeReporter.getAxeResultString());
+		}
 	}
 
 	@Override

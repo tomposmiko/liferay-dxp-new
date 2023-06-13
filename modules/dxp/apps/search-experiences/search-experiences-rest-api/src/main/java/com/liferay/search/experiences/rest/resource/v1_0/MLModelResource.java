@@ -54,7 +54,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface MLModelResource {
 
-	public Page<MLModel> getMLModelsPage(
+	public Page<MLModel> getSentenceTransformerMLModelsPage(
 			Integer limit, String pipelineTag, String query, String tag)
 		throws Exception;
 

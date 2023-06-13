@@ -108,7 +108,7 @@ const yupSchema = {
 		dueStatus: yup.string().required(),
 		issues: yup.string(),
 		runId: yup.number(),
-		startDate: yup.string(),
+		startDate: yup.string().nullable(),
 		userId: yup.number(),
 	}),
 	caseType: yup.object({
@@ -171,7 +171,10 @@ const yupSchema = {
 		id: yup.string(),
 		key: yup.string(),
 		linkTitle: yup.string().required(),
-		linkURL: yup.string().required(),
+		linkURL: yup
+			.string()
+			.url(i18n.translate('the-link-url-must-be-a-valid-url'))
+			.required(),
 		summary: yup.string().required(),
 	}),
 	role: yup.object({
@@ -192,6 +195,20 @@ const yupSchema = {
 		name: yup.string().required(),
 		number: yup.number().required(),
 	}),
+	subtask: yup.object({
+		dueStatus: yup.string(),
+		id: yup.number().required(),
+		issue: yup.string(),
+		name: yup.string(),
+		score: yup.number(),
+		taskId: yup.number(),
+		userId: yup.number(),
+	}),
+	subtaskToCaseResult: yup.object({
+		caseResultId: yup.number(),
+		name: yup.string(),
+		subtaskId: yup.number(),
+	}),
 	suite: yup.object({
 		autoanalyze: yup.boolean(),
 		caseParameters: yup.string(),
@@ -203,9 +220,9 @@ const yupSchema = {
 	task: yup.object({
 		buildId: yup.number().required(),
 		caseTypes: yup.array(yup.number()).required(),
-		dueStatus: yup.number(),
+		dueStatus: yup.string(),
 		name: yup.string().required(i18n.sub('x-is-a-required-field', 'name')),
-		users: yup.array().of(yup.number()),
+		userIds: yup.array().of(yup.number()),
 	}),
 	taskToUser: yup.object({
 		name: yup.string(),

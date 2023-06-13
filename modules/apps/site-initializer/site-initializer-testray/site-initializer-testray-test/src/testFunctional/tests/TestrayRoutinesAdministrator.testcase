@@ -125,11 +125,24 @@ definition {
 			TestrayRoutines.createRoutine(key_name = "Routines_1 Routine");
 		}
 
-		task ("When the user goes add a new build") {
+		task ("When the user goes add a new build with enviroments") {
+			TestrayContextMenu.clickContextMenuProjects(name = "Routines_1 Routine");
+
+			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Select Default Environment Factors");
+
+			TestrayBuild.selectDefaultEnvironmentFactors(
+				label = "Application Server",
+				label1 = "Browser",
+				listCategory = "Application Server,Browser",
+				listOption = "Tomcat 6.0",
+				listOption1 = "Chrome 57");
+
 			TestrayRoutines.goToRoutine(routineName = "Routines_1 Routine");
 
 			TestrayBuild.createBuild(
+				addVersion = "1.2",
 				description = "Routines_4 Build Description",
+				dropdownItem = "New Build",
 				fieldName = "Routines_4 Build",
 				gitHash = "12345",
 				productVersion = "1.x",
@@ -178,12 +191,19 @@ definition {
 	}
 
 	@description = "This is a test for LPS-160585 - Verify if as an Administrator I should not be able to add a duplicate routine"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test AdminCanNotAddDuplicateRoutine {
+		task ("Given that the user add Routine with duplicated name") {
+			Testray.goToProjectPage(projectName = "Projects_1 Project");
 
-		// TODO LPS-160585 AdminCanNotAddDuplicateRoutine pending implementation
+			TestrayRoutines.createRoutine(key_name = "Routines_1 Routine");
 
+			TestrayRoutines.createRoutine(key_name = "Routines_1 Routine");
+		}
+
+		task ("Then the error message should appear") {
+			Alert.viewErrorMessage(errorMessage = "The Routine name already exists");
+		}
 	}
 
 	@description = "This is a test for LPS-164145 - Verify that the user can not create a routine if all the required fields are not filled in"
@@ -195,7 +215,7 @@ definition {
 			TestrayRoutines.createRoutine(key_name = "");
 		}
 
-		task ("Then the error message should appear") {
+		task ("Then a warning message is displayed") {
 			Testray.viewErrorMessage(
 				fieldLabel = "Name",
 				warningMessage = "name is a required field");

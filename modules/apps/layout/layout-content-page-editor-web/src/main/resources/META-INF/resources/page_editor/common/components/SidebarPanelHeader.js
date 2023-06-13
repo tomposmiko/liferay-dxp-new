@@ -17,7 +17,7 @@ import classNames from 'classnames';
 import React from 'react';
 
 import {switchSidebarPanel} from '../../app/actions/index';
-import {useDispatch} from '../../app/contexts/StoreContext';
+import {useDispatch, useSelector} from '../../app/contexts/StoreContext';
 
 export default function SidebarPanelHeader({
 	children,
@@ -25,6 +25,8 @@ export default function SidebarPanelHeader({
 	iconRight = null,
 }) {
 	const dispatch = useDispatch();
+
+	const sidebarPanelId = useSelector((state) => state.sidebar?.panelId);
 
 	return (
 		<header
@@ -34,7 +36,7 @@ export default function SidebarPanelHeader({
 		>
 			{iconLeft}
 
-			<h1 className="flex-grow-1 mb-0 mr-1 text-3">{children}</h1>
+			<h2 className="flex-grow-1 mb-0 mr-1 text-3">{children}</h2>
 
 			{iconRight}
 
@@ -42,6 +44,10 @@ export default function SidebarPanelHeader({
 				displayType="unstyled"
 				onClick={() => {
 					dispatch(switchSidebarPanel({sidebarOpen: false}));
+
+					document
+						.querySelector(`[data-panel-id="${sidebarPanelId}"]`)
+						?.focus();
 				}}
 				small
 				symbol="times"

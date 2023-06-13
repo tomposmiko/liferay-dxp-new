@@ -47,7 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luis Miguel Barcos
  */
 @Component(
-	factory = "com.liferay.object.rest.internal.resource.v1_0.RelatedObjectEntryResource",
+	factory = "com.liferay.object.rest.internal.resource.v1_0.RelatedObjectEntryResourceImpl",
 	property = {"api.version=v1.0", "osgi.jaxrs.resource=true"},
 	service = RelatedObjectEntryResourceImpl.class
 )

@@ -48,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sarai Díaz
  */
 @Component(
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -129,7 +129,7 @@ public class AnalyticsReportsPortlet extends MVCPortlet {
 
 		return Optional.ofNullable(
 			(InfoItemReference)httpServletRequest.getAttribute(
-				AnalyticsReportsWebKeys.INFO_ITEM_REFERENCE)
+				AnalyticsReportsWebKeys.ANALYTICS_INFO_ITEM_REFERENCE)
 		).orElseGet(
 			() -> Optional.ofNullable(
 				_getClassTypeName(httpServletRequest)

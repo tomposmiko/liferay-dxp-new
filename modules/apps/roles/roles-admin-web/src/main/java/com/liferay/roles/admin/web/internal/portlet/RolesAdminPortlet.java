@@ -25,7 +25,6 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceComparator;
-import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.exception.DataLimitExceededException;
 import com.liferay.portal.kernel.exception.DuplicateRoleException;
@@ -36,7 +35,6 @@ import com.liferay.portal.kernel.exception.RequiredRoleException;
 import com.liferay.portal.kernel.exception.RoleAssignmentException;
 import com.liferay.portal.kernel.exception.RoleNameException;
 import com.liferay.portal.kernel.exception.RolePermissionsException;
-import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -54,6 +52,7 @@ import com.liferay.portal.kernel.service.RoleService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.UserService;
+import com.liferay.portal.kernel.service.permission.RolePermission;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -86,6 +85,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.portlet.ActionRequest;
@@ -112,7 +112,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Drew Brokke
  */
 @Component(
-	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-users-admin",
@@ -301,9 +300,7 @@ public class RolesAdminPortlet extends MVCPortlet {
 		if (!ArrayUtil.isEmpty(addUserIds) ||
 			!ArrayUtil.isEmpty(removeUserIds)) {
 
-			try (SafeCloseable safeCloseable =
-					ProxyModeThreadLocal.setWithSafeCloseable(true)) {
-
+			try {
 				_userService.addRoleUsers(roleId, addUserIds);
 				_userService.unsetRoleUsers(roleId, removeUserIds);
 			}
@@ -330,15 +327,11 @@ public class RolesAdminPortlet extends MVCPortlet {
 			ParamUtil.getString(actionRequest, "addSegmentsEntryIds"), 0L);
 
 		if (ArrayUtil.isNotEmpty(addSegmentsEntryIds)) {
-			try (SafeCloseable safeCloseable =
-					ProxyModeThreadLocal.setWithSafeCloseable(true)) {
-
-				for (long segmentsEntryId : addSegmentsEntryIds) {
-					_segmentsEntryRoleLocalService.addSegmentsEntryRole(
-						segmentsEntryId, roleId,
-						ServiceContextFactory.getInstance(
-							Role.class.getName(), actionRequest));
-				}
+			for (long segmentsEntryId : addSegmentsEntryIds) {
+				_segmentsEntryRoleLocalService.addSegmentsEntryRole(
+					segmentsEntryId, roleId,
+					ServiceContextFactory.getInstance(
+						Role.class.getName(), actionRequest));
 			}
 		}
 
@@ -346,13 +339,9 @@ public class RolesAdminPortlet extends MVCPortlet {
 			ParamUtil.getString(actionRequest, "removeSegmentsEntryIds"), 0L);
 
 		if (ArrayUtil.isNotEmpty(removeSegmentsEntryIds)) {
-			try (SafeCloseable safeCloseable =
-					ProxyModeThreadLocal.setWithSafeCloseable(true)) {
-
-				for (long segmentsEntryId : removeSegmentsEntryIds) {
-					_segmentsEntryRoleLocalService.deleteSegmentsEntryRole(
-						segmentsEntryId, roleId);
-				}
+			for (long segmentsEntryId : removeSegmentsEntryIds) {
+				_segmentsEntryRoleLocalService.deleteSegmentsEntryRole(
+					segmentsEntryId, roleId);
 			}
 		}
 	}
@@ -538,6 +527,26 @@ public class RolesAdminPortlet extends MVCPortlet {
 				bundleContext, PanelCategoryRoleTypeMapper.class);
 	}
 
+	@Override
+	protected void checkPermissions(PortletRequest portletRequest)
+		throws Exception {
+
+		String mvcPath = ParamUtil.getString(portletRequest, "mvcPath");
+
+		if (Objects.equals(mvcPath, "/edit_role_assignments.jsp")) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)portletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			_rolePermission.check(
+				themeDisplay.getPermissionChecker(),
+				ParamUtil.getLong(portletRequest, "roleId"),
+				ActionKeys.ASSIGN_MEMBERS);
+		}
+
+		super.checkPermissions(portletRequest);
+	}
+
 	@Deactivate
 	protected void deactivate() {
 		_personalMenuEntryServiceTrackerList.close();
@@ -548,6 +557,13 @@ public class RolesAdminPortlet extends MVCPortlet {
 	protected void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
+
+		try {
+			checkPermissions(renderRequest);
+		}
+		catch (Exception exception) {
+			SessionErrors.add(renderRequest, exception.getClass(), exception);
+		}
 
 		_setAttributes(renderRequest);
 
@@ -877,6 +893,9 @@ public class RolesAdminPortlet extends MVCPortlet {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
+
+	@Reference
+	private RolePermission _rolePermission;
 
 	@Reference
 	private RoleService _roleService;

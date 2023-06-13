@@ -9,8 +9,8 @@
  * distribution rights of the Software.
  */
 
+import Table from '../../../../../../../../common/components/Table';
 import MDFRequest from '../../../../../../../../common/interfaces/mdfRequest';
-import Table from '../../../Table';
 
 interface IProps {
 	mdfRequest: MDFRequest;
@@ -36,7 +36,7 @@ const GoalsEntries = ({mdfRequest}: IProps) => (
 			items={[
 				{
 					title: 'Provide the name of the campaign',
-					value: mdfRequest.campaignName,
+					value: mdfRequest.overallCampaignName,
 				},
 				{
 					title:

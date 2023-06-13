@@ -63,7 +63,10 @@ const InviteTeamMembersPage = ({
 	const [
 		associateUserAccount,
 		{error: associateUserAccountError},
-	] = useMutation(associateUserAccountWithAccountAndAccountRole);
+	] = useMutation(associateUserAccountWithAccountAndAccountRole, {
+		awaitRefetchQueries: true,
+		refetchQueries: ['getUserAccountsByAccountExternalReferenceCode'],
+	});
 
 	const [baseButtonDisabled, setBaseButtonDisabled] = useState(true);
 	const [hasInitialError, setInitialError] = useState();
@@ -118,13 +121,8 @@ const InviteTeamMembersPage = ({
 		};
 
 		getRoles();
-	}, [
-		availableAdministratorAssets,
-		client,
-		project,
-		projectHasSLAGoldPlatinum,
-		setFieldValue,
-	]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [availableAdministratorAssets, client, setFieldValue]);
 
 	useEffect(() => {
 		if (values && accountRoles?.length) {

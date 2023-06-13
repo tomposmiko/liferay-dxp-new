@@ -63,6 +63,7 @@ import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupServiceUtil;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -279,10 +280,17 @@ public class JournalEditArticleDisplayContext {
 		).put(
 			"sitesCount",
 			() -> {
+				if (!GroupPermissionUtil.contains(
+						_themeDisplay.getPermissionChecker(),
+						ActionKeys.VIEW)) {
+
+					return 0;
+				}
+
 				int groupsCount = GroupServiceUtil.getGroupsCount(
 					_themeDisplay.getCompanyId(), 0, Boolean.TRUE);
 
-				return groupsCount - 1;
+				return Math.max(groupsCount - 1, 0);
 			}
 		).build();
 	}
@@ -305,7 +313,7 @@ public class JournalEditArticleDisplayContext {
 			() -> {
 				List<Map<String, Object>> languages = new ArrayList<>();
 
-				LinkedHashSet<String> uniqueLanguageIds = new LinkedHashSet<>();
+				Set<String> uniqueLanguageIds = new LinkedHashSet<>();
 
 				uniqueLanguageIds.add(getSelectedLanguageId());
 
@@ -585,22 +593,6 @@ public class JournalEditArticleDisplayContext {
 		}
 
 		return _defaultArticleLanguageId;
-	}
-
-	public String getEditArticleURL() {
-		return PortletURLBuilder.createRenderURL(
-			_liferayPortletResponse
-		).setMVCPath(
-			"/edit_article.jsp"
-		).setRedirect(
-			getRedirect()
-		).setParameter(
-			"articleId", getArticleId()
-		).setParameter(
-			"groupId", getGroupId()
-		).setParameter(
-			"version", getVersion()
-		).buildString();
 	}
 
 	public long getFolderId() {
@@ -903,14 +895,6 @@ public class JournalEditArticleDisplayContext {
 		return JournalFolderPermission.contains(
 			_themeDisplay.getPermissionChecker(), getGroupId(), getFolderId(),
 			ActionKeys.ADD_ARTICLE);
-	}
-
-	public boolean isApproved() {
-		if ((_article != null) && (getVersion() > 0)) {
-			return _article.isApproved();
-		}
-
-		return false;
 	}
 
 	public boolean isChangeStructure() {

@@ -78,7 +78,7 @@ public abstract class BaseMLModelResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/search-experiences-rest/v1.0/ml-models'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/search-experiences-rest/v1.0/sentence-transformer/ml-models'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -104,10 +104,10 @@ public abstract class BaseMLModelResourceImpl
 		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "MLModel")}
 	)
 	@javax.ws.rs.GET
-	@javax.ws.rs.Path("/ml-models")
+	@javax.ws.rs.Path("/sentence-transformer/ml-models")
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
-	public Page<MLModel> getMLModelsPage(
+	public Page<MLModel> getSentenceTransformerMLModelsPage(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.ws.rs.QueryParam("limit")
 			Integer limit,
@@ -179,10 +179,8 @@ public abstract class BaseMLModelResourceImpl
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		return getMLModelsPage(
-			Integer.parseInt((String)parameters.get("limit")),
-			(String)parameters.get("pipelineTag"),
-			(String)parameters.get("query"), (String)parameters.get("tag"));
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Override

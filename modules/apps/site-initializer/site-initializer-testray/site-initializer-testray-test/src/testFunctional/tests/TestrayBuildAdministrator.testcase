@@ -61,6 +61,19 @@ definition {
 			TestrayRoutines.createRoutine(key_name = "Routines_1 Routine");
 		}
 
+		task ("Add Environments Factors") {
+			TestrayContextMenu.clickContextMenuProjects(name = "Routines_1 Routine");
+
+			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Select Default Environment Factors");
+
+			TestrayBuild.selectDefaultEnvironmentFactors(
+				label = "Application Server",
+				label1 = "Browser",
+				listCategory = "Application Server,Browser",
+				listOption = "JBoss 6.1",
+				listOption1 = "Chrome x");
+		}
+
 		task ("Go to Testray 2 and change the pagination") {
 			ApplicationsMenu.gotoSite(site = "Testray 2");
 
@@ -93,7 +106,9 @@ definition {
 			TestrayRoutines.goToRoutine(routineName = "Routines_1 Routine");
 
 			TestrayBuild.createBuild(
+				addVersion = "1.2",
 				description = "Builds_1 Project Description",
+				dropdownItem = "New Build",
 				fieldName = "Builds_1 Project",
 				gitHash = "12345",
 				productVersion = "1.0",
@@ -107,7 +122,7 @@ definition {
 
 	@description = "This is a test for LPS-157540 - Verify if as an Administrator I should be able to archive a build "
 	@ignore = "Test Stub"
-	@priority = "5"
+	@priority = "3"
 	test AdminCanArchiveBuild {
 
 		// TODO LPS-157540 AdminCanArchiveBuild pending implementation
@@ -132,7 +147,9 @@ definition {
 			TestrayRoutines.goToRoutine(routineName = "Routines_1 Routine");
 
 			TestrayBuild.createBuild(
+				addVersion = "1.2",
 				description = "Builds_1 Project Description",
+				dropdownItem = "New Build",
 				fieldName = "Builds_1 Project",
 				gitHash = "12345",
 				productVersion = "1.0",
@@ -149,26 +166,17 @@ definition {
 	}
 
 	@description = "This is a test for LPS-156575 - Verify if as an Administrator I should be able to delete a build that contains runs"
-	@priority = "5"
+	@priority = "4"
 	test AdminCanDeleteBuildContainsRuns {
 		task ("Given that the user add a new build with Environments Factors") {
 			Testray.goToProjectPage(projectName = "Projects_1 Project");
 
-			TestrayContextMenu.clickContextMenuProjects(name = "Routines_1 Routine");
-
-			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Select Default Environment Factors");
-
-			TestrayBuild.selectDefaultEnvironmentFactors(
-				label = "Application Server",
-				label1 = "Browser",
-				listCategory = "Application Server,Browser",
-				listOption = "JBoss 6.1",
-				listOption1 = "Chrome x");
-
 			TestrayRoutines.goToRoutine(routineName = "Routines_1 Routine");
 
 			TestrayBuild.createBuild(
+				addVersion = "1.2",
 				description = "Builds_1 Project Description",
+				dropdownItem = "New Build",
 				fieldName = "Builds_1 Project",
 				gitHash = "12345",
 				productVersion = "1.0",
@@ -211,7 +219,9 @@ definition {
 			TestrayRoutines.goToRoutine(routineName = "Routines_1 Routine");
 
 			TestrayBuild.createBuild(
+				addVersion = "1.2",
 				description = "Builds_1 Project Description",
+				dropdownItem = "New Build",
 				fieldName = "Builds_1 Project",
 				gitHash = "12345",
 				productVersion = "1.0",
@@ -245,7 +255,9 @@ definition {
 			TestrayRoutines.goToRoutine(routineName = "Routines_1 Routine");
 
 			TestrayBuild.createBuild(
+				addVersion = "1.2",
 				description = "Builds_1 Project Description",
+				dropdownItem = "New Build",
 				fieldName = "Builds_1 Project",
 				gitHash = "12345",
 				productVersion = "1.0",
@@ -254,33 +266,35 @@ definition {
 
 		task ("When add a build with duplicated name") {
 			TestrayBuild.createBuild(
+				addVersion = "1.4",
 				description = "Builds_1 Project Description",
+				dropdownItem = "New Build",
 				fieldName = "Builds_1 Project",
 				gitHash = "12345",
 				productVersion = "1.0",
 				routine = "Routines_1 Routine");
 		}
 
-		task ("Then an error message is displayed") {
-			Alert.viewErrorMessage(errorMessage = "An unexpected error ocurred");
+		task ("Then a warning message is displayed") {
+			Alert.viewErrorMessage(errorMessage = "The Build name already exists");
 		}
-	}
-
-	@description = "This is a test for LPS-156455 - Verify if as an Administrator cannot archive Build"
-	@ignore = "Test Stub"
-	@priority = "5"
-	test AdminCanNotArchiveBuild {
-
-		// TODO LPS-156455 AdminCanNotArchiveBuild pending implementation
-
 	}
 
 	@description = "This is a test for LPS-156557 - Verify if as an Administrator I should not be able to archive a build where its task is in analysis using"
 	@ignore = "Test Stub"
-	@priority = "5"
+	@priority = "3"
 	test AdminCanNotArchiveBuildInAnalysis {
 
 		// TODO LPS-156557 AdminCanNotArchivedBuildInAnalysis pending implementation
+
+	}
+
+	@description = "This is a test for LPS-156455 - Verify if as an Administrator I should not be able to archive a promoted build"
+	@ignore = "Test Stub"
+	@priority = "5"
+	test AdminCanNotArchivePromotedBuild {
+
+		// TODO LPS-156455 AdminCanNotArchivePromotedBuild pending implementation
 
 	}
 
@@ -293,7 +307,9 @@ definition {
 			TestrayRoutines.goToRoutine(routineName = "Routines_1 Routine");
 
 			TestrayBuild.createBuild(
+				addVersion = "1.2",
 				description = "Builds_1 Project Description",
+				dropdownItem = "New Build",
 				fieldName = "Builds_1 Project",
 				gitHash = "12345",
 				productVersion = "1.0",
@@ -322,7 +338,7 @@ definition {
 
 	@description = "This is a test for LPS-156586 - Verify if as an Administrator I should be able to sort the Builds Promoted"
 	@ignore = "Test Stub"
-	@priority = "4"
+	@priority = "3"
 	test AdminCanSortBuildPromoted {
 
 		// TODO LPS-156586 AdminCanSortBuildPromoted pending implementation
@@ -340,7 +356,7 @@ definition {
 
 	@description = "This is a test for LPS-156580 - Verify if as an Administrator I should be able to specify a start and end parameter when fetching a build index "
 	@ignore = "Test Stub"
-	@priority = "5"
+	@priority = "4"
 	test AdminCanSpecifyStartAndEndParameter {
 
 		// TODO LPS-156580 AdminCanSpecifyStartAndEndParameter pending implementation
@@ -349,7 +365,7 @@ definition {
 
 	@description = "This is a test for LPS-156592 - Verify if as an Administrator I should be able to unarchive a build"
 	@ignore = "Test Stub"
-	@priority = "5"
+	@priority = "4"
 	test AdminCanUnarchiveBuilds {
 
 		// TODO LPS-156592 AdminCanUnarchiveBuilds pending implementation

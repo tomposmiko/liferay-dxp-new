@@ -24,6 +24,7 @@ import com.liferay.object.exception.ObjectFieldBusinessTypeException;
 import com.liferay.object.exception.ObjectFieldDBTypeException;
 import com.liferay.object.exception.ObjectFieldDefaultValueException;
 import com.liferay.object.exception.ObjectFieldLabelException;
+import com.liferay.object.exception.ObjectFieldListTypeDefinitionIdException;
 import com.liferay.object.exception.ObjectFieldNameException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.exception.ObjectFieldStateException;
@@ -45,7 +46,6 @@ import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.base.ObjectFieldLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectEntryPersistence;
-import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectFieldSettingPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
@@ -67,6 +67,7 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -125,9 +126,10 @@ public class ObjectFieldLocalServiceImpl
 			indexedLanguageId, labelMap, name, required, state, false);
 
 		if (objectDefinition.isApproved() &&
-			!Objects.equals(
-				objectField.getBusinessType(),
-				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
+			!objectField.compareBusinessType(
+				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
+			!objectField.compareBusinessType(
+				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
 
 			runSQL(
 				DynamicObjectDefinitionTable.getAlterTableAddColumnSQL(
@@ -248,7 +250,7 @@ public class ObjectFieldLocalServiceImpl
 		throws PortalException {
 
 		for (ObjectField objectField :
-				_objectFieldPersistence.findByObjectDefinitionId(
+				objectFieldPersistence.findByObjectDefinitionId(
 					objectDefinitionId)) {
 
 			if (Validator.isNotNull(objectField.getRelationshipType())) {
@@ -356,7 +358,7 @@ public class ObjectFieldLocalServiceImpl
 
 	@Override
 	public List<ObjectField> getCustomObjectFields(long objectFieldId) {
-		List<ObjectField> objectFields = _objectFieldPersistence.findByODI_S(
+		List<ObjectField> objectFields = objectFieldPersistence.findByODI_S(
 			objectFieldId, false);
 
 		for (ObjectField objectField : objectFields) {
@@ -525,6 +527,7 @@ public class ObjectFieldLocalServiceImpl
 			newObjectField.getCompanyId(),
 			newObjectField.getObjectDefinitionId());
 
+		_validateListTypeDefinitionId(listTypeDefinitionId, businessType);
 		_validateDefaultValue(
 			businessType, defaultValue, listTypeDefinitionId, state);
 		_validateIndexed(
@@ -648,6 +651,7 @@ public class ObjectFieldLocalServiceImpl
 			externalReferenceCode, 0, objectDefinition.getCompanyId(),
 			objectDefinitionId);
 
+		_validateListTypeDefinitionId(listTypeDefinitionId, businessType);
 		_validateDefaultValue(
 			businessType, defaultValue, listTypeDefinitionId, state);
 		_validateIndexed(
@@ -836,9 +840,10 @@ public class ObjectFieldLocalServiceImpl
 			  Objects.equals(
 				  objectField.getBusinessType(),
 				  ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP))) &&
-			!Objects.equals(
-				objectField.getBusinessType(),
-				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
+			!objectField.compareBusinessType(
+				ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) &&
+			!objectField.compareBusinessType(
+				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
 
 			runSQL(
 				DynamicObjectDefinitionTable.getAlterTableDropColumnSQL(
@@ -870,6 +875,14 @@ public class ObjectFieldLocalServiceImpl
 	private void _setBusinessTypeAndDBType(
 			String businessType, String dbType, ObjectField objectField)
 		throws PortalException {
+
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-158776")) &&
+			StringUtil.equals(
+				businessType,
+				ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
+
+			throw new UnsupportedOperationException();
+		}
 
 		ObjectFieldBusinessType objectFieldBusinessType =
 			_objectFieldBusinessTypeTracker.getObjectFieldBusinessType(
@@ -989,6 +1002,20 @@ public class ObjectFieldLocalServiceImpl
 		}
 	}
 
+	private void _validateListTypeDefinitionId(
+			long listTypeDefinitionId, String businessType)
+		throws PortalException {
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164278")) &&
+			(listTypeDefinitionId == 0) &&
+			StringUtil.equals(
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+
+			throw new ObjectFieldListTypeDefinitionIdException(
+				"List type definition ID is 0");
+		}
+	}
+
 	private void _validateName(
 			long objectFieldId, ObjectDefinition objectDefinition, String name,
 			boolean system)
@@ -1097,9 +1124,6 @@ public class ObjectFieldLocalServiceImpl
 
 	@Reference
 	private ObjectFieldBusinessTypeTracker _objectFieldBusinessTypeTracker;
-
-	@Reference
-	private ObjectFieldPersistence _objectFieldPersistence;
 
 	@Reference
 	private ObjectFieldSettingContributorTracker

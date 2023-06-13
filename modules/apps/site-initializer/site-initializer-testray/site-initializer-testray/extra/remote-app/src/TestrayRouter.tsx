@@ -285,12 +285,14 @@ const TestrayRoute = () => (
 							path=":buildId/create"
 						/>
 
-						<Route element={<Subtasks />} path="subtasks" />
+						<Route element={<OutletBridge />} path=":taskId">
+							<Route element={<TestFlowTasks />} index />
 
-						<Route
-							element={<TestFlowTasks />}
-							path=":testrayTaskId"
-						/>
+							<Route
+								element={<Subtasks />}
+								path="subtasks/:subtaskId"
+							/>
+						</Route>
 					</Route>
 
 					<Route element={<CompareRunsOutlet />} path="compare-runs">

@@ -20,6 +20,7 @@ import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.item.ClassPKInfoItemIdentifier;
 import com.liferay.info.item.InfoItemIdentifier;
+import com.liferay.info.item.InfoItemReference;
 import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemDetailsProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
@@ -54,7 +55,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pablo Molina
  */
 @Component(
-	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/get_fragment_entry_link"
@@ -116,7 +116,8 @@ public class GetFragmentEntryLinkMVCResourceCommand
 				Object infoItemObject = infoItemObjectProvider.getInfoItem(
 					infoItemIdentifier);
 
-				defaultFragmentRendererContext.setDisplayObject(infoItemObject);
+				defaultFragmentRendererContext.setContextInfoItemReference(
+					new InfoItemReference(itemClassName, infoItemIdentifier));
 
 				httpServletRequest.setAttribute(
 					InfoDisplayWebKeys.INFO_ITEM, infoItemObject);
@@ -133,8 +134,8 @@ public class GetFragmentEntryLinkMVCResourceCommand
 				}
 
 				httpServletRequest.setAttribute(
-					InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT,
-					infoItemObject);
+					InfoDisplayWebKeys.INFO_ITEM_REFERENCE,
+					new InfoItemReference(itemClassName, infoItemIdentifier));
 			}
 
 			LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
@@ -163,7 +164,7 @@ public class GetFragmentEntryLinkMVCResourceCommand
 		}
 		finally {
 			httpServletRequest.removeAttribute(
-				InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT);
+				InfoDisplayWebKeys.INFO_ITEM_REFERENCE);
 
 			httpServletRequest.setAttribute(
 				LayoutDisplayPageWebKeys.LAYOUT_DISPLAY_PAGE_PROVIDER,

@@ -66,6 +66,9 @@ const BreadcrumbFinder: React.FC<BreadcrumbFinderProps> = ({heading}) => {
 					}))
 				);
 			}
+			else {
+				setBreadCrumb([]);
+			}
 		}
 	}, [heading, params, setBreadCrumb]);
 

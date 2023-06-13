@@ -14,12 +14,15 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.object.configuration.ObjectConfiguration;
 import com.liferay.object.constants.ObjectActionKeys;
+import com.liferay.object.entry.permission.util.ObjectEntryPermissionUtil;
 import com.liferay.object.exception.ObjectEntryCountException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.base.ObjectEntryServiceBaseImpl;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
@@ -101,11 +104,8 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 	public ObjectEntry deleteObjectEntry(long objectEntryId)
 		throws PortalException {
 
-		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
-			objectEntryId);
-
-		_checkModelResourcePermission(
-			objectEntry.getObjectDefinitionId(), objectEntry.getObjectEntryId(),
+		_checkPermissions(
+			objectEntryLocalService.getObjectEntry(objectEntryId),
 			ActionKeys.DELETE);
 
 		return objectEntryLocalService.deleteObjectEntry(objectEntryId);
@@ -119,9 +119,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
 			externalReferenceCode, companyId, groupId);
 
-		_checkModelResourcePermission(
-			objectEntry.getObjectDefinitionId(), objectEntry.getObjectEntryId(),
-			ActionKeys.DELETE);
+		_checkPermissions(objectEntry, ActionKeys.DELETE);
 
 		return objectEntryLocalService.deleteObjectEntry(objectEntry);
 	}
@@ -134,9 +132,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			objectEntryId);
 
 		if (objectEntry != null) {
-			_checkModelResourcePermission(
-				objectEntry.getObjectDefinitionId(),
-				objectEntry.getObjectEntryId(), ActionKeys.VIEW);
+			_checkPermissions(objectEntry, ActionKeys.VIEW);
 		}
 
 		return objectEntry;
@@ -149,9 +145,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
 			objectEntryId);
 
-		_checkModelResourcePermission(
-			objectEntry.getObjectDefinitionId(), objectEntry.getObjectEntryId(),
-			ActionKeys.VIEW);
+		_checkPermissions(objectEntry, ActionKeys.VIEW);
 
 		return objectEntry;
 	}
@@ -164,9 +158,7 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		ObjectEntry objectEntry = objectEntryLocalService.getObjectEntry(
 			externalReferenceCode, companyId, groupId);
 
-		_checkModelResourcePermission(
-			objectEntry.getObjectDefinitionId(), objectEntry.getObjectEntryId(),
-			ActionKeys.VIEW);
+		_checkPermissions(objectEntry, ActionKeys.VIEW);
 
 		return objectEntry;
 	}
@@ -291,6 +283,18 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			getPermissionChecker(), objectEntryId, actionId);
 	}
 
+	private void _checkPermissions(ObjectEntry objectEntry, String actionId)
+		throws PortalException {
+
+		_checkModelResourcePermission(
+			objectEntry.getObjectDefinitionId(), objectEntry.getObjectEntryId(),
+			actionId);
+
+		ObjectEntryPermissionUtil.checkAccountEntryPermission(
+			_accountEntryLocalService, actionId, _objectDefinitionLocalService,
+			objectEntry, _objectFieldLocalService, getUserId());
+	}
+
 	private void _checkPortletResourcePermission(
 			long groupId, long objectDefinitionId, String actionId)
 		throws PortalException {
@@ -329,12 +333,18 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 		}
 	}
 
+	@Reference
+	private AccountEntryLocalService _accountEntryLocalService;
+
 	private final Map<String, ModelResourcePermission<ObjectEntry>>
 		_modelResourcePermissions = new ConcurrentHashMap<>();
 	private volatile ObjectConfiguration _objectConfiguration;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 	private final Map<String, PortletResourcePermission>
 		_portletResourcePermissions = new ConcurrentHashMap<>();

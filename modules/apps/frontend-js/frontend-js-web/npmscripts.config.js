@@ -22,20 +22,10 @@ module.exports = {
 		'uuid',
 	],
 	build: {
-		bundler: {
-			exclude: {
-				'*': true,
-			},
-			ignore: [
-				'**/global.bundle.js',
-				'**/liferay/dom_task_runner.js',
-				'**/liferay/events.js',
-				'**/liferay/lazy_load.js',
-				'**/liferay/liferay.js',
-				'**/liferay/portlet.js',
-				'**/liferay/workflow.js',
-				'**/loader/config.js',
-			],
+		customBridges: {
+			'bridge/frontend-js-web/index':
+				'../../../../../frontend-js-web/__liferay__/index.js',
 		},
+		main: 'src/main/resources/META-INF/resources/index.es.js',
 	},
 };

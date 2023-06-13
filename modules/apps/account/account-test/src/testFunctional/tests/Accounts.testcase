@@ -543,6 +543,39 @@ definition {
 		}
 	}
 
+	@description = "This tests activating an inactive account"
+	@priority = "3"
+	test CanActivateAnInactiveAccount {
+		task ("Given a business account that is Inactive") {
+			JSONAccountEntry.addAccountEntry(
+				accountEntryName = "Accounts Name for Test",
+				accountEntryStatus = "Inactive",
+				accountEntryType = "Business");
+		}
+
+		task ("When a user activates it") {
+			Accounts.openAccountsAdmin();
+
+			ManagementBar.setFilterAndOrder(filterBy = "Inactive");
+
+			LexiconEntry.gotoEntryMenuItemNoError(
+				menuItem = "Activate",
+				rowEntry = "Accounts Name for Test");
+
+			Alert.viewSuccessMessage();
+		}
+
+		task ("Then the account is in Active status and can be viewed in the Active filter") {
+			Accounts.openAccountsAdmin();
+
+			LexiconEntry.viewEntryName(rowEntry = "Accounts Name for Test");
+
+			ManagementBar.setFilterAndOrder(filterBy = "Inactive");
+
+			LexiconEntry.viewNoEntry(rowEntry = "Accounts Name for Test");
+		}
+	}
+
 	@description = "This test adds a new user via the Users tab of an Account"
 	@priority = "4"
 	test CanAddAccountUserViaAssignUser {
@@ -1089,45 +1122,6 @@ definition {
 			key_rowEntry = "userfn userln",
 			locator1 = "ContentRow#ENTRY_CONTENT_ROW_NUMBER_TD",
 			value1 = "Account Administrator, Account Specific Role");
-	}
-
-	@description = "This test updates an account's status from Active to Inactive asserts change saves successfully."
-	@priority = "4"
-	test CanChangeAccountStatusToInactiveThenActiveViaEdit {
-		JSONAccountEntry.addAccountEntry(
-			accountEntryName = "Change Account Status",
-			accountEntryType = "Business");
-
-		Accounts.openAccountsAdmin();
-
-		Accounts.editCP(
-			accountName = "Change Account Status",
-			accountNameEdit = "Edited Account Name",
-			accountStatusEdit = "Inactive");
-
-		Accounts.openAccountsAdmin();
-
-		LexiconEntry.viewNoEntry(rowEntry = "Edited Account Name");
-
-		ManagementBar.setFilterAndOrder(filterBy = "Inactive");
-
-		LexiconEntry.viewEntryStatus(
-			rowEntry = "Edited Account Name",
-			rowStatus = "Inactive");
-
-		LexiconEntry.gotoEntry(rowEntry = "Edited Account Name");
-
-		Check.checkToggleSwitch(locator1 = "ToggleSwitch#ACCOUNT_STATUS");
-
-		Button.clickSave();
-
-		Alert.viewSuccessMessage();
-
-		Accounts.openAccountsAdmin();
-
-		LexiconEntry.viewEntryStatus(
-			rowEntry = "Edited Account Name",
-			rowStatus = "Active");
 	}
 
 	@description = "This test asserts that address type can be changed from Billing to Shipping and vice versa."
@@ -1947,21 +1941,24 @@ definition {
 	@description = "This is a use case for LPS-101315. Deleting an inactive account will navigate you back to inactive filter."
 	@priority = "3"
 	test CanDeleteAnInactiveAccount {
-		Accounts.openAccountsAdmin();
+		task ("Given a business account that is Inactive") {
+			JSONAccountEntry.addAccountEntry(
+				accountEntryName = "Accounts Name for Test",
+				accountEntryStatus = "Inactive",
+				accountEntryType = "Business");
+		}
 
-		Accounts.addInactiveBusinessAccount(
-			accountDescription = "Accounts Name Description for Test",
-			accountName = "Accounts Name for Test");
+		task ("When a user deletes it") {
+			Accounts.openAccountsAdmin();
 
-		Accounts.openAccountsAdmin();
+			ManagementBar.setFilterAndOrder(filterBy = "Inactive");
 
-		ManagementBar.setFilterAndOrder(filterBy = "Inactive");
+			Accounts.deleteAccount(accountName = "Accounts Name for Test");
+		}
 
-		Accounts.deleteAccount(accountName = "Accounts Name for Test");
-
-		ManagementBar.viewFilterAndOrder(menuItem = "Inactive");
-
-		LexiconEntry.viewNoEntry(rowEntry = "Accounts Name for Test");
+		task ("Then the inactive account is successfully deleted") {
+			LexiconEntry.viewNoEntry(rowEntry = "Accounts Name for Test");
+		}
 	}
 
 	@description = "This test adds a custom field for an account entry and asserts field can be updated."

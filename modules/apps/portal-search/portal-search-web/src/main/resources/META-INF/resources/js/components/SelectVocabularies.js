@@ -344,8 +344,21 @@ function SelectVocabularies({
 			/>
 
 			<div className="select-vocabularies-helptext text-3">
-				{Liferay.Language.get(
-					'select-vocabularies-configuration-description'
+				{disabled ? (
+					Liferay.Language.get(
+						'select-vocabularies-configuration-description'
+					)
+				) : (
+					<div>
+						{Liferay.Language.get(
+							'select-vocabularies-configuration-enabled-description'
+						)}
+
+						<LearnMessage
+							learnMessages={learnMessages}
+							resourceKey="tag-and-category-facet"
+						/>
+					</div>
 				)}
 			</div>
 

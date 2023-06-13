@@ -25,6 +25,9 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
+import com.liferay.dynamic.data.mapping.expression.DDMExpression;
+import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.configuration.ObjectConfiguration;
@@ -58,6 +61,7 @@ import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectFieldSettingPersistence;
 import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
 import com.liferay.object.util.ObjectRelationshipUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLFunctionFactoryUtil;
@@ -120,6 +124,7 @@ import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -140,7 +145,6 @@ import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -160,11 +164,14 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 
+import java.text.DateFormat;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -790,7 +797,9 @@ public class ObjectEntryLocalServiceImpl
 
 		Expression<?>[] selectExpressions = ArrayUtil.append(
 			_getSelectExpressions(dynamicObjectDefinitionTable),
-			_getSelectExpressions(extensionDynamicObjectDefinitionTable));
+			ArrayUtil.remove(
+				_getSelectExpressions(extensionDynamicObjectDefinitionTable),
+				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()));
 
 		List<Object[]> rows = _list(
 			DSLQueryFactoryUtil.select(
@@ -811,7 +820,9 @@ public class ObjectEntryLocalServiceImpl
 			),
 			selectExpressions);
 
-		return _getValues(rows.get(0), selectExpressions);
+		return _putFormulaObjectFieldValues(
+			objectEntry.getObjectDefinitionId(),
+			_getValues(rows.get(0), selectExpressions));
 	}
 
 	@Override
@@ -828,7 +839,9 @@ public class ObjectEntryLocalServiceImpl
 
 		Expression<?>[] selectExpressions = ArrayUtil.append(
 			_getSelectExpressions(dynamicObjectDefinitionTable),
-			_getSelectExpressions(extensionDynamicObjectDefinitionTable),
+			ArrayUtil.remove(
+				_getSelectExpressions(extensionDynamicObjectDefinitionTable),
+				extensionDynamicObjectDefinitionTable.getPrimaryKeyColumn()),
 			_EXPRESSIONS);
 
 		List<Object[]> rows = _list(
@@ -1822,6 +1835,48 @@ public class ObjectEntryLocalServiceImpl
 		);
 	}
 
+	private Serializable _getOutputValue(String outputType, Object value) {
+		if (StringUtil.equals(
+				outputType, ObjectFieldConstants.BUSINESS_TYPE_BOOLEAN)) {
+
+			return GetterUtil.getBoolean(value);
+		}
+
+		if (StringUtil.equals(
+				outputType, ObjectFieldConstants.BUSINESS_TYPE_DATE)) {
+
+			User user = _userLocalService.fetchUser(
+				PrincipalThreadLocal.getUserId());
+
+			Locale locale =
+				(user == null) ? LocaleUtil.getSiteDefault() : user.getLocale();
+
+			DateFormat dateFormat = DateFormatFactoryUtil.getDate(locale);
+
+			return dateFormat.format(value);
+		}
+
+		if (StringUtil.equals(
+				outputType, ObjectFieldConstants.BUSINESS_TYPE_DECIMAL)) {
+
+			return GetterUtil.getDouble(value);
+		}
+
+		if (StringUtil.equals(
+				outputType, ObjectFieldConstants.BUSINESS_TYPE_INTEGER)) {
+
+			return GetterUtil.getInteger(value);
+		}
+
+		if (StringUtil.equals(
+				outputType, ObjectFieldConstants.BUSINESS_TYPE_TEXT)) {
+
+			return GetterUtil.getString(value);
+		}
+
+		return null;
+	}
+
 	private Predicate _getPermissionWherePredicate(
 		DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
 		long groupId) {
@@ -1838,7 +1893,7 @@ public class ObjectEntryLocalServiceImpl
 
 		return _inlineSQLHelper.getPermissionWherePredicate(
 			objectDefinition.getClassName(),
-			dynamicObjectDefinitionTable.getPrimaryKeyColumn());
+			dynamicObjectDefinitionTable.getPrimaryKeyColumn(), groupId);
 	}
 
 	private Object _getResult(
@@ -1886,8 +1941,7 @@ public class ObjectEntryLocalServiceImpl
 		for (ObjectField objectField :
 				dynamicObjectDefinitionTable.getObjectFields()) {
 
-			if (!Objects.equals(
-					objectField.getBusinessType(),
+			if (!objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
 
 				continue;
@@ -2200,9 +2254,10 @@ public class ObjectEntryLocalServiceImpl
 			dynamicObjectDefinitionTable.getObjectFields();
 
 		for (ObjectField objectField : objectFields) {
-			if (Objects.equals(
-					objectField.getBusinessType(),
+			if (objectField.compareBusinessType(
 					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+				objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
 				!values.containsKey(objectField.getName())) {
 
 				if (objectField.isRequired()) {
@@ -2260,9 +2315,10 @@ public class ObjectEntryLocalServiceImpl
 			_setColumn(preparedStatement, index++, Types.BIGINT, objectEntryId);
 
 			for (ObjectField objectField : objectFields) {
-				if (Objects.equals(
-						objectField.getBusinessType(),
+				if (objectField.compareBusinessType(
 						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+					objectField.compareBusinessType(
+						ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
 					!values.containsKey(objectField.getName())) {
 
 					continue;
@@ -2310,6 +2366,62 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		return results;
+	}
+
+	private Map<String, Serializable> _putFormulaObjectFieldValues(
+			long objectDefinitionId, Map<String, Serializable> values)
+		throws PortalException {
+
+		List<ObjectField> objectFields =
+			_objectFieldLocalService.getObjectFields(objectDefinitionId);
+
+		for (ObjectField objectField : objectFields) {
+			if (!objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
+
+				continue;
+			}
+
+			Map<String, Object> objectFieldSettingMap = new HashMap<>();
+
+			List<ObjectFieldSetting> objectFieldSettings =
+				_objectFieldSettingLocalService.
+					getObjectFieldObjectFieldSettings(
+						objectField.getObjectFieldId());
+
+			for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
+				objectFieldSettingMap.put(
+					objectFieldSetting.getName(),
+					objectFieldSetting.getValue());
+			}
+
+			Object script = objectFieldSettingMap.get("script");
+
+			if (script == null) {
+				break;
+			}
+
+			DDMExpression<Serializable> ddmExpression =
+				_ddmExpressionFactory.createExpression(
+					CreateExpressionRequest.Builder.newBuilder(
+						String.valueOf(script)
+					).build());
+
+			ddmExpression.setVariables(new HashMap<>(values));
+
+			try {
+				values.put(
+					objectField.getName(),
+					_getOutputValue(
+						String.valueOf(objectFieldSettingMap.get("output")),
+						ddmExpression.evaluate()));
+			}
+			catch (PortalException portalException) {
+				_log.error(portalException);
+			}
+		}
+
+		return values;
 	}
 
 	private void _putValue(
@@ -2595,9 +2707,10 @@ public class ObjectEntryLocalServiceImpl
 			dynamicObjectDefinitionTable.getObjectFields();
 
 		for (ObjectField objectField : objectFields) {
-			if (Objects.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION)) {
+			if (objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+				objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
 
 				continue;
 			}
@@ -2666,9 +2779,10 @@ public class ObjectEntryLocalServiceImpl
 			int index = 1;
 
 			for (ObjectField objectField : objectFields) {
-				if (Objects.equals(
-						objectField.getBusinessType(),
+				if (objectField.compareBusinessType(
 						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+					objectField.compareBusinessType(
+						ObjectFieldConstants.BUSINESS_TYPE_FORMULA) ||
 					!values.containsKey(objectField.getName())) {
 
 					continue;
@@ -3051,6 +3165,9 @@ public class ObjectEntryLocalServiceImpl
 
 	@Reference
 	private CurrentConnection _currentConnection;
+
+	@Reference
+	private DDMExpressionFactory _ddmExpressionFactory;
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;

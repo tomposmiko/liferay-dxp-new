@@ -13,6 +13,8 @@
  */
 
 export default {
+	'a-task-for-this-build-already-exists':
+		'A task for this build already exists.',
 	'activate': 'Activate',
 	'active': 'Active',
 	'add': 'Add',
@@ -39,6 +41,8 @@ export default {
 	'are-you-sure-you-want-to-delete-this-item':
 		'Are you sure you want to delete this item?',
 	'assign': 'Assign',
+	'assign-and-begin-analysis': 'Assign and Begin Analysis',
+	'assign-and-reanalyze': 'Assign and Reanalyze',
 	'assign-to-me': 'Assign to Me',
 	'assign-user-groups': 'Assign User Groups',
 	'assign-users': 'Assign Users',
@@ -46,7 +50,7 @@ export default {
 	'assigned-users': 'Assigned Users',
 	'assignee': 'Assignee',
 	'at-least-one-environment-stack-is-required':
-		'At least one environment stack is required',
+		'At least one environment stack is required.',
 	'attachment': 'Attachment',
 	'attachments': 'Attachments',
 	'attachments-x': 'Attachments ({0})',
@@ -73,6 +77,7 @@ export default {
 	'case-name': 'Case Name',
 	'case-parameters': 'Case Parameters',
 	'case-result': 'Case Result',
+	'case-results-status': 'Case Results Status',
 	'case-type': 'Case Type',
 	'case-types': 'Case Types',
 	'cases': 'Cases',
@@ -91,6 +96,7 @@ export default {
 	'comments': 'Comments',
 	'compare-details': 'Compare Details',
 	'compare-runs': 'Compare Runs',
+	'complete': 'Complete',
 	'complete-test': 'Complete Test',
 	'component': 'Component',
 	'components': 'Components',
@@ -217,11 +223,13 @@ export default {
 	'new-user-account': 'New User Account',
 	'new-x': 'New {0}',
 	'next': 'Next',
+	'no-content-yet': 'No content yet',
 	'no-password-provided': 'No password provided',
 	'no-permissions': 'No Permissions',
 	'no-results-found': 'No results found',
 	'no-x': 'No {0}',
 	'operating-system': 'Operating System',
+	'option': 'Option',
 	'options': 'Options',
 	'order-by': 'Order By',
 	'overview': 'Overview',
@@ -230,7 +238,7 @@ export default {
 	'password-may-contain-letters-and-numbers':
 		'Password may contain letters and numbers.',
 	'passwords-do-not-match': 'Passwords do not match.',
-	'please-select-one-or-more-roles': 'Please select one or more roles.',
+	'please-select-one-or-more-roles': 'Please, select one or more roles.',
 	'priority': 'Priority',
 	'product-version': 'Product Version',
 	'progress': 'Progress',
@@ -249,6 +257,7 @@ export default {
 	'result': 'Result',
 	'results': 'Results',
 	'resync-with-jira': 'Resync with Jira',
+	'return-to-open': 'Return to open',
 	'roles': 'Roles',
 	'routine': 'Routine',
 	'routine-archived': 'Routine archived',
@@ -314,13 +323,14 @@ export default {
 	'testray-user': ' User',
 	'tests': 'Tests',
 	'the-component-name-already-exists': 'The component name already exists.',
+	'the-link-url-must-be-a-valid-url': 'The link URL must be a valid URL.',
 	'the-name-already-exists': 'The name already exists.',
 	'the-project-cannot-be-deleted-because-it-has-associated-builds':
 		'The Project cannot be deleted because it has associated builds',
 	'the-team-cannot-be-deleted-because-it-has-associated-components':
 		'The team cannot be deleted because it has associated components',
 	'the-team-name-already-exists': 'The team name already exists',
-	'the-x-name-already-exists': 'The {0} name already exists',
+	'the-x-name-already-exists': 'The {0} name already exists.',
 	'there-are-no-entries-yet': 'There are no entries yet.',
 	'there-are-no-linked-cases': 'There are no linked cases.',
 	'there-are-no-linked-users': 'There are no linked users.',
@@ -330,7 +340,7 @@ export default {
 		'This build is currently in analysis.',
 	'this-builds-task-has-been-abandoned':
 		"This build's task has been abandoned.",
-	'this-field-is-required': 'This field is Required.',
+	'this-field-is-required': 'This field is required.',
 	'this-role-is-for-general-liferay-employees-and-enables-authenticated-users-to-view-test-results':
 		'This role is for general Liferay employees and enables authenticated users to view test results.',
 	'time-x-total-issues': 'Time {0} Total Issues',

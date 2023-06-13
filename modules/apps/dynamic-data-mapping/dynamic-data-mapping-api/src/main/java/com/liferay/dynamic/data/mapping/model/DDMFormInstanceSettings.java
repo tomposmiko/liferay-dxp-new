@@ -36,6 +36,8 @@ import org.osgi.annotation.versioning.ProviderType;
 				"setVisible('emailFromName', getValue('sendEmailNotification'))",
 				"setVisible('emailSubject', getValue('sendEmailNotification'))",
 				"setVisible('emailToAddress', getValue('sendEmailNotification'))",
+				"setVisible('limitToOneSubmissionPerUserBody', getValue('limitToOneSubmissionPerUser'))",
+				"setVisible('limitToOneSubmissionPerUserHeader', getValue('limitToOneSubmissionPerUser'))",
 				"setVisible('objectDefinitionId', contains(getValue('storageType'), \"object\"))",
 				"setVisible('published', FALSE)",
 				"setVisible('workflowDefinition', not(contains(getValue('storageType'), \"object\")))"
@@ -106,8 +108,10 @@ import org.osgi.annotation.versioning.ProviderType;
 							size = 12,
 							value = {
 								"showPartialResultsToRespondents",
-								"limitToOneSubmissionPerUser", "expirationDate",
-								"neverExpire"
+								"limitToOneSubmissionPerUser",
+								"limitToOneSubmissionPerUserHeader",
+								"limitToOneSubmissionPerUserBody",
+								"expirationDate", "neverExpire"
 							}
 						)
 					}
@@ -162,6 +166,23 @@ public interface DDMFormInstanceSettings {
 		tip = "%respondents-will-be-required-to-sign-in", type = "checkbox"
 	)
 	public boolean limitToOneSubmissionPerUser();
+
+	@DDMFormField(
+		label = "%body",
+		properties = {
+			"displayStyle=multiline",
+			"placeholder=%you-can-fill-out-this-form-only-once.-contact-the-owner-of-the-form-if-you-think-this-is-a-mistake"
+		},
+		type = "localizable_text"
+	)
+	public String limitToOneSubmissionPerUserBody();
+
+	@DDMFormField(
+		label = "%header",
+		properties = "placeholder=%you-have-already-responded",
+		type = "localizable_text"
+	)
+	public String limitToOneSubmissionPerUserHeader();
 
 	@DDMFormField(
 		label = "%never-expire", predefinedValue = "true", type = "checkbox"
