@@ -20,9 +20,8 @@ import ClayLayout from '@clayui/layout';
 import classNames from 'classnames';
 import {fetch, objectToFormData, openToast, sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useMemo, useState} from 'react';
+import React, {useMemo} from 'react';
 
-import {DELETION_TYPES} from '../constants/deletionTypes';
 import {NESTING_MARGIN} from '../constants/nestingMargin';
 import {SIDEBAR_PANEL_IDS} from '../constants/sidebarPanelIds';
 import {useConstants} from '../contexts/ConstantsContext';
@@ -37,7 +36,8 @@ import getItemPath from '../utils/getItemPath';
 import getOrder from '../utils/getOrder';
 import {useDragItem, useDropTarget} from '../utils/useDragAndDrop';
 import useKeyboardNavigation from '../utils/useKeyboardNavigation';
-import DeletionModal from './DeletionModal';
+import {AddItemDropDown} from './AddItemDropdown';
+import MenuItemOptions from './MenuItemOptions';
 
 export function MenuItem({
 	isMovementEnabled,
@@ -50,7 +50,6 @@ export function MenuItem({
 	const setSelectedMenuItemId = useSetSelectedMenuItemId();
 	const setSidebarPanelId = useSetSidebarPanelId();
 	const {
-		deleteSiteNavigationMenuItemURL,
 		editSiteNavigationMenuItemParentURL,
 		languageId,
 		portletNamespace,
@@ -60,41 +59,6 @@ export function MenuItem({
 	const {siteNavigationMenuItemId, title, type} = item;
 	const itemPath = getItemPath(siteNavigationMenuItemId, items);
 	const selected = useSelectedMenuItemId() === siteNavigationMenuItemId;
-
-	const [deletionModalVisible, setDeletionModalVisible] = useState(false);
-	const [deletionType, setDeletionType] = useState(DELETION_TYPES.single);
-
-	const deleteMenuItem = () => {
-		fetch(deleteSiteNavigationMenuItemURL, {
-			body: objectToFormData({
-				[`${portletNamespace}siteNavigationMenuItemId`]: siteNavigationMenuItemId,
-				[`${portletNamespace}deleteChildren`]:
-					deletionType === DELETION_TYPES.bulk,
-			}),
-			method: 'POST',
-		})
-			.then((response) => response.json())
-			.then(({siteNavigationMenuItems}) => {
-				const newItems = getFlatItems(siteNavigationMenuItems);
-
-				setItems(newItems);
-
-				setSidebarPanelId(null);
-				onMenuItemRemoved();
-			})
-			.catch(({error}) => {
-				openToast({
-					message: Liferay.Language.get(
-						'an-unexpected-error-occurred'
-					),
-					type: 'danger',
-				});
-
-				if (process.env.NODE_ENV === 'development') {
-					console.error(error);
-				}
-			});
-	};
 
 	const order = useMemo(
 		() =>
@@ -157,6 +121,7 @@ export function MenuItem({
 		itemPath.length > 1 ? itemPath[itemPath.length - 2] : '0';
 
 	const {
+		element,
 		isTarget,
 		onBlur,
 		onFocus,
@@ -189,8 +154,8 @@ export function MenuItem({
 				data-item-id={item.siteNavigationMenuItemId}
 				data-parent-item-id={parentItemId}
 				onBlur={onBlur}
-				onClick={() => {
-					if (!isMovementEnabled) {
+				onClick={(event) => {
+					if (!isMovementEnabled && event.nativeEvent.pointerType) {
 						setSelectedMenuItemId(siteNavigationMenuItemId);
 						setSidebarPanelId(SIDEBAR_PANEL_IDS.menuItemSettings);
 					}
@@ -199,7 +164,8 @@ export function MenuItem({
 				onKeyDown={(event) => {
 					if (
 						(event.key === ' ' || event.key === 'Enter') &&
-						!isMovementEnabled
+						!isMovementEnabled &&
+						event.target === element
 					) {
 						setSelectedMenuItemId(siteNavigationMenuItemId);
 						setSidebarPanelId(SIDEBAR_PANEL_IDS.menuItemSettings);
@@ -365,22 +331,100 @@ export function MenuItem({
 									</div>
 								</ClayLayout.ContentCol>
 
-								<ClayLayout.ContentCol gutters>
-									<ClayButtonWithIcon
-										aria-label={sub(
-											Liferay.Language.get('delete-x'),
-											`${title} (${type})`
-										)}
-										className="delete-item-button"
-										displayType="unstyled"
-										onClick={() =>
-											item.children.length
-												? setDeletionModalVisible(true)
-												: deleteMenuItem()
+								{Liferay.FeatureFlags['LPS-134527'] && (
+									<div
+										onClick={(event) =>
+											event.stopPropagation()
 										}
-										size="sm"
-										symbol="times-circle"
-										tabIndex={isTarget ? '0' : '-1'}
+									>
+										<AddItemDropDown
+											className="position-absolute site_navigation_menu_editor_MenuItem-add-button-dropdown top-button"
+											order={order}
+											parentSiteNavigationMenuItemId={
+												item.parentSiteNavigationMenuItemId
+											}
+											trigger={
+												<ClayButtonWithIcon
+													aria-label={sub(
+														Liferay.Language.get(
+															'add-item-before-x'
+														),
+														`${title} (${type})`
+													)}
+													className="site_navigation_menu_editor_MenuItem-add-button"
+													displayType="primary"
+													onClick={(event) => {
+														event.preventDefault();
+														event.stopPropagation();
+													}}
+													size="xs"
+													symbol="plus"
+													tabIndex={
+														isTarget &&
+														Liferay.FeatureFlags[
+															'LPS-134527'
+														]
+															? '0'
+															: '-1'
+													}
+													title={Liferay.Language.get(
+														'add-item'
+													)}
+												/>
+											}
+										/>
+
+										<AddItemDropDown
+											className="bottom-button position-absolute site_navigation_menu_editor_MenuItem-add-button-dropdown"
+											order={order + 1}
+											parentSiteNavigationMenuItemId={
+												item.parentSiteNavigationMenuItemId
+											}
+											trigger={
+												<ClayButtonWithIcon
+													aria-label={sub(
+														Liferay.Language.get(
+															'add-item-after-x'
+														),
+														`${title} (${type})`
+													)}
+													className="site_navigation_menu_editor_MenuItem-add-button"
+													displayType="primary"
+													onClick={(event) => {
+														event.preventDefault();
+														event.stopPropagation();
+													}}
+													size="xs"
+													symbol="plus"
+													tabIndex={
+														isTarget &&
+														Liferay.FeatureFlags[
+															'LPS-134527'
+														]
+															? '0'
+															: '-1'
+													}
+													title={Liferay.Language.get(
+														'add-item'
+													)}
+												/>
+											}
+										/>
+									</div>
+								)}
+
+								<ClayLayout.ContentCol
+									gutters
+									onClick={(event) => event.stopPropagation()}
+								>
+									<MenuItemOptions
+										isTarget={isTarget}
+										label={`${title} (${type})`}
+										numberOfChildren={item.children.length}
+										onMenuItemRemoved={onMenuItemRemoved}
+										siteNavigationMenuItemId={
+											siteNavigationMenuItemId
+										}
 									/>
 								</ClayLayout.ContentCol>
 							</ClayCard.Row>
@@ -388,15 +432,6 @@ export function MenuItem({
 					</ClayCard.Body>
 				</ClayCard>
 			</div>
-
-			{deletionModalVisible && (
-				<DeletionModal
-					deletionType={deletionType}
-					onCloseModal={() => setDeletionModalVisible(false)}
-					onDeleteItem={deleteMenuItem}
-					setDeletionType={setDeletionType}
-				/>
-			)}
 		</>
 	);
 }

@@ -20,6 +20,7 @@ import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.content.dashboard.item.ContentDashboardItem;
 import com.liferay.content.dashboard.item.ContentDashboardItemFactory;
 import com.liferay.content.dashboard.item.ContentDashboardItemVersion;
+import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtype;
 import com.liferay.content.dashboard.web.internal.constants.ContentDashboardPortletKeys;
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryRegistry;
 import com.liferay.content.dashboard.web.internal.search.request.ContentDashboardSearchContextBuilder;
@@ -65,7 +66,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.portlet.ResourceRequest;
@@ -137,20 +137,24 @@ public class GetContentDashboardItemsXlsMVCResourceCommand
 		WorkbookBuilder workbookBuilder) {
 
 		workbookBuilder.cell(
+			String.valueOf(contentDashboardItem.getId())
+		).cell(
 			contentDashboardItem.getTitle(locale)
 		).cell(
 			contentDashboardItem.getUserName()
 		).cell(
 			contentDashboardItem.getTypeLabel(locale)
 		).cell(
-			Optional.ofNullable(
-				contentDashboardItem.getContentDashboardItemSubtype()
-			).map(
-				contentDashboardItemSubtype ->
-					contentDashboardItemSubtype.getLabel(locale)
-			).orElse(
-				StringPool.BLANK
-			)
+			() -> {
+				ContentDashboardItemSubtype<?> contentDashboardItemSubtype =
+					contentDashboardItem.getContentDashboardItemSubtype();
+
+				if (contentDashboardItemSubtype == null) {
+					return StringPool.BLANK;
+				}
+
+				return contentDashboardItemSubtype.getLabel(locale);
+			}
 		).cell(
 			contentDashboardItem.getScopeName(locale)
 		).cell(
@@ -205,6 +209,8 @@ public class GetContentDashboardItemsXlsMVCResourceCommand
 
 	private void _addWorkbookHeaders(WorkbookBuilder workbookBuilder) {
 		workbookBuilder.localizedCell(
+			"id"
+		).localizedCell(
 			"title"
 		).localizedCell(
 			"author"

@@ -11,7 +11,7 @@ definition {
 
 		User.firstLoginPG();
 
-		JSONGroup.addGroup(groupName = "Site Name");
+		HeadlessSite.addSite(siteName = "Site Name");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -293,6 +293,8 @@ definition {
 	@description = "This is a use case for LPS-71786"
 	@priority = 3
 	test AssertDeletedAssetLinkRemovedFromLiveSite {
+		property test.name.skip.portal.instance = "StagingUsecase#AssertDeletedAssetLinkRemovedFromLiveSite";
+
 		task ("Given: User add a Blog portlet to the Staging site and 2 documents") {
 			JSONLayout.addWidgetToPublicLayout(
 				column = 1,
@@ -1904,9 +1906,9 @@ definition {
 		}
 
 		task ("When: User add a child site with a page and an AP widget on it") {
-			JSONGroup.addChildGroup(
-				groupName = "Child Site",
-				parentGroupName = "Site Name");
+			HeadlessSite.addSite(
+				parentSiteName = "Site Name",
+				siteName = "Child Site");
 
 			JSONLayout.addPublicLayout(
 				groupName = "Child Site",
@@ -2137,7 +2139,7 @@ definition {
 	@priority = 3
 	test SubscribeWebContentWithStaging {
 		task ("Given: User add a new site and a new role") {
-			JSONGroup.addGroup(groupName = "Test Site");
+			HeadlessSite.addSite(siteName = "Test Site");
 
 			JSONRole.addRegularRole(
 				roleKey = "Web Content Subscriber Role",

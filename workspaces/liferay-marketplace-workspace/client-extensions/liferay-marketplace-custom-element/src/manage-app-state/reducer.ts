@@ -96,14 +96,11 @@ export function appReducer(state: InitialStateProps, action: TAction) {
 			return {...state, appName};
 		}
 		case TYPES.UPDATE_APP_NOTES: {
-			const {id, value} = action.payload;
+			const {value} = action.payload;
 
 			return {
 				...state,
-				appNotes: {
-					id,
-					value,
-				},
+				appNotes: value,
 			};
 		}
 		case TYPES.UPDATE_APP_PRICE_MODEL: {
@@ -160,16 +157,47 @@ export function appReducer(state: InitialStateProps, action: TAction) {
 			};
 		}
 		case TYPES.UPDATE_APP_VERSION: {
-			const {id, value} = action.payload;
+			const {value} = action.payload;
 
 			return {
 				...state,
-				appVersion: {
-					id,
-					value,
-				},
+				appVersion: value,
 			};
 		}
+
+		case TYPES.UPDATE_OPTION_ID: {
+			const optionId = action.payload.value;
+
+			return {...state, optionId};
+		}
+
+		case TYPES.UPDATE_PRODUCT_OPTION_ID: {
+			const productOptionId = action.payload.value;
+
+			return {...state, productOptionId};
+		}
+
+		case TYPES.UPDATE_PRODUCT_OPTION_VALUES_ID: {
+			const noOptionId = action.payload.noOptionId;
+			const yesOptionId = action.payload.yesOptionId;
+
+			const optionValuesId = {noOptionId, yesOptionId};
+
+			return {...state, optionValuesId};
+		}
+
+		case TYPES.UPDATE_SKU_TRIAL_ID: {
+			const skuTrialId = action.payload.value;
+
+			return {...state, skuTrialId};
+		}
+
+		case TYPES.UPDATE_SKU_VERSION_ID: {
+			const skuVersionId = action.payload.value;
+
+			return {...state, skuVersionId};
+		}
+
 		default:
 			return state;
 	}

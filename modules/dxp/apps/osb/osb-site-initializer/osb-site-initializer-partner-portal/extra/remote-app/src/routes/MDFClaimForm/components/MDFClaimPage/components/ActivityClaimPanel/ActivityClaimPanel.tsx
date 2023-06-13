@@ -19,6 +19,7 @@ import PRMForm from '../../../../../../common/components/PRMForm';
 import InputMultipleFilesListing from '../../../../../../common/components/PRMForm/components/fields/InputMultipleFilesListing';
 import PRMFormik from '../../../../../../common/components/PRMFormik';
 import {useWebDAV} from '../../../../../../common/context/WebDAV';
+import LiferayFile from '../../../../../../common/interfaces/liferayFile';
 import MDFClaim from '../../../../../../common/interfaces/mdfClaim';
 import MDFClaimActivity from '../../../../../../common/interfaces/mdfClaimActivity';
 import {Status} from '../../../../../../common/utils/constants/status';
@@ -82,7 +83,7 @@ const ActivityClaimPanel = ({
 	return (
 		<>
 			<ClayPanel
-				className="border-brand-primary-lighten-2 mb-4 text-neutral-7"
+				className="bg-neutral-1 border-brand-primary-lighten-2 mb-4 text-neutral-7"
 				displayType="secondary"
 				expanded={activity.selected && expanded}
 			>
@@ -109,7 +110,7 @@ const ActivityClaimPanel = ({
 						</p>
 
 						<h5 className="text-neutral-10">
-							{activity.name} ({activity.id})
+							{`${activity.name} (${activity.r_actToMDFClmActs_c_activityId})`}
 						</h5>
 
 						<div className="align-items-center d-sm-flex mb-1 text-neutral-7 text-weight-semi-bold">
@@ -156,7 +157,7 @@ const ActivityClaimPanel = ({
 				</PanelHeader>
 
 				<PanelBody expanded={activity.selected && expanded}>
-					<ClayPanel.Body className="mx-2 pt-4 px-5">
+					<ClayPanel.Body className="mx-2 px-5 py-5">
 						{activity.budgets?.map((budget, index) => (
 							<BudgetClaimPanel
 								activityIndex={activityIndex}
@@ -180,10 +181,10 @@ const ActivityClaimPanel = ({
 								description="You can downloaded the Excel Template, fill it out, and upload it back here"
 								displayType="secondary"
 								label="List of Qualified Leads"
-								name={`activities[${activityIndex}].listQualifiedLeads`}
+								name={`activities[${activityIndex}].listOfQualifiedLeads`}
 								onAccept={(value: File) =>
 									setFieldValue(
-										`activities[${activityIndex}].listQualifiedLeads`,
+										`activities[${activityIndex}].listOfQualifiedLeads`,
 										value
 									)
 								}
@@ -191,7 +192,7 @@ const ActivityClaimPanel = ({
 								small
 							/>
 
-							<div className="mb-3">
+							<div className="bg-neutral-0 mb-3">
 								<Link
 									button
 									displayType="secondary"
@@ -200,7 +201,7 @@ const ActivityClaimPanel = ({
 									small
 									target="_blank"
 								>
-									<span className="inline-item inline-item-before">
+									<span className="bg-neutral-0 inline-item inline-item-before">
 										<ClayIcon symbol="download" />
 									</span>
 									Download template
@@ -211,16 +212,18 @@ const ActivityClaimPanel = ({
 						<InputMultipleFilesListing
 							description="Drag and drop your files here to upload."
 							label="All Contents"
-							name={`activities[${activityIndex}].documents`}
+							name={`activities[${activityIndex}].allContents`}
 							onAccept={(value: File[]) =>
 								setFieldValue(
-									`activities[${activityIndex}].documents`,
-									activity.documents
-										? activity.documents.concat(value)
+									`activities[${activityIndex}].allContents`,
+									activity.allContents
+										? activity.allContents.concat(
+												value as LiferayFile[]
+										  )
 										: value
 								)
 							}
-							value={activity.documents}
+							value={activity.allContents}
 						/>
 					</ClayPanel.Body>
 				</PanelBody>

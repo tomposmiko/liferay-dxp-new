@@ -77,6 +77,10 @@ public class AvailabilityLabelInfoItemRenderer
 		}
 
 		try {
+			RequestDispatcher requestDispatcher =
+				_servletContext.getRequestDispatcher(
+					"/info/item/renderer/availability_label/page.jsp");
+
 			CPDefinitionInventory cpDefinitionInventory =
 				_cpDefinitionInventoryLocalService.
 					fetchCPDefinitionInventoryByCPDefinitionId(
@@ -141,10 +145,6 @@ public class AvailabilityLabelInfoItemRenderer
 							"default"));
 				}
 			}
-
-			RequestDispatcher requestDispatcher =
-				_servletContext.getRequestDispatcher(
-					"/info/item/renderer/availability_label/page.jsp");
 
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
 		}

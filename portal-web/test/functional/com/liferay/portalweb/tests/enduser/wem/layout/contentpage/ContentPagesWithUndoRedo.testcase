@@ -669,9 +669,6 @@ definition {
 	@priority = 5
 	@uitest
 	test UndoInteractionStatesHundredTimes {
-		property custom.properties = "session.timeout=30";
-		property web.xml.timeout = "30";
-
 		task ("Add a Tabs fragment to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
@@ -683,10 +680,16 @@ definition {
 		}
 
 		task ("Change the number of Tabs 19 times") {
-			for (var i : list "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19") {
-				PageEditor.editTabs(
-					numberOfTabs = ${i},
-					panel = "General");
+			PageEditor.editTabs(
+				numberOfTabs = 1,
+				panel = "General");
+
+			var i = 2;
+
+			while ((${i} != 20) && (maxIterations = "30")) {
+				PageEditor.configureFragment(numberOfTabs = ${i});
+
+				var i = ${i} + 1;
 			}
 		}
 
@@ -701,10 +704,16 @@ definition {
 		}
 
 		task ("Change the number of Tabs 18 times") {
-			for (var i : list "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18") {
-				PageEditor.editTabs(
-					numberOfTabs = ${i},
-					panel = "General");
+			PageEditor.editTabs(
+				numberOfTabs = 1,
+				panel = "General");
+
+			var i = 2;
+
+			while ((${i} != 19) && (maxIterations = "30")) {
+				PageEditor.configureFragment(numberOfTabs = ${i});
+
+				var i = ${i} + 1;
 			}
 		}
 
@@ -719,10 +728,16 @@ definition {
 		}
 
 		task ("Change the number of Tabs 18 times") {
-			for (var i : list "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18") {
-				PageEditor.editTabs(
-					numberOfTabs = ${i},
-					panel = "General");
+			PageEditor.editTabs(
+				numberOfTabs = 1,
+				panel = "General");
+
+			var i = 2;
+
+			while ((${i} != 19) && (maxIterations = "30")) {
+				PageEditor.configureFragment(numberOfTabs = ${i});
+
+				var i = ${i} + 1;
 			}
 		}
 
@@ -737,10 +752,16 @@ definition {
 		}
 
 		task ("Change the number of Tabs 18 times") {
-			for (var i : list "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18") {
-				PageEditor.editTabs(
-					numberOfTabs = ${i},
-					panel = "General");
+			PageEditor.editTabs(
+				numberOfTabs = 1,
+				panel = "General");
+
+			var i = 2;
+
+			while ((${i} != 19) && (maxIterations = "30")) {
+				PageEditor.configureFragment(numberOfTabs = ${i});
+
+				var i = ${i} + 1;
 			}
 		}
 
@@ -755,10 +776,16 @@ definition {
 		}
 
 		task ("Change the number of Tabs 19 times") {
-			for (var i : list "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19") {
-				PageEditor.editTabs(
-					numberOfTabs = ${i},
-					panel = "General");
+			PageEditor.editTabs(
+				numberOfTabs = 1,
+				panel = "General");
+
+			var i = 2;
+
+			while ((${i} != 20) && (maxIterations = "30")) {
+				PageEditor.configureFragment(numberOfTabs = ${i});
+
+				var i = ${i} + 1;
 			}
 		}
 

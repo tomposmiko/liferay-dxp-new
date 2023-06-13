@@ -344,7 +344,7 @@
 </tr>
 <tr>
 	<td>REPEATABLE_HELP_TEXT</td>
-	<td>//div[contains(@class,'form-container')]//div[contains(@data-field-name,'${key_fieldName}')][${key_repeatableFieldNumber}]//p[@class='liferay-ddm-form-field-tip'] | //div[contains(@class,'form-container')]//div[contains(@data-field-name,'${key_fieldName}')][${key_repeatableFieldNumber}]//span</td>
+	<td>//div[contains(@class,'form-container')]//div[contains(@data-field-name,'${key_fieldName}')][${key_repeatableFieldNumber}]//div[contains(@id,'fieldHelp')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -1199,14 +1199,6 @@
 <tr>
 	<td>IMAGE_TABLE_ENTRY</td>
 	<td>//td[contains(@class,'lfr-image-column')]</td>
-	<td></td>
-</tr>
-
-<!--TRANSLATION-->
-
-<tr>
-	<td>TRANSLATION_LIST</td>
-	<td>xpath=//ul[@class='nav nav-underline lfr-translationmanager']//li[@class='nav-item'][${key_position}]/..//span[contains(text(),'${key_language}')]</td>
 	<td></td>
 </tr>
 

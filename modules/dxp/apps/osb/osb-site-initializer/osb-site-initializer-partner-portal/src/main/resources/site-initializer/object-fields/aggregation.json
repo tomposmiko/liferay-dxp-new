@@ -3,6 +3,7 @@
 		{
 			"DBType": "String",
 			"businessType": "Aggregation",
+			"externalReferenceCode": "42ae3c76-3488-435a-bc43-d20d0a25fb2d",
 			"indexed": true,
 			"indexedAsKeyword": false,
 			"label": {
@@ -20,7 +21,7 @@
 				},
 				{
 					"name": "objectFieldName",
-					"value": "amountClaimed"
+					"value": "totalClaimAmount"
 				}
 			],
 			"required": false,

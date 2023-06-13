@@ -1,10 +1,12 @@
 import {useEffect, useState} from 'react';
 
+import brightnessEmptyIcon from '../../assets/icons/brightness-empty.svg';
 import documentationIcon from '../../assets/icons/documentation-icon.svg';
 import emptyImage from '../../assets/icons/emptyImage.svg';
 import globeIcon from '../../assets/icons/globe-icon.svg';
 import guideIcon from '../../assets/icons/guide-icon.svg';
 import phoneIcon from '../../assets/icons/phone-icon.svg';
+import scheduleIcon from '../../assets/icons/schedule-icon.svg';
 import usageTermsIcon from '../../assets/icons/usage-terms-icon.svg';
 import {Checkbox} from '../../components/Checkbox/Checkbox';
 import {Header} from '../../components/Header/Header';
@@ -16,9 +18,10 @@ import {
 	getProduct,
 	getProductSKU,
 	getProductSpecifications,
+	getProductSubscriptionConfiguration,
 } from '../../utils/api';
 import {CardSection} from './CardSection';
-import {initialReviewAndSubmitAppPageItems} from './ReviewAndSubmitAppPageUtil';
+import {ReviewAndSubmitAppPageUtilProps} from './ReviewAndSubmitAppPageUtil';
 
 import './ReviewAndSubmitAppPage.scss';
 
@@ -52,11 +55,11 @@ export function ReviewAndSubmitAppPage({
 	const [notes, setNotes] = useState('');
 	const [appLicense, setAppLicense] = useState('');
 
-	// const [price, setPrice] = useState('');
-
 	const [cardInfos, setCardInfos] = useState<
 		{icon: string; link: string; title: string}[]
 	>([]);
+	const [reviewAndSubmitAppPageItems, setReviewAndSubmitAppPageItems] =
+		useState<ReviewAndSubmitAppPageUtilProps[]>([]);
 
 	const buildZIPTitles = buildZIPFiles?.map(
 		(buildZIPFile) => buildZIPFile.fileName
@@ -68,11 +71,96 @@ export function ReviewAndSubmitAppPage({
 				appERC,
 			});
 
+			const productCategories = {
+				section: 'Categories',
+				tags: productResponse.categories
+					.filter((category: any) => {
+						return (
+							category.vocabulary ===
+							'marketplace-solution-category'
+						);
+					})
+					.map((category: any) => {
+						return category.name;
+					}),
+			};
+
+			const productTags = {
+				section: 'Tags',
+				tags: productResponse.categories
+					.filter((tag: any) => {
+						return tag.vocabulary === 'marketplace-solution-tags';
+					})
+					.map((tag: any) => {
+						return tag.name;
+					}),
+			};
+
 			const skuResponse = await getProductSKU({
 				appProductId,
 			});
 
-			// setPrice(skuResponse.items[0]?.price);
+			dispatch({
+				payload: {
+					value: skuResponse.items[0]?.price === 0 ? 'Free' : 'Paid',
+				},
+				type: TYPES.UPDATE_APP_PRICE_MODEL,
+			});
+
+			const pricing = {
+				icon: brightnessEmptyIcon,
+				section: 'Pricing',
+				title: priceModel,
+			};
+
+			dispatch({
+				payload: {
+					value: skuResponse.items[0]?.price,
+				},
+				type: TYPES.UPDATE_APP_LICENSE_PRICE,
+			});
+
+			const productSubscriptionConfigurationResponse =
+				await getProductSubscriptionConfiguration({
+					appERC,
+				});
+
+			const licensing = {
+				description:
+					productSubscriptionConfigurationResponse.subscriptionType
+						? 'License must be renewed annually.'
+						: 'License never expires.',
+				icon: scheduleIcon,
+				section: 'Licensing',
+				title: productSubscriptionConfigurationResponse.subscriptionType
+					? 'Non-Perpetual License'
+					: 'Perpetual License',
+			};
+
+			const storefront = {
+				section: 'Storefront',
+			};
+
+			const versioning = {
+				description: notes,
+				section: 'Version',
+				title: 'Release Notes',
+				version,
+			};
+
+			const supportHelp = {
+				section: 'Support & Help',
+			};
+
+			setReviewAndSubmitAppPageItems([
+				productCategories,
+				productTags,
+				pricing,
+				licensing,
+				storefront,
+				versioning,
+				supportHelp,
+			]);
 
 			const productSpecificationsResponse =
 				await getProductSpecifications({
@@ -222,84 +310,78 @@ export function ReviewAndSubmitAppPage({
 							sectionName="Description"
 						/>
 
-						{initialReviewAndSubmitAppPageItems.map(
-							(item, index) => {
-								const cardTitle = () => {
-									if (item.section === 'Pricing') {
-										return priceModel;
-									}
-									else if (item.section === 'Licensing') {
-										return appLicense;
-									}
-									else if (item.section === 'Version') {
-										return item.title;
-									}
-								};
+						{reviewAndSubmitAppPageItems.map((item, index) => {
+							const cardTitle = () => {
+								if (item.section === 'Pricing') {
+									return priceModel;
+								}
+								else if (item.section === 'Licensing') {
+									return item.title;
+								}
+								else if (item.section === 'Version') {
+									return item.title;
+								}
+							};
 
-								const cardDescription = () => {
-									if (item.section === 'Pricing') {
-										if (priceModel === 'free') {
-											return 'The app is offered in the Marketplace with no charge.';
-										}
-										else {
-											return 'To enable paid apps, you must be a business and enter payment information in your Marketplace account profile.';
-										}
+							const cardDescription = () => {
+								if (item.section === 'Pricing') {
+									if (priceModel === 'free') {
+										return 'The app is offered in the Marketplace with no charge.';
 									}
 									else {
-										return item.description;
+										return 'To enable paid apps, you must be a business and enter payment information in your Marketplace account profile.';
 									}
-								};
+								}
+								else {
+									return item.description;
+								}
+							};
 
-								const description = () => {
-									if (item.section === 'Version') {
-										return notes;
-									}
-									else {
-										return item.description;
-									}
-								};
+							const description = () => {
+								if (item.section === 'Version') {
+									return notes;
+								}
+								else {
+									return item.description;
+								}
+							};
 
-								return (
-									<CardSection
-										build={item.section === 'Build'}
-										buildZIPTitles={buildZIPTitles}
-										cardDescription={cardDescription()}
-										cardInfos={cardInfos}
-										cardLink={
-											item.section === 'Support & Help'
-										}
-										cardTags={item.cardTags}
-										cardTitle={cardTitle()}
-										cardView={
-											item.section === 'Pricing' ||
-											item.section === 'Licensing'
-										}
-										description={description()}
-										enableEdit={!readonly}
-										files={appStorefrontImages}
-										icon={item.icon}
-										key={index}
-										price={appLicensePrice}
-										required
-										sectionName={item.section}
-										storefront={
-											item.section === 'Storefront'
-										}
-										tags={item.tags}
-										title={
-											item.section === 'Build'
-												? item.fileName
-												: item.title
-										}
-										version={
-											item.section === 'Version'
-												? version
-												: null
-										}
-									/>
-								);
-							}
-						)}
+							return (
+								<CardSection
+									build={false}
+									buildZIPTitles={buildZIPTitles}
+									cardDescription={cardDescription()}
+									cardInfos={cardInfos}
+									cardLink={item.section === 'Support & Help'}
+									cardTags={item.cardTags}
+									cardTitle={cardTitle()}
+									cardView={
+										item.section === 'Pricing' ||
+										item.section === 'Licensing'
+									}
+									description={description()}
+									enableEdit={!readonly}
+									files={appStorefrontImages}
+									icon={item.icon}
+									key={index}
+									price={appLicensePrice}
+									required
+									sectionName={item.section}
+									storefront={item.section === 'Storefront'}
+									tags={item.tags}
+									title={
+										item.section === 'Build'
+											? item.fileName
+											: item.title
+									}
+									version={
+										item.section === 'Version'
+											? version
+											: null
+									}
+								/>
+							);
+						})}
 					</div>
 				</div>
 			</Section>

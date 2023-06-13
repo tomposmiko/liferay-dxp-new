@@ -35,6 +35,7 @@ import com.liferay.gradle.plugins.workspace.internal.client.extension.NodeBuildC
 import com.liferay.gradle.plugins.workspace.internal.client.extension.ThemeCSSTypeConfigurer;
 import com.liferay.gradle.plugins.workspace.internal.util.GradleUtil;
 import com.liferay.gradle.plugins.workspace.task.CreateClientExtensionConfigTask;
+import com.liferay.gradle.util.Validator;
 import com.liferay.petra.string.StringBundler;
 
 import groovy.lang.Closure;
@@ -72,7 +73,6 @@ import org.gradle.api.artifacts.dsl.ArtifactHandler;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.file.DirectoryProperty;
-import org.gradle.api.file.RelativePath;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.BasePlugin;
@@ -99,6 +99,9 @@ public class ClientExtensionProjectConfigurator
 	public static final String BUILD_CLIENT_EXTENSION_ZIP_TASK_NAME =
 		"buildClientExtensionZip";
 
+	public static final String CLIENT_EXTENSION_BUILD_DIR =
+		"liferay-client-extension-build";
+
 	public static final String CREATE_CLIENT_EXTENSION_CONFIG_TASK_NAME =
 		"createClientExtensionConfig";
 
@@ -112,6 +115,8 @@ public class ClientExtensionProjectConfigurator
 			Collections.singletonList(new ConfigurationTypeConfigurer()));
 		_clientExtensionConfigurers.put(
 			"customElement", Collections.singletonList(nodeBuildConfigurer));
+		_clientExtensionConfigurers.put(
+			"fdsCellRenderer", Collections.singletonList(nodeBuildConfigurer));
 		_clientExtensionConfigurers.put(
 			"globalCSS", Collections.singletonList(nodeBuildConfigurer));
 		_clientExtensionConfigurers.put(
@@ -170,14 +175,14 @@ public class ClientExtensionProjectConfigurator
 				entry -> {
 					String id = entry.getKey();
 
-					if (Objects.equals("assemble", id)) {
+					if (Objects.equals(id, "assemble")) {
 						JsonNode assembleJsonNode = entry.getValue();
 
 						_configureAssembleClientExtensionTask(
 							project, assembleClientExtensionTaskProvider,
 							assembleJsonNode);
 					}
-					else if (Objects.equals("runtime", id)) {
+					else if (Objects.equals(id, "runtime")) {
 						JsonNode runtimeJsonNode = entry.getValue();
 
 						JsonNode runtimeTypeJsonNode = runtimeJsonNode.get(
@@ -213,9 +218,7 @@ public class ClientExtensionProjectConfigurator
 
 							clientExtension.id = id;
 
-							if ((clientExtension.type == null) ||
-								clientExtension.type.isEmpty()) {
-
+							if (Validator.isNull(clientExtension.type)) {
 								clientExtension.type = id;
 							}
 
@@ -223,6 +226,8 @@ public class ClientExtensionProjectConfigurator
 								clientExtension.id, clientExtension.type);
 
 							clientExtension.projectName = project.getName();
+
+							_validateClientExtension(clientExtension);
 
 							createClientExtensionConfigTaskProvider.configure(
 								createClientExtensionConfigTask ->
@@ -474,6 +479,8 @@ public class ClientExtensionProjectConfigurator
 								}
 							}
 
+							copySpec.exclude(CLIENT_EXTENSION_BUILD_DIR);
+
 							if (intoJsonNode != null) {
 								copySpec.into(intoJsonNode.asText());
 							}
@@ -502,24 +509,10 @@ public class ClientExtensionProjectConfigurator
 
 		assembleClientExtensionTaskProvider.configure(
 			copy -> {
-				copy.from(
-					createClientExtensionConfigTaskProvider,
-					spec -> spec.eachFile(
-						fileCopyDetails -> {
-							File buildDir = project.getBuildDir();
-
-							File file = fileCopyDetails.getFile();
-
-							Path buildPath = buildDir.toPath();
-
-							Path relativePath = buildPath.relativize(
-								file.toPath());
-
-							fileCopyDetails.setRelativePath(
-								new RelativePath(
-									false, relativePath.toString()));
-						}));
-				copy.into(new File(project.getBuildDir(), "clientExtension"));
+				copy.dependsOn(CREATE_CLIENT_EXTENSION_CONFIG_TASK_NAME);
+				copy.into(
+					new File(
+						project.getBuildDir(), CLIENT_EXTENSION_BUILD_DIR));
 			});
 
 		buildClientExtensionZipTaskProvider.configure(
@@ -679,6 +672,31 @@ public class ClientExtensionProjectConfigurator
 	private File _getZipFile(Project project) {
 		return project.file(
 			"dist/" + GradleUtil.getArchivesBaseName(project) + ".zip");
+	}
+
+	private void _validateClientExtension(ClientExtension clientExtension) {
+		if (Objects.equals(clientExtension.type, "batch")) {
+			if (!clientExtension.typeSettings.containsKey(
+					"oAuthApplicationHeadlessServer")) {
+
+				throw new GradleException(
+					StringBundler.concat(
+						"Client extension ", clientExtension.id, " with type ",
+						clientExtension.type, " must define the property ",
+						"\"oAuthApplicationHeadlessServer\""));
+			}
+		}
+		else if (Objects.equals(
+					clientExtension.type, "instanceConfiguration")) {
+
+			if (!clientExtension.typeSettings.containsKey("pid")) {
+				throw new GradleException(
+					StringBundler.concat(
+						"Client extension ", clientExtension.id, " with type ",
+						clientExtension.type,
+						" must define the property \"pid\""));
+			}
+		}
 	}
 
 	private static final String _CLIENT_EXTENSION_YAML =

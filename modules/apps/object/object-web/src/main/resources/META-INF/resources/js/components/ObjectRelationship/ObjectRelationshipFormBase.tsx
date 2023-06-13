@@ -116,7 +116,7 @@ export function ObjectRelationshipFormBase({
 	>();
 
 	const [objectDefinitions, setObjectDefinitions] = useState<
-		ObjectDefinition[]
+		Partial<ObjectDefinition>[]
 	>([]);
 	const [query, setQuery] = useState<string>('');
 
@@ -151,11 +151,24 @@ export function ObjectRelationshipFormBase({
 			)!;
 
 			const objectDefinitions = items.filter(
-				({parameterRequired, storageType, system}) =>
-					(!currentObjectDefinition.system || !system) &&
-					(!Liferay.FeatureFlags['LPS-135430'] ||
-						storageType === 'default') &&
-					!parameterRequired
+				({modifiable, parameterRequired, storageType, system}) => {
+					if (Liferay.FeatureFlags['LPS-167253']) {
+						return (
+							(currentObjectDefinition.modifiable ||
+								modifiable) &&
+							(!Liferay.FeatureFlags['LPS-135430'] ||
+								storageType === 'default') &&
+							!parameterRequired
+						);
+					}
+
+					return (
+						(!currentObjectDefinition.system || !system) &&
+						(!Liferay.FeatureFlags['LPS-135430'] ||
+							storageType === 'default') &&
+						!parameterRequired
+					);
+				}
 			);
 
 			setCreationLanguageId(currentObjectDefinition.defaultLanguageId);
@@ -211,7 +224,7 @@ export function ObjectRelationshipFormBase({
 				value={selectedType}
 			/>
 
-			<AutoComplete<ObjectDefinition>
+			<AutoComplete<Partial<ObjectDefinition>>
 				creationLanguageId={
 					creationLanguageId as Liferay.Language.Locale
 				}
@@ -271,11 +284,3 @@ interface IPros {
 	setValues: (values: Partial<ObjectRelationship>) => void;
 	values: Partial<ObjectRelationship>;
 }
-
-type ObjectDefinition = {
-	externalReferenceCode: string;
-	id: number;
-	label: LocalizedValue<string>;
-	name: string;
-	system: boolean;
-};

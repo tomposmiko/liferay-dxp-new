@@ -38,18 +38,13 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.scheduler.JobState;
 import com.liferay.portal.kernel.scheduler.SchedulerEngine;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
-import com.liferay.portal.kernel.scheduler.SchedulerEntry;
-import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
 import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.scheduler.SchedulerJobConfiguration;
 import com.liferay.portal.kernel.scheduler.StorageType;
-import com.liferay.portal.kernel.scheduler.StorageTypeAware;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerConfiguration;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import com.liferay.portal.kernel.scheduler.TriggerState;
-import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListener;
-import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.InetAddressUtil;
@@ -63,10 +58,10 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -265,33 +260,6 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 	}
 
 	@Override
-	public void register(
-		MessageListener messageListener, SchedulerEntry schedulerEntry,
-		String destinationName) {
-
-		Dictionary<String, Object> properties =
-			HashMapDictionaryBuilder.<String, Object>put(
-				"destination.name", destinationName
-			).build();
-
-		SchedulerEventMessageListenerWrapper
-			schedulerEventMessageListenerWrapper =
-				new SchedulerEventMessageListenerWrapper();
-
-		schedulerEventMessageListenerWrapper.setMessageListener(
-			messageListener);
-
-		schedulerEventMessageListenerWrapper.setSchedulerEntry(schedulerEntry);
-
-		ServiceRegistration<SchedulerEventMessageListener> serviceRegistration =
-			_bundleContext.registerService(
-				SchedulerEventMessageListener.class,
-				schedulerEventMessageListenerWrapper, properties);
-
-		_serviceRegistrations.put(messageListener, serviceRegistration);
-	}
-
-	@Override
 	public void resume(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
@@ -338,16 +306,6 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 	}
 
 	@Override
-	public void unregister(MessageListener messageListener) {
-		ServiceRegistration<?> serviceRegistration =
-			_serviceRegistrations.remove(messageListener);
-
-		if (serviceRegistration != null) {
-			serviceRegistration.unregister();
-		}
-	}
-
-	@Override
 	public void unschedule(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
@@ -374,18 +332,36 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			_bundleContext, DestinationConfiguration.DESTINATION_TYPE_PARALLEL,
 			DestinationNames.SCHEDULER_SCRIPTING);
 
-		SchedulerEventMessageListenerWrapper
-			schedulerEventMessageListenerWrapper =
-				new SchedulerEventMessageListenerWrapper();
+		ScriptingMessageListener scriptingMessageListener =
+			new ScriptingMessageListener();
 
-		schedulerEventMessageListenerWrapper.setMessageListener(
-			new ScriptingMessageListener());
+		SchedulerJobConfigurationMessageListener
+			schedulerJobConfigurationMessageListener =
+				new SchedulerJobConfigurationMessageListener(
+					new SchedulerJobConfiguration() {
 
-		scriptingDestination.register(schedulerEventMessageListenerWrapper);
+						@Override
+						public UnsafeConsumer<Message, Exception>
+							getJobExecutorUnsafeConsumer() {
 
-		_serviceTracker = ServiceTrackerFactory.open(
-			_bundleContext, SchedulerEventMessageListener.class,
-			new SchedulerEventMessageListenerServiceTrackerCustomizer());
+							return scriptingMessageListener::receive;
+						}
+
+						@Override
+						public UnsafeRunnable<Exception>
+							getJobExecutorUnsafeRunnable() {
+
+							return null;
+						}
+
+						@Override
+						public TriggerConfiguration getTriggerConfiguration() {
+							return null;
+						}
+
+					});
+
+		scriptingDestination.register(schedulerJobConfigurationMessageListener);
 
 		_schedulerJobConfigurationServiceTracker = ServiceTrackerFactory.open(
 			_bundleContext, SchedulerJobConfiguration.class,
@@ -407,10 +383,6 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 
 		_schedulerJobConfigurationServiceTracker.close();
 
-		if (_serviceTracker != null) {
-			_serviceTracker.close();
-		}
-
 		try {
 			_schedulerEngine.shutdown();
 		}
@@ -429,12 +401,6 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			serviceRegistration.unregister();
 
 			destination.destroy();
-		}
-
-		for (ServiceRegistration<SchedulerEventMessageListener>
-				serviceRegistration : _serviceRegistrations.values()) {
-
-			serviceRegistration.unregister();
 		}
 
 		_bundleContext = null;
@@ -508,138 +474,81 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 		_schedulerEngineHelperConfiguration;
 	private ServiceTracker<SchedulerJobConfiguration, SchedulerJobConfiguration>
 		_schedulerJobConfigurationServiceTracker;
-	private final Map
-		<MessageListener, ServiceRegistration<SchedulerEventMessageListener>>
-			_serviceRegistrations = new ConcurrentHashMap<>();
-	private volatile ServiceTracker
-		<SchedulerEventMessageListener, SchedulerEventMessageListener>
-			_serviceTracker;
 
 	@Reference
 	private TriggerFactory _triggerFactory;
 
-	private class SchedulerEventMessageListenerServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer
-			<SchedulerEventMessageListener, SchedulerEventMessageListener> {
+	private class SchedulerJobConfigurationMessageListener
+		implements MessageListener {
 
 		@Override
-		public SchedulerEventMessageListener addingService(
-			ServiceReference<SchedulerEventMessageListener> serviceReference) {
+		public void receive(Message message) throws MessageListenerException {
+			if (Objects.equals(
+					DestinationNames.SCHEDULER_DISPATCH,
+					message.getString(SchedulerEngine.DESTINATION_NAME)) &&
+				(!Objects.equals(
+					_schedulerJobConfiguration.getName(),
+					message.getString(SchedulerEngine.GROUP_NAME)) ||
+				 !Objects.equals(
+					 _schedulerJobConfiguration.getName(),
+					 message.getString(SchedulerEngine.JOB_NAME)))) {
 
-			Bundle bundle = serviceReference.getBundle();
-
-			BundleContext bundleContext = bundle.getBundleContext();
-
-			SchedulerEventMessageListener schedulerEventMessageListener =
-				bundleContext.getService(serviceReference);
-
-			SchedulerEntry schedulerEntry =
-				schedulerEventMessageListener.getSchedulerEntry();
-
-			if ((schedulerEntry == null) ||
-				(schedulerEntry.getTrigger() == null)) {
-
-				return null;
+				return;
 			}
-
-			StorageType storageType = StorageType.MEMORY_CLUSTERED;
-
-			if (schedulerEntry instanceof StorageTypeAware) {
-				StorageTypeAware storageTypeAware =
-					(StorageTypeAware)schedulerEntry;
-
-				storageType = storageTypeAware.getStorageType();
-			}
-
-			String destinationName = (String)serviceReference.getProperty(
-				"destination.name");
-
-			if (Validator.isNull(destinationName)) {
-				destinationName = DestinationNames.SCHEDULER_DISPATCH;
-			}
-
-			ClusterableContextThreadLocal.putThreadLocalContext(
-				SchedulerEngine.SCHEDULER_CLUSTER_INVOKING, false);
 
 			try {
-				schedule(
-					schedulerEntry.getTrigger(), storageType,
-					schedulerEntry.getDescription(), destinationName, null);
+				UnsafeConsumer<Message, Exception> unsafeConsumer =
+					_schedulerJobConfiguration.getJobExecutorUnsafeConsumer();
 
-				_messageListenerServiceRegistrations.put(
-					schedulerEntry.getEventListenerClass(),
-					bundleContext.registerService(
-						MessageListener.class, schedulerEventMessageListener,
-						HashMapDictionaryBuilder.<String, Object>put(
-							"destination.name", destinationName
-						).build()));
+				if (unsafeConsumer != null) {
+					unsafeConsumer.accept(message);
+				}
+				else {
+					long companyId = message.getLong("companyId");
 
-				return schedulerEventMessageListener;
+					if (companyId == CompanyConstants.SYSTEM) {
+						UnsafeRunnable<Exception> jobExecutorUnsafeRunnable =
+							_schedulerJobConfiguration.
+								getJobExecutorUnsafeRunnable();
+
+						jobExecutorUnsafeRunnable.run();
+					}
+					else {
+						UnsafeConsumer<Long, Exception>
+							companyJobExecutorUnsafeConsumer =
+								_schedulerJobConfiguration.
+									getCompanyJobExecutorUnsafeConsumer();
+
+						companyJobExecutorUnsafeConsumer.accept(companyId);
+					}
+				}
 			}
-			catch (SchedulerException schedulerException) {
-				_log.error(schedulerException);
-			}
-			finally {
-				ClusterableContextThreadLocal.putThreadLocalContext(
-					SchedulerEngine.SCHEDULER_CLUSTER_INVOKING, true);
-			}
+			catch (Exception exception) {
+				if (exception instanceof MessageListenerException) {
+					throw (MessageListenerException)exception;
+				}
 
-			return null;
-		}
-
-		@Override
-		public void modifiedService(
-			ServiceReference<SchedulerEventMessageListener> serviceReference,
-			SchedulerEventMessageListener schedulerEventMessageListener) {
-		}
-
-		@Override
-		public void removedService(
-			ServiceReference<SchedulerEventMessageListener> serviceReference,
-			SchedulerEventMessageListener schedulerEntryMessageListener) {
-
-			Bundle bundle = serviceReference.getBundle();
-
-			BundleContext bundleContext = bundle.getBundleContext();
-
-			bundleContext.ungetService(serviceReference);
-
-			SchedulerEntry schedulerEntry =
-				schedulerEntryMessageListener.getSchedulerEntry();
-
-			StorageType storageType = StorageType.MEMORY_CLUSTERED;
-
-			if (schedulerEntry instanceof StorageTypeAware) {
-				StorageTypeAware storageTypeAware =
-					(StorageTypeAware)schedulerEntry;
-
-				storageType = storageTypeAware.getStorageType();
-			}
-
-			ClusterableContextThreadLocal.putThreadLocalContext(
-				SchedulerEngine.SCHEDULER_CLUSTER_INVOKING, false);
-
-			Trigger trigger = schedulerEntry.getTrigger();
-
-			try {
-				delete(
-					trigger.getJobName(), trigger.getGroupName(), storageType);
-			}
-			catch (SchedulerException schedulerException) {
-				_log.error(schedulerException);
+				throw new MessageListenerException(exception);
 			}
 			finally {
-				ClusterableContextThreadLocal.putThreadLocalContext(
-					SchedulerEngine.SCHEDULER_CLUSTER_INVOKING, true);
+				try {
+					auditSchedulerJobs(message, TriggerState.NORMAL);
+				}
+				catch (Exception exception) {
+					if (_log.isInfoEnabled()) {
+						_log.info("Unable to send audit message", exception);
+					}
+				}
 			}
-
-			ServiceRegistration<MessageListener>
-				messageListenerServiceRegistration =
-					_messageListenerServiceRegistrations.remove(
-						schedulerEntry.getEventListenerClass());
-
-			messageListenerServiceRegistration.unregister();
 		}
+
+		private SchedulerJobConfigurationMessageListener(
+			SchedulerJobConfiguration schedulerJobConfiguration) {
+
+			_schedulerJobConfiguration = schedulerJobConfiguration;
+		}
+
+		private final SchedulerJobConfiguration _schedulerJobConfiguration;
 
 	}
 
@@ -673,41 +582,6 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 					triggerConfiguration.getTimeUnit());
 			}
 
-			SchedulerEventMessageListenerWrapper
-				schedulerEventMessageListenerWrapper =
-					new SchedulerEventMessageListenerWrapper();
-
-			schedulerEventMessageListenerWrapper.setMessageListener(
-				message -> {
-					long companyId = message.getLong("companyId");
-
-					try {
-						if (companyId == CompanyConstants.SYSTEM) {
-							UnsafeRunnable<Exception>
-								jobExecutorUnsafeRunnable =
-									schedulerJobConfiguration.
-										getJobExecutorUnsafeRunnable();
-
-							jobExecutorUnsafeRunnable.run();
-						}
-						else {
-							UnsafeConsumer<Long, Exception>
-								companyJobExecutorUnsafeConsumer =
-									schedulerJobConfiguration.
-										getCompanyJobExecutorUnsafeConsumer();
-
-							companyJobExecutorUnsafeConsumer.accept(companyId);
-						}
-					}
-					catch (Exception exception) {
-						throw new MessageListenerException(exception);
-					}
-				});
-
-			schedulerEventMessageListenerWrapper.setSchedulerEntry(
-				new SchedulerEntryImpl(
-					schedulerJobConfiguration.getName(), trigger));
-
 			ClusterableContextThreadLocal.putThreadLocalContext(
 				SchedulerEngine.SCHEDULER_CLUSTER_INVOKING, false);
 
@@ -720,7 +594,8 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 					schedulerJobConfiguration.getName(),
 					_bundleContext.registerService(
 						MessageListener.class,
-						schedulerEventMessageListenerWrapper,
+						new SchedulerJobConfigurationMessageListener(
+							schedulerJobConfiguration),
 						HashMapDictionaryBuilder.<String, Object>put(
 							"destination.name",
 							schedulerJobConfiguration.getDestinationName()

@@ -16,7 +16,9 @@ export type ClaimType = {
 	claimAmount: number;
 	claimCreateDate: string;
 	claimStatus: {key: string; name: string};
+	dataJSON: string;
 	id: number;
+	incidentDate: string;
 	r_policyToClaims_c_raylifePolicy: {
 		r_quoteToPolicies_c_raylifeQuote: {
 			r_applicationToQuotes_c_raylifeApplication: {
@@ -27,9 +29,9 @@ export type ClaimType = {
 			};
 		};
 	};
-	r_policyToClaims_c_raylifePolicyERC: string;
-	r_policyToClaims_c_raylifePolicyId: number;
-	settledDate: string;
+	r_policyToClaims_c_raylifePolicyERC?: string;
+	r_policyToClaims_c_raylifePolicyId?: number;
+	settledDate?: string;
 };
 
 export type ClaimDetailDataType = {
@@ -44,4 +46,18 @@ export type ClaimDetailDataType = {
 
 export type ClaimStatusType = {
 	claimStatus: string;
+};
+
+export type ClaimActivitiesDataType = {
+	activity: string;
+	body?: boolean;
+	by: string;
+	date: string;
+	message: string;
+};
+
+export type ClaimComponentsType = {
+	claimData: ClaimType;
+	incidentDate?: string;
+	isClaimSettled?: boolean;
 };

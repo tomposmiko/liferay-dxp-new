@@ -40,13 +40,9 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.odata.sort.SortParserProvider;
-
-import java.io.IOException;
-import java.io.OutputStream;
 
 import java.util.Collection;
 import java.util.Date;
@@ -143,12 +139,9 @@ public class BatchEngineExportTaskExecutorImpl
 						batchEngineExportTask.getParameters(),
 						_userLocalService.getUser(
 							batchEngineExportTask.getUserId()));
-			ZipOutputStream zipOutputStream = _getZipOutputStream(
-				batchEngineExportTask.getContentType(),
-				unsyncByteArrayOutputStream);
 			BatchEngineExportTaskItemWriter batchEngineExportTaskItemWriter =
 				_getBatchEngineExportTaskItemWriter(
-					batchEngineExportTask, zipOutputStream)) {
+					batchEngineExportTask, unsyncByteArrayOutputStream)) {
 
 			int exportBatchSize = _getExportBatchSize(
 				batchEngineExportTask.getCompanyId());
@@ -199,17 +192,20 @@ public class BatchEngineExportTaskExecutorImpl
 
 	private BatchEngineExportTaskItemWriter _getBatchEngineExportTaskItemWriter(
 			BatchEngineExportTask batchEngineExportTask,
-			OutputStream outputStream)
+			UnsyncByteArrayOutputStream unsyncByteArrayOutputStream)
 		throws Exception {
 
 		BatchEngineExportTaskItemWriterBuilder
 			batchEngineExportTaskItemWriterBuilder =
 				new BatchEngineExportTaskItemWriterBuilder();
 
+		BatchEngineTaskContentType batchEngineTaskContentType =
+			BatchEngineTaskContentType.valueOf(
+				batchEngineExportTask.getContentType());
+
 		return batchEngineExportTaskItemWriterBuilder.
 			batchEngineTaskContentType(
-				BatchEngineTaskContentType.valueOf(
-					batchEngineExportTask.getContentType())
+				batchEngineTaskContentType
 			).companyId(
 				batchEngineExportTask.getCompanyId()
 			).csvFileColumnDelimiter(
@@ -223,7 +219,8 @@ public class BatchEngineExportTaskExecutorImpl
 				_batchEngineTaskMethodRegistry.getItemClass(
 					batchEngineExportTask.getClassName())
 			).outputStream(
-				outputStream
+				_getZipOutputStream(
+					batchEngineTaskContentType, unsyncByteArrayOutputStream)
 			).parameters(
 				batchEngineExportTask.getParameters()
 			).userId(
@@ -252,15 +249,15 @@ public class BatchEngineExportTaskExecutorImpl
 	}
 
 	private ZipOutputStream _getZipOutputStream(
-			String contentType,
+			BatchEngineTaskContentType batchEngineTaskContentType,
 			UnsyncByteArrayOutputStream unsyncByteArrayOutputStream)
-		throws IOException {
+		throws Exception {
 
 		ZipOutputStream zipOutputStream = new ZipOutputStream(
 			unsyncByteArrayOutputStream);
 
 		ZipEntry zipEntry = new ZipEntry(
-			"export." + StringUtil.toLowerCase(contentType));
+			"export." + batchEngineTaskContentType.getFileExtension());
 
 		zipOutputStream.putNextEntry(zipEntry);
 

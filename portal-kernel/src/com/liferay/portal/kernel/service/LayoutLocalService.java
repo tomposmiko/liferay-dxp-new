@@ -371,6 +371,13 @@ public interface LayoutLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	public Layout copyLayout(
+			long userId, long groupId, boolean privateLayout,
+			Map<Locale, String> nameMap, boolean hidden, boolean system,
+			boolean copyPermissions, long sourcePlid,
+			ServiceContext serviceContext)
+		throws PortalException;
+
 	/**
 	 * Creates a new layout with the primary key. Does not add the layout to the database.
 	 *

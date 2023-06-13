@@ -1,8 +1,8 @@
 import ClayButton from '@clayui/button';
-import {useState} from 'react';
+import ClayDropDown from '@clayui/drop-down';
+import ClayIcon from '@clayui/icon';
+import {Dispatch, useState} from 'react';
 
-import arrowDown from '../../assets/icons/arrow-down.svg';
-import arrowUP from '../../assets/icons/arrow-up.svg';
 import {DashboardNavigationList} from './DashboardNavigationList';
 
 import './DashboardNavigation.scss';
@@ -18,71 +18,80 @@ export interface DashboardListItems {
 interface DashboardNavigationProps {
 	accountAppsNumber: string;
 	accountIcon: string;
-	accountTitle: string;
+	accounts: Account[];
+	currentAccount: Account;
 	dashboardNavigationItems: DashboardListItems[];
 	onSelectAppChange: (value: AppProps) => void;
 	setDashboardNavigationItems: (values: DashboardListItems[]) => void;
+	setSelectedAccount: Dispatch<React.SetStateAction<Account>>;
 }
 
 export function DashboardNavigation({
 	accountAppsNumber,
 	accountIcon,
-	accountTitle,
+	accounts,
+	currentAccount,
 	dashboardNavigationItems,
 	onSelectAppChange,
 	setDashboardNavigationItems,
+	setSelectedAccount,
 }: DashboardNavigationProps) {
-	const [expandList, setExpandList] = useState(true);
-
 	return (
 		<div className="dashboard-navigation-container">
-			<div className="dashboard-navigation-header">
-				<div className="dashboard-navigation-header-left-content">
-					<img
-						alt="account logo"
-						className="dashboard-navigation-header-logo"
-						src={accountIcon}
-					/>
+			<ClayDropDown
+				trigger={
+					<div className="dashboard-navigation-header">
+						<div className="dashboard-navigation-header-left-content">
+							<img
+								alt="account logo"
+								className="dashboard-navigation-header-logo"
+								src={accountIcon}
+							/>
 
-					<div className="dashboard-navigation-header-text-container">
-						<span className="dashboard-navigation-header-title">
-							{accountTitle}
-						</span>
+							<div className="dashboard-navigation-header-text-container">
+								<span className="dashboard-navigation-header-title">
+									{currentAccount.name}
+								</span>
 
-						<span className="dashboard-navigation-header-apps">
-							{accountAppsNumber} apps
-						</span>
-					</div>
-				</div>
+								<span className="dashboard-navigation-header-apps">
+									{accountAppsNumber} apps
+								</span>
+							</div>
+						</div>
 
-				<ClayButton
-					displayType="unstyled"
-					onClick={() => setExpandList(!expandList)}
-				>
-					<img
-						alt="Arrow Down"
-						className="dashboard-navigation-header-arrow-down"
-						src={expandList ? arrowUP : arrowDown}
-					/>
-				</ClayButton>
-			</div>
-
-			{expandList && (
-				<div className="dashboard-navigation-body">
-					{dashboardNavigationItems.map((navigationMock) => (
-						<DashboardNavigationList
-							dashboardNavigationItems={dashboardNavigationItems}
-							key={navigationMock.itemName}
-							navigationItemMock={navigationMock}
-							navigationItemsMock={dashboardNavigationItems}
-							onSelectAppChange={onSelectAppChange}
-							setDashboardNavigationItems={
-								setDashboardNavigationItems
-							}
+						<ClayIcon
+							className="dashboard-navigation-header-arrow-down"
+							symbol="caret-bottom"
 						/>
+					</div>
+				}
+			>
+				<ClayDropDown.ItemList>
+					{accounts.map((account) => (
+						<ClayDropDown.Item
+							key={account.id}
+							onClick={() => setSelectedAccount(account)}
+						>
+							{account.name}
+						</ClayDropDown.Item>
 					))}
-				</div>
-			)}
+				</ClayDropDown.ItemList>
+			</ClayDropDown>
+
+			<div className="dashboard-navigation-body">
+				{dashboardNavigationItems.map((navigationMock) => (
+					<DashboardNavigationList
+						dashboardNavigationItems={dashboardNavigationItems}
+						key={navigationMock.itemName}
+						navigationItemMock={navigationMock}
+						navigationItemsMock={dashboardNavigationItems}
+						onSelectAppChange={onSelectAppChange}
+						setDashboardNavigationItems={
+							setDashboardNavigationItems
+						}
+					/>
+				))}
+			</div>
 		</div>
 	);
 }

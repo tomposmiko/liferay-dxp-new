@@ -201,7 +201,6 @@ function StructureTreeNodeContent({
 	const dispatch = useDispatch();
 	const hoverItem = useHoverItem();
 	const nodeRef = useRef();
-	const restrictedItemIds = new Set(config.restrictedItemIds);
 	const selectedViewportSize = useSelector(
 		(state) => state.selectedViewportSize
 	);
@@ -439,13 +438,11 @@ function StructureTreeNodeContent({
 				nameInfo={node.nameInfo}
 				onEditName={onEditName}
 				ref={nodeRef}
-				showPermissionRestriction={
-					Liferay.FeatureFlags['LPS-169923'] &&
-					((node.type === LAYOUT_DATA_ITEM_TYPES.form &&
-						formIsRestricted(item)) ||
-						(node.type === LAYOUT_DATA_ITEM_TYPES.collection &&
-							restrictedItemIds.has(item.itemId)))
-				}
+				showPermissionRestriction={isRestricted(
+					item,
+					node,
+					config.restrictedItemIds
+				)}
 				showUnavailableWarning={
 					Liferay.FeatureFlags['LPS-169923'] &&
 					node.type === LAYOUT_DATA_ITEM_TYPES.form &&
@@ -455,7 +452,7 @@ function StructureTreeNodeContent({
 
 			{!editingName && (
 				<div
-					className={classNames('flex-shrink-0', {
+					className={classNames({
 						'page-editor__page-structure__tree-node__buttons--hidden':
 							node.hidden || node.hiddenAncestor,
 					})}
@@ -525,12 +522,7 @@ const NameLabel = React.forwardRef(
 				)}
 				ref={ref}
 			>
-				{icon && (
-					<ClayIcon
-						className="flex-shrink-0 mt-0"
-						symbol={icon || ''}
-					/>
-				)}
+				{icon && <ClayIcon className="mt-0" symbol={icon || ''} />}
 
 				{editingName ? (
 					<input
@@ -561,9 +553,7 @@ const NameLabel = React.forwardRef(
 						value={name}
 					/>
 				) : (
-					<span className="text-truncate">
-						{name || defaultName || Liferay.Language.get('element')}
-					</span>
+					name || defaultName || Liferay.Language.get('element')
 				)}
 
 				{!editingName && nameInfo && (
@@ -889,4 +879,23 @@ function getItemPosition(item, monitor, targetRefs) {
 	const elevation = targetPositionWithMiddle !== TARGET_POSITIONS.MIDDLE;
 
 	return [targetPositionWithMiddle, targetPositionWithoutMiddle, elevation];
+}
+
+function isRestricted(item, node, restrictedItemIds) {
+	if (!Liferay.FeatureFlags['LPS-169923']) {
+		return false;
+	}
+
+	if (node.type === LAYOUT_DATA_ITEM_TYPES.form) {
+		return formIsRestricted(item);
+	}
+
+	if (
+		node.type === LAYOUT_DATA_ITEM_TYPES.collection ||
+		node.type === LAYOUT_DATA_ITEM_TYPES.fragment
+	) {
+		return restrictedItemIds.has(item.itemId);
+	}
+
+	return false;
 }

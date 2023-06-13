@@ -17,7 +17,14 @@ package com.liferay.jethr0.util;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
 import java.util.Locale;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Michael Hashimoto
@@ -32,6 +39,26 @@ public class StringUtil {
 		}
 
 		return sb.toString();
+	}
+
+	public static Date toDate(String dateString) {
+		if ((dateString == null) || dateString.isEmpty()) {
+			return null;
+		}
+
+		try {
+			return _simpleDateFormat.parse(dateString);
+		}
+		catch (ParseException parseException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					combine(
+						"Unable to parse date string \'", dateString, "\'\n",
+						parseException.getMessage()));
+			}
+
+			return null;
+		}
 	}
 
 	public static String toLowerCase(String s) {
@@ -75,6 +102,14 @@ public class StringUtil {
 		return sb.toString();
 	}
 
+	public static String toString(Date date) {
+		if (date == null) {
+			return null;
+		}
+
+		return _simpleDateFormat.format(date);
+	}
+
 	public static URL toURL(String urlString) {
 		try {
 			return new URL(urlString);
@@ -83,5 +118,10 @@ public class StringUtil {
 			throw new RuntimeException(malformedURLException);
 		}
 	}
+
+	private static final Log _log = LogFactory.getLog(StringUtil.class);
+
+	private static final SimpleDateFormat _simpleDateFormat =
+		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 }

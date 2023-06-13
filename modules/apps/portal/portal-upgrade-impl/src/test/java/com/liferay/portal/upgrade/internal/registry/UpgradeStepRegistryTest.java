@@ -15,18 +15,25 @@
 package com.liferay.portal.upgrade.internal.registry;
 
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
+import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import java.sql.Connection;
+
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import org.osgi.framework.Version;
 
@@ -40,8 +47,22 @@ public class UpgradeStepRegistryTest {
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+	@BeforeClass
+	public static void setUpClass() {
+		Connection connection = Mockito.mock(Connection.class);
+
+		MockedStatic<DataAccess> dataAccessMockedStatic = Mockito.mockStatic(
+			DataAccess.class);
+
+		dataAccessMockedStatic.when(
+			DataAccess::getConnection
+		).thenReturn(
+			connection
+		);
+	}
+
 	@Test
-	public void testCreateUpgradeInfos() {
+	public void testCreateUpgradeInfos() throws Exception {
 		UpgradeStepRegistry upgradeStepRegistry = new UpgradeStepRegistry(0);
 
 		TestUpgradeStep testUpgradeStep = new TestUpgradeStep();
@@ -70,7 +91,7 @@ public class UpgradeStepRegistryTest {
 	}
 
 	@Test
-	public void testCreateUpgradeInfosWithNoSteps() {
+	public void testCreateUpgradeInfosWithNoSteps() throws Exception {
 		UpgradeStepRegistry upgradeStepRegistry = new UpgradeStepRegistry(0);
 
 		upgradeStepRegistry.register("0.0.0", "1.0.0");
@@ -81,7 +102,7 @@ public class UpgradeStepRegistryTest {
 	}
 
 	@Test
-	public void testCreateUpgradeInfosWithOneStep() {
+	public void testCreateUpgradeInfosWithOneStep() throws Exception {
 		UpgradeStepRegistry upgradeStepRegistry = new UpgradeStepRegistry(0);
 
 		TestUpgradeStep testUpgradeStep = new TestUpgradeStep();
@@ -97,28 +118,31 @@ public class UpgradeStepRegistryTest {
 	}
 
 	@Test
-	public void testCreateUpgradeInfosWithPostUpgradeSteps() {
+	public void testCreateUpgradeInfosWithPostUpgradeSteps() throws Exception {
 		_registerAndCheckPreAndPostUpgradeSteps(
 			new UpgradeStep[0],
 			new UpgradeStep[] {new TestUpgradeStep(), new TestUpgradeStep()});
 	}
 
 	@Test
-	public void testCreateUpgradeInfosWithPreAndPostUpgradeSteps() {
+	public void testCreateUpgradeInfosWithPreAndPostUpgradeSteps()
+		throws Exception {
+
 		_registerAndCheckPreAndPostUpgradeSteps(
 			new UpgradeStep[] {new TestUpgradeStep()},
 			new UpgradeStep[] {new TestUpgradeStep()});
 	}
 
 	@Test
-	public void testCreateUpgradeInfosWithPreUpgradeSteps() {
+	public void testCreateUpgradeInfosWithPreUpgradeSteps() throws Exception {
 		_registerAndCheckPreAndPostUpgradeSteps(
 			new UpgradeStep[] {new TestUpgradeStep(), new TestUpgradeStep()},
 			new UpgradeStep[0]);
 	}
 
 	private void _registerAndCheckPreAndPostUpgradeSteps(
-		UpgradeStep[] preUpgradeSteps, UpgradeStep[] postUpgradeSteps) {
+			UpgradeStep[] preUpgradeSteps, UpgradeStep[] postUpgradeSteps)
+		throws Exception {
 
 		UpgradeProcess upgradeProcess = new UpgradeProcess() {
 

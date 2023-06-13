@@ -2,19 +2,19 @@ import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayNavigationBar from '@clayui/navigation-bar';
 import classNames from 'classnames';
+import {useEffect, useState} from 'react';
 
 import arrowDown from '../../assets/icons/arrow-down.svg';
 import arrowLeft from '../../assets/icons/arrow-left.svg';
 import circleFullIcon from '../../assets/icons/circle_fill.svg';
 import circleInfoIcon from '../../assets/icons/info-circle-icon.svg';
-
-import './AppDetailsPage.scss';
-
-import {useState} from 'react';
-
 import {DashboardListItems} from '../../components/DashboardNavigation/DashboardNavigation';
 import {AppProps} from '../../components/DashboardTable/DashboardTable';
+import {useAppContext} from '../../manage-app-state/AppManageState';
+import {TYPES} from '../../manage-app-state/actionTypes';
 import {ReviewAndSubmitAppPage} from '../ReviewAndSubmitAppPage/ReviewAndSubmitAppPage';
+
+import './AppDetailsPage.scss';
 
 interface AppDetailsPageProps {
 	dashboardNavigationItems: DashboardListItems[];
@@ -29,6 +29,20 @@ export function AppDetailsPage({
 }: AppDetailsPageProps) {
 	const [navigationBarActive, setNavigationBarActive] =
 		useState('App Details');
+
+	const [_, dispatch] = useAppContext();
+
+	useEffect(() => {
+		dispatch({
+			payload: {
+				value: {
+					appERC: selectedApp.externalReferenceCode,
+					appProductId: selectedApp.productId,
+				},
+			},
+			type: TYPES.SUBMIT_APP_PROFILE,
+		});
+	}, [selectedApp]);
 
 	return (
 		<div className="app-details-page-container">
@@ -85,7 +99,7 @@ export function AppDetailsPage({
 						<img
 							alt="App Logo"
 							className="app-details-page-app-info-logo"
-							src={selectedApp.image}
+							src={selectedApp.thumbnail}
 						/>
 					</div>
 
@@ -152,40 +166,6 @@ export function AppDetailsPage({
 							}
 						>
 							<span>App Details</span>
-						</ClayButton>
-					</ClayNavigationBar.Item>
-
-					<ClayNavigationBar.Item
-						active={navigationBarActive === 'Comments'}
-					>
-						<ClayButton
-							onClick={() => setNavigationBarActive('Comments')}
-						>
-							<span>Comments (3)</span>
-						</ClayButton>
-					</ClayNavigationBar.Item>
-
-					<ClayNavigationBar.Item
-						active={navigationBarActive === 'Activity history'}
-					>
-						<ClayButton
-							onClick={() =>
-								setNavigationBarActive('Activity history')
-							}
-						>
-							<span>Activity history</span>
-						</ClayButton>
-					</ClayNavigationBar.Item>
-
-					<ClayNavigationBar.Item
-						active={navigationBarActive === 'App versions'}
-					>
-						<ClayButton
-							onClick={() =>
-								setNavigationBarActive('App versions')
-							}
-						>
-							<span>App versions</span>
 						</ClayButton>
 					</ClayNavigationBar.Item>
 				</ClayNavigationBar>

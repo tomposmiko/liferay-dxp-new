@@ -134,7 +134,10 @@ export function ScopeContainer({
 						values.defaultLanguageId as Liferay.Language.Locale
 					}
 					disabled={
-						values.system || !hasUpdateObjectDefinitionPermission
+						(Liferay.FeatureFlags['LPS-167253']
+							? !values.modifiable && values.system
+							: values.system) ||
+						!hasUpdateObjectDefinitionPermission
 					}
 					emptyStateMessage={Liferay.Language.get(
 						'no-options-were-found'

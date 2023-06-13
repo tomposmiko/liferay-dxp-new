@@ -145,6 +145,14 @@ public class CPPriceRangeFacetsDisplayContext {
 		return false;
 	}
 
+	public boolean isShowClear(String fieldName) {
+		Optional<String[]> parameterValuesOptional =
+			_portletSharedSearchResponse.getParameterValues(
+				fieldName, _renderRequest);
+
+		return parameterValuesOptional.isPresent();
+	}
+
 	public boolean showInputRange() {
 		return _cpPriceRangeFacetsPortletInstanceConfiguration.showInputRange();
 	}

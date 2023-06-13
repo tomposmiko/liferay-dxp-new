@@ -15,6 +15,7 @@
 package com.liferay.jethr0.project.queue;
 
 import com.liferay.jethr0.project.Project;
+import com.liferay.jethr0.project.comparator.BaseProjectComparator;
 import com.liferay.jethr0.project.comparator.ProjectComparator;
 import com.liferay.jethr0.project.prioritizer.ProjectPrioritizer;
 
@@ -35,7 +36,7 @@ public class ProjectQueue {
 
 		_projects.add(project);
 
-		_sort();
+		sort();
 	}
 
 	public void addProjects(List<Project> projects) {
@@ -51,7 +52,7 @@ public class ProjectQueue {
 
 		_projects.addAll(projects);
 
-		_sort();
+		sort();
 	}
 
 	public ProjectPrioritizer getProjectPrioritizer() {
@@ -65,10 +66,10 @@ public class ProjectQueue {
 	public void setProjectPrioritizer(ProjectPrioritizer projectPrioritizer) {
 		_projectPrioritizer = projectPrioritizer;
 
-		_sort();
+		sort();
 	}
 
-	private void _sort() {
+	public void sort() {
 		if (_projectPrioritizer == null) {
 			return;
 		}
@@ -92,7 +93,14 @@ public class ProjectQueue {
 			for (ProjectComparator projectComparator :
 					_projectPrioritizer.getProjectComparators()) {
 
-				int result = projectComparator.compare(project1, project2);
+				if (!(projectComparator instanceof BaseProjectComparator)) {
+					continue;
+				}
+
+				BaseProjectComparator baseProjectComparator =
+					(BaseProjectComparator)projectComparator;
+
+				int result = baseProjectComparator.compare(project1, project2);
 
 				if (result != 0) {
 					return result;

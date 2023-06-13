@@ -245,6 +245,82 @@ definition {
 		}
 	}
 
+	@description = "Bug: LRAC-12938 | Automation ID: LRAC-13010 | Test Summary: Check that event not being sent when desynchronized sites"
+	@priority = 4
+	test CheckEventNotBeingSentWhenDesynchronizedSites {
+		property proxy.server.enabled = "true";
+
+		task ("Connect DXP to AC > Sync channel and the two sites > Sync contacts and accounts > Sync attributes > Finish") {
+			ACDXPSettings.connectDXPtoAnalyticsCloud();
+		}
+
+		task ("Go to the sites and assert that the events are being sent") {
+			for (var siteName : list "Site Name,Minium Demo") {
+				task ("Go to the site page") {
+					ApplicationsMenu.gotoSite(site = ${siteName});
+				}
+
+				task ("Start Har recording") {
+					ProxyUtil.startHarRecording("pageEvents");
+				}
+
+				task ("Refresh the page") {
+					Refresh();
+				}
+
+				task ("Wait for sending requests") {
+					ACUtils.waitForSendingRequest();
+				}
+
+				task ("View the pageViewed event triggered") {
+					ACUtils.assertEventPresent(
+						applicationId = "Page",
+						eventId = "pageViewed");
+				}
+			}
+		}
+
+		task ("Go to instance settings > Analytics Cloud > Properties") {
+			ACDXPSettings.goToInstanceSettingsAC();
+
+			ACDXPSettings.navToSyncedSitesMenu();
+		}
+
+		task ("Deselect the sites that were selected before") {
+			for (var site : list "Site Name,Minium Demo") {
+				ACDXPSettings.syncSites(
+					propertyName = ${assignedPropertyName},
+					siteName = ${site});
+			}
+		}
+
+		task ("Go to the sites and assert that the events are not being sent") {
+			for (var siteName : list "Site Name,Minium Demo") {
+				task ("Go to the site page") {
+					ApplicationsMenu.gotoSite(site = ${siteName});
+				}
+
+				task ("Start Har recording") {
+					ProxyUtil.startHarRecording("pageEvents");
+				}
+
+				task ("Refresh the page") {
+					Refresh();
+				}
+
+				task ("Wait for sending requests") {
+					ACUtils.waitForSendingRequest();
+				}
+
+				task ("View that the pageViewed event is not triggered") {
+					ACUtils.assertEventNotPresent(
+						applicationId = "Page",
+						eventId = "pageViewed");
+				}
+			}
+		}
+	}
+
 	@description = "Story: LRAC-10858 | Automation ID: LRAC-12576 | Test Summary: Check that it is possible to enable toggle commerce for two different properties"
 	@priority = 5
 	test CheckIsPossibleEnableToggleCommerceForTwoDifferentProperties {

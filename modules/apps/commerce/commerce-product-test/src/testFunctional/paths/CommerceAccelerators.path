@@ -91,6 +91,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ACCOUNT_SELECTOR_ORDERS_LIST_ITEM</td>
+	<td>//div[contains(@class,'account-selector-dropdown')]//a[text()='${key_orderId}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ACCOUNT_SELECTOR_NO_ACCOUNTS_WERE_FOUND</td>
 	<td>//div[contains(@class,'account-selector-dropdown-menu')]//div[text()='No accounts were found.']</td>
 	<td></td>
@@ -191,6 +196,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PRODUCT_CARD_PRICE_FIELD</td>
+	<td>//p[@title='${key_productName}']/..//span[@class='price-value${key_element}'][normalize-space(text())='$ ${key_price}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PRODUCT_CARD_PRICE_VALUE</td>
 	<td>//p[@title='${key_productName}']/..//span[@class='price-value'][normalize-space(text())='$ ${key_productPrice}']</td>
 	<td></td>
@@ -233,6 +243,16 @@
 <tr>
 	<td>GENERAL_QUANTITY_SELECTOR_INPUT_FIELD_ENABLED</td>
 	<td>//input[contains(@class,"quantity-selector") and not(@disabled)]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GENERAL_QUANTITY_SELECTOR_INPUT_FIELD_OPTION_VALUE</td>
+	<td>//input[contains(@class,"quantity-selector") and @value='${key_optionValue}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GENERAL_QUANTITY_SELECTOR_INPUT_FIELD_HAS_ERROR</td>
+	<td>//div[contains(@class,'has-error')]/input[contains(@class,"quantity-selector")]</td>
 	<td></td>
 </tr>
 <tr>
@@ -307,7 +327,7 @@
 </tr>
 <tr>
 	<td>PRODUCT_CARD_AVAILABILITY_LABEL</td>
-	<td>//a[contains(@href,'${key_productName}')]//span[contains(@class,'m-0')]</td>
+	<td>//a[contains(@href,'${key_productName}')]//span[contains(@class,'m-0') and not(contains(@class,'invisible'))]</td>
 	<td></td>
 </tr>
 <tr>

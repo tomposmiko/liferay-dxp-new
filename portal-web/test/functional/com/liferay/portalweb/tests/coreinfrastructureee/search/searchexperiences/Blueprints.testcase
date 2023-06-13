@@ -2043,11 +2043,11 @@ definition {
 			PortletEntry.save();
 		}
 
-		Pagination.viewResults(results = "Showing 1 to 5 of 5");
+		Pagination.viewResults(results = "Showing 1 to 5 of 5 entries.");
 
-		Pagination.changePagination(itemsPerPage = "4 items");
+		Pagination.changePagination(itemsPerPage = "4 Items");
 
-		Pagination.viewResults(results = "Showing 1 to 4 of 5");
+		Pagination.viewResults(results = "Showing 1 to 4 of 5 entries.");
 
 		AssertElementPresent(
 			key_index = 4,
@@ -2059,7 +2059,7 @@ definition {
 
 		Click(locator1 = "Blueprints#PAGINATION_NEXT_LINK");
 
-		Pagination.viewResults(results = "Showing 5 to 5 of 5");
+		Pagination.viewResults(results = "Showing 5 to 5 of 5 entries.");
 
 		AssertElementPresent(
 			key_index = 1,
@@ -2071,7 +2071,7 @@ definition {
 
 		Click(locator1 = "Blueprints#PAGINATION_PREVIOUS_LINK");
 
-		Pagination.viewResults(results = "Showing 1 to 4 of 5");
+		Pagination.viewResults(results = "Showing 1 to 4 of 5 entries.");
 
 		AssertElementPresent(
 			key_index = 4,
@@ -2085,7 +2085,7 @@ definition {
 			key_pageNumber = 2,
 			locator1 = "Pagination#ANY_PAGE");
 
-		Pagination.viewResults(results = "Showing 5 to 5 of 5");
+		Pagination.viewResults(results = "Showing 5 to 5 of 5 entries.");
 
 		AssertElementPresent(
 			key_index = 1,
@@ -2099,7 +2099,7 @@ definition {
 			key_pageNumber = 1,
 			locator1 = "Pagination#ANY_PAGE");
 
-		Pagination.viewResults(results = "Showing 1 to 4 of 5");
+		Pagination.viewResults(results = "Showing 1 to 4 of 5 entries.");
 
 		AssertElementPresent(
 			key_index = 4,
@@ -2109,9 +2109,9 @@ definition {
 			key_index = 5,
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_NTH_ENTRY");
 
-		Pagination.changePagination(itemsPerPage = "8 items");
+		Pagination.changePagination(itemsPerPage = "8 Items");
 
-		Pagination.viewResults(results = "Showing 1 to 5 of 5");
+		Pagination.viewResults(results = "Showing 1 to 5 of 5 entries.");
 
 		AssertElementPresent(
 			key_index = 5,
@@ -2184,11 +2184,13 @@ definition {
 
 		echo(${paginationResults});
 
-		var totalElements = StringUtil.extractLast(${paginationResults}, " ");
+		var totalElements = StringUtil.extractLast(${paginationResults}, "of ");
 
-		Pagination.changePagination(itemsPerPage = "4 items");
+		var totalElements = StringUtil.extractFirst(${totalElements}, " ");
 
-		Pagination.viewResults(results = "Showing 1 to 4 of ${totalElements}");
+		Pagination.changePagination(itemsPerPage = "4 Items");
+
+		Pagination.viewResults(results = "Showing 1 to 4 of ${totalElements} entries.");
 
 		AssertElementPresent(
 			key_index = 4,
@@ -2200,7 +2202,7 @@ definition {
 
 		Click(locator1 = "Blueprints#PAGINATION_NEXT_LINK");
 
-		Pagination.viewResults(results = "Showing 5 to 8 of ${totalElements}");
+		Pagination.viewResults(results = "Showing 5 to 8 of ${totalElements} entries.");
 
 		AssertElementPresent(
 			key_index = 4,
@@ -2212,7 +2214,7 @@ definition {
 
 		Click(locator1 = "Blueprints#PAGINATION_PREVIOUS_LINK");
 
-		Pagination.viewResults(results = "Showing 1 to 4 of ${totalElements}");
+		Pagination.viewResults(results = "Showing 1 to 4 of ${totalElements} entries.");
 
 		AssertElementPresent(
 			key_index = 4,
@@ -2226,7 +2228,7 @@ definition {
 			key_pageNumber = 3,
 			locator1 = "Pagination#ANY_PAGE");
 
-		Pagination.viewResults(results = "Showing 9 to 12 of ${totalElements}");
+		Pagination.viewResults(results = "Showing 9 to 12 of ${totalElements} entries.");
 
 		AssertElementPresent(
 			key_index = 4,
@@ -2240,7 +2242,7 @@ definition {
 			key_pageNumber = 1,
 			locator1 = "Pagination#ANY_PAGE");
 
-		Pagination.viewResults(results = "Showing 1 to 4 of ${totalElements}");
+		Pagination.viewResults(results = "Showing 1 to 4 of ${totalElements} entries.");
 
 		AssertElementPresent(
 			key_index = 4,
@@ -2250,9 +2252,9 @@ definition {
 			key_index = 5,
 			locator1 = "Blueprints#BLUEPRINTS_ADMIN_NTH_ENTRY");
 
-		Pagination.changePagination(itemsPerPage = "60 items");
+		Pagination.changePagination(itemsPerPage = "60 Items");
 
-		Pagination.viewResults(results = "Showing 1 to ${totalElements} of ${totalElements}");
+		Pagination.viewResults(results = "Showing 1 to ${totalElements} of ${totalElements} entries.");
 
 		AssertElementPresent(
 			key_index = ${totalElements},
@@ -2482,7 +2484,7 @@ definition {
 
 		Type(
 			key_elementName = "Boost Contents in a Category for User Segments",
-			key_fieldLabel = "Asset Category ID",
+			key_fieldLabel = "Asset Category Name (ID)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = ${categoryId});
 
@@ -4440,7 +4442,7 @@ definition {
 
 		Type(
 			key_elementName = "Boost Contents in a Category",
-			key_fieldLabel = "Asset Category IDs",
+			key_fieldLabel = "Asset Category Name (IDs)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "Test Category");
 
@@ -4465,7 +4467,7 @@ definition {
 
 		Click.clickNoMouseOver(
 			key_elementName = "Boost Contents in a Category",
-			key_fieldLabel = "Asset Category IDs",
+			key_fieldLabel = "Asset Category Name (IDs)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD_CLEAR_ALL_BUTTON");
 
 		AssertTextNotEquals.assertNotPartialText(
@@ -4485,7 +4487,7 @@ definition {
 
 		Type(
 			key_elementName = "Boost Contents in a Category",
-			key_fieldLabel = "Asset Category IDs",
+			key_fieldLabel = "Asset Category Name (IDs)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "Test");
 
@@ -4510,12 +4512,12 @@ definition {
 
 		Click.clickNoMouseOver(
 			key_elementName = "Boost Contents in a Category",
-			key_fieldLabel = "Asset Category IDs",
+			key_fieldLabel = "Asset Category Name (IDs)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD_CLEAR_ALL_BUTTON");
 
 		Type(
 			key_elementName = "Boost Contents in a Category",
-			key_fieldLabel = "Asset Category IDs",
+			key_fieldLabel = "Asset Category Name (IDs)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = ${categoryId});
 
@@ -4530,7 +4532,7 @@ definition {
 
 		Click.clickNoMouseOver(
 			key_elementName = "Boost Contents in a Category",
-			key_fieldLabel = "Asset Category IDs",
+			key_fieldLabel = "Asset Category Name (IDs)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD_CLEAR_ALL_BUTTON");
 
 		Button.clickSelect();
@@ -4588,7 +4590,7 @@ definition {
 
 		Type(
 			key_elementName = "Hide Contents in a Category for Guest Users",
-			key_fieldLabel = "Asset Category ID",
+			key_fieldLabel = "Asset Category Name (ID)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "Test Category");
 
@@ -4598,7 +4600,7 @@ definition {
 
 		AssertValue(
 			key_elementName = "Hide Contents in a Category for Guest Users",
-			key_fieldLabel = "Asset Category ID",
+			key_fieldLabel = "Asset Category Name (ID)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "Test Category (ID: ${categoryId})");
 
@@ -4614,7 +4616,7 @@ definition {
 
 		Type(
 			key_elementName = "Hide Contents in a Category for Guest Users",
-			key_fieldLabel = "Asset Category ID",
+			key_fieldLabel = "Asset Category Name (ID)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "");
 
@@ -4622,7 +4624,7 @@ definition {
 
 		Type(
 			key_elementName = "Hide Contents in a Category for Guest Users",
-			key_fieldLabel = "Asset Category ID",
+			key_fieldLabel = "Asset Category Name (ID)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "Test");
 
@@ -4632,7 +4634,7 @@ definition {
 
 		AssertValue(
 			key_elementName = "Hide Contents in a Category for Guest Users",
-			key_fieldLabel = "Asset Category ID",
+			key_fieldLabel = "Asset Category Name (ID)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "Test Category (ID: ${categoryId})");
 
@@ -4648,7 +4650,7 @@ definition {
 
 		Type(
 			key_elementName = "Hide Contents in a Category for Guest Users",
-			key_fieldLabel = "Asset Category ID",
+			key_fieldLabel = "Asset Category Name (ID)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "");
 
@@ -4671,7 +4673,7 @@ definition {
 
 		AssertValue(
 			key_elementName = "Hide Contents in a Category for Guest Users",
-			key_fieldLabel = "Asset Category ID",
+			key_fieldLabel = "Asset Category Name (ID)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "Test Category (ID: ${categoryId})");
 
@@ -4691,7 +4693,7 @@ definition {
 
 		Type(
 			key_elementName = "Hide Contents in a Category for Guest Users",
-			key_fieldLabel = "Asset Category ID",
+			key_fieldLabel = "Asset Category Name (ID)",
 			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
 			value1 = "Test Category");
 
@@ -4919,83 +4921,115 @@ definition {
 	}
 
 	test ViewSelectedAssetTypesUI {
-		Blueprints.openBlueprintsAdmin();
+		task ("Create a test blueprint and navigate to the 'Query Settings' tab") {
+			Blueprints.openBlueprintsAdmin();
 
-		Blueprints.createBlueprint(title = "Test Blueprint");
+			Blueprints.createBlueprint(title = "Test Blueprint");
 
-		Navigator.gotoNavNested(navNested = "Query Settings");
+			Navigator.gotoNavNested(navNested = "Query Settings");
+		}
 
-		Check.checkNotVisible(
-			locator1 = "Radio#ANY",
-			radioLabel = "Selected Types");
+		task ("Open the 'Select Types' modal") {
+			Check.checkNotVisible(
+				locator1 = "Radio#ANY",
+				radioLabel = "Selected Types");
 
-		Button.click(button = "Select Asset Types");
+			Button.click(button = "Select Asset Types");
+		}
 
-		Check.checkNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+		task ("Check the select all checkbox and assert the 'Select All' button doesn't appear") {
+			Check.checkNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
 
-		AssertChecked.assertCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+			AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_REMAINING");
+		}
 
-		AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_REMAINING");
+		task ("Assert at least one asset type is checked and no unchecked asset types are present") {
+			AssertChecked.assertCheckedNotVisible(
+				key_assetType = "Blogs Entry",
+				locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
 
-		AssertChecked.assertCheckedNotVisible(
-			key_assetType = "Blogs Entry",
-			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+			AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX_UNCHECKED");
+		}
 
-		AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX_UNCHECKED");
+		task ("Uncheck the select all checkbox and assert no checked asset type is present") {
+			Uncheck.uncheckNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
 
-		Uncheck.uncheckNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+			AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX_CHECKED");
+		}
 
-		AssertNotChecked.assertNotCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+		task ("Assert the 'Select All' button appears when at least one, but not all asset types are checked") {
+			Check.checkNotVisible(
+				key_assetType = "Web Content Article",
+				locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
 
-		AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX_CHECKED");
+			Click(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_REMAINING");
+		}
 
-		Check.checkNotVisible(
-			key_assetType = "Web Content Article",
-			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+		task ("Assert clicking the 'Select All' button causes the rest of the remaining unchecked asset types to become checked") {
+			AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX_UNCHECKED");
+		}
 
-		Click(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_REMAINING");
+		task ("Save the modal and assert at least one of the checked asset types appears on the main page") {
+			Button.clickDone();
 
-		AssertElementNotPresent(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX_UNCHECKED");
+			AssertElementPresent(
+				key_assetType = "Web Content Article",
+				locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+		}
 
-		Button.clickDone();
+		task ("Click the remove button for one of the asset types and assert that is removed from the main page") {
+			Click(
+				key_assetType = "Wiki Page",
+				locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_REMOVE_SELECTED");
 
-		AssertElementPresent(
-			key_assetType = "Web Content Article",
-			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+			AssertElementNotPresent(
+				key_assetType = "Wiki Page",
+				locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+		}
 
-		Click(
-			key_assetType = "Wiki Page",
-			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_REMOVE_SELECTED");
+		task ("Assert the removed asset type is also immediately removed from the 'Select Types' modal. This covers the bug in LPS-179782.") {
+			Button.click(button = "Select Asset Types");
 
-		AssertElementNotPresent(
-			key_assetType = "Wiki Page",
-			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+			AssertNotChecked.assertNotCheckedNotVisible(
+				key_assetType = "Wiki Page",
+				locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+		}
 
-		PortletEntry.save();
+		task ("Save the blueprint, open it again, and navigate back to the 'Query Settings' tab") {
+			PortletEntry.save();
 
-		Blueprints.gotoBlueprint(title = "Test Blueprint");
+			Blueprints.gotoBlueprint(title = "Test Blueprint");
 
-		Navigator.gotoNavNested(navNested = "Query Settings");
+			Navigator.gotoNavNested(navNested = "Query Settings");
+		}
 
-		AssertElementPresent(
-			key_assetType = "Web Content Article",
-			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+		task ("Assert that at least one asset type is selected on the main page") {
+			AssertElementPresent(
+				key_assetType = "Web Content Article",
+				locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+		}
 
-		AssertElementNotPresent(
-			key_assetType = "Wiki Page",
-			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+		task ("Assert the previously removed asset type is not selected on the main page") {
+			AssertElementNotPresent(
+				key_assetType = "Wiki Page",
+				locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECTED");
+		}
 
-		Button.click(button = "Select Asset Types");
+		task ("Open the 'Select Types' modal and assert the select all checkbox is checked in indeterminate state when some but not all asset types are checked") {
+			Button.click(button = "Select Asset Types");
 
-		AssertChecked.assertCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+			AssertChecked.assertCheckedNotVisible(locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_SELECT_ALL_CHECKBOX");
+		}
 
-		AssertChecked.assertCheckedNotVisible(
-			key_assetType = "Web Content Article",
-			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+		task ("Assert at least one of the asset types are checked and the previously removed asset type is not checked") {
+			AssertChecked.assertCheckedNotVisible(
+				key_assetType = "Web Content Article",
+				locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
 
-		AssertNotChecked.assertNotCheckedNotVisible(
-			key_assetType = "Wiki Page",
-			locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+			AssertNotChecked.assertNotCheckedNotVisible(
+				key_assetType = "Wiki Page",
+				locator1 = "Blueprints#BLUEPRINTS_SEARCHABLE_ASSET_TYPE_CHECKBOX");
+		}
 	}
 
 	test ViewUnsavedChangesAlertForBlueprints {

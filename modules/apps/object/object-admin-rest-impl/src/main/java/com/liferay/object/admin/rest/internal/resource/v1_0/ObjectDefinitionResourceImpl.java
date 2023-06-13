@@ -26,10 +26,7 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectValidationRule;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectView;
 import com.liferay.object.admin.rest.dto.v1_0.Status;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
-import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectFieldDTOConverter;
-import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectRelationshipDTOConverter;
-import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectValidationRuleDTOConverter;
-import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectViewDTOConverter;
+import com.liferay.object.admin.rest.internal.dto.v1_0.converter.constants.DTOConverterConstants;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldSettingUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
@@ -43,6 +40,7 @@ import com.liferay.object.admin.rest.resource.v1_0.ObjectViewResource;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.exception.ObjectDefinitionEnableLocalizationException;
 import com.liferay.object.exception.ObjectDefinitionModifiableException;
 import com.liferay.object.exception.ObjectDefinitionStorageTypeException;
 import com.liferay.object.service.ObjectActionLocalService;
@@ -79,6 +77,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
+import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -231,6 +230,12 @@ public class ObjectDefinitionResourceImpl
 			ObjectDefinition objectDefinition)
 		throws Exception {
 
+		if (Validator.isNotNull(objectDefinition.getEnableLocalization()) &&
+			!FeatureFlagManagerUtil.isEnabled("LPS-146755")) {
+
+			throw new ObjectDefinitionEnableLocalizationException();
+		}
+
 		if (Validator.isNotNull(objectDefinition.getModifiable()) &&
 			!FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
 
@@ -266,6 +271,8 @@ public class ObjectDefinitionResourceImpl
 					transformToList(
 						objectDefinition.getObjectFields(),
 						objectField -> ObjectFieldUtil.toObjectField(
+							GetterUtil.getBoolean(
+								objectDefinition.getEnableLocalization()),
 							_listTypeDefinitionLocalService, objectField,
 							_objectFieldLocalService,
 							_objectFieldSettingLocalService,
@@ -275,6 +282,8 @@ public class ObjectDefinitionResourceImpl
 			serviceBuilderObjectDefinition =
 				_objectDefinitionService.addCustomObjectDefinition(
 					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableLocalization()),
 					LocalizedMapUtil.getLocalizedMap(
 						objectDefinition.getLabel()),
 					objectDefinition.getName(),
@@ -292,6 +301,8 @@ public class ObjectDefinitionResourceImpl
 								ObjectFieldConstants.
 									BUSINESS_TYPE_AGGREGATION)),
 						objectField -> ObjectFieldUtil.toObjectField(
+							GetterUtil.getBoolean(
+								objectDefinition.getEnableLocalization()),
 							_listTypeDefinitionLocalService, objectField,
 							_objectFieldLocalService,
 							_objectFieldSettingLocalService,
@@ -335,7 +346,7 @@ public class ObjectDefinitionResourceImpl
 								ObjectFieldConstants.
 									BUSINESS_TYPE_AGGREGATION)),
 						objectField -> ObjectFieldUtil.toObjectField(
-							_listTypeDefinitionLocalService, objectField,
+							false, _listTypeDefinitionLocalService, objectField,
 							_objectFieldLocalService,
 							_objectFieldSettingLocalService,
 							_objectFilterLocalService))) {
@@ -347,11 +358,11 @@ public class ObjectDefinitionResourceImpl
 				serviceBuilderObjectDefinition.getObjectDefinitionId(),
 				aggregationServiceBuilderObjectField.getBusinessType(),
 				aggregationServiceBuilderObjectField.getDBType(),
-				aggregationServiceBuilderObjectField.getDefaultValue(),
 				aggregationServiceBuilderObjectField.isIndexed(),
 				aggregationServiceBuilderObjectField.isIndexedAsKeyword(),
 				aggregationServiceBuilderObjectField.getIndexedLanguageId(),
 				aggregationServiceBuilderObjectField.getLabelMap(),
+				aggregationServiceBuilderObjectField.isLocalized(),
 				aggregationServiceBuilderObjectField.getName(),
 				aggregationServiceBuilderObjectField.isRequired(),
 				aggregationServiceBuilderObjectField.isState(),
@@ -436,7 +447,7 @@ public class ObjectDefinitionResourceImpl
 				titleServiceBuilderObjectField.getObjectFieldId();
 		}
 
-		if (serviceBuilderObjectDefinition.isSystem()) {
+		if (serviceBuilderObjectDefinition.isUnmodifiableSystemObject()) {
 			return _toObjectDefinition(
 				_objectDefinitionService.updateSystemObjectDefinition(
 					objectDefinition.getExternalReferenceCode(),
@@ -456,6 +467,7 @@ public class ObjectDefinitionResourceImpl
 				GetterUtil.getBoolean(
 					objectDefinition.getEnableCategorization(), true),
 				GetterUtil.getBoolean(objectDefinition.getEnableComments()),
+				GetterUtil.getBoolean(objectDefinition.getEnableLocalization()),
 				GetterUtil.getBoolean(
 					objectDefinition.getEnableObjectEntryHistory()),
 				LocalizedMapUtil.getLocalizedMap(objectDefinition.getLabel()),
@@ -483,21 +495,17 @@ public class ObjectDefinitionResourceImpl
 					contextUser.getUserId(), listTypeDefinitionId,
 					objectDefinitionId, objectField.getBusinessTypeAsString(),
 					null, null, objectField.getDBTypeAsString(),
-					objectField.getDefaultValue(), objectField.getIndexed(),
-					objectField.getIndexedAsKeyword(),
+					objectField.getIndexed(), objectField.getIndexedAsKeyword(),
 					objectField.getIndexedLanguageId(),
 					LocalizedMapUtil.getLocalizedMap(objectField.getLabel()),
+					GetterUtil.getBoolean(objectField.getLocalized()),
 					objectField.getName(), objectField.getRequired(),
 					GetterUtil.getBoolean(objectField.getState()),
 					objectField.getSystem(),
-					transformToList(
-						objectField.getObjectFieldSettings(),
-						objectFieldSetting ->
-							ObjectFieldSettingUtil.toObjectFieldSetting(
-								objectField.getBusinessTypeAsString(),
-								listTypeDefinitionId, objectFieldSetting,
-								_objectFieldSettingLocalService,
-								_objectFilterLocalService)));
+					ObjectFieldSettingUtil.toObjectFieldSettings(
+						listTypeDefinitionId, objectField,
+						_objectFieldSettingLocalService,
+						_objectFilterLocalService));
 
 				serviceBuilderObjectFields.removeIf(
 					serviceBuilderObjectField -> Objects.equals(
@@ -777,6 +785,12 @@ public class ObjectDefinitionResourceImpl
 				enableCategorization =
 					objectDefinition.getEnableCategorization();
 				enableComments = objectDefinition.getEnableComments();
+
+				if (FeatureFlagManagerUtil.isEnabled("LPS-146755")) {
+					enableLocalization =
+						objectDefinition.getEnableLocalization();
+				}
+
 				enableObjectEntryHistory =
 					objectDefinition.getEnableObjectEntryHistory();
 				externalReferenceCode =
@@ -938,8 +952,9 @@ public class ObjectDefinitionResourceImpl
 	@Reference
 	private ObjectDefinitionService _objectDefinitionService;
 
-	@Reference
-	private ObjectFieldDTOConverter _objectFieldDTOConverter;
+	@Reference(target = DTOConverterConstants.OBJECT_FIELD_DTO_CONVERTER)
+	private DTOConverter<com.liferay.object.model.ObjectField, ObjectField>
+		_objectFieldDTOConverter;
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
@@ -956,8 +971,10 @@ public class ObjectDefinitionResourceImpl
 	@Reference
 	private ObjectLayoutResource.Factory _objectLayoutResourceFactory;
 
-	@Reference
-	private ObjectRelationshipDTOConverter _objectRelationshipDTOConverter;
+	@Reference(target = DTOConverterConstants.OBJECT_RELATIONSHIP_DTO_CONVERTER)
+	private DTOConverter
+		<com.liferay.object.model.ObjectRelationship, ObjectRelationship>
+			_objectRelationshipDTOConverter;
 
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
@@ -966,8 +983,12 @@ public class ObjectDefinitionResourceImpl
 	private ObjectRelationshipResource.Factory
 		_objectRelationshipResourceFactory;
 
-	@Reference
-	private ObjectValidationRuleDTOConverter _objectValidationRuleDTOConverter;
+	@Reference(
+		target = DTOConverterConstants.OBJECT_VALIDATION_RULE_DTO_CONVERTER
+	)
+	private DTOConverter
+		<com.liferay.object.model.ObjectValidationRule, ObjectValidationRule>
+			_objectValidationRuleDTOConverter;
 
 	@Reference
 	private ObjectValidationRuleLocalService _objectValidationRuleLocalService;
@@ -976,8 +997,9 @@ public class ObjectDefinitionResourceImpl
 	private ObjectValidationRuleResource.Factory
 		_objectValidationRuleResourceFactory;
 
-	@Reference
-	private ObjectViewDTOConverter _objectViewDTOConverter;
+	@Reference(target = DTOConverterConstants.OBJECT_VIEW_DTO_CONVERTER)
+	private DTOConverter<com.liferay.object.model.ObjectView, ObjectView>
+		_objectViewDTOConverter;
 
 	@Reference
 	private ObjectViewLocalService _objectViewLocalService;

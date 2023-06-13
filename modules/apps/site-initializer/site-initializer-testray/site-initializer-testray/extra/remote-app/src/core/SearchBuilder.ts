@@ -105,6 +105,10 @@ export default class SearchBuilder {
 		return `${key} le ${value}`;
 	}
 
+	static group(type: 'CLOSE' | 'OPEN') {
+		return type === 'OPEN' ? '(' : ')';
+	}
+
 	static startsWith(key: Key, value: Value) {
 		return `${key} startsWith '${value}'`;
 	}
@@ -211,6 +215,10 @@ export default class SearchBuilder {
 
 	public ne(key: Key, value: Value) {
 		return this.setContext(SearchBuilder.ne(key, value));
+	}
+
+	public group(type: 'CLOSE' | 'OPEN') {
+		return this.setContext(SearchBuilder.group(type));
 	}
 
 	private setContext(query: string) {

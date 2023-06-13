@@ -24,7 +24,7 @@ export default interface DealRegistrationDTO
 		| 'prospect'
 		| 'primaryProspect'
 	> {
-	accountExternalReferenceCodeSF?: string;
+	accountExternalReferenceCode?: string;
 	additionalContactEmailAddress?: string;
 	additionalContactFirstName?: string;
 	additionalContactLastName?: string;
@@ -36,7 +36,7 @@ export default interface DealRegistrationDTO
 	leadQualificationExternalReferenceCode?: string;
 	leadStatus?: string;
 	leadStatusDetail?: string;
-	mdfActivityExternalReferenceCodeSF?: string;
+	mdfActivityExternalReferenceCode?: string;
 	opportunityOwner?: string;
 	ownerName?: string;
 	partnerAccountName?: string;

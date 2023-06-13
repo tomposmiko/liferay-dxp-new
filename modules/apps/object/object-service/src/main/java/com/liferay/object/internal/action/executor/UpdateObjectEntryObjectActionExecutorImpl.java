@@ -17,8 +17,8 @@ package com.liferay.object.internal.action.executor;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
+import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.internal.action.util.ObjectEntryVariablesUtil;
-import com.liferay.object.internal.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
@@ -28,7 +28,6 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -71,7 +70,7 @@ public class UpdateObjectEntryObjectActionExecutorImpl
 					_userLocalService.getUser(userId),
 					_getValues(
 						objectDefinition, parametersUnicodeProperties,
-						ObjectEntryVariablesUtil.getActionVariables(
+						ObjectEntryVariablesUtil.getVariables(
 							_dtoConverterRegistry, objectDefinition,
 							payloadJSONObject,
 							_systemObjectDefinitionMetadataRegistry)));
@@ -91,12 +90,6 @@ public class UpdateObjectEntryObjectActionExecutorImpl
 		throws Exception {
 
 		if (objectDefinition.isSystem()) {
-			if (!FeatureFlagManagerUtil.isEnabled(
-					objectDefinition.getCompanyId(), "LPS-173537")) {
-
-				throw new UnsupportedOperationException();
-			}
-
 			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
 				_systemObjectDefinitionMetadataRegistry.
 					getSystemObjectDefinitionMetadata(

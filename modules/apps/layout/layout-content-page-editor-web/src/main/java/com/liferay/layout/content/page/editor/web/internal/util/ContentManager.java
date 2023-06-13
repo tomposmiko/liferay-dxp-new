@@ -23,6 +23,9 @@ import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.PortletRegistry;
+import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
+import com.liferay.fragment.renderer.FragmentRenderer;
+import com.liferay.fragment.renderer.FragmentRendererRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.info.display.url.provider.InfoEditURLProvider;
 import com.liferay.info.display.url.provider.InfoEditURLProviderRegistry;
@@ -78,6 +81,7 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
@@ -177,7 +181,7 @@ public class ContentManager {
 				themeDisplay.getScopeGroupId(), plid, segmentsExperienceId);
 
 		List<String> restrictedItemIds = getRestrictedItemIds(
-			layoutStructure, themeDisplay);
+			httpServletRequest, layoutStructure, themeDisplay);
 
 		return _getPageContentsJSONArray(
 			httpServletRequest, httpServletResponse, plid, segmentsExperienceId,
@@ -185,7 +189,8 @@ public class ContentManager {
 	}
 
 	public List<String> getRestrictedItemIds(
-		LayoutStructure layoutStructure, ThemeDisplay themeDisplay) {
+		HttpServletRequest httpServletRequest, LayoutStructure layoutStructure,
+		ThemeDisplay themeDisplay) {
 
 		List<String> restrictedItemIds = new ArrayList<>();
 
@@ -273,6 +278,51 @@ public class ContentManager {
 
 			restrictedItemIds.add(
 				collectionStyledLayoutStructureItem.getItemId());
+		}
+
+		Map<Long, LayoutStructureItem> fragmentLayoutStructureItems =
+			layoutStructure.getFragmentLayoutStructureItems();
+
+		for (LayoutStructureItem layoutStructureItem :
+				fragmentLayoutStructureItems.values()) {
+
+			FragmentStyledLayoutStructureItem
+				fragmentStyledLayoutStructureItem =
+					(FragmentStyledLayoutStructureItem)layoutStructureItem;
+
+			if (layoutStructure.isItemMarkedForDeletion(
+					fragmentStyledLayoutStructureItem.getItemId())) {
+
+				continue;
+			}
+
+			FragmentEntryLink fragmentEntryLink =
+				_fragmentEntryLinkLocalService.fetchFragmentEntryLink(
+					fragmentStyledLayoutStructureItem.getFragmentEntryLinkId());
+
+			if (fragmentEntryLink == null) {
+				continue;
+			}
+
+			String rendererKey = fragmentEntryLink.getRendererKey();
+
+			if (Validator.isNull(rendererKey)) {
+				continue;
+			}
+
+			FragmentRenderer fragmentRenderer =
+				_fragmentRendererRegistry.getFragmentRenderer(rendererKey);
+
+			if ((fragmentRenderer == null) ||
+				fragmentRenderer.hasViewPermission(
+					new DefaultFragmentRendererContext(fragmentEntryLink),
+					httpServletRequest)) {
+
+				continue;
+			}
+
+			restrictedItemIds.add(
+				fragmentStyledLayoutStructureItem.getItemId());
 		}
 
 		return restrictedItemIds;
@@ -619,7 +669,8 @@ public class ContentManager {
 	private JSONArray _getLayoutClassedModelPageContentsJSONArray(
 			HttpServletRequest httpServletRequest,
 			LayoutStructure layoutStructure, long plid,
-			List<String> hiddenItemIds, long segmentsExperienceId)
+			List<String> hiddenItemIds, List<String> restrictedItemIds,
+			long segmentsExperienceId)
 		throws PortalException {
 
 		JSONArray mappedContentsJSONArray = _jsonFactory.createJSONArray();
@@ -642,6 +693,8 @@ public class ContentManager {
 
 				continue;
 			}
+
+			boolean restricted = false;
 
 			if (layoutClassedModelUsage.getContainerType() ==
 					_getFragmentEntryLinkClassNameId()) {
@@ -675,6 +728,9 @@ public class ContentManager {
 
 					continue;
 				}
+
+				restricted = restrictedItemIds.contains(
+					layoutStructureItem.getItemId());
 			}
 
 			if ((layoutClassedModelUsage.getContainerType() ==
@@ -711,7 +767,8 @@ public class ContentManager {
 				mappedContentsJSONArray.put(
 					_getPageContentJSONObject(
 						layoutClassedModelUsage,
-						layoutDisplayPageObjectProvider, httpServletRequest));
+						layoutDisplayPageObjectProvider, httpServletRequest,
+						restricted));
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
@@ -878,7 +935,7 @@ public class ContentManager {
 	private JSONObject _getPageContentJSONObject(
 			LayoutClassedModelUsage layoutClassedModelUsage,
 			LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider,
-			HttpServletRequest httpServletRequest)
+			HttpServletRequest httpServletRequest, boolean restricted)
 		throws Exception {
 
 		ThemeDisplay themeDisplay =
@@ -903,7 +960,7 @@ public class ContentManager {
 				layoutClassedModelUsage.getClassName(),
 				layoutClassedModelUsage.getClassPK())
 		).put(
-			"isRestricted", false
+			"isRestricted", restricted
 		).put(
 			"status", _getStatusJSONObject(layoutClassedModelUsage)
 		).put(
@@ -942,7 +999,7 @@ public class ContentManager {
 		return JSONUtil.concat(
 			_getLayoutClassedModelPageContentsJSONArray(
 				httpServletRequest, layoutStructure, plid, hiddenItemIds,
-				segmentsExperienceId),
+				restrictedItemIds, segmentsExperienceId),
 			_assetListEntryUsagesManager.getPageContentsJSONArray(
 				hiddenItemIds, httpServletRequest, httpServletResponse,
 				layoutStructure, plid, restrictedItemIds));
@@ -1118,6 +1175,9 @@ public class ContentManager {
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private FragmentRendererRegistry _fragmentRendererRegistry;
 
 	@Reference
 	private InfoEditURLProviderRegistry _infoEditURLProviderRegistry;

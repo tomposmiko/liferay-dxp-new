@@ -18,7 +18,6 @@ import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
-import com.liferay.portal.kernel.dao.db.DBContext;
 import com.liferay.portal.kernel.dao.db.DBProcessContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -34,6 +33,8 @@ import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.OutputStream;
+
+import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,11 +77,6 @@ public class UpgradeStepRegistratorTracker {
 
 			if (releaseUpgradeSteps != null) {
 				DBProcessContext dbProcessContext = new DBProcessContext() {
-
-					@Override
-					public DBContext getDBContext() {
-						return new DBContext();
-					}
 
 					@Override
 					public OutputStream getOutputStream() {
@@ -177,8 +173,14 @@ public class UpgradeStepRegistratorTracker {
 					bundleSymbolicName, releaseUpgradeSteps);
 			}
 
-			List<UpgradeInfo> upgradeInfos =
-				upgradeStepRegistry.getUpgradeInfos();
+			List<UpgradeInfo> upgradeInfos = null;
+
+			try {
+				upgradeInfos = upgradeStepRegistry.getUpgradeInfos();
+			}
+			catch (SQLException sqlException) {
+				throw new RuntimeException(sqlException);
+			}
 
 			if (PropsValues.UPGRADE_DATABASE_AUTO_RUN ||
 				(_releaseLocalService.fetchRelease(bundleSymbolicName) ==

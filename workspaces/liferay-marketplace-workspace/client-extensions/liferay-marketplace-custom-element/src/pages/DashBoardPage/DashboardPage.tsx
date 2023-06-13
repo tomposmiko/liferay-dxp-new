@@ -5,6 +5,7 @@ import {AppProps} from '../../components/DashboardTable/DashboardTable';
 import {Footer} from '../../components/Footer/Footer';
 import {Header} from '../../components/Header/Header';
 import {AppDetailsPage} from '../AppDetailsPage/AppDetailsPage';
+import {MemberProps} from '../PublishedAppsDashboardPage/PublishedDashboardPageUtil';
 
 import './DashboardPage.scss';
 
@@ -19,11 +20,11 @@ export interface DashboardListItems {
 type DashBoardPageProps = {
 	accountAppsNumber: string;
 	accountLogo: string;
-	accountTitle: string;
-	buttonMessage: string;
+	accounts: Account[];
+	buttonMessage?: string;
 	children: ReactNode;
+	currentAccount: Account;
 	dashboardNavigationItems: DashboardListItems[];
-	items: AppProps[];
 	messages: {
 		description: string;
 		emptyStateMessage: {
@@ -34,17 +35,20 @@ type DashBoardPageProps = {
 		title: string;
 	};
 	setDashboardNavigationItems: Dispatch<SetStateAction<DashboardListItems[]>>;
+	setSelectedAccount: Dispatch<React.SetStateAction<Account>>;
 };
 
 export function DashboardPage({
 	accountAppsNumber,
 	accountLogo,
-	accountTitle,
+	accounts,
 	buttonMessage,
 	children,
+	currentAccount,
 	dashboardNavigationItems,
 	messages,
 	setDashboardNavigationItems,
+	setSelectedAccount,
 }: DashBoardPageProps) {
 	const [selectedApp, setSelectedApp] = useState<AppProps>();
 
@@ -55,12 +59,14 @@ export function DashboardPage({
 					<DashboardNavigation
 						accountAppsNumber={accountAppsNumber}
 						accountIcon={accountLogo}
-						accountTitle={accountTitle}
+						accounts={accounts}
+						currentAccount={currentAccount}
 						dashboardNavigationItems={dashboardNavigationItems}
 						onSelectAppChange={setSelectedApp}
 						setDashboardNavigationItems={
 							setDashboardNavigationItems
 						}
+						setSelectedAccount={setSelectedAccount}
 					/>
 
 					{selectedApp ? (
@@ -77,11 +83,13 @@ export function DashboardPage({
 									title={messages.title}
 								/>
 
-								<a href="/create-new-app">
-									<button className="dashboard-page-body-header-button">
-										{buttonMessage}
-									</button>
-								</a>
+								{buttonMessage && (
+									<a href="/create-new-app">
+										<button className="dashboard-page-body-header-button">
+											{buttonMessage}
+										</button>
+									</a>
+								)}
 							</div>
 
 							{children}

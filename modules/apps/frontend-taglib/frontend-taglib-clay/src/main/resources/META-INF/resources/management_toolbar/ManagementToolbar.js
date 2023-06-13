@@ -164,7 +164,7 @@ function ManagementToolbar({
 					/>
 				)}
 
-				<FrontendManagementToolbar.ItemList>
+				<FrontendManagementToolbar.ItemList role="none">
 					{!active && showSearch && (
 						<SearchControls.ShowMobileButton
 							disabled={disabled}
@@ -283,6 +283,7 @@ function ManagementToolbar({
 					clearResultsURL={clearResultsURL}
 					filterLabelItems={filterLabelItems}
 					itemsTotal={itemsTotal}
+					searchContainerId={searchContainerId}
 					searchValue={searchValue}
 				/>
 			)}

@@ -120,6 +120,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
+import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.view.count.ViewCountManager;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -141,6 +142,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -346,19 +348,19 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	}
 
 	@Override
-	public void checkKBArticles() throws PortalException {
+	public void checkKBArticles(long companyId) throws PortalException {
 		Date date = new Date();
 
-		_checkKBArticlesByExpirationDate(date);
+		_checkKBArticlesByExpirationDate(companyId, date);
 
-		if (_previousCheckDate == null) {
-			_previousCheckDate = new Date(
-				date.getTime() - _getKBArticleCheckInterval());
-		}
+		_dates.computeIfAbsent(
+			companyId,
+			key -> new Date(
+				date.getTime() - (_getKBArticleCheckInterval() * Time.MINUTE)));
 
-		_checkKBArticlesByReviewDate(date);
+		_checkKBArticlesByReviewDate(companyId, date);
 
-		_previousCheckDate = date;
+		_dates.put(companyId, date);
 	}
 
 	@Override
@@ -1600,31 +1602,34 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return dynamicQuery.add(junction);
 	}
 
-	private void _checkKBArticlesByExpirationDate(Date expirationDate)
+	private void _checkKBArticlesByExpirationDate(
+			long companyId, Date expirationDate)
 		throws PortalException {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
-				"Expiring file entries with expiration date previous to " +
-					expirationDate);
+				StringBundler.concat(
+					"Expiring file entries with expiration date previous to ",
+					expirationDate, " for company ", companyId));
 		}
 
-		_companyLocalService.forEachCompany(
-			company -> _expireKBArticlesByCompany(company, expirationDate));
+		_expireKBArticlesByCompany(
+			_companyLocalService.getCompany(companyId), expirationDate);
 	}
 
-	private void _checkKBArticlesByReviewDate(Date reviewDate)
+	private void _checkKBArticlesByReviewDate(long companyId, Date reviewDate)
 		throws PortalException {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
 				StringBundler.concat(
 					"Sending review notification for articles with review ",
-					"date between ", _previousCheckDate, " and ", reviewDate));
+					"date between ", _dates.get(companyId), " and ", reviewDate,
+					" for company ", companyId));
 		}
 
-		_companyLocalService.forEachCompany(
-			company -> _notifyReviewKBArticlesByCompany(company, reviewDate));
+		_notifyReviewKBArticlesByCompany(
+			_companyLocalService.getCompany(companyId), reviewDate);
 	}
 
 	private void _deleteAssets(KBArticle kbArticle) throws PortalException {
@@ -2190,7 +2195,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			company.getCompanyId());
 
 		List<KBArticle> kbArticles = _getKBArticlesByCompanyIdAndReviewDate(
-			company.getCompanyId(), _previousCheckDate, reviewDate);
+			company.getCompanyId(), _dates.get(company.getCompanyId()),
+			reviewDate);
 
 		for (KBArticle kbArticle : kbArticles) {
 			if (_log.isDebugEnabled()) {
@@ -2510,6 +2516,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	@Reference
 	private ConfigurationProvider _configurationProvider;
 
+	private final Map<Long, Date> _dates = new ConcurrentHashMap<>();
+
 	@Reference
 	private DiffHtml _diffHtml;
 
@@ -2548,8 +2556,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 	@Reference
 	private PortletFileRepository _portletFileRepository;
-
-	private Date _previousCheckDate;
 
 	@Reference
 	private RatingsStatsLocalService _ratingsStatsLocalService;

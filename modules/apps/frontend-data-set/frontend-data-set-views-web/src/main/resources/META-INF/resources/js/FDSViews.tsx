@@ -183,7 +183,6 @@ const AddFDSViewModalContent = ({
 };
 
 interface IFDSViewsProps {
-	fdsEntriesAPIURL: string;
 	fdsEntryId: string;
 	fdsEntryLabel: string;
 	fdsViewURL: string;
@@ -192,7 +191,6 @@ interface IFDSViewsProps {
 }
 
 const FDSViews = ({
-	fdsEntriesAPIURL,
 	fdsEntryId,
 	fdsEntryLabel,
 	fdsViewURL,
@@ -208,6 +206,59 @@ const FDSViews = ({
 		url.searchParams.set(`${namespace}fdsViewLabel`, itemData.label);
 
 		navigate(url);
+	};
+
+	const onDeleteClick = ({
+		itemData,
+		loadData,
+	}: {
+		itemData: TFDSView;
+		loadData: Function;
+	}) => {
+		openModal({
+			bodyHTML: Liferay.Language.get(
+				'deleting-a-dataset-view-is-an-action-that-cannot-be-reversed'
+			),
+			buttons: [
+				{
+					autoFocus: true,
+					displayType: 'secondary',
+					label: Liferay.Language.get('cancel'),
+					type: 'cancel',
+				},
+				{
+					displayType: 'danger',
+					label: Liferay.Language.get('delete'),
+					onClick: ({processClose}: {processClose: Function}) => {
+						processClose();
+
+						fetch(`${fdsViewsAPIURL}/${itemData.id}`, {
+							method: 'DELETE',
+						})
+							.then(() => {
+								openToast({
+									message: Liferay.Language.get(
+										'your-request-completed-successfully'
+									),
+									type: 'success',
+								});
+
+								loadData();
+							})
+							.catch(() =>
+								openToast({
+									message: Liferay.Language.get(
+										'your-request-failed-to-complete'
+									),
+									type: 'danger',
+								})
+							);
+					},
+				},
+			],
+			status: 'danger',
+			title: Liferay.Language.get('delete-dataset-view'),
+		});
 	};
 
 	const creationMenu = {
@@ -249,7 +300,7 @@ const FDSViews = ({
 
 	return (
 		<FrontendDataSet
-			apiURL={`${fdsEntriesAPIURL}/${fdsEntryId}/${OBJECT_RELATIONSHIP.FDS_ENTRY_FDS_VIEW}`}
+			apiURL={`${fdsViewsAPIURL}/?filter=(${OBJECT_RELATIONSHIP.FDS_ENTRY_FDS_VIEW_ID} eq '${fdsEntryId}')`}
 			creationMenu={creationMenu}
 			id={`${namespace}FDSViews`}
 			itemsActions={[
@@ -257,6 +308,11 @@ const FDSViews = ({
 					icon: 'view',
 					label: Liferay.Language.get('view'),
 					onClick: onViewClick,
+				},
+				{
+					icon: 'trash',
+					label: Liferay.Language.get('delete'),
+					onClick: onDeleteClick,
 				},
 			]}
 			style="fluid"

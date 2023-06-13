@@ -1,11 +1,11 @@
 @component-name = "portal-publications"
 definition {
 
-	property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver";
 	property osgi.module.configuration.file.names = "com.liferay.change.tracking.configuration.CTSettingsConfiguration.config";
 	property osgi.module.configurations = "enabled=B\"true\"";
 	property portal.release = "true";
 	property portal.upstream = "true";
+	property testray.component.names = "Page Administration";
 	property testray.main.component.name = "Publications";
 
 	setUp {
@@ -437,6 +437,20 @@ definition {
 		PublicationsNavigator.gotoReviewChanges(
 			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name");
+
+		PublicationsChanges.viewChanges(
+			changeCategory = "Page Set",
+			changeSite = "Site Name",
+			changeTitle = "Pages",
+			changeType = "Added",
+			changeUser = "Test Test");
+
+		PublicationsChanges.viewChanges(
+			changeCategory = "Page",
+			changeSite = "Site Name",
+			changeTitle = "Test Page",
+			changeType = "Added",
+			changeUser = "Test Test");
 
 		PublicationsNavigator.gotoViewChangeDetails(
 			changeCategory = "Page",

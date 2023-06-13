@@ -36,6 +36,7 @@ import com.liferay.exportimport.lar.ThemeExporter;
 import com.liferay.exportimport.lar.ThemeImporter;
 import com.liferay.layout.internal.exportimport.staged.model.repository.StagedLayoutSetStagedModelRepository;
 import com.liferay.layout.set.model.adapter.StagedLayoutSet;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -86,8 +87,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -296,11 +295,11 @@ public class StagedLayoutSetStagedModelDataHandler
 					portletDataContext.getLayoutSetPrototypeUuid(),
 					portletDataContext.getCompanyId());
 
-		List<Layout> layoutSetLayouts = _layoutLocalService.getLayouts(
-			portletDataContext.getGroupId(),
-			portletDataContext.isPrivateLayout());
+		for (Layout layout :
+				_layoutLocalService.getLayouts(
+					portletDataContext.getGroupId(),
+					portletDataContext.isPrivateLayout())) {
 
-		for (Layout layout : layoutSetLayouts) {
 			if (Validator.isNull(layout.getSourcePrototypeLayoutUuid())) {
 				continue;
 			}
@@ -338,17 +337,9 @@ public class StagedLayoutSetStagedModelDataHandler
 			return;
 		}
 
-		List<Layout> previousLayouts = _layoutLocalService.getLayouts(
-			portletDataContext.getGroupId(),
-			portletDataContext.isPrivateLayout());
-
-		Stream<Element> layoutElementsStream = layoutElements.stream();
-
-		List<String> sourceLayoutUuids = layoutElementsStream.map(
-			layoutElement -> layoutElement.attributeValue("uuid")
-		).collect(
-			Collectors.toList()
-		);
+		List<String> sourceLayoutUuids = TransformUtil.transform(
+			layoutElements,
+			layoutElement -> layoutElement.attributeValue("uuid"));
 
 		if (_log.isDebugEnabled() && !sourceLayoutUuids.isEmpty()) {
 			_log.debug("Delete missing layouts");
@@ -360,7 +351,11 @@ public class StagedLayoutSetStagedModelDataHandler
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		for (Layout layout : previousLayouts) {
+		for (Layout layout :
+				_layoutLocalService.getLayouts(
+					portletDataContext.getGroupId(),
+					portletDataContext.isPrivateLayout())) {
+
 			if (!sourceLayoutUuids.contains(layout.getUuid()) &&
 				!layoutPlids.containsValue(layout.getPlid())) {
 
@@ -406,13 +401,11 @@ public class StagedLayoutSetStagedModelDataHandler
 
 		LayoutSet layoutSet = stagedLayoutSet.getLayoutSet();
 
-		List<ClientExtensionEntryRel> clientExtensionEntryRels =
-			_clientExtensionEntryRelLocalService.getClientExtensionEntryRels(
-				_portal.getClassNameId(LayoutSet.class),
-				layoutSet.getLayoutSetId());
-
 		for (ClientExtensionEntryRel clientExtensionEntryRel :
-				clientExtensionEntryRels) {
+				_clientExtensionEntryRelLocalService.
+					getClientExtensionEntryRels(
+						_portal.getClassNameId(LayoutSet.class),
+						layoutSet.getLayoutSetId())) {
 
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
 				portletDataContext, stagedLayoutSet, clientExtensionEntryRel,
@@ -488,11 +481,10 @@ public class StagedLayoutSetStagedModelDataHandler
 				group.getGroupId(), portletDataContext.isPrivateLayout());
 		}
 
-		List<StagedModel> stagedModels =
-			_stagedLayoutSetStagedModelRepository.fetchChildrenStagedModels(
-				portletDataContext, stagedLayoutSet);
+		for (StagedModel stagedModel :
+				_stagedLayoutSetStagedModelRepository.fetchChildrenStagedModels(
+					portletDataContext, stagedLayoutSet)) {
 
-		for (StagedModel stagedModel : stagedModels) {
 			Layout layout = (Layout)stagedModel;
 
 			if (!ArrayUtil.contains(layoutIds, layout.getLayoutId())) {
@@ -679,10 +671,9 @@ public class StagedLayoutSetStagedModelDataHandler
 	private boolean _hasSkippedSiblingLayout(
 		Element layoutElement, Map<Long, List<String>> siblingActionsMap) {
 
-		long parentLayoutId = GetterUtil.getLong(
-			layoutElement.attributeValue("layout-parent-layout-id"));
-
-		List<String> actions = siblingActionsMap.get(parentLayoutId);
+		List<String> actions = siblingActionsMap.get(
+			GetterUtil.getLong(
+				layoutElement.attributeValue("layout-parent-layout-id")));
 
 		if (actions.contains(Constants.SKIP)) {
 			return true;
@@ -1061,22 +1052,18 @@ public class StagedLayoutSetStagedModelDataHandler
 			Map<String, ThemeSetting> themeSettings =
 				importedTheme.getConfigurableSettings();
 
-			Set<Map.Entry<String, ThemeSetting>> themeSettingsEntries =
-				themeSettings.entrySet();
+			Map<String, String> defaultsMap = new HashMap<>();
 
-			Stream<Map.Entry<String, ThemeSetting>> themeSettingsEntriesStream =
-				themeSettingsEntries.stream();
+			for (Map.Entry<String, ThemeSetting> entry :
+					themeSettings.entrySet()) {
 
-			Map<String, String> defaultsMap =
-				themeSettingsEntriesStream.collect(
-					Collectors.toMap(
-						entry -> ThemeSettingImpl.namespaceProperty(
-							"regular", entry.getKey()),
-						entry -> {
-							ThemeSetting themeSetting = entry.getValue();
+				ThemeSetting themeSetting = entry.getValue();
 
-							return themeSetting.getValue();
-						}));
+				defaultsMap.put(
+					ThemeSettingImpl.namespaceProperty(
+						"regular", entry.getKey()),
+					themeSetting.getValue());
+			}
 
 			defaultsMap.put(Sites.SHOW_SITE_NAME, Boolean.TRUE.toString());
 			defaultsMap.put("javascript", null);

@@ -62,6 +62,10 @@ public class CPAttachmentFileEntryInfoItemRenderer
 		}
 
 		try {
+			RequestDispatcher requestDispatcher =
+				_servletContext.getRequestDispatcher(
+					"/info/item/renderer/cp_attachment_file_entry/page.jsp");
+
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)httpServletRequest.getAttribute(
 					WebKeys.THEME_DISPLAY);
@@ -73,10 +77,6 @@ public class CPAttachmentFileEntryInfoItemRenderer
 						(CommerceContext)httpServletRequest.getAttribute(
 							CommerceWebKeys.COMMERCE_CONTEXT)),
 					cpAttachmentFileEntry, themeDisplay));
-
-			RequestDispatcher requestDispatcher =
-				_servletContext.getRequestDispatcher(
-					"/info/item/renderer/cp_attachment_file_entry/page.jsp");
 
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
 		}

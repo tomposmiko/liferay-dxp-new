@@ -18,20 +18,21 @@ import TestrayStorage, {STORAGE_KEYS} from '~/core/Storage';
 import useStorage from '~/hooks/useStorage';
 import {ActionMap, SortDirection, SortOption} from '~/types';
 import {safeJSONParse} from '~/util';
+import {PAGINATION_DELTA} from '~/util/constants';
 import {CONSENT_TYPE} from '~/util/enum';
 import isDeepEqual from '~/util/object';
 
 const testrayStorage = TestrayStorage.getInstance().getStorage('persisted');
 
-export type Sort = {
-	direction: SortDirection;
-	key: string;
-};
-
 export type Entry = {
 	label: string;
 	name: string;
 	value: string;
+};
+
+export type Sort = {
+	direction: SortDirection;
+	key: string;
 };
 
 type ListViewFilter = {
@@ -70,7 +71,7 @@ const initialState: InitialState = {
 	id: '',
 	keywords: '',
 	page: 1,
-	pageSize: 20,
+	pageSize: PAGINATION_DELTA[0],
 	pin: false,
 	selectedRows: [],
 	sort: {direction: SortOption.ASC, key: ''},

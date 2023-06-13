@@ -36,6 +36,7 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
+import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
@@ -234,7 +235,9 @@ public class ObjectEntryInfoItemFormProvider
 						objectField.getListTypeDefinitionId()),
 					listTypeEntry -> new MultiselectInfoFieldType.Option(
 						Objects.equals(
-							objectField.getDefaultValue(),
+							ObjectFieldSettingUtil.getDefaultValueAsString(
+								null, objectField.getObjectFieldId(),
+								_objectFieldSettingLocalService, null),
 							listTypeEntry.getKey()),
 						new FunctionInfoLocalizedValue<>(
 							listTypeEntry::getName),
@@ -497,7 +500,7 @@ public class ObjectEntryInfoItemFormProvider
 
 					unsafeConsumer.accept(
 						_getObjectDefinitionInfoFieldSet(
-							objectDefinition.getLabelMap(),
+							true, objectDefinition.getLabelMap(),
 							objectDefinition.getName(),
 							ObjectField.class.getSimpleName(),
 							objectDefinition));
@@ -562,8 +565,8 @@ public class ObjectEntryInfoItemFormProvider
 	}
 
 	private InfoFieldSet _getObjectDefinitionInfoFieldSet(
-		Map<Locale, String> labelMap, String name, String namespace,
-		ObjectDefinition objectDefinition) {
+		boolean editable, Map<Locale, String> labelMap, String name,
+		String namespace, ObjectDefinition objectDefinition) {
 
 		return InfoFieldSet.builder(
 		).infoFieldSetEntry(
@@ -602,7 +605,7 @@ public class ObjectEntryInfoItemFormProvider
 							).name(
 								objectField.getName()
 							).editable(
-								true
+								editable
 							).labelInfoLocalizedValue(
 								InfoLocalizedValue.<String>builder(
 								).values(
@@ -637,7 +640,10 @@ public class ObjectEntryInfoItemFormProvider
 			options.add(
 				new SelectInfoFieldType.Option(
 					Objects.equals(
-						objectField.getDefaultValue(), listTypeEntry.getKey()),
+						ObjectFieldSettingUtil.getDefaultValueAsString(
+							null, objectField.getObjectFieldId(),
+							_objectFieldSettingLocalService, null),
+						listTypeEntry.getKey()),
 					new FunctionInfoLocalizedValue<>(listTypeEntry::getName),
 					listTypeEntry.getKey()));
 		}
@@ -674,7 +680,7 @@ public class ObjectEntryInfoItemFormProvider
 				continue;
 			}
 
-			if (objectDefinition1.isSystem()) {
+			if (objectDefinition1.isUnmodifiableSystemObject()) {
 				continue;
 			}
 
@@ -695,7 +701,7 @@ public class ObjectEntryInfoItemFormProvider
 
 			infoFieldSetEntries.add(
 				_getObjectDefinitionInfoFieldSet(
-					fieldSetLabelMap, objectRelationship.getName(),
+					false, fieldSetLabelMap, objectRelationship.getName(),
 					StringBundler.concat(
 						ObjectRelationship.class.getSimpleName(),
 						StringPool.POUND, objectDefinition1.getName(),

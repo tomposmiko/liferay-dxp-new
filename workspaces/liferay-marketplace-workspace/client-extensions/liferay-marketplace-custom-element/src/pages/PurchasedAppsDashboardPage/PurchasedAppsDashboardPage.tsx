@@ -1,37 +1,51 @@
+import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
 import {useEffect, useState} from 'react';
 
 import accountLogo from '../../assets/icons/mainAppLogo.svg';
+import {DashboardTable} from '../../components/DashboardTable/DashboardTable';
+import {PurchasedAppsDashboardTableRow} from '../../components/DashboardTable/PurchasedAppsDashboardTableRow';
+import {getCompanyId} from '../../liferay/constants';
 import {
-	AppProps,
-	DashboardTable,
-} from '../../components/DashboardTable/DashboardTable';
-import {DashboardTableRow} from '../../components/DashboardTable/DashboardTableRow';
-import {getOrders} from '../../utils/api';
+	getAccounts,
+	getChannels,
+	getOrders,
+	getSKUCustomFieldExpandoValue,
+} from '../../utils/api';
 import {DashboardPage} from '../DashBoardPage/DashboardPage';
-import {initialDashboardNavigationItems} from './PurchasedDashboardPageUtil';
+import {initialAccountState, initialDashboardNavigationItems} from './PurchasedDashboardPageUtil';
+
+export interface PurchasedAppProps {
+	image: string;
+	name: string;
+	orderId: number;
+	project?: string;
+	provisioning: string;
+	purchasedBy: string;
+	purchasedDate: string;
+	type: string;
+	version: string;
+}
+
+interface PurchasedAppTable {
+	items: PurchasedAppProps[];
+	pageSize: number;
+	totalCount: number;
+}
 
 const tableHeaders = [
 	{
-		iconSymbol: 'order-arrow',
 		title: 'Name',
 	},
 	{
-		iconSymbol: 'order-arrow',
 		title: 'Purchased By',
 	},
 	{
-		iconSymbol: 'order-arrow',
 		title: 'Type',
 	},
 	{
-		iconSymbol: 'order-arrow',
 		title: 'Order ID',
 	},
 	{
-		title: 'Project',
-	},
-	{
-		iconSymbol: 'order-arrow',
 		title: 'Provisioning',
 	},
 	{
@@ -40,7 +54,11 @@ const tableHeaders = [
 ];
 
 export function PurchasedAppsDashboardPage() {
-	const [orders, setOrders] = useState<AppProps[]>(Array<AppProps>());
+	const [accounts, setAccounts] = useState<Account[]>(initialAccountState);
+	const [selectedAccount, setSelectedAccount] = useState<Account>(accounts[0]);
+	const [purchasedAppTable, setPurchasedAppTable] =
+		useState<PurchasedAppTable>({items: [], pageSize: 7, totalCount: 1});
+	const [page, setPage] = useState<number>(1);
 	const [dashboardNavigationItems, setDashboardNavigationItems] = useState(
 		initialDashboardNavigationItems
 	);
@@ -58,30 +76,137 @@ export function PurchasedAppsDashboardPage() {
 
 	useEffect(() => {
 		(async () => {
-			const orders = await getOrders();
+			const accountsResponse = await getAccounts();
 
-			setOrders(orders);
+			const accountsList = accountsResponse.items.map(
+				(account: Account) => {
+					return {
+						externalReferenceCode: account.externalReferenceCode,
+						id: account.id,
+						name: account.name,
+					} as Account;
+				}
+			);
+
+			setAccounts(accountsList);
+			setSelectedAccount(accountsList[0]);
 		})();
 	}, []);
+
+	useEffect(() => {
+		const makeFetch = async () => {
+			const channels = await getChannels();
+
+			const channel =
+				channels.find(
+					(channel) => channel.name === 'Marketplace Channel'
+				) || channels[0];
+
+			const placedOrders = await getOrders(
+				selectedAccount?.id || 50307,
+				channel.id,
+				page,
+				purchasedAppTable.pageSize
+			);
+
+			const newOrderItems = await Promise.all(
+				placedOrders.items.map(async (order) => {
+					const [placeOrderItem] = order.placedOrderItems;
+
+					const date = new Date(order.createDate);
+					const options: Intl.DateTimeFormatOptions = {
+						day: 'numeric',
+						month: 'short',
+						year: 'numeric',
+					};
+					const formattedDate = date.toLocaleDateString(
+						'en-US',
+						options
+					);
+
+					const version = await getSKUCustomFieldExpandoValue({
+						companyId: parseInt(getCompanyId()),
+						customFieldName: 'version',
+						skuId: placeOrderItem.skuId,
+					});
+
+					return {
+						image: placeOrderItem.thumbnail,
+						name: placeOrderItem.name,
+						orderId: order.id,
+						provisioning: order.orderStatusInfo.label_i18n,
+						purchasedBy: order.author,
+						purchasedDate: formattedDate,
+						type: placeOrderItem.subscription
+							? 'Subscription'
+							: 'Perpetual',
+						version: version ?? '',
+					};
+				})
+			);
+
+			setPurchasedAppTable({
+				...purchasedAppTable,
+				items: newOrderItems,
+				totalCount: placedOrders.totalCount,
+			});
+
+			const accountsResponse = await getAccounts();
+
+			const accountsList = accountsResponse.items.map(
+				(account: Account) => {
+					return {
+						externalReferenceCode: account.externalReferenceCode,
+						id: account.id,
+						name: account.name,
+					};
+				}
+			);
+
+			setAccounts(accountsList);
+		};
+		makeFetch();
+	}, [page, selectedAccount]);
 
 	return (
 		<DashboardPage
 			accountAppsNumber="0"
 			accountLogo={accountLogo}
-			accountTitle="Hourglass"
+			accounts={accounts}
 			buttonMessage="Add Apps"
+			currentAccount={selectedAccount}
 			dashboardNavigationItems={dashboardNavigationItems}
-			items={orders}
 			messages={messages}
 			setDashboardNavigationItems={setDashboardNavigationItems}
+			setSelectedAccount={setSelectedAccount}
 		>
-			<DashboardTable<AppProps>
+			<DashboardTable<PurchasedAppProps>
 				emptyStateMessage={messages.emptyStateMessage}
-				items={orders}
+				items={purchasedAppTable.items}
 				tableHeaders={tableHeaders}
 			>
-				{(item) => <DashboardTableRow item={item} key={item.name} />}
+				{(item) => (
+					<PurchasedAppsDashboardTableRow
+						item={item}
+						key={item.name}
+					/>
+				)}
 			</DashboardTable>
+
+			{purchasedAppTable.items.length ? (
+				<ClayPaginationBarWithBasicItems
+					active={page}
+					activeDelta={purchasedAppTable.pageSize}
+					defaultActive={1}
+					ellipsisBuffer={3}
+					ellipsisProps={{'aria-label': 'More', 'title': 'More'}}
+					onActiveChange={setPage}
+					showDeltasDropDown={false}
+					totalItems={purchasedAppTable?.totalCount}
+				/>
+			) : (
+				<></>
+			)}
 		</DashboardPage>
 	);
 }

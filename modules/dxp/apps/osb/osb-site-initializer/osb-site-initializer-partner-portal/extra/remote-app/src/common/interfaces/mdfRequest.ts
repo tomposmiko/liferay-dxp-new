@@ -15,16 +15,17 @@ import LiferayPicklist from './liferayPicklist';
 import MDFRequestActivity from './mdfRequestActivity';
 
 export default interface MDFRequest extends Partial<LiferayObject> {
-	accountExternalReferenceCodeSF?: string;
+	accountExternalReferenceCode?: string;
 	activities: MDFRequestActivity[];
 	additionalOption: LiferayPicklist;
 	company?: LiferayAccountBrief;
 	country: LiferayPicklist;
 	currency: LiferayPicklist;
+	externalReferenceCode?: string;
 	externalReferenceCodeSF?: string;
 	liferayBusinessSalesGoals?: string[];
 	maxDateActivity?: string;
-	mdfRequestStatus?: LiferayPicklist;
+	mdfRequestStatus: LiferayPicklist;
 	minDateActivity?: string;
 	overallCampaignDescription: string;
 	overallCampaignName: string;

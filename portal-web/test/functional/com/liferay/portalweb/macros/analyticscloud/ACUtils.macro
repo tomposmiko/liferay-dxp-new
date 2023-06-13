@@ -27,7 +27,7 @@ definition {
 			var siteName = "Site Name";
 		}
 
-		JSONGroup.addGroup(groupName = ${siteName});
+		HeadlessSite.addSite(siteName = ${siteName});
 
 		if (!(isSet(layoutName))) {
 			var layoutName = "AC Page";
@@ -252,7 +252,7 @@ definition {
 
 		var actual = JSONUtil.getWithJSONPath("[${postDataText}]", "$..[?(@['applicationId'] == '${applicationId}' && @['eventId'] == '${eventId}')]['eventId']");
 
-		TestUtils.assertEquals(
+		TestUtils.assertPartialEquals(
 			actual = ${actual},
 			expected = ${eventId});
 	}

@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author David Arques
@@ -30,11 +29,9 @@ public class AssetCategoryMetric {
 		AssetVocabularyMetric assetVocabularyMetric, String key, String name,
 		long value) {
 
-		_assetVocabularyMetric = Optional.ofNullable(
-			assetVocabularyMetric
-		).orElse(
-			AssetVocabularyMetric.empty()
-		);
+		_assetVocabularyMetric =
+			(assetVocabularyMetric == null) ? AssetVocabularyMetric.empty() :
+				assetVocabularyMetric;
 		_key = key;
 		_name = name;
 		_value = value;

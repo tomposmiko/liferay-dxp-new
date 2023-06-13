@@ -104,12 +104,12 @@ public abstract class BaseProcessorImpl
 			String fieldExpression, Class<V> clazz,
 			UnsafeBiConsumer<T, V[], ?> unsafeBiConsumer) {
 
-			V[] values = _processorContext.getValueArray(
-				clazz, fieldExpression);
-
-			if ((values == null) || (values.length == 0)) {
+			if (!_processorContext.isDefined(clazz, fieldExpression)) {
 				return;
 			}
+
+			V[] values = _processorContext.getValueArray(
+				clazz, fieldExpression);
 
 			_patchingQueue.add(
 				object -> unsafeBiConsumer.accept(object, values));
@@ -130,11 +130,8 @@ public abstract class BaseProcessorImpl
 
 			handleUnsafeStringArray(
 				fieldExpression,
-				(object, values) -> {
-					for (String value : values) {
-						biConsumer.accept(object, GetterUtil.getBoolean(value));
-					}
-				});
+				(object, values) -> biConsumer.accept(
+					object, GetterUtil.getBoolean(_head(values))));
 		}
 
 		@Override
@@ -143,15 +140,8 @@ public abstract class BaseProcessorImpl
 
 			handleUnsafeStringArray(
 				fieldExpression,
-				(object, value) -> {
-					boolean[] booleanArray = new boolean[value.length];
-
-					for (int i = 0; i < booleanArray.length; i++) {
-						booleanArray[i] = GetterUtil.getBoolean(value[i]);
-					}
-
-					biConsumer.accept(object, booleanArray);
-				});
+				(object, value) -> biConsumer.accept(
+					object, GetterUtil.getBooleanValues(value)));
 		}
 
 		@Override
@@ -161,13 +151,11 @@ public abstract class BaseProcessorImpl
 			handleUnsafeStringArray(
 				fieldExpression,
 				(object, values) -> {
-					for (String value : values) {
-						try {
-							biConsumer.accept(object, Long.parseLong(value));
-						}
-						catch (NumberFormatException numberFormatException) {
-							throw numberFormatException;
-						}
+					try {
+						biConsumer.accept(object, Long.parseLong(values[0]));
+					}
+					catch (NumberFormatException numberFormatException) {
+						throw numberFormatException;
 					}
 				});
 		}
@@ -179,13 +167,18 @@ public abstract class BaseProcessorImpl
 			handleUnsafeStringArray(
 				fieldExpression,
 				(object, value) -> {
-					long[] longArray = new long[value.length];
+					try {
+						long[] longArray = new long[value.length];
 
-					for (int i = 0; i < longArray.length; i++) {
-						longArray[i] = GetterUtil.getLong(value[i]);
+						for (int i = 0; i < longArray.length; i++) {
+							longArray[i] = Long.parseLong(value[i]);
+						}
+
+						biConsumer.accept(object, longArray);
 					}
-
-					biConsumer.accept(object, longArray);
+					catch (NumberFormatException numberFormatException) {
+						throw numberFormatException;
+					}
 				});
 		}
 
@@ -195,16 +188,14 @@ public abstract class BaseProcessorImpl
 
 			handleUnsafeStringArray(
 				fieldExpression,
-				(object, values) -> biConsumer.accept(object, values[0]));
+				(object, values) -> biConsumer.accept(object, _head(values)));
 		}
 
 		@Override
 		public void mapStringArray(
 			String fieldExpression, BiConsumer<T, String[]> biConsumer) {
 
-			handleUnsafeStringArray(
-				fieldExpression,
-				(object, values) -> biConsumer.accept(object, values));
+			handleUnsafeStringArray(fieldExpression, biConsumer::accept);
 		}
 
 		@Override
@@ -214,7 +205,16 @@ public abstract class BaseProcessorImpl
 
 			handleUnsafeStringArray(
 				fieldExpression,
-				(object, values) -> unsafeBiConsumer.accept(object, values[0]));
+				(object, values) -> unsafeBiConsumer.accept(
+					object, _head(values)));
+		}
+
+		private <V> V _head(V[] values) {
+			if ((values == null) || (values.length == 0)) {
+				return null;
+			}
+
+			return values[0];
 		}
 
 		private final Queue<UnsafeConsumer<T, ?>> _patchingQueue =
@@ -272,6 +272,20 @@ public abstract class BaseProcessorImpl
 			}
 
 			return (V[])map.get(fieldExpression);
+		}
+
+		public boolean isDefined(Class<?> clazz, String fieldExpression) {
+			if (!Validator.isBlank(_prefix)) {
+				fieldExpression = _prefix + ':' + fieldExpression;
+			}
+
+			Map<String, Object[]> map = _maps.get(clazz);
+
+			if (map == null) {
+				return false;
+			}
+
+			return map.containsKey(fieldExpression);
 		}
 
 		private final String _prefix;

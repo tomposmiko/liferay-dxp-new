@@ -24,6 +24,8 @@ String redirect = ParamUtil.getString(request, "redirect");
 CTCollectionTemplate ctCollectionTemplate = (CTCollectionTemplate)request.getAttribute(CTWebKeys.CT_COLLECTION_TEMPLATE);
 
 long ctCollectionTemplateId = 0;
+boolean defaultCTCollectionTemplate = false;
+boolean defaultSandboxCTCollectionTemplate = false;
 String description = StringPool.BLANK;
 String name = StringPool.BLANK;
 String publicationDescription = StringPool.BLANK;
@@ -32,6 +34,8 @@ String saveButtonLabel = "create";
 
 if (ctCollectionTemplate != null) {
 	ctCollectionTemplateId = ctCollectionTemplate.getCtCollectionTemplateId();
+	defaultCTCollectionTemplate = GetterUtil.getBoolean(request.getAttribute(CTWebKeys.DEFAULT_CT_COLLECTION_TEMPLATE));
+	defaultSandboxCTCollectionTemplate = GetterUtil.getBoolean(request.getAttribute(CTWebKeys.DEFAULT_SANDBOX_CT_COLLECTION_TEMPLATE));
 	description = ctCollectionTemplate.getDescription();
 	name = ctCollectionTemplate.getName();
 	publicationDescription = ctCollectionTemplate.getPublicationDescription();
@@ -69,6 +73,10 @@ portletDisplay.setShowBackIcon(true);
 				"collaboratorsProps", publicationsDisplayContext.getCollaboratorsReactData(ctCollectionTemplateId, true)
 			).put(
 				"ctCollectionTemplateId", ctCollectionTemplateId
+			).put(
+				"defaultCTCollectionTemplate", defaultCTCollectionTemplate
+			).put(
+				"defaultSandboxCTCollectionTemplate", defaultSandboxCTCollectionTemplate
 			).put(
 				"description", description
 			).put(

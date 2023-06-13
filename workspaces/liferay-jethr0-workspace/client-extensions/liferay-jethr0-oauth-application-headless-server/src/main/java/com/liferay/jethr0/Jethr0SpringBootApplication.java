@@ -14,10 +14,13 @@
 
 package com.liferay.jethr0;
 
+import com.liferay.client.extension.util.spring.boot.ClientExtensionUtilSpringBootComponentScan;
+import com.liferay.client.extension.util.spring.boot.LiferayOAuth2Util;
 import com.liferay.jethr0.dalo.ProjectComparatorDALO;
-import com.liferay.jethr0.dalo.ProjectDALO;
 import com.liferay.jethr0.dalo.ProjectPrioritizerDALO;
 import com.liferay.jethr0.project.Project;
+import com.liferay.jethr0.project.ProjectDALO;
+import com.liferay.jethr0.project.ProjectRepository;
 import com.liferay.jethr0.project.comparator.ProjectComparator;
 import com.liferay.jethr0.project.prioritizer.ProjectPrioritizer;
 import com.liferay.jethr0.project.queue.ProjectQueue;
@@ -26,10 +29,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 /**
  * @author Michael Hashimoto
  */
+@Import(ClientExtensionUtilSpringBootComponentScan.class)
 @SpringBootApplication
 public class Jethr0SpringBootApplication {
 
@@ -38,9 +45,20 @@ public class Jethr0SpringBootApplication {
 	}
 
 	@Bean
+	public OAuth2AccessToken getOAuth2AccessToken(
+		AuthorizedClientServiceOAuth2AuthorizedClientManager
+			authorizedClientServiceOAuth2AuthorizedClientManager) {
+
+		return LiferayOAuth2Util.getOAuth2AccessToken(
+			authorizedClientServiceOAuth2AuthorizedClientManager,
+			_liferayOAuthApplicationExternalReferenceCodes);
+	}
+
+	@Bean
 	public ProjectQueue getProjectQueue(
-		ProjectComparatorDALO projectComparatorDALO, ProjectDALO projectDALO,
-		ProjectPrioritizerDALO projectPrioritizerDALO) {
+		ProjectComparatorDALO projectComparatorDALO,
+		ProjectPrioritizerDALO projectPrioritizerDALO,
+		ProjectRepository projectRepository) {
 
 		ProjectQueue projectQueue = new ProjectQueue();
 
@@ -48,13 +66,23 @@ public class Jethr0SpringBootApplication {
 			_getDefaultProjectPrioritizer(
 				projectComparatorDALO, projectPrioritizerDALO));
 
-		projectQueue.addProjects(projectDALO.retrieveProjects());
+		projectQueue.addProjects(
+			projectRepository.getByState(Project.State.RUNNING));
 
 		for (Project project : projectQueue.getProjects()) {
 			System.out.println(project);
 		}
 
 		return projectQueue;
+	}
+
+	@Bean
+	public ProjectRepository getProjectRepository(ProjectDALO projectDALO) {
+		ProjectRepository projectRepository = new ProjectRepository();
+
+		projectRepository.add(projectDALO.get());
+
+		return projectRepository;
 	}
 
 	private ProjectPrioritizer _getDefaultProjectPrioritizer(
@@ -84,7 +112,10 @@ public class Jethr0SpringBootApplication {
 		return projectPrioritizer;
 	}
 
-	@Value("${liferay.project.prioritizer}")
+	@Value("${liferay.oauth.application.external.reference.codes}")
+	private String _liferayOAuthApplicationExternalReferenceCodes;
+
+	@Value("${liferay.jethr0.project.prioritizer}")
 	private String _liferayProjectPrioritizer;
 
 }

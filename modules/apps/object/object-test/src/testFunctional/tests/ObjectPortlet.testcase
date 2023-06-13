@@ -757,7 +757,7 @@ definition {
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject245");
 
-		ObjectPortlet.checkUncheckColumnsDisplayed(dropdowntItem = "ID");
+		ObjectPortlet.checkUncheckColumnsDisplayed(dropdownItem = "ID");
 
 		ObjectPortlet.assertEntryColumnNotPresent(column = "ID");
 	}
@@ -1612,7 +1612,9 @@ definition {
 
 		ObjectPortlet.searchColumn(columnName = "Field");
 
-		ObjectPortlet.assertMenuItemColumn(dropdowntItem = "Field");
+		AssertElementPresent(
+			key_dropdownItem = "Field",
+			locator1 = "ObjectPortlet#CHECK_UNCHECK_DROPDOWN_ITEM");
 	}
 
 	@description = "LPS-140082 - Verify it is possible to search for a partial Object entry on the Relationship field"
@@ -2439,7 +2441,7 @@ definition {
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject286");
 
-		ObjectPortlet.changePagination(itemsPerPage = "4 items");
+		ObjectPortlet.changePagination(itemsPerPage = "4 Items");
 
 		ObjectPortlet.checkAnyPage(pageNumber = 2);
 
@@ -2477,7 +2479,7 @@ definition {
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject287");
 
-		ObjectPortlet.changePagination(itemsPerPage = "4 items");
+		ObjectPortlet.changePagination(itemsPerPage = "4 Items");
 
 		for (var number : list "1,2,3,4") {
 			ObjectPortlet.viewEntry(entry = "Test text ${number}");

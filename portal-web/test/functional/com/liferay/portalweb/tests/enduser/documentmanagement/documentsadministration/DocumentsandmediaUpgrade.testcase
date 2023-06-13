@@ -103,11 +103,13 @@ definition {
 		Upgrade.deleteDocumentTypesAndMetadataSets();
 	}
 
+	@description = "Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test ViewDMArchive72104 {
 		property data.archive.type = "data-archive-documents-and-media";
 		property portal.version = "7.2.10.4";
+		property test.name.skip.portal.instance = "DocumentsandmediaUpgrade#ViewDMArchive72104";
 
 		Upgrade.viewDocuments();
 
@@ -122,11 +124,13 @@ definition {
 		Upgrade.deleteDocumentTypesAndMetadataSets();
 	}
 
+	@description = "Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test ViewDMArchive73101 {
 		property data.archive.type = "data-archive-documents-and-media";
 		property portal.version = "7.3.10.1";
+		property test.name.skip.portal.instance = "DocumentsandmediaUpgrade#ViewDMArchive73101";
 
 		Upgrade.viewDocuments();
 
@@ -161,11 +165,13 @@ definition {
 		Upgrade.viewDocument();
 	}
 
+	@description = "Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test ViewDMArchive701015 {
 		property data.archive.type = "data-archive-documents-and-media";
 		property portal.version = "7.0.10.15";
+		property test.name.skip.portal.instance = "DocumentsandmediaUpgrade#ViewDMArchive701015";
 
 		Upgrade.viewDocuments();
 

@@ -1608,11 +1608,12 @@ definition {
 			value1 = "Asset Libraries");
 	}
 
-	@description = "This ensures that a document from depot cannot be accessed through Blogs on a connected site when a user doesn't have permissions."
+	@description = "This ensures that a document from depot cannot be accessed through Blogs on a connected site when a user doesn't have permissions. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test DocumentCannotBeSelectedWithoutPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
+		property test.name.skip.portal.instance = "DepotPermission#DocumentCannotBeSelectedWithoutPermissions";
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",

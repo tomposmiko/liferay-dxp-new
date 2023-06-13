@@ -14,6 +14,9 @@
 
 package com.liferay.object.field.business.type;
 
+import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.exception.ObjectFieldDefaultValueException;
 import com.liferay.object.exception.ObjectFieldSettingNameException;
 import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.field.render.ObjectFieldRenderingContext;
@@ -21,6 +24,9 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
@@ -63,7 +69,9 @@ public interface ObjectFieldBusinessType {
 
 	public PropertyDefinition.PropertyType getPropertyType();
 
-	public default Set<String> getRequiredObjectFieldSettingsNames() {
+	public default Set<String> getRequiredObjectFieldSettingsNames(
+		ObjectField objectField) {
+
 		return Collections.emptySet();
 	}
 
@@ -85,7 +93,7 @@ public interface ObjectFieldBusinessType {
 	}
 
 	public default void validateObjectFieldSettings(
-			long objectDefinitionId, String objectFieldName,
+			ObjectField objectField,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
 
@@ -99,7 +107,7 @@ public interface ObjectFieldBusinessType {
 		}
 
 		for (String requiredObjectFieldSettingName :
-				getRequiredObjectFieldSettingsNames()) {
+				getRequiredObjectFieldSettingsNames(objectField)) {
 
 			if (Validator.isNull(
 					objectFieldSettingsValuesMap.get(
@@ -112,7 +120,7 @@ public interface ObjectFieldBusinessType {
 
 		if (!missingRequiredObjectFieldSettingsNames.isEmpty()) {
 			throw new ObjectFieldSettingValueException.MissingRequiredValues(
-				objectFieldName, missingRequiredObjectFieldSettingsNames);
+				objectField.getName(), missingRequiredObjectFieldSettingsNames);
 		}
 
 		Set<String> notAllowedObjectFieldSettingsNames = new HashSet<>(
@@ -121,11 +129,51 @@ public interface ObjectFieldBusinessType {
 		notAllowedObjectFieldSettingsNames.removeAll(
 			getAllowedObjectFieldSettingsNames());
 		notAllowedObjectFieldSettingsNames.removeAll(
-			getRequiredObjectFieldSettingsNames());
+			getRequiredObjectFieldSettingsNames(objectField));
 
 		if (!notAllowedObjectFieldSettingsNames.isEmpty()) {
+			if (!FeatureFlagManagerUtil.isEnabled("LPS-163716") &&
+				notAllowedObjectFieldSettingsNames.contains(
+					ObjectFieldSettingConstants.NAME_DEFAULT_VALUE)) {
+
+				throw new ObjectFieldDefaultValueException(
+					StringBundler.concat(
+						"Object field can only have a default type when the ",
+						"business type is \"",
+						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST, "\""));
+			}
+
 			throw new ObjectFieldSettingNameException.NotAllowedNames(
-				objectFieldName, notAllowedObjectFieldSettingsNames);
+				objectField.getName(), notAllowedObjectFieldSettingsNames);
+		}
+
+		validateObjectFieldSettingsDefaultValue(
+			objectField, objectFieldSettingsValuesMap);
+	}
+
+	public default void validateObjectFieldSettingsDefaultValue(
+			ObjectField objectField,
+			Map<String, String> objectFieldSettingsValuesMap)
+		throws PortalException {
+
+		String defaultValueType = objectFieldSettingsValuesMap.get(
+			ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE);
+
+		if (defaultValueType == null) {
+			return;
+		}
+
+		if (!(StringUtil.equals(
+				defaultValueType,
+				ObjectFieldSettingConstants.VALUE_EXPRESSION_BUILDER) ||
+			  StringUtil.equals(
+				  defaultValueType,
+				  ObjectFieldSettingConstants.VALUE_INPUT_AS_VALUE))) {
+
+			throw new ObjectFieldSettingValueException.InvalidValue(
+				objectField.getName(),
+				ObjectFieldSettingConstants.NAME_DEFAULT_VALUE_TYPE,
+				defaultValueType);
 		}
 	}
 

@@ -55,8 +55,9 @@ const CaseResultEditTest = () => {
 	}: OutletContext = useOutletContext();
 
 	const issues = caseResult.issues
-		.map((caseResultIssue: TestrayCaseResultIssue) =>
-			splitIssueName(caseResultIssue.name)
+		.map(
+			(caseResultIssue: TestrayCaseResultIssue) =>
+				splitIssueName(caseResultIssue.name)[0]
 		)
 		.join(', ');
 

@@ -353,6 +353,34 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 			inputStream, mimeType);
 	}
 
+	public Layout copyLayout(
+			long groupId, boolean privateLayout,
+			Map<Locale, String> localeNamesMap, boolean hidden, boolean system,
+			boolean copyPermissions, long sourcePlid,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		Layout sourceLayout = layoutLocalService.getLayout(sourcePlid);
+
+		long parentLayoutId = sourceLayout.getParentLayoutId();
+
+		if (parentLayoutId == LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) {
+			GroupPermissionUtil.check(
+				permissionChecker, groupId, ActionKeys.ADD_LAYOUT);
+		}
+		else {
+			LayoutPermissionUtil.check(
+				permissionChecker, groupId, privateLayout, parentLayoutId,
+				ActionKeys.ADD_LAYOUT);
+		}
+
+		return layoutLocalService.copyLayout(
+			getUserId(), groupId, privateLayout, localeNamesMap, hidden, system,
+			copyPermissions, sourcePlid, serviceContext);
+	}
+
 	/**
 	 * Deletes the layout with the primary key, also deleting the layout's child
 	 * layouts, and associated resources.

@@ -19,6 +19,7 @@ import com.deque.html.axecore.results.Rule;
 import com.deque.html.axecore.selenium.AxeBuilder;
 import com.deque.html.axecore.selenium.AxeReporter;
 
+import com.liferay.poshi.core.PoshiGetterUtil;
 import com.liferay.poshi.core.selenium.LiferaySelenium;
 import com.liferay.poshi.core.util.CharPool;
 import com.liferay.poshi.core.util.FileUtil;
@@ -49,10 +50,6 @@ import java.awt.event.KeyEvent;
 
 import java.io.File;
 import java.io.StringReader;
-
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import java.nio.file.Paths;
 
@@ -1031,7 +1028,13 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public void get(String url) {
-		_webDriver.get(url);
+		try {
+			_webDriver.get(url);
+		}
+		catch (Throwable throwable) {
+			throw new WebDriverException(
+				"Invalid URL: " + url, throwable.getCause());
+		}
 	}
 
 	@Override
@@ -1735,11 +1738,11 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public boolean isTestName(String testName) {
-		if (testName.equals(getTestName())) {
-			return true;
-		}
+		String expectedTestName =
+			PoshiGetterUtil.getClassCommandNameFromNamespacedClassCommandName(
+				getTestName());
 
-		return false;
+		return testName.equals(expectedTestName);
 	}
 
 	@Override
@@ -2135,12 +2138,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 			targetURL = PropsValues.PORTAL_URL + targetURL;
 		}
 
-		if (_isValidURL(targetURL)) {
-			get(targetURL);
-		}
-		else {
-			throw new IllegalArgumentException("Invalid URL: " + targetURL);
-		}
+		get(targetURL);
 	}
 
 	@Override
@@ -4542,19 +4540,6 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 		private final String _message;
 
-	}
-
-	private boolean _isValidURL(String targetURL) {
-		try {
-			URL url = new URL(targetURL);
-
-			url.toURI();
-
-			return true;
-		}
-		catch (MalformedURLException | URISyntaxException exception) {
-			return false;
-		}
 	}
 
 	private static final String _OCULAR_BASELINE_IMAGE_DIR_NAME;

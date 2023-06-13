@@ -18,6 +18,7 @@ interface ContentContainerProps {
 	baseResourceURL: string;
 	editorConfig: object;
 	errors: FormError<NotificationTemplate>;
+	objectDefinitions: ObjectDefinition[];
 	selectedLocale: Locale;
 	setSelectedLocale: React.Dispatch<
 		React.SetStateAction<Liferay.Language.Locale>
@@ -29,6 +30,7 @@ export default function ContentContainer({
 	baseResourceURL,
 	editorConfig,
 	errors,
+	objectDefinitions,
 	selectedLocale,
 	setSelectedLocale,
 	setValues,

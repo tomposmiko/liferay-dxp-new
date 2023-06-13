@@ -25,12 +25,12 @@ import com.liferay.object.exception.ObjectRelationshipParameterObjectFieldIdExce
 import com.liferay.object.exception.ObjectRelationshipReverseException;
 import com.liferay.object.exception.ObjectRelationshipTypeException;
 import com.liferay.object.internal.info.collection.provider.RelatedInfoCollectionProviderFactory;
-import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
-import com.liferay.object.internal.petra.sql.dsl.DynamicObjectRelationshipMappingTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.ObjectRelationshipTable;
+import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionTable;
+import com.liferay.object.petra.sql.dsl.DynamicObjectRelationshipMappingTable;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
@@ -164,7 +164,7 @@ public class ObjectRelationshipLocalServiceImpl
 		ObjectField objectField2 = _objectFieldLocalService.getObjectField(
 			objectRelationship.getObjectFieldId2());
 
-		if (objectDefinition2.isSystem()) {
+		if (objectDefinition2.isUnmodifiableSystemObject()) {
 			_objectEntryLocalService.insertIntoOrUpdateExtensionTable(
 				objectRelationship.getObjectDefinitionId2(), primaryKey2,
 				HashMapBuilder.<String, Serializable>put(
@@ -601,6 +601,14 @@ public class ObjectRelationshipLocalServiceImpl
 	}
 
 	@Override
+	public List<ObjectRelationship> getObjectRelationshipsByObjectDefinitionId2(
+		long objectDefinitionId2) {
+
+		return objectRelationshipPersistence.findByObjectDefinitionId2(
+			objectDefinitionId2);
+	}
+
+	@Override
 	public void registerObjectRelationshipsRelatedInfoCollectionProviders(
 		ObjectDefinition objectDefinition1,
 		ObjectDefinitionLocalService objectDefinitionLocalService) {
@@ -993,12 +1001,14 @@ public class ObjectRelationshipLocalServiceImpl
 		ObjectDefinition objectDefinition2 =
 			_objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId2);
 
-		if (objectDefinition1.isSystem() && objectDefinition2.isSystem()) {
+		if (objectDefinition1.isUnmodifiableSystemObject() &&
+			objectDefinition2.isUnmodifiableSystemObject()) {
+
 			throw new ObjectRelationshipTypeException(
 				"Relationships are not allowed between system objects");
 		}
 
-		if (objectDefinition1.isSystem() &&
+		if (objectDefinition1.isUnmodifiableSystemObject() &&
 			Objects.equals(type, ObjectRelationshipConstants.TYPE_ONE_TO_ONE)) {
 
 			throw new ObjectRelationshipTypeException(
@@ -1028,7 +1038,7 @@ public class ObjectRelationshipLocalServiceImpl
 			ObjectDefinition objectDefinition, long primaryKey)
 		throws PortalException {
 
-		if (objectDefinition.isSystem()) {
+		if (objectDefinition.isUnmodifiableSystemObject()) {
 			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
 				_systemObjectDefinitionMetadataRegistry.
 					getSystemObjectDefinitionMetadata(
@@ -1051,7 +1061,7 @@ public class ObjectRelationshipLocalServiceImpl
 
 		String restContextPath = StringPool.BLANK;
 
-		if (!objectDefinition1.isSystem()) {
+		if (!objectDefinition1.isUnmodifiableSystemObject()) {
 			restContextPath = objectDefinition1.getRESTContextPath();
 		}
 		else {

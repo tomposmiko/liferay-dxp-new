@@ -22,14 +22,22 @@ import groovy.lang.Closure;
 
 import java.io.File;
 
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
+import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.invocation.Gradle;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtensionContainer;
 
@@ -47,6 +55,7 @@ public class WorkspacePlugin implements Plugin<Settings> {
 	@SuppressWarnings("serial")
 	public void apply(Settings settings) {
 		Gradle gradle = settings.getGradle();
+		File rootDir = settings.getRootDir();
 
 		final WorkspaceExtension workspaceExtension = _addWorkspaceExtension(
 			settings);
@@ -54,12 +63,14 @@ public class WorkspacePlugin implements Plugin<Settings> {
 		for (ProjectConfigurator projectConfigurator :
 				workspaceExtension.getProjectConfigurators()) {
 
-			for (File rootDir : projectConfigurator.getDefaultRootDirs()) {
+			for (File defaultRootDir :
+					projectConfigurator.getDefaultRootDirs()) {
+
 				for (File projectDir :
-						projectConfigurator.getProjectDirs(rootDir)) {
+						projectConfigurator.getProjectDirs(defaultRootDir)) {
 
 					String projectPath = GradleUtil.getProjectPath(
-						projectDir, settings.getRootDir());
+						projectDir, rootDir);
 
 					settings.include(new String[] {projectPath});
 
@@ -99,6 +110,61 @@ public class WorkspacePlugin implements Plugin<Settings> {
 					}
 				}
 
+			});
+
+		String absolutePath = rootDir.getAbsolutePath();
+
+		if (File.separatorChar == '\\') {
+			absolutePath = absolutePath.replace('\\', '/');
+		}
+
+		String rootAbsolutePath = absolutePath;
+
+		Path rootDirPath = rootDir.toPath();
+
+		FileSystem fileSystem = rootDirPath.getFileSystem();
+
+		gradle.afterProject(
+			project -> {
+				StartParameter startParameter = gradle.getStartParameter();
+
+				File projectDir = project.getProjectDir();
+
+				if (Objects.equals(
+						startParameter.getCurrentDir(), projectDir)) {
+
+					return;
+				}
+
+				Path path = projectDir.toPath();
+
+				for (String glob : workspaceExtension.getDirExcludesGlobs()) {
+					PathMatcher pathMatcher = fileSystem.getPathMatcher(
+						"glob:" + rootAbsolutePath + '/' + glob);
+
+					if (!pathMatcher.matches(path)) {
+						continue;
+					}
+
+					Logger logger = project.getLogger();
+
+					if (logger.isInfoEnabled()) {
+						logger.info(
+							"Disabling tasks for {} because it matches the " +
+								"exclude pattern {}.",
+							project.getPath(), glob);
+					}
+
+					Map<Project, Set<Task>> map = project.getAllTasks(false);
+
+					for (Map.Entry<Project, Set<Task>> entry : map.entrySet()) {
+						for (Task task : entry.getValue()) {
+							task.setEnabled(false);
+						}
+					}
+
+					return;
+				}
 			});
 	}
 

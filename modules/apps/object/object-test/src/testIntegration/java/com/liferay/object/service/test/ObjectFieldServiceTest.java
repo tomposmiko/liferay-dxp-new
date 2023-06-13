@@ -39,8 +39,10 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.Collections;
@@ -66,6 +68,11 @@ public class ObjectFieldServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-163716", "true"
+			).build());
+
 		_defaultUser = _userLocalService.getDefaultUser(
 			TestPropsValues.getCompanyId());
 		_objectDefinition = ObjectDefinitionTestUtil.addObjectDefinition(
@@ -90,6 +97,11 @@ public class ObjectFieldServiceTest {
 		PermissionThreadLocal.setPermissionChecker(_originalPermissionChecker);
 
 		PrincipalThreadLocal.setName(_originalName);
+
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-163716", "false"
+			).build());
 	}
 
 	@Test
@@ -190,9 +202,9 @@ public class ObjectFieldServiceTest {
 			null, user.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(),
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
+			ObjectFieldConstants.DB_TYPE_STRING, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), true, false, Collections.emptyList());
+			false, StringUtil.randomId(), true, false, Collections.emptyList());
 	}
 
 	private void _setUser(User user) {
@@ -213,9 +225,10 @@ public class ObjectFieldServiceTest {
 			objectField = _objectFieldService.addCustomObjectField(
 				null, 0, objectDefinitionId,
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-				ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
+				ObjectFieldConstants.DB_TYPE_STRING, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				StringUtil.randomId(), true, false, Collections.emptyList());
+				false, StringUtil.randomId(), true, false,
+				Collections.emptyList());
 		}
 		finally {
 			if (objectField != null) {
@@ -270,10 +283,10 @@ public class ObjectFieldServiceTest {
 
 			objectField = _objectFieldService.updateObjectField(
 				StringPool.BLANK, objectField.getObjectFieldId(), 0, "Text",
-				"String", null, true, false,
+				ObjectFieldConstants.DB_TYPE_STRING, true, false,
 				LanguageUtil.getLanguageId(LocaleUtil.getDefault()),
-				LocalizedMapUtil.getLocalizedMap("baker"), "baker", true, false,
-				Collections.emptyList());
+				LocalizedMapUtil.getLocalizedMap("baker"), false, "baker", true,
+				false, Collections.emptyList());
 		}
 		finally {
 			if (objectField != null) {

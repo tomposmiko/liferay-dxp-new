@@ -570,8 +570,7 @@ public class RootProjectConfigurator implements Plugin<Project> {
 			project, CREATE_DOCKER_CONTAINER_TASK_NAME,
 			DockerCreateContainer.class);
 
-		dockerCreateContainer.dependsOn(
-			verifyProductTask, dockerBuildImage, dockerRemoveContainer);
+		dockerCreateContainer.dependsOn(verifyProductTask, dockerBuildImage);
 		dockerCreateContainer.mustRunAfter(
 			verifyProductTask, dockerRemoveContainer);
 
@@ -606,22 +605,28 @@ public class RootProjectConfigurator implements Plugin<Project> {
 		DockerCreateContainer.HostConfig hostConfig =
 			dockerCreateContainer.getHostConfig();
 
-		MapProperty<String, String> binds = hostConfig.getBinds();
+		Property<Boolean> autoRemoveProperty = hostConfig.getAutoRemove();
 
-		binds.put(clientExtensionsPath, "/opt/liferay/osgi/client-extensions");
-		binds.put(deployPath, "/mnt/liferay/deploy");
-		binds.put(workPath, "/opt/liferay/work");
+		autoRemoveProperty.set(true);
+
+		MapProperty<String, String> bindsMapProperty = hostConfig.getBinds();
+
+		bindsMapProperty.put(
+			clientExtensionsPath, "/opt/liferay/osgi/client-extensions");
+		bindsMapProperty.put(deployPath, "/mnt/liferay/deploy");
+		bindsMapProperty.put(workPath, "/opt/liferay/work");
 
 		dockerCreateContainer.setDescription(
 			"Creates a Docker container from your built image and mounts " +
 				dockerPath + " to /mnt/liferay.");
 		dockerCreateContainer.setGroup(DOCKER_GROUP);
 
-		ListProperty<String> portBindings = hostConfig.getPortBindings();
+		ListProperty<String> portBindingsListProperty =
+			hostConfig.getPortBindings();
 
-		portBindings.add("8000:8000");
-		portBindings.add("8080:8080");
-		portBindings.add("11311:11311");
+		portBindingsListProperty.add("8000:8000");
+		portBindingsListProperty.add("8080:8080");
+		portBindingsListProperty.add("11311:11311");
 
 		dockerCreateContainer.targetImageId(
 			new Callable<String>() {
@@ -1078,7 +1083,7 @@ public class RootProjectConfigurator implements Plugin<Project> {
 						try {
 							URL srcURL = (URL)src;
 
-							if (Objects.equals("file", srcURL.getProtocol())) {
+							if (Objects.equals(srcURL.getProtocol(), "file")) {
 								URI uri = project.uri(src);
 
 								file = project.file(uri);

@@ -63,6 +63,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.service.AddressLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
@@ -334,16 +335,22 @@ public class AccountEntryLocalServiceImpl
 
 		accountEntry = super.deleteAccountEntry(accountEntry);
 
-		// Group
-
-		_groupLocalService.deleteGroup(accountEntry.getAccountEntryGroup());
-
 		// Resources
 
 		_resourceLocalService.deleteResource(
 			accountEntry.getCompanyId(), AccountEntry.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			accountEntry.getAccountEntryId());
+
+		// Addresses
+
+		_addressLocalService.deleteAddresses(
+			accountEntry.getCompanyId(), AccountEntry.class.getName(),
+			accountEntry.getAccountEntryId());
+
+		// Group
+
+		_groupLocalService.deleteGroup(accountEntry.getAccountEntryGroup());
 
 		// Asset
 
@@ -1243,6 +1250,9 @@ public class AccountEntryLocalServiceImpl
 	@Reference
 	private AccountEntryEmailAddressValidatorFactory
 		_accountEntryEmailAddressValidatorFactory;
+
+	@Reference
+	private AddressLocalService _addressLocalService;
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;

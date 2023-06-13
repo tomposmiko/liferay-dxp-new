@@ -39,6 +39,21 @@ public class UpgradeSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testUpgradeBNDIncludeResourceCheck() throws Exception {
+		test("upgrade/upgrade-include-resource-check/bnd.testbnd");
+	}
+
+	@Test
+	public void testUpgradeGradleIncludeResourceCheck() throws Exception {
+		test(
+			"upgrade/upgrade-include-resource-check/build.testgradle",
+			new String[0],
+			new String[] {
+				"upgrade/upgrade-include-resource-check/bnd.testbnd"
+			});
+	}
+
+	@Test
 	public void testXMLUpgradeDTDVersionCheck() throws Exception {
 		test("upgrade/GradleUpgradeReleaseDxpCheck.testgradle");
 	}

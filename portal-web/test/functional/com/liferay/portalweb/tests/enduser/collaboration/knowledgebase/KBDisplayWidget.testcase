@@ -357,9 +357,12 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title 2");
 	}
 
+	@description = "Skip the instance for performance improvement."
 	@priority = 3
 	@refactorneeded
 	test CanViewArticlesWithDifferentSiteScopes {
+		property test.name.skip.portal.instance = "KBDisplayWidget#CanViewArticlesWithDifferentSiteScopes";
+
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Knowledge Base Display Page 2");
@@ -389,6 +392,8 @@ definition {
 			portlet = "Knowledge Base",
 			scope = "Knowledge Base Display Page");
 
+		WaitForElementPresent(locator1 = "KnowledgeBase#PAGE_TREE_PANEL_OPENED");
+
 		KBArticle.addCP(
 			kbArticleContent = "Knowledge Base Article Content",
 			kbArticleTitle = "Knowledge Base Article Title for Page");
@@ -399,6 +404,8 @@ definition {
 			category = "Content & Data",
 			portlet = "Knowledge Base",
 			scope = "Knowledge Base Display Page 2");
+
+		WaitForElementPresent(locator1 = "KnowledgeBase#PAGE_TREE_PANEL_OPENED");
 
 		KBArticle.addCP(
 			kbArticleContent = "Knowledge Base Article Content",

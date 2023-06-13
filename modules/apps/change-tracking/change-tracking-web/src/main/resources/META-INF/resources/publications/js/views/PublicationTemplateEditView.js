@@ -14,6 +14,7 @@
 
 import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
+import {ClayCheckbox} from '@clayui/form';
 import {fetch, navigate, objectToFormData} from 'frontend-js-web';
 import React, {useState} from 'react';
 
@@ -26,6 +27,8 @@ export default function PublicationTemplateEditView({
 	actionUrl,
 	collaboratorsProps,
 	ctCollectionTemplateId,
+	defaultCTCollectionTemplate,
+	defaultSandboxCTCollectionTemplate,
 	description,
 	getTemplateCollaboratorsURL,
 	name,
@@ -36,17 +39,26 @@ export default function PublicationTemplateEditView({
 	saveButtonLabel,
 	tokens,
 }) {
-	const [showModal, setShowModal] = useState(false);
 	const [collaboratorData, setCollaboratorData] = useState(null);
-	const [nameField, setNameField] = useState(name);
+	const [
+		defaultCTCollectionTemplateField,
+		setDefaultCTCollectionTemplateField,
+	] = useState(defaultCTCollectionTemplate);
+	const [
+		defaultSandboxCTCollectionTemplateField,
+		setDefaultSandboxCTCollectionTemplateField,
+	] = useState(defaultSandboxCTCollectionTemplate);
 	const [descriptionField, setDescriptionField] = useState(description);
-	const [publicationNameField, setPublicationNameField] = useState(
-		publicationName
-	);
+	const [nameField, setNameField] = useState(name);
 	const [
 		publicationDescriptionField,
 		setPublicationDescriptionField,
 	] = useState(publicationDescription);
+	const [publicationNameField, setPublicationNameField] = useState(
+		publicationName
+	);
+
+	const [showModal, setShowModal] = useState(false);
 
 	const afterSubmitNotification = () => {
 		setShowModal(false);
@@ -69,6 +81,8 @@ export default function PublicationTemplateEditView({
 			[`${namespace}userIds`]: collaboratorData
 				? collaboratorData['userIds']
 				: null,
+			[`${namespace}defaultCTCollectionTemplate`]: defaultCTCollectionTemplateField,
+			[`${namespace}defaultSandboxCTCollectionTemplate`]: defaultSandboxCTCollectionTemplateField,
 		});
 
 		fetch(actionUrl, {
@@ -147,6 +161,26 @@ export default function PublicationTemplateEditView({
 					'publication-template-description-placeholder'
 				)}
 				required={false}
+			/>
+
+			<ClayCheckbox
+				checked={defaultCTCollectionTemplateField}
+				label={Liferay.Language.get('default-template')}
+				onChange={() =>
+					setDefaultCTCollectionTemplateField(
+						!defaultCTCollectionTemplateField
+					)
+				}
+			/>
+
+			<ClayCheckbox
+				checked={defaultSandboxCTCollectionTemplateField}
+				label={Liferay.Language.get('default-sandbox-template')}
+				onChange={() =>
+					setDefaultSandboxCTCollectionTemplateField(
+						!defaultSandboxCTCollectionTemplateField
+					)
+				}
 			/>
 
 			<CollapsablePanel
