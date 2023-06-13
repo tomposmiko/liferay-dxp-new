@@ -16,6 +16,8 @@ package com.liferay.object.service.impl;
 
 import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
+import com.liferay.notification.model.NotificationTemplate;
+import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
@@ -112,8 +114,9 @@ public class ObjectActionLocalServiceImpl
 		User user = _userLocalService.getUser(userId);
 
 		_validateParametersUnicodeProperties(
-			user.getCompanyId(), conditionExpression, objectActionExecutorKey,
-			objectActionTriggerKey, parametersUnicodeProperties);
+			user.getCompanyId(), userId, conditionExpression,
+			objectActionExecutorKey, objectActionTriggerKey,
+			parametersUnicodeProperties);
 
 		ObjectAction objectAction = objectActionPersistence.create(
 			counterLocalService.increment());
@@ -296,9 +299,9 @@ public class ObjectActionLocalServiceImpl
 		_validateObjectActionExecutorKey(objectActionExecutorKey);
 
 		_validateParametersUnicodeProperties(
-			objectAction.getCompanyId(), conditionExpression,
-			objectActionExecutorKey, objectActionTriggerKey,
-			parametersUnicodeProperties);
+			objectAction.getCompanyId(), objectAction.getUserId(),
+			conditionExpression, objectActionExecutorKey,
+			objectActionTriggerKey, parametersUnicodeProperties);
 
 		if (Validator.isNotNull(externalReferenceCode)) {
 			objectAction.setExternalReferenceCode(externalReferenceCode);
@@ -493,7 +496,7 @@ public class ObjectActionLocalServiceImpl
 	}
 
 	private void _validateParametersUnicodeProperties(
-			long companyId, String conditionExpression,
+			long companyId, long userId, String conditionExpression,
 			String objectActionExecutorKey, String objectActionTriggerKey,
 			UnicodeProperties parametersUnicodeProperties)
 		throws PortalException {
@@ -590,6 +593,44 @@ public class ObjectActionLocalServiceImpl
 				catch (ObjectScriptingException objectScriptingException) {
 					errorMessageKeys.put(
 						"script", objectScriptingException.getMessageKey());
+				}
+			}
+		}
+		else if (Objects.equals(
+					objectActionExecutorKey,
+					ObjectActionExecutorConstants.KEY_NOTIFICATION)) {
+
+			String notificationTemplateExternalReferenceCode =
+				GetterUtil.getString(
+					parametersUnicodeProperties.remove(
+						"notificationTemplateExternalReferenceCode"));
+
+			if (Validator.isNotNull(
+					notificationTemplateExternalReferenceCode)) {
+
+				NotificationTemplate existingNotificationTemplate =
+					_notificationTemplateLocalService.
+						fetchNotificationTemplateByExternalReferenceCode(
+							notificationTemplateExternalReferenceCode,
+							companyId);
+
+				String type = GetterUtil.getString(
+					parametersUnicodeProperties.remove("type"));
+
+				if ((existingNotificationTemplate == null) && (type != null)) {
+					existingNotificationTemplate =
+						_notificationTemplateLocalService.
+							addNotificationTemplate(
+								notificationTemplateExternalReferenceCode,
+								userId, type);
+				}
+
+				if (existingNotificationTemplate != null) {
+					parametersUnicodeProperties.put(
+						"notificationTemplateId",
+						String.valueOf(
+							existingNotificationTemplate.
+								getNotificationTemplateId()));
 				}
 			}
 		}
@@ -705,6 +746,9 @@ public class ObjectActionLocalServiceImpl
 
 	@Reference
 	private MessageBus _messageBus;
+
+	@Reference
+	private NotificationTemplateLocalService _notificationTemplateLocalService;
 
 	@Reference
 	private ObjectActionExecutorRegistry _objectActionExecutorRegistry;

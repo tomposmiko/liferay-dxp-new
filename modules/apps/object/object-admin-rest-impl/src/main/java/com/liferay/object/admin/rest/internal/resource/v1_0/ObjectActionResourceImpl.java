@@ -14,13 +14,13 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
+import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectAction;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectActionResource;
 import com.liferay.object.service.ObjectActionService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -29,6 +29,7 @@ import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import org.osgi.service.component.annotations.Component;
@@ -211,8 +212,12 @@ public class ObjectActionResourceImpl
 					objectAction.getObjectDefinitionId())
 			).build(),
 			contextAcceptLanguage.getPreferredLocale(),
-			_objectDefinitionLocalService, objectAction);
+			_notificationTemplateLocalService, _objectDefinitionLocalService,
+			objectAction);
 	}
+
+	@Reference
+	private NotificationTemplateLocalService _notificationTemplateLocalService;
 
 	@Reference
 	private ObjectActionService _objectActionService;

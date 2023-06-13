@@ -54,6 +54,8 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeDefinition;
 import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeEntry;
@@ -83,6 +85,7 @@ import com.liferay.knowledge.base.util.comparator.KBArticlePriorityComparator;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.notification.rest.dto.v1_0.NotificationTemplate;
 import com.liferay.notification.rest.resource.v1_0.NotificationTemplateResource;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectRelationship;
@@ -99,6 +102,9 @@ import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
@@ -404,7 +410,8 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals(
 			"liferay-test-remote-app", customElementCET.getHTMLElementName());
 		Assert.assertEquals(
-			"category.remote-apps", customElementCET.getPortletCategoryName());
+			"category.client-extensions",
+			customElementCET.getPortletCategoryName());
 	}
 
 	private void _assertCommerceCatalogs(Group group) throws Exception {
@@ -789,8 +796,61 @@ public class BundleSiteInitializerTest {
 			"This is the body for Test KB Article 3.", kbArticle3.getContent());
 	}
 
-	private void _assertLayoutPageTemplateEntry(Group group) throws Exception {
+	private void _assertLayoutPageTemplateEntries(Group group)
+		throws JSONException {
+
+		// Test Display Page Template
+
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				group.getGroupId(), "Test Display Page Template",
+				LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE);
+
+		Assert.assertNotNull(layoutPageTemplateEntry);
+		Assert.assertEquals(
+			"Test Display Page Template", layoutPageTemplateEntry.getName());
+
+		List<FragmentEntryLink> fragmentEntryLinks =
+			_fragmentEntryLinkLocalService.getFragmentEntryLinksByPlid(
+				group.getGroupId(), layoutPageTemplateEntry.getPlid());
+
+		Assert.assertEquals(
+			fragmentEntryLinks.toString(), 1, fragmentEntryLinks.size());
+
+		FragmentEntryLink fragmentEntryLink = fragmentEntryLinks.get(0);
+
+		JSONObject editableValuesJSONObject = JSONFactoryUtil.createJSONObject(
+			fragmentEntryLink.getEditableValues());
+
+		Assert.assertNotNull(editableValuesJSONObject);
+
+		JSONObject editableFragmentEntryProcessorJSONObject =
+			editableValuesJSONObject.getJSONObject(
+				"com.liferay.fragment.entry.processor.editable." +
+					"EditableFragmentEntryProcessor");
+
+		Assert.assertNotNull(editableFragmentEntryProcessorJSONObject);
+
+		JSONObject linkJSONObject =
+			editableFragmentEntryProcessorJSONObject.getJSONObject("link");
+
+		Assert.assertNotNull(linkJSONObject);
+
+		JSONObject configJSONObject = linkJSONObject.getJSONObject("config");
+
+		Assert.assertNotNull(configJSONObject);
+
+		JSONObject layoutJSONObject = configJSONObject.getJSONObject("layout");
+
+		Assert.assertNotNull(layoutJSONObject);
+		Assert.assertEquals(
+			group.getGroupId(), layoutJSONObject.getLong("groupId"));
+		Assert.assertFalse(layoutJSONObject.getBoolean("privateLayout"));
+		Assert.assertEquals("/home", layoutJSONObject.getString("value"));
+
+		// Test Master Page
+
+		layoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
 				group.getGroupId(), "Test Master Page",
 				LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT);
@@ -1340,9 +1400,17 @@ public class BundleSiteInitializerTest {
 			group.getCompanyId(), "Test Role 2");
 
 		Assert.assertNotNull(role2);
-		Assert.assertEquals(1, role2.getType());
+		Assert.assertEquals(6, role2.getType());
 
 		_assertRolesAssignments(2, role2.getRoleId());
+
+		ResourcePermission resourcePermission =
+			_resourcePermissionLocalService.fetchResourcePermission(
+				group.getCompanyId(), "com.liferay.portal.kernel.model.Role", 1,
+				String.valueOf(group.getCompanyId()), role2.getRoleId());
+
+		Assert.assertEquals(1, resourcePermission.getScope());
+		Assert.assertTrue(resourcePermission.isViewActionId());
 
 		Role role3 = _roleLocalService.fetchRole(
 			group.getCompanyId(), "Test Role 3");
@@ -1781,9 +1849,9 @@ public class BundleSiteInitializerTest {
 			_assertFragmentEntries(group, serviceContext);
 			_assertJournalArticles(group);
 			_assertKBArticles(group);
-			_assertLayoutPageTemplateEntry(group);
-			_assertLayouts(group, serviceContext);
+			_assertLayoutPageTemplateEntries(group);
 			_assertLayoutSets(group);
+			_assertLayouts(group, serviceContext);
 			_assertListTypeDefinitions(serviceContext);
 			_assertNotificationTemplate(serviceContext);
 			_assertObjectDefinitions(group, serviceContext);
@@ -1901,6 +1969,9 @@ public class BundleSiteInitializerTest {
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 
 	@Inject
+	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Inject
 	private FragmentEntryLocalService _fragmentEntryLocalService;
 
 	@Inject
@@ -1924,6 +1995,10 @@ public class BundleSiteInitializerTest {
 	@Inject
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
+
+	@Inject
+	private LayoutPageTemplateStructureLocalService
+		_layoutPageTemplateStructureLocalService;
 
 	@Inject
 	private LayoutSetLocalService _layoutSetLocalService;

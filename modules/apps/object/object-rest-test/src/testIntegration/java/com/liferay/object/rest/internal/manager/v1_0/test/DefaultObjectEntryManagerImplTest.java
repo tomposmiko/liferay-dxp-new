@@ -65,7 +65,6 @@ import com.liferay.object.service.ObjectFieldService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -119,6 +118,7 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -1044,6 +1044,24 @@ public class DefaultObjectEntryManagerImplTest {
 				}
 			},
 			ObjectDefinitionConstants.SCOPE_COMPANY);
+
+		// And/Or with Parentheses
+
+		_testGetObjectEntries(
+			HashMapBuilder.put(
+				"filter",
+				StringBundler.concat(
+					_buildEqualsExpressionFilterString(
+						"picklistObjectFieldName", picklistObjectFieldValue1),
+					" and (",
+					_buildEqualsExpressionFilterString(
+						"picklistObjectFieldName", picklistObjectFieldValue1),
+					" or ",
+					_buildEqualsExpressionFilterString(
+						"picklistObjectFieldName", picklistObjectFieldValue2),
+					")")
+			).build(),
+			childObjectEntry1);
 
 		// Equals expression
 
