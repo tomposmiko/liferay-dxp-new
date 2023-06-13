@@ -11,7 +11,7 @@
 
 import {createContext, useContext, useEffect, useReducer} from 'react';
 import client from '../../../apolloClient';
-import {useApplicationProvider} from '../../../common/context/AppPropertiesProvider';
+import {useAppPropertiesContext} from '../../../common/contexts/AppPropertiesContext';
 import {Liferay} from '../../../common/services/liferay';
 import {
 	getAccountByExternalReferenceCode,
@@ -56,12 +56,10 @@ const eventKoroneikiAccounts = Liferay.publish(
 	}
 );
 
-const AppContextProvider = ({assetsPath, children, page}) => {
-	const {oktaSessionURL} = useApplicationProvider();
+const AppContextProvider = ({children}) => {
+	const {oktaSessionAPI} = useAppPropertiesContext();
 	const [state, dispatch] = useReducer(reducer, {
-		assetsPath,
 		isQuickLinksExpanded: true,
-		page,
 		project: undefined,
 		quickLinks: undefined,
 		sessionId: '',
@@ -201,7 +199,7 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 		};
 
 		const getSessionId = async () => {
-			const session = await getCurrentSession(oktaSessionURL);
+			const session = await getCurrentSession(oktaSessionAPI);
 
 			if (session) {
 				dispatch({
@@ -280,7 +278,7 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 
 		fetchData();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [oktaSessionURL]);
+	}, [oktaSessionAPI]);
 
 	return (
 		<AppContext.Provider value={[state, dispatch]}>

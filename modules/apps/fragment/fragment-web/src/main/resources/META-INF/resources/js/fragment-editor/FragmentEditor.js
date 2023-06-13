@@ -23,6 +23,7 @@ import {
 	fetch,
 	objectToFormData,
 	openToast,
+	sub,
 } from 'frontend-js-web';
 import React, {useCallback, useEffect, useState} from 'react';
 
@@ -44,6 +45,7 @@ const FragmentEditor = ({
 		},
 		autocompleteTags,
 		cacheable,
+		cacheableEnabled,
 		dataAttributes,
 		fieldTypes: availableFieldTypes,
 		fragmentCollectionId,
@@ -294,6 +296,7 @@ const FragmentEditor = ({
 											<input
 												checked={isCacheable}
 												className="custom-control-input toggle-switch-check"
+												disabled={!cacheableEnabled}
 												name="cacheable"
 												onChange={(event) =>
 													setIsCacheable(
@@ -366,7 +369,7 @@ const FragmentEditor = ({
 						<div className="javascript source-editor">
 							<CodeMirrorEditor
 								codeFooterText="}"
-								codeHeaderHelpText={Liferay.Util.sub(
+								codeHeaderHelpText={sub(
 									Liferay.Language.get(
 										'parameter-x-provides-access-to-the-current-fragment-node-use-it-to-manipulate-fragment-components'
 									),

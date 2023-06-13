@@ -29,7 +29,10 @@ import {
 	defaultLocale,
 } from '../utils/locale';
 import {BasicInfo, Conditions} from './DataValidation/ObjectValidationTabs';
-import {useObjectValidationForm} from './ObjectValidationFormBase';
+import {
+	ObjectValidationErrors,
+	useObjectValidationForm,
+} from './ObjectValidationFormBase';
 
 const TABS = [
 	{
@@ -48,8 +51,13 @@ export default function EditObjectValidation({
 	readOnly,
 }: IProps) {
 	const [activeIndex, setActiveIndex] = useState<number>(0);
+	const [errorMessage, setErrorMessage] = useState<ObjectValidationErrors>(
+		{}
+	);
 
 	const onSubmit = async (objectValidation: ObjectValidation) => {
+		delete objectValidation.ffUseMetadataAsSystemFields;
+
 		const response = await fetch(
 			`/o/object-admin/v1.0/object-validation-rules/${objectValidation.id}`,
 			{
@@ -68,9 +76,17 @@ export default function EditObjectValidation({
 			});
 		}
 		else {
-			const message = Liferay.Language.get('an-error-occurred');
+			const {detail} = (await response.json()) as {detail: string};
+			const {fieldName, message} = JSON.parse(detail) as {
+				fieldName: keyof ObjectValidationErrors;
+				message: string;
+			};
 
-			openToast({message, type: 'danger'});
+			setErrorMessage({[fieldName]: message});
+			openToast({
+				message: Liferay.Language.get('an-error-occurred'),
+				type: 'danger',
+			});
 		}
 	};
 
@@ -114,7 +130,14 @@ export default function EditObjectValidation({
 								componentLabel={label}
 								defaultLocale={defaultLocale!}
 								disabled={readOnly}
-								errors={errors}
+								errors={
+									Object.keys(errors).length !== 0
+										? errors
+										: errorMessage
+								}
+								ffUseMetadataAsSystemFields={
+									values.ffUseMetadataAsSystemFields as boolean
+								}
 								handleChange={handleChange}
 								locales={availableLocales}
 								objectValidationRuleElements={

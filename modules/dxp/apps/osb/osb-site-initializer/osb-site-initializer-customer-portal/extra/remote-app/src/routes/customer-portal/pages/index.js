@@ -10,29 +10,17 @@
  */
 
 import {useCustomerPortal} from '../context';
-import {PAGE_TYPES} from '../utils/constants';
-import Home from './Home';
 import Overview from './Project/Overview';
 import ProjectRoutes from './Project/routes/project.routes';
 
 const Pages = () => {
-	const [{page, userAccount}] = useCustomerPortal();
-	const PageLayout = {
-		[PAGE_TYPES.home]: {
-			Component: <Home userAccount={userAccount} />,
-			Skeleton: <Home.Skeleton />,
-		},
-		[PAGE_TYPES.overview]: {
-			Component: <ProjectRoutes />,
-			Skeleton: <Overview.Skeleton />,
-		},
-	};
+	const [{userAccount}] = useCustomerPortal();
 
 	if (userAccount) {
-		return PageLayout[page].Component;
+		return <ProjectRoutes />;
 	}
 
-	return PageLayout[page].Skeleton;
+	return <Overview.Skeleton />;
 };
 
 export default Pages;

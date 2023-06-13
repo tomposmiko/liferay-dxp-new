@@ -16,11 +16,11 @@ package com.liferay.object.internal.action.engine;
 
 import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpression;
-import com.liferay.dynamic.data.mapping.expression.DDMExpressionException;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
+import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.internal.action.util.ObjectActionVariablesUtil;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
@@ -31,8 +31,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
@@ -65,28 +63,22 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 	}
 
 	private boolean _evaluateConditionExpression(
-		String conditionExpression, Map<String, Object> variables) {
+			String conditionExpression, Map<String, Object> variables)
+		throws Exception {
 
 		if (Validator.isNull(conditionExpression)) {
 			return true;
 		}
 
-		try {
-			DDMExpression<Boolean> ddmExpression =
-				_ddmExpressionFactory.createExpression(
-					CreateExpressionRequest.Builder.newBuilder(
-						conditionExpression
-					).build());
+		DDMExpression<Boolean> ddmExpression =
+			_ddmExpressionFactory.createExpression(
+				CreateExpressionRequest.Builder.newBuilder(
+					conditionExpression
+				).build());
 
-			ddmExpression.setVariables(variables);
+		ddmExpression.setVariables(variables);
 
-			return ddmExpression.evaluate();
-		}
-		catch (DDMExpressionException ddmExpressionException) {
-			_log.error(ddmExpressionException);
-
-			return false;
-		}
+		return ddmExpression.evaluate();
 	}
 
 	private void _executeObjectActions(
@@ -129,21 +121,32 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 				objectActionTriggerKey);
 
 		for (ObjectAction objectAction : objectActions) {
-			if (GetterUtil.getBoolean(
-					PropsUtil.get("feature.flag.LPS-152181")) &&
-				!_evaluateConditionExpression(
-					objectAction.getConditionExpression(), variables)) {
+			try {
+				if (!_evaluateConditionExpression(
+						objectAction.getConditionExpression(), variables)) {
 
-				continue;
+					continue;
+				}
+
+				ObjectActionExecutor objectActionExecutor =
+					_objectActionExecutorRegistry.getObjectActionExecutor(
+						objectAction.getObjectActionExecutorKey());
+
+				objectActionExecutor.execute(
+					companyId, objectAction.getParametersUnicodeProperties(),
+					payloadJSONObject, userId);
+
+				_objectActionLocalService.updateStatus(
+					objectAction.getObjectActionId(),
+					ObjectActionConstants.STATUS_SUCCESS);
 			}
+			catch (Exception exception) {
+				_log.error(exception);
 
-			ObjectActionExecutor objectActionExecutor =
-				_objectActionExecutorRegistry.getObjectActionExecutor(
-					objectAction.getObjectActionExecutorKey());
-
-			objectActionExecutor.execute(
-				companyId, objectAction.getParametersUnicodeProperties(),
-				payloadJSONObject, userId);
+				_objectActionLocalService.updateStatus(
+					objectAction.getObjectActionId(),
+					ObjectActionConstants.STATUS_FAILED);
+			}
 		}
 	}
 

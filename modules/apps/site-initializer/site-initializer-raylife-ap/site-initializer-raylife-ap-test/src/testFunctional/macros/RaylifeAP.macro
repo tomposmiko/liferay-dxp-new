@@ -1,10 +1,7 @@
 definition {
 
 	macro createRaylifeAPSite {
-		ApplicationsMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Sites");
+		Site.openSitesAdmin();
 
 		LexiconEntry.gotoAdd();
 
@@ -18,20 +15,13 @@ definition {
 
 		Click(locator1 = "Button#ADD");
 
-		AssertElementPresent(locator1 = "RaylifeAP#SAVE_LOADING_ANIMATION");
-
 		Alert.viewSuccessMessage();
+
+		Refresh();
 	}
 
 	macro tearDownCP {
-		Refresh();
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Sites");
-
-		Refresh();
+		Site.openSitesAdmin();
 
 		PortletEntry.selectAll();
 

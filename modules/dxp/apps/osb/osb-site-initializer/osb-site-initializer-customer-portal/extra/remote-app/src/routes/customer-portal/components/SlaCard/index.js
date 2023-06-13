@@ -15,7 +15,7 @@ import {useEffect, useState} from 'react';
 import i18n from '../../../../common/I18n';
 import {FORMAT_DATE} from '../../../../common/utils/constants/slaCardDate';
 import {SLA_CARD_NAMES} from '../../../../common/utils/constants/slaCardNames';
-import getDateCustomFormat from '../../utils/getDateCustomFormat';
+import getDateCustomFormat from '../../../../common/utils/getDateCustomFormat';
 import SlaCardLayout from './Layout';
 
 const SlaCard = ({project}) => {

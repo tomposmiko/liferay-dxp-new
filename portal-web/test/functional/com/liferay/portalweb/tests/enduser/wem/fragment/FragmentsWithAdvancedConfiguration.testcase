@@ -129,7 +129,7 @@ definition {
 		}
 
 		task ("View the Advanced Config Field is persisted after publish") {
-			PageEditor.clickPublish();
+			PageEditor.publish();
 
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Page Name",
@@ -180,7 +180,7 @@ definition {
 		}
 
 		task ("Publish the page") {
-			PageEditor.clickPublish();
+			PageEditor.publish();
 		}
 
 		task ("Search 'Go Somewhere' from page search bar, assert a search result about Button fragment") {
@@ -206,7 +206,7 @@ definition {
 		}
 
 		task ("Publish the page") {
-			PageEditor.clickPublish();
+			PageEditor.publish();
 		}
 
 		task ("Search 'Go Somewhere' from page search bar, assert no search result about Button fragment") {
@@ -266,7 +266,7 @@ definition {
 
 			PageEditor.waitForAutoSave();
 
-			PageEditor.clickPublish();
+			PageEditor.publish();
 		}
 
 		task ("Create a couple more content pages with the same Paragraph fragment") {
@@ -318,7 +318,7 @@ definition {
 
 			PageEditor.configureFragment(hideFromSiteSearchResults = "true");
 
-			PageEditor.clickPublish();
+			PageEditor.publish();
 		}
 
 		task ("Search 'footer' from page search bar, assert the page with Hide from Site Search Results checked does not appear in the search result") {
@@ -340,9 +340,9 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-150921. The user could view message when the fragment is hidden. The Hide from Site Search Results is not grouped in fieldset on Advanced panel."
+	@description = "This is a test for LPS-150921. The Hide from Site Search Results is not grouped in fieldset on Advanced panel."
 	@priority = "4"
-	test ViewMessageWhenHideFragment {
+	test ViewHideFromSiteSearchResultsNotGroupedInFieldset {
 		task ("Given a Page creator has a content page with a Heading fragment") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Page Name",
@@ -359,16 +359,6 @@ definition {
 
 		task ("Then the Page Creator could view the Hide from Site Search Results is not grouped in fieldset") {
 			AssertElementNotPresent(locator1 = "//div[contains(@class,'page-editor__collapse')]//label[contains(.,'Hide from Site Search Results')]//input[@type='checkbox']");
-		}
-
-		task ("When the Page Creator hides the Heading via General panel") {
-			PageEditor.hideFragmentViaPageStyles(fragmentName = "Heading");
-		}
-
-		task ("Then the Page Creator could view warning message on General panel") {
-			AssertTextEquals(
-				locator1 = "PageEditor#FRAGMENT_SIDEBAR_SECONDARY_TEXT",
-				value1 = "This fragment is still visible on search. You can hide it from search in the advanced tab.");
 		}
 	}
 

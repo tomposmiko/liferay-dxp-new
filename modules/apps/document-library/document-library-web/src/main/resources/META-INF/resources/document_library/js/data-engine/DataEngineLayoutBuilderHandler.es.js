@@ -12,6 +12,8 @@
  * details.
  */
 
+import {sub} from 'frontend-js-web';
+
 import {
 	getDataEngineStructure,
 	getInputLocalizedValues,
@@ -51,7 +53,7 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 		}
 	};
 
-	window.addEventListener('click', detectClickOutside, true);
+	window.addEventListener('mousedown', detectClickOutside, true);
 
 	const saveDataEngineStructure = async () => {
 		const dataLayoutBuilder = await getDataLayoutBuilder();
@@ -64,7 +66,7 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 
 		if (!nameInput.value || !name[defaultLanguageId]) {
 			Liferay.Util.openToast({
-				message: Liferay.Util.sub(
+				message: sub(
 					Liferay.Language.get(
 						'please-enter-a-valid-title-for-the-default-language-x'
 					),
@@ -108,7 +110,7 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 	return {
 		dispose() {
 			form.removeEventListener('submit', saveDataEngineStructure);
-			window.removeEventListener('click', detectClickOutside, true);
+			window.removeEventListener('mousedown', detectClickOutside, true);
 		},
 	};
 }

@@ -205,7 +205,7 @@ definition {
 				collectionName = "Content Display",
 				fragmentName = "Display Page Content");
 
-			PageEditor.clickPublish();
+			PageEditor.publish();
 		}
 
 		task ("Add a web content based on Basic Web Content") {
@@ -254,6 +254,28 @@ definition {
 			Click(locator1 = "Dropdown#FILTER_AND_ORDER");
 
 			MenuItem.viewVisible(menuItem = "Filter by Status");
+		}
+	}
+
+	@description = "This is a test for LPS-153323. View kebab icon of web content visible."
+	@priority = "4"
+	test ViewKebabIconOfWebContentVisible {
+		property testray.component.names = "Web Content Administration";
+
+		task ("Add a published web content based on Basic Web Content") {
+			JSONWebcontent.addWebContent(
+				content = "Web Content Content",
+				groupName = "Test Site Name",
+				title = "Web Content Title");
+		}
+
+		task ("Check kebab icon of the web content visible") {
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+			AssertCssValue(
+				locator1 = "//dd//button[contains(@class, 'dropdown-toggle')]",
+				locator2 = "color",
+				value1 = "rgba(107, 108, 126, 1)");
 		}
 	}
 

@@ -556,6 +556,12 @@ public class ObjectEntryLocalServiceImpl
 			return new HashMap<>();
 		}
 
+		Map<String, Object> baseModelAttributes = new HashMap<>();
+
+		PersistedModelLocalService persistedModelLocalService =
+			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
+				objectDefinition.getClassName());
+
 		DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
 			_getDynamicObjectDefinitionTable(
 				objectDefinition.getObjectDefinitionId());
@@ -563,41 +569,39 @@ public class ObjectEntryLocalServiceImpl
 		Column<DynamicObjectDefinitionTable, Long> primaryKeyColumn =
 			dynamicObjectDefinitionTable.getPrimaryKeyColumn();
 
-		DSLQuery dslQuery = DSLQueryFactoryUtil.select(
-		).from(
-			dynamicObjectDefinitionTable
-		).where(
-			primaryKeyColumn.eq(objectEntryId)
-		);
-
-		PersistedModelLocalService persistedModelLocalService =
-			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
-				objectDefinition.getClassName());
-
 		List<BaseModel<?>> baseModels = persistedModelLocalService.dslQuery(
-			dslQuery);
+			DSLQueryFactoryUtil.select(
+			).from(
+				dynamicObjectDefinitionTable
+			).where(
+				primaryKeyColumn.eq(objectEntryId)
+			));
 
-		if (baseModels.isEmpty()) {
-			return new HashMap<>();
+		if (!baseModels.isEmpty()) {
+			BaseModel<?> baseModel = baseModels.get(0);
+
+			baseModelAttributes = baseModel.getModelAttributes();
 		}
-
-		BaseModel<?> baseModel = baseModels.get(0);
-
-		Map<String, Object> baseModelAttributes =
-			baseModel.getModelAttributes();
 
 		Map<String, Object> modelAttributes =
 			HashMapBuilder.<String, Object>put(
-				"createDate", baseModelAttributes.get("createDate")
+				"createDate",
+				GetterUtil.get(
+					baseModelAttributes.get("createDate"), objectEntryId)
 			).put(
 				"externalReferenceCode",
-				baseModelAttributes.get("externalReferenceCode")
+				GetterUtil.get(
+					baseModelAttributes.get("externalReferenceCode"),
+					objectEntryId)
 			).put(
-				"modifiedDate", baseModelAttributes.get("modifiedDate")
+				"modifiedDate",
+				GetterUtil.get(
+					baseModelAttributes.get("modifiedDate"), objectEntryId)
 			).put(
 				"objectDefinitionId", objectDefinition.getObjectDefinitionId()
 			).put(
-				"uuid", baseModelAttributes.get("uuid")
+				"uuid",
+				GetterUtil.get(baseModelAttributes.get("uuid"), objectEntryId)
 			).build();
 
 		for (ObjectField objectField :
@@ -606,7 +610,9 @@ public class ObjectEntryLocalServiceImpl
 
 			modelAttributes.put(
 				objectField.getName(),
-				baseModelAttributes.get(objectField.getDBColumnName()));
+				GetterUtil.getObject(
+					baseModelAttributes.get(objectField.getDBColumnName()),
+					objectEntryId));
 		}
 
 		return modelAttributes;
@@ -1002,6 +1008,14 @@ public class ObjectEntryLocalServiceImpl
 		objectEntry.setStatusDate(serviceContext.getModifiedDate(null));
 
 		objectEntry = objectEntryPersistence.update(objectEntry);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.fetchByPrimaryKey(
+				objectEntry.getObjectDefinitionId());
+
+		_assetEntryLocalService.updateEntry(
+			objectDefinition.getClassName(), objectEntry.getObjectEntryId(),
+			null, null, true, objectEntry.isApproved());
 
 		_reindex(objectEntry);
 
@@ -1634,7 +1648,7 @@ public class ObjectEntryLocalServiceImpl
 		for (ObjectField objectField : objectFields) {
 			Object value = values.get(objectField.getName());
 
-			if (value == null) {
+			if (Validator.isNull(value)) {
 				if (objectField.isRequired()) {
 					throw new ObjectEntryValuesException.Required(
 						objectField.getName());
@@ -1699,7 +1713,7 @@ public class ObjectEntryLocalServiceImpl
 			for (ObjectField objectField : objectFields) {
 				Object value = values.get(objectField.getName());
 
-				if (value == null) {
+				if (Validator.isNull(value)) {
 					continue;
 				}
 

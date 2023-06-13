@@ -31,15 +31,6 @@ import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 )
 public interface CookiesBannerConfiguration {
 
-	@Meta.AD(deflt = "false", name = "enabled", required = false)
-	public boolean enabled();
-
-	@Meta.AD(
-		deflt = "true", description = "cookie-explicit-consent-mode-help",
-		name = "cookie-explicit-consent-mode", required = false
-	)
-	public boolean explicitConsentMode();
-
 	@Meta.AD(
 		deflt = "${language:cookies-banner-content}", name = "content",
 		required = false

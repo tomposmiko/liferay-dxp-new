@@ -2690,7 +2690,7 @@ definition {
 		}
 
 		Type(
-			key_fieldLabel = "Maximum File Size",
+			key_fieldLabel = "File Max Size",
 			locator1 = "TextInput#GENERIC_TEXT_INPUT",
 			value1 = "${fieldValue}");
 
@@ -2717,6 +2717,9 @@ definition {
 				portlet = "Documents and Media Size Limits",
 				siteURLKey = "${siteURLKey}");
 		}
+		else if (isSet(depotName)) {
+			DepotNavigator.openDepotSettingsGeneral(depotName = "${depotName}");
+		}
 		else {
 			DMNavigator.openToConfigInSystemSettings(portlet = "Documents and Media Size Limits");
 		}
@@ -2725,16 +2728,27 @@ definition {
 			Click(locator1 = "Button#DUPLICATE");
 
 			Type(
+				key_fieldLabel = "Mime Type",
 				key_indexNumber = "${indexNumber}",
-				key_label = "Mime Type Size Limit",
-				locator1 = "TextArea#ANY_LABELED_N",
-				value1 = "${fieldValue}");
+				locator1 = "TextInput#GENERIC_TEXT_INPUT_N",
+				value1 = "${mimeTypeValue}");
+
+			Type(
+				key_fieldLabel = "Maximum File Size",
+				key_indexNumber = "${indexNumber}",
+				locator1 = "TextInput#GENERIC_NUMBER_INPUT_N",
+				value1 = "${maximumFileSizeValue}");
 		}
 		else {
 			Type(
-				key_label = "Mime Type Size Limit",
-				locator1 = "TextArea#ANY_LABELED",
-				value1 = "${fieldValue}");
+				key_fieldLabel = "Mime Type",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "${mimeTypeValue}");
+
+			Type(
+				key_fieldLabel = "Maximum File Size",
+				locator1 = "TextInput#GENERIC_NUMBER_INPUT",
+				value1 = "${maximumFileSizeValue}");
 		}
 
 		SystemSettings.saveConfiguration();

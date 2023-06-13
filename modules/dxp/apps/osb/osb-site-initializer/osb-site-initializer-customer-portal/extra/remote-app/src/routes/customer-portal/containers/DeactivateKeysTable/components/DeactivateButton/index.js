@@ -14,7 +14,7 @@ import {useModal} from '@clayui/modal';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import i18n from '../../../../../../common/I18n';
-import {useApplicationProvider} from '../../../../../../common/context/AppPropertiesProvider';
+import {useAppPropertiesContext} from '../../../../../../common/contexts/AppPropertiesContext';
 import {putDeactivateKeys} from '../../../../../../common/services/liferay/rest/raysource/LicenseKeys';
 import {ALERT_DOWNLOAD_TYPE, STATUS_CODE} from '../../../../utils/constants';
 import ConfirmationMessageModal from '../../../ActivationKeysTable/components/Deactivate/ConfirmationMessageModal';
@@ -29,7 +29,7 @@ const DeactivateButton = ({
 	setDeactivateKeysStatus,
 	urlPreviousPage,
 }) => {
-	const {licenseKeyDownloadURL} = useApplicationProvider();
+	const {provisioningServerAPI} = useAppPropertiesContext();
 	const [isDeactivating, setIsDeactivating] = useState(false);
 	const [isVisibleModal, setIsVisibleModal] = useState(false);
 	const [alreadyDeactivated, setAlreadyDeactivated] = useState(false);
@@ -45,7 +45,7 @@ const DeactivateButton = ({
 		setIsDeactivating(true);
 
 		const response = await putDeactivateKeys(
-			licenseKeyDownloadURL,
+			provisioningServerAPI,
 			filterCheckedActivationKeys,
 			sessionId
 		);

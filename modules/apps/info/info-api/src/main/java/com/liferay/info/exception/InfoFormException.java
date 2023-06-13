@@ -15,14 +15,18 @@
 package com.liferay.info.exception;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
+
+import java.util.Locale;
 
 /**
  * @author Rubén Pulido
  */
 public class InfoFormException extends PortalException {
 
-	public InfoFormException(Throwable throwable) {
-		super(throwable);
+	public String getLocalizedMessage(Locale locale) {
+		return LanguageUtil.get(
+			locale, "an-error-occurred-while-sending-the-form-information");
 	}
 
 }

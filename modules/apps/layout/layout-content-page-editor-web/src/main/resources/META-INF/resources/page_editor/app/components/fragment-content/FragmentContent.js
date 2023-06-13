@@ -38,6 +38,7 @@ import resolveEditableConfig from '../../utils/editable-value/resolveEditableCon
 import resolveEditableValue from '../../utils/editable-value/resolveEditableValue';
 import {getCommonStyleByName} from '../../utils/getCommonStyleByName';
 import {getFrontendTokenValue} from '../../utils/getFrontendTokenValue';
+import getLayoutDataItemCssClasses from '../../utils/getLayoutDataItemCssClasses';
 import getLayoutDataItemUniqueClassName from '../../utils/getLayoutDataItemUniqueClassName';
 import {getResponsiveConfig} from '../../utils/getResponsiveConfig';
 import hasInnerCommonStyles from '../../utils/hasInnerCustomStyles';
@@ -121,6 +122,8 @@ const FragmentContent = ({
 
 	const fragmentEntryLinkError = fragmentEntryLink?.error;
 
+	const cssClasses = getLayoutDataItemCssClasses(item);
+
 	useEffect(() => {
 		if (fragmentEntryLinkError) {
 			throw new Error(fragmentEntryLinkError);
@@ -145,6 +148,14 @@ const FragmentContent = ({
 
 		if (!isBeingEdited) {
 			fragmentElement.innerHTML = defaultContent;
+
+			if (hasInnerCommonStyles(fragmentEntryLink)) {
+				const stylesElement = fragmentElement.querySelector(
+					'[data-lfr-styles]'
+				);
+
+				stylesElement.className = `${stylesElement.className} ${cssClasses}`;
+			}
 
 			Promise.all(
 				getAllEditables(fragmentElement).map((editable) => {
@@ -198,6 +209,7 @@ const FragmentContent = ({
 		languageId,
 		segmentsExperienceId,
 		toControlsId,
+		cssClasses,
 	]);
 
 	const responsiveConfig = getResponsiveConfig(
@@ -299,6 +311,9 @@ const FragmentContent = ({
 						'page-editor__fragment-content',
 						{
 							[`${fragmentEntryLink?.cssClass}`]: config.featureFlagLps132571,
+							[getLayoutDataItemCssClasses(item)]:
+								Liferay.FeatureFlags['LPS-147511'] &&
+								!hasInnerCommonStyles(fragmentEntryLink),
 							[getLayoutDataItemUniqueClassName(
 								item.itemId
 							)]: !hasInnerCommonStyles(fragmentEntryLink),

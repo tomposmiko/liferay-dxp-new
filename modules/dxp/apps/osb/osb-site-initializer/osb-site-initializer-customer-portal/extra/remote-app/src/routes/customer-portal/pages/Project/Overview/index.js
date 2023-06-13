@@ -126,13 +126,15 @@ const Overview = () => {
 		return <OverviewSkeleton />;
 	}
 
+	const isPartnership =
+		selectedSubscriptionGroup === PRODUCT_TYPES.partnership ||
+		subscriptionGroups[0]?.name === PRODUCT_TYPES.partnership;
+
 	return (
 		<>
 			<ProjectSupport />
 			<div className="d-flex flex-column mr-4 mt-6">
-				{selectedSubscriptionGroup !== PRODUCT_TYPES.partnership && (
-					<h3>{i18n.translate('subscriptions')}</h3>
-				)}
+				{!isPartnership && <h3>{i18n.translate('subscriptions')}</h3>}
 
 				{!!subscriptionGroupsWithSubscriptions.length && (
 					<>

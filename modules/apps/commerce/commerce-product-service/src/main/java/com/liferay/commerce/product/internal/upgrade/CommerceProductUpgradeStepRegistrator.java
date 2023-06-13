@@ -20,7 +20,6 @@ import com.liferay.commerce.product.internal.upgrade.v1_10_1.CommerceSiteTypeUpg
 import com.liferay.commerce.product.internal.upgrade.v1_11_0.CPAttachmentFileEntryGroupUpgradeProcess;
 import com.liferay.commerce.product.internal.upgrade.v1_11_1.CPDisplayLayoutUpgradeProcess;
 import com.liferay.commerce.product.internal.upgrade.v1_2_0.ProductSubscriptionUpgradeProcess;
-import com.liferay.commerce.product.internal.upgrade.v1_3_0.CPAttachmentFileEntryUpgradeProcess;
 import com.liferay.commerce.product.internal.upgrade.v1_3_0.CPDefinitionLinkUpgradeProcess;
 import com.liferay.commerce.product.internal.upgrade.v1_3_0.CPDefinitionOptionRelUpgradeProcess;
 import com.liferay.commerce.product.internal.upgrade.v1_3_0.CPDefinitionUpgradeProcess;
@@ -44,7 +43,6 @@ import com.liferay.commerce.product.internal.upgrade.v2_2_0.CPDefinitionOptionVa
 import com.liferay.commerce.product.internal.upgrade.v2_3_0.CommerceChannelUpgradeProcess;
 import com.liferay.commerce.product.internal.upgrade.v2_5_0.FriendlyURLEntryUpgradeProcess;
 import com.liferay.commerce.product.internal.upgrade.v3_1_0.CPTaxCategoryUpgradeProcess;
-import com.liferay.commerce.product.internal.upgrade.v3_3_0.CPAttachmentFileEntryCDNUpgradeProcess;
 import com.liferay.commerce.product.internal.upgrade.v3_8_0.CPMeasurementUnitUpgradeProcess;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
@@ -87,7 +85,9 @@ public class CommerceProductUpgradeStepRegistrator
 			"1.1.0", "1.2.0", new ProductSubscriptionUpgradeProcess());
 
 		registry.register(
-			"1.2.0", "1.3.0", new CPAttachmentFileEntryUpgradeProcess(),
+			"1.2.0", "1.3.0",
+			new com.liferay.commerce.product.internal.upgrade.v1_3_0.
+				CPAttachmentFileEntryUpgradeProcess(),
 			new CPDefinitionLinkUpgradeProcess(),
 			new CPDefinitionOptionRelUpgradeProcess(),
 			new CPDefinitionUpgradeProcess(), CProductTable.create(),
@@ -204,7 +204,9 @@ public class CommerceProductUpgradeStepRegistrator
 		registry.register("3.2.0", "3.2.1", new DummyUpgradeProcess());
 
 		registry.register(
-			"3.2.1", "3.3.0", new CPAttachmentFileEntryCDNUpgradeProcess());
+			"3.2.1", "3.3.0",
+			new com.liferay.commerce.product.internal.upgrade.v3_3_0.
+				CPAttachmentFileEntryUpgradeProcess());
 
 		registry.register(
 			"3.3.0", "3.4.0",
@@ -254,6 +256,11 @@ public class CommerceProductUpgradeStepRegistrator
 
 		registry.register(
 			"3.7.0", "3.8.0", new CPMeasurementUnitUpgradeProcess());
+
+		registry.register(
+			"3.8.0", "3.8.1",
+			new com.liferay.commerce.product.internal.upgrade.v3_8_1.
+				CPAttachmentFileEntryUpgradeProcess());
 
 		if (_log.isInfoEnabled()) {
 			_log.info("Commerce product upgrade step registrator finished");

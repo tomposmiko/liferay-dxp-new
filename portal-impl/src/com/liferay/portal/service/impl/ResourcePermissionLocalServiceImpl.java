@@ -120,12 +120,20 @@ public class ResourcePermissionLocalServiceImpl
 		else if (serviceContext.isAddGroupPermissions() ||
 				 serviceContext.isAddGuestPermissions()) {
 
+			long groupId = 0;
+
+			boolean addGroupPermissions =
+				serviceContext.isAddGroupPermissions();
+
+			if (addGroupPermissions) {
+				groupId = getGroupId(auditedModel);
+			}
+
 			addResourcePermissions(
-				auditedModel.getCompanyId(), getGroupId(auditedModel),
-				auditedModel.getUserId(), auditedModel.getModelClassName(),
+				auditedModel.getCompanyId(), groupId, auditedModel.getUserId(),
+				auditedModel.getModelClassName(),
 				String.valueOf(auditedModel.getPrimaryKeyObj()), false,
-				serviceContext.isAddGroupPermissions(),
-				serviceContext.isAddGuestPermissions());
+				addGroupPermissions, serviceContext.isAddGuestPermissions());
 		}
 		else {
 			if (serviceContext.isDeriveDefaultPermissions()) {
@@ -1742,20 +1750,13 @@ public class ResourcePermissionLocalServiceImpl
 	}
 
 	protected long getGroupId(AuditedModel auditedModel) {
-		long defaultGroupId = 0;
-
 		if (auditedModel instanceof GroupedModel) {
 			GroupedModel groupedModel = (GroupedModel)auditedModel;
 
-			defaultGroupId = groupedModel.getGroupId();
-		}
-		else {
-			defaultGroupId = BeanPropertiesUtil.getLongSilent(
-				auditedModel, "groupId", defaultGroupId);
+			return groupedModel.getGroupId();
 		}
 
-		return BeanPropertiesUtil.getLongSilent(
-			auditedModel, "resourceGroupId", defaultGroupId);
+		return BeanPropertiesUtil.getLongSilent(auditedModel, "groupId", 0);
 	}
 
 	protected Role getRole(long companyId, long groupId, String roleName)

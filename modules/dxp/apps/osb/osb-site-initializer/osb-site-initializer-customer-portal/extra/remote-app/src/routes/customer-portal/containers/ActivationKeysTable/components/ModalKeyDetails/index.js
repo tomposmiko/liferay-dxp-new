@@ -13,8 +13,7 @@ import ClayModal from '@clayui/modal';
 import React, {useState} from 'react';
 import i18n from '../../../../../../common/I18n';
 import Button from '../../../../../../common/components/Button';
-import {useApplicationProvider} from '../../../../../../common/context/AppPropertiesProvider';
-import {useCustomerPortal} from '../../../../context';
+import {useAppPropertiesContext} from '../../../../../../common/contexts/AppPropertiesContext';
 import {ALERT_DOWNLOAD_TYPE} from '../../../../utils/constants/alertDownloadType';
 import {AUTO_CLOSE_ALERT_TIME} from '../../../../utils/constants/autoCloseAlertTime';
 import {ALERT_ACTIVATION_AGGREGATED_KEYS_DOWNLOAD_TEXT} from '../../utils/constants/alertAggregateKeysDownloadText';
@@ -28,8 +27,7 @@ const ModalKeyDetails = ({
 	project,
 	sessionId,
 }) => {
-	const [{assetsPath}] = useCustomerPortal();
-	const {licenseKeyDownloadURL} = useApplicationProvider();
+	const {liferayWebDAV, provisioningServerAPI} = useAppPropertiesContext();
 
 	const [valueToCopyToClipboard, setValueToCopyToClipboard] = useState('');
 
@@ -72,8 +70,8 @@ const ModalKeyDetails = ({
 				</div>
 
 				<TableKeyDetails
-					assetsPath={assetsPath}
 					currentActivationKey={currentActivationKey}
+					liferayWebDAV={liferayWebDAV}
 					setValueToCopyToClipboard={setValueToCopyToClipboard}
 				/>
 
@@ -88,7 +86,7 @@ const ModalKeyDetails = ({
 						onClick={async () => {
 							const isAbleToDownloadKey = await downloadActivationLicenseKey(
 								currentActivationKey.id,
-								licenseKeyDownloadURL,
+								provisioningServerAPI,
 								sessionId,
 								currentActivationKey.productName,
 								currentActivationKey.productVersion,

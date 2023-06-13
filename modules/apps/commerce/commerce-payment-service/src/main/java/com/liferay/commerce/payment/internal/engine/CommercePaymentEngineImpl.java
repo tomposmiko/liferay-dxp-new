@@ -37,6 +37,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -505,11 +506,11 @@ public class CommercePaymentEngineImpl implements CommercePaymentEngine {
 		List<CommercePaymentMethodGroupRel> commercePaymentMethodGroupRels,
 		long commerceOrderTypeId, boolean subscriptionOrder) {
 
+		List<CommercePaymentMethod> commercePaymentMethods = new LinkedList<>();
+
 		ListUtil.sort(
 			commercePaymentMethodGroupRels,
 			new CommercePaymentMethodPriorityComparator());
-
-		List<CommercePaymentMethod> commercePaymentMethods = new LinkedList<>();
 
 		for (CommercePaymentMethodGroupRel commercePaymentMethodGroupRel :
 				commercePaymentMethodGroupRels) {
@@ -536,12 +537,21 @@ public class CommercePaymentEngineImpl implements CommercePaymentEngine {
 				continue;
 			}
 
+			PermissionChecker permissionChecker =
+				PermissionThreadLocal.getPermissionChecker();
+
 			CommercePaymentMethod commercePaymentMethod =
 				_commercePaymentMethodRegistry.getCommercePaymentMethod(
 					commercePaymentMethodGroupRel.getEngineKey());
 
-			if (subscriptionOrder &&
-				!commercePaymentMethod.isProcessRecurringEnabled()) {
+			if (!permissionChecker.hasPermission(
+					commercePaymentMethodGroupRel.getGroupId(),
+					CommercePaymentMethodGroupRel.class.getName(),
+					commercePaymentMethodGroupRel.
+						getCommercePaymentMethodGroupRelId(),
+					ActionKeys.VIEW) ||
+				(subscriptionOrder &&
+				 !commercePaymentMethod.isProcessRecurringEnabled())) {
 
 				continue;
 			}

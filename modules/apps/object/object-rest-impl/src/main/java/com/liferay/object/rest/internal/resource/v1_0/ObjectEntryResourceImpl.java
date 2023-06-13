@@ -48,6 +48,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -76,15 +77,37 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_objectScopeProviderRegistry.getObjectScopeProvider(
 				_objectDefinition.getScope());
 
-		UnsafeConsumer<ObjectEntry, Exception> unsafeConsumer =
-			this::postObjectEntry;
-
 		if (objectScopeProvider.isGroupAware()) {
-			unsafeConsumer = objectEntry -> postScopeScopeKey(
-				(String)parameters.get("scopeKey"), objectEntry);
-		}
+			UnsafeConsumer<ObjectEntry, Exception> objectEntryUnsafeConsumer =
+				null;
 
-		contextBatchUnsafeConsumer.accept(objectEntries, unsafeConsumer);
+			String createStrategy = (String)parameters.getOrDefault(
+				"createStrategy", "INSERT");
+
+			if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
+				objectEntryUnsafeConsumer = objectEntry -> postScopeScopeKey(
+					(String)parameters.get("scopeKey"), objectEntry);
+			}
+
+			if (StringUtil.equalsIgnoreCase(createStrategy, "UPSERT")) {
+				objectEntryUnsafeConsumer =
+					objectEntry -> putScopeScopeKeyByExternalReferenceCode(
+						(String)parameters.get("scopeKey"),
+						objectEntry.getExternalReferenceCode(), objectEntry);
+			}
+
+			if (objectEntryUnsafeConsumer == null) {
+				throw new NotSupportedException(
+					"Create strategy \"" + createStrategy +
+						"\" is not supported for object entry");
+			}
+
+			contextBatchUnsafeConsumer.accept(
+				objectEntries, objectEntryUnsafeConsumer);
+		}
+		else {
+			super.create(objectEntries, parameters);
+		}
 	}
 
 	@Override

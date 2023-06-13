@@ -56,7 +56,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -347,32 +346,36 @@ public class DLViewEntriesDisplayContext {
 	private boolean _hasValidAssetVocabularies(long scopeGroupId)
 		throws PortalException {
 
+		if (_hasValidAssetVocabularies != null) {
+			return _hasValidAssetVocabularies;
+		}
+
 		List<AssetVocabulary> assetVocabularies =
 			AssetVocabularyServiceUtil.getGroupVocabularies(
 				PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId));
 
-		Stream<AssetVocabulary> stream = assetVocabularies.stream();
+		for (AssetVocabulary assetVocabulary : assetVocabularies) {
+			if (!assetVocabulary.isAssociatedToClassNameId(
+					ClassNameLocalServiceUtil.getClassNameId(
+						DLFileEntry.class.getName()))) {
 
-		return stream.anyMatch(
-			assetVocabulary -> {
-				if (!assetVocabulary.isAssociatedToClassNameId(
-						ClassNameLocalServiceUtil.getClassNameId(
-							DLFileEntry.class.getName()))) {
+				continue;
+			}
 
-					return false;
-				}
+			int count = AssetCategoryServiceUtil.getVocabularyCategoriesCount(
+				assetVocabulary.getGroupId(),
+				assetVocabulary.getVocabularyId());
 
-				int count =
-					AssetCategoryServiceUtil.getVocabularyCategoriesCount(
-						assetVocabulary.getGroupId(),
-						assetVocabulary.getVocabularyId());
+			if (count > 0) {
+				_hasValidAssetVocabularies = true;
 
-				if (count > 0) {
-					return true;
-				}
+				return _hasValidAssetVocabularies;
+			}
+		}
 
-				return false;
-			});
+		_hasValidAssetVocabularies = false;
+
+		return _hasValidAssetVocabularies;
 	}
 
 	private boolean _hasWorkflowDefinitionLink(FileEntry fileEntry) {
@@ -412,6 +415,7 @@ public class DLViewEntriesDisplayContext {
 		_dlPortletInstanceSettingsHelper;
 	private final DLRequestHelper _dlRequestHelper;
 	private final DLTrashHelper _dlTrashHelper;
+	private Boolean _hasValidAssetVocabularies;
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;

@@ -15,7 +15,7 @@ import {useEffect, useMemo, useState} from 'react';
 import client from '../../../../../apolloClient';
 import i18n from '../../../../../common/I18n';
 import {Button} from '../../../../../common/components';
-import {useApplicationProvider} from '../../../../../common/context/AppPropertiesProvider';
+import {useAppPropertiesContext} from '../../../../../common/contexts/AppPropertiesContext';
 import {
 	getAccountSubscriptions,
 	getAccountSubscriptionsTerms,
@@ -24,9 +24,9 @@ import {getCommonLicenseKey} from '../../../../../common/services/liferay/rest/r
 import {ROLE_TYPES} from '../../../../../common/utils/constants';
 import downloadFromBlob from '../../../../../common/utils/downloadFromBlob';
 import getCurrentEndDate from '../../../../../common/utils/getCurrentEndDate';
+import getKebabCase from '../../../../../common/utils/getKebabCase';
 import {useCustomerPortal} from '../../../context';
 import {EXTENSION_FILE_TYPES, STATUS_CODE} from '../../../utils/constants';
-import getKebabCase from '../../../utils/getKebabCase';
 import {getYearlyTerms} from '../../../utils/getYearlyTerms';
 
 const ActivationKeysInputs = ({
@@ -38,9 +38,9 @@ const ActivationKeysInputs = ({
 	const [{project, userAccount}] = useCustomerPortal();
 
 	const {
-		createSupportRequest,
-		licenseKeyDownloadURL,
-	} = useApplicationProvider();
+		provisioningServerAPI,
+		submitSupportTicketURL,
+	} = useAppPropertiesContext();
 
 	const [accountSubscriptions, setAccountSubscriptions] = useState([]);
 
@@ -120,7 +120,7 @@ const ActivationKeysInputs = ({
 			selectDateInterval.endDate.toISOString(),
 			selectDateInterval.startDate.toISOString(),
 			selectedAccountSubscriptionName.toLowerCase(),
-			licenseKeyDownloadURL,
+			provisioningServerAPI,
 			encodeURI(productTitle),
 			sessionId
 		);
@@ -153,7 +153,7 @@ const ActivationKeysInputs = ({
 					)}
 
 					<a
-						href={createSupportRequest}
+						href={submitSupportTicketURL}
 						rel="noreferrer"
 						target="_blank"
 					>
@@ -172,7 +172,7 @@ const ActivationKeysInputs = ({
 				</p>
 			),
 		}),
-		[createSupportRequest, productTitle]
+		[submitSupportTicketURL, productTitle]
 	);
 
 	const currentEnterpriseMessage = useMemo(() => {

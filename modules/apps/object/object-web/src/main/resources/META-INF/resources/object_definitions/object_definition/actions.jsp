@@ -35,6 +35,7 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 	fdsActionDropdownItems="<%= objectDefinitionsActionsDisplayContext.getFDSActionDropdownItems() %>"
 	formName="fm"
 	id="<%= ObjectDefinitionsFDSNames.OBJECT_ACTIONS %>"
+	propsTransformer="js/ObjectDefinitionsActionsFDSPropsTransformer"
 	style="fluid"
 />
 
@@ -43,6 +44,8 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 		module="js/components/ObjectAction/ExpressionBuilderModal"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
+				"ffUseMetadataAsSystemFields", GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-154872"))
+			).put(
 				"sidebarElements", objectDefinitionsActionsDisplayContext.getObjectActionCodeEditorElements()
 			).build()
 		%>'

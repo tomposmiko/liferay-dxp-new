@@ -300,6 +300,14 @@ public class ObjectRelationshipLocalServiceImpl
 			objectDefinitionId1, start, end);
 	}
 
+	@Override
+	public List<ObjectRelationship> getObjectRelationships(
+		long objectDefinitionId1, long objectDefinition2, String type) {
+
+		return objectRelationshipPersistence.findByODI1_ODI2_T(
+			objectDefinitionId1, objectDefinition2, type);
+	}
+
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectRelationship updateObjectRelationship(

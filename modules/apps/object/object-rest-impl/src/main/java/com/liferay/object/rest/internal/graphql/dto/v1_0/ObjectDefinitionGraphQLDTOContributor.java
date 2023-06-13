@@ -14,8 +14,10 @@
 
 package com.liferay.object.rest.internal.graphql.dto.v1_0;
 
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
@@ -23,7 +25,9 @@ import com.liferay.object.rest.internal.petra.sql.dsl.expression.PredicateUtil;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -41,6 +45,7 @@ import com.liferay.portal.vulcan.graphql.dto.v1_0.Creator;
 import com.liferay.portal.vulcan.list.type.ListEntry;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.math.BigDecimal;
 
@@ -66,6 +71,7 @@ public class ObjectDefinitionGraphQLDTOContributor
 		ObjectDefinition objectDefinition,
 		ObjectEntryManager objectEntryManager,
 		ObjectFieldLocalService objectFieldLocalService,
+		ObjectRelationshipLocalService objectRelationshipLocalService,
 		ObjectScopeProvider objectScopeProvider) {
 
 		List<GraphQLDTOProperty> graphQLDTOProperties = new ArrayList<>();
@@ -102,8 +108,8 @@ public class ObjectDefinitionGraphQLDTOContributor
 
 				String objectFieldName = objectField.getName();
 
-				String relationshipIdName = objectFieldName.substring(
-					objectFieldName.lastIndexOf(StringPool.UNDERLINE) + 1);
+				String relationshipIdName =
+					objectFieldName.split(StringPool.UNDERLINE)[1];
 
 				graphQLDTOProperties.add(
 					GraphQLDTOProperty.of(relationshipIdName, Long.class));
@@ -121,6 +127,25 @@ public class ObjectDefinitionGraphQLDTOContributor
 						_typedClasses.getOrDefault(
 							objectField.getDBType(), Object.class)));
 			}
+		}
+
+		List<ObjectRelationship> objectRelationships =
+			objectRelationshipLocalService.getObjectRelationships(
+				objectDefinition.getObjectDefinitionId());
+
+		for (ObjectRelationship objectRelationship : objectRelationships) {
+			if (!Objects.equals(
+					objectRelationship.getType(),
+					ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
+
+				continue;
+			}
+
+			graphQLDTOProperties.add(
+				GraphQLDTOProperty.of(
+					objectRelationship.getName(), Long.class));
+			relationshipGraphQLDTOProperties.add(
+				GraphQLDTOProperty.of(objectRelationship.getName(), Map.class));
 		}
 
 		return new ObjectDefinitionGraphQLDTOContributor(
@@ -242,12 +267,31 @@ public class ObjectDefinitionGraphQLDTOContributor
 			return null;
 		}
 
+		String relationshipIdName = null;
+
 		ObjectEntry objectEntry = _objectEntryManager.getObjectEntry(
 			dtoConverterContext, _objectDefinition, id);
 
 		Map<String, Object> properties = objectEntry.getProperties();
 
-		String relationshipIdName = relationshipName + "Id";
+		for (String key : properties.keySet()) {
+			if (key.contains(relationshipName)) {
+				relationshipIdName = key;
+
+				break;
+			}
+		}
+
+		if (relationshipIdName == null) {
+			Page<ObjectEntry> page =
+				_objectEntryManager.getObjectEntryRelatedObjectEntries(
+					dtoConverterContext, _objectDefinition, id,
+					relationshipName,
+					Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+
+			return (T)TransformUtil.transform(
+				page.getItems(), itemObjectEntry -> _toMap(itemObjectEntry));
+		}
 
 		Object relationshipId = properties.get(relationshipIdName);
 

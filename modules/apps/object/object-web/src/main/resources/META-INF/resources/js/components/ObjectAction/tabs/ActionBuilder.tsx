@@ -33,6 +33,7 @@ export default function ActionBuilder({
 	objectActionExecutors,
 	objectActionTriggers,
 	setValues,
+	validateExpressionBuilderContentURL,
 	values,
 }: IProps) {
 	const [notificationTemplates, setNotificationTemplates] = useState<any[]>(
@@ -119,60 +120,58 @@ export default function ActionBuilder({
 				</Card>
 			</Card>
 
-			{Liferay.FeatureFlags['LPS-152181'] &&
-				['onAfterAdd', 'onAfterDelete', 'onAfterUpdate'].some(
-					(key) => key === values.objectActionTriggerKey
-				) && (
-					<Card title={Liferay.Language.get('condition')}>
-						<ClayForm.Group>
-							<ClayToggle
-								label={Liferay.Language.get('enable-condition')}
-								name="condition"
-								onToggle={(enable) =>
-									setValues({
-										conditionExpression: enable
-											? ''
-											: undefined,
-									})
-								}
-								toggled={
-									!(values.conditionExpression === undefined)
-								}
-							/>
-						</ClayForm.Group>
+			{['onAfterAdd', 'onAfterDelete', 'onAfterUpdate'].some(
+				(key) => key === values.objectActionTriggerKey
+			) && (
+				<Card title={Liferay.Language.get('condition')}>
+					<ClayForm.Group>
+						<ClayToggle
+							label={Liferay.Language.get('enable-condition')}
+							name="condition"
+							onToggle={(enable) =>
+								setValues({
+									conditionExpression: enable
+										? ''
+										: undefined,
+								})
+							}
+							toggled={
+								!(values.conditionExpression === undefined)
+							}
+						/>
+					</ClayForm.Group>
 
-						{values.conditionExpression !== undefined && (
-							<ExpressionBuilder
-								error={errors.conditionExpression}
-								feedbackMessage={Liferay.Language.get(
-									'use-expressions-to-create-a-condition'
-								)}
-								label={Liferay.Language.get(
-									'expression-builder'
-								)}
-								name="conditionExpression"
-								onChange={({target: {value}}: any) =>
-									setValues({conditionExpression: value})
-								}
-								onOpenModal={() => {
-									const parentWindow = Liferay.Util.getOpener();
+					{values.conditionExpression !== undefined && (
+						<ExpressionBuilder
+							error={errors.conditionExpression}
+							feedbackMessage={Liferay.Language.get(
+								'use-expressions-to-create-a-condition'
+							)}
+							label={Liferay.Language.get('expression-builder')}
+							name="conditionExpression"
+							onChange={({target: {value}}: any) =>
+								setValues({conditionExpression: value})
+							}
+							onOpenModal={() => {
+								const parentWindow = Liferay.Util.getOpener();
 
-									parentWindow.Liferay.fire(
-										'openExpressionBuilderModal',
-										{
-											onSave: handleSave,
-											source: values.conditionExpression,
-										}
-									);
-								}}
-								placeholder={Liferay.Language.get(
-									'create-an-expression'
-								)}
-								value={values.conditionExpression as string}
-							/>
-						)}
-					</Card>
-				)}
+								parentWindow.Liferay.fire(
+									'openExpressionBuilderModal',
+									{
+										onSave: handleSave,
+										source: values.conditionExpression,
+										validateExpressionBuilderContentURL,
+									}
+								);
+							}}
+							placeholder={Liferay.Language.get(
+								'create-an-expression'
+							)}
+							value={values.conditionExpression as string}
+						/>
+					)}
+				</Card>
+			)}
 
 			<Card title={Liferay.Language.get('action')}>
 				<Card
@@ -281,6 +280,7 @@ interface IProps {
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 	setValues: (values: Partial<ObjectAction>) => void;
+	validateExpressionBuilderContentURL: string;
 	values: Partial<ObjectAction>;
 }
 

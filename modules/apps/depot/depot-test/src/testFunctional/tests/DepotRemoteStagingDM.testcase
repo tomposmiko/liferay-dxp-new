@@ -4014,31 +4014,246 @@ definition {
 			dmDocumentTitle = "DM Document Title");
 	}
 
-	@description = "This test covers LPS-154438."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154438. It ensures that an image with a custom friendlyURL can be correctly rendered in the Blogs cover image field on a site after its friendlyURL is edited and published from an asset library."
 	@priority = "5"
 	test CanViewBlogsCoverImageAfterFriendlyURLIsUpdated {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
+		property test.name.skip.portal.instance = "DepotRemoteStagingDM#CanViewBlogsCoverImageAfterFriendlyURLIsUpdated";
 
-		// TODO LPS-154438
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Image Description",
+			dmDocumentTitle = "Document_1.jpg",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page",
+			widgetName = "Blogs");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Blogs.addEntryWithUploadedCoverImage(
+			coverImageName = "document_1",
+			depotName = "Test Depot Name",
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title",
+			imageFileName = "Document_1.jpg",
+			navTab = "Documents and Media");
+
+		PortletEntry.publish();
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		DepotNavigator.openToEditDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "Document_1.jpg");
+
+		DMDocument.editFriendlyURL(friendlyURLEdit = "custom-url");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.openSitePage(
+			baseURL = "http://localhost:9080",
+			pageName = "Test Page",
+			siteName = "Remote Site");
+
+		BlogsEntry.viewCoverImage(uploadFileName = "Document_1.jpg");
 	}
 
-	@description = "This test covers LPS-154439."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154439. It ensures that an image with a custom friendlyURL can be correctly rendered in the Blogs small image field on a site after its friendlyURL is edited and published from an asset library."
 	@priority = "5"
 	test CanViewBlogsSmallImageAfterFriendlyURLIsUpdated {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
+		property test.name.skip.portal.instance = "DepotRemoteStagingDM#CanViewBlogsSmallImageAfterFriendlyURLIsUpdated";
 
-		// TODO LPS-154439
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Image Description",
+			dmDocumentTitle = "Document_1.jpg",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page",
+			widgetName = "Blogs");
+
+		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+
+		BlogsEntry.addEntryContent(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title");
+
+		BlogsEntry.addSmallImage(
+			depotName = "Test Depot Name",
+			imageFileName = "Document_1.jpg",
+			navTab = "Documents and Media");
+
+		PortletEntry.publish();
+
+		Navigator.openSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		DepotNavigator.openToEditDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "Document_1.jpg");
+
+		DMDocument.editFriendlyURL(friendlyURLEdit = "custom-url");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.openSitePage(
+			baseURL = "http://localhost:9080",
+			pageName = "Test Page",
+			siteName = "Remote Site");
+
+		BlogsEntry.viewSmallImage(uploadFileName = "Document_1.jpg");
 	}
 
-	@description = "This test covers LPS-154437."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154437. It ensures that an external video with a custom friendlyURL can be correctly rendered in the Blog content field on a site after its friendlyURL is edited and published from an asset library."
 	@priority = "5"
 	test CanViewExternalVideoFromBlogsContentFieldAfterFriendlyURLIsUpdated {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
+		property test.name.skip.portal.instance = "DepotRemoteStagingDM#CanViewExternalVideoFromBlogsContentFieldAfterFriendlyURLIsUpdated";
 
-		// TODO LPS-154437
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
+		VideoShortcut.addCP(
+			videoShortcutTitle = "Test YouTube Video",
+			videoURL = "https://www.youtube.com/watch?v=HOdbzGCI5ME");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page",
+			widgetName = "Blogs");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Blogs.addEntry(
+			depotName = "Test Depot Name",
+			embedVideo = "true",
+			entryContent = "video",
+			entryTitle = "Blogs Entry Title",
+			navTab = "Documents and Media",
+			videoShortcutTitle = "Test YouTube Video");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		DepotNavigator.openToEditDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "Test YouTube Video");
+
+		DMDocument.editFriendlyURL(friendlyURLEdit = "document_1_edit");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		Navigator.openSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		BlogsNavigator.openToBlogEntry(
+			baseURL = "http://localhost:9080",
+			entryTitle = "Blogs Entry Title",
+			layoutName = "Test Page",
+			siteURLKey = "remote-site");
+
+		BlogsEntry.viewEntryPG(
+			embedVideo = "true",
+			entryContent = "video",
+			entryTitle = "Blogs Entry Title");
 	}
 
 	@description = "This test covers LPS-154444."
@@ -4078,22 +4293,169 @@ definition {
 			navTab = "Documents and Media");
 	}
 
-	@description = "This test covers LPS-154436."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154436. It ensures that an image with a custom friendlyURL can be correctly rendered in the Blog content field on a site after its friendlyURL is edited and published from an asset library."
 	@priority = "5"
 	test CanViewImageFromBlogsContentFieldAfterFriendlyURLIsUpdated {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
+		property test.name.skip.portal.instance = "DepotRemoteStagingDM#CanViewImageFromBlogsContentFieldAfterFriendlyURLIsUpdated";
 
-		// TODO LPS-154436
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page",
+			widgetName = "Blogs");
+
+		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+
+		BlogsEntry.addTitle(entryTitle = "Blogs Entry Title");
+
+		BlogsEntry.addContentWithInlineImage(
+			depotName = "Test Depot Name",
+			entryContent = "Blogs Entry Content",
+			imageFileName = "DM Document Title",
+			navTab = "Documents and Media");
+
+		PortletEntry.publish();
+
+		Navigator.openSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		DepotNavigator.openToEditDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "DM Document Title");
+
+		DMDocument.editFriendlyURL(friendlyURLEdit = "document_1_edit");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		Navigator.openSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		BlogsNavigator.openToBlogEntry(
+			baseURL = "http://localhost:9080",
+			entryTitle = "Blogs Entry Title",
+			layoutName = "Test Page",
+			siteURLKey = "remote-site");
+
+		BlogsEntry.viewInlineImage(uploadFileName = "dm-document-title");
 	}
 
-	@description = "This test covers LPS-154440."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154440. It ensures that an image with a custom friendlyURL added to a dynamic collection displayed in an Asset Publisher can be rendered properly on a site after its friendlyURL is edited and published from an asset library."
 	@priority = "4"
-	test CanViewImageInDynamicCollectionViaAPAfterPublish {
+	test CanViewImageInDynamicCollectionViaAPAfterFriendlyURLIsUpdated {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
+		property test.name.skip.portal.instance = "DepotRemoteStagingDM#CanViewImageInDynamicCollectionViaAPAfterFriendlyURLIsUpdated";
 
-		// TODO LPS-154440
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Image Description",
+			dmDocumentTitle = "Document_1.jpg",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
+		JSONAssetlist.addDynamicAssetListEntryWithItemType(
+			groupName = "Test Depot Name",
+			itemSubtype = "Basic Document",
+			itemType = "Document",
+			site = "false",
+			title = "Dynamic Collection");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "2",
+			groupName = "Site Name",
+			layoutName = "Test Page",
+			widgetName = "Asset Publisher");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.selectAssetList(
+			assetListName = "Dynamic Collection",
+			depotName = "Test Depot Name");
+
+		Navigator.openSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		DepotNavigator.openToEditDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "Document_1.jpg");
+
+		DMDocument.editFriendlyURL(friendlyURLEdit = "custom-url");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.openSitePage(
+			baseURL = "http://localhost:9080",
+			pageName = "Test Page",
+			siteName = "Remote Site");
+
+		AssetPublisherPortlet.viewAssetPG(assetTitle = "Document_1.jpg");
 	}
 
 	@description = "This test covers LPS-154443."
@@ -4103,6 +4465,71 @@ definition {
 
 		// TODO LPS-154443
 
+	}
+
+	@description = "This test covers LPS-155797. It ensures that an image that was published in a depot can still be accessed after remote staging is disabled."
+	@priority = "5"
+	test ImageIsStillAccessibleAfterDisablingStaging {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
+		property test.name.skip.portal.instance = "DepotRemoteStagingDM#ImageIsStillAccessibleAfterDisablingStaging";
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Image Description",
+			dmDocumentTitle = "Document_1",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
+
+		DepotNavigator.openToEditDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "Document_1");
+
+		DMDocument.editFriendlyURL(
+			dmDocumentTitle = "Document_1",
+			friendlyURLEdit = "document_1_edit");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		DepotNavigator.openToDMEntryInDepot(
+			baseURL = "http://localhost:9080",
+			depotName = "Remote Depot",
+			dmDocumentTitle = "Document_1");
+
+		var latestVersionURL = DMDocument.getLatestVersionURL();
+
+		User.loginPG(
+			nodePort = "8080",
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		Depot.disableStagingDepot(
+			depotName = "Test Depot Name",
+			remoteStaging = "true");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.openSpecificURL(url = "${latestVersionURL}");
+
+		AssertVisible(
+			key_imageSourceURL = "document_1_edit",
+			locator1 = "DocumentsAndMediaDocument#DOCUMENT_VIEWPORT_PREVIEW");
 	}
 
 }

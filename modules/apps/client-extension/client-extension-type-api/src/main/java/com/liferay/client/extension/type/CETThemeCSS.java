@@ -14,16 +14,22 @@
 
 package com.liferay.client.extension.type;
 
+import com.liferay.client.extension.type.annotation.CETProperty;
+import com.liferay.client.extension.type.annotation.CETType;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Iván Zaera Avellón
  */
+@CETType(description = "This is a description.", name = "themeCSS")
 @ProviderType
 public interface CETThemeCSS extends CET {
 
+	@CETProperty(defaultValue = "", name = "clayURL", type = "string")
 	public String getClayURL();
 
+	@CETProperty(defaultValue = "", name = "mainURL", type = "string")
 	public String getMainURL();
 
 }

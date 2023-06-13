@@ -1,0 +1,237 @@
+@component-name = "portal-frontend-infrastructure"
+definition {
+
+	property osgi.modules.includes = "frontend-js-components-sample-web";
+	property portal.acceptance = "true";
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.component.names = "Walkthrough";
+	property testray.main.component.name = "User Interface";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		task ("Given walkthrough component sample portlet") {
+			JSONLayout.addPublicLayout(
+				groupName = "Guest",
+				layoutName = "JS Components Sample Page");
+
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Guest",
+				layoutName = "JS Components Sample Page",
+				widgetName = "JS Components Sample");
+
+			JSONLayout.updateLayoutTemplateOfPublicLayout(
+				groupName = "Guest",
+				layoutName = "JS Components Sample Page",
+				layoutTemplate = "1 Column");
+
+			Navigator.gotoPage(pageName = "JS Components Sample Page");
+
+			Navigator.gotoNavTab(navTab = "Walkable");
+		}
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONLayout.deletePublicLayout(
+				groupName = "Guest",
+				layoutName = "JS Components Sample Page");
+		}
+	}
+
+	@description = "LPS-154368. Assert component will switch to hotspot mode in the current step when closing popover."
+	@priority = "5"
+	test CanBeClosed {
+		task ("Given click hotspot element") {
+			Click(locator1 = "Walkthrough#HOTSPOT");
+		}
+
+		task ("When Click close icon") {
+			Click(locator1 = "Walkthrough#CLOSE_POPOVER");
+		}
+
+		task ("Then hotspot element is present") {
+			AssertElementPresent(locator1 = "Walkthrough#HOTSPOT");
+		}
+	}
+
+	@description = "LPS-154643. Assert popover mode contains content."
+	@priority = "5"
+	test CanDisplayContent {
+		task ("When click hotspot element") {
+			Click(locator1 = "Walkthrough#HOTSPOT");
+		}
+
+		task ("Then content text is present on popover") {
+			AssertElementPresent(
+				key_index = "1",
+				locator1 = "Walkthrough#POPOVER_SAMPLE_CONTENT");
+		}
+	}
+
+	@description = "LPS-154645. Assert popover contains a button to transition to previous step."
+	@priority = "5"
+	test CanDisplayPreviousButtonOnIntermediateStep {
+		task ("And Given popover mode") {
+			Walkthrough.enablePopoverMode();
+		}
+
+		task ("When navigate to 2nd step popover") {
+			Walkthrough.goToNextStep(key_step = "2");
+		}
+
+		task ("Then previous step button is present") {
+			AssertElementPresent(locator1 = "Button#PREVIOUS");
+		}
+
+		task ("And When click on previous step button") {
+			Click(locator1 = "Button#PREVIOUS");
+		}
+
+		task ("Then 1st step popover is present") {
+			AssertElementPresent(
+				key_title = "Step 1 of 5: Title 1",
+				locator1 = "Walkthrough#POPOVER_TITLE");
+		}
+
+		task ("And Then 2nd step popover is not present") {
+			AssertElementNotPresent(
+				key_title = "Step 2 of 5: Title 2",
+				locator1 = "Walkthrough#POPOVER_TITLE");
+		}
+	}
+
+	@description = "LPS-154642. Assert popover mode contains a title."
+	@priority = "5"
+	test CanDisplayTitle {
+		task ("When click hotspot element") {
+			Click(locator1 = "Walkthrough#HOTSPOT");
+		}
+
+		task ("Then title text is present on popover") {
+			AssertElementPresent(
+				key_title = "Step 1 of 5: Title 1",
+				locator1 = "Walkthrough#POPOVER_TITLE");
+		}
+	}
+
+	@description = "LPS-154641. Assert a dark background overlay can be toggled."
+	@priority = "3"
+	test CanHaveADarkBackgroundOverlay {
+		task ("When click hotspot element") {
+			Click(locator1 = "Walkthrough#HOTSPOT");
+		}
+
+		task ("Then outside the element has a dark background overlay") {
+			AssertElementPresent(locator1 = "Walkthrough#POPOVER_OVERLAY");
+
+			AssertAttributeValue(
+				attribute1 = "fill",
+				locator1 = "Walkthrough#POPOVER_OVERLAY",
+				value1 = "#393a4a");
+		}
+	}
+
+	@description = "LPS-154646. Assert 1st step popover does not contain a button to transition to previous step."
+	@priority = "5"
+	test FirstStepDoesNotHavePreviousStepButton {
+		task ("And Given popover mode") {
+			Walkthrough.enablePopoverMode();
+		}
+
+		task ("When on 1st step popover") {
+			VerifyElementPresent(
+				key_title = "Step 1 of 5: Title 1",
+				locator1 = "Walkthrough#POPOVER_TITLE");
+		}
+
+		task ("Then previous step button is not present") {
+			AssertElementNotPresent(locator1 = "Button#PREVIOUS");
+		}
+
+		task ("And Then the primary button next step is present") {
+			AssertElementPresent(locator1 = "Button#OK");
+		}
+
+		task ("And When click on next step button") {
+			Click(locator1 = "Button#OK");
+		}
+
+		task ("Then 2nd step popover is present") {
+			AssertElementPresent(
+				key_title = "Step 2 of 5: Title 2",
+				locator1 = "Walkthrough#POPOVER_TITLE");
+		}
+
+		task ("And Then 1st step popover is not present") {
+			AssertElementNotPresent(
+				key_title = "Step 1 of 5: Title 1",
+				locator1 = "Walkthrough#POPOVER_TITLE");
+		}
+	}
+
+	@description = "LPS-154647. Assert intermediate step displays previous and next step button."
+	@priority = "5"
+	test IntermediateStepHasPreviousAndNextStepPresent {
+		task ("And Given popover mode") {
+			Walkthrough.enablePopoverMode();
+		}
+
+		task ("When on 1st step popover") {
+			VerifyElementPresent(
+				key_title = "Step 1 of 5: Title 1",
+				locator1 = "Walkthrough#POPOVER_TITLE");
+		}
+
+		task ("And When click on next steps until second to last step") {
+			Walkthrough.goToSpecificStep(key_step = "4");
+		}
+
+		task ("Then able to reach second to final step") {
+			AssertElementPresent(
+				key_title = "Step 4",
+				locator1 = "Walkthrough#POPOVER_TITLE");
+		}
+
+		task ("And Then primary button is present") {
+			AssertElementPresent(locator1 = "Button#OK");
+		}
+
+		task ("And Then secondary button previous step is present") {
+			AssertElementPresent(locator1 = "Button#PREVIOUS");
+		}
+	}
+
+	@description = "LPS-154639. Assert component will switch to hotspot mode in the 2nd step when closing 2nd popover."
+	@priority = "5"
+	test WhenClosedCanTransitionToHotSpotModeOnCurrentStepElement {
+		task ("Given click hotspot element") {
+			Click(locator1 = "Walkthrough#HOTSPOT");
+		}
+
+		task ("Click on next step") {
+			Click(locator1 = "Button#OK");
+		}
+
+		task ("When Click close icon") {
+			Click(locator1 = "Walkthrough#CLOSE_POPOVER");
+		}
+
+		task ("Then hotspot element is present on the 2nd element") {
+			AssertElementPresent(locator1 = "Walkthrough#HOTSPOT");
+
+			WalkthroughPopover.viewCoordinatePositionMatchesElementStep(
+				hotspotElementClass = "lfr-walkthrough-hotspot-inner",
+				stepElementId = "step2");
+		}
+	}
+
+}

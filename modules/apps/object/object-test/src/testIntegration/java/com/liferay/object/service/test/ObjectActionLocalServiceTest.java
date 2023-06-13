@@ -16,6 +16,7 @@ package com.liferay.object.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
+import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.model.ObjectAction;
@@ -34,15 +35,12 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.Props;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -54,13 +52,12 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Queue;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,18 +73,6 @@ public class ObjectActionLocalServiceTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
-
-	@BeforeClass
-	public static void setUpClass() {
-		_props = PropsUtil.getProps();
-
-		PropsTestUtil.setProps("feature.flag.LPS-152181", "true");
-	}
-
-	@AfterClass
-	public static void tearDownClass() {
-		PropsUtil.setProps(_props);
-	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -454,6 +439,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "0123456789"
 			).build(),
 			objectAction.getParametersUnicodeProperties());
+		Assert.assertEquals(
+			ObjectActionConstants.STATUS_NEVER_RAN, objectAction.getStatus());
 
 		objectAction = _objectActionLocalService.updateObjectAction(
 			objectAction.getObjectActionId(), false,
@@ -481,6 +468,8 @@ public class ObjectActionLocalServiceTest {
 				"secret", "30624700"
 			).build(),
 			objectAction.getParametersUnicodeProperties());
+		Assert.assertEquals(
+			ObjectActionConstants.STATUS_NEVER_RAN, objectAction.getStatus());
 	}
 
 	private Object _getAndSetFieldValue(
@@ -495,11 +484,17 @@ public class ObjectActionLocalServiceTest {
 				(proxy, method, arguments) -> {
 					_argumentsList.add(arguments);
 
+					if (Objects.equals(
+							method.getDeclaringClass(),
+							GroovyScriptingExecutor.class) &&
+						Objects.equals(method.getName(), "execute")) {
+
+						return Collections.emptyMap();
+					}
+
 					return null;
 				}));
 	}
-
-	private static Props _props;
 
 	private final Queue<Object[]> _argumentsList = new LinkedList<>();
 

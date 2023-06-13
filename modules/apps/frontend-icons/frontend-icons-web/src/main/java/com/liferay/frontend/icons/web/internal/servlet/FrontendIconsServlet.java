@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -90,7 +91,9 @@ public class FrontendIconsServlet extends HttpServlet {
 				iconPacks = frontendIconsPacksConfiguration.selectedIconPacks();
 			}
 			else if (path.equals("pack")) {
-				iconPacks = new String[] {matcher.group(2)};
+				String name = matcher.group(2);
+
+				iconPacks = new String[] {StringUtil.toUpperCase(name)};
 			}
 			else {
 				httpServletResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -104,14 +107,12 @@ public class FrontendIconsServlet extends HttpServlet {
 				new ArrayList<>();
 
 			for (String iconPack : iconPacks) {
-				FrontendIconsResourcePack frontendIconsResourcePack =
+				frontendIconsResourcePacks.add(
 					_frontendIconsResourcePackRepository.
 						getFrontendIconsResourcePack(
 							(Long)httpServletRequest.getAttribute(
 								WebKeys.COMPANY_ID),
-							iconPack);
-
-				frontendIconsResourcePacks.add(frontendIconsResourcePack);
+							iconPack));
 			}
 
 			if (frontendIconsResourcePacks.isEmpty()) {

@@ -79,11 +79,20 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 
 		Properties properties = PropsUtil.getProperties();
 
+		properties.remove("hibernate.cache.region.factory_class");
+
 		if (DBManagerUtil.getDBType(dialect) == DBType.SYBASE) {
 			properties.setProperty(PropsKeys.HIBERNATE_JDBC_BATCH_SIZE, "0");
 		}
 
-		properties.put("javax.persistence.validation.mode", "none");
+		properties.setProperty(
+			"hibernate.allow_update_outside_transaction", "true");
+		properties.setProperty("hibernate.cache.use_query_cache", "false");
+		properties.setProperty(
+			"hibernate.cache.use_second_level_cache", "false");
+		properties.setProperty(
+			"hibernate.current_session_context_class",
+			PortalCurrentSessionContext.class.getName());
 
 		if (Validator.isNull(PropsValues.HIBERNATE_DIALECT)) {
 			Class<?> clazz = dialect.getClass();
@@ -91,17 +100,9 @@ public class PortalHibernateConfiguration extends LocalSessionFactoryBean {
 			properties.setProperty("hibernate.dialect", clazz.getName());
 		}
 
-		properties.setProperty("hibernate.cache.use_query_cache", "false");
-		properties.setProperty(
-			"hibernate.cache.use_second_level_cache", "false");
-
-		properties.remove("hibernate.cache.region.factory_class");
-
 		properties.setProperty(
 			"hibernate.query.sql.jdbc_style_params_base", "true");
-
-		properties.setProperty(
-			"hibernate.allow_update_outside_transaction", "true");
+		properties.setProperty("javax.persistence.validation.mode", "none");
 
 		setHibernateProperties(properties);
 

@@ -34,6 +34,73 @@ definition {
 	}
 
 	@priority = "5"
+	test StructuredContentDraftByVersionContainsSetPriority {
+		property portal.acceptance = "true";
+
+		task ("Given in Headless Admin Content I create a structuredContent draft with a priority field set") {
+			var ddmStructureId = WebContentStructures.getDdmStructureId(structureName = "content-structure");
+
+			var responseToParse = HeadlessWebcontentAPI.createStructuredContentDraft(
+				data = "Text",
+				ddmStructureId = "${ddmStructureId}",
+				label = "Text",
+				name = "Text",
+				priority = "1",
+				title = "Title");
+		}
+
+		task ("When returning only web content with version 1.0") {
+			var response = HeadlessWebcontentAPI.versionStructureContent(
+				responseToParse = "${responseToParse}",
+				versionvalue = "1.0");
+		}
+
+		task ("Then the response body includes the set priority") {
+			HeadlessWebcontentAPI.assertPriorityFieldWithCorrectValue(
+				expectedPriorityValue = "1.0",
+				responseToParse = "${response}");
+		}
+	}
+
+	@priority = "5"
+	test StructuredContentDraftContainsModifiedPriorityValue {
+		property portal.acceptance = "true";
+
+		task ("Given in Headless Admin Content I create a structuredContent draft with a priority field set") {
+			var ddmStructureId = WebContentStructures.getDdmStructureId(structureName = "content-structure");
+
+			var responseToParse = HeadlessWebcontentAPI.createStructuredContentDraft(
+				data = "Text",
+				ddmStructureId = "${ddmStructureId}",
+				label = "Text",
+				name = "Text",
+				priority = "1",
+				title = "Title");
+		}
+
+		task ("When a structured content draft priority is modified") {
+			var editStructuredContentId = HeadlessWebcontentAPI.editStructuredContent(
+				data = "Text",
+				ddmStructureId = "${ddmStructureId}",
+				label = "Text",
+				name = "Text",
+				priority = "3.0",
+				responseToParse = "${responseToParse}",
+				title = "Title");
+		}
+
+		task ("When web contents are filtered with 3.0 priority") {
+			var response = HeadlessWebcontentAPI.filterStructuredContent(filtervalue = "priority%20eq%203.0");
+		}
+
+		task ("Then I should see in response content1 with the updated priority value") {
+			HeadlessWebcontentAPI.assertPriorityFieldWithCorrectValue(
+				expectedPriorityValue = "3.0",
+				responseToParse = "${response}");
+		}
+	}
+
+	@priority = "5"
 	test StructuredContentDraftContainsPriorityField {
 		property portal.acceptance = "true";
 
@@ -59,7 +126,7 @@ definition {
 	test StructuredContentDraftContainsSetPriorityValue {
 		property portal.acceptance = "true";
 
-		task ("When in Headless Admin Content i create a structuredContent draft with with a priority field set") {
+		task ("When in Headless Admin Content I create a structuredContent draft with a priority field set") {
 			var ddmStructureId = WebContentStructures.getDdmStructureId(structureName = "content-structure");
 
 			var responseToParse = HeadlessWebcontentAPI.createStructuredContentDraft(
