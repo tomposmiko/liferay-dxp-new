@@ -1252,7 +1252,7 @@
 					"then": {
 						"properties": {
 							"definition": {
-								"$ref": "#/definitions/PageDropZoneDefinition"
+								"$ref": "#/definitions/PageFragmentDropZoneDefinition"
 							}
 						}
 					}
@@ -1472,6 +1472,17 @@
 				}
 			},
 			"title": "The PageFormDefinition Schema",
+			"type": "object"
+		},
+		"PageFragmentDropZoneDefinition": {
+			"additionalProperties": false,
+			"properties": {
+				"fragmentDropZoneId": {
+					"title": "The fragmentDropZoneId Schema",
+					"type": "string"
+				}
+			},
+			"title": "The PageFragmentDropZoneDefinition Schema",
 			"type": "object"
 		},
 		"PageFragmentInstanceDefinition": {

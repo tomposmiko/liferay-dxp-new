@@ -17,11 +17,10 @@
 <%@ include file="/init.jsp" %>
 
 <%
-UnicodeProperties groupTypeSettings = (UnicodeProperties)request.getAttribute("site.groupTypeSettings");
+UnicodeProperties groupTypeSettingsUnicodeProperties = (UnicodeProperties)request.getAttribute("site.groupTypeSettings");
 
-boolean groupTrashEnabled = PropertiesParamUtil.getBoolean(groupTypeSettings, request, "trashEnabled", true);
-
-int trashEntriesMaxAge = PropertiesParamUtil.getInteger(groupTypeSettings, request, "trashEntriesMaxAge", PrefsPropsUtil.getInteger(company.getCompanyId(), PropsKeys.TRASH_ENTRIES_MAX_AGE));
+boolean groupTrashEnabled = PropertiesParamUtil.getBoolean(groupTypeSettingsUnicodeProperties, request, "trashEnabled", true);
+int trashEntriesMaxAge = PropertiesParamUtil.getInteger(groupTypeSettingsUnicodeProperties, request, "trashEntriesMaxAge", PrefsPropsUtil.getInteger(company.getCompanyId(), PropsKeys.TRASH_ENTRIES_MAX_AGE));
 %>
 
 <aui:input id="trashEnabled" inlineLabel="right" label="enable-recycle-bin" labelCssClass="simple-toggle-switch" name="trashEnabled" type="toggle-switch" value="<%= groupTrashEnabled %>" />

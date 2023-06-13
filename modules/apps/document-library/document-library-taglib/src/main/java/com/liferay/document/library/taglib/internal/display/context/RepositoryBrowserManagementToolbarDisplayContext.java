@@ -31,6 +31,8 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
@@ -172,7 +174,13 @@ public class RepositoryBrowserManagementToolbarDisplayContext
 
 	@Override
 	protected String[] getOrderByKeys() {
-		return new String[] {"modified-date", "title"};
+		if (Validator.isNotNull(
+				ParamUtil.getString(httpServletRequest, "keywords"))) {
+
+			return null;
+		}
+
+		return new String[] {"modified-date", "size", "title"};
 	}
 
 	private final Set<String> _actions;

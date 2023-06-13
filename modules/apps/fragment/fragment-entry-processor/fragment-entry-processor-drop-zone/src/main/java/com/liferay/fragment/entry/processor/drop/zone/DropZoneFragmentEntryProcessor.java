@@ -31,13 +31,17 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -155,35 +159,51 @@ public class DropZoneFragmentEntryProcessor implements FragmentEntryProcessor {
 				}
 			}
 			else {
+				Map<String, String> fragmentDropZoneIdsMap =
+					new LinkedHashMap<>();
+
+				List<String> noFragmentDropZoneItemIds = new LinkedList<>();
+
+				for (String dropZoneItemId : dropZoneItemIds) {
+					LayoutStructureItem childLayoutStructureItem =
+						layoutStructure.getLayoutStructureItem(dropZoneItemId);
+
+					if (!(childLayoutStructureItem instanceof
+							FragmentDropZoneLayoutStructureItem)) {
+
+						continue;
+					}
+
+					FragmentDropZoneLayoutStructureItem
+						fragmentDropZoneLayoutStructureItem =
+							(FragmentDropZoneLayoutStructureItem)
+								childLayoutStructureItem;
+
+					String fragmentDropZoneId =
+						fragmentDropZoneLayoutStructureItem.
+							getFragmentDropZoneId();
+
+					if (Validator.isBlank(fragmentDropZoneId)) {
+						noFragmentDropZoneItemIds.add(dropZoneItemId);
+					}
+					else {
+						fragmentDropZoneIdsMap.put(
+							fragmentDropZoneId, dropZoneItemId);
+					}
+				}
+
 				for (int i = 0; i < elements.size(); i++) {
 					Element element = elements.get(i);
 
 					String dropZoneId = element.attr("data-lfr-drop-zone-id");
 
-					for (String itemId : dropZoneItemIds) {
-						LayoutStructureItem childLayoutStructureItem =
-							layoutStructure.getLayoutStructureItem(itemId);
-
-						if (!(childLayoutStructureItem instanceof
-								FragmentDropZoneLayoutStructureItem)) {
-
-							continue;
-						}
-
-						FragmentDropZoneLayoutStructureItem
-							fragmentDropZoneLayoutStructureItem =
-								(FragmentDropZoneLayoutStructureItem)
-									childLayoutStructureItem;
-
-						if (Objects.equals(
-								dropZoneId,
-								fragmentDropZoneLayoutStructureItem.
-									getFragmentDropZoneId())) {
-
-							element.attr("uuid", itemId);
-
-							break;
-						}
+					if (fragmentDropZoneIdsMap.containsKey(dropZoneId)) {
+						element.attr(
+							"uuid", fragmentDropZoneIdsMap.get(dropZoneId));
+					}
+					else if (ListUtil.isNotEmpty(noFragmentDropZoneItemIds)) {
+						element.attr(
+							"uuid", noFragmentDropZoneItemIds.remove(0));
 					}
 				}
 			}

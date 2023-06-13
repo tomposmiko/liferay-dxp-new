@@ -15,6 +15,7 @@
 package com.liferay.portal.cache.ehcache.internal;
 
 import com.liferay.portal.cache.AggregatedPortalCacheListener;
+import com.liferay.portal.cache.ehcache.internal.configurator.BaseEhcachePortalCacheManagerConfigurator;
 import com.liferay.portal.db.partition.DBPartitionUtil;
 import com.liferay.portal.kernel.cache.PortalCacheListener;
 import com.liferay.portal.kernel.cache.PortalCacheListenerScope;
@@ -83,6 +84,20 @@ public class ShardedEhcachePortalCacheTest {
 
 		_cacheManager = new CacheManager(configuration);
 
+		_baseEhcachePortalCacheManager = new BaseEhcachePortalCacheManager() {
+
+			@Override
+			protected BaseEhcachePortalCacheManagerConfigurator
+				getBaseEhcachePortalCacheManagerConfigurator() {
+
+				return null;
+			}
+
+		};
+
+		ReflectionTestUtil.setFieldValue(
+			_baseEhcachePortalCacheManager, "_cacheManager", _cacheManager);
+
 		_dbPartitionUtilMockedStatic.when(
 			DBPartitionUtil::getCurrentCompanyId
 		).thenAnswer(
@@ -97,16 +112,11 @@ public class ShardedEhcachePortalCacheTest {
 			}
 		);
 
-		_ehcachePortalCacheManager = new EhcachePortalCacheManager();
-
-		ReflectionTestUtil.setFieldValue(
-			_ehcachePortalCacheManager, "_cacheManager", _cacheManager);
-
 		_companyIdThreadLocal = ReflectionTestUtil.getFieldValue(
 			CompanyThreadLocal.class, "_companyId");
 
 		_shardedEhcachePortalCache = new ShardedEhcachePortalCache(
-			_ehcachePortalCacheManager,
+			_baseEhcachePortalCacheManager,
 			new EhcachePortalCacheConfiguration(
 				_TEST_CACHE_NAME, Collections.emptySet(), false));
 
@@ -142,7 +152,7 @@ public class ShardedEhcachePortalCacheTest {
 
 		ShardedEhcachePortalCache testDefaultShardedEhcachePortalCache =
 			new ShardedEhcachePortalCache(
-				_ehcachePortalCacheManager,
+				_baseEhcachePortalCacheManager,
 				new EhcachePortalCacheConfiguration(
 					"test.default.cache", Collections.emptySet(), false));
 
@@ -684,9 +694,9 @@ public class ShardedEhcachePortalCacheTest {
 
 	private static final String _TEST_VALUE_SYSTEM = "TEST_VALUE_SYSTEM";
 
+	private static BaseEhcachePortalCacheManager _baseEhcachePortalCacheManager;
 	private static CacheManager _cacheManager;
 	private static ThreadLocal<Long> _companyIdThreadLocal;
-	private static EhcachePortalCacheManager _ehcachePortalCacheManager;
 
 	private final MockedStatic<DBPartitionUtil> _dbPartitionUtilMockedStatic =
 		Mockito.mockStatic(DBPartitionUtil.class);

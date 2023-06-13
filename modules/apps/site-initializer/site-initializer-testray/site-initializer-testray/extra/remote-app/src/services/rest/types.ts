@@ -244,6 +244,8 @@ export type TestraySubTask = {
 	dueStatus: PickList;
 	errors: string;
 	id: number;
+	mbMessageId: number;
+	mbThreadId: number;
 	mergedToSubtaskId: TestraySubTask;
 	name: string;
 	r_mergedToTestraySubtask_c_subtaskId: TestraySubTask;
@@ -261,6 +263,15 @@ export type TestraySubTaskCaseResult = {
 	name?: string;
 	r_caseResultToSubtasksCasesResults_c_caseResult?: TestrayCaseResult;
 	r_subtaskToSubtasksCasesResults_c_subtask?: TestraySubTask;
+	subTask?: TestraySubTask;
+};
+
+export type TestraySubTaskIssue = {
+	id: number;
+	issue?: TestrayIssue;
+	name: string;
+	r_issueToSubtasksIssues_c_issue?: TestrayIssue;
+	r_subtaskToSubtasksIssues_c_subtask?: TestraySubTask;
 	subTask?: TestraySubTask;
 };
 

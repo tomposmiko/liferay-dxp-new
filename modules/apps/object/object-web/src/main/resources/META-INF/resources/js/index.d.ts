@@ -28,6 +28,7 @@ type NotificationTemplate = {
 	objectDefinitionId: number | null;
 	subject: LocalizedValue<string>;
 	to: LocalizedValue<string>;
+	type: 'email' | 'userNotification';
 };
 
 interface ObjectAction {
@@ -49,6 +50,7 @@ interface ObjectAction {
 interface ObjectActionParameters {
 	lineCount?: number;
 	notificationTemplateId?: number;
+	objectDefinitionExternalReferenceCode?: string;
 	objectDefinitionId?: number;
 	predefinedValues?: PredefinedValue[];
 	relatedObjectEntries?: boolean;
@@ -275,6 +277,7 @@ interface PickList {
 	actions: Actions;
 	externalReferenceCode: string;
 	id: number;
+	key: string;
 	listTypeEntries: PickListItem[];
 	name: string;
 	name_i18n: LocalizedValue<string>;

@@ -18,9 +18,9 @@ import {ClayDropDownWithItems} from '@clayui/drop-down';
 import ClayEmptyState from '@clayui/empty-state';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
-import ClayManagementToolbar from '@clayui/management-toolbar';
 import ClayTabs from '@clayui/tabs';
 import ClayUpperToolbar from '@clayui/upper-toolbar';
+import {FlagsModal} from '@liferay/flags-taglib';
 import classNames from 'classnames';
 import {useMutation} from 'graphql-hooks';
 import React, {
@@ -47,7 +47,6 @@ import PaginatedList from '../../components/PaginatedList.es';
 import Rating from '../../components/Rating.es';
 import SectionLabel from '../../components/SectionLabel.es';
 import SubscritionCheckbox from '../../components/SubscribeCheckbox.es';
-import SubscriptionButton from '../../components/SubscriptionButton.es';
 import TagList from '../../components/TagList.es';
 import {
 	createAnswerQuery,
@@ -57,7 +56,6 @@ import {
 	getUserActivityQuery,
 	markAsAnswerMessageBoardMessageQuery,
 	subscribeQuery,
-	unsubscribeQuery,
 } from '../../utils/client.es';
 import {ALL_SECTIONS_ID} from '../../utils/contants.es';
 import lang from '../../utils/lang.es';
@@ -68,8 +66,8 @@ import {
 	getFullPath,
 	historyPushWithSlug,
 } from '../../utils/utils.es';
-import FlagsContainer from './components/FlagsContainer';
 import useActiviyQuestionKebabOptions from './hooks/useActivityQuestionKebabOptions.es';
+import useFlagsContainer from './hooks/useFlagsContainer.es';
 
 const tabs = [
 	{label: Liferay.Language.get('newest'), sortBy: 'dateCreated:desc'},
@@ -85,15 +83,17 @@ const Question = ({
 		actions: true,
 		addAnswer: true,
 		breadcrumb: true,
+		flags: true,
 		kebab: false,
 		rating: true,
+		showAnswer: true,
+		showSignature: false,
 		styled: false,
 		tabs: true,
 	},
 	history,
 	questionId,
 	sectionTitle,
-	url,
 }) => {
 	const sectionRef = useRef(null);
 
@@ -125,13 +125,19 @@ const Question = ({
 	const editorRef = useRef('');
 	const historyPushParser = historyPushWithSlug(history.push);
 
+	const flagsContainerProps = useFlagsContainer({
+		content: question,
+		context,
+		showIcon: false,
+	});
+
 	const {kebabOptions, setIsSubscribe} = useActiviyQuestionKebabOptions({
 		context,
+		onClickReport: () => flagsContainerProps.flagsModal.handleClickShow(),
 		question,
 		questionId,
 		sectionTitle,
 		setError,
-		setShowDeleteModalPanel,
 	});
 
 	const fetchMessages = useCallback(() => {
@@ -406,13 +412,13 @@ const Question = ({
 			)}
 
 			<div
-				className={classNames('', {
-					'c-mt-2': display.styled,
+				className={classNames({
+					'c-mt-2 px-3': display.styled,
 					'c-mt-5': !display.styled,
 				})}
 			>
 				{!loading && !error && (
-					<div className="questions-container">
+					<div className="questions-container row">
 						{display.actions && display.rating && (
 							<div className="col-md-1 text-md-center">
 								<Rating
@@ -429,22 +435,22 @@ const Question = ({
 						)}
 
 						<div
-							className={classNames('', {
+							className={classNames({
 								'col-md-10': !display.styled,
 								'col-md-12 ': display.styled,
 							})}
 						>
 							<div
-								className={classNames('', {
+								className={classNames({
 									'align-items-top flex-column-reverse flex-md-row justify-content-between':
 										display.styled,
 									'align-items-top flex-column-reverse flex-md-row row': !display.styled,
 								})}
 							>
 								<div
-									className={classNames('', {
+									className={classNames({
 										'c-mt-2 c-mt-md-0': display.styled,
-										'c-mt-4 c-mt-md-0 col-md-7': !display.styled,
+										'c-mt-4 c-mt-md-0 w-100': !display.styled,
 									})}
 								>
 									{!!question.messageBoardSection &&
@@ -470,9 +476,7 @@ const Question = ({
 									<div className="d-flex flex-row justify-content-between">
 										<h1
 											className={classNames(
-												'c-mt-2',
-												'question-headline',
-
+												'c-mt-2 text-6 question-headline text-weight-bold',
 												{
 													'question-seen':
 														question.seen,
@@ -498,25 +502,23 @@ const Question = ({
 											)}
 										</h1>
 
-										{display.kebab && (
-											<ClayManagementToolbar.ItemList>
-												<ClayUpperToolbar.Item>
-													<ClayDropDownWithItems
-														items={kebabOptions}
-														trigger={
-															<ClayButtonWithIcon
-																displayType="unstyled"
-																small
-																symbol="ellipsis-v"
-															/>
-														}
-													/>
-												</ClayUpperToolbar.Item>
-											</ClayManagementToolbar.ItemList>
-										)}
+										<div className="d-flex mt-2">
+											<ClayUpperToolbar.Item>
+												<ClayDropDownWithItems
+													items={kebabOptions}
+													trigger={
+														<ClayButtonWithIcon
+															displayType="unstyled"
+															small
+															symbol="ellipsis-v"
+														/>
+													}
+												/>
+											</ClayUpperToolbar.Item>
+										</div>
 									</div>
 
-									<p className="small text-secondary">
+									<p className="align-items-start d-flex justify-content-start small text-secondary">
 										<EditedTimestamp
 											dateCreated={question.dateCreated}
 											dateModified={question.dateModified}
@@ -533,101 +535,6 @@ const Question = ({
 										)}`}
 									</p>
 								</div>
-
-								{!display.kebab && !question.locked && (
-									<div className="col-md-5 text-right">
-										<ClayButton.Group
-											className="questions-actions"
-											spaced
-										>
-											{display.actions &&
-												question.actions.subscribe && (
-													<SubscriptionButton
-														isSubscribed={
-															question.subscribed
-														}
-														onSubscription={(
-															subscribed
-														) => {
-															deleteCacheKey(
-																getSubscriptionsQuery,
-																{
-																	contentType:
-																		'MessageBoardThread',
-																}
-															);
-
-															setQuestion(
-																(
-																	prevQuestion
-																) => ({
-																	...prevQuestion,
-																	subscribed,
-																})
-															);
-														}}
-														queryVariables={{
-															messageBoardThreadId:
-																question.id,
-														}}
-														subscribeQuery={
-															subscribeQuery
-														}
-														unsubscribeQuery={
-															unsubscribeQuery
-														}
-													/>
-												)}
-
-											{display.actions &&
-												question.actions.delete && (
-													<ClayButton
-														data-tooltip-align="top"
-														displayType="secondary"
-														onClick={() =>
-															setShowDeleteModalPanel(
-																true
-															)
-														}
-														title={Liferay.Language.get(
-															'delete'
-														)}
-													>
-														<ClayIcon symbol="trash" />
-													</ClayButton>
-												)}
-
-											<FlagsContainer
-												content={question}
-												context={context}
-											/>
-
-											{display.actions &&
-												question.actions.replace && (
-													<Link to={`${url}/edit`}>
-														<ClayButton displayType="secondary">
-															{Liferay.Language.get(
-																'edit'
-															)}
-														</ClayButton>
-													</Link>
-												)}
-
-											{isPageScroll &&
-												!!answers.items?.length && (
-													<ClayButton
-														className="btn btn-secondary"
-														displayType="secondary"
-														onClick={runScroll}
-													>
-														{Liferay.Language.get(
-															'go-to-answers'
-														)}
-													</ClayButton>
-												)}
-										</ClayButton.Group>
-									</div>
-								)}
 							</div>
 
 							<div className="c-mt-4">
@@ -662,6 +569,7 @@ const Question = ({
 
 							<ClayTabs
 								active={activeIndex}
+								className="mb-2"
 								modern
 								onActiveChange={setActiveIndex}
 							>
@@ -682,8 +590,8 @@ const Question = ({
 							<ClayTabs.Content activeIndex={activeIndex} fade>
 								<div
 									className={classNames({
-										'c-mt-3': !display.styled,
-										'd-none': display.styled,
+										'c-mt-3 font-weight-normal':
+											display.styled,
 									})}
 								>
 									<PaginatedList
@@ -704,10 +612,16 @@ const Question = ({
 												}
 												context={context}
 												deleteAnswer={deleteAnswer}
+												display={display}
 												editable={!question.locked}
 												key={answer.id}
 												onSubscription={onSubscription}
 												question={question}
+												showItems={display.showAnswer}
+												showSignature={
+													display.showSignature
+												}
+												styledItems={display.styled}
 											/>
 										)}
 									</PaginatedList>
@@ -784,6 +698,28 @@ const Question = ({
 
 				<Alert info={error} />
 			</div>
+
+			{flagsContainerProps.flagsModal.reportDialogOpen && (
+				<FlagsModal
+					handleClose={flagsContainerProps.flagsModal.onClose}
+					handleSubmit={
+						flagsContainerProps.flagsModal.handleSubmitReport
+					}
+					{...flagsContainerProps.flagsModal}
+				/>
+			)}
+
+			{isPageScroll && !display?.preview && (
+				<div className="scroll-to-element">
+					<ClayButtonWithIcon
+						displayType="secondary"
+						fontSize={22}
+						onClick={runScroll}
+						symbol="angle-down"
+						title={Liferay.Language.get('go-to-answers')}
+					/>
+				</div>
+			)}
 
 			{question && (
 				<Helmet>

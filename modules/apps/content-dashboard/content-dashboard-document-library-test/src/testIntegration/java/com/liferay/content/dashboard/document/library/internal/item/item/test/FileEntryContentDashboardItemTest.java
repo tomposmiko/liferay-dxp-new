@@ -22,6 +22,7 @@ import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.content.dashboard.item.ContentDashboardItem;
 import com.liferay.content.dashboard.item.ContentDashboardItemFactory;
 import com.liferay.content.dashboard.item.ContentDashboardItemVersion;
 import com.liferay.content.dashboard.item.VersionableContentDashboardItem;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionResponse;
+import com.liferay.portal.kernel.test.portlet.MockLiferayPortletRenderRequest;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -59,10 +61,12 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import java.net.URL;
 import java.net.URLEncoder;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -420,9 +424,26 @@ public class FileEntryContentDashboardItemTest {
 	}
 
 	@Test
-	public void testGetSpecificInformation() throws Exception {
-		ServiceContextThreadLocal.pushServiceContext(
-			ServiceContextTestUtil.getServiceContext());
+	public void testGetSpecificInformationList() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
+
+		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
+			new MockLiferayPortletRenderRequest();
+
+		mockLiferayPortletRenderRequest.setAttribute(
+			WebKeys.THEME_DISPLAY, new ThemeDisplay());
+
+		mockHttpServletRequest.setAttribute(
+			JavaConstants.JAVAX_PORTLET_REQUEST,
+			mockLiferayPortletRenderRequest);
+
+		serviceContext.setRequest(mockHttpServletRequest);
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
 		VersionableContentDashboardItem<FileEntry>
 			versionableContentDashboardItem =
@@ -431,13 +452,69 @@ public class FileEntryContentDashboardItemTest {
 					ServiceContextTestUtil.getServiceContext(
 						_group.getGroupId()));
 
-		Map<String, Object> specificInformation =
-			versionableContentDashboardItem.getSpecificInformation(
-				LocaleUtil.getDefault());
+		List<ContentDashboardItem.SpecificInformation<?>>
+			specificInformationList =
+				versionableContentDashboardItem.getSpecificInformationList(
+					LocaleUtil.getDefault());
 
-		Assert.assertEquals("jpg", specificInformation.get("extension"));
-		Assert.assertEquals("0 B", specificInformation.get("size"));
-		Assert.assertNotNull(specificInformation.get("file-name"));
+		Stream<ContentDashboardItem.SpecificInformation<?>> stream =
+			specificInformationList.stream();
+
+		ContentDashboardItem.SpecificInformation<?>
+			extensionSpecificInformation = stream.filter(
+				specificInformation -> Objects.equals(
+					specificInformation.getKey(), "extension")
+			).findFirst(
+			).orElseThrow(
+				() -> new AssertionError("extension not found")
+			);
+
+		Assert.assertEquals("jpg", extensionSpecificInformation.getValue());
+
+		stream = specificInformationList.stream();
+
+		ContentDashboardItem.SpecificInformation<?> sizeSpecificInformation =
+			stream.filter(
+				specificInformation -> Objects.equals(
+					specificInformation.getKey(), "size")
+			).findFirst(
+			).orElseThrow(
+				() -> new AssertionError("size not found")
+			);
+
+		Assert.assertEquals("0 B", sizeSpecificInformation.getValue());
+
+		stream = specificInformationList.stream();
+
+		ContentDashboardItem.SpecificInformation<?>
+			fileNameSpecificInformation = stream.filter(
+				specificInformation -> Objects.equals(
+					specificInformation.getKey(), "file-name")
+			).findFirst(
+			).orElseThrow(
+				() -> new AssertionError("file-name not found")
+			);
+
+		Assert.assertNotNull(fileNameSpecificInformation.getValue());
+
+		stream = specificInformationList.stream();
+
+		ContentDashboardItem.SpecificInformation<URL>
+			webDAVSpecificInformation =
+				(ContentDashboardItem.SpecificInformation<URL>)stream.filter(
+					specificInformation -> Objects.equals(
+						specificInformation.getKey(), "web-dav-url")
+				).findFirst(
+				).orElseThrow(
+					() -> new AssertionError("web-dav-url not found")
+				);
+
+		String url = String.valueOf(webDAVSpecificInformation.getValue());
+
+		Assert.assertTrue(url.contains("webdav"));
+
+		Assert.assertEquals(
+			"webdav-help", webDAVSpecificInformation.getHelpText());
 	}
 
 	@Test

@@ -27,12 +27,12 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ThemeCSSCET extends CET {
 
 	@CETProperty(
-		defaultValue = "", name = "clayURL", type = "string", url = true
+		defaultValue = "", name = "clayURL", type = CETProperty.Type.URL
 	)
 	public String getClayURL();
 
 	@CETProperty(
-		defaultValue = "", name = "mainURL", type = "string", url = true
+		defaultValue = "", name = "mainURL", type = CETProperty.Type.URL
 	)
 	public String getMainURL();
 

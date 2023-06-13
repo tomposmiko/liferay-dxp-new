@@ -436,13 +436,15 @@ export const getMessagesQuery = `
 						dateCreated
 						dateModified
 						encodingFormat
+						friendlyUrlPath
 						hasCompanyMx
 						id
-						friendlyUrlPath
+						modified
 						showAsAnswer
 						status
 					}
 				}
+				modified
 				myRating {
 					ratingValue
 				}
@@ -805,11 +807,11 @@ export const getUserActivityQuery = `
 					image
 					name
 				}
-				dateCreated
 				creatorStatistics {
 					postsNumber
 					rank
 				}
+				dateCreated
 				dateModified
 				friendlyUrlPath
 				headline
@@ -822,6 +824,11 @@ export const getUserActivityQuery = `
 					}
 				}
 				numberOfMessageBoardMessages
+				parentMessageBoardMessage {
+					articleBody
+					headline
+				}
+				showAsAnswer
 			}
 			page
 			pageSize

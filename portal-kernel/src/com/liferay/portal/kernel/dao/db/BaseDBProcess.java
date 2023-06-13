@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.dao.db;
 
+import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.function.UnsafeSupplier;
@@ -21,6 +22,7 @@ import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -34,6 +36,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 
 import java.io.IOException;
@@ -43,6 +46,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -384,7 +388,36 @@ public abstract class BaseDBProcess implements DBProcess {
 	}
 
 	protected void processConcurrently(
-			String sqlQuery,
+			String sql, String updateSQL,
+			UnsafeFunction<ResultSet, Object[], Exception> unsafeFunction,
+			UnsafeBiConsumer<Object[], PreparedStatement, Exception>
+				unsafeBiConsumer,
+			String exceptionMessage)
+		throws Exception {
+
+		int fetchSize = GetterUtil.getInteger(
+			PropsUtil.get(PropsKeys.UPGRADE_CONCURRENT_FETCH_SIZE));
+
+		try (Statement statement = connection.createStatement()) {
+			statement.setFetchSize(fetchSize);
+
+			try (ResultSet resultSet = statement.executeQuery(sql)) {
+				_processConcurrently(
+					updateSQL,
+					() -> {
+						if (resultSet.next()) {
+							return unsafeFunction.apply(resultSet);
+						}
+
+						return null;
+					},
+					null, unsafeBiConsumer, exceptionMessage);
+			}
+		}
+	}
+
+	protected void processConcurrently(
+			String sql,
 			UnsafeFunction<ResultSet, Object[], Exception> unsafeFunction,
 			UnsafeConsumer<Object[], Exception> unsafeConsumer,
 			String exceptionMessage)
@@ -396,8 +429,9 @@ public abstract class BaseDBProcess implements DBProcess {
 		try (Statement statement = connection.createStatement()) {
 			statement.setFetchSize(fetchSize);
 
-			try (ResultSet resultSet = statement.executeQuery(sqlQuery)) {
+			try (ResultSet resultSet = statement.executeQuery(sql)) {
 				_processConcurrently(
+					null,
 					() -> {
 						if (resultSet.next()) {
 							return unsafeFunction.apply(resultSet);
@@ -405,7 +439,7 @@ public abstract class BaseDBProcess implements DBProcess {
 
 						return null;
 					},
-					unsafeConsumer, exceptionMessage);
+					unsafeConsumer, null, exceptionMessage);
 			}
 		}
 	}
@@ -418,6 +452,7 @@ public abstract class BaseDBProcess implements DBProcess {
 		AtomicInteger atomicInteger = new AtomicInteger();
 
 		_processConcurrently(
+			null,
 			() -> {
 				int index = atomicInteger.getAndIncrement();
 
@@ -427,7 +462,7 @@ public abstract class BaseDBProcess implements DBProcess {
 
 				return null;
 			},
-			unsafeConsumer, exceptionMessage);
+			unsafeConsumer, null, exceptionMessage);
 	}
 
 	protected void removePrimaryKey(String tableName) throws Exception {
@@ -437,6 +472,23 @@ public abstract class BaseDBProcess implements DBProcess {
 	}
 
 	protected Connection connection;
+
+	private PreparedStatement _getConcurrentPreparedStatement(
+		String updateSQL,
+		Map<Thread, PreparedStatement> preparedStatementHashMap) {
+
+		return preparedStatementHashMap.computeIfAbsent(
+			Thread.currentThread(),
+			k -> {
+				try {
+					return AutoBatchPreparedStatementUtil.autoBatch(
+						connection, updateSQL);
+				}
+				catch (SQLException sqlException) {
+					throw new RuntimeException(sqlException);
+				}
+			});
+	}
 
 	private Connection _getConnection() {
 		try {
@@ -481,19 +533,29 @@ public abstract class BaseDBProcess implements DBProcess {
 	}
 
 	private <T> void _processConcurrently(
-			UnsafeSupplier<T, Exception> unsafeSupplier,
+			String updateSQL, UnsafeSupplier<T, Exception> unsafeSupplier,
 			UnsafeConsumer<T, Exception> unsafeConsumer,
+			UnsafeBiConsumer<T, PreparedStatement, Exception> unsafeBiConsumer,
 			String exceptionMessage)
 		throws Exception {
 
 		Objects.requireNonNull(unsafeSupplier);
-		Objects.requireNonNull(unsafeConsumer);
+
+		if (Validator.isNull(updateSQL)) {
+			Objects.requireNonNull(unsafeConsumer);
+		}
+		else {
+			Objects.requireNonNull(unsafeBiConsumer);
+		}
 
 		ExecutorService executorService = Executors.newWorkStealingPool();
 
 		ThrowableCollector throwableCollector = new ThrowableCollector();
 
 		List<Future<Void>> futures = new ArrayList<>();
+
+		Map<Thread, PreparedStatement> preparedStatementHashMap =
+			new ConcurrentHashMap<>();
 
 		try {
 			boolean notificationEnabled = NotificationThreadLocal.isEnabled();
@@ -514,7 +576,15 @@ public abstract class BaseDBProcess implements DBProcess {
 						try (SafeCloseable safeCloseable =
 								CompanyThreadLocal.lock(companyId)) {
 
-							unsafeConsumer.accept(current);
+							if (Validator.isNull(updateSQL)) {
+								unsafeConsumer.accept(current);
+							}
+							else {
+								unsafeBiConsumer.accept(
+									current,
+									_getConcurrentPreparedStatement(
+										updateSQL, preparedStatementHashMap));
+							}
 						}
 						catch (Exception exception) {
 							throwableCollector.collect(exception);
@@ -555,6 +625,21 @@ public abstract class BaseDBProcess implements DBProcess {
 			}
 
 			ReflectionUtil.throwException(throwable);
+		}
+
+		try {
+			for (PreparedStatement preparedStatement :
+					preparedStatementHashMap.values()) {
+
+				preparedStatement.executeBatch();
+
+				preparedStatement.close();
+			}
+		}
+		catch (Exception exception) {
+			_log.error(exceptionMessage, exception);
+
+			throw exception;
 		}
 	}
 

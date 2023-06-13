@@ -39,6 +39,7 @@ const MultiSelect = ({
 	label,
 	onBlurFn = () => {},
 	onItemsChangeFn,
+	placeholder,
 	required = false,
 	sourceItems = [],
 }: {
@@ -50,6 +51,7 @@ const MultiSelect = ({
 	label: string;
 	onBlurFn?: () => void;
 	onItemsChangeFn: OnItemsChangeFn;
+	placeholder?: string;
 	required?: boolean;
 	sourceItems?: MultiSelectItem[];
 }) => (
@@ -74,6 +76,7 @@ const MultiSelect = ({
 					// @ts-ignore
 
 					onItemsChange={onItemsChangeFn}
+					placeholder={placeholder}
 					sourceItems={sourceItems}
 				/>
 
@@ -129,9 +132,12 @@ const InviteUserFormGroup = ({
 				errorMessages={emailAddressErrorMessages}
 				inputName={`${portletNamespace}emailAddresses${index}`}
 				items={emailAddresses}
-				label={Liferay.Language.get('emails')}
+				label={Liferay.Language.get('email-addresses')}
 				onBlurFn={() => setShowRequiredMessage(true)}
 				onItemsChangeFn={onEmailAddressItemsChange}
+				placeholder={Liferay.Language.get(
+					'type-a-comma-or-press-enter-to-input-email-addresses'
+				)}
 				required={true}
 			/>
 
@@ -144,6 +150,9 @@ const InviteUserFormGroup = ({
 				items={accountRoles}
 				label={Liferay.Language.get('roles')}
 				onItemsChangeFn={onAccountRoleItemsChange}
+				placeholder={Liferay.Language.get(
+					'type-a-comma-or-press-enter-to-input-roles'
+				)}
 				sourceItems={availableAccountRoles}
 			/>
 		</ClayLayout.Sheet>

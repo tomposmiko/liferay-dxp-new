@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -59,7 +58,10 @@ public class CETFDSActionProvider implements FDSActionProvider {
 		CETFDSEntry cetFDSEntry = (CETFDSEntry)model;
 
 		if (cetFDSEntry.isReadOnly()) {
-			return Collections.emptyList();
+			return DropdownItemListBuilder.add(
+				dropdownItem -> _buildViewClientExtensionEntryAction(
+					cetFDSEntry, dropdownItem, httpServletRequest)
+			).build();
 		}
 
 		return DropdownItemListBuilder.add(
@@ -91,23 +93,38 @@ public class CETFDSActionProvider implements FDSActionProvider {
 		CETFDSEntry cetFDSEntry, DropdownItem dropdownItem,
 		HttpServletRequest httpServletRequest) {
 
-		PortletURL editClientExtensionEntryURL = PortletURLBuilder.create(
-			_getRenderURL(httpServletRequest)
-		).setMVCRenderCommandName(
-			"/client_extension_admin/edit_client_extension_entry"
-		).setParameter(
-			"externalReferenceCode", cetFDSEntry.getExternalReferenceCode()
-		).buildPortletURL();
-
-		String currentURL = ParamUtil.getString(
-			httpServletRequest, "currentURL",
-			_portal.getCurrentURL(httpServletRequest));
-
-		editClientExtensionEntryURL.setParameter("redirect", currentURL);
-
-		dropdownItem.setHref(editClientExtensionEntryURL);
-
+		dropdownItem.setHref(
+			PortletURLBuilder.create(
+				_getRenderURL(httpServletRequest)
+			).setMVCRenderCommandName(
+				"/client_extension_admin/edit_client_extension_entry"
+			).setRedirect(
+				ParamUtil.getString(
+					httpServletRequest, "currentURL",
+					_portal.getCurrentURL(httpServletRequest))
+			).setParameter(
+				"externalReferenceCode", cetFDSEntry.getExternalReferenceCode()
+			).buildPortletURL());
 		dropdownItem.setLabel(_getMessage(httpServletRequest, "edit"));
+	}
+
+	private void _buildViewClientExtensionEntryAction(
+		CETFDSEntry cetFDSEntry, DropdownItem dropdownItem,
+		HttpServletRequest httpServletRequest) {
+
+		dropdownItem.setHref(
+			PortletURLBuilder.create(
+				_getRenderURL(httpServletRequest)
+			).setMVCRenderCommandName(
+				"/client_extension_admin/view_client_extension_entry"
+			).setRedirect(
+				ParamUtil.getString(
+					httpServletRequest, "currentURL",
+					_portal.getCurrentURL(httpServletRequest))
+			).setParameter(
+				"externalReferenceCode", cetFDSEntry.getExternalReferenceCode()
+			).buildPortletURL());
+		dropdownItem.setLabel(_getMessage(httpServletRequest, "view"));
 	}
 
 	private PortletURL _getActionURL(HttpServletRequest httpServletRequest) {

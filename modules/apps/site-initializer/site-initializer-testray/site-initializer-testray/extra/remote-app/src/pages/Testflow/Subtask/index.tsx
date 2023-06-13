@@ -12,8 +12,9 @@
  * details.
  */
 
-import {useEffect} from 'react';
-import {useOutletContext, useParams} from 'react-router-dom';
+import {useContext} from 'react';
+import {useOutletContext} from 'react-router-dom';
+import {KeyedMutator} from 'swr';
 
 import Avatar from '../../../components/Avatar';
 import AssignToMe from '../../../components/Avatar/AssigneToMe';
@@ -23,62 +24,39 @@ import Loading from '../../../components/Loading';
 import StatusBadge from '../../../components/StatusBadge';
 import {StatusBadgeType} from '../../../components/StatusBadge/StatusBadge';
 import QATable from '../../../components/Table/QATable';
-import {useFetch} from '../../../hooks/useFetch';
-import useHeader from '../../../hooks/useHeader';
+import {ApplicationPropertiesContext} from '../../../context/ApplicationPropertiesContext';
 import i18n from '../../../i18n';
-import {APIResponse, TestraySubTask, TestrayTask} from '../../../services/rest';
+import {
+	MessageBoardMessage,
+	TestraySubTask,
+	TestraySubTaskIssue,
+	TestrayTask,
+} from '../../../services/rest';
 import {testraySubTaskImpl} from '../../../services/rest/TestraySubtask';
 import {getTimeFromNow} from '../../../util/date';
-import {searchUtil} from '../../../util/search';
 import SubtasksCaseResults from './SubtaskCaseResults';
 import SubtaskHeaderActions from './SubtaskHeaderActions';
 
 type OutletContext = {
+	mbMessage: MessageBoardMessage;
+	mergedSubtaskNames: string;
+	mutateSubtask: KeyedMutator<TestraySubTask>;
+	mutateSubtaskIssues: KeyedMutator<TestraySubTask>;
+	subtaskIssues: TestraySubTaskIssue[];
+	testraySubtask: TestraySubTask;
 	testrayTask: TestrayTask;
 };
 
 const Subtasks = () => {
-	const {setHeading} = useHeader();
-	const {subtaskId} = useParams();
-	const {testrayTask} = useOutletContext<OutletContext>();
+	const {jiraBaseURL} = useContext(ApplicationPropertiesContext);
 
-	const {data: testraySubtask, mutate: mutateSubtask} = useFetch<
-		TestraySubTask
-	>(testraySubTaskImpl.getResource(subtaskId as string), (response) =>
-		testraySubTaskImpl.transformData(response)
-	);
-
-	const {data: testraySubtaskToMerged} = useFetch<
-		APIResponse<TestraySubTask>
-	>(
-		`${testraySubTaskImpl.resource}&filter=${searchUtil.eq(
-			'r_mergedToTestraySubtask_c_subtaskId',
-			subtaskId as string
-		)}&pageSize=100&fields=name`,
-		(response) => testraySubTaskImpl.transformDataFromList(response)
-	);
-
-	const mergedSubtaskNames = (testraySubtaskToMerged?.items || [])
-		.map(({name}) => name)
-		.join(', ');
-
-	useEffect(() => {
-		if (testraySubtask) {
-			setTimeout(() => {
-				setHeading([
-					{
-						category: i18n.translate('task'),
-						path: `/testflow/${testrayTask.id}`,
-						title: testrayTask.name,
-					},
-					{
-						category: i18n.translate('subtask'),
-						title: testraySubtask.name,
-					},
-				]);
-			});
-		}
-	}, [setHeading, testraySubtask, testrayTask]);
+	const {
+		mbMessage,
+		mergedSubtaskNames,
+		mutateSubtask,
+		subtaskIssues,
+		testraySubtask,
+	} = useOutletContext<OutletContext>();
 
 	if (!testraySubtask) {
 		return <Loading />;
@@ -136,11 +114,44 @@ const Subtasks = () => {
 								},
 								{
 									title: i18n.translate('issues'),
-									value: '-',
+									value: subtaskIssues.map(
+										(
+											subtaskIssues: TestraySubTaskIssue,
+											index: number
+										) => (
+											<a
+												className="mr-2"
+												href={`${jiraBaseURL}/browse/${subtaskIssues?.issue?.name}`}
+												key={index}
+											>
+												{subtaskIssues?.issue?.name}
+											</a>
+										)
+									),
 								},
 								{
 									title: i18n.translate('comment'),
-									value: 'None',
+									value: mbMessage ? (
+										<div className="d-flex flex-column mt-3">
+											<cite>
+												{mbMessage?.articleBody}
+											</cite>
+
+											<small className="mt-1 text-gray">
+												<Avatar
+													displayName
+													name={`${
+														mbMessage.creator?.name
+													} · ${getTimeFromNow(
+														mbMessage.dateCreated
+													)}`}
+													url={
+														mbMessage.creator?.image
+													}
+												/>
+											</small>
+										</div>
+									) : null,
 								},
 							]}
 						/>

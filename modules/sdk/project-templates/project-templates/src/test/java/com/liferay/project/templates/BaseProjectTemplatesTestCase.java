@@ -674,46 +674,9 @@ public interface BaseProjectTemplatesTestCase {
 		if (buildType.equals("gradle")) {
 			workspaceDir = buildWorkspace(temporaryFolder, liferayVersion);
 
-			if (liferayVersion.startsWith("7.0")) {
-				writeGradlePropertiesInWorkspace(
-					workspaceDir,
-					"liferay.workspace.target.platform.version=7.0.10.17");
-
-				writeGradlePropertiesInWorkspace(
-					workspaceDir, "liferay.workspace.product=dxp-7.0-sp17");
-			}
-			else if (liferayVersion.startsWith("7.1")) {
-				writeGradlePropertiesInWorkspace(
-					workspaceDir,
-					"liferay.workspace.target.platform.version=7.1.10.7");
-
-				writeGradlePropertiesInWorkspace(
-					workspaceDir, "liferay.workspace.product=dxp-7.1-sp7");
-			}
-			else if (liferayVersion.startsWith("7.2")) {
-				writeGradlePropertiesInWorkspace(
-					workspaceDir,
-					"liferay.workspace.target.platform.version=7.2.10.7");
-
-				writeGradlePropertiesInWorkspace(
-					workspaceDir, "liferay.workspace.product=dxp-7.2-sp7");
-			}
-			else if (liferayVersion.startsWith("7.3")) {
-				writeGradlePropertiesInWorkspace(
-					workspaceDir,
-					"liferay.workspace.target.platform.version=7.3.7");
-
-				writeGradlePropertiesInWorkspace(
-					workspaceDir, "liferay.workspace.product=portal-7.3-ga8");
-			}
-			else if (liferayVersion.startsWith("7.4")) {
-				writeGradlePropertiesInWorkspace(
-					workspaceDir,
-					"liferay.workspace.target.platform.version=7.4.3.36");
-
-				writeGradlePropertiesInWorkspace(
-					workspaceDir, "liferay.workspace.product=portal-7.4-ga36");
-			}
+			writeGradlePropertiesInWorkspace(
+				workspaceDir,
+				"liferay.workspace.target.platform.version=" + liferayVersion);
 		}
 		else {
 			File destinationDir = temporaryFolder.newFolder("mavenWorkspace");
@@ -725,21 +688,9 @@ public interface BaseProjectTemplatesTestCase {
 				"-Dpackage=com.test");
 
 			if (VersionUtil.getMinorVersion(liferayVersion) < 3) {
-				if (liferayVersion.startsWith("7.0")) {
-					updateMavenPomProperties(
-						workspaceDir, "liferay.bom.version",
-						"liferay.bom.version", "7.0.10.17");
-				}
-				else if (liferayVersion.startsWith("7.1")) {
-					updateMavenPomProperties(
-						workspaceDir, "liferay.bom.version",
-						"liferay.bom.version", "7.1.10.7");
-				}
-				else if (liferayVersion.startsWith("7.2")) {
-					updateMavenPomProperties(
-						workspaceDir, "liferay.bom.version",
-						"liferay.bom.version", "7.2.10.7");
-				}
+				updateMavenPomProperties(
+					workspaceDir, "liferay.bom.version", "liferay.bom.version",
+					liferayVersion);
 
 				updateMavenPomElementText(
 					workspaceDir, "//artifactId[text()='release.portal.bom']",
@@ -1170,6 +1121,26 @@ public interface BaseProjectTemplatesTestCase {
 		return projectTemplatesArgs.getLiferayVersion();
 	}
 
+	public default String getLiferayWorkspaceProduct(String liferayVersion) {
+		if (liferayVersion.startsWith("7.0")) {
+			return "dxp-7.0-sp17";
+		}
+		else if (liferayVersion.startsWith("7.1")) {
+			return "dxp-7.1-sp7";
+		}
+		else if (liferayVersion.startsWith("7.2")) {
+			return "dxp-7.2-sp7";
+		}
+		else if (liferayVersion.startsWith("7.3")) {
+			return "portal-7.3-ga8";
+		}
+		else if (liferayVersion.startsWith("7.4")) {
+			return "portal-7.4-ga36";
+		}
+
+		return null;
+	}
+
 	public default File getWorkspaceDir(File dir) {
 		File gradleParent = findParentFile(
 			dir,
@@ -1310,6 +1281,15 @@ public interface BaseProjectTemplatesTestCase {
 			temporaryFolder, "gradle", "gradleWS", liferayVersion,
 			mavenExecutor);
 
+		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
+			liferayVersion);
+
+		if (liferayWorkspaceProduct != null) {
+			writeGradlePropertiesInWorkspace(
+				gradleWorkspaceDir,
+				"liferay.workspace.product=" + liferayWorkspaceProduct);
+		}
+
 		File gradleWorkspaceModulesDir = new File(
 			gradleWorkspaceDir, "modules");
 
@@ -1394,6 +1374,15 @@ public interface BaseProjectTemplatesTestCase {
 		File gradleWorkspaceDir = buildWorkspace(
 			temporaryFolder, "gradle", "gradleWS", liferayVersion,
 			mavenExecutor);
+
+		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
+			liferayVersion);
+
+		if (liferayWorkspaceProduct != null) {
+			writeGradlePropertiesInWorkspace(
+				gradleWorkspaceDir,
+				"liferay.workspace.product=" + liferayWorkspaceProduct);
+		}
 
 		String modulesDir = "modules";
 
@@ -1547,6 +1536,15 @@ public interface BaseProjectTemplatesTestCase {
 
 		File mavenWorkspaceDir = buildWorkspace(
 			temporaryFolder, "maven", "mavenWS", liferayVersion, mavenExecutor);
+
+		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
+			liferayVersion);
+
+		if (liferayWorkspaceProduct != null) {
+			writeGradlePropertiesInWorkspace(
+				gradleWorkspaceDir,
+				"liferay.workspace.product=" + liferayWorkspaceProduct);
+		}
 
 		File mavenModulesDir = new File(mavenWorkspaceDir, "modules");
 

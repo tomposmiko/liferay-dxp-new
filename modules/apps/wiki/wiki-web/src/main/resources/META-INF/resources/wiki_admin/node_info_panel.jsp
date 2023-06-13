@@ -17,7 +17,7 @@
 <%@ include file="/wiki/init.jsp" %>
 
 <%
-WikiNodeInfoPanelDisplayContext wikiNodeInfoPanelDisplayContext = wikiDisplayContextProvider.getWikiNodeInfoPanelDisplayContext(request, response);
+WikiNodeInfoPanelDisplayContext wikiNodeInfoPanelDisplayContext = new WikiNodeInfoPanelDisplayContext(request);
 %>
 
 <div class="sidebar-header">

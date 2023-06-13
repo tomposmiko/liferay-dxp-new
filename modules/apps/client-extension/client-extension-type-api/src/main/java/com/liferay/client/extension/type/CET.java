@@ -31,30 +31,34 @@ public interface CET {
 
 	public long getCompanyId();
 
-	@CETProperty(name = "description", type = "string")
+	@CETProperty(name = "description", type = CETProperty.Type.String)
 	public String getDescription();
 
 	public String getEditJSP();
 
 	public String getExternalReferenceCode();
 
-	@CETProperty(name = "name", type = "string")
+	@CETProperty(name = "name", type = CETProperty.Type.String)
 	public String getName(Locale locale);
 
 	public Properties getProperties();
 
 	@CETProperty(
 		defaultValue = "https://www.liferay.com", name = "sourceCodeURL",
-		type = "string"
+		type = CETProperty.Type.String
 	)
 	public String getSourceCodeURL();
 
 	public int getStatus();
 
-	@CETProperty(name = "type", type = "string")
+	@CETProperty(name = "type", type = CETProperty.Type.String)
 	public String getType();
 
 	public String getTypeSettings();
+
+	public default String getViewJSP() {
+		return null;
+	}
 
 	public boolean hasProperties();
 

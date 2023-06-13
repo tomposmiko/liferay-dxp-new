@@ -1186,6 +1186,19 @@ public class GraphQLServletExtender {
 			).build());
 	}
 
+	private void _registerFields(
+		GraphQLObjectType.Builder graphQLObjectTypeBuilder, String namespace,
+		GraphQLObjectType.Builder rootGraphQLObjectTypeBuilder) {
+
+		GraphQLObjectType queryGraphQLObjectType =
+			graphQLObjectTypeBuilder.build();
+
+		if (ListUtil.isNotEmpty(queryGraphQLObjectType.getFieldDefinitions())) {
+			rootGraphQLObjectTypeBuilder.field(
+				_addField(queryGraphQLObjectType, namespace));
+		}
+	}
+
 	private void _registerGraphQLDTOContributor(
 		GraphQLDTOContributor graphQLDTOContributor,
 		GraphQLSchema.Builder graphQLSchemaBuilder,
@@ -1388,10 +1401,12 @@ public class GraphQLServletExtender {
 				queryGraphQLObjectTypeBuilder);
 		}
 
-		rootQueryGraphQLObjectTypeBuilder.field(
-			_addField(queryGraphQLObjectTypeBuilder.build(), namespace));
-		rootMutationGraphQLObjectTypeBuilder.field(
-			_addField(mutationGraphQLObjectTypeBuilder.build(), namespace));
+		_registerFields(
+			mutationGraphQLObjectTypeBuilder, namespace,
+			rootMutationGraphQLObjectTypeBuilder);
+		_registerFields(
+			queryGraphQLObjectTypeBuilder, namespace,
+			rootQueryGraphQLObjectTypeBuilder);
 
 		GraphQLCodeRegistry.Builder graphQLCodeRegistryBuilder =
 			processingElementsContainer.getCodeRegistryBuilder();

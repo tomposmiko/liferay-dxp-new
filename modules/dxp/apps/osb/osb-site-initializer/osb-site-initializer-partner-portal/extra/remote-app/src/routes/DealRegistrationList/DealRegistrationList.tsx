@@ -15,6 +15,7 @@ import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {useModal} from '@clayui/modal';
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
 import {useState} from 'react';
+import {CSVLink} from 'react-csv';
 
 import Modal from '../../common/components/Modal';
 import Table from '../../common/components/Table';
@@ -29,6 +30,7 @@ import {Liferay} from '../../common/services/liferay';
 import ModalContent from './components/ModalContent';
 import useFilters from './hooks/useFilters';
 import useGetListItemsFromDealRegistration from './hooks/useGetListItemsFromDealRegistration';
+import getDoubleParagraph from './utils/getDoubleParagraph';
 
 export type DealRegistrationItem = {
 	[key in DealRegistrationColumnKey]?: any;
@@ -66,11 +68,11 @@ const DealRegistrationList = () => {
 		},
 		{
 			columnKey: DealRegistrationColumnKey.DEAL_AMOUNT,
-			label: 'Amount',
+			label: 'Deal Amount',
 		},
 		{
 			columnKey: DealRegistrationColumnKey.PARTNER_REP,
-			label: 'Partner Rep',
+			label: getDoubleParagraph('Partner Rep', 'Partner Email'),
 		},
 		{
 			columnKey: DealRegistrationColumnKey.LIFERAY_REP,
@@ -132,7 +134,7 @@ const DealRegistrationList = () => {
 
 	return (
 		<div className="border-0 my-4">
-			<h1>Partner Opportunity Registration</h1>
+			<h1>Partner Deal Registration</h1>
 
 			<TableHeader>
 				<div className="d-flex">
@@ -162,6 +164,16 @@ const DealRegistrationList = () => {
 				</div>
 
 				<div className="mb-2 mb-lg-0">
+					{!!data.items?.length && (
+						<CSVLink
+							className="btn btn-secondary mr-2"
+							data={data.items}
+							filename="deal-registration.csv"
+						>
+							Export All
+						</CSVLink>
+					)}
+
 					<ClayButton
 						onClick={() =>
 							Liferay.Util.navigate(
@@ -169,7 +181,7 @@ const DealRegistrationList = () => {
 							)
 						}
 					>
-						Register New Opportunity
+						Register New Deal
 					</ClayButton>
 				</div>
 			</TableHeader>

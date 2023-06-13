@@ -13,12 +13,16 @@
  */
 
 import yupSchema from '../../schema/yup';
+import {waitTimeout} from '../../util';
 import {searchUtil} from '../../util/search';
 import {SubTaskStatuses} from '../../util/statuses';
 import {Liferay} from '../liferay';
+import {liferayMessageBoardImpl} from './LiferayMessageBoard';
 import Rest from './Rest';
 import {testrayCaseResultImpl} from './TestrayCaseResult';
+import {testrayIssueImpl} from './TestrayIssues';
 import {testraySubtaskCaseResultImpl} from './TestraySubtaskCaseResults';
+import {testraySubtaskIssuesImpl} from './TestraySubtaskIssues';
 import {TestraySubTask} from './types';
 
 type SubtaskForm = typeof yupSchema.subtask.__outputType & {
@@ -33,6 +37,8 @@ class TestraySubtaskImpl extends Rest<SubtaskForm, TestraySubTask> {
 			adapter: ({
 				dueStatus,
 				errors,
+				mbMessageId,
+				mbThreadId,
 				mergedToSubtaskId: r_mergedToTestraySubtask_c_subtaskId,
 				name,
 				score,
@@ -41,6 +47,8 @@ class TestraySubtaskImpl extends Rest<SubtaskForm, TestraySubTask> {
 			}) => ({
 				dueStatus,
 				errors,
+				mbMessageId,
+				mbThreadId,
 				name,
 				r_mergedToTestraySubtask_c_subtaskId,
 				r_taskToSubtasks_c_taskId,
@@ -115,9 +123,84 @@ class TestraySubtaskImpl extends Rest<SubtaskForm, TestraySubTask> {
 		);
 	}
 
-	public async complete(subTaskId: number, dueStatus: string) {
+	private async addComment(data: Partial<SubtaskForm>) {
+		try {
+			const message = data.comment as string;
+			let mbThreadId = data.mbThreadId;
+
+			if (!mbThreadId) {
+				const mbThread = await liferayMessageBoardImpl.createMbThread(
+					message
+				);
+
+				mbThreadId = mbThread.id;
+
+				await waitTimeout(1500);
+			}
+
+			const mbMessage = await liferayMessageBoardImpl.createMbMessage(
+				message,
+				mbThreadId as number
+			);
+
+			return {mbMessage, mbThreadId};
+		}
+		catch {
+			return {};
+		}
+	}
+
+	public async complete(
+		dueStatus: string,
+		issues: string[],
+		subTaskcomment: Partial<SubtaskForm>,
+		subTaskId: number
+	) {
+		const subtaskIssuesResponse = await testraySubtaskIssuesImpl.getAll(
+			searchUtil.eq('subtaskId', subTaskId)
+		);
+
+		for (const issue of issues) {
+			const testrayIssue = await testrayIssueImpl.createIfNotExist(issue);
+
+			await testraySubtaskIssuesImpl.createIfNotExist({
+				issueId: testrayIssue?.id,
+				name: `${issue}-${subTaskId}`,
+				subTaskId,
+			});
+		}
+
+		if (subtaskIssuesResponse?.items) {
+			const caseResultIssuesTransform = await testraySubtaskIssuesImpl.transformDataFromList(
+				subtaskIssuesResponse
+			);
+
+			const subtaskIssueIdsToRemove = caseResultIssuesTransform.items
+				.filter(({issue}) => !issues.includes(issue?.name || ''))
+				.map(({id}) => id);
+
+			for (const caseResultIssueId of subtaskIssueIdsToRemove) {
+				await testraySubtaskIssuesImpl.remove(caseResultIssueId);
+			}
+		}
+
+		if (subTaskcomment.comment) {
+			const {mbMessage, mbThreadId} = await this.addComment(
+				subTaskcomment
+			);
+
+			subTaskcomment.mbMessageId = mbMessage.id;
+			subTaskcomment.mbThreadId = mbThreadId;
+		}
+
+		if (!subTaskcomment.comment && subTaskcomment.mbMessageId) {
+			subTaskcomment.mbMessageId = 0;
+		}
+
 		await this.update(subTaskId, {
 			dueStatus: SubTaskStatuses.COMPLETE,
+			mbMessageId: subTaskcomment.mbMessageId,
+			mbThreadId: subTaskcomment.mbThreadId,
 		});
 
 		const caseResults = await this.getCaseResultsFromSubtask(subTaskId);
@@ -129,9 +212,19 @@ class TestraySubtaskImpl extends Rest<SubtaskForm, TestraySubTask> {
 		await testrayCaseResultImpl.updateBatch(
 			caseResultIds,
 			caseResultIds.map(() => ({
+				defaultMessageId: subTaskcomment.mbMessageId,
 				dueStatus,
+				mbMessageId: subTaskcomment.mbMessageId,
+				mbThreadId: subTaskcomment.mbThreadId,
 			}))
 		);
+
+		for (const caseResultId of caseResultIds) {
+			await testrayCaseResultImpl.assignCaseResultIssue(
+				caseResultId,
+				issues
+			);
+		}
 	}
 
 	public returnToOpen(subTask: TestraySubTask) {

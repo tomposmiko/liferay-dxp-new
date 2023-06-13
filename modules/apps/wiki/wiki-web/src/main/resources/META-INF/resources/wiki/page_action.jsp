@@ -28,7 +28,7 @@ else {
 	wikiPage = (WikiPage)request.getAttribute("page_info_panel.jsp-wikiPage");
 }
 
-WikiListPagesDisplayContext wikiListPagesDisplayContext = wikiDisplayContextProvider.getWikiListPagesDisplayContext(request, response, wikiPage.getNode());
+WikiListPagesDisplayContext wikiListPagesDisplayContext = new WikiListPagesDisplayContext(request, (TrashHelper)request.getAttribute(TrashWebKeys.TRASH_HELPER), wikiPage.getNode());
 %>
 
 <liferay-ui:menu

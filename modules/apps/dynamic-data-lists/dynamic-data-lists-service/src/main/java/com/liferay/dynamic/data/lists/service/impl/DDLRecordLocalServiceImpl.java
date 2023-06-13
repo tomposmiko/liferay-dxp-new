@@ -933,7 +933,8 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 			}
 		}
 		else {
-			if (Objects.equals(
+			if ((status != WorkflowConstants.STATUS_PENDING) &&
+				Objects.equals(
 					record.getVersion(), recordVersion.getVersion())) {
 
 				String newVersion = DDLRecordConstants.VERSION_DEFAULT;
