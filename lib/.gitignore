@@ -130,7 +130,6 @@
 /portal/crypt.jar
 /portal/curvesapi.jar
 /portal/daisydiff.jar
-/portal/displaytag.jar
 /portal/dom4j.jar
 /portal/eclipse-core-runtime.jar
 /portal/ecs.jar
@@ -173,7 +172,6 @@
 /portal/jcifs.jar
 /portal/jcl-over-slf4j.jar
 /portal/jcommon.jar
-/portal/jdom.jar
 /portal/jdom2.jar
 /portal/jempbox.jar
 /portal/jena.jar
@@ -234,7 +232,6 @@
 /portal/reload4j.jar
 /portal/rhino.jar
 /portal/rmi-api.jar
-/portal/rome.jar
 /portal/rometools-utils.jar
 /portal/rometools.jar
 /portal/saaj-api.jar
