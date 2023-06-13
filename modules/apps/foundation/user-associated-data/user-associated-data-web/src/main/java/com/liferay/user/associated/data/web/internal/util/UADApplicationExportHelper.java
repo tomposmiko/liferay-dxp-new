@@ -21,9 +21,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.user.associated.data.aggregator.UADAggregator;
-import com.liferay.user.associated.data.display.UADEntityDisplay;
-import com.liferay.user.associated.data.exporter.UADEntityExporter;
+import com.liferay.user.associated.data.exporter.UADExporter;
 import com.liferay.user.associated.data.web.internal.display.UADApplicationExportDisplay;
 import com.liferay.user.associated.data.web.internal.export.background.task.UADExportBackgroundTaskManagerUtil;
 import com.liferay.user.associated.data.web.internal.registry.UADRegistry;
@@ -31,7 +29,6 @@ import com.liferay.user.associated.data.web.internal.registry.UADRegistry;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,16 +42,15 @@ import org.osgi.service.component.annotations.Reference;
 public class UADApplicationExportHelper {
 
 	public int getApplicationDataCount(String applicationName, long userId) {
-		List<UADEntityExporter> uadEntityExporters =
-			getApplicationUADEntityExporters(applicationName);
+		List<UADExporter> uadExporters = getApplicationUADExporters(
+			applicationName);
 
-		Stream<UADEntityExporter> uadEntityExporterStream =
-			uadEntityExporters.stream();
+		Stream<UADExporter> uadExporterStream = uadExporters.stream();
 
-		return uadEntityExporterStream.mapToInt(
-			uadEntityExporter -> {
+		return uadExporterStream.mapToInt(
+			uadExporter -> {
 				try {
-					return (int)uadEntityExporter.count(userId);
+					return (int)uadExporter.count(userId);
 				}
 				catch (PortalException pe) {
 					_log.error(pe, pe);
@@ -79,36 +75,27 @@ public class UADApplicationExportHelper {
 		return null;
 	}
 
-	public List<String> getApplicationNames() {
-		Collection<UADAggregator> uadAggregators =
-			_uadRegistry.getUADAggregators();
+	public Stream<String> getApplicationNames() {
+		Collection<UADExporter> uadExporters = _uadRegistry.getUADExporters();
 
-		Stream<UADAggregator> uadAggregatorStream = uadAggregators.stream();
+		Stream<UADExporter> uadExporterStream = uadExporters.stream();
 
-		return uadAggregatorStream.map(
-			UADAggregator::getApplicationName
+		return uadExporterStream.map(
+			UADExporter::getApplicationName
 		).distinct(
-		).sorted(
-		).collect(
-			Collectors.toList()
-		);
+		).sorted();
 	}
 
-	public List<UADEntityExporter> getApplicationUADEntityExporters(
+	public List<UADExporter> getApplicationUADExporters(
 		String applicationName) {
 
-		Stream<UADEntityDisplay> uadEntityDisplayStream =
-			_uadRegistry.getUADEntityDisplayStream();
+		Collection<UADExporter> uadExporters = _uadRegistry.getUADExporters();
 
-		return uadEntityDisplayStream.filter(
-			uadEntityDisplay -> applicationName.equals(
-				uadEntityDisplay.getApplicationName())
-		).map(
-			uadEntityDisplay -> uadEntityDisplay.getKey()
-		).map(
-			key -> _uadRegistry.getUADEntityExporter(key)
-		).filter(
-			Objects::nonNull
+		Stream<UADExporter> uadExporterStream = uadExporters.stream();
+
+		return uadExporterStream.filter(
+			uadExporter -> applicationName.equals(
+				uadExporter.getApplicationName())
 		).collect(
 			Collectors.toList()
 		);
@@ -117,21 +104,19 @@ public class UADApplicationExportHelper {
 	public UADApplicationExportDisplay getUADApplicationExportDisplay(
 		String applicationName, long groupId, long userId) {
 
-		List<UADEntityExporter> uadEntityExporters =
-			getApplicationUADEntityExporters(applicationName);
+		List<UADExporter> uadExporters = getApplicationUADExporters(
+			applicationName);
 
 		return new UADApplicationExportDisplay(
 			applicationName, getApplicationDataCount(applicationName, userId),
-			ListUtil.isNotEmpty(uadEntityExporters),
+			ListUtil.isNotEmpty(uadExporters),
 			getApplicationLastExportDate(applicationName, groupId, userId));
 	}
 
 	public List<UADApplicationExportDisplay> getUADApplicationExportDisplays(
 		long groupId, long userId) {
 
-		List<String> applicationNames = getApplicationNames();
-
-		Stream<String> applicationNameStream = applicationNames.stream();
+		Stream<String> applicationNameStream = getApplicationNames();
 
 		return applicationNameStream.map(
 			applicationName ->

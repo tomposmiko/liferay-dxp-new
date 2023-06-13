@@ -24,8 +24,13 @@ import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryServiceUtil;
 import com.liferay.fragment.util.FragmentEntryRenderUtil;
 import com.liferay.item.selector.ItemSelector;
+import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.ItemSelectorReturnType;
+import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
+import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
+import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
+import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.editor.configuration.EditorConfiguration;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigurationFactoryUtil;
@@ -39,6 +44,7 @@ import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PrefsParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -54,6 +60,9 @@ import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @author Pavel Savinov
  */
@@ -66,6 +75,9 @@ public class FragmentEntryDisplayContext {
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 		_portletPreferences = portletPreferences;
+
+		_itemSelector = (ItemSelector)renderRequest.getAttribute(
+			FragmentEntryDisplayWebKeys.ITEM_SELECTOR);
 	}
 
 	public String getEventName() {
@@ -164,8 +176,15 @@ public class FragmentEntryDisplayContext {
 
 		soyContext.put(
 			"editFragmentEntryLinkURL", editFragmentEntryLinkURL.toString());
-
 		soyContext.put("fragmentEntryLink", _getSoyContextFragmentEntryLink());
+
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			RequestBackedPortletURLFactoryUtil.create(_renderRequest),
+			_renderResponse.getNamespace() + "selectImage",
+			_getImageItemSelectorCriterion(), _getURLItemSelectorCriterion());
+
+		soyContext.put("imageSelectorURL", itemSelectorURL.toString());
+
 		soyContext.put("portletNamespace", _renderResponse.getNamespace());
 		soyContext.put(
 			"spritemap",
@@ -208,16 +227,38 @@ public class FragmentEntryDisplayContext {
 			portletDisplay.getId(), ActionKeys.CONFIGURATION);
 	}
 
+	private ItemSelectorCriterion _getImageItemSelectorCriterion() {
+		ItemSelectorCriterion imageItemSelectorCriterion =
+			new ImageItemSelectorCriterion();
+
+		List<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
+			new ArrayList<>();
+
+		desiredItemSelectorReturnTypes.add(
+			new FileEntryItemSelectorReturnType());
+
+		imageItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			desiredItemSelectorReturnTypes);
+
+		return imageItemSelectorCriterion;
+	}
+
 	private SoyContext _getSoyContextFragmentEntryLink()
 		throws PortalException {
 
 		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
 
+		HttpServletRequest request = PortalUtil.getHttpServletRequest(
+			_renderRequest);
+		HttpServletResponse response = PortalUtil.getHttpServletResponse(
+			_renderResponse);
+
 		FragmentEntryLink fragmentEntryLink = getFragmentEntryLink();
 
 		soyContext.putHTML(
 			"content",
-			FragmentEntryRenderUtil.renderFragmentEntryLink(fragmentEntryLink));
+			FragmentEntryRenderUtil.renderFragmentEntryLink(
+				fragmentEntryLink, request, response));
 		soyContext.put(
 			"editableValues",
 			JSONFactoryUtil.createJSONObject(
@@ -238,8 +279,24 @@ public class FragmentEntryDisplayContext {
 		return soyContext;
 	}
 
+	private ItemSelectorCriterion _getURLItemSelectorCriterion() {
+		ItemSelectorCriterion urlItemSelectorCriterion =
+			new URLItemSelectorCriterion();
+
+		List<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
+			new ArrayList<>();
+
+		desiredItemSelectorReturnTypes.add(new URLItemSelectorReturnType());
+
+		urlItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			desiredItemSelectorReturnTypes);
+
+		return urlItemSelectorCriterion;
+	}
+
 	private Long _fragmentEntryId;
 	private Long _fragmentEntryLinkId;
+	private final ItemSelector _itemSelector;
 	private final PortletPreferences _portletPreferences;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;

@@ -91,12 +91,35 @@ public class FragmentEntryProcessorEditableTest {
 
 		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+		JSONObject editableFragmentEntryProcessorJSONObject =
+			JSONFactoryUtil.createJSONObject();
 
-		jsonObject.put("editable_img", "sample.jpg");
-		jsonObject.put("editable_text", "test");
+		JSONObject editableValuesJSONObject =
+			JSONFactoryUtil.createJSONObject();
 
-		fragmentEntryLink.setEditableValues(jsonObject.toString());
+		JSONObject editableImageDefaultValueJSONObject =
+			JSONFactoryUtil.createJSONObject();
+
+		editableImageDefaultValueJSONObject.put("defaultValue", "sample.jpg");
+
+		editableValuesJSONObject.put(
+			"editable_img", editableImageDefaultValueJSONObject);
+
+		JSONObject editableTextDefaultValueJSONObject =
+			JSONFactoryUtil.createJSONObject();
+
+		editableTextDefaultValueJSONObject.put("defaultValue", "test");
+
+		editableValuesJSONObject.put(
+			"editable_text", editableTextDefaultValueJSONObject);
+
+		editableFragmentEntryProcessorJSONObject.put(
+			"com.liferay.fragment.entry.processor.editable." +
+				"EditableFragmentEntryProcessor",
+			editableValuesJSONObject);
+
+		fragmentEntryLink.setEditableValues(
+			editableFragmentEntryProcessorJSONObject.toString());
 
 		Document document = Jsoup.parseBodyFragment(
 			_getFileAsString("processed_fragment_entry.html"));
@@ -132,6 +155,27 @@ public class FragmentEntryProcessorEditableTest {
 			_group.getGroupId(), fragmentCollection.getFragmentCollectionId(),
 			"Fragment Entry", null,
 			_getFileAsString("fragment_entry_with_duplicate_editable_ids.html"),
+			null, WorkflowConstants.STATUS_APPROVED, serviceContext);
+	}
+
+	@Test(expected = FragmentEntryContentException.class)
+	public void testFragmentEntryProcessorEditableWithInvalidTypeAttribute()
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		FragmentCollection fragmentCollection =
+			FragmentCollectionServiceUtil.addFragmentCollection(
+				_group.getGroupId(), "Fragment Collection", StringPool.BLANK,
+				serviceContext);
+
+		FragmentEntryServiceUtil.addFragmentEntry(
+			_group.getGroupId(), fragmentCollection.getFragmentCollectionId(),
+			"Fragment Entry", null,
+			_getFileAsString(
+				"fragment_entry_with_invalid_editable_type_attribute.html"),
 			null, WorkflowConstants.STATUS_APPROVED, serviceContext);
 	}
 

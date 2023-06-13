@@ -20,6 +20,7 @@ import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportProcessCallbackRegistry;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
@@ -323,6 +324,10 @@ public class StagedLayoutSetStagedModelDataHandler
 
 		updateShowSiteName(portletDataContext, importedStagedLayoutSet);
 
+		// Show search header
+
+		updateShowSearchHeader(portletDataContext, importedStagedLayoutSet);
+
 		// Last merge time
 
 		updateLastMergeTime(portletDataContext, modifiedLayouts);
@@ -341,8 +346,9 @@ public class StagedLayoutSetStagedModelDataHandler
 	}
 
 	protected void exportLayouts(
-		PortletDataContext portletDataContext,
-		StagedLayoutSet stagedLayoutSet) {
+			PortletDataContext portletDataContext,
+			StagedLayoutSet stagedLayoutSet)
+		throws PortletDataException {
 
 		// Force to always export layout deletions
 
@@ -385,6 +391,8 @@ public class StagedLayoutSetStagedModelDataHandler
 				if (_log.isWarnEnabled()) {
 					_log.warn("Unable to export layout " + layout.getName(), e);
 				}
+
+				throw e;
 			}
 		}
 	}
@@ -697,6 +705,37 @@ public class StagedLayoutSetStagedModelDataHandler
 			}
 
 			_layoutLocalService.updateLayout(layout);
+		}
+	}
+
+	protected void updateShowSearchHeader(
+			PortletDataContext portletDataContext,
+			StagedLayoutSet importedLayoutSet)
+		throws PortalException {
+
+		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
+			portletDataContext.getGroupId(),
+			portletDataContext.isPrivateLayout());
+
+		UnicodeProperties importedSettingsProperties =
+			importedLayoutSet.getSettingsProperties();
+
+		boolean showSearchHeader = GetterUtil.getBoolean(
+			importedSettingsProperties.getProperty(
+				"lfr-theme:regular:show-header-search"));
+
+		UnicodeProperties settingsProperties =
+			layoutSet.getSettingsProperties();
+
+		String mergeFailFriendlyURLLayouts = settingsProperties.getProperty(
+			Sites.MERGE_FAIL_FRIENDLY_URL_LAYOUTS);
+
+		if (Validator.isNull(mergeFailFriendlyURLLayouts)) {
+			settingsProperties.setProperty(
+				"lfr-theme:regular:show-header-search",
+				String.valueOf(showSearchHeader));
+
+			_layoutSetLocalService.updateLayoutSet(layoutSet);
 		}
 	}
 

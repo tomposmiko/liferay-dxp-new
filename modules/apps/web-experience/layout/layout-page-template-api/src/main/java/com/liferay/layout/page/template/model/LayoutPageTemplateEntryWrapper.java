@@ -70,9 +70,11 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 		attributes.put("layoutPageTemplateCollectionId",
 			getLayoutPageTemplateCollectionId());
 		attributes.put("classNameId", getClassNameId());
+		attributes.put("classTypeId", getClassTypeId());
 		attributes.put("name", getName());
+		attributes.put("type", getType());
 		attributes.put("htmlPreviewEntryId", getHtmlPreviewEntryId());
-		attributes.put("defaultTemplate", getDefaultTemplate());
+		attributes.put("defaultTemplate", isDefaultTemplate());
 
 		return attributes;
 	}
@@ -135,10 +137,22 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 			setClassNameId(classNameId);
 		}
 
+		Long classTypeId = (Long)attributes.get("classTypeId");
+
+		if (classTypeId != null) {
+			setClassTypeId(classTypeId);
+		}
+
 		String name = (String)attributes.get("name");
 
 		if (name != null) {
 			setName(name);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
 		}
 
 		Long htmlPreviewEntryId = (Long)attributes.get("htmlPreviewEntryId");
@@ -155,7 +169,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new LayoutPageTemplateEntryWrapper((LayoutPageTemplateEntry)_layoutPageTemplateEntry.clone());
 	}
 
@@ -170,7 +184,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	* @return the fully qualified class name of this layout page template entry
 	*/
 	@Override
-	public java.lang.String getClassName() {
+	public String getClassName() {
 		return _layoutPageTemplateEntry.getClassName();
 	}
 
@@ -185,6 +199,16 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	}
 
 	/**
+	* Returns the class type ID of this layout page template entry.
+	*
+	* @return the class type ID of this layout page template entry
+	*/
+	@Override
+	public long getClassTypeId() {
+		return _layoutPageTemplateEntry.getClassTypeId();
+	}
+
+	/**
 	* Returns the company ID of this layout page template entry.
 	*
 	* @return the company ID of this layout page template entry
@@ -195,7 +219,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	}
 
 	@Override
-	public java.lang.String getContent()
+	public String getContent()
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _layoutPageTemplateEntry.getContent();
 	}
@@ -246,7 +270,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	}
 
 	@Override
-	public java.lang.String getImagePreviewURL(
+	public String getImagePreviewURL(
 		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay) {
 		return _layoutPageTemplateEntry.getImagePreviewURL(themeDisplay);
 	}
@@ -287,7 +311,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	* @return the name of this layout page template entry
 	*/
 	@Override
-	public java.lang.String getName() {
+	public String getName() {
 		return _layoutPageTemplateEntry.getName();
 	}
 
@@ -307,6 +331,16 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	}
 
 	/**
+	* Returns the type of this layout page template entry.
+	*
+	* @return the type of this layout page template entry
+	*/
+	@Override
+	public int getType() {
+		return _layoutPageTemplateEntry.getType();
+	}
+
+	/**
 	* Returns the user ID of this layout page template entry.
 	*
 	* @return the user ID of this layout page template entry
@@ -322,7 +356,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	* @return the user name of this layout page template entry
 	*/
 	@Override
-	public java.lang.String getUserName() {
+	public String getUserName() {
 		return _layoutPageTemplateEntry.getUserName();
 	}
 
@@ -332,7 +366,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	* @return the user uuid of this layout page template entry
 	*/
 	@Override
-	public java.lang.String getUserUuid() {
+	public String getUserUuid() {
 		return _layoutPageTemplateEntry.getUserUuid();
 	}
 
@@ -377,7 +411,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	}
 
 	@Override
-	public void setClassName(java.lang.String className) {
+	public void setClassName(String className) {
 		_layoutPageTemplateEntry.setClassName(className);
 	}
 
@@ -389,6 +423,16 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	@Override
 	public void setClassNameId(long classNameId) {
 		_layoutPageTemplateEntry.setClassNameId(classNameId);
+	}
+
+	/**
+	* Sets the class type ID of this layout page template entry.
+	*
+	* @param classTypeId the class type ID of this layout page template entry
+	*/
+	@Override
+	public void setClassTypeId(long classTypeId) {
+		_layoutPageTemplateEntry.setClassTypeId(classTypeId);
 	}
 
 	/**
@@ -494,7 +538,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	* @param name the name of this layout page template entry
 	*/
 	@Override
-	public void setName(java.lang.String name) {
+	public void setName(String name) {
 		_layoutPageTemplateEntry.setName(name);
 	}
 
@@ -519,6 +563,16 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	}
 
 	/**
+	* Sets the type of this layout page template entry.
+	*
+	* @param type the type of this layout page template entry
+	*/
+	@Override
+	public void setType(int type) {
+		_layoutPageTemplateEntry.setType(type);
+	}
+
+	/**
 	* Sets the user ID of this layout page template entry.
 	*
 	* @param userId the user ID of this layout page template entry
@@ -534,7 +588,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	* @param userName the user name of this layout page template entry
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_layoutPageTemplateEntry.setUserName(userName);
 	}
 
@@ -544,7 +598,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	* @param userUuid the user uuid of this layout page template entry
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_layoutPageTemplateEntry.setUserUuid(userUuid);
 	}
 
@@ -559,7 +613,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _layoutPageTemplateEntry.toString();
 	}
 
@@ -569,7 +623,7 @@ public class LayoutPageTemplateEntryWrapper implements LayoutPageTemplateEntry,
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _layoutPageTemplateEntry.toXmlString();
 	}
 

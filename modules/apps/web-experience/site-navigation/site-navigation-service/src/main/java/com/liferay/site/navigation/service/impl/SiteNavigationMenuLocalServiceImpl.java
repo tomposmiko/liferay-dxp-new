@@ -17,6 +17,7 @@ package com.liferay.site.navigation.service.impl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -25,6 +26,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.site.navigation.constants.SiteNavigationConstants;
 import com.liferay.site.navigation.exception.SiteNavigationMenuNameException;
+import com.liferay.site.navigation.menu.item.layout.constants.SiteNavigationMenuItemTypeConstants;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
 import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 import com.liferay.site.navigation.service.base.SiteNavigationMenuLocalServiceBaseImpl;
@@ -279,6 +281,14 @@ public class SiteNavigationMenuLocalServiceImpl
 		if (Validator.isNull(name)) {
 			throw new SiteNavigationMenuNameException();
 		}
+
+		int nameMaxLength = ModelHintsUtil.getMaxLength(
+			SiteNavigationMenu.class.getName(), "name");
+
+		if (name.length() > nameMaxLength) {
+			throw new SiteNavigationMenuNameException(
+				"Maximum length of name exceeded");
+		}
 	}
 
 	private void _addSiteNavigationMenuItems(
@@ -287,19 +297,19 @@ public class SiteNavigationMenuLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
+		SiteNavigationMenuItemType siteNavigationMenuItemType =
+			_siteNavigationMenuItemTypeRegistry.getSiteNavigationMenuItemType(
+				SiteNavigationMenuItemTypeConstants.LAYOUT);
+
+		if (siteNavigationMenuItemType == null) {
+			return;
+		}
+
 		List<Layout> layouts = layoutLocalService.getLayouts(
 			siteNavigationMenu.getGroupId(), false, layoutId);
 
 		for (Layout layout : layouts) {
 			if (layout.isHidden()) {
-				continue;
-			}
-
-			SiteNavigationMenuItemType siteNavigationMenuItemType =
-				_siteNavigationMenuItemTypeRegistry.
-					getSiteNavigationMenuItemTypeByLayoutType(layout.getType());
-
-			if (siteNavigationMenuItemType == null) {
 				continue;
 			}
 

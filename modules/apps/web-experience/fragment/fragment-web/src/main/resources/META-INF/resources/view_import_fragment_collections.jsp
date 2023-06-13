@@ -31,6 +31,8 @@ DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfigurati
 	<liferay-ui:message arguments="<%= dfcke.getMessage() %>" key="a-fragment-collection-with-the-key-x-already-exists" />
 </liferay-ui:error>
 
+<liferay-ui:error exception="<%= InvalidFragmentCollectionFileException.class %>" message="selected-file-does-not-contain-fragment-collections" />
+
 <div class="lfr-dynamic-uploader" id="<portlet:namespace />uploaderContainer">
 	<div class="container-fluid-1280">
 		<aui:row>
@@ -79,6 +81,7 @@ DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfigurati
 			%>
 
 			decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
+			deleteFile: '<portlet:actionURL name="/fragment/import_fragment_collections"><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE_TEMP %>" /></portlet:actionURL>',
 			fallback: '#<portlet:namespace />fallback',
 			fileDescription: '<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
 			maxFileSize: '<%= UploadServletRequestConfigurationHelperUtil.getMaxSize() %> B',

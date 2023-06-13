@@ -70,7 +70,6 @@ public class LayoutPageTemplateCollectionWrapper
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
-		attributes.put("type", getType());
 
 		return attributes;
 	}
@@ -131,16 +130,10 @@ public class LayoutPageTemplateCollectionWrapper
 		if (description != null) {
 			setDescription(description);
 		}
-
-		Integer type = (Integer)attributes.get("type");
-
-		if (type != null) {
-			setType(type);
-		}
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new LayoutPageTemplateCollectionWrapper((LayoutPageTemplateCollection)_layoutPageTemplateCollection.clone());
 	}
 
@@ -176,7 +169,7 @@ public class LayoutPageTemplateCollectionWrapper
 	* @return the description of this layout page template collection
 	*/
 	@Override
-	public java.lang.String getDescription() {
+	public String getDescription() {
 		return _layoutPageTemplateCollection.getDescription();
 	}
 
@@ -221,7 +214,7 @@ public class LayoutPageTemplateCollectionWrapper
 	* @return the name of this layout page template collection
 	*/
 	@Override
-	public java.lang.String getName() {
+	public String getName() {
 		return _layoutPageTemplateCollection.getName();
 	}
 
@@ -241,16 +234,6 @@ public class LayoutPageTemplateCollectionWrapper
 	}
 
 	/**
-	* Returns the type of this layout page template collection.
-	*
-	* @return the type of this layout page template collection
-	*/
-	@Override
-	public int getType() {
-		return _layoutPageTemplateCollection.getType();
-	}
-
-	/**
 	* Returns the user ID of this layout page template collection.
 	*
 	* @return the user ID of this layout page template collection
@@ -266,7 +249,7 @@ public class LayoutPageTemplateCollectionWrapper
 	* @return the user name of this layout page template collection
 	*/
 	@Override
-	public java.lang.String getUserName() {
+	public String getUserName() {
 		return _layoutPageTemplateCollection.getUserName();
 	}
 
@@ -276,7 +259,7 @@ public class LayoutPageTemplateCollectionWrapper
 	* @return the user uuid of this layout page template collection
 	*/
 	@Override
-	public java.lang.String getUserUuid() {
+	public String getUserUuid() {
 		return _layoutPageTemplateCollection.getUserUuid();
 	}
 
@@ -336,7 +319,7 @@ public class LayoutPageTemplateCollectionWrapper
 	* @param description the description of this layout page template collection
 	*/
 	@Override
-	public void setDescription(java.lang.String description) {
+	public void setDescription(String description) {
 		_layoutPageTemplateCollection.setDescription(description);
 	}
 
@@ -393,7 +376,7 @@ public class LayoutPageTemplateCollectionWrapper
 	* @param name the name of this layout page template collection
 	*/
 	@Override
-	public void setName(java.lang.String name) {
+	public void setName(String name) {
 		_layoutPageTemplateCollection.setName(name);
 	}
 
@@ -418,16 +401,6 @@ public class LayoutPageTemplateCollectionWrapper
 	}
 
 	/**
-	* Sets the type of this layout page template collection.
-	*
-	* @param type the type of this layout page template collection
-	*/
-	@Override
-	public void setType(int type) {
-		_layoutPageTemplateCollection.setType(type);
-	}
-
-	/**
 	* Sets the user ID of this layout page template collection.
 	*
 	* @param userId the user ID of this layout page template collection
@@ -443,7 +416,7 @@ public class LayoutPageTemplateCollectionWrapper
 	* @param userName the user name of this layout page template collection
 	*/
 	@Override
-	public void setUserName(java.lang.String userName) {
+	public void setUserName(String userName) {
 		_layoutPageTemplateCollection.setUserName(userName);
 	}
 
@@ -453,7 +426,7 @@ public class LayoutPageTemplateCollectionWrapper
 	* @param userUuid the user uuid of this layout page template collection
 	*/
 	@Override
-	public void setUserUuid(java.lang.String userUuid) {
+	public void setUserUuid(String userUuid) {
 		_layoutPageTemplateCollection.setUserUuid(userUuid);
 	}
 
@@ -468,7 +441,7 @@ public class LayoutPageTemplateCollectionWrapper
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _layoutPageTemplateCollection.toString();
 	}
 
@@ -478,7 +451,7 @@ public class LayoutPageTemplateCollectionWrapper
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _layoutPageTemplateCollection.toXmlString();
 	}
 

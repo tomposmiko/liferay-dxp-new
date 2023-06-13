@@ -19,8 +19,7 @@
 <%
 ViewUADEntitiesDisplay viewUADEntitiesDisplay = (ViewUADEntitiesDisplay)request.getAttribute(UADWebKeys.VIEW_UAD_ENTITIES_DISPLAY);
 
-UADEntityDisplay uadEntityDisplay = viewUADEntitiesDisplay.getUADEntityDisplay();
-SearchContainer uadEntitySearchContainer = viewUADEntitiesDisplay.getSearchContainer();
+SearchContainer<UADEntity> uadEntitySearchContainer = viewUADEntitiesDisplay.getSearchContainer();
 
 portletDisplay.setShowBackIcon(true);
 
@@ -38,36 +37,16 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 	items="<%= viewUADEntitiesDisplay.getNavigationItems() %>"
 />
 
-<liferay-frontend:management-bar
-	includeCheckBox="<%= true %>"
+<clay:management-toolbar
+	actionItems="<%= viewUADEntitiesDisplay.getActionDropdownItems() %>"
+	infoPanelId="infoPanelId"
+	namespace="<%= renderResponse.getNamespace() %>"
 	searchContainerId="UADEntities"
->
-	<liferay-frontend:management-bar-buttons>
-		<liferay-frontend:management-bar-sidenav-toggler-button
-			icon="info-circle"
-			label="info"
-		/>
-
-		<liferay-frontend:management-bar-action-buttons>
-			<liferay-frontend:management-bar-sidenav-toggler-button
-				icon="info-circle"
-				label="info"
-			/>
-
-			<liferay-frontend:management-bar-button
-				href='<%= "javascript:" + renderResponse.getNamespace() + "doAnonymizeMultiple();" %>'
-				icon="magic"
-				label="anonymize"
-			/>
-
-			<liferay-frontend:management-bar-button
-				href='<%= "javascript:" + renderResponse.getNamespace() + "doDeleteMultiple();" %>'
-				icon="trash"
-				label="delete"
-			/>
-		</liferay-frontend:management-bar-action-buttons>
-	</liferay-frontend:management-bar-buttons>
-</liferay-frontend:management-bar>
+	selectable="<%= true %>"
+	showInfoButton="<%= true %>"
+	showSearch="<%= false %>"
+	totalItems="<%= uadEntitySearchContainer.getTotal() %>"
+/>
 
 <aui:form method="post" name="viewUADEntitiesFm">
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
@@ -76,20 +55,20 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 	<aui:input name="primaryKeys" type="hidden" />
 
 	<div class="closed container-fluid container-fluid-max-xl sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
-		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= true %>" id="/entity_type_sidebar" var="entityTypeSidebarURL" />
+		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= true %>" id="/info_panel" var="entityTypeSidebarURL" />
 
 		<liferay-frontend:sidebar-panel
 			resourceURL="<%= entityTypeSidebarURL %>"
 			searchContainerId="UADEntities"
 		>
-			<%@ include file="/uad_entity_type_sidebar.jspf" %>
+			<liferay-util:include page="/info_panel.jsp" servletContext="<%= application %>" />
 		</liferay-frontend:sidebar-panel>
 
 		<div class="sidenav-content">
 			<liferay-ui:search-container
 				emptyResultsMessage="no-entities-remain-of-this-type"
 				id="UADEntities"
-				searchContainer="<%= viewUADEntitiesDisplay.getSearchContainer() %>"
+				searchContainer="<%= uadEntitySearchContainer %>"
 			>
 				<liferay-ui:search-container-row
 					className="com.liferay.user.associated.data.web.internal.display.UADEntity"
@@ -134,13 +113,15 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 	function <portlet:namespace/>doAnonymizeMultiple() {
 		<portlet:namespace />doMultiple(
 			'<portlet:actionURL name="/anonymize_uad_entities" />',
-			'<liferay-ui:message key="are-you-sure-you-want-to-anonymize-the-selected items" />');
+			'<liferay-ui:message key="are-you-sure-you-want-to-anonymize-the-selected-items" />'
+		);
 	}
 
 	function <portlet:namespace/>doDeleteMultiple() {
 		<portlet:namespace />doMultiple(
 			'<portlet:actionURL name="/delete_uad_entities" />',
-			'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected items" />');
+			'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-items" />'
+		);
 	}
 
 	function <portlet:namespace/>doMultiple(actionURL, message) {

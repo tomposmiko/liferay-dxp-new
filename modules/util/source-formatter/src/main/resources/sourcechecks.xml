@@ -62,12 +62,11 @@
 		<check name="GradleBlockOrderCheck" />
 		<check name="GradleBodyCheck" />
 		<check name="GradleDependenciesCheck" />
-		<check name="GradleExportedPackageDependenciesCheck">
-			<property name="enabled" value="false" />
-		</check>
+		<check name="GradleExportedPackageDependenciesCheck" />
 		<check name="GradleImportsCheck" />
 		<check name="GradleIndentationCheck" />
 		<check name="GradlePropertiesCheck" />
+		<check name="GradleProvidedDependenciesCheck" />
 		<check name="GradleVersionCheck" />
 		<check name="WhitespaceCheck" />
 	</source-processor>
@@ -87,9 +86,7 @@
 		<check name="GetterUtilCheck" />
 		<check name="Java2HTMLCheck" />
 		<check name="JavaAggregateTestRuleParameterOrderCheck" />
-		<check name="JavaAnnotationsCheck">
-			<property name="enabled" value="false" />
-		</check>
+		<check name="JavaAnnotationsCheck" />
 		<check name="JavaAssertEqualsCheck" />
 		<check name="JavaBooleanStatementCheck" />
 		<check name="JavaBooleanUsageCheck" />
@@ -147,9 +144,7 @@
 
 		<!-- Module checks -->
 
-		<check name="JavaModuleComponentCheck">
-			<property name="enabled" value="false" />
-		</check>
+		<check name="JavaModuleComponentCheck" />
 		<check name="JavaModuleExtendedObjectClassDefinitionCheck" />
 		<check name="JavaModuleIllegalImportsCheck">
 			<property name="checkRegistryInTestClasses" value="false" />
@@ -187,7 +182,9 @@
 		</check>
 		<check name="JavaCleanUpMethodSuperCleanUpCheck" />
 		<check name="JavaCleanUpMethodVariablesCheck" />
-		<check name="JavaDataAccessConnectionCheck" />
+		<check name="JavaDataAccessConnectionCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="JavaDeprecatedKernelClassesCheck">
 			<property name="enabled" value="false" />
 		</check>
@@ -205,6 +202,9 @@
 		<check name="JavaTestMethodAnnotationsCheck" />
 		<check name="JavaUnsafeCastingCheck" />
 		<check name="JavaUpgradeClassCheck" />
+		<check name="JavaUpgradeConnectionCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="JavaVariableTypeCheck">
 			<property name="immutableFieldTypes" value="boolean,byte,char,double,float,int,long,short,Boolean,Byte,Character,Class,Double,Float,Int,Long,Number,Short,String" />
 		</check>
@@ -245,9 +245,7 @@
 		<check name="JSPStringBundlerCheck" />
 		<check name="JSPStylingCheck" />
 		<check name="JSPSubnameCheck" />
-		<check name="JSPTagAttributesCheck">
-			<property name="enabled" value="false" />
-		</check>
+		<check name="JSPTagAttributesCheck" />
 		<check name="JSPTaglibVariableCheck" />
 		<check name="JSPUnusedTermsCheck" />
 		<check name="JSPWhitespaceCheck" />
@@ -349,12 +347,11 @@
 		<check name="XMLPoshiFileCheck" />
 		<check name="XMLProjectElementCheck" />
 		<check name="XMLResourceActionsFileCheck" />
+		<check name="XMLServiceEntityNameCheck" />
 		<check name="XMLServiceFileCheck" />
 		<check name="XMLSolrSchemaFileCheck" />
 		<check name="XMLSuppressionsFileCheck" />
-		<check name="XMLTagAttributesCheck">
-			<property name="enabled" value="false" />
-		</check>
+		<check name="XMLTagAttributesCheck" />
 		<check name="XMLToggleFileCheck" />
 		<check name="XMLWhitespaceCheck" />
 
@@ -369,7 +366,7 @@
 		<check name="XMLWebFileCheck" />
 	</source-processor>
 	<source-processor name="YMLSourceProcessor">
-		<check name="YMLDefintionOrderCheck" />
+		<check name="YMLDefinitionOrderCheck" />
 		<check name="YMLWhitespaceCheck">
 			<property name="allowLeadingSpaces" value="true" />
 		</check>

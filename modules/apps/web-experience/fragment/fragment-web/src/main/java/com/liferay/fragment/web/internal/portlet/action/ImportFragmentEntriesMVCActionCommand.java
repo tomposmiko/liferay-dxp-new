@@ -15,9 +15,11 @@
 package com.liferay.fragment.web.internal.portlet.action;
 
 import com.liferay.fragment.constants.FragmentPortletKeys;
+import com.liferay.fragment.exception.InvalidFragmentEntryFileException;
 import com.liferay.fragment.web.internal.constatns.ExportImportConstants;
 import com.liferay.fragment.web.internal.portlet.util.ImportUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -72,6 +74,11 @@ public class ImportFragmentEntriesMVCActionCommand
 
 			hideDefaultSuccessMessage(actionRequest);
 		}
+		else if (Objects.equals(cmd, Constants.DELETE_TEMP)) {
+			_deleteTempAttachment(actionRequest, actionResponse);
+
+			hideDefaultSuccessMessage(actionRequest);
+		}
 		else if (Objects.equals(cmd, Constants.IMPORT)) {
 			_importFragmentEntries(actionRequest, actionResponse);
 		}
@@ -110,6 +117,38 @@ public class ImportFragmentEntriesMVCActionCommand
 		}
 	}
 
+	private void _deleteTempAttachment(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		String fileName = ParamUtil.getString(actionRequest, "fileName");
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		try {
+			TempFileEntryUtil.deleteTempFileEntry(
+				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
+				ExportImportConstants.FRAGMENT_ENTRY_TEMP_FOLDER_NAME,
+				fileName);
+
+			jsonObject.put("deleted", Boolean.TRUE);
+		}
+		catch (Exception e) {
+			jsonObject.put("deleted", Boolean.FALSE);
+
+			String errorMessage = themeDisplay.translate(
+				"an-unexpected-error-occurred-while-deleting-the-file");
+
+			jsonObject.put("errorMessage", errorMessage);
+		}
+
+		JSONPortletResponseUtil.writeJSON(
+			actionRequest, actionResponse, jsonObject);
+	}
+
 	private void _importFragmentEntries(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
@@ -138,6 +177,10 @@ public class ImportFragmentEntriesMVCActionCommand
 
 				ZipReader zipReader = ZipReaderFactoryUtil.getZipReader(
 					tempFileEntry.getContentStream());
+
+				if (_importUtil.isValidFragmentCollectionsFile(zipReader)) {
+					throw new InvalidFragmentEntryFileException();
+				}
 
 				_importUtil.importFragmentEntries(
 					actionRequest, zipReader, fragmentCollectionId,

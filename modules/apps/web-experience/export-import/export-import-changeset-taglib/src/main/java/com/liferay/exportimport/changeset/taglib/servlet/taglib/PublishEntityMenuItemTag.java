@@ -93,11 +93,11 @@ public class PublishEntityMenuItemTag extends IncludeTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
+		_changesetUuid = StringPool.BLANK;
 		_className = StringPool.BLANK;
 		_classNameId = 0;
 		_groupId = 0;
 		_uuid = StringPool.BLANK;
-		_changesetUuid = StringPool.BLANK;
 	}
 
 	@Override
@@ -111,6 +111,9 @@ public class PublishEntityMenuItemTag extends IncludeTag {
 			"liferay-export-import-changeset:publish-entity-menu-item:" +
 				"changesetUuid",
 			_changesetUuid);
+		request.setAttribute(
+			"liferay-export-import-changeset:publish-entity-menu-item:groupId",
+			_groupId);
 	}
 
 	private static final String _PAGE = "/publish_entity_menu_item/page.jsp";

@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -421,12 +422,28 @@ public class Representor<T, S> {
 			 * @param  stringFunction the function used to get the string value
 			 * @return builder's step
 			 */
-			public FirstStep addLocalizedString(
+			public FirstStep addLocalizedStringByLanguage(
 				String key, BiFunction<T, Language, String> stringFunction) {
 
 				_representor._localizedStringFunctions.put(key, stringFunction);
 
 				return this;
+			}
+
+			/**
+			 * Provides information about a resource localized string field.
+			 *
+			 * @param  key the field's name
+			 * @param  stringFunction the function used to get the string value
+			 * @return builder's step
+			 */
+			public FirstStep addLocalizedStringByLocale(
+				String key, BiFunction<T, Locale, String> stringFunction) {
+
+				return addLocalizedStringByLanguage(
+					key,
+					(t, language) -> stringFunction.apply(
+						t, language.getPreferredLocale()));
 			}
 
 			/**

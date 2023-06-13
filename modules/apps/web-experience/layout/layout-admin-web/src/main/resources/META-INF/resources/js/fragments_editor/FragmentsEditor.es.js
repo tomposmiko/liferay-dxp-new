@@ -3,10 +3,27 @@ import Component from 'metal-component';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 
+import './dialogs/SelectMappingTypeDialog.es';
 import './sidebar/SidebarAddedFragments.es';
-import './sidebar/SidebarFragmentCollections.es';
+import './sidebar/SidebarAvailableFragments.es';
+import './sidebar/SidebarMapping.es';
+import './translation/TranslationStatus.es';
 import FragmentEntryLink from './FragmentEntryLink.es';
 import templates from './FragmentsEditor.soy';
+
+/**
+ * Tab that will show fragmentEntryLinks added to the editor
+ * @review
+ * @type {!{
+ *   id: !string,
+ *   label: !string
+ * }}
+ */
+
+const ADDED_FRAGMENTS_TAB = {
+	id: 'added',
+	label: Liferay.Language.get('added')
+};
 
 /**
  * FragmentsEditor
@@ -14,6 +31,30 @@ import templates from './FragmentsEditor.soy';
  */
 
 class FragmentsEditor extends Component {
+
+	/**
+	 * @inheritDoc
+	 * @review
+	 */
+
+	created() {
+		this._sidebarTabs = this.fragmentEntryLinks.length > 0 ?
+			[...this.sidebarTabs, ADDED_FRAGMENTS_TAB] :
+			[...this.sidebarTabs];
+
+		this.on('languageIdChanged', this._handleLanguageIdChange);
+	}
+
+	rendered(firstRender) {
+		if (firstRender) {
+			this._translationStatus = this._getTranslationStatus(
+				Object
+					.keys(this.availableLanguages)
+					.filter(languageId => languageId !== '_INJECTED_DATA_'),
+				this._getEditableValues()
+			);
+		}
+	}
 
 	/**
 	 * Sends message to delete a single fragment entry link to the server and,
@@ -107,6 +148,39 @@ class FragmentsEditor extends Component {
 	}
 
 	/**
+	 * Gets all editable values in the current fragment
+	 * @returns Array<Object>
+	 * @private
+	 * @review
+	 */
+
+	_getEditableValues() {
+		return this.fragmentEntryLinks
+			.map(
+				fragmentEntryLink => {
+					const component = this._getFragmentEntryLinkComponent(
+						fragmentEntryLink.fragmentEntryLinkId
+					);
+
+					return component ? component.getEditableValues() : null;
+				}
+			)
+			.filter(editableValues => editableValues);
+	}
+
+	/**
+	 * Returns a FragmentEntryLink instance for a fragmentEntryLinkId
+	 * @param {string} fragmentEntryLinkId
+	 * @private
+	 * @return {FragmentEntryLink}
+	 * @review
+	 */
+
+	_getFragmentEntryLinkComponent(fragmentEntryLinkId) {
+		return this.refs[`fragmentEntryLink_${fragmentEntryLinkId}`];
+	}
+
+	/**
 	 * Gets a new FragmentEntryLink position.
 	 * @returns {number}
 	 * @private
@@ -125,6 +199,61 @@ class FragmentsEditor extends Component {
 	}
 
 	/**
+	 * Gets the translation status for a given set of parameters
+	 * @param languageIds The set of languageIds to check
+	 * @param editableValues The current editable values state
+	 * @private
+	 * @returns {{
+	 * 	languageValues: {{
+	 * 		languageId: string
+	 * 		values: Array<string>
+	 *  }},
+	 *  translationKeys: Array<string>
+	 * }} A translation status object
+	 * @review
+	 */
+
+	_getTranslationStatus(languageIds, editableValues) {
+		const translationKeys = editableValues.map(
+			editableValue => {
+				return Object.keys(editableValue).map(
+					editableValueId => editableValue[editableValueId].defaultValue
+				);
+			}
+		).reduce(
+			(acc, val) => acc.concat(val),
+			[]
+		);
+
+		const languageValues = languageIds.map(
+			languageId => {
+				const values = editableValues.map(
+					editableValue => {
+						return Object.keys(editableValue).map(
+							editableValueId => editableValue[editableValueId][languageId]
+						);
+					}
+				).reduce(
+					(acc, val) => acc.concat(val),
+					[]
+				).filter(
+					localeValue => localeValue
+				);
+
+				return {
+					languageId,
+					values
+				};
+			}
+		);
+
+		return {
+			languageValues,
+			translationKeys
+		};
+	}
+
+	/**
 	 * Callback executed everytime an editable field has been changed
 	 * @param {{
 	 *   editableId: !string,
@@ -136,15 +265,27 @@ class FragmentsEditor extends Component {
 	 */
 
 	_handleEditableChanged(data) {
+		const component = this._getFragmentEntryLinkComponent(data.fragmentEntryLinkId);
 		const fragmentEntryLink = this.fragmentEntryLinks.find(
-			fragmentEntryLink => fragmentEntryLink.fragmentEntryLinkId === data.fragmentEntryLinkId
+			fragmentEntryLink => fragmentEntryLink.fragmentEntryLinkId ===
+				data.fragmentEntryLinkId
 		);
 
-		if (fragmentEntryLink) {
-			fragmentEntryLink.editableValues[data.editableId] = data.value;
-		}
+		if (fragmentEntryLink && component) {
+			const editableValue = component.getEditableValue(data.editableId) || {};
 
-		this._updateFragmentEntryLink(fragmentEntryLink);
+			const defaultEditableValue = editableValue.defaultValue || '';
+
+			if (data.value.trim() !== defaultEditableValue.trim()) {
+				const newEditableValues = component.setEditableValue(
+					data.editableId,
+					{[this.languageId]: data.value}
+				);
+
+				fragmentEntryLink.editableValues = newEditableValues;
+				this._updateFragmentEntryLink(fragmentEntryLink);
+			}
+		}
 	}
 
 	/**
@@ -236,6 +377,11 @@ class FragmentsEditor extends Component {
 
 							this._dirty = false;
 
+							this._sidebarTabs = [
+								...this.sidebarTabs,
+								ADDED_FRAGMENTS_TAB
+							];
+
 							this._focusFragmentEntryLink(
 								response.fragmentEntryLinkId
 							);
@@ -322,6 +468,18 @@ class FragmentsEditor extends Component {
 				...this.fragmentEntryLinks.slice(index + 1)
 			];
 
+			if (this.fragmentEntryLinks.length === 0) {
+				this._sidebarSelectedTab = FragmentsEditor.DEFAULT_TAB_ID;
+				this._sidebarTabs = [...this.sidebarTabs];
+			}
+
+			this._translationStatus = this._getTranslationStatus(
+				Object
+					.keys(this.availableLanguages)
+					.filter(languageId => languageId !== '_INJECTED_DATA_'),
+				this._getEditableValues()
+			);
+
 			this._deleteFragmentEntryLink(data.fragmentEntryLinkId);
 		}
 	}
@@ -334,6 +492,51 @@ class FragmentsEditor extends Component {
 
 	_handleHideContextualSidebar() {
 		this._contextualSidebarVisible = false;
+	}
+
+	/**
+	 * Callback executed when the language id has changed
+	 * @private
+	 * @review
+	 */
+
+	_handleLanguageIdChange() {
+		Object.keys(this.refs).filter(
+			key => key.startsWith('fragmentEntryLink_')
+		).forEach(
+			key => this.refs[key].update(this.languageId, this.defaultLanguageId)
+		);
+	}
+
+	/**
+	 * Callback executed when a mapping type hsa been selected
+	 * @param {{ labels: Array<string> }} event
+	 * @private
+	 * @review
+	 */
+
+	_handleMappingTypeSelected(event) {
+		this.selectedMappingTypeLabel = event.label;
+	}
+
+	/**
+	 * Callback executed when the SelectMappingTypeDialog should be shown
+	 * @review
+	 */
+
+	_handleSelectAssetTypeButtonClick() {
+		this._selectMappingTypeDialogVisible = true;
+	}
+
+	/**
+	 * Callback executed when the SelectMappingTypeDialog visibility changes
+	 * @param {{ newVal: boolean }} change
+	 * @private
+	 * @review
+	 */
+
+	_handleSelectMappingTypeDialogVisibleChanged(change) {
+		this._selectMappingTypeDialogVisible = change.newVal;
 	}
 
 	/**
@@ -355,6 +558,17 @@ class FragmentsEditor extends Component {
 
 	_handleToggleContextualSidebarButtonClick() {
 		this._contextualSidebarVisible = !this._contextualSidebarVisible;
+	}
+
+	/**
+	 * Callback executed when the translation language has changed
+	 * @private
+	 * @param {{languageId: string}} event
+	 * @review
+	 */
+
+	_handleTranslationLanguageChange(event) {
+		this.languageId = event.languageId;
 	}
 
 	/**
@@ -405,6 +619,17 @@ class FragmentsEditor extends Component {
 				() => {
 					this._lastSaveDate = new Date().toLocaleTimeString();
 
+					this._translationStatus = this._getTranslationStatus(
+						Object.keys(this.availableLanguages).filter(languageId => languageId !== '_INJECTED_DATA_'),
+						this._getEditableValues()
+					);
+
+					const fragmentEntryLinkComponent = this.refs[`fragmentEntryLink_${fragmentEntryLink.fragmentEntryLinkId}`];
+
+					if (fragmentEntryLinkComponent) {
+						fragmentEntryLinkComponent.updateTranslationStatus(this.languageId, this.defaultLanguageId);
+					}
+
 					this._dirty = false;
 				}
 			);
@@ -413,23 +638,13 @@ class FragmentsEditor extends Component {
 }
 
 /**
- * Tabs that can appear inside the sidebar
+ * Default selected tab
  * @review
- * @see FragmentsEditor._sidebarTabs
+ * @static
+ * @type {!string}
  */
 
-const SIDEBAR_TABS = [
-	{
-		id: 'fragments',
-		name: Liferay.Language.get('fragments'),
-		visible: true
-	},
-	{
-		id: 'added',
-		name: Liferay.Language.get('added'),
-		visible: true
-	}
-];
+FragmentsEditor.DEFAULT_TAB_ID = 'available';
 
 /**
  * State definition.
@@ -450,6 +665,17 @@ FragmentsEditor.STATE = {
 	 */
 
 	addFragmentEntryLinkURL: Config.string().required(),
+
+	/**
+	 * List of available languages for translation.
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @review
+	 * @type {!object}
+	 */
+
+	availableLanguages: Config.object().required(),
 
 	/**
 	 * Class name id used for storing changes.
@@ -483,6 +709,17 @@ FragmentsEditor.STATE = {
 	 */
 
 	defaultEditorConfiguration: Config.object().value({}),
+
+	/**
+	 * Default language id.
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @review
+	 * @type {!string}
+	 */
+
+	defaultLanguageId: Config.string().required(),
 
 	/**
 	 * URL for removing fragment entries of the underlying model.
@@ -533,6 +770,30 @@ FragmentsEditor.STATE = {
 	).required(),
 
 	/**
+	 * URL for obtaining the class types of an asset
+	 * created.
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @review
+	 * @type {!string}
+	 */
+
+	getAssetClassTypesURL: Config.string().required(),
+
+	/**
+	 * URL for obtaining the asset types for which asset display pages can be
+	 * created.
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @review
+	 * @type {!string}
+	 */
+
+	getAssetDisplayContributorsURL: Config.string().required(),
+
+	/**
 	 * Optional ID provided by the template system.
 	 * @default ''
 	 * @instance
@@ -579,6 +840,17 @@ FragmentsEditor.STATE = {
 	).value([]),
 
 	/**
+	 * Currently selected language id.
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @review
+	 * @type {!string}
+	 */
+
+	languageId: Config.string().required(),
+
+	/**
 	 * Portlet namespace needed for prefixing form inputs
 	 * @default undefined
 	 * @instance
@@ -601,6 +873,48 @@ FragmentsEditor.STATE = {
 	renderFragmentEntryURL: Config.string().required(),
 
 	/**
+	 * Selected mapping type label
+	 * @default {}
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @review
+	 * @type {{
+	 *   subtype: string,
+	 *   type: string
+	 * }}
+	 */
+
+	selectedMappingTypeLabel: Config
+		.shapeOf(
+			{
+				subtype: Config.string().value(''),
+				type: Config.string().value('')
+			}
+		)
+		.value({}),
+
+	/**
+	 * Tabs being shown in sidebar
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @review
+	 * @type {!Array<{
+	 * 	 id: string,
+	 * 	 label: string
+	 * }>}
+	 */
+
+	sidebarTabs: Config.arrayOf(
+		Config.shapeOf(
+			{
+				id: Config.string().required(),
+				label: Config.string().required()
+			}
+		)
+	).required(),
+
+	/**
 	 * Path of the available icons.
 	 * @default undefined
 	 * @instance
@@ -621,6 +935,17 @@ FragmentsEditor.STATE = {
      */
 
 	updateFragmentEntryLinksURL: Config.string().required(),
+
+	/**
+	 * URL for updating the asset type associated to a template.
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @review
+	 * @type {!string}
+	 */
+
+	updateLayoutPageTemplateEntryAssetTypeURL: Config.string().required(),
 
 	/**
 	 * Allow opening/closing contextual sidebar
@@ -664,34 +989,23 @@ FragmentsEditor.STATE = {
 		.value(''),
 
 	/**
-	 * Tabs being shown in sidebar
-	 * @default SIDEBAR_TABS
+	 * Flag indicating if the SelectMappingTypeDialog should be shown
+	 * @default false
 	 * @instance
 	 * @memberOf FragmentsEditor
 	 * @private
 	 * @review
-	 * @type {Array<{
-	 * 	 id:string,
-	 * 	 name:string,
-	 * 	 visible:boolean
-	 * }>}
+	 * @type {boolean}
 	 */
 
-	_sidebarTabs: Config.arrayOf(
-		Config.shapeOf(
-			{
-				id: Config.string(),
-				name: Config.string(),
-				visible: Config.bool()
-			}
-		)
-	)
+	_selectMappingTypeDialogVisible: Config
+		.bool()
 		.internal()
-		.value(SIDEBAR_TABS),
+		.value(false),
 
 	/**
 	 * Tab selected inside sidebar
-	 * @default SIDEBAR_TABS[0].id
+	 * @default 'fragments'
 	 * @instance
 	 * @memberOf FragmentsEditor
 	 * @private
@@ -699,11 +1013,32 @@ FragmentsEditor.STATE = {
 	 * @type {string}
 	 */
 
-	_sidebarSelectedTab: Config.oneOf(
-		SIDEBAR_TABS.map(tab => tab.id)
-	)
+	_sidebarSelectedTab: Config
+		.string()
 		.internal()
-		.value(SIDEBAR_TABS[0].id)
+		.value(FragmentsEditor.DEFAULT_TAB_ID),
+
+	/**
+	 * Internal copy of the selected tabs that will be mutated.
+	 * @default []
+	 * @instance
+	 * @memberOf FragmentsEditor
+	 * @private
+	 * @review
+	 * @type {Array<{
+	 * 	 id: string,
+	 * 	 label: string
+	 * }>}
+	 */
+
+	_sidebarTabs: Config.arrayOf(
+		Config.shapeOf(
+			{
+				id: Config.string().required(),
+				label: Config.string().required()
+			}
+		)
+	).value([])
 };
 
 Soy.register(FragmentsEditor, templates);

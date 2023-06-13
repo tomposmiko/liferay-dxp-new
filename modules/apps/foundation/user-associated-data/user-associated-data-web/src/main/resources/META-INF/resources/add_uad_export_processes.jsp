@@ -46,9 +46,11 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 					<liferay-ui:message key="please-select-the-applications-for-which-you-want-to-start-an-export-process" />
 				</div>
 
-				<liferay-frontend:management-bar
-					includeCheckBox="<%= true %>"
+				<clay:management-toolbar
+					namespace="<%= renderResponse.getNamespace() %>"
 					searchContainerId="uadApplicationExportDisplay"
+					selectable="<%= true %>"
+					showSearch="<%= false %>"
 				/>
 
 				<liferay-ui:search-container
@@ -73,17 +75,9 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 
 						<liferay-ui:search-container-column-text
 							cssClass="table-cell-expand"
-							name="data-to-export"
-						>
-							<c:choose>
-								<c:when test="<%= uadApplicationExportDisplay.getDataCount() > 0 %>">
-									<liferay-ui:message key="yes" />
-								</c:when>
-								<c:otherwise>
-									<liferay-ui:message key="no" />
-								</c:otherwise>
-							</c:choose>
-						</liferay-ui:search-container-column-text>
+							name="items"
+							value="<%= String.valueOf(uadApplicationExportDisplay.getDataCount()) %>"
+						/>
 
 						<%
 						Format dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat("yyyy.MM.dd - hh:mm a", locale, themeDisplay.getTimeZone());

@@ -100,6 +100,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -1063,10 +1064,10 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		jar.setGroup(BasePlugin.BUILD_GROUP);
 		jar.setIncludeEmptyDirs(false);
 
-		JSDocTask jsdocTask = (JSDocTask)GradleUtil.getTask(
+		JSDocTask jsDocTask = (JSDocTask)GradleUtil.getTask(
 			project, JSDocPlugin.JSDOC_TASK_NAME);
 
-		jar.from(jsdocTask);
+		jar.from(jsDocTask);
 
 		return jar;
 	}
@@ -1200,10 +1201,10 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 				"Documentation files for this project.");
 		jar.setGroup(BasePlugin.BUILD_GROUP);
 
-		TLDDocTask tlddocTask = (TLDDocTask)GradleUtil.getTask(
+		TLDDocTask tldDocTask = (TLDDocTask)GradleUtil.getTask(
 			project, TLDDocBuilderPlugin.TLDDOC_TASK_NAME);
 
-		jar.from(tlddocTask);
+		jar.from(tldDocTask);
 
 		return jar;
 	}
@@ -1737,20 +1738,20 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 				Dependency.ARCHIVES_CONFIGURATION, jarJavadocTask);
 		}
 
-		Task jsdocTask = GradleUtil.getTask(
+		Task jsDocTask = GradleUtil.getTask(
 			project, JSDocPlugin.JSDOC_TASK_NAME);
 
-		TaskInputs taskInputs = jsdocTask.getInputs();
+		TaskInputs taskInputs = jsDocTask.getInputs();
 
 		if (FileUtil.hasFiles(taskInputs.getFiles(), _jsdocSpec)) {
 			artifactHandler.add(
 				Dependency.ARCHIVES_CONFIGURATION, jarJSDocTask);
 		}
 
-		Task tlddocTask = GradleUtil.getTask(
+		Task tldDocTask = GradleUtil.getTask(
 			project, TLDDocBuilderPlugin.TLDDOC_TASK_NAME);
 
-		if (FileUtil.hasSourceFiles(tlddocTask, _tldSpec)) {
+		if (FileUtil.hasSourceFiles(tldDocTask, _tldSpec)) {
 			artifactHandler.add(
 				Dependency.ARCHIVES_CONFIGURATION, jarTLDDocTask);
 		}
@@ -1820,9 +1821,19 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		File appBndFile = _getAppBndFile(project, portalRootDir);
 
 		if (appBndFile != null) {
+			List<String> relativePaths = new ArrayList<>(2);
+
+			relativePaths.add(FileUtil.getRelativePath(project, appBndFile));
+
+			File suiteBndFile = _getSuiteBndFile(appBndFile, portalRootDir);
+
+			if (suiteBndFile != null) {
+				relativePaths.add(
+					FileUtil.getRelativePath(project, suiteBndFile));
+			}
+
 			bundleDefaultInstructions.put(
-				Constants.INCLUDE,
-				FileUtil.getRelativePath(project, appBndFile));
+				Constants.INCLUDE, StringUtil.merge(relativePaths, ","));
 		}
 
 		File packageJsonFile = project.file("package.json");
@@ -3355,12 +3366,12 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			return;
 		}
 
-		TLDDocTask tlddocTask = (TLDDocTask)GradleUtil.getTask(
+		TLDDocTask tldDocTask = (TLDDocTask)GradleUtil.getTask(
 			project, TLDDocBuilderPlugin.TLDDOC_TASK_NAME);
 
 		File xsltDir = new File(portalRootDir, "tools/styles/taglibs");
 
-		tlddocTask.setXsltDir(xsltDir);
+		tldDocTask.setXsltDir(xsltDir);
 	}
 
 	private void _configureTaskUpdateFileVersions(
@@ -3503,8 +3514,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		String path = FileUtil.relativize(
 			project.getProjectDir(), modulesPrivateDir);
 
-		if (File.pathSeparatorChar != '/') {
-			path = path.replace(File.pathSeparatorChar, '/');
+		if (File.separatorChar != '/') {
+			path = path.replace(File.separatorChar, '/');
 		}
 
 		while (true) {
@@ -3723,6 +3734,30 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 	private String _getProjectDependency(Project project) {
 		return "project(\"" + project.getPath() + "\")";
+	}
+
+	private File _getSuiteBndFile(File appBndFile, File portalRootDir) {
+		if (appBndFile == null) {
+			return null;
+		}
+
+		Properties properties = GUtil.loadProperties(appBndFile);
+
+		String liferayRelengSuite = properties.getProperty(
+			"Liferay-Releng-Suite");
+
+		if (Validator.isNull(liferayRelengSuite)) {
+			return null;
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("modules/suites/");
+		sb.append(liferayRelengSuite);
+		sb.append('/');
+		sb.append(_SUITE_BND_FILE_NAME);
+
+		return new File(portalRootDir, sb.toString());
 	}
 
 	private Version _getVersion(Object version) {
@@ -4153,6 +4188,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 	private static final String _SOURCE_FORMATTER_PORTAL_TOOL_NAME =
 		"com.liferay.source.formatter";
+
+	private static final String _SUITE_BND_FILE_NAME = "suite.bnd";
 
 	private static final String
 		_UPDATE_FILE_VERSIONS_EXACT_VERSION_PROPERTY_NAME = "exactVersion";

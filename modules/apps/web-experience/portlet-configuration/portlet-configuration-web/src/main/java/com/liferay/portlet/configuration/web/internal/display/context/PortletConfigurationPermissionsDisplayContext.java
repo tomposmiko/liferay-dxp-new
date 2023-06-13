@@ -15,6 +15,8 @@
 package com.liferay.portlet.configuration.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.ResourcePrimKeyException;
@@ -163,6 +165,14 @@ public class PortletConfigurationPermissionsDisplayContext {
 		return _actions;
 	}
 
+	public String getClearResultsURL() throws Exception {
+		PortletURL clearResultsURL = getIteratorURL();
+
+		clearResultsURL.setParameter("keywords", StringPool.BLANK);
+
+		return clearResultsURL.toString();
+	}
+
 	public PortletURL getDefinePermissionsURL() throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -265,18 +275,17 @@ public class PortletConfigurationPermissionsDisplayContext {
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		List<NavigationItem> navigationItems = new ArrayList<>();
-
-		NavigationItem entriesNavigationItem = new NavigationItem();
-
-		entriesNavigationItem.setActive(true);
-		entriesNavigationItem.setHref(themeDisplay.getURLCurrent());
-		entriesNavigationItem.setLabel(
-			LanguageUtil.get(_request, "permissions"));
-
-		navigationItems.add(entriesNavigationItem);
-
-		return navigationItems;
+		return new NavigationItemList() {
+			{
+				add(
+					navigationItem -> {
+						navigationItem.setActive(true);
+						navigationItem.setHref(themeDisplay.getURLCurrent());
+						navigationItem.setLabel(
+							LanguageUtil.get(_request, "permissions"));
+					});
+			}
+		};
 	}
 
 	public Resource getResource() throws PortalException {
@@ -490,6 +499,12 @@ public class PortletConfigurationPermissionsDisplayContext {
 		}
 
 		return _roleTypes;
+	}
+
+	public String getSearchActionURL() throws Exception {
+		PortletURL searchActionURL = getIteratorURL();
+
+		return searchActionURL.toString();
 	}
 
 	public String getSelResource() {

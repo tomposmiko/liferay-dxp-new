@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.comment.DiscussionStagingHandler;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -141,14 +142,25 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 					portletDataContext),
 				new TransientValue<T>(stagedModel), t);
 
-			PortletDataException pde = new PortletDataException(t);
+			if ((t instanceof SystemException) &&
+				(t.getCause() instanceof PortletDataException)) {
+
+				throw (PortletDataException)t.getCause();
+			}
+
+			PortletDataException pde = new PortletDataException(
+				t.getMessage(), t);
+
+			pde.setStagedModelDisplayName(getDisplayName(stagedModel));
+			pde.setStagedModelClassName(stagedModel.getModelClassName());
+			pde.setStagedModelClassPK(
+				GetterUtil.getString(stagedModel.getPrimaryKeyObj()));
 
 			if (t instanceof NoSuchModelException) {
-				pde.setStagedModelDisplayName(getDisplayName(stagedModel));
-				pde.setStagedModelClassName(stagedModel.getModelClassName());
-				pde.setStagedModelClassPK(
-					GetterUtil.getString(stagedModel.getPrimaryKeyObj()));
 				pde.setType(PortletDataException.MISSING_DEPENDENCY);
+			}
+			else {
+				pde.setType(PortletDataException.EXPORT_STAGED_MODEL);
 			}
 
 			throw pde;
@@ -383,24 +395,6 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 					portletDataContext),
 				new TransientValue<T>(stagedModel));
 		}
-		catch (NoSuchModelException nsme) {
-			ExportImportLifecycleManagerUtil.fireExportImportLifecycleEvent(
-				EVENT_STAGED_MODEL_IMPORT_FAILED, getProcessFlag(),
-				portletDataContext.getExportImportProcessId(),
-				PortletDataContextFactoryUtil.clonePortletDataContext(
-					portletDataContext),
-				new TransientValue<T>(stagedModel), nsme);
-
-			PortletDataException pde = new PortletDataException(nsme);
-
-			pde.setStagedModelDisplayName(getDisplayName(stagedModel));
-			pde.setStagedModelClassName(stagedModel.getModelClassName());
-			pde.setStagedModelClassPK(
-				GetterUtil.getString(stagedModel.getPrimaryKeyObj()));
-			pde.setType(PortletDataException.MISSING_DEPENDENCY);
-
-			throw pde;
-		}
 		catch (PortletDataException pde) {
 			ExportImportLifecycleManagerUtil.fireExportImportLifecycleEvent(
 				EVENT_STAGED_MODEL_IMPORT_FAILED, getProcessFlag(),
@@ -419,7 +413,28 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 					portletDataContext),
 				new TransientValue<T>(stagedModel), t);
 
-			throw new PortletDataException(t);
+			if ((t instanceof SystemException) &&
+				(t.getCause() instanceof PortletDataException)) {
+
+				throw (PortletDataException)t.getCause();
+			}
+
+			PortletDataException pde = new PortletDataException(
+				t.getMessage(), t);
+
+			pde.setStagedModelDisplayName(getDisplayName(stagedModel));
+			pde.setStagedModelClassName(stagedModel.getModelClassName());
+			pde.setStagedModelClassPK(
+				GetterUtil.getString(stagedModel.getPrimaryKeyObj()));
+
+			if (t instanceof NoSuchModelException) {
+				pde.setType(PortletDataException.MISSING_DEPENDENCY);
+			}
+			else {
+				pde.setType(PortletDataException.IMPORT_STAGED_MODEL);
+			}
+
+			throw pde;
 		}
 	}
 

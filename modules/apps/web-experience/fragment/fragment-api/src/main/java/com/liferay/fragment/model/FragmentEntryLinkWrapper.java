@@ -18,11 +18,14 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
 
+import com.liferay.exportimport.kernel.lar.StagedModelType;
+
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -57,8 +60,14 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("uuid", getUuid());
 		attributes.put("fragmentEntryLinkId", getFragmentEntryLinkId());
 		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
+		attributes.put("userId", getUserId());
+		attributes.put("userName", getUserName());
+		attributes.put("createDate", getCreateDate());
+		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("originalFragmentEntryLinkId",
 			getOriginalFragmentEntryLinkId());
 		attributes.put("fragmentEntryId", getFragmentEntryId());
@@ -69,12 +78,20 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 		attributes.put("js", getJs());
 		attributes.put("editableValues", getEditableValues());
 		attributes.put("position", getPosition());
+		attributes.put("lastPropagationDate", getLastPropagationDate());
+		attributes.put("namespace", getNamespace());
 
 		return attributes;
 	}
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
 		Long fragmentEntryLinkId = (Long)attributes.get("fragmentEntryLinkId");
 
 		if (fragmentEntryLinkId != null) {
@@ -85,6 +102,36 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 
 		if (groupId != null) {
 			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		String userName = (String)attributes.get("userName");
+
+		if (userName != null) {
+			setUserName(userName);
+		}
+
+		Date createDate = (Date)attributes.get("createDate");
+
+		if (createDate != null) {
+			setCreateDate(createDate);
+		}
+
+		Date modifiedDate = (Date)attributes.get("modifiedDate");
+
+		if (modifiedDate != null) {
+			setModifiedDate(modifiedDate);
 		}
 
 		Long originalFragmentEntryLinkId = (Long)attributes.get(
@@ -141,10 +188,22 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 		if (position != null) {
 			setPosition(position);
 		}
+
+		Date lastPropagationDate = (Date)attributes.get("lastPropagationDate");
+
+		if (lastPropagationDate != null) {
+			setLastPropagationDate(lastPropagationDate);
+		}
+
+		String namespace = (String)attributes.get("namespace");
+
+		if (namespace != null) {
+			setNamespace(namespace);
+		}
 	}
 
 	@Override
-	public java.lang.Object clone() {
+	public Object clone() {
 		return new FragmentEntryLinkWrapper((FragmentEntryLink)_fragmentEntryLink.clone());
 	}
 
@@ -159,7 +218,7 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	* @return the fully qualified class name of this fragment entry link
 	*/
 	@Override
-	public java.lang.String getClassName() {
+	public String getClassName() {
 		return _fragmentEntryLink.getClassName();
 	}
 
@@ -184,12 +243,32 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	}
 
 	/**
+	* Returns the company ID of this fragment entry link.
+	*
+	* @return the company ID of this fragment entry link
+	*/
+	@Override
+	public long getCompanyId() {
+		return _fragmentEntryLink.getCompanyId();
+	}
+
+	/**
+	* Returns the create date of this fragment entry link.
+	*
+	* @return the create date of this fragment entry link
+	*/
+	@Override
+	public Date getCreateDate() {
+		return _fragmentEntryLink.getCreateDate();
+	}
+
+	/**
 	* Returns the css of this fragment entry link.
 	*
 	* @return the css of this fragment entry link
 	*/
 	@Override
-	public java.lang.String getCss() {
+	public String getCss() {
 		return _fragmentEntryLink.getCss();
 	}
 
@@ -199,7 +278,7 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	* @return the editable values of this fragment entry link
 	*/
 	@Override
-	public java.lang.String getEditableValues() {
+	public String getEditableValues() {
 		return _fragmentEntryLink.getEditableValues();
 	}
 
@@ -244,7 +323,7 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	* @return the html of this fragment entry link
 	*/
 	@Override
-	public java.lang.String getHtml() {
+	public String getHtml() {
 		return _fragmentEntryLink.getHtml();
 	}
 
@@ -254,8 +333,38 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	* @return the js of this fragment entry link
 	*/
 	@Override
-	public java.lang.String getJs() {
+	public String getJs() {
 		return _fragmentEntryLink.getJs();
+	}
+
+	/**
+	* Returns the last propagation date of this fragment entry link.
+	*
+	* @return the last propagation date of this fragment entry link
+	*/
+	@Override
+	public Date getLastPropagationDate() {
+		return _fragmentEntryLink.getLastPropagationDate();
+	}
+
+	/**
+	* Returns the modified date of this fragment entry link.
+	*
+	* @return the modified date of this fragment entry link
+	*/
+	@Override
+	public Date getModifiedDate() {
+		return _fragmentEntryLink.getModifiedDate();
+	}
+
+	/**
+	* Returns the namespace of this fragment entry link.
+	*
+	* @return the namespace of this fragment entry link
+	*/
+	@Override
+	public String getNamespace() {
+		return _fragmentEntryLink.getNamespace();
 	}
 
 	/**
@@ -293,6 +402,46 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 		return _fragmentEntryLink.getPrimaryKeyObj();
 	}
 
+	/**
+	* Returns the user ID of this fragment entry link.
+	*
+	* @return the user ID of this fragment entry link
+	*/
+	@Override
+	public long getUserId() {
+		return _fragmentEntryLink.getUserId();
+	}
+
+	/**
+	* Returns the user name of this fragment entry link.
+	*
+	* @return the user name of this fragment entry link
+	*/
+	@Override
+	public String getUserName() {
+		return _fragmentEntryLink.getUserName();
+	}
+
+	/**
+	* Returns the user uuid of this fragment entry link.
+	*
+	* @return the user uuid of this fragment entry link
+	*/
+	@Override
+	public String getUserUuid() {
+		return _fragmentEntryLink.getUserUuid();
+	}
+
+	/**
+	* Returns the uuid of this fragment entry link.
+	*
+	* @return the uuid of this fragment entry link
+	*/
+	@Override
+	public String getUuid() {
+		return _fragmentEntryLink.getUuid();
+	}
+
 	@Override
 	public int hashCode() {
 		return _fragmentEntryLink.hashCode();
@@ -306,6 +455,12 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	@Override
 	public boolean isEscapedModel() {
 		return _fragmentEntryLink.isEscapedModel();
+	}
+
+	@Override
+	public boolean isLatestVersion()
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _fragmentEntryLink.isLatestVersion();
 	}
 
 	@Override
@@ -324,7 +479,7 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	}
 
 	@Override
-	public void setClassName(java.lang.String className) {
+	public void setClassName(String className) {
 		_fragmentEntryLink.setClassName(className);
 	}
 
@@ -349,12 +504,32 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	}
 
 	/**
+	* Sets the company ID of this fragment entry link.
+	*
+	* @param companyId the company ID of this fragment entry link
+	*/
+	@Override
+	public void setCompanyId(long companyId) {
+		_fragmentEntryLink.setCompanyId(companyId);
+	}
+
+	/**
+	* Sets the create date of this fragment entry link.
+	*
+	* @param createDate the create date of this fragment entry link
+	*/
+	@Override
+	public void setCreateDate(Date createDate) {
+		_fragmentEntryLink.setCreateDate(createDate);
+	}
+
+	/**
 	* Sets the css of this fragment entry link.
 	*
 	* @param css the css of this fragment entry link
 	*/
 	@Override
-	public void setCss(java.lang.String css) {
+	public void setCss(String css) {
 		_fragmentEntryLink.setCss(css);
 	}
 
@@ -364,7 +539,7 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	* @param editableValues the editable values of this fragment entry link
 	*/
 	@Override
-	public void setEditableValues(java.lang.String editableValues) {
+	public void setEditableValues(String editableValues) {
 		_fragmentEntryLink.setEditableValues(editableValues);
 	}
 
@@ -420,7 +595,7 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	* @param html the html of this fragment entry link
 	*/
 	@Override
-	public void setHtml(java.lang.String html) {
+	public void setHtml(String html) {
 		_fragmentEntryLink.setHtml(html);
 	}
 
@@ -430,8 +605,38 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	* @param js the js of this fragment entry link
 	*/
 	@Override
-	public void setJs(java.lang.String js) {
+	public void setJs(String js) {
 		_fragmentEntryLink.setJs(js);
+	}
+
+	/**
+	* Sets the last propagation date of this fragment entry link.
+	*
+	* @param lastPropagationDate the last propagation date of this fragment entry link
+	*/
+	@Override
+	public void setLastPropagationDate(Date lastPropagationDate) {
+		_fragmentEntryLink.setLastPropagationDate(lastPropagationDate);
+	}
+
+	/**
+	* Sets the modified date of this fragment entry link.
+	*
+	* @param modifiedDate the modified date of this fragment entry link
+	*/
+	@Override
+	public void setModifiedDate(Date modifiedDate) {
+		_fragmentEntryLink.setModifiedDate(modifiedDate);
+	}
+
+	/**
+	* Sets the namespace of this fragment entry link.
+	*
+	* @param namespace the namespace of this fragment entry link
+	*/
+	@Override
+	public void setNamespace(String namespace) {
+		_fragmentEntryLink.setNamespace(namespace);
 	}
 
 	@Override
@@ -474,6 +679,46 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 		_fragmentEntryLink.setPrimaryKeyObj(primaryKeyObj);
 	}
 
+	/**
+	* Sets the user ID of this fragment entry link.
+	*
+	* @param userId the user ID of this fragment entry link
+	*/
+	@Override
+	public void setUserId(long userId) {
+		_fragmentEntryLink.setUserId(userId);
+	}
+
+	/**
+	* Sets the user name of this fragment entry link.
+	*
+	* @param userName the user name of this fragment entry link
+	*/
+	@Override
+	public void setUserName(String userName) {
+		_fragmentEntryLink.setUserName(userName);
+	}
+
+	/**
+	* Sets the user uuid of this fragment entry link.
+	*
+	* @param userUuid the user uuid of this fragment entry link
+	*/
+	@Override
+	public void setUserUuid(String userUuid) {
+		_fragmentEntryLink.setUserUuid(userUuid);
+	}
+
+	/**
+	* Sets the uuid of this fragment entry link.
+	*
+	* @param uuid the uuid of this fragment entry link
+	*/
+	@Override
+	public void setUuid(String uuid) {
+		_fragmentEntryLink.setUuid(uuid);
+	}
+
 	@Override
 	public com.liferay.portal.kernel.model.CacheModel<FragmentEntryLink> toCacheModel() {
 		return _fragmentEntryLink.toCacheModel();
@@ -485,7 +730,7 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	}
 
 	@Override
-	public java.lang.String toString() {
+	public String toString() {
 		return _fragmentEntryLink.toString();
 	}
 
@@ -495,7 +740,7 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 	}
 
 	@Override
-	public java.lang.String toXmlString() {
+	public String toXmlString() {
 		return _fragmentEntryLink.toXmlString();
 	}
 
@@ -517,6 +762,11 @@ public class FragmentEntryLinkWrapper implements FragmentEntryLink,
 		}
 
 		return false;
+	}
+
+	@Override
+	public StagedModelType getStagedModelType() {
+		return _fragmentEntryLink.getStagedModelType();
 	}
 
 	@Override

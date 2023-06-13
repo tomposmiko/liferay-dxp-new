@@ -2955,6 +2955,8 @@ version 2.2.0.
 
 ### Changed
 - [LPS-78050]: Update the [Liferay Gradle Plugins] dependency to version 3.8.8.
+- [LPS-78537]: Update the [Liferay Gradle Plugins Poshi Runner] dependency to
+version 2.2.1.
 
 ## 5.3.19 - 2018-03-07
 
@@ -3251,6 +3253,253 @@ classpath.
 - [LPS-74171]: Update the [Liferay Gradle Plugins] dependency to version
 3.10.13.
 
+## 5.3.71 - 2018-04-10
+
+### Changed
+- [LPS-78308]: Update the [Liferay Gradle Plugins] dependency to version
+3.10.14.
+
+## 5.3.72 - 2018-04-10
+
+### Changed
+- [LPS-78911]: Update the [Liferay Gradle Plugins] dependency to version
+3.10.15.
+
+## 5.3.73 - 2018-04-11
+
+### Changed
+- [LPS-75010]: Update the [Liferay Gradle Plugins] dependency to version
+3.10.16.
+
+## 5.3.74 - 2018-04-12
+
+### Changed
+- [LPS-79576]: Update the [Liferay Gradle Plugins] dependency to version
+3.10.17.
+
+## 5.3.75 - 2018-04-12
+
+### Changed
+- [LPS-79576]: Update the [Liferay Gradle Plugins] dependency to version
+3.10.18.
+
+## 5.3.76 - 2018-04-12
+
+### Changed
+- [LPS-75530]: Update the [Liferay Gradle Plugins] dependency to version 3.11.0.
+
+## 5.3.77 - 2018-04-13
+
+### Changed
+- [LPS-79576]: Update the [Liferay Gradle Plugins] dependency to version 3.11.1.
+
+## 5.3.78 - 2018-04-13
+
+### Changed
+- [LPS-77639]: Update the [Liferay Gradle Plugins] dependency to version 3.11.2.
+
+## 5.3.79 - 2018-04-13
+
+### Changed
+- [LPS-79623]: Update the [Liferay Gradle Plugins] dependency to version 3.11.3.
+
+## 5.3.80 - 2018-04-16
+
+### Changed
+- [LPS-79576]: Update the [Liferay Gradle Plugins] dependency to version 3.11.4.
+
+## 5.3.81 - 2018-04-16
+
+### Changed
+- [LPS-79665]: Update the [Liferay Gradle Plugins] dependency to version 3.11.5.
+
+## 5.3.82 - 2018-04-17
+
+### Changed
+- [LPS-79679]: Update the [Liferay Gradle Plugins] dependency to version 3.11.6.
+
+## 5.3.83 - 2018-04-18
+
+### Changed
+- [LPS-79755]: Update the [Liferay Gradle Plugins] dependency to version 3.11.7.
+
+## 5.3.84 - 2018-04-18
+
+### Changed
+- [LPS-79679]: Update the [Liferay Gradle Plugins] dependency to version 3.11.8.
+
+## 5.3.85 - 2018-04-19
+
+### Changed
+- [LPS-79386]: Update the [Liferay Gradle Plugins] dependency to version 3.11.9.
+
+## 5.3.86 - 2018-04-19
+
+### Changed
+- [LPS-74544]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.10.
+
+## 5.3.87 - 2018-04-20
+
+### Changed
+- [LPS-79919]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.11.
+
+## 5.3.88 - 2018-04-20
+
+### Changed
+- [LPS-79919]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.12.
+
+## 5.3.89 - 2018-04-22
+
+### Changed
+- [LPS-75049]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.13.
+
+## 5.3.90 - 2018-04-23
+
+### Changed
+- [LPS-79953]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.14.
+
+## 5.3.91 - 2018-04-23
+
+### Changed
+- [LPS-80055]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.15.
+
+## 5.3.92 - 2018-04-23
+
+### Changed
+- [LPS-79799]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.16.
+
+## 5.3.93 - 2018-04-24
+
+### Changed
+- [LPS-80091]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.17.
+
+## 5.3.94 - 2018-04-25
+
+### Changed
+- [LPS-79963]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.18.
+
+## 5.3.95 - 2018-04-25
+
+### Changed
+- [LPS-79388]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.19.
+
+## 5.3.96 - 2018-04-26
+
+### Changed
+- [LPS-80184]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.20.
+
+## 5.3.97 - 2018-04-26
+
+### Changed
+- [LPS-80125]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.21.
+
+## 5.3.98 - 2018-04-26
+
+### Changed
+- [LPS-80123]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.22.
+
+## 5.3.99 - 2018-04-29
+
+### Changed
+- [LPS-80123]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.23.
+
+## 5.3.100 - 2018-04-30
+
+### Changed
+- [LPS-79679]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.24.
+
+## 5.3.101 - 2018-04-30
+
+### Changed
+- [LPS-80122]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.25.
+
+## 5.3.102 - 2018-05-01
+
+### Added
+- [LPS-80332]: Update the `-include` instruction for projects that have a
+`suite.bnd` file.
+
+## 5.3.103 - 2018-05-01
+
+### Changed
+- [LPS-80184]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.26.
+
+## 5.3.104 - 2018-05-02
+
+### Changed
+- [LPS-79679]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.27.
+
+## 5.3.105 - 2018-05-02
+
+### Changed
+- [LPS-80332]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.28.
+
+## 5.3.106 - 2018-05-02
+
+### Changed
+- [LPS-80394]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.29.
+- [LPS-80394]: Update the [Liferay Gradle Plugins Poshi Runner] dependency to
+version 2.2.3.
+
+### Fixed
+- [LPS-65633]: If the module is `private`, search for the public `app.bnd`.
+
+## 5.3.107 - 2018-05-03
+
+### Changed
+- [LPS-80386]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.30.
+
+## 5.3.108 - 2018-05-03
+
+### Changed
+- [LPS-80466]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.31.
+
+## 5.3.109 - 2018-05-03
+
+### Changed
+- [LPS-79679]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.32.
+
+## 5.3.110 - 2018-05-04
+
+### Changed
+- [LPS-74544]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.33.
+
+## 5.3.111 - 2018-05-06
+
+### Changed
+- [LPS-80517]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.34.
+
+## 5.3.112 - 2018-05-06
+
+### Changed
+- [LPS-80520]: Update the [Liferay Gradle Plugins] dependency to version
+3.11.35.
+
 [Find Security Bugs]: https://github.com/liferay/liferay-portal/tree/master/modules/third-party/com-h3xstream-findsecbugs
 [Gradle License Report]: https://github.com/jk1/Gradle-License-Report
 [Liferay CDN]: https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public
@@ -3273,6 +3522,7 @@ classpath.
 [LPS-63943]: https://issues.liferay.com/browse/LPS-63943
 [LPS-64098]: https://issues.liferay.com/browse/LPS-64098
 [LPS-65179]: https://issues.liferay.com/browse/LPS-65179
+[LPS-65633]: https://issues.liferay.com/browse/LPS-65633
 [LPS-65930]: https://issues.liferay.com/browse/LPS-65930
 [LPS-66396]: https://issues.liferay.com/browse/LPS-66396
 [LPS-66762]: https://issues.liferay.com/browse/LPS-66762
@@ -3527,6 +3777,7 @@ classpath.
 [LPS-75399]: https://issues.liferay.com/browse/LPS-75399
 [LPS-75430]: https://issues.liferay.com/browse/LPS-75430
 [LPS-75488]: https://issues.liferay.com/browse/LPS-75488
+[LPS-75530]: https://issues.liferay.com/browse/LPS-75530
 [LPS-75610]: https://issues.liferay.com/browse/LPS-75610
 [LPS-75624]: https://issues.liferay.com/browse/LPS-75624
 [LPS-75633]: https://issues.liferay.com/browse/LPS-75633
@@ -3577,6 +3828,7 @@ classpath.
 [LPS-77524]: https://issues.liferay.com/browse/LPS-77524
 [LPS-77532]: https://issues.liferay.com/browse/LPS-77532
 [LPS-77630]: https://issues.liferay.com/browse/LPS-77630
+[LPS-77639]: https://issues.liferay.com/browse/LPS-77639
 [LPS-77795]: https://issues.liferay.com/browse/LPS-77795
 [LPS-77797]: https://issues.liferay.com/browse/LPS-77797
 [LPS-77836]: https://issues.liferay.com/browse/LPS-77836
@@ -3600,6 +3852,7 @@ classpath.
 [LPS-78459]: https://issues.liferay.com/browse/LPS-78459
 [LPS-78477]: https://issues.liferay.com/browse/LPS-78477
 [LPS-78493]: https://issues.liferay.com/browse/LPS-78493
+[LPS-78537]: https://issues.liferay.com/browse/LPS-78537
 [LPS-78558]: https://issues.liferay.com/browse/LPS-78558
 [LPS-78571]: https://issues.liferay.com/browse/LPS-78571
 [LPS-78669]: https://issues.liferay.com/browse/LPS-78669
@@ -3620,7 +3873,30 @@ classpath.
 [LPS-79286]: https://issues.liferay.com/browse/LPS-79286
 [LPS-79360]: https://issues.liferay.com/browse/LPS-79360
 [LPS-79365]: https://issues.liferay.com/browse/LPS-79365
+[LPS-79386]: https://issues.liferay.com/browse/LPS-79386
+[LPS-79388]: https://issues.liferay.com/browse/LPS-79388
 [LPS-79450]: https://issues.liferay.com/browse/LPS-79450
+[LPS-79576]: https://issues.liferay.com/browse/LPS-79576
+[LPS-79623]: https://issues.liferay.com/browse/LPS-79623
+[LPS-79665]: https://issues.liferay.com/browse/LPS-79665
+[LPS-79679]: https://issues.liferay.com/browse/LPS-79679
+[LPS-79755]: https://issues.liferay.com/browse/LPS-79755
+[LPS-79799]: https://issues.liferay.com/browse/LPS-79799
+[LPS-79919]: https://issues.liferay.com/browse/LPS-79919
+[LPS-79953]: https://issues.liferay.com/browse/LPS-79953
+[LPS-79963]: https://issues.liferay.com/browse/LPS-79963
+[LPS-80055]: https://issues.liferay.com/browse/LPS-80055
+[LPS-80091]: https://issues.liferay.com/browse/LPS-80091
+[LPS-80122]: https://issues.liferay.com/browse/LPS-80122
+[LPS-80123]: https://issues.liferay.com/browse/LPS-80123
+[LPS-80125]: https://issues.liferay.com/browse/LPS-80125
+[LPS-80184]: https://issues.liferay.com/browse/LPS-80184
+[LPS-80332]: https://issues.liferay.com/browse/LPS-80332
+[LPS-80386]: https://issues.liferay.com/browse/LPS-80386
+[LPS-80394]: https://issues.liferay.com/browse/LPS-80394
+[LPS-80466]: https://issues.liferay.com/browse/LPS-80466
+[LPS-80517]: https://issues.liferay.com/browse/LPS-80517
+[LPS-80520]: https://issues.liferay.com/browse/LPS-80520
 [LRDOCS-2594]: https://issues.liferay.com/browse/LRDOCS-2594
 [LRDOCS-2841]: https://issues.liferay.com/browse/LRDOCS-2841
 [LRDOCS-2981]: https://issues.liferay.com/browse/LRDOCS-2981

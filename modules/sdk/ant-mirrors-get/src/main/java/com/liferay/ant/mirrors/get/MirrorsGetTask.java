@@ -51,7 +51,16 @@ public class MirrorsGetTask extends Task {
 	}
 
 	public void setDest(File dest) {
-		_dest = dest;
+		String destPath = dest.getPath();
+
+		if (destPath.matches(".*\\$\\{.+\\}.*")) {
+			Project project = getProject();
+
+			_dest = new File(project.replaceProperties(destPath));
+		}
+		else {
+			_dest = dest;
+		}
 	}
 
 	public void setForce(boolean force) {
@@ -67,6 +76,10 @@ public class MirrorsGetTask extends Task {
 	}
 
 	public void setSrc(String src) {
+		Project project = getProject();
+
+		src = project.replaceProperties(src);
+
 		Matcher matcher = _srcPattern.matcher(src);
 
 		if (!matcher.find()) {
@@ -77,7 +90,7 @@ public class MirrorsGetTask extends Task {
 		_path = matcher.group(1);
 
 		if (_path.startsWith("mirrors/")) {
-			_path = _path.replace("mirrors/", getMirrorsHostname());
+			_path = _path.replaceFirst("mirrors", getMirrorsHostname());
 		}
 
 		while (_path.endsWith("/")) {
@@ -183,8 +196,6 @@ public class MirrorsGetTask extends Task {
 					downloadFile(sourceURL, localCacheFile);
 				}
 				catch (IOException ioe) {
-					ioe.printStackTrace();
-
 					sb = new StringBuilder();
 
 					sb.append("http://");
@@ -192,9 +203,13 @@ public class MirrorsGetTask extends Task {
 					sb.append("/");
 					sb.append(_fileName);
 
-					sourceURL = new URL(sb.toString());
+					URL defaultURL = new URL(sb.toString());
 
-					downloadFile(sourceURL, localCacheFile);
+					System.out.println(
+						"Unable to connect to " + sourceURL +
+							", defaulting to " + defaultURL);
+
+					downloadFile(defaultURL, localCacheFile);
 				}
 			}
 			else {

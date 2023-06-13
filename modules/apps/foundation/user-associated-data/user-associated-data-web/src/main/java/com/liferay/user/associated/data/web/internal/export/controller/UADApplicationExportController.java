@@ -14,12 +14,6 @@
 
 package com.liferay.user.associated.data.web.internal.export.controller;
 
-import static com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleConstants.EVENT_PORTLET_EXPORT_FAILED;
-import static com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleConstants.EVENT_PORTLET_EXPORT_STARTED;
-import static com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleConstants.EVENT_PORTLET_EXPORT_SUCCEEDED;
-import static com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleConstants.PROCESS_FLAG_PORTLET_EXPORT_IN_PROCESS;
-
-import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleManager;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
@@ -31,8 +25,9 @@ import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
-import com.liferay.user.associated.data.display.UADEntityDisplay;
-import com.liferay.user.associated.data.exporter.UADEntityExporter;
+import com.liferay.user.associated.data.display.UADDisplay;
+import com.liferay.user.associated.data.exporter.UADExporter;
+import com.liferay.user.associated.data.web.internal.export.background.task.UADExportBackgroundTaskStatusMessageSender;
 import com.liferay.user.associated.data.web.internal.registry.UADRegistry;
 
 import java.io.File;
@@ -53,23 +48,15 @@ public class UADApplicationExportController {
 
 	public File export(String applicationName, long userId) throws Exception {
 		try {
-			_exportImportLifecycleManager.fireExportImportLifecycleEvent(
-				EVENT_PORTLET_EXPORT_STARTED,
-				PROCESS_FLAG_PORTLET_EXPORT_IN_PROCESS, applicationName);
+			_uadExportBackgroundTaskStatusMessageSender.sendStatusMessage(
+				"application", applicationName,
+				_getApplicationDataCount(applicationName, userId));
 
 			File file = _exportApplicationData(applicationName, userId);
-
-			_exportImportLifecycleManager.fireExportImportLifecycleEvent(
-				EVENT_PORTLET_EXPORT_SUCCEEDED,
-				PROCESS_FLAG_PORTLET_EXPORT_IN_PROCESS, applicationName);
 
 			return file;
 		}
 		catch (Throwable t) {
-			_exportImportLifecycleManager.fireExportImportLifecycleEvent(
-				EVENT_PORTLET_EXPORT_FAILED,
-				PROCESS_FLAG_PORTLET_EXPORT_IN_PROCESS, applicationName, t);
-
 			throw t;
 		}
 	}
@@ -82,10 +69,10 @@ public class UADApplicationExportController {
 		for (String uadRegistryKey :
 				_getApplicationUADEntityRegistryKeys(applicationName)) {
 
-			UADEntityExporter uadEntityExporter =
-				_uadRegistry.getUADEntityExporter(uadRegistryKey);
+			UADExporter uadExporter = _uadRegistry.getUADExporter(
+				uadRegistryKey);
 
-			File file = uadEntityExporter.exportAll(userId);
+			File file = uadExporter.exportAll(userId);
 
 			if (file.exists()) {
 				try {
@@ -98,6 +85,9 @@ public class UADApplicationExportController {
 						zipWriter.addEntry(
 							_getEntryPath(uadRegistryKey, entry),
 							zipReader.getEntryAsInputStream(entry));
+
+						_uadExportBackgroundTaskStatusMessageSender.
+							sendStatusMessage("entity", uadRegistryKey);
 					}
 				}
 				catch (IOException ioe) {
@@ -109,39 +99,55 @@ public class UADApplicationExportController {
 		return zipWriter.getFile();
 	}
 
-	private Stream<UADEntityDisplay> _getApplicationUADEntityDisplayStream(
+	private long _getApplicationDataCount(String applicationName, long userId)
+		throws PortalException {
+
+		long totalCount = 0;
+
+		for (String uadRegistryKey :
+				_getApplicationUADEntityRegistryKeys(applicationName)) {
+
+			UADExporter uadExporter = _uadRegistry.getUADExporter(
+				uadRegistryKey);
+
+			totalCount += uadExporter.count(userId);
+		}
+
+		return totalCount;
+	}
+
+	private Stream<UADDisplay> _getApplicationUADDisplayStream(
 		String applicationName) {
 
-		Stream<UADEntityDisplay> uadEntityDisplayStream =
-			_uadRegistry.getUADEntityDisplayStream();
+		Stream<UADDisplay> uadDisplayStream =
+			_uadRegistry.getUADDisplayStream();
 
-		return uadEntityDisplayStream.filter(
-			uadEntityDisplay -> applicationName.equals(
-				uadEntityDisplay.getApplicationName()));
+		return uadDisplayStream.filter(
+			uadDisplay -> applicationName.equals(
+				uadDisplay.getApplicationName()));
 	}
 
 	private List<String> _getApplicationUADEntityRegistryKeys(
 		String applicationName) {
 
-		Stream<UADEntityDisplay> uadEntityDisplayStream =
-			_getApplicationUADEntityDisplayStream(applicationName);
+		Stream<UADDisplay> uadDisplayStream = _getApplicationUADDisplayStream(
+			applicationName);
 
-		return uadEntityDisplayStream.map(
-			UADEntityDisplay::getKey
+		return uadDisplayStream.map(
+			UADDisplay::getKey
 		).collect(
 			Collectors.toList()
 		);
 	}
 
 	private String _getEntryPath(String uadRegistryKey, String fileName) {
-		UADEntityDisplay uadEntityDisplay = _uadRegistry.getUADEntityDisplay(
-			uadRegistryKey);
+		UADDisplay uadDisplay = _uadRegistry.getUADDisplay(uadRegistryKey);
 
 		StringBundler sb = new StringBundler(5);
 
-		sb.append(uadEntityDisplay.getApplicationName());
+		sb.append(uadDisplay.getApplicationName());
 		sb.append(StringPool.FORWARD_SLASH);
-		sb.append(uadEntityDisplay.getTypeName());
+		sb.append(uadRegistryKey);
 		sb.append(StringPool.FORWARD_SLASH);
 		sb.append(fileName);
 
@@ -178,7 +184,8 @@ public class UADApplicationExportController {
 	}
 
 	@Reference
-	private ExportImportLifecycleManager _exportImportLifecycleManager;
+	private UADExportBackgroundTaskStatusMessageSender
+		_uadExportBackgroundTaskStatusMessageSender;
 
 	@Reference
 	private UADRegistry _uadRegistry;

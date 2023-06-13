@@ -342,8 +342,8 @@
 
 		<execute function="AssertClick" locator1="Button#REPLY" value1="Reply" />
 
-		<execute function="AssertElementPresent" locator1="Comments#THUMBS_UP" />
-		<execute function="AssertElementPresent" locator1="Comments#THUMBS_DOWN" />
+		<execute function="AssertElementPresent" locator1="Ratings#THUMB_UP" />
+		<execute function="AssertElementPresent" locator1="Ratings#THUMB_DOWN" />
 	</command>
 
 	<command name="viewConfigureScopePG">
@@ -352,10 +352,10 @@
 		<if>
 			<equals arg1="${scopeSelectionDefault}" arg2="true" />
 			<then>
-				<execute function="AssertTextEquals" locator1="Portlet#TITLE" value1="Web Content Display" />
+				<execute function="AssertTextEquals#assertTextCaseInsensitive" locator1="Portlet#TITLE" value1="Web Content Display" />
 			</then>
 			<else>
-				<execute function="AssertTextEquals" locator1="Portlet#TITLE" value1="Web Content Display (${scopeSelection})" />
+				<execute function="AssertTextEquals#assertTextCaseInsensitive" locator1="Portlet#TITLE" value1="Web Content Display (${scopeSelection})" />
 			</else>
 		</if>
 

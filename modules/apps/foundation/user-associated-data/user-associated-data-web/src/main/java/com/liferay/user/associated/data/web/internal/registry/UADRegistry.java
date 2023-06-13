@@ -16,10 +16,9 @@ package com.liferay.user.associated.data.web.internal.registry;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.user.associated.data.aggregator.UADAggregator;
 import com.liferay.user.associated.data.anonymizer.UADAnonymizer;
-import com.liferay.user.associated.data.display.UADEntityDisplay;
-import com.liferay.user.associated.data.exporter.UADEntityExporter;
+import com.liferay.user.associated.data.display.UADDisplay;
+import com.liferay.user.associated.data.exporter.UADExporter;
 
 import java.util.Collection;
 import java.util.Set;
@@ -36,18 +35,6 @@ import org.osgi.service.component.annotations.Deactivate;
 @Component(immediate = true, service = UADRegistry.class)
 public class UADRegistry {
 
-	public UADAggregator getUADAggregator(String key) {
-		return _uadAggregatorServiceTrackerMap.getService(key);
-	}
-
-	public Set<String> getUADAggregatorKeySet() {
-		return _uadAggregatorServiceTrackerMap.keySet();
-	}
-
-	public Collection<UADAggregator> getUADAggregators() {
-		return _uadAggregatorServiceTrackerMap.values();
-	}
-
 	public UADAnonymizer getUADAnonymizer(String key) {
 		return _uadAnonymizerServiceTrackerMap.getService(key);
 	}
@@ -60,65 +47,58 @@ public class UADRegistry {
 		return _uadAnonymizerServiceTrackerMap.values();
 	}
 
-	public UADEntityDisplay getUADEntityDisplay(String key) {
-		return _uadEntityDisplayServiceTrackerMap.getService(key);
+	public UADDisplay getUADDisplay(String key) {
+		return _uadDisplayServiceTrackerMap.getService(key);
 	}
 
-	public Set<String> getUADEntityDisplayKeySet() {
-		return _uadEntityDisplayServiceTrackerMap.keySet();
+	public Set<String> getUADDisplayKeySet() {
+		return _uadDisplayServiceTrackerMap.keySet();
 	}
 
-	public Collection<UADEntityDisplay> getUADEntityDisplays() {
-		return _uadEntityDisplayServiceTrackerMap.values();
+	public Collection<UADDisplay> getUADDisplays() {
+		return _uadDisplayServiceTrackerMap.values();
 	}
 
-	public Stream<UADEntityDisplay> getUADEntityDisplayStream() {
-		return getUADEntityDisplays().stream();
+	public Stream<UADDisplay> getUADDisplayStream() {
+		return getUADDisplays().stream();
 	}
 
-	public UADEntityExporter getUADEntityExporter(String key) {
-		return _uadEntityExporterServiceTrackerMap.getService(key);
+	public UADExporter getUADExporter(String key) {
+		return _uadExporterServiceTrackerMap.getService(key);
 	}
 
-	public Set<String> getUADEntityExporterKeySet() {
-		return _uadEntityExporterServiceTrackerMap.keySet();
+	public Set<String> getUADExporterKeySet() {
+		return _uadExporterServiceTrackerMap.keySet();
 	}
 
-	public Collection<UADEntityExporter> getUADEntityExporters() {
-		return _uadEntityExporterServiceTrackerMap.values();
+	public Collection<UADExporter> getUADExporters() {
+		return _uadExporterServiceTrackerMap.values();
 	}
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_uadAggregatorServiceTrackerMap =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, UADAggregator.class, "model.class.name");
 		_uadAnonymizerServiceTrackerMap =
 			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext, UADAnonymizer.class, "model.class.name");
-		_uadEntityDisplayServiceTrackerMap =
+		_uadDisplayServiceTrackerMap =
 			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, UADEntityDisplay.class, "model.class.name");
-		_uadEntityExporterServiceTrackerMap =
+				bundleContext, UADDisplay.class, "model.class.name");
+		_uadExporterServiceTrackerMap =
 			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, UADEntityExporter.class, "model.class.name");
+				bundleContext, UADExporter.class, "model.class.name");
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_uadAggregatorServiceTrackerMap.close();
 		_uadAnonymizerServiceTrackerMap.close();
-		_uadEntityDisplayServiceTrackerMap.close();
-		_uadEntityExporterServiceTrackerMap.close();
+		_uadDisplayServiceTrackerMap.close();
+		_uadExporterServiceTrackerMap.close();
 	}
 
-	private ServiceTrackerMap<String, UADAggregator>
-		_uadAggregatorServiceTrackerMap;
 	private ServiceTrackerMap<String, UADAnonymizer>
 		_uadAnonymizerServiceTrackerMap;
-	private ServiceTrackerMap<String, UADEntityDisplay>
-		_uadEntityDisplayServiceTrackerMap;
-	private ServiceTrackerMap<String, UADEntityExporter>
-		_uadEntityExporterServiceTrackerMap;
+	private ServiceTrackerMap<String, UADDisplay> _uadDisplayServiceTrackerMap;
+	private ServiceTrackerMap<String, UADExporter>
+		_uadExporterServiceTrackerMap;
 
 }

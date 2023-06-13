@@ -66,7 +66,7 @@ import java.rmi.RemoteException;
 @ProviderType
 public class LayoutPageTemplateCollectionServiceSoap {
 	public static com.liferay.layout.page.template.model.LayoutPageTemplateCollectionSoap addLayoutPageTemplateCollection(
-		long groupId, java.lang.String name, java.lang.String description,
+		long groupId, String name, String description,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
@@ -125,45 +125,11 @@ public class LayoutPageTemplateCollectionServiceSoap {
 		}
 	}
 
-	public static com.liferay.layout.page.template.model.LayoutPageTemplateCollectionSoap[] getBasicLayoutPageTemplateCollections(
-		long groupId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.layout.page.template.model.LayoutPageTemplateCollection> orderByComparator)
-		throws RemoteException {
-		try {
-			java.util.List<com.liferay.layout.page.template.model.LayoutPageTemplateCollection> returnValue =
-				LayoutPageTemplateCollectionServiceUtil.getBasicLayoutPageTemplateCollections(groupId,
-					start, end, orderByComparator);
-
-			return com.liferay.layout.page.template.model.LayoutPageTemplateCollectionSoap.toSoapModels(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
 	public static com.liferay.layout.page.template.model.LayoutPageTemplateCollectionSoap[] getLayoutPageTemplateCollections(
 		long groupId) throws RemoteException {
 		try {
 			java.util.List<com.liferay.layout.page.template.model.LayoutPageTemplateCollection> returnValue =
 				LayoutPageTemplateCollectionServiceUtil.getLayoutPageTemplateCollections(groupId);
-
-			return com.liferay.layout.page.template.model.LayoutPageTemplateCollectionSoap.toSoapModels(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	public static com.liferay.layout.page.template.model.LayoutPageTemplateCollectionSoap[] getLayoutPageTemplateCollections(
-		long groupId, int type) throws RemoteException {
-		try {
-			java.util.List<com.liferay.layout.page.template.model.LayoutPageTemplateCollection> returnValue =
-				LayoutPageTemplateCollectionServiceUtil.getLayoutPageTemplateCollections(groupId,
-					type);
 
 			return com.liferay.layout.page.template.model.LayoutPageTemplateCollectionSoap.toSoapModels(returnValue);
 		}
@@ -209,7 +175,7 @@ public class LayoutPageTemplateCollectionServiceSoap {
 	}
 
 	public static com.liferay.layout.page.template.model.LayoutPageTemplateCollectionSoap[] getLayoutPageTemplateCollections(
-		long groupId, java.lang.String name, int start, int end,
+		long groupId, String name, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.layout.page.template.model.LayoutPageTemplateCollection> orderByComparator)
 		throws RemoteException {
 		try {
@@ -241,7 +207,7 @@ public class LayoutPageTemplateCollectionServiceSoap {
 	}
 
 	public static int getLayoutPageTemplateCollectionsCount(long groupId,
-		java.lang.String name) throws RemoteException {
+		String name) throws RemoteException {
 		try {
 			int returnValue = LayoutPageTemplateCollectionServiceUtil.getLayoutPageTemplateCollectionsCount(groupId,
 					name);
@@ -256,8 +222,8 @@ public class LayoutPageTemplateCollectionServiceSoap {
 	}
 
 	public static com.liferay.layout.page.template.model.LayoutPageTemplateCollectionSoap updateLayoutPageTemplateCollection(
-		long layoutPageTemplateCollectionId, java.lang.String name,
-		java.lang.String description) throws RemoteException {
+		long layoutPageTemplateCollectionId, String name, String description)
+		throws RemoteException {
 		try {
 			com.liferay.layout.page.template.model.LayoutPageTemplateCollection returnValue =
 				LayoutPageTemplateCollectionServiceUtil.updateLayoutPageTemplateCollection(layoutPageTemplateCollectionId,

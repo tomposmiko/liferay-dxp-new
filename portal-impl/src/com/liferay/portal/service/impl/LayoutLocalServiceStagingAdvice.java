@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.service.SystemEventLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.service.persistence.LayoutRevisionUtil;
 import com.liferay.portal.kernel.service.persistence.LayoutUtil;
+import com.liferay.portal.kernel.spring.aop.AdvisedSupport;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntry;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntryThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -64,8 +65,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.aop.TargetSource;
-import org.springframework.aop.framework.AdvisedSupport;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -86,14 +85,12 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		AdvisedSupport advisedSupport = ServiceBeanAopProxy.getAdvisedSupport(
 			_beanFactory.getBean(LayoutLocalService.class.getName()));
 
-		TargetSource targetSource = advisedSupport.getTargetSource();
-
 		advisedSupport.setTarget(
 			ProxyUtil.newProxyInstance(
 				LayoutLocalServiceStagingAdvice.class.getClassLoader(),
 				new Class<?>[] {LayoutLocalService.class},
 				new LayoutLocalServiceStagingInvocationHandler(
-					targetSource.getTarget())));
+					this, advisedSupport.getTarget())));
 
 		layoutLocalServiceHelper =
 			(LayoutLocalServiceHelper)_beanFactory.getBean(
@@ -704,7 +701,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 			}
 			else {
 				try {
-					Class<?> clazz = getClass();
+					Class<?> clazz = LayoutLocalServiceStagingAdvice.class;
 
 					parameterTypes = ArrayUtil.append(
 						new Class<?>[] {LayoutLocalService.class},
@@ -717,7 +714,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 						new Object[] {_targetObject}, arguments);
 
 					returnValue = layoutLocalServiceStagingAdviceMethod.invoke(
-						this, arguments);
+						_layoutLocalServiceStagingAdvice, arguments);
 				}
 				catch (InvocationTargetException ite) {
 					throw ite.getTargetException();
@@ -733,8 +730,10 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		}
 
 		private LayoutLocalServiceStagingInvocationHandler(
+			LayoutLocalServiceStagingAdvice layoutLocalServiceStagingAdvice,
 			Object targetObject) {
 
+			_layoutLocalServiceStagingAdvice = layoutLocalServiceStagingAdvice;
 			_targetObject = targetObject;
 		}
 
@@ -749,6 +748,8 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 			}
 		}
 
+		private final LayoutLocalServiceStagingAdvice
+			_layoutLocalServiceStagingAdvice;
 		private final Object _targetObject;
 
 	}

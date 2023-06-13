@@ -56,18 +56,7 @@ public class LayoutPageTemplateCollectionLocalServiceUtil {
 	}
 
 	public static com.liferay.layout.page.template.model.LayoutPageTemplateCollection addLayoutPageTemplateCollection(
-		long userId, long groupId, java.lang.String name,
-		java.lang.String description, int type,
-		com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .addLayoutPageTemplateCollection(userId, groupId, name,
-			description, type, serviceContext);
-	}
-
-	public static com.liferay.layout.page.template.model.LayoutPageTemplateCollection addLayoutPageTemplateCollection(
-		long userId, long groupId, java.lang.String name,
-		java.lang.String description,
+		long userId, long groupId, String name, String description,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
@@ -262,7 +251,7 @@ public class LayoutPageTemplateCollectionLocalServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.layout.page.template.model.LayoutPageTemplateCollection> getLayoutPageTemplateCollections(
-		long groupId, java.lang.String name, int start, int end,
+		long groupId, String name, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.layout.page.template.model.LayoutPageTemplateCollection> orderByComparator) {
 		return getService()
 				   .getLayoutPageTemplateCollections(groupId, name, start, end,
@@ -283,7 +272,7 @@ public class LayoutPageTemplateCollectionLocalServiceUtil {
 	*
 	* @return the OSGi service identifier
 	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
+	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 
@@ -306,8 +295,7 @@ public class LayoutPageTemplateCollectionLocalServiceUtil {
 	}
 
 	public static com.liferay.layout.page.template.model.LayoutPageTemplateCollection updateLayoutPageTemplateCollection(
-		long layoutPageTemplateCollectionId, java.lang.String name,
-		java.lang.String description)
+		long layoutPageTemplateCollectionId, String name, String description)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .updateLayoutPageTemplateCollection(layoutPageTemplateCollectionId,

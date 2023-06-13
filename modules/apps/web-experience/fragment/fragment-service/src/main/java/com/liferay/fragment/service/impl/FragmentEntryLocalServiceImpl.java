@@ -25,6 +25,7 @@ import com.liferay.html.preview.model.HtmlPreviewEntry;
 import com.liferay.html.preview.service.HtmlPreviewEntryLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -364,6 +365,14 @@ public class FragmentEntryLocalServiceImpl
 		if (Validator.isNull(name)) {
 			throw new FragmentEntryNameException("Name must not be null");
 		}
+
+		int nameMaxLength = ModelHintsUtil.getMaxLength(
+			FragmentEntry.class.getName(), "name");
+
+		if (name.length() > nameMaxLength) {
+			throw new FragmentEntryNameException(
+				"Maximum length of name exceeded");
+		}
 	}
 
 	protected void validateContent(String html) throws PortalException {
@@ -411,7 +420,7 @@ public class FragmentEntryLocalServiceImpl
 	private String _parseHTMLContent(String html)
 		throws FragmentEntryContentException {
 
-		Document document = Jsoup.parse(html);
+		Document document = Jsoup.parseBodyFragment(html);
 
 		Document.OutputSettings outputSettings = new Document.OutputSettings();
 
