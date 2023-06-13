@@ -44,7 +44,7 @@
 	</tear-down>
 
 	<command name="AddNavigationMenuEntriesAllTypes" priority="5">
-		<property name="portal.acceptance" value="pending" />
+		<property name="portal.acceptance" value="true" />
 
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
@@ -319,12 +319,15 @@
 			<var name="itemName" value="Liferay" />
 		</execute>
 
-		<execute macro="Navigator#gotoSitePage">
-			<var name="pageName" value="Liferay" />
+		<execute macro="Navigator#openSiteURL">
 			<var name="siteName" value="Test Site Name" />
 		</execute>
 
-		<execute function="AssertLocation" value1="https://liferay.com" />
+		<execute function="AssertClick" locator1="Home#PAGE" value1="Liferay">
+			<var name="key_pageName" value="Liferay" />
+		</execute>
+
+		<execute function="AssertLocation" value1="https://www.liferay.com/" />
 	</command>
 
 	<command name="ConfigurePrimaryNavigationMenu" priority="4">
@@ -387,7 +390,7 @@
 	</command>
 
 	<command name="DeleteNavigationMenu" priority="5">
-		<property name="portal.acceptance" value="pending" />
+		<property name="portal.acceptance" value="true" />
 
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
@@ -407,7 +410,7 @@
 
 	<command name="EditNavigationMenuPageItemName" priority="5">
 		<description message="This is a usecase for LPS-76658" />
-		<property name="portal.acceptance" value="pending" />
+		<property name="portal.acceptance" value="true" />
 
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
@@ -472,7 +475,7 @@
 			<var name="name" value="Primary Menu Name 1 Edit" />
 		</execute>
 
-		<execute macro="Modal#submit" />
+		<execute macro="Modal#save" />
 
 		<execute macro="LexiconEntry#viewEntryName">
 			<var name="rowEntry" value="Primary Menu Name 1 Edit" />

@@ -285,7 +285,7 @@
 	</command>
 
 	<command name="SitesPrivatePagesPermissions" priority="5">
-		<property name="portal.acceptance" value="pending" />
+		<property name="portal.acceptance" value="false" />
 		<property name="test.name.skip.portal.instance" value="SitepagesUsecase#SitesPrivatePagesPermissions" />
 		<property name="testray.component.names" value="Permissions,Roles,Site Pages Administration,Training" />
 
@@ -376,12 +376,9 @@
 			<var name="portlet" value="Pages" />
 		</execute>
 
-		<execute macro="SitePages#togglePrivacy">
-			<var name="privacy" value="Private" />
-		</execute>
-
 		<execute macro="PermissionsInline#gotoSitepageCP">
 			<var name="pageName" value="Site Page" />
+			<var name="privacy" value="Private" />
 		</execute>
 
 		<execute macro="Role#removePermissionPG">
@@ -429,12 +426,9 @@
 			<var name="portlet" value="Pages" />
 		</execute>
 
-		<execute macro="SitePages#togglePrivacy">
-			<var name="privacy" value="Private" />
-		</execute>
-
 		<execute macro="PermissionsInline#gotoSitepageCP">
 			<var name="pageName" value="Site Page" />
+			<var name="privacy" value="Private" />
 		</execute>
 
 		<execute macro="Role#removePermissionPG">

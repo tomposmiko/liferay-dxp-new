@@ -24,7 +24,7 @@
 			<var name="portlet" value="Page Fragments" />
 		</execute>
 
-		<execute macro="Collection#addCollection">
+		<execute macro="Fragment#addCollection">
 			<var name="collectionDescription" value="Collection Description" />
 			<var name="collectionName" value="Collection Name" />
 		</execute>
@@ -77,7 +77,7 @@
 			<var name="navItem" value="Page Templates" />
 		</execute>
 
-		<execute macro="Collection#addCollection">
+		<execute macro="LayoutPageTemplates#addCollection">
 			<var name="collectionName" value="Page Template Collection" />
 		</execute>
 
@@ -103,6 +103,78 @@
 		<execute macro="LayoutPageTemplates#viewAutoSaveMessage" />
 
 		<execute macro="LayoutPageTemplates#viewEditorEmpty" />
+	</command>
+
+	<command name="AddPageTemplateWithWidgetInFragment" priority="4">
+		<execute macro="Navigator#gotoNavNested">
+			<var name="navNested" value="Collection Name" />
+		</execute>
+
+		<execute macro="Fragment#addFragment">
+			<var name="fragmentName" value="Fragment Name" />
+		</execute>
+
+		<execute macro="TestCase#getFileContent">
+			<return from="fileContent" name="htmlSnippet" />
+			<var name="fileName" value="Navigation_Menu_Portlet.html" />
+		</execute>
+
+		<execute macro="Fragment#typeFragmentEditor">
+			<var name="editor" value="html" />
+			<var name="templateScript" value="${htmlSnippet}" />
+		</execute>
+
+		<execute macro="PortletEntry#publish" />
+
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Build" />
+			<var name="panel" value="Site Administration" />
+			<var name="portlet" value="Pages" />
+		</execute>
+
+		<execute macro="SitePages#addPublicPage">
+			<var name="pageName" value="Test Page" />
+		</execute>
+
+		<execute macro="Navigator#gotoNavItem">
+			<var name="navItem" value="Page Templates" />
+		</execute>
+
+		<execute macro="LayoutPageTemplates#addCollection">
+			<var name="collectionName" value="Page Template Collection" />
+		</execute>
+
+		<execute macro="Navigator#gotoNavNested">
+			<var name="navNested" value="Page Template Collection" />
+		</execute>
+
+		<execute macro="LayoutPageTemplates#add">
+			<var name="pageTemplateName" value="Page Template Name" />
+		</execute>
+
+		<execute macro="LayoutPageTemplates#selectFragment">
+			<var name="collectionName" value="Collection Name" />
+			<var name="fragmentName" value="Fragment Name" />
+		</execute>
+
+		<execute macro="LayoutPageTemplates#viewNavigationPortlet">
+			<var name="fragmentName" value="Fragment Name" />
+		</execute>
+
+		<execute macro="LayoutPageTemplates#gotoPortletConfiguration">
+			<var name="fragmentName" value="Fragment Name" />
+		</execute>
+
+		<execute macro="NavigationMenu#selectAndSaveConfiguration">
+			<var name="displayTemplate" value="Tabs" />
+		</execute>
+
+		<execute function="Refresh" />
+
+		<execute macro="LayoutPageTemplates#viewNavigationPortlet">
+			<var name="displayTemplateClass" value="nav-tabs" />
+			<var name="fragmentName" value="Fragment Name" />
+		</execute>
 	</command>
 
 	<command ignore="true" name="ChangeEditableImage" priority="5">
@@ -146,7 +218,7 @@
 			<var name="navItem" value="Page Templates" />
 		</execute>
 
-		<execute macro="Collection#addCollection">
+		<execute macro="LayoutPageTemplates#addCollection">
 			<var name="collectionName" value="Page Template Collection" />
 		</execute>
 
@@ -200,7 +272,7 @@
 			<var name="navItem" value="Page Templates" />
 		</execute>
 
-		<execute macro="Collection#addCollection">
+		<execute macro="LayoutPageTemplates#addCollection">
 			<var name="collectionName" value="Page Template Collection" />
 		</execute>
 
@@ -228,9 +300,7 @@
 		</execute>
 	</command>
 
-	<command name="DeleteCollection" priority="5">
-		<property name="portal.acceptance" value="true" />
-
+	<command name="DeleteCollection" priority="4">
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
 			<var name="panel" value="Site Administration" />
@@ -241,7 +311,7 @@
 			<var name="navItem" value="Page Templates" />
 		</execute>
 
-		<execute macro="Collection#addCollection">
+		<execute macro="LayoutPageTemplates#addCollection">
 			<var name="collectionName" value="Collection Name" />
 		</execute>
 
@@ -267,7 +337,7 @@
 			<var name="navItem" value="Page Templates" />
 		</execute>
 
-		<execute macro="Collection#addCollection">
+		<execute macro="LayoutPageTemplates#addCollection">
 			<var name="collectionName" value="Page Template Collection" />
 		</execute>
 
@@ -313,7 +383,7 @@
 			<var name="navItem" value="Page Templates" />
 		</execute>
 
-		<execute macro="Collection#addCollection">
+		<execute macro="LayoutPageTemplates#addCollection">
 			<var name="collectionDescription" value="Collection Description Original" />
 			<var name="collectionName" value="Collection Name Original" />
 		</execute>
@@ -340,7 +410,7 @@
 			<var name="navItem" value="Page Templates" />
 		</execute>
 
-		<execute macro="Collection#addCollection">
+		<execute macro="LayoutPageTemplates#addCollection">
 			<var name="collectionName" value="Page Template Collection" />
 		</execute>
 
@@ -445,7 +515,7 @@
 			<var name="navItem" value="Page Templates" />
 		</execute>
 
-		<execute macro="Collection#addCollection">
+		<execute macro="LayoutPageTemplates#addCollection">
 			<var name="collectionName" value="Page Template Collection" />
 		</execute>
 
@@ -469,12 +539,12 @@
 
 		<execute macro="LayoutPageTemplates#viewFragmentOrder">
 			<var name="fragmentName" value="Fragment 1" />
-			<var name="position" value="1" />
+			<var name="position" value="0" />
 		</execute>
 
 		<execute macro="LayoutPageTemplates#viewFragmentOrder">
 			<var name="fragmentName" value="Fragment 2" />
-			<var name="position" value="2" />
+			<var name="position" value="1" />
 		</execute>
 
 		<execute macro="LayoutPageTemplates#moveFragment">
@@ -484,12 +554,12 @@
 
 		<execute macro="LayoutPageTemplates#viewFragmentOrder">
 			<var name="fragmentName" value="Fragment 1" />
-			<var name="position" value="2" />
+			<var name="position" value="1" />
 		</execute>
 
 		<execute macro="LayoutPageTemplates#viewFragmentOrder">
 			<var name="fragmentName" value="Fragment 2" />
-			<var name="position" value="1" />
+			<var name="position" value="0" />
 		</execute>
 
 		<execute macro="LayoutPageTemplates#moveFragment">
@@ -499,12 +569,12 @@
 
 		<execute macro="LayoutPageTemplates#viewFragmentOrder">
 			<var name="fragmentName" value="Fragment 1" />
-			<var name="position" value="1" />
+			<var name="position" value="0" />
 		</execute>
 
 		<execute macro="LayoutPageTemplates#viewFragmentOrder">
 			<var name="fragmentName" value="Fragment 2" />
-			<var name="position" value="2" />
+			<var name="position" value="1" />
 		</execute>
 	</command>
 
@@ -527,7 +597,7 @@
 			<var name="navItem" value="Page Templates" />
 		</execute>
 
-		<execute macro="Collection#addCollection">
+		<execute macro="LayoutPageTemplates#addCollection">
 			<var name="collectionName" value="Page Template Collection" />
 		</execute>
 

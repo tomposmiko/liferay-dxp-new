@@ -16,7 +16,8 @@
 		}
 	},
 	"dependencies": {
-		"clay": "2.0.2",
+		"clay": "2.1.6",
+		"clay-alert": "2.1.6",
 		"jquery": "^3.3.1",
 		"liferay-amd-loader": "3.1.1",
 		"lodash": "4.17.4",
@@ -24,7 +25,7 @@
 		"metal-anim": "^2.0.0",
 		"metal-component": "^2.5.13",
 		"metal-dom": "^2.5.13",
-		"metal-drag-drop": "^3.1.0",
+		"metal-drag-drop": "^3.0.1",
 		"metal-events": "^2.5.16",
 		"metal-keyboard-focus": "^2.0.1",
 		"metal-position": "^2.1.1",
@@ -39,8 +40,8 @@
 		"check-source-formatting": "^2.0.4",
 		"jest": "^20.0.4",
 		"liferay-jest-junit-reporter": "0.0.3",
-		"liferay-npm-bridge-generator": "2.0.0-rc.2",
-		"liferay-npm-bundler": "2.0.0-rc.2",
+		"liferay-npm-bridge-generator": "2.0.0-rc.3",
+		"liferay-npm-bundler": "2.0.0-rc.3",
 		"metal-tools-soy": "^4.2.1",
 		"webpack": "^4.6.0",
 		"webpack-cli": "^2.0.15",
@@ -65,7 +66,7 @@
 	},
 	"name": "frontend-js-web",
 	"scripts": {
-		"build": "metalsoy && babel -d classes/META-INF/resources src/main/resources/META-INF/resources && liferay-npm-bundler && liferay-npm-bridge-generator -i classes/META-INF/resources -o classes/META-INF/resources/bridge/frontend-js-web -g 'liferay/**/*.js' -d '(.*)\\.js$:bridge/frontend-js-web/$1' -s '(.*)\\.js$:frontend-js-web/$1'",
+		"build": "metalsoy && babel -d classes/META-INF/resources src/main/resources/META-INF/resources && liferay-npm-bundler && liferay-npm-bridge-generator",
 		"checkFormat": "npm run csf",
 		"csf": "csf src/**/liferay/**/*.js test/**/*.js",
 		"format": "npm run csf -- -i",

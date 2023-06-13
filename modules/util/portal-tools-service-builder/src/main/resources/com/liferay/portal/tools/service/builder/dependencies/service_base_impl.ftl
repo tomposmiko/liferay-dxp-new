@@ -433,6 +433,23 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			</#if>
 		</#if>
 
+		<#if entity.hasExternalReferenceCode() && entity.hasEntityColumn("companyId")>
+			/**
+			 * Returns the ${entity.humanName} with the matching external reference code and company.
+			 *
+			 * @param companyId the primary key of the company
+			 * @param externalReferenceCode the ${entity.humanName}'s external reference code
+			 * @return the matching ${entity.humanName}, or <code>null</code> if a matching ${entity.humanName} could not be found
+			<#list serviceBaseExceptions as exception>
+			 * @throws ${exception}
+			</#list>
+			 */
+			@Override
+			public ${entity.name} fetch${entity.name}ByReferenceCode(long companyId, String externalReferenceCode) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
+				return ${entity.varName}Persistence.fetchByC_ERC(companyId, null);
+			}
+		</#if>
+
 		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "get" + entity.name, [entity.PKClassName], ["PortalException"]) />
 
 		/**

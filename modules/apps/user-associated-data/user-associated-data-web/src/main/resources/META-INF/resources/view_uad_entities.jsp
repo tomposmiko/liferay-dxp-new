@@ -21,7 +21,7 @@ ViewUADEntitiesDisplay viewUADEntitiesDisplay = (ViewUADEntitiesDisplay)request.
 
 SearchContainer<UADEntity> uadEntitySearchContainer = viewUADEntitiesDisplay.getSearchContainer();
 
-ViewUADEntitiesManagementToolbarDisplayContext viewUADEntitiesManagementToolbarDisplayContext = new ViewUADEntitiesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, uadEntitySearchContainer);
+ViewUADEntitiesManagementToolbarDisplayContext viewUADEntitiesManagementToolbarDisplayContext = new ViewUADEntitiesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, uadEntitySearchContainer);
 
 portletDisplay.setShowBackIcon(true);
 
@@ -41,13 +41,13 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 
 <clay:management-toolbar
 	actionDropdownItems="<%= viewUADEntitiesManagementToolbarDisplayContext.getActionDropdownItems() %>"
-	disabled="<%= viewUADEntitiesManagementToolbarDisplayContext.getDisabled() %>"
+	disabled="<%= viewUADEntitiesManagementToolbarDisplayContext.isDisabled() %>"
 	infoPanelId="<%= viewUADEntitiesManagementToolbarDisplayContext.getInfoPanelId() %>"
 	itemsTotal="<%= viewUADEntitiesManagementToolbarDisplayContext.getItemsTotal() %>"
 	searchContainerId="<%= viewUADEntitiesManagementToolbarDisplayContext.getSearchContainerId() %>"
-	selectable="<%= viewUADEntitiesManagementToolbarDisplayContext.getSelectable() %>"
-	showInfoButton="<%= viewUADEntitiesManagementToolbarDisplayContext.getShowInfoButton() %>"
-	showSearch="<%= viewUADEntitiesManagementToolbarDisplayContext.getShowSearch() %>"
+	selectable="<%= viewUADEntitiesManagementToolbarDisplayContext.isSelectable() %>"
+	showInfoButton="<%= viewUADEntitiesManagementToolbarDisplayContext.isShowInfoButton() %>"
+	showSearch="<%= viewUADEntitiesManagementToolbarDisplayContext.isShowSearch() %>"
 />
 
 <aui:form method="post" name="viewUADEntitiesFm">
@@ -125,9 +125,18 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 	}
 
 	function <portlet:namespace/>doMultiple(actionURL, message) {
-		var form = document.forms.<portlet:namespace />viewUADEntitiesFm;
+		var form = document.getElementById('<portlet:namespace />viewUADEntitiesFm');
 
-		form.elements.<portlet:namespace />primaryKeys.value = Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds');
+		if (form) {
+			var primaryKeys = form.querySelector('#<portlet:namespace />primaryKeys');
+
+			if (primaryKeys) {
+				primaryKeys.setAttribute(
+					'value',
+					Liferay.Util.listCheckedExcept(form, '<portlet:namespace />allRowIds')
+				);
+			}
+		}
 
 		<portlet:namespace />confirmAction('viewUADEntitiesFm', actionURL, message);
 	}
