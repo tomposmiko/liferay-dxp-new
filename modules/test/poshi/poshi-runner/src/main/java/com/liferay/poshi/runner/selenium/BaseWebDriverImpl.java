@@ -360,14 +360,10 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 			results = axeBuilder.analyze(webDriver);
 		}
 
-		List<Rule> rules = new ArrayList<>();
+		List<Rule> violations = results.getViolations();
 
-		if (results != null) {
-			rules.addAll(results.getViolations());
-		}
-
-		if (!rules.isEmpty()) {
-			AxeReporter.getReadableAxeResults("analyze", webDriver, rules);
+		if (!violations.isEmpty()) {
+			AxeReporter.getReadableAxeResults("analyze", webDriver, violations);
 
 			throw new Exception(AxeReporter.getAxeResultString());
 		}
@@ -2973,34 +2969,6 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		Alert alert = getAlert();
 
 		alert.sendKeys(value);
-	}
-
-	@Override
-	public void typeAlloyEditor(String locator, String value) {
-		JavascriptExecutor javascriptExecutor =
-			(JavascriptExecutor)getWrappedWebDriver(locator);
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("CKEDITOR.instances[\"");
-
-		String titleAttribute = getAttribute(locator + "@title");
-
-		int x = titleAttribute.indexOf(",");
-
-		int y = titleAttribute.indexOf(",", x + 1);
-
-		if (y == -1) {
-			y = titleAttribute.length();
-		}
-
-		sb.append(titleAttribute.substring(x + 2, y));
-
-		sb.append("\"].setData(\"");
-		sb.append(HtmlUtil.escapeJS(StringUtil.replace(value, "\\", "\\\\")));
-		sb.append("\");");
-
-		javascriptExecutor.executeScript(sb.toString());
 	}
 
 	@Override

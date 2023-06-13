@@ -119,6 +119,18 @@ public class AccountEntryUserRelServiceWrapper
 	}
 
 	@Override
+	public void inviteUser(
+			long accountEntryId, long[] accountRoleIds, String emailAddress,
+			com.liferay.portal.kernel.model.User inviter,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_accountEntryUserRelService.inviteUser(
+			accountEntryId, accountRoleIds, emailAddress, inviter,
+			serviceContext);
+	}
+
+	@Override
 	public void setPersonTypeAccountEntryUser(long accountEntryId, long userId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 

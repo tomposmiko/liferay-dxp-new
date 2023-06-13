@@ -14,7 +14,7 @@
 
 import ClayButton from '@clayui/button';
 import ClayDropDown, {Align} from '@clayui/drop-down';
-import React, {useState} from 'react';
+import React from 'react';
 
 import SearchForm from '../../../common/components/SearchForm';
 
@@ -24,8 +24,6 @@ export default function ContentFilter({
 	onChangeSelect,
 	selectedType,
 }) {
-	const [active, setActive] = useState(false);
-
 	return (
 		<div className="flex-shrink-0 page-editor__page-contents__content-filter px-3">
 			<p className="mb-4 page-editor__page-contents__content-filter__help">
@@ -33,18 +31,20 @@ export default function ContentFilter({
 			</p>
 
 			<ClayDropDown
-				active={active}
 				alignmentPosition={Align.BottomLeft}
 				className="mb-2"
+				closeOnClick
 				menuElementAttrs={{
 					containerProps: {
 						className: 'cadmin',
 					},
 				}}
-				onActiveChange={setActive}
 				role="listbox"
 				trigger={
 					<ClayButton
+						aria-label={Liferay.Language.get(
+							'filter-by-content-type'
+						)}
 						className="form-control form-control-select form-control-sm text-left"
 						displayType="unstyled"
 						small
@@ -58,10 +58,7 @@ export default function ContentFilter({
 					{contentTypes?.map((type) => (
 						<React.Fragment key={type}>
 							<ClayDropDown.Item
-								onClick={() => {
-									onChangeSelect(type);
-									setActive(false);
-								}}
+								onClick={() => onChangeSelect(type)}
 								symbolRight={
 									selectedType === type ? 'check' : undefined
 								}
@@ -73,7 +70,11 @@ export default function ContentFilter({
 				</ClayDropDown.ItemList>
 			</ClayDropDown>
 
-			<SearchForm className="mb-3" onChange={onChangeInput} />
+			<SearchForm
+				className="mb-3"
+				label={Liferay.Language.get('search-content')}
+				onChange={onChangeInput}
+			/>
 		</div>
 	);
 }

@@ -100,6 +100,19 @@ definition {
 			value1 = "${key_filter}");
 	}
 
+	macro resetFilter {
+		if (!(isSet(reset_filter))) {
+			ClickNoError(
+				locator1 = "FrontendDataSet#RESET_FILTERS",
+				reset_filter = "Reset Filters");
+		}
+		else {
+			ClickNoError(
+				locator1 = "FrontendDataSet#RESET_FILTERS",
+				reset_filter = "${reset_filter}");
+		}
+	}
+
 	macro searchFilter {
 		VerifyElementPresent(locator1 = "ObjectPortlet#COLUMN_SEARCH_FIELD");
 

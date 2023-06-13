@@ -15,6 +15,7 @@
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
+import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectAction;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
@@ -61,6 +62,7 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
@@ -220,6 +222,8 @@ public class ObjectDefinitionResourceImpl
 			throw new ObjectDefinitionStorageTypeException();
 		}
 
+		_addListTypeDefinition(objectDefinition);
+
 		com.liferay.object.model.ObjectDefinition
 			serviceBuilderObjectDefinition =
 				_objectDefinitionService.addCustomObjectDefinition(
@@ -295,6 +299,10 @@ public class ObjectDefinitionResourceImpl
 				_objectDefinitionService.getObjectDefinition(
 					objectDefinitionId);
 
+		if (!serviceBuilderObjectDefinition.isApproved()) {
+			_addListTypeDefinition(objectDefinition);
+		}
+
 		long titleObjectFieldId = 0;
 
 		com.liferay.object.model.ObjectField titleServiceBuilderObjectField =
@@ -322,9 +330,11 @@ public class ObjectDefinitionResourceImpl
 				GetterUtil.getBoolean(
 					objectDefinition.getAccountEntryRestricted()),
 				GetterUtil.getBoolean(objectDefinition.getActive(), true),
-				objectDefinition.getEnableCategorization(),
-				objectDefinition.getEnableComments(),
-				objectDefinition.getEnableObjectEntryHistory(),
+				GetterUtil.getBoolean(
+					objectDefinition.getEnableCategorization(), true),
+				GetterUtil.getBoolean(objectDefinition.getEnableComments()),
+				GetterUtil.getBoolean(
+					objectDefinition.getEnableObjectEntryHistory()),
 				LocalizedMapUtil.getLocalizedMap(objectDefinition.getLabel()),
 				objectDefinition.getName(), objectDefinition.getPanelAppOrder(),
 				objectDefinition.getPanelCategoryKey(),
@@ -339,14 +349,16 @@ public class ObjectDefinitionResourceImpl
 
 		for (ObjectField objectField : objectDefinition.getObjectFields()) {
 			_objectFieldLocalService.updateObjectField(
-				objectField.getExternalReferenceCode(), contextUser.getUserId(),
-				objectDefinitionId, GetterUtil.getLong(objectField.getId()),
+				objectField.getExternalReferenceCode(),
+				GetterUtil.getLong(objectField.getId()),
+				contextUser.getUserId(),
 				ObjectFieldUtil.getListTypeDefinitionId(
 					serviceBuilderObjectDefinition.getCompanyId(),
 					_listTypeDefinitionLocalService, objectField),
-				objectField.getBusinessTypeAsString(), null, null,
-				objectField.getDBTypeAsString(), objectField.getDefaultValue(),
-				objectField.getIndexed(), objectField.getIndexedAsKeyword(),
+				objectDefinitionId, objectField.getBusinessTypeAsString(), null,
+				null, objectField.getDBTypeAsString(),
+				objectField.getDefaultValue(), objectField.getIndexed(),
+				objectField.getIndexedAsKeyword(),
 				objectField.getIndexedLanguageId(),
 				com.liferay.portal.vulcan.util.LocalizedMapUtil.getLocalizedMap(
 					objectField.getLabel()),
@@ -434,6 +446,26 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		return postObjectDefinition(objectDefinition);
+	}
+
+	private void _addListTypeDefinition(ObjectDefinition objectDefinition)
+		throws Exception {
+
+		if (objectDefinition.getObjectFields() == null) {
+			return;
+		}
+
+		for (ObjectField objectField : objectDefinition.getObjectFields()) {
+			if (StringUtil.equals(
+					objectField.getBusinessTypeAsString(),
+					ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+
+				ObjectFieldUtil.addListTypeDefinition(
+					contextUser.getCompanyId(), _listTypeDefinitionLocalService,
+					_listTypeEntryLocalService, objectField,
+					contextUser.getUserId());
+			}
+		}
 	}
 
 	private void _addObjectDefinitionResources(
@@ -702,6 +734,9 @@ public class ObjectDefinitionResourceImpl
 
 	@Reference
 	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
+
+	@Reference
+	private ListTypeEntryLocalService _listTypeEntryLocalService;
 
 	@Reference
 	private ObjectActionLocalService _objectActionLocalService;

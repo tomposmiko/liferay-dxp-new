@@ -71,6 +71,7 @@ export default function useSubmitLXCEnvironment(
 			const {data} = await createLiferayExperienceCloudEnvironment({
 				variables: {
 					LiferayExperienceCloudEnvironment: {
+						accountEntryId: project.id,
 						accountKey: project.accountKey,
 						incidentManagementEmailAddress:
 							lxcActivationFields.incidentManagementEmail,
@@ -84,15 +85,16 @@ export default function useSubmitLXCEnvironment(
 
 			if (data) {
 				const liferayExperienceCloudEnvironmentId =
-					data.c?.createLiferayExperienceCloudEnvironment
-						?.liferayExperienceCloudEnvironmentId;
+					data.createLiferayExperienceCloudEnvironment?.id;
 
 				await updateAccountSubscriptionGroupsInfo({
 					context: {
 						displaySuccess: false,
+						type: 'liferay-rest',
 					},
 					variables: {
 						accountSubscriptionGroup: {
+							accountEntryId: project.id,
 							accountKey: project.accountKey,
 							activationStatus: STATUS_TAG_TYPE_NAMES.inProgress,
 							manageContactsURL: `http://${liferayExperienceCloudEnvironmentId}.lxc.liferay.com`,
@@ -105,11 +107,9 @@ export default function useSubmitLXCEnvironment(
 					lxcActivationFields?.admins?.map(
 						({email, fullName, github}) => {
 							return createAdminLiferayExperienceCloud({
-								context: {
-									displaySuccess: false,
-								},
 								variables: {
 									AdminLiferayExperienceCloud: {
+										accountEntryId: project.id,
 										emailAddress: email,
 										fullName,
 										githubUsername: github,

@@ -48,9 +48,11 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Alessio Antonio Rendina
@@ -64,8 +66,14 @@ public class AttachmentUtil {
 		throws Exception {
 
 		if (Validator.isNotNull(attachment.getAttachment())) {
-			return addFileEntry(
-				attachment, uniqueFileNameProvider, serviceContext);
+			String base64EncodedContent = attachment.getAttachment();
+
+			File file = FileUtil.createTempFile(
+				Base64.decode(base64EncodedContent));
+
+			return _addFileEntry(
+				file, attachment.getContentType(), uniqueFileNameProvider,
+				serviceContext);
 		}
 
 		if (Validator.isNotNull(attachment.getSrc())) {
@@ -329,6 +337,8 @@ public class AttachmentUtil {
 			contentType = MimeTypesUtil.getContentType(file);
 		}
 
+		uniqueFileName = _appendExtension(contentType, uniqueFileName);
+
 		FileEntry fileEntry = DLAppServiceUtil.addFileEntry(
 			null, serviceContext.getScopeGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, uniqueFileName,
@@ -338,6 +348,24 @@ public class AttachmentUtil {
 		FileUtil.delete(file);
 
 		return fileEntry;
+	}
+
+	private static String _appendExtension(
+		String contentType, String uniqueFileName) {
+
+		String extension = StringPool.BLANK;
+
+		Set<String> extensions = MimeTypesUtil.getExtensions(contentType);
+
+		if (!extensions.isEmpty()) {
+			Iterator<String> iterator = extensions.iterator();
+
+			if (iterator.hasNext()) {
+				extension = iterator.next();
+			}
+		}
+
+		return uniqueFileName.concat(extension);
 	}
 
 	private static boolean _exists(

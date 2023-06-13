@@ -538,8 +538,13 @@ public class ObjectRelationshipLocalServiceImpl
 
 		_objectFieldSettingLocalService.addObjectFieldSetting(
 			user.getUserId(), objectField.getObjectFieldId(),
-			ObjectFieldSettingConstants.OBJECT_DEFINITION_1_SHORT_NAME,
+			ObjectFieldSettingConstants.NAME_OBJECT_DEFINITION_1_SHORT_NAME,
 			objectDefinition1.getShortName());
+
+		_objectFieldSettingLocalService.addObjectFieldSetting(
+			user.getUserId(), objectField.getObjectFieldId(),
+			ObjectFieldSettingConstants.NAME_OBJECT_RELATIONSHIP_ERC_FIELD_NAME,
+			StringUtil.replaceLast(objectField.getName(), "Id", "ERC"));
 
 		if (objectDefinition2.isApproved()) {
 			runSQL(

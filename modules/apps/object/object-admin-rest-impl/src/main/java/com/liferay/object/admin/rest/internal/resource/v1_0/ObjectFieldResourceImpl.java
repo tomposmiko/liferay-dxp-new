@@ -14,8 +14,8 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
-import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
+import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
 import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectFieldDTOConverter;
@@ -156,7 +156,9 @@ public class ObjectFieldResourceImpl
 			throw new UnsupportedOperationException();
 		}
 
-		_addListTypeDefinition(objectField);
+		ObjectFieldUtil.addListTypeDefinition(
+			contextUser.getCompanyId(), _listTypeDefinitionLocalService,
+			_listTypeEntryLocalService, objectField, contextUser.getUserId());
 
 		return _toObjectField(
 			_objectFieldService.addCustomObjectField(
@@ -205,7 +207,10 @@ public class ObjectFieldResourceImpl
 					serviceBuilderObjectField.getObjectDefinitionId());
 
 		if (!serviceBuilderObjectDefinition.isApproved()) {
-			_addListTypeDefinition(objectField);
+			ObjectFieldUtil.addListTypeDefinition(
+				contextUser.getCompanyId(), _listTypeDefinitionLocalService,
+				_listTypeEntryLocalService, objectField,
+				contextUser.getUserId());
 		}
 
 		return _toObjectField(
@@ -231,29 +236,6 @@ public class ObjectFieldResourceImpl
 							objectField.getBusinessTypeAsString(),
 							objectFieldSetting, _objectFieldSettingLocalService,
 							_objectFilterLocalService))));
-	}
-
-	private void _addListTypeDefinition(ObjectField objectField)
-		throws Exception {
-
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164278")) ||
-			Validator.isNull(
-				objectField.getListTypeDefinitionExternalReferenceCode())) {
-
-			return;
-		}
-
-		ListTypeDefinition listTypeDefinition =
-			_listTypeDefinitionLocalService.
-				fetchListTypeDefinitionByExternalReferenceCode(
-					contextUser.getCompanyId(),
-					objectField.getListTypeDefinitionExternalReferenceCode());
-
-		if (listTypeDefinition == null) {
-			_listTypeDefinitionLocalService.addListTypeDefinition(
-				objectField.getListTypeDefinitionExternalReferenceCode(),
-				contextUser.getUserId());
-		}
 	}
 
 	private ObjectField _toObjectField(
@@ -328,6 +310,9 @@ public class ObjectFieldResourceImpl
 
 	@Reference
 	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
+
+	@Reference
+	private ListTypeEntryLocalService _listTypeEntryLocalService;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;

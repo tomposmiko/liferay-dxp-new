@@ -420,6 +420,17 @@ public class AccountEntryUserRelLocalServiceUtil {
 		return getService().hasAccountEntryUserRel(accountEntryId, userId);
 	}
 
+	public static void inviteUser(
+			long accountEntryId, long[] accountRoleIds, String emailAddress,
+			com.liferay.portal.kernel.model.User inviter,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		getService().inviteUser(
+			accountEntryId, accountRoleIds, emailAddress, inviter,
+			serviceContext);
+	}
+
 	public static boolean isAccountEntryUser(long userId) {
 		return getService().isAccountEntryUser(userId);
 	}

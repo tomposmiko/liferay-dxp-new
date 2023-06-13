@@ -115,8 +115,6 @@ const ActionButton = ({
 		provisioningServerAPI,
 		sessionId,
 		handleAlertStatus,
-		handleRedirectPage,
-		handleDeactivatePage,
 		productName
 	);
 

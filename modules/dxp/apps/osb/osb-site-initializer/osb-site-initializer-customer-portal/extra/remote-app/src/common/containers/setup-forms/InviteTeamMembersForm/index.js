@@ -191,10 +191,14 @@ const InviteTeamMembersPage = ({
 					const invitedUser = await addTeamMemberInvitation({
 						context: {
 							displaySuccess: false,
+							type: 'liferay-rest',
 						},
 						variables: {
 							TeamMembersInvitation: {
+								accountEntryId: project.id,
 								email,
+								r_accountEntryToDXPCloudEnvironment_accountEntryId:
+									project?.id,
 								role: role.key,
 							},
 							scopeKey: Liferay.ThemeDisplay.getScopeGroupId(),

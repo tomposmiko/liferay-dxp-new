@@ -479,6 +479,18 @@ public class AccountEntryUserRelLocalServiceWrapper
 	}
 
 	@Override
+	public void inviteUser(
+			long accountEntryId, long[] accountRoleIds, String emailAddress,
+			com.liferay.portal.kernel.model.User inviter,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_accountEntryUserRelLocalService.inviteUser(
+			accountEntryId, accountRoleIds, emailAddress, inviter,
+			serviceContext);
+	}
+
+	@Override
 	public boolean isAccountEntryUser(long userId) {
 		return _accountEntryUserRelLocalService.isAccountEntryUser(userId);
 	}
