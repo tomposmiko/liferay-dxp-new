@@ -17,7 +17,6 @@ package com.liferay.headless.commerce.delivery.order.resource.v1_0.test;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.account.service.CommerceAccountLocalService;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.service.CommerceCurrencyLocalService;
@@ -125,7 +124,7 @@ public class PlacedOrderItemShipmentResourceTest
 			_commerceOrderItemLocalService.addCommerceOrderItem(
 				_user.getUserId(), _commerceOrder.getCommerceOrderId(),
 				_cpInstance.getCPInstanceId(), null,
-				RandomTestUtil.randomInt(1, 10),
+				RandomTestUtil.randomInt(1, 10), 0,
 				RandomTestUtil.randomInt(1, 10),
 				new TestCommerceContext(
 					_accountEntry, _commerceCurrency, _commerceChannel, _user,
@@ -261,9 +260,6 @@ public class PlacedOrderItemShipmentResourceTest
 
 	@Inject
 	private AddressLocalService _addressLocalService;
-
-	@Inject
-	private CommerceAccountLocalService _commerceAccountLocalService;
 
 	@DeleteAfterTestRun
 	private CommerceChannel _commerceChannel;

@@ -10,6 +10,26 @@
 			],
 			"roleName": "Guest",
 			"scope": 4
+		},
+		{
+			"actionIds": [
+			],
+			"roleName": "Site Member",
+			"scope": 4
+		},
+		{
+			"actionIds": [
+				"VIEW"
+			],
+			"roleName": "Partner Manager (PM)",
+			"scope": 4
+		},
+		{
+			"actionIds": [
+				"VIEW"
+			],
+			"roleName": "Partner Sales User (PSU)",
+			"scope": 4
 		}
 	],
 	"private": false,

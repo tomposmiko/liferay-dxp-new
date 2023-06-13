@@ -1,7 +1,8 @@
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
 import {useEffect, useState} from 'react';
 
-import accountLogo from '../../assets/icons/mainAppLogo.svg';
+import {showAccountImage} from '../../utils/util';
+
 import {DashboardNavigation} from '../../components/DashboardNavigation/DashboardNavigation';
 import {DashboardMemberTableRow} from '../../components/DashboardTable/DashboardMemberTableRow';
 import {
@@ -26,8 +27,6 @@ import {
 import {
 	AccountBriefProps,
 	MemberProps,
-	ProductResponseProps,
-	ProductSpecificationProps,
 	UserAccountProps,
 	customerRoles,
 	initialDashboardNavigationItems,
@@ -35,9 +34,9 @@ import {
 } from './PublishedDashboardPageUtil';
 
 import './PublishedAppsDashboardPage.scss';
-import {ProjectsPage} from '../ProjectsPage/ProjectsPage';
 import {Liferay} from '../../liferay/liferay';
 import {getProductVersionFromSpecifications} from '../../utils/util';
+import {ProjectsPage} from '../ProjectsPage/ProjectsPage';
 
 const appTableHeaders = [
 	{
@@ -88,6 +87,36 @@ interface PublishedAppTable {
 	totalCount: number;
 }
 
+const appMessages = {
+	description: 'Manage and publish apps on the Marketplace',
+	emptyStateMessage: {
+		description1: 'Publish apps and they will show up here.',
+		description2: 'Click on “New App” to start.',
+		title: 'No Apps Yet',
+	},
+	title: 'Apps',
+};
+
+const memberMessages = {
+	description: 'Manage users in your development team and invite new ones',
+	emptyStateMessage: {
+		description1: 'Create new members and they will show up here.',
+		description2: 'Click on “New Member” to start.',
+		title: 'No Members Yet',
+	},
+	title: 'Members',
+};
+
+const solutionMessages = {
+	description: 'Manage solution trial and purchases from the Marketplace',
+	emptyStateMessage: {
+		description1: 'Publish solutions and they will show up here.',
+		description2: 'Click on “New Solutions” to start.',
+		title: 'No Solutions Yet',
+	},
+	title: 'My Solutions',
+};
+
 export function PublishedAppsDashboardPage() {
 	const [accounts, setAccounts] = useState<Account[]>(initialAccountsState);
 	const [catalogId, setCatalogId] = useState<number>();
@@ -110,31 +139,10 @@ export function PublishedAppsDashboardPage() {
 		initialAccountsState[0]
 	);
 
-	const appMessages = {
-		description: 'Manage and publish apps on the Marketplace',
-		emptyStateMessage: {
-			description1: 'Publish apps and they will show up here.',
-			description2: 'Click on “New App” to start.',
-			title: 'No apps yet',
-		},
-		title: 'Apps',
-	};
-
 	const buttonRedirectURL = Liferay.ThemeDisplay.getCanonicalURL().replaceAll(
 		'/publisher-dashboard',
 		'/create-new-app'
 	);
-
-	const memberMessages = {
-		description:
-			'Manage users in your development team and invite new ones',
-		emptyStateMessage: {
-			description1: 'Create new members and they will show up here.',
-			description2: 'Click on “New Member” to start.',
-			title: 'No members yet',
-		},
-		title: 'Members',
-	};
 
 	const formatDate = (date: string) => {
 		const locale = Liferay.ThemeDisplay.getLanguageId().replace('_', '-');
@@ -153,17 +161,14 @@ export function PublishedAppsDashboardPage() {
 		return formattedDate;
 	};
 
-	function getAppListProductSpecifications(productIds: number[]) {
-		const appListProductSpecifications: Promise<ProductSpecificationProps>[] =
-			[];
-
-		productIds.forEach((productId) => {
-			appListProductSpecifications.push(
-				getProductSpecifications({appProductId: productId})
-			);
-		});
-
-		return Promise.all(appListProductSpecifications);
+	async function getAppListProductSpecifications(productIds: number[]) {
+		return await Promise.all(
+			productIds.map(async (productId) => {
+				return await getProductSpecifications({
+					appProductId: productId,
+				});
+			})
+		);
 	}
 
 	function getAppListProductIds(products: {items: Product[]}) {
@@ -177,19 +182,19 @@ export function PublishedAppsDashboardPage() {
 	}
 
 	function getProductTypeFromSpecifications(
-		specifications: ProductSpecificationProps
+		specifications: ProductSpecification[]
 	) {
 		let productType = 'no type';
 
-		specifications.items.forEach((specification: Specification) => {
+		specifications.forEach((specification: ProductSpecification) => {
 			if (specification.specificationKey === 'type') {
 				productType = specification.value.en_US;
 
 				if (productType === 'cloud') {
 					productType = 'Cloud';
 				}
-				else if (productType === 'osgi') {
-					productType = 'OSGI';
+				else if (productType === 'dxp') {
+					productType = 'DXP';
 				}
 			}
 		});
@@ -215,8 +220,19 @@ export function PublishedAppsDashboardPage() {
 		const makeFetch = async () => {
 			const accountsResponse = await getAccounts();
 
-			setAccounts(accountsResponse.items);
-			setSelectedAccount(accountsResponse.items[0]);
+			const accountsPublisher = accountsResponse.items.filter(
+				(currentAccount) => {
+					const catalogIdCustomField =
+						currentAccount.customFields?.find(
+							(customField) => customField.name === 'CatalogId'
+						);
+
+					return catalogIdCustomField?.customValue.data !== '';
+				}
+			);
+
+			setAccounts(accountsPublisher);
+			setSelectedAccount(accountsPublisher[0]);
 		};
 
 		makeFetch();
@@ -432,7 +448,7 @@ export function PublishedAppsDashboardPage() {
 			{showDashboardNavigation && (
 				<DashboardNavigation
 					accountAppsNumber={apps.length.toString()}
-					accountIcon={commerceAccount?.logoURL ?? accountLogo}
+					accountIcon={showAccountImage(commerceAccount?.logoURL)}
 					accounts={accounts}
 					currentAccount={selectedAccount}
 					dashboardNavigationItems={dashboardNavigationItems}
@@ -481,6 +497,23 @@ export function PublishedAppsDashboardPage() {
 					) : (
 						<></>
 					)}
+				</DashboardPage>
+			)}
+
+			{selectedNavigationItem === 'Solutions' && (
+				<DashboardPage
+					dashboardNavigationItems={dashboardNavigationItems}
+					messages={solutionMessages}
+					selectedApp={selectedApp}
+					setSelectedApp={setSelectedApp}
+				>
+					<DashboardTable
+						emptyStateMessage={solutionMessages.emptyStateMessage}
+						items={[]}
+						tableHeaders={[]}
+					>
+						{(item) => <></>}
+					</DashboardTable>
 				</DashboardPage>
 			)}
 

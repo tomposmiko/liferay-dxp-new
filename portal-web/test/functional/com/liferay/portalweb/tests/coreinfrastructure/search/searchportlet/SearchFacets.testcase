@@ -20,6 +20,95 @@ definition {
 		}
 	}
 
+	@description = "This is a use case for LPS-172127 - The Custom Facet widget supports aggregating on a Web Content Structure DDM field either using the single field or nested field notations."
+	@priority = 4
+	test AggregateDDMFieldsViaCustomFacet {
+		task ("Add a Web Content Structure and create Web Content Articles using the structure") {
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+
+			NavItem.gotoStructures();
+
+			WebContentStructures.addCP(structureName = "content-structure");
+
+			FormViewBuilder.addFieldByDoubleClick(fieldType = "Text");
+
+			Button.clickSave();
+
+			NavItem.gotoWebContent();
+
+			for (var order : list "1,2") {
+				WebContentNavigator.gotoAddWithStructureCP(structureName = "content-structure");
+
+				WebContent.addWithStructureCP(
+					structureName = "content-structure",
+					webContentTitle = "WC Title ${order}");
+
+				Type(
+					key_fieldFieldLabel = "Text",
+					locator1 = "WCEditWebContent#TEXT_INPUT",
+					value1 = "Liferay ${order}");
+
+				PortletEntry.publish();
+			}
+		}
+
+		task ("Add Custom Facet widget to the Search Page") {
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Guest",
+				layoutName = "Search",
+				widgetName = "Custom Facet");
+		}
+
+		task ("Go to the Search page and execute a search for the web content articles") {
+			Search.openSearchPage(searchTerm = "WC Title");
+		}
+
+		task ("Curl the Elasticsearch index to retrieve the DDM field name of the text field for the web content structure") {
+			var port = Elasticsearch.getServerPort();
+			var portalHostname = PropsUtil.get("portal.hostname");
+
+			var curl = "http://${portalHostname}:${port}/_search?q=entryClassName:com.liferay.journal.model.JournalArticle";
+
+			var aggregationField = JSONCurlUtil.get(${curl}, "$.hits.hits[0]._source.ddmFieldArray[0].ddmFieldName");
+		}
+
+		task ("Configure the Custom Facet widget aggregation field with the DDM single field name") {
+			SearchFacetPortlet.configureCustomFacet(aggregationField = ${aggregationField});
+
+			Refresh();
+		}
+
+		task ("Select one of the Custom Facet terms and assert the results") {
+			SearchFacetPortlet.checkFacet(facetValueName = "Liferay 1");
+
+			SearchResultPortlet.viewSearchResults(
+				searchAssetTitle = "WC Title 1",
+				searchAssetType = "Web Content Article");
+
+			SearchResultPortlet.viewSearchResultNotPresent(
+				searchAssetTitle = "WC Title 2",
+				searchAssetType = "Web Content Article");
+		}
+
+		task ("Configure the Custom Facet widget aggregation field with the DDM nested field name") {
+			SearchFacetPortlet.configureCustomFacet(aggregationField = "ddmFieldArray.${aggregationField}.ddmFieldValueKeyword_en_US");
+
+			Refresh();
+		}
+
+		task ("Select the other Custom Facet term and assert the results") {
+			SearchFacetPortlet.checkFacet(facetValueName = "Liferay 2");
+
+			SearchResultPortlet.viewSearchResults(
+				searchAssetTitle = "WC Title 2",
+				searchAssetType = "Web Content Article");
+
+			SearchResultPortlet.viewSearchResultNotPresent(
+				searchAssetTitle = "WC Title 1",
+				searchAssetType = "Web Content Article");
+		}
+	}
+
 	@priority = 4
 	test AssertBasicFacetSelection {
 		var webContentserviceContext1 = '''{"assetTagNames": ["fruit"]}''';
@@ -286,7 +375,7 @@ definition {
 	@description = "This is a use case for LPS-160922."
 	@priority = 4
 	test AssertDefaultSearchResultsDisplayTemplate {
-		property test.name.skip.portal.instance = "Search#AssertDefaultSearchResultsDisplayTemplate";
+		property test.name.skip.portal.instance = "SearchFacets#AssertDefaultSearchResultsDisplayTemplate";
 
 		ApplicationDisplayTemplates.openWidgetTemplatesAdmin(siteURLKey = "guest");
 
@@ -1288,13 +1377,12 @@ definition {
 			folderName = "Provided by Liferay",
 			groupName = "Guest");
 
-		task ("Add some Wiki Page examples") {
-			for (var wikiNumber : list "1,2,3,4") {
-				JSONWiki.addWikiPage(
+		task ("Add web contents") {
+			for (var count : list "1,2,3,4") {
+				JSONWebcontent.addWebContent(
+					content = "WC Content",
 					groupName = "Guest",
-					wikiNodeName = "Main",
-					wikiPageContent = "Wiki Page Content",
-					wikiPageName = "Wiki Page ${wikiNumber}");
+					title = "Web Content ${count}");
 			}
 		}
 
@@ -1313,7 +1401,7 @@ definition {
 		SearchPortlets.searchEmbedded(searchTerm = "test");
 
 		task ("Assert that the Type facet sorts by term frequency descending by default") {
-			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "Wiki Page,Page,Document,User");
+			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "Web Content Article,Page,Document,User");
 		}
 
 		task ("Assert that the Type facet values are correct when sorted by term frequency ascending") {
@@ -1323,7 +1411,7 @@ definition {
 
 			Refresh();
 
-			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "User,Document,Page,Wiki Page");
+			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "User,Document,Page,Web Content Article");
 		}
 
 		task ("Assert that the Type facet values are correct when sorted by term value ascending") {
@@ -1333,7 +1421,7 @@ definition {
 
 			Refresh();
 
-			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "Document,Page,User,Wiki Page");
+			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "Document,Page,User,Web Content Article");
 		}
 
 		task ("Assert that the Type facet values are correct when sorted by term value descending") {
@@ -1343,7 +1431,7 @@ definition {
 
 			Refresh();
 
-			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "Wiki Page,User,Page,Document");
+			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "Web Content Article,User,Page,Document");
 		}
 	}
 
@@ -2283,8 +2371,6 @@ definition {
 	@description = "This is a use case for LPS-74299."
 	@priority = 3
 	test ViewFacetPersistence {
-		property test.name.skip.portal.instance = "Search#ViewFacetPersistence";
-
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");

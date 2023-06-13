@@ -14,12 +14,14 @@
 
 package com.liferay.headless.commerce.admin.catalog.internal.resource.v1_0;
 
+import com.liferay.account.model.AccountGroup;
+import com.liferay.account.service.AccountGroupRelLocalService;
+import com.liferay.account.service.AccountGroupRelService;
+import com.liferay.account.service.AccountGroupService;
+import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagService;
-import com.liferay.commerce.account.model.CommerceAccountGroup;
-import com.liferay.commerce.account.service.CommerceAccountGroupRelService;
-import com.liferay.commerce.account.service.CommerceAccountGroupService;
 import com.liferay.commerce.price.list.service.CommercePriceEntryLocalService;
 import com.liferay.commerce.price.list.service.CommercePriceListLocalService;
 import com.liferay.commerce.product.configuration.CProductVersionConfiguration;
@@ -480,12 +482,12 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		DateConfig expirationDateConfig = DateConfig.toExpirationDateConfig(
 			product.getExpirationDate(), serviceContext.getTimeZone());
 
-		ProductShippingConfiguration shippingConfiguration =
+		ProductShippingConfiguration productShippingConfiguration =
 			_getProductShippingConfiguration(product);
-		ProductSubscriptionConfiguration subscriptionConfiguration =
+		ProductSubscriptionConfiguration productSubscriptionConfiguration =
 			_getProductSubscriptionConfiguration(product);
-		ProductTaxConfiguration taxConfiguration = _getProductTaxConfiguration(
-			product);
+		ProductTaxConfiguration productTaxConfiguration =
+			_getProductTaxConfiguration(product);
 
 		CPDefinition cpDefinition =
 			_cpDefinitionService.
@@ -498,7 +500,22 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		if (categories != null) {
 			serviceContext.setAssetCategoryIds(
 				transformToLongArray(
-					Arrays.asList(categories), Category::getId));
+					Arrays.asList(categories),
+					category -> {
+						if (Validator.isNull(
+								category.getExternalReferenceCode())) {
+
+							return category.getId();
+						}
+
+						AssetCategory assetCategory =
+							_assetCategoryLocalService.
+								fetchAssetCategoryByExternalReferenceCode(
+									category.getExternalReferenceCode(),
+									contextCompany.getGroupId());
+
+						return assetCategory.getCategoryId();
+					}));
 		}
 		else if (cpDefinition != null) {
 			serviceContext.setAssetCategoryIds(
@@ -578,31 +595,35 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 			LanguageUtils.getLocalizedMap(metaDescriptionMap),
 			LanguageUtils.getLocalizedMap(metaKeywordsMap),
 			product.getProductType(), ignoreSKUCombinations,
-			GetterUtil.getBoolean(shippingConfiguration.getShippable(), true),
 			GetterUtil.getBoolean(
-				shippingConfiguration.getFreeShipping(), true),
+				productShippingConfiguration.getShippable(), true),
 			GetterUtil.getBoolean(
-				shippingConfiguration.getShippingSeparately(), true),
-			GetterUtil.getDouble(shippingConfiguration.getShippingExtraPrice()),
-			GetterUtil.getDouble(shippingConfiguration.getWidth()),
-			GetterUtil.getDouble(shippingConfiguration.getHeight()),
-			GetterUtil.getDouble(shippingConfiguration.getDepth()),
-			GetterUtil.getDouble(shippingConfiguration.getWeight()),
-			GetterUtil.getLong(taxConfiguration.getId()),
-			ProductUtil.isTaxExempt(null, taxConfiguration), false, null, true,
-			displayDateConfig.getMonth(), displayDateConfig.getDay(),
+				productShippingConfiguration.getFreeShipping(), true),
+			GetterUtil.getBoolean(
+				productShippingConfiguration.getShippingSeparately(), true),
+			GetterUtil.getDouble(
+				productShippingConfiguration.getShippingExtraPrice()),
+			GetterUtil.getDouble(productShippingConfiguration.getWidth()),
+			GetterUtil.getDouble(productShippingConfiguration.getHeight()),
+			GetterUtil.getDouble(productShippingConfiguration.getDepth()),
+			GetterUtil.getDouble(productShippingConfiguration.getWeight()),
+			GetterUtil.getLong(productTaxConfiguration.getId()),
+			ProductUtil.isTaxExempt(null, productTaxConfiguration), false, null,
+			true, displayDateConfig.getMonth(), displayDateConfig.getDay(),
 			displayDateConfig.getYear(), displayDateConfig.getHour(),
 			displayDateConfig.getMinute(), expirationDateConfig.getMonth(),
 			expirationDateConfig.getDay(), expirationDateConfig.getYear(),
 			expirationDateConfig.getHour(), expirationDateConfig.getMinute(),
 			GetterUtil.getBoolean(product.getNeverExpire(), true),
 			product.getDefaultSku(),
-			GetterUtil.getBoolean(subscriptionConfiguration.getEnable()),
-			GetterUtil.getInteger(subscriptionConfiguration.getLength(), 1),
+			GetterUtil.getBoolean(productSubscriptionConfiguration.getEnable()),
+			GetterUtil.getInteger(
+				productSubscriptionConfiguration.getLength(), 1),
 			GetterUtil.getString(
-				subscriptionConfiguration.getSubscriptionTypeAsString()),
+				productSubscriptionConfiguration.getSubscriptionTypeAsString()),
 			null,
-			GetterUtil.getLong(subscriptionConfiguration.getNumberOfLength()),
+			GetterUtil.getLong(
+				productSubscriptionConfiguration.getNumberOfLength()),
 			productStatus, serviceContext);
 
 		if ((product.getActive() != null) && !product.getActive()) {
@@ -711,11 +732,11 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 	private ProductShippingConfiguration _getProductShippingConfiguration(
 		Product product) {
 
-		ProductShippingConfiguration shippingConfiguration =
+		ProductShippingConfiguration productShippingConfiguration =
 			product.getShippingConfiguration();
 
-		if (shippingConfiguration != null) {
-			return shippingConfiguration;
+		if (productShippingConfiguration != null) {
+			return productShippingConfiguration;
 		}
 
 		return new ProductShippingConfiguration();
@@ -724,11 +745,11 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 	private ProductSubscriptionConfiguration
 		_getProductSubscriptionConfiguration(Product product) {
 
-		ProductSubscriptionConfiguration subscriptionConfiguration =
+		ProductSubscriptionConfiguration productSubscriptionConfiguration =
 			product.getSubscriptionConfiguration();
 
-		if (subscriptionConfiguration != null) {
-			return subscriptionConfiguration;
+		if (productSubscriptionConfiguration != null) {
+			return productSubscriptionConfiguration;
 		}
 
 		return new ProductSubscriptionConfiguration();
@@ -737,11 +758,11 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 	private ProductTaxConfiguration _getProductTaxConfiguration(
 		Product product) {
 
-		ProductTaxConfiguration taxConfiguration =
+		ProductTaxConfiguration productTaxConfiguration =
 			product.getTaxConfiguration();
 
-		if (taxConfiguration != null) {
-			return taxConfiguration;
+		if (productTaxConfiguration != null) {
+			return productTaxConfiguration;
 		}
 
 		return new ProductTaxConfiguration();
@@ -1015,8 +1036,9 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 			product.getProductAccountGroups();
 
 		if (productAccountGroups != null) {
-			_commerceAccountGroupRelService.deleteCommerceAccountGroupRels(
-				CPDefinition.class.getName(), cpDefinition.getCPDefinitionId());
+			_accountGroupRelLocalService.deleteAccountGroupRels(
+				CPDefinition.class.getName(),
+				new long[] {cpDefinition.getCPDefinitionId()});
 
 			for (ProductAccountGroup productAccountGroup :
 					productAccountGroups) {
@@ -1029,24 +1051,22 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 						productAccountGroup.getAccountGroupId();
 
 					if (accountGroupId != null) {
-						_commerceAccountGroupRelService.
-							addCommerceAccountGroupRel(
-								CPDefinition.class.getName(),
-								cpDefinition.getCPDefinitionId(),
-								accountGroupId, serviceContext);
+						_accountGroupRelService.addAccountGroupRel(
+							accountGroupId, CPDefinition.class.getName(),
+							cpDefinition.getCPDefinitionId());
 					}
 
 					continue;
 				}
 
-				CommerceAccountGroup commerceAccountGroup = null;
+				AccountGroup accountGroup = null;
 
 				try {
-					commerceAccountGroup =
-						_commerceAccountGroupService.
-							fetchByExternalReferenceCode(
-								contextCompany.getCompanyId(),
-								productAccountGroup.getExternalReferenceCode());
+					accountGroup =
+						_accountGroupService.
+							fetchAccountGroupByExternalReferenceCode(
+								productAccountGroup.getExternalReferenceCode(),
+								contextCompany.getCompanyId());
 				}
 				catch (PortalException portalException) {
 					if (_log.isDebugEnabled()) {
@@ -1054,15 +1074,14 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 					}
 				}
 
-				if (commerceAccountGroup == null) {
+				if (accountGroup == null) {
 					continue;
 				}
 
-				_commerceAccountGroupRelService.addCommerceAccountGroupRel(
+				_accountGroupRelService.addAccountGroupRel(
+					accountGroup.getAccountGroupId(),
 					CPDefinition.class.getName(),
-					cpDefinition.getCPDefinitionId(),
-					commerceAccountGroup.getCommerceAccountGroupId(),
-					serviceContext);
+					cpDefinition.getCPDefinitionId());
 			}
 		}
 
@@ -1199,7 +1218,22 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		else {
 			serviceContext.setAssetCategoryIds(
 				transformToLongArray(
-					Arrays.asList(categories), Category::getId));
+					Arrays.asList(categories),
+					category -> {
+						if (Validator.isNull(
+								category.getExternalReferenceCode())) {
+
+							return category.getId();
+						}
+
+						AssetCategory assetCategory =
+							_assetCategoryLocalService.
+								fetchAssetCategoryByExternalReferenceCode(
+									category.getExternalReferenceCode(),
+									contextCompany.getGroupId());
+
+						return assetCategory.getCategoryId();
+					}));
 		}
 
 		Map<String, String> nameMap = product.getName();
@@ -1293,6 +1327,15 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		ProductResourceImpl.class);
 
 	@Reference
+	private AccountGroupRelLocalService _accountGroupRelLocalService;
+
+	@Reference
+	private AccountGroupRelService _accountGroupRelService;
+
+	@Reference
+	private AccountGroupService _accountGroupService;
+
+	@Reference
 	private AssetCategoryLocalService _assetCategoryLocalService;
 
 	@Reference
@@ -1300,12 +1343,6 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
-	private CommerceAccountGroupRelService _commerceAccountGroupRelService;
-
-	@Reference
-	private CommerceAccountGroupService _commerceAccountGroupService;
 
 	@Reference
 	private CommerceCatalogLocalService _commerceCatalogLocalService;

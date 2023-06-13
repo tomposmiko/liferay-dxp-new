@@ -111,7 +111,7 @@ public class UADSearchContainerBuilder {
 	public SearchContainer<UADEntity<?>> getHierarchyUADEntitySearchContainer(
 		LiferayPortletResponse liferayPortletResponse,
 		RenderRequest renderRequest, String applicationKey,
-		PortletURL currentURL, long[] groupIds, Class<?> parentContainerClass,
+		PortletURL currentURL, long[] groupIds, String parentContainerKey,
 		Serializable parentContainerId, User selectedUser,
 		UADHierarchyDisplay uadHierarchyDisplay) {
 
@@ -127,7 +127,7 @@ public class UADSearchContainerBuilder {
 
 			entities.addAll(
 				uadHierarchyDisplay.search(
-					parentContainerClass, parentContainerId,
+					parentContainerKey, parentContainerId,
 					selectedUser.getUserId(), groupIds,
 					displayTerms.getKeywords(), null, null, QueryUtil.ALL_POS,
 					QueryUtil.ALL_POS));
@@ -135,7 +135,7 @@ public class UADSearchContainerBuilder {
 			if (Objects.equals(String.valueOf(parentContainerId), "0")) {
 				entities.addAll(
 					uadHierarchyDisplay.search(
-						parentContainerClass, -1L, selectedUser.getUserId(),
+						parentContainerKey, -1L, selectedUser.getUserId(),
 						groupIds, displayTerms.getKeywords(), null, null,
 						QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 			}
@@ -265,7 +265,7 @@ public class UADSearchContainerBuilder {
 			uadHierarchyDisplay.getEditURL(
 				liferayPortletRequest, liferayPortletResponse, entity),
 			uadHierarchyDisplay.isInTrash(entity),
-			uadHierarchyDisplay.getTypeClass(entity),
+			uadHierarchyDisplay.getTypeKey(entity),
 			uadHierarchyDisplay.isUserOwned(entity, selectedUserId),
 			uadHierarchyDisplay.getViewURL(
 				liferayPortletRequest, liferayPortletResponse, applicationKey,
@@ -339,8 +339,7 @@ public class UADSearchContainerBuilder {
 			entity, uadDisplay.getPrimaryKey(entity),
 			uadDisplay.getEditURL(
 				entity, liferayPortletRequest, liferayPortletResponse),
-			uadDisplay.isInTrash(entity), uadDisplay.getTypeClass(), true,
-			null);
+			uadDisplay.isInTrash(entity), uadDisplay.getTypeKey(), true, null);
 
 		Map<String, Object> columnFieldValues = uadDisplay.getFieldValues(
 			entity, uadDisplay.getColumnFieldNames(),

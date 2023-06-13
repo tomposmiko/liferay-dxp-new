@@ -29,6 +29,11 @@ import javax.servlet.http.HttpServletRequest;
 public interface CommerceAccountHelper {
 
 	public AccountEntryUserRel addAccountEntryUserRel(
+			long accountEntryId, long userId, long[] roleIds,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	public AccountEntryUserRel addAccountEntryUserRel(
 			long commerceAccountId, long commerceAccountUserId,
 			ServiceContext serviceContext)
 		throws PortalException;
@@ -68,6 +73,10 @@ public interface CommerceAccountHelper {
 			HttpServletRequest httpServletRequest, long groupId,
 			long commerceAccountId)
 		throws PortalException;
+
+	public Integer toAccountEntryStatus(Boolean commerceAccountActive);
+
+	public String toAccountEntryType(int commerceAccountType);
 
 	public String[] toAccountEntryTypes(int commerceSiteType);
 

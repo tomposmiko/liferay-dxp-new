@@ -96,6 +96,16 @@ public class UADRegistry {
 		return _uadDisplayServiceTrackerMap.getService(key);
 	}
 
+	public UADDisplay<?> getUADDisplayByObject(Object object) {
+		for (UADDisplay<?> uadDisplay : getUADDisplays()) {
+			if (uadDisplay.isTypeEntity(object)) {
+				return uadDisplay;
+			}
+		}
+
+		return null;
+	}
+
 	public Collection<UADDisplay<?>> getUADDisplays() {
 		return _uadDisplayServiceTrackerMap.values();
 	}
@@ -112,7 +122,7 @@ public class UADRegistry {
 			return null;
 		}
 
-		return new UADHierarchyDisplay(uadHierarchyDeclaration);
+		return new UADHierarchyDisplay(uadHierarchyDeclaration, this);
 	}
 
 	@Activate
@@ -164,17 +174,17 @@ public class UADRegistry {
 		Collection<UADAnonymizer<?>> uadAnonymizers,
 		Collection<UADDisplay<?>> uadDisplayList) {
 
-		List<Class<?>> uadDisplayTypeClasses = new ArrayList<>();
+		List<String> uadDisplayTypeKeys = new ArrayList<>();
 
 		for (UADDisplay<?> uadDisplay : uadDisplayList) {
-			uadDisplayTypeClasses.add(uadDisplay.getTypeClass());
+			uadDisplayTypeKeys.add(uadDisplay.getTypeKey());
 		}
 
 		List<UADAnonymizer<?>> nonreviewableUADAnonymizers = new ArrayList<>(
 			uadAnonymizers);
 
 		for (UADAnonymizer<?> uadAnonymizer : uadAnonymizers) {
-			if (uadDisplayTypeClasses.contains(uadAnonymizer.getTypeClass())) {
+			if (uadDisplayTypeKeys.contains(uadAnonymizer.getTypeKey())) {
 				nonreviewableUADAnonymizers.remove(uadAnonymizer);
 			}
 		}
@@ -190,11 +200,8 @@ public class UADRegistry {
 			bundleContext, clazz, null,
 			ServiceReferenceMapperFactory.create(
 				bundleContext,
-				(uadComponent, emitter) -> {
-					Class<?> uadClass = uadComponent.getTypeClass();
-
-					emitter.emit(uadClass.getName());
-				}));
+				(uadComponent, emitter) -> emitter.emit(
+					uadComponent.getTypeKey())));
 	}
 
 	private <T> ServiceTrackerMap<String, T>

@@ -101,6 +101,7 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.ActionUtil;
@@ -155,7 +156,7 @@ public class DefaultObjectEntryManagerImpl
 					objectEntry, dtoConverterContext.getUserId()));
 
 		if (FeatureFlagManagerUtil.isEnabled("LPS-153117")) {
-			_addOrUpdateNestedObjectEntries(
+			serviceBuilderObjectEntry = _addOrUpdateNestedObjectEntries(
 				dtoConverterContext, objectDefinition, objectEntry,
 				_getObjectRelationships(objectDefinition, objectEntry),
 				serviceBuilderObjectEntry.getPrimaryKey());
@@ -670,7 +671,7 @@ public class DefaultObjectEntryManagerImpl
 				objectEntry, dtoConverterContext.getUserId()));
 
 		if (FeatureFlagManagerUtil.isEnabled("LPS-153117")) {
-			_addOrUpdateNestedObjectEntries(
+			serviceBuilderObjectEntry = _addOrUpdateNestedObjectEntries(
 				dtoConverterContext, objectDefinition, objectEntry,
 				_getObjectRelationships(objectDefinition, objectEntry),
 				serviceBuilderObjectEntry.getPrimaryKey());
@@ -706,11 +707,12 @@ public class DefaultObjectEntryManagerImpl
 			uriInfo);
 	}
 
-	private void _addOrUpdateNestedObjectEntries(
-			DTOConverterContext dtoConverterContext,
-			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
-			Map<String, ObjectRelationship> objectRelationships,
-			long primaryKey)
+	private com.liferay.object.model.ObjectEntry
+			_addOrUpdateNestedObjectEntries(
+				DTOConverterContext dtoConverterContext,
+				ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+				Map<String, ObjectRelationship> objectRelationships,
+				long primaryKey)
 		throws Exception {
 
 		Map<String, Object> properties = objectEntry.getProperties();
@@ -732,7 +734,7 @@ public class DefaultObjectEntryManagerImpl
 						relatedObjectDefinition.getCompanyId(),
 						objectRelationship.getType());
 
-			if (relatedObjectDefinition.isSystem()) {
+			if (relatedObjectDefinition.isUnmodifiableSystemObject()) {
 				SystemObjectDefinitionManager systemObjectDefinitionManager =
 					_systemObjectDefinitionManagerRegistry.
 						getSystemObjectDefinitionManager(
@@ -777,7 +779,13 @@ public class DefaultObjectEntryManagerImpl
 						nestedObjectEntry.getId());
 				}
 			}
+
+			if (properties.containsKey(entry.getKey())) {
+				NestedFieldsSupplier.addFieldName(entry.getKey());
+			}
 		}
+
+		return _objectEntryLocalService.getObjectEntry(primaryKey);
 	}
 
 	private void _checkObjectEntryObjectDefinitionId(

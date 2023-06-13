@@ -19,18 +19,18 @@ import com.liferay.content.dashboard.item.action.ContentDashboardItemAction;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.url.builder.ResourceURLBuilder;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.util.List;
 import java.util.Locale;
-
-import javax.portlet.ResourceURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -57,36 +57,21 @@ public class ContentDashboardDropdownItemsProvider {
 
 		Locale locale = _portal.getLocale(_liferayPortletRequest);
 
-		DropdownItemList dropdownItemList = DropdownItemList.of(
-			(DropdownItem[])TransformUtil.transformToArray(
-				contentDashboardItem.getContentDashboardItemActions(
-					httpServletRequest, ContentDashboardItemAction.Type.VIEW,
-					ContentDashboardItemAction.Type.EDIT),
-				contentDashboardItemAction -> _toDropdownItem(
-					contentDashboardItemAction, locale),
-				DropdownItem.class));
-
-		dropdownItemList.addAll(
+		return DropdownItemListBuilder.addAll(
+			DropdownItemList.of(
+				(DropdownItem[])TransformUtil.transformToArray(
+					contentDashboardItem.getContentDashboardItemActions(
+						httpServletRequest,
+						ContentDashboardItemAction.Type.VIEW,
+						ContentDashboardItemAction.Type.EDIT),
+					contentDashboardItemAction -> _toDropdownItem(
+						contentDashboardItemAction, locale),
+					DropdownItem.class))
+		).addAll(
 			DropdownItemList.of(
 				() -> {
-					ResourceURL resourceURL =
-						_liferayPortletResponse.createResourceURL();
-
-					resourceURL.setParameter(
-						"backURL",
-						_portal.getCurrentURL(_liferayPortletRequest));
-
 					InfoItemReference infoItemReference =
 						contentDashboardItem.getInfoItemReference();
-
-					resourceURL.setParameter(
-						"className", infoItemReference.getClassName());
-					resourceURL.setParameter(
-						"classPK",
-						String.valueOf(infoItemReference.getClassPK()));
-
-					resourceURL.setResourceID(
-						"/content_dashboard/get_content_dashboard_item_info");
 
 					return DropdownItemBuilder.setData(
 						HashMapBuilder.<String, Object>put(
@@ -96,7 +81,19 @@ public class ContentDashboardDropdownItemsProvider {
 						).put(
 							"classPK", infoItemReference.getClassPK()
 						).put(
-							"fetchURL", String.valueOf(resourceURL)
+							"fetchURL",
+							ResourceURLBuilder.createResourceURL(
+								_liferayPortletResponse
+							).setBackURL(
+								_portal.getCurrentURL(_liferayPortletRequest)
+							).setParameter(
+								"className", infoItemReference.getClassName()
+							).setParameter(
+								"classPK", infoItemReference.getClassPK()
+							).setResourceID(
+								"/content_dashboard" +
+									"/get_content_dashboard_item_info"
+							).buildString()
 						).build()
 					).setIcon(
 						"info-circle-open"
@@ -105,17 +102,15 @@ public class ContentDashboardDropdownItemsProvider {
 					).setQuickAction(
 						true
 					).build();
-				}));
-
-		dropdownItemList.addAll(
+				})
+		).addAll(
 			TransformUtil.transform(
 				contentDashboardItem.getContentDashboardItemActions(
 					httpServletRequest,
 					ContentDashboardItemAction.Type.VIEW_IN_PANEL),
 				contentDashboardItemAction -> _toViewInPanelDropdownItem(
-					contentDashboardItem, contentDashboardItemAction, locale)));
-
-		return dropdownItemList;
+					contentDashboardItem, contentDashboardItemAction, locale))
+		).build();
 	}
 
 	private DropdownItem _toDropdownItem(

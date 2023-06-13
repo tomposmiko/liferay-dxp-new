@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.admin.web.internal.display.context.IndexActionsDisplayContext;
+import com.liferay.portal.search.capabilities.SearchCapabilities;
 
 import java.util.Map;
 
@@ -45,12 +46,13 @@ public class IndexActionsDisplayContextBuilder {
 
 	public IndexActionsDisplayContextBuilder(
 		Language language, Portal portal, RenderRequest renderRequest,
-		RenderResponse renderResponse) {
+		RenderResponse renderResponse, SearchCapabilities searchCapabilities) {
 
 		_language = language;
 		_portal = portal;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
+		_searchCapabilities = searchCapabilities;
 
 		_httpServletRequest = portal.getHttpServletRequest(renderRequest);
 	}
@@ -71,6 +73,9 @@ public class IndexActionsDisplayContextBuilder {
 			"initialExecutionMode", _getInitialExecutionMode()
 		).put(
 			"initialScope", _getInitialScope()
+		).put(
+			"isConcurrentModeSupported",
+			_searchCapabilities.isConcurrentModeSupported()
 		).put(
 			"virtualInstances", _getVirtualInstancesJSONArray()
 		).build();
@@ -134,5 +139,6 @@ public class IndexActionsDisplayContextBuilder {
 	private final Portal _portal;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
+	private final SearchCapabilities _searchCapabilities;
 
 }

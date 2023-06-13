@@ -302,6 +302,7 @@ public class ObjectDefinitionResourceTest
 						indexed = false;
 						indexedAsKeyword = false;
 						label = Collections.singletonMap("en_US", "Column");
+						localized = !objectDefinition.getSystem();
 						name = StringUtil.randomId();
 						required = false;
 						system = false;
@@ -309,6 +310,19 @@ public class ObjectDefinitionResourceTest
 				}
 			});
 		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_COMPANY);
+		objectDefinition.setStatus(
+			new Status() {
+				{
+					code = WorkflowConstants.STATUS_DRAFT;
+					label = WorkflowConstants.getStatusLabel(
+						WorkflowConstants.STATUS_DRAFT);
+					label_i18n = _language.get(
+						LanguageResources.getResourceBundle(
+							LocaleUtil.getDefault()),
+						WorkflowConstants.getStatusLabel(
+							WorkflowConstants.STATUS_DRAFT));
+				}
+			});
 
 		if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
 			objectDefinition.setStorageType(StringPool.BLANK);

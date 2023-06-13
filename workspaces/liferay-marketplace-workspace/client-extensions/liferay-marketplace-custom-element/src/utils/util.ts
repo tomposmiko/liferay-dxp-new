@@ -1,4 +1,3 @@
-import {ProductSpecificationProps} from '../pages/PublishedAppsDashboardPage/PublishedDashboardPageUtil';
 import {
 	createProductSpecification,
 	getAccountGroup,
@@ -7,6 +6,9 @@ import {
 	getUserAccountsById,
 	updateProductSpecification,
 } from './api';
+
+import accountPlaceholder from '../assets/images/account_placeholder.png';
+import appPlaceholder from '../assets/images/app_placeholder.png';
 
 export function createSkuName(
 	appProductId: number,
@@ -50,17 +52,25 @@ export async function userAccountChecker(verifiedAccounts: string[]) {
 }
 
 export function getProductVersionFromSpecifications(
-	specifications: ProductSpecificationProps
+	specifications: ProductSpecification[]
 ) {
 	let productVersion = '0';
 
-	specifications.items.forEach((specification: Specification) => {
+	specifications.forEach((specification) => {
 		if (specification.specificationKey === 'latest-version') {
 			productVersion = specification.value.en_US;
 		}
 	});
 
 	return productVersion;
+}
+
+export function showAccountImage(url?: string) {
+	return url?.includes('img_id=0') || !url ? accountPlaceholder : url;
+}
+
+export function showAppImage(url?: string) {
+	return url?.includes('/default') || !url ? appPlaceholder : url;
 }
 
 async function submitSpecification(

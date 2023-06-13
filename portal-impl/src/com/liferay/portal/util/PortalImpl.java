@@ -2442,16 +2442,6 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
-	public Map<String, Serializable> getExpandoBridgeAttributes(
-			ExpandoBridge expandoBridge,
-			UploadPortletRequest uploadPortletRequest)
-		throws PortalException {
-
-		return getExpandoBridgeAttributes(
-			expandoBridge, (HttpServletRequest)uploadPortletRequest);
-	}
-
-	@Override
 	public Serializable getExpandoValue(
 			HttpServletRequest httpServletRequest, String name, int type,
 			String displayType)
@@ -2617,16 +2607,6 @@ public class PortalImpl implements Portal {
 
 		return getExpandoValue(
 			getHttpServletRequest(portletRequest), name, type, displayType);
-	}
-
-	@Override
-	public Serializable getExpandoValue(
-			UploadPortletRequest uploadPortletRequest, String name, int type,
-			String displayType)
-		throws PortalException {
-
-		return getExpandoValue(
-			(HttpServletRequest)uploadPortletRequest, name, type, displayType);
 	}
 
 	@Override
@@ -6829,6 +6809,8 @@ public class PortalImpl implements Portal {
 		else if (PropsValues.LAYOUT_SHOW_HTTP_STATUS) {
 			DynamicServletRequest dynamicRequest = new DynamicServletRequest(
 				httpServletRequest);
+
+			dynamicRequest.setAttribute("status_code", status);
 
 			// Reset layout params or there will be an infinite loop
 

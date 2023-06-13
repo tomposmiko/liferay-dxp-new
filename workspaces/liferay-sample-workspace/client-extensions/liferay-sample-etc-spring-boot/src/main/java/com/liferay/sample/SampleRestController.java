@@ -74,7 +74,7 @@ public class SampleRestController {
 		return "READY";
 	}
 
-	@PostMapping("/sample/notification/type/1")
+	@PostMapping("/notification/type/1")
 	public ResponseEntity<String> postSampleNotificationType(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
@@ -96,7 +96,7 @@ public class SampleRestController {
 		return new ResponseEntity<>(json, HttpStatus.CREATED);
 	}
 
-	@PostMapping("/sample/object/action/1")
+	@PostMapping("/object/action/1")
 	public ResponseEntity<String> postSampleObjectAction1(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
@@ -118,7 +118,7 @@ public class SampleRestController {
 		return new ResponseEntity<>(json, HttpStatus.CREATED);
 	}
 
-	@PostMapping("/sample/object/action/2")
+	@PostMapping("/object/action/2")
 	public ResponseEntity<String> postSampleObjectAction2(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 
@@ -140,7 +140,7 @@ public class SampleRestController {
 		return new ResponseEntity<>(json, HttpStatus.CREATED);
 	}
 
-	@PostMapping("/sample/workflow/action/1")
+	@PostMapping("/workflow/action/1")
 	public ResponseEntity<String> postSampleWorkflowAction1(
 		@AuthenticationPrincipal Jwt jwt, @RequestBody String json) {
 

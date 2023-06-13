@@ -1,7 +1,8 @@
 import ClayTable from '@clayui/table';
 import classNames from 'classnames';
 
-import circleFill from '../../assets/icons/circle_fill.svg';
+import circleFill from '../../assets/icons/circle_fill_icon.svg';
+import {showAppImage} from '../../utils/util';
 import {AppProps} from './DashboardTable';
 
 import './PublishedAppsDashboardTableRow.scss';
@@ -23,7 +24,7 @@ export function PublishedAppsDashboardTableRow({
 					<img
 						alt="App Image"
 						className="dashboard-table-row-name-logo"
-						src={thumbnail}
+						src={showAppImage(thumbnail)}
 					/>
 
 					<span className="dashboard-table-row-name-text">

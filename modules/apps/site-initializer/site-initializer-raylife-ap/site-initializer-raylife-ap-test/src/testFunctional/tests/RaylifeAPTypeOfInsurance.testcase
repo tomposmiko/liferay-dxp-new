@@ -24,8 +24,14 @@ definition {
 			Raylife.createRaylifeSite(siteName = "Raylife D2C");
 
 			Raylife.createRaylifeSite(siteName = "Raylife AP");
+		}
 
-			RaylifeAP.goToRaylifeAPSiteWithRefresh();
+		task ("Login as Scott Producer because of roles and permissions") {
+			User.logoutPG();
+
+			RaylifeAP.userLoginInRaylife(email = "scott.producer");
+
+			RaylifeAP.goToRaylifeUserProfileMenu(raylifeSite = "Raylife AP");
 		}
 	}
 

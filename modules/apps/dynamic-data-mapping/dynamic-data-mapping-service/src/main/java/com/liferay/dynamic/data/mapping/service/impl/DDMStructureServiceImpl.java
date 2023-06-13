@@ -117,7 +117,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 * extracted from the original one. The new structure supports a new name
 	 * and description.
 	 *
-	 * @param  structureId the primary key of the structure to be copied
+	 * @param  sourceStructureId the primary key of the structure to be copied
 	 * @param  nameMap the new structure's locales and localized names
 	 * @param  descriptionMap the new structure's locales and localized
 	 *         descriptions
@@ -128,41 +128,42 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 */
 	@Override
 	public DDMStructure copyStructure(
-			long structureId, Map<Locale, String> nameMap,
+			long sourceStructureId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
-			structureId);
+		DDMStructure sourceStructure = ddmStructurePersistence.findByPrimaryKey(
+			sourceStructureId);
 
 		_ddmStructureModelResourcePermission.check(
-			getPermissionChecker(), structure, ActionKeys.VIEW);
+			getPermissionChecker(), sourceStructure, ActionKeys.VIEW);
 
 		_ddmPermissionSupport.checkAddStructurePermission(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			structure.getClassNameId());
+			sourceStructure.getClassNameId());
 
 		return ddmStructureLocalService.copyStructure(
-			getUserId(), structureId, nameMap, descriptionMap, serviceContext);
+			getUserId(), sourceStructureId, nameMap, descriptionMap,
+			serviceContext);
 	}
 
 	@Override
 	public DDMStructure copyStructure(
-			long structureId, ServiceContext serviceContext)
+			long sourceStructureId, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
-			structureId);
+		DDMStructure sourceStructure = ddmStructurePersistence.findByPrimaryKey(
+			sourceStructureId);
 
 		_ddmStructureModelResourcePermission.check(
-			getPermissionChecker(), structure, ActionKeys.VIEW);
+			getPermissionChecker(), sourceStructure, ActionKeys.VIEW);
 
 		_ddmPermissionSupport.checkAddStructurePermission(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			structure.getClassNameId());
+			sourceStructure.getClassNameId());
 
 		return ddmStructureLocalService.copyStructure(
-			getUserId(), structureId, serviceContext);
+			getUserId(), sourceStructureId, serviceContext);
 	}
 
 	/**
@@ -400,6 +401,33 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			getUserId(), structureId, version, serviceContext);
 	}
 
+	@Override
+	public List<DDMStructure> search(
+			long companyId, long[] groupIds, long classNameId, long classPK,
+			String keywords, int status, int start, int end,
+			OrderByComparator<DDMStructure> orderByComparator)
+		throws PortalException {
+
+		try {
+			SearchContext searchContext =
+				_ddmSearchHelper.buildStructureSearchContext(
+					companyId, groupIds, getUserId(), classNameId, classPK,
+					keywords, keywords, StringPool.BLANK, null, status, start,
+					end, orderByComparator);
+
+			return _ddmSearchHelper.doSearch(
+				searchContext, DDMStructure.class,
+				ddmStructureLocalService::fetchStructure);
+		}
+		catch (PrincipalException principalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(principalException);
+			}
+		}
+
+		return Collections.emptyList();
+	}
+
 	/**
 	 * Returns an ordered range of all the structures matching the groups and
 	 * class name IDs, and matching the keywords in the structure names and
@@ -569,6 +597,31 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		}
 
 		return Collections.emptyList();
+	}
+
+	@Override
+	public int searchCount(
+			long companyId, long[] groupIds, long classNameId, long classPK,
+			String keywords, int status)
+		throws PortalException {
+
+		try {
+			SearchContext searchContext =
+				_ddmSearchHelper.buildStructureSearchContext(
+					companyId, groupIds, getUserId(), classNameId, classPK,
+					keywords, keywords, StringPool.BLANK, null, status,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+			return _ddmSearchHelper.doSearchCount(
+				searchContext, DDMStructure.class);
+		}
+		catch (PrincipalException principalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(principalException);
+			}
+		}
+
+		return 0;
 	}
 
 	/**

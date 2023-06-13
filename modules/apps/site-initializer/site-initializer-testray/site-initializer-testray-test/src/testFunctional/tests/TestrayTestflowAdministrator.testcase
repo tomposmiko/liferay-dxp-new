@@ -49,6 +49,8 @@ definition {
 				projectName = ${projectName},
 				routineName = ${routineName});
 
+			JSONTestray.addCaseType(caseType = ${caseType});
+
 			JSONTestray.addCases(
 				caseName = ${caseName},
 				caseType = ${caseType},
@@ -185,10 +187,6 @@ definition {
 				routine = ${routineName},
 				status = "In Analysis",
 				taskName = "Task_1");
-		}
-
-		task ("Delete the user") {
-			JSONUser.deleteUserByEmailAddress(userEmailAddress = "user@liferay.com");
 		}
 	}
 

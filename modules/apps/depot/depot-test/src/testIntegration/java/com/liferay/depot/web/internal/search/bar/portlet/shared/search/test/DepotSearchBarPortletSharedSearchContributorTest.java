@@ -304,11 +304,6 @@ public class DepotSearchBarPortletSharedSearchContributorTest {
 			}
 
 			@Override
-			public Optional<String> getParameter71(String name) {
-				return Optional.empty();
-			}
-
-			@Override
 			public Optional<String> getParameterOptional(String name) {
 				return Optional.empty();
 			}
@@ -319,18 +314,8 @@ public class DepotSearchBarPortletSharedSearchContributorTest {
 			}
 
 			@Override
-			public Optional<String[]> getParameterValues71(String name) {
-				return Optional.empty();
-			}
-
-			@Override
 			public String getPortletId() {
 				return null;
-			}
-
-			@Override
-			public Optional<PortletPreferences> getPortletPreferences71() {
-				return Optional.empty();
 			}
 
 			@Override

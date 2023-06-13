@@ -1311,3 +1311,72 @@ This affects anyone calling the `CTSQLModeThreadLocal` class from their code.
 ### Why was this change made?
 
 To resolve [LPS-181233](https://issues.liferay.com/browse/LPS-181233), the value of the `CTSQLModeThreadLocal` must be set from the `portal-kernel` module. Moving the class into the `portal-kernel` module allows it to be referenced as required.
+
+---------------------------------------
+
+## Remove Log4j1 compatibility
+
+- **Date:** 2023-May-9
+- **JIRA Ticket:** [LPS-181002](https://issues.liferay.com/browse/LPS-181002)
+
+### What changed?
+
+Log4j1 config format support is removed.
+
+### Who is affected?
+
+Code that's using Log4j1 config format's config files.
+
+### How should I update my code?
+
+Use Log4j2 strict XML format.
+
+### Why was this change made?
+
+Portal has been using Log4j2. After this change, all log4j config files will use log4j2 config format.
+
+---------------------------------------
+
+## Remove verifyDB function from Server Administration
+
+- **Date:** 2023-May-10
+- **JIRA Ticket:** [LPS-184192](https://issues.liferay.com/browse/LPS-184192)
+
+### What changed?
+
+The verifyDB() method was removed from ServiceComponentLocalService. The "Verify database tables of all plugins." function was removed from "Server Administration" -> "Verification Actions"
+
+### Who is affected?
+
+This affects anyone calling the `ServiceComponentLocalService.verifyDB()` method from their code and using the UI function.
+
+### How should I update my code?
+
+Remove usage of `ServiceComponentLocalService.verifyDB()`
+
+### Why was this change made?
+
+Upgrade framework manages all modules' tables and Release record creation. This verifyDB function does not do anything.
+
+---------------------------------------
+
+## Removed 7.1 methods in PortletSharedSearchSettings from portal-search-web-api module
+
+- **Date:** 2023-May-10
+- **JIRA Ticket:** [LPS-183921](https://issues.liferay.com/browse/LPS-183921)
+
+### What changed?
+
+ `PortalSharedSearchSettings` methods related to 7.1 compatibility are removed.
+
+### Who is affected?
+
+This affects anyone who is calling these methods from there code: `getParameter71()`, `getParameterValues71()`, and `getPortletPreferences71()`
+
+### How should I update my code?
+
+Replace `getParameter71()` with `getParameterOptional()`, `getParameterValues71()` with `getParameterValues()`, and `getPortletPreferences71()` with `getPortletPreferencesOptional()`.
+
+### Why was this change made?
+
+These methods were added back in 7.2 for forward compatibility: [LPS-101007](https://issues.liferay.com/browse/LPS-101007). Now in 7.4, they are only redundant methods to their Optional and String version.

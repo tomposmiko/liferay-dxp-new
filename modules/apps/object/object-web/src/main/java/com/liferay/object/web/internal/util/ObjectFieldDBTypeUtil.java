@@ -19,6 +19,7 @@ import com.liferay.info.field.type.DateInfoFieldType;
 import com.liferay.info.field.type.FileInfoFieldType;
 import com.liferay.info.field.type.HTMLInfoFieldType;
 import com.liferay.info.field.type.InfoFieldType;
+import com.liferay.info.field.type.LongTextInfoFieldType;
 import com.liferay.info.field.type.MultiselectInfoFieldType;
 import com.liferay.info.field.type.NumberInfoFieldType;
 import com.liferay.info.field.type.RelationshipInfoFieldType;
@@ -67,6 +68,12 @@ public class ObjectFieldDBTypeUtil {
 					 ObjectFieldConstants.BUSINESS_TYPE_PRECISION_DECIMAL)) {
 
 			return NumberInfoFieldType.INSTANCE;
+		}
+		else if (Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_LONG_TEXT)) {
+
+			return LongTextInfoFieldType.INSTANCE;
 		}
 		else if (Objects.equals(
 					objectField.getBusinessType(),

@@ -59,12 +59,11 @@ definition {
 	}
 
 	@description = "LRQA-72024 - Verify that the calendar has Agenda view"
-	@ignore = "Test Stub"
 	@priority = 3
 	test CalendarHasAgendaView {
 		CalendarNavigator.gotoView(viewType = "Agenda");
 
-		CalendarPage.viewTypeOfTableView(tableType = "Mont");
+		AssertVisible(locator1 = "CalendarPage#VIEW_AGENDA_CURRENT_DAY");
 	}
 
 	@description = "LRQA-72024 - Verify that the calendar has Day view"

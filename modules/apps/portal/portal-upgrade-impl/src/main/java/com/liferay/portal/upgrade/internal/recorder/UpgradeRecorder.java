@@ -52,7 +52,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 public class UpgradeRecorder {
 
 	public Map<String, Map<String, Integer>> getErrorMessages() {
-		return _filter(_errorMessages);
+		return _errorMessages;
 	}
 
 	public String getFinalSchemaVersion(String servletContextName) {
@@ -90,7 +90,7 @@ public class UpgradeRecorder {
 	}
 
 	public Map<String, Map<String, Integer>> getWarningMessages() {
-		return _filter(_warningMessages);
+		return _warningMessages;
 	}
 
 	public void recordErrorMessage(String loggerName, String message) {
@@ -136,6 +136,9 @@ public class UpgradeRecorder {
 	}
 
 	public void stop() {
+		_filter(_errorMessages);
+		_filter(_warningMessages);
+
 		_result = _calculateResult();
 		_type = _calculateType();
 
@@ -185,7 +188,7 @@ public class UpgradeRecorder {
 					"Unable to check the upgrade result due to ",
 					exception.getMessage(), ". Please check manually."));
 
-			return "unresolved";
+			return "failure";
 		}
 
 		if (!_warningMessages.isEmpty()) {

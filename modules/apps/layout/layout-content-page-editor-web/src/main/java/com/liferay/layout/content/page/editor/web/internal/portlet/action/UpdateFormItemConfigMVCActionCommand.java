@@ -17,22 +17,14 @@ package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
 import com.liferay.fragment.entry.processor.constants.FragmentEntryProcessorConstants;
+import com.liferay.fragment.helper.DefaultInputFragmentEntryConfigurationProvider;
 import com.liferay.fragment.listener.FragmentEntryLinkListener;
 import com.liferay.fragment.listener.FragmentEntryLinkListenerRegistry;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkService;
 import com.liferay.info.field.InfoField;
-import com.liferay.info.field.type.BooleanInfoFieldType;
-import com.liferay.info.field.type.DateInfoFieldType;
-import com.liferay.info.field.type.FileInfoFieldType;
-import com.liferay.info.field.type.HTMLInfoFieldType;
 import com.liferay.info.field.type.InfoFieldType;
-import com.liferay.info.field.type.MultiselectInfoFieldType;
-import com.liferay.info.field.type.NumberInfoFieldType;
-import com.liferay.info.field.type.RelationshipInfoFieldType;
-import com.liferay.info.field.type.SelectInfoFieldType;
-import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.provider.InfoItemFormProvider;
@@ -62,7 +54,6 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -74,6 +65,7 @@ import com.liferay.segments.constants.SegmentsExperienceConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 
@@ -204,7 +196,8 @@ public class UpdateFormItemConfigMVCActionCommand extends BaseMVCActionCommand {
 
 			FragmentEntry fragmentEntry =
 				_fragmentCollectionContributorRegistry.getFragmentEntry(
-					_getFragmentEntryKey(infoField));
+					_getFragmentEntryKey(
+						infoField, themeDisplay.getScopeGroupId()));
 
 			if ((fragmentEntry == null) ||
 				!_isAllowedFragmentEntryKey(
@@ -272,50 +265,14 @@ public class UpdateFormItemConfigMVCActionCommand extends BaseMVCActionCommand {
 		return addedFragmentEntryLinks;
 	}
 
-	private String _getFragmentEntryKey(InfoField infoField) {
+	private String _getFragmentEntryKey(InfoField infoField, long groupId) {
 		InfoFieldType infoFieldType = infoField.getInfoFieldType();
 
-		if (infoFieldType instanceof BooleanInfoFieldType) {
-			return "INPUTS-checkbox";
-		}
+		Map<String, String> defaultInputFragmentEntryKeys =
+			_defaultInputFragmentEntryHelper.getDefaultInputFragmentEntryKeys(
+				groupId);
 
-		if (infoFieldType instanceof DateInfoFieldType) {
-			return "INPUTS-date-input";
-		}
-
-		if (infoFieldType instanceof FileInfoFieldType) {
-			return "INPUTS-file-upload";
-		}
-
-		if (infoFieldType instanceof HTMLInfoFieldType) {
-			return "INPUTS-rich-text-input";
-		}
-
-		if (infoFieldType instanceof MultiselectInfoFieldType) {
-			return "INPUTS-multiselect-list";
-		}
-
-		if (infoFieldType instanceof NumberInfoFieldType) {
-			return "INPUTS-numeric-input";
-		}
-
-		if (infoFieldType instanceof RelationshipInfoFieldType ||
-			infoFieldType instanceof SelectInfoFieldType) {
-
-			return "INPUTS-select-from-list";
-		}
-
-		if (infoFieldType instanceof TextInfoFieldType) {
-			if (GetterUtil.getBoolean(
-					infoField.getAttribute(TextInfoFieldType.MULTILINE))) {
-
-				return "INPUTS-textarea";
-			}
-
-			return "INPUTS-text-input";
-		}
-
-		return null;
+		return defaultInputFragmentEntryKeys.get(infoFieldType.getName());
 	}
 
 	private List<InfoField<?>> _getInfoFields(
@@ -566,6 +523,10 @@ public class UpdateFormItemConfigMVCActionCommand extends BaseMVCActionCommand {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpdateFormItemConfigMVCActionCommand.class);
+
+	@Reference
+	private DefaultInputFragmentEntryConfigurationProvider
+		_defaultInputFragmentEntryHelper;
 
 	@Reference
 	private FragmentCollectionContributorRegistry

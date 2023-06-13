@@ -23,6 +23,7 @@ import com.liferay.poshi.core.PoshiVariablesContext;
 import com.liferay.poshi.core.util.FileUtil;
 import com.liferay.poshi.core.util.GetterUtil;
 import com.liferay.poshi.core.util.PropsValues;
+import com.liferay.poshi.core.util.Validator;
 import com.liferay.poshi.runner.logger.PoshiLogger;
 import com.liferay.poshi.runner.logger.SummaryLogger;
 import com.liferay.poshi.runner.selenium.LiferaySeleniumUtil;
@@ -115,6 +116,10 @@ public class PoshiRunner {
 				PoshiGetterUtil.getNamespaceFromNamespacedClassCommandName(
 					testName);
 
+			if (Validator.isNull(namespace)) {
+				namespace = PoshiContext.getDefaultNamespace();
+			}
+
 			if (testName.contains("#")) {
 				String classCommandName =
 					PoshiGetterUtil.
@@ -152,6 +157,10 @@ public class PoshiRunner {
 			PoshiGetterUtil.
 				getNamespacedClassNameFromNamespacedClassCommandName(
 					_testNamespacedClassCommandName);
+	}
+
+	public String getTestNamespacedClassCommandName() {
+		return _testNamespacedClassCommandName;
 	}
 
 	@Before

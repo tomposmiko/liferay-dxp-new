@@ -21,9 +21,11 @@
 >
 
 	<%
-	StatusDisplayContext statusDisplayContext = new StatusDisplayContext(request);
+	int status = GetterUtil.getInteger(request.getAttribute("status_code"));
 
-	int status = ParamUtil.getInteger(request, "status");
+	if (status == 0) {
+		status = ParamUtil.getInteger(request, "status");
+	}
 
 	if (status > 0) {
 		response.setStatus(status);
@@ -31,6 +33,26 @@
 	%>
 
 	<c:choose>
+		<c:when test="<%= status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR %>">
+			<liferay-layout:render-layout-utility-page-entry
+				type="<%= LayoutUtilityPageEntryConstants.TYPE_SC_INTERNAL_SERVER_ERROR %>"
+			>
+				<h3 class="alert alert-danger">
+					<liferay-ui:message key="internal-server-error" />
+				</h3>
+
+				<liferay-ui:message key="an-error-occurred-while-accessing-the-requested-resource" />
+
+				<br /><br />
+
+				<code class="lfr-url-error"><%= statusDisplayContext.getEscapedURL(themeDisplay) %></code>
+
+				<%
+				statusDisplayContext.logSessionErrors();
+				%>
+
+			</liferay-layout:render-layout-utility-page-entry>
+		</c:when>
 		<c:when test="<%= SessionErrors.contains(request, PrincipalException.getNestedClasses()) %>">
 			<h3 class="alert alert-danger">
 				<liferay-ui:message key="forbidden" />

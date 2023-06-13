@@ -14,8 +14,7 @@ import DealRegistrationDTO from '../../../interfaces/dto/dealRegistrationDTO';
 
 export function getDTOFromDealRegistration(
 	dealRegistration: DealRegistration,
-	leadExternalReferenceCode?: string,
-	leadQualificationExternalReferenceCode?: string
+	leadExternalReferenceCode?: string
 ): DealRegistrationDTO {
 	return {
 		accountExternalReferenceCode:
@@ -30,12 +29,12 @@ export function getDTOFromDealRegistration(
 			dealRegistration.additionalInformationAboutTheOpportunity,
 		currency: dealRegistration.currency,
 		leadExternalReferenceCode,
-		leadQualificationExternalReferenceCode,
 		leadStatusDetail: dealRegistration.leadStatusDetails,
 		mdfActivityExternalReferenceCode:
 			dealRegistration.mdfActivityAssociated.externalReferenceCode,
 		mdfActivityName: dealRegistration.mdfActivityAssociated.name,
-		partnerAccountName: dealRegistration.partnerAccount.name,
+		partnerFirstName: dealRegistration.partnerFirstName,
+		partnerLastName: dealRegistration.partnerLastName,
 		primaryProspectBusinessUnit:
 			dealRegistration.primaryProspect.businessUnit,
 		primaryProspectDepartment:

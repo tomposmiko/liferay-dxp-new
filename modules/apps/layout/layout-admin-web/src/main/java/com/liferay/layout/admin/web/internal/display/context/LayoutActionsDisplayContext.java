@@ -18,10 +18,13 @@ import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
+import com.liferay.layout.admin.web.internal.security.permission.resource.LayoutPageTemplatePermission;
+import com.liferay.layout.page.template.constants.LayoutPageTemplateActionKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.layout.utility.page.model.LayoutUtilityPageEntry;
 import com.liferay.layout.utility.page.service.LayoutUtilityPageEntryLocalServiceUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -41,7 +44,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -111,7 +113,7 @@ public class LayoutActionsDisplayContext {
 							dropdownItem.setTarget("_blank");
 						}
 					).add(
-						() -> _isContentLayout(layout),
+						() -> _isShowConvertToPageTemplateAction(layout),
 						dropdownItem -> {
 							dropdownItem.putData(
 								"action", "convertToPageTemplate");
@@ -351,6 +353,24 @@ public class LayoutActionsDisplayContext {
 
 		return LayoutPermissionUtil.containsLayoutUpdatePermission(
 			_themeDisplay.getPermissionChecker(), layout);
+	}
+
+	private boolean _isShowConvertToPageTemplateAction(Layout layout)
+		throws PortalException {
+
+		if (_isContentLayout(layout) &&
+			LayoutPageTemplatePermission.contains(
+				_themeDisplay.getPermissionChecker(), layout.getGroupId(),
+				LayoutPageTemplateActionKeys.
+					ADD_LAYOUT_PAGE_TEMPLATE_COLLECTION) &&
+			LayoutPageTemplatePermission.contains(
+				_themeDisplay.getPermissionChecker(), layout.getGroupId(),
+				LayoutPageTemplateActionKeys.ADD_LAYOUT_PAGE_TEMPLATE_ENTRY)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _isShowDeleteAction(Layout layout) throws PortalException {

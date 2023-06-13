@@ -201,7 +201,18 @@ public class ObjectEntryVariablesUtil {
 
 		Map<String, Object> allowedVariables =
 			HashMapBuilder.<String, Object>put(
-				"creator", payloadJSONObject.get("userId")
+				"creator",
+				() -> {
+					if (objectDefinition.isUnmodifiableSystemObject()) {
+						return payloadJSONObject.get("userId");
+					}
+
+					Map<String, Object> objectEntry =
+						(Map<String, Object>)payloadJSONObject.get(
+							"objectEntry");
+
+					return objectEntry.get("userId");
+				}
 			).put(
 				"currentUserId", payloadJSONObject.get("userId")
 			).build();

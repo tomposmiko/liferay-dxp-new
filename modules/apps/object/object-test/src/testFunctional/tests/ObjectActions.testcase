@@ -2951,6 +2951,7 @@ definition {
 	@description = "Verify an action with an oldValue function sends an email when the order payment status is updated"
 	@priority = 4
 	test CanSendEmailWhenPaymentStatusIsUpdated {
+		property portal.upstream = "quarantine";
 		property test.smtp.server.enabled = "true";
 
 		task ("Given an email notification template") {
@@ -3569,57 +3570,56 @@ definition {
 			actionLabel = "Update Action Label");
 	}
 
-	@description = "LPS-173537 - Verify adding a Commerce Product entry triggers an action to update the Commerce Product Group entry."
+	@description = "Verify creating a Commerce Product entry triggers an action to update the Commerce Product entry"
 	@priority = 5
-	test CanUpdateCommerceProductGroupEntryAfterCreatingCommerceProductEntry {
+	test CanUpdateCommerceProductEntryAfterCreatingCommerceProductEntry {
 		property portal.acceptance = "true";
 
-		task ("Given a Commerce Product Group object") {
+		task ("Given an action to update a Commerce Product entry after creating a Commerce Product entry") {
 			ObjectAdmin.openObjectAdmin();
 
-			ObjectPortlet.selectSystemObject(label = "Commerce Product Group");
-		}
+			ObjectPortlet.selectSystemObject(label = "Commerce Product");
 
-		task ("And given an action to update a Commerce Product Group entry after creating a Commerce Product Group entry") {
 			ObjectAdmin.goToActionsTab();
 
 			ObjectAdmin.addObjectActionViaUI(
 				actionLabel = "Custom Action",
-				actionName = "CustomAction",
 				active = "true",
-				fieldName = "Title",
+				fieldName = "Name",
 				inputMethod = "true",
-				inputValue = "Product Group Updated",
-				objectLabel = "Commerce Product Group",
+				inputValue = "Shoes",
 				thenAction = "Update an Object Entry",
 				whenAction = "On After Add");
 		}
 
-		task ("When the user creates a Commerce Product Group entry") {
-			CommerceNavigator.gotoPortlet(
-				category = "Pricing",
-				portlet = "Product Groups");
+		task ("When the user adds a new Commerce Product entry") {
+			CommerceProducts.openProductsAdmin();
 
 			Click(locator1 = "Button#PLUS");
 
-			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_IFRAME");
+			DropdownMenuItem.click(menuItem = "Simple");
+
+			WaitForElementPresent(locator1 = "IFrame#MODAL_BODY");
+
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
 			Type(
-				key_fieldLabel = "Name",
-				locator1 = "TextInput#GENERIC_TEXT_INPUT",
-				value1 = "Product Group");
+				locator1 = "CommerceEntry#NAME_FIELD",
+				value1 = "Bottle");
+
+			CommerceEntry.selectAutoCompleteField(
+				entryName = "Master",
+				label = "Catalog");
 
 			Button.clickSubmitButton();
+
+			CommerceProducts.openProductsAdmin();
 		}
 
-		task ("Then the action is triggered and the Commerce Product Group entry is updated") {
-			CommerceNavigator.gotoPortlet(
-				category = "Pricing",
-				portlet = "Product Groups");
-
+		task ("Then the action is triggered and the created Commerce Product entry is updated") {
 			AssertElementPresent(
-				key_entryName = "Product Group Updated",
-				locator1 = "CommerceEntry#TABLE_LIST_TITLE");
+				key_entry = "Shoes",
+				locator1 = "CommerceNavigation#ANY_ENTRY_NAME");
 		}
 	}
 

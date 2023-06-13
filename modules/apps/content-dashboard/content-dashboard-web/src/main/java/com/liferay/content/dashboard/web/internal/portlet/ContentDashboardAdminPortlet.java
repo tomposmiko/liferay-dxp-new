@@ -20,7 +20,6 @@ import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.content.dashboard.item.ContentDashboardItem;
 import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtypeFactoryRegistry;
 import com.liferay.content.dashboard.web.internal.constants.ContentDashboardPortletKeys;
-import com.liferay.content.dashboard.web.internal.constants.ContentDashboardWebKeys;
 import com.liferay.content.dashboard.web.internal.dao.search.ContentDashboardItemSearchContainerFactory;
 import com.liferay.content.dashboard.web.internal.data.provider.ContentDashboardDataProvider;
 import com.liferay.content.dashboard.web.internal.display.context.ContentDashboardAdminDisplayContext;
@@ -161,7 +160,7 @@ public class ContentDashboardAdminPortlet extends MVCPortlet {
 					resourceBundle, searchContainer);
 
 		renderRequest.setAttribute(
-			ContentDashboardWebKeys.CONTENT_DASHBOARD_ADMIN_DISPLAY_CONTEXT,
+			ContentDashboardAdminDisplayContext.class.getName(),
 			contentDashboardAdminDisplayContext);
 
 		ContentDashboardAdminManagementToolbarDisplayContext
@@ -176,13 +175,12 @@ public class ContentDashboardAdminPortlet extends MVCPortlet {
 					_portal.getLocale(renderRequest), _userLocalService);
 
 		renderRequest.setAttribute(
-			ContentDashboardWebKeys.
-				CONTENT_DASHBOARD_ADMIN_MANAGEMENT_TOOLBAR_DISPLAY_CONTEXT,
+			ContentDashboardAdminManagementToolbarDisplayContext.class.
+				getName(),
 			contentDashboardAdminManagementToolbarDisplayContext);
 
 		renderRequest.setAttribute(
-			ContentDashboardWebKeys.
-				CONTENT_DASHBOARD_ADMIN_SHARING_DISPLAY_CONTEXT,
+			ContentDashboardAdminSharingDisplayContext.class.getName(),
 			new ContentDashboardAdminSharingDisplayContext(
 				_contentDashboardItemFactoryRegistry,
 				_portal.getHttpServletRequest(liferayPortletRequest),

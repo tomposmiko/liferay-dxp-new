@@ -17,11 +17,11 @@ package com.liferay.layout.seo.web.internal.servlet.taglib;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryMetadataLocalService;
 import com.liferay.document.library.util.DLURLHelper;
-import com.liferay.dynamic.data.mapping.kernel.DDMFormFieldValue;
-import com.liferay.dynamic.data.mapping.kernel.DDMFormValues;
-import com.liferay.dynamic.data.mapping.kernel.StorageEngineManagerUtil;
-import com.liferay.dynamic.data.mapping.kernel.Value;
+import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
+import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.storage.DDMStorageEngineManager;
 import com.liferay.dynamic.data.mapping.storage.StorageEngine;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.item.InfoItemDetails;
@@ -143,7 +143,7 @@ public class OpenGraphTopHeadDynamicInclude extends BaseDynamicInclude {
 				(layoutSEOEntry.getDDMStorageId() != 0)) {
 
 				DDMFormValues ddmFormValues =
-					StorageEngineManagerUtil.getDDMFormValues(
+					_ddmStorageEngineManager.getDDMFormValues(
 						layoutSEOEntry.getDDMStorageId());
 
 				Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
@@ -455,6 +455,9 @@ public class OpenGraphTopHeadDynamicInclude extends BaseDynamicInclude {
 
 		return false;
 	}
+
+	@Reference
+	private DDMStorageEngineManager _ddmStorageEngineManager;
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;

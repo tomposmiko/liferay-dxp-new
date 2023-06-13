@@ -30,6 +30,7 @@ import com.liferay.info.field.type.DateInfoFieldType;
 import com.liferay.info.field.type.FileInfoFieldType;
 import com.liferay.info.field.type.HTMLInfoFieldType;
 import com.liferay.info.field.type.InfoFieldType;
+import com.liferay.info.field.type.LongTextInfoFieldType;
 import com.liferay.info.field.type.MultiselectInfoFieldType;
 import com.liferay.info.field.type.NumberInfoFieldType;
 import com.liferay.info.field.type.RelationshipInfoFieldType;
@@ -440,10 +441,6 @@ public class EditFragmentEntryDisplayContext {
 			"autocompleteTags",
 			_fragmentEntryProcessorRegistry.getAvailableTagsJSONArray()
 		).put(
-			"cacheable", _fragmentEntry.isCacheable()
-		).put(
-			"cacheableEnabled", _isCacheableEnabled()
-		).put(
 			"dataAttributes",
 			_fragmentEntryProcessorRegistry.getDataAttributesJSONArray()
 		).put(
@@ -587,16 +584,6 @@ public class EditFragmentEntryDisplayContext {
 		return new ArrayList<>(resourcesMap.keySet());
 	}
 
-	private boolean _isCacheableEnabled() {
-		FragmentEntry fragmentEntry = getFragmentEntry();
-
-		if (!fragmentEntry.isTypeInput()) {
-			return true;
-		}
-
-		return false;
-	}
-
 	private boolean _isReadOnlyFragmentEntry() {
 		if (_readOnly != null) {
 			return _readOnly;
@@ -665,9 +652,10 @@ public class EditFragmentEntryDisplayContext {
 	private static final InfoFieldType[] _INFO_FIELD_TYPES = {
 		BooleanInfoFieldType.INSTANCE, CaptchaInfoFieldType.INSTANCE,
 		DateInfoFieldType.INSTANCE, FileInfoFieldType.INSTANCE,
-		HTMLInfoFieldType.INSTANCE, MultiselectInfoFieldType.INSTANCE,
-		NumberInfoFieldType.INSTANCE, RelationshipInfoFieldType.INSTANCE,
-		SelectInfoFieldType.INSTANCE, TextInfoFieldType.INSTANCE
+		HTMLInfoFieldType.INSTANCE, LongTextInfoFieldType.INSTANCE,
+		MultiselectInfoFieldType.INSTANCE, NumberInfoFieldType.INSTANCE,
+		RelationshipInfoFieldType.INSTANCE, SelectInfoFieldType.INSTANCE,
+		TextInfoFieldType.INSTANCE
 	};
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -80,6 +80,8 @@ type Cart = {
 	paymentMethod: string;
 	purchaseOrderNumber?: string;
 	shippingAddress: BillingAddress;
+	orderTypeExternalReferenceCode: string;
+	orderTypeId: number;
 };
 
 type CartItem = {
@@ -194,8 +196,14 @@ interface PlacedOrder {
 	accountId: number;
 	author: string;
 	createDate: string;
+	customFields: {[key: string]: string};
 	id: number;
-	orderStatusInfo: {code: number; label: string; label_i18n: string};
+	orderStatusInfo: {
+		code: number;
+		label: string;
+		label_i18n: string;
+	};
+	orderTypeExternalReferenceCode: string;
 	placedOrderItems: PlacedOrderItems[];
 }
 
@@ -300,7 +308,12 @@ type SKU = {
 	skuOptions: {key: string; value: string}[];
 };
 
-type Specification = {
+type ProductSpecification = {
+	id: number;
+	optionCategoryId: number;
+	priority: number;
+	productId: number;
+	specificationId: number;
 	specificationKey: string;
 	value: {[key: string]: string};
 };

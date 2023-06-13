@@ -13,12 +13,15 @@
  */
 
 import ClayButton from '@clayui/button';
+import ClayDatePicker from '@clayui/date-picker';
 import ClayForm, {ClayInput, ClaySelectWithOption} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayModal from '@clayui/modal';
+import classNames from 'classnames';
+import {isBefore} from 'date-fns';
 import {fetch, navigate, openModal, openToast} from 'frontend-js-web';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {API_URL, OBJECT_RELATIONSHIP} from '../Constants';
 import {FDSViewType} from '../FDSViews';
@@ -37,6 +40,79 @@ interface Filter {
 	label: string;
 	name: string;
 	type: string;
+}
+
+interface DateFilter extends Filter {
+	from: string;
+	to: string;
+}
+
+function DateRange({
+	from,
+	namespace,
+	onFromChange,
+	onToChange,
+	to,
+}: {
+	from: string;
+	namespace: string;
+	onFromChange: (from: string) => void;
+	onToChange: (to: string) => void;
+	to: string;
+}) {
+	const [isValid, setIsValid] = useState(true);
+
+	useEffect(() => {
+		if (from && to) {
+			setIsValid(isBefore(new Date(from), new Date(to)));
+		}
+	}, [from, to]);
+
+	return (
+		<>
+			<ClayForm.Group className="form-group-autofit">
+				<div
+					className={classNames('form-group-item', {
+						'has-error': !isValid,
+					})}
+				>
+					<label htmlFor={namespace + 'date-range-from'}>
+						{Liferay.Language.get('from')}
+					</label>
+
+					<ClayDatePicker
+						onChange={(value: string) => onFromChange(value)}
+						placeholder="YYYY-MM-DD"
+						value={from}
+					/>
+
+					{!isValid && (
+						<ClayForm.FeedbackGroup>
+							<ClayForm.FeedbackItem>
+								<ClayForm.FeedbackIndicator symbol="exclamation-full" />
+
+								{Liferay.Language.get(
+									'date-range-is-invalid.-from-must-be-before-to'
+								)}
+							</ClayForm.FeedbackItem>
+						</ClayForm.FeedbackGroup>
+					)}
+				</div>
+
+				<div className="form-group-item">
+					<label htmlFor={namespace + 'date-range-to'}>
+						{Liferay.Language.get('to')}
+					</label>
+
+					<ClayDatePicker
+						onChange={(value: string) => onToChange(value)}
+						placeholder="YYYY-MM-DD"
+						value={to}
+					/>
+				</div>
+			</ClayForm.Group>
+		</>
+	);
 }
 
 interface IPropsAddFDSFilterModalContent {
@@ -68,8 +144,10 @@ function AddFDSFilterModalContent({
 	namespace,
 	onSave,
 }: IPropsAddFDSFilterModalContent) {
-	const [selectedField, setSelectedField] = React.useState<string>();
-	const [label, setLabel] = React.useState<string>();
+	const [selectedField, setSelectedField] = useState<string>();
+	const [label, setLabel] = useState<string>();
+	const [from, setFrom] = useState<string>('');
+	const [to, setTo] = useState<string>('');
 
 	const handleFilterSave = async () => {
 		const field = fields.find((item: Field) => item.name === selectedField);
@@ -85,17 +163,19 @@ function AddFDSFilterModalContent({
 
 		if (field.format === 'date-time') {
 			url = API_URL.FDS_DATE_FILTERS;
+
 			body = {
 				[OBJECT_RELATIONSHIP.FDS_VIEW_FDS_DATE_FILTER_ID]: fdsView.id,
 				fieldName: field.name,
-				from: '',
+				from,
 				label: label || field.label,
-				to: '',
+				to,
 				type: field.format,
 			};
 		}
 		else {
 			url = API_URL.FDS_DYNAMIC_FILTERS;
+
 			body = {
 				[OBJECT_RELATIONSHIP.FDS_VIEW_FDS_DYNAMIC_FILTER_ID]:
 					fdsView.id,
@@ -127,6 +207,8 @@ function AddFDSFilterModalContent({
 
 		closeModal();
 	};
+
+	const field = fields.find((item: Field) => item.name === selectedField);
 
 	return (
 		<div className="fds-view-fields-modal">
@@ -186,6 +268,16 @@ function AddFDSFilterModalContent({
 						/>
 					</ClayForm.Group>
 				)}
+
+				{field?.format === 'date-time' && (
+					<DateRange
+						from={from}
+						namespace={namespace}
+						onFromChange={setFrom}
+						onToChange={setTo}
+						to={to}
+					/>
+				)}
 			</ClayModal.Body>
 
 			<ClayModal.Footer
@@ -215,9 +307,9 @@ interface IProps {
 }
 
 function Filters({fdsView, fdsViewsURL, namespace}: IProps) {
-	const [fields, setFields] = React.useState<Field[]>([]);
-	const [filters, setFilters] = React.useState<Filter[]>([]);
-	const [newFiltersOrder, setNewFiltersOrder] = React.useState<string>('');
+	const [fields, setFields] = useState<Field[]>([]);
+	const [filters, setFilters] = useState<Filter[]>([]);
+	const [newFiltersOrder, setNewFiltersOrder] = useState<string>('');
 
 	const updateFDSFiltersOrder = async () => {
 		const response = await fetch(
@@ -267,7 +359,7 @@ function Filters({fdsView, fdsViewsURL, namespace}: IProps) {
 			),
 		});
 
-	React.useEffect(() => {
+	useEffect(() => {
 		const getFilters = async () => {
 			const response = await fetch(
 				`${API_URL.FDS_VIEWS}/${fdsView.id}?nestedFields=${OBJECT_RELATIONSHIP.FDS_VIEW_FDS_DATE_FILTER},${OBJECT_RELATIONSHIP.FDS_VIEW_FDS_DYNAMIC_FILTER}`
@@ -277,7 +369,7 @@ function Filters({fdsView, fdsViewsURL, namespace}: IProps) {
 
 			const dateFiltersOrderer = responseJSON[
 				OBJECT_RELATIONSHIP.FDS_VIEW_FDS_DATE_FILTER
-			] as Filter[];
+			] as DateFilter[];
 			const dynamicFiltersOrderer = responseJSON[
 				OBJECT_RELATIONSHIP.FDS_VIEW_FDS_DYNAMIC_FILTER
 			] as Filter[];

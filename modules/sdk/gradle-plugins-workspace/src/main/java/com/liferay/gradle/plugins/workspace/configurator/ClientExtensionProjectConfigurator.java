@@ -37,6 +37,7 @@ import com.liferay.gradle.plugins.workspace.internal.util.StringUtil;
 import com.liferay.gradle.plugins.workspace.task.CreateClientExtensionConfigTask;
 import com.liferay.gradle.util.Validator;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 
 import groovy.lang.Closure;
 
@@ -62,6 +63,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.gradle.api.Action;
+import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -103,6 +105,9 @@ public class ClientExtensionProjectConfigurator
 	public static final String CREATE_CLIENT_EXTENSION_CONFIG_TASK_NAME =
 		"createClientExtensionConfig";
 
+	public static final String VALIDATE_CLIENT_EXTENSION_IDS_TASK_NAME =
+		"validateClientExtensionIds";
+
 	public ClientExtensionProjectConfigurator(Settings settings) {
 		super(settings);
 
@@ -129,10 +134,16 @@ public class ClientExtensionProjectConfigurator
 			GradleUtil.addTaskProvider(
 				project, BUILD_CLIENT_EXTENSION_ZIP_TASK_NAME, Zip.class);
 
+		TaskProvider<DefaultTask> validateClientExtensionIdsTaskProvider =
+			GradleUtil.addTaskProvider(
+				project, VALIDATE_CLIENT_EXTENSION_IDS_TASK_NAME,
+				DefaultTask.class);
+
 		_baseConfigureClientExtensionProject(
 			project, assembleClientExtensionTaskProvider,
 			buildClientExtensionZipTaskProvider,
-			createClientExtensionConfigTaskProvider);
+			createClientExtensionConfigTaskProvider,
+			validateClientExtensionIdsTaskProvider);
 
 		Map<String, JsonNode> profileJsonNodes =
 			_configureClientExtensionJsonNodes(
@@ -184,6 +195,18 @@ public class ClientExtensionProjectConfigurator
 
 						_validateClientExtension(clientExtension);
 
+						_clientExtensionIds.compute(
+							clientExtension.id,
+							(key, value) -> {
+								if (value == null) {
+									value = new HashSet<>();
+								}
+
+								value.add(project);
+
+								return value;
+							});
+
 						createClientExtensionConfigTaskProvider.configure(
 							createClientExtensionConfigTask -> {
 								if (!_isActiveProfile(project, profileName)) {
@@ -224,7 +247,9 @@ public class ClientExtensionProjectConfigurator
 		_nodeBuildConfigurer.apply(
 			project, assembleClientExtensionTaskProvider);
 
-		_addDockerTasks(project, assembleClientExtensionTaskProvider);
+		_addDockerTasks(
+			project, assembleClientExtensionTaskProvider,
+			createClientExtensionConfigTaskProvider);
 	}
 
 	@Override
@@ -277,8 +302,9 @@ public class ClientExtensionProjectConfigurator
 	protected static final String NAME = "client.extension";
 
 	private void _addDockerTasks(
-		Project project,
-		TaskProvider<Copy> assembleClientExtensionTaskProvider) {
+		Project project, TaskProvider<Copy> assembleClientExtensionTaskProvider,
+		TaskProvider<CreateClientExtensionConfigTask>
+			createClientExtensionConfigTaskProvider) {
 
 		DockerBuildImage dockerBuildImage = GradleUtil.addTask(
 			project, RootProjectConfigurator.BUILD_DOCKER_IMAGE_TASK_NAME,
@@ -289,7 +315,7 @@ public class ClientExtensionProjectConfigurator
 				"all configs deployed.");
 		dockerBuildImage.setGroup(RootProjectConfigurator.DOCKER_GROUP);
 
-		dockerBuildImage.dependsOn(assembleClientExtensionTaskProvider);
+		dockerBuildImage.dependsOn(createClientExtensionConfigTaskProvider);
 
 		DirectoryProperty inputDirectoryProperty =
 			dockerBuildImage.getInputDir();
@@ -344,7 +370,8 @@ public class ClientExtensionProjectConfigurator
 		Project project, TaskProvider<Copy> assembleClientExtensionTaskProvider,
 		TaskProvider<Zip> buildClientExtensionZipTaskProvider,
 		TaskProvider<CreateClientExtensionConfigTask>
-			createClientExtensionConfigTaskProvider) {
+			createClientExtensionConfigTaskProvider,
+		TaskProvider<DefaultTask> validateClientExtensionIdsTaskProvider) {
 
 		if (isDefaultRepositoryEnabled()) {
 			GradleUtil.addDefaultRepositories(project);
@@ -365,13 +392,15 @@ public class ClientExtensionProjectConfigurator
 		_configureLiferayExtension(project, liferayExtension);
 
 		_configureConfigurationDefault(project);
+		_configureTaskCheck(project);
 		_configureTaskClean(project);
 		_configureTaskDeploy(project);
 
 		_configureClientExtensionTasks(
 			project, assembleClientExtensionTaskProvider,
 			buildClientExtensionZipTaskProvider,
-			createClientExtensionConfigTaskProvider);
+			createClientExtensionConfigTaskProvider,
+			validateClientExtensionIdsTaskProvider);
 
 		addTaskDockerDeploy(
 			project, buildClientExtensionZipTaskProvider,
@@ -535,12 +564,15 @@ public class ClientExtensionProjectConfigurator
 		Project project, TaskProvider<Copy> assembleClientExtensionTaskProvider,
 		TaskProvider<Zip> buildClientExtensionZipTaskProvider,
 		TaskProvider<CreateClientExtensionConfigTask>
-			createClientExtensionConfigTaskProvider) {
+			createClientExtensionConfigTaskProvider,
+		TaskProvider<DefaultTask> validateClientExtensionIdsTaskProvider) {
 
 		createClientExtensionConfigTaskProvider.configure(
 			createClientExtensionConfigTask -> {
 				createClientExtensionConfigTask.dependsOn(
 					ASSEMBLE_CLIENT_EXTENSION_TASK_NAME);
+				createClientExtensionConfigTask.dependsOn(
+					VALIDATE_CLIENT_EXTENSION_IDS_TASK_NAME);
 
 				TaskInputs taskInputs =
 					createClientExtensionConfigTask.getInputs();
@@ -583,6 +615,55 @@ public class ClientExtensionProjectConfigurator
 
 				zip.from(clientExtensionBuildDir);
 				zip.include("**/*");
+			});
+
+		validateClientExtensionIdsTaskProvider.configure(
+			validateClientExtensionIdsTask -> {
+				validateClientExtensionIdsTask.setDescription(
+					"Validates that this project's client extension IDs are " +
+						"unique among all projects.");
+				validateClientExtensionIdsTask.setGroup(
+					LifecycleBasePlugin.VERIFICATION_GROUP);
+
+				validateClientExtensionIdsTask.doFirst(
+					validateClientExtensionIdsTask1 -> {
+						StringBundler sb = new StringBundler();
+
+						File rootDir = project.getRootDir();
+
+						Path rootDirPath = rootDir.toPath();
+
+						for (Map.Entry<String, Set<Project>> entry :
+								_clientExtensionIds.entrySet()) {
+
+							Set<Project> projects = entry.getValue();
+
+							if ((projects.size() > 1) &&
+								projects.contains(project)) {
+
+								sb.append("Duplicate client extension ID \"");
+								sb.append(entry.getKey());
+								sb.append("\" found in these projects:\n");
+
+								for (Project curProject : projects) {
+									File projectDir =
+										curProject.getProjectDir();
+
+									sb.append(
+										rootDirPath.relativize(
+											projectDir.toPath()));
+
+									sb.append(StringPool.NEW_LINE);
+								}
+
+								sb.append(StringPool.NEW_LINE);
+							}
+						}
+
+						if (sb.length() > 0) {
+							throw new GradleException(sb.toString());
+						}
+					});
 			});
 	}
 
@@ -679,6 +760,13 @@ public class ClientExtensionProjectConfigurator
 				}
 
 			});
+	}
+
+	private void _configureTaskCheck(Project project) {
+		Task checkTask = GradleUtil.getTask(
+			project, LifecycleBasePlugin.CHECK_TASK_NAME);
+
+		checkTask.dependsOn(VALIDATE_CLIENT_EXTENSION_IDS_TASK_NAME);
 	}
 
 	private void _configureTaskClean(Project project) {
@@ -848,6 +936,8 @@ public class ClientExtensionProjectConfigurator
 	private static final Pattern _overrideClientExtensionYamlPattern =
 		Pattern.compile("^client-extension\\.([a-z]+)\\.yaml$");
 
+	private final Map<String, Set<Project>> _clientExtensionIds =
+		new HashMap<>();
 	private Properties _clientExtensionProperties;
 	private final boolean _defaultRepositoryEnabled;
 	private final NodeBuildConfigurer _nodeBuildConfigurer =

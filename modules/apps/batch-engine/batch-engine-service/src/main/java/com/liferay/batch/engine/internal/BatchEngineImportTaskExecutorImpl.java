@@ -223,7 +223,14 @@ public class BatchEngineImportTaskExecutorImpl
 			processedItemsCount, exception.toString());
 
 		if (batchEngineImportTask.getImportStrategy() ==
-				BatchEngineImportTaskConstants.IMPORT_STRATEGY_ON_ERROR_FAIL) {
+				BatchEngineImportTaskConstants.
+					IMPORT_STRATEGY_ON_ERROR_CONTINUE) {
+
+			_log.error(exception);
+		}
+		else if (batchEngineImportTask.getImportStrategy() ==
+					BatchEngineImportTaskConstants.
+						IMPORT_STRATEGY_ON_ERROR_FAIL) {
 
 			throw exception;
 		}

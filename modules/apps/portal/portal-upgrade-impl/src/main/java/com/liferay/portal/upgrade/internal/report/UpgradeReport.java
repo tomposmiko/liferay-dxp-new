@@ -14,6 +14,7 @@
 
 package com.liferay.portal.upgrade.internal.report;
 
+import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -76,16 +77,12 @@ public class UpgradeReport {
 		_initialTableCounts = _getTableCounts();
 	}
 
-	public void generateReport(
-		PersistenceManager persistenceManager, ReleaseManager releaseManager,
-		UpgradeRecorder upgradeRecorder) {
-
+	public void generateReport(UpgradeRecorder upgradeRecorder) {
 		if (_log.isInfoEnabled()) {
 			_log.info("Starting upgrade report generation");
 		}
 
-		Map<String, Object> reportData = _getReportData(
-			persistenceManager, releaseManager, upgradeRecorder);
+		Map<String, Object> reportData = _getReportData(upgradeRecorder);
 
 		_printToLogContext(reportData);
 		_writeToFile(reportData);
@@ -145,7 +142,6 @@ public class UpgradeReport {
 	}
 
 	private Map<String, Object> _getReportData(
-		PersistenceManager persistenceManager, ReleaseManager releaseManager,
 		UpgradeRecorder upgradeRecorder) {
 
 		return LinkedHashMapBuilder.<String, Object>put(
@@ -237,6 +233,23 @@ public class UpgradeReport {
 		).put(
 			"result", upgradeRecorder.getResult()
 		).put(
+			"status",
+			() -> {
+				ReleaseManager releaseManager = _releaseManagerSnapshot.get();
+
+				if (releaseManager == null) {
+					return "Upgrade failed to complete";
+				}
+
+				String statusMessage = releaseManager.getStatusMessage(false);
+
+				if (statusMessage.isEmpty()) {
+					return "There are no pending upgrades";
+				}
+
+				return statusMessage;
+			}
+		).put(
 			"database.version",
 			() -> {
 				DB db = DBManagerUtil.getDB();
@@ -254,8 +267,7 @@ public class UpgradeReport {
 							"AdvancedFileSystemStore")) {
 
 					_rootDir = _getRootDir(
-						_CONFIGURATION_PID_ADVANCED_FILE_SYSTEM_STORE,
-						persistenceManager);
+						_CONFIGURATION_PID_ADVANCED_FILE_SYSTEM_STORE);
 				}
 				else if (StringUtil.equals(
 							PropsValues.DL_STORE_IMPL,
@@ -263,8 +275,7 @@ public class UpgradeReport {
 								"FileSystemStore")) {
 
 					_rootDir = _getRootDir(
-						_CONFIGURATION_PID_FILE_SYSTEM_STORE,
-						persistenceManager);
+						_CONFIGURATION_PID_FILE_SYSTEM_STORE);
 
 					if (_rootDir == null) {
 						_rootDir =
@@ -454,21 +465,6 @@ public class UpgradeReport {
 		).put(
 			"warnings",
 			_getMessagesPrinters(upgradeRecorder.getWarningMessages())
-		).put(
-			"status",
-			() -> {
-				if (releaseManager == null) {
-					return "Unable to determine. Release manager not available";
-				}
-
-				String statusMessage = releaseManager.getStatusMessage(false);
-
-				if (statusMessage.isEmpty()) {
-					return "There are no pending upgrades";
-				}
-
-				return statusMessage;
-			}
 		).build();
 	}
 
@@ -524,10 +520,11 @@ public class UpgradeReport {
 			value.toString());
 	}
 
-	private String _getRootDir(
-		String dlStoreConfigurationPid, PersistenceManager persistenceManager) {
-
+	private String _getRootDir(String dlStoreConfigurationPid) {
 		try {
+			PersistenceManager persistenceManager =
+				_persistenceManagerSnapshot.get();
+
 			Dictionary<String, String> configurations = persistenceManager.load(
 				dlStoreConfigurationPid);
 
@@ -719,6 +716,11 @@ public class UpgradeReport {
 	private static final Log _log = LogFactoryUtil.getLog(UpgradeReport.class);
 
 	private static boolean _logContext;
+	private static final Snapshot<PersistenceManager>
+		_persistenceManagerSnapshot = new Snapshot<>(
+			UpgradeReport.class, PersistenceManager.class);
+	private static final Snapshot<ReleaseManager> _releaseManagerSnapshot =
+		new Snapshot<>(UpgradeReport.class, ReleaseManager.class);
 
 	private double _dlSize;
 	private final Thread _dlSizeThread = new DLSizeThread();

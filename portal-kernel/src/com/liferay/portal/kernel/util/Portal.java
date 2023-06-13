@@ -647,11 +647,6 @@ public interface Portal {
 			ExpandoBridge expandoBridge, PortletRequest portletRequest)
 		throws PortalException;
 
-	public Map<String, Serializable> getExpandoBridgeAttributes(
-			ExpandoBridge expandoBridge,
-			UploadPortletRequest uploadPortletRequest)
-		throws PortalException;
-
 	public Serializable getExpandoValue(
 			HttpServletRequest httpServletRequest, String name, int type,
 			String displayType)
@@ -659,11 +654,6 @@ public interface Portal {
 
 	public Serializable getExpandoValue(
 			PortletRequest portletRequest, String name, int type,
-			String displayType)
-		throws PortalException;
-
-	public Serializable getExpandoValue(
-			UploadPortletRequest uploadPortletRequest, String name, int type,
 			String displayType)
 		throws PortalException;
 
