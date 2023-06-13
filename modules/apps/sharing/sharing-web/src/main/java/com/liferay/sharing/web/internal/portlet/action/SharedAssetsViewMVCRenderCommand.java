@@ -24,11 +24,13 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.sharing.configuration.SharingConfigurationFactory;
 import com.liferay.sharing.display.context.util.SharingMenuItemFactory;
 import com.liferay.sharing.filter.SharedAssetsFilterItem;
 import com.liferay.sharing.interpreter.SharingEntryInterpreter;
@@ -172,8 +174,8 @@ public class SharedAssetsViewMVCRenderCommand implements MVCRenderCommand {
 		_serviceTrackerList.forEach(sharedAssetsFilterItems::add);
 
 		return new SharedAssetsViewDisplayContext(
-			liferayPortletRequest, liferayPortletResponse,
-			sharedAssetsFilterItems,
+			_groupLocalService, liferayPortletRequest, liferayPortletResponse,
+			sharedAssetsFilterItems, _sharingConfigurationFactory,
 			_sharingEntryInterpreterProvider::getSharingEntryInterpreter,
 			_sharingEntryLocalService, _sharingEntryMenuItemContributorRegistry,
 			_sharingMenuItemFactory, _sharingPermission);
@@ -201,10 +203,16 @@ public class SharedAssetsViewMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
 	private Portal _portal;
 
 	private ServiceTrackerList<SharedAssetsFilterItem, SharedAssetsFilterItem>
 		_serviceTrackerList;
+
+	@Reference
+	private SharingConfigurationFactory _sharingConfigurationFactory;
 
 	@Reference
 	private SharingEntryInterpreterProvider _sharingEntryInterpreterProvider;

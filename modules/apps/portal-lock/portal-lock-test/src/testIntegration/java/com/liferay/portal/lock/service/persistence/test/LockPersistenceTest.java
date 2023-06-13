@@ -192,6 +192,15 @@ public class LockPersistenceTest {
 	}
 
 	@Test
+	public void testCountByClassName() throws Exception {
+		_persistence.countByClassName("");
+
+		_persistence.countByClassName("null");
+
+		_persistence.countByClassName((String)null);
+	}
+
+	@Test
 	public void testCountByLtExpirationDate() throws Exception {
 		_persistence.countByLtExpirationDate(RandomTestUtil.nextDate());
 

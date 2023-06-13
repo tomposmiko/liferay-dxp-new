@@ -14,26 +14,38 @@
 
 package com.liferay.data.engine.rest.internal.rule.function.v1_0;
 
-import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionField;
-import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionRuleParameter;
+import com.liferay.data.engine.rest.internal.constants.DataRuleFunctionConstants;
+import com.liferay.data.engine.spi.field.type.SPIDataDefinitionField;
+import com.liferay.data.engine.spi.rule.function.DataRuleFunction;
+import com.liferay.data.engine.spi.rule.function.DataRuleFunctionResult;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.Map;
 import java.util.stream.Stream;
+
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Jeyvison Nascimento
  */
+@Component(
+	immediate = true,
+	property = {
+		"data.engine.rule.function.name=empty",
+		"data.engine.rule.function.type=" + DataRuleFunctionConstants.VALIDATION_RULE_TYPE
+	},
+	service = DataRuleFunction.class
+)
 public class EmptyDataRuleFunction implements DataRuleFunction {
 
 	@Override
 	public DataRuleFunctionResult validate(
-		DataDefinitionField dataDefinitionField,
-		DataDefinitionRuleParameter[] dataDefinitionRuleParameters,
-		Object value) {
+		Map<String, Object> dataDefinitionRuleParameters,
+		SPIDataDefinitionField spiDataDefinitionField, Object value) {
 
 		DataRuleFunctionResult dataRuleFunctionResult =
 			DataRuleFunctionResult.of(
-				dataDefinitionField, "value-must-not-be-empty");
+				spiDataDefinitionField, "value-must-not-be-empty");
 
 		if (value == null) {
 			return dataRuleFunctionResult;

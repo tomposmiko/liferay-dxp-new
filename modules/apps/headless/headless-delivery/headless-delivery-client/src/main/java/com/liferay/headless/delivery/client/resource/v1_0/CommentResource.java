@@ -32,22 +32,53 @@ import javax.annotation.Generated;
 @Generated("")
 public class CommentResource {
 
-	public Page<Comment> getBlogPostingCommentsPage(
+	public static Page<Comment> getBlogPostingCommentsPage(
 			Long blogPostingId, String search, String filterString,
 			Pagination pagination, String sortString)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getBlogPostingCommentsPageHttpResponse(
+				blogPostingId, search, filterString, pagination, sortString);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		return Page.of(content, CommentSerDes::toDTO);
+	}
+
+	public static HttpInvoker.HttpResponse
+			getBlogPostingCommentsPageHttpResponse(
+				Long blogPostingId, String search, String filterString,
+				Pagination pagination, String sortString)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
-		httpInvoker.parameter("filter", filterString);
+		if (search != null) {
+			httpInvoker.parameter("search", String.valueOf(search));
+		}
 
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
+		if (filterString != null) {
+			httpInvoker.parameter("filter", filterString);
+		}
 
-		httpInvoker.parameter("sort", sortString);
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
+
+		if (sortString != null) {
+			httpInvoker.parameter("sort", sortString);
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/headless-delivery/v1.0/blog-postings/{blogPostingId}/comments",
@@ -55,41 +86,23 @@ public class CommentResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, CommentSerDes::toDTO);
+		return httpInvoker.invoke();
 	}
 
-	public Comment postBlogPostingComment(Long blogPostingId, Comment comment)
+	public static Comment postBlogPostingComment(
+			Long blogPostingId, Comment comment)
 		throws Exception {
 
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.body(CommentSerDes.toJSON(comment), "application/json");
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-delivery/v1.0/blog-postings/{blogPostingId}/comments",
-			blogPostingId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		HttpInvoker.HttpResponse httpResponse =
+			postBlogPostingCommentHttpResponse(blogPostingId, comment);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return CommentSerDes.toDTO(content);
@@ -103,7 +116,42 @@ public class CommentResource {
 		}
 	}
 
-	public void deleteComment(Long commentId) throws Exception {
+	public static HttpInvoker.HttpResponse postBlogPostingCommentHttpResponse(
+			Long blogPostingId, Comment comment)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.body(comment.toString(), "application/json");
+
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-delivery/v1.0/blog-postings/{blogPostingId}/comments",
+			blogPostingId);
+
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
+
+		return httpInvoker.invoke();
+	}
+
+	public static void deleteComment(Long commentId) throws Exception {
+		HttpInvoker.HttpResponse httpResponse = deleteCommentHttpResponse(
+			commentId);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+	}
+
+	public static HttpInvoker.HttpResponse deleteCommentHttpResponse(
+			Long commentId)
+		throws Exception {
+
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.DELETE);
@@ -114,35 +162,20 @@ public class CommentResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		return httpInvoker.invoke();
 	}
 
-	public Comment getComment(Long commentId) throws Exception {
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-delivery/v1.0/comments/{commentId}",
+	public static Comment getComment(Long commentId) throws Exception {
+		HttpInvoker.HttpResponse httpResponse = getCommentHttpResponse(
 			commentId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return CommentSerDes.toDTO(content);
@@ -156,12 +189,56 @@ public class CommentResource {
 		}
 	}
 
-	public Comment putComment(Long commentId, Comment comment)
+	public static HttpInvoker.HttpResponse getCommentHttpResponse(
+			Long commentId)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-		httpInvoker.body(CommentSerDes.toJSON(comment), "application/json");
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-delivery/v1.0/comments/{commentId}",
+			commentId);
+
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
+
+		return httpInvoker.invoke();
+	}
+
+	public static Comment putComment(Long commentId, Comment comment)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse = putCommentHttpResponse(
+			commentId, comment);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		try {
+			return CommentSerDes.toDTO(content);
+		}
+		catch (Exception e) {
+			_logger.log(
+				Level.WARNING, "Unable to process HTTP response: " + content,
+				e);
+
+			throw e;
+		}
+	}
+
+	public static HttpInvoker.HttpResponse putCommentHttpResponse(
+			Long commentId, Comment comment)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.body(comment.toString(), "application/json");
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
 
@@ -171,28 +248,30 @@ public class CommentResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		return httpInvoker.invoke();
+	}
+
+	public static Page<Comment> getCommentCommentsPage(
+			Long parentCommentId, String search, String filterString,
+			Pagination pagination, String sortString)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getCommentCommentsPageHttpResponse(
+				parentCommentId, search, filterString, pagination, sortString);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
-		try {
-			return CommentSerDes.toDTO(content);
-		}
-		catch (Exception e) {
-			_logger.log(
-				Level.WARNING, "Unable to process HTTP response: " + content,
-				e);
-
-			throw e;
-		}
+		return Page.of(content, CommentSerDes::toDTO);
 	}
 
-	public Page<Comment> getCommentCommentsPage(
+	public static HttpInvoker.HttpResponse getCommentCommentsPageHttpResponse(
 			Long parentCommentId, String search, String filterString,
 			Pagination pagination, String sortString)
 		throws Exception {
@@ -201,13 +280,23 @@ public class CommentResource {
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
-		httpInvoker.parameter("filter", filterString);
+		if (search != null) {
+			httpInvoker.parameter("search", String.valueOf(search));
+		}
 
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
+		if (filterString != null) {
+			httpInvoker.parameter("filter", filterString);
+		}
 
-		httpInvoker.parameter("sort", sortString);
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
+
+		if (sortString != null) {
+			httpInvoker.parameter("sort", sortString);
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/headless-delivery/v1.0/comments/{parentCommentId}/comments",
@@ -215,41 +304,23 @@ public class CommentResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, CommentSerDes::toDTO);
+		return httpInvoker.invoke();
 	}
 
-	public Comment postCommentComment(Long parentCommentId, Comment comment)
+	public static Comment postCommentComment(
+			Long parentCommentId, Comment comment)
 		throws Exception {
 
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.body(CommentSerDes.toJSON(comment), "application/json");
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-delivery/v1.0/comments/{parentCommentId}/comments",
-			parentCommentId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		HttpInvoker.HttpResponse httpResponse = postCommentCommentHttpResponse(
+			parentCommentId, comment);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return CommentSerDes.toDTO(content);
@@ -263,7 +334,46 @@ public class CommentResource {
 		}
 	}
 
-	public Page<Comment> getDocumentCommentsPage(
+	public static HttpInvoker.HttpResponse postCommentCommentHttpResponse(
+			Long parentCommentId, Comment comment)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.body(comment.toString(), "application/json");
+
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-delivery/v1.0/comments/{parentCommentId}/comments",
+			parentCommentId);
+
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
+
+		return httpInvoker.invoke();
+	}
+
+	public static Page<Comment> getDocumentCommentsPage(
+			Long documentId, String search, String filterString,
+			Pagination pagination, String sortString)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getDocumentCommentsPageHttpResponse(
+				documentId, search, filterString, pagination, sortString);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		return Page.of(content, CommentSerDes::toDTO);
+	}
+
+	public static HttpInvoker.HttpResponse getDocumentCommentsPageHttpResponse(
 			Long documentId, String search, String filterString,
 			Pagination pagination, String sortString)
 		throws Exception {
@@ -272,13 +382,23 @@ public class CommentResource {
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
-		httpInvoker.parameter("filter", filterString);
+		if (search != null) {
+			httpInvoker.parameter("search", String.valueOf(search));
+		}
 
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
+		if (filterString != null) {
+			httpInvoker.parameter("filter", filterString);
+		}
 
-		httpInvoker.parameter("sort", sortString);
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
+
+		if (sortString != null) {
+			httpInvoker.parameter("sort", sortString);
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}/comments",
@@ -286,41 +406,22 @@ public class CommentResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, CommentSerDes::toDTO);
+		return httpInvoker.invoke();
 	}
 
-	public Comment postDocumentComment(Long documentId, Comment comment)
+	public static Comment postDocumentComment(Long documentId, Comment comment)
 		throws Exception {
 
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.body(CommentSerDes.toJSON(comment), "application/json");
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}/comments",
-			documentId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		HttpInvoker.HttpResponse httpResponse = postDocumentCommentHttpResponse(
+			documentId, comment);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return CommentSerDes.toDTO(content);
@@ -334,22 +435,73 @@ public class CommentResource {
 		}
 	}
 
-	public Page<Comment> getStructuredContentCommentsPage(
+	public static HttpInvoker.HttpResponse postDocumentCommentHttpResponse(
+			Long documentId, Comment comment)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.body(comment.toString(), "application/json");
+
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-delivery/v1.0/documents/{documentId}/comments",
+			documentId);
+
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
+
+		return httpInvoker.invoke();
+	}
+
+	public static Page<Comment> getStructuredContentCommentsPage(
 			Long structuredContentId, String search, String filterString,
 			Pagination pagination, String sortString)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getStructuredContentCommentsPageHttpResponse(
+				structuredContentId, search, filterString, pagination,
+				sortString);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		return Page.of(content, CommentSerDes::toDTO);
+	}
+
+	public static HttpInvoker.HttpResponse
+			getStructuredContentCommentsPageHttpResponse(
+				Long structuredContentId, String search, String filterString,
+				Pagination pagination, String sortString)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
-		httpInvoker.parameter("filter", filterString);
+		if (search != null) {
+			httpInvoker.parameter("search", String.valueOf(search));
+		}
 
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
+		if (filterString != null) {
+			httpInvoker.parameter("filter", filterString);
+		}
 
-		httpInvoker.parameter("sort", sortString);
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
+
+		if (sortString != null) {
+			httpInvoker.parameter("sort", sortString);
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/headless-delivery/v1.0/structured-contents/{structuredContentId}/comments",
@@ -357,42 +509,24 @@ public class CommentResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, CommentSerDes::toDTO);
+		return httpInvoker.invoke();
 	}
 
-	public Comment postStructuredContentComment(
+	public static Comment postStructuredContentComment(
 			Long structuredContentId, Comment comment)
 		throws Exception {
 
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.body(CommentSerDes.toJSON(comment), "application/json");
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-delivery/v1.0/structured-contents/{structuredContentId}/comments",
-			structuredContentId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		HttpInvoker.HttpResponse httpResponse =
+			postStructuredContentCommentHttpResponse(
+				structuredContentId, comment);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return CommentSerDes.toDTO(content);
@@ -404,6 +538,26 @@ public class CommentResource {
 
 			throw e;
 		}
+	}
+
+	public static HttpInvoker.HttpResponse
+			postStructuredContentCommentHttpResponse(
+				Long structuredContentId, Comment comment)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.body(comment.toString(), "application/json");
+
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-delivery/v1.0/structured-contents/{structuredContentId}/comments",
+			structuredContentId);
+
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
+
+		return httpInvoker.invoke();
 	}
 
 	private static final Logger _logger = Logger.getLogger(

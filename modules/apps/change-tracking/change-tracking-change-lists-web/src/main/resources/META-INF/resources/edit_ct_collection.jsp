@@ -35,11 +35,18 @@ portletDisplay.setURLBack(backURL.toString());
 portletDisplay.setShowBackIcon(true);
 %>
 
+<liferay-portlet:renderURL var="portletURL" />
+
 <liferay-portlet:actionURL name="/change_lists/edit_ct_collection" var="actionURL">
+	<liferay-portlet:param name="mvcRenderCommandName" value="/change_lists/view" />
+	<liferay-portlet:param name="redirect" value="<%= portletURL.toString() %>" />
 	<liferay-portlet:param name="backURL" value="<%= backURL.toString() %>" />
 </liferay-portlet:actionURL>
 
+<liferay-ui:error exception="<%= CTCollectionDescriptionCTEngineException.class %>" message="the-change-list-description-is-too-long" />
+<liferay-ui:error exception="<%= CTCollectionNameCTEngineException.class %>" message="the-change-list-name-is-too-long" />
 <liferay-ui:error key="ctCollectionDuplicate" message="name-is-already-used-by-another-change-list" />
+<liferay-ui:error key="ctCollectionName" message="the-change-list-name-is-too-short" />
 
 <div class="custom-sheet sheet sheet-lg">
 	<aui:form action='<%= actionURL.toString() + "&etag=0&strip=0" %>' cssClass="lfr-export-dialog" method="post" name="addChangeListFm">
@@ -50,7 +57,9 @@ portletDisplay.setShowBackIcon(true);
 			<aui:validator name="required" />
 		</aui:input>
 
-		<aui:input label="description" name="description" placeholder="change-list-description-placeholder" value="<%= description %>" />
+		<aui:input label="description" name="description" placeholder="change-list-description-placeholder" value="<%= description %>">
+			<aui:validator name="maxLength"><%= ModelHintsUtil.getMaxLength(CTCollection.class.getName(), "description") %></aui:validator>
+		</aui:input>
 
 		<aui:button-row>
 			<aui:button id="saveButton" type="submit" value='<%= LanguageUtil.get(request, "save") %>' />

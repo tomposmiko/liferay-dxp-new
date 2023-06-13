@@ -14,9 +14,10 @@
 
 package com.liferay.change.tracking.change.lists.history.web.internal.display.context;
 
-import com.liferay.change.tracking.CTEngineManager;
-import com.liferay.change.tracking.CTManager;
+import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.constants.CTWebKeys;
+import com.liferay.change.tracking.engine.CTEngineManager;
+import com.liferay.change.tracking.engine.CTManager;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
@@ -83,6 +84,8 @@ public class ChangeListsHistoryDisplayContext {
 		).put(
 			"filterUser", _getFilterByUser()
 		).put(
+			"keywords", _getKeywords()
+		).put(
 			"orderByCol", _getOrderByCol()
 		).put(
 			"orderByType", getOrderByType()
@@ -93,6 +96,11 @@ public class ChangeListsHistoryDisplayContext {
 			"urlProcesses",
 			_themeDisplay.getPortalURL() +
 				"/o/change-tracking/processes?companyId=" +
+					_themeDisplay.getCompanyId()
+		).put(
+			"urlProcessUsers",
+			_themeDisplay.getPortalURL() +
+				"/o/change-tracking/processes/users?companyId=" +
 					_themeDisplay.getCompanyId()
 		);
 
@@ -194,7 +202,7 @@ public class ChangeListsHistoryDisplayContext {
 	}
 
 	public String getViewSearchActionURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		PortletURL portletURL = _getPortletURL();
 
 		return portletURL.toString();
 	}
@@ -210,12 +218,13 @@ public class ChangeListsHistoryDisplayContext {
 		return _filterByStatus;
 	}
 
-	private String _getFilterByUser() {
+	private long _getFilterByUser() {
 		if (_filterByUser != null) {
 			return _filterByUser;
 		}
 
-		_filterByUser = ParamUtil.getString(_httpServletRequest, "user", "all");
+		_filterByUser = ParamUtil.getLong(
+			_httpServletRequest, "user", CTConstants.USER_FILTER_ALL);
 
 		return _filterByUser;
 	}
@@ -279,8 +288,10 @@ public class ChangeListsHistoryDisplayContext {
 				add(
 					dropdownItem -> {
 						dropdownItem.setActive(
-							Objects.equals(_getFilterByUser(), "all"));
-						dropdownItem.setHref(_getPortletURL(), "user", "all");
+							_getFilterByUser() == CTConstants.USER_FILTER_ALL);
+						dropdownItem.setHref(
+							_getPortletURL(), "user",
+							CTConstants.USER_FILTER_ALL);
 						dropdownItem.setLabel(
 							LanguageUtil.get(_httpServletRequest, "all"));
 					});
@@ -304,6 +315,16 @@ public class ChangeListsHistoryDisplayContext {
 			CTWebKeys.CT_PROCESS_ID, String.valueOf(ctProcessId));
 
 		return iteratorURL;
+	}
+
+	private String _getKeywords() {
+		if (_keywords != null) {
+			return _keywords;
+		}
+
+		_keywords = ParamUtil.getString(_httpServletRequest, "keywords", null);
+
+		return _keywords;
 	}
 
 	private String _getOrderByCol() {
@@ -391,8 +412,9 @@ public class ChangeListsHistoryDisplayContext {
 	private final CTEngineManager _ctEngineManager;
 	private final CTManager _ctManager;
 	private String _filterByStatus;
-	private String _filterByUser;
+	private Long _filterByUser;
 	private final HttpServletRequest _httpServletRequest;
+	private String _keywords;
 	private String _orderByCol;
 	private String _orderByType;
 	private final RenderRequest _renderRequest;

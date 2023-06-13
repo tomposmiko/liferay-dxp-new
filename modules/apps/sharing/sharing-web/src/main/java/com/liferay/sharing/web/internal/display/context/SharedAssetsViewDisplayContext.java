@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
@@ -37,6 +38,8 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.sharing.configuration.SharingConfiguration;
+import com.liferay.sharing.configuration.SharingConfigurationFactory;
 import com.liferay.sharing.display.context.util.SharingMenuItemFactory;
 import com.liferay.sharing.filter.SharedAssetsFilterItem;
 import com.liferay.sharing.interpreter.SharingEntryInterpreter;
@@ -70,9 +73,11 @@ import javax.servlet.http.HttpServletRequest;
 public class SharedAssetsViewDisplayContext {
 
 	public SharedAssetsViewDisplayContext(
+		GroupLocalService groupLocalService,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
 		List<SharedAssetsFilterItem> sharedAssetsFilterItems,
+		SharingConfigurationFactory sharingConfigurationFactory,
 		Function<SharingEntry, SharingEntryInterpreter>
 			sharingEntryInterpreterFunction,
 		SharingEntryLocalService sharingEntryLocalService,
@@ -81,9 +86,11 @@ public class SharedAssetsViewDisplayContext {
 		SharingMenuItemFactory sharingMenuItemFactory,
 		SharingPermission sharingPermission) {
 
+		_groupLocalService = groupLocalService;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 		_sharedAssetsFilterItems = sharedAssetsFilterItems;
+		_sharingConfigurationFactory = sharingConfigurationFactory;
 		_sharingEntryInterpreterFunction = sharingEntryInterpreterFunction;
 		_sharingEntryLocalService = sharingEntryLocalService;
 		_sharingEntryMenuItemContributorRegistry =
@@ -278,11 +285,19 @@ public class SharedAssetsViewDisplayContext {
 			return false;
 		}
 
-		if (sharingEntryInterpreter.isVisible(sharingEntry)) {
-			return true;
+		if (!sharingEntryInterpreter.isVisible(sharingEntry)) {
+			return false;
 		}
 
-		return false;
+		SharingConfiguration groupSharingConfiguration =
+			_sharingConfigurationFactory.getGroupSharingConfiguration(
+				_groupLocalService.getGroup(sharingEntry.getGroupId()));
+
+		if (!groupSharingConfiguration.isEnabled()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	public void populateResults(SearchContainer<SharingEntry> searchContainer) {
@@ -367,6 +382,10 @@ public class SharedAssetsViewDisplayContext {
 				_liferayPortletResponse.createLiferayPortletURL(
 					_themeDisplay.getPlid(), portletDisplay.getId(),
 					PortletRequest.RENDER_PHASE, false);
+
+			redirectURL.setParameter(
+				"mvcRenderCommandName",
+				"/shared_assets/close_sharing_entry_edit_dialog");
 
 			editPortletURL.setParameter("redirect", redirectURL.toString());
 
@@ -501,10 +520,12 @@ public class SharedAssetsViewDisplayContext {
 	}
 
 	private final PortletURL _currentURLObj;
+	private final GroupLocalService _groupLocalService;
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final List<SharedAssetsFilterItem> _sharedAssetsFilterItems;
+	private final SharingConfigurationFactory _sharingConfigurationFactory;
 	private final Function<SharingEntry, SharingEntryInterpreter>
 		_sharingEntryInterpreterFunction;
 	private final SharingEntryLocalService _sharingEntryLocalService;

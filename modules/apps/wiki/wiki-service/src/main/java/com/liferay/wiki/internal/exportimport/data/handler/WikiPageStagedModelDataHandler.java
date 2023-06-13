@@ -109,7 +109,7 @@ public class WikiPageStagedModelDataHandler
 
 		return _wikiPageLocalService.getWikiPagesByUuidAndCompanyId(
 			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			new StagedModelModifiedDateComparator<WikiPage>());
+			new StagedModelModifiedDateComparator<>());
 	}
 
 	@Override
@@ -139,9 +139,11 @@ public class WikiPageStagedModelDataHandler
 		page.setContent(content);
 
 		if (page.isHead()) {
-			for (FileEntry fileEntry : page.getAttachmentsFileEntries()) {
+			for (FileEntry attachmentFileEntry :
+					page.getAttachmentsFileEntries()) {
+
 				StagedModelDataHandlerUtil.exportReferenceStagedModel(
-					portletDataContext, page, fileEntry,
+					portletDataContext, page, attachmentFileEntry,
 					PortletDataContext.REFERENCE_TYPE_WEAK);
 			}
 		}
@@ -158,9 +160,8 @@ public class WikiPageStagedModelDataHandler
 
 	@Override
 	protected void doImportMissingReference(
-			PortletDataContext portletDataContext, String uuid, long groupId,
-			long pageId)
-		throws Exception {
+		PortletDataContext portletDataContext, String uuid, long groupId,
+		long pageId) {
 
 		WikiPage existingPage = fetchMissingReference(uuid, groupId);
 
@@ -278,16 +279,19 @@ public class WikiPageStagedModelDataHandler
 			}
 		}
 
-		if (existingPage != null) {
-			for (FileEntry fileEntry :
-					existingPage.getAttachmentsFileEntries()) {
-
-				PortletFileRepositoryUtil.deletePortletFileEntry(
-					fileEntry.getFileEntryId());
-			}
-		}
-
 		if (page.isHead()) {
+			existingPage = fetchStagedModelByUuidAndGroupId(
+				page.getUuid(), portletDataContext.getScopeGroupId());
+
+			if (existingPage != null) {
+				for (FileEntry attachmentFileEntry :
+						existingPage.getAttachmentsFileEntries()) {
+
+					PortletFileRepositoryUtil.deletePortletFileEntry(
+						attachmentFileEntry.getFileEntryId());
+				}
+			}
+
 			List<Element> attachmentElements =
 				portletDataContext.getReferenceDataElements(
 					pageElement, DLFileEntry.class,
@@ -354,29 +358,6 @@ public class WikiPageStagedModelDataHandler
 		}
 	}
 
-	@Reference(unbind = "-")
-	protected void setWikiPageExportImportContentProcessor(
-		WikiPageExportImportContentProcessor
-			wikiPageExportImportContentProcessor) {
-
-		_wikiPageExportImportContentProcessor =
-			wikiPageExportImportContentProcessor;
-	}
-
-	@Reference(unbind = "-")
-	protected void setWikiPageLocalService(
-		WikiPageLocalService wikiPageLocalService) {
-
-		_wikiPageLocalService = wikiPageLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setWikiPageResourceLocalService(
-		WikiPageResourceLocalService wikiPageResourceLocalService) {
-
-		_wikiPageResourceLocalService = wikiPageResourceLocalService;
-	}
-
 	private InputStream _getPageAttachmentInputStream(
 			String binPath, PortletDataContext portletDataContext,
 			FileEntry fileEntry)
@@ -406,9 +387,14 @@ public class WikiPageStagedModelDataHandler
 	private static final Log _log = LogFactoryUtil.getLog(
 		WikiPageStagedModelDataHandler.class);
 
+	@Reference
 	private WikiPageExportImportContentProcessor
 		_wikiPageExportImportContentProcessor;
+
+	@Reference
 	private WikiPageLocalService _wikiPageLocalService;
+
+	@Reference
 	private WikiPageResourceLocalService _wikiPageResourceLocalService;
 
 }

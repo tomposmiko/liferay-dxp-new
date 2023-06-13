@@ -183,11 +183,12 @@ public abstract class BaseStringQueryTestCase extends BaseIndexingTestCase {
 				Assert.assertEquals(
 					"Total hits", 20, searchHits.getTotalHits());
 
-				List<SearchHit> searchHitList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
-				Assert.assertEquals("Retrieved hits", 20, searchHitList.size());
+				Assert.assertEquals(
+					"Retrieved hits", 20, searchHitsList.size());
 
-				searchHitList.forEach(
+				searchHitsList.forEach(
 					searchHit -> {
 						Document document = searchHit.getDocument();
 
@@ -239,11 +240,11 @@ public abstract class BaseStringQueryTestCase extends BaseIndexingTestCase {
 
 				SearchHits searchHits = searchSearchResponse.getSearchHits();
 
-				List<SearchHit> searchHitList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
 				List<String> actualValues = new ArrayList<>();
 
-				searchHitList.forEach(
+				searchHitsList.forEach(
 					searchHit -> {
 						Document document = searchHit.getDocument();
 
@@ -256,7 +257,7 @@ public abstract class BaseStringQueryTestCase extends BaseIndexingTestCase {
 
 				Assert.assertEquals(
 					"Retrieved hits", expectedValues.size(),
-					searchHitList.size());
+					searchHitsList.size());
 
 				Assert.assertEquals(
 					"Total hits", expectedValues.size(),

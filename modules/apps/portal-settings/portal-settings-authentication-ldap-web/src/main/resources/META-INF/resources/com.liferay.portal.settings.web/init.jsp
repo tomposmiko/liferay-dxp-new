@@ -41,12 +41,9 @@ page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.portal.security.ldap.DuplicateLDAPServerNameException" %><%@
 page import="com.liferay.portal.security.ldap.LDAPServerNameException" %><%@
-page import="com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration" %><%@
 page import="com.liferay.portal.security.ldap.configuration.ConfigurationProvider" %><%@
 page import="com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration" %><%@
 page import="com.liferay.portal.security.ldap.constants.LDAPConstants" %><%@
-page import="com.liferay.portal.security.ldap.exportimport.configuration.LDAPExportConfiguration" %><%@
-page import="com.liferay.portal.security.ldap.exportimport.configuration.LDAPImportConfiguration" %><%@
 page import="com.liferay.portal.security.ldap.util.LDAPUtil" %><%@
 page import="com.liferay.portal.security.ldap.validator.LDAPFilterException" %><%@
 page import="com.liferay.portal.settings.authentication.ldap.web.internal.portlet.util.ConfigurationProviderUtil" %><%@
@@ -73,17 +70,5 @@ page import="javax.naming.ldap.LdapContext" %>
 <portlet:defineObjects />
 
 <%
-ConfigurationProvider<LDAPAuthConfiguration> ldapAuthConfigurationProvider = ConfigurationProviderUtil.getLDAPAuthConfigurationProvider();
-
-LDAPAuthConfiguration ldapAuthConfiguration = ldapAuthConfigurationProvider.getConfiguration(themeDisplay.getCompanyId());
-
-ConfigurationProvider<LDAPExportConfiguration> ldapExportConfigurationProvider = ConfigurationProviderUtil.getLDAPExportConfigurationProvider();
-
-LDAPExportConfiguration ldapExportConfiguration = ldapExportConfigurationProvider.getConfiguration(themeDisplay.getCompanyId());
-
-ConfigurationProvider<LDAPImportConfiguration> ldapImportConfigurationProvider = ConfigurationProviderUtil.getLDAPImportConfigurationProvider();
-
-LDAPImportConfiguration ldapImportConfiguration = ldapImportConfigurationProvider.getConfiguration(themeDisplay.getCompanyId());
-
 ConfigurationProvider<LDAPServerConfiguration> ldapServerConfigurationProvider = ConfigurationProviderUtil.getLDAPServerConfigurationProvider();
 %>

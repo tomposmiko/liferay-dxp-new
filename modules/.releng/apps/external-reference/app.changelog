@@ -1,0 +1,10 @@
+#
+# Liferay App Version 2.0.0
+#
+
+app.artifacts-2.0.0=\
+	
+
+app.change.log-2.0.0=LPS-69035 LPS-77425 LPS-81336 LPS-82261 LPS-87885 LPS-91343 LPS-95413 LPS-95555 LRDOCS-6300
+
+app.git.id-2.0.0=5a1de3445b98ac8d4e08fd020740dffd8bbb57c3

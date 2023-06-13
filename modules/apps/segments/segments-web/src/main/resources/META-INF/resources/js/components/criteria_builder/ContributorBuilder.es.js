@@ -78,10 +78,10 @@ class ContributorBuilder extends React.Component {
 		previewMembersURL: PropTypes.string,
 		propertyGroups: PropTypes.arrayOf(propertyGroupShape),
 		requestMembersCountURL: PropTypes.string,
+		segmentName: PropTypes.string,
 		supportedConjunctions: PropTypes.arrayOf(conjunctionShape).isRequired,
 		supportedOperators: PropTypes.arrayOf(operatorShape).isRequired,
-		supportedPropertyTypes: propertyTypeShape.isRequired,
-		values: PropTypes.object
+		supportedPropertyTypes: propertyTypeShape.isRequired
 	};
 
 	static defaultProps = {
@@ -94,6 +94,10 @@ class ContributorBuilder extends React.Component {
 
 		const {initialContributors, propertyGroups} = props;
 
+		const {conjunctionId: initialConjunction} = initialContributors.find(
+			c => c.conjunctionId
+		) || {conjunctionId: CONJUNCTIONS.AND};
+
 		const contributors = initialContributors && initialContributors.map(
 			c => {
 				const propertyGroup = propertyGroups &&
@@ -102,7 +106,7 @@ class ContributorBuilder extends React.Component {
 					);
 
 				return {
-					conjunctionId: c.conjunctionId || CONJUNCTIONS.AND,
+					conjunctionId: c.conjunctionId || initialConjunction,
 					conjunctionInputId: c.conjunctionInputId,
 					criteriaMap: c.initialQuery ?
 						translateQueryToCriteria(c.initialQuery) :
@@ -216,7 +220,7 @@ class ContributorBuilder extends React.Component {
 					destroyOnHide: true
 				},
 				id: 'segment-members-dialog',
-				title: sub(Liferay.Language.get('x-members'), [this.props.values.name]),
+				title: sub(Liferay.Language.get('x-members'), [this.props.segmentName]),
 				uri: url
 			}
 		);

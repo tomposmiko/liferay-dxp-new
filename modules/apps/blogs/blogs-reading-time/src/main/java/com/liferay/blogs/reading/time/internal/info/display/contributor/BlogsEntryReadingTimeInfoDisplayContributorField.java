@@ -15,8 +15,8 @@
 package com.liferay.blogs.reading.time.internal.info.display.contributor;
 
 import com.liferay.blogs.model.BlogsEntry;
-import com.liferay.info.display.contributor.InfoDisplayContributorField;
-import com.liferay.info.display.contributor.InfoDisplayContributorFieldType;
+import com.liferay.info.display.contributor.field.InfoDisplayContributorField;
+import com.liferay.info.display.contributor.field.InfoDisplayContributorFieldType;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.reading.time.message.ReadingTimeMessageProvider;

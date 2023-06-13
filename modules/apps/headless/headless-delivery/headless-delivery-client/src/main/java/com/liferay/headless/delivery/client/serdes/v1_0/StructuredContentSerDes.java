@@ -15,6 +15,7 @@
 package com.liferay.headless.delivery.client.serdes.v1_0;
 
 import com.liferay.headless.delivery.client.dto.v1_0.ContentField;
+import com.liferay.headless.delivery.client.dto.v1_0.CustomField;
 import com.liferay.headless.delivery.client.dto.v1_0.RelatedContent;
 import com.liferay.headless.delivery.client.dto.v1_0.RenderedContent;
 import com.liferay.headless.delivery.client.dto.v1_0.StructuredContent;
@@ -146,6 +147,29 @@ public class StructuredContentSerDes {
 			sb.append("\"creator\": ");
 
 			sb.append(String.valueOf(structuredContent.getCreator()));
+		}
+
+		if (structuredContent.getCustomFields() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"customFields\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < structuredContent.getCustomFields().length;
+				 i++) {
+
+				sb.append(
+					String.valueOf(structuredContent.getCustomFields()[i]));
+
+				if ((i + 1) < structuredContent.getCustomFields().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (structuredContent.getDateCreated() != null) {
@@ -497,6 +521,15 @@ public class StructuredContentSerDes {
 			map.put("creator", String.valueOf(structuredContent.getCreator()));
 		}
 
+		if (structuredContent.getCustomFields() == null) {
+			map.put("customFields", null);
+		}
+		else {
+			map.put(
+				"customFields",
+				String.valueOf(structuredContent.getCustomFields()));
+		}
+
 		map.put(
 			"dateCreated",
 			liferayToJSONDateFormat.format(structuredContent.getDateCreated()));
@@ -632,7 +665,9 @@ public class StructuredContentSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		return string.replaceAll("\"", "\\\\\"");
+		string = string.replace("\\", "\\\\");
+
+		return string.replace("\"", "\\\"");
 	}
 
 	private static String _toJSON(Map<String, ?> map) {
@@ -721,6 +756,18 @@ public class StructuredContentSerDes {
 				if (jsonParserFieldValue != null) {
 					structuredContent.setCreator(
 						CreatorSerDes.toDTO((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "customFields")) {
+				if (jsonParserFieldValue != null) {
+					structuredContent.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {

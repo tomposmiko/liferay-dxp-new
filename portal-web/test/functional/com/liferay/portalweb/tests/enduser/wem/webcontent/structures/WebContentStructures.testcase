@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Web Content Administration";
@@ -221,6 +222,14 @@ definition {
 	@priority = "4"
 	test ValidateDDMNavigation {
 		property testray.component.names = "Web Content Administration";
+		property test.name.skip.portal.instance = "WebContentStructures#ValidateDDMNavigation";
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search");
+
+		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
 
 		WebContent.openWebContentAdmin(siteURLKey = "global");
 
@@ -304,4 +313,5 @@ definition {
 
 		WebContentStructures.viewFavoriteStructureViaPlusButton(structureName = "WC Structure Name 9");
 	}
+
 }

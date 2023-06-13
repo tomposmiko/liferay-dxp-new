@@ -14,60 +14,53 @@
 
 package com.liferay.headless.delivery.resource.v1_0.test;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardAttachment;
+import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
+import com.liferay.headless.delivery.client.resource.v1_0.MessageBoardAttachmentResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.MessageBoardAttachmentSerDes;
-import com.liferay.headless.delivery.resource.v1_0.MessageBoardAttachmentResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.multipart.BinaryFile;
-import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
 
-import java.net.URL;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
 
@@ -103,8 +96,10 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 		testGroup = GroupTestUtil.addGroup();
 		testLocale = LocaleUtil.getDefault();
 
-		_resourceURL = new URL(
-			"http://localhost:8080/o/headless-delivery/v1.0");
+		testCompany = CompanyLocalServiceUtil.getCompany(
+			testGroup.getCompanyId());
+
+		_messageBoardAttachmentResource.setContextCompany(testCompany);
 	}
 
 	@After
@@ -118,18 +113,16 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 		ObjectMapper objectMapper = new ObjectMapper() {
 			{
 				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				configure(
+					SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
 				enable(SerializationFeature.INDENT_OUTPUT);
 				setDateFormat(new ISO8601DateFormat());
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
 				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+				setVisibility(
+					PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+				setVisibility(
+					PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
 			}
 		};
 
@@ -150,17 +143,15 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 		ObjectMapper objectMapper = new ObjectMapper() {
 			{
 				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				configure(
+					SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
 				setDateFormat(new ISO8601DateFormat());
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
 				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+				setVisibility(
+					PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+				setVisibility(
+					PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
 			}
 		};
 
@@ -176,21 +167,51 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 	}
 
 	@Test
+	public void testEscapeRegexInStringFields() throws Exception {
+		String regex = "^[0-9]+(\\.[0-9]{1,2})\"?";
+
+		MessageBoardAttachment messageBoardAttachment =
+			randomMessageBoardAttachment();
+
+		messageBoardAttachment.setContentUrl(regex);
+		messageBoardAttachment.setEncodingFormat(regex);
+		messageBoardAttachment.setFileExtension(regex);
+		messageBoardAttachment.setTitle(regex);
+
+		String json = MessageBoardAttachmentSerDes.toJSON(
+			messageBoardAttachment);
+
+		Assert.assertFalse(json.contains(regex));
+
+		messageBoardAttachment = MessageBoardAttachmentSerDes.toDTO(json);
+
+		Assert.assertEquals(regex, messageBoardAttachment.getContentUrl());
+		Assert.assertEquals(regex, messageBoardAttachment.getEncodingFormat());
+		Assert.assertEquals(regex, messageBoardAttachment.getFileExtension());
+		Assert.assertEquals(regex, messageBoardAttachment.getTitle());
+	}
+
+	@Test
 	public void testDeleteMessageBoardAttachment() throws Exception {
 		MessageBoardAttachment messageBoardAttachment =
 			testDeleteMessageBoardAttachment_addMessageBoardAttachment();
 
-		assertResponseCode(
+		assertHttpResponseStatusCode(
 			204,
-			invokeDeleteMessageBoardAttachmentResponse(
-				messageBoardAttachment.getId()));
+			MessageBoardAttachmentResource.
+				deleteMessageBoardAttachmentHttpResponse(
+					messageBoardAttachment.getId()));
 
-		assertResponseCode(
+		assertHttpResponseStatusCode(
 			404,
-			invokeGetMessageBoardAttachmentResponse(
-				messageBoardAttachment.getId()));
+			MessageBoardAttachmentResource.
+				getMessageBoardAttachmentHttpResponse(
+					messageBoardAttachment.getId()));
 
-		assertResponseCode(404, invokeGetMessageBoardAttachmentResponse(0L));
+		assertHttpResponseStatusCode(
+			404,
+			MessageBoardAttachmentResource.
+				getMessageBoardAttachmentHttpResponse(0L));
 	}
 
 	protected MessageBoardAttachment
@@ -201,57 +222,14 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 			"This method needs to be implemented");
 	}
 
-	protected void invokeDeleteMessageBoardAttachment(
-			Long messageBoardAttachmentId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setDelete(true);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-attachments/{messageBoardAttachmentId}",
-					messageBoardAttachmentId);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-	}
-
-	protected Http.Response invokeDeleteMessageBoardAttachmentResponse(
-			Long messageBoardAttachmentId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setDelete(true);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-attachments/{messageBoardAttachmentId}",
-					messageBoardAttachmentId);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
 	@Test
 	public void testGetMessageBoardAttachment() throws Exception {
 		MessageBoardAttachment postMessageBoardAttachment =
 			testGetMessageBoardAttachment_addMessageBoardAttachment();
 
 		MessageBoardAttachment getMessageBoardAttachment =
-			invokeGetMessageBoardAttachment(postMessageBoardAttachment.getId());
+			MessageBoardAttachmentResource.getMessageBoardAttachment(
+				postMessageBoardAttachment.getId());
 
 		assertEquals(postMessageBoardAttachment, getMessageBoardAttachment);
 		assertValid(getMessageBoardAttachment);
@@ -263,57 +241,6 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
-	}
-
-	protected MessageBoardAttachment invokeGetMessageBoardAttachment(
-			Long messageBoardAttachmentId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-attachments/{messageBoardAttachmentId}",
-					messageBoardAttachmentId);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return MessageBoardAttachmentSerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokeGetMessageBoardAttachmentResponse(
-			Long messageBoardAttachmentId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-attachments/{messageBoardAttachmentId}",
-					messageBoardAttachmentId);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -332,8 +259,9 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 					randomIrrelevantMessageBoardAttachment());
 
 			Page<MessageBoardAttachment> page =
-				invokeGetMessageBoardMessageMessageBoardAttachmentsPage(
-					irrelevantMessageBoardMessageId);
+				MessageBoardAttachmentResource.
+					getMessageBoardMessageMessageBoardAttachmentsPage(
+						irrelevantMessageBoardMessageId);
 
 			Assert.assertEquals(1, page.getTotalCount());
 
@@ -352,8 +280,9 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 				messageBoardMessageId, randomMessageBoardAttachment());
 
 		Page<MessageBoardAttachment> page =
-			invokeGetMessageBoardMessageMessageBoardAttachmentsPage(
-				messageBoardMessageId);
+			MessageBoardAttachmentResource.
+				getMessageBoardMessageMessageBoardAttachmentsPage(
+					messageBoardMessageId);
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -369,8 +298,10 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 				MessageBoardAttachment messageBoardAttachment)
 		throws Exception {
 
-		return invokePostMessageBoardMessageMessageBoardAttachment(
-			messageBoardMessageId, toMultipartBody(messageBoardAttachment));
+		return MessageBoardAttachmentResource.
+			postMessageBoardMessageMessageBoardAttachment(
+				messageBoardMessageId, messageBoardAttachment,
+				getMultipartFiles());
 	}
 
 	protected Long
@@ -388,50 +319,6 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 		return null;
 	}
 
-	protected Page<MessageBoardAttachment>
-			invokeGetMessageBoardMessageMessageBoardAttachmentsPage(
-				Long messageBoardMessageId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-messages/{messageBoardMessageId}/message-board-attachments",
-					messageBoardMessageId);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		return Page.of(string, MessageBoardAttachmentSerDes::toDTO);
-	}
-
-	protected Http.Response
-			invokeGetMessageBoardMessageMessageBoardAttachmentsPageResponse(
-				Long messageBoardMessageId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-messages/{messageBoardMessageId}/message-board-attachments",
-					messageBoardMessageId);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
 	@Test
 	public void testPostMessageBoardMessageMessageBoardAttachment()
 		throws Exception {
@@ -444,76 +331,10 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 				MessageBoardAttachment messageBoardAttachment)
 		throws Exception {
 
-		return invokePostMessageBoardMessageMessageBoardAttachment(
-			testGetMessageBoardMessageMessageBoardAttachmentsPage_getMessageBoardMessageId(),
-			toMultipartBody(messageBoardAttachment));
-	}
-
-	protected MessageBoardAttachment
-			invokePostMessageBoardMessageMessageBoardAttachment(
-				Long messageBoardMessageId, MultipartBody multipartBody)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.addPart(
-			"messageBoardAttachment", _toJSON(multipartBody.getValues()));
-
-		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
-
-		options.addFilePart(
-			"file", binaryFile.getFileName(),
-			FileUtil.getBytes(binaryFile.getInputStream()), testContentType,
-			"UTF-8");
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-messages/{messageBoardMessageId}/message-board-attachments",
-					messageBoardMessageId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return MessageBoardAttachmentSerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response
-			invokePostMessageBoardMessageMessageBoardAttachmentResponse(
-				Long messageBoardMessageId, MultipartBody multipartBody)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-messages/{messageBoardMessageId}/message-board-attachments",
-					messageBoardMessageId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
+		return MessageBoardAttachmentResource.
+			postMessageBoardMessageMessageBoardAttachment(
+				testGetMessageBoardMessageMessageBoardAttachmentsPage_getMessageBoardMessageId(),
+				messageBoardAttachment, getMultipartFiles());
 	}
 
 	@Test
@@ -532,8 +353,9 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 					randomIrrelevantMessageBoardAttachment());
 
 			Page<MessageBoardAttachment> page =
-				invokeGetMessageBoardThreadMessageBoardAttachmentsPage(
-					irrelevantMessageBoardThreadId);
+				MessageBoardAttachmentResource.
+					getMessageBoardThreadMessageBoardAttachmentsPage(
+						irrelevantMessageBoardThreadId);
 
 			Assert.assertEquals(1, page.getTotalCount());
 
@@ -552,8 +374,9 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 				messageBoardThreadId, randomMessageBoardAttachment());
 
 		Page<MessageBoardAttachment> page =
-			invokeGetMessageBoardThreadMessageBoardAttachmentsPage(
-				messageBoardThreadId);
+			MessageBoardAttachmentResource.
+				getMessageBoardThreadMessageBoardAttachmentsPage(
+					messageBoardThreadId);
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -569,8 +392,10 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 				MessageBoardAttachment messageBoardAttachment)
 		throws Exception {
 
-		return invokePostMessageBoardThreadMessageBoardAttachment(
-			messageBoardThreadId, toMultipartBody(messageBoardAttachment));
+		return MessageBoardAttachmentResource.
+			postMessageBoardThreadMessageBoardAttachment(
+				messageBoardThreadId, messageBoardAttachment,
+				getMultipartFiles());
 	}
 
 	protected Long
@@ -588,50 +413,6 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 		return null;
 	}
 
-	protected Page<MessageBoardAttachment>
-			invokeGetMessageBoardThreadMessageBoardAttachmentsPage(
-				Long messageBoardThreadId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-threads/{messageBoardThreadId}/message-board-attachments",
-					messageBoardThreadId);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		return Page.of(string, MessageBoardAttachmentSerDes::toDTO);
-	}
-
-	protected Http.Response
-			invokeGetMessageBoardThreadMessageBoardAttachmentsPageResponse(
-				Long messageBoardThreadId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-threads/{messageBoardThreadId}/message-board-attachments",
-					messageBoardThreadId);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
 	@Test
 	public void testPostMessageBoardThreadMessageBoardAttachment()
 		throws Exception {
@@ -644,83 +425,18 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 				MessageBoardAttachment messageBoardAttachment)
 		throws Exception {
 
-		return invokePostMessageBoardThreadMessageBoardAttachment(
-			testGetMessageBoardThreadMessageBoardAttachmentsPage_getMessageBoardThreadId(),
-			toMultipartBody(messageBoardAttachment));
+		return MessageBoardAttachmentResource.
+			postMessageBoardThreadMessageBoardAttachment(
+				testGetMessageBoardThreadMessageBoardAttachmentsPage_getMessageBoardThreadId(),
+				messageBoardAttachment, getMultipartFiles());
 	}
 
-	protected MessageBoardAttachment
-			invokePostMessageBoardThreadMessageBoardAttachment(
-				Long messageBoardThreadId, MultipartBody multipartBody)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.addPart(
-			"messageBoardAttachment", _toJSON(multipartBody.getValues()));
-
-		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
-
-		options.addFilePart(
-			"file", binaryFile.getFileName(),
-			FileUtil.getBytes(binaryFile.getInputStream()), testContentType,
-			"UTF-8");
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-threads/{messageBoardThreadId}/message-board-attachments",
-					messageBoardThreadId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return MessageBoardAttachmentSerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response
-			invokePostMessageBoardThreadMessageBoardAttachmentResponse(
-				Long messageBoardThreadId, MultipartBody multipartBody)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/message-board-threads/{messageBoardThreadId}/message-board-attachments",
-					messageBoardThreadId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
-	protected void assertResponseCode(
-		int expectedResponseCode, Http.Response actualResponse) {
+	protected void assertHttpResponseStatusCode(
+		int expectedHttpResponseStatusCode,
+		HttpInvoker.HttpResponse actualHttpResponse) {
 
 		Assert.assertEquals(
-			expectedResponseCode, actualResponse.getResponseCode());
+			expectedHttpResponseStatusCode, actualHttpResponse.getStatusCode());
 	}
 
 	protected void assertEquals(
@@ -1038,6 +754,11 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
+	protected Map<String, File> getMultipartFiles() throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
 	protected MessageBoardAttachment randomMessageBoardAttachment()
 		throws Exception {
 
@@ -1068,84 +789,11 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 		return randomMessageBoardAttachment();
 	}
 
-	protected MultipartBody toMultipartBody(
-		MessageBoardAttachment messageBoardAttachment) {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
 	protected Group irrelevantGroup;
-	protected String testContentType = "application/json";
+	protected Company testCompany;
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	private Http.Options _createHttpOptions() {
-		Http.Options options = new Http.Options();
-
-		options.addHeader("Accept", "application/json");
-		options.addHeader(
-			"Accept-Language", LocaleUtil.toW3cLanguageId(testLocale));
-
-		String encodedTestUserNameAndPassword = Base64.encode(
-			testUserNameAndPassword.getBytes());
-
-		options.addHeader(
-			"Authorization", "Basic " + encodedTestUserNameAndPassword);
-
-		options.addHeader("Content-Type", testContentType);
-
-		return options;
-	}
-
-	private String _toJSON(Map<String, String> map) {
-		if (map == null) {
-			return "null";
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("{");
-
-		Set<Map.Entry<String, String>> set = map.entrySet();
-
-		Iterator<Map.Entry<String, String>> iterator = set.iterator();
-
-		while (iterator.hasNext()) {
-			Map.Entry<String, String> entry = iterator.next();
-
-			sb.append("\"" + entry.getKey() + "\": ");
-
-			if (entry.getValue() == null) {
-				sb.append("null");
-			}
-			else {
-				sb.append("\"" + entry.getValue() + "\"");
-			}
-
-			if (iterator.hasNext()) {
-				sb.append(", ");
-			}
-		}
-
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private String _toPath(String template, Object... values) {
-		if (ArrayUtil.isEmpty(values)) {
-			return template;
-		}
-
-		for (int i = 0; i < values.length; i++) {
-			template = template.replaceFirst(
-				"\\{.*?\\}", String.valueOf(values[i]));
-		}
-
-		return template;
-	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseMessageBoardAttachmentResourceTestCase.class);
@@ -1165,8 +813,8 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 	private static DateFormat _dateFormat;
 
 	@Inject
-	private MessageBoardAttachmentResource _messageBoardAttachmentResource;
-
-	private URL _resourceURL;
+	private
+		com.liferay.headless.delivery.resource.v1_0.
+			MessageBoardAttachmentResource _messageBoardAttachmentResource;
 
 }

@@ -1,5 +1,6 @@
 @component-name = "portal-workflow"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.component.names = "Dynamic Data Lists,Workflow";
@@ -124,6 +125,8 @@ definition {
 			ddlRecordFieldDataEdit = "DDL Record Edit",
 			fieldFieldLabel = "Text",
 			fieldName = "Text");
+
+		Navigator.openURL();
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
@@ -252,4 +255,5 @@ definition {
 			fieldName = "TextName",
 			workflowStatus = "Update");
 	}
+
 }

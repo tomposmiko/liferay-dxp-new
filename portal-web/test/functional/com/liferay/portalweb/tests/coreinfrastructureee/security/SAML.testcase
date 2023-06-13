@@ -1,5 +1,6 @@
 @component-name = "portal-authentication-ee"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property app.server.bundles.size = "1";
@@ -270,6 +271,18 @@ definition {
 		User.viewLoggedOutPG();
 
 		SAML.executeIdPInitiatedSSO(
+			idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
+			password = "test",
+			samlEnabled = "true",
+			spURL = "http://www.able.com:9080/",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.openURL();
+
+		Pause(locator1 = "60000");
+
+		SAML.executeIdPInitiatedSSO(
+			autoLogin = "true",
 			idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
 			password = "test",
 			samlEnabled = "true",
@@ -580,12 +593,9 @@ definition {
 
 		Navigator.gotoLoginPage();
 
-		// Unignore after LPS-90460 is resolved
-
-		// AssertConsoleTextPresent(value1 = "Validation failure: Failed to resolve both a data and a key encryption credential");
+		AssertConsoleTextPresent(value1 = "org.opensaml.messaging.handler.MessageHandlerException: Message context was not authenticated");
 	}
 
-	@ignore = "true"
 	@priority = "4"
 	test ConfigureSAMLToImportUsersFromLDAP {
 		property apacheds.enabled = "true";
@@ -656,6 +666,7 @@ definition {
 		Navigator.gotoBack();
 
 		User.editPasswordCP(
+			samlEnabled = "true",
 			userEmailAddress = "ldapuseremail@liferay.com",
 			userScreenName = "ldapusercn");
 
@@ -672,7 +683,7 @@ definition {
 
 		SAMLNavigation.gotoServiceProvider();
 
-		SAMLPortlet.configureServiceProvider(enbleLDAPImport = "true");
+		SAMLPortlet.configureServiceProvider(LDAPImport = "enable");
 
 		User.logoutPG(specificURL = "http://www.able.com:9080");
 
@@ -1224,4 +1235,5 @@ definition {
 			locator1 = "Portlet#PORTLET_CONTENT",
 			value1 = "No identity provider is available to sign you in.");
 	}
+
 }

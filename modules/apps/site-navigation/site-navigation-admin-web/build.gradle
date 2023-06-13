@@ -7,7 +7,7 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.petra.lang", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.site.navigation.admin.api", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.site.navigation.api", version: "3.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.site.navigation.api", version: "3.1.0"
 	compileOnly group: "com.liferay", name: "com.liferay.site.navigation.menu.item.api", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.site.navigation.service", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.staging.api", version: "4.0.0"

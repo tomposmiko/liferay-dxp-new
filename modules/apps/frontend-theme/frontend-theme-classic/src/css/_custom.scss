@@ -11,37 +11,62 @@
 @import "portlet/portlet_decorators";
 @import "portlet/portlet_hello_world";
 
-header {
-	.portlet, .field-wrapper, .form-group {
-		margin-bottom: 0;
-	}
+body {
+	header {
+		.field-wrapper {
+			position: absolute;
+			right: 4px;
+			top: 2px;
 
-	.text-default {
-		color: #6B6C7E;
-		font-weight: 600;
-	}
-
-	.field-wrapper {
-		position: absolute;
-		right: 4px;
-		top: 2px;
-
-		a {
-			color: #FFF;
+			a {
+				color: #FFF;
+			}
 		}
-	}
 
-	.portlet {
-		margin-bottom: 0;
+		.field-wrapper, .form-group {
+			margin-bottom: 0;
+		}
 
-		&:hover {
-			z-index: 1034;
+		.portlet {
+			margin-bottom: 0;
+
+			&:hover {
+				z-index: 1034;
+			}
+		}
+
+		.search-input {
+			font-size: 0.88rem;
+			padding: 0.28rem 2rem 0.28rem 1rem;
+		}
+
+		.text-default {
+			color: #6B6C7E;
+			font-weight: 600;
+		}
+
+		.user-personal-bar {
+			.fieldset {
+				position: relative;
+			}
+
+			.user-avatar-link .panel-notifications-count {
+				right: calc(100% - 0.75rem);
+				top: -0.35rem;
+			}
 		}
 	}
 
 	.user-avatar-link {
 		display: block;
 		position: relative;
+
+		.panel-notifications-count {
+			margin: 0;
+			position: absolute;
+			right: calc(100% - 0.7rem);
+			top: -0.4rem;
+		}
 
 		.text-default {
 			align-items: center;
@@ -55,24 +80,6 @@ header {
 				}
 			}
 		}
-
-		.panel-notifications-count {
-			margin: 0;
-			position: absolute;
-			right: calc(100% - 0.7rem);
-			top: -0.4rem;
-		}
-	}
-
-	.user-personal-bar {
-		.fieldset {
-			position: relative;
-		}
-	}
-
-	.search-input {
-		font-size: 0.88rem;
-		padding: 0.28rem 2rem 0.28rem 1rem;
 	}
 }
 

@@ -4,7 +4,7 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.adaptive.media.image.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.blogs.api", version: "5.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.exportimport.api", version: "4.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.info.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.info.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "4.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.0.0"

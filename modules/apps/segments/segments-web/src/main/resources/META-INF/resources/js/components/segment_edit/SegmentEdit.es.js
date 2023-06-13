@@ -34,6 +34,7 @@ class SegmentEdit extends Component {
 		formId: PropTypes.string,
 		handleBlur: PropTypes.func,
 		handleChange: PropTypes.func,
+		hasUpdatePermission: PropTypes.bool,
 		initialMembersCount: PropTypes.number,
 		initialSegmentActive: PropTypes.bool,
 		initialSegmentName: PropTypes.object,
@@ -122,11 +123,13 @@ class SegmentEdit extends Component {
 	);
 
 	_renderContributors = () => {
-		const {contributors, formId, initialMembersCount, previewMembersURL, propertyGroups, requestMembersCountURL, values} = this.props;
+		const {contributors, formId, initialMembersCount, locale, previewMembersURL, propertyGroups, requestMembersCountURL, values} = this.props;
 
 		const {editing} = this.state;
 
 		const emptyContributors = this._isQueryEmpty();
+
+		const segmentName = values.name[locale];
 
 		return (
 			(propertyGroups && contributors) ?
@@ -140,10 +143,10 @@ class SegmentEdit extends Component {
 					previewMembersURL={previewMembersURL}
 					propertyGroups={propertyGroups}
 					requestMembersCountURL={requestMembersCountURL}
+					segmentName={segmentName}
 					supportedConjunctions={SUPPORTED_CONJUNCTIONS}
 					supportedOperators={SUPPORTED_OPERATORS}
 					supportedPropertyTypes={SUPPORTED_PROPERTY_TYPES}
-					values={values}
 				/> :
 				null
 		);
@@ -247,6 +250,7 @@ class SegmentEdit extends Component {
 		const {
 			availableLocales,
 			defaultLanguageId,
+			hasUpdatePermission,
 			portletNamespace,
 			redirect,
 			source,
@@ -297,42 +301,44 @@ class SegmentEdit extends Component {
 							/>
 						</div>
 
-						<div className="form-header-section-right">
-							<div className="btn-group">
-								<div className="btn-group-item mr-2">
-									<ClayToggle
-										checked={editing}
-										className="toggle-editing"
-										iconOff="pencil"
-										iconOn="pencil"
-										onChange={this._handleCriteriaEdit}
-									/>
-								</div>
-							</div>
-
-							<div className="btn-group">
-								<div className="btn-group-item">
-									<ClayButton
-										className="text-capitalize"
-										href={redirect}
-										label={Liferay.Language.get('cancel')}
-										size="sm"
-									/>
+						{hasUpdatePermission &&
+							<div className="form-header-section-right">
+								<div className="btn-group">
+									<div className="btn-group-item mr-2">
+										<ClayToggle
+											checked={editing}
+											className="toggle-editing"
+											iconOff="pencil"
+											iconOn="pencil"
+											onChange={this._handleCriteriaEdit}
+										/>
+									</div>
 								</div>
 
-								<div className="btn-group-item">
-									<ClayButton
-										className="text-capitalize"
-										disabled={disabledSaveButton}
-										label={Liferay.Language.get('save')}
-										onClick={this._handleValidate}
-										size="sm"
-										style="primary"
-										type="submit"
-									/>
+								<div className="btn-group">
+									<div className="btn-group-item">
+										<ClayButton
+											className="text-capitalize"
+											href={redirect}
+											label={Liferay.Language.get('cancel')}
+											size="sm"
+										/>
+									</div>
+
+									<div className="btn-group-item">
+										<ClayButton
+											className="text-capitalize"
+											disabled={disabledSaveButton}
+											label={Liferay.Language.get('save')}
+											onClick={this._handleValidate}
+											size="sm"
+											style="primary"
+											type="submit"
+										/>
+									</div>
 								</div>
 							</div>
-						</div>
+						}
 					</div>
 				</div>
 

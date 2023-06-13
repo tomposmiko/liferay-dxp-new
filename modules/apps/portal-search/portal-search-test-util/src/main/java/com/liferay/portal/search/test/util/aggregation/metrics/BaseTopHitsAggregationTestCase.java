@@ -119,9 +119,9 @@ public abstract class BaseTopHitsAggregationTestCase
 
 		SearchHits searchHits = topHitsAggregationResult.getSearchHits();
 
-		List<SearchHit> searchHitList = searchHits.getSearchHits();
+		List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
-		SearchHit searchHit = searchHitList.get(0);
+		SearchHit searchHit = searchHitsList.get(0);
 
 		Document document = searchHit.getDocument();
 

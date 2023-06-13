@@ -14,9 +14,13 @@
 
 package com.liferay.headless.delivery.internal.resource.v1_0;
 
+import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
+import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.headless.common.spi.service.context.ServiceContextUtil;
 import com.liferay.headless.delivery.dto.v1_0.MessageBoardSection;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CreatorUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.CustomFieldsUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.EntityFieldsUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.MessageBoardSectionEntityModel;
 import com.liferay.headless.delivery.resource.v1_0.MessageBoardSectionResource;
 import com.liferay.message.boards.model.MBCategory;
@@ -30,7 +34,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -39,6 +42,11 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
+
+import java.io.Serializable;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -66,7 +74,12 @@ public class MessageBoardSectionResourceImpl
 
 	@Override
 	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
-		return _entityModel;
+		return new MessageBoardSectionEntityModel(
+			new ArrayList<>(
+				EntityFieldsUtil.getEntityFields(
+					_portal.getClassNameId(MBCategory.class.getName()),
+					contextCompany.getCompanyId(), _expandoColumnLocalService,
+					_expandoTableLocalService)));
 	}
 
 	@Override
@@ -159,7 +172,9 @@ public class MessageBoardSectionResourceImpl
 				messageBoardSection.getDescription(),
 				mbCategory.getDisplayStyle(), "", "", "", 0, false, "", "", 0,
 				"", false, "", 0, false, "", "", false, false, false,
-				new ServiceContext()));
+				ServiceContextUtil.createServiceContext(
+					_getExpandoBridgeAttributes(messageBoardSection),
+					mbCategory.getGroupId(), null)));
 	}
 
 	private MessageBoardSection _addMessageBoardSection(
@@ -173,7 +188,17 @@ public class MessageBoardSectionResourceImpl
 				messageBoardSection.getTitle(),
 				messageBoardSection.getDescription(),
 				ServiceContextUtil.createServiceContext(
-					siteId, messageBoardSection.getViewableByAsString())));
+					_getExpandoBridgeAttributes(messageBoardSection), siteId,
+					messageBoardSection.getViewableByAsString())));
+	}
+
+	private Map<String, Serializable> _getExpandoBridgeAttributes(
+		MessageBoardSection messageBoardSection) {
+
+		return CustomFieldsUtil.toMap(
+			MBCategory.class.getName(), contextCompany.getCompanyId(),
+			messageBoardSection.getCustomFields(),
+			contextAcceptLanguage.getPreferredLocale());
 	}
 
 	private Page<MessageBoardSection> _getSiteMessageBoardSectionsPage(
@@ -205,6 +230,10 @@ public class MessageBoardSectionResourceImpl
 				creator = CreatorUtil.toCreator(
 					_portal,
 					_userLocalService.getUserById(mbCategory.getUserId()));
+				customFields = CustomFieldsUtil.toCustomFields(
+					MBCategory.class.getName(), mbCategory.getCategoryId(),
+					mbCategory.getCompanyId(),
+					contextAcceptLanguage.getPreferredLocale());
 				dateCreated = mbCategory.getCreateDate();
 				dateModified = mbCategory.getModifiedDate();
 				description = mbCategory.getDescription();
@@ -219,8 +248,11 @@ public class MessageBoardSectionResourceImpl
 		};
 	}
 
-	private static final EntityModel _entityModel =
-		new MessageBoardSectionEntityModel();
+	@Reference
+	private ExpandoColumnLocalService _expandoColumnLocalService;
+
+	@Reference
+	private ExpandoTableLocalService _expandoTableLocalService;
 
 	@Reference
 	private MBCategoryService _mbCategoryService;

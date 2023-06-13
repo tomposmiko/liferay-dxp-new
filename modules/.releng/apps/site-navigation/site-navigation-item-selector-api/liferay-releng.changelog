@@ -2,3 +2,8 @@
 # Bundle Version 2.0.0
 #
 62ad475678e5d1e6ac813535e4c376a3afade9bc^..cb0daa9b0086ae09669801395ef8fcb2fe0a5161=LPS-77425 LPS-80332
+
+#
+# Bundle Version 2.0.1
+#
+cb0daa9b0086ae09669801395ef8fcb2fe0a5161^..dec2abf47a44a9f998291d03aa499bb7b2e49496=LPS-95555

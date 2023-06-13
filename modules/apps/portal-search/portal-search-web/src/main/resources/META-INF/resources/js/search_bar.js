@@ -21,6 +21,8 @@ AUI.add(
 
 			instance.keywordsInput = instance.form.one('.search-bar-keywords-input');
 
+			instance.resetStartPage = instance.form.one('.search-bar-reset-start-page');
+
 			instance.scopeSelect = instance.form.one('.search-bar-scope-select');
 
 			var searchButton = instance.form.one('.search-bar-search-button');
@@ -79,6 +81,32 @@ AUI.add(
 							queryString
 						);
 					}
+
+					if (hasQuestionMark) {
+						var parts = queryString.split('?');
+
+						queryString = parts[1];
+
+						hasQuestionMark = false;
+					}
+
+					var parameterArray = queryString.split('&');
+
+					parameterArray = FacetUtil.removeURLParameters(
+						'start',
+						parameterArray
+					);
+
+					if (instance.resetStartPage) {
+						var resetStartPageName = instance.resetStartPage.get('name');
+
+						parameterArray = FacetUtil.removeURLParameters(
+							resetStartPageName,
+							parameterArray
+						);
+					}
+
+					queryString = parameterArray.join('&');
 
 					if (!hasQuestionMark) {
 						queryString = '?' + queryString;

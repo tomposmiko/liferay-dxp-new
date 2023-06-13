@@ -1,4 +1,5 @@
 definition {
+
 	macro dragAndDropPortletToPortletColumnPG {
 		var key_portletTitleName = "${portletName}";
 
@@ -25,7 +26,9 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		AssertChecked(locator1 = "Portlet#LAYOUT_2_COLUMNS");
+		AssertChecked(
+			key_card = "${defaultColumnName}",
+			locator1 = "LexiconCard#CARD_RADIO");
 
 		SelectFrameTop(value1 = "relative=top");
 	}
@@ -37,4 +40,5 @@ definition {
 			locator1 = "Home#PORTLET_COLUMN_${portletColumnNumberTo}_NESTED_PORTLET_TITLE",
 			value1 = "${portletName}");
 	}
+
 }

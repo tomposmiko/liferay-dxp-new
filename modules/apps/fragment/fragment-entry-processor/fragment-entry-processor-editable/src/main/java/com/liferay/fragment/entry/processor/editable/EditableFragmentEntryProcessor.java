@@ -149,9 +149,18 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			fragmentEntryLink.getEditableValues());
 
+		if (jsonObject.length() == 0) {
+			Class<?> clazz = getClass();
+
+			jsonObject.put(
+				clazz.getName(),
+				getDefaultEditableValuesJSONObject(
+					fragmentEntryLink.getHtml()));
+		}
+
 		Document document = _getDocument(html);
 
-		Map<Long, Map<String, Object>> assetEntriesFieldValues =
+		Map<Long, Map<String, Object>> infoDisplaysFieldValues =
 			new HashMap<>();
 
 		for (Element element : document.select("lfr-editable")) {
@@ -205,7 +214,7 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 
 			if (_fragmentEntryProcessorUtil.isMapped(editableValueJSONObject)) {
 				Object fieldValue = _fragmentEntryProcessorUtil.getMappedValue(
-					editableValueJSONObject, assetEntriesFieldValues,
+					editableValueJSONObject, infoDisplaysFieldValues,
 					fragmentEntryProcessorContext.getMode(),
 					fragmentEntryProcessorContext.getLocale(),
 					fragmentEntryProcessorContext.getPreviewClassPK(),
@@ -265,7 +274,7 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 
 		Element bodyElement = document.body();
 
-		if (!assetEntriesFieldValues.containsKey(
+		if (!infoDisplaysFieldValues.containsKey(
 				fragmentEntryProcessorContext.getPreviewClassPK())) {
 
 			return bodyElement.html();
@@ -351,8 +360,7 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 
 		Template template = TemplateManagerUtil.getTemplate(
 			TemplateConstants.LANG_TYPE_FTL,
-			new StringTemplateResource("template_id", "[#ftl]\n" + html),
-			false);
+			new StringTemplateResource("template_id", "[#ftl]\n" + html), true);
 
 		TemplateManager templateManager =
 			TemplateManagerUtil.getTemplateManager(
@@ -400,7 +408,7 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 				resourceBundle,
 				"you-must-define-all-require-attributes-x-for-each-editable-" +
 					"element",
-				String.join(StringPool.COMMA, _REQUIRED_ATTRIBUTE_NAMES)));
+				StringUtil.merge(_REQUIRED_ATTRIBUTE_NAMES)));
 	}
 
 	private void _validateAttributes(String html)

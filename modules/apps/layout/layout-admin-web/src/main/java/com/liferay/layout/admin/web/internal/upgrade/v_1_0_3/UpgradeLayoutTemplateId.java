@@ -14,8 +14,8 @@
 
 package com.liferay.layout.admin.web.internal.upgrade.v_1_0_3;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.StringBundler;
 
 /**
  * @author Sam Ziemer
@@ -31,7 +31,8 @@ public class UpgradeLayoutTemplateId extends UpgradeProcess {
 		String sql = StringBundler.concat(
 			"update Layout set typeSettings = REPLACE(typeSettings, ",
 			"'layout-template-id=1_2_1_columns', ",
-			"'layout-template-id=1_2_1_columns_ii')");
+			"'layout-template-id=1_2_1_columns_ii') where typesettings like ",
+			"'%layout-template-id=1_2_1_columns%'");
 
 		runSQL(sql);
 	}

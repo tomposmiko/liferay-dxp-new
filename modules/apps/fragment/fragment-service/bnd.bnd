@@ -1,9 +1,10 @@
 Bundle-Name: Liferay Fragment Service
 Bundle-SymbolicName: com.liferay.fragment.service
-Bundle-Version: 2.0.5
+Bundle-Version: 2.0.11
 Import-Package:\
 	com.liferay.fragment.util.comparator,\
 	\
 	*
-Liferay-Require-SchemaVersion: 2.1.0
+Liferay-Require-SchemaVersion: 2.1.1
 Liferay-Service: true
+-dsannotations-options: inherit

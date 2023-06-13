@@ -29,7 +29,9 @@ import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.journal.web.internal.security.permission.resource.JournalArticlePermission;
 import com.liferay.journal.web.internal.security.permission.resource.JournalFolderPermission;
+import com.liferay.journal.web.internal.util.JournalChangeTrackingHelperUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -128,11 +130,10 @@ public class JournalEditArticleDisplayContext {
 
 			strings.put(
 				curLanguageId,
-				LanguageUtil.format(
-					_httpServletRequest, "default-language-x",
-					availableLocale.getDisplayName(
-						LocaleUtil.fromLanguageId(getDefaultLanguageId())),
-					false));
+				StringBundler.concat(
+					availableLocale.getDisplayLanguage(), StringPool.SPACE,
+					StringPool.OPEN_PARENTHESIS, availableLocale.getCountry(),
+					StringPool.CLOSE_PARENTHESIS));
 
 			uniqueLanguageIds.add(curLanguageId);
 		}
@@ -437,6 +438,12 @@ public class JournalEditArticleDisplayContext {
 	}
 
 	public String getPublishButtonLabel() throws PortalException {
+		if (JournalChangeTrackingHelperUtil.hasActiveCTCollection(
+				_themeDisplay.getCompanyId(), _themeDisplay.getUserId())) {
+
+			return "publish-to-change-list";
+		}
+
 		if (getClassNameId() > JournalArticleConstants.CLASSNAME_ID_DEFAULT) {
 			return "save";
 		}

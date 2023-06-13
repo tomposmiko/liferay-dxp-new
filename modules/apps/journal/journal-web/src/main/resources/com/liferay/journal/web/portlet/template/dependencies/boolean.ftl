@@ -2,10 +2,14 @@
 
 <#if stringUtil.equals(language, "ftl")>
 ${r"<#if"} getterUtil.getBoolean(${variableName})>
-	[$CURSOR$]
+	${r"${"}languageUtil.get(locale, "yes")}
+${r"<#else>"}
+	${r"${"}languageUtil.get(locale, "no")}
 ${r"</#if>"}
 <#else>
 #if ($getterUtil.getBoolean($${variableName}))
-	[$CURSOR$]
+	$languageUtil.get($$locale, "yes")
+#else
+	$languageUtil.get($$locale, "no")
 #end
 </#if>

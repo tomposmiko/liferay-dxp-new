@@ -14,6 +14,7 @@
 
 package com.liferay.portal.tools.deploy;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ServerDetector;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -223,9 +223,7 @@ public class PortletDeployer extends BaseDeployer {
 
 	@Override
 	public void updateDeployDirectory(File srcFile) throws Exception {
-		boolean customPortletXML = false;
-
-		customPortletXML = PropsValues.AUTO_DEPLOY_CUSTOM_PORTLET_XML;
+		boolean customPortletXML = PropsValues.AUTO_DEPLOY_CUSTOM_PORTLET_XML;
 
 		customPortletXML = GetterUtil.getBoolean(
 			System.getProperty("deployer.custom.portlet.xml"),

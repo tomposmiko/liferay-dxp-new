@@ -1,7 +1,7 @@
 dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.application.list.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.application.list.taglib", version: "4.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.change.tracking.api", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.change.tracking.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.lang", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.product.navigation.personal.menu.api", version: "1.0.0"

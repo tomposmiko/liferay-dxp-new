@@ -76,11 +76,12 @@ public abstract class BaseSimpleStringQueryTestCase
 				Assert.assertEquals(
 					"Total hits", 20, searchHits.getTotalHits());
 
-				List<SearchHit> searchHitList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
-				Assert.assertEquals("Retrieved hits", 20, searchHitList.size());
+				Assert.assertEquals(
+					"Retrieved hits", 20, searchHitsList.size());
 
-				searchHitList.forEach(
+				searchHitsList.forEach(
 					searchHit -> {
 						Document document = searchHit.getDocument();
 

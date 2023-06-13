@@ -65,12 +65,13 @@ public abstract class BaseMatchAllQueryTestCase extends BaseIndexingTestCase {
 				Assert.assertEquals(
 					"Total hits", 20, searchHits.getTotalHits());
 
-				List<SearchHit> searchHitList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
-				Assert.assertEquals("Retrieved hits", 20, searchHitList.size());
+				Assert.assertEquals(
+					"Retrieved hits", 20, searchHitsList.size());
 
 				for (int i = 0; i < 20; i++) {
-					SearchHit searchHit = searchHitList.get(i);
+					SearchHit searchHit = searchHitsList.get(i);
 
 					Document document = searchHit.getDocument();
 
@@ -110,10 +111,10 @@ public abstract class BaseMatchAllQueryTestCase extends BaseIndexingTestCase {
 				Assert.assertEquals(
 					"Total hits", 20, searchHits.getTotalHits());
 
-				List<SearchHit> searchHitList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
 				Assert.assertTrue(
-					"Expected empty search hits", searchHitList.isEmpty());
+					"Expected empty search hits", searchHitsList.isEmpty());
 			});
 	}
 

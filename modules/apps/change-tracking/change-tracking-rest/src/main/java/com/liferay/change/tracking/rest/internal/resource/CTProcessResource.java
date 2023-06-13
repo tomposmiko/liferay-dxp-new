@@ -14,9 +14,12 @@
 
 package com.liferay.change.tracking.rest.internal.resource;
 
+import com.liferay.change.tracking.constants.CTConstants;
+import com.liferay.change.tracking.engine.CTEngineManager;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTProcess;
 import com.liferay.change.tracking.rest.internal.model.process.CTProcessModel;
+import com.liferay.change.tracking.rest.internal.model.process.CTProcessUserModel;
 import com.liferay.change.tracking.rest.internal.util.CTJaxRsUtil;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTProcessLocalService;
@@ -41,6 +44,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,6 +61,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -80,9 +85,26 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class CTProcessResource {
 
 	@GET
+	@Path("/{ctProcessId}")
+	@Produces
+	public CTProcessModel getCtProcessModel(
+		@PathParam("ctProcessId") long ctProcessId) {
+
+		return Optional.ofNullable(
+			_ctProcessLocalService.fetchCTProcess(ctProcessId)
+		).map(
+			this::_getCTProcessModel
+		).orElse(
+			CTProcessModel.emptyCTProcessModel()
+		);
+	}
+
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<CTProcessModel> getCtProcessModels(
 			@QueryParam("companyId") long companyId,
+			@QueryParam("userId") long userId,
+			@QueryParam("keywords") String keywords,
 			@DefaultValue(_TYPE_ALL) @QueryParam("type") String type,
 			@QueryParam("offset") int offset, @QueryParam("limit") int limit,
 			@QueryParam("sort") String sort)
@@ -90,41 +112,47 @@ public class CTProcessResource {
 
 		CTJaxRsUtil.checkCompany(companyId);
 
-		if (_TYPE_ALL.equals(type)) {
-			List<CTProcess> ctProcesses = _ctProcessLocalService.getCTProcesses(
-				companyId, _getQueryDefinition(offset, limit, sort));
+		return _getCTProcessModels(
+			_getCTProcesses(
+				companyId, userId, keywords, type, offset, limit, sort));
+	}
 
-			return _getCTProcessModels(ctProcesses);
-		}
-		else if (_TYPE_FAILED.equals(type)) {
-			List<CTProcess> ctProcesses = _ctProcessLocalService.getCTProcesses(
-				companyId, BackgroundTaskConstants.STATUS_FAILED,
-				_getQueryDefinition(offset, limit, sort));
+	@GET
+	@Path("/users")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<CTProcessUserModel> getCtProcessUserModels(
+			@QueryParam("companyId") long companyId,
+			@QueryParam("keywords") String keywords,
+			@DefaultValue(_TYPE_ALL) @QueryParam("type") String type,
+			@QueryParam("offset") int offset, @QueryParam("limit") int limit)
+		throws PortalException {
 
-			return _getCTProcessModels(ctProcesses);
-		}
-		else if (_TYPE_IN_PROGRESS.equals(type)) {
-			List<CTProcess> ctProcesses = _ctProcessLocalService.getCTProcesses(
-				companyId, BackgroundTaskConstants.STATUS_IN_PROGRESS,
-				_getQueryDefinition(offset, limit, sort));
+		CTJaxRsUtil.checkCompany(companyId);
 
-			return _getCTProcessModels(ctProcesses);
-		}
-		else if (_TYPE_PUBLISHED.equals(type)) {
-			List<CTProcess> ctProcesses = _ctProcessLocalService.getCTProcesses(
-				companyId, BackgroundTaskConstants.STATUS_SUCCESSFUL,
-				_getQueryDefinition(offset, limit, sort));
+		Stream<CTProcess> stream = _getCTProcesses(
+			companyId, CTConstants.USER_FILTER_ALL, keywords, type, offset,
+			limit, null
+		).stream();
 
-			return _getCTProcessModels(ctProcesses);
-		}
-		else if (_TYPE_PUBLISHED_LATEST.equals(type)) {
-			CTProcessModel ctProcessModel = _getPublishedCTProcessModel(
-				companyId);
+		return stream.map(
+			CTProcess::getUserId
+		).distinct(
+		).map(
+			_userLocalService::fetchUser
+		).filter(
+			Objects::nonNull
+		).map(
+			user -> {
+				CTProcessUserModel.Builder builder =
+					CTProcessUserModel.forUserId(user.getUserId());
 
-			return Collections.singletonList(ctProcessModel);
-		}
-
-		return Collections.emptyList();
+				return builder.setUserName(
+					user.getFullName()
+				).build();
+			}
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private Optional<com.liferay.portal.kernel.backgroundtask.BackgroundTask>
@@ -155,6 +183,33 @@ public class CTProcessResource {
 
 		return portalKernelBackgroundTaskOptional.map(
 			backgroundTaskExecutor::getBackgroundTaskDisplay);
+	}
+
+	private List<CTProcess> _getCTProcesses(
+		long companyId, long userId, String keywords, String type, int offset,
+		int limit, String sort) {
+
+		List<CTProcess> ctProcesses = null;
+
+		if (_TYPE_PUBLISHED_LATEST.equals(type)) {
+			Optional<CTProcess> latestCTProcessOptional =
+				_ctEngineManager.getLatestCTProcessOptional(companyId);
+
+			ctProcesses = latestCTProcessOptional.map(
+				Collections::singletonList
+			).orElse(
+				Collections.emptyList()
+			);
+		}
+		else {
+			int status = _getStatus(type);
+
+			ctProcesses = _ctEngineManager.getCTProcesses(
+				companyId, userId, keywords,
+				_getQueryDefinition(offset, limit, status, sort));
+		}
+
+		return ctProcesses;
 	}
 
 	private CTProcessModel _getCTProcessModel(CTProcess ctProcess) {
@@ -253,23 +308,9 @@ public class CTProcessResource {
 			themeDisplay.getPathImage(), true, 0, StringPool.BLANK);
 	}
 
-	private CTProcessModel _getPublishedCTProcessModel(long companyId)
-		throws PortalException {
-
-		CTJaxRsUtil.checkCompany(companyId);
-
-		CTProcess ctProcess = _ctProcessLocalService.fetchLatestCTProcess(
-			companyId);
-
-		if (ctProcess == null) {
-			return CTProcessModel.emptyCTProcessModel();
-		}
-
-		return _getCTProcessModel(ctProcess);
-	}
-
+	@SuppressWarnings("unchecked")
 	private QueryDefinition _getQueryDefinition(
-		int offset, int limit, String sort) {
+		int offset, int limit, int status, String sort) {
 
 		QueryDefinition queryDefinition = new QueryDefinition();
 
@@ -284,6 +325,8 @@ public class CTProcessResource {
 		if (start > 0) {
 			queryDefinition.setStart(start);
 		}
+
+		queryDefinition.setStatus(status);
 
 		Object[] sortColumns = CTJaxRsUtil.checkSortColumns(
 			sort, _orderByColumnNames);
@@ -306,6 +349,25 @@ public class CTProcessResource {
 		queryDefinition.setOrderByComparator(orderByComparator);
 
 		return queryDefinition;
+	}
+
+	private int _getStatus(String type) {
+		int status = 0;
+
+		if (_TYPE_ALL.equals(type)) {
+			status = WorkflowConstants.STATUS_ANY;
+		}
+		else if (_TYPE_FAILED.equals(type)) {
+			status = BackgroundTaskConstants.STATUS_FAILED;
+		}
+		else if (_TYPE_IN_PROGRESS.equals(type)) {
+			status = BackgroundTaskConstants.STATUS_IN_PROGRESS;
+		}
+		else if (_TYPE_PUBLISHED.equals(type)) {
+			status = BackgroundTaskConstants.STATUS_SUCCESSFUL;
+		}
+
+		return status;
 	}
 
 	private static final String _TYPE_ALL = "all";
@@ -335,6 +397,9 @@ public class CTProcessResource {
 
 	@Reference
 	private CTCollectionLocalService _ctCollectionLocalService;
+
+	@Reference
+	private CTEngineManager _ctEngineManager;
 
 	@Reference
 	private CTProcessLocalService _ctProcessLocalService;

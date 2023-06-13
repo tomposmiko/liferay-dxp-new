@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -73,6 +74,10 @@ public class ImageEditableElementParser implements EditableElementParser {
 	public String getValue(Element element) {
 		List<Element> elements = element.getElementsByTag("img");
 
+		if (ListUtil.isEmpty(elements)) {
+			return StringPool.BLANK;
+		}
+
 		Element replaceableElement = elements.get(0);
 
 		return replaceableElement.attr("src");
@@ -99,6 +104,10 @@ public class ImageEditableElementParser implements EditableElementParser {
 		Element element, String value, JSONObject configJSONObject) {
 
 		List<Element> elements = element.getElementsByTag("img");
+
+		if (ListUtil.isEmpty(elements)) {
+			return;
+		}
 
 		Element replaceableElement = elements.get(0);
 

@@ -81,6 +81,11 @@ $productMenuWidth: 320px;
 			body.open & {
 				left: $productMenuWidth;
 				width: calc(100% - #{$productMenuWidth});
+
+				@media (max-width: 768px) {
+					left: 0;
+					width: 100%;
+				}
 			}
 
 			> .container-fluid {
@@ -130,6 +135,10 @@ $productMenuWidth: 320px;
 					order: 1;
 					padding-right: 0.5rem;
 				}
+			}
+
+			.journal-article-button-row .btn-cancel {
+				border: 0;
 			}
 
 			@media (min-width: 768px) {
@@ -193,6 +202,10 @@ $productMenuWidth: 320px;
 			.article-content-description {
 				@extend .article-content-content;
 
+				.language-value, .input-localized-content {
+					margin-bottom: 0;
+				}
+
 				.alloy-editor-switch {
 					display: none;
 				}
@@ -211,14 +224,21 @@ $productMenuWidth: 320px;
 			}
 		}
 
-		.sidebar-body .panel-body {
-			padding: 0;
+		.sidebar-body {
+			.panel-body {
+				margin-bottom: 16px;
+				padding: 0;
+
+				.article-default-language {
+					margin-bottom: 1rem;
+				}
+			}
 		}
 	}
 
 	.check-circle-center {
 		.green {
-			color: green;
+			color: #008000;
 		}
 	}
 }

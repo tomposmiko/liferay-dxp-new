@@ -68,7 +68,7 @@ public class UserGroupsManagementToolbarDisplayContext
 				try {
 					if (GroupPermissionUtil.contains(
 							themeDisplay.getPermissionChecker(),
-							themeDisplay.getScopeGroup(),
+							_userGroupsDisplayContext.getGroupId(),
 							ActionKeys.ASSIGN_MEMBERS)) {
 
 						add(
@@ -88,7 +88,7 @@ public class UserGroupsManagementToolbarDisplayContext
 				try {
 					if (GroupPermissionUtil.contains(
 							themeDisplay.getPermissionChecker(),
-							themeDisplay.getScopeGroupId(),
+							_userGroupsDisplayContext.getGroupId(),
 							ActionKeys.ASSIGN_USER_ROLES)) {
 
 						add(
@@ -226,10 +226,8 @@ public class UserGroupsManagementToolbarDisplayContext
 			{
 				if (role != null) {
 					add(
-						labelItem -> {
-							labelItem.setLabel(
-								role.getTitle(themeDisplay.getLocale()));
-						});
+						labelItem -> labelItem.setLabel(
+							role.getTitle(themeDisplay.getLocale())));
 				}
 			}
 		};

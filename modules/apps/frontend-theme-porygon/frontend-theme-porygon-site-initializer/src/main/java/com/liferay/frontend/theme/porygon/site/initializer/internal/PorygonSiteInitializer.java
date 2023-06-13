@@ -819,7 +819,7 @@ public class PorygonSiteInitializer implements SiteInitializer {
 
 		sb.append(StringPool.UNDERLINE);
 		sb.append(portletId);
-		sb.append(StringPool.UNDERLINE);
+		sb.append(StringPool.DOUBLE_UNDERLINE);
 		sb.append(column);
 
 		return sb.toString();

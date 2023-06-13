@@ -24,7 +24,6 @@ import com.liferay.document.library.kernel.versioning.VersioningStrategy;
 import com.liferay.document.library.preview.DLPreviewRenderer;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
 import com.liferay.document.library.preview.exception.DLFileEntryPreviewGenerationException;
-import com.liferay.document.library.preview.exception.DLFileEntryPreviewNotAvailableException;
 import com.liferay.document.library.preview.exception.DLPreviewGenerationInProcessException;
 import com.liferay.document.library.preview.exception.DLPreviewSizeException;
 import com.liferay.document.library.util.DLURLHelper;
@@ -342,16 +341,17 @@ public class DefaultDLViewFileVersionDisplayContext
 			_dlPortletInstanceSettingsHelper =
 				new DLPortletInstanceSettingsHelper(dlRequestHelper);
 
+			FileEntry fileEntry = _getFileEntry(fileVersion);
+
 			_fileEntryDisplayContextHelper = new FileEntryDisplayContextHelper(
-				dlRequestHelper.getPermissionChecker(),
-				_getFileEntry(fileVersion));
+				dlRequestHelper.getPermissionChecker(), fileEntry);
 
 			_fileVersionDisplayContextHelper =
 				new FileVersionDisplayContextHelper(fileVersion);
 
 			if (fileShortcut == null) {
 				_uiItemsBuilder = new UIItemsBuilder(
-					httpServletRequest, fileVersion, _resourceBundle,
+					httpServletRequest, fileEntry, fileVersion, _resourceBundle,
 					dlTrashUtil, versioningStrategy, dlURLHelper);
 			}
 			else {
@@ -420,6 +420,25 @@ public class DefaultDLViewFileVersionDisplayContext
 		return menuItems;
 	}
 
+	private void _handleError(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, Exception e)
+		throws IOException, ServletException {
+
+		JSPRenderer jspRenderer = new JSPRenderer(
+			"/document_library/view_file_entry_preview_error.jsp");
+
+		jspRenderer.setAttribute(
+			WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
+
+		if (e != null) {
+			jspRenderer.setAttribute(
+				DLWebKeys.DOCUMENT_LIBRARY_PREVIEW_EXCEPTION, e);
+		}
+
+		jspRenderer.render(httpServletRequest, httpServletResponse);
+	}
+
 	private void _renderPreview(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse,
@@ -428,7 +447,9 @@ public class DefaultDLViewFileVersionDisplayContext
 
 		try {
 			if (!dlPreviewRendererOptional.isPresent()) {
-				throw new DLFileEntryPreviewNotAvailableException();
+				_handleError(httpServletRequest, httpServletResponse, null);
+
+				return;
 			}
 
 			DLPreviewRenderer dlPreviewRenderer =
@@ -438,7 +459,6 @@ public class DefaultDLViewFileVersionDisplayContext
 		}
 		catch (Exception e) {
 			if (e instanceof DLFileEntryPreviewGenerationException ||
-				e instanceof DLFileEntryPreviewNotAvailableException ||
 				e instanceof DLPreviewGenerationInProcessException ||
 				e instanceof DLPreviewSizeException) {
 
@@ -453,15 +473,7 @@ public class DefaultDLViewFileVersionDisplayContext
 					e);
 			}
 
-			JSPRenderer jspRenderer = new JSPRenderer(
-				"/document_library/view_file_entry_preview_error.jsp");
-
-			jspRenderer.setAttribute(
-				WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
-			jspRenderer.setAttribute(
-				DLWebKeys.DOCUMENT_LIBRARY_PREVIEW_EXCEPTION, e);
-
-			jspRenderer.render(httpServletRequest, httpServletResponse);
+			_handleError(httpServletRequest, httpServletResponse, e);
 		}
 	}
 

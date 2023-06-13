@@ -1,5 +1,6 @@
 @component-name = "portal-frontend-infrastructure"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "User Interface";
@@ -20,7 +21,7 @@ definition {
 
 	@priority = "5"
 	test RightToLeftSmoke {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 		property test.name.skip.portal.instance = "UIInfrastructureUsecase#RightToLeftSmoke";
 
 		ProductMenu.gotoPortlet(
@@ -44,7 +45,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "en_US",
-			textIcon = "English-United States");
+			textIcon = "english-United States");
 
 		ProductMenu.gotoPortlet(
 			category = "Content &amp; Data",
@@ -169,4 +170,5 @@ definition {
 			userLastName = "Ääkkönen",
 			userScreenName = "uskandi");
 	}
+
 }

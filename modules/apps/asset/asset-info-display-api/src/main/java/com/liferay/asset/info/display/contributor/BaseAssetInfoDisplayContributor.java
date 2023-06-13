@@ -21,10 +21,10 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.model.VersionedAssetEntry;
-import com.liferay.info.display.contributor.InfoDisplayContributorField;
-import com.liferay.info.display.contributor.InfoDisplayContributorFieldType;
 import com.liferay.info.display.contributor.InfoDisplayField;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
+import com.liferay.info.display.contributor.field.InfoDisplayContributorField;
+import com.liferay.info.display.contributor.field.InfoDisplayContributorFieldType;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
@@ -111,21 +111,26 @@ public abstract class BaseAssetInfoDisplayContributor<T>
 	}
 
 	@Override
-	public InfoDisplayObjectProvider getInfoDisplayObjectProvider(long classPK)
-		throws PortalException {
+	public InfoDisplayObjectProvider getInfoDisplayObjectProvider(
+		long classPK) {
 
 		AssetRendererFactory assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.
 				getAssetRendererFactoryByClassNameId(
 					PortalUtil.getClassNameId(getClassName()));
 
-		AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(
-			classPK);
+		try {
+			AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(
+				classPK);
 
-		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
-			getClassName(), assetRenderer.getClassPK());
+			AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+				getClassName(), assetRenderer.getClassPK());
 
-		return new AssetInfoDisplayObjectProvider(assetEntry);
+			return new AssetInfoDisplayObjectProvider(assetEntry);
+		}
+		catch (Exception e) {
+			return null;
+		}
 	}
 
 	@Override

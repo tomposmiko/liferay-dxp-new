@@ -41,6 +41,7 @@ import com.liferay.headless.delivery.internal.dto.v1_0.util.AggregateRatingUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.ContentDocumentUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.ContentStructureUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CreatorUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RelatedContentUtil;
 import com.liferay.headless.delivery.internal.resource.v1_0.BaseStructuredContentResourceImpl;
 import com.liferay.journal.model.JournalArticle;
@@ -116,6 +117,10 @@ public class StructuredContentDTOConverter implements DTOConverter {
 				creator = CreatorUtil.toCreator(
 					_portal,
 					_userLocalService.getUserById(journalArticle.getUserId()));
+				customFields = CustomFieldsUtil.toCustomFields(
+					JournalArticle.class.getName(), journalArticle.getId(),
+					journalArticle.getCompanyId(),
+					dtoConverterContext.getLocale());
 				dateCreated = journalArticle.getCreateDate();
 				dateModified = journalArticle.getModifiedDate();
 				datePublished = journalArticle.getDisplayDate();

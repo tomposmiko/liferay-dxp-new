@@ -8,8 +8,8 @@ export const SELECT_MAPPEABLE_TYPE = 'selectMappeableType';
 
 export const UPDATE_SELECTED_SIDEBAR_PANEL_ID = 'updateSelectedSidebarPanelId';
 
-export const UPDATE_LAST_SAVE_DATE = 'updateLastSaveDate';
-export const UPDATE_SAVING_CHANGES_STATUS = 'updateSavingChangesStatus';
+export const UPDATE_LAST_SAVE_DATE = 'UPDATE_LAST_SAVE_DATE';
+export const UPDATE_SAVING_CHANGES_STATUS = 'UPDATE_SAVING_CHANGES_STATUS';
 
 export const CHANGE_LANGUAGE_ID = 'languageId';
 export const SELECT_SEGMENTS_EXPERIENCE = 'selectSegmentsExperience';
@@ -22,9 +22,15 @@ export const UPDATE_SEGMENTS_EXPERIENCE_PRIORITY = 'UPDATE_SEGMENTS_EXPERIENCE_P
 export const ADD_ROW = 'addRow';
 export const MOVE_ROW = 'moveRow';
 export const REMOVE_ROW = 'removeRow';
-export const UPDATE_ROW_COLUMNS = 'updateRowColumns';
-export const UPDATE_ROW_COLUMNS_NUMBER = 'updateRowColumnsNumber';
 export const UPDATE_ROW_CONFIG = 'updateRowConfig';
+
+export const UPDATE_ROW_COLUMNS_ERROR = 'UPDATE_ROW_COLUMNS_ERROR';
+export const UPDATE_ROW_COLUMNS_LOADING = 'UPDATE_ROW_COLUMNS_LOADING';
+export const UPDATE_ROW_COLUMNS_SUCCESS = 'UPDATE_ROW_COLUMNS_SUCCESS';
+
+export const UPDATE_ROW_COLUMNS_NUMBER_ERROR = 'UPDATE_ROW_COLUMNS_NUMBER_ERROR';
+export const UPDATE_ROW_COLUMNS_NUMBER_LOADING = 'UPDATE_ROW_COLUMNS_NUMBER_LOADING';
+export const UPDATE_ROW_COLUMNS_NUMBER_SUCCESS = 'UPDATE_ROW_COLUMNS_NUMBER_SUCCESS';
 
 export const ADD_FRAGMENT_ENTRY_LINK = 'addFragmentEntryLink';
 export const ADD_PORTLET = 'addPortlet';

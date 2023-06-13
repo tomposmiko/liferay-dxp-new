@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -46,6 +45,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
 
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 
@@ -121,11 +121,13 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 		Layout layout = _layoutLocalService.getLayout(
 			groupId, privateLayout, layoutId);
 
-		if (MapUtil.isEmpty(
-				MapUtil.filter(
-					friendlyURLMap,
-					entry -> Validator.isNotNull(entry.getValue())))) {
+		String oldFriendlyURL = layout.getFriendlyURL();
 
+		Collection<String> values = friendlyURLMap.values();
+
+		values.removeIf(value -> Validator.isNull(value));
+
+		if (friendlyURLMap.isEmpty()) {
 			friendlyURLMap = layout.getFriendlyURLMap();
 		}
 
@@ -232,7 +234,7 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
-		if (Validator.isNull(redirect)) {
+		if (Validator.isNull(redirect) || redirect.endsWith(oldFriendlyURL)) {
 			redirect = _portal.getLayoutFullURL(layout, themeDisplay);
 		}
 

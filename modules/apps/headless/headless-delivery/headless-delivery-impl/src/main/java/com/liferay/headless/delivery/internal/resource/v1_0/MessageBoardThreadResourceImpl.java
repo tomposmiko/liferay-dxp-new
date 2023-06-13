@@ -18,12 +18,16 @@ import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetLinkLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
+import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
+import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.headless.common.spi.resource.SPIRatingResource;
 import com.liferay.headless.common.spi.service.context.ServiceContextUtil;
 import com.liferay.headless.delivery.dto.v1_0.MessageBoardThread;
 import com.liferay.headless.delivery.dto.v1_0.Rating;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.AggregateRatingUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CreatorUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.CustomFieldsUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.EntityFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RatingUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RelatedContentUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.MessageBoardMessageEntityModel;
@@ -65,8 +69,12 @@ import com.liferay.portal.vulcan.util.SearchUtil;
 import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 
+import java.io.Serializable;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.ws.rs.BadRequestException;
@@ -108,7 +116,12 @@ public class MessageBoardThreadResourceImpl
 
 	@Override
 	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
-		return _entityModel;
+		return new MessageBoardMessageEntityModel(
+			new ArrayList<>(
+				EntityFieldsUtil.getEntityFields(
+					_portal.getClassNameId(MBMessage.class.getName()),
+					contextCompany.getCompanyId(), _expandoColumnLocalService,
+					_expandoTableLocalService)));
 	}
 
 	@Override
@@ -237,12 +250,14 @@ public class MessageBoardThreadResourceImpl
 					mbThread.getGroupId(), messageBoardThread.getThreadType()),
 				false,
 				ServiceContextUtil.createServiceContext(
+					null,
 					Optional.ofNullable(
 						messageBoardThread.getKeywords()
 					).orElse(
 						new String[0]
 					),
-					null, mbThread.getGroupId(),
+					_getExpandoBridgeAttributes(messageBoardThread),
+					mbThread.getGroupId(),
 					messageBoardThread.getViewableByAsString())));
 	}
 
@@ -271,12 +286,22 @@ public class MessageBoardThreadResourceImpl
 			MBMessageConstants.DEFAULT_FORMAT, Collections.emptyList(), false,
 			_toPriority(siteId, messageBoardThread.getThreadType()), false,
 			ServiceContextUtil.createServiceContext(
-				messageBoardThread.getKeywords(), null, siteId,
+				null, messageBoardThread.getKeywords(),
+				_getExpandoBridgeAttributes(messageBoardThread), siteId,
 				messageBoardThread.getViewableByAsString()));
 
 		_updateQuestion(mbMessage, messageBoardThread);
 
 		return _toMessageBoardThread(mbMessage);
+	}
+
+	private Map<String, Serializable> _getExpandoBridgeAttributes(
+		MessageBoardThread messageBoardThread) {
+
+		return CustomFieldsUtil.toMap(
+			MBMessage.class.getName(), contextCompany.getCompanyId(),
+			messageBoardThread.getCustomFields(),
+			contextAcceptLanguage.getPreferredLocale());
 	}
 
 	private Page<MessageBoardThread> _getSiteMessageBoardThreadsPage(
@@ -328,6 +353,10 @@ public class MessageBoardThreadResourceImpl
 				articleBody = mbMessage.getBody();
 				creator = CreatorUtil.toCreator(
 					_portal, _userService.getUserById(mbThread.getUserId()));
+				customFields = CustomFieldsUtil.toCustomFields(
+					MBMessage.class.getName(), mbMessage.getMessageId(),
+					mbThread.getCompanyId(),
+					contextAcceptLanguage.getPreferredLocale());
 				dateCreated = mbMessage.getCreateDate();
 				dateModified = mbMessage.getModifiedDate();
 				encodingFormat = mbMessage.getFormat();
@@ -427,9 +456,6 @@ public class MessageBoardThreadResourceImpl
 		}
 	}
 
-	private static final EntityModel _entityModel =
-		new MessageBoardMessageEntityModel();
-
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
 
@@ -438,6 +464,12 @@ public class MessageBoardThreadResourceImpl
 
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;
+
+	@Reference
+	private ExpandoColumnLocalService _expandoColumnLocalService;
+
+	@Reference
+	private ExpandoTableLocalService _expandoTableLocalService;
 
 	@Reference
 	private MBCategoryService _mbCategoryService;

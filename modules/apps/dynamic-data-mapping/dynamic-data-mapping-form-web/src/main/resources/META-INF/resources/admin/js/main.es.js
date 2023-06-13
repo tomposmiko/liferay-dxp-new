@@ -1,9 +1,9 @@
 import AutoSave from './util/AutoSave.es';
 import ClayModal from 'clay-modal';
 import Component from 'metal-jsx';
+import compose from 'dynamic-data-mapping-form-builder/js/util/compose.es';
 import core from 'metal';
 import dom from 'metal-dom';
-import FormBuilder from 'dynamic-data-mapping-form-builder/js/components/FormBuilder/FormBuilder.es';
 import LayoutProvider from 'dynamic-data-mapping-form-builder/js/components/LayoutProvider/LayoutProvider.es';
 import Notifications from './util/Notifications.es';
 import PreviewButton from './components/PreviewButton/PreviewButton.es';
@@ -11,8 +11,14 @@ import PublishButton from './components/PublishButton/PublishButton.es';
 import RuleBuilder from 'dynamic-data-mapping-form-builder/js/components/RuleBuilder/RuleBuilder.es';
 import ShareFormPopover from './components/ShareFormPopover/ShareFormPopover.es';
 import StateSyncronizer from './util/StateSyncronizer.es';
+import withActionableFields from 'dynamic-data-mapping-form-builder/js/components/FormBuilder/withActionableFields.es';
+import withEditablePageHeader from 'dynamic-data-mapping-form-builder/js/components/FormBuilder/withEditablePageHeader.es';
+import withMoveableFields from 'dynamic-data-mapping-form-builder/js/components/FormBuilder/withMoveableFields.es';
+import withMultiplePages from 'dynamic-data-mapping-form-builder/js/components/FormBuilder/withMultiplePages.es';
+import withResizeableColumns from 'dynamic-data-mapping-form-builder/js/components/FormBuilder/withResizeableColumns.es';
 import {Config} from 'metal-state';
 import {EventHandler} from 'metal-events';
+import {FormBuilderBase} from 'dynamic-data-mapping-form-builder/js/components/FormBuilder/FormBuilder.es';
 import {isKeyInSet, isModifyingKey} from 'dynamic-data-mapping-form-builder/js/util/dom.es';
 import {pageStructure} from 'dynamic-data-mapping-form-builder/js/util/config.es';
 import {sub} from 'dynamic-data-mapping-form-builder/js/util/strings.es';
@@ -23,250 +29,6 @@ import {sub} from 'dynamic-data-mapping-form-builder/js/util/strings.es';
  */
 
 class Form extends Component {
-	static PROPS = {
-
-		/**
-		 * The context for rendering a layout that represents a form.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		context: Config.shapeOf(
-			{
-				pages: Config.arrayOf(Config.object()),
-				paginationMode: Config.string(),
-				rules: Config.array(),
-				successPageSettings: Config.object()
-			}
-		).required().setter('_setContext'),
-
-		/**
-		 * The rules of a form.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		dataProviderInstanceParameterSettingsURL: Config.string().required(),
-
-		/**
-		 * The rules of a form.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		dataProviderInstancesURL: Config.string().required(),
-
-		/**
-		 * The default language id of the form.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		defaultLanguageId: Config.string().value(themeDisplay.getDefaultLanguageId()),
-
-		/**
-		 * The default language id of the form.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		editingLanguageId: Config.string().value(themeDisplay.getDefaultLanguageId()),
-
-		/**
-		 * @default []
-		 * @instance
-		 * @memberof Form
-		 * @type {?(array|undefined)}
-		 */
-
-		fieldTypes: Config.array().value([]),
-
-		/**
-		 * A map with all translated values available as the form description.
-		 * @default 0
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		formInstanceId: Config.number().value(0),
-
-		/**
-		 * A map with all translated values available as the form name.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		functionsMetadata: Config.object().value({}),
-
-		/**
-		 * A map with all translated values available as the form name.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		functionsURL: Config.string(),
-
-		/**
-		 * A map with all translated values available as the form description.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		localizedDescription: Config.object().value({}),
-
-		/**
-		 * The context for rendering a layout that represents a form.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		localizedName: Config.object().value({}),
-
-		/**
-		 * The namespace of the portlet.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!string}
-		 */
-
-		namespace: Config.string().required(),
-
-		/**
-		 * Wether the form is published or not
-		 * @default false
-		 * @instance
-		 * @memberof Form
-		 * @type {!boolean}
-		 */
-
-		published: Config.bool().value(false),
-
-		/**
-		 * The url to be redirected when canceling the Element Set edition.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!string}
-		 */
-
-		redirectURL: Config.string(),
-
-		/**
-		 * The rules of a form.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		rolesURL: Config.string(),
-
-		/**
-		 * The rules of a form.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		rules: Config.array().value([]),
-
-		/**
-		 * The path to the SVG spritemap file containing the icons.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!boolean}
-		 */
-
-		saved: Config.bool(),
-
-		/**
-		 * Wether to show an alert telling the user about the result of the
-		 * "Publish" operation.
-		 * @default false
-		 * @instance
-		 * @memberof Form
-		 * @type {!boolean}
-		 */
-
-		showPublishAlert: Config.bool().value(false),
-
-		/**
-		 * The path to the SVG spritemap file containing the icons.
-		 * @default undefined
-		 * @instance
-		 * @memberof Form
-		 * @type {!string}
-		 */
-
-		spritemap: Config.string().required(),
-
-		view: Config.string()
-	};
-
-	static STATE = {
-
-		/**
-		 * Internal mirror of the pages state
-		 * @default _pagesValueFn
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		pages: Config.arrayOf(pageStructure).valueFn('_pagesValueFn'),
-
-		/**
-		 * @default _paginationModeValueFn
-		 * @instance
-		 * @memberof Form
-		 * @type {!array}
-		 */
-
-		paginationMode: Config.string().valueFn('_paginationModeValueFn'),
-
-		/**
-		 * Wether the RuleBuilder should be visible or not.
-		 * @default false
-		 * @instance
-		 * @memberof Form
-		 * @type {!boolean}
-		 */
-
-		ruleBuilderVisible: Config.bool().value(false),
-
-		/**
-		 * The label of the save button
-		 * @default 'save-form'
-		 * @instance
-		 * @memberof Form
-		 * @type {!string}
-		 */
-
-		saveButtonLabel: Config.string().valueFn('_saveButtonLabelValueFn')
-	}
-
 	attached() {
 		const {layoutProvider} = this.refs;
 		const {
@@ -295,14 +57,15 @@ class Form extends Component {
 			this._createEditor('descriptionEditor')
 		];
 
+		dependencies.push(this._getTranslationManager());
+
 		if (this.isFormBuilderView()) {
 			dependencies.push(this._getSettingsDDMForm());
-			dependencies.push(this._getTranslationManager());
 		}
 
 		Promise.all(dependencies).then(
 			results => {
-				const translationManager = results[3];
+				const translationManager = results[2];
 
 				if (translationManager) {
 					translationManager.on(
@@ -330,7 +93,7 @@ class Form extends Component {
 						namespace,
 						paginationMode,
 						published,
-						settingsDDMForm: results[2],
+						settingsDDMForm: results[3],
 						translationManager
 					},
 					this.element
@@ -383,6 +146,7 @@ class Form extends Component {
 		this._handlePaginationModeChanded = this._handlePaginationModeChanded.bind(this);
 		this._resolvePreviewURL = this._resolvePreviewURL.bind(this);
 		this._updateAutoSaveMessage = this._updateAutoSaveMessage.bind(this);
+		this.ComposedFormBuilder = this._createFormBuilder();
 		this.submitForm = this.submitForm.bind(this);
 	}
 
@@ -442,6 +206,7 @@ class Form extends Component {
 	}
 
 	render() {
+		const {ComposedFormBuilder} = this;
 		const {
 			context,
 			defaultLanguageId,
@@ -456,6 +221,7 @@ class Form extends Component {
 			spritemap,
 			view
 		} = this.props;
+		const {saveButtonLabel} = this.state;
 
 		const layoutProviderProps = {
 			...this.props,
@@ -471,39 +237,40 @@ class Form extends Component {
 			initialSuccessPageSettings: context.successPageSettings,
 			ref: 'layoutProvider'
 		};
-		const {saveButtonLabel} = this.state;
+
+		const LayoutProviderTag = LayoutProvider;
 
 		return (
 			<div class={'ddm-form-builder'}>
-				<LayoutProvider {...layoutProviderProps}>
-					<RuleBuilder
-						dataProviderInstanceParameterSettingsURL={this.props.dataProviderInstanceParameterSettingsURL}
-						dataProviderInstancesURL={this.props.dataProviderInstancesURL}
-						fieldTypes={fieldTypes}
-						functionsMetadata={this.props.functionsMetadata}
-						functionsURL={this.props.functionsURL}
-						pages={context.pages}
-						rolesURL={this.props.rolesURL}
-						rules={this.props.rules}
-						spritemap={spritemap}
-						visible={this.isShowRuleBuilder()}
-					/>
-
-					{!this.isShowRuleBuilder() && (
-						<FormBuilder
-							fieldSetDefinitionURL={fieldSetDefinitionURL}
-							fieldSets={fieldSets}
+				<LayoutProviderTag {...layoutProviderProps}>
+					{this.isFormBuilderView() && (
+						<RuleBuilder
+							dataProviderInstanceParameterSettingsURL={this.props.dataProviderInstanceParameterSettingsURL}
+							dataProviderInstancesURL={this.props.dataProviderInstancesURL}
 							fieldTypes={fieldTypes}
-							groupId={groupId}
-							namespace={this.props.namespace}
-							ref="builder"
+							functionsMetadata={this.props.functionsMetadata}
+							functionsURL={this.props.functionsURL}
+							pages={context.pages}
+							rolesURL={this.props.rolesURL}
 							rules={this.props.rules}
 							spritemap={spritemap}
-							view={view}
-							visible={!this.isShowRuleBuilder()}
+							visible={this.isShowRuleBuilder()}
 						/>
 					)}
-				</LayoutProvider>
+
+					<ComposedFormBuilder
+						fieldSetDefinitionURL={fieldSetDefinitionURL}
+						fieldSets={fieldSets}
+						fieldTypes={fieldTypes}
+						groupId={groupId}
+						namespace={this.props.namespace}
+						ref="builder"
+						rules={this.props.rules}
+						spritemap={spritemap}
+						view={view}
+						visible={!this.isShowRuleBuilder()}
+					/>
+				</LayoutProviderTag>
 
 				<div class="container-fluid-1280">
 					{this.isFormBuilderView() && (
@@ -667,6 +434,21 @@ class Form extends Component {
 		}
 
 		return promise;
+	}
+
+	_createFormBuilder() {
+		const composeList = [
+			withActionableFields,
+			withMoveableFields,
+			withMultiplePages,
+			withResizeableColumns
+		];
+
+		if (this.isFormBuilderView()) {
+			composeList.push(withEditablePageHeader);
+		}
+
+		return compose(...composeList)(FormBuilderBase);
 	}
 
 	_createFormURL() {
@@ -974,6 +756,250 @@ class Form extends Component {
 		}
 	}
 }
+
+Form.PROPS = {
+
+	/**
+	 * The context for rendering a layout that represents a form.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	context: Config.shapeOf(
+		{
+			pages: Config.arrayOf(Config.object()),
+			paginationMode: Config.string(),
+			rules: Config.array(),
+			successPageSettings: Config.object()
+		}
+	).required().setter('_setContext'),
+
+	/**
+	 * The rules of a form.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	dataProviderInstanceParameterSettingsURL: Config.string().required(),
+
+	/**
+	 * The rules of a form.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	dataProviderInstancesURL: Config.string().required(),
+
+	/**
+	 * The default language id of the form.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	defaultLanguageId: Config.string().value(themeDisplay.getDefaultLanguageId()),
+
+	/**
+	 * The default language id of the form.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	editingLanguageId: Config.string().value(themeDisplay.getDefaultLanguageId()),
+
+	/**
+	 * @default []
+	 * @instance
+	 * @memberof Form
+	 * @type {?(array|undefined)}
+	 */
+
+	fieldTypes: Config.array().value([]),
+
+	/**
+	 * A map with all translated values available as the form description.
+	 * @default 0
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	formInstanceId: Config.number().value(0),
+
+	/**
+	 * A map with all translated values available as the form name.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	functionsMetadata: Config.object().value({}),
+
+	/**
+	 * A map with all translated values available as the form name.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	functionsURL: Config.string(),
+
+	/**
+	 * A map with all translated values available as the form description.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	localizedDescription: Config.object().value({}),
+
+	/**
+	 * The context for rendering a layout that represents a form.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	localizedName: Config.object().value({}),
+
+	/**
+	 * The namespace of the portlet.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!string}
+	 */
+
+	namespace: Config.string().required(),
+
+	/**
+	 * Wether the form is published or not
+	 * @default false
+	 * @instance
+	 * @memberof Form
+	 * @type {!boolean}
+	 */
+
+	published: Config.bool().value(false),
+
+	/**
+	 * The url to be redirected when canceling the Element Set edition.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!string}
+	 */
+
+	redirectURL: Config.string(),
+
+	/**
+	 * The rules of a form.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	rolesURL: Config.string(),
+
+	/**
+	 * The rules of a form.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	rules: Config.array().value([]),
+
+	/**
+	 * The path to the SVG spritemap file containing the icons.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!boolean}
+	 */
+
+	saved: Config.bool(),
+
+	/**
+	 * Wether to show an alert telling the user about the result of the
+	 * "Publish" operation.
+	 * @default false
+	 * @instance
+	 * @memberof Form
+	 * @type {!boolean}
+	 */
+
+	showPublishAlert: Config.bool().value(false),
+
+	/**
+	 * The path to the SVG spritemap file containing the icons.
+	 * @default undefined
+	 * @instance
+	 * @memberof Form
+	 * @type {!string}
+	 */
+
+	spritemap: Config.string().required(),
+
+	view: Config.string()
+};
+
+Form.STATE = {
+
+	/**
+	 * Internal mirror of the pages state
+	 * @default _pagesValueFn
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	pages: Config.arrayOf(pageStructure).valueFn('_pagesValueFn'),
+
+	/**
+	 * @default _paginationModeValueFn
+	 * @instance
+	 * @memberof Form
+	 * @type {!array}
+	 */
+
+	paginationMode: Config.string().valueFn('_paginationModeValueFn'),
+
+	/**
+	 * Wether the RuleBuilder should be visible or not.
+	 * @default false
+	 * @instance
+	 * @memberof Form
+	 * @type {!boolean}
+	 */
+
+	ruleBuilderVisible: Config.bool().value(false),
+
+	/**
+	 * The label of the save button
+	 * @default 'save-form'
+	 * @instance
+	 * @memberof Form
+	 * @type {!string}
+	 */
+
+	saveButtonLabel: Config.string().valueFn('_saveButtonLabelValueFn')
+};
 
 export default Form;
 export {Form};

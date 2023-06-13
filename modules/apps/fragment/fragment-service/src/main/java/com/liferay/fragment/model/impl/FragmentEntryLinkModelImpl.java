@@ -19,9 +19,11 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.model.FragmentEntryLinkModel;
+import com.liferay.fragment.model.FragmentEntryLinkSoap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
@@ -35,12 +37,17 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -58,6 +65,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see FragmentEntryLinkImpl
  * @generated
  */
+@JSON(strict = true)
 @ProviderType
 public class FragmentEntryLinkModelImpl
 	extends BaseModelImpl<FragmentEntryLink> implements FragmentEntryLinkModel {
@@ -76,10 +84,10 @@ public class FragmentEntryLinkModelImpl
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
 		{"originalFragmentEntryLinkId", Types.BIGINT},
 		{"fragmentEntryId", Types.BIGINT}, {"classNameId", Types.BIGINT},
-		{"classPK", Types.BIGINT}, {"css", Types.VARCHAR},
-		{"html", Types.VARCHAR}, {"js", Types.VARCHAR},
-		{"editableValues", Types.VARCHAR}, {"namespace", Types.VARCHAR},
-		{"position", Types.INTEGER}, {"rendererKey", Types.VARCHAR},
+		{"classPK", Types.BIGINT}, {"css", Types.CLOB}, {"html", Types.CLOB},
+		{"js", Types.CLOB}, {"editableValues", Types.CLOB},
+		{"namespace", Types.VARCHAR}, {"position", Types.INTEGER},
+		{"rendererKey", Types.VARCHAR},
 		{"lastPropagationDate", Types.TIMESTAMP},
 		{"lastPublishDate", Types.TIMESTAMP}
 	};
@@ -100,10 +108,10 @@ public class FragmentEntryLinkModelImpl
 		TABLE_COLUMNS_MAP.put("fragmentEntryId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("classNameId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("classPK", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("css", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("html", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("js", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("editableValues", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("css", Types.CLOB);
+		TABLE_COLUMNS_MAP.put("html", Types.CLOB);
+		TABLE_COLUMNS_MAP.put("js", Types.CLOB);
+		TABLE_COLUMNS_MAP.put("editableValues", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("namespace", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("position", Types.INTEGER);
 		TABLE_COLUMNS_MAP.put("rendererKey", Types.VARCHAR);
@@ -112,7 +120,7 @@ public class FragmentEntryLinkModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table FragmentEntryLink (uuid_ VARCHAR(75) null,fragmentEntryLinkId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,originalFragmentEntryLinkId LONG,fragmentEntryId LONG,classNameId LONG,classPK LONG,css STRING null,html STRING null,js STRING null,editableValues STRING null,namespace VARCHAR(75) null,position INTEGER,rendererKey VARCHAR(200) null,lastPropagationDate DATE null,lastPublishDate DATE null)";
+		"create table FragmentEntryLink (uuid_ VARCHAR(75) null,fragmentEntryLinkId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,originalFragmentEntryLinkId LONG,fragmentEntryId LONG,classNameId LONG,classPK LONG,css TEXT null,html TEXT null,js TEXT null,editableValues TEXT null,namespace VARCHAR(75) null,position INTEGER,rendererKey VARCHAR(200) null,lastPropagationDate DATE null,lastPublishDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table FragmentEntryLink";
 
@@ -128,21 +136,6 @@ public class FragmentEntryLinkModelImpl
 
 	public static final String TX_MANAGER = "liferayTransactionManager";
 
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(
-		com.liferay.fragment.service.util.ServiceProps.get(
-			"value.object.entity.cache.enabled.com.liferay.fragment.model.FragmentEntryLink"),
-		true);
-
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(
-		com.liferay.fragment.service.util.ServiceProps.get(
-			"value.object.finder.cache.enabled.com.liferay.fragment.model.FragmentEntryLink"),
-		true);
-
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(
-		com.liferay.fragment.service.util.ServiceProps.get(
-			"value.object.column.bitmask.enabled.com.liferay.fragment.model.FragmentEntryLink"),
-		true);
-
 	public static final long CLASSNAMEID_COLUMN_BITMASK = 1L;
 
 	public static final long CLASSPK_COLUMN_BITMASK = 2L;
@@ -157,9 +150,75 @@ public class FragmentEntryLinkModelImpl
 
 	public static final long POSITION_COLUMN_BITMASK = 64L;
 
-	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
-		com.liferay.fragment.service.util.ServiceProps.get(
-			"lock.expiration.time.com.liferay.fragment.model.FragmentEntryLink"));
+	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
+		_entityCacheEnabled = entityCacheEnabled;
+	}
+
+	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+		_finderCacheEnabled = finderCacheEnabled;
+	}
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 */
+	public static FragmentEntryLink toModel(FragmentEntryLinkSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		FragmentEntryLink model = new FragmentEntryLinkImpl();
+
+		model.setUuid(soapModel.getUuid());
+		model.setFragmentEntryLinkId(soapModel.getFragmentEntryLinkId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setOriginalFragmentEntryLinkId(
+			soapModel.getOriginalFragmentEntryLinkId());
+		model.setFragmentEntryId(soapModel.getFragmentEntryId());
+		model.setClassNameId(soapModel.getClassNameId());
+		model.setClassPK(soapModel.getClassPK());
+		model.setCss(soapModel.getCss());
+		model.setHtml(soapModel.getHtml());
+		model.setJs(soapModel.getJs());
+		model.setEditableValues(soapModel.getEditableValues());
+		model.setNamespace(soapModel.getNamespace());
+		model.setPosition(soapModel.getPosition());
+		model.setRendererKey(soapModel.getRendererKey());
+		model.setLastPropagationDate(soapModel.getLastPropagationDate());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 */
+	public static List<FragmentEntryLink> toModels(
+		FragmentEntryLinkSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<FragmentEntryLink> models = new ArrayList<FragmentEntryLink>(
+			soapModels.length);
+
+		for (FragmentEntryLinkSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
 
 	public FragmentEntryLinkModelImpl() {
 	}
@@ -247,6 +306,32 @@ public class FragmentEntryLinkModelImpl
 		getAttributeSetterBiConsumers() {
 
 		return _attributeSetterBiConsumers;
+	}
+
+	private static Function<InvocationHandler, FragmentEntryLink>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			FragmentEntryLink.class.getClassLoader(), FragmentEntryLink.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<FragmentEntryLink> constructor =
+				(Constructor<FragmentEntryLink>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException roe) {
+					throw new InternalError(roe);
+				}
+			};
+		}
+		catch (NoSuchMethodException nsme) {
+			throw new InternalError(nsme);
+		}
 	}
 
 	private static final Map<String, Function<FragmentEntryLink, Object>>
@@ -383,6 +468,7 @@ public class FragmentEntryLinkModelImpl
 			(Map)attributeSetterBiConsumers);
 	}
 
+	@JSON
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
@@ -408,6 +494,7 @@ public class FragmentEntryLinkModelImpl
 		return GetterUtil.getString(_originalUuid);
 	}
 
+	@JSON
 	@Override
 	public long getFragmentEntryLinkId() {
 		return _fragmentEntryLinkId;
@@ -418,6 +505,7 @@ public class FragmentEntryLinkModelImpl
 		_fragmentEntryLinkId = fragmentEntryLinkId;
 	}
 
+	@JSON
 	@Override
 	public long getGroupId() {
 		return _groupId;
@@ -440,6 +528,7 @@ public class FragmentEntryLinkModelImpl
 		return _originalGroupId;
 	}
 
+	@JSON
 	@Override
 	public long getCompanyId() {
 		return _companyId;
@@ -462,6 +551,7 @@ public class FragmentEntryLinkModelImpl
 		return _originalCompanyId;
 	}
 
+	@JSON
 	@Override
 	public long getUserId() {
 		return _userId;
@@ -488,6 +578,7 @@ public class FragmentEntryLinkModelImpl
 	public void setUserUuid(String userUuid) {
 	}
 
+	@JSON
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
@@ -503,6 +594,7 @@ public class FragmentEntryLinkModelImpl
 		_userName = userName;
 	}
 
+	@JSON
 	@Override
 	public Date getCreateDate() {
 		return _createDate;
@@ -513,6 +605,7 @@ public class FragmentEntryLinkModelImpl
 		_createDate = createDate;
 	}
 
+	@JSON
 	@Override
 	public Date getModifiedDate() {
 		return _modifiedDate;
@@ -529,6 +622,7 @@ public class FragmentEntryLinkModelImpl
 		_modifiedDate = modifiedDate;
 	}
 
+	@JSON
 	@Override
 	public long getOriginalFragmentEntryLinkId() {
 		return _originalFragmentEntryLinkId;
@@ -541,6 +635,7 @@ public class FragmentEntryLinkModelImpl
 		_originalFragmentEntryLinkId = originalFragmentEntryLinkId;
 	}
 
+	@JSON
 	@Override
 	public long getFragmentEntryId() {
 		return _fragmentEntryId;
@@ -583,6 +678,7 @@ public class FragmentEntryLinkModelImpl
 		setClassNameId(classNameId);
 	}
 
+	@JSON
 	@Override
 	public long getClassNameId() {
 		return _classNameId;
@@ -605,6 +701,7 @@ public class FragmentEntryLinkModelImpl
 		return _originalClassNameId;
 	}
 
+	@JSON
 	@Override
 	public long getClassPK() {
 		return _classPK;
@@ -627,6 +724,7 @@ public class FragmentEntryLinkModelImpl
 		return _originalClassPK;
 	}
 
+	@JSON
 	@Override
 	public String getCss() {
 		if (_css == null) {
@@ -642,6 +740,7 @@ public class FragmentEntryLinkModelImpl
 		_css = css;
 	}
 
+	@JSON
 	@Override
 	public String getHtml() {
 		if (_html == null) {
@@ -657,6 +756,7 @@ public class FragmentEntryLinkModelImpl
 		_html = html;
 	}
 
+	@JSON
 	@Override
 	public String getJs() {
 		if (_js == null) {
@@ -672,6 +772,7 @@ public class FragmentEntryLinkModelImpl
 		_js = js;
 	}
 
+	@JSON
 	@Override
 	public String getEditableValues() {
 		if (_editableValues == null) {
@@ -687,6 +788,7 @@ public class FragmentEntryLinkModelImpl
 		_editableValues = editableValues;
 	}
 
+	@JSON
 	@Override
 	public String getNamespace() {
 		if (_namespace == null) {
@@ -702,6 +804,7 @@ public class FragmentEntryLinkModelImpl
 		_namespace = namespace;
 	}
 
+	@JSON
 	@Override
 	public int getPosition() {
 		return _position;
@@ -714,6 +817,7 @@ public class FragmentEntryLinkModelImpl
 		_position = position;
 	}
 
+	@JSON
 	@Override
 	public String getRendererKey() {
 		if (_rendererKey == null) {
@@ -729,6 +833,7 @@ public class FragmentEntryLinkModelImpl
 		_rendererKey = rendererKey;
 	}
 
+	@JSON
 	@Override
 	public Date getLastPropagationDate() {
 		return _lastPropagationDate;
@@ -739,6 +844,7 @@ public class FragmentEntryLinkModelImpl
 		_lastPropagationDate = lastPropagationDate;
 	}
 
+	@JSON
 	@Override
 	public Date getLastPublishDate() {
 		return _lastPublishDate;
@@ -776,8 +882,7 @@ public class FragmentEntryLinkModelImpl
 	@Override
 	public FragmentEntryLink toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = (FragmentEntryLink)ProxyUtil.newProxyInstance(
-				_classLoader, _escapedModelInterfaces,
+			_escapedModel = _escapedModelProxyProviderFunction.apply(
 				new AutoEscapeBeanHandler(this));
 		}
 
@@ -895,12 +1000,12 @@ public class FragmentEntryLinkModelImpl
 
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return ENTITY_CACHE_ENABLED;
+		return _entityCacheEnabled;
 	}
 
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return FINDER_CACHE_ENABLED;
+		return _finderCacheEnabled;
 	}
 
 	@Override
@@ -1133,11 +1238,10 @@ public class FragmentEntryLinkModelImpl
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader =
-		FragmentEntryLink.class.getClassLoader();
-	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-		FragmentEntryLink.class, ModelWrapper.class
-	};
+	private static final Function<InvocationHandler, FragmentEntryLink>
+		_escapedModelProxyProviderFunction = _getProxyProviderFunction();
+	private static boolean _entityCacheEnabled;
+	private static boolean _finderCacheEnabled;
 
 	private String _uuid;
 	private String _originalUuid;

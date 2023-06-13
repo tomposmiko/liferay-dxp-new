@@ -24,6 +24,8 @@ if (assetPublisherDisplayContext.isEnableTagBasedNavigation() && !assetPublisher
 }
 %>
 
+<liferay-ui:success key='<%= AssetPublisherPortletKeys.ASSET_PUBLISHER + "requestProcessed" %>' message="your-request-completed-successfully" />
+
 <c:if test="<%= assetPublisherDisplayContext.isEnableSubscriptions() %>">
 	<div class="subscribe-action">
 		<c:if test="<%= assetPublisherDisplayContext.isSubscriptionEnabled() %>">

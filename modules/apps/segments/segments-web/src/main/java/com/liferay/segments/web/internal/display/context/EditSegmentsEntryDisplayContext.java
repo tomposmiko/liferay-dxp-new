@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -40,6 +41,7 @@ import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributorRegi
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.provider.SegmentsEntryProvider;
 import com.liferay.segments.service.SegmentsEntryService;
+import com.liferay.segments.web.internal.security.permission.resource.SegmentsEntryPermission;
 
 import java.util.List;
 import java.util.Locale;
@@ -240,22 +242,34 @@ public class EditSegmentsEntryDisplayContext {
 		return _segmentsEntry;
 	}
 
-	public int getSegmentsEntryClassPKsCount() throws PortalException {
-		if (_segmentsEntryClassPKsCount != null) {
+	public int getSegmentsEntryClassPKsCount() {
+		try {
+			if (_segmentsEntryClassPKsCount != null) {
+				return _segmentsEntryClassPKsCount;
+			}
+
+			SegmentsEntry segmentsEntry = null;
+
+			segmentsEntry = getSegmentsEntry();
+
+			if (segmentsEntry == null) {
+				return 0;
+			}
+
+			_segmentsEntryClassPKsCount =
+				_segmentsEntryProvider.getSegmentsEntryClassPKsCount(
+					segmentsEntry.getSegmentsEntryId());
+
 			return _segmentsEntryClassPKsCount;
 		}
+		catch (PortalException pe) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to get the segments entry class PKs count", pe);
+			}
 
-		SegmentsEntry segmentsEntry = getSegmentsEntry();
-
-		if (segmentsEntry == null) {
 			return 0;
 		}
-
-		_segmentsEntryClassPKsCount =
-			_segmentsEntryProvider.getSegmentsEntryClassPKsCount(
-				segmentsEntry.getSegmentsEntryId());
-
-		return _segmentsEntryClassPKsCount;
 	}
 
 	public long getSegmentsEntryId() {
@@ -329,6 +343,25 @@ public class EditSegmentsEntryDisplayContext {
 			_httpServletRequest, "type", User.class.getName());
 	}
 
+	public boolean hasUpdatePermission() throws PortalException {
+		if (_hasUpdatePermission != null) {
+			return _hasUpdatePermission;
+		}
+
+		SegmentsEntry segmentsEntry = getSegmentsEntry();
+
+		if (segmentsEntry != null) {
+			_hasUpdatePermission = SegmentsEntryPermission.contains(
+				_themeDisplay.getPermissionChecker(), segmentsEntry,
+				ActionKeys.UPDATE);
+		}
+		else {
+			_hasUpdatePermission = true;
+		}
+
+		return _hasUpdatePermission;
+	}
+
 	public boolean isShowInEditMode() {
 		if (_showInEditMode != null) {
 			return _showInEditMode;
@@ -362,6 +395,7 @@ public class EditSegmentsEntryDisplayContext {
 	private Set<Locale> _availableLocales;
 	private String _defaultLanguageId;
 	private Long _groupId;
+	private Boolean _hasUpdatePermission;
 	private final HttpServletRequest _httpServletRequest;
 	private String _redirect;
 	private final RenderRequest _renderRequest;

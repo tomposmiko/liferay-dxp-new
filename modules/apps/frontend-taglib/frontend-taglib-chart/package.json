@@ -1,6 +1,6 @@
 {
 	"dependencies": {
-		"clay-charts": "2.14.2"
+		"clay-charts": "2.15.1"
 	},
 	"name": "frontend-taglib-chart",
 	"scripts": {
@@ -8,5 +8,5 @@
 		"checkFormat": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},
-	"version": "2.0.2"
+	"version": "2.0.5"
 }

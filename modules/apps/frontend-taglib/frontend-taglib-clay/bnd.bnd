@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Frontend Taglib Clay
 Bundle-SymbolicName: com.liferay.frontend.taglib.clay
-Bundle-Version: 2.1.1
+Bundle-Version: 2.1.7
 Export-Package:\
 	com.liferay.frontend.taglib.clay.servlet.taglib.contributor,\
 	com.liferay.frontend.taglib.clay.servlet.taglib.data,\
@@ -23,6 +23,7 @@ Liferay-JS-Submodules-Bridge:\
 	clay-icon,\
 	clay-label,\
 	clay-link,\
+	clay-loading-indicator,\
 	clay-management-toolbar,\
 	clay-modal,\
 	clay-multi-select,\

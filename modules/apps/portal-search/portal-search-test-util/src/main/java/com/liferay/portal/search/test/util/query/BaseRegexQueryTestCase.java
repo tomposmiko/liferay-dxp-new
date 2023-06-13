@@ -87,11 +87,12 @@ public abstract class BaseRegexQueryTestCase extends BaseIndexingTestCase {
 				Assert.assertEquals(
 					"Total hits", 10, searchHits.getTotalHits());
 
-				List<SearchHit> searchHitList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
-				Assert.assertEquals("Retrieved hits", 10, searchHitList.size());
+				Assert.assertEquals(
+					"Retrieved hits", 10, searchHitsList.size());
 
-				searchHitList.forEach(
+				searchHitsList.forEach(
 					searchHit -> {
 						Document document = searchHit.getDocument();
 

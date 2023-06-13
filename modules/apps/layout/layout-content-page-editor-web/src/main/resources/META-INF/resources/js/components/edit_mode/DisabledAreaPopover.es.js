@@ -37,7 +37,12 @@ class DisabledAreaPopover extends Component {
 
 		this._documentListeners = [
 			on(document.body, 'click', this._handleDocumentClick.bind(this)),
-			on(window, 'scroll', this._handleWindowScroll.bind(this))
+
+			on(
+				'.fragment-entry-link-list-wrapper',
+				'scroll',
+				this._handleFragmentEntryLinkListScroll.bind(this)
+			)
 		];
 	}
 
@@ -51,6 +56,39 @@ class DisabledAreaPopover extends Component {
 		this._documentListeners.forEach(
 			documentListener => documentListener.removeListener()
 		);
+	}
+
+	/**
+	 * @inheritdoc
+	 * @review
+	 */
+	rendered() {
+		if (this._position) {
+			requestAnimationFrame(
+				() => {
+					let popoverPosition = Align.TopCenter;
+
+					const suggestedAlign = Align.suggestAlignBestRegion(
+						this.refs.popover,
+						this._clickedElement,
+						popoverPosition
+					);
+
+					if (suggestedAlign.position !== popoverPosition) {
+						popoverPosition = Align.BottomCenter;
+					}
+
+					Align.align(
+						this.refs.popover,
+						this._clickedElement,
+						popoverPosition,
+						false
+					);
+
+					this._setPosition(popoverPosition);
+				}
+			);
+		}
 	}
 
 	/**
@@ -117,13 +155,9 @@ class DisabledAreaPopover extends Component {
 	_handleElementClick(event) {
 		event.stopImmediatePropagation();
 
-		const alignPosition = Align.align(
-			this.refs.popover,
-			event.delegateTarget,
-			Align.TopCenter
-		);
+		this._clickedElement = event.delegateTarget;
 
-		this._setPosition(alignPosition);
+		this._setPosition(Align.TopCenter);
 	}
 
 	/**
@@ -133,7 +167,7 @@ class DisabledAreaPopover extends Component {
 	 * @private
 	 * @review
 	 */
-	_handleWindowScroll() {
+	_handleFragmentEntryLinkListScroll() {
 		this._hidePopover();
 	}
 
@@ -143,6 +177,7 @@ class DisabledAreaPopover extends Component {
 	 * @review
 	 */
 	_hidePopover() {
+		this._clickedElement = null;
 		this._position = null;
 	}
 
@@ -154,7 +189,9 @@ class DisabledAreaPopover extends Component {
 	 * @review
 	 */
 	_setPosition(alignPosition) {
-		this._position = POPOVER_POSITIONS[alignPosition];
+		if (this._position !== POPOVER_POSITIONS[alignPosition]) {
+			this._position = POPOVER_POSITIONS[alignPosition];
+		}
 	}
 
 }

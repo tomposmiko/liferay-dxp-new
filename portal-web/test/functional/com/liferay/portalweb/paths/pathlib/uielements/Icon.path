@@ -20,7 +20,7 @@
 </tr>
 <tr>
 	<td>ANGLE_LEFT_BACK</td>
-	<td>//div[contains(@class,'taglib-header')]//span[contains(.,'Back')]/a | //a[span/*[name()='svg'][contains(@class,'icon-angle-left')]]</td>
+	<td>//div[contains(@class,'taglib-header')]//span[contains(.,'Back')]/a | //a[span//*[name()='svg'][contains(@class,'icon-angle-left')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -231,7 +231,7 @@
 </tr>
 <tr>
 	<td>REMOVE_TAG</td>
-	<td>//span[contains(.,'${key_removeTag}')]//..//button[contains(@class,'btn close')]</td>
+	<td>//span[contains(.,'${key_removeTag}')]//..//button[contains(@class,'close')]</td>
 	<td></td>
 </tr>
 <tr>

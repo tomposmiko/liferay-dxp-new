@@ -2,7 +2,7 @@ dependencies {
 	compileInclude group: "jfree", name: "jcommon", version: "1.0.16"
 	compileInclude group: "jfree", name: "jfreechart", version: "1.0.13"
 
-	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bnd.annotation", version: "3.1.0"
+	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bnd.annotation", version: "4.2.0"
 	compileOnly group: "com.liferay", name: "com.liferay.application.list.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.captcha.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.frontend.taglib", version: "4.0.0"

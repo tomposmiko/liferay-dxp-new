@@ -15,8 +15,8 @@
 package com.liferay.portal.util;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -85,8 +85,7 @@ public class HtmlImplTest {
 
 		Assert.assertEquals(value, _htmlImpl.escape(value));
 
-		Assert.assertEquals(
-			value, _htmlImpl.escape(value, HtmlImpl.ESCAPE_MODE_ATTRIBUTE));
+		Assert.assertEquals(value, _htmlImpl.escapeAttribute(value));
 	}
 
 	@Test

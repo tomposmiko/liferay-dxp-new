@@ -162,8 +162,13 @@
 							instance._bindBrowseButton(event.editor, dialogDefinition, 'info', 'audioselector', 'url');
 						}
 						else if (dialogName === 'image') {
-							instance._bindBrowseButton(event.editor, dialogDefinition, 'info', 'imageselector', 'txtUrl');
-							instance._bindBrowseButton(event.editor, dialogDefinition, 'Link', 'imageselector', 'txtUrl');
+							instance._bindBrowseButton(event.editor, dialogDefinition, 'Link', 'linkselector', 'txtUrl');
+
+							dialogDefinition.getContents('info').remove('browse');
+
+							dialogDefinition.onLoad = function() {
+								this.getContentElement('info', 'txtUrl').getInputElement().setAttribute('readOnly', true);
+							};
 						}
 						else if (dialogName === 'video') {
 							instance._bindBrowseButton(event.editor, dialogDefinition, 'info', 'videoselector', 'poster');
@@ -400,7 +405,7 @@
 						'destroy',
 						function() {
 							if (imageSrc) {
-								if (callback) {
+								if (typeof callback === 'function') {
 									callback(imageSrc, selectedItem);
 								}
 								else {
@@ -446,7 +451,7 @@
 					Liferay.Util.getWindow(eventName).onceAfter(
 						'destroy',
 						function() {
-							if (callback) {
+							if (typeof callback === 'function') {
 								callback(linkUrl, selectedItem);
 							}
 						}
@@ -463,7 +468,7 @@
 					var videoSrc = instance._getItemSrc(editor, selectedItem);
 
 					if (videoSrc) {
-						if (callback) {
+						if (typeof callback === 'function') {
 							callback(videoSrc);
 						}
 						else {

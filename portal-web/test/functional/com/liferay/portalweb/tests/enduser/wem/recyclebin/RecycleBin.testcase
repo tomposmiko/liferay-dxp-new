@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Recycle Bin";
@@ -219,21 +220,10 @@ definition {
 			threadBody = "MB Body",
 			threadSubject = "MB Subject");
 
-		ProductMenu.gotoSite(site = "Site Name");
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Message Boards");
-
-		MessageboardsThread.gotoCP(threadSubject = "MB Subject");
-
 		MessageboardsThread.editCP(
 			mbAttachmentFile = "Document_1.doc",
 			threadAttachmentRemove = "true",
 			threadBodyEdit = "MB Body Edit");
-
-		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Content &amp; Data",
@@ -246,11 +236,11 @@ definition {
 			threadSubject = "MB Subject",
 			userName = "Test Test");
 
+		AssertElementNotPresent(locator1 = "MessageBoardsThread#MESSAGE_BODY_ATTACHMENT_1");
+
 		PortletEntry.clickEditFromEllipsis();
 
 		MessageboardsThread.restoreMBAttachmentCP(mbAttachmentFile = "Document_1.doc");
-
-		ProductMenu.gotoSite(site = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Content &amp; Data",
@@ -1160,4 +1150,5 @@ definition {
 			webContentStatus = "DRAFT",
 			webContentTitle = "Web Content Title Edit Draft");
 	}
+
 }

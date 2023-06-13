@@ -80,13 +80,13 @@ public abstract class BaseDateRangeTermQueryTestCase
 
 				Assert.assertEquals("Total hits", 4, searchHits.getTotalHits());
 
-				List<SearchHit> searchHitList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
-				Assert.assertEquals("Retrieved hits", 4, searchHitList.size());
+				Assert.assertEquals("Retrieved hits", 4, searchHitsList.size());
 
 				DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
-				searchHitList.forEach(
+				searchHitsList.forEach(
 					searchHit -> {
 						Document document = searchHit.getDocument();
 

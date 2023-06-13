@@ -109,7 +109,7 @@ public class WikiPagesManagementToolbarDisplayContext {
 		};
 	}
 
-	public List<String> getAvailableActionDropdownItems(WikiPage wikiPage)
+	public List<String> getAvailableActions(WikiPage wikiPage)
 		throws PortalException {
 
 		List<String> availableActionDropdownItems = new ArrayList<>();
@@ -309,7 +309,7 @@ public class WikiPagesManagementToolbarDisplayContext {
 
 				String[] navigationKeys = {
 					"all-pages", "draft-pages", "frontpage", "orphan-pages",
-					"recent-changes"
+					"pending-pages", "recent-changes"
 				};
 
 				PortletURL portletURL = _getPortletURL();

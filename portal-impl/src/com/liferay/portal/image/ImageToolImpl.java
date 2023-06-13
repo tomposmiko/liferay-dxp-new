@@ -15,6 +15,7 @@
 package com.liferay.portal.image;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.concurrent.FutureConverter;
 import com.liferay.portal.kernel.exception.ImageResolutionException;
 import com.liferay.portal.kernel.image.ImageBag;
@@ -27,7 +28,6 @@ import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.ImageImpl;
 import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
@@ -792,8 +792,14 @@ public class ImageToolImpl implements ImageTool {
 
 		BufferedImage originalBufferedImage = getBufferedImage(renderedImage);
 
+		int type = originalBufferedImage.getType();
+
+		if (type == BufferedImage.TYPE_CUSTOM) {
+			type = BufferedImage.TYPE_INT_ARGB;
+		}
+
 		BufferedImage scaledBufferedImage = new BufferedImage(
-			scaledWidth, scaledHeight, originalBufferedImage.getType());
+			scaledWidth, scaledHeight, type);
 
 		int originalHeight = originalBufferedImage.getHeight();
 		int originalWidth = originalBufferedImage.getWidth();

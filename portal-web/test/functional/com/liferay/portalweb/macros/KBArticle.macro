@@ -1,4 +1,5 @@
 definition {
+
 	macro _gotoChildArticle {
 		var key_kbChildArticleTitle = "${kbChildArticleTitle}";
 
@@ -511,8 +512,8 @@ definition {
 	}
 
 	macro deleteCP {
-		if (IsElementPresent(locator1 = "Button#DELETE_ENTRY")) {
-			ClickNoError(locator1 = "Button#DELETE_ENTRY");
+		if (IsElementPresent(locator1 = "Icon#DELETE")) {
+			ClickNoError(locator1 = "Icon#DELETE");
 		}
 		else {
 			Click(
@@ -898,25 +899,10 @@ definition {
 		AssertElementNotPresent(locator1 = "Ratings#YOUR_RATING_STAR_EMPTY_1");
 	}
 
-	macro rateArticlePG {
-		AssertTextEquals(
-			locator1 = "KnowledgeBase#DISPLAY_TITLE",
-			value1 = "${kbArticleTitle}");
-
-		if ("${rateUp}" == "true") {
-			Click(locator1 = "Ratings#THUMB_UP");
-		}
-		else if ("${rateUp}" == "false") {
-			Click(locator1 = "Ratings#THUMB_DOWN");
-		}
-
-		AssertTextEquals(
-			locator1 = "KnowledgeBase#DISPLAY_VOTES",
-			value1 = "${articleVoteCount}");
-	}
-
 	macro selectAllCP {
 		PortletEntry.selectAll();
+
+		AssertElementPresent(locator1 = "Button#DELETE");
 	}
 
 	macro selectArticleCP {
@@ -1598,4 +1584,5 @@ definition {
 			locator1 = "KnowledgeBase#DISPLAY_CONTENT",
 			value1 = "${kbArticleContent}");
 	}
+
 }

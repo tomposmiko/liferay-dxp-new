@@ -20,6 +20,7 @@ import com.liferay.fragment.internal.upgrade.v2_0_0.util.FragmentEntryTable;
 import com.liferay.fragment.internal.upgrade.v2_1_0.UpgradeSchema;
 import com.liferay.portal.kernel.upgrade.BaseUpgradeSQLServerDatetime;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
+import com.liferay.portal.upgrade.step.util.UpgradeStepFactory;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -40,6 +41,17 @@ public class FragmentServiceUpgrade implements UpgradeStepRegistrator {
 				}));
 
 		registry.register("2.0.0", "2.1.0", new UpgradeSchema());
+
+		registry.register(
+			"2.1.0", "2.1.1",
+			UpgradeStepFactory.alterColumnTypes(
+				com.liferay.fragment.internal.upgrade.v2_1_1.util.
+					FragmentEntryTable.class,
+				"TEXT null", "css", "html", "js"),
+			UpgradeStepFactory.alterColumnTypes(
+				com.liferay.fragment.internal.upgrade.v2_1_1.util.
+					FragmentEntryLinkTable.class,
+				"TEXT null", "css", "html", "js", "editableValues"));
 	}
 
 }

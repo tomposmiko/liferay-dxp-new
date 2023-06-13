@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Display Pages";
@@ -111,11 +112,9 @@ definition {
 		task ("Configure the display page settings so the header and footer do not appear") {
 			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-			DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
-				displayPageName = "Display Page Name",
-				item = "Configure");
+			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			PageEditor.gotoTab(tabName = "Look and Feel");
 
 			Click(locator1 = "Radio#SPECIFIC_LOOK");
 
@@ -128,12 +127,6 @@ definition {
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 
 			Button.clickSave();
-
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
-
-			DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
-				displayPageName = "Display Page Name",
-				item = "Edit");
 
 			Button.clickPublish();
 		}
@@ -164,7 +157,7 @@ definition {
 	@description = "This is a test for LPS-86191. A user can configure the page settings for each individual display page. This test changes the theme."
 	@priority = "4"
 	test ConfigureDisplayPageTheme {
-		property test.run.environment = "CE";
+		property osgi.app.includes = "frontend-theme-fjord";
 
 		task ("Add a web content that uses the display page") {
 			WebContent.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -193,13 +186,9 @@ definition {
 		}
 
 		task ("Change the display page theme from Classic to Fjord") {
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+			DisplayPageTemplate.clickPencilItem(item = "Edit Display Page Template");
 
-			DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
-				displayPageName = "Display Page Name",
-				item = "Configure");
-
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			PageEditor.gotoTab(tabName = "Look and Feel");
 
 			Click(locator1 = "Radio#SPECIFIC_LOOK");
 
@@ -213,17 +202,7 @@ definition {
 
 			Button.clickSave();
 
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
-
-			DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
-				displayPageName = "Display Page Name",
-				item = "Edit");
-
-			Button.clickPublish();
-		}
-
-		task ("View the web content through the display page") {
-			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/w/webcontent-title");
+			PageEditor.clickPublish();
 		}
 
 		task ("Assert the display page is using the Fjord Theme") {
@@ -856,4 +835,5 @@ definition {
 				locator1 = "Fragment#FRAGMENT");
 		}
 	}
+
 }

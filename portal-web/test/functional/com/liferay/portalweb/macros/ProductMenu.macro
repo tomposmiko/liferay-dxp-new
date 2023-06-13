@@ -1,4 +1,5 @@
 definition {
+
 	@summary = "Navigate to the Live site"
 	macro gotoLiveSite {
 		ProductMenuHelper.expandPanel(panel = "Site Administration");
@@ -57,6 +58,8 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
+		Pause(locator1 = "3000");
+
 		Navigator.gotoNavItem(navItem = "My Sites");
 
 		SiteSelector.selectSite(site = "${site}");
@@ -100,4 +103,5 @@ definition {
 
 		ProductMenuHelper.viewNoSite(site = "${site}");
 	}
+
 }

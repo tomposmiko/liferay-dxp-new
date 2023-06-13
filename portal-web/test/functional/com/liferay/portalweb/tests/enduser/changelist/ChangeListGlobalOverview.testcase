@@ -1,5 +1,6 @@
 @component-name = "portal-staging"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Change Lists";
@@ -14,7 +15,14 @@ definition {
 			panel = "Control Panel",
 			portlet = "Settings");
 
-		ChangeList.enableChangeList(gotoOverview = "true");
+		ChangeList.enableChangeList();
+
+		ChangeList.changeUserSettingsPopuConfirmation(changeUserPopupConfirmation = "disable");
+
+		ProductMenu.gotoPortlet(
+			category = "Change Lists",
+			panel = "Control Panel",
+			portlet = "Overview");
 	}
 
 	tearDown {
@@ -30,6 +38,8 @@ definition {
 				portlet = "Settings");
 
 			ChangeList.disableChangeList();
+
+			ChangeList.changeUserSettingsPopuConfirmation(changeUserPopupConfirmation = "enable");
 		}
 	}
 
@@ -50,12 +60,12 @@ definition {
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "First Web Content");
 
-		PortletEntry.publish();
+		Button.clickPublishToChangeList();
 
 		ProductMenu.gotoPortlet(
 			category = "Change Lists",
 			panel = "Control Panel",
-			portlet = "Change Lists");
+			portlet = "Overview");
 
 		ChangeList.viewChangeOnOverview(
 			contentChangeType = "Added",
@@ -83,12 +93,12 @@ definition {
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "Second Web Content");
 
-		PortletEntry.publish();
+		Button.clickPublishToChangeList();
 
 		ProductMenu.gotoPortlet(
 			category = "Change Lists",
 			panel = "Control Panel",
-			portlet = "Change Lists");
+			portlet = "Overview");
 
 		ChangeList.viewChangeOnOverview(
 			contentChangeType = "Added",
@@ -113,12 +123,12 @@ definition {
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "Web Content Title");
 
-		PortletEntry.publish();
+		Button.clickPublishToChangeList();
 
 		ProductMenu.gotoPortlet(
 			category = "Change Lists",
 			panel = "Control Panel",
-			portlet = "Change Lists");
+			portlet = "Overview");
 
 		ChangeList.viewChangeOnOverview(
 			contentChangeType = "Added",
@@ -135,6 +145,7 @@ definition {
 		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
 
 		WebContent.editCP(
+			changeListEnabled = "true",
 			webContentContentEdit = "WC WebContent Content Edit",
 			webContentTitle = "Web Content Title",
 			webContentTitleEdit = "Web Content Title Edit");
@@ -142,7 +153,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Change Lists",
 			panel = "Control Panel",
-			portlet = "Change Lists");
+			portlet = "Overview");
 
 		ChangeList.viewChangeOnOverview(
 			contentChangeType = "Modified",
@@ -163,7 +174,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Change Lists",
 			panel = "Control Panel",
-			portlet = "Change Lists");
+			portlet = "Overview");
 
 		ChangeList.viewChangeOnOverview(
 			contentChangeType = "Deleted",
@@ -199,12 +210,14 @@ definition {
 			fieldFieldLabel = "Web Content",
 			fieldName = "WebContent");
 
-		WebContentStructures.saveCP(structureName = "My Structure");
+		WebContentStructures.saveCP(
+			changeListEnabled = "true",
+			structureName = "My Structure");
 
 		ProductMenu.gotoPortlet(
 			category = "Change Lists",
 			panel = "Control Panel",
-			portlet = "Change Lists");
+			portlet = "Overview");
 
 		ChangeList.viewContentTypeOnOverview(
 			contentTitle = "My Structure",
@@ -225,6 +238,7 @@ definition {
 		NavItem.gotoTemplates();
 
 		WebContentTemplates.addCP(
+			changeListEnabled = "true",
 			structureName = "Basic Web Content",
 			templateDescription = "WC Template Description",
 			templateName = "WC Template Name");
@@ -232,7 +246,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Change Lists",
 			panel = "Control Panel",
-			portlet = "Change Lists");
+			portlet = "Overview");
 
 		ChangeList.viewContentTypeOnOverview(
 			contentTitle = "WC Template Name",
@@ -299,7 +313,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Change Lists",
 			panel = "Control Panel",
-			portlet = "Change Lists");
+			portlet = "Overview");
 
 		ChangeList.selectChangeList(changeListName = "Select Change List");
 
@@ -341,4 +355,14 @@ definition {
 			locator1 = "ChangeList#ACTIVE_CHANGE_LIST_TITLE",
 			value1 = "Change List Name");
 	}
+
+	@priority = "5"
+	test DeleteChangeListFromOverviewScreen {
+		ChangeList.addNewChangeList(
+			changeListDescription = "Change List Description",
+			changeListName = "Change List Name");
+
+		ChangeList.deleteChangeListFromOverviewScreen(changeListName = "Change List Name");
+	}
+
 }

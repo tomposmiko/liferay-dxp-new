@@ -1,4 +1,5 @@
 definition {
+
 	var assetType = "Documents Folder";
 
 	macro addCP {
@@ -308,8 +309,8 @@ definition {
 		var key_dmFolderName = "${dmFolderName1}";
 
 		AssertClick(
-			locator1 = "DocumentsAndMediaSelectFolder#CHOOSE_BUTTON",
-			value1 = "Choose");
+			locator1 = "DocumentsAndMediaSelectFolder#SELECT_BUTTON",
+			value1 = "Select");
 
 		SelectFrame(locator1 = "relative=top");
 
@@ -496,4 +497,5 @@ definition {
 			locator1 = "MediaGallery#FOLDER_HEADER_TITLE",
 			value1 = "${mgFolderName}");
 	}
+
 }

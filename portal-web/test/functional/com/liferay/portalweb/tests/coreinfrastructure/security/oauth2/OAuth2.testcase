@@ -1,5 +1,7 @@
 @component-name = "portal-security"
 definition {
+
+	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "OAuth 2";
 
@@ -107,6 +109,45 @@ definition {
 		OAuth2.deleteApplication(applicationName = "OAuth Application Edited");
 	}
 
+	@description = "This is a use case for OAUTH2-242."
+	@priority = "5"
+	test AssertAuthorizationCodeWorksInCluster {
+		property app.server.bundles.size = "1";
+		property cluster.enabled = "true";
+		property custom.properties = "virtual.hosts.default.site.name=Guest";
+		property remote.elasticsearch.enabled = "true";
+		property test.name.skip.portal.instance = "OAuth2#AssertAuthorizationCodeWorksInCluster";
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "OAuth 2 Administration");
+
+		OAuth2.addApplication(
+			applicationName = "OAuth Application",
+			callbackURI = "http://www.liferay.com");
+
+		OAuth2.inputApplicationValues(
+			clientId = "abc123",
+			clientSecret = "abc123");
+
+		var authorizationCode = OAuth2.getAuthorizationCode();
+
+		var curl = '''
+			http://localhost:9080/o/oauth2/token \
+				 --data client_id=abc123&client_secret=abc123&grant_type=authorization_code&code=${authorizationCode}
+		''';
+
+		var reponse = JSONCurlUtil.post("${curl}");
+
+		if (contains("${reponse}", "access_token")) {
+			echo("OAuth2 Authorization Code is working in cluster.");
+		}
+		else {
+			fail("OAuth2 Authorization Code is not working in cluster.");
+		}
+	}
+
 	test AuthorizeExternalApplication {
 		property custom.properties = "virtual.hosts.default.site.name=Guest";
 
@@ -158,7 +199,7 @@ definition {
 			value1 = "test@liferay.com");
 	}
 
-	test EditApplicationScopes {
+	test EditApplicationScopesAndViewLanguageKeys {
 		property liferay.dependency.jars = "com.liferay.oauth2.provider.scope.sample.qa.jar";
 		property osgi.module.configuration.file.names = "com.liferay.oauth2.provider.scope.internal.configuration.ConfigurableScopeMapperConfiguration-default.config";
 		property osgi.module.configurations = "mapping=[&quot;example-scope-1,example-scope-2\=everything&quot;]${line.separator}osgi.jaxrs.name=&quot;liferay-oauth2-scope-sample-qa-app&quot;${line.separator}passthrough=&quot;true&quot;";
@@ -185,6 +226,22 @@ definition {
 		OAuth2.addApplication(
 			applicationName = "OAuth Application",
 			checkboxUncheckList = "Authorization Code");
+
+		Navigator.gotoNavItem(navItem = "Scopes");
+
+		Navigator.gotoNavUnderline(navUnderline = "Resource scopes");
+
+		for (var resourcePanel : list "Liferay.Bulk.REST,Liferay.Headless.Admin.Taxonomy,Liferay.Headless.Admin.User,Liferay.Headless.Admin.Workflow,Liferay.Headless.Delivery,Liferay.Headless.Form") {
+			var key_panel = "${resourcePanel}";
+
+			AssertElementNotPresent(locator1 = "OAuth2#ADMIN_RESOURCE_PANEL_COLLAPSED");
+		}
+
+		for (var resourcePanel : list "Analytics,Bulk Processing,Change Tracking,Content Delivery,Dynamic Data Lists,Forms,Portal Services,Taxonomy Administration,User Administration,Workflow Administration") {
+			var key_panel = "${resourcePanel}";
+
+			AssertElementPresent(locator1 = "OAuth2#ADMIN_RESOURCE_PANEL_COLLAPSED");
+		}
 
 		Navigator.gotoBack();
 
@@ -305,4 +362,93 @@ definition {
 
 		OAuth2.viewGrantedAuthViaUser(noAuthorizations = "true");
 	}
+
+	test ViewAuthPromptRequestedScopes {
+		property custom.properties = "virtual.hosts.default.site.name=Guest";
+		property osgi.module.configuration.file.names = "com.liferay.oauth2.provider.scope.internal.configuration.BundlePrefixHandlerFactoryConfiguration-default.config";
+		property osgi.module.configurations = "include.bundle.symbolic.name=&quot;false&quot;${line.separator}osgi.jaxrs.name=&quot;Default&quot;${line.separator}separator=&quot;&quot;${line.separator}service.properties=&quot;&quot;";
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "OAuth 2 Administration");
+
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "Analytics Cloud");
+
+		WaitForSPARefresh();
+
+		var generatedClientId = selenium.getElementValue("OAuth2#ADMIN_INPUT_FORM_CLIENT_ID");
+		var portalURL = PropsUtil.get("portal.url");
+
+		Navigator.gotoBack();
+
+		OAuth2.editScopes(
+			applicationName = "Analytics Cloud",
+			checkGlobalScope = "Everything");
+
+		AntCommand(
+			locator1 = "build-test.xml",
+			value1 = "deploy-dependency-jars -Dliferay.dependency.jars=com.liferay.oauth2.provider.sample.jar");
+
+		Pause(locator1 = "7000");
+
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "Analytics Cloud");
+
+		AssertClick(
+			key_navItem = "Scopes",
+			locator1 = "NavBar#NAV_ITEM_LINK",
+			value1 = "Scopes");
+
+		OAuth2.expandResourcePanel(resourcePanel = "sample-app");
+
+		AssertChecked(
+			key_panel = "sample-app",
+			key_scopeName = "everything.read",
+			locator1 = "OAuth2#ADMIN_GLOBAL_RESOURCE_SCOPE_CHECKBOX");
+
+		Navigator.openSpecificURL(url = "${portalURL}/o/oauth2/authorize?client_id=${generatedClientId}&response_type=code");
+
+		AssertElementPresent(
+			key_applicationName = "Analytics Cloud",
+			locator1 = "OAuth2#AUTHORIZATION_REQUEST_APPLICATION_NAME");
+
+		AssertElementPresent(
+			key_resourceName = "Portal Services",
+			locator1 = "OAuth2#AUTHORIZATION_REQUEST_RESOURCE_NAME");
+
+		AssertElementNotPresent(
+			key_resourceName = "sample-app",
+			locator1 = "OAuth2#AUTHORIZATION_REQUEST_RESOURCE_NAME");
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "OAuth 2 Administration");
+
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "Analytics Cloud");
+
+		AssertClick(
+			key_navItem = "Scopes",
+			locator1 = "NavBar#NAV_ITEM_LINK",
+			value1 = "Scopes");
+
+		PortletEntry.save();
+
+		Navigator.openSpecificURL(url = "${portalURL}/o/oauth2/authorize?client_id=${generatedClientId}&response_type=code");
+
+		AssertElementPresent(
+			key_resourceName = "Portal Services",
+			locator1 = "OAuth2#AUTHORIZATION_REQUEST_RESOURCE_NAME");
+
+		AssertElementPresent(
+			key_resourceName = "sample-app",
+			locator1 = "OAuth2#AUTHORIZATION_REQUEST_RESOURCE_NAME");
+	}
+
 }

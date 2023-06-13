@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Content Pages";
@@ -723,9 +724,9 @@ definition {
 				locator1 = "Home#SITE_NAME",
 				value1 = "Test Site Name");
 
-			AssertTextEquals(
-				locator1 = "Message#INFO",
-				value1 = "This search bar is not visible to users yet. Set up its destination to make it visible.");
+			AssertVisible(
+				key_infoMessage = "This search bar is not visible to users yet.",
+				locator1 = "Message#INFO_SPECIFIC");
 
 			AssertVisible(locator1 = "UserBar#USER_AVATAR_IMAGE");
 
@@ -750,7 +751,7 @@ definition {
 				value1 = "This area is defined by the theme. To change theme settings go to the Look and Feel configuration in the sidebar.");
 		}
 
-		task ("Click away from the header so the popover will disappear") {
+		task ("Assert the popover goes away after clicking away from the header") {
 			Click(locator1 = "PageEditor#EMPTY_MESSAGE");
 
 			AssertElementNotPresent(locator1 = "PageEditor#CONTENT_PAGE_DISABLED_POPOVER");
@@ -765,5 +766,12 @@ definition {
 				locator1 = "PageEditor#CONTENT_PAGE_DISABLED_POPOVER",
 				value1 = "This area is defined by the theme. To change theme settings go to the Look and Feel configuration in the sidebar.");
 		}
+
+		task ("Assert the popover goes away after clicking away from the footer") {
+			Click(locator1 = "PageEditor#EMPTY_MESSAGE");
+
+			AssertElementNotPresent(locator1 = "PageEditor#CONTENT_PAGE_DISABLED_POPOVER");
+		}
 	}
+
 }

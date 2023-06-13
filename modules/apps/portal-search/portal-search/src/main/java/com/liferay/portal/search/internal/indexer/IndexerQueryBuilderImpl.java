@@ -130,29 +130,27 @@ public class IndexerQueryBuilderImpl<T extends BaseModel<?>>
 		SearchContext searchContext) {
 
 		stream.forEach(
-			keywordQueryContributor -> {
-				keywordQueryContributor.contribute(
-					searchContext.getKeywords(), booleanQuery,
-					new KeywordQueryContributorHelper() {
+			keywordQueryContributor -> keywordQueryContributor.contribute(
+				searchContext.getKeywords(), booleanQuery,
+				new KeywordQueryContributorHelper() {
 
-						@Override
-						public String getClassName() {
-							return _modelSearchSettings.getClassName();
-						}
+					@Override
+					public String getClassName() {
+						return _modelSearchSettings.getClassName();
+					}
 
-						@Override
-						public Stream<String> getSearchClassNamesStream() {
-							return Stream.of(
-								_modelSearchSettings.getSearchClassNames());
-						}
+					@Override
+					public Stream<String> getSearchClassNamesStream() {
+						return Stream.of(
+							_modelSearchSettings.getSearchClassNames());
+					}
 
-						@Override
-						public SearchContext getSearchContext() {
-							return searchContext;
-						}
+					@Override
+					public SearchContext getSearchContext() {
+						return searchContext;
+					}
 
-					});
-			});
+				}));
 	}
 
 	protected void contributeSearchContext(SearchContext searchContext) {
@@ -167,10 +165,8 @@ public class IndexerQueryBuilderImpl<T extends BaseModel<?>>
 			};
 
 		_searchContextContributors.forEach(
-			searchContextContributor -> {
-				searchContextContributor.contribute(
-					searchContext, searchContextContributorHelper);
-			});
+			searchContextContributor -> searchContextContributor.contribute(
+				searchContext, searchContextContributorHelper));
 
 		_modelSearchContextContributors.forEach(
 			modelSearchContextContributor ->

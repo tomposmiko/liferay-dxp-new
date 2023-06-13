@@ -69,11 +69,11 @@ public abstract class BaseExistsQueryTestCase extends BaseIndexingTestCase {
 
 				Assert.assertEquals("Total hits", 1, searchHits.getTotalHits());
 
-				List<SearchHit> searchHitList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
-				Assert.assertEquals("Retrieved hits", 1, searchHitList.size());
+				Assert.assertEquals("Retrieved hits", 1, searchHitsList.size());
 
-				SearchHit searchHit = searchHitList.get(0);
+				SearchHit searchHit = searchHitsList.get(0);
 
 				Document document = searchHit.getDocument();
 

@@ -142,6 +142,25 @@ public class FjordSiteInitializer implements SiteInitializer {
 
 			homeFragmentEntries.addAll(featuresFragmentEntries);
 
+			List<FragmentEntry> headerFragmentEntries = _addFragmentEntries(
+				fragmentCollection.getFragmentCollectionId(),
+				_PATH + "/fragments/common/header", serviceContext);
+
+			FragmentEntry headerFullscreenFragmentEntry = _getFragmentEntry(
+				headerFragmentEntries, "Header");
+
+			downloadFragmentEntries.add(0, headerFullscreenFragmentEntry);
+			featuresFragmentEntries.add(0, headerFullscreenFragmentEntry);
+			homeFragmentEntries.add(0, headerFullscreenFragmentEntry);
+
+			List<FragmentEntry> footerFragmentEntries = _addFragmentEntries(
+				fragmentCollection.getFragmentCollectionId(),
+				_PATH + "/fragments/common/footer", serviceContext);
+
+			downloadFragmentEntries.addAll(footerFragmentEntries);
+			featuresFragmentEntries.addAll(footerFragmentEntries);
+			homeFragmentEntries.addAll(footerFragmentEntries);
+
 			_addLayout(
 				layoutPageTemplateCollection.
 					getLayoutPageTemplateCollectionId(),
@@ -284,7 +303,7 @@ public class FjordSiteInitializer implements SiteInitializer {
 		nameMap.put(LocaleUtil.getSiteDefault(), name);
 
 		Layout layout = _layoutLocalService.addLayout(
-			serviceContext.getUserId(), serviceContext.getScopeGroupId(), false,
+			serviceContext.getUserId(), serviceContext.getScopeGroupId(), true,
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
 			_portal.getClassNameId(LayoutPageTemplateEntry.class),
 			layoutPageTemplateEntry.getLayoutPageTemplateEntryId(), nameMap,
@@ -361,6 +380,19 @@ public class FjordSiteInitializer implements SiteInitializer {
 		serviceContext.setTimeZone(user.getTimeZone());
 
 		return serviceContext;
+	}
+
+	private FragmentEntry _getFragmentEntry(
+		List<FragmentEntry> fragmentEntries, String name) {
+
+		for (FragmentEntry fragmentEntry : fragmentEntries) {
+			if (name.equals(fragmentEntry.getName())) {
+				return fragmentEntry;
+			}
+		}
+
+		throw new IllegalArgumentException(
+			"Unable to get fragment entry " + name);
 	}
 
 	private long _getPreviewFileEntryId(

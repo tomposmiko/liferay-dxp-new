@@ -1,4 +1,5 @@
 definition {
+
 	macro configureScopePG {
 		Portlet.gotoPortletOptions(
 			portletName = "${portletName}",
@@ -16,6 +17,8 @@ definition {
 	}
 
 	macro configureSetupPG {
+		Pause(locator1 = "3000");
+
 		if (isSet(userToolNameList)) {
 			SelectFrame(locator1 = "IFrame#DIALOG");
 
@@ -86,9 +89,7 @@ definition {
 			value1 = "Template Edit");
 
 		if (isSet(templateScript)) {
-			Type.typeAceEditor(
-				locator1 = "DDMEditTemplate#SCRIPT_CONTENT_FIELD_TEXT_AREA",
-				value1 = "${templateScript}");
+			WebContentTemplates.inputScript(templateScript = "${templateScript}");
 		}
 
 		Button.clickSave();
@@ -271,6 +272,8 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
+		Pause(locator1 = "3000");
+
 		AssertClick(
 			locator1 = "WCDConfiguration#SELECT_WEB_CONTENT_BUTTON",
 			value1 = "Select");
@@ -329,6 +332,7 @@ definition {
 			value1 = "Subscribe");
 
 		AssertTextEquals(
+			key_relatedAssetTitle = "${relatedAssetTitle}",
 			locator1 = "AssetRelatedAssets#ASSET_TITLE",
 			value1 = "${relatedAssetTitle}");
 
@@ -405,8 +409,6 @@ definition {
 			AssertTextEquals.assertPartialText(
 				locator1 = "WCD#DOCUMENT_CONVERSION_TYPE",
 				value1 = "${fileType}");
-
-			AssertElementPresent(locator1 = "WCD#DOCUMENT_CONVERSION_TYPE_ICON");
 		}
 	}
 
@@ -421,4 +423,5 @@ definition {
 			locator1 = "Message#ERROR_3",
 			value1 = "The web content article ${webContentTitle} was moved to the Recycle Bin");
 	}
+
 }

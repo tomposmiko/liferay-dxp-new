@@ -1,7 +1,8 @@
+import {disableSavingChangesStatusAction, enableSavingChangesStatusAction, updateLastSaveDateAction} from './saveChanges.es';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../utils/constants';
-import {setIn, updateIn} from '../utils/FragmentsEditorUpdateUtils.es';
-import {updateEditableValues} from '../utils/FragmentsEditorFetchUtils.es';
+import {deleteIn, setIn, updateIn} from '../utils/FragmentsEditorUpdateUtils.es';
 import {UPDATE_EDITABLE_VALUE_ERROR, UPDATE_EDITABLE_VALUE_LOADING, UPDATE_EDITABLE_VALUE_SUCCESS} from './actions.es';
+import {updateEditableValues} from '../utils/FragmentsEditorFetchUtils.es';
 import debouncedAlert from '../utils/debouncedAlert.es';
 
 /**
@@ -37,6 +38,8 @@ const debouncedUpdateEditableValues = debouncedAlert(
 		).then(
 			() => {
 				dispatch(updateEditableValueSuccessAction());
+				dispatch(disableSavingChangesStatusAction());
+				dispatch(updateLastSaveDateAction());
 			}
 		).catch(
 			() => {
@@ -46,6 +49,8 @@ const debouncedUpdateEditableValues = debouncedAlert(
 						previousEditableValues
 					)
 				);
+
+				dispatch(disableSavingChangesStatusAction());
 			}
 		);
 	},
@@ -119,11 +124,19 @@ function updateEditableValuesAction(
 
 		editableValues.forEach(
 			editableValue => {
-				nextEditableValues = setIn(
-					nextEditableValues,
-					[...keysTreeArray, editableValue.editableValueId],
-					editableValue.content
-				);
+				if (!editableValue.content) {
+					nextEditableValues = deleteIn(
+						nextEditableValues,
+						[...keysTreeArray, editableValue.editableValueId],
+					);
+				}
+				else {
+					nextEditableValues = setIn(
+						nextEditableValues,
+						[...keysTreeArray, editableValue.editableValueId],
+						editableValue.content
+					);
+				}
 
 				if (editableValue.editableValueId === 'mappedField') {
 					nextEditableValues = updateIn(
@@ -159,6 +172,8 @@ function updateEditableValuesAction(
 				nextEditableValues
 			)
 		);
+
+		dispatch(enableSavingChangesStatusAction());
 
 		debouncedUpdateEditableValues(
 			dispatch,

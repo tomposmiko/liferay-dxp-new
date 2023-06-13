@@ -17,16 +17,20 @@ package com.liferay.headless.delivery.internal.resource.v1_0;
 import com.liferay.headless.common.spi.service.context.ServiceContextUtil;
 import com.liferay.headless.delivery.dto.v1_0.KnowledgeBaseFolder;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CreatorUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.ParentKnowledgeBaseFolderUtil;
 import com.liferay.headless.delivery.resource.v1_0.KnowledgeBaseFolderResource;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.service.KBArticleService;
 import com.liferay.knowledge.base.service.KBFolderService;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+
+import java.io.Serializable;
+
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -98,16 +102,17 @@ public class KnowledgeBaseFolderResourceImpl
 			KnowledgeBaseFolder knowledgeBaseFolder)
 		throws Exception {
 
-		KBFolder kbFolder = _kbFolderService.getKBFolder(
+		KBFolder parentKBFolder = _kbFolderService.getKBFolder(
 			parentKnowledgeBaseFolderId);
 
 		return _toKnowledgeBaseFolder(
 			_kbFolderService.addKBFolder(
-				kbFolder.getGroupId(), _getClassNameId(),
+				parentKBFolder.getGroupId(), _getClassNameId(),
 				parentKnowledgeBaseFolderId, knowledgeBaseFolder.getName(),
 				knowledgeBaseFolder.getDescription(),
 				ServiceContextUtil.createServiceContext(
-					kbFolder.getGroupId(),
+					_getExpandoBridgeAttributes(knowledgeBaseFolder),
+					parentKBFolder.getGroupId(),
 					knowledgeBaseFolder.getViewableByAsString())));
 	}
 
@@ -121,7 +126,8 @@ public class KnowledgeBaseFolderResourceImpl
 				siteId, _getClassNameId(), 0, knowledgeBaseFolder.getName(),
 				knowledgeBaseFolder.getDescription(),
 				ServiceContextUtil.createServiceContext(
-					siteId, knowledgeBaseFolder.getViewableByAsString())));
+					_getExpandoBridgeAttributes(knowledgeBaseFolder), siteId,
+					knowledgeBaseFolder.getViewableByAsString())));
 	}
 
 	@Override
@@ -140,11 +146,23 @@ public class KnowledgeBaseFolderResourceImpl
 			_kbFolderService.updateKBFolder(
 				_getClassNameId(), parentKnowledgeBaseFolderId,
 				knowledgeBaseFolderId, knowledgeBaseFolder.getName(),
-				knowledgeBaseFolder.getDescription(), new ServiceContext()));
+				knowledgeBaseFolder.getDescription(),
+				ServiceContextUtil.createServiceContext(
+					_getExpandoBridgeAttributes(knowledgeBaseFolder), 0,
+					null)));
 	}
 
 	private long _getClassNameId() {
 		return _portal.getClassNameId(KBFolder.class.getName());
+	}
+
+	private Map<String, Serializable> _getExpandoBridgeAttributes(
+		KnowledgeBaseFolder knowledgeBaseFolder) {
+
+		return CustomFieldsUtil.toMap(
+			KBFolder.class.getName(), contextCompany.getCompanyId(),
+			knowledgeBaseFolder.getCustomFields(),
+			contextAcceptLanguage.getPreferredLocale());
 	}
 
 	private KnowledgeBaseFolder _toKnowledgeBaseFolder(KBFolder kbFolder)
@@ -158,6 +176,10 @@ public class KnowledgeBaseFolderResourceImpl
 			{
 				creator = CreatorUtil.toCreator(
 					_portal, _userLocalService.getUser(kbFolder.getUserId()));
+				customFields = CustomFieldsUtil.toCustomFields(
+					KBFolder.class.getName(), kbFolder.getKbFolderId(),
+					kbFolder.getCompanyId(),
+					contextAcceptLanguage.getPreferredLocale());
 				dateCreated = kbFolder.getCreateDate();
 				dateModified = kbFolder.getModifiedDate();
 				description = kbFolder.getDescription();

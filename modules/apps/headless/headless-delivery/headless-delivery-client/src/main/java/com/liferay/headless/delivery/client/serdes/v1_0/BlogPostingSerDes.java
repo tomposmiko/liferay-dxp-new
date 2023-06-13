@@ -15,6 +15,7 @@
 package com.liferay.headless.delivery.client.serdes.v1_0;
 
 import com.liferay.headless.delivery.client.dto.v1_0.BlogPosting;
+import com.liferay.headless.delivery.client.dto.v1_0.CustomField;
 import com.liferay.headless.delivery.client.dto.v1_0.RelatedContent;
 import com.liferay.headless.delivery.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
@@ -110,6 +111,26 @@ public class BlogPostingSerDes {
 			sb.append("\"creator\": ");
 
 			sb.append(String.valueOf(blogPosting.getCreator()));
+		}
+
+		if (blogPosting.getCustomFields() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"customFields\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < blogPosting.getCustomFields().length; i++) {
+				sb.append(String.valueOf(blogPosting.getCustomFields()[i]));
+
+				if ((i + 1) < blogPosting.getCustomFields().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (blogPosting.getDateCreated() != null) {
@@ -411,6 +432,14 @@ public class BlogPostingSerDes {
 			map.put("creator", String.valueOf(blogPosting.getCreator()));
 		}
 
+		if (blogPosting.getCustomFields() == null) {
+			map.put("customFields", null);
+		}
+		else {
+			map.put(
+				"customFields", String.valueOf(blogPosting.getCustomFields()));
+		}
+
 		map.put(
 			"dateCreated",
 			liferayToJSONDateFormat.format(blogPosting.getDateCreated()));
@@ -533,7 +562,9 @@ public class BlogPostingSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		return string.replaceAll("\"", "\\\\\"");
+		string = string.replace("\\", "\\\\");
+
+		return string.replace("\"", "\\\"");
 	}
 
 	private static String _toJSON(Map<String, ?> map) {
@@ -607,6 +638,18 @@ public class BlogPostingSerDes {
 				if (jsonParserFieldValue != null) {
 					blogPosting.setCreator(
 						CreatorSerDes.toDTO((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "customFields")) {
+				if (jsonParserFieldValue != null) {
+					blogPosting.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {

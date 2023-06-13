@@ -56,7 +56,7 @@ public class MBCategoryUADDisplay extends BaseMBCategoryUADDisplay {
 
 		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
 			portal.getControlPanelPlid(liferayPortletRequest),
-			MBPortletKeys.MESSAGE_BOARDS, PortletRequest.RENDER_PHASE);
+			MBPortletKeys.MESSAGE_BOARDS_ADMIN, PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter(
 			"mvcRenderCommandName", "/message_boards/edit_category");
@@ -125,8 +125,10 @@ public class MBCategoryUADDisplay extends BaseMBCategoryUADDisplay {
 			else if (childObject instanceof MBThread) {
 				MBThread mbThread = (MBThread)childObject;
 
-				if (mbThread.getCategoryId() ==
-						MBCategoryConstants.DISCUSSION_CATEGORY_ID) {
+				if ((mbThread.getCategoryId() ==
+						MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) ||
+					(mbThread.getCategoryId() ==
+						MBCategoryConstants.DISCUSSION_CATEGORY_ID)) {
 
 					return null;
 				}

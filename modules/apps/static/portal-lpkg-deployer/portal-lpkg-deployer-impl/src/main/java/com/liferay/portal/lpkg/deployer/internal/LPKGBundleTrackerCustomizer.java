@@ -16,6 +16,7 @@ package com.liferay.portal.lpkg.deployer.internal;
 
 import com.liferay.osgi.util.bundle.BundleStartLevelUtil;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
@@ -23,8 +24,8 @@ import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.lpkg.StaticLPKGResolver;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
@@ -361,9 +362,8 @@ public class LPKGBundleTrackerCustomizer
 					if (_log.isInfoEnabled()) {
 						_log.info(
 							StringBundler.concat(
-								"Uninstalled ", String.valueOf(installedBundle),
-								"because ", String.valueOf(bundle),
-								" was updated"));
+								"Uninstalled ", installedBundle, "because ",
+								bundle, " was updated"));
 					}
 				}
 			}
@@ -426,9 +426,8 @@ public class LPKGBundleTrackerCustomizer
 			catch (Throwable t) {
 				_log.error(
 					StringBundler.concat(
-						"Unable to uninstall ", String.valueOf(newBundle),
-						" in response to uninstallation of ",
-						String.valueOf(bundle)),
+						"Unable to uninstall ", newBundle,
+						" in response to uninstallation of ", bundle),
 					t);
 			}
 		}
@@ -833,7 +832,7 @@ public class LPKGBundleTrackerCustomizer
 		attributes.putValue(
 			Constants.IMPORT_PACKAGE,
 			_buildImportPackageString(
-				BundleActivator.class, BundleStartLevel.class,
+				BundleActivator.class, BundleStartLevel.class, GetterUtil.class,
 				ServiceTrackerCustomizer.class, StringBundler.class,
 				URLConstants.class));
 		attributes.putValue("Liferay-WAB-Context-Name", contextName);

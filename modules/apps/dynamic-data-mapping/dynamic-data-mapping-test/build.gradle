@@ -36,7 +36,7 @@ dependencies {
 	testCompile project(":core:petra:petra-reflect")
 	testCompile project(":core:petra:petra-string")
 
-	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.16"
+	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.17"
 	testIntegrationCompile group: "org.springframework", name: "spring-web", version: "4.1.9.RELEASE"
 	testIntegrationCompile project(":apps:dynamic-data-mapping:dynamic-data-mapping-form-builder")
 	testIntegrationCompile project(":apps:export-import:export-import-test-util")

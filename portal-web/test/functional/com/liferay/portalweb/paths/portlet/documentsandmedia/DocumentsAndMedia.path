@@ -19,11 +19,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>CHOOSE_FOLDER_BUTTON</td>
-	<td>//button[@data-foldername='${key_dmFolderName}']/span[contains(.,'Choose')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>CONFIGURATION_IFRAME</td>
 	<td>//iframe[contains(@id,'DLPortlet')]</td>
 	<td></td>
@@ -49,6 +44,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SELECT_FOLDER_BUTTON</td>
+	<td>//button[@data-foldername='${key_dmFolderName}']/span[contains(.,'Select')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TAG</td>
 	<td>//span//span[contains(.,'${key_tagName}')]</td>
 	<td></td>
@@ -61,7 +61,7 @@
 <!--EDIT_TAGS-->
 <tr>
 	<td>EDIT_TAGS_FIELD</td>
-	<td>//div[@class='input-group-item']//div/input[@type='text']</td>
+	<td>//input[@class='form-control-inset']</td>
 	<td></td>
 </tr>
 <tr>

@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Dynamic Data Mapping Form Web
 Bundle-SymbolicName: com.liferay.dynamic.data.mapping.form.web
-Bundle-Version: 2.0.14
+Bundle-Version: 2.0.20
 Liferay-JS-Config: /META-INF/resources/admin/js/config.js
 Provide-Capability:\
 	liferay.resource.bundle;\

@@ -1,4 +1,5 @@
 definition {
+
 	macro _selectCard {
 		if (isSet(collectionName)) {
 			Navigator.gotoNavNested(navNested = "${collectionName}");
@@ -14,6 +15,8 @@ definition {
 
 	macro addPage {
 		var key_breadcrumbName="Pages";
+
+		Pause(locator1 = "3000");
 
 		if (IsElementPresent(locator1 = "Message#EMPTY_INFO_TAGLIB")) {
 			SitePages.gotoAddFirstPage(pageType = "Public Page");
@@ -44,4 +47,5 @@ definition {
 	macro clickPencil {
 		Click(locator1 = "Icon#EDIT_PENCIL");
 	}
+
 }

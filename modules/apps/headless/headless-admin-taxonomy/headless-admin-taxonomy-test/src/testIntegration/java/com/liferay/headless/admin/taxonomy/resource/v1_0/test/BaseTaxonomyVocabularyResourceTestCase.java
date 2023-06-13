@@ -14,42 +14,37 @@
 
 package com.liferay.headless.admin.taxonomy.resource.v1_0.test;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.TaxonomyVocabulary;
+import com.liferay.headless.admin.taxonomy.client.http.HttpInvoker;
 import com.liferay.headless.admin.taxonomy.client.pagination.Page;
+import com.liferay.headless.admin.taxonomy.client.pagination.Pagination;
+import com.liferay.headless.admin.taxonomy.client.resource.v1_0.TaxonomyVocabularyResource;
 import com.liferay.headless.admin.taxonomy.client.serdes.v1_0.TaxonomyVocabularySerDes;
-import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyVocabularyResource;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Base64;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.InvocationTargetException;
-
-import java.net.URL;
 
 import java.text.DateFormat;
 
@@ -58,19 +53,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
@@ -108,8 +100,10 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		testGroup = GroupTestUtil.addGroup();
 		testLocale = LocaleUtil.getDefault();
 
-		_resourceURL = new URL(
-			"http://localhost:8080/o/headless-admin-taxonomy/v1.0");
+		testCompany = CompanyLocalServiceUtil.getCompany(
+			testGroup.getCompanyId());
+
+		_taxonomyVocabularyResource.setContextCompany(testCompany);
 	}
 
 	@After
@@ -123,18 +117,16 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		ObjectMapper objectMapper = new ObjectMapper() {
 			{
 				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				configure(
+					SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
 				enable(SerializationFeature.INDENT_OUTPUT);
 				setDateFormat(new ISO8601DateFormat());
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
 				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+				setVisibility(
+					PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+				setVisibility(
+					PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
 			}
 		};
 
@@ -153,17 +145,15 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		ObjectMapper objectMapper = new ObjectMapper() {
 			{
 				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				configure(
+					SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
 				setDateFormat(new ISO8601DateFormat());
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
 				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+				setVisibility(
+					PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+				setVisibility(
+					PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
 			}
 		};
 
@@ -174,6 +164,25 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 
 		Assert.assertEquals(
 			objectMapper.readTree(json1), objectMapper.readTree(json2));
+	}
+
+	@Test
+	public void testEscapeRegexInStringFields() throws Exception {
+		String regex = "^[0-9]+(\\.[0-9]{1,2})\"?";
+
+		TaxonomyVocabulary taxonomyVocabulary = randomTaxonomyVocabulary();
+
+		taxonomyVocabulary.setDescription(regex);
+		taxonomyVocabulary.setName(regex);
+
+		String json = TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary);
+
+		Assert.assertFalse(json.contains(regex));
+
+		taxonomyVocabulary = TaxonomyVocabularySerDes.toDTO(json);
+
+		Assert.assertEquals(regex, taxonomyVocabulary.getDescription());
+		Assert.assertEquals(regex, taxonomyVocabulary.getName());
 	}
 
 	@Test
@@ -188,7 +197,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 					irrelevantSiteId, randomIrrelevantTaxonomyVocabulary());
 
 			Page<TaxonomyVocabulary> page =
-				invokeGetSiteTaxonomyVocabulariesPage(
+				TaxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
 					irrelevantSiteId, null, null, Pagination.of(1, 2), null);
 
 			Assert.assertEquals(1, page.getTotalCount());
@@ -207,8 +216,9 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			testGetSiteTaxonomyVocabulariesPage_addTaxonomyVocabulary(
 				siteId, randomTaxonomyVocabulary());
 
-		Page<TaxonomyVocabulary> page = invokeGetSiteTaxonomyVocabulariesPage(
-			siteId, null, null, Pagination.of(1, 2), null);
+		Page<TaxonomyVocabulary> page =
+			TaxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
+				siteId, null, null, Pagination.of(1, 2), null);
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -239,7 +249,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 
 		for (EntityField entityField : entityFields) {
 			Page<TaxonomyVocabulary> page =
-				invokeGetSiteTaxonomyVocabulariesPage(
+				TaxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
 					siteId, null,
 					getFilterString(
 						entityField, "between", taxonomyVocabulary1),
@@ -275,7 +285,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 
 		for (EntityField entityField : entityFields) {
 			Page<TaxonomyVocabulary> page =
-				invokeGetSiteTaxonomyVocabulariesPage(
+				TaxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
 					siteId, null,
 					getFilterString(entityField, "eq", taxonomyVocabulary1),
 					Pagination.of(1, 2), null);
@@ -304,8 +314,9 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			testGetSiteTaxonomyVocabulariesPage_addTaxonomyVocabulary(
 				siteId, randomTaxonomyVocabulary());
 
-		Page<TaxonomyVocabulary> page1 = invokeGetSiteTaxonomyVocabulariesPage(
-			siteId, null, null, Pagination.of(1, 2), null);
+		Page<TaxonomyVocabulary> page1 =
+			TaxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
+				siteId, null, null, Pagination.of(1, 2), null);
 
 		List<TaxonomyVocabulary> taxonomyVocabularies1 =
 			(List<TaxonomyVocabulary>)page1.getItems();
@@ -313,8 +324,9 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		Assert.assertEquals(
 			taxonomyVocabularies1.toString(), 2, taxonomyVocabularies1.size());
 
-		Page<TaxonomyVocabulary> page2 = invokeGetSiteTaxonomyVocabulariesPage(
-			siteId, null, null, Pagination.of(2, 2), null);
+		Page<TaxonomyVocabulary> page2 =
+			TaxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
+				siteId, null, null, Pagination.of(2, 2), null);
 
 		Assert.assertEquals(3, page2.getTotalCount());
 
@@ -367,7 +379,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 
 		for (EntityField entityField : entityFields) {
 			Page<TaxonomyVocabulary> ascPage =
-				invokeGetSiteTaxonomyVocabulariesPage(
+				TaxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
 					siteId, null, null, Pagination.of(1, 2),
 					entityField.getName() + ":asc");
 
@@ -376,7 +388,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 				(List<TaxonomyVocabulary>)ascPage.getItems());
 
 			Page<TaxonomyVocabulary> descPage =
-				invokeGetSiteTaxonomyVocabulariesPage(
+				TaxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
 					siteId, null, null, Pagination.of(1, 2),
 					entityField.getName() + ":desc");
 
@@ -419,7 +431,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 
 		for (EntityField entityField : entityFields) {
 			Page<TaxonomyVocabulary> ascPage =
-				invokeGetSiteTaxonomyVocabulariesPage(
+				TaxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
 					siteId, null, null, Pagination.of(1, 2),
 					entityField.getName() + ":asc");
 
@@ -428,7 +440,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 				(List<TaxonomyVocabulary>)ascPage.getItems());
 
 			Page<TaxonomyVocabulary> descPage =
-				invokeGetSiteTaxonomyVocabulariesPage(
+				TaxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
 					siteId, null, null, Pagination.of(1, 2),
 					entityField.getName() + ":desc");
 
@@ -443,7 +455,8 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 				Long siteId, TaxonomyVocabulary taxonomyVocabulary)
 		throws Exception {
 
-		return invokePostSiteTaxonomyVocabulary(siteId, taxonomyVocabulary);
+		return TaxonomyVocabularyResource.postSiteTaxonomyVocabulary(
+			siteId, taxonomyVocabulary);
 	}
 
 	protected Long testGetSiteTaxonomyVocabulariesPage_getSiteId()
@@ -456,64 +469,6 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		throws Exception {
 
 		return irrelevantGroup.getGroupId();
-	}
-
-	protected Page<TaxonomyVocabulary> invokeGetSiteTaxonomyVocabulariesPage(
-			Long siteId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath("/sites/{siteId}/taxonomy-vocabularies", siteId);
-
-		location = HttpUtil.addParameter(location, "filter", filterString);
-
-		location = HttpUtil.addParameter(
-			location, "page", pagination.getPage());
-		location = HttpUtil.addParameter(
-			location, "pageSize", pagination.getPageSize());
-
-		location = HttpUtil.addParameter(location, "sort", sortString);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		return Page.of(string, TaxonomyVocabularySerDes::toDTO);
-	}
-
-	protected Http.Response invokeGetSiteTaxonomyVocabulariesPageResponse(
-			Long siteId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath("/sites/{siteId}/taxonomy-vocabularies", siteId);
-
-		location = HttpUtil.addParameter(location, "filter", filterString);
-
-		location = HttpUtil.addParameter(
-			location, "page", pagination.getPage());
-		location = HttpUtil.addParameter(
-			location, "pageSize", pagination.getPageSize());
-
-		location = HttpUtil.addParameter(location, "sort", sortString);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -534,68 +489,9 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 				TaxonomyVocabulary taxonomyVocabulary)
 		throws Exception {
 
-		return invokePostSiteTaxonomyVocabulary(
+		return TaxonomyVocabularyResource.postSiteTaxonomyVocabulary(
 			testGetSiteTaxonomyVocabulariesPage_getSiteId(),
 			taxonomyVocabulary);
-	}
-
-	protected TaxonomyVocabulary invokePostSiteTaxonomyVocabulary(
-			Long siteId, TaxonomyVocabulary taxonomyVocabulary)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath("/sites/{siteId}/taxonomy-vocabularies", siteId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return TaxonomyVocabularySerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokePostSiteTaxonomyVocabularyResponse(
-			Long siteId, TaxonomyVocabulary taxonomyVocabulary)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath("/sites/{siteId}/taxonomy-vocabularies", siteId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -603,66 +499,27 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		TaxonomyVocabulary taxonomyVocabulary =
 			testDeleteTaxonomyVocabulary_addTaxonomyVocabulary();
 
-		assertResponseCode(
+		assertHttpResponseStatusCode(
 			204,
-			invokeDeleteTaxonomyVocabularyResponse(taxonomyVocabulary.getId()));
+			TaxonomyVocabularyResource.deleteTaxonomyVocabularyHttpResponse(
+				taxonomyVocabulary.getId()));
 
-		assertResponseCode(
+		assertHttpResponseStatusCode(
 			404,
-			invokeGetTaxonomyVocabularyResponse(taxonomyVocabulary.getId()));
+			TaxonomyVocabularyResource.getTaxonomyVocabularyHttpResponse(
+				taxonomyVocabulary.getId()));
 
-		assertResponseCode(404, invokeGetTaxonomyVocabularyResponse(0L));
+		assertHttpResponseStatusCode(
+			404,
+			TaxonomyVocabularyResource.getTaxonomyVocabularyHttpResponse(0L));
 	}
 
 	protected TaxonomyVocabulary
 			testDeleteTaxonomyVocabulary_addTaxonomyVocabulary()
 		throws Exception {
 
-		return invokePostSiteTaxonomyVocabulary(
+		return TaxonomyVocabularyResource.postSiteTaxonomyVocabulary(
 			testGroup.getGroupId(), randomTaxonomyVocabulary());
-	}
-
-	protected void invokeDeleteTaxonomyVocabulary(Long taxonomyVocabularyId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setDelete(true);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/taxonomy-vocabularies/{taxonomyVocabularyId}",
-					taxonomyVocabularyId);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-	}
-
-	protected Http.Response invokeDeleteTaxonomyVocabularyResponse(
-			Long taxonomyVocabularyId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setDelete(true);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/taxonomy-vocabularies/{taxonomyVocabularyId}",
-					taxonomyVocabularyId);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -670,8 +527,9 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		TaxonomyVocabulary postTaxonomyVocabulary =
 			testGetTaxonomyVocabulary_addTaxonomyVocabulary();
 
-		TaxonomyVocabulary getTaxonomyVocabulary = invokeGetTaxonomyVocabulary(
-			postTaxonomyVocabulary.getId());
+		TaxonomyVocabulary getTaxonomyVocabulary =
+			TaxonomyVocabularyResource.getTaxonomyVocabulary(
+				postTaxonomyVocabulary.getId());
 
 		assertEquals(postTaxonomyVocabulary, getTaxonomyVocabulary);
 		assertValid(getTaxonomyVocabulary);
@@ -681,59 +539,8 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			testGetTaxonomyVocabulary_addTaxonomyVocabulary()
 		throws Exception {
 
-		return invokePostSiteTaxonomyVocabulary(
+		return TaxonomyVocabularyResource.postSiteTaxonomyVocabulary(
 			testGroup.getGroupId(), randomTaxonomyVocabulary());
-	}
-
-	protected TaxonomyVocabulary invokeGetTaxonomyVocabulary(
-			Long taxonomyVocabularyId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/taxonomy-vocabularies/{taxonomyVocabularyId}",
-					taxonomyVocabularyId);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return TaxonomyVocabularySerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokeGetTaxonomyVocabularyResponse(
-			Long taxonomyVocabularyId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/taxonomy-vocabularies/{taxonomyVocabularyId}",
-					taxonomyVocabularyId);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -745,7 +552,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			randomPatchTaxonomyVocabulary();
 
 		TaxonomyVocabulary patchTaxonomyVocabulary =
-			invokePatchTaxonomyVocabulary(
+			TaxonomyVocabularyResource.patchTaxonomyVocabulary(
 				postTaxonomyVocabulary.getId(), randomPatchTaxonomyVocabulary);
 
 		TaxonomyVocabulary expectedPatchTaxonomyVocabulary =
@@ -754,8 +561,9 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		_beanUtilsBean.copyProperties(
 			expectedPatchTaxonomyVocabulary, randomPatchTaxonomyVocabulary);
 
-		TaxonomyVocabulary getTaxonomyVocabulary = invokeGetTaxonomyVocabulary(
-			patchTaxonomyVocabulary.getId());
+		TaxonomyVocabulary getTaxonomyVocabulary =
+			TaxonomyVocabularyResource.getTaxonomyVocabulary(
+				patchTaxonomyVocabulary.getId());
 
 		assertEquals(expectedPatchTaxonomyVocabulary, getTaxonomyVocabulary);
 		assertValid(getTaxonomyVocabulary);
@@ -765,71 +573,8 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			testPatchTaxonomyVocabulary_addTaxonomyVocabulary()
 		throws Exception {
 
-		return invokePostSiteTaxonomyVocabulary(
+		return TaxonomyVocabularyResource.postSiteTaxonomyVocabulary(
 			testGroup.getGroupId(), randomTaxonomyVocabulary());
-	}
-
-	protected TaxonomyVocabulary invokePatchTaxonomyVocabulary(
-			Long taxonomyVocabularyId, TaxonomyVocabulary taxonomyVocabulary)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/taxonomy-vocabularies/{taxonomyVocabularyId}",
-					taxonomyVocabularyId);
-
-		options.setLocation(location);
-
-		options.setPatch(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return TaxonomyVocabularySerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokePatchTaxonomyVocabularyResponse(
-			Long taxonomyVocabularyId, TaxonomyVocabulary taxonomyVocabulary)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/taxonomy-vocabularies/{taxonomyVocabularyId}",
-					taxonomyVocabularyId);
-
-		options.setLocation(location);
-
-		options.setPatch(true);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -840,14 +585,16 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		TaxonomyVocabulary randomTaxonomyVocabulary =
 			randomTaxonomyVocabulary();
 
-		TaxonomyVocabulary putTaxonomyVocabulary = invokePutTaxonomyVocabulary(
-			postTaxonomyVocabulary.getId(), randomTaxonomyVocabulary);
+		TaxonomyVocabulary putTaxonomyVocabulary =
+			TaxonomyVocabularyResource.putTaxonomyVocabulary(
+				postTaxonomyVocabulary.getId(), randomTaxonomyVocabulary);
 
 		assertEquals(randomTaxonomyVocabulary, putTaxonomyVocabulary);
 		assertValid(putTaxonomyVocabulary);
 
-		TaxonomyVocabulary getTaxonomyVocabulary = invokeGetTaxonomyVocabulary(
-			putTaxonomyVocabulary.getId());
+		TaxonomyVocabulary getTaxonomyVocabulary =
+			TaxonomyVocabularyResource.getTaxonomyVocabulary(
+				putTaxonomyVocabulary.getId());
 
 		assertEquals(randomTaxonomyVocabulary, getTaxonomyVocabulary);
 		assertValid(getTaxonomyVocabulary);
@@ -857,78 +604,16 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			testPutTaxonomyVocabulary_addTaxonomyVocabulary()
 		throws Exception {
 
-		return invokePostSiteTaxonomyVocabulary(
+		return TaxonomyVocabularyResource.postSiteTaxonomyVocabulary(
 			testGroup.getGroupId(), randomTaxonomyVocabulary());
 	}
 
-	protected TaxonomyVocabulary invokePutTaxonomyVocabulary(
-			Long taxonomyVocabularyId, TaxonomyVocabulary taxonomyVocabulary)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/taxonomy-vocabularies/{taxonomyVocabularyId}",
-					taxonomyVocabularyId);
-
-		options.setLocation(location);
-
-		options.setPut(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return TaxonomyVocabularySerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokePutTaxonomyVocabularyResponse(
-			Long taxonomyVocabularyId, TaxonomyVocabulary taxonomyVocabulary)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/taxonomy-vocabularies/{taxonomyVocabularyId}",
-					taxonomyVocabularyId);
-
-		options.setLocation(location);
-
-		options.setPut(true);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
-	protected void assertResponseCode(
-		int expectedResponseCode, Http.Response actualResponse) {
+	protected void assertHttpResponseStatusCode(
+		int expectedHttpResponseStatusCode,
+		HttpInvoker.HttpResponse actualHttpResponse) {
 
 		Assert.assertEquals(
-			expectedResponseCode, actualResponse.getResponseCode());
+			expectedHttpResponseStatusCode, actualHttpResponse.getStatusCode());
 	}
 
 	protected void assertEquals(
@@ -1440,76 +1125,10 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 	}
 
 	protected Group irrelevantGroup;
-	protected String testContentType = "application/json";
+	protected Company testCompany;
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	private Http.Options _createHttpOptions() {
-		Http.Options options = new Http.Options();
-
-		options.addHeader("Accept", "application/json");
-		options.addHeader(
-			"Accept-Language", LocaleUtil.toW3cLanguageId(testLocale));
-
-		String encodedTestUserNameAndPassword = Base64.encode(
-			testUserNameAndPassword.getBytes());
-
-		options.addHeader(
-			"Authorization", "Basic " + encodedTestUserNameAndPassword);
-
-		options.addHeader("Content-Type", testContentType);
-
-		return options;
-	}
-
-	private String _toJSON(Map<String, String> map) {
-		if (map == null) {
-			return "null";
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("{");
-
-		Set<Map.Entry<String, String>> set = map.entrySet();
-
-		Iterator<Map.Entry<String, String>> iterator = set.iterator();
-
-		while (iterator.hasNext()) {
-			Map.Entry<String, String> entry = iterator.next();
-
-			sb.append("\"" + entry.getKey() + "\": ");
-
-			if (entry.getValue() == null) {
-				sb.append("null");
-			}
-			else {
-				sb.append("\"" + entry.getValue() + "\"");
-			}
-
-			if (iterator.hasNext()) {
-				sb.append(", ");
-			}
-		}
-
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private String _toPath(String template, Object... values) {
-		if (ArrayUtil.isEmpty(values)) {
-			return template;
-		}
-
-		for (int i = 0; i < values.length; i++) {
-			template = template.replaceFirst(
-				"\\{.*?\\}", String.valueOf(values[i]));
-		}
-
-		return template;
-	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseTaxonomyVocabularyResourceTestCase.class);
@@ -1529,8 +1148,8 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 	private static DateFormat _dateFormat;
 
 	@Inject
-	private TaxonomyVocabularyResource _taxonomyVocabularyResource;
-
-	private URL _resourceURL;
+	private
+		com.liferay.headless.admin.taxonomy.resource.v1_0.
+			TaxonomyVocabularyResource _taxonomyVocabularyResource;
 
 }

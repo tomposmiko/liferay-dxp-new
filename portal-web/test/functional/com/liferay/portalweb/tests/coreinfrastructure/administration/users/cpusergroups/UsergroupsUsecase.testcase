@@ -1,5 +1,6 @@
 @component-name = "portal-user-management-and-portal-configuration"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "User Groups";
@@ -291,7 +292,7 @@ definition {
 			password = "test",
 			userEmailAddress = "userea3@liferay.com");
 
-		ProductMenu.gotoSite(site = "Site Name");
+		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "People",
@@ -480,7 +481,7 @@ definition {
 
 		AssertTextPresent(
 			locator1 = "Home#PAGE_1",
-			value1 = "Home");
+			value1 = "My Profile");
 
 		AssertTextPresent(
 			locator1 = "Home#PAGE_2",
@@ -494,7 +495,7 @@ definition {
 
 		AssertTextPresent(
 			locator1 = "Home#PAGE_1",
-			value1 = "Home");
+			value1 = "My Dashboard");
 
 		if (IsElementPresent(locator1 = "Home#PAGE_2")) {
 			AssertTextNotEquals(
@@ -520,7 +521,7 @@ definition {
 
 		AssertTextPresent(
 			locator1 = "Home#PAGE_1",
-			value1 = "Home");
+			value1 = "My Profile");
 
 		if (IsElementPresent(locator1 = "Home#PAGE_2")) {
 			AssertTextNotEquals(
@@ -538,7 +539,7 @@ definition {
 
 		AssertTextPresent(
 			locator1 = "Home#PAGE_1",
-			value1 = "Home");
+			value1 = "My Dashboard");
 
 		if (IsElementPresent(locator1 = "Home#PAGE_2")) {
 			AssertTextNotEquals(
@@ -579,7 +580,7 @@ definition {
 
 		AssertTextPresent(
 			locator1 = "Home#PAGE_1",
-			value1 = "Home");
+			value1 = "My Profile");
 
 		AssertTextPresent(
 			locator1 = "Home#PAGE_2",
@@ -593,7 +594,7 @@ definition {
 
 		AssertTextPresent(
 			locator1 = "Home#PAGE_1",
-			value1 = "Home");
+			value1 = "My Dashboard");
 
 		if (IsElementPresent(locator1 = "Home#PAGE_2")) {
 			AssertTextNotEquals(
@@ -811,4 +812,5 @@ definition {
 			locator1 = "Permissions#CONTENT_PERMISSIONS_ROLE_NAME",
 			value1 = "Roles Siterole Name");
 	}
+
 }

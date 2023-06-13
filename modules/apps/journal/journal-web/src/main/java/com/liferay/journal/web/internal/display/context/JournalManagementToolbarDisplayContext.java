@@ -190,8 +190,9 @@ public class JournalManagementToolbarDisplayContext
 	public String getClearResultsURL() {
 		PortletURL clearResultsURL = getPortletURL();
 
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
 		clearResultsURL.setParameter("navigation", StringPool.BLANK);
+		clearResultsURL.setParameter("ddmStructureKey", StringPool.BLANK);
+		clearResultsURL.setParameter("keywords", StringPool.BLANK);
 		clearResultsURL.setParameter(
 			"status", String.valueOf(WorkflowConstants.STATUS_ANY));
 
@@ -335,31 +336,24 @@ public class JournalManagementToolbarDisplayContext
 
 				if (_journalDisplayContext.isNavigationRecent()) {
 					add(
-						labelItem -> {
-							labelItem.setLabel(
-								LanguageUtil.get(request, "recent"));
-						});
+						labelItem -> labelItem.setLabel(
+							LanguageUtil.get(request, "recent")));
 				}
 
 				if (_journalDisplayContext.isNavigationStructure()) {
 					add(
-						labelItem -> {
-							labelItem.setLabel(
-								LanguageUtil.get(request, "structures") + ": " +
-									_journalDisplayContext.
-										getDDMStructureName());
-						});
+						labelItem -> labelItem.setLabel(
+							LanguageUtil.get(request, "structures") + ": " +
+								_journalDisplayContext.getDDMStructureName()));
 				}
 
 				int status = _journalDisplayContext.getStatus();
 
 				if (status != _journalDisplayContext.getDefaultStatus()) {
 					add(
-						labelItem -> {
-							labelItem.setLabel(
-								LanguageUtil.get(request, "status") + ": " +
-									WorkflowConstants.getStatusLabel(status));
-						});
+						labelItem -> labelItem.setLabel(
+							LanguageUtil.get(request, "status") + ": " +
+								WorkflowConstants.getStatusLabel(status)));
 				}
 			}
 		};

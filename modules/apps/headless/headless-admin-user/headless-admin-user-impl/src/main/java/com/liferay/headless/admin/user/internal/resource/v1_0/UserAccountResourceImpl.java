@@ -25,6 +25,7 @@ import com.liferay.headless.admin.user.dto.v1_0.RoleBrief;
 import com.liferay.headless.admin.user.dto.v1_0.SiteBrief;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.dto.v1_0.WebUrl;
+import com.liferay.headless.admin.user.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.EmailAddressUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PhoneUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PostalAddressUtil;
@@ -54,7 +55,6 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.ListTypeService;
 import com.liferay.portal.kernel.service.RoleService;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -259,6 +259,9 @@ public class UserAccountResourceImpl
 							WebUrl.class);
 					}
 				};
+				customFields = CustomFieldsUtil.toCustomFields(
+					User.class.getName(), user.getUserId(), user.getCompanyId(),
+					contextAcceptLanguage.getPreferredLocale());
 				dateCreated = user.getCreateDate();
 				dateModified = user.getModifiedDate();
 				emailAddress = user.getEmailAddress();
@@ -334,9 +337,6 @@ public class UserAccountResourceImpl
 
 	@Reference
 	private RoleService _roleService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 	@Reference
 	private UserService _userService;

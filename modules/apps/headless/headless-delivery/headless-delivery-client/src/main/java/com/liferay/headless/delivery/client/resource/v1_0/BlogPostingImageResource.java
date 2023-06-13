@@ -35,7 +35,23 @@ import javax.annotation.Generated;
 @Generated("")
 public class BlogPostingImageResource {
 
-	public void deleteBlogPostingImage(Long blogPostingImageId)
+	public static void deleteBlogPostingImage(Long blogPostingImageId)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			deleteBlogPostingImageHttpResponse(blogPostingImageId);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+	}
+
+	public static HttpInvoker.HttpResponse deleteBlogPostingImageHttpResponse(
+			Long blogPostingImageId)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -48,17 +64,37 @@ public class BlogPostingImageResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		return httpInvoker.invoke();
+	}
+
+	public static BlogPostingImage getBlogPostingImage(Long blogPostingImageId)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse = getBlogPostingImageHttpResponse(
+			blogPostingImageId);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		try {
+			return BlogPostingImageSerDes.toDTO(content);
+		}
+		catch (Exception e) {
+			_logger.log(
+				Level.WARNING, "Unable to process HTTP response: " + content,
+				e);
+
+			throw e;
+		}
 	}
 
-	public BlogPostingImage getBlogPostingImage(Long blogPostingImageId)
+	public static HttpInvoker.HttpResponse getBlogPostingImageHttpResponse(
+			Long blogPostingImageId)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -71,14 +107,82 @@ public class BlogPostingImageResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		return httpInvoker.invoke();
+	}
+
+	public static Page<BlogPostingImage> getSiteBlogPostingImagesPage(
+			Long siteId, String search, String filterString,
+			Pagination pagination, String sortString)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getSiteBlogPostingImagesPageHttpResponse(
+				siteId, search, filterString, pagination, sortString);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		return Page.of(content, BlogPostingImageSerDes::toDTO);
+	}
+
+	public static HttpInvoker.HttpResponse
+			getSiteBlogPostingImagesPageHttpResponse(
+				Long siteId, String search, String filterString,
+				Pagination pagination, String sortString)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+		if (search != null) {
+			httpInvoker.parameter("search", String.valueOf(search));
+		}
+
+		if (filterString != null) {
+			httpInvoker.parameter("filter", filterString);
+		}
+
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
+
+		if (sortString != null) {
+			httpInvoker.parameter("sort", sortString);
+		}
+
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/blog-posting-images",
+			siteId);
+
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
+
+		return httpInvoker.invoke();
+	}
+
+	public static BlogPostingImage postSiteBlogPostingImage(
+			Long siteId, BlogPostingImage blogPostingImage,
+			Map<String, File> multipartFiles)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			postSiteBlogPostingImageHttpResponse(
+				siteId, blogPostingImage, multipartFiles);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return BlogPostingImageSerDes.toDTO(content);
@@ -92,53 +196,20 @@ public class BlogPostingImageResource {
 		}
 	}
 
-	public Page<BlogPostingImage> getSiteBlogPostingImagesPage(
-			Long siteId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
-
-		httpInvoker.parameter("filter", filterString);
-
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
-
-		httpInvoker.parameter("sort", sortString);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/blog-posting-images",
-			siteId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, BlogPostingImageSerDes::toDTO);
-	}
-
-	public BlogPostingImage postSiteBlogPostingImage(
+	public static HttpInvoker.HttpResponse postSiteBlogPostingImageHttpResponse(
 			Long siteId, BlogPostingImage blogPostingImage,
-			Map<String, File> files)
+			Map<String, File> multipartFiles)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.multipart();
 
 		httpInvoker.part(
 			"blogPostingImage",
 			BlogPostingImageSerDes.toJSON(blogPostingImage));
 
-		for (Map.Entry<String, File> entry : files.entrySet()) {
+		for (Map.Entry<String, File> entry : multipartFiles.entrySet()) {
 			httpInvoker.part(entry.getKey(), entry.getValue());
 		}
 
@@ -150,25 +221,7 @@ public class BlogPostingImageResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		try {
-			return BlogPostingImageSerDes.toDTO(content);
-		}
-		catch (Exception e) {
-			_logger.log(
-				Level.WARNING, "Unable to process HTTP response: " + content,
-				e);
-
-			throw e;
-		}
+		return httpInvoker.invoke();
 	}
 
 	private static final Logger _logger = Logger.getLogger(

@@ -1,5 +1,6 @@
 @component-name = "portal-document-management-ee"
 definition {
+
 	property cmis.repository.type = "sharepoint2010";
 	property custom.properties = "session.store.password=true${line.separator}company.security.auth.type=screenName";
 	property dummy.socket.proxy.disabled = "true";
@@ -49,8 +50,6 @@ definition {
 			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Documents and Media");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		DMNavigator.gotoAddRepositoryCP();
 
@@ -348,8 +347,6 @@ definition {
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
-		LexiconEntry.changeDisplayStyle(displayStyle = "cards");
-
 		DMDocument.moveToSubFolderCP(
 			dmDocumentTitle = "Document_1.txt",
 			dmFolderName = "Sharepoint Repository Name",
@@ -572,4 +569,5 @@ definition {
 
 		DMRepository.viewBreadcrumb(dmRepositoryName = "Sharepoint Repository Name");
 	}
+
 }

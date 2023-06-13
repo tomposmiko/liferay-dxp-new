@@ -1,4 +1,5 @@
 definition {
+
 	macro addIdentityProviderConnection {
 		AssertClick(
 			locator1 = "CPSAMLAdminIdentityProviderConnection#ADD_IDENTITY_PROVIDER_BUTTON",
@@ -121,6 +122,10 @@ definition {
 	}
 
 	macro configureServiceProvider {
+		if ("${LDAPImport}" == "enable") {
+			Check(locator1 = "CPSAMLAdminServiceProvider#SERVICE_PROVIDER_LDAP_IMPORT_ENABLED_CHECKBOX");
+		}
+
 		if ("${signAuthnRequests}" == "disable") {
 			Uncheck(locator1 = "CPSAMLAdminServiceProvider#SERVICE_PROVIDER_SIGN_AUTHN_REQUESTS_CHECKBOX");
 		}
@@ -159,4 +164,5 @@ definition {
 
 		Alert.viewSuccessMessage();
 	}
+
 }

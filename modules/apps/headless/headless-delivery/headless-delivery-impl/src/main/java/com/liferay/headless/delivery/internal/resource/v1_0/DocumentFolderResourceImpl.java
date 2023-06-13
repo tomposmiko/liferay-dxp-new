@@ -17,10 +17,15 @@ package com.liferay.headless.delivery.internal.resource.v1_0;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
+import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.headless.common.spi.service.context.ServiceContextUtil;
+import com.liferay.headless.delivery.dto.v1_0.CustomField;
 import com.liferay.headless.delivery.dto.v1_0.DocumentFolder;
 import com.liferay.headless.delivery.dto.v1_0.converter.DefaultDTOConverterContext;
 import com.liferay.headless.delivery.internal.dto.v1_0.converter.DocumentFolderDTOConverter;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.CustomFieldsUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.EntityFieldsUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.DocumentFolderEntityModel;
 import com.liferay.headless.delivery.resource.v1_0.DocumentFolderResource;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -30,8 +35,8 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -84,7 +89,11 @@ public class DocumentFolderResourceImpl
 
 	@Override
 	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
-		return _entityModel;
+		return new DocumentFolderEntityModel(
+			EntityFieldsUtil.getEntityFields(
+				_portal.getClassNameId(DLFolder.class.getName()),
+				contextCompany.getCompanyId(), _expandoColumnLocalService,
+				_expandoTableLocalService));
 	}
 
 	@Override
@@ -111,16 +120,16 @@ public class DocumentFolderResourceImpl
 		Folder existingFolder = _dlAppService.getFolder(documentFolderId);
 
 		return _updateDocumentFolder(
-			documentFolderId,
-			Optional.ofNullable(
-				documentFolder.getName()
-			).orElse(
-				existingFolder.getName()
-			),
+			documentFolderId, documentFolder.getCustomFields(),
 			Optional.ofNullable(
 				documentFolder.getDescription()
 			).orElse(
 				existingFolder.getDescription()
+			),
+			Optional.ofNullable(
+				documentFolder.getName()
+			).orElse(
+				existingFolder.getName()
 			));
 	}
 
@@ -151,8 +160,8 @@ public class DocumentFolderResourceImpl
 		throws Exception {
 
 		return _updateDocumentFolder(
-			documentFolderId, documentFolder.getName(),
-			documentFolder.getDescription());
+			documentFolderId, documentFolder.getCustomFields(),
+			documentFolder.getDescription(), documentFolder.getName());
 	}
 
 	private DocumentFolder _addFolder(
@@ -165,6 +174,10 @@ public class DocumentFolderResourceImpl
 				siteId, parentDocumentFolderId, documentFolder.getName(),
 				documentFolder.getDescription(),
 				ServiceContextUtil.createServiceContext(
+					CustomFieldsUtil.toMap(
+						DLFolder.class.getName(), contextCompany.getCompanyId(),
+						documentFolder.getCustomFields(),
+						contextAcceptLanguage.getPreferredLocale()),
 					siteId, documentFolder.getViewableByAsString())));
 	}
 
@@ -207,21 +220,34 @@ public class DocumentFolderResourceImpl
 	}
 
 	private DocumentFolder _updateDocumentFolder(
-			Long documentFolderId, String name, String description)
+			Long documentFolderId, CustomField[] customFields,
+			String description, String name)
 		throws Exception {
 
 		return _toDocumentFolder(
 			_dlAppService.updateFolder(
-				documentFolderId, name, description, new ServiceContext()));
+				documentFolderId, name, description,
+				ServiceContextUtil.createServiceContext(
+					CustomFieldsUtil.toMap(
+						DLFolder.class.getName(), contextCompany.getCompanyId(),
+						customFields,
+						contextAcceptLanguage.getPreferredLocale()),
+					0, null)));
 	}
-
-	private static final EntityModel _entityModel =
-		new DocumentFolderEntityModel();
 
 	@Reference
 	private DLAppService _dlAppService;
 
 	@Reference
 	private DocumentFolderDTOConverter _documentFolderDTOConverter;
+
+	@Reference
+	private ExpandoColumnLocalService _expandoColumnLocalService;
+
+	@Reference
+	private ExpandoTableLocalService _expandoTableLocalService;
+
+	@Reference
+	private Portal _portal;
 
 }

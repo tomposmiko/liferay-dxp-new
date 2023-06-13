@@ -37,11 +37,11 @@ import org.osgi.service.component.annotations.Reference;
 public class CTEntryAggregateFinderImpl
 	extends CTEntryAggregateFinderBaseImpl implements CTEntryAggregateFinder {
 
-	public static final String FIND_BY_C_O =
-		CTEntryAggregateFinder.class.getName() + ".findByC_O";
+	public static final String FIND_BY_CTCI_OCTEI =
+		CTEntryAggregateFinder.class.getName() + ".findByCTCI_OCTEI";
 
 	@Override
-	public List<CTEntryAggregate> findByC_O(
+	public List<CTEntryAggregate> findByCTCI_OCTEI(
 		long ctCollectionId, long ownerCTEntryId,
 		QueryDefinition<CTEntryAggregate> queryDefinition) {
 
@@ -50,7 +50,7 @@ public class CTEntryAggregateFinderImpl
 		try {
 			session = openSession();
 
-			String sql = _customSQL.get(getClass(), FIND_BY_C_O);
+			String sql = _customSQL.get(getClass(), FIND_BY_CTCI_OCTEI);
 
 			sql = _customSQL.replaceOrderBy(
 				sql, queryDefinition.getOrderByComparator());

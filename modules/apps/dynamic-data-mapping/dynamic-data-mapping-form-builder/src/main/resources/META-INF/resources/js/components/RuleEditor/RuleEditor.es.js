@@ -37,316 +37,6 @@ const fieldOptionStructure = Config.shapeOf(
  */
 
 class RuleEditor extends Component {
-	static STATE = {
-		actions: Config.arrayOf(
-			Config.shapeOf(
-				{
-					action: Config.string(),
-					calculatorFields: Config.arrayOf(fieldOptionStructure).value([]),
-					expression: Config.string(),
-					hasRequiredInputs: Config.bool(),
-					inputs: Config.object(),
-					label: Config.string(),
-					outputs: Config.object(),
-					target: Config.string()
-				}
-			)
-		).internal().setter('_setActions').value([]),
-
-		actionTypes: Config.arrayOf(
-			Config.shapeOf(
-				{
-					label: Config.string(),
-					value: Config.string()
-				}
-			)
-		).internal().value(
-			[
-				{
-					label: Liferay.Language.get('show'),
-					value: 'show'
-				},
-				{
-					label: Liferay.Language.get('enable'),
-					value: 'enable'
-				},
-				{
-					label: Liferay.Language.get('require'),
-					value: 'require'
-				},
-				{
-					label: Liferay.Language.get('autofill'),
-					value: 'auto-fill'
-				},
-				{
-					label: Liferay.Language.get('calculate'),
-					value: 'calculate'
-				},
-				{
-					label: Liferay.Language.get('jump-to-page'),
-					value: 'jump-to-page'
-				}
-			]
-		),
-
-		/**
-		 * Used for tracking which action we are currently focused on
-		 * when trying to delete an action.
-		 * @default 0
-		 * @instance
-		 * @memberof RuleEditor
-		 * @type {Number}
-		 */
-		activeActionIndex: Config.number().value(-1),
-
-		/**
-		 * Used for tracking which condition we are currently focused on
-		 * when trying to delete a condition.
-		 * @default 0
-		 * @instance
-		 * @memberof RuleEditor
-		 * @type {Number}
-		 */
-
-		activeConditionIndex: Config.number().value(-1),
-
-		calculatorFunctions: Config.arrayOf(
-			Config.shapeOf(
-				{
-					label: Config.string(),
-					tooltip: Config.string(),
-					value: Config.string()
-				}
-			)
-		).internal().value([]),
-
-		calculatorResultOptions: Config.arrayOf(fieldOptionStructure).internal().valueFn('_calculatorResultOptionsValueFn'),
-
-		/**
-		 * @default 0
-		 * @instance
-		 * @memberof RuleEditor
-		 * @type {?array}
-		 */
-
-		conditions: Config.arrayOf(
-			Config.shapeOf(
-				{
-					operands: Config.arrayOf(
-						Config.shapeOf(
-							{
-								dataType: Config.string(),
-								label: Config.string(),
-								repeatable: Config.bool(),
-								type: Config.string(),
-								value: Config.string()
-							}
-						)
-					),
-					operator: Config.string()
-				}
-			)
-		).internal().setter('_setConditions').value([]),
-
-		dataProvider: Config.arrayOf(
-			Config.shapeOf(
-				{
-					id: Config.string(),
-					name: Config.string(),
-					uuid: Config.string()
-				}
-			)
-		).internal(),
-
-		dataProviderInstanceParameterSettingsURL: Config.string().required(),
-
-		dataProviderInstancesURL: Config.string().required(),
-
-		deletedFields: Config.arrayOf(Config.string()).value([]),
-
-		fieldOptions: Config.arrayOf(
-			Config.shapeOf(
-				{
-					dataType: Config.string(),
-					name: Config.string(),
-					options: Config.arrayOf(
-						Config.shapeOf(
-							{
-								label: Config.string(),
-								name: Config.string(),
-								value: Config.string()
-							}
-						)
-					),
-					type: Config.string(),
-					value: Config.string()
-				}
-			)
-		).internal().valueFn('_fieldOptionsValueFn'),
-
-		fixedOptions: Config.arrayOf(
-			fieldOptionStructure
-		).value(
-			[
-				{
-					dataType: 'user',
-					label: Liferay.Language.get('user'),
-					name: 'user',
-					value: 'user'
-				}
-			]
-		),
-
-		functionsMetadata: Config.shapeOf(
-			{
-				number: Config.arrayOf(
-					Config.shapeOf(
-						{
-							label: Config.string(),
-							name: Config.string(),
-							parameterTypes: Config.array(),
-							returnType: Config.string()
-						}
-					)
-				),
-				text: Config.arrayOf(
-					Config.shapeOf(
-						{
-							label: Config.string(),
-							name: Config.string(),
-							parameterTypes: Config.array(),
-							returnType: Config.string()
-						}
-					)
-				),
-				user: Config.arrayOf(
-					Config.shapeOf(
-						{
-							label: Config.string(),
-							name: Config.string(),
-							parameterTypes: Config.array(),
-							returnType: Config.string()
-						}
-					)
-				)
-			}
-		),
-
-		functionsURL: Config.string(),
-
-		invalidRule: Config.bool().value(true),
-
-		loadingDataProviderOptions: Config.bool(),
-
-		logicalOperator: Config.string().internal().value('or'),
-
-		pageOptions: Config.arrayOf(
-			Config.shapeOf(
-				{
-					dataType: Config.string(),
-					name: Config.string(),
-					options: Config.arrayOf(
-						Config.shapeOf(
-							{
-								label: Config.string(),
-								name: Config.string(),
-								value: Config.string()
-							}
-						)
-					),
-					type: Config.string(),
-					value: Config.string()
-				}
-			)
-		).internal().value([]),
-
-		pages: Config.array().required(),
-
-		readOnly: Config.bool().value(false),
-
-		roles: Config.arrayOf(
-			Config.shapeOf(
-				{
-					id: Config.string(),
-					name: Config.string()
-				}
-			)
-		).valueFn('_rolesValueFn'),
-
-		/**
-		 * @default 0
-		 * @instance
-		 * @memberof RuleEditor
-		 * @type {?array}
-		 */
-
-		rule: Config.shapeOf(
-			{
-				actions: Config.arrayOf(
-					Config.shapeOf(
-						{
-							action: Config.string(),
-							calculatorFields: Config.arrayOf(fieldOptionStructure).value([]),
-							ddmDataProviderInstanceUUID: Config.string(),
-							expression: Config.string(),
-							inputs: Config.object(),
-							label: Config.string(),
-							outputs: Config.object(),
-							target: Config.string()
-						}
-					)
-				),
-				conditions: Config.arrayOf(
-					Config.shapeOf(
-						{
-							operands: Config.arrayOf(
-								Config.shapeOf(
-									{
-										label: Config.string(),
-										repeatable: Config.bool(),
-										type: Config.string(),
-										value: Config.string()
-									}
-								)
-							),
-							operator: Config.string()
-						}
-					)
-				),
-				['logical-operator']: Config.string()
-			}
-		),
-
-		ruleEditedIndex: Config.number(),
-
-		secondOperandList: Config.arrayOf(
-			Config.shapeOf(
-				{
-					name: Config.string(),
-					value: Config.string()
-				}
-			)
-		).value(
-			[
-				{
-					value: Liferay.Language.get('value')
-				},
-				{
-					name: 'field',
-					value: Liferay.Language.get('other-field')
-				}
-			]
-		),
-
-		/**
-		 * @default undefined
-		 * @instance
-		 * @memberof RuleEditor
-		 * @type {!string}
-		 */
-
-		spritemap: Config.string().required()
-	}
 
 	convertAutoFillDataToArray(action, type) {
 		const data = action[type];
@@ -358,10 +48,10 @@ class RuleEditor extends Component {
 
 				const fieldsTypes = this.getTypesByFieldType(type);
 
-				const fieldOptions = this.getFieldsByTypes(this.fieldOptions, fieldsTypes);
+				const actionsFieldOptions = this.getFieldsByTypes(this.actionsFieldOptions, fieldsTypes);
 
 				return {
-					fieldOptions,
+					fieldOptions: actionsFieldOptions,
 					label,
 					name,
 					required,
@@ -452,13 +142,13 @@ class RuleEditor extends Component {
 		let options = [];
 		const visitor = new PagesVisitor(this.pages);
 
-		visitor.mapFields(
+		const field = visitor.findField(
 			field => {
-				if (field.fieldName === fieldName) {
-					options = field.options;
-				}
+				return field.fieldName === fieldName;
 			}
 		);
+
+		options = field ? field.options : [];
 
 		return options;
 	}
@@ -665,10 +355,11 @@ class RuleEditor extends Component {
 		this.setState(
 			{
 				actions: this._syncActions(actions),
+				actionsFieldOptions: this._actionsFieldOptionsValueFn(),
 				calculatorResultOptions: this._calculatorResultOptionsValueFn(),
 				conditions,
+				conditionsFieldOptions: this._conditionsFieldOptionsValueFn(['paragraph']),
 				deletedFields: this._getDeletedFields(visitor),
-				fieldOptions: this._fieldOptionsValueFn(),
 				pageOptions: pageOptions(pages, maxPage),
 				roles: this._rolesValueFn()
 			}
@@ -820,32 +511,20 @@ class RuleEditor extends Component {
 		);
 	}
 
-	_fieldOptionsValueFn() {
-		const {pages} = this;
-		const fields = [];
-		const visitor = new PagesVisitor(pages);
+	_actionsFieldOptionsValueFn() {
+		return this._getFieldOptions();
+	}
 
-		visitor.mapFields(
-			field => {
-				fields.push(
-					{
-						...field,
-						options: field.options ? field.options : [],
-						value: field.fieldName
-					}
-				);
-			}
-		);
-
-		return fields;
+	_conditionsFieldOptionsValueFn(omittedFieldsList) {
+		return this._getFieldOptions(omittedFieldsList);
 	}
 
 	_getDeletedFields(visitor) {
 		const existentFields = [];
-		const {fieldOptions} = this;
+		const {actionsFieldOptions} = this;
 		let deletedFields = [];
 
-		fieldOptions.forEach(
+		actionsFieldOptions.forEach(
 			field => {
 				visitor.mapFields(
 					({fieldName}) => {
@@ -857,7 +536,7 @@ class RuleEditor extends Component {
 			}
 		);
 
-		const oldFields = fieldOptions.map(field => field.fieldName);
+		const oldFields = actionsFieldOptions.map(field => field.fieldName);
 
 		deletedFields = oldFields.filter(
 			field => {
@@ -866,6 +545,28 @@ class RuleEditor extends Component {
 		);
 
 		return deletedFields;
+	}
+
+	_getFieldOptions(omittedFieldsList = []) {
+		const {pages} = this;
+		const fields = [];
+		const visitor = new PagesVisitor(pages);
+
+		visitor.mapFields(
+			field => {
+				if (omittedFieldsList.indexOf(field.type) < 0) {
+					fields.push(
+						{
+							...field,
+							options: field.options ? field.options : [],
+							value: field.fieldName
+						}
+					);
+				}
+			}
+		);
+
+		return fields;
 	}
 
 	_getFieldLabel(fieldName) {
@@ -906,7 +607,7 @@ class RuleEditor extends Component {
 			dataType = 'user';
 		}
 		else {
-			const selectedField = this.fieldOptions.find(
+			const selectedField = this.actionsFieldOptions.find(
 				field => field.value === fieldName
 			);
 
@@ -1428,7 +1129,7 @@ class RuleEditor extends Component {
 		if (Array.isArray(action.outputs)) {
 			action.outputs.forEach(
 				output => {
-					delete output.fieldOptions;
+					delete output.actionsFieldOptions;
 					delete output.name;
 					delete output.type;
 				}
@@ -1667,7 +1368,7 @@ class RuleEditor extends Component {
 	}
 
 	_syncActions(actions) {
-		const {pages, rule} = this;
+		const {pages} = this;
 
 		const visitor = new PagesVisitor(pages);
 
@@ -1694,7 +1395,7 @@ class RuleEditor extends Component {
 				}
 				else if (action.action == 'auto-fill') {
 					action = {
-						...rule.actions[index],
+						...action,
 						calculatorFields: []
 					};
 				}
@@ -1832,6 +1533,301 @@ class RuleEditor extends Component {
 			this._validateActionsAutoFill(autofillActions, 'outputs');
 	}
 }
+
+RuleEditor.STATE = {
+	actions: Config.arrayOf(
+		Config.shapeOf(
+			{
+				action: Config.string(),
+				calculatorFields: Config.arrayOf(fieldOptionStructure).value([]),
+				expression: Config.string(),
+				hasRequiredInputs: Config.bool(),
+				inputs: Config.object(),
+				label: Config.string(),
+				outputs: Config.object(),
+				target: Config.string()
+			}
+		)
+	).internal().setter('_setActions').value([]),
+
+	actionsFieldOptions: Config.arrayOf(fieldOptionStructure).internal().valueFn('_actionsFieldOptionsValueFn'),
+
+	actionTypes: Config.arrayOf(
+		Config.shapeOf(
+			{
+				label: Config.string(),
+				value: Config.string()
+			}
+		)
+	).internal().value(
+		[
+			{
+				label: Liferay.Language.get('show'),
+				value: 'show'
+			},
+			{
+				label: Liferay.Language.get('enable'),
+				value: 'enable'
+			},
+			{
+				label: Liferay.Language.get('require'),
+				value: 'require'
+			},
+			{
+				label: Liferay.Language.get('autofill'),
+				value: 'auto-fill'
+			},
+			{
+				label: Liferay.Language.get('calculate'),
+				value: 'calculate'
+			},
+			{
+				label: Liferay.Language.get('jump-to-page'),
+				value: 'jump-to-page'
+			}
+		]
+	),
+
+	/**
+	 * Used for tracking which action we are currently focused on
+	 * when trying to delete an action.
+	 * @default 0
+	 * @instance
+	 * @memberof RuleEditor
+	 * @type {Number}
+	 */
+	activeActionIndex: Config.number().value(-1),
+
+	/**
+	 * Used for tracking which condition we are currently focused on
+	 * when trying to delete a condition.
+	 * @default 0
+	 * @instance
+	 * @memberof RuleEditor
+	 * @type {Number}
+	 */
+
+	activeConditionIndex: Config.number().value(-1),
+
+	calculatorFunctions: Config.arrayOf(
+		Config.shapeOf(
+			{
+				label: Config.string(),
+				tooltip: Config.string(),
+				value: Config.string()
+			}
+		)
+	).internal().value([]),
+
+	calculatorResultOptions: Config.arrayOf(fieldOptionStructure).internal().valueFn('_calculatorResultOptionsValueFn'),
+
+	/**
+	 * @default 0
+	 * @instance
+	 * @memberof RuleEditor
+	 * @type {?array}
+	 */
+
+	conditions: Config.arrayOf(
+		Config.shapeOf(
+			{
+				operands: Config.arrayOf(
+					Config.shapeOf(
+						{
+							dataType: Config.string(),
+							label: Config.string(),
+							repeatable: Config.bool(),
+							type: Config.string(),
+							value: Config.string()
+						}
+					)
+				),
+				operator: Config.string()
+			}
+		)
+	).internal().setter('_setConditions').value([]),
+
+	conditionsFieldOptions: Config.arrayOf(fieldOptionStructure).internal().valueFn('_conditionsFieldOptionsValueFn'),
+
+	dataProvider: Config.arrayOf(
+		Config.shapeOf(
+			{
+				id: Config.string(),
+				name: Config.string(),
+				uuid: Config.string()
+			}
+		)
+	).internal(),
+
+	dataProviderInstanceParameterSettingsURL: Config.string().required(),
+
+	dataProviderInstancesURL: Config.string().required(),
+
+	deletedFields: Config.arrayOf(Config.string()).value([]),
+
+	fixedOptions: Config.arrayOf(
+		fieldOptionStructure
+	).value(
+		[
+			{
+				dataType: 'user',
+				label: Liferay.Language.get('user'),
+				name: 'user',
+				value: 'user'
+			}
+		]
+	),
+
+	functionsMetadata: Config.shapeOf(
+		{
+			number: Config.arrayOf(
+				Config.shapeOf(
+					{
+						label: Config.string(),
+						name: Config.string(),
+						parameterTypes: Config.array(),
+						returnType: Config.string()
+					}
+				)
+			),
+			text: Config.arrayOf(
+				Config.shapeOf(
+					{
+						label: Config.string(),
+						name: Config.string(),
+						parameterTypes: Config.array(),
+						returnType: Config.string()
+					}
+				)
+			),
+			user: Config.arrayOf(
+				Config.shapeOf(
+					{
+						label: Config.string(),
+						name: Config.string(),
+						parameterTypes: Config.array(),
+						returnType: Config.string()
+					}
+				)
+			)
+		}
+	),
+
+	functionsURL: Config.string(),
+
+	invalidRule: Config.bool().value(true),
+
+	loadingDataProviderOptions: Config.bool(),
+
+	logicalOperator: Config.string().internal().value('or'),
+
+	pageOptions: Config.arrayOf(
+		Config.shapeOf(
+			{
+				dataType: Config.string(),
+				name: Config.string(),
+				options: Config.arrayOf(
+					Config.shapeOf(
+						{
+							label: Config.string(),
+							name: Config.string(),
+							value: Config.string()
+						}
+					)
+				),
+				type: Config.string(),
+				value: Config.string()
+			}
+		)
+	).internal().value([]),
+
+	pages: Config.array().required(),
+
+	readOnly: Config.bool().value(false),
+
+	roles: Config.arrayOf(
+		Config.shapeOf(
+			{
+				id: Config.string(),
+				name: Config.string()
+			}
+		)
+	).valueFn('_rolesValueFn'),
+
+	/**
+	 * @default 0
+	 * @instance
+	 * @memberof RuleEditor
+	 * @type {?array}
+	 */
+
+	rule: Config.shapeOf(
+		{
+			actions: Config.arrayOf(
+				Config.shapeOf(
+					{
+						action: Config.string(),
+						calculatorFields: Config.arrayOf(fieldOptionStructure).value([]),
+						ddmDataProviderInstanceUUID: Config.string(),
+						expression: Config.string(),
+						inputs: Config.object(),
+						label: Config.string(),
+						outputs: Config.object(),
+						target: Config.string()
+					}
+				)
+			),
+			conditions: Config.arrayOf(
+				Config.shapeOf(
+					{
+						operands: Config.arrayOf(
+							Config.shapeOf(
+								{
+									label: Config.string(),
+									repeatable: Config.bool(),
+									type: Config.string(),
+									value: Config.string()
+								}
+							)
+						),
+						operator: Config.string()
+					}
+				)
+			),
+			['logical-operator']: Config.string()
+		}
+	),
+
+	ruleEditedIndex: Config.number(),
+
+	secondOperandList: Config.arrayOf(
+		Config.shapeOf(
+			{
+				name: Config.string(),
+				value: Config.string()
+			}
+		)
+	).value(
+		[
+			{
+				value: Liferay.Language.get('value')
+			},
+			{
+				name: 'field',
+				value: Liferay.Language.get('other-field')
+			}
+		]
+	),
+
+	/**
+	 * @default undefined
+	 * @instance
+	 * @memberof RuleEditor
+	 * @type {!string}
+	 */
+
+	spritemap: Config.string().required()
+};
 
 Soy.register(RuleEditor, templates);
 

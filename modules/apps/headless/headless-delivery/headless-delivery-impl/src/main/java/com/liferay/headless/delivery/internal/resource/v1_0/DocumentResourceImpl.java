@@ -20,12 +20,17 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
+import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.headless.common.spi.resource.SPIRatingResource;
 import com.liferay.headless.common.spi.service.context.ServiceContextUtil;
+import com.liferay.headless.delivery.dto.v1_0.CustomField;
 import com.liferay.headless.delivery.dto.v1_0.Document;
 import com.liferay.headless.delivery.dto.v1_0.Rating;
 import com.liferay.headless.delivery.dto.v1_0.converter.DefaultDTOConverterContext;
 import com.liferay.headless.delivery.internal.dto.v1_0.converter.DocumentDTOConverter;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.CustomFieldsUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.EntityFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RatingUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.DocumentEntityModel;
 import com.liferay.headless.delivery.resource.v1_0.DocumentResource;
@@ -53,6 +58,9 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
 
+import java.io.Serializable;
+
+import java.util.Map;
 import java.util.Optional;
 
 import javax.ws.rs.BadRequestException;
@@ -121,7 +129,11 @@ public class DocumentResourceImpl
 
 	@Override
 	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
-		return _entityModel;
+		return new DocumentEntityModel(
+			EntityFieldsUtil.getEntityFields(
+				_portal.getClassNameId(DLFileEntry.class.getName()),
+				contextCompany.getCompanyId(), _expandoColumnLocalService,
+				_expandoTableLocalService));
 	}
 
 	@Override
@@ -173,13 +185,6 @@ public class DocumentResourceImpl
 			multipartBody.getValueAsInstanceOptional(
 				"document", Document.class);
 
-		String[] keywords = documentOptional.map(
-			Document::getKeywords
-		).orElseGet(
-			() -> _assetTagLocalService.getTagNames(
-				DLFileEntry.class.getName(), documentId)
-		);
-
 		Long[] categoryIds = documentOptional.map(
 			Document::getTaxonomyCategoryIds
 		).orElseGet(
@@ -188,31 +193,40 @@ public class DocumentResourceImpl
 					DLFileEntry.class.getName(), documentId))
 		);
 
-		FileEntry fileEntry = _dlAppService.updateFileEntry(
-			documentId, binaryFile.getFileName(), binaryFile.getContentType(),
-			documentOptional.map(
-				Document::getTitle
-			).orElse(
-				existingFileEntry.getTitle()
-			),
-			documentOptional.map(
-				Document::getDescription
-			).orElse(
-				existingFileEntry.getDescription()
-			),
-			null, DLVersionNumberIncrease.AUTOMATIC,
-			binaryFile.getInputStream(), binaryFile.getSize(),
-			ServiceContextUtil.createServiceContext(
-				keywords, categoryIds, existingFileEntry.getGroupId(),
-				documentOptional.map(
-					Document::getViewableBy
-				).map(
-					Document.ViewableBy::getValue
-				).orElse(
-					null
-				)));
+		String[] keywords = documentOptional.map(
+			Document::getKeywords
+		).orElseGet(
+			() -> _assetTagLocalService.getTagNames(
+				DLFileEntry.class.getName(), documentId)
+		);
 
-		return _toDocument(fileEntry);
+		return _toDocument(
+			_dlAppService.updateFileEntry(
+				documentId, binaryFile.getFileName(),
+				binaryFile.getContentType(),
+				documentOptional.map(
+					Document::getTitle
+				).orElse(
+					existingFileEntry.getTitle()
+				),
+				documentOptional.map(
+					Document::getDescription
+				).orElse(
+					existingFileEntry.getDescription()
+				),
+				null, DLVersionNumberIncrease.AUTOMATIC,
+				binaryFile.getInputStream(), binaryFile.getSize(),
+				ServiceContextUtil.createServiceContext(
+					categoryIds, keywords,
+					_getExpandoBridgeAttributes1(documentOptional),
+					existingFileEntry.getGroupId(),
+					documentOptional.map(
+						Document::getViewableBy
+					).map(
+						Document.ViewableBy::getValue
+					).orElse(
+						null
+					))));
 	}
 
 	@Override
@@ -269,39 +283,40 @@ public class DocumentResourceImpl
 				existingFileEntry.getSize())
 		);
 
-		FileEntry fileEntry = _dlAppService.updateFileEntry(
-			documentId, binaryFile.getFileName(), binaryFile.getContentType(),
-			documentOptional.map(
-				Document::getTitle
-			).orElse(
-				existingFileEntry.getTitle()
-			),
-			documentOptional.map(
-				Document::getDescription
-			).orElse(
-				null
-			),
-			null, DLVersionNumberIncrease.AUTOMATIC,
-			binaryFile.getInputStream(), binaryFile.getSize(),
-			ServiceContextUtil.createServiceContext(
+		return _toDocument(
+			_dlAppService.updateFileEntry(
+				documentId, binaryFile.getFileName(),
+				binaryFile.getContentType(),
 				documentOptional.map(
-					Document::getKeywords
+					Document::getTitle
 				).orElse(
-					new String[0]
+					existingFileEntry.getTitle()
 				),
 				documentOptional.map(
-					Document::getTaxonomyCategoryIds
+					Document::getDescription
 				).orElse(
-					new Long[0]
+					null
 				),
-				existingFileEntry.getGroupId(),
-				documentOptional.map(
-					Document::getViewableByAsString
-				).orElse(
-					Document.ViewableBy.OWNER.getValue()
-				)));
-
-		return _toDocument(fileEntry);
+				null, DLVersionNumberIncrease.AUTOMATIC,
+				binaryFile.getInputStream(), binaryFile.getSize(),
+				ServiceContextUtil.createServiceContext(
+					documentOptional.map(
+						Document::getTaxonomyCategoryIds
+					).orElse(
+						new Long[0]
+					),
+					documentOptional.map(
+						Document::getKeywords
+					).orElse(
+						new String[0]
+					),
+					_getExpandoBridgeAttributes1(documentOptional),
+					existingFileEntry.getGroupId(),
+					documentOptional.map(
+						Document::getViewableByAsString
+					).orElse(
+						Document.ViewableBy.OWNER.getValue()
+					))));
 	}
 
 	@Override
@@ -329,39 +344,38 @@ public class DocumentResourceImpl
 			multipartBody.getValueAsInstanceOptional(
 				"document", Document.class);
 
-		FileEntry fileEntry = _dlAppService.addFileEntry(
-			repositoryId, documentFolderId, binaryFile.getFileName(),
-			binaryFile.getContentType(),
-			documentOptional.map(
-				Document::getTitle
-			).orElse(
-				binaryFile.getFileName()
-			),
-			documentOptional.map(
-				Document::getDescription
-			).orElse(
-				null
-			),
-			null, binaryFile.getInputStream(), binaryFile.getSize(),
-			ServiceContextUtil.createServiceContext(
+		return _toDocument(
+			_dlAppService.addFileEntry(
+				repositoryId, documentFolderId, binaryFile.getFileName(),
+				binaryFile.getContentType(),
 				documentOptional.map(
-					Document::getKeywords
+					Document::getTitle
+				).orElse(
+					binaryFile.getFileName()
+				),
+				documentOptional.map(
+					Document::getDescription
 				).orElse(
 					null
 				),
-				documentOptional.map(
-					Document::getTaxonomyCategoryIds
-				).orElse(
-					null
-				),
-				groupId,
-				documentOptional.map(
-					Document::getViewableByAsString
-				).orElse(
-					Document.ViewableBy.OWNER.getValue()
-				)));
-
-		return _toDocument(fileEntry);
+				null, binaryFile.getInputStream(), binaryFile.getSize(),
+				ServiceContextUtil.createServiceContext(
+					documentOptional.map(
+						Document::getTaxonomyCategoryIds
+					).orElse(
+						null
+					),
+					documentOptional.map(
+						Document::getKeywords
+					).orElse(
+						null
+					),
+					_getExpandoBridgeAttributes1(documentOptional), groupId,
+					documentOptional.map(
+						Document::getViewableByAsString
+					).orElse(
+						Document.ViewableBy.OWNER.getValue()
+					))));
 	}
 
 	private Page<Document> _getDocumentsPage(
@@ -382,6 +396,25 @@ public class DocumentResourceImpl
 			sorts);
 	}
 
+	private CustomField[] _getExpandoBridgeAttributes(
+		Optional<Document> documentOptional) {
+
+		return documentOptional.map(
+			Document::getCustomFields
+		).orElse(
+			null
+		);
+	}
+
+	private Map<String, Serializable> _getExpandoBridgeAttributes1(
+		Optional<Document> documentOptional) {
+
+		return CustomFieldsUtil.toMap(
+			DLFileEntry.class.getName(), contextCompany.getCompanyId(),
+			_getExpandoBridgeAttributes(documentOptional),
+			contextAcceptLanguage.getPreferredLocale());
+	}
+
 	private SPIRatingResource<Rating> _getSPIRatingResource() {
 		return new SPIRatingResource<>(
 			DLFileEntry.class.getName(), _ratingsEntryLocalService,
@@ -395,8 +428,6 @@ public class DocumentResourceImpl
 			new DefaultDTOConverterContext(null, fileEntry.getFileEntryId()));
 	}
 
-	private static final EntityModel _entityModel = new DocumentEntityModel();
-
 	@Reference
 	private AssetCategoryLocalService _assetCategoryLocalService;
 
@@ -408,6 +439,12 @@ public class DocumentResourceImpl
 
 	@Reference
 	private DocumentDTOConverter _documentDTOConverter;
+
+	@Reference
+	private ExpandoColumnLocalService _expandoColumnLocalService;
+
+	@Reference
+	private ExpandoTableLocalService _expandoTableLocalService;
 
 	@Reference
 	private Portal _portal;

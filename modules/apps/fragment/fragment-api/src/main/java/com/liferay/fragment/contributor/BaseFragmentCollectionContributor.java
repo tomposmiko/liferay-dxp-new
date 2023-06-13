@@ -20,6 +20,7 @@ import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
@@ -29,7 +30,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -150,7 +150,9 @@ public abstract class BaseFragmentCollectionContributor
 		JSONObject jsonObject = _getStructure(path + "/fragment.json");
 
 		String name = jsonObject.getString("name");
-		String fragmentEntryKey = _getFragmentEntryKey(jsonObject);
+		String fragmentEntryKey = StringBundler.concat(
+			getFragmentCollectionKey(), StringPool.DASH,
+			jsonObject.getString("fragmentEntryKey"));
 		String css = _getFileContent(path, jsonObject.getString("cssPath"));
 		String html = _getFileContent(path, jsonObject.getString("htmlPath"));
 		String js = _getFileContent(path, jsonObject.getString("jsPath"));
@@ -171,13 +173,6 @@ public abstract class BaseFragmentCollectionContributor
 		fragmentEntry.setImagePreviewURL(thumbnailURL);
 
 		return fragmentEntry;
-	}
-
-	private String _getFragmentEntryKey(JSONObject jsonObject) {
-		String fragmentEntryKey = jsonObject.getString("fragmentEntryKey");
-
-		return String.join(
-			StringPool.DASH, getFragmentCollectionKey(), fragmentEntryKey);
 	}
 
 	private String _getImagePreviewURL(String fileName) {

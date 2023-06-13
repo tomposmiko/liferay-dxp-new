@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.aggregation.Aggregation;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
 import com.liferay.portal.search.filter.ComplexQueryPart;
+import com.liferay.portal.search.groupby.GroupByRequest;
 import com.liferay.portal.search.internal.searcher.SearchRequestImpl;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.searcher.FacetContext;
@@ -58,6 +59,17 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 		_searchContext = searchContext;
 	}
 
+	public SearchRequestBuilderImpl(
+		SearchRequestBuilderFactory searchRequestBuilderFactory,
+		SearchRequest searchRequest) {
+
+		this(
+			searchRequestBuilderFactory,
+			new SearchRequestImpl(
+				(SearchRequestImpl)searchRequest
+			).getSearchContext());
+	}
+
 	@Override
 	public SearchRequestBuilder addAggregation(Aggregation aggregation) {
 		withSearchRequestImpl(
@@ -70,9 +82,11 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 	public SearchRequestBuilder addComplexQueryPart(
 		ComplexQueryPart complexQueryPart) {
 
-		withSearchRequestImpl(
-			searchRequestImpl -> searchRequestImpl.addComplexQueryPart(
-				complexQueryPart));
+		if (complexQueryPart != null) {
+			withSearchRequestImpl(
+				searchRequestImpl -> searchRequestImpl.addComplexQueryPart(
+					complexQueryPart));
+		}
 
 		return this;
 	}
@@ -156,6 +170,14 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 	}
 
 	@Override
+	public SearchRequestBuilder excludeContributors(String... ids) {
+		withSearchRequestImpl(
+			searchRequestImpl -> searchRequestImpl.addExcludeContributors(ids));
+
+		return this;
+	}
+
+	@Override
 	public SearchRequestBuilder explain(boolean explain) {
 		withSearchRequestImpl(
 			searchRequestImpl -> searchRequestImpl.setExplain(explain));
@@ -202,6 +224,17 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 	}
 
 	@Override
+	public SearchRequestBuilder groupByRequests(
+		GroupByRequest... groupByRequests) {
+
+		withSearchRequestImpl(
+			searchRequestImpl -> searchRequestImpl.setGroupByRequests(
+				groupByRequests));
+
+		return this;
+	}
+
+	@Override
 	public SearchRequestBuilder highlightEnabled(boolean highlightEnabled) {
 		withSearchRequestImpl(
 			searchRequestImpl -> searchRequestImpl.setHighlightEnabled(
@@ -215,6 +248,14 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 		withSearchRequestImpl(
 			searchRequestImpl -> searchRequestImpl.setHighlightFields(
 				highlightFields));
+
+		return this;
+	}
+
+	@Override
+	public SearchRequestBuilder includeContributors(String... ids) {
+		withSearchRequestImpl(
+			searchRequestImpl -> searchRequestImpl.addIncludeContributors(ids));
 
 		return this;
 	}
@@ -245,6 +286,16 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 				classes));
 
 		return this;
+	}
+
+	@Override
+	public void paginationStartParameterName(
+		String paginationStartParameterName) {
+
+		withSearchRequestImpl(
+			searchRequestImpl ->
+				searchRequestImpl.setPaginationStartParameterName(
+					paginationStartParameterName));
 	}
 
 	@Override
@@ -379,6 +430,9 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 		return _searchRequestBuilderFactory.builder(
 		).federatedSearchKey(
 			federatedSearchKey
+		).withSearchContext(
+			searchContext -> searchContext.setCompanyId(
+				_searchContext.getCompanyId())
 		);
 	}
 

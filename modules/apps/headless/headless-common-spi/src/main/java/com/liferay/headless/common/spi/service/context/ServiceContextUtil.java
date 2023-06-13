@@ -18,6 +18,10 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.io.Serializable;
+
+import java.util.Map;
+
 /**
  * @author Víctor Galán
  */
@@ -27,11 +31,20 @@ public class ServiceContextUtil {
 		long groupId, String viewableBy) {
 
 		return createServiceContext(
-			new String[0], new Long[0], groupId, viewableBy);
+			new Long[0], new String[0], groupId, viewableBy);
 	}
 
 	public static ServiceContext createServiceContext(
-		String[] assetTagNames, Long[] assetCategoryIds, Long groupId,
+		Long[] assetCategoryIds, String[] assetTagNames, Long groupId,
+		String viewableBy) {
+
+		return createServiceContext(
+			assetCategoryIds, assetTagNames, null, groupId, viewableBy);
+	}
+
+	public static ServiceContext createServiceContext(
+		Long[] assetCategoryIds, String[] assetTagNames,
+		Map<String, Serializable> expandoBridgeAttributes, Long groupId,
 		String viewableBy) {
 
 		return new ServiceContext() {
@@ -57,11 +70,24 @@ public class ServiceContextUtil {
 					setAssetTagNames(assetTagNames);
 				}
 
+				if (expandoBridgeAttributes != null) {
+					setExpandoBridgeAttributes(expandoBridgeAttributes);
+				}
+
 				if (groupId != null) {
 					setScopeGroupId(groupId);
 				}
 			}
 		};
+	}
+
+	public static ServiceContext createServiceContext(
+		Map<String, Serializable> expandoBridgeAttributes, long groupId,
+		String viewableBy) {
+
+		return createServiceContext(
+			new Long[0], new String[0], expandoBridgeAttributes, groupId,
+			viewableBy);
 	}
 
 }

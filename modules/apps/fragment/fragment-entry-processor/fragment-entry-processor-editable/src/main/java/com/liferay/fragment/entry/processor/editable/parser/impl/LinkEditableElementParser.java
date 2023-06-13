@@ -18,9 +18,11 @@ import com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProces
 import com.liferay.fragment.entry.processor.editable.parser.EditableElementParser;
 import com.liferay.fragment.entry.processor.editable.parser.util.EditableElementParserUtil;
 import com.liferay.fragment.exception.FragmentEntryContentException;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -47,6 +49,10 @@ public class LinkEditableElementParser implements EditableElementParser {
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		List<Element> elements = element.getElementsByTag("a");
+
+		if (ListUtil.isEmpty(elements)) {
+			return jsonObject;
+		}
 
 		Element replaceableElement = elements.get(0);
 
@@ -82,6 +88,10 @@ public class LinkEditableElementParser implements EditableElementParser {
 	public String getValue(Element element) {
 		List<Element> elements = element.getElementsByTag("a");
 
+		if (ListUtil.isEmpty(elements)) {
+			return StringPool.BLANK;
+		}
+
 		Element replaceableElement = elements.get(0);
 
 		return replaceableElement.html();
@@ -97,6 +107,10 @@ public class LinkEditableElementParser implements EditableElementParser {
 		Element element, String value, JSONObject configJSONObject) {
 
 		List<Element> elements = element.getElementsByTag("a");
+
+		if (ListUtil.isEmpty(elements)) {
+			return;
+		}
 
 		Element replaceableElement = elements.get(0);
 

@@ -31,6 +31,7 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -46,7 +47,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.test.rule.Inject;
@@ -98,7 +98,7 @@ public class DLFileEntryInfoDisplayContributorTest {
 
 				String expectedURL = StringBundler.concat(
 					"/web/", StringUtil.lowerCase(_group.getGroupKey()), "/d/",
-					String.valueOf(fileEntry.getFileEntryId()));
+					fileEntry.getFileEntryId());
 
 				Assert.assertEquals(
 					expectedURL,
@@ -128,10 +128,34 @@ public class DLFileEntryInfoDisplayContributorTest {
 						fileEntry, LocaleUtil.getDefault());
 
 				Assert.assertEquals(
-					StringPool.BLANK, infoDisplayFieldsValues.get("summary"));
+					fileEntry.getUserName(),
+					infoDisplayFieldsValues.get("authorName"));
+				Assert.assertEquals(
+					StringPool.BLANK,
+					infoDisplayFieldsValues.get("authorProfileImage"));
+				Assert.assertEquals(
+					StringPool.BLANK,
+					infoDisplayFieldsValues.get("categories"));
+				Assert.assertEquals(
+					fileEntry.getDescription(),
+					infoDisplayFieldsValues.get("description"));
+				Assert.assertEquals(
+					_dlurlHelper.getDownloadURL(
+						fileEntry, fileEntry.getFileVersion(), null,
+						StringPool.BLANK),
+					infoDisplayFieldsValues.get("downloadURL"));
 				Assert.assertEquals(
 					fileEntry.getFileName(),
 					infoDisplayFieldsValues.get("fileName"));
+				Assert.assertEquals(
+					fileEntry.getMimeType(),
+					infoDisplayFieldsValues.get("mimeType"));
+
+				JSONObject previewImageJSONObject =
+					(JSONObject)infoDisplayFieldsValues.get("previewImage");
+
+				Assert.assertEquals(
+					StringPool.BLANK, previewImageJSONObject.getString("url"));
 
 				Format dateFormatDateTime =
 					FastDateFormatFactoryUtil.getDateTime(
@@ -142,46 +166,16 @@ public class DLFileEntryInfoDisplayContributorTest {
 					infoDisplayFieldsValues.get("publishDate"));
 
 				Assert.assertEquals(
-					_dlurlHelper.getDownloadURL(
-						fileEntry, fileEntry.getFileVersion(), null,
-						StringPool.BLANK),
-					infoDisplayFieldsValues.get("downloadURL"));
+					TextFormatter.formatStorageSize(
+						fileEntry.getSize(), LocaleUtil.getDefault()),
+					infoDisplayFieldsValues.get("size"));
 				Assert.assertEquals(
-					fileEntry.getDescription(),
-					infoDisplayFieldsValues.get("description"));
-				Assert.assertEquals(
-					fileEntry.getMimeType(),
-					infoDisplayFieldsValues.get("mimeType"));
+					StringPool.BLANK, infoDisplayFieldsValues.get("tagNames"));
 				Assert.assertEquals(
 					fileEntry.getTitle(), infoDisplayFieldsValues.get("title"));
 				Assert.assertEquals(
 					fileEntry.getVersion(),
 					infoDisplayFieldsValues.get("version"));
-				Assert.assertEquals(
-					StringPool.BLANK, infoDisplayFieldsValues.get("tagNames"));
-
-				JSONObject authorProfileImageJSONObject =
-					(JSONObject)infoDisplayFieldsValues.get(
-						"authorProfileImage");
-
-				Assert.assertEquals(0, authorProfileImageJSONObject.length());
-
-				Assert.assertEquals(
-					TextFormatter.formatStorageSize(
-						fileEntry.getSize(), LocaleUtil.getDefault()),
-					infoDisplayFieldsValues.get("size"));
-				Assert.assertEquals(
-					fileEntry.getUserName(),
-					infoDisplayFieldsValues.get("authorName"));
-				Assert.assertEquals(
-					StringPool.BLANK,
-					infoDisplayFieldsValues.get("categories"));
-
-				JSONObject previewImageJSONObject =
-					(JSONObject)infoDisplayFieldsValues.get("previewImage");
-
-				Assert.assertEquals(
-					StringPool.BLANK, previewImageJSONObject.getString("url"));
 			});
 	}
 
@@ -299,7 +293,7 @@ public class DLFileEntryInfoDisplayContributorTest {
 	private Group _group;
 
 	@Inject(filter = "component.name=*.DLFileEntryInfoDisplayContributor")
-	private InfoDisplayContributor _infoDisplayContributor;
+	private InfoDisplayContributor<FileEntry> _infoDisplayContributor;
 
 	@Inject
 	private LayoutPageTemplateCollectionService

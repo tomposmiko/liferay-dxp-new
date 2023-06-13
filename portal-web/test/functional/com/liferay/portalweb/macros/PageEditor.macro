@@ -1,4 +1,5 @@
 definition {
+
 	macro addFragment {
 		PageEditor.expandFragmentCollection(collectionName = "${collectionName}");
 
@@ -44,9 +45,9 @@ definition {
 
 		Pause(locator1 = "5000");
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "Portlet#PORTLET_CONTENT",
-			value1 = "${portletName}");
+		AssertElementPresent(
+			key_fragmentName = "${portletName}",
+			locator1 = "Fragment#FRAGMENT_HEADER");
 	}
 
 	macro assertFragmentSidebarLoaded {
@@ -63,17 +64,21 @@ definition {
 		Confirm();
 	}
 
+	macro clickEditableField {
+		Click(
+			key_fragmentName = "${fragmentName}",
+			key_id = "${id}",
+			locator1 = "Fragment#EDITABLE_FIELD");
+	}
+
 	macro clickPublish {
 		Button.click(button = "Publish");
 	}
 
 	macro editFragmentImage {
-		Click(
-			key_fragmentName = "${fragmentName}",
-			key_id = "${id}",
-			locator1 = "Fragment#EDITABLE_FIELD");
-
-		Click(locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_IMAGE_PROPERTIES_BUTTON");
+		PageEditor.gotoEditableFieldImageProperties(
+			fragmentName = "${fragmentName}",
+			id = "${id}");
 
 		Button.clickSelect();
 
@@ -95,12 +100,9 @@ definition {
 	}
 
 	macro editFragmentText {
-		Click(
-			key_fragmentName = "${fragmentName}",
-			key_id = "${id}",
-			locator1 = "Fragment#EDITABLE_FIELD");
-
-		Click(locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_EDIT_BUTTON");
+		PageEditor.gotoEditableFieldEdit(
+			fragmentName = "${fragmentName}",
+			id = "${id}");
 
 		Type(
 			key_fragmentName = "${fragmentName}",
@@ -178,6 +180,22 @@ definition {
 		AssertElementPresent(
 			key_collectionName = "${collectionName}",
 			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLECTION_PANEL_EXPANDED");
+	}
+
+	macro gotoEditableFieldEdit {
+		PageEditor.clickEditableField(
+			fragmentName = "${fragmentName}",
+			id = "${id}");
+
+		Click(locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_EDIT_BUTTON");
+	}
+
+	macro gotoEditableFieldImageProperties {
+		PageEditor.clickEditableField(
+			fragmentName = "${fragmentName}",
+			id = "${id}");
+
+		Click(locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_IMAGE_PROPERTIES_BUTTON");
 	}
 
 	macro gotoTab {
@@ -258,4 +276,5 @@ definition {
 			locator1 = "PageEditor#AUTOSAVE_MESSAGE",
 			value1 = "Draft saved at");
 	}
+
 }

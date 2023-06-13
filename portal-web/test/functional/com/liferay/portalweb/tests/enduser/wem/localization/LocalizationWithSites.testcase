@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Site Localization";
@@ -64,7 +65,7 @@ definition {
 		Page.viewSiteNameTranslationsPG(
 			locale = "en-US",
 			siteName = "Site Name",
-			textIcon = "English-United States");
+			textIcon = "english-United States");
 
 		Page.viewSiteNameTranslationsPG(
 			locale = "es-ES",
@@ -111,7 +112,7 @@ definition {
 
 		PortalSettings.configureCurrentLanguagesCP(
 			currentPortalLanguages = "Arabic (Saudi Arabia),Czech (Czech Republic),French (France)",
-			errorMessage = "Language cannot be removed because it is in use by the following site",
+			errorMessage = "Error: You cannot remove a language that is the current default language.",
 			failExpected = "true");
 	}
 
@@ -149,7 +150,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "en_US",
-			textIcon = "English-United States");
+			textIcon = "english-United States");
 
 		Navigator.gotoPage(pageName = "Language Test Page");
 	}
@@ -188,7 +189,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "en_US",
-			textIcon = "English-United States");
+			textIcon = "english-United States");
 
 		Navigator.gotoPage(pageName = "Language Test Page");
 	}
@@ -227,7 +228,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "en_US",
-			textIcon = "English-United States");
+			textIcon = "english-United States");
 
 		Navigator.gotoPage(pageName = "Language Test Page");
 	}
@@ -594,7 +595,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "en_US",
-			textIcon = "English-United States");
+			textIcon = "english-United States");
 	}
 
 	@description = "This is a use case for LPS-59345"
@@ -929,4 +930,5 @@ definition {
 			fieldName = "Nombre",
 			unavailableLanguageList = "en_US");
 	}
+
 }

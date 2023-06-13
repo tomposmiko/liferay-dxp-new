@@ -219,11 +219,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>DOCUMENTS_AND_MEDIA</td>
-	<td>//div[@data-fieldname='${key_fieldName}']/div/button[contains(.,'Select')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>DONE</td>
 	<td>//button[contains(.,'Done')]</td>
 	<td></td>
@@ -331,11 +326,6 @@
 <tr>
 	<td>LEAVE</td>
 	<td>//button[contains(.,'Leave')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>LINK_TO_PAGE_SELECT_PAGE</td>
-	<td>//div[@data-fieldname='${key_fieldName}']//button[contains(.,'Select')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -541,6 +531,11 @@
 <tr>
 	<td>SELECT_CATEGORIES</td>
 	<td>//button[contains(@class,'btn-secondary')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_CONTENT</td>
+	<td>//div[@data-fieldname='${key_fieldName}']//button[contains(.,'Select')]</td>
 	<td></td>
 </tr>
 <tr>

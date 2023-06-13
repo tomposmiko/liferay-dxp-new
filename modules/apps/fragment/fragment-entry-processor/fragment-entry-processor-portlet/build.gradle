@@ -1,7 +1,7 @@
 dependencies {
 	compileInclude group: "com.liferay", name: "org.jsoup", version: "1.10.2.LIFERAY-PATCHED-3"
 
-	compileOnly group: "com.liferay", name: "com.liferay.fragment.api", version: "2.4.0"
+	compileOnly group: "com.liferay", name: "com.liferay.fragment.api", version: "2.5.0"
 	compileOnly group: "com.liferay", name: "com.liferay.layout.page.template.api", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.0.0"

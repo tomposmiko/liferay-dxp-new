@@ -14,23 +14,25 @@
 
 package com.liferay.dynamic.data.mapping.change.tracking.internal.service;
 
-import com.liferay.change.tracking.CTEngineManager;
-import com.liferay.change.tracking.CTManager;
 import com.liferay.change.tracking.constants.CTConstants;
-import com.liferay.change.tracking.exception.CTEntryException;
-import com.liferay.change.tracking.exception.CTException;
+import com.liferay.change.tracking.engine.CTEngineManager;
+import com.liferay.change.tracking.engine.CTManager;
+import com.liferay.change.tracking.engine.exception.CTEngineException;
 import com.liferay.change.tracking.model.CTEntry;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.model.DDMTemplateVersion;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceWrapper;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionLocalService;
+import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.io.File;
@@ -76,6 +78,10 @@ public class CTDDMTemplateLocalServiceWrapper
 				templateKey, nameMap, descriptionMap, type, mode, language,
 				script, cacheable, smallImage, smallImageURL, smallImageFile,
 				serviceContext));
+
+		if (!_isClassNameChangeTracked(classNameId)) {
+			return ddmTemplate;
+		}
 
 		DDMTemplateVersion ddmTemplateVersion =
 			ddmTemplate.getTemplateVersion();
@@ -138,6 +144,10 @@ public class CTDDMTemplateLocalServiceWrapper
 				mode, language, script, cacheable, smallImage, smallImageURL,
 				smallImageFile, serviceContext));
 
+		if (!_isClassNameChangeTracked(ddmTemplate.getClassNameId())) {
+			return ddmTemplate;
+		}
+
 		DDMTemplateVersion ddmTemplateVersion =
 			ddmTemplate.getTemplateVersion();
 
@@ -163,6 +173,27 @@ public class CTDDMTemplateLocalServiceWrapper
 		return false;
 	}
 
+	private boolean _isClassNameChangeTracked(long classNameId) {
+		String className;
+
+		try {
+			className = _portal.getClassName(classNameId);
+		}
+		catch (Exception e) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Unable to get class name from " + classNameId, e);
+			}
+
+			return false;
+		}
+
+		if (ArrayUtil.contains(_CHANGE_TRACKED_CLASS_NAMES, className)) {
+			return true;
+		}
+
+		return false;
+	}
+
 	private boolean _isRetrievable(DDMTemplate ddmTemplate) {
 		if (ddmTemplate == null) {
 			return false;
@@ -175,9 +206,14 @@ public class CTDDMTemplateLocalServiceWrapper
 			return true;
 		}
 
+		if (!_isClassNameChangeTracked(ddmTemplate.getClassNameId())) {
+			return true;
+		}
+
 		Optional<CTEntry> ctEntryOptional =
 			_ctManager.getLatestModelChangeCTEntryOptional(
-				PrincipalThreadLocal.getUserId(), ddmTemplate.getTemplateId());
+				ddmTemplate.getCompanyId(), PrincipalThreadLocal.getUserId(),
+				ddmTemplate.getTemplateId());
 
 		return ctEntryOptional.isPresent();
 	}
@@ -185,7 +221,8 @@ public class CTDDMTemplateLocalServiceWrapper
 	private DDMTemplate _populateDDMTemplate(DDMTemplate ddmTemplate) {
 		Optional<CTEntry> ctEntryOptional =
 			_ctManager.getLatestModelChangeCTEntryOptional(
-				PrincipalThreadLocal.getUserId(), ddmTemplate.getTemplateId());
+				ddmTemplate.getCompanyId(), PrincipalThreadLocal.getUserId(),
+				ddmTemplate.getTemplateId());
 
 		if (!ctEntryOptional.isPresent()) {
 			return ddmTemplate;
@@ -220,7 +257,7 @@ public class CTDDMTemplateLocalServiceWrapper
 
 	private void _registerChange(
 			DDMTemplateVersion ddmTemplateVersion, int changeType)
-		throws CTException {
+		throws CTEngineException {
 
 		_registerChange(ddmTemplateVersion, changeType, false);
 	}
@@ -228,7 +265,7 @@ public class CTDDMTemplateLocalServiceWrapper
 	private void _registerChange(
 			DDMTemplateVersion ddmTemplateVersion, int changeType,
 			boolean force)
-		throws CTException {
+		throws CTEngineException {
 
 		if (ddmTemplateVersion == null) {
 			return;
@@ -236,22 +273,27 @@ public class CTDDMTemplateLocalServiceWrapper
 
 		try {
 			_ctManager.registerModelChange(
+				ddmTemplateVersion.getCompanyId(),
 				PrincipalThreadLocal.getUserId(),
 				_portal.getClassNameId(DDMTemplateVersion.class.getName()),
 				ddmTemplateVersion.getTemplateVersionId(),
 				ddmTemplateVersion.getTemplateId(), changeType, force);
 		}
-		catch (CTException cte) {
-			if (cte instanceof CTEntryException) {
+		catch (CTEngineException ctee) {
+			if (ctee instanceof CTEngineException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(cte.getMessage());
+					_log.warn(ctee.getMessage());
 				}
 			}
 			else {
-				throw cte;
+				throw ctee;
 			}
 		}
 	}
+
+	private static final String[] _CHANGE_TRACKED_CLASS_NAMES = {
+		DDMStructure.class.getName(), JournalArticle.class.getName()
+	};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CTDDMTemplateLocalServiceWrapper.class);

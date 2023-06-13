@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal Search Admin Web
 Bundle-SymbolicName: com.liferay.portal.search.admin.web
-Bundle-Version: 2.0.4
+Bundle-Version: 2.0.10
 Liferay-JS-Submodules-Bridge: portal-search-admin-web/js/FieldMappings.es.js
 Provide-Capability:\
 	soy;\
@@ -8,7 +8,7 @@ Provide-Capability:\
 		version:Version="${Bundle-Version}"
 Require-Capability:\
 	osgi.extender;\
-		filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/soy))"
+		filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/soy))",\
 	soy;\
 		filter:="(type=metal)"
 Web-ContextPath: /portal-search-admin-web

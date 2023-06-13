@@ -42,7 +42,7 @@
 										direction="left-side"
 										icon=""
 										markupView="lexicon"
-										message=""
+										message="actions"
 										showWhenSingleIcon=true
 									>
 										<#if blogsEntryPermission.contains(permissionChecker, curBlogEntry, "UPDATE")>
@@ -92,6 +92,7 @@
 						<div class="autofit-row widget-metadata">
 							<div class="autofit-col inline-item-before">
 								<@liferay_ui["user-portrait"]
+									size="lg"
 									userId=curBlogEntry.userId
 									userName=curBlogEntry.userName
 								/>
@@ -169,8 +170,8 @@
 											${viewCommentsPortletURL.setParameter("entryId", curBlogEntry.getEntryId()?string)}
 										</#if>
 
-										<a class="btn btn-outline-borderless btn-outline-secondary btn-sm" href="${viewCommentsPortletURL.toString()}">
-											<span class="inline-item inline-item-before" title="${language.get(locale, "comments")}">
+										<a class="btn btn-outline-borderless btn-outline-secondary btn-sm" href="${viewCommentsPortletURL.toString()}" title="${language.get(locale, "comments")}">
+											<span class="inline-item inline-item-before">
 												<@clay["icon"] symbol="comments" />
 											</span> ${commentManager.getCommentsCount("com.liferay.blogs.model.BlogsEntry", curBlogEntry.getEntryId())}
 										</a>

@@ -1,7 +1,7 @@
 {
 	"dependencies": {
-		"clay-button": "2.14.2",
-		"clay-icon": "2.14.2",
+		"clay-button": "2.15.1",
+		"clay-icon": "2.15.1",
 		"metal-soy": "2.16.8",
 		"metal-state": "2.16.8"
 	},
@@ -11,5 +11,5 @@
 		"checkFormat": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},
-	"version": "4.0.8"
+	"version": "4.0.12"
 }

@@ -15,12 +15,12 @@
 		}
 	},
 	"dependencies": {
-		"clay-checkbox": "2.14.2",
-		"clay-dropdown": "2.14.2",
+		"clay-checkbox": "2.15.1",
+		"clay-dropdown": "2.15.1",
 		"metal": "2.16.8",
 		"metal-aop": "3.0.0",
 		"metal-component": "2.16.8",
-		"metal-debounce": "2.0.1",
+		"metal-debounce": "^2.0.2",
 		"metal-dom": "2.16.8",
 		"metal-drag-drop": "3.3.1",
 		"metal-events": "2.16.8",
@@ -45,5 +45,5 @@
 		"format": "liferay-npm-scripts format",
 		"test_DISABLED": "liferay-npm-scripts test"
 	},
-	"version": "1.0.14"
+	"version": "1.0.21"
 }

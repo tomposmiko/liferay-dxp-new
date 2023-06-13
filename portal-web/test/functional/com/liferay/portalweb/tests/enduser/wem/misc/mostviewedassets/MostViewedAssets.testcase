@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.component.names = "Asset Publisher,Most Viewed Assets";
@@ -53,6 +54,8 @@ definition {
 			siteName = "Site Name");
 
 		Portlet.addPG(portletName = "Asset Publisher");
+
+		AssetPublisherPortlet.configureDisplaySettings(displaySettings = "View Count Increment");
 
 		ProductMenu.gotoPortlet(
 			category = "Content &amp; Data",
@@ -121,4 +124,5 @@ definition {
 			assetTitle = "Web Content Title 1",
 			viewCount = "3 View");
 	}
+
 }

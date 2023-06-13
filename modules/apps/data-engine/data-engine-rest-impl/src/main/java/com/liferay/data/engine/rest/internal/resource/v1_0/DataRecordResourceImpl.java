@@ -19,14 +19,15 @@ import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionField;
 import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionRule;
 import com.liferay.data.engine.rest.dto.v1_0.DataRecord;
 import com.liferay.data.engine.rest.internal.constants.DataActionKeys;
+import com.liferay.data.engine.rest.internal.dto.v1_0.util.DataDefinitionFieldUtil;
 import com.liferay.data.engine.rest.internal.dto.v1_0.util.DataDefinitionUtil;
 import com.liferay.data.engine.rest.internal.model.InternalDataRecordCollection;
-import com.liferay.data.engine.rest.internal.rule.function.v1_0.DataRuleFunction;
-import com.liferay.data.engine.rest.internal.rule.function.v1_0.DataRuleFunctionFactory;
-import com.liferay.data.engine.rest.internal.rule.function.v1_0.DataRuleFunctionResult;
 import com.liferay.data.engine.rest.internal.storage.DataRecordExporter;
 import com.liferay.data.engine.rest.internal.storage.DataStorageTracker;
 import com.liferay.data.engine.rest.resource.v1_0.DataRecordResource;
+import com.liferay.data.engine.spi.rule.function.DataRuleFunction;
+import com.liferay.data.engine.spi.rule.function.DataRuleFunctionResult;
+import com.liferay.data.engine.spi.rule.function.DataRuleFunctionTracker;
 import com.liferay.data.engine.spi.storage.DataStorage;
 import com.liferay.dynamic.data.lists.model.DDLRecord;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
@@ -39,6 +40,7 @@ import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.service.DDMContentLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStorageLinkLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -113,8 +115,15 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 
 	@Override
 	public String getDataRecordCollectionDataRecordExport(
-			Long dataRecordCollectionId)
+			Long dataRecordCollectionId, Pagination pagination)
 		throws Exception {
+
+		if (pagination.getPageSize() > 250) {
+			throw new BadRequestException(
+				LanguageUtil.format(
+					contextAcceptLanguage.getPreferredLocale(),
+					"page-size-is-greater-than-x", 250));
+		}
 
 		_modelResourcePermission.check(
 			PermissionThreadLocal.getPermissionChecker(),
@@ -123,7 +132,8 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 		return _dataRecordExporter.export(
 			transform(
 				_ddlRecordLocalService.getRecords(
-					dataRecordCollectionId, -1, -1, null),
+					dataRecordCollectionId, pagination.getStartPosition(),
+					pagination.getEndPosition(), null),
 				this::_toDataRecord));
 	}
 
@@ -131,6 +141,13 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 	public Page<DataRecord> getDataRecordCollectionDataRecordsPage(
 			Long dataRecordCollectionId, Pagination pagination)
 		throws Exception {
+
+		if (pagination.getPageSize() > 250) {
+			throw new BadRequestException(
+				LanguageUtil.format(
+					contextAcceptLanguage.getPreferredLocale(),
+					"page-size-cannot-be-bigger-than-x", 250));
+		}
 
 		_modelResourcePermission.check(
 			PermissionThreadLocal.getPermissionChecker(),
@@ -322,7 +339,7 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 
 		for (DataDefinitionRule dataDefinitionRule : dataDefinitionRules) {
 			DataRuleFunction dataRuleFunction =
-				DataRuleFunctionFactory.getDataRuleFunction(
+				_dataRuleFunctionTracker.getDataRuleFunction(
 					dataDefinitionRule.getName());
 
 			if (dataRuleFunction == null) {
@@ -337,8 +354,9 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 
 				DataRuleFunctionResult dataRuleFunctionResult =
 					dataRuleFunction.validate(
-						dataDefinitionField,
 						dataDefinitionRule.getDataDefinitionRuleParameters(),
+						DataDefinitionFieldUtil.toSPIDataDefinitionField(
+							dataDefinitionField),
 						dataRecordValues.get(dataDefinitionField.getName()));
 
 				if (dataRuleFunctionResult.isValid()) {
@@ -360,6 +378,9 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 	}
 
 	private DataRecordExporter _dataRecordExporter;
+
+	@Reference
+	private DataRuleFunctionTracker _dataRuleFunctionTracker;
 
 	@Reference
 	private DataStorageTracker _dataStorageTracker;

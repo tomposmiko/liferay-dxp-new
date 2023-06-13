@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermission;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.constants.DLConstants;
+import com.liferay.sharing.security.permission.resource.SharingModelResourcePermissionConfigurator;
 
 import java.util.Dictionary;
 
@@ -51,6 +52,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Preston Crary
@@ -78,6 +81,12 @@ public class DLFileEntryModelResourcePermissionRegistrar {
 					consumer.accept(
 						new DLFileEntryWorkflowedModelPermissionLogic(
 							modelResourcePermission));
+
+					if (_sharingModelResourcePermissionConfigurator != null) {
+						_sharingModelResourcePermissionConfigurator.configure(
+							modelResourcePermission, consumer);
+					}
+
 					consumer.accept(
 						(permissionChecker, name, fileEntry, actionId) -> {
 							String className = fileEntry.getClassName();
@@ -168,6 +177,13 @@ public class DLFileEntryModelResourcePermissionRegistrar {
 	private PortletResourcePermission _portletResourcePermission;
 
 	private ServiceRegistration<ModelResourcePermission> _serviceRegistration;
+
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private SharingModelResourcePermissionConfigurator
+		_sharingModelResourcePermissionConfigurator;
 
 	@Reference
 	private StagingPermission _stagingPermission;

@@ -14,6 +14,8 @@
 
 package com.liferay.external.data.source.test.model.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.external.data.source.test.model.TestEntity;
@@ -29,6 +31,9 @@ import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+
 import java.sql.Types;
 
 import java.util.Collections;
@@ -37,8 +42,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
-import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The base model implementation for the TestEntity service. Represents a row in the &quot;TestEntity&quot; database table, with each column mapped to a property of this class.
@@ -192,6 +195,32 @@ public class TestEntityModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, TestEntity>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			TestEntity.class.getClassLoader(), TestEntity.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<TestEntity> constructor =
+				(Constructor<TestEntity>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException roe) {
+					throw new InternalError(roe);
+				}
+			};
+		}
+		catch (NoSuchMethodException nsme) {
+			throw new InternalError(nsme);
+		}
+	}
+
 	private static final Map<String, Function<TestEntity, Object>>
 		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<TestEntity, Object>>
@@ -291,8 +320,7 @@ public class TestEntityModelImpl
 	@Override
 	public TestEntity toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel = (TestEntity)ProxyUtil.newProxyInstance(
-				_classLoader, _escapedModelInterfaces,
+			_escapedModel = _escapedModelProxyProviderFunction.apply(
 				new AutoEscapeBeanHandler(this));
 		}
 
@@ -447,11 +475,8 @@ public class TestEntityModelImpl
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader =
-		TestEntity.class.getClassLoader();
-	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-		TestEntity.class, ModelWrapper.class
-	};
+	private static final Function<InvocationHandler, TestEntity>
+		_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	private long _id;
 	private String _data;

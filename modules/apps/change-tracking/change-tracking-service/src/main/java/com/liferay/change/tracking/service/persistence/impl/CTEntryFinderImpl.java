@@ -67,13 +67,15 @@ public class CTEntryFinderImpl
 			sql = _customSQL.appendCriteria(
 				sql, "AND (CTEntry.originalCTCollectionId = ?)");
 
-			if (queryDefinition.isExcludeStatus()) {
-				sql = _customSQL.appendCriteria(
-					sql, "AND (CTEntry.status != ?)");
-			}
-			else {
-				sql = _customSQL.appendCriteria(
-					sql, "AND (CTEntry.status = ?)");
+			if (queryDefinition.getStatus() != WorkflowConstants.STATUS_ANY) {
+				if (queryDefinition.isExcludeStatus()) {
+					sql = _customSQL.appendCriteria(
+						sql, "AND (CTEntry.status != ?)");
+				}
+				else {
+					sql = _customSQL.appendCriteria(
+						sql, "AND (CTEntry.status = ?)");
+				}
 			}
 
 			SQLQuery q = session.createSynchronizedSQLQuery(sql);
@@ -84,7 +86,10 @@ public class CTEntryFinderImpl
 
 			qPos.add(ctCollectionId);
 			qPos.add(ctCollectionId);
-			qPos.add(queryDefinition.getStatus());
+
+			if (queryDefinition.getStatus() != WorkflowConstants.STATUS_ANY) {
+				qPos.add(queryDefinition.getStatus());
+			}
 
 			Iterator<Long> itr = q.iterate();
 
@@ -181,13 +186,15 @@ public class CTEntryFinderImpl
 			sql = _customSQL.appendCriteria(
 				sql, "AND (CTEntry.originalCTCollectionId = ?)");
 
-			if (queryDefinition.isExcludeStatus()) {
-				sql = _customSQL.appendCriteria(
-					sql, "AND (CTEntry.status != ?)");
-			}
-			else {
-				sql = _customSQL.appendCriteria(
-					sql, "AND (CTEntry.status = ?)");
+			if (queryDefinition.getStatus() != WorkflowConstants.STATUS_ANY) {
+				if (queryDefinition.isExcludeStatus()) {
+					sql = _customSQL.appendCriteria(
+						sql, "AND (CTEntry.status != ?)");
+				}
+				else {
+					sql = _customSQL.appendCriteria(
+						sql, "AND (CTEntry.status = ?)");
+				}
 			}
 
 			sql = _customSQL.replaceOrderBy(
@@ -201,7 +208,10 @@ public class CTEntryFinderImpl
 
 			qPos.add(ctCollectionId);
 			qPos.add(ctCollectionId);
-			qPos.add(queryDefinition.getStatus());
+
+			if (queryDefinition.getStatus() != WorkflowConstants.STATUS_ANY) {
+				qPos.add(queryDefinition.getStatus());
+			}
 
 			return (List<CTEntry>)QueryUtil.list(
 				q, getDialect(), queryDefinition.getStart(),
@@ -268,7 +278,59 @@ public class CTEntryFinderImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<CTEntry> findByC_R(
+	public List<CTEntry> findByCTCI_MCNI(
+		long ctCollectionId, long modelClassNameId,
+		QueryDefinition<CTEntry> queryDefinition) {
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			String sql = _customSQL.get(getClass(), FIND_BY_CT_COLLECTION_ID);
+
+			sql = _customSQL.appendCriteria(
+				sql, "AND (CTEntry.modelClassNameId = ?)");
+
+			if (queryDefinition.getStatus() != WorkflowConstants.STATUS_ANY) {
+				if (queryDefinition.isExcludeStatus()) {
+					sql = _customSQL.appendCriteria(
+						sql, "AND (CTEntry.status != ?)");
+				}
+				else {
+					sql = _customSQL.appendCriteria(
+						sql, "AND (CTEntry.status = ?)");
+				}
+			}
+
+			SQLQuery q = session.createSynchronizedSQLQuery(sql);
+
+			q.addEntity("CTEntry", CTEntryImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(ctCollectionId);
+			qPos.add(modelClassNameId);
+
+			if (queryDefinition.getStatus() != WorkflowConstants.STATUS_ANY) {
+				qPos.add(queryDefinition.getStatus());
+			}
+
+			return (List<CTEntry>)QueryUtil.list(
+				q, getDialect(), queryDefinition.getStart(),
+				queryDefinition.getEnd());
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CTEntry> findByCTCI_MRPK(
 		long ctCollectionId, long modelResourcePrimKey,
 		QueryDefinition<CTEntry> queryDefinition) {
 
@@ -313,7 +375,7 @@ public class CTEntryFinderImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public CTEntry findByC_C_C(
+	public CTEntry findByCTCI_MCNI_MCPK(
 		long ctCollectionId, long modelClassNameId, long modelClassPK) {
 
 		Session session = null;

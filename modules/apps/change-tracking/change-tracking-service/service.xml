@@ -85,7 +85,7 @@
 		<finder name="ModelClassNameId" return-type="Collection">
 			<finder-column name="modelClassNameId" />
 		</finder>
-		<finder name="C_C" return-type="CTEntry" unique="true">
+		<finder name="MCNI_MCPK" return-type="CTEntry" unique="true">
 			<finder-column name="modelClassNameId" />
 			<finder-column name="modelClassPK" />
 		</finder>
@@ -163,6 +163,7 @@
 		<reference entity="Company" package-path="com.liferay.portal" />
 	</entity>
 	<exceptions>
+		<exception>CTCollectionDescription</exception>
 		<exception>CTCollectionName</exception>
 		<exception>DuplicateCTEntry</exception>
 	</exceptions>

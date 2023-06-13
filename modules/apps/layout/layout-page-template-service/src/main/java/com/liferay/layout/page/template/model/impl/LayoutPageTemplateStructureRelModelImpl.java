@@ -34,6 +34,9 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+
 import java.sql.Types;
 
 import java.util.Collections;
@@ -75,7 +78,7 @@ public class LayoutPageTemplateStructureRelModelImpl
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
 		{"layoutPageTemplateStructureId", Types.BIGINT},
-		{"segmentsExperienceId", Types.BIGINT}, {"data_", Types.VARCHAR}
+		{"segmentsExperienceId", Types.BIGINT}, {"data_", Types.CLOB}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -92,11 +95,11 @@ public class LayoutPageTemplateStructureRelModelImpl
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("layoutPageTemplateStructureId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("segmentsExperienceId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("data_", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("data_", Types.CLOB);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table LayoutPageTemplateStructureRel (uuid_ VARCHAR(75) null,lPageTemplateStructureRelId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,layoutPageTemplateStructureId LONG,segmentsExperienceId LONG,data_ STRING null)";
+		"create table LayoutPageTemplateStructureRel (uuid_ VARCHAR(75) null,lPageTemplateStructureRelId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,layoutPageTemplateStructureId LONG,segmentsExperienceId LONG,data_ TEXT null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table LayoutPageTemplateStructureRel";
@@ -233,6 +236,32 @@ public class LayoutPageTemplateStructureRelModelImpl
 		getAttributeSetterBiConsumers() {
 
 		return _attributeSetterBiConsumers;
+	}
+
+	private static Function<InvocationHandler, LayoutPageTemplateStructureRel>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LayoutPageTemplateStructureRel.class.getClassLoader(),
+			LayoutPageTemplateStructureRel.class, ModelWrapper.class);
+
+		try {
+			Constructor<LayoutPageTemplateStructureRel> constructor =
+				(Constructor<LayoutPageTemplateStructureRel>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException roe) {
+					throw new InternalError(roe);
+				}
+			};
+		}
+		catch (NoSuchMethodException nsme) {
+			throw new InternalError(nsme);
+		}
 	}
 
 	private static final Map
@@ -570,10 +599,8 @@ public class LayoutPageTemplateStructureRelModelImpl
 	@Override
 	public LayoutPageTemplateStructureRel toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel =
-				(LayoutPageTemplateStructureRel)ProxyUtil.newProxyInstance(
-					_classLoader, _escapedModelInterfaces,
-					new AutoEscapeBeanHandler(this));
+			_escapedModel = _escapedModelProxyProviderFunction.apply(
+				new AutoEscapeBeanHandler(this));
 		}
 
 		return _escapedModel;
@@ -834,11 +861,9 @@ public class LayoutPageTemplateStructureRelModelImpl
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader =
-		LayoutPageTemplateStructureRel.class.getClassLoader();
-	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-		LayoutPageTemplateStructureRel.class, ModelWrapper.class
-	};
+	private static final Function
+		<InvocationHandler, LayoutPageTemplateStructureRel>
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	private String _uuid;
 	private String _originalUuid;

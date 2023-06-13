@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Asset Publisher";
@@ -405,7 +406,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "de-DE",
-			textIcon = "Deutsch-Deutschland");
+			textIcon = "deutsch-Deutschland");
 
 		Navigator.gotoPage(pageName = "Asset Publisher Page");
 
@@ -437,7 +438,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "en_US",
-			textIcon = "English-United States");
+			textIcon = "english-United States");
 	}
 
 	@priority = "5"
@@ -849,7 +850,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "de-DE",
-			textIcon = "Deutsch-Deutschland");
+			textIcon = "deutsch-Deutschland");
 
 		Navigator.gotoPage(pageName = "Asset Publisher Page");
 
@@ -860,7 +861,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "en_US",
-			textIcon = "English-United States");
+			textIcon = "english-United States");
 
 		ProductMenu.gotoPortlet(
 			category = "Content &amp; Data",
@@ -1758,7 +1759,7 @@ definition {
 			assetTitle = "WC WebContent Title",
 			relatedAssetTitle = "Blogs Entry Title");
 
-		RelatedAssets.viewPG(assetTitle = "Blogs Entry Title");
+		RelatedAssets.viewPG(relatedAssetTitle = "Blogs Entry Title");
 
 		Navigator.gotoPage(pageName = "Asset Publisher Page");
 
@@ -1769,7 +1770,7 @@ definition {
 			assetTitle = "Blogs Entry Title",
 			relatedAssetTitle = "WC WebContent Title");
 
-		RelatedAssets.viewPG(assetTitle = "WC WebContent Title");
+		RelatedAssets.viewPG(relatedAssetTitle = "WC WebContent Title");
 	}
 
 	@priority = "3"
@@ -1861,9 +1862,9 @@ definition {
 			dmDocumentTitle = "DM Document Title Edit");
 
 		BlogsEntry.viewAsRelatedAssetPG(
-			assetTitle = "DM Document Title Edit",
 			entryContent = "Blogs Entry Content",
-			entryTitle = "Blogs Entry Title");
+			entryTitle = "Blogs Entry Title",
+			relatedAssetTitle = "DM Document Title Edit");
 	}
 
 	@priority = "4"
@@ -1908,4 +1909,5 @@ definition {
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title");
 	}
+
 }

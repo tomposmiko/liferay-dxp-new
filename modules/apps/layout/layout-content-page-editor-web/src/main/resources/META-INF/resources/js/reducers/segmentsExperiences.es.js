@@ -1,9 +1,11 @@
 import {CREATE_SEGMENTS_EXPERIENCE, DELETE_SEGMENTS_EXPERIENCE, EDIT_SEGMENTS_EXPERIENCE, SELECT_SEGMENTS_EXPERIENCE, UPDATE_SEGMENTS_EXPERIENCE_PRIORITY} from '../actions/actions.es';
-import {deepClone} from '../utils/FragmentsEditorGetUtils.es';
+import {deepClone, getFragmentRowIndex} from '../utils/FragmentsEditorGetUtils.es';
 import {setIn} from '../utils/FragmentsEditorUpdateUtils.es';
 import {removeExperience, updatePageEditorLayoutData} from '../utils/FragmentsEditorFetchUtils.es';
 import {getRowFragmentEntryLinkIds} from '../utils/FragmentsEditorGetUtils.es';
-import {containsFragmentEntryLinkId} from '../utils/LayoutDataList.es';
+import {containsFragmentEntryLinkId, getEmptyLayoutData} from '../utils/LayoutDataList.es';
+import {prefixSegmentsExperienceId} from '../utils/prefixSegmentsExperienceId.es';
+import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../utils/constants';
 
 const CREATE_SEGMENTS_EXPERIENCE_URL = '/segments.segmentsexperience/add-segments-experience';
 
@@ -84,11 +86,22 @@ function _switchLayoutDataList(state, segmentsExperienceId) {
 						const prevLayout = nextState.layoutData;
 						const prevSegmentsExperienceId = state.segmentsExperienceId || nextState.defaultSegmentsExperienceId;
 
-						const {layoutData} = nextState.layoutDataList.find(
-							segmentedLayout => {
-								return segmentedLayout.segmentsExperienceId === segmentsExperienceId;
-							}
-						);
+						let layoutData = {};
+
+						if (segmentsExperienceId === prevSegmentsExperienceId) {
+							layoutData = nextState.layoutData;
+						}
+						else {
+							const layoutDataItem = nextState.layoutDataList.find(
+								segmentedLayout => {
+									return segmentedLayout.segmentsExperienceId === segmentsExperienceId;
+								}
+							);
+
+							layoutData = layoutDataItem ?
+								layoutDataItem.layoutData :
+								getEmptyLayoutData();
+						}
 
 						nextState = setIn(
 							nextState,
@@ -262,6 +275,8 @@ function createSegmentsExperienceReducer(state, action) {
 												segmentsExperienceId
 											);
 
+											nextNewState = _provideDefaultValueToFragments(nextNewState, segmentsExperienceId);
+
 											resolve(nextNewState);
 										}
 									).catch(
@@ -281,6 +296,105 @@ function createSegmentsExperienceReducer(state, action) {
 				resolve(nextState);
 			}
 		}
+	);
+}
+
+/**
+ * Adds content to each fragmentEntryLink editable value
+ * based on the defaultSegment values, or on the defaultValue
+ *
+ * @param {object} state
+ * @param {string} state.defaultSegmentsExperienceId
+ * @param {object} state.fragmentEntryLinks
+ * @param {object} state.layoutData
+ * @param {string} incomingExperienceId
+ * @returns {object}
+ */
+function _provideDefaultValueToFragments(state, incomingExperienceId) {
+	let nextState = state;
+
+	const defaultSegmentsExperienceKey = prefixSegmentsExperienceId(nextState.defaultSegmentsExperienceId);
+	const incomingExperienceKey = prefixSegmentsExperienceId(incomingExperienceId);
+
+	const newFragmentEntryLinks = Object.entries(nextState.fragmentEntryLinks).reduce(
+		(acc, entry) => {
+			const [fragmentEntryLinkId, fragmentEntryLink] = entry;
+			let newAcc = acc;
+
+			if (getFragmentRowIndex(nextState.layoutData.structure, fragmentEntryLinkId) !== -1) {
+				const newEditableValues = Object.assign(
+					{},
+					fragmentEntryLink.editableValues,
+					{
+						[EDITABLE_FRAGMENT_ENTRY_PROCESSOR]: Object.entries(
+							fragmentEntryLink.editableValues[EDITABLE_FRAGMENT_ENTRY_PROCESSOR]
+						).reduce(
+							(editableAcc, editableEntry) => {
+								const [editableKey, editableValue] = editableEntry;
+								let newEditableValue = editableValue;
+
+								if (editableValue[defaultSegmentsExperienceKey]) {
+									newEditableValue = Object.assign(
+										{},
+										editableValue,
+										{
+											[prefixSegmentsExperienceId]: deepClone(
+												editableValue[defaultSegmentsExperienceKey]
+											)
+										}
+									);
+								}
+								else {
+									newEditableValue = Object.assign(
+										{},
+										editableValue,
+										{
+											[incomingExperienceKey]: {
+												defaultValue: editableValue.defaultValue
+											}
+										}
+									);
+								}
+
+								return Object.assign(
+									{},
+									editableAcc,
+									{
+										[editableKey]: newEditableValue
+									}
+								);
+							},
+							{}
+						)
+					}
+				);
+
+				const newFragmentEntryLink = Object.assign(
+					{},
+					fragmentEntryLink,
+					{
+						editableValues: newEditableValues
+					}
+				);
+
+				newAcc = Object.assign(
+					{},
+					acc,
+					{
+						[fragmentEntryLinkId]: newFragmentEntryLink
+					}
+				);
+			}
+
+			return newAcc;
+		},
+		{}
+	);
+
+	return setIn(
+		nextState,
+		['fragmentEntryLinks'],
+		newFragmentEntryLinks
 	);
 }
 
@@ -369,8 +483,8 @@ function deleteSegmentsExperienceReducer(state, action) {
 
 							resolve(nextState);
 						},
-						(error, {exception}) => {
-							reject(exception);
+						error => {
+							reject(error);
 						}
 					);
 				}
@@ -403,27 +517,22 @@ function selectSegmentsExperienceReducer(state, action) {
 		(resolve, reject) => {
 			let nextState = state;
 			if (action.type === SELECT_SEGMENTS_EXPERIENCE) {
-				if (action.segmentsExperienceId === nextState.segmentsExperienceId) {
-					resolve(nextState);
-				}
-				else {
-					_switchLayoutDataList(nextState, action.segmentsExperienceId)
-						.then(
-							newState => {
-								let nextNewState = setIn(
-									newState,
-									['segmentsExperienceId'],
-									action.segmentsExperienceId,
-								);
-								resolve(nextNewState);
-							}
-						)
-						.catch(
-							e => {
-								reject(e);
-							}
-						);
-				}
+				_switchLayoutDataList(nextState, action.segmentsExperienceId)
+					.then(
+						newState => {
+							let nextNewState = setIn(
+								newState,
+								['segmentsExperienceId'],
+								action.segmentsExperienceId,
+							);
+							resolve(nextNewState);
+						}
+					)
+					.catch(
+						e => {
+							reject(e);
+						}
+					);
 			}
 			else {
 				resolve(nextState);

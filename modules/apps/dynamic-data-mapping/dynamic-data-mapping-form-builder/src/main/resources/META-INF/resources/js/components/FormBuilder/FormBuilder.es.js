@@ -22,88 +22,7 @@ import {PagesVisitor} from '../../util/visitors.es';
  * @extends Component
  */
 
-class FormBuilder extends Component {
-	static PROPS = {
-
-		/**
-		 * @default
-		 * @instance
-		 * @memberof FormBuilder
-		 * @type {?number}
-		 */
-
-		activePage: Config.number().value(0),
-
-		/**
-		 * @default undefined
-		 * @instance
-		 * @memberof FormBuilder
-		 * @type {?string}
-		 */
-
-		defaultLanguageId: Config.string(),
-
-		/**
-		 * @default undefined
-		 * @instance
-		 * @memberof FormBuilder
-		 * @type {?string}
-		 */
-
-		editingLanguageId: Config.string(),
-
-		/**
-		 * @default []
-		 * @instance
-		 * @memberof Sidebar
-		 * @type {?(array|undefined)}
-		 */
-
-		fieldTypes: Config.array().value([]),
-
-		/**
-		 * @default {}
-		 * @instance
-		 * @memberof FormBuilder
-		 * @type {?object}
-		 */
-
-		focusedField: focusedFieldStructure.value({}),
-
-		/**
-		 * @default []
-		 * @instance
-		 * @memberof FormBuilder
-		 * @type {?array<object>}
-		 */
-
-		pages: Config.arrayOf(pageStructure).value([]),
-
-		/**
-		 * @instance
-		 * @memberof FormBuilder
-		 * @type {string}
-		 */
-
-		paginationMode: Config.string().required(),
-
-		/**
-		 * @instance
-		 * @memberof FormBuilder
-		 * @type {string}
-		 */
-
-		rules: Config.arrayOf(ruleStructure).required(),
-
-		/**
-		 * @default undefined
-		 * @instance
-		 * @memberof FormRenderer
-		 * @type {!string}
-		 */
-
-		spritemap: Config.string().required()
-	};
+class FormBuilderBase extends Component {
 
 	attached() {
 		const {activePage, pages} = this.props;
@@ -514,10 +433,94 @@ class FormBuilder extends Component {
 	}
 }
 
+FormBuilderBase.PROPS = {
+
+	/**
+	 * @default
+	 * @instance
+	 * @memberof FormBuilder
+	 * @type {?number}
+	 */
+
+	activePage: Config.number().value(0),
+
+	/**
+	 * @default undefined
+	 * @instance
+	 * @memberof FormBuilder
+	 * @type {?string}
+	 */
+
+	defaultLanguageId: Config.string(),
+
+	/**
+	 * @default undefined
+	 * @instance
+	 * @memberof FormBuilder
+	 * @type {?string}
+	 */
+
+	editingLanguageId: Config.string(),
+
+	/**
+	 * @default []
+	 * @instance
+	 * @memberof Sidebar
+	 * @type {?(array|undefined)}
+	 */
+
+	fieldTypes: Config.array().value([]),
+
+	/**
+	 * @default {}
+	 * @instance
+	 * @memberof FormBuilder
+	 * @type {?object}
+	 */
+
+	focusedField: focusedFieldStructure.value({}),
+
+	/**
+	 * @default []
+	 * @instance
+	 * @memberof FormBuilder
+	 * @type {?array<object>}
+	 */
+
+	pages: Config.arrayOf(pageStructure).value([]),
+
+	/**
+	 * @instance
+	 * @memberof FormBuilder
+	 * @type {string}
+	 */
+
+	paginationMode: Config.string().required(),
+
+	/**
+	 * @instance
+	 * @memberof FormBuilder
+	 * @type {string}
+	 */
+
+	rules: Config.arrayOf(ruleStructure).required(),
+
+	/**
+	 * @default undefined
+	 * @instance
+	 * @memberof FormRenderer
+	 * @type {!string}
+	 */
+
+	spritemap: Config.string().required()
+};
+
 export default compose(
 	withActionableFields,
 	withEditablePageHeader,
 	withMoveableFields,
 	withMultiplePages,
 	withResizeableColumns
-)(FormBuilder);
+)(FormBuilderBase);
+
+export {FormBuilderBase};

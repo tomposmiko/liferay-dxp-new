@@ -57,6 +57,10 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 
 	@Override
 	public Lock fetchLock(String className, String key) {
+		if (lockPersistence.countByClassName(className) == 0) {
+			return null;
+		}
+
 		Lock lock = lockPersistence.fetchByC_K(className, key);
 
 		if (lock != null) {
@@ -77,6 +81,13 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 
 	@Override
 	public Lock getLock(String className, String key) throws PortalException {
+		if (lockPersistence.countByClassName(className) == 0) {
+			throw new NoSuchLockException(
+				StringBundler.concat(
+					"No Lock exists with the key {className=", className,
+					", key=", key, "}"));
+		}
+
 		Lock lock = lockPersistence.findByC_K(className, key);
 
 		if (lock.isExpired()) {

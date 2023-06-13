@@ -1,5 +1,6 @@
 @component-name = "portal-web-forms-and-data-lists"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Dynamic Data Lists";
@@ -8,18 +9,6 @@ definition {
 		TestCase.setUpPortalInstance();
 
 		User.firstLoginPG();
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Site Administration",
-			portlet = "Settings");
-
-		Site.configureCurrentLanguagesCP(
-			currentSiteLanguages = "English (United States),Spanish (Spain),Portuguese (Brazil)",
-			defaultSiteLanguage = "Portuguese (Brazil)",
-			displaySettings = "Display Settings");
 
 		Navigator.openURL();
 
@@ -115,4 +104,5 @@ definition {
 				fieldValue = "${language} Pergunta");
 		}
 	}
+
 }

@@ -53,7 +53,7 @@ public class CreateAssetListFormNavigatorEntry
 
 	@Override
 	public boolean isVisible(User user, Object object) {
-		if (!isAssetListSelection()) {
+		if (isDynamicAssetSelection() || isManualSelection()) {
 			return true;
 		}
 

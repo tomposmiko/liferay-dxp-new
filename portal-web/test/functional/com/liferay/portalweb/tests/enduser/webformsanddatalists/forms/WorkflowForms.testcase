@@ -1,5 +1,6 @@
 @component-name = "portal-workflow"
 definition {
+
 	property custom.properties = "minifier.enabled=true";
 	property portal.release = "true";
 	property portal.upstream = "true";
@@ -54,7 +55,7 @@ definition {
 
 		Form.gotoAddField(fieldType = "Text Field");
 
-		Form.editFieldLabel(fieldValue = "Text Field");
+		Form.editFieldLabelMetal(fieldValue = "Text Field");
 
 		Form.closeSidebar();
 
@@ -265,7 +266,7 @@ definition {
 
 		Form.gotoAddField(fieldType = "Select from List");
 
-		Form.editFieldLabel(fieldValue = "Select");
+		Form.editFieldLabelMetal(fieldValue = "Select");
 
 		FormFields.editOptionsRow(
 			optionName = "Select1",
@@ -275,13 +276,13 @@ definition {
 
 		Form.gotoAddField(fieldType = "Text Field");
 
-		Form.editFieldLabel(fieldValue = "Text One");
+		Form.editFieldLabelMetal(fieldValue = "Text One");
 
 		Form.closeSidebar();
 
 		Form.gotoAddField(fieldType = "Single Selection");
 
-		Form.editFieldLabel(fieldValue = "Radio");
+		Form.editFieldLabelMetal(fieldValue = "Radio");
 
 		FormFields.editOptionsRow(
 			optionName = "Option1",
@@ -291,7 +292,7 @@ definition {
 
 		Form.gotoAddField(fieldType = "Text Field");
 
-		Form.editFieldLabel(fieldValue = "Text Two");
+		Form.editFieldLabelMetal(fieldValue = "Text Two");
 
 		Form.closeSidebar();
 
@@ -481,4 +482,5 @@ definition {
 			fieldName = "TextTwo",
 			fieldValue = "Text Two Input");
 	}
+
 }

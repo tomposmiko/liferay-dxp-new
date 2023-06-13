@@ -19,9 +19,11 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureModel;
+import com.liferay.layout.page.template.model.LayoutPageTemplateStructureSoap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
@@ -35,12 +37,17 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -58,6 +65,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutPageTemplateStructureImpl
  * @generated
  */
+@JSON(strict = true)
 @ProviderType
 public class LayoutPageTemplateStructureModelImpl
 	extends BaseModelImpl<LayoutPageTemplateStructure>
@@ -139,6 +147,60 @@ public class LayoutPageTemplateStructureModelImpl
 	public static final long UUID_COLUMN_BITMASK = 16L;
 
 	public static final long LAYOUTPAGETEMPLATESTRUCTUREID_COLUMN_BITMASK = 32L;
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 */
+	public static LayoutPageTemplateStructure toModel(
+		LayoutPageTemplateStructureSoap soapModel) {
+
+		if (soapModel == null) {
+			return null;
+		}
+
+		LayoutPageTemplateStructure model =
+			new LayoutPageTemplateStructureImpl();
+
+		model.setUuid(soapModel.getUuid());
+		model.setLayoutPageTemplateStructureId(
+			soapModel.getLayoutPageTemplateStructureId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setClassNameId(soapModel.getClassNameId());
+		model.setClassPK(soapModel.getClassPK());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 */
+	public static List<LayoutPageTemplateStructure> toModels(
+		LayoutPageTemplateStructureSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<LayoutPageTemplateStructure> models =
+			new ArrayList<LayoutPageTemplateStructure>(soapModels.length);
+
+		for (LayoutPageTemplateStructureSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
 
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.layout.page.template.service.util.ServiceProps.get(
@@ -234,6 +296,32 @@ public class LayoutPageTemplateStructureModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, LayoutPageTemplateStructure>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LayoutPageTemplateStructure.class.getClassLoader(),
+			LayoutPageTemplateStructure.class, ModelWrapper.class);
+
+		try {
+			Constructor<LayoutPageTemplateStructure> constructor =
+				(Constructor<LayoutPageTemplateStructure>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException roe) {
+					throw new InternalError(roe);
+				}
+			};
+		}
+		catch (NoSuchMethodException nsme) {
+			throw new InternalError(nsme);
+		}
+	}
+
 	private static final Map
 		<String, Function<LayoutPageTemplateStructure, Object>>
 			_attributeGetterFunctions;
@@ -319,6 +407,7 @@ public class LayoutPageTemplateStructureModelImpl
 			(Map)attributeSetterBiConsumers);
 	}
 
+	@JSON
 	@Override
 	public String getUuid() {
 		if (_uuid == null) {
@@ -344,6 +433,7 @@ public class LayoutPageTemplateStructureModelImpl
 		return GetterUtil.getString(_originalUuid);
 	}
 
+	@JSON
 	@Override
 	public long getLayoutPageTemplateStructureId() {
 		return _layoutPageTemplateStructureId;
@@ -356,6 +446,7 @@ public class LayoutPageTemplateStructureModelImpl
 		_layoutPageTemplateStructureId = layoutPageTemplateStructureId;
 	}
 
+	@JSON
 	@Override
 	public long getGroupId() {
 		return _groupId;
@@ -378,6 +469,7 @@ public class LayoutPageTemplateStructureModelImpl
 		return _originalGroupId;
 	}
 
+	@JSON
 	@Override
 	public long getCompanyId() {
 		return _companyId;
@@ -400,6 +492,7 @@ public class LayoutPageTemplateStructureModelImpl
 		return _originalCompanyId;
 	}
 
+	@JSON
 	@Override
 	public long getUserId() {
 		return _userId;
@@ -426,6 +519,7 @@ public class LayoutPageTemplateStructureModelImpl
 	public void setUserUuid(String userUuid) {
 	}
 
+	@JSON
 	@Override
 	public String getUserName() {
 		if (_userName == null) {
@@ -441,6 +535,7 @@ public class LayoutPageTemplateStructureModelImpl
 		_userName = userName;
 	}
 
+	@JSON
 	@Override
 	public Date getCreateDate() {
 		return _createDate;
@@ -451,6 +546,7 @@ public class LayoutPageTemplateStructureModelImpl
 		_createDate = createDate;
 	}
 
+	@JSON
 	@Override
 	public Date getModifiedDate() {
 		return _modifiedDate;
@@ -487,6 +583,7 @@ public class LayoutPageTemplateStructureModelImpl
 		setClassNameId(classNameId);
 	}
 
+	@JSON
 	@Override
 	public long getClassNameId() {
 		return _classNameId;
@@ -509,6 +606,7 @@ public class LayoutPageTemplateStructureModelImpl
 		return _originalClassNameId;
 	}
 
+	@JSON
 	@Override
 	public long getClassPK() {
 		return _classPK;
@@ -560,10 +658,8 @@ public class LayoutPageTemplateStructureModelImpl
 	@Override
 	public LayoutPageTemplateStructure toEscapedModel() {
 		if (_escapedModel == null) {
-			_escapedModel =
-				(LayoutPageTemplateStructure)ProxyUtil.newProxyInstance(
-					_classLoader, _escapedModelInterfaces,
-					new AutoEscapeBeanHandler(this));
+			_escapedModel = _escapedModelProxyProviderFunction.apply(
+				new AutoEscapeBeanHandler(this));
 		}
 
 		return _escapedModel;
@@ -804,11 +900,9 @@ public class LayoutPageTemplateStructureModelImpl
 		return sb.toString();
 	}
 
-	private static final ClassLoader _classLoader =
-		LayoutPageTemplateStructure.class.getClassLoader();
-	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-		LayoutPageTemplateStructure.class, ModelWrapper.class
-	};
+	private static final Function
+		<InvocationHandler, LayoutPageTemplateStructure>
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	private String _uuid;
 	private String _originalUuid;

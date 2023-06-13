@@ -1,5 +1,6 @@
 @component-name = "portal-util-misc"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.component.names = "Nested Portlets";
@@ -43,7 +44,9 @@ definition {
 
 		Portlet.addPG(portletName = "Nested Applications");
 
-		NestedPortlets.viewConfigurationDefaultLayoutTemplate(portletName = "Nested Applications");
+		NestedPortlets.viewConfigurationDefaultLayoutTemplate(
+			defaultColumnName = "2 Columns (50/50)",
+			portletName = "Nested Applications");
 
 		Navigator.gotoPage(pageName = "Nested Portlets Page");
 
@@ -58,4 +61,5 @@ definition {
 			portletColumnNumberTo = "1",
 			portletName = "Web Content Display");
 	}
+
 }

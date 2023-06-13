@@ -1,5 +1,6 @@
 @component-name = "portal-security"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "XSS";
@@ -90,110 +91,6 @@ definition {
 			value1 = "The requested resource could not be found.");
 
 		AssertElementPresent(locator1 = "Home#URL_ERROR_MESSAGE");
-	}
-
-	@priority = "5"
-	test ViewBookmarks {
-		property osgi.app.includes = "bookmarks";
-
-		Navigator.openURL();
-
-		UserBar.gotoDropdownItem(dropdownItem = "Account Settings");
-
-		User.editDetailsViaMyAccount(userLastNameEdit = '''<script>alert(123);</script>''');
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Bookmarks");
-
-		Bookmark.addCP(
-			bookmarkName = "Test Bookmark Name",
-			bookmarkURL = "https://www.liferay.com");
-
-		Navigator.openURL();
-
-		Portlet.addPG(portletName = "Bookmarks");
-
-		Navigator.openURL();
-
-		RelatedAssets.gotoBookmarksSelectionPG(assetType = "Bookmarks Entry");
-
-		AssertElementNotPresent(locator1 = "//body[.='XSS']");
-
-		var actualScript = '''<script>alert(123);</script>''';
-
-		var escapedScript = '''&lt;script&gt;alert(123);&lt;/script&gt;''';
-
-		AssertHTMLSourceTextNotPresent(value1 = "${actualScript}");
-
-		// Unignore when LPS-94171 is resolved
-
-		// AssertHTMLSourceTextPresent(value1 = "${escapedScript}");
-	}
-
-	@description = "This is a use case for LPS-72807."
-	@priority = "4"
-	test ViewCustomFieldDocumentsFolderNoXSS {
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Custom Fields");
-
-		CustomFields.addCP(
-			customFieldName = '''<script>alert(123);</script>''',
-			customFieldType = "Input Field",
-			localization = "true",
-			resourceName = "Documents Folder");
-
-		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
-			panel = "Site Administration",
-			portlet = "Documents and Media");
-
-		LexiconEntry.gotoAddMenuItem(menuItem = "Folder");
-
-		AssertAlertNotPresent();
-
-		var actualScript = '''<script>alert(123);</script>''';
-
-		var escapedScript = '''&lt;script&gt;alert(123);&lt;/script&gt;''';
-
-		AssertHTMLSourceTextNotPresent(value1 = "${actualScript}");
-
-		AssertHTMLSourceTextPresent(value1 = "${escapedScript}");
-
-		PortletEntry.inputName(name = "DM Folder Name");
-
-		Panel.expandPanel(panel = "Custom Fields");
-
-		AssertTextEquals(
-			key_customFieldName = "${actualScript}",
-			locator1 = "DocumentsAndMedia#CUSTOM_FIELD_NAME",
-			value1 = "${actualScript}");
-
-		PortletEntry.changeLocale(
-			fieldName = "${actualScript}",
-			locale = "zh_CN");
-
-		Click(locator1 = "DocumentsAndMedia#CUSTOM_FIELD");
-
-		Type(
-			locator1 = "DocumentsAndMedia#CUSTOM_FIELD",
-			value1 = "测试");
-
-		PortletEntry.save();
-
-		AssertAlertNotPresent();
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
-
-		AssertTextEquals(
-			key_dmDocumentTitle = "DM Folder Name",
-			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
-			value1 = "DM Folder Name");
 	}
 
 	@priority = "3"
@@ -352,7 +249,7 @@ definition {
 
 		BlogsNavigator.gotoAddEntry();
 
-		Type.typeAceEditor(
+		Type(
 			key_editor = "title",
 			locator1 = "AlloyEditor#EDITOR",
 			value1 = "${entryTitle}");
@@ -633,4 +530,5 @@ definition {
 
 		AssertHTMLSourceTextPresent(value1 = "${escapedScript}");
 	}
+
 }

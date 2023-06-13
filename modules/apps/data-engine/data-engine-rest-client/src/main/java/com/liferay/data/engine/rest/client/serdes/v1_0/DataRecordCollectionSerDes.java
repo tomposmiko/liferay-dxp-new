@@ -154,7 +154,9 @@ public class DataRecordCollectionSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		return string.replaceAll("\"", "\\\\\"");
+		string = string.replace("\\", "\\\\");
+
+		return string.replace("\"", "\\\"");
 	}
 
 	private static String _toJSON(Map<String, ?> map) {
@@ -213,7 +215,7 @@ public class DataRecordCollectionSerDes {
 			else if (Objects.equals(jsonParserFieldName, "description")) {
 				if (jsonParserFieldValue != null) {
 					dataRecordCollection.setDescription(
-						DataRecordCollectionSerDes.toMap(
+						(Map)DataRecordCollectionSerDes.toMap(
 							(String)jsonParserFieldValue));
 				}
 			}
@@ -226,7 +228,7 @@ public class DataRecordCollectionSerDes {
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					dataRecordCollection.setName(
-						DataRecordCollectionSerDes.toMap(
+						(Map)DataRecordCollectionSerDes.toMap(
 							(String)jsonParserFieldValue));
 				}
 			}

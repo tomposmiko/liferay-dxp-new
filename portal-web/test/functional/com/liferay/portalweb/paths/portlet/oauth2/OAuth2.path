@@ -20,6 +20,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ADMIN_GLOBAL_RESOURCE_SCOPE_CHECKBOX</td>
+	<td>//a[contains(.,'${key_panel}')]/following-sibling::div//input[contains(@data-slave,'${key_scopeName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ADMIN_GLOBAL_SCOPE_CHECKBOX</td>
 	<td>//div[contains(@id,'navGlobalScopes')]//div[normalize-space()='${key_scopeName}']//input[@type='checkbox']</td>
 	<td></td>
@@ -112,6 +117,22 @@
 <tr>
 	<td>ADMIN_TABLE_APP_SCOPES_COUNT</td>
 	<td>//tr[td[@class=' lfr-name-column' and contains(.,'${key_tableName}')]]/td[@class=' lfr-scopes-column']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--AUTHORIZATION_REQUEST-->
+<tr>
+	<td>AUTHORIZATION_REQUEST_APPLICATION_NAME</td>
+	<td>//form[contains(@id,'OAuth2AuthorizePortlet')]//h1[contains(.,'${key_applicationName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>AUTHORIZATION_REQUEST_RESOURCE_NAME</td>
+	<td>//ul[@class='list-group']//div[contains(.,'${key_resourceName}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -190,7 +190,7 @@ if (portletTitleBasedNavigation) {
 			</div>
 		</c:if>
 
-		<c:if test="<%= (fileEntry.getLock() != null) && DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE) %>">
+		<c:if test="<%= (lock != null) && DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE) %>">
 			<c:choose>
 				<c:when test="<%= fileEntry.hasLock() %>">
 					<div class="alert alert-success">
@@ -314,9 +314,14 @@ if (addPortletBreadcrumbEntries) {
 		if (openContextualSidebarButton) {
 			openContextualSidebarButton.addEventListener(
 				'click',
-				function() {
-					document.querySelector('#<portlet:namespace />FileEntry .contextual-sidebar')
-						.classList.toggle('contextual-sidebar-visible');
+				function(event) {
+					event.currentTarget.classList.toggle('active');
+
+					document.querySelector(
+						'#<portlet:namespace />FileEntry .contextual-sidebar'
+					).classList.toggle(
+						'contextual-sidebar-visible'
+					);
 				}
 			);
 		}

@@ -14,13 +14,13 @@
 
 package com.liferay.portal.kernel.dao.search;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -108,6 +108,14 @@ public class RowChecker {
 			httpServletRequest, checked, disabled, _rowIds, primaryKey,
 			StringUtil.quote(_rowIds), StringUtil.quote(_allRowIds),
 			StringPool.BLANK);
+	}
+
+	public String getRowCheckBox(
+		HttpServletRequest httpServletRequest, ResultRow resultRow) {
+
+		return getRowCheckBox(
+			httpServletRequest, isChecked(resultRow.getObject()),
+			isDisabled(resultRow.getObject()), resultRow.getPrimaryKey());
 	}
 
 	public String getRowId() {

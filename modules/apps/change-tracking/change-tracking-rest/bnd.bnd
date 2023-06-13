@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Change Tracking REST
 Bundle-SymbolicName: com.liferay.change.tracking.rest
-Bundle-Version: 1.0.8
+Bundle-Version: 1.0.14
 Liferay-Configuration-Path: /configuration
 Provide-Capability:\
 	liferay.resource.bundle;\

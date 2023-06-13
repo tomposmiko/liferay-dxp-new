@@ -293,6 +293,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		Date now = new Date();
 
+		Date modifiedDate = serviceContext.getModifiedDate(now);
+
 		long messageId = counterLocalService.increment();
 
 		subject = getSubject(subject, body);
@@ -323,7 +325,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		message.setUserId(user.getUserId());
 		message.setUserName(userName);
 		message.setCreateDate(serviceContext.getCreateDate(now));
-		message.setModifiedDate(serviceContext.getModifiedDate(now));
+		message.setModifiedDate(modifiedDate);
 
 		if (threadId > 0) {
 			message.setThreadId(threadId);
@@ -338,7 +340,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		message.setStatus(WorkflowConstants.STATUS_DRAFT);
 		message.setStatusByUserId(user.getUserId());
 		message.setStatusByUserName(userName);
-		message.setStatusDate(serviceContext.getModifiedDate(now));
+		message.setStatusDate(modifiedDate);
 
 		// Thread
 
@@ -1214,6 +1216,13 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 	}
 
 	@Override
+	public MBMessage getLastThreadMessage(long threadId, int status)
+		throws PortalException {
+
+		return mbMessagePersistence.findByT_S_Last(threadId, status, null);
+	}
+
+	@Override
 	public MBMessage getMessage(long messageId) throws PortalException {
 		return mbMessagePersistence.findByPrimaryKey(messageId);
 	}
@@ -1864,7 +1873,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 						publishDate = assetEntry.getPublishDate();
 					}
 					else {
-						publishDate = now;
+						publishDate = modifiedDate;
 
 						serviceContext.setCommand(Constants.ADD);
 					}
@@ -1910,8 +1919,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		if (!message.isDiscussion()) {
 			mbStatsUserLocalService.updateStatsUser(
-				message.getGroupId(), userId,
-				serviceContext.getModifiedDate(now));
+				message.getGroupId(), userId, modifiedDate);
 		}
 
 		return message;

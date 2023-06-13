@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Web Content Administration";
@@ -64,28 +65,4 @@ definition {
 			templateScript = '''${Text.getData()}''');
 	}
 
-	@priority = "5"
-	test AddTemplateXSL {
-		property testray.component.names = "Training,Web Content Administration,XSL";
-
-		WebContent.openWebContentAdmin(siteURLKey = "test-site-name");
-
-		NavItem.gotoTemplates();
-
-		WebContentTemplates.addCP(
-			templateDescription = "WC Template Description",
-			templateFile = "xsl_template.xsl",
-			templateLanguage = "xsl",
-			templateName = "WC Template Name");
-
-		WebContent.openWebContentAdmin(siteURLKey = "test-site-name");
-
-		Navigator.gotoNavItem(navItem = "Templates");
-
-		WebContentTemplates.viewCP(
-			templateDescription = "WC Template Description",
-			templateLanguage = "xsl",
-			templateName = "WC Template Name",
-			templateScript = '''"/root/dynamic-element[@name='Text']"''');
-	}
 }

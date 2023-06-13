@@ -21,6 +21,8 @@ import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.model.AssetEntryUsage;
+import com.liferay.asset.service.AssetEntryUsageLocalService;
 import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
 import com.liferay.document.library.kernel.exception.FileSizeException;
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
@@ -952,6 +954,9 @@ public class JournalPortlet extends MVCPortlet {
 		long refererPlid = ParamUtil.getLong(actionRequest, "refererPlid");
 
 		if (Validator.isNotNull(portletResource) && (refererPlid > 0)) {
+			AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+				JournalArticle.class.getName(), article.getResourcePrimKey());
+
 			Layout layout = _layoutLocalService.getLayout(refererPlid);
 
 			PortletPreferences portletPreferences =
@@ -964,10 +969,6 @@ public class JournalPortlet extends MVCPortlet {
 				portletPreferences.setValue(
 					"articleId", article.getArticleId());
 
-				AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
-					JournalArticle.class.getName(),
-					article.getResourcePrimKey());
-
 				if (assetEntry != null) {
 					portletPreferences.setValue(
 						"assetEntryId",
@@ -977,7 +978,13 @@ public class JournalPortlet extends MVCPortlet {
 				portletPreferences.store();
 
 				updateContentSearch(
-					actionRequest, portletResource, article.getArticleId());
+					refererPlid, portletResource, article.getArticleId());
+			}
+
+			if (assetEntry != null) {
+				_updateAssetEntryUsage(
+					groupId, assetEntry, portletResource, refererPlid,
+					serviceContext);
 			}
 		}
 
@@ -1346,8 +1353,6 @@ public class JournalPortlet extends MVCPortlet {
 		String referringPortletResource = ParamUtil.getString(
 			actionRequest, "referringPortletResource");
 
-		String languageId = ParamUtil.getString(actionRequest, "languageId");
-
 		PortletURL portletURL = PortletURLFactoryUtil.create(
 			actionRequest, JournalPortletKeys.JOURNAL,
 			PortletRequest.RENDER_PHASE);
@@ -1366,10 +1371,6 @@ public class JournalPortlet extends MVCPortlet {
 		portletURL.setParameter("articleId", article.getArticleId());
 		portletURL.setParameter(
 			"version", String.valueOf(article.getVersion()));
-
-		if (Validator.isNotNull(languageId)) {
-			portletURL.setParameter("languageId", languageId);
-		}
 
 		portletURL.setWindowState(actionRequest.getWindowState());
 
@@ -1540,20 +1541,10 @@ public class JournalPortlet extends MVCPortlet {
 	}
 
 	protected void updateContentSearch(
-			ActionRequest actionRequest, String portletResource,
-			String articleId)
+			long plid, String portletResource, String articleId)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		Layout layout = themeDisplay.getLayout();
-
-		long refererPlid = ParamUtil.getLong(actionRequest, "refererPlid");
-
-		if (refererPlid > 0) {
-			layout = _layoutLocalService.fetchLayout(refererPlid);
-		}
+		Layout layout = _layoutLocalService.fetchLayout(plid);
 
 		_journalContentSearchLocalService.updateContentSearch(
 			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
@@ -1572,6 +1563,28 @@ public class JournalPortlet extends MVCPortlet {
 		return true;
 	}
 
+	private void _updateAssetEntryUsage(
+		long groupId, AssetEntry assetEntry, String portletResource, long plid,
+		ServiceContext serviceContext) {
+
+		AssetEntryUsage assetEntryUsage =
+			_assetEntryUsageLocalService.fetchAssetEntryUsage(
+				assetEntry.getEntryId(),
+				_portal.getClassNameId(
+					com.liferay.portal.kernel.model.Portlet.class),
+				portletResource, plid);
+
+		if (assetEntryUsage != null) {
+			return;
+		}
+
+		_assetEntryUsageLocalService.addAssetEntryUsage(
+			groupId, assetEntry.getEntryId(),
+			_portal.getClassNameId(
+				com.liferay.portal.kernel.model.Portlet.class),
+			portletResource, plid, serviceContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(JournalPortlet.class);
 
 	@Reference
@@ -1584,6 +1597,9 @@ public class JournalPortlet extends MVCPortlet {
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private AssetEntryUsageLocalService _assetEntryUsageLocalService;
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;

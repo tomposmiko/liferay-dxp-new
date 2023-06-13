@@ -17,6 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <clay:management-toolbar
+	clearResultsURL="<%= changeListsHistoryDisplayContext.getViewSearchActionURL() %>"
+	componentId="changeListHistoryManagementToolbar"
 	filterDropdownItems="<%= changeListsHistoryDisplayContext.getFilterDropdownItems() %>"
 	searchActionURL="<%= changeListsHistoryDisplayContext.getViewSearchActionURL() %>"
 	selectable="<%= false %>"

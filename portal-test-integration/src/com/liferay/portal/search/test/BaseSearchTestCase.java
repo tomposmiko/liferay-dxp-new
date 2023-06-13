@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.test;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -42,7 +43,6 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.test.randomizerbumpers.BBCodeRandomizerBumper;
@@ -792,13 +792,13 @@ public abstract class BaseSearchTestCase {
 
 			serviceContext.setUserId(user1.getUserId());
 
-			baseModel = addBaseModel(
+			addBaseModel(
 				parentBaseModel1, true, RandomTestUtil.randomString(),
 				serviceContext);
-			baseModel = addBaseModel(
+			addBaseModel(
 				parentBaseModel1, true, RandomTestUtil.randomString(),
 				serviceContext);
-			baseModel = addBaseModel(
+			addBaseModel(
 				parentBaseModel2, true, RandomTestUtil.randomString(),
 				serviceContext);
 
@@ -806,9 +806,10 @@ public abstract class BaseSearchTestCase {
 
 			serviceContext.setUserId(user2.getUserId());
 
-			baseModel = addBaseModel(
+			addBaseModel(
 				parentBaseModel1, true, RandomTestUtil.randomString(),
 				serviceContext);
+
 			baseModel = addBaseModel(
 				parentBaseModel2, true, RandomTestUtil.randomString(),
 				serviceContext);
@@ -861,13 +862,13 @@ public abstract class BaseSearchTestCase {
 
 			PrincipalThreadLocal.setName(user1.getUserId());
 
-			baseModel = addBaseModel(
+			addBaseModel(
 				parentBaseModel1, true, RandomTestUtil.randomString(),
 				serviceContext);
-			baseModel = addBaseModel(
+			addBaseModel(
 				parentBaseModel1, true, RandomTestUtil.randomString(),
 				serviceContext);
-			baseModel = addBaseModel(
+			addBaseModel(
 				parentBaseModel2, true, RandomTestUtil.randomString(),
 				serviceContext);
 
@@ -875,9 +876,10 @@ public abstract class BaseSearchTestCase {
 
 			PrincipalThreadLocal.setName(user2.getUserId());
 
-			baseModel = addBaseModel(
+			addBaseModel(
 				parentBaseModel1, true, RandomTestUtil.randomString(),
 				serviceContext);
+
 			baseModel = addBaseModel(
 				parentBaseModel2, true, RandomTestUtil.randomString(),
 				serviceContext);

@@ -89,8 +89,6 @@ public class AssetDisplayPageEntryLocalServiceImpl
 
 		assetDisplayPageEntryPersistence.update(assetDisplayPageEntry);
 
-		// Layout Page Template Entry
-
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
 				assetDisplayPageEntryId);
@@ -175,8 +173,6 @@ public class AssetDisplayPageEntryLocalServiceImpl
 
 		assetDisplayPageEntryPersistence.update(assetDisplayPageEntry);
 
-		// Layout Page Template Entry
-
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
 				assetDisplayPageEntryId);
@@ -192,9 +188,8 @@ public class AssetDisplayPageEntryLocalServiceImpl
 	}
 
 	private long _getPlid(
-			long groupId, long classNameId, long classPK,
-			long layoutPageTemplateEntryId)
-		throws PortalException {
+		long groupId, long classNameId, long classPK,
+		long layoutPageTemplateEntryId) {
 
 		AssetRendererFactory assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.

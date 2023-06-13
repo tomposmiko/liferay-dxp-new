@@ -6,90 +6,25 @@ import {focusedFieldStructure, pageStructure, ruleStructure} from '../../util/co
 
 const withMoveableFields = ChildComponent => {
 	class MoveableFields extends Component {
-		static PROPS = {
-
-			/**
-			 * @default
-			 * @instance
-			 * @memberof FormBuilder
-			 * @type {?number}
-			 */
-
-			activePage: Config.number().value(0),
-
-			/**
-			 * @default undefined
-			 * @instance
-			 * @memberof FormBuilder
-			 * @type {?string}
-			 */
-
-			defaultLanguageId: Config.string(),
-
-			/**
-			 * @default undefined
-			 * @instance
-			 * @memberof FormBuilder
-			 * @type {?string}
-			 */
-
-			editingLanguageId: Config.string(),
-
-			/**
-			 * @default []
-			 * @instance
-			 * @memberof Sidebar
-			 * @type {?(array|undefined)}
-			 */
-
-			fieldTypes: Config.array().value([]),
-
-			/**
-			 * @default {}
-			 * @instance
-			 * @memberof FormBuilder
-			 * @type {?object}
-			 */
-
-			focusedField: focusedFieldStructure.value({}),
-
-			/**
-			 * @default []
-			 * @instance
-			 * @memberof FormBuilder
-			 * @type {?array<object>}
-			 */
-
-			pages: Config.arrayOf(pageStructure).value([]),
-
-			/**
-			 * @instance
-			 * @memberof FormBuilder
-			 * @type {string}
-			 */
-
-			paginationMode: Config.string().required(),
-
-			/**
-			 * @instance
-			 * @memberof FormBuilder
-			 * @type {string}
-			 */
-
-			rules: Config.arrayOf(ruleStructure).required(),
-
-			/**
-			 * @default undefined
-			 * @instance
-			 * @memberof FormRenderer
-			 * @type {!string}
-			 */
-
-			spritemap: Config.string().required()
+		attached() {
+			this.createDragAndDrop();
 		}
 
-		attached() {
-			this._createDragAndDrop();
+		createDragAndDrop() {
+			this._dragAndDrop = new DragDrop(
+				{
+					sources: '.moveable .ddm-drag',
+					targets: '.moveable .ddm-target',
+					useShim: false
+				}
+			);
+
+			this._dragAndDrop.on(
+				DragDrop.Events.END,
+				this._handleDragAndDropEnd.bind(this)
+			);
+
+			this._dragAndDrop.on(DragDrop.Events.DRAG, this._handleDragStarted.bind(this));
 		}
 
 		disposeDragAndDrop() {
@@ -126,23 +61,6 @@ const withMoveableFields = ChildComponent => {
 			);
 		}
 
-		_createDragAndDrop() {
-			this._dragAndDrop = new DragDrop(
-				{
-					sources: '.moveable .ddm-drag',
-					targets: '.moveable .ddm-target',
-					useShim: false
-				}
-			);
-
-			this._dragAndDrop.on(
-				DragDrop.Events.END,
-				this._handleDragAndDropEnd.bind(this)
-			);
-
-			this._dragAndDrop.on(DragDrop.Events.DRAG, this._handleDragStarted.bind(this));
-		}
-
 		_handleDragAndDropEnd({source, target}) {
 			const lastParent = document.querySelector('.ddm-parent-dragging');
 
@@ -169,6 +87,8 @@ const withMoveableFields = ChildComponent => {
 					}
 				);
 			}
+
+			this._refreshDragAndDrop();
 		}
 
 		_handleDragStarted({source}) {
@@ -184,7 +104,94 @@ const withMoveableFields = ChildComponent => {
 
 			store.emit('fieldMoved', event);
 		}
+
+		_refreshDragAndDrop() {
+			this.disposeDragAndDrop();
+			this.createDragAndDrop();
+		}
 	}
+
+	MoveableFields.PROPS = {
+
+		/**
+		 * @default
+		 * @instance
+		 * @memberof FormBuilder
+		 * @type {?number}
+		 */
+
+		activePage: Config.number().value(0),
+
+		/**
+		 * @default undefined
+		 * @instance
+		 * @memberof FormBuilder
+		 * @type {?string}
+		 */
+
+		defaultLanguageId: Config.string(),
+
+		/**
+		 * @default undefined
+		 * @instance
+		 * @memberof FormBuilder
+		 * @type {?string}
+		 */
+
+		editingLanguageId: Config.string(),
+
+		/**
+		 * @default []
+		 * @instance
+		 * @memberof Sidebar
+		 * @type {?(array|undefined)}
+		 */
+
+		fieldTypes: Config.array().value([]),
+
+		/**
+		 * @default {}
+		 * @instance
+		 * @memberof FormBuilder
+		 * @type {?object}
+		 */
+
+		focusedField: focusedFieldStructure.value({}),
+
+		/**
+		 * @default []
+		 * @instance
+		 * @memberof FormBuilder
+		 * @type {?array<object>}
+		 */
+
+		pages: Config.arrayOf(pageStructure).value([]),
+
+		/**
+		 * @instance
+		 * @memberof FormBuilder
+		 * @type {string}
+		 */
+
+		paginationMode: Config.string().required(),
+
+		/**
+		 * @instance
+		 * @memberof FormBuilder
+		 * @type {string}
+		 */
+
+		rules: Config.arrayOf(ruleStructure).required(),
+
+		/**
+		 * @default undefined
+		 * @instance
+		 * @memberof FormRenderer
+		 * @type {!string}
+		 */
+
+		spritemap: Config.string().required()
+	};
 
 	return MoveableFields;
 };

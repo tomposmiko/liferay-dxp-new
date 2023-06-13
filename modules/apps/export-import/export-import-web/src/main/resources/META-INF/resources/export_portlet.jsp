@@ -55,6 +55,14 @@ portletURL.setParameter("portletResource", portletResource);
 
 <c:choose>
 	<c:when test='<%= tabs3.equals("new-export-process") %>'>
+		<c:if test="<%= StagingUtil.isChangeTrackingEnabled(company.getCompanyId()) %>">
+			<liferay-staging:alert
+				dismissible="<%= true %>"
+				type="WARNING"
+			>
+				<liferay-ui:message key='<%= LanguageUtil.get(request, "export-import-change-lists-warning") %>' />
+			</liferay-staging:alert>
+		</c:if>
 
 		<%
 		int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(themeDisplay.getScopeGroupId(), selPortlet.getPortletId(), BackgroundTaskExecutorNames.PORTLET_EXPORT_BACKGROUND_TASK_EXECUTOR, false);
@@ -82,19 +90,7 @@ portletURL.setParameter("portletResource", portletResource);
 			<aui:input name="tabs1" type="hidden" value="export_import" />
 			<aui:input name="tabs2" type="hidden" value="export" />
 			<aui:input name="redirect" type="hidden" value="<%= redirectURL %>" />
-
-			<%
-			if (layout instanceof VirtualLayout && layout.isTypeControlPanel()) {
-				VirtualLayout virtualLayout = (VirtualLayout)layout;
-
-				long targetGroupId = virtualLayout.getVirtualGroupId();
-
-				plid = LayoutLocalServiceUtil.getDefaultPlid(targetGroupId);
-			}
-			%>
-
 			<aui:input name="plid" type="hidden" value="<%= plid %>" />
-
 			<aui:input name="groupId" type="hidden" value="<%= themeDisplay.getScopeGroupId() %>" />
 			<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
 
@@ -578,4 +574,16 @@ portletURL.setParameter("portletResource", portletResource);
 	Liferay.Util.toggleRadio('<portlet:namespace />rangeAll', '', ['<portlet:namespace />startEndDate', '<portlet:namespace />rangeLastInputs']);
 	Liferay.Util.toggleRadio('<portlet:namespace />rangeDateRange', '<portlet:namespace />startEndDate', '<portlet:namespace />rangeLastInputs');
 	Liferay.Util.toggleRadio('<portlet:namespace />rangeLast', '<portlet:namespace />rangeLastInputs', ['<portlet:namespace />startEndDate']);
+
+	<c:if test="<%= StagingUtil.isChangeTrackingEnabled(company.getCompanyId()) %>">
+	var form = document.<portlet:namespace />fm1;
+
+	if (form) {
+		var formElements = form.elements;
+
+		for (var i = 0; i < formElements.length; ++i) {
+			formElements[i].disabled = true;
+		}
+	}
+	</c:if>
 </aui:script>

@@ -272,7 +272,9 @@ public class DataDefinitionFieldSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		return string.replaceAll("\"", "\\\\\"");
+		string = string.replace("\\", "\\\\");
+
+		return string.replace("\"", "\\\"");
 	}
 
 	private static String _toJSON(Map<String, ?> map) {
@@ -325,14 +327,14 @@ public class DataDefinitionFieldSerDes {
 			if (Objects.equals(jsonParserFieldName, "customProperties")) {
 				if (jsonParserFieldValue != null) {
 					dataDefinitionField.setCustomProperties(
-						DataDefinitionFieldSerDes.toMap(
+						(Map)DataDefinitionFieldSerDes.toMap(
 							(String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "defaultValue")) {
 				if (jsonParserFieldValue != null) {
 					dataDefinitionField.setDefaultValue(
-						DataDefinitionFieldSerDes.toMap(
+						(Map)DataDefinitionFieldSerDes.toMap(
 							(String)jsonParserFieldValue));
 				}
 			}
@@ -357,7 +359,7 @@ public class DataDefinitionFieldSerDes {
 			else if (Objects.equals(jsonParserFieldName, "label")) {
 				if (jsonParserFieldValue != null) {
 					dataDefinitionField.setLabel(
-						DataDefinitionFieldSerDes.toMap(
+						(Map)DataDefinitionFieldSerDes.toMap(
 							(String)jsonParserFieldValue));
 				}
 			}
@@ -381,7 +383,7 @@ public class DataDefinitionFieldSerDes {
 			else if (Objects.equals(jsonParserFieldName, "tip")) {
 				if (jsonParserFieldValue != null) {
 					dataDefinitionField.setTip(
-						DataDefinitionFieldSerDes.toMap(
+						(Map)DataDefinitionFieldSerDes.toMap(
 							(String)jsonParserFieldValue));
 				}
 			}

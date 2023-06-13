@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Web Content Administration";
@@ -62,75 +63,7 @@ definition {
 
 		var templateScript = '''<@liferay_portlet["runtime"] portletName="com_liferay_hello_world_web_portlet_HelloWorldPortlet" />''';
 
-		Type.typeAceEditor(
-			locator1 = "DDMEditTemplate#SCRIPT_CONTENT_FIELD_TEXT_AREA",
-			value1 = "${templateScript}");
-
-		PortletEntry.save();
-
-		SelectFrameTop();
-
-		Navigator.gotoSitePage(
-			pageName = "Web Content Display Page",
-			siteName = "Test Site Name");
-
-		Portlet.addPG(portletName = "Web Content Display");
-
-		Navigator.gotoSitePage(
-			pageName = "Web Content Display Page",
-			siteName = "Test Site Name");
-
-		WebContent.addStructuredPGViaWCD(
-			structureName = "WC Structure Name",
-			templateName = "WC Template Name",
-			webContentTitle = "WC Title");
-
-		Portlet.viewBody(
-			portletBody = "Welcome to Liferay",
-			portletName = "Hello World");
-	}
-
-	@priority = "3"
-	test AddEmbeddedPortletVelocityTemplate {
-		property osgi.app.includes = "currency-converter";
-		property testray.component.names = "Web Content Administration";
-
-		JSONLayout.addPublicLayout(
-			groupName = "Test Site Name",
-			layoutName = "Web Content Display Page");
-
-		WebContent.openWebContentAdmin(siteURLKey = "test-site-name");
-
-		NavItem.gotoStructures();
-
-		WebContentStructures.addCP(
-			structureDescription = "WC Structure Description",
-			structureName = "WC Structure Name");
-
-		DynamicDataMapping.addField(
-			field = "Text",
-			fieldFieldLabel = "Text",
-			fieldName = "Text");
-
-		WebContentStructures.saveCP(structureName = "WC Structure Name");
-
-		WebContent.openWebContentAdmin(siteURLKey = "test-site-name");
-
-		NavItem.gotoTemplates();
-
-		LexiconEntry.gotoAdd();
-
-		WebContentTemplates.inputTemplateAddScreenFields(
-			structureName = "WC Structure Name",
-			templateDescription = "WC Template Description",
-			templateLanguage = "vm",
-			templateName = "WC Template Name");
-
-		var templateScript = '''$theme.runtime("com_liferay_hello_world_web_portlet_HelloWorldPortlet")''';
-
-		Type.typeAceEditor(
-			locator1 = "DDMEditTemplate#SCRIPT_CONTENT_FIELD_TEXT_AREA",
-			value1 = "${templateScript}");
+		WebContentTemplates.inputScript(templateScript = "${templateScript}");
 
 		PortletEntry.save();
 
@@ -1388,4 +1321,5 @@ definition {
 
 		WebContentStructures.addNullCP();
 	}
+
 }

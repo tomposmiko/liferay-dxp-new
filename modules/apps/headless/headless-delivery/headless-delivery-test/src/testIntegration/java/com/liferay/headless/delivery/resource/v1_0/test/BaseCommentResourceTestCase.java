@@ -14,42 +14,37 @@
 
 package com.liferay.headless.delivery.resource.v1_0.test;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.delivery.client.dto.v1_0.Comment;
+import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
+import com.liferay.headless.delivery.client.pagination.Pagination;
+import com.liferay.headless.delivery.client.resource.v1_0.CommentResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.CommentSerDes;
-import com.liferay.headless.delivery.resource.v1_0.CommentResource;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Base64;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.InvocationTargetException;
-
-import java.net.URL;
 
 import java.text.DateFormat;
 
@@ -58,19 +53,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
@@ -108,8 +100,10 @@ public abstract class BaseCommentResourceTestCase {
 		testGroup = GroupTestUtil.addGroup();
 		testLocale = LocaleUtil.getDefault();
 
-		_resourceURL = new URL(
-			"http://localhost:8080/o/headless-delivery/v1.0");
+		testCompany = CompanyLocalServiceUtil.getCompany(
+			testGroup.getCompanyId());
+
+		_commentResource.setContextCompany(testCompany);
 	}
 
 	@After
@@ -123,18 +117,16 @@ public abstract class BaseCommentResourceTestCase {
 		ObjectMapper objectMapper = new ObjectMapper() {
 			{
 				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				configure(
+					SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
 				enable(SerializationFeature.INDENT_OUTPUT);
 				setDateFormat(new ISO8601DateFormat());
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
 				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+				setVisibility(
+					PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+				setVisibility(
+					PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
 			}
 		};
 
@@ -152,17 +144,15 @@ public abstract class BaseCommentResourceTestCase {
 		ObjectMapper objectMapper = new ObjectMapper() {
 			{
 				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				configure(
+					SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
 				setDateFormat(new ISO8601DateFormat());
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
 				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+				setVisibility(
+					PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+				setVisibility(
+					PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
 			}
 		};
 
@@ -176,6 +166,23 @@ public abstract class BaseCommentResourceTestCase {
 	}
 
 	@Test
+	public void testEscapeRegexInStringFields() throws Exception {
+		String regex = "^[0-9]+(\\.[0-9]{1,2})\"?";
+
+		Comment comment = randomComment();
+
+		comment.setText(regex);
+
+		String json = CommentSerDes.toJSON(comment);
+
+		Assert.assertFalse(json.contains(regex));
+
+		comment = CommentSerDes.toDTO(json);
+
+		Assert.assertEquals(regex, comment.getText());
+	}
+
+	@Test
 	public void testGetBlogPostingCommentsPage() throws Exception {
 		Long blogPostingId = testGetBlogPostingCommentsPage_getBlogPostingId();
 		Long irrelevantBlogPostingId =
@@ -186,7 +193,7 @@ public abstract class BaseCommentResourceTestCase {
 				testGetBlogPostingCommentsPage_addComment(
 					irrelevantBlogPostingId, randomIrrelevantComment());
 
-			Page<Comment> page = invokeGetBlogPostingCommentsPage(
+			Page<Comment> page = CommentResource.getBlogPostingCommentsPage(
 				irrelevantBlogPostingId, null, null, Pagination.of(1, 2), null);
 
 			Assert.assertEquals(1, page.getTotalCount());
@@ -203,7 +210,7 @@ public abstract class BaseCommentResourceTestCase {
 		Comment comment2 = testGetBlogPostingCommentsPage_addComment(
 			blogPostingId, randomComment());
 
-		Page<Comment> page = invokeGetBlogPostingCommentsPage(
+		Page<Comment> page = CommentResource.getBlogPostingCommentsPage(
 			blogPostingId, null, null, Pagination.of(1, 2), null);
 
 		Assert.assertEquals(2, page.getTotalCount());
@@ -232,7 +239,7 @@ public abstract class BaseCommentResourceTestCase {
 			blogPostingId, comment1);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> page = invokeGetBlogPostingCommentsPage(
+			Page<Comment> page = CommentResource.getBlogPostingCommentsPage(
 				blogPostingId, null,
 				getFilterString(entityField, "between", comment1),
 				Pagination.of(1, 2), null);
@@ -264,7 +271,7 @@ public abstract class BaseCommentResourceTestCase {
 			blogPostingId, randomComment());
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> page = invokeGetBlogPostingCommentsPage(
+			Page<Comment> page = CommentResource.getBlogPostingCommentsPage(
 				blogPostingId, null,
 				getFilterString(entityField, "eq", comment1),
 				Pagination.of(1, 2), null);
@@ -290,14 +297,14 @@ public abstract class BaseCommentResourceTestCase {
 		Comment comment3 = testGetBlogPostingCommentsPage_addComment(
 			blogPostingId, randomComment());
 
-		Page<Comment> page1 = invokeGetBlogPostingCommentsPage(
+		Page<Comment> page1 = CommentResource.getBlogPostingCommentsPage(
 			blogPostingId, null, null, Pagination.of(1, 2), null);
 
 		List<Comment> comments1 = (List<Comment>)page1.getItems();
 
 		Assert.assertEquals(comments1.toString(), 2, comments1.size());
 
-		Page<Comment> page2 = invokeGetBlogPostingCommentsPage(
+		Page<Comment> page2 = CommentResource.getBlogPostingCommentsPage(
 			blogPostingId, null, null, Pagination.of(2, 2), null);
 
 		Assert.assertEquals(3, page2.getTotalCount());
@@ -345,7 +352,7 @@ public abstract class BaseCommentResourceTestCase {
 			blogPostingId, comment2);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> ascPage = invokeGetBlogPostingCommentsPage(
+			Page<Comment> ascPage = CommentResource.getBlogPostingCommentsPage(
 				blogPostingId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":asc");
 
@@ -353,7 +360,7 @@ public abstract class BaseCommentResourceTestCase {
 				Arrays.asList(comment1, comment2),
 				(List<Comment>)ascPage.getItems());
 
-			Page<Comment> descPage = invokeGetBlogPostingCommentsPage(
+			Page<Comment> descPage = CommentResource.getBlogPostingCommentsPage(
 				blogPostingId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":desc");
 
@@ -391,7 +398,7 @@ public abstract class BaseCommentResourceTestCase {
 			blogPostingId, comment2);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> ascPage = invokeGetBlogPostingCommentsPage(
+			Page<Comment> ascPage = CommentResource.getBlogPostingCommentsPage(
 				blogPostingId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":asc");
 
@@ -399,7 +406,7 @@ public abstract class BaseCommentResourceTestCase {
 				Arrays.asList(comment1, comment2),
 				(List<Comment>)ascPage.getItems());
 
-			Page<Comment> descPage = invokeGetBlogPostingCommentsPage(
+			Page<Comment> descPage = CommentResource.getBlogPostingCommentsPage(
 				blogPostingId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":desc");
 
@@ -413,7 +420,7 @@ public abstract class BaseCommentResourceTestCase {
 			Long blogPostingId, Comment comment)
 		throws Exception {
 
-		return invokePostBlogPostingComment(blogPostingId, comment);
+		return CommentResource.postBlogPostingComment(blogPostingId, comment);
 	}
 
 	protected Long testGetBlogPostingCommentsPage_getBlogPostingId()
@@ -427,66 +434,6 @@ public abstract class BaseCommentResourceTestCase {
 		throws Exception {
 
 		return null;
-	}
-
-	protected Page<Comment> invokeGetBlogPostingCommentsPage(
-			Long blogPostingId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/blog-postings/{blogPostingId}/comments", blogPostingId);
-
-		location = HttpUtil.addParameter(location, "filter", filterString);
-
-		location = HttpUtil.addParameter(
-			location, "page", pagination.getPage());
-		location = HttpUtil.addParameter(
-			location, "pageSize", pagination.getPageSize());
-
-		location = HttpUtil.addParameter(location, "sort", sortString);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		return Page.of(string, CommentSerDes::toDTO);
-	}
-
-	protected Http.Response invokeGetBlogPostingCommentsPageResponse(
-			Long blogPostingId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/blog-postings/{blogPostingId}/comments", blogPostingId);
-
-		location = HttpUtil.addParameter(location, "filter", filterString);
-
-		location = HttpUtil.addParameter(
-			location, "page", pagination.getPage());
-		location = HttpUtil.addParameter(
-			location, "pageSize", pagination.getPageSize());
-
-		location = HttpUtil.addParameter(location, "sort", sortString);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -503,80 +450,22 @@ public abstract class BaseCommentResourceTestCase {
 	protected Comment testPostBlogPostingComment_addComment(Comment comment)
 		throws Exception {
 
-		return invokePostBlogPostingComment(
+		return CommentResource.postBlogPostingComment(
 			testGetBlogPostingCommentsPage_getBlogPostingId(), comment);
-	}
-
-	protected Comment invokePostBlogPostingComment(
-			Long blogPostingId, Comment comment)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
-			StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/blog-postings/{blogPostingId}/comments", blogPostingId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return CommentSerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokePostBlogPostingCommentResponse(
-			Long blogPostingId, Comment comment)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
-			StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/blog-postings/{blogPostingId}/comments", blogPostingId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
 	public void testDeleteComment() throws Exception {
 		Comment comment = testDeleteComment_addComment();
 
-		assertResponseCode(204, invokeDeleteCommentResponse(comment.getId()));
+		assertHttpResponseStatusCode(
+			204, CommentResource.deleteCommentHttpResponse(comment.getId()));
 
-		assertResponseCode(404, invokeGetCommentResponse(comment.getId()));
+		assertHttpResponseStatusCode(
+			404, CommentResource.getCommentHttpResponse(comment.getId()));
 
-		assertResponseCode(404, invokeGetCommentResponse(0L));
+		assertHttpResponseStatusCode(
+			404, CommentResource.getCommentHttpResponse(0L));
 	}
 
 	protected Comment testDeleteComment_addComment() throws Exception {
@@ -584,45 +473,11 @@ public abstract class BaseCommentResourceTestCase {
 			"This method needs to be implemented");
 	}
 
-	protected void invokeDeleteComment(Long commentId) throws Exception {
-		Http.Options options = _createHttpOptions();
-
-		options.setDelete(true);
-
-		String location =
-			_resourceURL + _toPath("/comments/{commentId}", commentId);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-	}
-
-	protected Http.Response invokeDeleteCommentResponse(Long commentId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setDelete(true);
-
-		String location =
-			_resourceURL + _toPath("/comments/{commentId}", commentId);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
 	@Test
 	public void testGetComment() throws Exception {
 		Comment postComment = testGetComment_addComment();
 
-		Comment getComment = invokeGetComment(postComment.getId());
+		Comment getComment = CommentResource.getComment(postComment.getId());
 
 		assertEquals(postComment, getComment);
 		assertValid(getComment);
@@ -633,60 +488,19 @@ public abstract class BaseCommentResourceTestCase {
 			"This method needs to be implemented");
 	}
 
-	protected Comment invokeGetComment(Long commentId) throws Exception {
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL + _toPath("/comments/{commentId}", commentId);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return CommentSerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokeGetCommentResponse(Long commentId)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL + _toPath("/comments/{commentId}", commentId);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
 	@Test
 	public void testPutComment() throws Exception {
 		Comment postComment = testPutComment_addComment();
 
 		Comment randomComment = randomComment();
 
-		Comment putComment = invokePutComment(
+		Comment putComment = CommentResource.putComment(
 			postComment.getId(), randomComment);
 
 		assertEquals(randomComment, putComment);
 		assertValid(putComment);
 
-		Comment getComment = invokeGetComment(putComment.getId());
+		Comment getComment = CommentResource.getComment(putComment.getId());
 
 		assertEquals(randomComment, getComment);
 		assertValid(getComment);
@@ -695,62 +509,6 @@ public abstract class BaseCommentResourceTestCase {
 	protected Comment testPutComment_addComment() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
-	}
-
-	protected Comment invokePutComment(Long commentId, Comment comment)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
-			StringPool.UTF8);
-
-		String location =
-			_resourceURL + _toPath("/comments/{commentId}", commentId);
-
-		options.setLocation(location);
-
-		options.setPut(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return CommentSerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokePutCommentResponse(
-			Long commentId, Comment comment)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
-			StringPool.UTF8);
-
-		String location =
-			_resourceURL + _toPath("/comments/{commentId}", commentId);
-
-		options.setLocation(location);
-
-		options.setPut(true);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -763,7 +521,7 @@ public abstract class BaseCommentResourceTestCase {
 			Comment irrelevantComment = testGetCommentCommentsPage_addComment(
 				irrelevantParentCommentId, randomIrrelevantComment());
 
-			Page<Comment> page = invokeGetCommentCommentsPage(
+			Page<Comment> page = CommentResource.getCommentCommentsPage(
 				irrelevantParentCommentId, null, null, Pagination.of(1, 2),
 				null);
 
@@ -781,7 +539,7 @@ public abstract class BaseCommentResourceTestCase {
 		Comment comment2 = testGetCommentCommentsPage_addComment(
 			parentCommentId, randomComment());
 
-		Page<Comment> page = invokeGetCommentCommentsPage(
+		Page<Comment> page = CommentResource.getCommentCommentsPage(
 			parentCommentId, null, null, Pagination.of(1, 2), null);
 
 		Assert.assertEquals(2, page.getTotalCount());
@@ -810,7 +568,7 @@ public abstract class BaseCommentResourceTestCase {
 			parentCommentId, comment1);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> page = invokeGetCommentCommentsPage(
+			Page<Comment> page = CommentResource.getCommentCommentsPage(
 				parentCommentId, null,
 				getFilterString(entityField, "between", comment1),
 				Pagination.of(1, 2), null);
@@ -842,7 +600,7 @@ public abstract class BaseCommentResourceTestCase {
 			parentCommentId, randomComment());
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> page = invokeGetCommentCommentsPage(
+			Page<Comment> page = CommentResource.getCommentCommentsPage(
 				parentCommentId, null,
 				getFilterString(entityField, "eq", comment1),
 				Pagination.of(1, 2), null);
@@ -866,14 +624,14 @@ public abstract class BaseCommentResourceTestCase {
 		Comment comment3 = testGetCommentCommentsPage_addComment(
 			parentCommentId, randomComment());
 
-		Page<Comment> page1 = invokeGetCommentCommentsPage(
+		Page<Comment> page1 = CommentResource.getCommentCommentsPage(
 			parentCommentId, null, null, Pagination.of(1, 2), null);
 
 		List<Comment> comments1 = (List<Comment>)page1.getItems();
 
 		Assert.assertEquals(comments1.toString(), 2, comments1.size());
 
-		Page<Comment> page2 = invokeGetCommentCommentsPage(
+		Page<Comment> page2 = CommentResource.getCommentCommentsPage(
 			parentCommentId, null, null, Pagination.of(2, 2), null);
 
 		Assert.assertEquals(3, page2.getTotalCount());
@@ -919,7 +677,7 @@ public abstract class BaseCommentResourceTestCase {
 			parentCommentId, comment2);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> ascPage = invokeGetCommentCommentsPage(
+			Page<Comment> ascPage = CommentResource.getCommentCommentsPage(
 				parentCommentId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":asc");
 
@@ -927,7 +685,7 @@ public abstract class BaseCommentResourceTestCase {
 				Arrays.asList(comment1, comment2),
 				(List<Comment>)ascPage.getItems());
 
-			Page<Comment> descPage = invokeGetCommentCommentsPage(
+			Page<Comment> descPage = CommentResource.getCommentCommentsPage(
 				parentCommentId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":desc");
 
@@ -963,7 +721,7 @@ public abstract class BaseCommentResourceTestCase {
 			parentCommentId, comment2);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> ascPage = invokeGetCommentCommentsPage(
+			Page<Comment> ascPage = CommentResource.getCommentCommentsPage(
 				parentCommentId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":asc");
 
@@ -971,7 +729,7 @@ public abstract class BaseCommentResourceTestCase {
 				Arrays.asList(comment1, comment2),
 				(List<Comment>)ascPage.getItems());
 
-			Page<Comment> descPage = invokeGetCommentCommentsPage(
+			Page<Comment> descPage = CommentResource.getCommentCommentsPage(
 				parentCommentId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":desc");
 
@@ -985,7 +743,7 @@ public abstract class BaseCommentResourceTestCase {
 			Long parentCommentId, Comment comment)
 		throws Exception {
 
-		return invokePostCommentComment(parentCommentId, comment);
+		return CommentResource.postCommentComment(parentCommentId, comment);
 	}
 
 	protected Long testGetCommentCommentsPage_getParentCommentId()
@@ -1001,66 +759,6 @@ public abstract class BaseCommentResourceTestCase {
 		return null;
 	}
 
-	protected Page<Comment> invokeGetCommentCommentsPage(
-			Long parentCommentId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/comments/{parentCommentId}/comments", parentCommentId);
-
-		location = HttpUtil.addParameter(location, "filter", filterString);
-
-		location = HttpUtil.addParameter(
-			location, "page", pagination.getPage());
-		location = HttpUtil.addParameter(
-			location, "pageSize", pagination.getPageSize());
-
-		location = HttpUtil.addParameter(location, "sort", sortString);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		return Page.of(string, CommentSerDes::toDTO);
-	}
-
-	protected Http.Response invokeGetCommentCommentsPageResponse(
-			Long parentCommentId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/comments/{parentCommentId}/comments", parentCommentId);
-
-		location = HttpUtil.addParameter(location, "filter", filterString);
-
-		location = HttpUtil.addParameter(
-			location, "page", pagination.getPage());
-		location = HttpUtil.addParameter(
-			location, "pageSize", pagination.getPageSize());
-
-		location = HttpUtil.addParameter(location, "sort", sortString);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
 	@Test
 	public void testPostCommentComment() throws Exception {
 		Comment randomComment = randomComment();
@@ -1074,69 +772,8 @@ public abstract class BaseCommentResourceTestCase {
 	protected Comment testPostCommentComment_addComment(Comment comment)
 		throws Exception {
 
-		return invokePostCommentComment(
+		return CommentResource.postCommentComment(
 			testGetCommentCommentsPage_getParentCommentId(), comment);
-	}
-
-	protected Comment invokePostCommentComment(
-			Long parentCommentId, Comment comment)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
-			StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/comments/{parentCommentId}/comments", parentCommentId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return CommentSerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokePostCommentCommentResponse(
-			Long parentCommentId, Comment comment)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
-			StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/comments/{parentCommentId}/comments", parentCommentId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -1149,7 +786,7 @@ public abstract class BaseCommentResourceTestCase {
 			Comment irrelevantComment = testGetDocumentCommentsPage_addComment(
 				irrelevantDocumentId, randomIrrelevantComment());
 
-			Page<Comment> page = invokeGetDocumentCommentsPage(
+			Page<Comment> page = CommentResource.getDocumentCommentsPage(
 				irrelevantDocumentId, null, null, Pagination.of(1, 2), null);
 
 			Assert.assertEquals(1, page.getTotalCount());
@@ -1166,7 +803,7 @@ public abstract class BaseCommentResourceTestCase {
 		Comment comment2 = testGetDocumentCommentsPage_addComment(
 			documentId, randomComment());
 
-		Page<Comment> page = invokeGetDocumentCommentsPage(
+		Page<Comment> page = CommentResource.getDocumentCommentsPage(
 			documentId, null, null, Pagination.of(1, 2), null);
 
 		Assert.assertEquals(2, page.getTotalCount());
@@ -1194,7 +831,7 @@ public abstract class BaseCommentResourceTestCase {
 		comment1 = testGetDocumentCommentsPage_addComment(documentId, comment1);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> page = invokeGetDocumentCommentsPage(
+			Page<Comment> page = CommentResource.getDocumentCommentsPage(
 				documentId, null,
 				getFilterString(entityField, "between", comment1),
 				Pagination.of(1, 2), null);
@@ -1226,7 +863,7 @@ public abstract class BaseCommentResourceTestCase {
 			documentId, randomComment());
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> page = invokeGetDocumentCommentsPage(
+			Page<Comment> page = CommentResource.getDocumentCommentsPage(
 				documentId, null, getFilterString(entityField, "eq", comment1),
 				Pagination.of(1, 2), null);
 
@@ -1249,14 +886,14 @@ public abstract class BaseCommentResourceTestCase {
 		Comment comment3 = testGetDocumentCommentsPage_addComment(
 			documentId, randomComment());
 
-		Page<Comment> page1 = invokeGetDocumentCommentsPage(
+		Page<Comment> page1 = CommentResource.getDocumentCommentsPage(
 			documentId, null, null, Pagination.of(1, 2), null);
 
 		List<Comment> comments1 = (List<Comment>)page1.getItems();
 
 		Assert.assertEquals(comments1.toString(), 2, comments1.size());
 
-		Page<Comment> page2 = invokeGetDocumentCommentsPage(
+		Page<Comment> page2 = CommentResource.getDocumentCommentsPage(
 			documentId, null, null, Pagination.of(2, 2), null);
 
 		Assert.assertEquals(3, page2.getTotalCount());
@@ -1300,7 +937,7 @@ public abstract class BaseCommentResourceTestCase {
 		comment2 = testGetDocumentCommentsPage_addComment(documentId, comment2);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> ascPage = invokeGetDocumentCommentsPage(
+			Page<Comment> ascPage = CommentResource.getDocumentCommentsPage(
 				documentId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":asc");
 
@@ -1308,7 +945,7 @@ public abstract class BaseCommentResourceTestCase {
 				Arrays.asList(comment1, comment2),
 				(List<Comment>)ascPage.getItems());
 
-			Page<Comment> descPage = invokeGetDocumentCommentsPage(
+			Page<Comment> descPage = CommentResource.getDocumentCommentsPage(
 				documentId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":desc");
 
@@ -1342,7 +979,7 @@ public abstract class BaseCommentResourceTestCase {
 		comment2 = testGetDocumentCommentsPage_addComment(documentId, comment2);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> ascPage = invokeGetDocumentCommentsPage(
+			Page<Comment> ascPage = CommentResource.getDocumentCommentsPage(
 				documentId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":asc");
 
@@ -1350,7 +987,7 @@ public abstract class BaseCommentResourceTestCase {
 				Arrays.asList(comment1, comment2),
 				(List<Comment>)ascPage.getItems());
 
-			Page<Comment> descPage = invokeGetDocumentCommentsPage(
+			Page<Comment> descPage = CommentResource.getDocumentCommentsPage(
 				documentId, null, null, Pagination.of(1, 2),
 				entityField.getName() + ":desc");
 
@@ -1364,7 +1001,7 @@ public abstract class BaseCommentResourceTestCase {
 			Long documentId, Comment comment)
 		throws Exception {
 
-		return invokePostDocumentComment(documentId, comment);
+		return CommentResource.postDocumentComment(documentId, comment);
 	}
 
 	protected Long testGetDocumentCommentsPage_getDocumentId()
@@ -1380,64 +1017,6 @@ public abstract class BaseCommentResourceTestCase {
 		return null;
 	}
 
-	protected Page<Comment> invokeGetDocumentCommentsPage(
-			Long documentId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath("/documents/{documentId}/comments", documentId);
-
-		location = HttpUtil.addParameter(location, "filter", filterString);
-
-		location = HttpUtil.addParameter(
-			location, "page", pagination.getPage());
-		location = HttpUtil.addParameter(
-			location, "pageSize", pagination.getPageSize());
-
-		location = HttpUtil.addParameter(location, "sort", sortString);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		return Page.of(string, CommentSerDes::toDTO);
-	}
-
-	protected Http.Response invokeGetDocumentCommentsPageResponse(
-			Long documentId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath("/documents/{documentId}/comments", documentId);
-
-		location = HttpUtil.addParameter(location, "filter", filterString);
-
-		location = HttpUtil.addParameter(
-			location, "page", pagination.getPage());
-		location = HttpUtil.addParameter(
-			location, "pageSize", pagination.getPageSize());
-
-		location = HttpUtil.addParameter(location, "sort", sortString);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
 	@Test
 	public void testPostDocumentComment() throws Exception {
 		Comment randomComment = randomComment();
@@ -1451,67 +1030,8 @@ public abstract class BaseCommentResourceTestCase {
 	protected Comment testPostDocumentComment_addComment(Comment comment)
 		throws Exception {
 
-		return invokePostDocumentComment(
+		return CommentResource.postDocumentComment(
 			testGetDocumentCommentsPage_getDocumentId(), comment);
-	}
-
-	protected Comment invokePostDocumentComment(
-			Long documentId, Comment comment)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
-			StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath("/documents/{documentId}/comments", documentId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return CommentSerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokePostDocumentCommentResponse(
-			Long documentId, Comment comment)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
-			StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath("/documents/{documentId}/comments", documentId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -1526,9 +1046,10 @@ public abstract class BaseCommentResourceTestCase {
 				testGetStructuredContentCommentsPage_addComment(
 					irrelevantStructuredContentId, randomIrrelevantComment());
 
-			Page<Comment> page = invokeGetStructuredContentCommentsPage(
-				irrelevantStructuredContentId, null, null, Pagination.of(1, 2),
-				null);
+			Page<Comment> page =
+				CommentResource.getStructuredContentCommentsPage(
+					irrelevantStructuredContentId, null, null,
+					Pagination.of(1, 2), null);
 
 			Assert.assertEquals(1, page.getTotalCount());
 
@@ -1544,7 +1065,7 @@ public abstract class BaseCommentResourceTestCase {
 		Comment comment2 = testGetStructuredContentCommentsPage_addComment(
 			structuredContentId, randomComment());
 
-		Page<Comment> page = invokeGetStructuredContentCommentsPage(
+		Page<Comment> page = CommentResource.getStructuredContentCommentsPage(
 			structuredContentId, null, null, Pagination.of(1, 2), null);
 
 		Assert.assertEquals(2, page.getTotalCount());
@@ -1574,10 +1095,11 @@ public abstract class BaseCommentResourceTestCase {
 			structuredContentId, comment1);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> page = invokeGetStructuredContentCommentsPage(
-				structuredContentId, null,
-				getFilterString(entityField, "between", comment1),
-				Pagination.of(1, 2), null);
+			Page<Comment> page =
+				CommentResource.getStructuredContentCommentsPage(
+					structuredContentId, null,
+					getFilterString(entityField, "between", comment1),
+					Pagination.of(1, 2), null);
 
 			assertEquals(
 				Collections.singletonList(comment1),
@@ -1607,10 +1129,11 @@ public abstract class BaseCommentResourceTestCase {
 			structuredContentId, randomComment());
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> page = invokeGetStructuredContentCommentsPage(
-				structuredContentId, null,
-				getFilterString(entityField, "eq", comment1),
-				Pagination.of(1, 2), null);
+			Page<Comment> page =
+				CommentResource.getStructuredContentCommentsPage(
+					structuredContentId, null,
+					getFilterString(entityField, "eq", comment1),
+					Pagination.of(1, 2), null);
 
 			assertEquals(
 				Collections.singletonList(comment1),
@@ -1634,14 +1157,14 @@ public abstract class BaseCommentResourceTestCase {
 		Comment comment3 = testGetStructuredContentCommentsPage_addComment(
 			structuredContentId, randomComment());
 
-		Page<Comment> page1 = invokeGetStructuredContentCommentsPage(
+		Page<Comment> page1 = CommentResource.getStructuredContentCommentsPage(
 			structuredContentId, null, null, Pagination.of(1, 2), null);
 
 		List<Comment> comments1 = (List<Comment>)page1.getItems();
 
 		Assert.assertEquals(comments1.toString(), 2, comments1.size());
 
-		Page<Comment> page2 = invokeGetStructuredContentCommentsPage(
+		Page<Comment> page2 = CommentResource.getStructuredContentCommentsPage(
 			structuredContentId, null, null, Pagination.of(2, 2), null);
 
 		Assert.assertEquals(3, page2.getTotalCount());
@@ -1690,17 +1213,19 @@ public abstract class BaseCommentResourceTestCase {
 			structuredContentId, comment2);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> ascPage = invokeGetStructuredContentCommentsPage(
-				structuredContentId, null, null, Pagination.of(1, 2),
-				entityField.getName() + ":asc");
+			Page<Comment> ascPage =
+				CommentResource.getStructuredContentCommentsPage(
+					structuredContentId, null, null, Pagination.of(1, 2),
+					entityField.getName() + ":asc");
 
 			assertEquals(
 				Arrays.asList(comment1, comment2),
 				(List<Comment>)ascPage.getItems());
 
-			Page<Comment> descPage = invokeGetStructuredContentCommentsPage(
-				structuredContentId, null, null, Pagination.of(1, 2),
-				entityField.getName() + ":desc");
+			Page<Comment> descPage =
+				CommentResource.getStructuredContentCommentsPage(
+					structuredContentId, null, null, Pagination.of(1, 2),
+					entityField.getName() + ":desc");
 
 			assertEquals(
 				Arrays.asList(comment2, comment1),
@@ -1737,17 +1262,19 @@ public abstract class BaseCommentResourceTestCase {
 			structuredContentId, comment2);
 
 		for (EntityField entityField : entityFields) {
-			Page<Comment> ascPage = invokeGetStructuredContentCommentsPage(
-				structuredContentId, null, null, Pagination.of(1, 2),
-				entityField.getName() + ":asc");
+			Page<Comment> ascPage =
+				CommentResource.getStructuredContentCommentsPage(
+					structuredContentId, null, null, Pagination.of(1, 2),
+					entityField.getName() + ":asc");
 
 			assertEquals(
 				Arrays.asList(comment1, comment2),
 				(List<Comment>)ascPage.getItems());
 
-			Page<Comment> descPage = invokeGetStructuredContentCommentsPage(
-				structuredContentId, null, null, Pagination.of(1, 2),
-				entityField.getName() + ":desc");
+			Page<Comment> descPage =
+				CommentResource.getStructuredContentCommentsPage(
+					structuredContentId, null, null, Pagination.of(1, 2),
+					entityField.getName() + ":desc");
 
 			assertEquals(
 				Arrays.asList(comment2, comment1),
@@ -1759,7 +1286,8 @@ public abstract class BaseCommentResourceTestCase {
 			Long structuredContentId, Comment comment)
 		throws Exception {
 
-		return invokePostStructuredContentComment(structuredContentId, comment);
+		return CommentResource.postStructuredContentComment(
+			structuredContentId, comment);
 	}
 
 	protected Long testGetStructuredContentCommentsPage_getStructuredContentId()
@@ -1774,68 +1302,6 @@ public abstract class BaseCommentResourceTestCase {
 		throws Exception {
 
 		return null;
-	}
-
-	protected Page<Comment> invokeGetStructuredContentCommentsPage(
-			Long structuredContentId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/structured-contents/{structuredContentId}/comments",
-					structuredContentId);
-
-		location = HttpUtil.addParameter(location, "filter", filterString);
-
-		location = HttpUtil.addParameter(
-			location, "page", pagination.getPage());
-		location = HttpUtil.addParameter(
-			location, "pageSize", pagination.getPageSize());
-
-		location = HttpUtil.addParameter(location, "sort", sortString);
-
-		options.setLocation(location);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		return Page.of(string, CommentSerDes::toDTO);
-	}
-
-	protected Http.Response invokeGetStructuredContentCommentsPageResponse(
-			Long structuredContentId, String search, String filterString,
-			Pagination pagination, String sortString)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/structured-contents/{structuredContentId}/comments",
-					structuredContentId);
-
-		location = HttpUtil.addParameter(location, "filter", filterString);
-
-		location = HttpUtil.addParameter(
-			location, "page", pagination.getPage());
-		location = HttpUtil.addParameter(
-			location, "pageSize", pagination.getPageSize());
-
-		location = HttpUtil.addParameter(location, "sort", sortString);
-
-		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
 	}
 
 	@Test
@@ -1853,79 +1319,17 @@ public abstract class BaseCommentResourceTestCase {
 			Comment comment)
 		throws Exception {
 
-		return invokePostStructuredContentComment(
+		return CommentResource.postStructuredContentComment(
 			testGetStructuredContentCommentsPage_getStructuredContentId(),
 			comment);
 	}
 
-	protected Comment invokePostStructuredContentComment(
-			Long structuredContentId, Comment comment)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
-			StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/structured-contents/{structuredContentId}/comments",
-					structuredContentId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return CommentSerDes.toDTO(string);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to process HTTP response: " + string, e);
-			}
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokePostStructuredContentCommentResponse(
-			Long structuredContentId, Comment comment)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
-			StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath(
-					"/structured-contents/{structuredContentId}/comments",
-					structuredContentId);
-
-		options.setLocation(location);
-
-		options.setPost(true);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
-	protected void assertResponseCode(
-		int expectedResponseCode, Http.Response actualResponse) {
+	protected void assertHttpResponseStatusCode(
+		int expectedHttpResponseStatusCode,
+		HttpInvoker.HttpResponse actualHttpResponse) {
 
 		Assert.assertEquals(
-			expectedResponseCode, actualResponse.getResponseCode());
+			expectedHttpResponseStatusCode, actualHttpResponse.getStatusCode());
 	}
 
 	protected void assertEquals(Comment comment1, Comment comment2) {
@@ -2271,76 +1675,10 @@ public abstract class BaseCommentResourceTestCase {
 	}
 
 	protected Group irrelevantGroup;
-	protected String testContentType = "application/json";
+	protected Company testCompany;
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	private Http.Options _createHttpOptions() {
-		Http.Options options = new Http.Options();
-
-		options.addHeader("Accept", "application/json");
-		options.addHeader(
-			"Accept-Language", LocaleUtil.toW3cLanguageId(testLocale));
-
-		String encodedTestUserNameAndPassword = Base64.encode(
-			testUserNameAndPassword.getBytes());
-
-		options.addHeader(
-			"Authorization", "Basic " + encodedTestUserNameAndPassword);
-
-		options.addHeader("Content-Type", testContentType);
-
-		return options;
-	}
-
-	private String _toJSON(Map<String, String> map) {
-		if (map == null) {
-			return "null";
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("{");
-
-		Set<Map.Entry<String, String>> set = map.entrySet();
-
-		Iterator<Map.Entry<String, String>> iterator = set.iterator();
-
-		while (iterator.hasNext()) {
-			Map.Entry<String, String> entry = iterator.next();
-
-			sb.append("\"" + entry.getKey() + "\": ");
-
-			if (entry.getValue() == null) {
-				sb.append("null");
-			}
-			else {
-				sb.append("\"" + entry.getValue() + "\"");
-			}
-
-			if (iterator.hasNext()) {
-				sb.append(", ");
-			}
-		}
-
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private String _toPath(String template, Object... values) {
-		if (ArrayUtil.isEmpty(values)) {
-			return template;
-		}
-
-		for (int i = 0; i < values.length; i++) {
-			template = template.replaceFirst(
-				"\\{.*?\\}", String.valueOf(values[i]));
-		}
-
-		return template;
-	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseCommentResourceTestCase.class);
@@ -2360,8 +1698,7 @@ public abstract class BaseCommentResourceTestCase {
 	private static DateFormat _dateFormat;
 
 	@Inject
-	private CommentResource _commentResource;
-
-	private URL _resourceURL;
+	private com.liferay.headless.delivery.resource.v1_0.CommentResource
+		_commentResource;
 
 }

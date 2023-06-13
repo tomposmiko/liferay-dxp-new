@@ -476,7 +476,7 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			<propertyregex
 				input="${test.batch.name}"
 				property="java.jdk.bundle.version"
-				regexp="-jdk([0-9]+)(_(adopt|open|oracle|redhat|zulu))?"
+				regexp="-jdk([0-9]+)(_(open|oracle|redhat|zulu))?"
 				select="\1"
 			/>
 
@@ -3466,6 +3466,7 @@ go</echo>
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.0" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.10" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.10.1" />
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.10.2" />
 					</or>
 					<then>
 						<var name="app.server.tomcat.version" value="9.0.6" />
@@ -3840,6 +3841,8 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					<contains string="${test.batch.name}" substring="unit" />
 				</or>
 				<then>
+					<mkdir dir="${liferay.home}/osgi/test" />
+
 					<copy
 						todir="${liferay.home}/osgi/modules"
 					>
@@ -7067,7 +7070,7 @@ ${lcs.portal.bundle.properties}</echo>
 			file="${app.server.bin.dir}/setenv${file.suffix.bat}"
 		>
 			<replacetoken><![CDATA[-Djava.net.preferIPv4Stack=true]]></replacetoken>
-			<replacevalue><![CDATA[-Djava.net.preferIPv4Stack=true -Dportal:ldap.auth.search.filter=\"(&(mail=@email_address@)(member=cn=Liferay\5C, Inc.,ou=Organizations,ou=liferay.com,o=Liferay))\" -Dportal:ldap.import.user.search.filter=\"(&(objectClass=inetOrgPerson)(member=cn=Liferay\5C, Inc.,ou=Organizations,ou=liferay.com,o=Liferay))\"]]></replacevalue>
+			<replacevalue><![CDATA[-Djava.locale.providers=JRE,COMPAT,CLDR -Djava.net.preferIPv4Stack=true -Dportal:ldap.auth.search.filter=\"(&(mail=@email_address@)(member=cn=Liferay\5C, Inc.,ou=Organizations,ou=liferay.com,o=Liferay))\" -Dportal:ldap.import.user.search.filter=\"(&(objectClass=inetOrgPerson)(member=cn=Liferay\5C, Inc.,ou=Organizations,ou=liferay.com,o=Liferay))\"]]></replacevalue>
 		</replace>
 
 		<copy
@@ -7126,7 +7129,7 @@ ${lcs.portal.bundle.properties}</echo>
 			file="${app.server.dir}/bin/setenv${file.suffix.bat}"
 		>
 			<replacetoken><![CDATA[-XX:MaxPermSize=256m]]></replacetoken>
-			<replacevalue><![CDATA[-XX:MaxPermSize=256m -javaagent:../../patching-tool/lib/patching-tool-agent.jar]]></replacevalue>
+			<replacevalue><![CDATA[-javaagent:../../patching-tool/lib/patching-tool-agent.jar]]></replacevalue>
 		</replace>
 
 		<echo file="${lp.plugins.dir}/portlets/lcs-portlet/docroot/WEB-INF/src/portlet-ext.properties">#QA AWS
@@ -7427,6 +7430,8 @@ memory.scheduler.org.quartz.threadPool.threadCount=1
 persisted.scheduler.org.quartz.threadPool.threadCount=1
 
 virtual.hosts.default.site.name=
+
+com.liferay.portal.servlet.filters.strip.StripFilter=true
 
 web.server.http.port=8080</echo>
 
@@ -9979,10 +9984,24 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 			</then>
 		</if>
 
-		<unzip
-			dest="${liferay.home}"
-			src="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip"
-		/>
+		<if>
+			<available file="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip" type="dir" />
+			<then>
+				<copy
+					todir="${liferay.home}"
+				>
+					<fileset
+						dir="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip"
+					/>
+				</copy>
+			</then>
+			<else>
+				<unzip
+					dest="${liferay.home}"
+					src="${portal.legacy.dir}/${portal.version}/data-archive/${data.archive.type}-${database.type}.zip"
+				/>
+			</else>
+		</if>
 
 		<if>
 			<equals arg1="${database.type}" arg2="db2" />

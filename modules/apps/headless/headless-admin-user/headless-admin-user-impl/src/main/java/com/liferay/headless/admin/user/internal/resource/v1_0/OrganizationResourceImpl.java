@@ -25,6 +25,7 @@ import com.liferay.headless.admin.user.dto.v1_0.Phone;
 import com.liferay.headless.admin.user.dto.v1_0.PostalAddress;
 import com.liferay.headless.admin.user.dto.v1_0.Service;
 import com.liferay.headless.admin.user.dto.v1_0.WebUrl;
+import com.liferay.headless.admin.user.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.EmailAddressUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PhoneUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PostalAddressUtil;
@@ -48,7 +49,6 @@ import com.liferay.portal.kernel.service.OrgLaborService;
 import com.liferay.portal.kernel.service.OrganizationService;
 import com.liferay.portal.kernel.service.PhoneService;
 import com.liferay.portal.kernel.service.RegionService;
-import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.service.WebsiteService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -203,6 +203,12 @@ public class OrganizationResourceImpl
 							WebUrlUtil::toWebUrl, WebUrl.class);
 					}
 				};
+				customFields = CustomFieldsUtil.toCustomFields(
+					com.liferay.portal.kernel.model.Organization.class.
+						getName(),
+					organization.getOrganizationId(),
+					organization.getCompanyId(),
+					contextAcceptLanguage.getPreferredLocale());
 				dateCreated = organization.getCreateDate();
 				dateModified = organization.getModifiedDate();
 				id = organization.getOrganizationId();
@@ -326,9 +332,6 @@ public class OrganizationResourceImpl
 
 	@Reference
 	private RegionService _regionService;
-
-	@Reference
-	private UserService _userService;
 
 	@Reference
 	private WebsiteService _websiteService;

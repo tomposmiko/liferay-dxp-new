@@ -101,11 +101,11 @@ public abstract class BaseHighlighterTestCase extends BaseIndexingTestCase {
 
 				SearchHits searchHits = searchSearchResponse.getSearchHits();
 
-				List<SearchHit> searchHitList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
 				List<String> actualValues = new ArrayList<>();
 
-				searchHitList.stream(
+				searchHitsList.stream(
 				).map(
 					searchHit -> getFragments(fieldName, searchHit)
 				).forEach(

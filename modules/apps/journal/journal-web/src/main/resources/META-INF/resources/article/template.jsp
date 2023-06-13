@@ -37,7 +37,7 @@ DDMTemplate ddmTemplate = journalEditArticleDisplayContext.getDDMTemplate();
 				<input class="field form-control lfr-input-text" id="<portlet:namespace />ddmTemplateName" readonly="readonly" title="<%= LanguageUtil.get(request, "template-name") %>" type="text" value="<%= (ddmTemplate != null) ? HtmlUtil.escape(ddmTemplate.getName(locale)) : LanguageUtil.get(request, "no-template") %>" />
 			</div>
 
-			<c:if test="<%= article != null %>">
+			<c:if test="<%= (article != null) && !article.isNew() && (journalEditArticleDisplayContext.getClassNameId() == JournalArticleConstants.CLASSNAME_ID_DEFAULT) %>">
 				<div class="input-group-item input-group-item-shrink">
 					<clay:button
 						icon="view"
@@ -67,7 +67,7 @@ DDMTemplate ddmTemplate = journalEditArticleDisplayContext.getDDMTemplate();
 </c:choose>
 
 <aui:script>
-	<c:if test="<%= article != null %>">
+	<c:if test="<%= (article != null) && !article.isNew() && (journalEditArticleDisplayContext.getClassNameId() == JournalArticleConstants.CLASSNAME_ID_DEFAULT) %>">
 		<portlet:renderURL var="previewArticleContentTemplateURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 			<portlet:param name="mvcPath" value="/preview_article_content_template.jsp" />
 			<portlet:param name="groupId" value="<%= String.valueOf(article.getGroupId()) %>" />
@@ -104,6 +104,14 @@ DDMTemplate ddmTemplate = journalEditArticleDisplayContext.getDDMTemplate();
 
 					uri = Liferay.Util.addParams('<portlet:namespace />ddmTemplateId=' + ddmTemplateId, uri);
 
+					var languageId = '<%= themeDisplay.getLanguageId() %>';
+
+					if (document.<portlet:namespace />fm1.<portlet:namespace />languageId.value != '') {
+						languageId = document.<portlet:namespace />fm1.<portlet:namespace />languageId.value;
+					}
+
+					uri = Liferay.Util.addParams('<portlet:namespace />languageId=' + languageId, uri);
+
 					Liferay.Util.selectEntity(
 						{
 							dialog: {
@@ -132,9 +140,13 @@ DDMTemplate ddmTemplate = journalEditArticleDisplayContext.getDDMTemplate();
 
 		if (oldDDMTemplateId != newDDMTemplateId) {
 			if (confirm('<%= UnicodeLanguageUtil.get(request, "editing-the-current-template-deletes-all-unsaved-content") %>')) {
+				var uri = '<%= themeDisplay.getURLCurrent() %>';
+
+				uri = Liferay.Util.addParams('<portlet:namespace />ddmTemplateId=' + newDDMTemplateId, uri);
+
 				document.<portlet:namespace />fm1.<portlet:namespace />ddmTemplateId.value = newDDMTemplateId;
 
-				submitForm(document.<portlet:namespace />fm1, null, false, false);
+				submitForm(document.<portlet:namespace />fm1, uri, false, false);
 			}
 		}
 	}
@@ -183,7 +195,7 @@ DDMTemplate ddmTemplate = journalEditArticleDisplayContext.getDDMTemplate();
 			'click',
 			function(event) {
 				if (confirm('<%= UnicodeLanguageUtil.get(request, "editing-the-current-template-deletes-all-unsaved-content") %>')) {
-					location.href = '<portlet:renderURL><portlet:param name="mvcPath" value="/edit_ddm_template.jsp" /><portlet:param name="redirect" value="<%= currentURL %>" /><portlet:param name="ddmTemplateId" value="<%= (ddmTemplate != null) ? String.valueOf(ddmTemplate.getTemplateId()) : StringPool.BLANK %>" /></portlet:renderURL>';
+					Liferay.Util.navigate('<portlet:renderURL><portlet:param name="mvcPath" value="/edit_ddm_template.jsp" /><portlet:param name="redirect" value="<%= themeDisplay.getURLCurrent() %>" /><portlet:param name="ddmTemplateId" value="<%= (ddmTemplate != null) ? String.valueOf(ddmTemplate.getTemplateId()) : StringPool.BLANK %>" /></portlet:renderURL>');
 				}
 			}
 		);

@@ -83,13 +83,13 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntryThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
-import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
@@ -99,7 +99,6 @@ import com.liferay.subscription.model.Subscription;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.io.InputStream;
-import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -148,7 +147,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		long groupId = serviceContext.getScopeGroupId();
 		urlTitle = normalizeUrlTitle(urlTitle);
 		double priority = getPriority(groupId, parentResourcePrimKey);
-		Date now = new Date();
 
 		validate(title, content, sourceURL);
 		validateParent(parentResourceClassNameId, parentResourcePrimKey);
@@ -175,8 +173,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		kbArticle.setCompanyId(user.getCompanyId());
 		kbArticle.setUserId(user.getUserId());
 		kbArticle.setUserName(user.getFullName());
-		kbArticle.setCreateDate(serviceContext.getCreateDate(now));
-		kbArticle.setModifiedDate(serviceContext.getModifiedDate(now));
 		kbArticle.setRootResourcePrimKey(rootResourcePrimKey);
 		kbArticle.setParentResourceClassNameId(parentResourceClassNameId);
 		kbArticle.setParentResourcePrimKey(parentResourcePrimKey);
@@ -229,8 +225,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		return WorkflowHandlerRegistryUtil.startWorkflowInstance(
 			user.getCompanyId(), groupId, userId, KBArticle.class.getName(),
-			resourcePrimKey, kbArticle, serviceContext,
-			Collections.<String, Serializable>emptyMap());
+			resourcePrimKey, kbArticle, serviceContext, Collections.emptyMap());
 	}
 
 	@Override
@@ -512,8 +507,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 	@Override
 	public KBArticle fetchKBArticleByUrlTitle(
-			long groupId, String kbFolderUrlTitle, String urlTitle)
-		throws PortalException {
+		long groupId, String kbFolderUrlTitle, String urlTitle) {
 
 		urlTitle = StringUtil.replaceFirst(
 			urlTitle, CharPool.SLASH, StringPool.BLANK);
@@ -1170,7 +1164,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			kbArticle.setStatus(WorkflowConstants.STATUS_DRAFT);
 		}
 
-		kbArticle.setModifiedDate(serviceContext.getModifiedDate(null));
 		kbArticle.setTitle(title);
 		kbArticle.setContent(content);
 		kbArticle.setDescription(description);
@@ -1218,17 +1211,22 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			String[] assetTagNames, long[] assetLinkEntryIds)
 		throws PortalException {
 
-		// TODO
+		boolean visible = false;
 
-		long classTypeId = 0;
+		if (kbArticle.isApproved()) {
+			visible = true;
+		}
+
+		String summary = HtmlUtil.extractText(
+			StringUtil.shorten(kbArticle.getContent(), 500));
 
 		AssetEntry assetEntry = assetEntryLocalService.updateEntry(
 			userId, kbArticle.getGroupId(), kbArticle.getCreateDate(),
 			kbArticle.getModifiedDate(), KBArticle.class.getName(),
-			kbArticle.getClassPK(), kbArticle.getUuid(), classTypeId,
-			assetCategoryIds, assetTagNames, true, false, null, null, null,
-			null, ContentTypes.TEXT_HTML, kbArticle.getTitle(),
-			kbArticle.getDescription(), null, null, null, 0, 0, null);
+			kbArticle.getClassPK(), kbArticle.getUuid(), 0, assetCategoryIds,
+			assetTagNames, true, visible, null, null, null, null,
+			ContentTypes.TEXT_HTML, kbArticle.getTitle(),
+			kbArticle.getDescription(), summary, null, null, 0, 0, null);
 
 		assetLinkLocalService.updateLinks(
 			userId, assetEntry.getEntryId(), assetLinkEntryIds,
@@ -1306,7 +1304,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			kbArticle.getParentResourceClassNameId(),
 			kbArticle.getParentResourcePrimKey(), status);
 
-		kbArticle.setModifiedDate(serviceContext.getModifiedDate(now));
 		kbArticle.setMain(main);
 		kbArticle.setStatus(status);
 		kbArticle.setStatusByUserId(user.getUserId());
@@ -1692,10 +1689,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return resourcePrimKey;
 	}
 
-	protected Date getTicketExpirationDate() {
-		return new Date(System.currentTimeMillis() + _TICKET_EXPIRATION);
-	}
-
 	protected String getUniqueUrlTitle(
 			long groupId, long kbFolderId, long kbArticleId, String title)
 		throws PortalException {
@@ -1753,16 +1746,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		return StringUtil.shorten(
 			uniqueUrlTitle, maxLength, StringPool.DASH + suffix);
-	}
-
-	protected boolean isValidFileName(String name) {
-		if ((name == null) || name.contains(StringPool.BACK_SLASH) ||
-			name.contains(StringPool.SLASH)) {
-
-			return false;
-		}
-
-		return true;
 	}
 
 	protected String normalizeUrlTitle(String urlTitle) {
@@ -2099,8 +2082,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	private static final int[] _STATUSES = {
 		WorkflowConstants.STATUS_APPROVED, WorkflowConstants.STATUS_PENDING
 	};
-
-	private static final long _TICKET_EXPIRATION = Time.HOUR;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		KBArticleLocalServiceImpl.class);

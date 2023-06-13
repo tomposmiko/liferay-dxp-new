@@ -1,4 +1,8 @@
 .portlet-journal-content {
+	.asset-links .list-group-item:last-child {
+		border-bottom-width: 0;
+	}
+
 	.journal-content-article {
 		word-wrap: break-word;
 
@@ -36,13 +40,13 @@
 
 		.lfr-icon-menu {
 			background-color: #FFF;
-			border: solid 2px;
-			border-radius: 4px;
 			color: #0B5FFF;
 		}
 
 		.lfr-icon-menu > a {
 			color: inherit;
+			line-height: 23px;
+			width: auto;
 		}
 	}
 
@@ -69,7 +73,8 @@
 	&.portlet-barebone .portlet .portlet-header {
 		margin-bottom: 0;
 		position: absolute;
-		right: 1px;
+		right: 2px;
+		top: 2px;
 		z-index: 1;
 	}
 }

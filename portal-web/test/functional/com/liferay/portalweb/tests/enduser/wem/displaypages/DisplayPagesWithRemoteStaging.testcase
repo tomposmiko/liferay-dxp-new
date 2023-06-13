@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=";
 	property portal.release = "true";
 	property portal.upstream = "true";
@@ -88,7 +89,7 @@ definition {
 
 		WebContent.editDisplayPage(
 			pageName = "Display Page Name",
-			pageType = "Display Pages");
+			pageType = "Display Page Templates");
 
 		PortletEntry.publish();
 
@@ -104,4 +105,5 @@ definition {
 			assetContent = "Webcontent Content",
 			assetTitle = "Webcontent Title");
 	}
+
 }

@@ -294,12 +294,16 @@
 		margin-bottom: 1.25rem;
 	}
 
+	.widget-mode-detail {
+		padding-top: 0.5rem;
+	}
+
 	.widget-mode-simple {
 		margin-top: 24px;
 	}
 
 	.widget-toolbar {
-		padding: 0.125rem 0;
+		padding: 0.5rem 0 0;
 
 		.taglib-ratings .btn + .btn {
 			margin-left: 0;

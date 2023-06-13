@@ -14,7 +14,6 @@
 
 package com.liferay.marketplace.app.manager.web.internal.util;
 
-import com.liferay.marketplace.app.manager.web.internal.constants.BundleConstants;
 import com.liferay.marketplace.app.manager.web.internal.constants.BundleStateConstants;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -22,10 +21,12 @@ import com.liferay.portal.kernel.util.StringUtil;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Constants;
 
 /**
  * @author Ryan Park
@@ -33,7 +34,7 @@ import org.osgi.framework.Bundle;
 public class MarketplaceAppManagerSearchUtil {
 
 	public static List<Object> getResults(
-		List<Bundle> bundles, String keywords) {
+		List<Bundle> bundles, String keywords, Locale locale) {
 
 		List<Object> results = new ArrayList<>();
 
@@ -42,7 +43,7 @@ public class MarketplaceAppManagerSearchUtil {
 		// App display
 
 		List<AppDisplay> appDisplays = AppDisplayFactoryUtil.getAppDisplays(
-			bundles, StringPool.BLANK, BundleStateConstants.ANY);
+			bundles, StringPool.BLANK, BundleStateConstants.ANY, locale);
 
 		for (AppDisplay appDisplay : appDisplays) {
 			if (hasAppDisplayKeywordsMatch(appDisplay, keywordsRegex)) {
@@ -111,14 +112,13 @@ public class MarketplaceAppManagerSearchUtil {
 		Dictionary<String, String> headers = bundle.getHeaders(
 			StringPool.BLANK);
 
-		String bundleDescription = headers.get(
-			BundleConstants.BUNDLE_DESCRIPTION);
+		String bundleDescription = headers.get(Constants.BUNDLE_DESCRIPTION);
 
 		if (containsMatches(keywordsRegex, bundleDescription)) {
 			return true;
 		}
 
-		String bundleName = headers.get(BundleConstants.BUNDLE_NAME);
+		String bundleName = headers.get(Constants.BUNDLE_NAME);
 
 		if (containsMatches(keywordsRegex, bundleName)) {
 			return true;

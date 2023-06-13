@@ -32,8 +32,28 @@ import javax.annotation.Generated;
 @Generated("")
 public class DataRecordCollectionResource {
 
-	public Page<DataRecordCollection>
+	public static Page<DataRecordCollection>
 			getDataDefinitionDataRecordCollectionsPage(
+				Long dataDefinitionId, String keywords, Pagination pagination)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getDataDefinitionDataRecordCollectionsPageHttpResponse(
+				dataDefinitionId, keywords, pagination);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		return Page.of(content, DataRecordCollectionSerDes::toDTO);
+	}
+
+	public static HttpInvoker.HttpResponse
+			getDataDefinitionDataRecordCollectionsPageHttpResponse(
 				Long dataDefinitionId, String keywords, Pagination pagination)
 		throws Exception {
 
@@ -41,9 +61,15 @@ public class DataRecordCollectionResource {
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
+		if (keywords != null) {
+			httpInvoker.parameter("keywords", String.valueOf(keywords));
+		}
+
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/data-engine/v1.0/data-definitions/{dataDefinitionId}/data-record-collections",
@@ -51,44 +77,24 @@ public class DataRecordCollectionResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, DataRecordCollectionSerDes::toDTO);
+		return httpInvoker.invoke();
 	}
 
-	public DataRecordCollection postDataDefinitionDataRecordCollection(
+	public static DataRecordCollection postDataDefinitionDataRecordCollection(
 			Long dataDefinitionId, DataRecordCollection dataRecordCollection)
 		throws Exception {
 
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.body(
-			DataRecordCollectionSerDes.toJSON(dataRecordCollection),
-			"application/json");
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/data-engine/v1.0/data-definitions/{dataDefinitionId}/data-record-collections",
-			dataDefinitionId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		HttpInvoker.HttpResponse httpResponse =
+			postDataDefinitionDataRecordCollectionHttpResponse(
+				dataDefinitionId, dataRecordCollection);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return DataRecordCollectionSerDes.toDTO(content);
@@ -102,7 +108,44 @@ public class DataRecordCollectionResource {
 		}
 	}
 
-	public void deleteDataRecordCollection(Long dataRecordCollectionId)
+	public static HttpInvoker.HttpResponse
+			postDataDefinitionDataRecordCollectionHttpResponse(
+				Long dataDefinitionId,
+				DataRecordCollection dataRecordCollection)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.body(dataRecordCollection.toString(), "application/json");
+
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+		httpInvoker.path(
+			"http://localhost:8080/o/data-engine/v1.0/data-definitions/{dataDefinitionId}/data-record-collections",
+			dataDefinitionId);
+
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
+
+		return httpInvoker.invoke();
+	}
+
+	public static void deleteDataRecordCollection(Long dataRecordCollectionId)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			deleteDataRecordCollectionHttpResponse(dataRecordCollectionId);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+	}
+
+	public static HttpInvoker.HttpResponse
+			deleteDataRecordCollectionHttpResponse(Long dataRecordCollectionId)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -115,17 +158,37 @@ public class DataRecordCollectionResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		return httpInvoker.invoke();
+	}
+
+	public static DataRecordCollection getDataRecordCollection(
+			Long dataRecordCollectionId)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getDataRecordCollectionHttpResponse(dataRecordCollectionId);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		try {
+			return DataRecordCollectionSerDes.toDTO(content);
+		}
+		catch (Exception e) {
+			_logger.log(
+				Level.WARNING, "Unable to process HTTP response: " + content,
+				e);
+
+			throw e;
+		}
 	}
 
-	public DataRecordCollection getDataRecordCollection(
+	public static HttpInvoker.HttpResponse getDataRecordCollectionHttpResponse(
 			Long dataRecordCollectionId)
 		throws Exception {
 
@@ -139,14 +202,25 @@ public class DataRecordCollectionResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		return httpInvoker.invoke();
+	}
+
+	public static DataRecordCollection putDataRecordCollection(
+			Long dataRecordCollectionId,
+			DataRecordCollection dataRecordCollection)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			putDataRecordCollectionHttpResponse(
+				dataRecordCollectionId, dataRecordCollection);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return DataRecordCollectionSerDes.toDTO(content);
@@ -160,16 +234,14 @@ public class DataRecordCollectionResource {
 		}
 	}
 
-	public DataRecordCollection putDataRecordCollection(
+	public static HttpInvoker.HttpResponse putDataRecordCollectionHttpResponse(
 			Long dataRecordCollectionId,
 			DataRecordCollection dataRecordCollection)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-		httpInvoker.body(
-			DataRecordCollectionSerDes.toJSON(dataRecordCollection),
-			"application/json");
+		httpInvoker.body(dataRecordCollection.toString(), "application/json");
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
 
@@ -179,36 +251,47 @@ public class DataRecordCollectionResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		return httpInvoker.invoke();
+	}
+
+	public static void postDataRecordCollectionDataRecordCollectionPermission(
+			Long dataRecordCollectionId, String operation,
+			com.liferay.data.engine.rest.client.dto.v1_0.
+				DataRecordCollectionPermission dataRecordCollectionPermission)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			postDataRecordCollectionDataRecordCollectionPermissionHttpResponse(
+				dataRecordCollectionId, operation,
+				dataRecordCollectionPermission);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		try {
-			return DataRecordCollectionSerDes.toDTO(content);
-		}
-		catch (Exception e) {
-			_logger.log(
-				Level.WARNING, "Unable to process HTTP response: " + content,
-				e);
-
-			throw e;
-		}
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 	}
 
-	public void postDataRecordCollectionDataRecordCollectionPermission(
-			Long dataRecordCollectionId, String operation,
-			com.liferay.data.engine.rest.client.dto.v1_0.
-				DataRecordCollectionPermission dataRecordCollectionPermission)
+	public static HttpInvoker.HttpResponse
+			postDataRecordCollectionDataRecordCollectionPermissionHttpResponse(
+				Long dataRecordCollectionId, String operation,
+				com.liferay.data.engine.rest.client.dto.v1_0.
+					DataRecordCollectionPermission
+						dataRecordCollectionPermission)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
+		httpInvoker.body(
+			dataRecordCollectionPermission.toString(), "application/json");
+
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+		if (operation != null) {
+			httpInvoker.parameter("operation", String.valueOf(operation));
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/data-engine/v1.0/data-record-collections/{dataRecordCollectionId}/data-record-collection-permissions",
@@ -216,25 +299,46 @@ public class DataRecordCollectionResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		return httpInvoker.invoke();
+	}
+
+	public static void postSiteDataRecordCollectionPermission(
+			Long siteId, String operation,
+			com.liferay.data.engine.rest.client.dto.v1_0.
+				DataRecordCollectionPermission dataRecordCollectionPermission)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			postSiteDataRecordCollectionPermissionHttpResponse(
+				siteId, operation, dataRecordCollectionPermission);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 	}
 
-	public void postSiteDataRecordCollectionPermission(
-			Long siteId, String operation,
-			com.liferay.data.engine.rest.client.dto.v1_0.
-				DataRecordCollectionPermission dataRecordCollectionPermission)
+	public static HttpInvoker.HttpResponse
+			postSiteDataRecordCollectionPermissionHttpResponse(
+				Long siteId, String operation,
+				com.liferay.data.engine.rest.client.dto.v1_0.
+					DataRecordCollectionPermission
+						dataRecordCollectionPermission)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
+		httpInvoker.body(
+			dataRecordCollectionPermission.toString(), "application/json");
+
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
+
+		if (operation != null) {
+			httpInvoker.parameter("operation", String.valueOf(operation));
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/data-engine/v1.0/sites/{siteId}/data-record-collection-permissions",
@@ -242,27 +346,46 @@ public class DataRecordCollectionResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		return httpInvoker.invoke();
+	}
+
+	public static Page<DataRecordCollection> getSiteDataRecordCollectionsPage(
+			Long siteId, String keywords, Pagination pagination)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getSiteDataRecordCollectionsPageHttpResponse(
+				siteId, keywords, pagination);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		return Page.of(content, DataRecordCollectionSerDes::toDTO);
 	}
 
-	public Page<DataRecordCollection> getSiteDataRecordCollectionsPage(
-			Long siteId, String keywords, Pagination pagination)
+	public static HttpInvoker.HttpResponse
+			getSiteDataRecordCollectionsPageHttpResponse(
+				Long siteId, String keywords, Pagination pagination)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
+		if (keywords != null) {
+			httpInvoker.parameter("keywords", String.valueOf(keywords));
+		}
+
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/data-engine/v1.0/sites/{siteId}/data-record-collections",
@@ -270,16 +393,7 @@ public class DataRecordCollectionResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, DataRecordCollectionSerDes::toDTO);
+		return httpInvoker.invoke();
 	}
 
 	private static final Logger _logger = Logger.getLogger(

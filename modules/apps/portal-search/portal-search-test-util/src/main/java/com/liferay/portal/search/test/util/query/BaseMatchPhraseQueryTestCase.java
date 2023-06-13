@@ -79,15 +79,15 @@ public abstract class BaseMatchPhraseQueryTestCase
 					"Total hits", expectedValues.size(),
 					searchHits.getTotalHits());
 
-				List<SearchHit> searchHitList = searchHits.getSearchHits();
+				List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
 				Assert.assertEquals(
 					"Retrieved hits", expectedValues.size(),
-					searchHitList.size());
+					searchHitsList.size());
 
 				List<String> actualValues = new ArrayList<>();
 
-				searchHitList.forEach(
+				searchHitsList.forEach(
 					searchHit -> {
 						Document document = searchHit.getDocument();
 

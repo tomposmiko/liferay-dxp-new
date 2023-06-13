@@ -32,7 +32,27 @@ import javax.annotation.Generated;
 @Generated("")
 public class OrganizationResource {
 
-	public Page<Organization> getOrganizationsPage(
+	public static Page<Organization> getOrganizationsPage(
+			String search, String filterString, Pagination pagination,
+			String sortString)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getOrganizationsPageHttpResponse(
+				search, filterString, pagination, sortString);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		return Page.of(content, OrganizationSerDes::toDTO);
+	}
+
+	public static HttpInvoker.HttpResponse getOrganizationsPageHttpResponse(
 			String search, String filterString, Pagination pagination,
 			String sortString)
 		throws Exception {
@@ -41,50 +61,45 @@ public class OrganizationResource {
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
-		httpInvoker.parameter("filter", filterString);
+		if (search != null) {
+			httpInvoker.parameter("search", String.valueOf(search));
+		}
 
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
+		if (filterString != null) {
+			httpInvoker.parameter("filter", filterString);
+		}
 
-		httpInvoker.parameter("sort", sortString);
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
+
+		if (sortString != null) {
+			httpInvoker.parameter("sort", sortString);
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/headless-admin-user/v1.0/organizations");
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, OrganizationSerDes::toDTO);
+		return httpInvoker.invoke();
 	}
 
-	public Organization getOrganization(Long organizationId) throws Exception {
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+	public static Organization getOrganization(Long organizationId)
+		throws Exception {
 
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-admin-user/v1.0/organizations/{organizationId}",
+		HttpInvoker.HttpResponse httpResponse = getOrganizationHttpResponse(
 			organizationId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return OrganizationSerDes.toDTO(content);
@@ -98,22 +113,71 @@ public class OrganizationResource {
 		}
 	}
 
-	public Page<Organization> getOrganizationOrganizationsPage(
-			Long parentOrganizationId, String search, String filterString,
-			Pagination pagination, String sortString)
+	public static HttpInvoker.HttpResponse getOrganizationHttpResponse(
+			Long organizationId)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
-		httpInvoker.parameter("filter", filterString);
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-admin-user/v1.0/organizations/{organizationId}",
+			organizationId);
 
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		httpInvoker.parameter("sort", sortString);
+		return httpInvoker.invoke();
+	}
+
+	public static Page<Organization> getOrganizationOrganizationsPage(
+			Long parentOrganizationId, String search, String filterString,
+			Pagination pagination, String sortString)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getOrganizationOrganizationsPageHttpResponse(
+				parentOrganizationId, search, filterString, pagination,
+				sortString);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		return Page.of(content, OrganizationSerDes::toDTO);
+	}
+
+	public static HttpInvoker.HttpResponse
+			getOrganizationOrganizationsPageHttpResponse(
+				Long parentOrganizationId, String search, String filterString,
+				Pagination pagination, String sortString)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+		if (search != null) {
+			httpInvoker.parameter("search", String.valueOf(search));
+		}
+
+		if (filterString != null) {
+			httpInvoker.parameter("filter", filterString);
+		}
+
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
+
+		if (sortString != null) {
+			httpInvoker.parameter("sort", sortString);
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/headless-admin-user/v1.0/organizations/{parentOrganizationId}/organizations",
@@ -121,16 +185,7 @@ public class OrganizationResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, OrganizationSerDes::toDTO);
+		return httpInvoker.invoke();
 	}
 
 	private static final Logger _logger = Logger.getLogger(

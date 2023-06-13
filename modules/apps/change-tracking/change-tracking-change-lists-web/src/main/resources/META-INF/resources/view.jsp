@@ -59,14 +59,19 @@ renderResponse.setTitle(title);
 
 					<%
 					boolean production = CTConstants.CT_COLLECTION_NAME_PRODUCTION.equals(curCTCollection.getName());
+
+					String ctCollectionName = production ? "work-on-production" : curCTCollection.getName();
+
+					String confirmationMessage = changeListsDisplayContext.getConfirmationMessage(ctCollectionName);
 					%>
 
 					<liferay-portlet:actionURL name="/change_lists/checkout_ct_collection" var="checkoutCollectionURL">
 						<portlet:param name="ctCollectionId" value="<%= String.valueOf(curCTCollection.getCtCollectionId()) %>" />
+						<portlet:param name="displayStyle" value="<%= changeListsDisplayContext.getDisplayStyle() %>" />
 					</liferay-portlet:actionURL>
 
 					<liferay-ui:search-container-column-text
-						href="<%= checkoutCollectionURL.toString() %>"
+						href='<%= "javascript:" + renderResponse.getNamespace() + "checkoutCollection(\'" + checkoutCollectionURL.toString() + "\', \'" + confirmationMessage + "\');" %>'
 						name="name"
 					>
 						<c:choose>
@@ -123,6 +128,22 @@ renderResponse.setTitle(title);
 							markupView="lexicon"
 							showWhenSingleIcon="<%= true %>"
 						>
+							<c:choose>
+								<c:when test="<%= changeListsDisplayContext.isChangeListActive(curCTCollection.getCtCollectionId()) %>">
+									<liferay-ui:icon
+										cssClass="disabled"
+										message="activate"
+										url="#"
+									/>
+								</c:when>
+								<c:otherwise>
+									<liferay-ui:icon
+										message="activate"
+										url='<%= "javascript:" + renderResponse.getNamespace() + "checkoutCollection(\'" + checkoutCollectionURL.toString() + "\', \'" + confirmationMessage + "\');" %>'
+									/>
+								</c:otherwise>
+							</c:choose>
+
 							<c:if test="<%= !production %>">
 								<liferay-portlet:renderURL var="editCollectionURL">
 									<portlet:param name="mvcRenderCommandName" value="/change_lists/edit_ct_collection" />
@@ -144,7 +165,7 @@ renderResponse.setTitle(title);
 
 										<liferay-ui:icon
 											message="publish"
-											onClick='<%= "javascript:" + renderResponse.getNamespace() + "handleClickPublish(\'" + publishModalURL.toString() + "\');" %>'
+											onClick='<%= "javascript:" + renderResponse.getNamespace() + "handleClickPublish(\'" + publishModalURL.toString() + "\', \'" + confirmationMessage +"\');" %>'
 											url="#"
 										/>
 									</c:when>
@@ -161,7 +182,8 @@ renderResponse.setTitle(title);
 									<portlet:param name="ctCollectionId" value="<%= String.valueOf(curCTCollection.getCtCollectionId()) %>" />
 								</liferay-portlet:actionURL>
 
-								<liferay-ui:icon
+								<liferay-ui:icon-delete
+									confirmation='<%= LanguageUtil.format(request, "are-you-sure-you-want-to-delete-x-change-list", curCTCollection.getName()) %>'
 									message="delete"
 									url="<%= deleteCollectionURL %>"
 								/>
@@ -184,18 +206,26 @@ renderResponse.setTitle(title);
 
 					<%
 					CTCollection productionCTCollection = changeListsDisplayContext.getProductionCTCollection();
+					String productionConfirmMessage = changeListsDisplayContext.getConfirmationMessage("work-on-production");
 					%>
 
 					<liferay-portlet:actionURL name="/change_lists/checkout_ct_collection" var="checkoutProductionURL">
 						<portlet:param name="ctCollectionId" value="<%= String.valueOf(productionCTCollection.getCtCollectionId()) %>" />
+						<portlet:param name="displayStyle" value="<%= changeListsDisplayContext.getDisplayStyle() %>" />
 					</liferay-portlet:actionURL>
 
-					<c:if test="<%= (productionCTCollection != null) && (ctCollectionSearchContainer.getCur() == 1) && Validator.isNull(displayTerms.getKeywords()) %>">
+					<c:if test="<%= (ctCollectionSearchContainer.getCur() == 1) && Validator.isNull(displayTerms.getKeywords()) %>">
 						<div class="col-sm-4">
 							<div class="<%= changeListsDisplayContext.isChangeListActive(productionCTCollection.getCtCollectionId()) ? "border-left-green" : "border-left-gray" %> card select-card-sheet">
 								<div class="card-row card-row-layout-fixed card-row-padded card-row-valign-top select-card-header">
 									<div class="card-col-content lfr-card-details-column production-details-column">
-										<a href="<%= checkoutProductionURL.toString() %>">
+										<script>
+											function <portlet:namespace/>checkoutLinkProduction() {
+												<portlet:namespace/>checkoutCollection('<%= checkoutProductionURL.toString() %>', '<%= productionConfirmMessage %>');
+											}
+										</script>
+
+										<a href="#" onclick="<%= "javascript:" + renderResponse.getNamespace() + "checkoutLinkProduction();" %>">
 											<span class="card-h3" data-qa-id="headerSubTitle">
 												<span class="work-on-production"><liferay-ui:message key="work-on-production" /></span>
 											</span>
@@ -206,6 +236,31 @@ renderResponse.setTitle(title);
 												<span class="work-on-production-description"><liferay-ui:message key="your-changes-will-be-added-to-the-live-site-immediately" /></span>
 											</div>
 										</div>
+									</div>
+
+									<div class="card-col-field lfr-card-actions-column">
+										<liferay-ui:icon-menu
+											direction="left-side"
+											icon="<%= StringPool.BLANK %>"
+											markupView="lexicon"
+											showWhenSingleIcon="<%= true %>"
+										>
+											<c:choose>
+												<c:when test="<%= changeListsDisplayContext.isChangeListActive(productionCTCollection.getCtCollectionId()) %>">
+													<liferay-ui:icon
+														cssClass="disabled"
+														message="activate"
+														url="#"
+													/>
+												</c:when>
+												<c:otherwise>
+													<liferay-ui:icon
+														message="activate"
+														url='<%= "javascript:" + renderResponse.getNamespace() + "checkoutCollection(\'" + checkoutProductionURL.toString() + "\', \'" + productionConfirmMessage + "\');" %>'
+													/>
+												</c:otherwise>
+											</c:choose>
+										</liferay-ui:icon-menu>
 									</div>
 								</div>
 							</div>
@@ -219,11 +274,13 @@ renderResponse.setTitle(title);
 					>
 
 						<%
+						String confirmationMessage = changeListsDisplayContext.getConfirmationMessage(curCTCollection.getName());
 						boolean production = CTConstants.CT_COLLECTION_NAME_PRODUCTION.equals(curCTCollection.getName());
 						%>
 
 						<liferay-portlet:actionURL name="/change_lists/checkout_ct_collection" var="checkoutCollectionURL">
 							<portlet:param name="ctCollectionId" value="<%= String.valueOf(curCTCollection.getCtCollectionId()) %>" />
+							<portlet:param name="displayStyle" value="<%= changeListsDisplayContext.getDisplayStyle() %>" />
 						</liferay-portlet:actionURL>
 
 						<c:if test="<%= !production %>">
@@ -231,7 +288,13 @@ renderResponse.setTitle(title);
 								<div class="<%= changeListsDisplayContext.isChangeListActive(curCTCollection.getCtCollectionId()) ? "border-left-blue" : "border-left-gray" %> card select-card-sheet">
 									<div class="card-row card-row-layout-fixed card-row-padded card-row-valign-top select-card-header">
 										<div class="card-col-content lfr-card-details-column">
-											<a href="<%= checkoutCollectionURL.toString() %>">
+											<script>
+												function <portlet:namespace/>checkoutLink<%= curCTCollection.getCtCollectionId() %>() {
+													<portlet:namespace/>checkoutCollection('<%= checkoutCollectionURL.toString() %>', '<%= confirmationMessage %>');
+												}
+											</script>
+
+											<a href="#" onclick="<%= "javascript:" + renderResponse.getNamespace() + "checkoutLink"+ curCTCollection.getCtCollectionId() + "();" %>">
 												<span class="card-h3" data-qa-id="headerSubTitle">
 													<%= HtmlUtil.escape(curCTCollection.getName()) %>
 												</span>
@@ -249,7 +312,7 @@ renderResponse.setTitle(title);
 												<span class="card-h4"><liferay-ui:message key="created-by" /> & <liferay-ui:message key="modified-date" /></span>
 
 												<div class="card-text" data-qa-id="created-by-modified-date">
-													<%= curCTCollection.getUserName() %> &ndash; <liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, changeListsDisplayContext.getCTCollectionAgeTime(curCTCollection), true) %>" key="x-ago" />
+													<%= HtmlUtil.escape(curCTCollection.getUserName()) %> &ndash; <liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, changeListsDisplayContext.getCTCollectionAgeTime(curCTCollection), true) %>" key="x-ago" />
 												</div>
 											</div>
 
@@ -295,6 +358,22 @@ renderResponse.setTitle(title);
 												markupView="lexicon"
 												showWhenSingleIcon="<%= true %>"
 											>
+												<c:choose>
+													<c:when test="<%= changeListsDisplayContext.isChangeListActive(curCTCollection.getCtCollectionId()) %>">
+														<liferay-ui:icon
+															cssClass="disabled"
+															message="activate"
+															url="#"
+														/>
+													</c:when>
+													<c:otherwise>
+														<liferay-ui:icon
+															message="activate"
+															url='<%= "javascript:" + renderResponse.getNamespace() + "checkoutCollection(\'" + checkoutCollectionURL.toString() + "\', \'" + confirmationMessage + "\');" %>'
+														/>
+													</c:otherwise>
+												</c:choose>
+
 												<liferay-portlet:renderURL var="editCollectionURL">
 													<portlet:param name="mvcRenderCommandName" value="/change_lists/edit_ct_collection" />
 													<portlet:param name="backURL" value="<%= themeDisplay.getURLCurrent() %>" />
@@ -332,7 +411,8 @@ renderResponse.setTitle(title);
 													<portlet:param name="ctCollectionId" value="<%= String.valueOf(curCTCollection.getCtCollectionId()) %>" />
 												</liferay-portlet:actionURL>
 
-												<liferay-ui:icon
+												<liferay-ui:icon-delete
+													confirmation='<%= LanguageUtil.format(request, "are-you-sure-you-want-to-delete-x-change-list", curCTCollection.getName()) %>'
 													message="delete"
 													url="<%= deleteCollectionURL %>"
 												/>
@@ -355,7 +435,7 @@ renderResponse.setTitle(title);
 
 <script>
 	Liferay.on(
-		'<portlet:namespace/>refreshSelectChangeList',
+		'<portlet:namespace/>refreshChangeListHistory',
 		function(event) {
 			setTimeout(
 				function() {
@@ -363,6 +443,35 @@ renderResponse.setTitle(title);
 				},
 				1000);
 	});
+
+	Liferay.on(
+		'<portlet:namespace/>refreshSelectChangeList',
+		function(event) {
+			setTimeout(
+				function() {
+
+					<%
+					PortletURL refreshURL = PortletURLFactoryUtil.create(request, CTPortletKeys.CHANGE_LISTS, PortletRequest.RENDER_PHASE);
+
+					refreshURL.setParameter("production", "true");
+					%>
+
+					Liferay.Util.navigate('<%= refreshURL.toString() %>');
+				},
+				1000);
+		});
+
+	if (<%= ParamUtil.getBoolean(request, "refresh") %>) {
+		Liferay.fire('<portlet:namespace/>refreshSelectChangeList');
+	}
+
+	function <portlet:namespace/>checkoutCollection(url, message) {
+		var confirmationDisabled = <%= !changeListsDisplayContext.isCheckoutCtCollectionConfirmationEnabled() %>;
+
+		if (confirmationDisabled || confirm(message)) {
+			submitForm(document.hrefFm, url);
+		}
+	}
 
 	function <portlet:namespace/>handleClickPublish(url) {
 		this.event.preventDefault();

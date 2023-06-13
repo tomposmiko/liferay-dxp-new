@@ -507,6 +507,7 @@ public class DDMDisplayContext {
 					addTemplateURL.setParameter(
 						"resourceClassNameId",
 						String.valueOf(getResourceClassNameId()));
+					addTemplateURL.setParameter("mode", getTemplateMode());
 
 					String message = "add";
 
@@ -541,8 +542,6 @@ public class DDMDisplayContext {
 							getCreationMenuDropdownItem(
 								addTemplateURL, message));
 					}
-
-					addTemplateURL.setParameter("mode", getTemplateMode());
 				}
 				else {
 					List<TemplateHandler> templateHandlers =
@@ -1037,7 +1036,7 @@ public class DDMDisplayContext {
 				structureSearch.getEnd());
 		}
 		else {
-			results = _ddmStructureService.search(
+			results = _ddmStructureService.getStructures(
 				_ddmWebRequestHelper.getCompanyId(), groupIds,
 				getStructureClassNameId(), searchTerms.getKeywords(),
 				searchTerms.getStatus(), structureSearch.getStart(),
@@ -1072,7 +1071,7 @@ public class DDMDisplayContext {
 				getSearchRestrictionClassPK());
 		}
 		else {
-			total = _ddmStructureService.searchCount(
+			total = _ddmStructureService.getStructuresCount(
 				_ddmWebRequestHelper.getCompanyId(), groupIds,
 				getStructureClassNameId(), searchTerms.getKeywords(),
 				searchTerms.getStatus());

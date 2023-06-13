@@ -1,4 +1,5 @@
 definition {
+
 	macro addNewChangeList {
 		Click(locator1 = "Button#PLUS");
 
@@ -21,6 +22,39 @@ definition {
 		AssertTextEquals(
 			locator1 = "ChangeList#OVERVIEW_PAGE_TITLE",
 			value1 = "Select Change List");
+	}
+
+	macro changeUserSettingsPopuConfirmation {
+		Click(locator1 = "ChangeList#CHANGE_LIST_NAVIGATION_USER_SETTINGS");
+
+		if ("${changeUserPopupConfirmation}" == "enable") {
+			Check.checkToggleSwitch(locator1 = "ChangeList#CHANGE_LIST_USER_SETTINGS_POPUP_ENABLED");
+		}
+		else {
+			Uncheck.uncheckToggleSwitch(locator1 = "ChangeList#CHANGE_LIST_USER_SETTINGS_POPUP_ENABLED");
+		}
+
+		Click(locator1 = "Button#SAVE");
+
+		Alert.viewSuccessMessage();
+
+		Click(locator1 = "ChangeList#CHANGE_LIST_NAVIGATION_GLOBAL_SETTINGS");
+	}
+
+	macro confirmSwitchingChangeList {
+		AssertConfirm.assertPartialConfirmation(value1 = "Do you want to switch to ${changeListName} change list?");
+	}
+
+	macro deleteChangeListFromOverviewScreen {
+		ClickNoError(locator1 = "Icon#DELETE");
+
+		AssertConfirm(value1 = "Are you sure you want to delete '${changeListName}' change list?");
+
+		AssertTextEquals(
+			locator1 = "ChangeList#OVERVIEW_PAGE_TITLE",
+			value1 = "Select Change List");
+
+		Alert.viewSuccessMessageText(successMessage = "Production has been checked out. All your modifications will be added to the live site immediately.");
 	}
 
 	macro disableChangeList {
@@ -46,12 +80,22 @@ definition {
 		Alert.viewSuccessMessage();
 	}
 
+	macro gotoActivate {
+		Click.waitForMenuToggleJSClick(
+			key_rowEntry = "${rowEntry}",
+			locator1 = "Icon#TABLE_VERTICAL_ELLIPSIS");
+
+		MenuItem.clickNoError(menuItem = "Activate");
+	}
+
 	macro gotoDelete {
 		Click.waitForMenuToggleJSClick(
 			key_rowEntry = "${rowEntry}",
 			locator1 = "Icon#TABLE_VERTICAL_ELLIPSIS");
 
-		MenuItem.click(menuItem = "Delete");
+		MenuItem.clickNoError(menuItem = "Delete");
+
+		AssertConfirm(value1 = "Are you sure you want to delete '${rowEntry}' change list?");
 	}
 
 	macro publishChangeList {
@@ -101,13 +145,17 @@ definition {
 				value1 = "Select Change List");
 		}
 		else {
-			Click(
+			ClickNoError(
 				key_changeListName = "${changeListName}",
 				locator1 = "ChangeList#SELECT_CHANGE_LIST_VALUE");
 
+			if ( "${changeListConfirmEnabled}" == "true") {
+				ChangeList.confirmSwitchingChangeList(changeListName = "${changeListName}");
+			}
+
 			AssertTextEquals(
 				locator1 = "ChangeList#OVERVIEW_PAGE_TITLE",
-				value1 = "Change Lists");
+				value1 = "Overview");
 		}
 	}
 
@@ -196,24 +244,73 @@ definition {
 			value1 = "${changeListName}");
 	}
 
+	macro viewWarningOnPortletExport {
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "${portletName}");
+
+		LAR._gotoExportImport();
+
+		SelectFrame(locator1 = "IFrame#CONFIGURATION_DIALOG");
+
+		Alert.viewWarningSpecific(warningMessage = "Change lists are enabled for the current virtual instance. Export/Import and change lists cannot be used together.");
+
+		IFrame.closeFrame();
+	}
+
+	macro viewWarningOnPortletImport {
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "${portletName}");
+
+		LAR._gotoExportImport();
+
+		SelectFrame(locator1 = "IFrame#CONFIGURATION_DIALOG");
+
+		NavItem.click(navItem = "Import");
+
+		Alert.viewWarningSpecific(warningMessage = "Change lists are enabled for the current virtual instance. Export/Import and change lists cannot be used together.");
+
+		IFrame.closeFrame();
+	}
+
+	macro viewWarningOnSiteExportImport {
+		ProductMenu.gotoPortlet(
+			category = "Publishing",
+			panel = "Site Administration",
+			portlet = "${portletName}");
+
+		Alert.viewWarningSpecific(warningMessage = "Change lists are enabled for the current virtual instance. Export/Import and change lists cannot be used together.");
+	}
+
 	macro workOnProduction {
-		if (IsTextEqual(locator1 = "ChangeList#OVERVIEW_PAGE_TITLE", value1 = "Change Lists")) {
+		if (IsTextEqual(locator1 = "ChangeList#OVERVIEW_PAGE_TITLE", value1 = "Overview")) {
 			Click(locator1 = "ChangeList#SELECT_CHANGE_LIST_DROPDOWN");
 
-			Click(
+			ClickNoError(
 				key_changeListName = "Work on Production",
 				locator1 = "ChangeList#SELECT_CHANGE_LIST_VALUE");
+
+			if ("${changeListConfirmEnabled}" == "true") {
+				ChangeList.confirmSwitchingChangeList(changeListName = "Work on Production");
+			}
 
 			AssertTextEquals(
 				locator1 = "ChangeList#OVERVIEW_PAGE_TITLE",
 				value1 = "Select Change List");
 		}
 		else {
-			Click(
+			ClickNoError(
 				key_changeListName = "Work on Production",
 				locator1 = "ChangeList#CHANGE_LIST_NAME_CARD_VIEW");
+			if ("${changeListConfirmEnabled}" == "true") {
+				ChangeList.confirmSwitchingChangeList(changeListName = "Work on Production");
+			}
 		}
-		Alert.viewSuccessMessageText(successMessage = "Production has been checked out. All your modifications will be added to the live site immediately.");
 
+		Alert.viewSuccessMessageText(successMessage = "Production has been checked out. All your modifications will be added to the live site immediately.");
 	}
+
 }

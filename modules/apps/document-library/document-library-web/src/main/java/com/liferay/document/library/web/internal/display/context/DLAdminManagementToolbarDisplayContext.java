@@ -84,11 +84,10 @@ import javax.servlet.http.HttpServletRequest;
 public class DLAdminManagementToolbarDisplayContext {
 
 	public DLAdminManagementToolbarDisplayContext(
-			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse,
-			HttpServletRequest httpServletRequest,
-			DLAdminDisplayContext dlAdminDisplayContext)
-		throws PortalException {
+		LiferayPortletRequest liferayPortletRequest,
+		LiferayPortletResponse liferayPortletResponse,
+		HttpServletRequest httpServletRequest,
+		DLAdminDisplayContext dlAdminDisplayContext) {
 
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
@@ -108,9 +107,6 @@ public class DLAdminManagementToolbarDisplayContext {
 
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
-
-		_hasValidAssetVocabularies = _hasValidAssetVocabularies(
-			_themeDisplay.getScopeGroupId());
 	}
 
 	public List<DropdownItem> getActionDropdownItems() throws PortalException {
@@ -175,7 +171,9 @@ public class DLAdminManagementToolbarDisplayContext {
 							dropdownItem.setQuickAction(true);
 						});
 
-					if (_hasValidAssetVocabularies) {
+					if (_hasValidAssetVocabularies(
+							_themeDisplay.getScopeGroupId())) {
+
 						add(
 							dropdownItem -> {
 								dropdownItem.putData(
@@ -248,7 +246,7 @@ public class DLAdminManagementToolbarDisplayContext {
 		};
 	}
 
-	public List<String> getAvailableActionDropdownItems(FileEntry fileEntry)
+	public List<String> getAvailableActions(FileEntry fileEntry)
 		throws PortalException {
 
 		List<String> availableActionDropdownItems = new ArrayList<>();
@@ -278,7 +276,9 @@ public class DLAdminManagementToolbarDisplayContext {
 					fileEntry.getRepositoryId()) &&
 				!_hasWorkflowDefinitionLink(fileEntry)) {
 
-				if (_hasValidAssetVocabularies) {
+				if (_hasValidAssetVocabularies(
+						_themeDisplay.getScopeGroupId())) {
+
 					availableActionDropdownItems.add("editCategories");
 				}
 
@@ -295,7 +295,7 @@ public class DLAdminManagementToolbarDisplayContext {
 		return availableActionDropdownItems;
 	}
 
-	public List<String> getAvailableActionDropdownItems(Folder folder)
+	public List<String> getAvailableActions(Folder folder)
 		throws PortalException {
 
 		List<String> availableActionDropdownItems = new ArrayList<>();
@@ -335,6 +335,11 @@ public class DLAdminManagementToolbarDisplayContext {
 			"folderId", String.valueOf(_getFolderId()));
 
 		return clearResultsURL.toString();
+	}
+
+	public String getComponentId() {
+		return _liferayPortletResponse.getNamespace() +
+			"entriesManagementToolbar";
 	}
 
 	public CreationMenu getCreationMenu() {
@@ -835,13 +840,17 @@ public class DLAdminManagementToolbarDisplayContext {
 	private boolean _hasValidAssetVocabularies(long scopeGroupId)
 		throws PortalException {
 
+		if (_hasValidAssetVocabularies != null) {
+			return _hasValidAssetVocabularies;
+		}
+
 		List<AssetVocabulary> assetVocabularies =
 			AssetVocabularyServiceUtil.getGroupVocabularies(
 				PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId));
 
 		Stream<AssetVocabulary> stream = assetVocabularies.stream();
 
-		return stream.anyMatch(
+		_hasValidAssetVocabularies = stream.anyMatch(
 			assetVocabulary -> {
 				if (!assetVocabulary.isAssociatedToClassNameId(
 						ClassNameLocalServiceUtil.getClassNameId(
@@ -861,6 +870,8 @@ public class DLAdminManagementToolbarDisplayContext {
 
 				return false;
 			});
+
+		return _hasValidAssetVocabularies;
 	}
 
 	private boolean _hasWorkflowDefinitionLink(FileEntry fileEntry)
@@ -920,7 +931,7 @@ public class DLAdminManagementToolbarDisplayContext {
 		_dlPortletInstanceSettingsHelper;
 	private final DLRequestHelper _dlRequestHelper;
 	private final DLTrashUtil _dlTrashUtil;
-	private final boolean _hasValidAssetVocabularies;
+	private Boolean _hasValidAssetVocabularies;
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;

@@ -32,7 +32,7 @@
 		"date-fns": "^1.30.1",
 		"formik": "^1.4.1",
 		"metal": "2.16.8",
-		"metal-debounce": "2.0.1",
+		"metal-debounce": "^2.0.2",
 		"prop-types": "^15.6.2",
 		"react": "^16.6.3",
 		"react-dnd": "^7.0.2",
@@ -41,15 +41,10 @@
 	},
 	"description": "",
 	"devDependencies": {
-		"@babel/cli": "^7.2.3",
-		"@babel/plugin-proposal-class-properties": "^7.4.0",
-		"@babel/preset-env": "^7.4.2",
 		"@babel/preset-react": "^7.0.0",
-		"babel-eslint": "^10.0.1",
-		"babel-loader": "^8.0.5",
 		"babel-plugin-module-resolver": "^3.2.0",
 		"check-source-formatting": "^2.0.14",
-		"clay-css": "2.14.2",
+		"clay-css": "2.15.1",
 		"css-loader": "^2.0.1",
 		"eslint": "^5.8.0",
 		"eslint-config-liferay": "^2.0.18",
@@ -90,5 +85,5 @@
 		"test:watch": "env TZ=utc liferay-npm-scripts test --watch",
 		"watch": "liferay-npm-scripts webpack --watch"
 	},
-	"version": "1.0.11"
+	"version": "1.0.18"
 }

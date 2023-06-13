@@ -252,6 +252,10 @@ public class CTProcessLocalServiceUtil {
 		return getService().getCTProcesses(ctCollectionId);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	public static java.util.List<com.liferay.change.tracking.model.CTProcess>
 		getCTProcesses(
 			long companyId, int status,
@@ -261,6 +265,20 @@ public class CTProcessLocalServiceUtil {
 		return getService().getCTProcesses(companyId, status, queryDefinition);
 	}
 
+	public static java.util.List<com.liferay.change.tracking.model.CTProcess>
+		getCTProcesses(
+			long companyId, long userId, String keywords,
+			com.liferay.portal.kernel.dao.orm.QueryDefinition<?>
+				queryDefinition) {
+
+		return getService().getCTProcesses(
+			companyId, userId, keywords, queryDefinition);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	public static java.util.List<com.liferay.change.tracking.model.CTProcess>
 		getCTProcesses(
 			long companyId,

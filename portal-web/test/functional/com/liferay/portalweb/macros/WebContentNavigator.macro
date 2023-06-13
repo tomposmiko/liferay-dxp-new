@@ -1,4 +1,5 @@
 definition {
+
 	macro _openDescriptiveMenulistCP {
 		if (!(contains("${webContentTitleEscapeCharacter}", "{webContentTitleEscapeCharacter}"))) {
 			var key_webContentTitle = "${webContentTitleEscapeCharacter}";
@@ -36,6 +37,10 @@ definition {
 
 	macro gotoAddPGViaWCD {
 		var portletName = "Web Content Display";
+
+		if (isSet(portletNameScoped)) {
+			var portletName = "${portletNameScoped}";
+		}
 
 		if (isSet(portletNameTranslation)) {
 			var portletName = "${portletNameTranslation}";
@@ -124,6 +129,8 @@ definition {
 	}
 
 	macro gotoEntryMenuItem {
+		Pause(locator1 = "3000");
+
 		Click(
 			key_webContentTitle = "${entry}",
 			locator1 = "WC#ENTRY_LIST_MENULIST_ICON");
@@ -179,4 +186,5 @@ definition {
 			locator1 = "DDMSelectTemplate#TEMPLATE_TABLE_NAME_LINK",
 			value1 = "${templateName}");
 	}
+
 }

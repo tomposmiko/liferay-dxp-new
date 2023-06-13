@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Web Content Administration";
@@ -108,7 +109,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "en_US",
-			textIcon = "English-United States");
+			textIcon = "english-United States");
 
 		Navigator.gotoSitePage(
 			pageName = "Test Page Name",
@@ -194,6 +195,8 @@ definition {
 		NavItem.gotoStructures();
 
 		LexiconEntry.gotoAdd();
+
+		Pause(locator1 = "3000");
 
 		WebContentStructures.addName(structureName = "WC Structure Name");
 
@@ -315,6 +318,7 @@ definition {
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "en_US",
-			textIcon = "English-United States");
+			textIcon = "english-United States");
 	}
+
 }

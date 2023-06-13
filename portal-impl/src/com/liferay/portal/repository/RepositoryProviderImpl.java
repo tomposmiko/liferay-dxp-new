@@ -27,6 +27,7 @@ import com.liferay.document.library.kernel.service.DLFileEntryServiceUtil;
 import com.liferay.document.library.kernel.service.DLFileShortcutLocalService;
 import com.liferay.document.library.kernel.service.DLFileVersionLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.NoSuchRepositoryException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -50,7 +51,6 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RepositoryEntryLocalService;
 import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +59,30 @@ import java.util.List;
  * @author Iván Zaera
  */
 public class RepositoryProviderImpl implements RepositoryProvider {
+
+	@Override
+	public LocalRepository fetchFileEntryLocalRepository(long fileEntryId)
+		throws PortalException {
+
+		long repositoryId = fetchFileEntryRepositoryId(fileEntryId);
+
+		if (repositoryId != -1) {
+			try {
+				return getLocalRepository(repositoryId);
+			}
+			catch (InvalidRepositoryIdException irie) {
+				StringBundler sb = new StringBundler(3);
+
+				sb.append("No FileEntry exists with the key {fileEntryId=");
+				sb.append(fileEntryId);
+				sb.append("}");
+
+				throw new NoSuchFileEntryException(sb.toString(), irie);
+			}
+		}
+
+		return null;
+	}
 
 	@Override
 	public LocalRepository getFileEntryLocalRepository(long fileEntryId)
@@ -394,6 +418,24 @@ public class RepositoryProviderImpl implements RepositoryProvider {
 		catch (NoSuchRepositoryException nsre) {
 			throw new InvalidRepositoryIdException(nsre.getMessage());
 		}
+	}
+
+	protected long fetchFileEntryRepositoryId(long fileEntryId) {
+		DLFileEntry dlFileEntry = dlFileEntryLocalService.fetchDLFileEntry(
+			fileEntryId);
+
+		if (dlFileEntry != null) {
+			return dlFileEntry.getRepositoryId();
+		}
+
+		RepositoryEntry repositoryEntry =
+			repositoryEntryLocalService.fetchRepositoryEntry(fileEntryId);
+
+		if (repositoryEntry != null) {
+			return repositoryEntry.getRepositoryId();
+		}
+
+		return -1;
 	}
 
 	protected long getFileEntryRepositoryId(long fileEntryId) {

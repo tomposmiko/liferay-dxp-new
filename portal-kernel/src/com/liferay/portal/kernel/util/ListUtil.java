@@ -48,6 +48,16 @@ import java.util.function.ToLongFunction;
  */
 public class ListUtil {
 
+	public static <E> List<E> concat(List<? extends E>... lists) {
+		List<E> newList = new ArrayList<>();
+
+		for (List<? extends E> list : lists) {
+			newList.addAll(list);
+		}
+
+		return newList;
+	}
+
 	public static <E> List<E> copy(List<? extends E> master) {
 		if (master == null) {
 			return null;

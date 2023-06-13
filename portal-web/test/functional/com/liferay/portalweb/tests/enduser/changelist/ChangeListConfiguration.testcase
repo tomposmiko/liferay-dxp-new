@@ -1,5 +1,6 @@
 @component-name = "portal-staging"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Change Lists";
@@ -59,6 +60,8 @@ definition {
 	@description = "Enable Change List and go to Overview"
 	@priority = "5"
 	test EnableChangeListAndGoToOverview {
+		property portal.acceptance = "true";
+
 		ProductMenu.gotoPortlet(
 			category = "Change Lists",
 			panel = "Control Panel",
@@ -75,6 +78,14 @@ definition {
 			value1 = "Work on Production");
 
 		ChangeList.viewNoStagingMenuitemsNotAvailable();
+
+		ChangeList.viewWarningOnSiteExportImport(portletName = "Export");
+
+		ChangeList.viewWarningOnSiteExportImport(portletName = "Import");
+
+		ChangeList.viewWarningOnPortletExport(portletName = "Web Content");
+
+		ChangeList.viewWarningOnPortletImport(portletName = "Web Content");
 
 		ProductMenu.gotoPortlet(
 			category = "Change Lists",
@@ -107,4 +118,5 @@ definition {
 
 		AssertElementPresent(locator1 = "ChangeListSettings#DISABLED_SAVE_AND_GO_TO_OVERVIEW_BUTTON");
 	}
+
 }

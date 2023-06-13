@@ -96,6 +96,18 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 		}
 
+		_exportAssetDisplayPages(portletDataContext, layoutPageTemplateEntry);
+
+		if (layoutPageTemplateEntry.getLayoutPrototypeId() > 0) {
+			LayoutPrototype layoutPrototype =
+				_layoutPrototypeLocalService.getLayoutPrototype(
+					layoutPageTemplateEntry.getLayoutPrototypeId());
+
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, layoutPageTemplateEntry, layoutPrototype,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+		}
+
 		Layout layout = _layoutLocalService.fetchLayout(
 			layoutPageTemplateEntry.getPlid());
 
@@ -111,18 +123,6 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 			portletDataContext.addReferenceElement(
 				layoutPageTemplateEntry, layoutPageTemplateEntryElement, layout,
 				PortletDataContext.REFERENCE_TYPE_DEPENDENCY, false);
-		}
-
-		_exportAssetDisplayPages(portletDataContext, layoutPageTemplateEntry);
-
-		if (layoutPageTemplateEntry.getLayoutPrototypeId() > 0) {
-			LayoutPrototype layoutPrototype =
-				_layoutPrototypeLocalService.getLayoutPrototype(
-					layoutPageTemplateEntry.getLayoutPrototypeId());
-
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, layoutPageTemplateEntry, layoutPrototype,
-				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 		}
 
 		Element entryElement = portletDataContext.getExportDataElement(

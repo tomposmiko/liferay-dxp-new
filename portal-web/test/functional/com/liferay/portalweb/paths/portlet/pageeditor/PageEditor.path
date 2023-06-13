@@ -10,7 +10,7 @@
 <tbody>
 <tr>
 	<td>AUTOSAVE_MESSAGE</td>
-	<td>//div[contains(@class,'management-bar')]//span[@class='navbar-text']</td>
+	<td>//div[contains(@class,'management-bar')]//span[contains(@class,'navbar-text')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -87,7 +87,7 @@
 </tr>
 <tr>
 	<td>CONTENT_PAGE_DISABLED_POPOVER</td>
-	<td>//div[contains(@class,'disabled-area-popover--visible')]//div[@class='popover-body']</td>
+	<td>//div[contains(@class,'clay-popover')][not(contains(@class,'sr-only'))]//div[@class='popover-body']/p</td>
 	<td></td>
 </tr>
 <tr>

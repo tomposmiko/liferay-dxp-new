@@ -305,7 +305,9 @@ public class DataDefinitionSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		return string.replaceAll("\"", "\\\\\"");
+		string = string.replace("\\", "\\\\");
+
+		return string.replace("\"", "\\\"");
 	}
 
 	private static String _toJSON(Map<String, ?> map) {
@@ -398,7 +400,7 @@ public class DataDefinitionSerDes {
 			else if (Objects.equals(jsonParserFieldName, "description")) {
 				if (jsonParserFieldValue != null) {
 					dataDefinition.setDescription(
-						DataDefinitionSerDes.toMap(
+						(Map)DataDefinitionSerDes.toMap(
 							(String)jsonParserFieldValue));
 				}
 			}
@@ -411,7 +413,7 @@ public class DataDefinitionSerDes {
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					dataDefinition.setName(
-						DataDefinitionSerDes.toMap(
+						(Map)DataDefinitionSerDes.toMap(
 							(String)jsonParserFieldValue));
 				}
 			}

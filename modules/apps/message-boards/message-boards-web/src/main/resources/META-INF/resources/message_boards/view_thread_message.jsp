@@ -187,10 +187,21 @@ if (message.isAnonymous()) {
 
 					boolean showAnswerFlag = false;
 
-					if (!message.isRoot()) {
-						MBMessage rootMessage = MBMessageLocalServiceUtil.getMessage(thread.getRootMessageId());
+					if (thread.isQuestion() && !message.isRoot()) {
+						MBMessageDisplay messageDisplay = (MBMessageDisplay)request.getAttribute(WebKeys.MESSAGE_BOARDS_MESSAGE_DISPLAY);
 
-						showAnswerFlag = MBMessagePermission.contains(permissionChecker, rootMessage, ActionKeys.UPDATE) && (thread.isQuestion() || MBThreadLocalServiceUtil.hasAnswerMessage(thread.getThreadId()));
+						MBMessage rootMessage;
+
+						if (messageDisplay != null) {
+							MBTreeWalker mbTreeWalker = messageDisplay.getTreeWalker();
+
+							rootMessage = mbTreeWalker.getRoot();
+						}
+						else {
+							rootMessage = MBMessageLocalServiceUtil.getMessage(thread.getRootMessageId());
+						}
+
+						showAnswerFlag = MBMessagePermission.contains(permissionChecker, rootMessage, ActionKeys.UPDATE);
 					}
 					%>
 

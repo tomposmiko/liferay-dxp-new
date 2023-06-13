@@ -9,6 +9,12 @@ import {Config} from 'metal-state';
 
 import templates from './ChangeListsHistory.soy';
 
+const TIMEOUT_FIRST = 3000;
+
+const TIMEOUT_INTERVAL = 60000;
+
+const USER_FILTER_ALL = -1;
+
 /**
  * Handles the tags of the selected file entries inside a modal.
  */
@@ -25,10 +31,27 @@ class ChangeListsHistory extends PortletBase {
 			method: 'GET'
 		};
 
-		let sort = '&' + this.orderByCol + ':' + this.orderByType;
+		let urlProcesses = this._getUrlProcesses();
 
-		let urlProcesses = this.urlProcesses + '&type=' + this.filterStatus + '&offset=0&limit=5' + sort;
+		this._fetchProcesses(urlProcesses, init);
 
+		let instance = this;
+
+		setTimeout(() => instance._fetchProcesses(urlProcesses, init), TIMEOUT_FIRST, urlProcesses, init);
+		setInterval(() => instance._fetchProcesses(urlProcesses, init), TIMEOUT_INTERVAL, urlProcesses, init);
+	}
+
+	static _getState(processEntryStatus) {
+		let statusText = processEntryStatus;
+
+		if (processEntryStatus === 'successful') {
+			statusText = 'published';
+		}
+
+		return statusText;
+	}
+
+	_fetchProcesses(urlProcesses, init) {
 		fetch(urlProcesses, init)
 			.then(r => r.json())
 			.then(response => this._populateProcessEntries(response))
@@ -47,16 +70,89 @@ class ChangeListsHistory extends PortletBase {
 					);
 				}
 			);
-	}
 
-	static _getState(processEntryStatus) {
-		let statusText = processEntryStatus;
+		let urlProcessUsers = this.urlProcessUsers + '&type=' + this.filterStatus + '&offset=0&limit=5';
 
-		if (processEntryStatus === 'successful') {
-			statusText = 'published';
+		if (this.keywords) {
+			urlProcessUsers = urlProcessUsers + '&keywords=' + this.keywords;
 		}
 
-		return statusText;
+		fetch(urlProcessUsers, init)
+			.then(r => r.json())
+			.then(response => this._populateProcessUsers(response))
+			.catch(
+				error => {
+					const message = typeof error === 'string' ?
+						error :
+						Liferay.Util.sub(Liferay.Language.get('an-error-occured-while-getting-data-from-x'), this.urlProcessUsers);
+
+					openToast(
+						{
+							message,
+							title: Liferay.Language.get('error'),
+							type: 'danger'
+						}
+					);
+				}
+			);
+	}
+
+	_getUrlProcesses() {
+		let sort = '&sort=' + this.orderByCol + ':' + this.orderByType;
+
+		let urlProcesses = this.urlProcesses + '&type=' + this.filterStatus + '&offset=0&limit=5' + sort;
+
+		if (this.filterUser > 0) {
+			urlProcesses = urlProcesses + '&user=' + this.filterUser;
+		}
+		else {
+			urlProcesses += '&user=' + USER_FILTER_ALL;
+		}
+
+		if (this.keywords) {
+			urlProcesses = urlProcesses + '&keywords=' + this.keywords;
+		}
+
+		return urlProcesses;
+	}
+
+	_populateProcessUsers(processUsers) {
+		AUI().use(
+			'liferay-portlet-url',
+			A => {
+				let managementToolbar = Liferay.component('changeListHistoryManagementToolbar');
+
+				let filterByUserIndex = managementToolbar.filterItems.findIndex(e => e.label === 'Filter by User');
+
+				let filterByUserItems = managementToolbar.filterItems[filterByUserIndex].items;
+
+				let updatedFilterByUserItems = [];
+
+				updatedFilterByUserItems.push(filterByUserItems[filterByUserItems.findIndex(e => e.label === 'All')]);
+
+				processUsers.forEach(
+					processUser => {
+						const userFilterUrl = Liferay.PortletURL.createURL(this.baseURL);
+
+						userFilterUrl.setParameter('displayStyle', 'list');
+						userFilterUrl.setParameter('orderByCol', this.orderByCol);
+						userFilterUrl.setParameter('orderByType', this.orderByType);
+						userFilterUrl.setParameter('user', processUser.userId);
+
+						updatedFilterByUserItems.push(
+							{
+								'active': this.filterUser === processUser.userId.toString(),
+								'href': userFilterUrl.toString(),
+								'label': processUser.userName,
+								'type': 'item'
+							}
+						);
+					}
+				);
+
+				managementToolbar.filterItems[filterByUserIndex].items = updatedFilterByUserItems;
+			}
+		);
 	}
 
 	_populateProcessEntries(processEntries) {
@@ -98,6 +194,8 @@ class ChangeListsHistory extends PortletBase {
 						);
 					}
 				);
+
+				Liferay.component('changeListHistoryManagementToolbar').totalItems = this.processEntries.length;
 			}
 		);
 
@@ -121,11 +219,15 @@ ChangeListsHistory.STATE = {
 
 	filterUser: Config.string(),
 
+	keywords: Config.string(),
+
 	orderByCol: Config.string(),
 
 	orderByType: Config.string(),
 
 	urlProcesses: Config.string(),
+
+	urlProcessUsers: Config.string(),
 
 	processEntries: Config.arrayOf(
 		Config.shapeOf(

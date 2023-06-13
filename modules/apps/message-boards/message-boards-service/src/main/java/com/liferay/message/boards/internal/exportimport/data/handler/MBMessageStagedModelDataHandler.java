@@ -50,15 +50,13 @@ import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -103,7 +101,7 @@ public class MBMessageStagedModelDataHandler
 
 		return _mbMessageLocalService.getMBMessagesByUuidAndCompanyId(
 			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			new StagedModelModifiedDateComparator<MBMessage>());
+			new StagedModelModifiedDateComparator<>());
 	}
 
 	@Override
@@ -114,34 +112,6 @@ public class MBMessageStagedModelDataHandler
 	@Override
 	public String getDisplayName(MBMessage message) {
 		return message.getSubject();
-	}
-
-	protected MBMessage addDiscussionMessage(
-			PortletDataContext portletDataContext, long userId, long threadId,
-			long parentMessageId, MBMessage message,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		MBMessage importedMessage = null;
-
-		if (!message.isRoot()) {
-			MBDiscussion discussion =
-				_mbDiscussionLocalService.getThreadDiscussion(threadId);
-
-			importedMessage = _mbMessageLocalService.addDiscussionMessage(
-				userId, message.getUserName(),
-				portletDataContext.getScopeGroupId(), discussion.getClassName(),
-				discussion.getClassPK(), threadId, parentMessageId,
-				message.getSubject(), message.getBody(), serviceContext);
-		}
-		else {
-			MBThread thread = _mbThreadLocalService.getThread(threadId);
-
-			importedMessage = _mbMessageLocalService.getMBMessage(
-				thread.getRootMessageId());
-		}
-
-		return importedMessage;
 	}
 
 	@Override
@@ -229,9 +199,8 @@ public class MBMessageStagedModelDataHandler
 
 	@Override
 	protected void doImportMissingReference(
-			PortletDataContext portletDataContext, String uuid, long groupId,
-			long messageId)
-		throws Exception {
+		PortletDataContext portletDataContext, String uuid, long groupId,
+		long messageId) {
 
 		MBMessage existingMessage = fetchMissingReference(uuid, groupId);
 
@@ -254,7 +223,7 @@ public class MBMessageStagedModelDataHandler
 		if (!message.isRoot()) {
 			StagedModelDataHandlerUtil.importReferenceStagedModel(
 				portletDataContext, message, MBMessage.class,
-				message.getParentMessageId());
+				(Serializable)message.getParentMessageId());
 		}
 
 		long userId = portletDataContext.getUserId(message.getUserUuid());
@@ -296,7 +265,7 @@ public class MBMessageStagedModelDataHandler
 			message.getParentMessageId());
 
 		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
-			getAttachments(portletDataContext, messageElement, message);
+			_getAttachments(portletDataContext, messageElement, message);
 
 		try {
 			ServiceContext serviceContext =
@@ -312,7 +281,7 @@ public class MBMessageStagedModelDataHandler
 					serviceContext.setUuid(message.getUuid());
 
 					if (message.isDiscussion()) {
-						importedMessage = addDiscussionMessage(
+						importedMessage = _addDiscussionMessage(
 							portletDataContext, userId, threadId,
 							parentMessageId, message, serviceContext);
 					}
@@ -341,37 +310,14 @@ public class MBMessageStagedModelDataHandler
 								message.getBody(), serviceContext);
 					}
 					else {
-						Stream<ObjectValuePair<String, InputStream>>
-							objectValuePairStream = inputStreamOVPs.stream();
-
-						Set<String> incomingFileNames =
-							objectValuePairStream.map(
-								ObjectValuePair::getKey
-							).collect(
-								Collectors.toSet()
-							);
-
-						List<FileEntry> portletFileEntries =
+						List<FileEntry> fileEntries =
 							PortletFileRepositoryUtil.getPortletFileEntries(
 								existingMessage.getGroupId(),
 								existingMessage.getAttachmentsFolderId());
 
-						Stream<FileEntry> portletFileEntryStream =
-							portletFileEntries.stream();
-
-						List<Long> updatedFileEntryIds =
-							portletFileEntryStream.filter(
-								fileEntry -> incomingFileNames.contains(
-									fileEntry.getFileName())
-							).map(
-								FileEntry::getFileEntryId
-							).collect(
-								Collectors.toList()
-							);
-
-						for (Long fileEntryId : updatedFileEntryIds) {
+						for (FileEntry fileEntry : fileEntries) {
 							PortletFileRepositoryUtil.deletePortletFileEntry(
-								fileEntryId);
+								fileEntry.getFileEntryId());
 						}
 
 						importedMessage = _mbMessageLocalService.updateMessage(
@@ -384,7 +330,7 @@ public class MBMessageStagedModelDataHandler
 			}
 			else {
 				if (message.isDiscussion()) {
-					importedMessage = addDiscussionMessage(
+					importedMessage = _addDiscussionMessage(
 						portletDataContext, userId, threadId, parentMessageId,
 						message, serviceContext);
 				}
@@ -483,7 +429,29 @@ public class MBMessageStagedModelDataHandler
 		}
 	}
 
-	protected List<ObjectValuePair<String, InputStream>> getAttachments(
+	private MBMessage _addDiscussionMessage(
+			PortletDataContext portletDataContext, long userId, long threadId,
+			long parentMessageId, MBMessage message,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		if (!message.isRoot()) {
+			MBDiscussion discussion =
+				_mbDiscussionLocalService.getThreadDiscussion(threadId);
+
+			return _mbMessageLocalService.addDiscussionMessage(
+				userId, message.getUserName(),
+				portletDataContext.getScopeGroupId(), discussion.getClassName(),
+				discussion.getClassPK(), threadId, parentMessageId,
+				message.getSubject(), message.getBody(), serviceContext);
+		}
+
+		MBThread thread = _mbThreadLocalService.getThread(threadId);
+
+		return _mbMessageLocalService.getMBMessage(thread.getRootMessageId());
+	}
+
+	private List<ObjectValuePair<String, InputStream>> _getAttachments(
 		PortletDataContext portletDataContext, Element messageElement,
 		MBMessage message) {
 
@@ -551,34 +519,6 @@ public class MBMessageStagedModelDataHandler
 		return inputStreamOVPs;
 	}
 
-	@Reference(unbind = "-")
-	protected void setMBDiscussionLocalService(
-		MBDiscussionLocalService mbDiscussionLocalService) {
-
-		_mbDiscussionLocalService = mbDiscussionLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setMBMessageLocalService(
-		MBMessageLocalService mbMessageLocalService) {
-
-		_mbMessageLocalService = mbMessageLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setMBThreadLocalService(
-		MBThreadLocalService mbThreadLocalService) {
-
-		_mbThreadLocalService = mbThreadLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setRatingsEntryLocalService(
-		RatingsEntryLocalService ratingsEntryLocalService) {
-
-		_ratingsEntryLocalService = ratingsEntryLocalService;
-	}
-
 	private MBMessage _updateAnswer(
 			MBMessage message, MBMessage importedMessage)
 		throws PortalException {
@@ -605,9 +545,16 @@ public class MBMessageStagedModelDataHandler
 	private static final Log _log = LogFactoryUtil.getLog(
 		MBMessageStagedModelDataHandler.class);
 
+	@Reference
 	private MBDiscussionLocalService _mbDiscussionLocalService;
+
+	@Reference
 	private MBMessageLocalService _mbMessageLocalService;
+
+	@Reference
 	private MBThreadLocalService _mbThreadLocalService;
+
+	@Reference
 	private RatingsEntryLocalService _ratingsEntryLocalService;
 
 }

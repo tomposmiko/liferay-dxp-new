@@ -1,4 +1,5 @@
 definition {
+
 	var entryAuthorFullName = "Test Test";
 
 	macro addContent {
@@ -456,26 +457,6 @@ definition {
 		Alert.viewSuccessMessage();
 	}
 
-	macro rateThumbsDown {
-		var key_entryTitle = "${entryTitle}";
-
-		AssertTextEquals(
-			locator1 = "BlogsEntry#TITLE",
-			value1 = "${entryTitle}");
-
-		Click(locator1 = "Ratings#THUMB_DOWN");
-	}
-
-	macro rateThumbsUp {
-		var key_entryTitle = "${entryTitle}";
-
-		AssertTextEquals(
-			locator1 = "BlogsEntry#TITLE",
-			value1 = "${entryTitle}");
-
-		Click(locator1 = "Ratings#THUMB_UP");
-	}
-
 	macro removeSmallImage {
 		Click(locator1 = "Button#REMOVE_IMAGE");
 
@@ -636,15 +617,13 @@ definition {
 	}
 
 	macro viewAsRelatedAssetPG {
-		var key_assetTitle = "${assetTitle}";
-		var key_entryContent = "${entryContent}";
-		var key_entryTitle = "${entryTitle}";
-
 		AssertTextEquals(
+			key_entryTitle = "${entryTitle}",
 			locator1 = "BlogsEntry#TITLE",
 			value1 = "${entryTitle}");
 
 		AssertTextEquals(
+			key_entryContent = "${entryContent}",
 			locator1 = "BlogsEntry#CONTENT",
 			value1 = "${entryContent}");
 
@@ -653,8 +632,9 @@ definition {
 			value1 = "Related Assets");
 
 		AssertTextEquals(
+			key_relatedAssetTitle = "${relatedAssetTitle}",
 			locator1 = "AssetRelatedAssets#ASSET_TITLE",
-			value1 = "${assetTitle}");
+			value1 = "${relatedAssetTitle}");
 	}
 
 	macro viewContent {
@@ -1085,30 +1065,6 @@ definition {
 		}
 	}
 
-	macro viewThumbsDown {
-		var key_entryTitle = "${entryTitle}";
-
-		AssertTextEquals(
-			locator1 = "BlogsEntry#TITLE",
-			value1 = "${entryTitle}");
-
-		AssertTextEquals(
-			locator1 = "Ratings#THUMB_DOWN",
-			value1 = "${voteCount}");
-	}
-
-	macro viewThumbsUp {
-		var key_entryTitle = "${entryTitle}";
-
-		AssertTextEquals(
-			locator1 = "BlogsEntry#TITLE",
-			value1 = "${entryTitle}");
-
-		AssertTextEquals(
-			locator1 = "Ratings#THUMB_UP",
-			value1 = "${voteCount}");
-	}
-
 	macro viewTitle {
 		var key_entryTitle = "${entryTitle}";
 
@@ -1259,4 +1215,5 @@ definition {
 
 		AssertElementNotPresent(locator1 = "AP#ASSET_ABSTRACT_TITLE");
 	}
+
 }

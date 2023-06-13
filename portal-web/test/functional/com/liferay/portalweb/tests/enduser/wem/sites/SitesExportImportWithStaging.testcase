@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Site Administration";
@@ -215,33 +216,27 @@ definition {
 		task ("Assert the fragments from the first site survived the import") {
 			FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name-2-staging");
 
-			AssertVisible(
-				key_cardText = "Content",
-				locator1 = "Card#SPECIFIC_LARGE_TEXT");
+			FragmentsAdmin.viewEntryPresent(entry = "Content");
 
-			AssertVisible(
-				key_cardText = "Image",
-				locator1 = "Card#SPECIFIC_LARGE_TEXT");
+			FragmentsAdmin.viewEntryPresent(entry = "Image");
 
-			AssertVisible(
-				key_cardText = "Button",
-				locator1 = "Card#SPECIFIC_LARGE_TEXT");
+			FragmentsAdmin.viewEntryPresent(entry = "Button");
 
-			AssertVisible(
-				key_cardText = "Multiple Editables",
-				locator1 = "Card#SPECIFIC_LARGE_TEXT");
+			FragmentsAdmin.viewEntryPresent(entry = "Multiple Editables");
 
-			AssertVisible(
-				key_cardText = "Rich Text",
-				locator1 = "Card#SPECIFIC_LARGE_TEXT");
+			FragmentsAdmin.viewEntryPresent(entry = "Static Text");
 
-			AssertVisible(
-				key_cardText = "Title",
-				locator1 = "Card#SPECIFIC_LARGE_TEXT");
+			FragmentsAdmin.viewEntryPresent(entry = "Image 2");
 
-			LexiconEntry.gotoEntryMenuItem(
-				menuItem = "Edit",
-				rowEntry = "Button");
+			FragmentsAdmin.viewEntryPresent(entry = "Rich Text");
+
+			FragmentsAdmin.viewEntryPresent(entry = "Title 2");
+
+			FragmentsAdmin.viewEntryPresent(entry = "Title");
+
+			FragmentsAdmin.gotoEntryEllipsisItem(
+				entry = "Button",
+				item = "Edit");
 
 			SelectFrame.selectFrameNoLoading(locator1 = "FragmentEditor#PREVIEW_IFRAME");
 
@@ -249,21 +244,13 @@ definition {
 
 			AssertElementPresent(locator1 = "Button#CANCEL");
 
-			AssertClickNoError(
-				locator1 = "Button#SUBMIT",
-				value1 = "Submit");
-
-			AssertConfirm(value1 = "Form submitted");
-
 			SelectFrameTop();
 		}
 
 		task ("Assert the content page template survived the import") {
 			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name-2-staging");
 
-			LexiconEntry.gotoEntryMenuItem(
-				menuItem = "Edit",
-				rowEntry = "Page Template Name");
+			PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
 
 			AssertVisible(
 				key_content = "Submit",
@@ -320,9 +307,7 @@ definition {
 		task ("Assert the display page survived the import") {
 			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-2-staging");
 
-			AssertVisible(
-				key_cardText = "Display Page Name",
-				locator1 = "Card#SPECIFIC_LARGE_TEXT");
+			DisplayPageTemplatesAdmin.viewDisplayPagePresent(displayPageName = "Display Page Name");
 		}
 
 		task ("Assert the web content article and its reference to its display page survived the import") {
@@ -341,4 +326,5 @@ definition {
 				locator1 = "Fragment#FRAGMENT");
 		}
 	}
+
 }

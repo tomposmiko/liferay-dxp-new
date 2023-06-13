@@ -1,8 +1,7 @@
-import {ADD_ROW, MOVE_ROW, REMOVE_ROW, UPDATE_ROW_COLUMNS, UPDATE_ROW_COLUMNS_NUMBER, UPDATE_ROW_CONFIG} from '../actions/actions.es';
+import {ADD_ROW, MOVE_ROW, REMOVE_ROW, UPDATE_ROW_COLUMNS_ERROR, UPDATE_ROW_COLUMNS_LOADING, UPDATE_ROW_COLUMNS_NUMBER_SUCCESS, UPDATE_ROW_CONFIG} from '../actions/actions.es';
 import {add, addRow, remove, setIn, updateIn, updateWidgets} from '../utils/FragmentsEditorUpdateUtils.es';
 import {containsFragmentEntryLinkId} from '../utils/LayoutDataList.es';
 import {getDropRowPosition, getRowFragmentEntryLinkIds, getRowIndex} from '../utils/FragmentsEditorGetUtils.es';
-import {MAX_COLUMNS} from '../utils/rowConstants';
 import {removeFragmentEntryLinks, updatePageEditorLayoutData} from '../utils/FragmentsEditorFetchUtils.es';
 
 /**
@@ -172,67 +171,28 @@ function removeRowReducer(state, action) {
 /**
  * @param {object} state
  * @param {object} action
- * @param {Array} action.columns
- * @param {string} action.rowId
+ * @param {object} action.layoutData
  * @param {string} action.type
  * @return {object}
  * @review
  */
-const updateRowColumnsReducer = (state, action) => new Promise(
-	resolve => {
-		let nextState = state;
+function updateRowColumnsReducer(state, action) {
+	let nextState = state;
 
-		if (action.type === UPDATE_ROW_COLUMNS) {
-			const rowIndex = getRowIndex(
-				nextState.layoutData.structure,
-				action.rowId
-			);
+	if (action.type === UPDATE_ROW_COLUMNS_ERROR ||
+		action.type === UPDATE_ROW_COLUMNS_LOADING) {
 
-			if (rowIndex === -1) {
-				resolve(nextState);
-			}
-			else {
-				const nextData = setIn(
-					nextState.layoutData,
-					[
-						'structure',
-						rowIndex.toString(),
-						'columns'
-					],
-					action.columns
-				);
-
-				updatePageEditorLayoutData(
-					nextData,
-					nextState.segmentsExperienceId
-				).then(
-					() => {
-						nextState = setIn(
-							nextState,
-							['layoutData'],
-							nextData
-						);
-
-						resolve(nextState);
-					}
-				).catch(
-					() => {
-						resolve(nextState);
-					}
-				);
-			}
-		}
-		else {
-			resolve(nextState);
-		}
+		nextState = setIn(nextState, ['layoutData'], action.layoutData);
 	}
-);
+
+	return nextState;
+}
 
 /**
  * @param {object} state
  * @param {object} action
- * @param {number} action.numberOfColumns
- * @param {string} action.rowId
+ * @param {Array} action.fragmentEntryLinkIdsToRemove
+ * @param {object} action.layoutData
  * @param {string} action.type
  * @return {object}
  * @review
@@ -240,84 +200,20 @@ const updateRowColumnsReducer = (state, action) => new Promise(
 function updateRowColumnsNumberReducer(state, action) {
 	let nextState = state;
 
-	return new Promise(
-		resolve => {
-			if (action.type === UPDATE_ROW_COLUMNS_NUMBER) {
+	if (action.type === UPDATE_ROW_COLUMNS_NUMBER_SUCCESS) {
+		nextState = setIn(nextState, ['layoutData'], action.layoutData);
 
-				let fragmentEntryLinkIdsToRemove = [];
-				let nextData;
-
-				const numberOfColumns = action.numberOfColumns;
-
-				const columnsSize = Math.floor(MAX_COLUMNS / numberOfColumns);
-
-				const rowIndex = getRowIndex(
-					nextState.layoutData.structure,
-					action.rowId
-				);
-
-				let columns = nextState.layoutData.structure[rowIndex].columns;
-
-				if (numberOfColumns > columns.length) {
-					nextData = _addColumns(
-						nextState.layoutData,
-						rowIndex,
-						numberOfColumns,
-						columnsSize
-					);
-				}
-				else {
-					let fragmentEntryLinkIdsToRemove = getRowFragmentEntryLinkIds(
-						{
-							columns: columns.slice(
-								numberOfColumns - columns.length
-							)
-						}
-					);
-
-					fragmentEntryLinkIdsToRemove.forEach(
-						fragmentEntryLinkId => {
-							nextState = updateWidgets(
-								nextState,
-								fragmentEntryLinkId
-							);
-						}
-					);
-
-					nextData = _removeColumns(
-						nextState.layoutData,
-						rowIndex,
-						numberOfColumns,
-						columnsSize
-					);
-				}
-
-				updatePageEditorLayoutData(
-					nextData,
-					nextState.segmentsExperienceId
-				).then(
-					() => removeFragmentEntryLinks(
-						nextData,
-						fragmentEntryLinkIdsToRemove,
-						nextState.segmentsExperienceId
-					)
-				).then(
-					() => {
-						nextState = setIn(nextState, ['layoutData'], nextData);
-
-						resolve(nextState);
-					}
-				).catch(
-					() => {
-						resolve(state);
-					}
+		action.fragmentEntryLinkIdsToRemove.forEach(
+			fragmentEntryLinkId => {
+				nextState = updateWidgets(
+					nextState,
+					fragmentEntryLinkId
 				);
 			}
-			else {
-				resolve(state);
-			}
-		}
-	);
+		);
+	}
+
+	return nextState;
 }
 
 /**
@@ -381,105 +277,6 @@ const updateRowConfigReducer = (state, action) => new Promise(
 		}
 	}
 );
-
-/**
- * Returns a new layoutData with the given columns inserted in the specified
- * row with the specified size and resizes the rest of columns to the
- * same size.
- *
- * @param {object} layoutData
- * @param {number} rowIndex
- * @param {number} numberOfColumns
- * @param {number} columnsSize
- * @return {object}
- */
-function _addColumns(layoutData, rowIndex, numberOfColumns, columnsSize) {
-	let nextColumnId = layoutData.nextColumnId || 0;
-
-	let nextData = updateIn(
-		layoutData,
-		['structure', rowIndex, 'columns'],
-		columns => {
-			columns.forEach(
-				(column, index) => {
-					column.size = _getColumnSize(numberOfColumns, columnsSize, index);
-				}
-			);
-
-			const numberOfNewColumns = numberOfColumns - columns.length;
-			const numberOfOldColumns = columns.length;
-
-			for (let i = 0; i < numberOfNewColumns; i++) {
-				columns.push(
-					{
-						columnId: `${nextColumnId}`,
-						fragmentEntryLinkIds: [],
-						size: _getColumnSize(numberOfColumns, columnsSize, (i + numberOfOldColumns))
-					}
-				);
-
-				nextColumnId += 1;
-			}
-
-			return columns;
-		}
-	);
-
-	nextData = setIn(layoutData, ['nextColumnId'], nextColumnId);
-
-	return nextData;
-}
-
-/**
- * Returns the new size of a column based on the total number of columns of a
- * grid, the general size and its position in the grid.
- *
- * @param {number} numberOfColumns
- * @param {number} columnsSize
- * @param {number} columnIndex
- * @return {string}
- */
-function _getColumnSize(numberOfColumns, columnsSize, columnIndex) {
-	let newColumnSize = columnsSize;
-
-	const middleColumnPosition = Math.ceil(numberOfColumns / 2) - 1;
-
-	if (middleColumnPosition === columnIndex) {
-		newColumnSize = MAX_COLUMNS - ((numberOfColumns - 1) * columnsSize);
-	}
-
-	return newColumnSize.toString();
-}
-
-/**
- * Returns a new layoutData without the columns out of range in the specified
- * row and resizes the rest of columns to the specified size.
- *
- * @param {object} layoutData
- * @param {number} rowIndex
- * @param {number} numberOfColumns
- * @param {number} columnsSize
- * @return {object}
- */
-function _removeColumns(layoutData, rowIndex, numberOfColumns, columnsSize) {
-	let nextData = updateIn(
-		layoutData,
-		['structure', rowIndex, 'columns'],
-		columns => {
-			columns = columns.slice(0, numberOfColumns);
-
-			columns.forEach(
-				(column, index) => {
-					column.size = _getColumnSize(numberOfColumns, columnsSize, index);
-				}
-			);
-
-			return columns;
-		}
-	);
-
-	return nextData;
-}
 
 /**
  * Returns a new layoutData with the given row moved to the position

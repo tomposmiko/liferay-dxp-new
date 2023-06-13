@@ -2,5 +2,5 @@ apply plugin: "nebula.optional-base"
 
 dependencies {
 	testIntegrationCompile group: "axis", name: "axis", optional, version: "1.4"
-	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.16"
+	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.17"
 }

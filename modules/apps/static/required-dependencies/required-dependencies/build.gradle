@@ -1,24 +1,24 @@
 import com.liferay.gradle.util.copy.RenameDependencyClosure
 
-task deployTestLibs(type: Copy)
+task deployReqTestLibs(type: Copy)
 
 configurations {
 	compileOnly {
 		transitive = false
 	}
 
-	testLibs {
+	reqTestLibs {
 		transitive = false
 	}
 }
 
 dependencies {
-	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-annotations", version: "2.9.8"
-	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-core", version: "2.9.8"
-	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.9.8"
+	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-annotations", version: "2.9.9"
+	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-core", version: "2.9.9"
+	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.9.9"
 	compileOnly group: "com.liferay", name: "javax.servlet.jsp.jstl", version: "1.2.3.LIFERAY-PATCHED-2"
 	compileOnly group: "com.liferay", name: "org.apache.aries.spifly.dynamic.framework.extension", version: "1.2.LIFERAY-PATCHED-1"
-	compileOnly group: "com.liferay", name: "org.apache.felix.configadmin", version: "1.9.8.LIFERAY-PATCHED-1"
+	compileOnly group: "com.liferay", name: "org.apache.felix.configadmin", version: "1.9.8.LIFERAY-PATCHED-3"
 	compileOnly group: "com.liferay", name: "org.apache.felix.fileinstall", version: "3.6.4.LIFERAY-PATCHED-1"
 	compileOnly group: "com.liferay", name: "org.apache.felix.gogo.runtime", version: "1.1.0.LIFERAY-PATCHED-2"
 	compileOnly group: "com.liferay", name: "org.eclipse.equinox.metatype", version: "1.4.200-20150831.175616-1-LIFERAY-CACHED"
@@ -49,16 +49,14 @@ dependencies {
 	compileOnly group: "org.osgi", name: "org.osgi.util.function", version: "1.1.0"
 	compileOnly group: "org.osgi", name: "org.osgi.util.promise", version: "1.1.0"
 
-	testLibs group: "org.apache.aries", name: "org.apache.aries.util", version: "1.0.0"
-	testLibs group: "org.apache.aries.jmx", name: "org.apache.aries.jmx.api", version: "1.1.1"
-	testLibs group: "org.apache.aries.jmx", name: "org.apache.aries.jmx.core", version: "1.1.3"
+	reqTestLibs group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge.connector", version: "1.0.0"
 }
 
 deploy {
 	deleteAllActions()
 
 	dependsOn = []
-	finalizedBy deployTestLibs
+	finalizedBy deployReqTestLibs
 }
 
 deployDependencies {
@@ -70,12 +68,12 @@ deployDependencies {
 	rename(/javax.el-(.+)\.jar/, "javax.el" + renameSuffix)
 }
 
-deployTestLibs {
+deployReqTestLibs {
 	ext {
 		autoClean = false
 	}
 
-	from configurations.testLibs
+	from configurations.reqTestLibs
 
 	into {
 		"${liferay.liferayHome}/osgi/test"
@@ -85,5 +83,5 @@ deployTestLibs {
 		false
 	}
 
-	rename new RenameDependencyClosure(project, configurations.testLibs.name)
+	rename new RenameDependencyClosure(project, configurations.reqTestLibs.name)
 }

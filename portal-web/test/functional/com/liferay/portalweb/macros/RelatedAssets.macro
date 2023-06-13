@@ -1,4 +1,5 @@
 definition {
+
 	macro _selectAssetType {
 		var key_assetType = "${assetType}";
 
@@ -83,7 +84,9 @@ definition {
 		}
 
 		AssertTextEquals(
-			locator1 = "Relatedassets#ASSET_TITLE_1",
-			value1 = "${assetTitle}");
+			key_assetTitle = "${relatedAssetTitle}",
+			locator1 = "Relatedassets#ASSET_TITLE",
+			value1 = "${relatedAssetTitle}");
 	}
+
 }

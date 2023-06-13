@@ -27,6 +27,7 @@ import com.liferay.exportimport.kernel.staging.StagingConstants;
 import com.liferay.exportimport.kernel.staging.StagingURLHelperUtil;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
@@ -113,7 +114,6 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -837,7 +837,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 					group.getGroupId(),
 					BackgroundTaskConstants.STATUS_IN_PROGRESS);
 
-			if (!backgroundTasks.isEmpty()) {
+			if (ListUtil.isNotNull(backgroundTasks)) {
 				throw new PendingBackgroundTaskException(
 					"Unable to delete group with pending background tasks");
 			}
@@ -3765,9 +3765,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			return group;
 		}
 
-		User user = null;
-
-		user = userPersistence.fetchByPrimaryKey(group.getCreatorUserId());
+		User user = userPersistence.fetchByPrimaryKey(group.getCreatorUserId());
 
 		if (user == null) {
 			user = userPersistence.fetchByPrimaryKey(
@@ -4088,7 +4086,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 					StringBundler.concat(
 						"Unable to add default data for portlet ",
 						portletDataHandler.getPortletId(), " in group ",
-						String.valueOf(group.getGroupId())));
+						group.getGroupId()));
 
 				if (portletDataHandler.isRollbackOnException()) {
 					throw new SystemException(e);
@@ -4116,7 +4114,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 					StringBundler.concat(
 						"Unable to delete data for portlet ",
 						portletDataHandler.getPortletId(), " in group ",
-						String.valueOf(group.getGroupId())),
+						group.getGroupId()),
 					e);
 
 				if (portletDataHandler.isRollbackOnException()) {

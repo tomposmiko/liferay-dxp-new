@@ -99,10 +99,21 @@ public abstract class BaseFieldQueryBuilderTestCase
 				indexingTestHelper.search();
 
 				indexingTestHelper.verify(
-					hits -> {
-						DocumentsAssert.assertValues(
-							keywords, hits.getDocs(), getField(), values);
-					});
+					hits -> DocumentsAssert.assertValues(
+						keywords, hits.getDocs(), getField(), values));
+			});
+	}
+
+	protected void assertSearchCount(final String keywords, final int size)
+		throws Exception {
+
+		assertSearch(
+			indexingTestHelper -> {
+				prepareSearch(indexingTestHelper, keywords);
+
+				long count = indexingTestHelper.searchCount();
+
+				Assert.assertEquals(keywords, size, count);
 			});
 	}
 
@@ -149,13 +160,15 @@ public abstract class BaseFieldQueryBuilderTestCase
 			indexingTestHelper -> {
 				prepareSearch(indexingTestHelper, keywords);
 
+				indexingTestHelper.defineRequest(
+					searchRequestBuilder -> searchRequestBuilder.size(
+						size + 1));
+
 				indexingTestHelper.search();
 
 				indexingTestHelper.verify(
-					hits -> {
-						DocumentsAssert.assertCount(
-							keywords, hits.getDocs(), getField(), size);
-					});
+					hits -> DocumentsAssert.assertCount(
+						keywords, hits.getDocs(), getField(), size));
 			});
 	}
 

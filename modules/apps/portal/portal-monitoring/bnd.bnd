@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal Monitoring
 Bundle-SymbolicName: com.liferay.portal.monitoring
-Bundle-Version: 7.0.4
+Bundle-Version: 7.0.7
 Import-Package:\
 	com.liferay.portal.kernel.portlet;version="[9.0.0,9.1)",\
 	\

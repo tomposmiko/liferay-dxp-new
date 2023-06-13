@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserLocalServiceWrapper;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 
 import java.util.List;
 
@@ -78,10 +79,13 @@ public class MBMessageUserLocalServiceWrapper extends UserLocalServiceWrapper {
 			userGroupIds, serviceContext);
 
 		if (GetterUtil.getBoolean(
-				PropsKeys.USERS_UPDATE_USER_NAME + MBMessage.class.getName()) &&
-			!oldFullName.equals(user.getFullName())) {
+				PropsUtil.get(
+					PropsKeys.USERS_UPDATE_USER_NAME +
+						MBMessage.class.getName())) &&
+			!oldFullName.equals(curUser.getFullName())) {
 
-			_mbMessageLocalService.updateUserName(userId, user.getFullName());
+			_mbMessageLocalService.updateUserName(
+				userId, curUser.getFullName());
 		}
 
 		return curUser;

@@ -32,27 +32,19 @@ import javax.annotation.Generated;
 @Generated("")
 public class FormStructureResource {
 
-	public FormStructure getFormStructure(Long formStructureId)
+	public static FormStructure getFormStructure(Long formStructureId)
 		throws Exception {
 
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-form/v1.0/form-structures/{formStructureId}",
+		HttpInvoker.HttpResponse httpResponse = getFormStructureHttpResponse(
 			formStructureId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return FormStructureSerDes.toDTO(content);
@@ -66,17 +58,55 @@ public class FormStructureResource {
 		}
 	}
 
-	public Page<FormStructure> getSiteFormStructuresPage(
-			Long siteId, Pagination pagination)
+	public static HttpInvoker.HttpResponse getFormStructureHttpResponse(
+			Long formStructureId)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-form/v1.0/form-structures/{formStructureId}",
+			formStructureId);
+
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
+
+		return httpInvoker.invoke();
+	}
+
+	public static Page<FormStructure> getSiteFormStructuresPage(
+			Long siteId, Pagination pagination)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse =
+			getSiteFormStructuresPageHttpResponse(siteId, pagination);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		return Page.of(content, FormStructureSerDes::toDTO);
+	}
+
+	public static HttpInvoker.HttpResponse
+			getSiteFormStructuresPageHttpResponse(
+				Long siteId, Pagination pagination)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
 
 		httpInvoker.path(
 			"http://localhost:8080/o/headless-form/v1.0/sites/{siteId}/form-structures",
@@ -84,16 +114,7 @@ public class FormStructureResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, FormStructureSerDes::toDTO);
+		return httpInvoker.invoke();
 	}
 
 	private static final Logger _logger = Logger.getLogger(

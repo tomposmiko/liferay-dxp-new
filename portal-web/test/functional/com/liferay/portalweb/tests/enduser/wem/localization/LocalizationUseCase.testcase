@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Localization";
@@ -59,9 +60,9 @@ definition {
 
 		LanguagePortlet.viewLanguageCurrent(locale = "en-US");
 
-		LanguagePortlet.viewLanguagesAbsent(missingLocales = "français-France,magyar-Magyarország,日本語-日本,português-Brasil,中文-中国,עברית-ישראל,suomi-Suomi,català-Espanya,Nederlands-Nederland");
+		LanguagePortlet.viewLanguagesAbsent(missingLocales = "français-France,magyar-Magyarország,日本語-日本,português-Brasil,中文-中国,עברית-ישראל,suomi-Suomi,català-Espanya,nederlands-Nederland");
 
-		LanguagePortlet.viewLanguagesPresent(currentLocales = "Deutsch-Deutschland,español-España");
+		LanguagePortlet.viewLanguagesPresent(currentLocales = "deutsch-Deutschland,español-España");
 	}
 
 	@priority = "4"
@@ -121,7 +122,7 @@ definition {
 			pageName = "Test Page Name",
 			siteName = "Test Site Name");
 
-		LanguagePortlet.viewDisplayTemplateShortText(languageKey = "HU");
+		LanguagePortlet.viewDisplayTemplateShortText(languageKey = "hu");
 	}
 
 	@priority = "4"
@@ -148,7 +149,7 @@ definition {
 
 		LanguagePortlet.viewLanguageCurrent(locale = "en-US");
 
-		LanguagePortlet.viewLanguagesAbsent(missingLocales = "magyar-Magyarország,日本語-日本,português-Brasil,עברית-ישראל,suomi-Suomi,català-Espanya,Nederlands-Nederland,Deutsch-Deutschland,español-España");
+		LanguagePortlet.viewLanguagesAbsent(missingLocales = "magyar-Magyarország,日本語-日本,português-Brasil,עברית-ישראל,suomi-Suomi,català-Espanya,nederlands-Nederland,deutsch-Deutschland,español-España");
 
 		LanguagePortlet.viewLanguagesPresent(currentLocales = "français-France,中文-中国");
 
@@ -186,12 +187,13 @@ definition {
 
 		LanguagePortlet.viewLanguageCurrent(locale = "en-US");
 
-		LanguagePortlet.viewLanguagesAbsent(missingLocales = "français-France,magyar-Magyarország,日本語-日本,português-Brasil,中文-中国,עברית-ישראל,suomi-Suomi,català-Espanya,Nederlands-Nederland");
+		LanguagePortlet.viewLanguagesAbsent(missingLocales = "français-France,magyar-Magyarország,日本語-日本,português-Brasil,中文-中国,עברית-ישראל,suomi-Suomi,català-Espanya,nederlands-Nederland");
 
-		LanguagePortlet.viewLanguagesPresent(currentLocales = "Deutsch-Deutschland,español-España");
+		LanguagePortlet.viewLanguagesPresent(currentLocales = "deutsch-Deutschland,español-España");
 
 		Portlet.gotoPortletOptions(portletOption = "Configuration");
 
 		LanguagePortlet.configureViewCurrentLanguages(currentLanguages = "English (United States),German (Germany),Spanish (Spain)");
 	}
+
 }

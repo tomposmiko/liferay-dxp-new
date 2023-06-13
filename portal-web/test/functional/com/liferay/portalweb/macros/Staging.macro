@@ -1,10 +1,13 @@
 definition {
+
 	macro activateStagingCP {
 		ProductMenuHelper.openProductMenu();
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "ProductMenu#PRODUCT_MENU_PANEL_SITE_ADMINISTRATION_SITE_NAME",
 			value1 = "${siteName}");
+
+		Pause(locator1 = "3000");
 
 		if ("${remoteStaging}" == "true") {
 			Check.checkHiddenToggleSwitch(locator1 = "SiteSettingsStaging#STAGING_REMOTE_LIVE");
@@ -684,6 +687,8 @@ definition {
 	}
 
 	macro publishCustomPublication {
+		Pause(locator1 = "3000");
+
 		LexiconEntry.gotoAdd();
 
 		if ("${remoteStaging}" == "true") {
@@ -1274,4 +1279,5 @@ definition {
 
 		SelectFrameTop(value1 = "relative=top");
 	}
+
 }

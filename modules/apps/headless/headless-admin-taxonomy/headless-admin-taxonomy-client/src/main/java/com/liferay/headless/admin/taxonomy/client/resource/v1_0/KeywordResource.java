@@ -32,7 +32,23 @@ import javax.annotation.Generated;
 @Generated("")
 public class KeywordResource {
 
-	public void deleteKeyword(Long keywordId) throws Exception {
+	public static void deleteKeyword(Long keywordId) throws Exception {
+		HttpInvoker.HttpResponse httpResponse = deleteKeywordHttpResponse(
+			keywordId);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+	}
+
+	public static HttpInvoker.HttpResponse deleteKeywordHttpResponse(
+			Long keywordId)
+		throws Exception {
+
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.DELETE);
@@ -43,35 +59,20 @@ public class KeywordResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		return httpInvoker.invoke();
 	}
 
-	public Keyword getKeyword(Long keywordId) throws Exception {
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-admin-taxonomy/v1.0/keywords/{keywordId}",
+	public static Keyword getKeyword(Long keywordId) throws Exception {
+		HttpInvoker.HttpResponse httpResponse = getKeywordHttpResponse(
 			keywordId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return KeywordSerDes.toDTO(content);
@@ -85,12 +86,56 @@ public class KeywordResource {
 		}
 	}
 
-	public Keyword putKeyword(Long keywordId, Keyword keyword)
+	public static HttpInvoker.HttpResponse getKeywordHttpResponse(
+			Long keywordId)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-		httpInvoker.body(KeywordSerDes.toJSON(keyword), "application/json");
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-admin-taxonomy/v1.0/keywords/{keywordId}",
+			keywordId);
+
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
+
+		return httpInvoker.invoke();
+	}
+
+	public static Keyword putKeyword(Long keywordId, Keyword keyword)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse = putKeywordHttpResponse(
+			keywordId, keyword);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		try {
+			return KeywordSerDes.toDTO(content);
+		}
+		catch (Exception e) {
+			_logger.log(
+				Level.WARNING, "Unable to process HTTP response: " + content,
+				e);
+
+			throw e;
+		}
+	}
+
+	public static HttpInvoker.HttpResponse putKeywordHttpResponse(
+			Long keywordId, Keyword keyword)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.body(keyword.toString(), "application/json");
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
 
@@ -100,14 +145,77 @@ public class KeywordResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
+		return httpInvoker.invoke();
+	}
+
+	public static Page<Keyword> getSiteKeywordsPage(
+			Long siteId, String search, String filterString,
+			Pagination pagination, String sortString)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse = getSiteKeywordsPageHttpResponse(
+			siteId, search, filterString, pagination, sortString);
 
 		String content = httpResponse.getContent();
 
 		_logger.fine("HTTP response content: " + content);
 
 		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
+
+		return Page.of(content, KeywordSerDes::toDTO);
+	}
+
+	public static HttpInvoker.HttpResponse getSiteKeywordsPageHttpResponse(
+			Long siteId, String search, String filterString,
+			Pagination pagination, String sortString)
+		throws Exception {
+
+		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+		if (search != null) {
+			httpInvoker.parameter("search", String.valueOf(search));
+		}
+
+		if (filterString != null) {
+			httpInvoker.parameter("filter", filterString);
+		}
+
+		if (pagination != null) {
+			httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
+			httpInvoker.parameter(
+				"pageSize", String.valueOf(pagination.getPageSize()));
+		}
+
+		if (sortString != null) {
+			httpInvoker.parameter("sort", sortString);
+		}
+
+		httpInvoker.path(
+			"http://localhost:8080/o/headless-admin-taxonomy/v1.0/sites/{siteId}/keywords",
+			siteId);
+
+		httpInvoker.userNameAndPassword("test@liferay.com:test");
+
+		return httpInvoker.invoke();
+	}
+
+	public static Keyword postSiteKeyword(Long siteId, Keyword keyword)
+		throws Exception {
+
+		HttpInvoker.HttpResponse httpResponse = postSiteKeywordHttpResponse(
+			siteId, keyword);
+
+		String content = httpResponse.getContent();
+
+		_logger.fine("HTTP response content: " + content);
+
+		_logger.fine("HTTP response message: " + httpResponse.getMessage());
+		_logger.fine(
+			"HTTP response status code: " + httpResponse.getStatusCode());
 
 		try {
 			return KeywordSerDes.toDTO(content);
@@ -121,47 +229,13 @@ public class KeywordResource {
 		}
 	}
 
-	public Page<Keyword> getSiteKeywordsPage(
-			Long siteId, String search, String filterString,
-			Pagination pagination, String sortString)
+	public static HttpInvoker.HttpResponse postSiteKeywordHttpResponse(
+			Long siteId, Keyword keyword)
 		throws Exception {
 
 		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-		httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
-
-		httpInvoker.parameter("filter", filterString);
-
-		httpInvoker.parameter("page", String.valueOf(pagination.getPage()));
-		httpInvoker.parameter(
-			"pageSize", String.valueOf(pagination.getPageSize()));
-
-		httpInvoker.parameter("sort", sortString);
-
-		httpInvoker.path(
-			"http://localhost:8080/o/headless-admin-taxonomy/v1.0/sites/{siteId}/keywords",
-			siteId);
-
-		httpInvoker.userNameAndPassword("test@liferay.com:test");
-
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		return Page.of(content, KeywordSerDes::toDTO);
-	}
-
-	public Keyword postSiteKeyword(Long siteId, Keyword keyword)
-		throws Exception {
-
-		HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-		httpInvoker.body(KeywordSerDes.toJSON(keyword), "application/json");
+		httpInvoker.body(keyword.toString(), "application/json");
 
 		httpInvoker.httpMethod(HttpInvoker.HttpMethod.POST);
 
@@ -171,25 +245,7 @@ public class KeywordResource {
 
 		httpInvoker.userNameAndPassword("test@liferay.com:test");
 
-		HttpInvoker.HttpResponse httpResponse = httpInvoker.invoke();
-
-		String content = httpResponse.getContent();
-
-		_logger.fine("HTTP response content: " + content);
-
-		_logger.fine("HTTP response message: " + httpResponse.getMessage());
-		_logger.fine("HTTP response status: " + httpResponse.getStatus());
-
-		try {
-			return KeywordSerDes.toDTO(content);
-		}
-		catch (Exception e) {
-			_logger.log(
-				Level.WARNING, "Unable to process HTTP response: " + content,
-				e);
-
-			throw e;
-		}
+		return httpInvoker.invoke();
 	}
 
 	private static final Logger _logger = Logger.getLogger(

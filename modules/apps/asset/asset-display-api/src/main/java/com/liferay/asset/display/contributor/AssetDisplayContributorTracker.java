@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * @author     Lance Ji
  * @deprecated As of Judson (7.1.x), replaced by {@link
- *             com.liferay.info.display.contributor.InfoDisplayContributorFieldTracker}
+ *             InfoDisplayContributorFieldTracker}
  */
 @Deprecated
 public interface AssetDisplayContributorTracker {

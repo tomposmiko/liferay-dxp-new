@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.portlet;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.Portlet;
@@ -24,7 +25,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -174,7 +174,7 @@ public class PortletURLUtil {
 		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay,
 		boolean includeParameters) {
 
-		StringBundler sb = new StringBundler(34);
+		StringBundler sb = new StringBundler(36);
 
 		sb.append(themeDisplay.getPathMain());
 		sb.append("/portal/render_portlet?p_l_id=");
@@ -182,6 +182,17 @@ public class PortletURLUtil {
 		long plid = themeDisplay.getPlid();
 
 		sb.append(plid);
+
+		HttpServletRequest originalHttpServletRequest =
+			PortalUtil.getOriginalServletRequest(httpServletRequest);
+
+		String layoutMode = ParamUtil.getString(
+			originalHttpServletRequest, "p_l_mode");
+
+		if (Validator.isNotNull(layoutMode)) {
+			sb.append("&p_l_mode=");
+			sb.append(layoutMode);
+		}
 
 		Portlet portlet = (Portlet)httpServletRequest.getAttribute(
 			WebKeys.RENDER_PORTLET);

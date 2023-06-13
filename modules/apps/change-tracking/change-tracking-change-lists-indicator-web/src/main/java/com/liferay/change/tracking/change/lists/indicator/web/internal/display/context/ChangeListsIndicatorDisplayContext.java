@@ -16,8 +16,10 @@ package com.liferay.change.tracking.change.lists.indicator.web.internal.display.
 
 import com.liferay.change.tracking.constants.CTPortletKeys;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.template.soy.util.SoyContext;
 import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
@@ -26,6 +28,8 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.WindowState;
+import javax.portlet.WindowStateException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,9 +57,18 @@ public class ChangeListsIndicatorDisplayContext {
 			"spritemap",
 			_themeDisplay.getPathThemeImages() + "/lexicon/icons.svg");
 
-		PortletURL portletURL = PortletURLFactoryUtil.create(
-			_httpServletRequest, CTPortletKeys.CHANGE_LISTS,
-			PortletRequest.RENDER_PHASE);
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			_httpServletRequest, _themeDisplay.getScopeGroup(),
+			CTPortletKeys.CHANGE_LISTS, 0, 0, PortletRequest.RENDER_PHASE);
+
+		try {
+			portletURL.setWindowState(WindowState.MAXIMIZED);
+		}
+		catch (WindowStateException wse) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(wse, wse);
+			}
+		}
 
 		soyContext.put(
 			"urlChangeListsOverview", portletURL.toString()
@@ -72,6 +85,9 @@ public class ChangeListsIndicatorDisplayContext {
 
 		return soyContext;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ChangeListsIndicatorDisplayContext.class);
 
 	private final HttpServletRequest _httpServletRequest;
 	private final RenderRequest _renderRequest;

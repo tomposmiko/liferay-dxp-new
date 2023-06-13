@@ -90,14 +90,6 @@ public class ProductMenuProductNavigationControlMenuEntry
 			HttpServletResponse httpServletResponse)
 		throws IOException {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		if (themeDisplay.isIsolated()) {
-			return false;
-		}
-
 		_processBodyBottomContent(
 			PageContextFactoryUtil.create(
 				httpServletRequest, httpServletResponse));

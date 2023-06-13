@@ -1,4 +1,5 @@
 definition {
+
 	var assetType = "Message Boards Thread";
 	var userName = "Test Test";
 
@@ -7,7 +8,11 @@ definition {
 
 		MenuItem.click(menuItem = "Thread");
 
+		Pause(locator1 = "3000");
+
 		AssertElementPresent(locator1 = "TextInput#SUBJECT");
+
+		AssertVisible(locator1 = "TextInput#SUBJECT");
 
 		Type(
 			locator1 = "TextInput#SUBJECT",
@@ -81,7 +86,11 @@ definition {
 			locator1 = "Button#NEW_THREAD",
 			value1 = "New Thread");
 
+		Pause(locator1 = "3000");
+
 		AssertElementPresent(locator1 = "TextInput#SUBJECT");
+
+		AssertVisible(locator1 = "TextInput#SUBJECT");
 
 		Click(locator1 = "TextInput#SUBJECT");
 
@@ -142,6 +151,8 @@ definition {
 		AssertClick(
 			locator1 = "Button#NEW_THREAD",
 			value1 = "New Thread");
+
+		AssertElementPresent.assertElementPresent(locator1 = "TextInput#SUBJECT");
 
 		Type(
 			locator1 = "TextInput#SUBJECT",
@@ -323,6 +334,10 @@ definition {
 				key_attachmentName = "${mbAttachmentFile}",
 				locator1 = "MessageBoardsEditMessage#ATTACHMENTS_REMOVE_LINK",
 				value1 = "Move to Recycle Bin");
+
+			AssertElementNotPresent(
+				key_rowEntry = "${mbAttachmentFile}",
+				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK");
 		}
 
 		if (isSet(threadSubjectEdit)) {
@@ -537,8 +552,8 @@ definition {
 		SelectFrame(locator1 = "MessageBoardsSelectCategory#IFRAME");
 
 		AssertClick(
-			locator1 = "MessageBoardsSelectCategory#CATEGORY_TABLE_CHOOSE_BUTTON_2",
-			value1 = "Choose");
+			locator1 = "MessageBoardsSelectCategory#CATEGORY_TABLE_SELECT_BUTTON_2",
+			value1 = "Select");
 
 		if ("${explanationPost}" == "true") {
 			SelectFrame(value1 = "relative=top");
@@ -695,7 +710,7 @@ definition {
 	}
 
 	macro restoreMBAttachmentCP {
-		Click(locator1 = "Link#MOVE_TO_RECYCLING_BIN");
+		Click(locator1 = "MessageBoardsEditMessage#ATTACHMENTS_RECENTLY_REMOVED");
 
 		IFrame.selectModalFrame();
 
@@ -1592,4 +1607,5 @@ definition {
 			key_assetTitle = "${threadSubject}",
 			locator1 = "AP#ASSET_ABSTRACT_TITLE");
 	}
+
 }

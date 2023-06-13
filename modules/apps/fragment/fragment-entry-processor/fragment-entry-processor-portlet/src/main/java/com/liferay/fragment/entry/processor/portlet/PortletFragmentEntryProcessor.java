@@ -22,6 +22,7 @@ import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.renderer.FragmentPortletRenderer;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.fragment.util.FragmentPortletSetupUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.petra.string.StringBundler;
@@ -391,6 +392,14 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 				portletPreferencesList, jxPortletPreferences);
 		}
 
+		try {
+			FragmentPortletSetupUtil.setPortletBareboneCSSClassName(
+				jxPortletPreferences);
+		}
+		catch (Exception e) {
+			throw new PortalException(e);
+		}
+
 		Document preferencesDocument = _getDocument(
 			PortletPreferencesFactoryUtil.toXML(jxPortletPreferences));
 
@@ -435,10 +444,24 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 		String portletPreferencesXml = PortletPreferencesFactoryUtil.toXML(
 			jxPortletPreferences);
 
+		long plid = 0L;
+
+		if (jxPortletPreferences instanceof
+				com.liferay.portal.kernel.model.PortletPreferences) {
+
+			com.liferay.portal.kernel.model.PortletPreferences
+				portletPreferences =
+					(com.liferay.portal.kernel.model.PortletPreferences)
+						jxPortletPreferences;
+
+			plid = portletPreferences.getPlid();
+		}
+
 		for (com.liferay.portal.kernel.model.PortletPreferences
 				portletPreferences : portletPreferencesList) {
 
-			if (Objects.equals(
+			if ((plid != portletPreferences.getPlid()) ||
+				Objects.equals(
 					portletPreferences.getPreferences(),
 					portletPreferencesXml)) {
 

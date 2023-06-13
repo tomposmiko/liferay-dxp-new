@@ -22,3 +22,23 @@
 # Bundle Version 1.0.5
 #
 2345b68d71dcb7058e1dd3b4968a82d6e1cabb0c^..90653ece7a77346e8be8a5a9c8b4fb5dcc7726b7=LPS-95413
+
+#
+# Bundle Version 1.0.6
+#
+90653ece7a77346e8be8a5a9c8b4fb5dcc7726b7^..e0a33f555d8c179c5c166b18d50b9b09710a5a51=LPS-95555
+
+#
+# Bundle Version 1.0.7
+#
+e0a33f555d8c179c5c166b18d50b9b09710a5a51^..469c381acefa6597faa7ed702b7ff873e0bd8d91=LPS-86435
+
+#
+# Bundle Version 1.0.8
+#
+469c381acefa6597faa7ed702b7ff873e0bd8d91^..20c54dfd7c000959433f8d35d2f3d3c840fc631c=LPS-94555
+
+#
+# Bundle Version 1.0.9
+#
+20c54dfd7c000959433f8d35d2f3d3c840fc631c^..d93ab5a29867ac1a94512ee28ab489e5fca77a2e=LPS-77699

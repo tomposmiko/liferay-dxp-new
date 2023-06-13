@@ -21,8 +21,6 @@ KBComment kbComment = KBCommentServiceUtil.getKBComment(ParamUtil.getLong(reques
 
 String kbCommentTitle = StringUtil.shorten(kbComment.getContent(), 100);
 
-KBSuggestionListDisplayContext kbSuggestionListDisplayContext = new KBSuggestionListDisplayContext(request, templatePath, scopeGroupId);
-
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
@@ -94,20 +92,22 @@ int nextStatus = KBUtil.getNextStatus(kbComment.getStatus());
 		<c:if test="<%= KBArticlePermission.contains(permissionChecker, kbArticle, KBActionKeys.UPDATE) %>">
 			<c:if test="<%= previousStatus != KBCommentConstants.STATUS_NONE %>">
 				<liferay-portlet:actionURL name="updateKBCommentStatus" varImpl="previousStatusURL">
+					<portlet:param name="redirect" value="<%= currentURL %>" />
 					<portlet:param name="kbCommentId" value="<%= String.valueOf(kbComment.getKbCommentId()) %>" />
 					<portlet:param name="kbCommentStatus" value="<%= String.valueOf(previousStatus) %>" />
 				</liferay-portlet:actionURL>
 
-				<aui:button href="<%= kbSuggestionListDisplayContext.getViewSuggestionURL(previousStatusURL) %>" name="previousStatusButton" type="submit" value="<%= KBUtil.getStatusTransitionLabel(previousStatus) %>" />
+				<aui:button href="<%= previousStatusURL.toString() %>" name="previousStatusButton" type="submit" value="<%= KBUtil.getStatusTransitionLabel(previousStatus) %>" />
 			</c:if>
 
 			<c:if test="<%= nextStatus != KBCommentConstants.STATUS_NONE %>">
 				<liferay-portlet:actionURL name="updateKBCommentStatus" varImpl="nextStatusURL">
+					<portlet:param name="redirect" value="<%= currentURL %>" />
 					<portlet:param name="kbCommentId" value="<%= String.valueOf(kbComment.getKbCommentId()) %>" />
 					<portlet:param name="kbCommentStatus" value="<%= String.valueOf(nextStatus) %>" />
 				</liferay-portlet:actionURL>
 
-				<aui:button href="<%= kbSuggestionListDisplayContext.getViewSuggestionURL(nextStatusURL) %>" name="previousStatusButton" type="submit" value="<%= KBUtil.getStatusTransitionLabel(nextStatus) %>" />
+				<aui:button href="<%= nextStatusURL.toString() %>" name="previousStatusButton" type="submit" value="<%= KBUtil.getStatusTransitionLabel(nextStatus) %>" />
 			</c:if>
 		</c:if>
 
@@ -117,7 +117,7 @@ int nextStatus = KBUtil.getNextStatus(kbComment.getStatus());
 				<portlet:param name="kbCommentId" value="<%= String.valueOf(kbComment.getKbCommentId()) %>" />
 			</liferay-portlet:actionURL>
 
-			<aui:button href="<%= kbSuggestionListDisplayContext.getViewSuggestionURL(deleteURL) %>" name="previousStatusButton" value="<%= Constants.DELETE %>" />
+			<aui:button href="<%= deleteURL.toString() %>" name="previousStatusButton" value="<%= Constants.DELETE %>" />
 		</c:if>
 	</aui:button-row>
 </c:if>

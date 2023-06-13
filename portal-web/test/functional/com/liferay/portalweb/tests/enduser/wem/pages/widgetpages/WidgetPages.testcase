@@ -1,5 +1,6 @@
 @component-name = "portal-wcm"
 definition {
+
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Site Pages Administration";
@@ -52,6 +53,8 @@ definition {
 
 	@priority = "4"
 	test AddPagesFullPageApplication {
+		property osgi.app.includes = "hello-soy";
+		property portal.release = "false";
 		property testray.component.names = "Site Pages Administration";
 
 		for (var portlet : list "Blogs,Documents and Media,Wiki,Media Gallery,Message Boards,Form,Hello Soy Portlet,RSS Publisher,Application Authorization Request") {
@@ -72,6 +75,37 @@ definition {
 				siteName = "Test Site Name");
 
 			AssertTextEquals(
+				key_portletTitleName = "${portlet}",
+				locator1 = "Home#PAGE_COLUMN_PORTLET_COLUMN_1_PORTLET_TITLE",
+				value1 = "${portlet}");
+
+			AssertElementNotPresent(locator1 = "ControlMenu#ADD");
+		}
+	}
+
+	@priority = "4"
+	test AddPagesFullPageApplicationForRelease {
+		property portal.upstream = "false";
+		property testray.component.names = "Site Pages Administration";
+
+		for (var portlet : list "Blogs,Documents and Media,Form,Wiki,Media Gallery,Message Boards,RSS Publisher,Application Authorization Request") {
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			SitePages.addPublicPage(
+				pageName = "${portlet} Full Page Application",
+				sitePageType = "Full Page Application");
+
+			SitePages.configurePage(
+				pageName = "${portlet} Full Page Application",
+				portlet = "${portlet}",
+				privacy = "Public Pages",
+				sitePageType = "Full Page Application");
+
+			Navigator.gotoSitePage(
+				pageName = "${portlet} Full Page Application",
+				siteName = "Test Site Name");
+
+			AssertTextEquals.assertText(
 				key_portletTitleName = "${portlet}",
 				locator1 = "Home#PAGE_COLUMN_PORTLET_COLUMN_1_PORTLET_TITLE",
 				value1 = "${portlet}");
@@ -256,6 +290,7 @@ definition {
 	@priority = "5"
 	test EditSitePage {
 		property portal.acceptance = "true";
+		property test.name.skip.portal.instance = "WidgetPages#EditSitePage";
 		property testray.component.names = "Site Pages Administration,Training";
 
 		JSONLayout.addPublicLayout(
@@ -282,12 +317,12 @@ definition {
 
 		Page.viewSelectedLayoutColumn(columnName = "1 Column");
 
-		Page.editName(pageNameEdit = "Home");
+		Page.editName(pageNameEdit = "Home Edit");
 
-		Navigator.gotoPage(pageName = "Home");
+		Navigator.gotoPage(pageName = "Home Edit");
 
 		Page.view(
-			pageName = "Home",
+			pageName = "Home Edit",
 			privacy = "Public Pages");
 	}
 
@@ -418,4 +453,5 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 	}
+
 }

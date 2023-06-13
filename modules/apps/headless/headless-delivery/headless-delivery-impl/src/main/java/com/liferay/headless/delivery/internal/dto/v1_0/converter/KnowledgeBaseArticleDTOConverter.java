@@ -25,6 +25,7 @@ import com.liferay.headless.delivery.dto.v1_0.converter.DTOConverter;
 import com.liferay.headless.delivery.dto.v1_0.converter.DTOConverterContext;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.AggregateRatingUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.CreatorUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.ParentKnowledgeBaseFolderUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RelatedContentUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.TaxonomyCategoryUtil;
@@ -79,6 +80,9 @@ public class KnowledgeBaseArticleDTOConverter implements DTOConverter {
 				articleBody = kbArticle.getContent();
 				creator = CreatorUtil.toCreator(
 					_portal, _userLocalService.getUser(kbArticle.getUserId()));
+				customFields = CustomFieldsUtil.toCustomFields(
+					KBArticle.class.getName(), kbArticle.getKbArticleId(),
+					kbArticle.getCompanyId(), dtoConverterContext.getLocale());
 				dateCreated = kbArticle.getCreateDate();
 				dateModified = kbArticle.getModifiedDate();
 				description = kbArticle.getDescription();

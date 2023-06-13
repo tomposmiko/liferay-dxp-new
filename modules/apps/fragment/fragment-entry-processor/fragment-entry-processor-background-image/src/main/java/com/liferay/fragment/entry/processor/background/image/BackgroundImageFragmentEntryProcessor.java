@@ -66,7 +66,7 @@ public class BackgroundImageFragmentEntryProcessor
 
 		Document document = _getDocument(html);
 
-		Map<Long, Map<String, Object>> assetEntriesFieldValues =
+		Map<Long, Map<String, Object>> infoDisplaysFieldValues =
 			new HashMap<>();
 
 		for (Element element :
@@ -96,7 +96,7 @@ public class BackgroundImageFragmentEntryProcessor
 
 			if (_fragmentEntryProcessorUtil.isMapped(editableValueJSONObject)) {
 				Object fieldValue = _fragmentEntryProcessorUtil.getMappedValue(
-					editableValueJSONObject, assetEntriesFieldValues, mode,
+					editableValueJSONObject, infoDisplaysFieldValues, mode,
 					locale, previewClassPK, previewType);
 
 				if (fieldValue != null) {
@@ -109,9 +109,12 @@ public class BackgroundImageFragmentEntryProcessor
 					editableValueJSONObject, locale, segmentsExperienceIds);
 			}
 
-			element.attr(
-				"style",
-				"background-image: url(" + value + "); background-size: cover");
+			if (Validator.isNotNull(value)) {
+				element.attr(
+					"style",
+					"background-image: url(" + value +
+						"); background-size: cover");
+			}
 		}
 
 		if (Objects.equals(

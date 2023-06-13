@@ -1,4 +1,5 @@
 definition {
+
 	macro _addPageTemplate {
 		if (isSet(pageTemplateType)) {
 			var menuItem = "${pageTemplateType}";
@@ -76,6 +77,10 @@ definition {
 		LexiconCard.delete(card = "${pageTemplateName}");
 	}
 
+	macro gotoPageTemplate {
+		LexiconCard.clickCardTitle(card = "${pageTemplateName}");
+	}
+
 	macro gotoPageTemplateEllipsisItem {
 		LexiconCard.clickEllipsisItem(
 			card = "${pageTemplateName}",
@@ -103,4 +108,5 @@ definition {
 	macro viewPageTemplatePresent {
 		LexiconCard.viewCardPresent(card = "${pageTemplateName}");
 	}
+
 }

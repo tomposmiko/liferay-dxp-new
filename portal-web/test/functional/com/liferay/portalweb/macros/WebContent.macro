@@ -1,4 +1,5 @@
 definition {
+
 	macro addArticleCP {
 		WebContentNavigator.gotoAddCP();
 
@@ -211,7 +212,7 @@ definition {
 	}
 
 	macro addPGViaWCD {
-		WebContentNavigator.gotoAddPGViaWCD();
+		WebContentNavigator.gotoAddPGViaWCD(portletNameScoped = "${portletNameScoped}");
 
 		WebContent.addCP(
 			webContentContent = "${webContentContent}",
@@ -288,6 +289,8 @@ definition {
 	}
 
 	macro addViaCKEditor {
+		Pause(locator1 = "3000");
+
 		PortletEntry.inputTitle(title = "${webContentTitle}");
 
 		Type.typeCKEditorWaitForCKEditor(
@@ -405,6 +408,10 @@ definition {
 			categoryNameList = "${categoryNameList}",
 			vocabularyName = "${vocabularyName}");
 
+		if ("${allowMultipleCategories}" == "false") {
+			Button.clickPublish();
+		}
+
 		PortletEntry.publish();
 	}
 
@@ -461,8 +468,20 @@ definition {
 
 		if (isSet(webContentDocumentsAndMedia)) {
 			AssertClick(
-				locator1 = "Button#DOCUMENTS_AND_MEDIA",
+				key_fieldName = "${fieldName}",
+				locator1 = "Button#SELECT_CONTENT",
+				value1 = "Select");
+
+			SelectFrame(locator1 = "IFrame#DIALOG");
+
+			AssertClick(
+				key_dmDocumentTitle = "${webContentDocumentsAndMedia}",
+				locator1 = "WC#ICON_DOCUMENT_TITLE",
 				value1 = "${webContentDocumentsAndMedia}");
+
+			SelectFrameTop(value1 = "relative=top");
+
+			Click(locator1 = "Button#ADD");
 		}
 
 		if (isSet(webContentHTML)) {
@@ -519,7 +538,7 @@ definition {
 		if (isSet(webContentSelectWCFile)) {
 			AssertClick(
 				key_fieldName = "${fieldName}",
-				locator1 = "Button#LINK_TO_PAGE_SELECT_PAGE",
+				locator1 = "Button#SELECT_CONTENT",
 				value1 = "Select");
 
 			SelectFrame(locator1 = "IFrame#DIALOG");
@@ -737,8 +756,11 @@ definition {
 				value1 = "Draft");
 		}
 		else {
-			PortletEntry.publish();
-
+			if("${changeListEnabled}" == "true") {
+				Button.clickPublishToChangeList();
+			} else {
+				PortletEntry.publish();
+			}
 			LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 			var key_webContentTitle = "${webContentTitleEdit}";
@@ -1188,6 +1210,8 @@ definition {
 
 		Panel.expandPanel(panel = "Default Template");
 
+		Pause(locator1 = "3000");
+
 		AssertClick(
 			locator1 = "WCEditWebContent#SELECT_TEMPLATE",
 			value1 = "Select");
@@ -1195,6 +1219,8 @@ definition {
 		IFrame.selectTopFrame();
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
+
+		Pause(locator1 = "3000");
 
 		LexiconCard.clickCardWithConfirmation(card = "${templateName}");
 
@@ -1210,6 +1236,8 @@ definition {
 	}
 
 	macro subscribeToCurrentFolderCP {
+		Pause(locator1 = "3000");
+
 		Click.clickAt(locator1 = "Icon#INFO");
 
 		Pause(locator1 = "1000");
@@ -1723,8 +1751,9 @@ definition {
 
 	macro viewRelatedAssetsPGViaWCD {
 		AssertTextEquals(
-			locator1 = "Relatedassets#ASSET_TITLE_1",
-			value1 = "${assetTitle}");
+			key_relatedAssetTitle = "${relatedAssetTitle}",
+			locator1 = "AssetRelatedAssets#ASSET_TITLE",
+			value1 = "${relatedAssetTitle}");
 	}
 
 	macro viewRTLLayout {
@@ -2007,4 +2036,5 @@ definition {
 			locator1 = "AlloyEditor#EDITOR",
 			value1 = "${webContentContent}");
 	}
+
 }

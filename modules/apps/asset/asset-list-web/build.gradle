@@ -1,7 +1,7 @@
 dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.application.list.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.asset.api", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.asset.display.page.api", version: "3.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.asset.display.page.api", version: "5.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.asset.list.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.asset.publisher.api", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.asset.taglib", version: "4.0.0"

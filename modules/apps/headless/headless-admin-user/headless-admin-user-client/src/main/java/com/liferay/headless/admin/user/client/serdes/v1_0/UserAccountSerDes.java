@@ -14,6 +14,7 @@
 
 package com.liferay.headless.admin.user.client.serdes.v1_0;
 
+import com.liferay.headless.admin.user.client.dto.v1_0.CustomField;
 import com.liferay.headless.admin.user.client.dto.v1_0.OrganizationBrief;
 import com.liferay.headless.admin.user.client.dto.v1_0.RoleBrief;
 import com.liferay.headless.admin.user.client.dto.v1_0.SiteBrief;
@@ -116,6 +117,26 @@ public class UserAccountSerDes {
 			sb.append("\"contactInformation\": ");
 
 			sb.append(String.valueOf(userAccount.getContactInformation()));
+		}
+
+		if (userAccount.getCustomFields() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"customFields\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < userAccount.getCustomFields().length; i++) {
+				sb.append(String.valueOf(userAccount.getCustomFields()[i]));
+
+				if ((i + 1) < userAccount.getCustomFields().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (userAccount.getDashboardURL() != null) {
@@ -438,6 +459,14 @@ public class UserAccountSerDes {
 				String.valueOf(userAccount.getContactInformation()));
 		}
 
+		if (userAccount.getCustomFields() == null) {
+			map.put("customFields", null);
+		}
+		else {
+			map.put(
+				"customFields", String.valueOf(userAccount.getCustomFields()));
+		}
+
 		if (userAccount.getDashboardURL() == null) {
 			map.put("dashboardURL", null);
 		}
@@ -565,7 +594,9 @@ public class UserAccountSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		return string.replaceAll("\"", "\\\\\"");
+		string = string.replace("\\", "\\\\");
+
+		return string.replace("\"", "\\\"");
 	}
 
 	private static String _toJSON(Map<String, ?> map) {
@@ -638,6 +669,18 @@ public class UserAccountSerDes {
 					userAccount.setContactInformation(
 						ContactInformationSerDes.toDTO(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "customFields")) {
+				if (jsonParserFieldValue != null) {
+					userAccount.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dashboardURL")) {
