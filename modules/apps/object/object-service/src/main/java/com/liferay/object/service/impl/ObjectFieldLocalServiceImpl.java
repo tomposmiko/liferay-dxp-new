@@ -134,9 +134,7 @@ public class ObjectFieldLocalServiceImpl
 					dbTableName, objectField.getDBColumnName(), dbType));
 		}
 
-		_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
-
-		_objectStateFlowLocalService.addDefaultObjectStateFlow(objectField);
+		_addOrUpdateObjectFieldSettings(objectField, null, objectFieldSettings);
 
 		return objectField;
 	}
@@ -230,8 +228,8 @@ public class ObjectFieldLocalServiceImpl
 
 			objectFieldPersistence.remove(objectField);
 
-			_objectFieldSettingPersistence.removeByObjectFieldId(
-				objectField.getObjectFieldId());
+			_objectFieldSettingLocalService.deleteObjectFieldObjectFieldSetting(
+				objectField);
 		}
 	}
 
@@ -266,8 +264,9 @@ public class ObjectFieldLocalServiceImpl
 
 		for (ObjectField objectField : objectFields) {
 			objectField.setObjectFieldSettings(
-				_objectFieldSettingPersistence.findByObjectFieldId(
-					objectField.getObjectFieldId()));
+				_objectFieldSettingLocalService.
+					getObjectFieldObjectFieldSettings(
+						objectField.getObjectFieldId()));
 
 			if (Validator.isNotNull(objectField.getRelationshipType())) {
 				ObjectRelationship objectRelationship =
@@ -333,8 +332,9 @@ public class ObjectFieldLocalServiceImpl
 
 		for (ObjectField objectField : objectFields) {
 			objectField.setObjectFieldSettings(
-				_objectFieldSettingPersistence.findByObjectFieldId(
-					objectField.getObjectFieldId()));
+				_objectFieldSettingLocalService.
+					getObjectFieldObjectFieldSettings(
+						objectField.getObjectFieldId()));
 		}
 
 		return objectFields;
@@ -355,7 +355,8 @@ public class ObjectFieldLocalServiceImpl
 			objectFieldId);
 
 		objectField.setObjectFieldSettings(
-			_objectFieldSettingPersistence.findByObjectFieldId(objectFieldId));
+			_objectFieldSettingLocalService.getObjectFieldObjectFieldSettings(
+				objectField.getObjectFieldId()));
 
 		return objectField;
 	}
@@ -368,7 +369,7 @@ public class ObjectFieldLocalServiceImpl
 			objectDefinitionId, name);
 
 		objectField.setObjectFieldSettings(
-			_objectFieldSettingPersistence.findByObjectFieldId(
+			_objectFieldSettingLocalService.getObjectFieldObjectFieldSettings(
 				objectField.getObjectFieldId()));
 
 		return objectField;
@@ -381,8 +382,26 @@ public class ObjectFieldLocalServiceImpl
 
 		for (ObjectField objectField : objectFields) {
 			objectField.setObjectFieldSettings(
-				_objectFieldSettingPersistence.findByObjectFieldId(
-					objectField.getObjectFieldId()));
+				_objectFieldSettingLocalService.
+					getObjectFieldObjectFieldSettings(
+						objectField.getObjectFieldId()));
+		}
+
+		return objectFields;
+	}
+
+	@Override
+	public List<ObjectField> getObjectFields(
+		long objectDefinitionId, boolean system) {
+
+		List<ObjectField> objectFields = objectFieldPersistence.findByODI_S(
+			objectDefinitionId, system);
+
+		for (ObjectField objectField : objectFields) {
+			objectField.setObjectFieldSettings(
+				_objectFieldSettingLocalService.
+					getObjectFieldObjectFieldSettings(
+						objectField.getObjectFieldId()));
 		}
 
 		return objectFields;
@@ -397,8 +416,9 @@ public class ObjectFieldLocalServiceImpl
 
 		for (ObjectField objectField : objectFields) {
 			objectField.setObjectFieldSettings(
-				_objectFieldSettingPersistence.findByObjectFieldId(
-					objectField.getObjectFieldId()));
+				_objectFieldSettingLocalService.
+					getObjectFieldObjectFieldSettings(
+						objectField.getObjectFieldId()));
 		}
 
 		return objectFields;
@@ -491,7 +511,7 @@ public class ObjectFieldLocalServiceImpl
 			newObjectField = objectFieldPersistence.update(newObjectField);
 
 			_addOrUpdateObjectFieldSettings(
-				newObjectField, objectFieldSettings);
+				newObjectField, oldObjectField, objectFieldSettings);
 
 			return newObjectField;
 		}
@@ -529,10 +549,8 @@ public class ObjectFieldLocalServiceImpl
 
 		newObjectField = objectFieldPersistence.update(newObjectField);
 
-		_addOrUpdateObjectFieldSettings(newObjectField, objectFieldSettings);
-
-		_objectStateFlowLocalService.updateDefaultObjectStateFlow(
-			newObjectField, oldObjectField);
+		_addOrUpdateObjectFieldSettings(
+			newObjectField, oldObjectField, objectFieldSettings);
 
 		return newObjectField;
 	}
@@ -626,20 +644,20 @@ public class ObjectFieldLocalServiceImpl
 	}
 
 	private void _addOrUpdateObjectFieldSettings(
-			ObjectField objectField,
+			ObjectField newObjectField, ObjectField oldObjectField,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
 
 		ObjectFieldBusinessType objectFieldBusinessType =
 			_objectFieldBusinessTypeTracker.getObjectFieldBusinessType(
-				objectField.getBusinessType());
+				newObjectField.getBusinessType());
 
 		objectFieldBusinessType.validateObjectFieldSettings(
-			objectField.getName(), objectFieldSettings);
+			newObjectField.getName(), objectFieldSettings);
 
 		List<ObjectFieldSetting> oldObjectFieldSettings =
 			_objectFieldSettingPersistence.findByObjectFieldId(
-				objectField.getObjectFieldId());
+				newObjectField.getObjectFieldId());
 
 		for (ObjectFieldSetting oldObjectFieldSetting :
 				oldObjectFieldSettings) {
@@ -654,14 +672,18 @@ public class ObjectFieldLocalServiceImpl
 				).findFirst();
 
 			if (!objectFieldSettingOptional.isPresent()) {
-				_objectFieldSettingPersistence.remove(oldObjectFieldSetting);
+				_objectFieldSettingLocalService.deleteObjectFieldSetting(
+					oldObjectFieldSetting.getObjectFieldSettingId());
 			}
 		}
+
+		objectFieldBusinessType.predefineObjectFieldSettings(
+			newObjectField, oldObjectField);
 
 		for (ObjectFieldSetting newObjectFieldSetting : objectFieldSettings) {
 			ObjectFieldSetting oldObjectFieldSetting =
 				_objectFieldSettingPersistence.fetchByOFI_N(
-					objectField.getObjectFieldId(),
+					newObjectField.getObjectFieldId(),
 					newObjectFieldSetting.getName());
 
 			ObjectFieldSettingContributor objectFieldSettingContributor =
@@ -671,8 +693,8 @@ public class ObjectFieldLocalServiceImpl
 
 			if (oldObjectFieldSetting == null) {
 				objectFieldSettingContributor.addObjectFieldSetting(
-					objectField.getUserId(), objectField.getObjectFieldId(),
-					newObjectFieldSetting);
+					newObjectField.getUserId(),
+					newObjectField.getObjectFieldId(), newObjectFieldSetting);
 			}
 			else {
 				objectFieldSettingContributor.updateObjectFieldSetting(
@@ -680,6 +702,10 @@ public class ObjectFieldLocalServiceImpl
 					newObjectFieldSetting);
 			}
 		}
+
+		newObjectField.setObjectFieldSettings(
+			_objectFieldSettingLocalService.getObjectFieldObjectFieldSettings(
+				newObjectField.getObjectFieldId()));
 	}
 
 	private void _deleteFileEntries(long objectDefinitionId, String name) {
@@ -745,8 +771,8 @@ public class ObjectFieldLocalServiceImpl
 			objectFieldSettingFileSource = objectFieldSetting.getValue();
 		}
 
-		_objectFieldSettingPersistence.removeByObjectFieldId(
-			objectField.getObjectFieldId());
+		_objectFieldSettingLocalService.deleteObjectFieldObjectFieldSetting(
+			objectField);
 
 		_objectLayoutColumnPersistence.removeByObjectFieldId(
 			objectField.getObjectFieldId());
@@ -1046,8 +1072,8 @@ public class ObjectFieldLocalServiceImpl
 	private final Set<String> _reservedNames = SetUtil.fromArray(
 		"actions", "companyid", "createdate", "creator", "datecreated",
 		"datemodified", "externalreferencecode", "groupid", "id",
-		"lastpublishdate", "modifieddate", "statusbyuserid", "statusbyusername",
-		"statusdate", "userid", "username");
+		"lastpublishdate", "modifieddate", "status", "statusbyuserid",
+		"statusbyusername", "statusdate", "userid", "username");
 
 	@Reference
 	private UserLocalService _userLocalService;

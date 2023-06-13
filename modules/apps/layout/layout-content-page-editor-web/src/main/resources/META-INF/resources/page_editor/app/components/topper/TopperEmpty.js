@@ -19,7 +19,11 @@ import {getLayoutDataItemPropTypes} from '../../../prop-types/index';
 import {useSelector} from '../../contexts/StoreContext';
 import selectCanUpdatePageStructure from '../../selectors/selectCanUpdatePageStructure';
 import {TARGET_POSITIONS} from '../../utils/drag-and-drop/constants/targetPositions';
-import {useDropTarget} from '../../utils/drag-and-drop/useDragAndDrop';
+import {
+	useDropContainerId,
+	useDropTarget,
+	useIsDroppable,
+} from '../../utils/drag-and-drop/useDragAndDrop';
 
 export default function ({children, ...props}) {
 	const canUpdatePageStructure = useSelector(selectCanUpdatePageStructure);
@@ -38,6 +42,9 @@ function TopperEmpty({children, item}) {
 
 	const isFragment = children.type === React.Fragment;
 	const realChildren = isFragment ? children.props.children : children;
+
+	const dropContainerId = useDropContainerId();
+	const isDroppable = useIsDroppable();
 
 	return React.Children.map(realChildren, (child) => {
 		if (!child) {
@@ -58,6 +65,8 @@ function TopperEmpty({children, item}) {
 						'drag-over-top':
 							isOverTarget &&
 							targetPosition === TARGET_POSITIONS.TOP,
+						'drop-container': dropContainerId === item.itemId,
+						'not-droppable': !isDroppable,
 						'page-editor__topper': true,
 					}),
 					ref: (node) => {

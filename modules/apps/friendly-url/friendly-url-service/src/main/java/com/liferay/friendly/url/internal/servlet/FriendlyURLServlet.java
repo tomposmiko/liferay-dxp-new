@@ -172,15 +172,10 @@ public class FriendlyURLServlet extends HttpServlet {
 			"request", httpServletRequest
 		).build();
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
+		ServiceContext serviceContext = _getServiceContext(
+			group, httpServletRequest);
 
-		if (serviceContext == null) {
-			serviceContext = ServiceContextFactory.getInstance(
-				httpServletRequest);
-
-			ServiceContextThreadLocal.pushServiceContext(serviceContext);
-		}
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
 		Layout defaultLayout = null;
 
@@ -285,7 +280,9 @@ public class FriendlyURLServlet extends HttpServlet {
 
 				if (Validator.isNotNull(i18nLanguageId) &&
 					!LanguageUtil.isAvailableLocale(
-						group.getGroupId(), i18nLanguageId)) {
+						group.getGroupId(), i18nLanguageId) &&
+					(!portal.isGroupControlPanelPath(path) ||
+					 !LanguageUtil.isAvailableLocale(i18nLanguageId))) {
 
 					localeUnavailable = true;
 				}
@@ -376,6 +373,9 @@ public class FriendlyURLServlet extends HttpServlet {
 			}
 
 			layoutFriendlyURL = null;
+		}
+		finally {
+			ServiceContextThreadLocal.popServiceContext();
 		}
 
 		String actualURL = portal.getActualURL(
@@ -797,6 +797,28 @@ public class FriendlyURLServlet extends HttpServlet {
 		}
 
 		return requestURI.substring(_pathInfoOffset, pos);
+	}
+
+	private ServiceContext _getServiceContext(
+			Group group, HttpServletRequest httpServletRequest)
+		throws PortalException {
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext == null) {
+			serviceContext = ServiceContextFactory.getInstance(
+				httpServletRequest);
+
+			ServiceContextThreadLocal.pushServiceContext(serviceContext);
+		}
+
+		serviceContext = (ServiceContext)serviceContext.clone();
+
+		serviceContext.setCompanyId(group.getCompanyId());
+		serviceContext.setScopeGroupId(group.getGroupId());
+
+		return serviceContext;
 	}
 
 	private User _getUser(HttpServletRequest httpServletRequest)

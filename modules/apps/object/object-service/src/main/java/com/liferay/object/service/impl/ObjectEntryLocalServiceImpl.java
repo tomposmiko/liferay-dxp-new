@@ -681,7 +681,8 @@ public class ObjectEntryLocalServiceImpl
 
 		Expression<?>[] selectExpressions = ArrayUtil.append(
 			dynamicObjectDefinitionTable.getSelectExpressions(),
-			extensionDynamicObjectDefinitionTable.getSelectExpressions());
+			extensionDynamicObjectDefinitionTable.getSelectExpressions(),
+			_EXPRESSIONS);
 
 		List<Object[]> rows = _list(
 			DSLQueryFactoryUtil.selectDistinct(
@@ -1579,7 +1580,7 @@ public class ObjectEntryLocalServiceImpl
 
 			return resultSet.getClob(name);
 		}
-		else if (sqlType == Types.DATE) {
+		else if ((sqlType == Types.DATE) || (sqlType == Types.TIMESTAMP)) {
 			return resultSet.getTimestamp(name);
 		}
 		else if (sqlType == Types.DECIMAL) {
@@ -2456,6 +2457,14 @@ public class ObjectEntryLocalServiceImpl
 			}
 		}
 	}
+
+	private static final Expression<?>[] _EXPRESSIONS = {
+		ObjectEntryTable.INSTANCE.objectEntryId,
+		ObjectEntryTable.INSTANCE.userName,
+		ObjectEntryTable.INSTANCE.createDate,
+		ObjectEntryTable.INSTANCE.modifiedDate,
+		ObjectEntryTable.INSTANCE.status
+	};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectEntryLocalServiceImpl.class);

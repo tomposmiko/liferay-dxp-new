@@ -12,11 +12,18 @@
  * details.
  */
 
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 import classNames from 'classnames';
-import React from 'react';
+import React, {useCallback} from 'react';
 
-import {useSelector, useSelectorCallback} from '../../contexts/StoreContext';
+import FormMappingOptions from '../../../plugins/browser/components/page-structure/components/item-configuration-panels/FormMappingOptions';
+import {
+	useDispatch,
+	useSelector,
+	useSelectorCallback,
+} from '../../contexts/StoreContext';
 import selectLanguageId from '../../selectors/selectLanguageId';
+import updateFormItemConfig from '../../thunks/updateFormItemConfig';
 import {formIsMapped} from '../../utils/formIsMapped';
 import {getEditableLocalizedValue} from '../../utils/getEditableLocalizedValue';
 import isItemEmpty from '../../utils/isItemEmpty';
@@ -45,7 +52,7 @@ const FormWithControls = React.forwardRef(({children, item, ...rest}, ref) => {
 				{showMessagePreview ? (
 					<FormSuccessMessage item={item} />
 				) : isEmpty || !isMapped ? (
-					<FormEmptyState isMapped={isMapped} />
+					<FormEmptyState isMapped={isMapped} item={item} />
 				) : (
 					children
 				)}
@@ -56,19 +63,62 @@ const FormWithControls = React.forwardRef(({children, item, ...rest}, ref) => {
 
 export default FormWithControls;
 
-function FormEmptyState({isMapped}) {
+function FormEmptyState({isMapped, item}) {
+	const dispatch = useDispatch();
+
+	const onValueSelect = useCallback(
+		(nextConfig) =>
+			dispatch(
+				updateFormItemConfig({
+					itemConfig: nextConfig,
+					itemId: item.itemId,
+				})
+			),
+		[dispatch, item.itemId]
+	);
+
+	if (item.config.loading) {
+		return (
+			<div className="bg-lighter page-editor__no-fragments-state">
+				<ClayLoadingIndicator />
+
+				<p className="m-0 page-editor__no-fragments-state__message">
+					{Liferay.Language.get(
+						'your-form-is-being-loaded.-this-may-take-some-time'
+					)}
+				</p>
+			</div>
+		);
+	}
+
+	if (isMapped) {
+		return (
+			<div className="page-editor__no-fragments-state">
+				<p className="m-0 page-editor__no-fragments-state__message">
+					{Liferay.Language.get('place-fragments-here')}
+				</p>
+			</div>
+		);
+	}
+
 	return (
-		<div
-			className={classNames('page-editor__no-fragments-message', {
-				'bg-lighter': !isMapped,
-			})}
-		>
-			<div className="page-editor__no-fragments-message__title">
-				{isMapped
-					? Liferay.Language.get('place-fragments-here')
-					: Liferay.Language.get(
-							'select-a-content-type-to-start-creating-the-form'
-					  )}
+		<div className="align-items-center bg-lighter d-flex flex-column page-editor__no-fragments-state">
+			<p className="page-editor__no-fragments-state__title">
+				{Liferay.Language.get('map-your-form')}
+			</p>
+
+			<p className="mb-3 page-editor__no-fragments-state__message">
+				{Liferay.Language.get(
+					'select-a-content-type-to-start-creating-the-form'
+				)}
+			</p>
+
+			<div onClick={(event) => event.stopPropagation()}>
+				<FormMappingOptions
+					hideLabel={true}
+					item={item}
+					onValueSelect={onValueSelect}
+				/>
 			</div>
 		</div>
 	);

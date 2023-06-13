@@ -21,6 +21,14 @@ interface Region {
 	width: number;
 }
 
+interface DefaultFunction {
+	(): void;
+}
+
+interface AppendFunction {
+	(scriptElement: HTMLScriptElement): void;
+}
+
 /**
  * Aligns the element with the best region around alignElement. The best
  * region is defined by clockwise rotation starting from the specified
@@ -187,6 +195,18 @@ export function minimizePortlet(
 	options?: object
 ): void;
 
+export function openAlertModal({message}: {message: string}): void;
+
+export function openConfirmModal({
+	message,
+	onConfirm,
+	title,
+}: {
+	message: string;
+	onConfirm: (confirmed: boolean) => void;
+	title?: string;
+}): void;
+
 export function openModal(props: Object): void;
 
 export function openSelectionModal<T>(init: {
@@ -240,6 +260,15 @@ export function openWindow(config: object, callback?: Function): void;
  * Registers a portlet client with the portlet hub.
  */
 export function register(portletId: string): Promise<void>;
+
+/**
+ * Executes the content of script tags inside a HTMLElement
+ */
+export function runScriptsInElement(
+	element: HTMLElement,
+	defaultFn?: DefaultFunction,
+	appendFn?: AppendFunction
+): void;
 
 export function sub(
 	string: string,

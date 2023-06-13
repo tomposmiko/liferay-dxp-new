@@ -25,6 +25,7 @@ import com.liferay.document.library.kernel.service.DLAppHelperLocalServiceWrappe
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.document.library.kernel.util.DLAppHelperThreadLocal;
+import com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhitelist;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
@@ -47,11 +48,15 @@ import com.liferay.portlet.documentlibrary.DLGroupServiceSettings;
 import com.liferay.portlet.documentlibrary.constants.DLConstants;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.Serializable;
 
 import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -112,6 +117,22 @@ public class SubscriptionDLAppHelperLocalServiceWrapper
 				userId, latestFileVersion,
 				(String)workflowContext.get(WorkflowConstants.CONTEXT_URL),
 				serviceContext);
+		}
+	}
+
+	@Activate
+	protected void activate() {
+		_closeable = _liferayJSONDeserializationWhitelist.register(
+			DLSubscriptionSender.class.getName());
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		try {
+			_closeable.close();
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
 		}
 	}
 
@@ -292,6 +313,8 @@ public class SubscriptionDLAppHelperLocalServiceWrapper
 		subscriptionSender.flushNotificationsAsync();
 	}
 
+	private Closeable _closeable;
+
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
 
@@ -300,6 +323,10 @@ public class SubscriptionDLAppHelperLocalServiceWrapper
 
 	@Reference
 	private Language _language;
+
+	@Reference
+	private LiferayJSONDeserializationWhitelist
+		_liferayJSONDeserializationWhitelist;
 
 	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;

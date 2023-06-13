@@ -179,7 +179,6 @@ components:
                     example: 30130
                     format: int64
                     minimum: 0
-                    readOnly: true
                     type: integer
                 shippingOptionName:
                     example: "Standard Delivery"
@@ -191,6 +190,9 @@ components:
                     readOnly: true
                 trackingNumber:
                     example: "123AD-asd"
+                    type: string
+                trackingURL:
+                    example: "Standard Delivery"
                     type: string
                 userName:
                     example: "John"
@@ -348,7 +350,7 @@ info:
         name: Commerce Team
     description:
         "Liferay Commerce Admin Admin Shipment API. A Java client JAR is available for use with the group ID
-        'com.liferay', artifact ID 'com.liferay.headless.commerce.admin.shipment.client', and version '1.0.14'."
+        'com.liferay', artifact ID 'com.liferay.headless.commerce.admin.shipment.client', and version '1.0.16'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"

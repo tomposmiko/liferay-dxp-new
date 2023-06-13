@@ -2667,11 +2667,23 @@ server.detector.server.id=tomcat</echo>
 				<elseif>
 					<equals arg1="${app.server.type}" arg2="weblogic" />
 					<then>
-						<echo file="${liferay.home}/tools/portal-tools-db-upgrade-client/app-server.properties">dir=${app.server.dir}
+						<if>
+							<equals arg1="${app.server.weblogic.version}" arg2="12.2.1" />
+							<then>
+								<echo file="${liferay.home}/tools/portal-tools-db-upgrade-client/app-server.properties">dir=${app.server.dir}
 extra.lib.dirs=wlserver/modules
 global.lib.dir=domains/liferay/lib
 portal.dir=domains/liferay/autodeploy/ROOT
 server.detector.server.id=weblogic</echo>
+							</then>
+							<else>
+								<echo file="${liferay.home}/tools/portal-tools-db-upgrade-client/app-server.properties">dir=${app.server.weblogic.dir}
+extra.lib.dirs=oracle/wlserver/modules
+global.lib.dir=domains/liferay/lib
+portal.dir=/domains/liferay/autodeploy/ROOT
+server.detector.server.id=weblogic</echo>
+							</else>
+						</if>
 					</then>
 				</elseif>
 				<elseif>
@@ -6285,6 +6297,7 @@ go</echo>
 					<or>
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.3.21" />
 						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u1" />
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u33" />
 					</or>
 					<then>
 						<var name="app.server.tomcat.version" value="9.0.56" />
@@ -6553,12 +6566,16 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 		<attribute default="" name="testable.portal.started.marker.file" />
 
 		<sequential>
+			<lstopwatch action="start" name="start.app.server.@{app.server.bundle.index}" />
+
 			<start-app-server-cmd
 				app.server.bundle.index="@{app.server.bundle.index}"
 				delete.liferay.home="@{delete.liferay.home}"
 				test.docker.environment="${test.docker.environment}"
 				testable.portal.started.marker.file="@{testable.portal.started.marker.file}"
 			/>
+
+			<lstopwatch action="total" name="start.app.server.@{app.server.bundle.index}" />
 		</sequential>
 	</macrodef>
 
@@ -6822,7 +6839,6 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					<equals arg1="${database.version}" arg2="11.5.6" />
 				</and>
 				<then>
-					<property name="docker.database.wait.condition">[[ "$(/bin/su - db2inst1 -c '~/sqllib/bin/db2 db2set DB2COMM=tcpip')" =~ "" ]]</property>
 					<property name="docker.database.wait.condition">[[ "$(/bin/su - db2inst1 -c '~/sqllib/bin/db2 db2start')" =~ "SQL1026N" ]]</property>
 				</then>
 				<elseif>
@@ -6959,6 +6975,8 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 		<attribute default="0" name="app.server.explicit.stop.count" />
 
 		<sequential>
+			<lstopwatch action="start" name="stop.app.server.@{app.server.bundle.index}" />
+
 			<if>
 				<istrue value="${test.docker.environment}" />
 				<then>
@@ -6974,6 +6992,8 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					/>
 				</else>
 			</if>
+
+			<lstopwatch action="total" name="stop.app.server.@{app.server.bundle.index}" />
 		</sequential>
 	</macrodef>
 
@@ -14365,6 +14385,29 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 			<isset property="app.server.bundles.size" />
 			<then>
 				<prepare-additional-bundles />
+			</then>
+		</if>
+
+		<get-testcase-property property.name="configure.servlet.multipart" />
+
+		<if>
+			<equals arg1="${configure.servlet.multipart}" arg2="true" />
+			<then>
+				<mkdir dir="${app.server.dir}/work/Catalina/localhost/ROOT/tmp" />
+
+				<replace
+					file="${app.server.portal.dir}/WEB-INF/shielded-container-web.xml"
+				>
+					<replacetoken><![CDATA[<servlet-class>com.liferay.portal.module.framework.ModuleFrameworkServletAdapter</servlet-class>]]></replacetoken>
+					<replacevalue><![CDATA[
+					<servlet-class>com.liferay.portal.module.framework.ModuleFrameworkServletAdapter</servlet-class>
+					<multipart-config>
+						<location>/tmp</location>
+						<max-file-size>20848820</max-file-size>
+						<max-request-size>418018841</max-request-size>
+						<file-size-threshold>1048576</file-size-threshold>
+					</multipart-config>]]></replacevalue>
+				</replace>
 			</then>
 		</if>
 

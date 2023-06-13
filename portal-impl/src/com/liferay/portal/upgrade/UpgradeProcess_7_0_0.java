@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.util.UpgradeModulesFactory;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.ReleaseInfo;
+import com.liferay.portal.kernel.verify.model.VerifiableUUIDModel;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeAddress;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeAsset;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeAssetTagsResourcePermission;
@@ -58,9 +59,7 @@ import com.liferay.portal.upgrade.v7_0_0.UpgradeUser;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeWebsite;
 import com.liferay.portal.upgrade.v7_0_0.UpgradeWorkflow;
 import com.liferay.portal.verify.VerifyUUID;
-import com.liferay.portal.verify.model.AssetTagVerifiableModel;
-import com.liferay.portal.verify.model.RatingsEntryVerifiableModel;
-import com.liferay.portal.verify.model.TeamVerifiableModel;
+import com.liferay.portal.verify.model.AssetTagVerifiableUUIDModel;
 
 /**
  * @author Julio Camarero
@@ -70,6 +69,35 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 	@Override
 	public int getThreshold() {
 		return ReleaseInfo.RELEASE_7_0_0_BUILD_NUMBER;
+	}
+
+	public class RatingsEntryVerifiableUUIDModel
+		implements VerifiableUUIDModel {
+
+		@Override
+		public String getPrimaryKeyColumnName() {
+			return "entryId";
+		}
+
+		@Override
+		public String getTableName() {
+			return "RatingsEntry";
+		}
+
+	}
+
+	public class TeamVerifiableUUIDModel implements VerifiableUUIDModel {
+
+		@Override
+		public String getPrimaryKeyColumnName() {
+			return "teamId";
+		}
+
+		@Override
+		public String getTableName() {
+			return "Team";
+		}
+
 	}
 
 	@Override
@@ -129,8 +157,9 @@ public class UpgradeProcess_7_0_0 extends UpgradeProcess {
 	protected void populateUUIDModels() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			VerifyUUID.verify(
-				new AssetTagVerifiableModel(),
-				new RatingsEntryVerifiableModel(), new TeamVerifiableModel());
+				new AssetTagVerifiableUUIDModel(),
+				new RatingsEntryVerifiableUUIDModel(),
+				new TeamVerifiableUUIDModel());
 		}
 	}
 

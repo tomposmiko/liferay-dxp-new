@@ -66,6 +66,7 @@ import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutFriendlyURL;
+import com.liferay.portal.kernel.model.LayoutFriendlyURLComposite;
 import com.liferay.portal.kernel.model.LayoutQueryStringComposite;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutType;
@@ -6131,6 +6132,17 @@ public class PortalImpl implements Portal {
 	}
 
 	@Override
+	public boolean isGroupControlPanelPath(String path) {
+		if (Validator.isNull(path)) {
+			return false;
+		}
+
+		return path.contains(
+			VirtualLayoutConstants.CANONICAL_URL_SEPARATOR +
+				GroupConstants.CONTROL_PANEL_FRIENDLY_URL);
+	}
+
+	@Override
 	public boolean isGroupFriendlyURL(
 		String fullURL, String groupFriendlyURL, String layoutFriendlyURL) {
 
@@ -8165,10 +8177,10 @@ public class PortalImpl implements Portal {
 
 		String currentURL = canonicalURL.substring(pos);
 
-		int[] friendlyURLIndex = getGroupFriendlyURLIndex(currentURL);
+		int[] groupFriendlyURLIndex = getGroupFriendlyURLIndex(currentURL);
 
-		if (friendlyURLIndex != null) {
-			int y = friendlyURLIndex[1];
+		if (groupFriendlyURLIndex != null) {
+			int y = groupFriendlyURLIndex[1];
 
 			currentURL = currentURL.substring(y);
 
@@ -8213,33 +8225,91 @@ public class PortalImpl implements Portal {
 			}
 		}
 
+		String groupFriendlyURL = StringPool.BLANK;
+
+		if (!currentURL.equals(canonicalURLSuffix) &&
+			(groupFriendlyURLIndex != null)) {
+
+			groupFriendlyURL = canonicalURLSuffix.substring(
+				0, groupFriendlyURLIndex[1]);
+		}
+
 		for (Locale locale : availableLocales) {
 			String alternateURL = canonicalURL;
-			String alternateURLSuffix = canonicalURLSuffix;
+			String alternateURLSuffix = null;
 			String languageId = LocaleUtil.toLanguageId(locale);
 
 			if (replaceFriendlyURL) {
-				String friendlyURL = null;
+				String[] urlSeparators =
+					FriendlyURLResolverRegistryUtil.getURLSeparators();
 
-				for (LayoutFriendlyURL layoutFriendlyURL : layoutFriendlyURLs) {
-					if (!languageId.equals(layoutFriendlyURL.getLanguageId())) {
+				for (String urlSeparator : urlSeparators) {
+					if (!currentURL.startsWith(urlSeparator)) {
 						continue;
 					}
 
-					friendlyURL = layoutFriendlyURL.getFriendlyURL();
+					FriendlyURLResolver friendlyURLResolver =
+						FriendlyURLResolverRegistryUtil.getFriendlyURLResolver(
+							urlSeparator);
 
-					if (groupFriendlyURLPrefix != null) {
-						friendlyURL = groupFriendlyURLPrefix.concat(
-							friendlyURL);
+					HttpServletRequest httpServletRequest =
+						themeDisplay.getRequest();
+
+					try {
+						LayoutFriendlyURLComposite layoutFriendlyURLComposite =
+							friendlyURLResolver.getLayoutFriendlyURLComposite(
+								themeDisplay.getCompanyId(),
+								themeDisplay.getScopeGroupId(), false,
+								currentURL,
+								httpServletRequest.getParameterMap(),
+								HashMapBuilder.<String, Object>put(
+									"request", httpServletRequest
+								).put(
+									WebKeys.LOCALE, locale
+								).build());
+
+						alternateURLSuffix =
+							groupFriendlyURL +
+								layoutFriendlyURLComposite.getFriendlyURL();
+
+						break;
 					}
-
-					break;
+					catch (PortalException portalException) {
+						if (_log.isDebugEnabled()) {
+							_log.debug(portalException);
+						}
+					}
 				}
 
-				if (friendlyURL != null) {
-					alternateURLSuffix = StringUtil.replaceFirst(
-						alternateURLSuffix, layout.getFriendlyURL(),
-						friendlyURL);
+				if (Validator.isNull(alternateURLSuffix)) {
+					alternateURLSuffix = canonicalURLSuffix;
+
+					String friendlyURL = null;
+
+					for (LayoutFriendlyURL layoutFriendlyURL :
+							layoutFriendlyURLs) {
+
+						if (!languageId.equals(
+								layoutFriendlyURL.getLanguageId())) {
+
+							continue;
+						}
+
+						friendlyURL = layoutFriendlyURL.getFriendlyURL();
+
+						if (groupFriendlyURLPrefix != null) {
+							friendlyURL = groupFriendlyURLPrefix.concat(
+								friendlyURL);
+						}
+
+						break;
+					}
+
+					if (friendlyURL != null) {
+						alternateURLSuffix = StringUtil.replaceFirst(
+							alternateURLSuffix, layout.getFriendlyURL(),
+							friendlyURL);
+					}
 				}
 
 				alternateURL = canonicalURLPrefix.concat(alternateURLSuffix);

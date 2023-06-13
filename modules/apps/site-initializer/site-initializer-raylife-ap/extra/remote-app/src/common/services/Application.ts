@@ -45,3 +45,38 @@ export function deleteApplicationByExternalReferenceCode(
 		`${DeliveryAPI}/by-external-reference-code/${externalReferenceCode}`
 	);
 }
+
+const adaptToFormApplicationRequest = (state: any, status: any) => ({
+	address: state?.contactInfo?.form?.streetAddress,
+	addressApt: state?.contactInfo?.form?.apt,
+	applicationStatus: {
+		key: status,
+	},
+	city: state?.contactInfo?.form?.city,
+	dataJSON: JSON.stringify({
+		driverInfo: {
+			form: state?.driverInfo?.form,
+		},
+		ownership: state?.contactInfo?.ownership,
+		vehicleInfo: {
+			form: state?.vehicleInfo?.form,
+		},
+	}),
+	email: state?.contactInfo?.form?.email,
+	firstName: state?.contactInfo?.form?.firstName,
+	lastName: state?.contactInfo?.form?.lastName,
+	phone: state?.contactInfo?.form?.phone,
+	productName: 'Auto',
+	state: state?.contactInfo?.form?.state,
+	zip: state?.contactInfo?.form?.zipCode,
+});
+
+export function createOrUpdateRaylifeApplication(state: any, status: any) {
+	const payload = adaptToFormApplicationRequest(state?.steps, status);
+
+	if (state.applicationId) {
+		return axios.patch(`${DeliveryAPI}/${state.applicationId}`, payload);
+	}
+
+	return axios.post(`${DeliveryAPI}/`, payload);
+}

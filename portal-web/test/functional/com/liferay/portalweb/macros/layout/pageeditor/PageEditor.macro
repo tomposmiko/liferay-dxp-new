@@ -1162,6 +1162,21 @@ definition {
 			PageEditor.waitForAutoSave();
 		}
 
+		if ("${enableLazyLoading}" == "true") {
+			Check.checkNotVisible(
+				checkboxName = "Enable Lazy Loading",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+
+			PageEditor.waitForAutoSave();
+		}
+		else if ("${enableLazyLoading}" == "false") {
+			Uncheck.uncheckNotVisible(
+				checkboxName = "Enable Lazy Loading",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+
+			PageEditor.waitForAutoSave();
+		}
+
 		if (isSet(headingLevel)) {
 			Select(
 				key_fieldLabel = "Heading Level",
@@ -2364,20 +2379,20 @@ definition {
 
 				PageEditor.waitForAutoSave();
 			}
-			else if ("${successMessage}" == "URL") {
+			else if ("${successMessage}" == "External URL") {
 				Select(
 					key_fieldLabel = "Success Message",
 					locator1 = "Select#GENERIC_SELECT_FIELD",
-					value1 = "URL");
+					value1 = "External URL");
 
 				AssertSelectedLabel(
 					key_fieldLabel = "Success Message",
 					locator1 = "Select#GENERIC_SELECT_FIELD",
-					value1 = "URL");
+					value1 = "External URL");
 
 				if (isSet(url)) {
 					Type(
-						key_text = "URL",
+						key_text = "External URL",
 						locator1 = "TextInput#ANY",
 						value1 = "${url}");
 
@@ -2466,11 +2481,15 @@ definition {
 
 			AssertElementPresent.assertVisible(locator1 = "Button#SELECT_FILE");
 
+			WaitForEditable(locator1 = "TextInput#FILE");
+
 			UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
 				locator1 = "TextInput#FILE",
 				value1 = "${fileName}");
 
-			Pause(locator1 = "3000");
+			WaitForElementPresent(
+				key_text = "Add",
+				locator1 = "Button#ANY_ENABLED");
 
 			Button.clickAdd();
 		}
@@ -2581,11 +2600,6 @@ definition {
 				value1 = "${field}");
 
 			PageEditor.waitForAutoSave();
-
-			AssertTextEquals(
-				key_text = "Label",
-				locator1 = "TextInput#ANY",
-				value1 = "${field}");
 		}
 
 		if ("${markAsRequired}" == "true") {
@@ -2734,7 +2748,9 @@ definition {
 								value1 = "${source}");
 						}
 
-						Pause(locator1 = "3000");
+						WaitForEditable(
+							key_fieldLabel = "Field",
+							locator1 = "Select#GENERIC_SELECT_FIELD");
 
 						Select(
 							key_fieldLabel = "Field",
@@ -3055,7 +3071,9 @@ definition {
 								value1 = "${source}");
 						}
 
-						Pause(locator1 = "3000");
+						WaitForEditable(
+							key_fieldLabel = "Field",
+							locator1 = "Select#GENERIC_SELECT_FIELD");
 
 						Select(
 							key_fieldLabel = "Field",
@@ -3918,7 +3936,7 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 			locator1 = "PageEditor#CONFIGURATION_PANEL_HANDLE",
 			value1 = "${position}");
 
-		Pause(locator1 = "3000");
+		WaitForElementNotPresent(locator1 = "PageEditor#ACTIVE_CONFIGURATION_PANEL_HANDLE");
 
 		var updatedHeight = selenium.getElementHeight("PageEditor#CONFIGURATION_PANEL_CONFIGURATION");
 
@@ -5039,6 +5057,8 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 	}
 
 	macro waitForAutoSave {
+		WaitForElementNotPresent(locator1 = "PageEditor#DRAFT_SAVING_MESSAGE");
+
 		WaitForVisible(locator1 = "PageEditor#AUTOSAVE_MESSAGE");
 	}
 

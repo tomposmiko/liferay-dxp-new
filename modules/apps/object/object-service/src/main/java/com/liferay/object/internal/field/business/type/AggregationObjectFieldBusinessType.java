@@ -59,7 +59,8 @@ public class AggregationObjectFieldBusinessType
 
 	@Override
 	public Set<String> getAllowedObjectFieldSettingsNames() {
-		return SetUtil.fromArray("function", "relationship", "summarizeField");
+		return SetUtil.fromArray(
+			"filters", "function", "relationship", "summarizeField");
 	}
 
 	@Override
@@ -103,7 +104,7 @@ public class AggregationObjectFieldBusinessType
 		).build();
 
 		ListUtil.isNotEmptyForEach(
-			_objectFieldSettingLocalService.getObjectFieldSettings(
+			_objectFieldSettingLocalService.getObjectFieldObjectFieldSettings(
 				objectField.getObjectFieldId()),
 			objectFieldSetting -> properties.put(
 				objectFieldSetting.getName(), objectFieldSetting.getValue()));

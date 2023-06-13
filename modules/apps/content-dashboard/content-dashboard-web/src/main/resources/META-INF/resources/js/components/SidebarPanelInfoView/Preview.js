@@ -13,13 +13,16 @@
  */
 
 import ClayIcon from '@clayui/icon';
-import ClayLink from '@clayui/link';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const Preview = ({downloadURL, imageURL, title, url}) => {
+const Preview = ({compressed, imageURL, title, url}) => {
 	return (
-		<div className="document-preview sidebar-section">
+		<div
+			className={`document-preview sidebar-section ${
+				compressed ? 'sidebar-section--compress' : ''
+			}`}
+		>
 			{imageURL && (
 				<figure className="document-preview-figure mb-2">
 					<a
@@ -36,24 +39,17 @@ const Preview = ({downloadURL, imageURL, title, url}) => {
 					</a>
 				</figure>
 			)}
-
-			<div>
-				{downloadURL && (
-					<ClayLink className="btn btn-primary" href={downloadURL}>
-						{Liferay.Language.get('download')}
-					</ClayLink>
-				)}
-			</div>
 		</div>
 	);
 };
 
 Preview.defaultProps = {
+	compressed: false,
 	viewURL: null,
 };
 
 Preview.propTypes = {
-	downloadURL: PropTypes.string,
+	compressed: PropTypes.bool,
 	imageURL: PropTypes.string.isRequired,
 	title: PropTypes.string.isRequired,
 	viewURL: PropTypes.string,

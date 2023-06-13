@@ -240,7 +240,8 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "userNotification");
+			notificationTypeOption = "userNotification",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -571,6 +572,7 @@ definition {
 			newNotification = "true",
 			notificationTemplateValue = "${userName} sent you a ${entryType} for review in the workflow.",
 			notificationTypeOption = "userNotification",
+			singleAction = "true",
 			templateLanguageOption = "FreeMarker");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -805,12 +807,43 @@ definition {
 	}
 
 	@description = "Verify that the user can delete all notifications configurations"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanDeleteMultipleNotifications {
+		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanDeleteMultipleNotifications";
 
-		// TODO CanDeleteMultipleNotifications pending implementation
+		Workflow.openWorkflowListView();
 
+		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
+
+		ProcessBuilderKaleoDesignerReact.selectNode(nodeType = "start");
+
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(
+			name = "Liferay Notification",
+			newNotification = "true",
+			newSection = "New Notification",
+			notificationTemplateValue = "Liferay Template",
+			notificationTypeOption = "email",
+			sectionOptionList = "1,2,");
+
+		ProcessBuilderKaleoDesignerReact.viewMultipleNotificationPresent(
+			name = "Liferay Notification",
+			notificationTemplateValue = "Liferay Template",
+			notificationTypeOption = "email",
+			sectionOptionList = "1,2");
+
+		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
+
+		ProcessBuilderKaleoDesignerReact.viewPropertyValue(
+			propertyName = "Notification",
+			propertyValue = "Liferay Notification 1,Liferay Notification 2");
+
+		ProcessBuilderKaleoDesignerReact.gotoNotification(notificationName = "Liferay Notification 1,Liferay Notification 2");
+
+		ProcessBuilderKaleoDesignerReact.deleteByTrashTopSidebar(
+			modalMessage = "Are you sure you want to delete all notifications and their settings?",
+			sidebarPropertyName = "Notification");
+
+		ProcessBuilderKaleoDesignerReact.viewNotificationNotPresent(notificationName = "Liferay Notification 1,Liferay Notification 2");
 	}
 
 	@description = "LPS-139387 - Verify that the user is able to delete a node using the Delete key"
@@ -1110,7 +1143,8 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "userNotification");
+			notificationTypeOption = "userNotification",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -1118,7 +1152,9 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationDescription = "Notification Description");
 
-		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(description = "Notification Description Edited");
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(
+			description = "Notification Description Edited",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -1142,7 +1178,8 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "New Notification Template",
-			notificationTypeOption = "email");
+			notificationTypeOption = "email",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -1152,7 +1189,9 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationName = "Liferay Notification");
 
-		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(name = "Workflow Notifications");
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(
+			name = "Workflow Notifications",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -1175,6 +1214,7 @@ definition {
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
 			notificationTypeOption = "email",
+			singleAction = "true",
 			templateLanguageOption = "Text");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -1185,6 +1225,7 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(
 			notificationTemplateValue = '''${userName} sent you a ${entryType} for review in the workflow. Go Check it!''',
+			singleAction = "true",
 			templateLanguageOption = "FreeMarker");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -1262,6 +1303,7 @@ definition {
 			newNotification = "true",
 			notificationTemplateValue = "New Notification Template",
 			notificationTypeOption = "userNotification",
+			singleAction = "true",
 			templateLanguageOption = "FreeMarker");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -1287,6 +1329,7 @@ definition {
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
 			notificationTypeOption = "email",
+			singleAction = "true",
 			templateLanguageOption = "Text");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -1312,6 +1355,7 @@ definition {
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
 			notificationTypeOption = "email",
+			singleAction = "true",
 			templateLanguageOption = "Velocity");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -2196,7 +2240,8 @@ definition {
 			newNotification = "true",
 			notificationTemplateValue = "New Notification Template",
 			notificationTypeOption = "email",
-			recipientTypeOption = "Asset Creator");
+			recipientTypeOption = "Asset Creator",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -2220,7 +2265,8 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = "New Notification Template",
-			notificationTypeOption = "email");
+			notificationTypeOption = "email",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -2280,7 +2326,8 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email");
+			notificationTypeOption = "email",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -2305,7 +2352,8 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email");
+			notificationTypeOption = "email",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -2348,7 +2396,8 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email");
+			notificationTypeOption = "email",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -2374,7 +2423,8 @@ definition {
 			notificationsRecipientTypeRoleName = "Account Manager",
 			notificationTemplateValue = "New Notification Template",
 			notificationTypeOption = "email",
-			recipientTypeOption = "Role");
+			recipientTypeOption = "Role",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -2400,7 +2450,8 @@ definition {
 			notificationScript = '''returnValue = "Transition Name";''',
 			notificationTemplateValue = '''${userName} sent you a ${entryType} for review in the workflow.''',
 			notificationTypeOption = "userNotification",
-			recipientTypeOption = "Scripted Recipient");
+			recipientTypeOption = "Scripted Recipient",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -2427,7 +2478,8 @@ definition {
 			newNotification = "true",
 			notificationTemplateValue = '''${userName} sent you a ${entryType} for review in the workflow.''',
 			notificationTypeOption = "userNotification",
-			recipientTypeOption = "Task Assignees");
+			recipientTypeOption = "Task Assignees",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -2451,9 +2503,12 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email");
+			notificationTypeOption = "email",
+			singleAction = "true");
 
-		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(notificationTypeOption = "userNotification");
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(
+			notificationTypeOption = "userNotification",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -2479,7 +2534,8 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = '''${userName} sent you a ${entryType} for review in the workflow.''',
-			notificationTypeOption = "userNotification");
+			notificationTypeOption = "userNotification",
+			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 

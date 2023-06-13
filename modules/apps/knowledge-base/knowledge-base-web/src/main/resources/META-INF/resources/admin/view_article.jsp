@@ -16,8 +16,25 @@
 
 <%@ include file="/admin/init.jsp" %>
 
-<c:if test="<%= redirect.equals(currentURL) %>">
-	<liferay-util:include page="/admin/common/top_tabs.jsp" servletContext="<%= application %>" />
-</c:if>
+<c:choose>
+	<c:when test='<%= GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-156421")) %>'>
+		<c:if test="<%= redirect.equals(currentURL) %>">
+			<liferay-util:include page="/admin/common/vertical_menu.jsp" servletContext="<%= application %>" />
 
-<liferay-util:include page="/admin/common/view_article.jsp" servletContext="<%= application %>" />
+			<div class="knowledge-base-admin-content">
+		</c:if>
+
+		<liferay-util:include page="/admin/common/view_article.jsp" servletContext="<%= application %>" />
+
+		<c:if test="<%= redirect.equals(currentURL) %>">
+			</div>
+		</c:if>
+	</c:when>
+	<c:otherwise>
+		<c:if test="<%= redirect.equals(currentURL) %>">
+			<liferay-util:include page="/admin/common/top_tabs.jsp" servletContext="<%= application %>" />
+		</c:if>
+
+		<liferay-util:include page="/admin/common/view_article.jsp" servletContext="<%= application %>" />
+	</c:otherwise>
+</c:choose>

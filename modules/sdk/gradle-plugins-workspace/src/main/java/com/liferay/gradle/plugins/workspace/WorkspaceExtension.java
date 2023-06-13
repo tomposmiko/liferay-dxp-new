@@ -110,9 +110,15 @@ public class WorkspaceExtension {
 		_configsDir = _getProperty(
 			settings, "configs.dir",
 			BundleSupportConstants.DEFAULT_CONFIGS_DIR_NAME);
+		_dockerAccessToken = _getProperty(settings, "docker.access.token");
 		_dockerDir = _getProperty(settings, "docker.dir", _DOCKER_DIR);
 		_dockerImageLiferay = _getProperty(
 			settings, "docker.image.liferay", _getDefaultDockerImage());
+		_dockerLocalRegistryAddress = _getProperty(
+			settings, "docker.local.registry.address");
+		_dockerPullPolicy = _getProperty(
+			settings, "docker.pull.policy", _DOCKER_PULL_POLICY);
+		_dockerUserName = _getProperty(settings, "docker.username");
 		_environment = _getProperty(
 			settings, "environment",
 			BundleSupportConstants.DEFAULT_ENVIRONMENT);
@@ -265,6 +271,10 @@ public class WorkspaceExtension {
 		);
 	}
 
+	public String getDockerAccessToken() {
+		return GradleUtil.toString(_dockerAccessToken);
+	}
+
 	public String getDockerContainerId() {
 		return GradleUtil.toString(_dockerContainerId);
 	}
@@ -279,6 +289,18 @@ public class WorkspaceExtension {
 
 	public String getDockerImageLiferay() {
 		return GradleUtil.toString(_dockerImageLiferay);
+	}
+
+	public String getDockerLocalRegistryAddress() {
+		return GradleUtil.toString(_dockerLocalRegistryAddress);
+	}
+
+	public boolean getDockerPullPolicy() {
+		return GradleUtil.toBoolean(_dockerPullPolicy);
+	}
+
+	public String getDockerUserName() {
+		return GradleUtil.toString(_dockerUserName);
 	}
 
 	public String getEnvironment() {
@@ -379,6 +401,10 @@ public class WorkspaceExtension {
 		_configsDir = configsDir;
 	}
 
+	public void setDockerAccessToken(Object dockerAccessToken) {
+		_dockerAccessToken = dockerAccessToken;
+	}
+
 	public void setDockerContainerId(Object dockerContainerId) {
 		_dockerContainerId = dockerContainerId;
 	}
@@ -393,6 +419,20 @@ public class WorkspaceExtension {
 
 	public void setDockerImageLiferay(Object dockerImageLiferay) {
 		_dockerImageLiferay = dockerImageLiferay;
+	}
+
+	public void setDockerLocalRegistryAddress(
+		Object dockerLocalRegistryAddress) {
+
+		_dockerLocalRegistryAddress = dockerLocalRegistryAddress;
+	}
+
+	public void setDockerPullPolicy(Object dockerPullPolicy) {
+		_dockerPullPolicy = dockerPullPolicy;
+	}
+
+	public void setDockerUserName(Object dockerUserName) {
+		_dockerUserName = dockerUserName;
 	}
 
 	public void setEnvironment(Object environment) {
@@ -588,6 +628,11 @@ public class WorkspaceExtension {
 		return gson.fromJson(jsonReader, typeToken.getType());
 	}
 
+	private Object _getProperty(Object object, String keySuffix) {
+		return GradleUtil.getProperty(
+			object, WorkspacePlugin.PROPERTY_PREFIX + keySuffix);
+	}
+
 	private boolean _getProperty(
 		Object object, String keySuffix, boolean defaultValue) {
 
@@ -646,6 +691,8 @@ public class WorkspaceExtension {
 	private static final File _DOCKER_DIR = new File(
 		Project.DEFAULT_BUILD_DIR_NAME + File.separator + "docker");
 
+	private static final boolean _DOCKER_PULL_POLICY = true;
+
 	private static final String _NODE_PACKAGE_MANAGER = "yarn";
 
 	private static final String _PRODUCT_INFO_URL =
@@ -663,10 +710,14 @@ public class WorkspaceExtension {
 	private Object _bundleTokenPasswordFile;
 	private Object _bundleUrl;
 	private Object _configsDir;
+	private Object _dockerAccessToken;
 	private Object _dockerContainerId;
 	private Object _dockerDir;
 	private Object _dockerImageId;
 	private Object _dockerImageLiferay;
+	private Object _dockerLocalRegistryAddress;
+	private Object _dockerPullPolicy;
+	private Object _dockerUserName;
 	private Object _environment;
 	private final Gradle _gradle;
 	private Object _homeDir;

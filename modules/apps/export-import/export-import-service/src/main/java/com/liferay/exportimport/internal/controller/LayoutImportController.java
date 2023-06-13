@@ -337,6 +337,10 @@ public class LayoutImportController implements ImportController {
 			long layoutId = GetterUtil.getLong(
 				portletElement.attributeValue("layout-id"));
 
+			if (layoutId != 0) {
+				continue;
+			}
+
 			long plid = LayoutConstants.DEFAULT_PLID;
 
 			Layout layout = layouts.get(layoutId);

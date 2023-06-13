@@ -63,27 +63,42 @@ export default function GlobalJSCETsConfiguration({
 	const allGlobalJSCETs = useMemo(() => {
 		const globalJSCETsGroups = new Map<
 			IScriptLocationOptions,
-			Array<{globalJSCET: IGlobalJSCET; order: number}>
+			IGlobalJSCETGroup
 		>();
-
-		let order = 1;
 
 		[...fixedGlobalJSCETs, ...globalJSCETs].forEach((globalJSCET) => {
 			const groupId =
 				globalJSCET.scriptLocation || DEFAULT_SCRIPT_LOCATION_OPTION;
 
 			if (!globalJSCETsGroups.has(groupId)) {
-				globalJSCETsGroups.set(groupId, []);
+				globalJSCETsGroups.set(groupId, {
+					items: [],
+					scriptLocation: groupId,
+				});
 			}
 
-			const list = globalJSCETsGroups.get(groupId)!;
+			const group = globalJSCETsGroups.get(groupId)!;
 
-			list.push({globalJSCET, order});
-
-			order = order + 1;
+			group.items.push({globalJSCET, order: 0});
 		});
 
-		return globalJSCETsGroups;
+		let order = 1;
+		const sortedGroups: IGlobalJSCETGroup[] = [];
+
+		SCRIPT_LOCATION_LABELS.forEach(({scriptLocation}) => {
+			const group = globalJSCETsGroups.get(scriptLocation);
+
+			if (!group || !group.items.length) {
+				return;
+			}
+
+			sortedGroups.push({
+				items: group.items.map((item) => ({...item, order: order++})),
+				scriptLocation,
+			});
+		});
+
+		return sortedGroups;
 	}, [fixedGlobalJSCETs, globalJSCETs]);
 
 	const deleteGlobalJSCET = (deletedGlobalJSCET: IGlobalJSCET) => {
@@ -121,8 +136,10 @@ export default function GlobalJSCETsConfiguration({
 				setGlobalJSCETs((previousGlobalJSCETs) => {
 					const duplicatedGlobalJSCETs: IGlobalJSCET[] = [];
 
-					const nextGlobalJSCETs = selectedItems.value
-						.map((selectedItem) => ({
+					const nextGlobalJSCETs: IGlobalJSCET[] = [];
+
+					selectedItems.value.forEach((selectedItem) => {
+						const nextGlobalJSCET: IGlobalJSCET = {
 							inherited: false,
 							inheritedLabel: '-',
 							scriptLocation,
@@ -130,24 +147,23 @@ export default function GlobalJSCETsConfiguration({
 								cetExternalReferenceCode: string;
 								name: string;
 							}),
-						}))
-						.filter((nextGlobalJSCET) => {
-							const isDuplicated = previousGlobalJSCETs.some(
-								(previousGlobalJSCET) =>
-									nextGlobalJSCET.cetExternalReferenceCode ===
-										previousGlobalJSCET.cetExternalReferenceCode &&
-									nextGlobalJSCET.scriptLocation ===
-										previousGlobalJSCET.scriptLocation
-							);
+						};
 
-							if (isDuplicated) {
-								duplicatedGlobalJSCETs.push(nextGlobalJSCET);
+						const isDuplicated = previousGlobalJSCETs.some(
+							(previousGlobalJSCET) =>
+								nextGlobalJSCET.cetExternalReferenceCode ===
+									previousGlobalJSCET.cetExternalReferenceCode &&
+								nextGlobalJSCET.scriptLocation ===
+									previousGlobalJSCET.scriptLocation
+						);
 
-								return false;
-							}
-
-							return true;
-						});
+						if (isDuplicated) {
+							duplicatedGlobalJSCETs.push(nextGlobalJSCET);
+						}
+						else {
+							nextGlobalJSCETs.push(nextGlobalJSCET);
+						}
+					});
 
 					if (duplicatedGlobalJSCETs.length) {
 						openToast({
@@ -204,7 +220,7 @@ export default function GlobalJSCETsConfiguration({
 				portletNamespace={portletNamespace}
 			/>
 
-			{allGlobalJSCETs.size ? (
+			{allGlobalJSCETs.length ? (
 				<ClayTable>
 					<ClayTable.Head>
 						<ClayTable.Row>
@@ -250,49 +266,43 @@ export default function GlobalJSCETsConfiguration({
 					</ClayTable.Head>
 
 					<ClayTable.Body>
-						{[...allGlobalJSCETs.entries()].map(
-							([scriptLocation, globalJSCETs]) => {
-								return (
-									<React.Fragment key={scriptLocation}>
-										<ClayTable.Row>
-											<ClayTable.Cell
-												className="list-group-header-title py-2"
-												colSpan={5}
-											>
-												{scriptLocation === 'bottom'
-													? Liferay.Language.get(
-															'page-bottom-js-extensions'
-													  )
-													: Liferay.Language.get(
-															'page-head-js-extensions'
-													  )}
-											</ClayTable.Cell>
-										</ClayTable.Row>
+						{allGlobalJSCETs.map(({items, scriptLocation}) => {
+							return (
+								<React.Fragment key={scriptLocation}>
+									<ClayTable.Row>
+										<ClayTable.Cell
+											className="list-group-header-title py-2"
+											colSpan={5}
+										>
+											{scriptLocation === 'bottom'
+												? Liferay.Language.get(
+														'page-bottom-js-extensions'
+												  )
+												: Liferay.Language.get(
+														'page-head-js-extensions'
+												  )}
+										</ClayTable.Cell>
+									</ClayTable.Row>
 
-										{globalJSCETs.map(
-											({globalJSCET, order}) => (
-												<ExtensionRow
-													deleteGlobalJSCET={
-														deleteGlobalJSCET
-													}
-													globalJSCET={globalJSCET}
-													key={
-														globalJSCET.cetExternalReferenceCode
-													}
-													order={order}
-													portletNamespace={
-														portletNamespace
-													}
-													updateGlobalJSCET={
-														updateGlobalJSCET
-													}
-												/>
-											)
-										)}
-									</React.Fragment>
-								);
-							}
-						)}
+									{items.map(({globalJSCET, order}) => (
+										<ExtensionRow
+											deleteGlobalJSCET={
+												deleteGlobalJSCET
+											}
+											globalJSCET={globalJSCET}
+											key={
+												globalJSCET.cetExternalReferenceCode
+											}
+											order={order}
+											portletNamespace={portletNamespace}
+											updateGlobalJSCET={
+												updateGlobalJSCET
+											}
+										/>
+									))}
+								</React.Fragment>
+							);
+						})}
 					</ClayTable.Body>
 				</ClayTable>
 			) : (
@@ -324,17 +334,13 @@ function AddExtensionButton({
 			items={SCRIPT_LOCATION_LABELS.map(({label, scriptLocation}) => ({
 				label,
 				onClick: () => addGlobalJSCET(scriptLocation),
-				role: 'menuitem',
 			}))}
 			menuElementAttrs={{
 				'aria-labelledby': dropdownTriggerId,
-				'role': 'menu',
 			}}
 			onActiveChange={setActive}
 			trigger={
 				<ClayButton
-					aria-expanded={active}
-					aria-haspopup="true"
 					className="mb-3"
 					displayType="secondary"
 					small
@@ -429,6 +435,11 @@ interface IGlobalJSCET {
 	loadType?: ILoadTypeOptions;
 	name: string;
 	scriptLocation?: IScriptLocationOptions;
+}
+
+interface IGlobalJSCETGroup {
+	items: Array<{globalJSCET: IGlobalJSCET; order: number}>;
+	scriptLocation: IScriptLocationOptions;
 }
 
 interface IProps {

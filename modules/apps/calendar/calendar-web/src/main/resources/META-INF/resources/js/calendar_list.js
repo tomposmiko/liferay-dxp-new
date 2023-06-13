@@ -97,8 +97,8 @@ AUI.add(
 			'">{[Liferay.Util.escapeHTML(parent.calendars[$i].getDisplayName())]}</span>',
 			'<tpl if="parent.calendars[$i].get(\'hasMenuItems\')">',
 			'<div aria-label="' +
-				Liferay.Language.get('show-calendar-actions') +
-				'" class="',
+				Liferay.Language.get('show-actions-for-calendar-x'),
+			'{[parent.calendars[$i].getDisplayName()]}' + '" class="',
 			CSS_CALENDAR_LIST_ITEM_ARROW,
 			'" role="button" tabindex="0">',
 			CSS_ICON_CARET_DOWN,
@@ -170,50 +170,52 @@ AUI.add(
 					}
 				},
 
-				_onClick(event) {
-					const instance = this;
+				_onEvents(event) {
+					if (event.keyCode === 13 || event.type === 'click') {
+						const instance = this;
 
-					const target = event.target.ancestor(
-						STR_DOT + CSS_CALENDAR_LIST_ITEM_ARROW,
-						true,
-						STR_DOT + CSS_CALENDAR_LIST_ITEM
-					);
+						const target = event.target.ancestor(
+							STR_DOT + CSS_CALENDAR_LIST_ITEM_ARROW,
+							true,
+							STR_DOT + CSS_CALENDAR_LIST_ITEM
+						);
 
-					if (target) {
-						let activeNode = instance.activeNode;
+						if (target) {
+							let activeNode = instance.activeNode;
 
-						if (activeNode) {
-							activeNode.removeClass(
-								CSS_CALENDAR_LIST_ITEM_ACTIVE
+							if (activeNode) {
+								activeNode.removeClass(
+									CSS_CALENDAR_LIST_ITEM_ACTIVE
+								);
+							}
+
+							activeNode = event.currentTarget;
+
+							instance.activeItem = instance.getCalendarByNode(
+								activeNode
 							);
+
+							activeNode.addClass(CSS_CALENDAR_LIST_ITEM_ACTIVE);
+
+							instance.activeNode = activeNode;
+
+							const simpleMenu = instance.simpleMenu;
+
+							simpleMenu.setAttrs({
+								alignNode: target,
+								toggler: target,
+								visible:
+									simpleMenu.get('align.node') !== target ||
+									!simpleMenu.get('visible'),
+							});
 						}
+						else {
+							const calendar = instance.getCalendarByNode(
+								event.currentTarget
+							);
 
-						activeNode = event.currentTarget;
-
-						instance.activeItem = instance.getCalendarByNode(
-							activeNode
-						);
-
-						activeNode.addClass(CSS_CALENDAR_LIST_ITEM_ACTIVE);
-
-						instance.activeNode = activeNode;
-
-						const simpleMenu = instance.simpleMenu;
-
-						simpleMenu.setAttrs({
-							alignNode: target,
-							toggler: target,
-							visible:
-								simpleMenu.get('align.node') !== target ||
-								!simpleMenu.get('visible'),
-						});
-					}
-					else {
-						const calendar = instance.getCalendarByNode(
-							event.currentTarget
-						);
-
-						calendar.set('visible', !calendar.get('visible'));
+							calendar.set('visible', !calendar.get('visible'));
+						}
 					}
 				},
 
@@ -263,12 +265,17 @@ AUI.add(
 
 					const calendars = instance.get('calendars');
 					const contentBox = instance.get('contentBox');
+					const simpleMenu = instance.get('simpleMenu');
 
 					instance.items = A.NodeList.create(
 						TPL_CALENDAR_LIST_ITEM.parse({
 							calendars,
 						})
 					);
+
+					instance.items
+						.all(STR_DOT + CSS_CALENDAR_LIST_ITEM_ARROW)
+						.setAttribute('aria-controls', simpleMenu.id);
 
 					contentBox.setContent(instance.items);
 				},
@@ -387,7 +394,14 @@ AUI.add(
 
 					contentBox.delegate(
 						'click',
-						instance._onClick,
+						instance._onEvents,
+						STR_DOT + CSS_CALENDAR_LIST_ITEM,
+						instance
+					);
+
+					contentBox.delegate(
+						'keyup',
+						instance._onEvents,
 						STR_DOT + CSS_CALENDAR_LIST_ITEM,
 						instance
 					);

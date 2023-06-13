@@ -331,6 +331,83 @@ definition {
 		CommerceProducts.convertProductToDraft(status = "${status}");
 	}
 
+	macro configureSubscription {
+		if ("${subscriptionName}" == "Payment Subscription") {
+			var indexNumber = "1";
+		}
+		else {
+			var indexNumber = "2";
+		}
+
+		CommerceNavigator.searchEntry(entryName = "${productName}");
+
+		CommerceNavigator.gotoEntry(entryName = "${productName}");
+
+		CommerceEntry.gotoMenuTab(menuTab = "Subscription");
+
+		Check.checkToggleSwitch(
+			key_subscriptionName = "${subscriptionName}",
+			locator1 = "CommerceEntry#SUBSCRIPTION_TOGGLE");
+
+		if (isSet(subscriptionType)) {
+			Select(
+				key_subscriptionFieldLabel = "Subscription Type",
+				key_subscriptionName = "${subscriptionName}",
+				locator1 = "CommerceEntry#SUBSCRIPTION_FIELD_LABEL",
+				value1 = "${subscriptionType}");
+
+			if (isSet(subscriptionMode)) {
+				Select(
+					key_subscriptionFieldLabel = "Mode",
+					key_subscriptionName = "${subscriptionName}",
+					locator1 = "CommerceEntry#SUBSCRIPTION_FIELD_LABEL",
+					value1 = "${subscriptionMode}");
+
+				if ("${subscriptionMode}" == "Exact Day of Month") {
+					Type(
+						key_text = "On",
+						locator1 = "TextInput#ANY",
+						value1 = "${subscriptionExactDay}");
+				}
+
+				if ("${subscriptionMode}" == "Exact Day of Year") {
+					Select(
+						key_subscriptionFieldLabel = "Month",
+						key_subscriptionName = "${subscriptionName}",
+						locator1 = "CommerceEntry#SUBSCRIPTION_FIELD_LABEL",
+						value1 = "${subscriptionMonth}");
+
+					Type(
+						key_text = "Day",
+						locator1 = "TextInput#ANY",
+						value1 = "${subscriptionExactDay}");
+				}
+			}
+		}
+
+		if (isSet(subscriptionLength)) {
+			Type(
+				key_fieldLabel = "Subscription Length",
+				key_indexNumber = "${indexNumber}",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT_N",
+				value1 = "${subscriptionLength}");
+		}
+
+		if (isSet(neverEnds)) {
+			Click(
+				key_buttonName = "Never Ends",
+				key_indexNumber = "${indexNumber}",
+				locator1 = "CommerceEntry#TOGGLE_SWITCH_BUTTON");
+
+			Type(
+				key_text = "Ends After",
+				locator1 = "TextInput#ANY",
+				value1 = "${subscriptionCycleValue}");
+		}
+
+		Button.clickPublish();
+	}
+
 	macro convertProductToDraft {
 		if ("${status}" == "Draft") {
 			AssertElementPresent(
@@ -354,23 +431,21 @@ definition {
 				key_itemName = "",
 				locator1 = "CommerceEntry#SPECIFIC_MENU_ITEM");
 
-			Click(
+			ClickNoError(
 				key_optionValue = "Convert to Draft",
 				locator1 = "CommerceFrontStore#FS_PRODUCT_OPTION");
 
-			Click(locator1 = "Button#CANCEL");
+			Confirm.dismissAlert();
 
 			Click(
 				key_itemName = "",
 				locator1 = "CommerceEntry#SPECIFIC_MENU_ITEM");
 
-			Click(
+			ClickNoError(
 				key_optionValue = "Convert to Draft",
 				locator1 = "CommerceFrontStore#FS_PRODUCT_OPTION");
 
-			AssertElementPresent(locator1 = "CommerceNavigation#VALIDATE_CONVERT_TO_DRAFT_MODAL_MESSAGE");
-
-			Click(locator1 = "Button#OK");
+			AssertConfirm(value1 = "Converting the product status to draft will remove the product from the product catalog. Do you wish to proceed?");
 
 			AssertElementPresent(
 				key_text = "Save as Draft",

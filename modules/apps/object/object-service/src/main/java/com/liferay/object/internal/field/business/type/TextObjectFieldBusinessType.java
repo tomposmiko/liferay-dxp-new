@@ -97,7 +97,7 @@ public class TextObjectFieldBusinessType implements ObjectFieldBusinessType {
 		Map<String, Object> properties = new HashMap<>();
 
 		ListUtil.isNotEmptyForEach(
-			_objectFieldSettingLocalService.getObjectFieldSettings(
+			_objectFieldSettingLocalService.getObjectFieldObjectFieldSettings(
 				objectField.getObjectFieldId()),
 			objectFieldSetting -> properties.put(
 				objectFieldSetting.getName(), objectFieldSetting.getValue()));

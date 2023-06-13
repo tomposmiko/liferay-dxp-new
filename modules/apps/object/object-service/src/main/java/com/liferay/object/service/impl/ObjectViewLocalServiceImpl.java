@@ -330,8 +330,8 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 					objectView.getObjectViewId());
 				newObjectViewFilterColumn.setFilterType(
 					objectViewFilterColumn.getFilterType());
-				newObjectViewFilterColumn.setJson(
-					objectViewFilterColumn.getJson());
+				newObjectViewFilterColumn.setJSON(
+					objectViewFilterColumn.getJSON());
 				newObjectViewFilterColumn.setObjectFieldName(
 					objectViewFilterColumn.getObjectFieldName());
 
@@ -487,15 +487,15 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 			}
 
 			if (Validator.isNull(objectViewFilterColumn.getFilterType()) &&
-				Validator.isNull(objectViewFilterColumn.getJson())) {
+				Validator.isNull(objectViewFilterColumn.getJSON())) {
 
 				continue;
 			}
 
 			if ((Validator.isNull(objectViewFilterColumn.getFilterType()) &&
-				 Validator.isNotNull(objectViewFilterColumn.getJson())) ||
+				 Validator.isNotNull(objectViewFilterColumn.getJSON())) ||
 				(Validator.isNotNull(objectViewFilterColumn.getFilterType()) &&
-				 Validator.isNull(objectViewFilterColumn.getJson()))) {
+				 Validator.isNull(objectViewFilterColumn.getJSON()))) {
 
 				throw new ObjectViewFilterColumnException(
 					StringBundler.concat(

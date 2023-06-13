@@ -322,11 +322,11 @@ public class ObjectViewFilterColumnModelImpl
 			"filterType",
 			(BiConsumer<ObjectViewFilterColumn, String>)
 				ObjectViewFilterColumn::setFilterType);
-		attributeGetterFunctions.put("json", ObjectViewFilterColumn::getJson);
+		attributeGetterFunctions.put("json", ObjectViewFilterColumn::getJSON);
 		attributeSetterBiConsumers.put(
 			"json",
 			(BiConsumer<ObjectViewFilterColumn, String>)
-				ObjectViewFilterColumn::setJson);
+				ObjectViewFilterColumn::setJSON);
 		attributeGetterFunctions.put(
 			"objectFieldName", ObjectViewFilterColumn::getObjectFieldName);
 		attributeSetterBiConsumers.put(
@@ -547,7 +547,7 @@ public class ObjectViewFilterColumnModelImpl
 	}
 
 	@Override
-	public String getJson() {
+	public String getJSON() {
 		if (_json == null) {
 			return "";
 		}
@@ -557,7 +557,7 @@ public class ObjectViewFilterColumnModelImpl
 	}
 
 	@Override
-	public void setJson(String json) {
+	public void setJSON(String json) {
 		if (_columnOriginalValues == Collections.EMPTY_MAP) {
 			_setColumnOriginalValues();
 		}
@@ -668,7 +668,7 @@ public class ObjectViewFilterColumnModelImpl
 		objectViewFilterColumnImpl.setModifiedDate(getModifiedDate());
 		objectViewFilterColumnImpl.setObjectViewId(getObjectViewId());
 		objectViewFilterColumnImpl.setFilterType(getFilterType());
-		objectViewFilterColumnImpl.setJson(getJson());
+		objectViewFilterColumnImpl.setJSON(getJSON());
 		objectViewFilterColumnImpl.setObjectFieldName(getObjectFieldName());
 
 		objectViewFilterColumnImpl.resetOriginalValues();
@@ -701,7 +701,7 @@ public class ObjectViewFilterColumnModelImpl
 			this.<Long>getColumnOriginalValue("objectViewId"));
 		objectViewFilterColumnImpl.setFilterType(
 			this.<String>getColumnOriginalValue("filterType"));
-		objectViewFilterColumnImpl.setJson(
+		objectViewFilterColumnImpl.setJSON(
 			this.<String>getColumnOriginalValue("json"));
 		objectViewFilterColumnImpl.setObjectFieldName(
 			this.<String>getColumnOriginalValue("objectFieldName"));
@@ -838,7 +838,7 @@ public class ObjectViewFilterColumnModelImpl
 			objectViewFilterColumnCacheModel.filterType = null;
 		}
 
-		objectViewFilterColumnCacheModel.json = getJson();
+		objectViewFilterColumnCacheModel.json = getJSON();
 
 		String json = objectViewFilterColumnCacheModel.json;
 

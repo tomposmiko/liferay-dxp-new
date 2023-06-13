@@ -31,6 +31,7 @@ import SearchForm from '../../../common/components/SearchForm';
 export function DropdownColorPicker({
 	active,
 	colors,
+	fieldLabel = null,
 	label = null,
 	onValueChange = () => {},
 	onSetActive,
@@ -123,7 +124,14 @@ export function DropdownColorPicker({
 			{showSelector ? (
 				<ClayButton
 					aria-label={label}
-					className="align-items-center border-0 d-flex page-editor__dropdown-color-picker__selector w-100"
+					className={classNames(
+						'align-items-center border-0 d-flex page-editor__dropdown-color-picker__selector w-100',
+						{
+							'font-weight-normal':
+								Liferay.FeatureFlags['LPS-143206'],
+							'text-body': Liferay.FeatureFlags['LPS-143206'],
+						}
+					)}
 					displayType="secondary"
 					onClick={() => onSetActive((active) => !active)}
 					ref={triggerElementRef}
@@ -131,10 +139,12 @@ export function DropdownColorPicker({
 				>
 					<span className="c-inner" tabIndex="-1">
 						<span
-							className="page-editor__dropdown-color-picker__selector-splotch rounded-circle"
-							style={{
-								background: `${value}`,
-							}}
+							className={classNames(
+								'page-editor__dropdown-color-picker__selector-splotch rounded-circle',
+								{'lfr-portal-tooltip': fieldLabel}
+							)}
+							data-title={fieldLabel}
+							style={{background: `${value}`}}
 						/>
 
 						<span className="text-truncate">{label}</span>

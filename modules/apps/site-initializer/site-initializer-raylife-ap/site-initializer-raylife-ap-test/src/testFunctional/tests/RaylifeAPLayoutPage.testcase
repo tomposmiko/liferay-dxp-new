@@ -46,12 +46,12 @@ definition {
 			ApplicationsMenu.gotoSite(site = "${testSiteName}");
 		}
 
-		task ("Assert Sidebar is Expanded") {
-			RaylifeAP.mouseOverSidebar(menu = "policies");
+		task ("Can view Sidebar Expanded") {
+			RaylifeAP.expandedSidebar(key_menuSidebar = "policies");
+		}
 
-			AssertVisible(
-				key_menu = "policies",
-				locator1 = "RaylifeAP#MENU_SIDEBAR");
+		task ("Assert Sidebar is Expanded") {
+			RaylifeAP.assertVisibleSidebar(key_menuSidebar = "policies");
 		}
 	}
 
@@ -62,12 +62,12 @@ definition {
 			ApplicationsMenu.gotoSite(site = "${testSiteName}");
 		}
 
-		task ("Assert Applications section in Sidebar") {
-			RaylifeAP.mouseOverSidebar(menu = "applications");
+		task ("Can view Sidebar Expanded") {
+			RaylifeAP.expandedSidebar(key_menuSidebar = "applications");
+		}
 
-			AssertVisible(
-				key_menu = "applications",
-				locator1 = "RaylifeAP#MENU_SIDEBAR");
+		task ("Assert Applications section in Sidebar") {
+			RaylifeAP.assertVisibleSidebar(key_menuSidebar = "applications");
 		}
 	}
 

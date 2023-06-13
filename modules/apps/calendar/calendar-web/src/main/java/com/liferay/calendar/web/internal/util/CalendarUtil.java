@@ -169,6 +169,15 @@ public class CalendarUtil {
 		).put(
 			"calendarId", calendarBooking.getCalendarId()
 		).put(
+			"calendarResourceName",
+			() -> {
+				CalendarResource calendarResource =
+					_calendarResourceLocalService.getCalendarResource(
+						calendarBooking.getCalendarResourceId());
+
+				return calendarResource.getName(themeDisplay.getLocale());
+			}
+		).put(
 			"description",
 			calendarBooking.getDescription(themeDisplay.getLocale())
 		);

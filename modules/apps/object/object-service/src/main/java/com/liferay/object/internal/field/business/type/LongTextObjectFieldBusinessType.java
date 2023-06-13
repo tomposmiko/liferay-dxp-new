@@ -103,7 +103,7 @@ public class LongTextObjectFieldBusinessType
 		).build();
 
 		ListUtil.isNotEmptyForEach(
-			_objectFieldSettingLocalService.getObjectFieldSettings(
+			_objectFieldSettingLocalService.getObjectFieldObjectFieldSettings(
 				objectField.getObjectFieldId()),
 			objectFieldSetting -> properties.put(
 				objectFieldSetting.getName(), objectFieldSetting.getValue()));

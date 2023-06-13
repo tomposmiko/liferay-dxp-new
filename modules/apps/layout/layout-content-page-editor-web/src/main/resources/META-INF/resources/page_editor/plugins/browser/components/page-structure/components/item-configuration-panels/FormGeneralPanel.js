@@ -18,15 +18,12 @@ import React, {useCallback, useEffect, useState} from 'react';
 import updateItemLocalConfig from '../../../../../../app/actions/updateItemLocalConfig';
 import {SelectField} from '../../../../../../app/components/fragment-configuration-fields/SelectField';
 import {COMMON_STYLES_ROLES} from '../../../../../../app/config/constants/commonStylesRoles';
-import {FORM_MAPPING_SOURCES} from '../../../../../../app/config/constants/formMappingSources';
-import {config} from '../../../../../../app/config/index';
 import {
 	useDispatch,
 	useSelector,
 } from '../../../../../../app/contexts/StoreContext';
 import selectLanguageId from '../../../../../../app/selectors/selectLanguageId';
-import selectSegmentsExperienceId from '../../../../../../app/selectors/selectSegmentsExperienceId';
-import updateItemConfig from '../../../../../../app/thunks/updateItemConfig';
+import updateFormItemConfig from '../../../../../../app/thunks/updateFormItemConfig';
 import {formIsMapped} from '../../../../../../app/utils/formIsMapped';
 import {getEditableLocalizedValue} from '../../../../../../app/utils/getEditableLocalizedValue';
 import {useId} from '../../../../../../app/utils/useId';
@@ -36,21 +33,20 @@ import {LayoutSelector} from '../../../../../../common/components/LayoutSelector
 import useControlledState from '../../../../../../core/hooks/useControlledState';
 import {CommonStyles} from './CommonStyles';
 import ContainerDisplayOptions from './ContainerDisplayOptions';
+import FormMappingOptions from './FormMappingOptions';
 
 export function FormGeneralPanel({item}) {
 	const dispatch = useDispatch();
-	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
 
 	const onValueSelect = useCallback(
 		(nextConfig) =>
 			dispatch(
-				updateItemConfig({
+				updateFormItemConfig({
 					itemConfig: nextConfig,
 					itemId: item.itemId,
-					segmentsExperienceId,
 				})
 			),
-		[dispatch, item.itemId, segmentsExperienceId]
+		[dispatch, item.itemId]
 	);
 
 	return (
@@ -67,81 +63,13 @@ export function FormGeneralPanel({item}) {
 }
 
 function FormOptions({item, onValueSelect}) {
-	const formTypes = [
-		{
-			label: Liferay.Language.get('none'),
-			value: '',
-		},
-		...config.formTypes,
-	];
-
-	const {classNameId, classTypeId} = item.config;
-
-	const selectedType = formTypes.find(({value}) => value === classNameId);
-
-	const selectedSubtype = selectedType?.subtypes.find(
-		({value}) => value === classTypeId
-	);
-
 	return (
 		<div className="mb-3">
 			<Collapse
 				label={Liferay.Language.get('form-container-options')}
 				open
 			>
-				{!!formTypes.length && (
-					<SelectField
-						disabled={!formTypes.length}
-						field={{
-							label: Liferay.Language.get('content-type'),
-							name: 'classNameId',
-							typeOptions: {
-								validValues: formTypes,
-							},
-						}}
-						onValueSelect={(_name, classNameId) => {
-							const type = formTypes.find(
-								({value}) => value === classNameId
-							);
-
-							return onValueSelect({
-								classNameId,
-								classTypeId: type?.subtypes?.[0]?.value || '0',
-								formConfig:
-									FORM_MAPPING_SOURCES.otherContentType,
-							});
-						}}
-						value={selectedType ? classNameId : ''}
-					/>
-				)}
-
-				{selectedType?.subtypes?.length > 0 && (
-					<SelectField
-						disabled={!formTypes.length}
-						field={{
-							label: Liferay.Language.get('subtype'),
-							name: 'classTypeId',
-							typeOptions: {
-								validValues: [
-									{
-										label: Liferay.Language.get('none'),
-										value: '',
-									},
-									...selectedType.subtypes,
-								],
-							},
-						}}
-						onValueSelect={(_name, classTypeId) =>
-							onValueSelect({
-								classNameId: item.config.classNameId,
-								classTypeId,
-								formConfig:
-									FORM_MAPPING_SOURCES.otherContentType,
-							})
-						}
-						value={selectedSubtype ? classTypeId : ''}
-					/>
-				)}
+				<FormMappingOptions item={item} onValueSelect={onValueSelect} />
 
 				{formIsMapped(item) && (
 					<>
@@ -172,7 +100,7 @@ const SUCCESS_MESSAGE_OPTIONS = [
 		value: LAYOUT_OPTION,
 	},
 	{
-		label: Liferay.Language.get('url'),
+		label: Liferay.Language.get('external-url'),
 		value: URL_OPTION,
 	},
 ];
@@ -182,6 +110,8 @@ function SuccessMessageOptions({item, onValueSelect}) {
 
 	const languageId = useSelector(selectLanguageId);
 	const dispatch = useDispatch();
+
+	const helpTextId = useId();
 
 	const [selectedSource, setSelectedSource] = useState(
 		getSelectedOption(successMessageConfig)
@@ -218,6 +148,7 @@ function SuccessMessageOptions({item, onValueSelect}) {
 		return () => {
 			dispatch(
 				updateItemLocalConfig({
+					disableUndo: true,
 					itemConfig: {
 						showMessagePreview: false,
 					},
@@ -314,6 +245,7 @@ function SuccessMessageOptions({item, onValueSelect}) {
 
 							dispatch(
 								updateItemLocalConfig({
+									disableUndo: true,
 									itemConfig: {
 										showMessagePreview: checked,
 									},
@@ -328,7 +260,9 @@ function SuccessMessageOptions({item, onValueSelect}) {
 
 			{selectedSource === URL_OPTION && (
 				<ClayForm.Group small>
-					<label htmlFor={urlId}>{Liferay.Language.get('url')}</label>
+					<label htmlFor={urlId}>
+						{Liferay.Language.get('external-url')}
+					</label>
 
 					<ClayInput.Group small>
 						<ClayInput.GroupItem>
@@ -346,6 +280,7 @@ function SuccessMessageOptions({item, onValueSelect}) {
 									})
 								}
 								onChange={(event) => setUrl(event.target.value)}
+								placeholder="https://url.com"
 								type="text"
 								value={url || ''}
 							/>
@@ -355,6 +290,12 @@ function SuccessMessageOptions({item, onValueSelect}) {
 							<CurrentLanguageFlag />
 						</ClayInput.GroupItem>
 					</ClayInput.Group>
+
+					<div className="mt-1 small text-secondary" id={helpTextId}>
+						{Liferay.Language.get(
+							'urls-must-have-a-valid-protocol'
+						)}
+					</div>
 				</ClayForm.Group>
 			)}
 		</>

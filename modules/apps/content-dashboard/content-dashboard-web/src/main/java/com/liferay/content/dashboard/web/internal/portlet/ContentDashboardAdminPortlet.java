@@ -23,6 +23,7 @@ import com.liferay.content.dashboard.web.internal.dao.search.ContentDashboardIte
 import com.liferay.content.dashboard.web.internal.data.provider.ContentDashboardDataProvider;
 import com.liferay.content.dashboard.web.internal.display.context.ContentDashboardAdminDisplayContext;
 import com.liferay.content.dashboard.web.internal.display.context.ContentDashboardAdminManagementToolbarDisplayContext;
+import com.liferay.content.dashboard.web.internal.display.context.ContentDashboardAdminSharingDisplayContext;
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItem;
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryTracker;
 import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemSubtypeFactoryTracker;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.language.constants.LanguageConstants;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Portal;
@@ -46,6 +48,9 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.search.aggregation.Aggregations;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.searcher.Searcher;
+import com.liferay.sharing.configuration.SharingConfigurationFactory;
+import com.liferay.sharing.display.context.util.SharingJavaScriptFactory;
+import com.liferay.sharing.security.permission.SharingPermission;
 
 import java.io.IOException;
 
@@ -163,6 +168,16 @@ public class ContentDashboardAdminPortlet extends MVCPortlet {
 				CONTENT_DASHBOARD_ADMIN_MANAGEMENT_TOOLBAR_DISPLAY_CONTEXT,
 			contentDashboardAdminManagementToolbarDisplayContext);
 
+		renderRequest.setAttribute(
+			ContentDashboardWebKeys.
+				CONTENT_DASHBOARD_ADMIN_SHARING_DISPLAY_CONTEXT,
+			new ContentDashboardAdminSharingDisplayContext(
+				_contentDashboardItemFactoryTracker,
+				_contentDashboardItemSearchClassMapperTracker,
+				_portal.getHttpServletRequest(liferayPortletRequest)));
+
+		_sharingJavaScriptFactory.requestSharingJavascript();
+
 		super.render(renderRequest, renderResponse);
 	}
 
@@ -177,6 +192,9 @@ public class ContentDashboardAdminPortlet extends MVCPortlet {
 
 	@Reference
 	private AssetVocabularyLocalService _assetVocabularyLocalService;
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
 	private ContentDashboardItemFactoryTracker
@@ -211,6 +229,15 @@ public class ContentDashboardAdminPortlet extends MVCPortlet {
 
 	@Reference
 	private Searcher _searcher;
+
+	@Reference
+	private SharingConfigurationFactory _sharingConfigurationFactory;
+
+	@Reference
+	private SharingJavaScriptFactory _sharingJavaScriptFactory;
+
+	@Reference
+	private SharingPermission _sharingPermission;
 
 	@Reference
 	private UserLocalService _userLocalService;

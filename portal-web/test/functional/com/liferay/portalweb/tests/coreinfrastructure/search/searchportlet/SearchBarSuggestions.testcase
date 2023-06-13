@@ -282,11 +282,9 @@ definition {
 			searchAssetDescription = "WC WebContent Description",
 			searchAssetTitle = "Apple");
 
-		// Workaround for LPS-155753
-
-		/*SearchBarSuggestions.viewSuggestions(
+		SearchBarSuggestions.viewSuggestions(
 			searchAssetDescription = "DM Document Description",
-			searchAssetTitle = "Apple Pie");*/
+			searchAssetTitle = "Apple Pie");
 	}
 
 	@priority = "5"
@@ -373,11 +371,9 @@ definition {
 
 		SearchBarSuggestions.viewNoResultAssetTitle(searchAssetTitle = "Apple Pie Guest");
 
-		// Workaround for LPS-155753
-
-		/*SearchBarSuggestions.viewSuggestions(
+		SearchBarSuggestions.viewSuggestions(
 			searchAssetDescription = "WC WebContent Description",
-			searchAssetTitle = "Apple Site Name");*/
+			searchAssetTitle = "Apple Site Name");
 
 		SearchBarSuggestions.viewNoResultAssetTitle(searchAssetTitle = "Apple Pie Site Name");
 	}

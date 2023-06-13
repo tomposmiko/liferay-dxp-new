@@ -23,7 +23,6 @@ import com.liferay.client.extension.type.factory.CETFactory;
 import com.liferay.client.extension.web.internal.portlet.ClientExtensionEntryFriendlyURLMapper;
 import com.liferay.client.extension.web.internal.portlet.ClientExtensionEntryPortlet;
 import com.liferay.client.extension.web.internal.portlet.action.ClientExtensionEntryConfigurationAction;
-import com.liferay.client.extension.web.internal.servlet.taglib.ClientExtensionTopHeadDynamicInclude;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -177,25 +176,26 @@ public class CETDeployerImpl implements CETDeployer {
 
 			if (Validator.isNotNull(cssURLs)) {
 				dictionary.put(
-					"com.liferay.portlet.footer-portal-css",
+					"com.liferay.portlet.header-portal-css",
 					cssURLs.split(StringPool.NEW_LINE));
 			}
 
 			String urls = customElementCET.getURLs();
 
+			String[] urlsArray = urls.split(StringPool.NEW_LINE);
+
 			if (customElementCET.isUseESM()) {
-				_clientExtensionTopHeadDynamicInclude.registerURLs(
-					portletName, urls.split(StringPool.NEW_LINE));
+				for (int i = 0; i < urlsArray.length; i++) {
+					urlsArray[i] = "module:" + urlsArray[i];
+				}
 			}
-			else {
-				dictionary.put(
-					"com.liferay.portlet.footer-portal-javascript",
-					urls.split(StringPool.NEW_LINE));
-			}
+
+			dictionary.put(
+				"com.liferay.portlet.header-portal-javascript", urlsArray);
 		}
 		else if (iFrameCET != null) {
 			dictionary.put(
-				"com.liferay.portlet.footer-portlet-css",
+				"com.liferay.portlet.header-portlet-css",
 				"/display/css/main.css");
 		}
 		else {
@@ -214,10 +214,6 @@ public class CETDeployerImpl implements CETDeployer {
 
 	@Reference
 	private CETFactory _cetFactory;
-
-	@Reference
-	private ClientExtensionTopHeadDynamicInclude
-		_clientExtensionTopHeadDynamicInclude;
 
 	@Reference
 	private NPMResolver _npmResolver;

@@ -34,6 +34,7 @@ import {
 import {
 	useDispatch,
 	useSelector,
+	useSelectorCallback,
 	useSelectorRef,
 } from '../../../../../app/contexts/StoreContext';
 import selectCanUpdatePageStructure from '../../../../../app/selectors/selectCanUpdatePageStructure';
@@ -56,6 +57,7 @@ import {
 	initialDragDrop,
 	useDragItem,
 	useDropTarget,
+	useIsDroppable,
 } from '../../../../../app/utils/drag-and-drop/useDragAndDrop';
 import getFirstControlsId from '../../../../../app/utils/getFirstControlsId';
 import getMappingFieldsKey from '../../../../../app/utils/getMappingFieldsKey';
@@ -208,13 +210,29 @@ function StructureTreeNodeContent({
 		[layoutDataRef, node]
 	);
 
+	const fragmentEntryType = useSelectorCallback(
+		(state) => {
+			if (!node.type === LAYOUT_DATA_ITEM_TYPES.fragment) {
+				return null;
+			}
+
+			const fragmentEntryLink =
+				state.fragmentEntryLinks[item.config?.fragmentEntryLinkId];
+
+			return fragmentEntryLink?.fragmentEntryType ?? null;
+		},
+		[item]
+	);
+
 	const {isOverTarget, targetPosition, targetRef} = useDropTarget(
 		item,
 		computeHover
 	);
 
+	const isDroppable = useIsDroppable();
+
 	const {handlerRef, isDraggingSource} = useDragItem(
-		item,
+		{...item, fragmentEntryType},
 		(parentItemId, position) =>
 			dispatch(
 				moveItem({
@@ -292,6 +310,7 @@ function StructureTreeNodeContent({
 				'dragged': isDraggingSource,
 				'font-weight-semi-bold':
 					node.activable && node.itemType !== ITEM_TYPES.editable,
+				'not-droppable': !isDroppable,
 				'page-editor__page-structure__tree-node--active': isActive,
 				'page-editor__page-structure__tree-node--hovered': isHovered,
 				'page-editor__page-structure__tree-node--mapped': isMapped,
@@ -625,7 +644,7 @@ function computeHover({
 		return dispatch({
 			dropItem: sourceItem,
 			dropTargetItem: targetItem,
-			droppable: checkAllowedChild(sourceItem, targetItem),
+			droppable: checkAllowedChild(sourceItem, targetItem, layoutDataRef),
 			elevate: null,
 			targetPositionWithMiddle,
 			targetPositionWithoutMiddle,
@@ -637,11 +656,11 @@ function computeHover({
 	// - dropItem should be child of dropTargetItem
 	// - dropItem should be sibling of siblingItem
 
-	if (siblingItem && checkAllowedChild(sourceItem, targetItem)) {
+	if (siblingItem) {
 		return dispatch({
 			dropItem: sourceItem,
 			dropTargetItem: siblingItem,
-			droppable: true,
+			droppable: checkAllowedChild(sourceItem, targetItem, layoutDataRef),
 			elevate: true,
 			targetPositionWithMiddle,
 			targetPositionWithoutMiddle,
@@ -674,9 +693,8 @@ function computeHover({
 				);
 
 				if (
-					(targetPosition === targetPositionWithMiddle ||
-						parentPosition === targetPositionWithMiddle) &&
-					checkAllowedChild(sourceItem, parent)
+					targetPosition === targetPositionWithMiddle ||
+					parentPosition === targetPositionWithMiddle
 				) {
 					return [parent, target];
 				}

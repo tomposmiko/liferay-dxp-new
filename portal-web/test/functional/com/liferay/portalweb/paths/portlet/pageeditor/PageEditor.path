@@ -261,7 +261,7 @@
 </tr>
 <tr>
 	<td>NO_FRAGMENTS_MESSAGE</td>
-	<td>//div[contains(@class,'page-editor__no-fragments-message')][normalize-space()='Place fragments here.']</td>
+	<td>//div[contains(@class,'page-editor__no-fragments-state')][normalize-space()='Place fragments here.']</td>
 	<td></td>
 </tr>
 <tr>
@@ -779,6 +779,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DRAFT_SAVING_MESSAGE</td>
+	<td>//div[contains(@class,'management-bar')]//span[contains(@class,'text-info')][normalize-space(text())='Saving']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DEVICE_TYPE</td>
 	<td>//button[contains(@class,'btn')][@aria-label='${key_deviceType}']</td>
 	<td></td>
@@ -870,6 +875,11 @@
 <tr>
 	<td>CONFIGURATION_PANEL_HANDLE</td>
 	<td>//div[contains(@class,'resize-handler')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ACTIVE_CONFIGURATION_PANEL_HANDLE</td>
+	<td>//div[contains(@class,'resize-handler')][contains(@class,'active')]</td>
 	<td></td>
 </tr>
 <tr>

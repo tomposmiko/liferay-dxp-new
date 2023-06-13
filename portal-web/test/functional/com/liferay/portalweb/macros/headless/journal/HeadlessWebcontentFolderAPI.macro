@@ -73,6 +73,29 @@ definition {
 		return "${response}";
 	}
 
+	macro _filterStructuredContentFolders {
+		Variables.assertDefined(parameterList = "${filterValue}");
+
+		if (isSet(assetLibraryId)) {
+			var api = "asset-libraries/${assetLibraryId}/structured-content-folders";
+		}
+		else {
+			var api = "sites/${siteId}/structured-contents";
+		}
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+            ${portalURL}/o/headless-delivery/v1.0/${api}?filter=${filterValue} \
+            -u test@liferay.com:test \
+            -H Content-Type: application/json
+        ''';
+
+		var curl = JSONCurlUtil.get("${curl}");
+
+		return "${curl}";
+	}
+
 	macro _getStructuredContentFoldersByErcInAssetLibrary {
 		Variables.assertDefined(parameterList = "${assetLibraryId},${externalReferenceCode}");
 
@@ -91,15 +114,7 @@ definition {
 
 	macro assertExternalReferenceCodeWithCorrectValue {
 		if (!(isSet(expectedExternalReferenceCodeValue))) {
-			var folderId = JSONUtil.getWithJSONPath("${responseToParse}", "$.id");
-
-			var mysqlStatement = "SELECT uuid_ FROM JournalFolder WHERE folderid = '${folderId}';";
-
-			var sqlResults = SQL.executeMySQLStatement(mysqlStatement = "${mysqlStatement}");
-
-			var uuidResult = StringUtil.regexReplaceAll("${sqlResults}", "[\r\n]", "");
-
-			var expectedExternalReferenceCodeValue = StringUtil.extractLast("${uuidResult}", "uuid_");
+			var expectedExternalReferenceCodeValue = HeadlessWebcontentFolderAPI.getUuidOfCreatedStructuredContentFolder(responseToParse = "${responseToParse}");
 		}
 
 		var actualExternalReferenceCodeValue = JSONUtil.getWithJSONPath("${responseToParse}", "$..externalReferenceCode");
@@ -107,6 +122,20 @@ definition {
 		TestUtils.assertEquals(
 			actual = "${actualExternalReferenceCodeValue}",
 			expected = "${expectedExternalReferenceCodeValue}");
+	}
+
+	macro assertProperTotalCountOfStructuredContentFoldersInAssetLibrary {
+		Variables.assertDefined(parameterList = "${assetLibraryId},${expectedStructuredContentFolderTotalCount}");
+
+		var response = HeadlessWebcontentFolderAPI._filterStructuredContentFolders(
+			assetLibraryId = "${assetLibraryId}",
+			filterValue = "${filterValue}");
+
+		var actualTotalCount = JSONUtil.getWithJSONPath("${response}", "$..['totalCount']");
+
+		TestUtils.assertEquals(
+			actual = "${actualTotalCount}",
+			expected = "${expectedStructuredContentFolderTotalCount}");
 	}
 
 	macro assetProperNumberOfStructuredContentFolders {
@@ -147,10 +176,12 @@ definition {
 		return "${response}";
 	}
 
-	macro getIdOfCreateStructuredContentFolder {
-		var folderId = JSONUtil.getWithJSONPath("${responseToParse}", "$.id");
+	macro getElementOfCreatedStructuredContentFolder {
+		Variables.assertDefined(parameterList = "${responseToParse},${element}");
 
-		return "${folderId}";
+		var elementValue = JSONUtil.getWithJSONPath("${responseToParse}", "${element}");
+
+		return "${elementValue}";
 	}
 
 	macro getStructuredContentFoldersByErcInAssetLibrary {
@@ -161,6 +192,22 @@ definition {
 			externalReferenceCode = "${externalReferenceCode}");
 
 		return "${response}";
+	}
+
+	macro getUuidOfCreatedStructuredContentFolder {
+		Variables.assertDefined(parameterList = "${responseToParse}");
+
+		var folderId = JSONUtil.getWithJSONPath("${responseToParse}", "$.id");
+
+		var mysqlStatement = "SELECT uuid_ FROM JournalFolder WHERE folderid = '${folderId}';";
+
+		var sqlResults = SQL.executeMySQLStatement(mysqlStatement = "${mysqlStatement}");
+
+		var uuidResult = StringUtil.regexReplaceAll("${sqlResults}", "[\r\n]", "");
+
+		var structuredContentUuid = StringUtil.extractLast("${uuidResult}", "uuid_");
+
+		return "${structuredContentUuid}";
 	}
 
 }

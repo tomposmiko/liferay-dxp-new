@@ -86,6 +86,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -681,15 +682,19 @@ public class ObjectDefinitionLocalServiceImpl
 		Map<Long, List<ServiceRegistration<?>>> serviceRegistrationsMap =
 			new ConcurrentHashMap<>();
 
-		List<ObjectDefinition> objectDefinitions =
-			objectDefinitionLocalService.getCustomObjectDefinitions(
-				WorkflowConstants.STATUS_APPROVED);
+		_companyLocalService.forEachCompanyId(
+			companyId -> {
+				List<ObjectDefinition> objectDefinitions =
+					objectDefinitionLocalService.getObjectDefinitions(
+						companyId, true, false,
+						WorkflowConstants.STATUS_APPROVED);
 
-		for (ObjectDefinition objectDefinition : objectDefinitions) {
-			serviceRegistrationsMap.put(
-				objectDefinition.getObjectDefinitionId(),
-				objectDefinitionDeployer.deploy(objectDefinition));
-		}
+				for (ObjectDefinition objectDefinition : objectDefinitions) {
+					serviceRegistrationsMap.put(
+						objectDefinition.getObjectDefinitionId(),
+						objectDefinitionDeployer.deploy(objectDefinition));
+				}
+			});
 
 		_serviceRegistrationsMaps.put(
 			objectDefinitionDeployer, serviceRegistrationsMap);
@@ -1328,6 +1333,9 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private DynamicQueryBatchIndexingActionableFactory
