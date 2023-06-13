@@ -43,6 +43,7 @@ const deserializeUtil = new DeserializeUtil();
 
 export default function DiagramBuilder() {
 	const {
+		accountEntryId,
 		currentEditor,
 		definitionId,
 		deserialize,
@@ -57,6 +58,7 @@ export default function DiagramBuilder() {
 		setDeserialize,
 		setElements,
 		setShowDefinitionInfo,
+		statuses,
 		version,
 	} = useContext(DefinitionBuilderContext);
 	const reactFlowWrapperRef = useRef(null);
@@ -329,8 +331,13 @@ export default function DiagramBuilder() {
 
 			setElements(elements);
 
-			populateAssignmentsData(elements, setElements, setBlockingErrors);
-			populateNotificationsData(elements, setElements);
+			populateAssignmentsData(
+				accountEntryId,
+				elements,
+				setElements,
+				setBlockingErrors
+			);
+			populateNotificationsData(accountEntryId, elements, setElements);
 
 			setDeserialize(false);
 		}
@@ -371,8 +378,16 @@ export default function DiagramBuilder() {
 
 						setElements(elements);
 
-						populateAssignmentsData(elements, setElements);
-						populateNotificationsData(elements, setElements);
+						populateAssignmentsData(
+							accountEntryId,
+							elements,
+							setElements
+						);
+						populateNotificationsData(
+							accountEntryId,
+							elements,
+							setElements
+						);
 					}
 				);
 		}
@@ -390,6 +405,7 @@ export default function DiagramBuilder() {
 		setElementRectangle,
 		setSelectedItem,
 		setSelectedItemNewId,
+		statuses,
 	};
 
 	return (

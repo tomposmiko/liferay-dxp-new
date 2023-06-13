@@ -25,7 +25,7 @@ import {normalizeFieldSettings} from '../../utils/fieldSettings';
 import {ObjectFieldErrors} from './ObjectFieldFormBase';
 
 interface IAggregationSourcePropertyProps {
-	creationLanguageId2: Locale;
+	creationLanguageId2: Liferay.Language.Locale;
 	disabled?: boolean;
 	editingField?: boolean;
 	errors: ObjectFieldErrors;
@@ -191,7 +191,7 @@ export function AggregationFormBase({
 				if (currentSummarizeField) {
 					setSelectedSummarizeField(
 						getLocalizableLabel(
-							creationLanguageId2 as Locale,
+							creationLanguageId2 as Liferay.Language.Locale,
 							currentSummarizeField.label,
 							currentSummarizeField.name
 						)
@@ -316,7 +316,7 @@ export function AggregationFormBase({
 	const handleSummarizeFieldChange = (objectField: ObjectField) => {
 		setSelectedSummarizeField(
 			getLocalizableLabel(
-				creationLanguageId2 as Locale,
+				creationLanguageId2 as Liferay.Language.Locale,
 				objectField.label,
 				objectField.name
 			)
@@ -354,7 +354,7 @@ export function AggregationFormBase({
 				query={relationshipsQuery}
 				required
 				value={getLocalizableLabel(
-					creationLanguageId2 as Locale,
+					creationLanguageId2 as Liferay.Language.Locale,
 					selectedRelatedObjectRelationship?.label,
 					selectedRelatedObjectRelationship?.name
 				)}
@@ -363,7 +363,7 @@ export function AggregationFormBase({
 					<div className="d-flex justify-content-between">
 						<div>
 							{getLocalizableLabel(
-								creationLanguageId2 as Locale,
+								creationLanguageId2 as Liferay.Language.Locale,
 								label,
 								name
 							)}
@@ -384,7 +384,9 @@ export function AggregationFormBase({
 
 			{selectedAggregationFunction?.value !== 'COUNT' && (
 				<AutoComplete<ObjectField>
-					creationLanguageId={creationLanguageId2 as Locale}
+					creationLanguageId={
+						creationLanguageId2 as Liferay.Language.Locale
+					}
 					emptyStateMessage={Liferay.Language.get(
 						'no-fields-were-found'
 					)}
@@ -403,7 +405,7 @@ export function AggregationFormBase({
 						<div className="d-flex justify-content-between">
 							<div>
 								{getLocalizableLabel(
-									creationLanguageId2 as Locale,
+									creationLanguageId2 as Liferay.Language.Locale,
 									label,
 									name
 								)}

@@ -102,6 +102,7 @@ import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -152,7 +153,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -600,8 +600,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			"Liferay-Site-Initializer-Feature-Flag");
 
 		if (Validator.isNotNull(featureFlag) &&
-			!GetterUtil.getBoolean(
-				PropsUtil.get("feature.flag." + featureFlag))) {
+			!FeatureFlagManagerUtil.isEnabled(featureFlag)) {
 
 			return false;
 		}
@@ -867,9 +866,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 			_replace(
 				json,
 				new String[] {
-					"[$GROUP_FRIENDLY_URL$]", "[$GROUP_ID$]", "[$GROUP_KEY$]"
+					"[$COMPANY_ID$]", "[$GROUP_FRIENDLY_URL$]", "[$GROUP_ID$]",
+					"[$GROUP_KEY$]"
 				},
 				new String[] {
+					String.valueOf(group.getCompanyId()),
 					group.getFriendlyURL(),
 					String.valueOf(serviceContext.getScopeGroupId()),
 					group.getGroupKey()
@@ -1109,6 +1110,10 @@ public class BundleSiteInitializer implements SiteInitializer {
 			ServiceContext serviceContext,
 			Map<String, String> taxonomyCategoryIdsStringUtilReplaceValues)
 		throws Exception {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-162765")) {
+			return;
+		}
 
 		Enumeration<URL> enumeration = _bundle.findEntries(
 			"/site-initializer/layout-utility-page-entries", StringPool.STAR,
@@ -2789,23 +2794,38 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 			JSONObject jsonObject = _jsonFactory.createJSONObject(json);
 
-			long objectDefinitionId = GetterUtil.getLong(
-				(String)jsonObject.remove("objectDefinitionId"));
+			JSONArray jsonArray = jsonObject.getJSONArray("object-fields");
 
-			ObjectField objectField = ObjectField.toDTO(
-				JSONUtil.toString(jsonObject));
-
-			com.liferay.object.model.ObjectField existingObjectField =
-				_objectFieldLocalService.fetchObjectField(
-					objectDefinitionId, objectField.getName());
-
-			if (existingObjectField == null) {
-				objectFieldResource.postObjectDefinitionObjectField(
-					objectDefinitionId, objectField);
+			if (JSONUtil.isEmpty(jsonArray)) {
+				continue;
 			}
-			else {
-				objectFieldResource.putObjectField(
-					existingObjectField.getObjectFieldId(), objectField);
+
+			for (int i = 0; i < jsonArray.length(); i++) {
+				JSONObject objectFieldJSONObject = jsonArray.getJSONObject(i);
+
+				ObjectField objectField = ObjectField.toDTO(
+					JSONUtil.toString(objectFieldJSONObject));
+
+				if (objectField == null) {
+					_log.error(
+						"Unable to transform object field from JSON: " + json);
+
+					continue;
+				}
+
+				com.liferay.object.model.ObjectField existingObjectField =
+					_objectFieldLocalService.fetchObjectField(
+						jsonObject.getLong("objectDefinitionId"),
+						objectField.getName());
+
+				if (existingObjectField == null) {
+					objectFieldResource.postObjectDefinitionObjectField(
+						jsonObject.getLong("objectDefinitionId"), objectField);
+				}
+				else {
+					objectFieldResource.putObjectField(
+						existingObjectField.getObjectFieldId(), objectField);
+				}
 			}
 		}
 	}
@@ -4595,7 +4615,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 	}
 
 	private void _updateGroupSiteInitializerKey(long groupId) throws Exception {
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-165482"))) {
+		if (!FeatureFlagManagerUtil.isEnabled("LPS-165482")) {
 			return;
 		}
 

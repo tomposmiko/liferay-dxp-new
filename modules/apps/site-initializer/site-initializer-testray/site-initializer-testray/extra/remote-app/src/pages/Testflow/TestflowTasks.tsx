@@ -158,7 +158,7 @@ const TestFlowTasks = () => {
 		<>
 			<TaskHeaderActions />
 
-			<Container collapsable title={i18n.translate('task-details')}>
+			<Container collapsable title={i18n.sub('task-x', 'details')}>
 				<div className="d-flex flex-wrap">
 					<div className="col-4 col-lg-4 col-md-12 p-0">
 						<QATable
@@ -184,10 +184,9 @@ const TestFlowTasks = () => {
 													({user}) =>
 														user as UserAccount
 												)
-												.map(({givenName}) => ({
-													name: givenName,
-													url:
-														'https://picsum.photos/200',
+												.map(({image, name}) => ({
+													name,
+													url: image,
 												}))}
 											groupSize={3}
 										/>
@@ -351,10 +350,9 @@ const TestFlowTasks = () => {
 											<Avatar
 												className="text-capitalize"
 												displayName
-												name={`${subtask?.user?.emailAddress
-													.split('@')[0]
-													.replace('.', ' ')}`}
+												name={subtask?.user?.name}
 												size="sm"
+												url={subtask.user.image}
 											/>
 										);
 									}

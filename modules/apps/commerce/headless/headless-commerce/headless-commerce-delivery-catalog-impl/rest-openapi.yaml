@@ -538,6 +538,10 @@ components:
                     format: int64
                     minimum: 0
                     type: integer
+                specificationGroupKey:
+                    type: string
+                specificationGroupTitle:
+                    type: string
                 specificationId:
                     example: 30129
                     format: int64
@@ -545,6 +549,8 @@ components:
                     type: integer
                 specificationKey:
                     example: specification-key
+                    type: string
+                specificationTitle:
                     type: string
                 value:
                     type: string
@@ -698,7 +704,7 @@ components:
 info:
     description:
         "Headless Commerce Delivery Catalog API. A Java client JAR is available for use with the group ID 'com.liferay',
-        artifact ID 'com.liferay.headless.commerce.delivery.catalog.client', and version '4.0.26'."
+        artifact ID 'com.liferay.headless.commerce.delivery.catalog.client', and version '4.0.27'."
     license:
         name: Apache 2.0
         url: http://www.apache.org/licenses/LICENSE-2.0.html

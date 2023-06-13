@@ -176,7 +176,7 @@ class TestraySubtaskImpl extends Rest<SubtaskForm, TestraySubTask> {
 
 			await testraySubtaskIssuesImpl.createIfNotExist({
 				issueId: testrayIssue?.id,
-				name: `${issue}-${subTaskId}`,
+				name: `${issue}${testrayIssueImpl.DELIMITER}${subTaskId}`,
 				subTaskId,
 			});
 		}

@@ -1388,6 +1388,13 @@ public class PoshiContext {
 		for (Element trElement : trElements) {
 			List<Element> tdElements = trElement.elements("td");
 
+			if (tdElements.size() != 3) {
+				throw new Exception(
+					"<tr> element must have 3 <td> child elements at:\n" +
+						filePath + ":" +
+							trElement.attributeValue("line-number"));
+			}
+
 			Element locatorKeyElement = tdElements.get(0);
 
 			String locatorKey = locatorKeyElement.getText();

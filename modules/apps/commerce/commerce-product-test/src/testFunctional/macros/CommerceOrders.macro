@@ -110,7 +110,7 @@ definition {
 
 		var isLessThanSize = MathUtil.isLessThan(${count}, ${size});
 
-		while (("" == "true")) {
+		while ((${isLessThanSize} == "true")) {
 			var productName = ListUtil.get(${productNamesList}, ${count});
 			var productSku = ListUtil.get(${productSkusList}, ${count});
 			var productUnitPrice = ListUtil.get(${productUnitPricesList}, ${count});

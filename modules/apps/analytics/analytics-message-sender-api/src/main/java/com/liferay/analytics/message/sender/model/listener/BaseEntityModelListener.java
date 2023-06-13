@@ -24,11 +24,13 @@ import com.liferay.expando.kernel.model.ExpandoRow;
 import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.ExpandoTableConstants;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -54,7 +56,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
@@ -163,7 +164,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			Object associationClassPK)
 		throws ModelListenerException {
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LRAC-10632")) ||
+		if (FeatureFlagManagerUtil.isEnabled("LRAC-10632") ||
 			!analyticsConfigurationRegistry.isActive()) {
 
 			return;
@@ -176,7 +177,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	@Override
 	public void onAfterCreate(T model) throws ModelListenerException {
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LRAC-10632")) ||
+		if (FeatureFlagManagerUtil.isEnabled("LRAC-10632") ||
 			!analyticsConfigurationRegistry.isActive()) {
 
 			return;
@@ -194,7 +195,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			Object associationClassPK)
 		throws ModelListenerException {
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LRAC-10632")) ||
+		if (FeatureFlagManagerUtil.isEnabled("LRAC-10632") ||
 			!analyticsConfigurationRegistry.isActive()) {
 
 			return;
@@ -207,7 +208,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	@Override
 	public void onBeforeRemove(T model) throws ModelListenerException {
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LRAC-10632")) ||
+		if (FeatureFlagManagerUtil.isEnabled("LRAC-10632") ||
 			!analyticsConfigurationRegistry.isActive()) {
 
 			return;
@@ -220,7 +221,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	public void onBeforeUpdate(T originalModel, T model)
 		throws ModelListenerException {
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LRAC-10632")) ||
+		if (FeatureFlagManagerUtil.isEnabled("LRAC-10632") ||
 			!analyticsConfigurationRegistry.isActive()) {
 
 			return;
@@ -418,15 +419,10 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 					List<Group> groups = user.getSiteGroups();
 
 					if (!groups.isEmpty()) {
-						long[] membershipIds = new long[groups.size()];
-
-						for (int i = 0; i < groups.size(); i++) {
-							Group group = groups.get(i);
-
-							membershipIds[i] = group.getGroupId();
-						}
-
-						memberships.put(Group.class.getName(), membershipIds);
+						memberships.put(
+							Group.class.getName(),
+							TransformUtil.transformToLongArray(
+								groups, Group::getGroupId));
 					}
 				}
 				catch (Exception exception) {

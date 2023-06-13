@@ -711,7 +711,7 @@ definition {
 	@priority = 4
 	test AddWebContentWithRepeatableRichTextField {
 		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,rockylinux,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 
 		task ("Add a web content structure with a repeatable Rich Text field") {
@@ -1572,6 +1572,54 @@ definition {
 			SearchPortlets.searchEmbedded(searchTerm = "WC WebContent Title");
 
 			SearchResultPortlet.viewNoSearchResults(searchTerm = "WC WebContent Title");
+		}
+	}
+
+	@description = "This is a test for LPS-162313. The user is able to select Hidden Pages for Web Content structure."
+	@priority = 4
+	test SelectHiddenPageInLinkToPageField {
+		task ("Given a user has a widget page hidden from Menu Display") {
+			PagesAdmin.openPagesAdmin(siteURLKey = "Test Site Name");
+
+			PagesAdmin.addPage(
+				pageName = "Test Widget Page",
+				sitePageType = "Widget Page");
+
+			PagesAdmin.toggleHiddenFromNavigationMenuWidget(toggleValue = "enable");
+
+			PortletEntry.save();
+		}
+
+		task ("When the user creates a web content based on structure with Link a Page field") {
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+			NavItem.gotoStructures();
+
+			WebContentStructures.addCP(structureName = "WC Structure Name");
+
+			DataEngine.addField(
+				fieldFieldLabel = "Link to Page",
+				fieldName = "Link to Page");
+
+			WebContentStructures.saveCP();
+
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
+
+			WebContent.addWithStructureCP(webContentTitle = "WC WebContent Title");
+		}
+
+		task ("Then the user could select the hidden page in Link a Page field") {
+			DERenderer.inputDataInLinkToPageField(
+				linkToPageContent = "Test Widget Page",
+				linkToPageFieldLabel = "Link to Page");
+
+			DERenderer.assertContentInLinktoPageField(
+				linkToPageContent = "Pages > Test Widget Page",
+				linkToPageFieldLabel = "Link to Page");
+
+			PortletEntry.publish();
 		}
 	}
 

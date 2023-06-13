@@ -525,8 +525,6 @@ definition {
 
 	@priority = 4
 	test AssertNonAdminsCannotAddCertainWidgets {
-		property app.server.types = "tomcat";
-
 		JSONRole.addRegularRole(
 			roleKey = "Can Add Widgets",
 			roleTitle = "Can Add Widgets");
@@ -1304,6 +1302,10 @@ definition {
 
 	@priority = 3
 	test CanOrderFolderFacetTerms {
+		JSONFolder.moveFolderToTrash(
+			folderName = "Provided by Liferay",
+			groupName = "Guest");
+
 		for (var folder : list "Product,Engineering,2021,2022") {
 			JSONFolder.addFolder(
 				dmFolderName = ${folder},
@@ -1525,6 +1527,10 @@ definition {
 	@description = "This is a use case for LPS-162049. When configuring the Type Facet, I can choose from different ordering options so that facet terms are displayed according to the sort strategy"
 	@priority = 3
 	test CanOrderTypeFacetTerms {
+		JSONFolder.moveFolderToTrash(
+			folderName = "Provided by Liferay",
+			groupName = "Guest");
+
 		task ("Add some Wiki Page examples") {
 			for (var wikiNumber : list "1,2,3,4") {
 				JSONWiki.addWikiPage(
@@ -1535,18 +1541,22 @@ definition {
 			}
 		}
 
-		task ("Add two new Pages") {
-			for (var quantity : list "1,2") {
+		task ("Add Pages and Documents") {
+			for (var count : list "1,2") {
 				JSONLayout.addPublicLayout(
 					groupName = "Guest",
-					layoutName = "Test Page ${quantity}");
+					layoutName = "Test Page ${count}");
+
+				JSONDocument.addFile(
+					dmDocumentTitle = "DM Document Title ${count}",
+					groupName = "Guest");
 			}
 		}
 
 		SearchPortlets.searchEmbedded(searchTerm = "test");
 
 		task ("Assert that the Type facet sorts by term frequency descending by default") {
-			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "Document,Wiki Page,Page,User");
+			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "Wiki Page,Page,Document,User");
 		}
 
 		task ("Assert that the Type facet values are correct when sorted by term frequency ascending") {
@@ -1556,7 +1566,7 @@ definition {
 
 			Refresh();
 
-			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "User,Page,Wiki Page,Document");
+			SearchFacetPortlet.viewFacetItemsSpecificOrder(facetList = "User,Document,Page,Wiki Page");
 		}
 
 		task ("Assert that the Type facet values are correct when sorted by term value ascending") {
@@ -1837,7 +1847,7 @@ definition {
 			locator1 = "Search#FACET_DISPLAY_FREQUENCIES");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test EmptyRepeatableDDMFieldNotDisplayedWithCustomFacet {
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
@@ -1886,11 +1896,11 @@ definition {
 
 		var curl = "http://${portalHostname}:${port}/_search?q=entryClassName:com.liferay.journal.model.JournalArticle";
 
-		var journalArticleDocumentType = JSONCurlUtil.get("${curl}");
+		var journalArticleDocumentType = JSONCurlUtil.get(${curl});
 
-		var aggregationField = RegexUtil.replace("${journalArticleDocumentType}", "ddmFieldName\":\"(.*)\",\"ddmValueFieldName\"", "1");
+		var aggregationField = RegexUtil.replace(${journalArticleDocumentType}, "ddmFieldName\":\"(.*)\",\"ddmValueFieldName\"", 1);
 
-		SearchFacetPortlet.configureCustomFacet(aggregationField = "${aggregationField}");
+		SearchFacetPortlet.configureCustomFacet(aggregationField = ${aggregationField});
 
 		AssertElementNotPresent(
 			facetValueName = "Custom Facet",
@@ -2036,6 +2046,36 @@ definition {
 	}
 
 	@priority = 3
+	test FolderFacetEntryPresentAfterSelectingCategoryFacetEntry {
+		JSONCategory.addVocabulary(
+			groupName = "Guest",
+			title = "Vocabulary");
+
+		var categoryId = JSONCategory.addCategory(
+			groupName = "Guest",
+			title = "fuji",
+			vocabularyName = "Vocabulary");
+
+		JSONFolder.addFolder(
+			dmFolderName = "fruit",
+			groupName = "Guest");
+
+		JSONDocument.addFile(
+			assetCategoryIds = ${categoryId},
+			dmDocumentTitle = "apple",
+			folderName = "fruit",
+			groupName = "Guest");
+
+		SearchPortlets.searchEmbedded(searchTerm = "apple");
+
+		SearchFacetPortlet.checkFacet(facetValueName = "fuji");
+
+		AssertElementPresent(
+			checkboxName = "fruit",
+			locator1 = "Checkbox#ANY_CHECKBOX");
+	}
+
+	@priority = 3
 	test IsLocalizedInSearchAdmin {
 		property test.name.skip.portal.instance = "Search#IsLocalizedInSearchAdmin";
 
@@ -2134,7 +2174,7 @@ definition {
 		property custom.properties = "search.container.page.default.delta=1";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,rockylinux,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 
 		JSONLayout.addPublicLayout(
@@ -2775,8 +2815,6 @@ definition {
 
 	@priority = 4
 	test SearchCompanyScopedObject {
-		property search.environment.suite.exclude = "true";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 500",
 			objectName = "CustomObject500",
@@ -3064,10 +3102,6 @@ definition {
 
 	@priority = 5
 	test SearchDocumentsAndMediaDocument {
-		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
-		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property testray.component.names = "Training";
-
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
@@ -4128,8 +4162,6 @@ definition {
 
 	@description = "This is a use case for LPS-152937."
 	test SortAccentedWords {
-		property app.server.types = "tomcat,weblogic";
-
 		var digit = 1;
 
 		for (var content : list "Alicante,Barcelona,Álava,Alava") {

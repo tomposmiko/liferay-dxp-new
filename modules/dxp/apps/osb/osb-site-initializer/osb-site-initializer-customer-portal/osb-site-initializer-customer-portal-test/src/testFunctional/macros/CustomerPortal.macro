@@ -296,12 +296,10 @@ definition {
 		if (IsElementPresent(locator1 = "CustomerPortalSite#DND_TABLE_ELEMENT")) {
 			CustomerPortal.viewCPObjectCustomInfo(position = ${position});
 
-			CP2DXPCloudSetup.typeSetupDXPCloudInfoFields(
-				label = "activationStatus",
-				value = "");
+			Refresh();
 
 			CP2DXPCloudSetup.typeSetupDXPCloudInfoFields(
-				label = "manageContactsURL",
+				label = "activationStatus",
 				value = "");
 
 			Click(locator1 = "Button#SAVE");
@@ -386,20 +384,30 @@ definition {
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "group/control_panel/manage?p_p_id=com_liferay_client_extension_web_internal_portlet_ClientExtensionAdminPortlet");
 
-		ClientExtensionGeneral.deleteRemoteApp();
+		ClientExtensionGeneral.deleteRemoteApp(tableEntry = "Customer Portal");
 	}
 
 	macro customerPortalTearDown {
-		CustomerPortal.deleteEntryAccountFlag(entry = "ERC-");
+		ApplicationsMenu.gotoPortlet(
+			category = "Object",
+			panel = "Control Panel",
+			portlet = "Account Flags");
 
-		CustomerPortal.customerPortalApisTearDown();
+		if (IsElementPresent(locator1 = "ObjectPortlet#ENTRY_KEBAB_MENU")) {
+			CustomerPortal.deleteEntryAccountFlag(entry = "ERC-");
+
+			CustomerPortal.customerPortalApisTearDown();
+		}
+		else {
+			CustomerPortal.customerPortalApisTearDown();
+		}
 	}
 
 	macro deactivateKoroneikiAccount {
 		ApplicationsMenu.gotoPortlet(
 			category = "Object",
 			panel = "Control Panel",
-			portlet = "Koroneiki Account");
+			portlet = "Koroneiki Accounts");
 
 		CustomerPortal.viewCPObjectInfo();
 
@@ -426,11 +434,6 @@ definition {
 	}
 
 	macro deleteEntryAccountFlag {
-		ApplicationsMenu.gotoPortlet(
-			category = "Object",
-			panel = "Control Panel",
-			portlet = "Account Flags");
-
 		ObjectPortlet.deleteEntry(entry = ${entry});
 	}
 
@@ -450,14 +453,6 @@ definition {
 			locator1 = "CustomerPortalSite#CARD_NAME");
 
 		CustomerPortal.clickOnTheCloseButton(modalTitle = "LXC - SM Non-Production");
-	}
-
-	macro fullOnboardingFlow {
-		CustomerPortal.clickOnStartProjectSetup();
-
-		CustomerPortal.clickOnSkipForNowButton();
-
-		CustomerPortal.clickOnSkipForNowButton();
 	}
 
 	macro getValueFieldKoroneikiByAccountName {

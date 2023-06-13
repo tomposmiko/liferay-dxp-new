@@ -225,11 +225,19 @@ public abstract class BaseProductResourceTestCase {
 
 		assertContains(product1, (List<Product>)page.getItems());
 		assertContains(product2, (List<Product>)page.getItems());
-		assertValid(page);
+		assertValid(page, testGetProductsPage_getExpectedActions());
 
 		productResource.deleteProduct(product1.getId());
 
 		productResource.deleteProduct(product2.getId());
+	}
+
+	protected Map<String, Map> testGetProductsPage_getExpectedActions()
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		return expectedActions;
 	}
 
 	@Test
@@ -730,6 +738,7 @@ public abstract class BaseProductResourceTestCase {
 												product.
 													getExternalReferenceCode() +
 														"\"");
+
 										put("version", product.getVersion());
 									}
 								},
@@ -968,6 +977,7 @@ public abstract class BaseProductResourceTestCase {
 								new HashMap<String, Object>() {
 									{
 										put("id", product.getId());
+
 										put("version", product.getVersion());
 									}
 								},
@@ -1519,6 +1529,12 @@ public abstract class BaseProductResourceTestCase {
 	}
 
 	protected void assertValid(Page<Product> page) {
+		assertValid(page, Collections.emptyMap());
+	}
+
+	protected void assertValid(
+		Page<Product> page, Map<String, Map> expectedActions) {
+
 		boolean valid = false;
 
 		java.util.Collection<Product> products = page.getItems();
@@ -1533,6 +1549,20 @@ public abstract class BaseProductResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		Map<String, Map> actions = page.getActions();
+
+		for (String key : expectedActions.keySet()) {
+			Map action = actions.get(key);
+
+			Assert.assertNotNull(key + " does not contain an action", action);
+
+			Map expectedAction = expectedActions.get(key);
+
+			Assert.assertEquals(
+				expectedAction.get("method"), action.get("method"));
+			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
+		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -2202,6 +2232,10 @@ public abstract class BaseProductResourceTestCase {
 
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
+
+		if (entityModel == null) {
+			return Collections.emptyList();
+		}
 
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
