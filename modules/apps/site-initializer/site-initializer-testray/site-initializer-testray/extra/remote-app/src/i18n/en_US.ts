@@ -45,6 +45,8 @@ export default {
 	'assigned': 'Assigned',
 	'assigned-users': 'Assigned Users',
 	'assignee': 'Assignee',
+	'at-least-one-environment-stack-is-required':
+		'At least one environment stack is required',
 	'attachment': 'Attachment',
 	'attachments': 'Attachments',
 	'attachments-x': 'Attachments ({0})',
@@ -93,6 +95,7 @@ export default {
 	'component': 'Component',
 	'components': 'Components',
 	'confirm-password': 'Confirm Password',
+	'copy-x': 'Copy - {0}',
 	'create': 'Create',
 	'create-cases-if-you-want-to-link-cases-to-this-build':
 		'Create cases if you want to link cases to this build.',

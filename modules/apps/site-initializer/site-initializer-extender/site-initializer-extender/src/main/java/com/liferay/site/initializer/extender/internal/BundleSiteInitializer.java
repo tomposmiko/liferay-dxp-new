@@ -2097,36 +2097,19 @@ public class BundleSiteInitializer implements SiteInitializer {
 			serviceContext.getScopeGroupId(), jsonObject.getBoolean("private"),
 			jsonObject.getString("friendlyURL"));
 
-		if (layout == null) {
-			layout = _layoutLocalService.addLayout(
-				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
-				jsonObject.getBoolean("private"), parentLayoutId, nameMap,
-				SiteInitializerUtil.toMap(jsonObject.getString("title_i18n")),
-				SiteInitializerUtil.toMap(
-					jsonObject.getString("description_i18n")),
-				SiteInitializerUtil.toMap(
-					jsonObject.getString("keywords_i18n")),
-				SiteInitializerUtil.toMap(jsonObject.getString("robots_i18n")),
-				type, null, jsonObject.getBoolean("hidden"),
-				jsonObject.getBoolean("system"), friendlyURLMap,
-				serviceContext);
+		if (layout != null) {
+			_layoutLocalService.deleteLayout(layout);
 		}
-		else {
-			layout = _layoutLocalService.updateLayout(
-				serviceContext.getScopeGroupId(),
-				jsonObject.getBoolean("private"), layout.getLayoutId(),
-				parentLayoutId, nameMap,
-				SiteInitializerUtil.toMap(jsonObject.getString("title_i18n")),
-				SiteInitializerUtil.toMap(
-					jsonObject.getString("description_i18n")),
-				SiteInitializerUtil.toMap(
-					jsonObject.getString("keywords_i18n")),
-				SiteInitializerUtil.toMap(jsonObject.getString("robots_i18n")),
-				type, jsonObject.getBoolean("hidden"), friendlyURLMap,
-				layout.getIconImage(), null, layout.getStyleBookEntryId(),
-				layout.getFaviconFileEntryId(), layout.getMasterLayoutPlid(),
-				serviceContext);
-		}
+
+		layout = _layoutLocalService.addLayout(
+			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+			jsonObject.getBoolean("private"), parentLayoutId, nameMap,
+			SiteInitializerUtil.toMap(jsonObject.getString("title_i18n")),
+			SiteInitializerUtil.toMap(jsonObject.getString("description_i18n")),
+			SiteInitializerUtil.toMap(jsonObject.getString("keywords_i18n")),
+			SiteInitializerUtil.toMap(jsonObject.getString("robots_i18n")),
+			type, null, jsonObject.getBoolean("hidden"),
+			jsonObject.getBoolean("system"), friendlyURLMap, serviceContext);
 
 		_setResourcePermissions(
 			layout.getCompanyId(), layout.getModelClassName(),
@@ -3600,11 +3583,15 @@ public class BundleSiteInitializer implements SiteInitializer {
 					accountBriefsJSONArray.getJSONObject(j);
 
 				userAccount =
-					userAccountResource.
-						postAccountUserAccountByExternalReferenceCode(
-							accountBriefsJSONObject.getString(
-								"externalReferenceCode"),
-							userAccount);
+					userAccountResource.putUserAccountByExternalReferenceCode(
+						jsonObject.getString("externalReferenceCode"),
+						userAccount);
+
+				userAccountResource.
+					postAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
+						accountBriefsJSONObject.getString(
+							"externalReferenceCode"),
+						userAccount.getExternalReferenceCode());
 
 				j++;
 

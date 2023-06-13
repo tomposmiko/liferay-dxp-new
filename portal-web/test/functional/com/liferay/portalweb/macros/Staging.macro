@@ -383,6 +383,10 @@ definition {
 			ContentConfiguration.checkContentNameList(checkContentNameList = "${checkContentNameList}");
 		}
 
+		if (isSet(uncheckChildPages)) {
+			ContentConfiguration.uncheckChildPages(uncheckChildPagesNameList = "${uncheckChildPagesNameList}");
+		}
+
 		if (isSet(uncheckContentNameList)) {
 			ContentConfiguration.uncheckContentNameList(uncheckContentNameList = "${uncheckContentNameList}");
 		}
@@ -775,7 +779,7 @@ definition {
 		LexiconEntry.gotoHeaderMenuItem(menuItem = "Staging Configuration");
 
 		if (isSet(enableOnPublicPages)) {
-			Click(locator1 = "Checkbox#ENABLED_ON_PUBLIC_PAGES");
+			AssertNotChecked.assertNotCheckedNotVisible(locator1 = "Checkbox#ENABLED_ON_PUBLIC_PAGES");
 
 			AssertClickNoError(
 				locator1 = "Button#SAVE",
@@ -783,7 +787,7 @@ definition {
 		}
 
 		if (isSet(enableOnPrivatePages)) {
-			Click(locator1 = "Checkbox#ENABLED_ON_PRIVATE_PAGES");
+			AssertNotChecked.assertNotCheckedNotVisible(locator1 = "Checkbox#ENABLED_ON_PRIVATE_PAGES");
 
 			AssertClickNoError(
 				locator1 = "Button#SAVE",

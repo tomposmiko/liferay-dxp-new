@@ -354,6 +354,8 @@ definition {
 			permissionDefinitionValue = "Update Discussion",
 			permissionNavigationValue = "Web Content > Web Content Article");
 
+		Role.openRolesAdmin();
+
 		Role.viewAssignee(
 			assigneeName = "Site Name",
 			assigneeType = "Sites",
@@ -913,9 +915,9 @@ definition {
 			pageName = "Search Page",
 			siteName = "Organization Name");
 
-		SearchPortlets.searchWidget(searchTerm = "&quot;Test Blog&quot;");
+		SearchPortlets.searchWidget(searchTerm = "\"Test Blog\"");
 
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "&quot;Test Blog&quot;");
+		SearchResultPortlet.viewNoSearchResults(searchTerm = "\"Test Blog\"");
 
 		User.logoutPG();
 

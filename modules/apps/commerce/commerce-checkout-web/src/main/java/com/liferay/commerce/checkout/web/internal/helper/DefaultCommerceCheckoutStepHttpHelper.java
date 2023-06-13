@@ -82,10 +82,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  * @author Luca Pellizzon
  */
-@Component(
-	enabled = false, immediate = true,
-	service = CommerceCheckoutStepHttpHelper.class
-)
+@Component(immediate = true, service = CommerceCheckoutStepHttpHelper.class)
 public class DefaultCommerceCheckoutStepHttpHelper
 	implements CommerceCheckoutStepHttpHelper {
 
@@ -583,6 +580,30 @@ public class DefaultCommerceCheckoutStepHttpHelper
 			return false;
 		}
 
+		CommerceContext commerceContext =
+			(CommerceContext)httpServletRequest.getAttribute(
+				CommerceWebKeys.COMMERCE_CONTEXT);
+
+		List<CommerceShippingMethod> commerceShippingMethods =
+			_commerceShippingMethodLocalService.getCommerceShippingMethods(
+				commerceOrder.getGroupId(), true, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS,
+				new CommerceShippingMethodPriorityComparator());
+
+		CommerceShippingOption singleCommerceShippingOption =
+			_getSingleCommerceShippingOption(
+				commerceContext, commerceOrder, commerceShippingMethods,
+				httpServletRequest);
+
+		if (singleCommerceShippingOption != null) {
+			_updateCommerceOrder(
+				commerceContext, commerceOrder,
+				singleCommerceShippingOption.getCommerceShippingMethodKey(),
+				singleCommerceShippingOption.getKey(), httpServletRequest);
+
+			return false;
+		}
+
 		if (commerceOrder.getCommerceShippingMethodId() > 0) {
 			CommerceShippingMethod commerceShippingMethod =
 				_commerceShippingMethodLocalService.getCommerceShippingMethod(
@@ -596,34 +617,10 @@ public class DefaultCommerceCheckoutStepHttpHelper
 			}
 		}
 
-		CommerceContext commerceContext =
-			(CommerceContext)httpServletRequest.getAttribute(
-				CommerceWebKeys.COMMERCE_CONTEXT);
-
-		List<CommerceShippingMethod> commerceShippingMethods =
-			_commerceShippingMethodLocalService.getCommerceShippingMethods(
-				commerceOrder.getGroupId(), true, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS,
-				new CommerceShippingMethodPriorityComparator());
-
 		if (commerceShippingMethods.isEmpty()) {
 			_updateCommerceOrder(
 				commerceContext, commerceOrder, StringPool.BLANK,
 				StringPool.BLANK, httpServletRequest);
-
-			return false;
-		}
-
-		CommerceShippingOption singleCommerceShippingOption =
-			_getSingleCommerceShippingOption(
-				commerceContext, commerceOrder, commerceShippingMethods,
-				httpServletRequest);
-
-		if (singleCommerceShippingOption != null) {
-			_updateCommerceOrder(
-				commerceContext, commerceOrder,
-				singleCommerceShippingOption.getCommerceShippingMethodKey(),
-				singleCommerceShippingOption.getKey(), httpServletRequest);
 
 			return false;
 		}
@@ -666,7 +663,7 @@ public class DefaultCommerceCheckoutStepHttpHelper
 					commerceShippingMethod.getEngineKey());
 
 			List<CommerceShippingOption> commerceShippingOptions =
-				commerceShippingEngine.getCommerceShippingOptions(
+				commerceShippingEngine.getEnabledCommerceShippingOptions(
 					commerceContext, commerceOrder,
 					_portal.getLocale(httpServletRequest));
 

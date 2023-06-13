@@ -3,7 +3,7 @@ definition {
 
 	property custom.properties = "jsonws.web.service.paths.excludes=";
 	property osgi.module.configuration.file.names = "com.liferay.portal.security.sso.token.configuration.TokenConfiguration.config";
-	property osgi.module.configurations = "enabled=&quot;true&quot;${line.separator}tokenLocation=&quot;REQUEST&quot;";
+	property osgi.module.configurations = "enabled=\"true\"${line.separator}tokenLocation=\"REQUEST\"";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Segmentation";
@@ -1130,12 +1130,9 @@ definition {
 		}
 
 		task ("Add a tag for created organization") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Users",
-				panel = "Control Panel",
-				portlet = "Users and Organizations");
+			Organization.openOrganizationsAdmin();
 
-			Organization.editOrganizationCP(orgName = "organization Name");
+			Organization.gotoEdit(orgName = "organization Name");
 
 			AssetCategorization.addTag(tagName = "tagName");
 
@@ -4256,7 +4253,7 @@ definition {
 
 			PageEditor.viewFragment(fragmentName = "Container");
 
-			Click(locator1 = "PageEditor#EXPERIENCE_LABEL");
+			PageEditor.openExperienceMenu();
 
 			AssertElementNotPresent(
 				key_experienceName = "New Experience",
@@ -4303,7 +4300,7 @@ definition {
 
 			PageEditor.viewFragment(fragmentName = "Heading");
 
-			Click(locator1 = "PageEditor#EXPERIENCE_LABEL");
+			PageEditor.openExperienceMenu();
 
 			AssertElementNotPresent(
 				key_experienceName = "New Experience",
@@ -5464,7 +5461,7 @@ definition {
 		}
 
 		task ("Priorize experience and publish page") {
-			Click(locator1 = "PageEditor#EXPERIENCE_LABEL");
+			PageEditor.openExperienceMenu();
 
 			PageEditor.prioritizeExperience(experienceName = "Segment Name Experience");
 
@@ -5534,7 +5531,7 @@ definition {
 		}
 
 		task ("Priorize experience and publish page") {
-			Click(locator1 = "PageEditor#EXPERIENCE_LABEL");
+			PageEditor.openExperienceMenu();
 
 			PageEditor.prioritizeExperience(experienceName = "Segment Name Experience");
 

@@ -25,9 +25,6 @@ import ViewsContext from '../../views/ViewsContext';
 import {VIEWS_ACTION_TYPES} from '../../views/viewsReducer';
 
 const CustomViewsControls = () => {
-	const [viewsDropdownActive, setViewsDropdownActive] = useState(false);
-	const [actionsDropdownActive, setActionsDropdownActive] = useState(false);
-
 	const {appURL, id: fdsName, namespace, portletId} = useContext(
 		FrontendDataSetContext
 	);
@@ -44,6 +41,9 @@ const CustomViewsControls = () => {
 		},
 		viewsDispatch,
 	] = useContext(ViewsContext);
+
+	const [viewsDropdownActive, setViewsDropdownActive] = useState(false);
+	const [actionsDropdownActive, setActionsDropdownActive] = useState(false);
 
 	const customViewLabelInputRef = useRef();
 
@@ -62,41 +62,6 @@ const CustomViewsControls = () => {
 				type="text"
 			/>
 		</ClayForm.Group>
-	);
-
-	const ActionsItemList = () => (
-		<ClayDropDown.ItemList>
-			{activeCustomViewId && (
-				<ClayDropDown.Item
-					onClick={() => {
-						saveCustomView({
-							id: activeCustomViewId,
-						});
-
-						setActionsDropdownActive(false);
-					}}
-					symbolLeft="disk"
-				>
-					{Liferay.Language.get('save-view')}
-				</ClayDropDown.Item>
-			)}
-
-			<ClayDropDown.Item
-				onClick={openSaveCustomViewModal}
-				symbolLeft="disk"
-			>
-				{Liferay.Language.get('save-view-as')}
-			</ClayDropDown.Item>
-
-			{activeCustomViewId && (
-				<ClayDropDown.Item
-					onClick={openDeleteCustomViewModal}
-					symbolLeft="trash"
-				>
-					{Liferay.Language.get('delete-view')}
-				</ClayDropDown.Item>
-			)}
-		</ClayDropDown.ItemList>
 	);
 
 	const getNextCustomViewId = () => {
@@ -333,10 +298,6 @@ const CustomViewsControls = () => {
 							{Liferay.Language.get('default-view')}
 						</ClayDropDown.Item>
 					</ClayDropDown.ItemList>
-
-					<ClayDropDown.Divider />
-
-					<ActionsItemList />
 				</ClayDropDown>
 			</ManagementToolbar.Item>
 
@@ -352,7 +313,38 @@ const CustomViewsControls = () => {
 						</ClayButton>
 					}
 				>
-					<ActionsItemList />
+					<ClayDropDown.ItemList>
+						{activeCustomViewId && (
+							<ClayDropDown.Item
+								onClick={() => {
+									saveCustomView({
+										id: activeCustomViewId,
+									});
+
+									setActionsDropdownActive(false);
+								}}
+								symbolLeft="disk"
+							>
+								{Liferay.Language.get('save-view')}
+							</ClayDropDown.Item>
+						)}
+
+						<ClayDropDown.Item
+							onClick={openSaveCustomViewModal}
+							symbolLeft="disk"
+						>
+							{Liferay.Language.get('save-view-as')}
+						</ClayDropDown.Item>
+
+						{activeCustomViewId && (
+							<ClayDropDown.Item
+								onClick={openDeleteCustomViewModal}
+								symbolLeft="trash"
+							>
+								{Liferay.Language.get('delete-view')}
+							</ClayDropDown.Item>
+						)}
+					</ClayDropDown.ItemList>
 				</ClayDropDown>
 			</ManagementToolbar.Item>
 		</>

@@ -26,6 +26,7 @@ import {config} from '../../../app/config/index';
 import {useDispatch, useSelector} from '../../../app/contexts/StoreContext';
 import LayoutService from '../../../app/services/LayoutService';
 import changeMasterLayout from '../../../app/thunks/changeMasterLayout';
+import useTabsKeyboardNavigation from '../../../app/utils/useTabsKeyboardNavigation';
 import SidebarPanelHeader from '../../../common/components/SidebarPanelHeader';
 import {useId} from '../../../core/hooks/useId';
 import {useSetStyleBook, useStyleBook} from '../hooks/useStyleBook';
@@ -121,6 +122,13 @@ export default function PageDesignOptionsSidebar() {
 		]
 	);
 
+	const {onTabItemKeyDown, tabItemRef} = useTabsKeyboardNavigation({
+		numberOfPanels: tabs.length,
+		selectPanel: (panelIndex) => {
+			setActiveTabId(panelIndex);
+		},
+	});
+
 	const [activeTabId, setActiveTabId] = useState(0);
 	const tabIdNamespace = useId();
 
@@ -129,19 +137,19 @@ export default function PageDesignOptionsSidebar() {
 
 	return (
 		<>
-			<SidebarPanelHeader>
-				<span className="align-items-center d-flex justify-content-between">
-					{Liferay.Language.get('page-design-options')}
-
+			<SidebarPanelHeader
+				iconRight={
 					<ClayLink
 						displayType="secondary"
 						href={config.lookAndFeelURL}
 						monospaced
-						title={Liferay.Language.get('more')}
+						title={Liferay.Language.get('more-page-design-options')}
 					>
 						<ClayIcon symbol="cog" />
 					</ClayLink>
-				</span>
+				}
+			>
+				{Liferay.Language.get('page-design-options')}
 			</SidebarPanelHeader>
 
 			<ClayTabs className="flex-shrink-0 page-editor__sidebar__page-design-options__tabs px-3">
@@ -154,6 +162,8 @@ export default function PageDesignOptionsSidebar() {
 						}}
 						key={index}
 						onClick={() => setActiveTabId(index)}
+						onKeyDown={(event) => onTabItemKeyDown(event, index)}
+						ref={(ref) => tabItemRef(ref, index)}
 					>
 						{tab.label}
 					</ClayTabs.Item>

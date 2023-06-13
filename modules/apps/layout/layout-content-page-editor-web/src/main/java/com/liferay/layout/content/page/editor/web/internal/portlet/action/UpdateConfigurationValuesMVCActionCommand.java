@@ -28,13 +28,12 @@ import com.liferay.layout.content.page.editor.web.internal.util.ContentUtil;
 import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkManager;
 import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
 import com.liferay.layout.util.structure.LayoutStructure;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -78,7 +77,7 @@ public class UpdateConfigurationValuesMVCActionCommand
 			JSONObject defaultEditableValuesJSONObject, String editableValues)
 		throws Exception {
 
-		JSONObject editableValuesJSONObject = JSONFactoryUtil.createJSONObject(
+		JSONObject editableValuesJSONObject = _jsonFactory.createJSONObject(
 			editableValues);
 
 		for (String fragmentEntryProcessorKey :
@@ -209,7 +208,7 @@ public class UpdateConfigurationValuesMVCActionCommand
 	private FragmentEntryProcessorRegistry _fragmentEntryProcessorRegistry;
 
 	@Reference
-	private LayoutLocalService _layoutLocalService;
+	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Portal _portal;
