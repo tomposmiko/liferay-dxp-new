@@ -28,6 +28,7 @@ import com.liferay.fragment.util.configuration.FragmentConfigurationField;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.type.InfoFieldType;
+import com.liferay.info.field.type.SelectInfoFieldType;
 import com.liferay.info.form.InfoForm;
 import com.liferay.petra.io.DummyWriter;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
@@ -56,6 +57,8 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -165,7 +168,6 @@ public class FreeMarkerFragmentEntryProcessor
 				"input",
 				_toInputTemplateNode(
 					fragmentEntryLink,
-					fragmentEntryProcessorContext.getHttpServletRequest(),
 					fragmentEntryProcessorContext.getInfoFormOptional(),
 					fragmentEntryProcessorContext.getLocale()));
 		}
@@ -318,7 +320,6 @@ public class FreeMarkerFragmentEntryProcessor
 
 	private InputTemplateNode _toInputTemplateNode(
 		FragmentEntryLink fragmentEntryLink,
-		HttpServletRequest httpServletRequest,
 		Optional<InfoForm> infoFormOptional, Locale locale) {
 
 		InfoField infoField = null;
@@ -336,29 +337,18 @@ public class FreeMarkerFragmentEntryProcessor
 			infoField = infoForm.getInfoField(fieldName);
 		}
 
-		String defaultHelpTextValue = LanguageUtil.get(
-			httpServletRequest,
-			"guide-your-users-to-fill-in-the-field-by-adding-help-text-here");
-
 		String inputHelpText = GetterUtil.getString(
 			_fragmentEntryConfigurationParser.getFieldValue(
 				fragmentEntryLink.getEditableValues(),
 				new FragmentConfigurationField(
-					"inputHelpText", "string", defaultHelpTextValue, true,
-					"text"),
+					"inputHelpText", "string", "", true, "text"),
 				locale));
-
-		String defaultLabelValue = StringPool.BLANK;
-
-		if (infoField != null) {
-			defaultLabelValue = infoField.getLabel(locale);
-		}
 
 		String inputLabel = GetterUtil.getString(
 			_fragmentEntryConfigurationParser.getFieldValue(
 				fragmentEntryLink.getEditableValues(),
 				new FragmentConfigurationField(
-					"inputLabel", "string", defaultLabelValue, true, "text"),
+					"inputLabel", "string", StringPool.BLANK, true, "text"),
 				locale));
 
 		String name = "name";
@@ -402,9 +392,26 @@ public class FreeMarkerFragmentEntryProcessor
 			type = infoFieldType.getName();
 		}
 
-		return new InputTemplateNode(
+		InputTemplateNode inputTemplateNode = new InputTemplateNode(
 			inputHelpText, inputLabel, name, required, inputShowHelpText,
 			inputShowLabel, type, "value");
+
+		if ((infoField != null) &&
+			(infoField.getInfoFieldType() == SelectInfoFieldType.INSTANCE)) {
+
+			Optional<List<SelectInfoFieldType.Option>> optionsOptional =
+				infoField.getAttributeOptional(SelectInfoFieldType.OPTIONS);
+
+			List<SelectInfoFieldType.Option> options = optionsOptional.orElse(
+				new ArrayList<>());
+
+			for (SelectInfoFieldType.Option option : options) {
+				inputTemplateNode.addOption(
+					option.getLabel(locale), option.getValue());
+			}
+		}
+
+		return inputTemplateNode;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

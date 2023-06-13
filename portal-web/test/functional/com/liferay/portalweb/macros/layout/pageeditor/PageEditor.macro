@@ -426,7 +426,7 @@ definition {
 			key_content = "Place fragments here.",
 			key_fragmentClass = "content",
 			key_position = "${position}",
-			locator1 = "Fragment#NO_FRAGMENTS_MESSAGE");
+			locator1 = "Fragment#DROP_ZONE_NO_FRAGMENTS_MESSAGE");
 
 		PageEditor.gotoTab(tabName = "Fragments and Widgets");
 
@@ -798,9 +798,10 @@ definition {
 	}
 
 	macro addVideoFragmentURL {
-		FormFields.editText(
-			fieldName = "url",
-			fieldValue = "${videoLink}");
+		Type(
+			key_text = "URL",
+			locator1 = "TextInput#ANY",
+			value1 = "${videoLink}");
 
 		Click(
 			key_sidebarButton = "Browser",
@@ -1256,7 +1257,7 @@ definition {
 
 		if (isSet(numberOfTabs)) {
 			Type(
-				key_fieldLabel = "Number Of Tabs",
+				key_fieldLabel = "Number of Tabs",
 				locator1 = "FormFields#NUMBER_FIELD",
 				value1 = "${numberOfTabs}");
 
@@ -1267,7 +1268,7 @@ definition {
 			PageEditor.waitForAutoSave();
 
 			AssertTextEquals(
-				key_fieldLabel = "Number Of Tabs",
+				key_fieldLabel = "Number of Tabs",
 				locator1 = "FormFields#NUMBER_FIELD",
 				value1 = "${numberOfTabs}");
 		}
@@ -2196,6 +2197,69 @@ definition {
 		Click(locator1 = "PageEditor#EXPERIENCE_DEFAULT_BUTTON_NAME");
 	}
 
+	macro editFormContainer {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		if (isSet(deviceType) && ("${deviceType}" != "Desktop")) {
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#PAGE_EDITOR_GLOBAL_CONTEXT_IFRAME");
+		}
+
+		if (isSet(columnNumber)) {
+			Click.clickNoWaitForVisible(
+				key_columnNumber = "${columnNumber}",
+				key_elementHeader = "//div[@aria-label='Form Container']",
+				key_position = "1",
+				locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
+		}
+		else {
+			PageEditor.clickConfigurableField(
+				fragmentName = "Form Container",
+				index = "${index}");
+		}
+
+		if (isSet(deviceType) && ("${deviceType}" != "Desktop")) {
+			SelectFrame(value1 = "relative=top");
+		}
+
+		AssertVisible(
+			key_sidebarButton = "Browser",
+			locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+
+		if ("${panel}" == "General") {
+			Navigator.gotoNavTab(navTab = "General");
+
+			if (isSet(contentType)) {
+				Select(
+					key_fieldLabel = "Content Type",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "${contentType}");
+
+				PageEditor.waitForAutoSave();
+
+				AssertSelectedLabel(
+					key_fieldLabel = "Content Type",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "${contentType}");
+			}
+
+			if (isSet(subtype)) {
+				Select(
+					key_fieldLabel = "Subtype",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "${subtype}");
+
+				PageEditor.waitForAutoSave();
+
+				AssertSelectedLabel(
+					key_fieldLabel = "Subtype",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "${subtype}");
+			}
+		}
+	}
+
 	macro editFragmentHTML {
 		PageEditor.gotoEditableFieldEdit(
 			contributed = "${contributed}",
@@ -2249,9 +2313,17 @@ definition {
 		}
 
 		if (isSet(imageFileName)) {
-			ItemSelector.selectDMImage(
-				imageFileName = "${imageFileName}",
-				navTab = "Documents and Media");
+			if (isSet(depotName)) {
+				ItemSelector.selectRepositoryImage(
+					depotName = "${depotName}",
+					imageFileName = "${imageFileName}",
+					navTab = "Documents and Media");
+			}
+			else {
+				ItemSelector.selectDMImage(
+					imageFileName = "${imageFileName}",
+					navTab = "Documents and Media");
+			}
 		}
 		else if (isSet(imageSourceURL)) {
 			ItemSelector.addImageFromURL(

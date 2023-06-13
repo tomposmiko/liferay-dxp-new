@@ -736,6 +736,15 @@ public class PoshiContext {
 		}
 
 		if (Validator.isNotNull(
+				commandElement.attributeValue("disable-webdriver"))) {
+
+			String disableWebdriver = commandElement.attributeValue(
+				"disable-webdriver");
+
+			properties.setProperty("disable-webdriver", disableWebdriver);
+		}
+
+		if (Validator.isNotNull(
 				commandElement.attributeValue("known-issues"))) {
 
 			String knownIssues = commandElement.attributeValue("known-issues");

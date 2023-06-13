@@ -56,6 +56,7 @@ import com.liferay.portal.events.ServicePreAction;
 import com.liferay.portal.events.ThemeServicePreAction;
 import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.frontend.icons.FrontendIconsUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -280,10 +281,14 @@ public class DataLayoutResourceImpl
 				ddmFormRenderingContext);
 
 		ddmFormTemplateContext.put("editable", false);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)contextHttpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
 		ddmFormTemplateContext.put(
-			"spritemap",
-			dataLayoutRenderingContext.getPathThemeImages() +
-				"/clay/icons.svg");
+			"spritemap", FrontendIconsUtil.getSpritemap(themeDisplay));
+
 		ddmFormTemplateContext.remove("fieldTypes");
 
 		return Response.ok(

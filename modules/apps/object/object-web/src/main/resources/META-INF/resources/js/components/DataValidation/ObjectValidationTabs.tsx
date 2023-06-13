@@ -14,18 +14,17 @@
 
 import 'codemirror/mode/groovy/groovy';
 import {ClayToggle} from '@clayui/form';
-import {FieldFeedback} from 'data-engine-js-components-web';
-import React, {ChangeEventHandler, useRef, useState} from 'react';
+import {
+	Card,
+	Input,
+	InputLocalized,
+	Select,
+} from '@liferay/object-js-components-web';
+import React, {ChangeEventHandler, useState} from 'react';
 
-import Card from '../Card/Card';
-import Sidebar from '../Editor/Sidebar/Sidebar';
-import InputLocalized from '../Form/InputLocalized/InputLocalized';
-import Select from '../Form/Select';
+import {defaultLanguageId} from '../../utils/locale';
+import CodeEditor from '../CodeEditor/index';
 import {ObjectValidationErrors} from '../ObjectValidationFormBase';
-
-import './ObjectValidationTabs.scss';
-import CodeMirrorEditor from '../CodeMirrorEditor';
-import Input from '../Form/Input';
 
 function BasicInfo({
 	componentLabel,
@@ -47,6 +46,7 @@ function BasicInfo({
 		<>
 			<Card title={componentLabel}>
 				<InputLocalized
+					defaultLanguageId={defaultLanguageId}
 					disabled={disabled}
 					error={errors.name}
 					label={Liferay.Language.get('label')}
@@ -96,8 +96,6 @@ function Conditions({
 			symbol: string;
 		}
 	);
-	const editorRef = useRef<CodeMirror.Editor>();
-	const emptyScriptError = errors.script;
 	const engine = values.engine;
 	const ddmTooltip = {
 		content: Liferay.Language.get(
@@ -128,37 +126,20 @@ function Conditions({
 				tooltip={engine === 'ddm' ? ddmTooltip : null}
 				viewMode="no-padding"
 			>
-				<div className="lfr-objects__object-validation-editor-sidebar-container">
-					<div className="lfr-objects__object-validation-editor-container">
-						<CodeMirrorEditor
-							editorRef={editorRef}
-							error={emptyScriptError}
-							onChange={(script) => setValues({script})}
-							options={{
-								lineWrapping: true,
-								mode: engine === 'groovy' ? 'groovy' : 'null',
-								readOnly: disabled,
-								value: values.script ?? '',
-							}}
-							placeholder={placeholder}
-						/>
-
-						<div className="has-error mb-3">
-							<FieldFeedback errorMessage={emptyScriptError} />
-						</div>
-					</div>
-
-					<Sidebar
-						editorRef={editorRef}
-						objectValidationRuleElements={
-							objectValidationRuleElements
-						}
-					/>
-				</div>
+				<CodeEditor
+					elements={objectValidationRuleElements}
+					error={errors.script}
+					mode={engine}
+					onChange={(script) => setValues({script})}
+					placeholder={placeholder}
+					readOnly={disabled}
+					value={values.script ?? ''}
+				/>
 			</Card>
 
 			<Card title={Liferay.Language.get('error-message')}>
 				<InputLocalized
+					defaultLanguageId={defaultLanguageId}
 					disabled={disabled}
 					error={errors.errorLabel}
 					label={Liferay.Language.get('message')}

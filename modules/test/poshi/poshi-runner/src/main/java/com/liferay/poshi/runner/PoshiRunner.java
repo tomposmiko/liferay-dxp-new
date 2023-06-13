@@ -21,6 +21,7 @@ import com.liferay.poshi.core.PoshiStackTraceUtil;
 import com.liferay.poshi.core.PoshiValidation;
 import com.liferay.poshi.core.PoshiVariablesUtil;
 import com.liferay.poshi.core.util.FileUtil;
+import com.liferay.poshi.core.util.GetterUtil;
 import com.liferay.poshi.core.util.PropsValues;
 import com.liferay.poshi.runner.logger.PoshiLogger;
 import com.liferay.poshi.runner.logger.SummaryLogger;
@@ -37,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.dom4j.Element;
 
@@ -180,7 +182,19 @@ public class PoshiRunner {
 
 			SummaryLogger.startRunning();
 
-			SeleniumUtil.startSelenium();
+			String namespace =
+				PoshiGetterUtil.getNamespaceFromNamespacedClassCommandName(
+					_testNamespacedClassCommandName);
+
+			Properties properties =
+				PoshiContext.getNamespacedClassCommandNameProperties(
+					namespace + "." + _testNamespacedClassCommandName);
+
+			if (!GetterUtil.getBoolean(
+					properties.getProperty("disable-webdriver"))) {
+
+				SeleniumUtil.startSelenium();
+			}
 
 			_runSetUp();
 		}

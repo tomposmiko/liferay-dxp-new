@@ -118,7 +118,7 @@
 											"widgetInstance": {
 												"widgetConfig": {
 													"portletSetupPortletDecoratorId": "barebone",
-													"properties": "route:get-a-quote\ngoogleplaceskey:"
+													"properties": "route=get-a-quote\ngoogleplaceskey="
 												},
 												"widgetName": "[$CLIENT_EXTENSION_ENTRY_ID:RAYLIFE$]"
 											}

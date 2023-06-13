@@ -30,6 +30,8 @@ definition {
 		else {
 			DMDocument.tearDownCP();
 
+			JSONGroup.deleteGroupByName(groupName = "Site Name");
+
 			User.logoutPG();
 		}
 	}
@@ -98,6 +100,68 @@ definition {
 			rowEntry = "DM Document Title");
 
 		DMDocument.viewCategories(categoryNameList = "category");
+	}
+
+	@description = "This ensures that an old image friendlyURL redirects properly after document is reverted."
+	@priority = "5"
+	test CanAccessOldFriendlyURLAfterRevert {
+		var portalURL = PropsUtil.get("portal.url");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "Document_1",
+			groupName = "Guest",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
+
+		DMNavigator.openToEditEntryInSite(
+			dmDocumentTitle = "Document_1",
+			groupName = "Guest",
+			siteURLKey = "guest");
+
+		DMDocument.editFriendlyURL(friendlyURLEdit = "document_1_1");
+
+		DMNavigator.openToEditEntryInSite(
+			dmDocumentTitle = "Document_1",
+			groupName = "Guest",
+			siteURLKey = "guest");
+
+		DMDocument.editCP(
+			dmDocumentFileEdit = "Document_2.jpg",
+			dmDocumentFileNameEdit = "Document_2.jpg",
+			dmDocumentTitle = "Document_1",
+			dmDocumentTitleEdit = "Document_2",
+			skipNavigation = "true");
+
+		DMNavigator.openToEditEntryInSite(
+			dmDocumentTitle = "Document_2",
+			groupName = "Guest",
+			siteURLKey = "guest");
+
+		DMDocument.editFriendlyURL(friendlyURLEdit = "document_1_2");
+
+		DMNavigator.openToEntryInAdmin(
+			dmDocumentTitle = "Document_2",
+			groupName = "Guest",
+			siteURLKey = "guest");
+
+		DMDocument.revertPG(dmDocumentVersionNumber = "1.0");
+
+		AssertVisible(
+			key_dmDocumentFileName = "Document_1.jpg",
+			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
+
+		AssertElementPresent(
+			key_latestVersionURL = "${portalURL}/documents/d/guest/document_1_2",
+			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_LATEST_VERSION_URL");
+
+		for (var friendlyURL : list "document_1_2,document_1_1") {
+			Navigator.openSpecificURL(url = "${portalURL}/documents/d/guest/${friendlyURL}");
+
+			AssertVisible(
+				key_imageSourceURL = "document_1",
+				locator1 = "DocumentsAndMediaDocument#DOCUMENT_VIEWPORT_PREVIEW");
+		}
 	}
 
 	@priority = "4"
@@ -677,15 +741,27 @@ definition {
 	test CanDeleteDocumentInSitePage {
 		property portal.acceptance = "true";
 
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Documents and Media Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Site Name",
+			layoutName = "Documents and Media Page",
+			widgetName = "Documents and Media");
+
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "/D/M/Document Title",
-			groupName = "Guest",
+			groupName = "Site Name",
 			mimeType = "application/msword",
 			sourceFileName = "Document_1.doc");
 
-		Navigator.openURL();
-
-		Navigator.gotoPage(pageName = "Documents and Media Page");
+		Navigator.openSitePage(
+			pageName = "Documents and Media Page",
+			siteName = "Site Name");
 
 		DMDocument.enableActionsMenuOnPortlet();
 
@@ -702,7 +778,21 @@ definition {
 	test CanDeleteMultipleDocumentsViaActionsButton {
 		property portal.acceptance = "true";
 
-		Navigator.gotoPage(pageName = "Documents and Media Page");
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Documents and Media Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Site Name",
+			layoutName = "Documents and Media Page",
+			widgetName = "Documents and Media");
+
+		Navigator.openSitePage(
+			pageName = "Documents and Media Page",
+			siteName = "Site Name");
 
 		DMDocument.enableActionsMenuOnPortlet();
 
@@ -710,12 +800,14 @@ definition {
 			JSONDocument.addFileWithUploadedFile(
 				dmDocumentDescription = "DM Document Description",
 				dmDocumentTitle = "Document_${entryCount}.doc",
-				groupName = "Guest",
+				groupName = "Site Name",
 				mimeType = "application/msword",
 				sourceFileName = "Document_${entryCount}.doc");
 		}
 
-		Navigator.gotoPage(pageName = "Documents and Media Page");
+		Navigator.openSitePage(
+			pageName = "Documents and Media Page",
+			siteName = "Site Name");
 
 		for (var entryCount : list "1,2") {
 			var dmDocumentTitle = "Document_${entryCount}.doc";
@@ -1170,14 +1262,16 @@ definition {
 	test CanMoveDocumentToRecycleBin {
 		property portal.acceptance = "true";
 
+		JSONGroup.addGroup(groupName = "Site Name");
+
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
+			groupName = "Site Name",
 			mimeType = "text/plain",
 			sourceFileName = "Document_1.txt");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 		DMDocument.moveToRecycleBinCP(
 			assetType = "Document",
@@ -1291,7 +1385,21 @@ definition {
 	test CannotAddSpecialCharacterToName {
 		property portal.acceptance = "true";
 
-		Navigator.gotoPage(pageName = "Documents and Media Page");
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Documents and Media Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Site Name",
+			layoutName = "Documents and Media Page",
+			widgetName = "Documents and Media");
+
+		Navigator.openSitePage(
+			pageName = "Documents and Media Page",
+			siteName = "Site Name");
 
 		DMDocument.enableActionsMenuOnPortlet();
 
@@ -1300,7 +1408,9 @@ definition {
 			dmFolderDescription = "DM Folder Description",
 			dmFolderName = "DM Folder Name?");
 
-		Navigator.gotoPage(pageName = "Documents and Media Page");
+		Navigator.openSitePage(
+			pageName = "Documents and Media Page",
+			siteName = "Site Name");
 
 		DMPortlet.viewDefaultPG();
 	}
@@ -1509,19 +1619,31 @@ definition {
 
 		var portalURL = PropsUtil.get("portal.url");
 
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Documents and Media Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Site Name",
+			layoutName = "Documents and Media Page",
+			widgetName = "Documents and Media");
+
 		DMDocument.updateCheckInterval(fieldValue = "1");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_3.txt",
-			groupName = "Guest",
+			groupName = "Site Name",
 			mimeType = "text/plain",
 			sourceFileName = "Document_3.txt");
 
 		DMNavigator.openToEditEntryInSite(
 			dmDocumentTitle = "Document_3.txt",
-			groupName = "Guest",
-			siteURLKey = "guest");
+			groupName = "Site Name",
+			siteURLKey = "site-name");
 
 		DMDocument.setExpirationDate(
 			enableExpirationDate = "true",
@@ -1535,7 +1657,7 @@ definition {
 
 		Notifications.viewBadgeCount(notificationCount = "1");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 		DMDocument.viewStatus(
 			dmDocumentStatus = "Expired",
@@ -1543,7 +1665,7 @@ definition {
 
 		Navigator.openSpecificURL(url = "${portalURL}/c/portal/logout");
 
-		Navigator.openSpecificURL(url = "${portalURL}/web/guest/documents-and-media-page");
+		Navigator.openSpecificURL(url = "${portalURL}/web/site-name/documents-and-media-page");
 
 		DMDocument.viewDefault();
 	}
@@ -2770,6 +2892,20 @@ definition {
 			dmDocumentFileName = ''':"?.doc''',
 			dmDocumentTitle = "DM Document Title",
 			validateFileNameRestriction = "true");
+	}
+
+	@description = "This a ticket for LPS-154955. Verify tree image is available when Liferay is deployed"
+	@priority = "4"
+	test VerifyTreeImageIsAvailable {
+		task ("Go to Documents and Media Settings") {
+			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+		}
+
+		task ("Verify tree image is available and selectable") {
+			AssertElementPresent(
+				key_dmDocumentTitle = "tree.png",
+				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_CHECKBOX");
+		}
 	}
 
 	@priority = "5"

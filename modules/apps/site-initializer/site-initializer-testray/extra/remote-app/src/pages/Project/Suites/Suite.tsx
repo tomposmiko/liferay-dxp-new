@@ -14,7 +14,7 @@
 
 import {useOutletContext} from 'react-router-dom';
 
-import {BoxItem} from '../../../components/Input';
+import {BoxItem} from '../../../components/Form/DualListBox';
 import Container from '../../../components/Layout/Container';
 import ListView from '../../../components/ListView/ListView';
 import QATable from '../../../components/Table/QATable';

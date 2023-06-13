@@ -21,6 +21,8 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -46,6 +48,7 @@ public class ClientExtensionEntryWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
+		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
 		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("clientExtensionEntryId", getClientExtensionEntryId());
@@ -54,20 +57,12 @@ public class ClientExtensionEntryWrapper
 		attributes.put("userName", getUserName());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
-		attributes.put("customElementCSSURLs", getCustomElementCSSURLs());
-		attributes.put(
-			"customElementHTMLElementName", getCustomElementHTMLElementName());
-		attributes.put("customElementURLs", getCustomElementURLs());
-		attributes.put("customElementUseESM", isCustomElementUseESM());
 		attributes.put("description", getDescription());
-		attributes.put("friendlyURLMapping", getFriendlyURLMapping());
-		attributes.put("iFrameURL", getIFrameURL());
-		attributes.put("instanceable", isInstanceable());
 		attributes.put("name", getName());
-		attributes.put("portletCategoryName", getPortletCategoryName());
 		attributes.put("properties", getProperties());
 		attributes.put("sourceCodeURL", getSourceCodeURL());
 		attributes.put("type", getType());
+		attributes.put("typeSettings", getTypeSettings());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
 		attributes.put("statusByUserName", getStatusByUserName());
@@ -82,6 +77,12 @@ public class ClientExtensionEntryWrapper
 
 		if (mvccVersion != null) {
 			setMvccVersion(mvccVersion);
+		}
+
+		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
+
+		if (ctCollectionId != null) {
+			setCtCollectionId(ctCollectionId);
 		}
 
 		String uuid = (String)attributes.get("uuid");
@@ -134,69 +135,16 @@ public class ClientExtensionEntryWrapper
 			setModifiedDate(modifiedDate);
 		}
 
-		String customElementCSSURLs = (String)attributes.get(
-			"customElementCSSURLs");
-
-		if (customElementCSSURLs != null) {
-			setCustomElementCSSURLs(customElementCSSURLs);
-		}
-
-		String customElementHTMLElementName = (String)attributes.get(
-			"customElementHTMLElementName");
-
-		if (customElementHTMLElementName != null) {
-			setCustomElementHTMLElementName(customElementHTMLElementName);
-		}
-
-		String customElementURLs = (String)attributes.get("customElementURLs");
-
-		if (customElementURLs != null) {
-			setCustomElementURLs(customElementURLs);
-		}
-
-		Boolean customElementUseESM = (Boolean)attributes.get(
-			"customElementUseESM");
-
-		if (customElementUseESM != null) {
-			setCustomElementUseESM(customElementUseESM);
-		}
-
 		String description = (String)attributes.get("description");
 
 		if (description != null) {
 			setDescription(description);
 		}
 
-		String friendlyURLMapping = (String)attributes.get(
-			"friendlyURLMapping");
-
-		if (friendlyURLMapping != null) {
-			setFriendlyURLMapping(friendlyURLMapping);
-		}
-
-		String iFrameURL = (String)attributes.get("iFrameURL");
-
-		if (iFrameURL != null) {
-			setIFrameURL(iFrameURL);
-		}
-
-		Boolean instanceable = (Boolean)attributes.get("instanceable");
-
-		if (instanceable != null) {
-			setInstanceable(instanceable);
-		}
-
 		String name = (String)attributes.get("name");
 
 		if (name != null) {
 			setName(name);
-		}
-
-		String portletCategoryName = (String)attributes.get(
-			"portletCategoryName");
-
-		if (portletCategoryName != null) {
-			setPortletCategoryName(portletCategoryName);
 		}
 
 		String properties = (String)attributes.get("properties");
@@ -215,6 +163,12 @@ public class ClientExtensionEntryWrapper
 
 		if (type != null) {
 			setType(type);
+		}
+
+		String typeSettings = (String)attributes.get("typeSettings");
+
+		if (typeSettings != null) {
+			setTypeSettings(typeSettings);
 		}
 
 		Integer status = (Integer)attributes.get("status");
@@ -303,43 +257,13 @@ public class ClientExtensionEntryWrapper
 	}
 
 	/**
-	 * Returns the custom element cssur ls of this client extension entry.
+	 * Returns the ct collection ID of this client extension entry.
 	 *
-	 * @return the custom element cssur ls of this client extension entry
+	 * @return the ct collection ID of this client extension entry
 	 */
 	@Override
-	public String getCustomElementCSSURLs() {
-		return model.getCustomElementCSSURLs();
-	}
-
-	/**
-	 * Returns the custom element html element name of this client extension entry.
-	 *
-	 * @return the custom element html element name of this client extension entry
-	 */
-	@Override
-	public String getCustomElementHTMLElementName() {
-		return model.getCustomElementHTMLElementName();
-	}
-
-	/**
-	 * Returns the custom element ur ls of this client extension entry.
-	 *
-	 * @return the custom element ur ls of this client extension entry
-	 */
-	@Override
-	public String getCustomElementURLs() {
-		return model.getCustomElementURLs();
-	}
-
-	/**
-	 * Returns the custom element use esm of this client extension entry.
-	 *
-	 * @return the custom element use esm of this client extension entry
-	 */
-	@Override
-	public boolean getCustomElementUseESM() {
-		return model.getCustomElementUseESM();
+	public long getCtCollectionId() {
+		return model.getCtCollectionId();
 	}
 
 	@Override
@@ -365,36 +289,6 @@ public class ClientExtensionEntryWrapper
 	@Override
 	public String getExternalReferenceCode() {
 		return model.getExternalReferenceCode();
-	}
-
-	/**
-	 * Returns the friendly url mapping of this client extension entry.
-	 *
-	 * @return the friendly url mapping of this client extension entry
-	 */
-	@Override
-	public String getFriendlyURLMapping() {
-		return model.getFriendlyURLMapping();
-	}
-
-	/**
-	 * Returns the i frame url of this client extension entry.
-	 *
-	 * @return the i frame url of this client extension entry
-	 */
-	@Override
-	public String getIFrameURL() {
-		return model.getIFrameURL();
-	}
-
-	/**
-	 * Returns the instanceable of this client extension entry.
-	 *
-	 * @return the instanceable of this client extension entry
-	 */
-	@Override
-	public boolean getInstanceable() {
-		return model.getInstanceable();
 	}
 
 	/**
@@ -504,16 +398,6 @@ public class ClientExtensionEntryWrapper
 	}
 
 	/**
-	 * Returns the portlet category name of this client extension entry.
-	 *
-	 * @return the portlet category name of this client extension entry
-	 */
-	@Override
-	public String getPortletCategoryName() {
-		return model.getPortletCategoryName();
-	}
-
-	/**
 	 * Returns the primary key of this client extension entry.
 	 *
 	 * @return the primary key of this client extension entry
@@ -604,6 +488,16 @@ public class ClientExtensionEntryWrapper
 	}
 
 	/**
+	 * Returns the type settings of this client extension entry.
+	 *
+	 * @return the type settings of this client extension entry
+	 */
+	@Override
+	public String getTypeSettings() {
+		return model.getTypeSettings();
+	}
+
+	/**
 	 * Returns the user ID of this client extension entry.
 	 *
 	 * @return the user ID of this client extension entry
@@ -654,16 +548,6 @@ public class ClientExtensionEntryWrapper
 	}
 
 	/**
-	 * Returns <code>true</code> if this client extension entry is custom element use esm.
-	 *
-	 * @return <code>true</code> if this client extension entry is custom element use esm; <code>false</code> otherwise
-	 */
-	@Override
-	public boolean isCustomElementUseESM() {
-		return model.isCustomElementUseESM();
-	}
-
-	/**
 	 * Returns <code>true</code> if this client extension entry is denied.
 	 *
 	 * @return <code>true</code> if this client extension entry is denied; <code>false</code> otherwise
@@ -711,16 +595,6 @@ public class ClientExtensionEntryWrapper
 	@Override
 	public boolean isIncomplete() {
 		return model.isIncomplete();
-	}
-
-	/**
-	 * Returns <code>true</code> if this client extension entry is instanceable.
-	 *
-	 * @return <code>true</code> if this client extension entry is instanceable; <code>false</code> otherwise
-	 */
-	@Override
-	public boolean isInstanceable() {
-		return model.isInstanceable();
 	}
 
 	/**
@@ -804,45 +678,13 @@ public class ClientExtensionEntryWrapper
 	}
 
 	/**
-	 * Sets the custom element cssur ls of this client extension entry.
+	 * Sets the ct collection ID of this client extension entry.
 	 *
-	 * @param customElementCSSURLs the custom element cssur ls of this client extension entry
+	 * @param ctCollectionId the ct collection ID of this client extension entry
 	 */
 	@Override
-	public void setCustomElementCSSURLs(String customElementCSSURLs) {
-		model.setCustomElementCSSURLs(customElementCSSURLs);
-	}
-
-	/**
-	 * Sets the custom element html element name of this client extension entry.
-	 *
-	 * @param customElementHTMLElementName the custom element html element name of this client extension entry
-	 */
-	@Override
-	public void setCustomElementHTMLElementName(
-		String customElementHTMLElementName) {
-
-		model.setCustomElementHTMLElementName(customElementHTMLElementName);
-	}
-
-	/**
-	 * Sets the custom element ur ls of this client extension entry.
-	 *
-	 * @param customElementURLs the custom element ur ls of this client extension entry
-	 */
-	@Override
-	public void setCustomElementURLs(String customElementURLs) {
-		model.setCustomElementURLs(customElementURLs);
-	}
-
-	/**
-	 * Sets whether this client extension entry is custom element use esm.
-	 *
-	 * @param customElementUseESM the custom element use esm of this client extension entry
-	 */
-	@Override
-	public void setCustomElementUseESM(boolean customElementUseESM) {
-		model.setCustomElementUseESM(customElementUseESM);
+	public void setCtCollectionId(long ctCollectionId) {
+		model.setCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -863,36 +705,6 @@ public class ClientExtensionEntryWrapper
 	@Override
 	public void setExternalReferenceCode(String externalReferenceCode) {
 		model.setExternalReferenceCode(externalReferenceCode);
-	}
-
-	/**
-	 * Sets the friendly url mapping of this client extension entry.
-	 *
-	 * @param friendlyURLMapping the friendly url mapping of this client extension entry
-	 */
-	@Override
-	public void setFriendlyURLMapping(String friendlyURLMapping) {
-		model.setFriendlyURLMapping(friendlyURLMapping);
-	}
-
-	/**
-	 * Sets the i frame url of this client extension entry.
-	 *
-	 * @param iFrameURL the i frame url of this client extension entry
-	 */
-	@Override
-	public void setIFrameURL(String iFrameURL) {
-		model.setIFrameURL(iFrameURL);
-	}
-
-	/**
-	 * Sets whether this client extension entry is instanceable.
-	 *
-	 * @param instanceable the instanceable of this client extension entry
-	 */
-	@Override
-	public void setInstanceable(boolean instanceable) {
-		model.setInstanceable(instanceable);
 	}
 
 	/**
@@ -989,16 +801,6 @@ public class ClientExtensionEntryWrapper
 	}
 
 	/**
-	 * Sets the portlet category name of this client extension entry.
-	 *
-	 * @param portletCategoryName the portlet category name of this client extension entry
-	 */
-	@Override
-	public void setPortletCategoryName(String portletCategoryName) {
-		model.setPortletCategoryName(portletCategoryName);
-	}
-
-	/**
 	 * Sets the primary key of this client extension entry.
 	 *
 	 * @param primaryKey the primary key of this client extension entry
@@ -1089,6 +891,16 @@ public class ClientExtensionEntryWrapper
 	}
 
 	/**
+	 * Sets the type settings of this client extension entry.
+	 *
+	 * @param typeSettings the type settings of this client extension entry
+	 */
+	@Override
+	public void setTypeSettings(String typeSettings) {
+		model.setTypeSettings(typeSettings);
+	}
+
+	/**
 	 * Sets the user ID of this client extension entry.
 	 *
 	 * @param userId the user ID of this client extension entry
@@ -1126,6 +938,20 @@ public class ClientExtensionEntryWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
+	}
+
+	@Override
+	public Map<String, Function<ClientExtensionEntry, Object>>
+		getAttributeGetterFunctions() {
+
+		return model.getAttributeGetterFunctions();
+	}
+
+	@Override
+	public Map<String, BiConsumer<ClientExtensionEntry, Object>>
+		getAttributeSetterBiConsumers() {
+
+		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

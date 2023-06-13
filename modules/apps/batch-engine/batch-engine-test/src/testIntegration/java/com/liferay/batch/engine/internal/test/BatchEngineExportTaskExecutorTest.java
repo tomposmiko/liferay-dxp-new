@@ -131,8 +131,7 @@ public class BatchEngineExportTaskExecutorTest
 
 		List<BlogsEntry> blogsEntries = addBlogsEntries();
 
-		Assert.assertEquals(
-			ROWS_COUNT, blogsEntryLocalService.getBlogsEntriesCount());
+		assertBlogsEntriesCount();
 
 		List<String> fieldNames = Arrays.asList(
 			"articleBody", "datePublished", "headline", "id");
@@ -156,8 +155,7 @@ public class BatchEngineExportTaskExecutorTest
 
 		List<BlogsEntry> blogsEntries = addBlogsEntries();
 
-		Assert.assertEquals(
-			ROWS_COUNT, blogsEntryLocalService.getBlogsEntriesCount());
+		assertBlogsEntriesCount();
 
 		List<String> fieldNames = Arrays.asList(
 			"articleBody", "datePublished", "headline", "id");
@@ -456,8 +454,7 @@ public class BatchEngineExportTaskExecutorTest
 
 		List<BlogsEntry> blogsEntries = addBlogsEntries();
 
-		Assert.assertEquals(
-			ROWS_COUNT, blogsEntryLocalService.getBlogsEntriesCount());
+		assertBlogsEntriesCount();
 
 		_exportBlogPostings("CSV", fieldNames, parameters);
 
@@ -488,8 +485,7 @@ public class BatchEngineExportTaskExecutorTest
 
 		List<BlogsEntry> blogsEntries = addBlogsEntries();
 
-		Assert.assertEquals(
-			ROWS_COUNT, blogsEntryLocalService.getBlogsEntriesCount());
+		assertBlogsEntriesCount();
 
 		_exportBlogPostings("JSON", fieldNames, parameters);
 
@@ -523,8 +519,7 @@ public class BatchEngineExportTaskExecutorTest
 
 		List<BlogsEntry> blogsEntries = addBlogsEntries();
 
-		Assert.assertEquals(
-			ROWS_COUNT, blogsEntryLocalService.getBlogsEntriesCount());
+		assertBlogsEntriesCount();
 
 		_exportBlogPostings("JSONL", fieldNames, parameters);
 
@@ -568,8 +563,7 @@ public class BatchEngineExportTaskExecutorTest
 
 		List<BlogsEntry> blogsEntries = addBlogsEntries();
 
-		Assert.assertEquals(
-			ROWS_COUNT, blogsEntryLocalService.getBlogsEntriesCount());
+		assertBlogsEntriesCount();
 
 		_exportBlogPostings("XLS", fieldNames, parameters);
 

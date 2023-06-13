@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.frontend.icons;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 
@@ -26,19 +27,10 @@ import com.liferay.portal.kernel.util.StringBundler;
 public class FrontendIconsUtil {
 
 	public static String getBasePath() {
-		return _ICONS_BASE_PATH;
+		return PortalUtil.getPathContext() + _ICONS_BASE_PATH;
 	}
 
-	public static String getSpritemapPath(long siteId) {
-		return StringBundler.concat(
-			_ICONS_BASE_PATH, "/site/", String.valueOf(siteId), ".svg");
-	}
-
-	public static String getSpritemapPath(String name) {
-		return StringBundler.concat(_ICONS_BASE_PATH, "/pack/", name, ".svg");
-	}
-
-	public static String getSpritemapPath(ThemeDisplay themeDisplay) {
+	public static String getSpritemap(ThemeDisplay themeDisplay) {
 		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-145112"))) {
 			return themeDisplay.getPathThemeImages() + "/clay/icons.svg";
 		}
@@ -46,18 +38,27 @@ public class FrontendIconsUtil {
 		Theme theme = themeDisplay.getTheme();
 
 		if (theme.isControlPanelTheme()) {
-			return getSystemSpritemapPath();
+			return getSystemSpritemap();
 		}
 
-		return getSpritemapPath(themeDisplay.getSiteGroupId());
+		return _getSpritemap(themeDisplay.getSiteGroupId());
 	}
 
 	public static String getSystemIconPackName() {
 		return _SYSTEM_ICON_PACK_NAME;
 	}
 
-	public static String getSystemSpritemapPath() {
-		return getSpritemapPath(_SYSTEM_ICON_PACK_NAME);
+	public static String getSystemSpritemap() {
+		return _getSpritemap(_SYSTEM_ICON_PACK_NAME);
+	}
+
+	private static String _getSpritemap(long siteId) {
+		return StringBundler.concat(
+			getBasePath(), "/site/", String.valueOf(siteId), ".svg");
+	}
+
+	private static String _getSpritemap(String name) {
+		return StringBundler.concat(getBasePath(), "/pack/", name, ".svg");
 	}
 
 	private static final String _ICONS_BASE_PATH = "/o/icons";

@@ -14,28 +14,52 @@
 
 import {ClayButtonWithIcon} from '@clayui/button';
 import ClayDropDown, {Align} from '@clayui/drop-down';
-import {ReactPortal, useEventListener} from '@liferay/frontend-js-react-web';
+import {
+	ReactPortal,
+	useEventListener,
+	useIsMounted,
+} from '@liferay/frontend-js-react-web';
 import React, {useState} from 'react';
 
+import {
+	useMultipleUndo,
+	useRedoHistory,
+	useUndoHistory,
+} from './StyleBookContext';
 import {UNDO_TYPES} from './constants/undoTypes';
 
 export default function UndoHistory() {
-	const redoHistory = [];
-	const undoHistory = [];
+	const isMounted = useIsMounted();
+	const multipleUndo = useMultipleUndo();
+	const redoHistory = useRedoHistory();
+	const undoHistory = useUndoHistory();
 
 	const [active, setActive] = useState(false);
-	const [loading] = useState(false);
+	const [loading, setLoading] = useState(false);
 
-	const onHistoryItemClick = () => {};
+	const onHistoryItemClick = (event, numberOfActions, type) => {
+		event.preventDefault();
+
+		setLoading(true);
+
+		multipleUndo({
+			numberOfActions,
+			type,
+		}).then(() => {
+			if (isMounted()) {
+				setLoading(false);
+			}
+		});
+	};
 
 	return (
 		<>
 			<ClayDropDown
 				active={active}
 				alignmentPosition={Align.BottomRight}
-				className="ml-2"
+				className="ml-2 mr-2"
 				menuElementAttrs={{
-					className: 'page-editor__undo-history',
+					className: 'style-book-editor__undo-history',
 					containerProps: {
 						className: 'cadmin',
 					},
@@ -70,7 +94,13 @@ export default function UndoHistory() {
 
 					<ClayDropDown.Item
 						disabled={!undoHistory.length}
-						onClick={() => {}}
+						onClick={(event) => {
+							onHistoryItemClick(
+								event,
+								undoHistory.length,
+								UNDO_TYPES.undo
+							);
+						}}
 					>
 						{Liferay.Language.get('undo-all')}
 					</ClayDropDown.Item>
@@ -78,7 +108,7 @@ export default function UndoHistory() {
 			</ClayDropDown>
 
 			{loading && (
-				<ReactPortal>
+				<ReactPortal className="cadmin">
 					<Overlay />
 				</ReactPortal>
 			)}
@@ -100,7 +130,7 @@ const Overlay = () => {
 
 	return (
 		<div
-			className="page-editor__undo-history__overlay"
+			className="style-book-editor__undo-history__overlay"
 			onClickCapture={(event) => {
 				event.preventDefault();
 				event.stopPropagation();
@@ -117,7 +147,7 @@ const History = ({actions = [], type, onHistoryItemClick}) => {
 	return actionList.map((action, index) => (
 		<ClayDropDown.Item
 			disabled={isSelectedAction(index)}
-			key={action.actionId}
+			key={index}
 			onClick={(event) => {
 				const numberOfActions =
 					type === UNDO_TYPES.undo
@@ -127,6 +157,8 @@ const History = ({actions = [], type, onHistoryItemClick}) => {
 				onHistoryItemClick(event, numberOfActions, type);
 			}}
 			symbolRight={isSelectedAction(index) ? 'check' : ''}
-		/>
+		>
+			{Liferay.Util.sub(Liferay.Language.get('update-x'), action.label)}
+		</ClayDropDown.Item>
 	));
 };

@@ -23,6 +23,8 @@ import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.client.extension.model.ClientExtensionEntry;
 import com.liferay.client.extension.service.ClientExtensionEntryLocalService;
+import com.liferay.client.extension.type.CETCustomElement;
+import com.liferay.client.extension.type.factory.CETFactory;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
 import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseLocalService;
 import com.liferay.commerce.notification.model.CommerceNotificationTemplate;
@@ -424,12 +426,14 @@ public class BundleSiteInitializerTest {
 					group.getCompanyId(), "ERC001");
 
 		Assert.assertNotNull(clientExtensionEntry);
+
+		CETCustomElement cetCustomElement = _cetFactory.cetCustomElement(
+			clientExtensionEntry);
+
 		Assert.assertEquals(
-			"category.remote-apps",
-			clientExtensionEntry.getPortletCategoryName());
+			"liferay-test-remote-app", cetCustomElement.getHTMLElementName());
 		Assert.assertEquals(
-			"liferay-test-remote-app",
-			clientExtensionEntry.getCustomElementHTMLElementName());
+			"category.remote-apps", cetCustomElement.getPortletCategoryName());
 	}
 
 	private void _assertCommerceCatalogs(Group group) throws Exception {
@@ -1428,6 +1432,9 @@ public class BundleSiteInitializerTest {
 
 	@Inject
 	private AssetVocabularyLocalService _assetVocabularyLocalService;
+
+	@Inject
+	private CETFactory _cetFactory;
 
 	@Inject
 	private ClientExtensionEntryLocalService _clientExtensionEntryLocalService;

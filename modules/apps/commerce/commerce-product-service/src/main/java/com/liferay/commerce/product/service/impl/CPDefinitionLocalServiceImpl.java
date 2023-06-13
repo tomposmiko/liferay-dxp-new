@@ -562,7 +562,12 @@ public class CPDefinitionLocalServiceImpl
 			CProduct newCProduct = (CProduct)originalCProduct.clone();
 
 			newCProduct.setUuid(PortalUUIDUtil.generate());
-			newCProduct.setCProductId(counterLocalService.increment());
+
+			long cProductId = counterLocalService.increment();
+
+			newCProduct.setExternalReferenceCode(String.valueOf(cProductId));
+			newCProduct.setCProductId(cProductId);
+
 			newCProduct.setUserId(user.getUserId());
 			newCProduct.setUserName(user.getFullName());
 			newCProduct.setPublishedCPDefinitionId(newCPDefinitionId);
@@ -631,8 +636,13 @@ public class CPDefinitionLocalServiceImpl
 				(CPAttachmentFileEntry)cpAttachmentFileEntry.clone();
 
 			newCPAttachmentFileEntry.setUuid(PortalUUIDUtil.generate());
+
+			long cpAttachmentFileEntryId = counterLocalService.increment();
+
+			newCPAttachmentFileEntry.setExternalReferenceCode(
+				String.valueOf(cpAttachmentFileEntryId));
 			newCPAttachmentFileEntry.setCPAttachmentFileEntryId(
-				counterLocalService.increment());
+				cpAttachmentFileEntryId);
 
 			newCPAttachmentFileEntry.setClassPK(newCPDefinitionId);
 
@@ -762,7 +772,13 @@ public class CPDefinitionLocalServiceImpl
 			CPInstance newCPInstance = (CPInstance)cpInstance.clone();
 
 			newCPInstance.setUuid(PortalUUIDUtil.generate());
-			newCPInstance.setCPInstanceId(counterLocalService.increment());
+
+			long cpInstanceId = counterLocalService.increment();
+
+			newCPInstance.setExternalReferenceCode(
+				String.valueOf(cpInstanceId));
+			newCPInstance.setCPInstanceId(cpInstanceId);
+
 			newCPInstance.setCPInstanceUuid(PortalUUIDUtil.generate());
 
 			newCPInstance.setCPDefinitionId(newCPDefinitionId);

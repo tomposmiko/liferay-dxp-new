@@ -27,6 +27,10 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.PaginationBarTag;
 import com.liferay.frontend.taglib.clay.servlet.taglib.RowTag;
 import com.liferay.frontend.taglib.servlet.taglib.ComponentTag;
 import com.liferay.info.constants.InfoDisplayWebKeys;
+import com.liferay.info.exception.NoSuchFormVariationException;
+import com.liferay.info.form.InfoForm;
+import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.info.list.renderer.DefaultInfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRenderer;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
@@ -69,6 +73,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
@@ -164,6 +169,32 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	protected static final String LAYOUT_STRUCTURE =
 		RenderLayoutStructureTag.class.getName() + "#LAYOUT_STRUCTURE";
 
+	private InfoForm _getInfoForm(
+		FormStyledLayoutStructureItem formStyledLayoutStructureItem) {
+
+		InfoItemServiceTracker infoItemServiceTracker =
+			ServletContextUtil.getInfoItemServiceTracker();
+
+		InfoItemFormProvider<Object> infoItemFormProvider =
+			infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemFormProvider.class,
+				PortalUtil.getClassName(
+					formStyledLayoutStructureItem.getClassNameId()));
+
+		if (infoItemFormProvider != null) {
+			try {
+				return infoItemFormProvider.getInfoForm(
+					String.valueOf(
+						formStyledLayoutStructureItem.getClassTypeId()));
+			}
+			catch (NoSuchFormVariationException noSuchFormVariationException) {
+				return null;
+			}
+		}
+
+		return null;
+	}
+
 	private String _getLayoutMode() {
 		HttpServletRequest httpServletRequest = getRequest();
 
@@ -194,7 +225,7 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	}
 
 	private void _renderCollectionStyledLayoutStructureItem(
-			LayoutStructureItem layoutStructureItem,
+			InfoForm infoForm, LayoutStructureItem layoutStructureItem,
 			RenderLayoutStructureDisplayContext
 				renderLayoutStructureDisplayContext)
 		throws Exception {
@@ -368,7 +399,7 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 						_renderLayoutStructure(
 							layoutStructureItem.getChildrenItemIds(), index,
-							renderLayoutStructureDisplayContext);
+							infoForm, renderLayoutStructureDisplayContext);
 
 						httpServletRequest.removeAttribute(
 							COLLECTION_ELEMENT_INDEX);
@@ -491,7 +522,8 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	}
 
 	private void _renderColumnLayoutStructureItem(
-			LayoutStructureItem layoutStructureItem, int collectionElementIndex,
+			int collectionElementIndex, InfoForm infoForm,
+			LayoutStructureItem layoutStructureItem,
 			RenderLayoutStructureDisplayContext
 				renderLayoutStructureDisplayContext)
 		throws Exception {
@@ -515,13 +547,14 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 		_renderLayoutStructure(
 			layoutStructureItem.getChildrenItemIds(), collectionElementIndex,
-			renderLayoutStructureDisplayContext);
+			infoForm, renderLayoutStructureDisplayContext);
 
 		colTag.doEndTag();
 	}
 
 	private void _renderContainerStyledLayoutStructureItem(
-			LayoutStructureItem layoutStructureItem, int collectionElementIndex,
+			int collectionElementIndex, InfoForm infoForm,
+			LayoutStructureItem layoutStructureItem,
 			RenderLayoutStructureDisplayContext
 				renderLayoutStructureDisplayContext)
 		throws Exception {
@@ -614,7 +647,7 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 		_renderLayoutStructure(
 			layoutStructureItem.getChildrenItemIds(), collectionElementIndex,
-			renderLayoutStructureDisplayContext);
+			infoForm, renderLayoutStructureDisplayContext);
 
 		jspWriter.write("</");
 		jspWriter.write(htmlTag);
@@ -626,7 +659,8 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	}
 
 	private void _renderDropZoneLayoutStructureItem(
-			LayoutStructureItem layoutStructureItem, int collectionElementIndex,
+			int collectionElementIndex, InfoForm infoForm,
+			LayoutStructureItem layoutStructureItem,
 			RenderLayoutStructureDisplayContext
 				renderLayoutStructureDisplayContext)
 		throws Exception {
@@ -685,7 +719,8 @@ public class RenderLayoutStructureTag extends IncludeTag {
 		else {
 			_renderLayoutStructure(
 				layoutStructureItem.getChildrenItemIds(),
-				collectionElementIndex, renderLayoutStructureDisplayContext);
+				collectionElementIndex, infoForm,
+				renderLayoutStructureDisplayContext);
 		}
 	}
 
@@ -703,7 +738,8 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	}
 
 	private void _renderFormStyledLayoutStructureItem(
-			LayoutStructureItem layoutStructureItem, int collectionElementIndex,
+			int collectionElementIndex, InfoForm infoForm,
+			LayoutStructureItem layoutStructureItem,
 			RenderLayoutStructureDisplayContext
 				renderLayoutStructureDisplayContext)
 		throws Exception {
@@ -735,13 +771,14 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 		_renderLayoutStructure(
 			layoutStructureItem.getChildrenItemIds(), collectionElementIndex,
-			renderLayoutStructureDisplayContext);
+			infoForm, renderLayoutStructureDisplayContext);
 
 		jspWriter.write("</form>");
 	}
 
 	private void _renderFragmentStyledLayoutStructureItem(
-			int collectionElementIndex, LayoutStructureItem layoutStructureItem,
+			int collectionElementIndex, InfoForm infoForm,
+			LayoutStructureItem layoutStructureItem,
 			RenderLayoutStructureDisplayContext
 				renderLayoutStructureDisplayContext)
 		throws Exception {
@@ -772,9 +809,8 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				DefaultFragmentRendererContext defaultFragmentRendererContext =
 					renderLayoutStructureDisplayContext.
 						getDefaultFragmentRendererContext(
-							fragmentEntryLink,
-							fragmentStyledLayoutStructureItem.getItemId(),
-							collectionElementIndex);
+							collectionElementIndex, fragmentEntryLink, infoForm,
+							fragmentStyledLayoutStructureItem.getItemId());
 
 				FragmentRendererController fragmentRendererController =
 					ServletContextUtil.getFragmentRendererController();
@@ -794,9 +830,8 @@ public class RenderLayoutStructureTag extends IncludeTag {
 						true)) {
 
 					_write(
-						jspWriter, fragmentEntryLink,
-						fragmentStyledLayoutStructureItem,
-						renderLayoutStructureDisplayContext);
+						fragmentEntryLink, fragmentStyledLayoutStructureItem,
+						jspWriter, renderLayoutStructureDisplayContext);
 				}
 				else {
 					jspWriter.write("<div>");
@@ -814,6 +849,7 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 	private void _renderLayoutStructure(
 			List<String> childrenItemIds, int collectionElementIndex,
+			InfoForm infoForm,
 			RenderLayoutStructureDisplayContext
 				renderLayoutStructureDisplayContext)
 		throws Exception {
@@ -826,11 +862,12 @@ public class RenderLayoutStructureTag extends IncludeTag {
 					CollectionStyledLayoutStructureItem) {
 
 				_renderCollectionStyledLayoutStructureItem(
-					layoutStructureItem, renderLayoutStructureDisplayContext);
+					infoForm, layoutStructureItem,
+					renderLayoutStructureDisplayContext);
 			}
 			else if (layoutStructureItem instanceof ColumnLayoutStructureItem) {
 				_renderColumnLayoutStructureItem(
-					layoutStructureItem, collectionElementIndex,
+					collectionElementIndex, infoForm, layoutStructureItem,
 					renderLayoutStructureDisplayContext);
 			}
 			else if (layoutStructureItem instanceof
@@ -847,14 +884,14 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				}
 
 				_renderContainerStyledLayoutStructureItem(
-					layoutStructureItem, collectionElementIndex,
+					collectionElementIndex, infoForm, layoutStructureItem,
 					renderLayoutStructureDisplayContext);
 			}
 			else if (layoutStructureItem instanceof
 						DropZoneLayoutStructureItem) {
 
 				_renderDropZoneLayoutStructureItem(
-					layoutStructureItem, collectionElementIndex,
+					collectionElementIndex, infoForm, layoutStructureItem,
 					renderLayoutStructureDisplayContext);
 			}
 			else if (layoutStructureItem instanceof
@@ -870,8 +907,9 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				}
 
 				_renderFormStyledLayoutStructureItem(
-					layoutStructureItem, collectionElementIndex,
-					renderLayoutStructureDisplayContext);
+					collectionElementIndex,
+					_getInfoForm(formStyledLayoutStructureItem),
+					layoutStructureItem, renderLayoutStructureDisplayContext);
 			}
 			else if (layoutStructureItem instanceof
 						FragmentStyledLayoutStructureItem) {
@@ -887,7 +925,7 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				}
 
 				_renderFragmentStyledLayoutStructureItem(
-					collectionElementIndex, layoutStructureItem,
+					collectionElementIndex, infoForm, layoutStructureItem,
 					renderLayoutStructureDisplayContext);
 			}
 			else if (layoutStructureItem instanceof
@@ -903,13 +941,13 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				}
 
 				_renderRowStyledLayoutStructureItem(
-					layoutStructureItem, collectionElementIndex,
+					collectionElementIndex, infoForm, layoutStructureItem,
 					renderLayoutStructureDisplayContext);
 			}
 			else {
 				_renderLayoutStructure(
 					layoutStructureItem.getChildrenItemIds(),
-					collectionElementIndex,
+					collectionElementIndex, infoForm,
 					renderLayoutStructureDisplayContext);
 			}
 		}
@@ -929,11 +967,12 @@ public class RenderLayoutStructureTag extends IncludeTag {
 			childrenItemIds,
 			GetterUtil.getInteger(
 				httpServletRequest.getAttribute(COLLECTION_ELEMENT_INDEX), -1),
-			renderLayoutStructureDisplayContext);
+			null, renderLayoutStructureDisplayContext);
 	}
 
 	private void _renderRowStyledLayoutStructureItem(
-			LayoutStructureItem layoutStructureItem, int collectionElementIndex,
+			int collectionElementIndex, InfoForm infoForm,
+			LayoutStructureItem layoutStructureItem,
 			RenderLayoutStructureDisplayContext
 				renderLayoutStructureDisplayContext)
 		throws Exception {
@@ -1030,7 +1069,8 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 			_renderLayoutStructure(
 				layoutStructureItem.getChildrenItemIds(),
-				collectionElementIndex, renderLayoutStructureDisplayContext);
+				collectionElementIndex, infoForm,
+				renderLayoutStructureDisplayContext);
 
 			rowTag.doEndTag();
 
@@ -1048,7 +1088,8 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 			_renderLayoutStructure(
 				layoutStructureItem.getChildrenItemIds(),
-				collectionElementIndex, renderLayoutStructureDisplayContext);
+				collectionElementIndex, infoForm,
+				renderLayoutStructureDisplayContext);
 
 			rowTag.doEndTag();
 		}
@@ -1085,8 +1126,9 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	}
 
 	private void _write(
-			JspWriter jspWriter, FragmentEntryLink fragmentEntryLink,
+			FragmentEntryLink fragmentEntryLink,
 			FragmentStyledLayoutStructureItem fragmentStyledLayoutStructureItem,
+			JspWriter jspWriter,
 			RenderLayoutStructureDisplayContext
 				renderLayoutStructureDisplayContext)
 		throws Exception {

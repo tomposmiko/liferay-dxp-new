@@ -272,8 +272,6 @@ definition {
 	@description = "Verify that the user is not able to search by Workflow description"
 	@priority = "3"
 	test CanSearchByDescription {
-		property portal.upstream = "quarantine";
-
 		Workflow.openWorkflowListView();
 
 		task ("Search for existing Description") {
@@ -281,6 +279,7 @@ definition {
 
 			ProcessBuilderListView.validateIfSearchItem(
 				numberResults = "1",
+				singleResult = "true",
 				workflowName = "&quot;workflow content&quot;");
 
 			AssertElementPresent(
@@ -304,8 +303,6 @@ definition {
 	@description = "Verify that the user is able to search by Workflow title"
 	@priority = "4"
 	test CanSearchByTitle {
-		property portal.upstream = "quarantine";
-
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
 			panel = "Applications",
@@ -315,6 +312,7 @@ definition {
 
 		ProcessBuilderListView.validateIfSearchItem(
 			numberResults = "1",
+			singleResult = "true",
 			workflowName = "&quot;Approver&quot;");
 
 		Workflow.viewDefinitionPublished(workflowDefinitionTitle = "Single Approver");

@@ -32,6 +32,7 @@ page import="com.liferay.document.library.web.internal.display.context.DLEditFol
 page import="com.liferay.document.library.web.internal.display.context.DLFileEntryAdditionalMetadataSetsDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLFileEntryTypeDetailsDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLInfoPanelDisplayContext" %><%@
+page import="com.liferay.document.library.web.internal.display.context.DLSizeLimitConfigurationDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLViewDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLViewEntriesDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLViewFileEntryDisplayContext" %><%@
@@ -56,7 +57,6 @@ page import="com.liferay.portal.kernel.repository.model.RepositoryEntry" %><%@
 page import="com.liferay.portal.kernel.util.LocaleUtil" %><%@
 page import="com.liferay.portal.kernel.util.SetUtil" %><%@
 page import="com.liferay.portal.kernel.view.count.ViewCountManagerUtil" %><%@
-page import="com.liferay.portal.util.PropsUtil" %><%@
 page import="com.liferay.portal.util.RepositoryUtil" %><%@
 page import="com.liferay.taglib.util.PortalIncludeUtil" %>
 

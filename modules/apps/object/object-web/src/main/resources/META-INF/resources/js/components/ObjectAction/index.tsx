@@ -14,12 +14,16 @@
 
 import 'codemirror/mode/groovy/groovy';
 import ClayTabs from '@clayui/tabs';
+import {
+	CustomItem,
+	SidePanelForm,
+	closeSidePanel,
+	openToast,
+} from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useState} from 'react';
 
 import useForm, {FormError, invalidateRequired} from '../../hooks/useForm';
-import {CustomItem} from '../Form/CustomSelect/CustomSelect';
-import {SidePanelForm, closeSidePanel, openToast} from '../SidePanelContent';
 import ActionBuilder from './tabs/ActionBuilder';
 import BasicInfo from './tabs/BasicInfo';
 
@@ -31,6 +35,7 @@ const TABS = [
 ];
 
 export default function Action({
+	ffNotificationTemplates,
 	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
@@ -106,6 +111,7 @@ export default function Action({
 				<ClayTabs.TabPane>
 					<ActionBuilder
 						errors={errors}
+						ffNotificationTemplates={ffNotificationTemplates}
 						objectActionExecutors={objectActionExecutors}
 						objectActionTriggers={objectActionTriggers}
 						setValues={setValues}
@@ -156,6 +162,7 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 }
 
 interface IProps {
+	ffNotificationTemplates: boolean;
 	objectAction: Partial<ObjectAction>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

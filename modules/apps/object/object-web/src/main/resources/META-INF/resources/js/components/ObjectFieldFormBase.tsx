@@ -15,6 +15,11 @@
 import ClayForm, {ClayToggle} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import {ClayTooltipProvider} from '@clayui/tooltip';
+import {
+	FormCustomSelect,
+	Input,
+	Select,
+} from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {ChangeEventHandler, ReactNode, useMemo, useState} from 'react';
 
@@ -22,9 +27,6 @@ import useForm, {FormError, invalidateRequired} from '../hooks/useForm';
 import {normalizeFieldSettings} from '../utils/fieldSettings';
 import {defaultLanguageId} from '../utils/locale';
 import {toCamelCase} from '../utils/string';
-import CustomSelect from './Form/CustomSelect/CustomSelect';
-import Input from './Form/Input';
-import Select from './Form/Select';
 
 import './ObjectFieldFormBase.scss';
 
@@ -70,6 +72,22 @@ async function fetchPickList() {
 	return items.map(({id, name}) => ({id, name}));
 }
 
+async function fetchPickListItems(listTypeDefinitionId: number) {
+	const result = await fetch(
+		`/o/headless-admin-list-type/v1.0/list-type-definitions/${listTypeDefinitionId}/list-type-entries`,
+		{
+			headers,
+			method: 'GET',
+		}
+	);
+
+	const {items = []} = (await result.json()) as {
+		items: IPickListItems[] | undefined;
+	};
+
+	return items.map(({id, name}) => ({id, name}));
+}
+
 export default function ObjectFieldFormBase({
 	children,
 	disabled,
@@ -91,6 +109,7 @@ export default function ObjectFieldFormBase({
 	}, [objectFieldTypes]);
 
 	const [pickList, setPickList] = useState<IPickList[]>([]);
+	const [pickListItems, setPickListItems] = useState<IPickListItems[]>([]);
 
 	const handleTypeChange = async (option: ObjectFieldType) => {
 		if (option.businessType === 'Picklist') {
@@ -137,14 +156,28 @@ export default function ObjectFieldFormBase({
 				? values.indexedLanguageId ?? defaultLanguageId
 				: null;
 
-		setValues({
-			DBType: option.dbType,
-			businessType: option.businessType,
-			indexedAsKeyword,
-			indexedLanguageId,
-			objectFieldSettings,
-		});
+		if (Liferay.FeatureFlags['LPS-152677']) {
+			setValues({
+				DBType: option.dbType,
+				businessType: option.businessType,
+				indexedAsKeyword,
+				indexedLanguageId,
+				objectFieldSettings,
+				state: false,
+			});
+		}
+		else {
+			setValues({
+				DBType: option.dbType,
+				businessType: option.businessType,
+				indexedAsKeyword,
+				indexedLanguageId,
+				objectFieldSettings,
+			});
+		}
 	};
+
+	const picklist = values.businessType === 'Picklist';
 
 	return (
 		<>
@@ -161,7 +194,7 @@ export default function ObjectFieldFormBase({
 				}
 			/>
 
-			<CustomSelect<ObjectFieldType>
+			<FormCustomSelect<ObjectFieldType>
 				disabled={disabled}
 				error={errors.businessType}
 				label={Liferay.Language.get('type')}
@@ -183,28 +216,80 @@ export default function ObjectFieldFormBase({
 				/>
 			)}
 
-			{values.businessType === 'Picklist' && (
+			{picklist && (
 				<Select
 					disabled={disabled}
 					error={errors.listTypeDefinitionId}
 					label={Liferay.Language.get('picklist')}
-					onChange={({target: {value}}: any) =>
-						setValues({
-							listTypeDefinitionId: Number(pickList[value].id),
-						})
-					}
+					onChange={({target: {value}}: any) => {
+						if (Liferay.FeatureFlags['LPS-152677']) {
+							setValues({
+								listTypeDefinitionId: Number(
+									pickList[value].id
+								),
+								state: false,
+							});
+						}
+						else {
+							setValues({
+								listTypeDefinitionId: Number(
+									pickList[value].id
+								),
+							});
+						}
+					}}
 					options={pickList.map(({name}) => name)}
 					required
 				/>
 			)}
+
 			{children}
-			<ClayToggle
-				disabled={disabled}
-				label={Liferay.Language.get('mandatory')}
-				name="required"
-				onToggle={(required) => setValues({required})}
-				toggled={values.required}
-			/>
+
+			<ClayForm.Group className="lfr-objects__object-field-form-base-form-group-toggles">
+				<ClayToggle
+					disabled={disabled || values.state}
+					label={Liferay.Language.get('mandatory')}
+					name="required"
+					onToggle={(required) => setValues({required})}
+					toggled={values.required || values.state}
+				/>
+
+				{Liferay.FeatureFlags['LPS-152677'] &&
+					picklist &&
+					values.listTypeDefinitionId !== undefined &&
+					values.listTypeDefinitionId !== 0 && (
+						<ClayToggle
+							disabled={disabled}
+							label={Liferay.Language.get('mark-as-state')}
+							name="state"
+							onToggle={async (state) => {
+								setValues({state});
+								setPickListItems(
+									await fetchPickListItems(
+										values.listTypeDefinitionId!
+									)
+								);
+							}}
+							toggled={values.state}
+						/>
+					)}
+			</ClayForm.Group>
+
+			{values.state && (
+				<Select
+					disabled={disabled}
+					error={errors.defaultValue}
+					label={Liferay.Language.get('default-value')}
+					onChange={({target: {value}}: any) =>
+						setValues({
+							defaultValue: value,
+						})
+					}
+					options={pickListItems.map(({name}) => name)}
+					required
+					value={values.defaultValue}
+				/>
+			)}
 		</>
 	);
 }
@@ -346,6 +431,10 @@ export function useObjectFieldForm({
 			if (!field.listTypeDefinitionId) {
 				errors.listTypeDefinitionId = REQUIRED_MSG;
 			}
+
+			if (Liferay.FeatureFlags['LPS-152677'] && !field.defaultValue) {
+				errors.defaultValue = REQUIRED_MSG;
+			}
 		}
 
 		return errors;
@@ -422,7 +511,7 @@ function AttachmentSourceProperty({
 
 	return (
 		<>
-			<CustomSelect
+			<FormCustomSelect
 				disabled={disabled}
 				error={error}
 				label={Liferay.Language.get('request-files')}
@@ -477,10 +566,14 @@ interface IUseObjectFieldForm {
 	initialValues: Partial<ObjectField>;
 	onSubmit: (field: ObjectField) => void;
 }
-interface IPickList {
+interface IItemIdName {
 	id: string;
 	name: string;
 }
+
+interface IPickList extends IItemIdName {}
+
+interface IPickListItems extends IItemIdName {}
 
 interface IProps {
 	children?: ReactNode;

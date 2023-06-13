@@ -292,6 +292,10 @@ if (commerceOrder != null) {
 
 	<aui:button cssClass="btn btn-lg btn-secondary" onClick='<%= liferayPortletResponse.getNamespace() + "reorderCommerceOrder();" %>' value="reorder" />
 
+	<c:if test="<%= commerceOrderContentDisplayContext.isShowRetryPayment() %>">
+		<aui:button cssClass="btn btn-lg btn-primary" href="<%= commerceOrderContentDisplayContext.getRetryPaymentURL() %>" value="retry-payment" />
+	</c:if>
+
 	<liferay-util:dynamic-include key="com.liferay.commerce.order.content.web#/place_order_detail_cta#" />
 </div>
 
@@ -304,16 +308,13 @@ if (commerceOrder != null) {
 		contextParams.put("commerceOrderId", String.valueOf(commerceOrder.getCommerceOrderId()));
 		%>
 
-		<clay:data-set-display
+		<frontend-data-set:classic-display
 			contextParams="<%= contextParams %>"
-			dataProviderKey="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_PLACED_ORDER_ITEMS %>"
-			id="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_PLACED_ORDER_ITEMS %>"
+			dataProviderKey="<%= CommerceOrderFDSNames.PLACED_ORDER_ITEMS %>"
+			id="<%= CommerceOrderFDSNames.PLACED_ORDER_ITEMS %>"
 			itemsPerPage="<%= 10 %>"
-			namespace="<%= liferayPortletResponse.getNamespace() %>"
 			nestedItemsKey="orderItemId"
 			nestedItemsReferenceKey="orderItems"
-			pageNumber="<%= 1 %>"
-			portletURL="<%= commerceOrderContentDisplayContext.getPortletURL() %>"
 			style="stacked"
 		/>
 	</div>

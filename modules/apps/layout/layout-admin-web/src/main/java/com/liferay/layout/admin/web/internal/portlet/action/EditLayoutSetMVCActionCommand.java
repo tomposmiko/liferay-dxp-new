@@ -14,6 +14,8 @@
 
 package com.liferay.layout.admin.web.internal.portlet.action;
 
+import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
+import com.liferay.client.extension.service.ClientExtensionEntryRelLocalService;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.portal.kernel.model.Group;
@@ -21,13 +23,16 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.LayoutSetService;
+import com.liferay.portal.kernel.service.permission.GroupPermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -71,6 +76,8 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 
 		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(layoutSetId);
 
+		_updateClientExtensions(actionRequest, layoutSet, themeDisplay);
+
 		_updateLogo(actionRequest, liveGroupId, stagingGroupId, privateLayout);
 
 		updateLookAndFeel(
@@ -110,6 +117,38 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 			_updateLookAndFeel(
 				actionRequest, companyId, groupId, true,
 				typeSettingsUnicodeProperties);
+		}
+	}
+
+	private void _updateClientExtensions(
+			ActionRequest actionRequest, LayoutSet layoutSet,
+			ThemeDisplay themeDisplay)
+		throws Exception {
+
+		_groupPermission.check(
+			themeDisplay.getPermissionChecker(), layoutSet.getGroupId(),
+			ActionKeys.MANAGE_LAYOUTS);
+
+		String faviconCETExternalReferenceCode = ParamUtil.getString(
+			actionRequest, "faviconCETExternalReferenceCode");
+
+		if (Validator.isNotNull(faviconCETExternalReferenceCode)) {
+			_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
+				themeDisplay.getUserId(),
+				_portal.getClassNameId(LayoutSet.class),
+				layoutSet.getLayoutSetId(), faviconCETExternalReferenceCode,
+				ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
+		}
+
+		String themeCSSCETExternalReferenceCode = ParamUtil.getString(
+			actionRequest, "themeCSSCETExternalReferenceCode");
+
+		if (Validator.isNotNull(themeCSSCETExternalReferenceCode)) {
+			_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
+				themeDisplay.getUserId(),
+				_portal.getClassNameId(LayoutSet.class),
+				layoutSet.getLayoutSetId(), themeCSSCETExternalReferenceCode,
+				ClientExtensionEntryConstants.TYPE_THEME_CSS);
 		}
 	}
 
@@ -170,6 +209,12 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 				groupId, privateLayout, deviceThemeId, deviceColorSchemeId,
 				deviceCss);
 		}
+
+		long faviconFileEntryId = ParamUtil.getLong(
+			actionRequest, "faviconFileEntryId");
+
+		_layoutSetService.updateFaviconFileEntryId(
+			groupId, privateLayout, faviconFileEntryId);
 	}
 
 	private void _updateMergePages(
@@ -212,10 +257,17 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	@Reference
+	private ClientExtensionEntryRelLocalService
+		_clientExtensionEntryRelLocalService;
+
+	@Reference
 	private DLAppLocalService _dlAppLocalService;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private GroupPermission _groupPermission;
 
 	@Reference
 	private GroupService _groupService;
@@ -225,5 +277,8 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private LayoutSetService _layoutSetService;
+
+	@Reference
+	private Portal _portal;
 
 }

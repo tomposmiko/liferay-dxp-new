@@ -20,6 +20,26 @@ definition {
 			key_executionName = "${executionName}",
 			key_executionStatus = "${executionStatus}",
 			locator1 = "ImportExport#EXECUTION_ENTRY");
+
+		if (isSet(successfulRows) && isSet(failedRows) && isSet(totalRows)) {
+			AssertTextEquals(
+				key_column = "successful-rows",
+				key_executionName = "${executionName}",
+				locator1 = "ImportExport#EXECUTION_COLUMN",
+				value1 = "${successfulRows}");
+
+			AssertTextEquals(
+				key_column = "failed-rows",
+				key_executionName = "${executionName}",
+				locator1 = "ImportExport#EXECUTION_COLUMN",
+				value1 = "${failedRows}");
+
+			AssertTextEquals(
+				key_column = "total",
+				key_executionName = "${executionName}",
+				locator1 = "ImportExport#EXECUTION_COLUMN",
+				value1 = "${totalRows}");
+		}
 	}
 
 	macro assertExportTemplate {

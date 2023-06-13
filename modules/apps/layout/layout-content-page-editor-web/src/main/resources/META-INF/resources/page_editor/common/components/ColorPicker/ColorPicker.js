@@ -146,6 +146,10 @@ export function ColorPicker({
 	};
 
 	const onBlurAutocompleteInput = ({target}) => {
+		if (value.toLowerCase() === target.value.toLowerCase()) {
+			return;
+		}
+
 		if (!target.value) {
 			setColor(value);
 
@@ -454,7 +458,15 @@ export function ColorPicker({
 								className="border-0"
 								displayType="secondary"
 								onClick={() => {
+									if (
+										value.toLowerCase() ===
+										field.defaultValue?.toLowerCase()
+									) {
+										return;
+									}
+
 									setError({label: null, value: null});
+
 									onSetValue(
 										field.defaultValue ?? null,
 										field.defaultValue

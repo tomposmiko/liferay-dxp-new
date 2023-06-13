@@ -9,4 +9,14 @@
 	&-tooltip-icon {
 		color: $secondary-l1;
 	}
+
+	&-form-group-toggles {
+		display: contents;
+
+		.modal & {
+			display: grid;
+			gap: 1.56rem;
+			margin-bottom: 1.5rem;
+		}
+	}
 }

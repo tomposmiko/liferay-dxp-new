@@ -83,6 +83,21 @@ const ObjectLayoutTabs: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 										)}
 
 										<HeaderDropdown
+											addCategorization={() => {
+												dispatch({
+													payload: {
+														name: {
+															[defaultLanguageId]: Liferay.Language.get(
+																'categorization'
+															),
+														},
+														tabIndex,
+														type: 'categorization',
+													},
+													type:
+														TYPES.ADD_OBJECT_LAYOUT_BOX,
+												});
+											}}
 											deleteElement={() => {
 												dispatch({
 													payload: {
@@ -95,9 +110,8 @@ const ObjectLayoutTabs: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 										/>
 									</>
 								}
-								displayCollapseIcon
-								displayDragIcon
 								title={name[defaultLanguageId]}
+								type="regular"
 							/>
 
 							{!!objectLayoutBoxes?.length &&
@@ -109,13 +123,13 @@ const ObjectLayoutTabs: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 													collapsable,
 													name,
 													objectLayoutRows,
+													type,
 												},
 												boxIndex
 											) => (
 												<ObjectLayoutBox
 													boxIndex={boxIndex}
 													collapsable={collapsable}
-													displayAddButton
 													key={`box_${boxIndex}`}
 													label={
 														name[defaultLanguageId]
@@ -124,6 +138,13 @@ const ObjectLayoutTabs: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 														objectLayoutRows
 													}
 													tabIndex={tabIndex}
+													type={
+														!Liferay.FeatureFlags[
+															'LPS-149014'
+														]
+															? 'regular'
+															: type
+													}
 												/>
 											)
 										)}

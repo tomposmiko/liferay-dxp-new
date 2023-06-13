@@ -856,6 +856,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-7962 | Test Summary: Create a segment that contains anonymous individuals"
 	@priority = "5"
 	test CanCreateSegmentWithAnonymousIndividuals {
+		property analytics.cloud.upstream = "false";
+
 		var usernameList = "ac,liferay,dxp";
 		var emailList = "ac@liferay.com,liferay@liferay.com,dxp@liferay.com";
 		var nameList = "ac ac,liferay liferay,dxp dxp";
@@ -929,7 +931,7 @@ definition {
 		task ("Switch tab to membership and check the membership list") {
 			ACNavigation.switchTab(tabName = "Membership");
 
-			ACUtils.viewGenericText(textValueList = "There is no data for segment membership,Check back later to verify if data has been received from your data sources.,Learn more about segment membership.");
+			ACUtils.viewGenericText(textValueList = "There are no members found on the selected time period.,Check back later to verify if data has been received from your data sources.,Learn more about individuals.");
 		}
 
 		task ("Edit the segment") {

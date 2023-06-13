@@ -104,6 +104,11 @@ public class ObjectDefinitionResourceTest
 			Arrays.asList(objectDefinition2, objectDefinition1),
 			objectDefinitions.subList(
 				objectDefinitions.size() - 3, objectDefinitions.size() - 1));
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinition1.getId());
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			objectDefinition2.getId());
 	}
 
 	@Ignore
@@ -133,6 +138,9 @@ public class ObjectDefinitionResourceTest
 
 			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
 		}
+
+		_objectDefinitionLocalService.deleteObjectDefinition(
+			postObjectDefinition.getId());
 	}
 
 	@Override
@@ -148,6 +156,11 @@ public class ObjectDefinitionResourceTest
 	@Override
 	protected ObjectDefinition randomObjectDefinition() throws Exception {
 		ObjectDefinition objectDefinition = super.randomObjectDefinition();
+
+		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-153768"))) {
+			objectDefinition.setAccountEntryRestricted((Boolean)null);
+			objectDefinition.setAccountEntryRestrictedObjectFieldId((Long)null);
+		}
 
 		objectDefinition.setActive(false);
 		objectDefinition.setLabel(

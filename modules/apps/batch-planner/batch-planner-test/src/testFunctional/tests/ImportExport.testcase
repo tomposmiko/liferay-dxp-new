@@ -212,10 +212,45 @@ definition {
 				exportFileFormat = "JSON");
 		}
 
-		task ("Then only those fields should be imported") {
+		task ("Then only those fields should be exported") {
 			ImportExport.assertFileContent(
 				comparisonFileName = "json_channel_import.txt",
 				fileName = "export.json");
+		}
+	}
+
+	@description = "Verify users can exclude fields from being exported in JSONL format"
+	@priority = "3"
+	test CanExcludeJSONLFieldsFromExport {
+		property portal.acceptance = "true";
+
+		task ("Given several channels") {
+			CommerceJSONChannelsAPI._addChannel(
+				channelName = "Test Channel 1",
+				channelType = "site",
+				currencyCode = "USD",
+				externalReferenceCode = "101");
+
+			CommerceJSONChannelsAPI._addChannel(
+				channelName = "Test Channel 2",
+				channelType = "site",
+				currencyCode = "CAD",
+				externalReferenceCode = "102");
+		}
+
+		task ("When the user selects specific channel fields for export and exports the channels in JSONL format") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.exportFile(
+				entityType = "commerce.admin.channel.dto.v1_0.Channel",
+				exportFields = "name,type,currencyCode",
+				exportFileFormat = "JSONL");
+		}
+
+		task ("Then only those fields should be exported") {
+			ImportExport.assertFileContent(
+				comparisonFileName = "jsonl_channel_import.jsonl",
+				fileName = "export.jsonl");
 		}
 	}
 
@@ -991,7 +1026,6 @@ definition {
 	@description = "Verify users can schedule an import"
 	@priority = "3"
 	test CanScheduleImport {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "ImportExport#CanScheduleImport";
 
 		task ("Given an account import template") {
@@ -1449,6 +1483,50 @@ definition {
 		}
 	}
 
+	@description = "Verify users can download a report of the rows that had warnings or were not imported."
+	@priority = "3"
+	test CanViewImportErrorReport {
+		property portal.acceptance = "true";
+
+		task ("Given a failed account import due to an invalid account type in the second row") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.gotoImport();
+
+			ImportExport.configureImport(
+				entityType = "admin.user.dto.v1_0.Account",
+				fieldMappings = "name:Account Name,type:Account Type,description:Account Description,externalReferenceCode:External Reference Code",
+				fileName = "csv_account_import_error.csv",
+				stopImportOnError = "true");
+
+			Button.click(button = "Next");
+
+			Button.click(button = "Start Import");
+
+			WaitForElementPresent(locator1 = "Message#ERROR_FORM_FIELD_REQUIRED");
+		}
+
+		task ("When the user goes to the Import/Export Center and clicks on the ellipses for the import execution") {
+			ImportExport.openImportExportAdmin();
+
+			Click.waitForMenuToggleJSClick(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
+		}
+
+		task ("And the user clicks on the Download Error Report menu item") {
+			MenuItem.click(menuItem = "Download Error Report");
+		}
+
+		task ("Then an error report is downloaded which indicates an invalid type in the second row") {
+			DownloadTempFile();
+
+			var errorReportDownloadName = TestCase.getDownloadedTempFileName(fileNamePattern = "*.csv");
+
+			ImportExport.assertFileContent(
+				comparisonFileName = "account_import_error_report.csv",
+				fileName = "${errorReportDownloadName}");
+		}
+	}
+
 	@description = "Verify users receive a notification when an import is triggered."
 	@priority = "3"
 	test CanViewImportNotifications {
@@ -1734,6 +1812,37 @@ definition {
 			ImportExport.assertPreviewEntry(
 				entryName = "Test Person Account",
 				previewFields = "person,Test Person Account Description,103");
+		}
+	}
+
+	@description = "Verify users can view how many rows were successfully imported, how many rows were not imported, and the total number of rows for an import."
+	@priority = "3"
+	test ViewImportedRows {
+		property portal.acceptance = "true";
+
+		task ("Given a failed account import in which one of 3 rows was skipped due to an error in the second row") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.importFile(
+				entityType = "admin.user.dto.v1_0.Account",
+				fieldMappings = "name:Account Name,type:Account Type,description:Account Description,externalReferenceCode:External Reference Code",
+				fileName = "csv_account_import_error.csv",
+				stopImportOnError = "false");
+		}
+
+		task ("When the user goes to the Import/Export Center and views the import execution") {
+			ImportExport.openImportExportAdmin();
+		}
+
+		task ("Then the user should be able to view 2 successful rows, 1 failed row, and a total of 3") {
+			ImportExport.assertExecutionEntry(
+				entityType = "Account",
+				executionAction = "Import",
+				executionName = "csv_account_import_error",
+				executionStatus = "Partially Completed",
+				failedRows = "1",
+				successfulRows = "2",
+				totalRows = "3");
 		}
 	}
 

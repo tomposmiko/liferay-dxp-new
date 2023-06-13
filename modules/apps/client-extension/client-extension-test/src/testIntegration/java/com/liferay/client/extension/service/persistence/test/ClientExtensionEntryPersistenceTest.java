@@ -129,6 +129,8 @@ public class ClientExtensionEntryPersistenceTest {
 
 		newClientExtensionEntry.setMvccVersion(RandomTestUtil.nextLong());
 
+		newClientExtensionEntry.setCtCollectionId(RandomTestUtil.nextLong());
+
 		newClientExtensionEntry.setUuid(RandomTestUtil.randomString());
 
 		newClientExtensionEntry.setExternalReferenceCode(
@@ -144,37 +146,17 @@ public class ClientExtensionEntryPersistenceTest {
 
 		newClientExtensionEntry.setModifiedDate(RandomTestUtil.nextDate());
 
-		newClientExtensionEntry.setCustomElementCSSURLs(
-			RandomTestUtil.randomString());
-
-		newClientExtensionEntry.setCustomElementHTMLElementName(
-			RandomTestUtil.randomString());
-
-		newClientExtensionEntry.setCustomElementURLs(
-			RandomTestUtil.randomString());
-
-		newClientExtensionEntry.setCustomElementUseESM(
-			RandomTestUtil.randomBoolean());
-
 		newClientExtensionEntry.setDescription(RandomTestUtil.randomString());
 
-		newClientExtensionEntry.setFriendlyURLMapping(
-			RandomTestUtil.randomString());
-
-		newClientExtensionEntry.setIFrameURL(RandomTestUtil.randomString());
-
-		newClientExtensionEntry.setInstanceable(RandomTestUtil.randomBoolean());
-
 		newClientExtensionEntry.setName(RandomTestUtil.randomString());
-
-		newClientExtensionEntry.setPortletCategoryName(
-			RandomTestUtil.randomString());
 
 		newClientExtensionEntry.setProperties(RandomTestUtil.randomString());
 
 		newClientExtensionEntry.setSourceCodeURL(RandomTestUtil.randomString());
 
 		newClientExtensionEntry.setType(RandomTestUtil.randomString());
+
+		newClientExtensionEntry.setTypeSettings(RandomTestUtil.randomString());
 
 		newClientExtensionEntry.setStatus(RandomTestUtil.nextInt());
 
@@ -195,6 +177,9 @@ public class ClientExtensionEntryPersistenceTest {
 		Assert.assertEquals(
 			existingClientExtensionEntry.getMvccVersion(),
 			newClientExtensionEntry.getMvccVersion());
+		Assert.assertEquals(
+			existingClientExtensionEntry.getCtCollectionId(),
+			newClientExtensionEntry.getCtCollectionId());
 		Assert.assertEquals(
 			existingClientExtensionEntry.getUuid(),
 			newClientExtensionEntry.getUuid());
@@ -222,35 +207,11 @@ public class ClientExtensionEntryPersistenceTest {
 				existingClientExtensionEntry.getModifiedDate()),
 			Time.getShortTimestamp(newClientExtensionEntry.getModifiedDate()));
 		Assert.assertEquals(
-			existingClientExtensionEntry.getCustomElementCSSURLs(),
-			newClientExtensionEntry.getCustomElementCSSURLs());
-		Assert.assertEquals(
-			existingClientExtensionEntry.getCustomElementHTMLElementName(),
-			newClientExtensionEntry.getCustomElementHTMLElementName());
-		Assert.assertEquals(
-			existingClientExtensionEntry.getCustomElementURLs(),
-			newClientExtensionEntry.getCustomElementURLs());
-		Assert.assertEquals(
-			existingClientExtensionEntry.isCustomElementUseESM(),
-			newClientExtensionEntry.isCustomElementUseESM());
-		Assert.assertEquals(
 			existingClientExtensionEntry.getDescription(),
 			newClientExtensionEntry.getDescription());
 		Assert.assertEquals(
-			existingClientExtensionEntry.getFriendlyURLMapping(),
-			newClientExtensionEntry.getFriendlyURLMapping());
-		Assert.assertEquals(
-			existingClientExtensionEntry.getIFrameURL(),
-			newClientExtensionEntry.getIFrameURL());
-		Assert.assertEquals(
-			existingClientExtensionEntry.isInstanceable(),
-			newClientExtensionEntry.isInstanceable());
-		Assert.assertEquals(
 			existingClientExtensionEntry.getName(),
 			newClientExtensionEntry.getName());
-		Assert.assertEquals(
-			existingClientExtensionEntry.getPortletCategoryName(),
-			newClientExtensionEntry.getPortletCategoryName());
 		Assert.assertEquals(
 			existingClientExtensionEntry.getProperties(),
 			newClientExtensionEntry.getProperties());
@@ -260,6 +221,9 @@ public class ClientExtensionEntryPersistenceTest {
 		Assert.assertEquals(
 			existingClientExtensionEntry.getType(),
 			newClientExtensionEntry.getType());
+		Assert.assertEquals(
+			existingClientExtensionEntry.getTypeSettings(),
+			newClientExtensionEntry.getTypeSettings());
 		Assert.assertEquals(
 			existingClientExtensionEntry.getStatus(),
 			newClientExtensionEntry.getStatus());
@@ -291,6 +255,22 @@ public class ClientExtensionEntryPersistenceTest {
 		_persistence.countByUuid_C("null", 0L);
 
 		_persistence.countByUuid_C((String)null, 0L);
+	}
+
+	@Test
+	public void testCountByCompanyId() throws Exception {
+		_persistence.countByCompanyId(RandomTestUtil.nextLong());
+
+		_persistence.countByCompanyId(0L);
+	}
+
+	@Test
+	public void testCountByC_T() throws Exception {
+		_persistence.countByC_T(RandomTestUtil.nextLong(), "");
+
+		_persistence.countByC_T(0L, "null");
+
+		_persistence.countByC_T(0L, (String)null);
 	}
 
 	@Test
@@ -330,15 +310,13 @@ public class ClientExtensionEntryPersistenceTest {
 
 	protected OrderByComparator<ClientExtensionEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"ClientExtensionEntry", "mvccVersion", true, "uuid", true,
-			"externalReferenceCode", true, "clientExtensionEntryId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "customElementHTMLElementName", true,
-			"customElementUseESM", true, "friendlyURLMapping", true,
-			"iFrameURL", true, "instanceable", true, "name", true,
-			"portletCategoryName", true, "sourceCodeURL", true, "type", true,
-			"status", true, "statusByUserId", true, "statusByUserName", true,
-			"statusDate", true);
+			"ClientExtensionEntry", "mvccVersion", true, "ctCollectionId", true,
+			"uuid", true, "externalReferenceCode", true,
+			"clientExtensionEntryId", true, "companyId", true, "userId", true,
+			"userName", true, "createDate", true, "modifiedDate", true, "name",
+			true, "sourceCodeURL", true, "type", true, "status", true,
+			"statusByUserId", true, "statusByUserName", true, "statusDate",
+			true);
 	}
 
 	@Test
@@ -653,6 +631,8 @@ public class ClientExtensionEntryPersistenceTest {
 
 		clientExtensionEntry.setMvccVersion(RandomTestUtil.nextLong());
 
+		clientExtensionEntry.setCtCollectionId(RandomTestUtil.nextLong());
+
 		clientExtensionEntry.setUuid(RandomTestUtil.randomString());
 
 		clientExtensionEntry.setExternalReferenceCode(
@@ -668,37 +648,17 @@ public class ClientExtensionEntryPersistenceTest {
 
 		clientExtensionEntry.setModifiedDate(RandomTestUtil.nextDate());
 
-		clientExtensionEntry.setCustomElementCSSURLs(
-			RandomTestUtil.randomString());
-
-		clientExtensionEntry.setCustomElementHTMLElementName(
-			RandomTestUtil.randomString());
-
-		clientExtensionEntry.setCustomElementURLs(
-			RandomTestUtil.randomString());
-
-		clientExtensionEntry.setCustomElementUseESM(
-			RandomTestUtil.randomBoolean());
-
 		clientExtensionEntry.setDescription(RandomTestUtil.randomString());
 
-		clientExtensionEntry.setFriendlyURLMapping(
-			RandomTestUtil.randomString());
-
-		clientExtensionEntry.setIFrameURL(RandomTestUtil.randomString());
-
-		clientExtensionEntry.setInstanceable(RandomTestUtil.randomBoolean());
-
 		clientExtensionEntry.setName(RandomTestUtil.randomString());
-
-		clientExtensionEntry.setPortletCategoryName(
-			RandomTestUtil.randomString());
 
 		clientExtensionEntry.setProperties(RandomTestUtil.randomString());
 
 		clientExtensionEntry.setSourceCodeURL(RandomTestUtil.randomString());
 
 		clientExtensionEntry.setType(RandomTestUtil.randomString());
+
+		clientExtensionEntry.setTypeSettings(RandomTestUtil.randomString());
 
 		clientExtensionEntry.setStatus(RandomTestUtil.nextInt());
 

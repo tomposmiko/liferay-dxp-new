@@ -112,5 +112,12 @@ export {default as removeEntitySelection} from './liferay/util/remove_entity_sel
 export {default as showCapsLock} from './liferay/util/show_caps_lock';
 export {default as runScriptsInElement} from './liferay/util/run_scripts_in_element.es';
 export {default as selectFolder} from './liferay/util/select_folder';
+export {default as toggleBoxes} from './liferay/util/toggle_boxes';
 export {default as toggleControls} from './liferay/util/toggle_controls';
 export {default as toggleDisabled} from './liferay/util/toggle_disabled';
+export {default as toggleRadio} from './liferay/util/toggle_radio';
+export {default as toggleSelectBox} from './liferay/util/toggle_select_box';
+export {
+	getCheckedCheckboxes,
+	getUncheckedCheckboxes,
+} from './liferay/util/get_checkboxes';

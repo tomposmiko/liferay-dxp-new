@@ -38,6 +38,17 @@ const RequirementsOutlet = () => {
 	const {pathname} = useLocation();
 	const basePath = `/project/${projectId}/cases/${caseId}`;
 
+	const {data, loading} = useQuery<{requirement: TestrayRequirement}>(
+		getRequirement,
+		{
+			variables: {
+				requirementId,
+			},
+		}
+	);
+
+	const testrayRequirement = data?.requirement;
+
 	const {setHeading, setTabs} = useHeader({
 		shouldUpdate: false,
 		useTabs: [
@@ -54,25 +65,6 @@ const RequirementsOutlet = () => {
 		],
 	});
 
-	const {data, loading} = useQuery<{requirement: TestrayRequirement}>(
-		getRequirement,
-		{
-			variables: {
-				requirementId,
-			},
-		}
-	);
-
-	const testrayRequirement = data;
-
-	useEffect(() => {
-		if (testrayRequirement) {
-			setTimeout(() => {
-				setHeading([{title: testrayRequirement.requirement.key}], true);
-			}, 0);
-		}
-	}, [setHeading, testrayRequirement]);
-
 	useEffect(() => {
 		setTabs([]);
 	}, [setTabs]);
@@ -87,8 +79,7 @@ const RequirementsOutlet = () => {
 						title: testrayProject.name,
 					},
 					{
-						category: i18n.translate('case').toUpperCase(),
-						title: testrayRequirement?.requirement.components,
+						title: testrayRequirement?.key,
 					},
 				]);
 			}, 0);

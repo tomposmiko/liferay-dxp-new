@@ -1,5 +1,78 @@
 definition {
 
+	macro _addCommerceOrder {
+		var baseURL = "${baseURL}";
+
+		if (!(isSet(baseURL))) {
+			var baseURL = PropsUtil.get("portal.url");
+		}
+
+		var paymentMethod = StringUtil.lowerCase("${paymentMethod}");
+		var commerceChannelIds = CommerceJSONChannelsAPI._getCommerceChannelIds();
+		var accountEntryId = JSONAccountEntryAPI._getAccountEntryId(accountEntryName = "${accountEntryName}");
+
+		if (!(isSet(paymentStatus))) {
+			var paymentStatus = "1";
+		}
+
+		if (!(isSet(orderStatus))) {
+			var orderStatus = "2";
+		}
+
+		echo("Account id: ${accountEntryId}");
+
+		echo("Channel id: ${commerceChannelIds}");
+
+		var curl = '''
+			${baseURL}/o/headless-commerce-admin-order/v1.0/orders \
+			-u test@liferay.com:test \
+			-H 'accept: application/json' \
+  			-H 'Content-Type: application/json' \
+  			-d '{
+				  	"accountId": "${accountEntryId}",
+            		"channelId": "${commerceChannelIds}",
+            		"currencyCode": "USD",
+            		"paymentStatus": "${paymentStatus}",
+					"paymentMethod": "${paymentMethod}",
+					"orderStatus": ${orderStatus}
+				}'
+		''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	macro _addCommerceOrderItem {
+		var baseURL = "${baseURL}";
+
+		if (!(isSet(baseURL))) {
+			var baseURL = PropsUtil.get("portal.url");
+		}
+
+		if (!(isSet(quantity))) {
+			var quantity = "1";
+		}
+
+		var skuId = CommerceJSONProductsAPI._getSKUId(productSKU = "${productSKU}");
+		var orderId = CommerceJSONOrdersAPI._getCommerceOrder();
+
+		echo("SKU id: ${skuId}");
+
+		echo("Order id: ${orderId}");
+
+		var curl = '''
+			${baseURL}/o/headless-commerce-admin-order/v1.0/orders/${orderId}/orderItems \
+			-u test@liferay.com:test \
+			-H 'accept: application/json' \
+  			-H 'Content-Type: application/json' \
+  			-d '{
+				  	"quantity": "${quantity}",
+      				"skuId": "${skuId}"
+				}'
+		''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	macro _addOrderRule {
 		Variables.assertDefined(parameterList = "${orderRuleName},${orderRuleType},${applyTo}");
 
@@ -148,6 +221,26 @@ definition {
 		TestUtils.assertEquals(
 			actual = "${orderCount}",
 			expected = "0");
+	}
+
+	macro _getCommerceOrder {
+		var baseURL = "${baseURL}";
+
+		if (!(isSet(baseURL))) {
+			var baseURL = PropsUtil.get("portal.url");
+		}
+
+		var curl = '''
+			${baseURL}/o/headless-commerce-admin-order/v1.0/orders \
+			-u test@liferay.com:test \
+			-H 'accept: application/json' \
+		''';
+
+		var orderId = JSONCurlUtil.get("${curl}", "$..['id']");
+
+		echo("The Commerce order id is: ${orderId}");
+
+		return "${orderId}";
 	}
 
 	macro _getCommerceOrderIds {

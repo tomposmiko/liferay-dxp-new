@@ -32,8 +32,10 @@
 		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
+		<field name="accountEntryRestrictedObjectFieldId" type="long" />
 		<field name="descriptionObjectFieldId" type="long" />
 		<field name="titleObjectFieldId" type="long" />
+		<field name="accountEntryRestricted" type="boolean" />
 		<field name="active" type="boolean" />
 		<field name="DBTableName" type="String">
 			<validator name="required" />
@@ -138,6 +140,7 @@
 		<field name="collapsable" type="boolean" />
 		<field localized="true" name="name" type="String" />
 		<field name="priority" type="int" />
+		<field name="type" type="String" />
 	</model>
 	<model name="com.liferay.object.model.ObjectLayoutColumn">
 		<field name="mvccVersion" type="long" />

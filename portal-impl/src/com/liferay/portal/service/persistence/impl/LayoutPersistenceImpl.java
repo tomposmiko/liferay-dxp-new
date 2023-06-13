@@ -20130,6 +20130,7 @@ public class LayoutPersistenceImpl
 		ctStrictColumnNames.add("styleBookEntryId");
 		ctStrictColumnNames.add("css");
 		ctStrictColumnNames.add("priority");
+		ctStrictColumnNames.add("faviconFileEntryId");
 		ctStrictColumnNames.add("masterLayoutPlid");
 		ctStrictColumnNames.add("layoutPrototypeUuid");
 		ctStrictColumnNames.add("layoutPrototypeLinkEnabled");

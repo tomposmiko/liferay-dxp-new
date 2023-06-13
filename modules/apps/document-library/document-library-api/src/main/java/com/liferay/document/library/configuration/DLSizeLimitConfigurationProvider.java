@@ -16,15 +16,37 @@ package com.liferay.document.library.configuration;
 
 import java.util.Map;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * @author Adolfo Pérez
  */
+@ProviderType
 public interface DLSizeLimitConfigurationProvider {
+
+	public long getCompanyFileMaxSize(long companyId);
+
+	public Map<String, Long> getCompanyMimeTypeSizeLimit(long companyId);
+
+	public long getGroupFileMaxSize(long groupId);
 
 	public Map<String, Long> getGroupMimeTypeSizeLimit(long groupId);
 
-	public void updateGroupMimeTypeSizeLimit(
-			long groupId, Map<String, Long> mimeTypeSizeLimit)
+	public long getSystemFileMaxSize();
+
+	public Map<String, Long> getSystemMimeTypeSizeLimit();
+
+	public void updateCompanySizeLimit(
+			long companyId, long fileMaxSize,
+			Map<String, Long> mimeTypeSizeLimit)
+		throws Exception;
+
+	public void updateGroupSizeLimit(
+			long groupId, long fileMaxSize, Map<String, Long> mimeTypeSizeLimit)
+		throws Exception;
+
+	public void updateSystemSizeLimit(
+			long fileMaxSize, Map<String, Long> mimeTypeSizeLimit)
 		throws Exception;
 
 }

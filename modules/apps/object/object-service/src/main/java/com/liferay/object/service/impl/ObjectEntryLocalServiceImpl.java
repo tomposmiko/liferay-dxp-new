@@ -32,7 +32,6 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
-import com.liferay.object.exception.ObjectEntryCountException;
 import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectRelationshipMappingTable;
@@ -184,11 +183,9 @@ public class ObjectEntryLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		User user = _userLocalService.getUser(userId);
-
-		_validateSubmissionLimit(objectDefinitionId, user);
-
 		_validateGroupId(groupId, objectDefinition.getScope());
+
+		User user = _userLocalService.getUser(userId);
 
 		_validateValues(
 			user.isDefaultUser(), objectDefinitionId,
@@ -664,8 +661,8 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public List<Map<String, Serializable>> getValuesList(
-			long objectDefinitionId, Predicate predicate, String search,
-			int start, int end)
+			long objectDefinitionId, long groupId, long[] accountEntryIds,
+			Predicate predicate, String search, int start, int end)
 		throws PortalException {
 
 		DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
@@ -695,6 +692,17 @@ public class ObjectEntryLocalServiceImpl
 			).where(
 				ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
 					objectDefinitionId
+				).and(
+					() -> {
+						if (groupId == 0) {
+							return null;
+						}
+
+						return ObjectEntryTable.INSTANCE.groupId.eq(groupId);
+					}
+				).and(
+					_fillAccountEntriesPredicate(
+						objectDefinitionId, accountEntryIds)
 				).and(
 					_fillPredicate(objectDefinitionId, predicate, search)
 				).and(
@@ -727,7 +735,8 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public int getValuesListCount(
-			long objectDefinitionId, Predicate predicate, String search)
+			long objectDefinitionId, long groupId, long[] accountEntryIds,
+			Predicate predicate, String search)
 		throws PortalException {
 
 		DynamicObjectDefinitionTable dynamicObjectDefinitionTable =
@@ -752,6 +761,17 @@ public class ObjectEntryLocalServiceImpl
 		).where(
 			ObjectEntryTable.INSTANCE.objectDefinitionId.eq(
 				objectDefinitionId
+			).and(
+				() -> {
+					if (groupId == 0) {
+						return null;
+					}
+
+					return ObjectEntryTable.INSTANCE.groupId.eq(groupId);
+				}
+			).and(
+				_fillAccountEntriesPredicate(
+					objectDefinitionId, accountEntryIds)
 			).and(
 				_fillPredicate(objectDefinitionId, predicate, search)
 			).and(
@@ -1132,6 +1152,31 @@ public class ObjectEntryLocalServiceImpl
 				"delete from ", dbTableName, " where ",
 				objectDefinition.getPKObjectFieldDBColumnName(), " = ",
 				objectEntry.getObjectEntryId()));
+	}
+
+	private Predicate _fillAccountEntriesPredicate(
+			long objectDefinitionId, long[] accountEntryIds)
+		throws PortalException {
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+
+		if (!objectDefinition.isAccountEntryRestricted() ||
+			(accountEntryIds == null)) {
+
+			return null;
+		}
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectDefinition.getAccountEntryRestrictedObjectFieldId());
+
+		Table<?> table = _objectFieldLocalService.getTable(
+			objectDefinition.getObjectDefinitionId(), objectField.getName());
+
+		Column<?, Long> column = (Column<?, Long>)table.getColumn(
+			objectField.getDBColumnName());
+
+		return column.in(ArrayUtil.toLongArray(accountEntryIds));
 	}
 
 	private Predicate _fillPredicate(
@@ -2204,29 +2249,6 @@ public class ObjectEntryLocalServiceImpl
 			throw new ObjectEntryValuesException.OneToOneConstraintViolation(
 				dbColumnName, dbColumnValue,
 				dynamicObjectDefinitionTable.getTableName());
-		}
-	}
-
-	private void _validateSubmissionLimit(long objectDefinitionId, User user)
-		throws PortalException {
-
-		if (!user.isDefaultUser()) {
-			return;
-		}
-
-		int count = objectEntryPersistence.countByU_ODI(
-			user.getUserId(), objectDefinitionId);
-		long maximumNumberOfGuestUserObjectEntriesPerObjectDefinition =
-			_objectConfiguration.
-				maximumNumberOfGuestUserObjectEntriesPerObjectDefinition();
-
-		if (count >= maximumNumberOfGuestUserObjectEntriesPerObjectDefinition) {
-			throw new ObjectEntryCountException(
-				StringBundler.concat(
-					"Unable to exceed ",
-					maximumNumberOfGuestUserObjectEntriesPerObjectDefinition,
-					" guest object entries for object definition ",
-					objectDefinitionId));
 		}
 	}
 

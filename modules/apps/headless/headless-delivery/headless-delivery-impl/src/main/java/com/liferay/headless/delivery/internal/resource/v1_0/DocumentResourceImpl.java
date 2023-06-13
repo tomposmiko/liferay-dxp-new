@@ -56,6 +56,8 @@ import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.events.ServicePreAction;
+import com.liferay.portal.events.ThemeServicePreAction;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -71,10 +73,13 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.aggregation.Aggregations;
 import com.liferay.portal.search.expando.ExpandoBridgeIndexer;
@@ -100,6 +105,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
@@ -317,6 +325,7 @@ public class DocumentResourceImpl
 				existingFileEntry.getExpirationDate(),
 				existingFileEntry.getReviewDate(),
 				_createServiceContext(
+					Constants.UPDATE,
 					() -> ArrayUtil.toArray(
 						_assetCategoryLocalService.getCategoryIds(
 							DLFileEntry.class.getName(), documentId)),
@@ -461,8 +470,8 @@ public class DocumentResourceImpl
 				null, binaryFile.getInputStream(), binaryFile.getSize(), null,
 				null,
 				_createServiceContext(
-					() -> new Long[0], () -> new String[0], documentFolderId,
-					documentOptional, groupId)));
+					Constants.ADD, () -> new Long[0], () -> new String[0],
+					documentFolderId, documentOptional, groupId)));
 	}
 
 	private UnsafeConsumer<BooleanQuery, Exception>
@@ -490,7 +499,7 @@ public class DocumentResourceImpl
 	}
 
 	private ServiceContext _createServiceContext(
-			Supplier<Long[]> defaultCategoriesSupplier,
+			String command, Supplier<Long[]> defaultCategoriesSupplier,
 			Supplier<String[]> defaultKeywordsSupplier, Long documentFolderId,
 			Optional<Document> documentOptional, Long groupId)
 		throws Exception {
@@ -515,7 +524,17 @@ public class DocumentResourceImpl
 					Document.ViewableBy.OWNER.getValue()
 				));
 
+		serviceContext.setCommand(command);
+		serviceContext.setCompanyId(contextCompany.getCompanyId());
+		serviceContext.setPlid(
+			_portal.getControlPanelPlid(contextCompany.getCompanyId()));
+		serviceContext.setRequest(contextHttpServletRequest);
 		serviceContext.setUserId(contextUser.getUserId());
+
+		if (contextHttpServletRequest != null) {
+			_initThemeDisplay(
+				groupId, contextHttpServletRequest, contextHttpServletResponse);
+		}
 
 		Optional<DLFileEntryType> dlFileEntryTypeOptional =
 			_getDLFileEntryTypeOptional(
@@ -715,6 +734,29 @@ public class DocumentResourceImpl
 			contextUser);
 	}
 
+	private void _initThemeDisplay(
+			long groupId, HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws Exception {
+
+		ServicePreAction servicePreAction = new ServicePreAction();
+
+		servicePreAction.servicePre(
+			httpServletRequest, httpServletResponse, false);
+
+		ThemeServicePreAction themeServicePreAction =
+			new ThemeServicePreAction();
+
+		themeServicePreAction.run(httpServletRequest, httpServletResponse);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		themeDisplay.setScopeGroupId(groupId);
+		themeDisplay.setSiteGroupId(groupId);
+	}
+
 	private FileEntry _moveDocument(
 			Long documentId, Optional<Document> documentOptional,
 			FileEntry existingFileEntry)
@@ -818,7 +860,7 @@ public class DocumentResourceImpl
 				binaryFile.getInputStream(), binaryFile.getSize(),
 				fileEntry.getExpirationDate(), fileEntry.getReviewDate(),
 				_createServiceContext(
-					() -> new Long[0], () -> new String[0],
+					Constants.UPDATE, () -> new Long[0], () -> new String[0],
 					fileEntry.getFolderId(), documentOptional,
 					fileEntry.getGroupId())));
 	}

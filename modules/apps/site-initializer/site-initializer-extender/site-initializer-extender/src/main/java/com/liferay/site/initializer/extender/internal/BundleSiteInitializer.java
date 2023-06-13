@@ -22,7 +22,7 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
-import com.liferay.client.extension.model.ClientExtensionEntry;
+import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
 import com.liferay.client.extension.service.ClientExtensionEntryLocalService;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
@@ -653,7 +653,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		throws Exception {
 
 		String json = SiteInitializerUtil.read(
-			"/site-initializer/remote-app-entries.json", _servletContext);
+			"/site-initializer/client-extension-entries.json", _servletContext);
 
 		if (json == null) {
 			return Collections.emptyMap();
@@ -681,30 +681,42 @@ public class BundleSiteInitializer implements SiteInitializer {
 				}
 			}
 
-			ClientExtensionEntry clientExtensionEntry =
-				_clientExtensionEntryLocalService.
-					addOrUpdateCustomElementClientExtensionEntry(
-						jsonObject.getString("externalReferenceCode"),
-						serviceContext.getUserId(),
-						StringUtil.replace(
-							StringUtil.merge(
-								JSONUtil.toStringArray(
-									jsonObject.getJSONArray("cssURLs")),
-								StringPool.NEW_LINE),
-							"[$", "$]", documentsStringUtilReplaceValues),
-						jsonObject.getString("htmlElementName"),
-						StringUtil.replace(
-							StringUtil.merge(
-								JSONUtil.toStringArray(
-									jsonObject.getJSONArray("elementURLs")),
-								StringPool.NEW_LINE),
-							"[$", "$]", documentsStringUtilReplaceValues),
-						false, StringPool.BLANK, StringPool.BLANK,
-						jsonObject.getBoolean("instanceable"),
-						SiteInitializerUtil.toMap(
-							jsonObject.getString("name_i18n")),
-						jsonObject.getString("portletCategoryName"),
-						sb.toString(), StringPool.BLANK);
+			_clientExtensionEntryLocalService.addOrUpdateClientExtensionEntry(
+				jsonObject.getString("externalReferenceCode"),
+				serviceContext.getUserId(), StringPool.BLANK,
+				SiteInitializerUtil.toMap(jsonObject.getString("name_i18n")),
+				sb.toString(), StringPool.BLANK,
+				ClientExtensionEntryConstants.TYPE_CUSTOM_ELEMENT,
+				UnicodePropertiesBuilder.create(
+					true
+				).put(
+					"cssURLs",
+					StringUtil.replace(
+						StringUtil.merge(
+							JSONUtil.toStringArray(
+								jsonObject.getJSONArray("cssURLs")),
+							StringPool.NEW_LINE),
+						"[$", "$]", documentsStringUtilReplaceValues)
+				).put(
+					"friendlyURLMapping", StringPool.BLANK
+				).put(
+					"htmlElementName", jsonObject.getString("htmlElementName")
+				).put(
+					"instanceable", jsonObject.getBoolean("instanceable")
+				).put(
+					"portletCategoryName",
+					jsonObject.getString("portletCategoryName")
+				).put(
+					"urls",
+					StringUtil.replace(
+						StringUtil.merge(
+							JSONUtil.toStringArray(
+								jsonObject.getJSONArray("elementURLs")),
+							StringPool.NEW_LINE),
+						"[$", "$]", documentsStringUtilReplaceValues)
+				).put(
+					"useESM", false
+				).buildString());
 
 			clientExtensionEntryIdsStringUtilReplaceValues.put(
 				"CLIENT_EXTENSION_ENTRY_ID:" +
@@ -714,8 +726,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 					StringBundler.concat(
 						"[$CLIENT_EXTENSION_ENTRY_ID:",
 						jsonObject.getString("clientExtensionEntryKey"), "$]"),
-					String.valueOf(
-						clientExtensionEntry.getClientExtensionEntryId())));
+					jsonObject.getString("externalReferenceCode")));
 		}
 
 		return clientExtensionEntryIdsStringUtilReplaceValues;

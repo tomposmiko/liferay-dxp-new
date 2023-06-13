@@ -452,6 +452,9 @@
 			return typeof val === 'function';
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), replaced by `get_checkboxes.js`
+		 */
 		listCheckboxesExcept(form, except, name, checked) {
 			form = Util.getDOM(form);
 
@@ -485,6 +488,9 @@
 				.join();
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), replaced by `import {getCheckedCheckboxes} from 'frontend-js-web';`
+		 */
 		listCheckedExcept(form, except, name) {
 			return Util.listCheckboxesExcept(form, except, name, true);
 		},
@@ -508,6 +514,9 @@
 				.join(delimeter || ',');
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), replaced by `import {getUncheckedCheckboxes} from 'frontend-js-web';`
+		 */
 		listUncheckedExcept(form, except, name) {
 			return Util.listCheckboxesExcept(form, except, name, false);
 		},
@@ -734,93 +743,7 @@
 			return parseInt(value, 10) || 0;
 		},
 
-		toggleBoxes(
-			checkBoxId,
-			toggleBoxId,
-			displayWhenUnchecked,
-			toggleChildCheckboxes
-		) {
-			const checkBox = document.getElementById(checkBoxId);
-			const toggleBox = document.getElementById(toggleBoxId);
-
-			if (checkBox && toggleBox) {
-				let checked = checkBox.checked;
-
-				if (displayWhenUnchecked) {
-					checked = !checked;
-				}
-
-				if (checked) {
-					toggleBox.classList.remove('hide');
-				}
-				else {
-					toggleBox.classList.add('hide');
-				}
-
-				checkBox.addEventListener(EVENT_CLICK, () => {
-					toggleBox.classList.toggle('hide');
-
-					if (toggleChildCheckboxes) {
-						const childCheckboxes = toggleBox.querySelectorAll(
-							'input[type=checkbox]'
-						);
-
-						childCheckboxes.forEach((childCheckbox) => {
-							childCheckbox.checked = checkBox.checked;
-						});
-					}
-				});
-			}
-		},
-
-		toggleRadio(radioId, showBoxIds, hideBoxIds) {
-			const radioButton = document.getElementById(radioId);
-
-			if (radioButton) {
-				let showBoxes;
-
-				if (showBoxIds) {
-					if (Array.isArray(showBoxIds)) {
-						showBoxIds = showBoxIds.join(',#');
-					}
-
-					showBoxes = document.querySelectorAll('#' + showBoxIds);
-
-					showBoxes.forEach((showBox) => {
-						if (radioButton.checked) {
-							showBox.classList.remove('hide');
-						}
-						else {
-							showBox.classList.add('hide');
-						}
-					});
-				}
-
-				radioButton.addEventListener('change', () => {
-					if (showBoxes) {
-						showBoxes.forEach((showBox) => {
-							showBox.classList.remove('hide');
-						});
-					}
-
-					if (hideBoxIds) {
-						if (Array.isArray(hideBoxIds)) {
-							hideBoxIds = hideBoxIds.join(',#');
-						}
-
-						const hideBoxes = document.querySelectorAll(
-							'#' + hideBoxIds
-						);
-
-						hideBoxes.forEach((hideBox) => {
-							hideBox.classList.add('hide');
-						});
-					}
-				});
-			}
-		},
-
-		/*
+		/**
 		 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 		 */
 		toggleSearchContainerButton(
@@ -834,41 +757,11 @@
 				() => {
 					Util.toggleDisabled(
 						buttonId,
-						!Util.listCheckedExcept(form, ignoreFieldName)
+						!Util.getCheckedCheckboxes(form, ignoreFieldName)
 					);
 				},
 				'input[type=checkbox]'
 			);
-		},
-
-		toggleSelectBox(selectBoxId, value, toggleBoxId) {
-			var selectBox = document.getElementById(selectBoxId);
-			var toggleBox = document.getElementById(toggleBoxId);
-
-			if (selectBox && toggleBox) {
-				var dynamicValue = typeof value === 'function';
-
-				var toggle = function () {
-					var currentValue = selectBox.value;
-
-					var visible = value === currentValue;
-
-					if (dynamicValue) {
-						visible = value(currentValue, value);
-					}
-
-					if (visible) {
-						toggleBox.classList.remove('hide');
-					}
-					else {
-						toggleBox.classList.add('hide');
-					}
-				};
-
-				toggle();
-
-				selectBox.addEventListener('change', toggle);
-			}
 		},
 	};
 

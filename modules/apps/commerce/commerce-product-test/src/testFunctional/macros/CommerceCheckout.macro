@@ -1,38 +1,13 @@
 definition {
 
 	macro checkout {
-		WaitForElementPresent(locator1 = "CommerceAccelerators#CHECKOUT_PORTLET_BODY");
-
-		Type(
-			key_fieldName = "Name",
-			locator1 = "CommerceAccelerators#CHECKOUT_GENERIC_TEXT_INPUT",
-			value1 = "${newAddressName}");
-
-		Type(
-			key_fieldName = "Address",
-			locator1 = "CommerceAccelerators#CHECKOUT_GENERIC_TEXT_INPUT",
-			value1 = "${newAddressAddress}");
-
-		Select(
-			key_fieldName = "Country",
-			locator1 = "CommerceAccelerators#CHECKOUT_GENERIC_SELECT",
-			value1 = "${newAddressCountry}");
-
-		Type(
-			key_fieldName = "Zip",
-			locator1 = "CommerceAccelerators#CHECKOUT_GENERIC_TEXT_INPUT",
-			value1 = "${newAddressZipCode}");
-
-		Type(
-			key_fieldName = "City",
-			locator1 = "CommerceAccelerators#CHECKOUT_GENERIC_TEXT_INPUT",
-			value1 = "${newAddressCity}");
-
-		if (isSet(guestEmail)) {
-			Type(
-				locator1 = "CommerceAccelerators#GUEST_CHECKOUT_EMAIL",
-				value1 = "${guestEmail}");
-		}
+		CommerceCheckout.setAddress(
+			guestEmail = "${guestEmail}",
+			newAddressAddress = "${newAddressAddress}",
+			newAddressCity = "${newAddressCity}",
+			newAddressCountry = "${newAddressCountry}",
+			newAddressName = "${newAddressName}",
+			newAddressZipCode = "${newAddressZipCode}");
 
 		Click(locator1 = "Button#CONTINUE");
 
@@ -70,44 +45,45 @@ definition {
 	}
 
 	macro initializersCheckout {
-		WaitForElementPresent(locator1 = "CommerceAccelerators#CHECKOUT_PORTLET_BODY");
+		CommerceCheckout.setAddress(
+			guestEmail = "${guestEmail}",
+			newAddressAddress = "${newAddressAddress}",
+			newAddressCity = "${newAddressCity}",
+			newAddressCountry = "${newAddressCountry}",
+			newAddressName = "${newAddressName}",
+			newAddressZipCode = "${newAddressZipCode}");
 
-		if (isSet(newAddressName)) {
-			Type(
-				key_fieldName = "Name",
-				locator1 = "CommerceAccelerators#CHECKOUT_GENERIC_TEXT_INPUT",
-				value1 = "${newAddressName}");
+		if ("${viewBillingAddressPermission}" != "false") {
+			if (isSet(billingAddressName)) {
+				Uncheck.uncheckToggleSwitch(
+					checkboxName = "Use shipping address as billing address",
+					locator1 = "Checkbox#ANY_CHECKBOX");
 
-			Type(
-				key_fieldName = "Address",
-				locator1 = "CommerceAccelerators#CHECKOUT_GENERIC_TEXT_INPUT",
-				value1 = "${newAddressAddress}");
-
-			Select(
-				key_fieldName = "Country",
-				locator1 = "CommerceAccelerators#CHECKOUT_GENERIC_SELECT",
-				value1 = "${newAddressCountry}");
-
-			Type(
-				key_fieldName = "Zip",
-				locator1 = "CommerceAccelerators#CHECKOUT_GENERIC_TEXT_INPUT",
-				value1 = "${newAddressZipCode}");
-
-			Type(
-				key_fieldName = "City",
-				locator1 = "CommerceAccelerators#CHECKOUT_GENERIC_TEXT_INPUT",
-				value1 = "${newAddressCity}");
-
-			if (isSet(guestEmail)) {
-				Type(
-					locator1 = "CommerceAccelerators#GUEST_CHECKOUT_EMAIL",
-					value1 = "${guestEmail}");
+				var setBillingAddress = "true";
 			}
+			else {
+				var billingAddressAddress = "${newAddressAddress}";
+				var billingAddressCity = "${newAddressCity}";
+				var billingAddressCountry = "${newAddressCountry}";
+				var billingAddressName = "${newAddressName}";
+				var billingAddressZipCode = "${newAddressZipCode}";
+			}
+		}
+		else {
+			AssertElementNotPresent(
+				key_label = "Billing Address",
+				locator1 = "CommerceAccelerators#CHECKOUT_MULTI_STEP_INDICATOR_LABEL");
+
+			AssertElementNotPresent(
+				checkboxName = "Use shipping address as billing address",
+				locator1 = "Checkbox#ANY_CHECKBOX");
 		}
 
 		Click(locator1 = "Button#CONTINUE");
 
-		var subtotal = ${productUnitPrice} * ${productQuantity};
+		if (isSet(productUnitPrice) && isSet(productQuantity)) {
+			var subtotal = ${productUnitPrice} * ${productQuantity};
+		}
 
 		if (isSet(singleShippingOption)) {
 			if (isSet(shippingMethod)) {
@@ -152,6 +128,18 @@ definition {
 		}
 		else {
 			var total = "${subtotal}";
+		}
+
+		if (isSet(setBillingAddress)) {
+			CommerceCheckout.setAddress(
+				guestEmail = "${guestEmail}",
+				newAddressAddress = "${billingAddressAddress}",
+				newAddressCity = "${billingAddressCity}",
+				newAddressCountry = "${billingAddressCountry}",
+				newAddressName = "${billingAddressName}",
+				newAddressZipCode = "${billingAddressZipCode}");
+
+			Click(locator1 = "Button#CONTINUE");
 		}
 
 		if (isSet(deliveryTerm)) {
@@ -213,6 +201,10 @@ definition {
 			addressCity = "${newAddressCity}",
 			addressCountry = "${newAddressCountry}",
 			addressName = "${newAddressName}",
+			billingAddressAddress = "${billingAddressAddress}",
+			billingAddressCity = "${billingAddressCity}",
+			billingAddressCountry = "${billingAddressCountry}",
+			billingAddressName = "${billingAddressName}",
 			deliveryTerm = "${deliveryTerm}",
 			deliveryValue = "${deliveryValue}",
 			paymentMethod = "${paymentMethod}",
@@ -221,9 +213,12 @@ definition {
 			productPrice = "${productUnitPrice}",
 			productQuantity = "${productQuantity}",
 			subtotalValue = "${subtotal}",
-			totalValue = "${total}");
+			totalValue = "${total}",
+			viewBillingAddressPermission = "${viewBillingAddressPermission}");
 
-		Click(locator1 = "Button#CONTINUE");
+		if (IsElementPresent(key_productName = "", locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PRODUCT_TABLE_PRODUCT")) {
+			Click(locator1 = "Button#CONTINUE");
+		}
 	}
 
 	macro setAddress {
@@ -264,7 +259,7 @@ definition {
 	}
 
 	macro viewCheckoutOrderSummary {
-		if (IsElementPresent(key_label = "Shipping Address", locator1 = "CommerceAccelerators#CHECKOUT_MULTI_STEP_INDICATOR_LABEL")) {
+		if (IsElementPresent(key_addressInfo = "", locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_SHIPPING_ADDRESS")) {
 			AssertTextEquals.assertPartialText(
 				key_addressInfo = "${addressName}",
 				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_SHIPPING_ADDRESS",
@@ -286,6 +281,42 @@ definition {
 				value1 = "${addressCountry}");
 		}
 
+		if (IsElementPresent(key_addressInfo = "", locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_BILLING_ADDRESS")) {
+			if (isSet(billingAddressName)) {
+				AssertTextEquals.assertPartialText(
+					key_addressInfo = "${billingAddressName}",
+					locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_BILLING_ADDRESS",
+					value1 = "${billingAddressName}");
+			}
+
+			if (isSet(billingAddress)) {
+				AssertTextEquals.assertPartialText(
+					key_addressInfo = "${billingAddressAddress}",
+					locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_BILLING_ADDRESS",
+					value1 = "${billingAddressAddress}");
+			}
+
+			if (isSet(billingAddressCity)) {
+				AssertTextEquals.assertPartialText(
+					key_addressInfo = "${billingAddressCity}",
+					locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_BILLING_ADDRESS",
+					value1 = "${billingAddressCity}");
+			}
+
+			if (isSet(billingAddressCountry)) {
+				AssertTextEquals.assertPartialText(
+					key_addressInfo = "${billingAddressCountry}",
+					locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_BILLING_ADDRESS",
+					value1 = "${billingAddressCountry}");
+			}
+		}
+
+		if ("${viewBillingAddressPermission}" == "false") {
+			AssertElementNotPresent(
+				key_addressInfo = "",
+				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_BILLING_ADDRESS");
+		}
+
 		if (isSet(paymentMethod)) {
 			AssertTextEquals(
 				key_paymentMethod = "${paymentMethod}",
@@ -294,10 +325,17 @@ definition {
 		}
 
 		if (isSet(paymentTerm)) {
-			AssertTextEquals(
-				key_paymentMethod = "${paymentTerm}",
-				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PAYMENT_METHOD",
-				value1 = "${paymentTerm}");
+			if ("${paymentTerm}" == "") {
+				AssertElementNotPresent(
+					key_paymentTerm = "",
+					locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PAYMENT_TERM");
+			}
+			else {
+				AssertTextEquals(
+					key_paymentTerm = "${paymentTerm}",
+					locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PAYMENT_TERM",
+					value1 = "${paymentTerm}");
+			}
 		}
 
 		if (isSet(deliveryTerm)) {
@@ -307,25 +345,33 @@ definition {
 				value1 = "${deliveryTerm}");
 		}
 
-		AssertTextEquals.assertPartialText(
-			key_productName = "${productName}",
-			locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PRODUCT_TABLE_PRODUCT",
-			value1 = "${productName}");
+		if (isSet(productName)) {
+			AssertTextEquals.assertPartialText(
+				key_productName = "${productName}",
+				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PRODUCT_TABLE_PRODUCT",
+				value1 = "${productName}");
+		}
 
-		AssertTextEquals(
-			key_productQuantity = "${productQuantity}",
-			locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PRODUCT_TABLE_QUANTITY",
-			value1 = "${productQuantity}");
+		if (isSet(productQuantity)) {
+			AssertTextEquals(
+				key_productQuantity = "${productQuantity}",
+				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PRODUCT_TABLE_QUANTITY",
+				value1 = "${productQuantity}");
+		}
 
-		AssertTextEquals.assertPartialText(
-			key_productPrice = "${productPrice}",
-			locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PRODUCT_TABLE_PRICE",
-			value1 = "${productPrice}");
+		if (isSet(productPrice)) {
+			AssertTextEquals.assertPartialText(
+				key_productPrice = "${productPrice}",
+				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PRODUCT_TABLE_PRICE",
+				value1 = "${productPrice}");
+		}
 
-		AssertTextEquals.assertPartialText(
-			key_subtotalValue = "${subtotalValue}",
-			locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_SUBTOTAL",
-			value1 = "${subtotalValue}");
+		if (isSet(subtotalValue)) {
+			AssertTextEquals.assertPartialText(
+				key_subtotalValue = "${subtotalValue}",
+				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_SUBTOTAL",
+				value1 = "${subtotalValue}");
+		}
 
 		if (isSet(deliveryValue)) {
 			AssertTextEquals.assertPartialText(
@@ -341,10 +387,12 @@ definition {
 				value1 = "${taxValue}");
 		}
 
-		AssertTextEquals.assertPartialText(
-			key_totalValue = "${totalValue}",
-			locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_TOTAL",
-			value1 = "${totalValue}");
+		if (isSet(totalValue)) {
+			AssertTextEquals.assertPartialText(
+				key_totalValue = "${totalValue}",
+				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_TOTAL",
+				value1 = "${totalValue}");
+		}
 	}
 
 }

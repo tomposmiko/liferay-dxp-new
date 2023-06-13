@@ -361,22 +361,115 @@ definition {
 
 	}
 
-	@description = "This ensures that a depot image in the Blogs content field can be rendered correctly on a connected site after moving it to a folder."
-	@ignore = "Test Stub"
+	@description = "This ensures that a depot image in the MB content field can be rendered correctly on a connected site after moving it to a folder."
 	@priority = "4"
 	test CanViewImageInMBAfterMovingToFolder {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
 
-		// TODO LPS-154386 CanViewImageInMBAfterMovingToFolder pending implementation
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
+		JSONDepot.connectSite(
+			depotName = "Test Depot Name",
+			groupName = "Site Name");
+
+		JSONMBMessage.addMessage(
+			groupName = "Site Name",
+			threadBody = "MB Thread Message Body",
+			threadSubject = "MB Thread Message Subject");
+
+		MessageboardsThread.openToEditThread(
+			groupName = "Site Name",
+			siteURLKey = "site-name",
+			threadSubject = "MB Thread Message Subject");
+
+		MessageboardsThread.editCP(
+			depotName = "Test Depot Name",
+			skipNavigation = "true",
+			threadBodyEdit = "MB Thread Message Body",
+			threadBodyImageEdit = "DM Document Title");
+
+		PortletEntry.publish();
+
+		JSONFolder.addFolder(
+			dmFolderDescription = "DM Folder Description",
+			dmFolderName = "DM Folder Name",
+			groupName = "Test Depot Name");
+
+		JSONDocument.moveFileEntryToFolder(
+			dmDocumentTitle = "DM Document Title",
+			folderName = "DM Folder Name",
+			groupName = "Test Depot Name",
+			site = "false");
+
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "site-name");
+
+		MessageboardsThread.viewCP(
+			replyCount = "0",
+			threadBody = "MB Thread Message Body",
+			threadBodyImage = "dm-document-title",
+			threadSubject = "MB Thread Message Subject",
+			userName = "Test Test");
 	}
 
 	@description = "This ensures that a depot image in the MB content field can be rendered correctly on a connected site when publication is enabled."
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewImageInMBWithPublication {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
 
-		// TODO LPS-154394 CanViewImageInMBWithPublication pending implementation
+		JSONPublications.enablePublications();
 
+		JSONPublications.addPublication(publicationName = "Publication Name");
+
+		JSONPublications.selectPublication(publicationName = "Publication Name");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
+
+		JSONDepot.connectSite(
+			depotName = "Test Depot Name",
+			groupName = "Site Name");
+
+		JSONMBMessage.addMessage(
+			groupName = "Site Name",
+			threadBody = "MB Thread Message Body",
+			threadSubject = "MB Thread Message Subject");
+
+		MessageboardsThread.openToEditThread(
+			groupName = "Site Name",
+			siteURLKey = "site-name",
+			threadSubject = "MB Thread Message Subject");
+
+		MessageboardsThread.editCP(
+			depotName = "Test Depot Name",
+			skipNavigation = "true",
+			threadBodyEdit = "MB Thread Message Body",
+			threadBodyImageEdit = "DM Document Title");
+
+		PortletEntry.publish();
+
+		JSONPublications.publishPublication(publicationName = "Publication Name");
+
+		Publications.viewPublicationPublished(publicationName = "Publication Name");
+
+		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "site-name");
+
+		MessageboardsThread.viewCP(
+			replyCount = "0",
+			threadBody = "MB Thread Message Body",
+			threadBodyImage = "dm-document-title",
+			threadSubject = "MB Thread Message Subject",
+			userName = "Test Test");
 	}
 
 	@description = "This ensures that a depot image in the WC content field can be rendered correctly on a connected site after moving it to a folder."
@@ -407,12 +500,62 @@ definition {
 	}
 
 	@description = "This ensures that a depot image in an image fragment can be rendered correctly on a connect site after moving it to a folder."
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewImageViaImageFragmentAfterMovingToFolder {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
 
-		// TODO LPS-154383 CanViewImageViaImageFragmentAfterMovingToFolder pending implementation
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Content Page Name",
+			type = "content");
 
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "Document_1",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
+
+		JSONDepot.connectSite(
+			depotName = "Test Depot Name",
+			groupName = "Site Name");
+
+		ContentPagesNavigator.openEditContentPage(
+			pageName = "Content Page Name",
+			siteName = "Site Name");
+
+		PageEditor.addFragment(
+			collectionName = "Basic Components",
+			fragmentName = "Image");
+
+		PageEditor.editFragmentImage(
+			depotName = "Test Depot Name",
+			fragmentName = "Image",
+			id = "image-square",
+			imageFileName = "Document_1");
+
+		PageEditor.clickPublish();
+
+		JSONFolder.addFolder(
+			dmFolderDescription = "DM Folder Description",
+			dmFolderName = "DM Folder Name",
+			groupName = "Test Depot Name");
+
+		JSONDocument.moveFileEntryToFolder(
+			dmDocumentTitle = "Document_1",
+			folderName = "DM Folder Name",
+			groupName = "Test Depot Name",
+			site = "false");
+
+		ContentPagesNavigator.openViewContentPage(
+			pageName = "Content Page Name",
+			siteName = "Site Name");
+
+		ContentPages.viewFragmentImage(
+			fragmentName = "image",
+			id = "image-square",
+			image = "document_1");
 	}
 
 	@description = "This ensures that a depot image in MG widget can be rendered correctly on a connected site after moving it to a folder."
@@ -425,21 +568,112 @@ definition {
 	}
 
 	@description = "This ensures that a depot image in the Blogs content field can be rendered correctly on a connected site after moving it to a folder."
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewInlineImageAfterMovingToFolder {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
 
-		// TODO LPS-154379 CanViewInlineImageAfterMovingToFolder pending implementation
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
+		JSONDepot.connectSite(
+			depotName = "Test Depot Name",
+			groupName = "Site Name");
+
+		JSONBlog.addEntry(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title",
+			groupName = "Site Name");
+
+		BlogsNavigator.openToEditEntryInSite(
+			entryTitle = "Blogs Entry Title",
+			groupName = "Site Name",
+			siteURLKey = "site-name");
+
+		BlogsEntry.editContent(
+			depotName = "Test Depot Name",
+			dmImage = "DM Document Title",
+			entryContent = "Blogs Entry Content",
+			entryContentEdit = "Blogs Entry Content",
+			navTab = "Documents and Media");
+
+		PortletEntry.publish();
+
+		JSONFolder.addFolder(
+			dmFolderDescription = "DM Folder Description",
+			dmFolderName = "DM Folder Name",
+			groupName = "Test Depot Name");
+
+		JSONDocument.moveFileEntryToFolder(
+			dmDocumentTitle = "DM Document Title",
+			folderName = "DM Folder Name",
+			groupName = "Test Depot Name",
+			site = "false");
+
+		BlogsNavigator.openToEditEntryInSite(
+			entryTitle = "Blogs Entry Title",
+			groupName = "Site Name",
+			siteURLKey = "site-name");
+
+		BlogsEntry.viewInlineImage(uploadFileName = "dm-document-title");
 	}
 
 	@description = "This ensures that a depot image in the Blogs content field can be rendered correctly on a connected site when publication is enabled."
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewInlineImageWithPublication {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
 
-		// TODO LPS-154392 CanViewInlineImageWithPublication pending implementation
+		JSONPublications.enablePublications();
 
+		JSONPublications.addPublication(publicationName = "Publication Name");
+
+		JSONPublications.selectPublication(publicationName = "Publication Name");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
+
+		JSONDepot.connectSite(
+			depotName = "Test Depot Name",
+			groupName = "Site Name");
+
+		JSONBlog.addEntry(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title",
+			groupName = "Site Name");
+
+		BlogsNavigator.openToEditEntryInSite(
+			entryTitle = "Blogs Entry Title",
+			groupName = "Site Name",
+			siteURLKey = "site-name");
+
+		BlogsEntry.editContent(
+			depotName = "Test Depot Name",
+			dmImage = "DM Document Title",
+			entryContent = "Blogs Entry Content",
+			entryContentEdit = "Blogs Entry Content",
+			navTab = "Documents and Media");
+
+		PortletEntry.publish();
+
+		JSONPublications.publishPublication(publicationName = "Publication Name");
+
+		Publications.viewPublicationPublished(publicationName = "Publication Name");
+
+		BlogsNavigator.openToEditEntryInSite(
+			entryTitle = "Blogs Entry Title",
+			groupName = "Site Name",
+			siteURLKey = "site-name");
+
+		BlogsEntry.viewInlineImage(uploadFileName = "dm-document-title");
 	}
 
 	@description = "This ensures that the depot assets can be used through Related Assets on a connected site."
@@ -503,12 +737,64 @@ definition {
 	}
 
 	@description = "This ensures that a depot image in the Blogs small image can be rendered correctly on a connected site after moving it to a folder."
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewSmallImageAfterMovingToFolder {
+		property osgi.module.configuration.file.names = "com.liferay.document.library.configuration.FFFriendlyURLEntryFileEntryConfiguration.config";
+		property osgi.module.configurations = "enabled=B&quot;true&quot;";
 
-		// TODO LPS-154380 CanViewSmallImageAfterMovingToFolder pending implementation
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
 
+		JSONDepot.connectSite(
+			depotName = "Test Depot Name",
+			groupName = "Site Name");
+
+		JSONBlog.addEntry(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry With Small Image",
+			groupName = "Site Name");
+
+		BlogsNavigator.openToEditEntryInSite(
+			entryTitle = "Blogs Entry With Small Image",
+			groupName = "Site Name",
+			siteURLKey = "site-name");
+
+		BlogsEntry.addSmallImage(
+			depotName = "Test Depot Name",
+			imageFileName = "DM Document Title",
+			navTab = "Documents and Media");
+
+		PortletEntry.publish();
+
+		JSONFolder.addFolder(
+			dmFolderDescription = "DM Folder Description",
+			dmFolderName = "DM Folder Name",
+			groupName = "Test Depot Name");
+
+		JSONDocument.moveFileEntryToFolder(
+			dmDocumentTitle = "DM Document Title",
+			folderName = "DM Folder Name",
+			groupName = "Test Depot Name",
+			site = "false");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
+		Navigator.gotoSitePage(
+			pageName = "Blogs Page",
+			siteName = "Site Name");
+
+		BlogsEntry.viewSmallImage(uploadFileName = "Document_1.jpg");
 	}
 
 }

@@ -29,6 +29,9 @@ module.exports = {
 		bundler: {
 			config: {
 				imports: {
+					'@liferay/address-web': {
+						'/': '*',
+					},
 					'@liferay/document-library-preview-css': {
 						'/': '*',
 					},
@@ -73,6 +76,9 @@ module.exports = {
 						'/': '*',
 					},
 					'@liferay/map-openstreetmap': {
+						'/': '*',
+					},
+					'@liferay/object-js-components-web': {
 						'/': '*',
 					},
 					'asset-taglib': {
@@ -378,7 +384,6 @@ module.exports = {
 			'dynamic-data-mapping-form-renderer',
 		],
 		imports: {
-			'@liferay/frontend-icons-web': [],
 			'@liferay/frontend-js-state-web': [],
 			'frontend-js-react-web': [
 				'classnames',

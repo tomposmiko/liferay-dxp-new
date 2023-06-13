@@ -35,7 +35,9 @@ definition {
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
-		Click(locator1 = "Treeview#NODE_COLLAPSED");
+		Click(
+			key_site = "Minium",
+			locator1 = "CommerceEntry#TREEVIEW_NODE_COLLAPSED_PAGES");
 
 		Click(
 			key_nodeName = "${key_card}",
@@ -57,7 +59,9 @@ definition {
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
-		Click(locator1 = "Treeview#NODE_COLLAPSED");
+		Click(
+			key_site = "Minium",
+			locator1 = "CommerceEntry#TREEVIEW_NODE_COLLAPSED_PAGES");
 
 		Click(
 			key_nodeName = "${key_card}",
@@ -223,6 +227,22 @@ definition {
 		CommerceChannels.addCategoryDiplayPage(key_card = "${page}");
 	}
 
+	macro disablePaymentMethod {
+		CommerceEntry.clickTableEntryEditButton(
+			entryName = "${paymentMethod}",
+			table = "Payment Methods");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "CommerceEntry#IFRAME_SIDE_PANEL");
+
+		Uncheck.uncheckToggleSwitch(locator1 = "CommerceEntry#ACTIVE_CHECKBOX");
+
+		Button.clickSave();
+
+		Click(locator1 = "Icon#CLOSE");
+
+		SelectFrame.selectFrameTop();
+	}
+
 	macro editCategoryDisplayPage {
 		Click(
 			key_value = "${name}",
@@ -249,6 +269,10 @@ definition {
 				key_tabName = "Private+Pages",
 				locator1 = "AppBuilderAppAdmin#APP_TAB");
 		}
+
+		Click(
+			key_site = "Minium",
+			locator1 = "CommerceEntry#TREEVIEW_NODE_COLLAPSED_PAGES");
 
 		Click(
 			key_nodeName = "${key_card}",

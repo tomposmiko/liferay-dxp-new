@@ -303,6 +303,18 @@ declare module Liferay {
 		/* Returns a formatted XML */
 		export function formatXML(content: string, options?: Object): string;
 
+		export function getCheckedCheckboxes(
+			form: HTMLFormElement,
+			except: string,
+			name?: string
+		): Array<number> | '';
+
+		export function getUncheckedCheckboxes(
+			form: HTMLFormElement,
+			except: string,
+			name?: string
+		): Array<number> | '';
+
 		/**
 		 * Returns dimensions and coordinates representing a cropped region
 		 */
@@ -495,6 +507,25 @@ declare module Liferay {
 		 * Get character code at the start of the given string.
 		 */
 		export function toCharCode(name: string): string;
+
+		export function toggleBoxes(
+			checkBoxId: string,
+			toggleBoxId: string,
+			displayWhenUnchecked?: boolean,
+			toggleChildCheckboxes?: boolean
+		): void;
+
+		export function toggleRadio(
+			radioId: string,
+			showBoxIds: string | string[],
+			hideBoxIds?: string | string[]
+		): void;
+
+		export function toggleSelectBox(
+			selectBoxId: string,
+			value: any,
+			toggleBoxId: string
+		): void;
 
 		/**
 		 * Unescapes HTML from the given string.

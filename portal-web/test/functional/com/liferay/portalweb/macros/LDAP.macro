@@ -127,6 +127,21 @@ definition {
 			userGroupName = "${userGroupName}");
 	}
 
+	@description = "Verify that the user is imported on localhost after LDAP sync, after a specified interval time."
+	macro verifyUserImportAfterImportIntervalTime {
+		if (!(isSet(intervalTime))) {
+			var intervalTime = "60000";
+		}
+
+		// Wait for the amount of the import interval time. Needed for LRQA-75138.
+
+		Pause(locator1 = "${intervalTime}");
+
+		User.openUsersAdmin();
+
+		Search.searchCP(searchTerm = "${userScreenName}");
+	}
+
 	@description = "Verify that the user is imported on localhost after LDAP sync"
 	macro verifyUserIsImported {
 		User.openUsersAdmin();

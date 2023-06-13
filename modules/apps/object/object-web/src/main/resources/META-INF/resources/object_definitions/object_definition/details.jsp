@@ -191,6 +191,24 @@ renderResponse.setTitle(LanguageUtil.format(request, "edit-x", objectDefinition.
 					<aui:input disabled="<%= !objectDefinitionsDetailsDisplayContext.hasUpdateObjectDefinitionPermission() %>" label="" labelOff='<%= LanguageUtil.get(request, "hide-widget") %>' labelOn='<%= LanguageUtil.get(request, "show-widget") %>' name="portlet" type="toggle-switch" value="<%= objectDefinition.isPortlet() %>" />
 				</aui:field-wrapper>
 			</clay:sheet-section>
+
+			<c:if test="<%= !objectDefinition.isDefaultStorageType() %>">
+				<clay:sheet-section>
+					<h3 class="sheet-subtitle">
+						<%= LanguageUtil.get(request, "external-data-source") %>
+					</h3>
+
+					<clay:row>
+						<clay:col
+							md="11"
+						>
+							<aui:select disabled="<%= true %>" name="storageType" showEmptyOption="<%= false %>">
+								<aui:option label="<%= LanguageUtil.get(request, objectDefinition.getStorageType()) %>" selected="<%= true %>" value="" />
+							</aui:select>
+						</clay:col>
+					</clay:row>
+				</clay:sheet-section>
+			</c:if>
 		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 

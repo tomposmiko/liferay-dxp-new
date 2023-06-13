@@ -14,9 +14,13 @@
 
 package com.liferay.object.rest.internal.manager.v1_0;
 
+import com.liferay.account.constants.AccountConstants;
+import com.liferay.account.model.AccountEntry;
+import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -29,12 +33,15 @@ import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -48,6 +55,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -143,10 +151,14 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 
 	@Override
 	public ObjectEntry addOrUpdateObjectEntry(
-			DTOConverterContext dtoConverterContext,
+			long companyId, DTOConverterContext dtoConverterContext,
 			String externalReferenceCode, ObjectDefinition objectDefinition,
 			ObjectEntry objectEntry, String scopeKey)
 		throws Exception {
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setCompanyId(companyId);
 
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,
@@ -157,7 +169,7 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 					objectDefinition.getObjectDefinitionId(),
 					objectEntry.getProperties(),
 					dtoConverterContext.getLocale()),
-				new ServiceContext()));
+				serviceContext));
 	}
 
 	@Override
@@ -291,6 +303,24 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 
 		long groupId = _getGroupId(objectDefinition, scopeKey);
 
+		long[] accountEntryIds = null;
+
+		if (objectDefinition.isAccountEntryRestricted()) {
+			List<AccountEntry> accountEntries =
+				_accountEntryLocalService.getUserAccountEntries(
+					dtoConverterContext.getUserId(),
+					AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, null,
+					new String[] {
+						AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
+						AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON
+					},
+					WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS);
+
+			accountEntryIds = ListUtil.toLongArray(
+				accountEntries, AccountEntry::getAccountEntryId);
+		}
+
 		List<Facet> facets = new ArrayList<>();
 
 		if ((aggregation != null) &&
@@ -346,7 +376,8 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 			facets,
 			TransformUtil.transform(
 				_objectEntryLocalService.getValuesList(
-					objectDefinition.getObjectDefinitionId(), predicate, search,
+					objectDefinition.getObjectDefinitionId(), groupId,
+					accountEntryIds, predicate, search,
 					pagination.getStartPosition(), pagination.getEndPosition()),
 				values -> getObjectEntry(
 					dtoConverterContext, objectDefinition,
@@ -354,7 +385,8 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 						values.get(objectDefinition.getPKObjectFieldName())))),
 			pagination,
 			_objectEntryLocalService.getValuesListCount(
-				objectDefinition.getObjectDefinitionId(), predicate, search));
+				objectDefinition.getObjectDefinitionId(), groupId,
+				accountEntryIds, predicate, search));
 	}
 
 	@Override
@@ -417,6 +449,74 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition, objectEntry);
+	}
+
+	@Override
+	public Page<ObjectEntry> getObjectEntryRelatedObjectEntries(
+			DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition, Long objectEntryId,
+			String objectRelationshipName, Pagination pagination)
+		throws Exception {
+
+		com.liferay.object.model.ObjectEntry objectEntry =
+			_objectEntryService.getObjectEntry(objectEntryId);
+
+		List<ObjectEntry> objectEntries = new ArrayList<>();
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipService.getObjectRelationship(
+				objectDefinition.getObjectDefinitionId(),
+				objectRelationshipName);
+
+		if (Objects.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+
+			objectEntries = _toObjectEntries(
+				dtoConverterContext,
+				_objectEntryLocalService.getOneToManyRelatedObjectEntries(
+					objectEntry.getGroupId(),
+					objectRelationship.getObjectRelationshipId(),
+					objectEntry.getObjectEntryId(),
+					pagination.getStartPosition(),
+					pagination.getEndPosition()));
+		}
+		else if (Objects.equals(
+					objectRelationship.getType(),
+					ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
+
+			boolean reverse = objectRelationship.isReverse();
+
+			if (reverse) {
+				objectRelationship =
+					_objectRelationshipLocalService.
+						fetchReverseObjectRelationship(
+							objectRelationship, false);
+			}
+
+			objectEntries = _toObjectEntries(
+				dtoConverterContext,
+				_objectEntryLocalService.getManyToManyRelatedObjectEntries(
+					objectEntry.getGroupId(),
+					objectRelationship.getObjectRelationshipId(),
+					objectEntry.getObjectEntryId(), reverse,
+					pagination.getStartPosition(),
+					pagination.getEndPosition()));
+		}
+
+		return Page.of(
+			HashMapBuilder.put(
+				"get",
+				ActionUtil.addAction(
+					ActionKeys.VIEW, ObjectEntryResourceImpl.class,
+					objectEntry.getObjectEntryId(),
+					"getCurrentObjectEntriesObjectRelationshipNamePage", null,
+					objectEntry.getUserId(),
+					_getObjectEntryPermissionName(
+						objectEntry.getObjectDefinitionId()),
+					objectEntry.getGroupId(), dtoConverterContext.getUriInfo())
+			).build(),
+			objectEntries);
 	}
 
 	@Override
@@ -565,6 +665,23 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 		return null;
 	}
 
+	private List<ObjectEntry> _toObjectEntries(
+			DTOConverterContext dtoConverterContext,
+			List<com.liferay.object.model.ObjectEntry> objectEntries)
+		throws Exception {
+
+		return TransformUtil.transform(
+			objectEntries,
+			objectEntry -> {
+				ObjectDefinition objectDefinition =
+					_objectDefinitionLocalService.getObjectDefinition(
+						objectEntry.getObjectDefinitionId());
+
+				return _toObjectEntry(
+					dtoConverterContext, objectDefinition, objectEntry);
+			});
+	}
+
 	private ObjectEntry _toObjectEntry(
 			DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition,
@@ -667,6 +784,9 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 		DefaultObjectEntryManagerImpl.class);
 
 	@Reference
+	private AccountEntryLocalService _accountEntryLocalService;
+
+	@Reference
 	private Aggregations _aggregations;
 
 	@Reference
@@ -685,6 +805,9 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
 	private ObjectEntryDTOConverter _objectEntryDTOConverter;
 
 	@Reference
@@ -695,6 +818,9 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Reference
 	private ObjectRelationshipService _objectRelationshipService;
