@@ -19,18 +19,18 @@ export default function MockDiagramBuilderContext({
 	children,
 	mockSelectedNode = null,
 }) {
-	const [availableArea] = useState(null);
+	const [collidingElements] = useState(null);
 	const [, setElements] = useState(defaultNodes);
-	const [selectedNode, setSelectedNode] = useState(mockSelectedNode);
-	const [selectedNodeNewId, setSelectedNodeNewId] = useState(null);
+	const [selectedItem, setSelectedItem] = useState(mockSelectedNode);
+	const [selectedItemNewId, setSelectedItemNewId] = useState(null);
 
 	const contextProps = {
-		availableArea,
-		selectedNode,
-		selectedNodeNewId,
+		collidingElements,
+		selectedItem,
+		selectedItemNewId,
 		setElements,
-		setSelectedNode,
-		setSelectedNodeNewId,
+		setSelectedItem,
+		setSelectedItemNewId,
 	};
 
 	return (

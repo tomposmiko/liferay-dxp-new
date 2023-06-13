@@ -219,12 +219,7 @@ definition {
 	test AssertContentNotBePublishedByDefault {
 		property test.name.skip.portal.instance = "StagingUsecase#AssertContentNotBePublishedByDefault";
 
-		SystemSettings.openSystemSettingsAdmin();
-
-		SystemSettings.gotoConfiguration(
-			configurationCategory = "Assets",
-			configurationName = "Asset Publisher",
-			configurationScope = "System Scope");
+		APNavigator.openToConfigInSystemSettings(portlet = "Asset Publisher");
 
 		AssertNotChecked.assertNotCheckedNotVisible(
 			key_settingFieldName = "Enable Dynamic Export",
@@ -1229,7 +1224,7 @@ definition {
 
 		DMNavigator.gotoDocumentPG(dmDocumentTitle = "DM Document Title");
 
-		DMDocument.viewTag(tagName = "stagingtag");
+		DMDocument.viewTagInfo(tagName = "stagingtag");
 
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -1263,7 +1258,7 @@ definition {
 
 		DMNavigator.gotoDocumentPG(dmDocumentTitle = "DM Document Title");
 
-		DMDocument.viewNoTag(tagName = "stagingtag");
+		DMDocument.viewNoTagInfo(tagName = "stagingtag");
 	}
 
 	@priority = "4"

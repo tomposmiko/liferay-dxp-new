@@ -199,13 +199,27 @@ definition {
 	}
 
 	@description = "This is a test for LPS-136989. It checks that pages can be imported into a specific node."
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanImportPagesIntoSpecificNode {
-		property portal.acceptance = "false";
+		JSONWiki.addWikiNode(
+			groupName = "Guest",
+			wikiNodeDescription = "Wiki Node Description",
+			wikiNodeName = "Wiki Node Name");
 
-		// TODO LPS-136989 CanImportPagesIntoSpecificNode pending implementation
+		WikiNavigator.openWikiAdmin(siteURLKey = "guest");
 
+		WikiNode.importWikiPage(
+			fileName = "Liferay-sample2.xml",
+			wikiNodeName = "Wiki Node Name");
+
+		WikiNavigator.openToWikiPage(
+			siteURLKey = "guest",
+			wikiNodeName = "Wiki Node Name",
+			wikiPageTitle = "Liferay");
+
+		WikiPage.viewCP(
+			wikiPageContent = "Liferay, Inc., is an open-source company that provides free documentation and paid professional service to users of its software. Mainly focused on enterprise portal] technology, the company has its headquarters in Diamond Bar, California, United States.",
+			wikiPageTitle = "Liferay");
 	}
 
 	@description = "This is a test for LPS-136984. It checks that Javascript will not be excuted from the page title."

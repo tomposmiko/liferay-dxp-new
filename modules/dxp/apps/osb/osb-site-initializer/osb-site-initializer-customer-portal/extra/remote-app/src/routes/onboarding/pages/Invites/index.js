@@ -1,15 +1,15 @@
-import {useMutation, useQuery} from '@apollo/client';
+import {useMutation} from '@apollo/client';
 import ClayForm from '@clayui/form';
 import {useFormikContext} from 'formik';
 import {useEffect, useState} from 'react';
+import client from '../../../../apolloClient';
 import BaseButton from '../../../../common/components/BaseButton';
 import WarningBadge from '../../../../common/components/WarningBadge';
 import {useApplicationProvider} from '../../../../common/context/ApplicationPropertiesProvider';
 import {LiferayTheme} from '../../../../common/services/liferay';
 import {
 	addTeamMembersInvitation,
-	getAccountRolesAndAccountFlags,
-	getAccountSubscriptionGroups,
+	getAccountRoles,
 } from '../../../../common/services/liferay/graphql/queries';
 import {PARAMS_KEYS} from '../../../../common/services/liferay/search-params';
 import {API_BASE_URL} from '../../../../common/utils';
@@ -19,7 +19,6 @@ import {useOnboarding} from '../../context';
 import {actionTypes} from '../../context/reducer';
 import {getInitialInvite, roles, steps} from '../../utils/constants';
 
-const ACCOUNT_SUBSCRIPTION_GROUP_NAME = 'DXP Cloud';
 const MAXIMUM_INVITES_COUNT = 10;
 
 const SLA = {
@@ -29,8 +28,9 @@ const SLA = {
 
 const Invites = () => {
 	const {supportLink} = useApplicationProvider();
-	const [{project}, dispatch] = useOnboarding();
+	const [{project, subscriptionGroups}, dispatch] = useOnboarding();
 	const {errors, setFieldValue, setTouched, values} = useFormikContext();
+	const [rolesData, setRolesData] = useState();
 
 	const [AddTeamMemberInvitation, {called, error}] = useMutation(
 		addTeamMembersInvitation
@@ -42,34 +42,42 @@ const Invites = () => {
 	const [accountRoles, setAccountRoles] = useState([]);
 	const [availableAdminsRoles, setAvailableAdminsRoles] = useState(1);
 
-	const {data: rolesData} = useQuery(getAccountRolesAndAccountFlags, {
-		variables: {
-			accountFlagsFilter: '',
-			accountId: 0,
-		},
-	});
+	useEffect(() => {
+		const getRoles = async () => {
+			const {data} = await client.query({
+				query: getAccountRoles,
+				variables: {
+					accountId: project.id,
+				},
+			});
+
+			if (data) {
+				setRolesData(data.accountAccountRoles?.items);
+			}
+		};
+
+		getRoles();
+	}, [project]);
 
 	const totalEmails = values?.invites?.length || 0;
 	const failedEmails = errors?.invites?.filter((email) => email).length || 0;
 	const filledEmails = values?.invites?.filter(({email}) => email).length;
+	const maxRequestors = project.maxRequestors < 1 ? 1 : project.maxRequestors;
 
-	const {data} = useQuery(getAccountSubscriptionGroups, {
-		variables: {
-			filter: `(accountKey eq '${project.accountKey}') and (name eq '${ACCOUNT_SUBSCRIPTION_GROUP_NAME}')`,
-		},
-	});
+	const hasSubscriptionsDXPCloud = !!subscriptionGroups?.length;
 
-	const hasSubscriptionsDXPCloud = !!data?.c?.accountSubscriptionGroups?.items
-		?.length;
-
-	const nextStep = hasSubscriptionsDXPCloud
-		? steps.dxpCloud
-		: steps.successDxpCloud;
-
-	const handleSkip = () => {
-		window.location.href = `${API_BASE_URL}${LiferayTheme.getLiferaySiteName()}/overview?${
-			PARAMS_KEYS.PROJECT_APPLICATION_EXTERNAL_REFERENCE_CODE
-		}=${project.accountKey}`;
+	const nextPage = () => {
+		if (hasSubscriptionsDXPCloud) {
+			dispatch({
+				payload: steps.dxpCloud,
+				type: actionTypes.CHANGE_STEP,
+			});
+		}
+		else {
+			window.location.href = `${API_BASE_URL}/${LiferayTheme.getLiferaySiteName()}/overview?${
+				PARAMS_KEYS.PROJECT_APPLICATION_EXTERNAL_REFERENCE_CODE
+			}=${project.accountKey}`;
+		}
 	};
 
 	const handleSubmit = async () => {
@@ -91,11 +99,9 @@ const Invites = () => {
 						})
 					)
 			);
+
 			if (!error) {
-				dispatch({
-					payload: nextStep,
-					type: actionTypes.CHANGE_STEP,
-				});
+				nextPage();
 			}
 		}
 		else {
@@ -136,52 +142,68 @@ const Invites = () => {
 	};
 
 	useEffect(() => {
-		let filterRoles = [
-			...new Set(
-				rolesData?.accountAccountRoles?.items.map(({name}) => name)
-			),
-		];
-		const SLA_CURRENT = project.slaCurrent;
-		const isPartner = project.partner;
+		if (rolesData) {
+			let filterRoles = [...new Set(rolesData.map(({name}) => name))];
+			const SLA_CURRENT = project.slaCurrent;
+			const isPartner = project.partner;
 
-		if (
-			!SLA_CURRENT.includes(SLA.gold) &&
-			!SLA_CURRENT.includes(SLA.platinum)
-		) {
-			filterRoles = filterRoles.filter(
-				(label) => label !== roles.REQUESTOR.key
+			if (
+				SLA_CURRENT.includes(SLA.gold) ||
+				SLA_CURRENT.includes(SLA.platinum)
+			) {
+				const requestorIndex = filterRoles.findIndex(
+					(label) => label === roles.REQUESTOR.key
+				);
+
+				if (requestorIndex === -1) {
+					filterRoles = [...filterRoles, roles.REQUESTOR.key];
+				}
+			}
+
+			if (isPartner) {
+				const partnerManagerIndex = filterRoles.findIndex(
+					(label) => label === roles.PARTNER_MANAGER.key
+				);
+				const partnerMemberIndex = filterRoles.findIndex(
+					(label) => label === roles.PARTNER_MEMBER.key
+				);
+
+				if (partnerManagerIndex === -1) {
+					filterRoles = [...filterRoles, roles.PARTNER_MANAGER.key];
+				}
+
+				if (partnerMemberIndex === -1) {
+					filterRoles = [...filterRoles, roles.PARTNER_MEMBER.key];
+				}
+			}
+
+			setFieldValue(
+				'invites[0].roleId',
+				maxRequestors === 1
+					? roles.MEMBER.key
+					: filterRoles.find(
+							(role) => role === roles.REQUESTOR.key
+					  ) || roles.ADMIN.key
 			);
+
+			const mapRolesName = filterRoles.sort().map((role) => {
+				const roleProperty = Object.values(roles).find(
+					({key}) => key === role
+				);
+
+				return {
+					disabled: false,
+					label: roleProperty?.name || role,
+					value: roleProperty?.key || role,
+				};
+			});
+			setAccountRoles(mapRolesName);
 		}
-
-		if (!isPartner) {
-			filterRoles = filterRoles.filter(
-				(label) =>
-					label !== roles.PARTNER_MANAGER.key &&
-					label !== roles.PARTNER_MEMBER.key
-			);
-		}
-		setFieldValue(
-			'invites[0].roleId',
-			filterRoles.find((role) => role === roles.REQUESTOR.key) ||
-				roles.ADMIN.key
-		);
-
-		const mapRolesName = filterRoles.map((role) => {
-			const roleProperty = Object.values(roles).find(
-				({key}) => key === role
-			);
-
-			return {
-				disabled: false,
-				label: roleProperty?.name || role,
-				value: roleProperty?.key || role,
-			};
-		});
-		setAccountRoles(mapRolesName);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [project, rolesData]);
+
 	useEffect(() => {
-		if (values) {
+		if (values && rolesData) {
 			const totalAdmins = values.invites.reduce(
 				(totalInvites, currentInvite) => {
 					if (
@@ -197,14 +219,14 @@ const Invites = () => {
 				},
 				1
 			);
-
-			const remainingAdmins = project.maxRequestors - totalAdmins;
+			const remainingAdmins = maxRequestors - totalAdmins;
 
 			disableAdminOptions(remainingAdmins === 0);
 
 			setAvailableAdminsRoles(remainingAdmins);
 		}
-	}, [values, project]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [values, project, rolesData]);
 
 	useEffect(() => {
 		if (filledEmails) {
@@ -219,7 +241,7 @@ const Invites = () => {
 		<Layout
 			footerProps={{
 				leftButton: (
-					<BaseButton borderless onClick={handleSkip}>
+					<BaseButton borderless onClick={nextPage}>
 						Skip for now
 					</BaseButton>
 				),
@@ -299,13 +321,13 @@ const Invites = () => {
 							project.slaCurrent.includes(SLA.platinum)
 								? roles.REQUESTOR.name
 								: roles.ADMIN.name
-						}	roles available: ${availableAdminsRoles} of ${
-							project.maxRequestors
-						}`}
+						}	roles available: ${availableAdminsRoles} of ${maxRequestors}`}
 					</h5>
 
 					<p className="mb-0 text-neutral-7 text-paragraph-sm">
-						{`Only ${project.maxRequestors} members per project (including yourself) have
+						{`Only ${maxRequestors} member${
+							maxRequestors > 1 ? 's' : ''
+						} per project (including yourself) have
 						role permissions (Admins & Requestors) to open Support
 						tickets. `}
 

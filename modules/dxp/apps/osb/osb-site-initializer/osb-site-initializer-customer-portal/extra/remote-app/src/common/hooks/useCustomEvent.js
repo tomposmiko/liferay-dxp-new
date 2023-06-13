@@ -1,13 +1,28 @@
-export function useCustomEvent(event) {
-	const dispatch = (data) => {
-		window.dispatchEvent(
-			new CustomEvent(event, {
-				bubbles: true,
-				composed: true,
-				detail: {...data},
-			})
-		);
-	};
+/**
+ *
+ * @param {String} name
+ * @returns {Function}
+ */
+export function useCustomEvent(name) {
+	return (data) => {
+		try {
+			const event = Liferay.publish(name, {
+				async: true,
+				fireOnce: true,
+			});
 
-	return dispatch;
+			event.fire({
+				detail: data,
+			});
+		}
+		catch {
+			window.dispatchEvent(
+				new CustomEvent(name, {
+					bubbles: true,
+					composed: true,
+					detail: data,
+				})
+			);
+		}
+	};
 }

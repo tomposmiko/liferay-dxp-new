@@ -88,9 +88,6 @@
 /development/xmlresolver.jar
 /portal/activation.jar
 /portal/ant.jar
-/portal/antlr2.jar
-/portal/antlr3-runtime.jar
-/portal/antlr3.jar
 /portal/asm-analysis.jar
 /portal/asm-commons.jar
 /portal/asm-tree.jar
@@ -124,15 +121,12 @@
 /portal/commons-math3.jar
 /portal/commons-pool.jar
 /portal/commons-validator.jar
-/portal/concurrent.jar
 /portal/crypt.jar
-/portal/curvesapi.jar
 /portal/daisydiff.jar
 /portal/dom4j.jar
 /portal/eclipse-core-runtime.jar
 /portal/fontbox.jar
 /portal/freshcookies-security.jar
-/portal/gif89.jar
 /portal/hessian.jar
 /portal/hibernate-core.jar
 /portal/hikaricp.jar
@@ -180,7 +174,6 @@
 /portal/jodd-json.jar
 /portal/jodd-proxetta.jar
 /portal/jodd-util.jar
-/portal/jrcs-diff.jar
 /portal/json-java.jar
 /portal/jsr107cache.jar
 /portal/juh.jar

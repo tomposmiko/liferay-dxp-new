@@ -206,7 +206,7 @@ definition {
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
 
-		ObjectPortlet.viewEntry(entry = "01/01/2001");
+		ObjectPortlet.viewEntry(entry = "Jan 1, 2001");
 	}
 
 	@description = "LPS-135396 - Verify it is possible to add a Double field on layout"
@@ -891,14 +891,14 @@ definition {
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
 
 		ObjectPortlet.updateEntry(
-			entry = "01/01/2001",
+			entry = "Jan 1, 2001",
 			updateEntry = "02/02/2002");
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
 
 		ObjectPortlet.assertEntryNotPresent(entry = "01/01/2001");
 
-		ObjectPortlet.viewEntry(entry = "02/02/2002");
+		ObjectPortlet.viewEntry(entry = "Feb 2, 2002");
 	}
 
 	@description = "LPS-135396 - Verify it is possible to edit a Double entry on layout"
@@ -1788,7 +1788,7 @@ definition {
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
 
-		ObjectPortlet.viewEntryDetails(entry = "01/01/2001");
+		ObjectPortlet.viewEntryDetails(entry = "Jan 1, 2001");
 
 		ObjectPortlet.assertEntryDetailsLabelPresent(entryLabel = "Field");
 
@@ -2098,7 +2098,7 @@ definition {
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
 
-		ObjectPortlet.viewEntry(entry = "2021-09-23");
+		ObjectPortlet.viewEntry(entry = "Sep 23, 2021");
 	}
 
 	@description = "LPS-135393 - Verify that a Double entry is correctly displayed on the auto-generated table on the Custom Object Portlet"

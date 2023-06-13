@@ -52,6 +52,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -228,7 +229,14 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 			<#else>
 				access = JsonProperty.Access.READ_WRITE
 			</#if>
+
+			<#if propertySchema.name?? && !stringUtil.equals(propertyName, propertySchema.name)>
+				, value = "${propertySchema.name}"
+			</#if>
 		)
+		<#if propertySchema.xml??>
+			@XmlElement(name = "${propertySchema.xml.name}")
+		</#if>
 		<#if schema.requiredPropertySchemaNames?? && schema.requiredPropertySchemaNames?seq_contains(propertyName)>
 			<#if stringUtil.equals(propertyType, "String")>
 				@NotEmpty
@@ -277,14 +285,23 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 		</#list>
 
 		<#list properties?keys as propertyName>
-			<#assign propertyType = properties[propertyName] />
+			<#assign
+				propertySchema = freeMarkerTool.getDTOPropertySchema(propertyName, schema)
+				propertyType = properties[propertyName]
+			/>
 
 			if (${propertyName} != null) {
 				if (sb.length() > 1) {
 					sb.append(", ");
 				}
 
-				sb.append("\"${propertyName}\": ");
+				<#if propertySchema.name?? && !stringUtil.equals(propertyName, propertySchema.name)>
+					<#assign key = propertySchema.name />
+				<#else>
+					<#assign key = propertyName />
+				</#if>
+
+				sb.append("\"${key}\": ");
 
 				<#if allSchemas[propertyType]??>
 					sb.append(String.valueOf(${propertyName}));

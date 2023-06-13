@@ -25,11 +25,13 @@ import com.liferay.item.selector.criteria.FolderItemSelectorReturnType;
 import com.liferay.item.selector.criteria.folder.criterion.FolderItemSelectorCriterion;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -121,7 +123,7 @@ public class IGConfigurationDisplayContext {
 		_initFolder();
 
 		if (Objects.equals(_folderName, StringPool.BLANK)) {
-			_getFolderName();
+			_folderName = _getFolderName();
 		}
 
 		return _folderName;
@@ -140,10 +142,9 @@ public class IGConfigurationDisplayContext {
 		folderItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new FolderItemSelectorReturnType());
 
-		folderItemSelectorCriterion.setFolderId(
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+		folderItemSelectorCriterion.setFolderId(getRootFolderId());
 		folderItemSelectorCriterion.setIgnoreRootFolder(true);
-		folderItemSelectorCriterion.setRepositoryId(0);
+		folderItemSelectorCriterion.setRepositoryId(getSelectedRepositoryId());
 		folderItemSelectorCriterion.setSelectedFolderId(getRootFolderId());
 		folderItemSelectorCriterion.setSelectedRepositoryId(
 			getSelectedRepositoryId());
@@ -151,7 +152,12 @@ public class IGConfigurationDisplayContext {
 
 		return _itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
-			getItemSelectedEventName(), folderItemSelectorCriterion);
+			GroupLocalServiceUtil.getGroup(
+				GetterUtil.getLong(
+					getSelectedRepositoryId(),
+					_themeDisplay.getScopeGroupId())),
+			_themeDisplay.getScopeGroupId(), getItemSelectedEventName(),
+			folderItemSelectorCriterion);
 	}
 
 	public boolean isRootFolderInTrash() throws PortalException {
@@ -181,24 +187,24 @@ public class IGConfigurationDisplayContext {
 		}
 	}
 
-	private void _getFolderName() {
+	private String _getFolderName() {
 		if ((_folderId == null) ||
 			(_folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)) {
 
-			return;
+			return LanguageUtil.get(_httpServletRequest, "home");
 		}
 
 		Folder folder = _getFolder();
 
 		if (folder == null) {
-			return;
+			return StringPool.BLANK;
 		}
-
-		_folderName = folder.getName();
 
 		if (_folderInTrash) {
-			_folderName = _trashHelper.getOriginalTitle(_folder.getName());
+			return _trashHelper.getOriginalTitle(_folder.getName());
 		}
+
+		return folder.getName();
 	}
 
 	private PortletPreferences _getPortletPreferences() {

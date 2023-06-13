@@ -256,7 +256,7 @@ definition {
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
 
-		ObjectPortlet.viewEntry(entry = "01/01/2001");
+		ObjectPortlet.viewEntry(entry = "Jan 1, 2001");
 	}
 
 	@description = "LPS-133365 - Verify if it's possible to map an Object field of Double type and view its entries"
@@ -549,7 +549,7 @@ definition {
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
 
-		ObjectPortlet.viewEntry(entry = "01/01/2001");
+		ObjectPortlet.viewEntry(entry = "Jan 1, 2001");
 	}
 
 }

@@ -21,6 +21,7 @@ export const HEADERS = new Headers({
 	'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
 });
 
+export const HEADLESS_BATCH_PLANNER_URL = '/o/batch-planner/v1.0';
 export const HEADLESS_BATCH_ENGINE_URL = '/o/headless-batch-engine/v1.0';
 export const HEADLESS_ENDPOINT_POLICY_NAME = 'headlessEndpoint';
 export const JSON_FORMAT = 'json';
@@ -32,6 +33,7 @@ export const PROCESS_COMPLETED = 'COMPLETED';
 export const PROCESS_FAILED = 'FAILED';
 export const PROCESS_STARTED = 'STARTED';
 export const SCHEMA_SELECTED_EVENT = 'schema-selected';
+export const TEMPLATE_CREATED = 'TEMPLATE_CREATED';
 export const TEMPLATE_SELECTED_EVENT = 'template-selected';
 export const TEMPLATE_SOILED = 'template-soiled';
 
