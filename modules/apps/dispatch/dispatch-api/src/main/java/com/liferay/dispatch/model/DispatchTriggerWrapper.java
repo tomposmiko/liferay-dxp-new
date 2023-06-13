@@ -389,6 +389,11 @@ public class DispatchTriggerWrapper
 		return model.getSystem();
 	}
 
+	@Override
+	public Date getTimeZoneEndDate() {
+		return model.getTimeZoneEndDate();
+	}
+
 	/**
 	 * Returns the time zone ID of this dispatch trigger.
 	 *
@@ -397,6 +402,11 @@ public class DispatchTriggerWrapper
 	@Override
 	public String getTimeZoneId() {
 		return model.getTimeZoneId();
+	}
+
+	@Override
+	public Date getTimeZoneStartDate() {
+		return model.getTimeZoneStartDate();
 	}
 
 	/**

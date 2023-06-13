@@ -51,12 +51,6 @@ const LABEL_CONFIGURATION_KEY = 'inputLabel';
 const REQUIRED_CONFIGURATION_KEY = 'inputRequired';
 const SHOW_HELP_TEXT_CONFIGURATION_KEY = 'inputShowHelpText';
 
-function getFieldLabel(fieldKey, fields) {
-	const flattenedFields = fields.flatMap((fieldSet) => fieldSet.fields);
-
-	return flattenedFields.find((field) => field.key === fieldKey)?.label;
-}
-
 function getInputCommonConfiguration(configurationValues, formFields) {
 	const fields = [];
 
@@ -286,30 +280,8 @@ export function FormInputGeneralPanel({item}) {
 		if (key === FIELD_ID_CONFIGURATION_KEY) {
 			editableValues = setIn(
 				fragmentEntryLinkRef.current.editableValues,
-				[
-					FREEMARKER_FRAGMENT_ENTRY_PROCESSOR,
-					REQUIRED_CONFIGURATION_KEY,
-				],
-				isFormRequiredField(value, formFields)
-			);
-
-			editableValues = setIn(
-				editableValues,
-				[
-					FREEMARKER_FRAGMENT_ENTRY_PROCESSOR,
-					LABEL_CONFIGURATION_KEY,
-					config.defaultLanguageId,
-				],
-				getFieldLabel(value, formFields)
-			);
-
-			editableValues = setIn(
-				editableValues,
-				[
-					FREEMARKER_FRAGMENT_ENTRY_PROCESSOR,
-					HELP_TEXT_CONFIGURATION_KEY,
-				],
-				null
+				[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR],
+				DEFAULT_CONFIGURATION_VALUES
 			);
 		}
 

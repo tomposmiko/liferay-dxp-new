@@ -12,7 +12,7 @@
  * details.
  */
 
-import {throttle} from 'frontend-js-web';
+import {openToast, throttle} from 'frontend-js-web';
 import React, {
 	useCallback,
 	useContext,
@@ -25,6 +25,7 @@ import React, {
 import {useDrag, useDrop} from 'react-dnd';
 import {getEmptyImage} from 'react-dnd-html5-backend';
 
+import {FRAGMENT_ENTRY_TYPES} from '../../config/constants/fragmentEntryTypes';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../config/constants/layoutDataItemTypes';
 import {
 	useCollectionItemIndex,
@@ -51,6 +52,11 @@ export const initialDragDrop = {
 	setCanDrag: () => {},
 
 	state: {
+
+		/**
+		 * Id of the closest container of drop item
+		 */
+		dropContainerId: null,
 
 		/**
 		 * Item that is being dragged
@@ -99,6 +105,14 @@ export const initialDragDrop = {
 };
 
 const DragAndDropContext = React.createContext(initialDragDrop);
+
+export function useDropContainerId() {
+	return useContext(DragAndDropContext).state.dropContainerId;
+}
+
+export function useIsDroppable() {
+	return useContext(DragAndDropContext).state.droppable;
+}
 
 export function useSetCanDrag() {
 	return useContext(DragAndDropContext).setCanDrag;
@@ -166,12 +180,22 @@ export function useDragItem(sourceItem, onDragEnd, onBegin = () => {}) {
 	};
 }
 
-export function useDragSymbol({icon, label, type}, onDragEnd) {
+export function useDragSymbol(
+	{fragmentEntryType, icon, label, type},
+	onDragEnd
+) {
 	const selectItem = useSelectItem();
 
 	const sourceItem = useMemo(
-		() => ({icon, isSymbol: true, itemId: label, name: label, type}),
-		[icon, label, type]
+		() => ({
+			fragmentEntryType,
+			icon,
+			isSymbol: true,
+			itemId: label,
+			name: label,
+			type,
+		}),
+		[fragmentEntryType, icon, label, type]
 	);
 
 	const {handlerRef, isDraggingSource, sourceRef} = useDragItem(
@@ -317,7 +341,28 @@ export function DragAndDropContextProvider({children}) {
 }
 
 function computeDrop({dispatch, layoutDataRef, onDragEnd, state}) {
-	if (state.droppable && state.dropItem && state.dropTargetItem) {
+	if (!state.droppable) {
+		if (state.dropItem.fragmentEntryType === FRAGMENT_ENTRY_TYPES.input) {
+			openToast({
+				message: Liferay.Language.get(
+					'form-components-can-only-be-placed-inside-a-mapped-form-container'
+				),
+				type: 'danger',
+			});
+		}
+		else {
+			openToast({
+				message: Liferay.Language.get('an-unexpected-error-occurred'),
+				type: 'danger',
+			});
+		}
+
+		dispatch(initialDragDrop.state);
+
+		return;
+	}
+
+	if (state.dropItem && state.dropTargetItem) {
 		if (state.elevate) {
 			const parentItem =
 				layoutDataRef.current.items[state.dropTargetItem.parentId];

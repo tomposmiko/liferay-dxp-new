@@ -90,7 +90,7 @@ definition {
 	}
 
 	macro searchViaKeywords {
-		AssertElementPresent(locator1 = "TextInput#SITE_SEARCH_KEYWORDS");
+		WaitForElementPresent(locator1 = "TextInput#SITE_SEARCH_KEYWORDS");
 
 		Type(
 			locator1 = "TextInput#SITE_SEARCH_KEYWORDS",
@@ -115,6 +115,10 @@ definition {
 	macro viewAuditDetails {
 		var key_resourceAction = "${resourceAction}";
 		var key_resourceName = "${resourceName}";
+
+		WaitForElementPresent(
+			locator1 = "AuditReports#REPORTS_TABLE_RESOURCE_ACTION",
+			value1 = "${resourceAction}");
 
 		AssertClick(
 			locator1 = "AuditReports#REPORTS_TABLE_RESOURCE_ACTION",

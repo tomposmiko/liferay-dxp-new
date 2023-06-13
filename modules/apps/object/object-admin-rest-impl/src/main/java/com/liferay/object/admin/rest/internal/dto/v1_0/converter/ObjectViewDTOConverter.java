@@ -145,7 +145,7 @@ public class ObjectViewDTOConverter
 			ObjectViewFilterColumn.FilterType.create(
 				serviceBuilderObjectViewFilterColumn.getFilterType()));
 		objectViewFilterColumn.setJson(
-			serviceBuilderObjectViewFilterColumn.getJson());
+			serviceBuilderObjectViewFilterColumn.getJSON());
 		objectViewFilterColumn.setValueSummary(
 			() -> {
 				ObjectFieldFilterParser objectFieldFilterParser =

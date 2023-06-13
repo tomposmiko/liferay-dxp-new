@@ -18,7 +18,7 @@ import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
 import classNames from 'classnames';
 import {FieldArray, withFormik} from 'formik';
-import {debounce, fetch, openModal} from 'frontend-js-web';
+import {debounce, fetch, openConfirmModal, openModal, openToast} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 
@@ -146,7 +146,7 @@ class SegmentEdit extends Component {
 			.catch(() => {
 				this.setState({membersCountLoading: false});
 
-				Liferay.Util.openToast({
+				openToast({
 					message: Liferay.Language.get(
 						'an-unexpected-error-occurred'
 					),
@@ -300,13 +300,16 @@ class SegmentEdit extends Component {
 		const {hasChanged} = this.state;
 
 		if (hasChanged) {
-			const confirmed = confirm(
-				Liferay.Language.get('criteria-cancel-confirmation-message')
-			);
-
-			if (confirmed) {
-				this._redirect();
-			}
+			openConfirmModal({
+				message: Liferay.Language.get(
+					'criteria-cancel-confirmation-message'
+				),
+				onConfirm: (isConfirmed) => {
+					if (isConfirmed) {
+						this._redirect();
+					}
+				},
+			});
 		}
 		else {
 			this._redirect();
@@ -381,7 +384,7 @@ class SegmentEdit extends Component {
 				event.preventDefault();
 
 				errorMessages.forEach((message) => {
-					Liferay.Util.openToast({
+					openToast({
 						message,
 						type: 'danger',
 					});

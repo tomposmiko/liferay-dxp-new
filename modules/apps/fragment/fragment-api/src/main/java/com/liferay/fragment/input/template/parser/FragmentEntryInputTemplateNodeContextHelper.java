@@ -14,6 +14,7 @@
 
 package com.liferay.fragment.input.template.parser;
 
+import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.util.configuration.FragmentConfigurationField;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
@@ -30,12 +31,18 @@ import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.math.BigDecimal;
@@ -44,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.portlet.PortletURL;
@@ -56,11 +64,12 @@ import javax.servlet.http.HttpServletRequest;
 public class FragmentEntryInputTemplateNodeContextHelper {
 
 	public FragmentEntryInputTemplateNodeContextHelper(
-		String defaultInputLabel,
+		String defaultInputLabel, DLAppLocalService dlAppLocalService,
 		FragmentEntryConfigurationParser fragmentEntryConfigurationParser,
 		ItemSelector itemSelector) {
 
 		_defaultInputLabel = defaultInputLabel;
+		_dlAppLocalService = dlAppLocalService;
 		_fragmentEntryConfigurationParser = fragmentEntryConfigurationParser;
 		_itemSelector = itemSelector;
 	}
@@ -109,11 +118,18 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 					LanguageUtil.get(locale, "add-your-help-text-here"), true,
 					"text"),
 				locale));
+
+		String defaultInputLabel = _defaultInputLabel;
+
+		if (infoField != null) {
+			defaultInputLabel = infoField.getLabel(locale);
+		}
+
 		String inputLabel = GetterUtil.getString(
 			_fragmentEntryConfigurationParser.getFieldValue(
 				fragmentEntryLink.getEditableValues(),
 				new FragmentConfigurationField(
-					"inputLabel", "string", _defaultInputLabel, true, "text"),
+					"inputLabel", "string", defaultInputLabel, true, "text"),
 				locale));
 
 		String name = "name";
@@ -152,15 +168,24 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 		if (infoField == null) {
 			return new InputTemplateNode(
 				errorMessage, inputHelpText, inputLabel, name, required,
-				inputShowHelpText, inputShowLabel, "type", "value");
+				inputShowHelpText, inputShowLabel, "type", StringPool.BLANK);
 		}
 
 		InfoFieldType infoFieldType = infoField.getInfoFieldType();
 
+		String value = StringPool.BLANK;
+
+		Map<String, String> formParameterMap =
+			(Map<String, String>)SessionMessages.get(
+				httpServletRequest, "infoFormParameterMap");
+
+		if (formParameterMap != null) {
+			value = formParameterMap.get(infoField.getName());
+		}
+
 		InputTemplateNode inputTemplateNode = new InputTemplateNode(
 			errorMessage, inputHelpText, inputLabel, name, required,
-			inputShowHelpText, inputShowLabel, infoFieldType.getName(),
-			"value");
+			inputShowHelpText, inputShowLabel, infoFieldType.getName(), value);
 
 		if (infoFieldType instanceof FileInfoFieldType) {
 			Optional<String> acceptedFileExtensionsOptional =
@@ -202,12 +227,34 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 				fileSourceTypeOptional.orElse(null);
 
 			if (fileSourceType != null) {
+				String fileName = null;
+				FileEntry fileEntry = null;
 				boolean selectFromDocumentLibrary = false;
+
+				if (Validator.isNotNull(value)) {
+					fileEntry = _fetchFileEntry(GetterUtil.getLong(value));
+				}
 
 				if (fileSourceType ==
 						FileInfoFieldType.FileSourceType.DOCUMENTS_AND_MEDIA) {
 
 					selectFromDocumentLibrary = true;
+
+					if (fileEntry != null) {
+						fileName = fileEntry.getFileName();
+					}
+				}
+				else if (fileSourceType ==
+							FileInfoFieldType.FileSourceType.USER_COMPUTER) {
+
+					if (fileEntry != null) {
+						fileName = TempFileEntryUtil.getOriginalTempFileName(
+							fileEntry.getFileName());
+					}
+				}
+
+				if (fileName != null) {
+					inputTemplateNode.addAttribute("fileName", fileName);
 				}
 
 				inputTemplateNode.addAttribute(
@@ -307,12 +354,31 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 				options.add(
 					new InputTemplateNode.Option(
 						option.getLabel(locale), option.getValue()));
+
+				if ((value != null) && value.equals(option.getValue())) {
+					inputTemplateNode.addAttribute(
+						"selectedOptionLabel", option.getLabel(locale));
+				}
 			}
 
 			inputTemplateNode.addAttribute("options", options);
 		}
 
 		return inputTemplateNode;
+	}
+
+	private FileEntry _fetchFileEntry(long fileEntryId) {
+		try {
+			return _dlAppLocalService.getFileEntry(fileEntryId);
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to get file entry " + fileEntryId, portalException);
+			}
+
+			return null;
+		}
 	}
 
 	private String _getStep(Integer decimalPartMaxLength) {
@@ -332,7 +398,11 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 			"1");
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		FragmentEntryInputTemplateNodeContextHelper.class);
+
 	private final String _defaultInputLabel;
+	private final DLAppLocalService _dlAppLocalService;
 	private final FragmentEntryConfigurationParser
 		_fragmentEntryConfigurationParser;
 	private final ItemSelector _itemSelector;

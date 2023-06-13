@@ -121,17 +121,6 @@ public class AddInfoItemStrutsActionTest {
 	}
 
 	@Test
-	public void testAddInfoItemInvalidDoubleTooBig() throws Exception {
-		_testAddInfoItemDouble("12345678901234567", "12345678901234568", false);
-	}
-
-	@Test
-	public void testAddInfoItemInvalidDoubleTooSmall() throws Exception {
-		_testAddInfoItemDouble(
-			"-12345678901234567", "-12345678901234568", false);
-	}
-
-	@Test
 	public void testAddInfoItemInvalidIntegerTooBig() throws Exception {
 		_testAddInfoItemInteger("2147483648", true);
 	}
@@ -154,15 +143,15 @@ public class AddInfoItemStrutsActionTest {
 	@Test
 	public void testAddInfoItemMaxValues() throws Exception {
 		_testAddInfoItem(
-			"99999999999999.9999999999999999", "9999999999999998", "999999999",
+			"99999999999999.9999999999999999", "9999999999", "999999999",
 			"9007199254740991", RandomTestUtil.randomString());
 	}
 
 	@Test
 	public void testAddInfoItemMinValues() throws Exception {
 		_testAddInfoItem(
-			"-99999999999999.9999999999999999", "-9999999999999998",
-			"-999999999", "-9007199254740991", RandomTestUtil.randomString());
+			"-99999999999999.9999999999999999", "-9999999999", "-999999999",
+			"-9007199254740991", RandomTestUtil.randomString());
 	}
 
 	@Test

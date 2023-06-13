@@ -22,6 +22,7 @@ import com.liferay.info.field.type.BooleanInfoFieldType;
 import com.liferay.info.field.type.DateInfoFieldType;
 import com.liferay.info.field.type.FileInfoFieldType;
 import com.liferay.info.field.type.NumberInfoFieldType;
+import com.liferay.info.field.type.RelationshipInfoFieldType;
 import com.liferay.info.field.type.SelectInfoFieldType;
 import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.form.InfoForm;
@@ -107,9 +108,19 @@ public class InfoRequestFieldValuesProviderHelper {
 				(infoField.getInfoFieldType() instanceof FileInfoFieldType)) {
 
 				for (FileItem fileItem : multipartParameters) {
-					infoFieldValues.add(
+					if ((fileItem.getSize() < 0) ||
+						Validator.isNull(fileItem.getFileName())) {
+
+						continue;
+					}
+
+					InfoFieldValue<Object> infoFieldValue =
 						_getFileInfoFieldValue(
-							fileItem, groupId, infoField, themeDisplay));
+							fileItem, groupId, infoField, themeDisplay);
+
+					if (infoFieldValue != null) {
+						infoFieldValues.add(infoFieldValue);
+					}
 				}
 			}
 
@@ -121,9 +132,12 @@ public class InfoRequestFieldValuesProviderHelper {
 			}
 
 			for (String value : regularParameters) {
-				infoFieldValues.add(
-					_getInfoFieldValue(
-						infoField, themeDisplay.getLocale(), value));
+				InfoFieldValue<Object> infoFieldValue = _getInfoFieldValue(
+					infoField, themeDisplay.getLocale(), value);
+
+				if (infoFieldValue != null) {
+					infoFieldValues.add(infoFieldValue);
+				}
 			}
 		}
 
@@ -252,6 +266,7 @@ public class InfoRequestFieldValuesProviderHelper {
 		}
 
 		if (infoField.getInfoFieldType() instanceof FileInfoFieldType ||
+			infoField.getInfoFieldType() instanceof RelationshipInfoFieldType ||
 			infoField.getInfoFieldType() instanceof SelectInfoFieldType ||
 			infoField.getInfoFieldType() instanceof TextInfoFieldType) {
 

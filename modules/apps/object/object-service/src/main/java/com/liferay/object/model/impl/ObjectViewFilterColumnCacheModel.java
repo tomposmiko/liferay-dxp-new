@@ -159,10 +159,10 @@ public class ObjectViewFilterColumnCacheModel
 		}
 
 		if (json == null) {
-			objectViewFilterColumnImpl.setJson("");
+			objectViewFilterColumnImpl.setJSON("");
 		}
 		else {
-			objectViewFilterColumnImpl.setJson(json);
+			objectViewFilterColumnImpl.setJSON(json);
 		}
 
 		if (objectFieldName == null) {

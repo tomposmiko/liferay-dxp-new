@@ -25,6 +25,9 @@ import com.liferay.info.exception.InfoFormInvalidGroupException;
 import com.liferay.info.exception.InfoFormInvalidLayoutModeException;
 import com.liferay.info.exception.InfoFormPrincipalException;
 import com.liferay.info.exception.InfoFormValidationException;
+import com.liferay.info.field.InfoField;
+import com.liferay.info.field.InfoFieldValue;
+import com.liferay.info.field.type.DateInfoFieldType;
 import com.liferay.info.internal.request.helper.InfoRequestFieldValuesProviderHelper;
 import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
@@ -43,8 +46,10 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -54,7 +59,11 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.text.SimpleDateFormat;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
@@ -83,13 +92,42 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 		String formItemId = ParamUtil.getString(
 			httpServletRequest, "formItemId");
 
+		List<InfoFieldValue<Object>> infoFieldValues = null;
+
+		try {
+			infoFieldValues =
+				_infoRequestFieldValuesProviderHelper.getInfoFieldValues(
+					httpServletRequest);
+		}
+		catch (InfoFormException infoFormException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(infoFormException);
+			}
+
+			SessionErrors.add(
+				httpServletRequest, formItemId, infoFormException);
+
+			httpServletResponse.sendRedirect(
+				httpServletRequest.getHeader(HttpHeaders.REFERER));
+
+			return null;
+		}
+
 		String redirect = null;
+		boolean success = false;
 
 		try {
 			if (!Objects.equals(
 					Constants.VIEW,
 					ParamUtil.getString(httpServletRequest, "p_l_mode"))) {
 
+				throw new InfoFormInvalidLayoutModeException();
+			}
+
+			Layout layout = _layoutLocalService.fetchLayout(
+				ParamUtil.getLong(httpServletRequest, "plid"));
+
+			if ((layout == null) || layout.isDraftLayout()) {
 				throw new InfoFormInvalidLayoutModeException();
 			}
 
@@ -120,8 +158,7 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 				groupId,
 				InfoItemFieldValues.builder(
 				).infoFieldValues(
-					_infoRequestFieldValuesProviderHelper.getInfoFieldValues(
-						httpServletRequest)
+					infoFieldValues
 				).infoItemReference(
 					new InfoItemReference(className, 0)
 				).build());
@@ -133,6 +170,8 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 
 				SessionMessages.add(httpServletRequest, formItemId);
 			}
+
+			success = true;
 		}
 		catch (CaptchaException captchaException) {
 			if (_log.isDebugEnabled()) {
@@ -183,6 +222,21 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 				httpServletRequest, formItemId, infoFormException);
 		}
 
+		if (!success && (infoFieldValues != null)) {
+			Map<String, String> formParameterMap = new HashMap<>();
+
+			for (InfoFieldValue<Object> infoFieldValue : infoFieldValues) {
+				InfoField<?> infoField = infoFieldValue.getInfoField();
+
+				formParameterMap.put(
+					infoField.getName(), _getValue(infoFieldValue));
+			}
+
+			SessionMessages.add(
+				httpServletRequest, "infoFormParameterMap" + formItemId,
+				formParameterMap);
+		}
+
 		if (Validator.isNull(redirect)) {
 			redirect = httpServletRequest.getHeader(HttpHeaders.REFERER);
 		}
@@ -197,6 +251,23 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 	protected void activate() {
 		_infoRequestFieldValuesProviderHelper =
 			new InfoRequestFieldValuesProviderHelper(_infoItemServiceTracker);
+	}
+
+	private String _getValue(InfoFieldValue<?> infoFieldValue) {
+		if (infoFieldValue == null) {
+			return null;
+		}
+
+		InfoField<?> infoField = infoFieldValue.getInfoField();
+
+		if (infoField.getInfoFieldType() == DateInfoFieldType.INSTANCE) {
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+				"yyyy-MM-dd");
+
+			return simpleDateFormat.format(infoFieldValue.getValue());
+		}
+
+		return String.valueOf(infoFieldValue.getValue());
 	}
 
 	private boolean _hasCaptcha(
@@ -335,6 +406,9 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 
 	private volatile InfoRequestFieldValuesProviderHelper
 		_infoRequestFieldValuesProviderHelper;
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private Portal _portal;

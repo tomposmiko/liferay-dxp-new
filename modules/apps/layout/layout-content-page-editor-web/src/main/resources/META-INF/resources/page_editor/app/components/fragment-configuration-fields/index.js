@@ -12,6 +12,7 @@
  * details.
  */
 
+import {ButtonGroupField} from './ButtonGroupField';
 import CSSClassSelectorField from './CSSClassSelectorField';
 import {CategoryTreeNodeSelectorField} from './CategoryTreeNodeSelectorField';
 import {CheckboxField} from './CheckboxField';
@@ -22,6 +23,7 @@ import CustomCSSField from './CustomCSSField';
 import {HideFragmentField} from './HideFragmentField';
 import {ImageSelectorField} from './ImageSelectorField';
 import {ItemSelectorField} from './ItemSelectorField';
+import {LengthField} from './LengthField';
 import {NavigationMenuSelectorField} from './NavigationMenuSelectorField';
 import {SelectField} from './SelectField';
 import {SpacingBoxField} from './SpacingBoxField';
@@ -29,6 +31,9 @@ import {TextField} from './TextField';
 import {VideoSelectorField} from './VideoSelectorField';
 
 export const FRAGMENT_CONFIGURATION_FIELDS = {
+	buttonGroup: Liferay.FeatureFlags['LPS-143206']
+		? ButtonGroupField
+		: SelectField,
 	categoryTreeNodeSelector: CategoryTreeNodeSelectorField,
 	checkbox: CheckboxField,
 	collectionSelector: CollectionSelectorField,
@@ -39,6 +44,7 @@ export const FRAGMENT_CONFIGURATION_FIELDS = {
 	hideFragment: HideFragmentField,
 	imageSelector: ImageSelectorField,
 	itemSelector: ItemSelectorField,
+	length: Liferay.FeatureFlags['LPS-143206'] ? LengthField : TextField,
 	navigationMenuSelector: NavigationMenuSelectorField,
 	select: SelectField,
 	spacing: SpacingBoxField,

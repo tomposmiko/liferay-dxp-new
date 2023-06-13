@@ -78,6 +78,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.taglib.util.IncludeTag;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
@@ -811,10 +812,25 @@ public class RenderLayoutStructureTag extends IncludeTag {
 				getRequest(), formStyledLayoutStructureItem.getItemId());
 		}
 
+		Map<String, String> infoFormParameterMap =
+			(Map<String, String>)SessionMessages.get(
+				getRequest(),
+				"infoFormParameterMap" +
+					formStyledLayoutStructureItem.getItemId());
+
+		SessionMessages.add(
+			getRequest(), "infoFormParameterMap", infoFormParameterMap);
+
+		SessionMessages.remove(
+			getRequest(),
+			"infoFormParameterMap" + formStyledLayoutStructureItem.getItemId());
+
 		_renderLayoutStructure(
 			formStyledLayoutStructureItem.getChildrenItemIds(),
 			collectionElementIndex, infoForm,
 			renderLayoutStructureDisplayContext);
+
+		SessionMessages.remove(getRequest(), "infoFormParameterMap");
 
 		jspWriter.write("</form>");
 	}

@@ -212,7 +212,7 @@ definition {
 		}
 
 		task ("Then I receive the correct information about the subjects related to it") {
-			ObjectDefinitionAPI.assertResponseHasCorrectDetailsRelatedToObjectEntry(
+			ObjectDefinitionAPI.assertResponseHasCorrectObjectEntryName(
 				expectedValue = "Liferay Foundations",
 				objectEntryId = "${subjectId}",
 				responseToParse = "${responseToParse}");
@@ -664,6 +664,221 @@ definition {
 		}
 	}
 
+	@priority = "5"
+	test CanGetObjectEntiresRelatedByManyToManyWhenDifferentRelationshipTypesCreated {
+		property portal.acceptance = "true";
+
+		task ("Given active student object definition created") {
+			var objectDefinitionId3 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+				en_US_label = "student",
+				en_US_plural_label = "students",
+				name = "Student",
+				requiredStringFieldName = "name");
+		}
+
+		task ("Given manyToMany relationship universitySubjects created") {
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				deletionType = "cascade",
+				en_US_label = "universitiesSubjects",
+				name = "universitiesSubjects",
+				objectDefinitionId1 = "${staticObjectId1}",
+				objectDefinitionId2 = "${staticObjectId2}",
+				type = "manyToMany");
+		}
+
+		task ("Given oneToMany relationship universityStudents created") {
+			var objectDefinitionId2 = JSONObject.getObjectId(objectName = "Student");
+
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				deletionType = "cascade",
+				en_US_label = "universitiesStudents",
+				name = "universitiesStudents",
+				objectDefinitionId1 = "${staticObjectId1}",
+				objectDefinitionId2 = "${objectDefinitionId2}",
+				type = "oneToMany");
+		}
+
+		task ("Given university entry created") {
+			var universityId = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "universities",
+				name = "Liferay University");
+		}
+
+		task ("Given subject entry created") {
+			var subjectId = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "subjects",
+				name = "Liferay Foundations");
+		}
+
+		task ("Given student entry created") {
+			var studentId = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "students",
+				name = "Liferay Employee");
+		}
+
+		task ("Given subject entry related to university entry through universities PUT endpoint") {
+			ObjectDefinitionAPI.relateObjectEntries(
+				en_US_plural_label = "universities",
+				objectEntry1 = "${universityId}",
+				objectEntry2 = "${subjectId}",
+				relationshipName = "universitiesSubjects");
+		}
+
+		task ("Given student entry related to university entry through universities PUT endpoint") {
+			ObjectDefinitionAPI.relateObjectEntries(
+				en_US_plural_label = "universities",
+				objectEntry1 = "${universityId}",
+				objectEntry2 = "${studentId}",
+				relationshipName = "universitiesStudents");
+		}
+
+		task ("When I call universities GET endpoint with {universityId}/universitySubjects") {
+			var responseToParse = ObjectDefinitionAPI.getObjectEntryRelation(
+				en_US_plural_label = "universities",
+				objectId = "${universityId}",
+				relationshipName = "universitiesSubjects");
+		}
+
+		task ("Then I receive the correct information about the subjects related to it") {
+			ObjectDefinitionAPI.assertResponseHasCorrectObjectEntryName(
+				expectedValue = "Liferay Foundations",
+				objectEntryId = "${subjectId}",
+				responseToParse = "${responseToParse}");
+		}
+	}
+
+	@priority = "5"
+	test CanGetObjectEntiresRelatedByOneToManyWhenDifferentRelationshipTypesCreated {
+		property portal.acceptance = "true";
+
+		task ("Given active student object definition created") {
+			var objectDefinitionId3 = ObjectDefinitionAPI.createAndPublishObjectDefinition(
+				en_US_label = "student",
+				en_US_plural_label = "students",
+				name = "Student",
+				requiredStringFieldName = "name");
+		}
+
+		task ("Given manyToMany relationship universitySubjects created") {
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				deletionType = "cascade",
+				en_US_label = "universitiesSubjects",
+				name = "universitiesSubjects",
+				objectDefinitionId1 = "${staticObjectId1}",
+				objectDefinitionId2 = "${staticObjectId2}",
+				type = "manyToMany");
+		}
+
+		task ("Given oneToMany relationship subjectStudents created") {
+			var objectDefinitionId2 = JSONObject.getObjectId(objectName = "Student");
+
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				deletionType = "cascade",
+				en_US_label = "subjectsStudents",
+				name = "subjectsStudents",
+				objectDefinitionId1 = "${staticObjectId2}",
+				objectDefinitionId2 = "${objectDefinitionId2}",
+				type = "oneToMany");
+		}
+
+		task ("Given university entry created") {
+			var universityId = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "universities",
+				name = "Liferay University");
+		}
+
+		task ("Given subject entry created") {
+			var subjectId = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "subjects",
+				name = "Liferay Foundations");
+		}
+
+		task ("Given student entry created") {
+			var studentId = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "students",
+				name = "Liferay Employee");
+		}
+
+		task ("Given subject entry related to university entry through universities PUT endpoint") {
+			ObjectDefinitionAPI.relateObjectEntries(
+				en_US_plural_label = "universities",
+				objectEntry1 = "${universityId}",
+				objectEntry2 = "${subjectId}",
+				relationshipName = "universitiesSubjects");
+		}
+
+		task ("Given student entry related to subject entry through subjects PUT endpoint") {
+			ObjectDefinitionAPI.relateObjectEntries(
+				en_US_plural_label = "subjects",
+				objectEntry1 = "${subjectId}",
+				objectEntry2 = "${studentId}",
+				relationshipName = "subjectsStudents");
+		}
+
+		task ("When I call subjects GET endpoint with {subjectId}/subjectStudents") {
+			var responseToParse = ObjectDefinitionAPI.getObjectEntryRelation(
+				en_US_plural_label = "subjects",
+				objectId = "${subjectId}",
+				relationshipName = "subjectsStudents");
+		}
+
+		task ("Then I receive the correct information about the students related to it") {
+			ObjectDefinitionAPI.assertResponseHasCorrectObjectEntryName(
+				expectedValue = "Liferay Employee",
+				objectEntryId = "${studentId}",
+				responseToParse = "${responseToParse}");
+		}
+	}
+
+	@priority = "5"
+	test CanGetSecondObjectEntiresRelatedToFirstObjectByManyToMany {
+		property portal.acceptance = "true";
+
+		task ("Given manyToMany relationship universitySubjects created") {
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				deletionType = "cascade",
+				en_US_label = "universitiesSubjects",
+				name = "universitiesSubjects",
+				objectDefinitionId1 = "${staticObjectId1}",
+				objectDefinitionId2 = "${staticObjectId2}",
+				type = "manyToMany");
+		}
+
+		task ("Given university entry created") {
+			var universityId = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "universities",
+				name = "Liferay University");
+		}
+
+		task ("Given subject entry created") {
+			var subjectId = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "subjects",
+				name = "Liferay Foundations");
+		}
+
+		task ("And Given university entry related to the subject entry created") {
+			ObjectDefinitionAPI.relateObjectEntries(
+				en_US_plural_label = "subjects",
+				objectEntry1 = "${subjectId}",
+				objectEntry2 = "${universityId}",
+				relationshipName = "universitiesSubjects");
+		}
+
+		task ("When I call universities GET endpoint with {universityId}/universitySubjects") {
+			var responseToParse = ObjectDefinitionAPI.getObjectEntryRelation(
+				en_US_plural_label = "subjects",
+				objectId = "${subjectId}",
+				relationshipName = "universitiesSubjects");
+		}
+
+		task ("Then I receive the correct information about the subjects related to it") {
+			ObjectDefinitionAPI.assertResponseHasCorrectObjectEntryName(
+				expectedValue = "Liferay University",
+				objectEntryId = "${universityId}",
+				responseToParse = "${responseToParse}");
+		}
+	}
+
 	@priority = "4"
 	test DeletedObjectDoesNotAppearInManyToManyRelationshipDetailsNestedFields_1 {
 		property portal.acceptance = "true";
@@ -874,6 +1089,60 @@ definition {
 				expectedValue = "Liferay Foundations,Liferay Foundations,Liferay Foundations",
 				objectEntryId = "${subjectId}",
 				responseToParse = "${responseToParse1}");
+		}
+	}
+
+	@priority = "5"
+	test RelationshipEnpointGetsDeletedWhenObjectDefinitionDeleted {
+		property portal.acceptance = "true";
+
+		task ("Given manyToMany relationship universitySubjects created") {
+			var relationshipName = ObjectDefinitionAPI.createRelationship(
+				deletionType = "cascade",
+				en_US_label = "universitiesSubjects",
+				name = "universitiesSubjects",
+				objectDefinitionId1 = "${staticObjectId1}",
+				objectDefinitionId2 = "${staticObjectId2}",
+				type = "manyToMany");
+		}
+
+		task ("Given university entry created") {
+			var universityId = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "universities",
+				name = "Liferay University");
+		}
+
+		task ("Given subject entry created") {
+			var subjectId = ObjectDefinitionAPI.createObjectEntryWithName(
+				en_US_plural_label = "subjects",
+				name = "Liferay Foundations");
+		}
+
+		task ("Given subject entry related to university entry through universities PUT endpoint") {
+			ObjectDefinitionAPI.relateObjectEntries(
+				en_US_plural_label = "universities",
+				objectEntry1 = "${universityId}",
+				objectEntry2 = "${subjectId}",
+				relationshipName = "universitiesSubjects");
+		}
+
+		task ("Given I delete the subject object definition") {
+			ObjectDefinitionAPI.deleteRelationship(objectDefinitionId = "${staticObjectId1}");
+
+			ObjectAdmin.deleteObjectViaAPI(objectName = "Subject");
+		}
+
+		task ("When I call universities GET endpoint with {universityId}/universitySubjects") {
+			var responseToParse = ObjectDefinitionAPI.getObjectEntryRelation(
+				en_US_plural_label = "universities",
+				objectId = "${universityId}",
+				relationshipName = "universitiesSubjects");
+		}
+
+		task ("Then I receive an error message of relationship not present") {
+			ObjectDefinitionAPI.assertResponseIncludesErrorMessage(
+				expectedValue = "No ObjectRelationship exists with the key {objectDefinitionId1=${staticObjectId1}, name=${relationshipName}}",
+				responseToParse = "${responseToParse}");
 		}
 	}
 

@@ -13,6 +13,17 @@
  */
 
 export const CONSTANTS = {
+	APPLICATION_STATUS: {
+		APPROVED: 'approved',
+		BOUND: 'bound',
+		INCOMPLETE: 'incomplete',
+		ININVESTIGATION: 'inInvestigation',
+		OPEN: 'open',
+		QUOTED: 'quoted',
+		REJECTED: 'rejected',
+		REVIEWED: 'reviewed',
+		UNDERWRITING: 'underwriting',
+	},
 	MONTHS_ABREVIATIONS: [
 		'Jan',
 		'Feb',
@@ -26,5 +37,27 @@ export const CONSTANTS = {
 		'Oct',
 		'Nov',
 		'Dec',
+	],
+	US_STATES: [
+		{
+			label: '',
+			value: '',
+		},
+		{
+			label: 'CHOOSE AN OPTION',
+			value: 'CHOOSE AN OPTION',
+		},
+		{
+			label: 'CA',
+			value: 'CA',
+		},
+		{
+			label: 'NV',
+			value: 'NV',
+		},
+		{
+			label: 'NY',
+			value: 'NY',
+		},
 	],
 };

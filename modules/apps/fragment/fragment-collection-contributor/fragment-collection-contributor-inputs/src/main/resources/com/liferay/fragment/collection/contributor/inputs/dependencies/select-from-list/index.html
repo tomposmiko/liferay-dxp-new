@@ -1,11 +1,11 @@
 <div class="forms-select-from-list">
-	<input name="${input.name}" ${input.required?then('required', '')} type="hidden" />
+	<input name="${input.name}" ${input.required?then('required', '')} type="hidden" [#if input.value??]value="${input.value}"[/#if] />
 
 	<label id="${fragmentEntryLinkNamespace}-label" class="[#if !input.showLabel || !input.label?has_content]sr-only[/#if]">${input.label}[#if input.required][@clay["icon"] className="reference-mark" symbol="asterisk" /][/#if]</label>
 
 	<button [#if input.showHelpText && input.helpText?has_content]aria-describedby="${fragmentEntryLinkNamespace}-help-text" [/#if] aria-haspopup="${fragmentEntryLinkNamespace}-listbox" aria-labelledby="${fragmentEntryLinkNamespace}-label ${fragmentEntryLinkNamespace}-button" class="form-control pr-5 text-left text-truncate" id="${fragmentEntryLinkNamespace}-button" type="button">
 		<span class="forms-select-from-list-label text-secondary">
-			${languageUtil.get(locale, "choose-an-option")}
+			[#if input.attributes.selectedOptionLabel??]${input.attributes.selectedOptionLabel}[#else]${languageUtil.get(locale, "choose-an-option")}[/#if]
 		</span>
 
 		[@clay["icon"] symbol="caret-double" /]
@@ -32,20 +32,32 @@
 			</div>
 		</div>
 
-		<ul aria-labelledby="${fragmentEntryLinkNamespace}-label" class="list-unstyled" id="${fragmentEntryLinkNamespace}-listbox" role="listbox" tabindex="0">
+		<ul aria-labelledby="${fragmentEntryLinkNamespace}-label" class="list-unstyled" id="${fragmentEntryLinkNamespace}-listbox" role="listbox" tabindex="0" [#if input.value??]aria-activedescendant="${fragmentEntryLinkNamespace}-option-${input.value}"[/#if]>
 			<li class="dropdown-item text-muted" data-option-value="" id="${fragmentEntryLinkNamespace}-option--" role="option">
 				${languageUtil.get(locale, "choose-an-option")}
 			</li>
+
+		[#assign selectedValueFoundInOptions=false]
 
 		[#list options as option]
 			[#if option?index == 10]
 				[#break]
 			[/#if]
 
+			[#if input.value?? && option.value == input.value]
+				[#assign selectedValueFoundInOptions=true]
+			[/#if]
+
 			<li class="dropdown-item" data-option-value="${option.value}" id="${fragmentEntryLinkNamespace}-option-${option.value}" role="option">
 				${option.label}
 			</li>
 		[/#list]
+
+			[#if !selectedValueFoundInOptions && input.value?? && input.attributes.selectedOptionLabel??]
+				<li class="dropdown-item" data-option-value="${input.value}" id="${fragmentEntryLinkNamespace}-option-${input.value}" role="option">
+					${input.attributes.selectedOptionLabel}
+				</li>
+			[/#if]
 
 		</ul>
 

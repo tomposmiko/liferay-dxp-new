@@ -60,6 +60,8 @@ public class VerifyResourcePermissions extends VerifyProcess {
 	protected void doVerify() throws Exception {
 		if (!ArrayUtil.isEmpty(_verifiableResourcedModels)) {
 			doVerify(_verifiableResourcedModels);
+
+			return;
 		}
 
 		Map<String, VerifiableResourcedModel> verifiableResourcedModelsMap =

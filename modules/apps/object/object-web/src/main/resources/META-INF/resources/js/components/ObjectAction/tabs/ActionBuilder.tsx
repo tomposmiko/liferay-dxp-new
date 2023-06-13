@@ -32,10 +32,10 @@ import React, {useEffect, useMemo, useState} from 'react';
 import PredefinedValuesTable from '../PredefinedValuesTable';
 
 import './ActionBuilder.scss';
-import {getObjectFields} from '../../../utils/api';
+import {fetchJSON, getObjectFields} from '../../../utils/api';
 import {ActionError} from '../index';
 
-let objectsOptionsList: Array<
+type ObjectsOptionsList = Array<
 	(
 		| React.ComponentProps<typeof ClaySelect.Option>
 		| React.ComponentProps<typeof ClaySelect.OptGroup>
@@ -51,12 +51,15 @@ export default function ActionBuilder({
 	objectActionTriggers,
 	objectDefinitionsRelationshipsURL,
 	setValues,
+	setWarningAlert,
 	validateExpressionURL,
 	values,
 }: IProps) {
 	const [notificationTemplates, setNotificationTemplates] = useState<any[]>(
 		[]
 	);
+
+	const [objectsOptions, setObjectOptions] = useState<ObjectsOptionsList>([]);
 
 	const notificationTemplateId = useMemo(() => {
 		return notificationTemplates.find(
@@ -75,24 +78,25 @@ export default function ActionBuilder({
 		setCurrentObjectDefinitionFields,
 	] = useState<ObjectField[]>([]);
 
-	const [showAlert, setShowAlert] = useState(true);
+	const [infoAlert, setInfoAlert] = useState(true);
 
 	const fetchObjectDefinitions = async () => {
-		const response = await fetch(objectDefinitionsRelationshipsURL);
+		const relationships = await fetchJSON<ObjectDefinitionsRelationship[]>(
+			objectDefinitionsRelationshipsURL
+		);
 
-		const relationships = (await response.json()) as ObjectDefinitionsRelationship[];
 		const relatedObjects: SelectItem[] = [];
-		const nonRelatedObjects: SelectItem[] = [];
+		const unrelatedObjects: SelectItem[] = [];
 
 		relationships?.forEach((object) => {
 			const {id, label} = object;
 
-			const target = object.related ? relatedObjects : nonRelatedObjects;
+			const target = object.related ? relatedObjects : unrelatedObjects;
 
 			target.push({label, value: id});
 		});
 
-		objectsOptionsList = [];
+		const objectsOptionsList = [];
 
 		if (!values.parameters?.objectDefinitionId) {
 			objectsOptionsList.push({
@@ -110,11 +114,9 @@ export default function ActionBuilder({
 
 		fillSelect(Liferay.Language.get('related-objects'), relatedObjects);
 
-		fillSelect(
-			Liferay.Language.get('non-related-objects'),
-			nonRelatedObjects
-		);
+		fillSelect(Liferay.Language.get('unrelated-objects'), unrelatedObjects);
 
+		setObjectOptions(objectsOptionsList);
 		setRelationships(relationships);
 	};
 
@@ -180,49 +182,46 @@ export default function ActionBuilder({
 		setValues({conditionExpression});
 	};
 
+	const isValidField = ({businessType, system}: ObjectField) =>
+		businessType !== 'Aggregation' &&
+		businessType !== 'Relationship' &&
+		!system;
+
 	const fetchObjectDefinitionFields = async () => {
-		const allFields: ObjectField[] = [];
+		let validFields: ObjectField[] = [];
 
 		if (values.parameters?.objectDefinitionId) {
 			const items = await getObjectFields(
 				values.parameters.objectDefinitionId
 			);
-			items.forEach((field) => {
-				if (
-					field.businessType !== 'Aggregation' &&
-					field.businessType !== 'Relationship' &&
-					!field.system
-				) {
-					allFields.push(field);
-				}
-			});
+
+			validFields = items.filter(isValidField);
 		}
 
-		setCurrentObjectDefinitionFields(allFields);
+		setCurrentObjectDefinitionFields(validFields);
 
 		const {
 			predefinedValues = [],
 		} = values.parameters as ObjectActionParameters;
 
+		const predefinedValuesMap = new Map<string, PredefinedValue>();
+
+		predefinedValues.forEach((field) => {
+			predefinedValuesMap.set(field.name, field);
+		});
+
 		const newPredefinedValues: PredefinedValue[] = [];
 
-		allFields.forEach((field) => {
-			let hasValue;
-			predefinedValues.forEach((item) => {
-				if (item.name === field.name) {
-					hasValue = item;
+		validFields.forEach(({name, required}) => {
+			if (predefinedValuesMap.has(name)) {
+				const field = predefinedValuesMap.get(name);
 
-					return;
-				}
-			});
-
-			if (hasValue) {
-				newPredefinedValues.push(hasValue);
+				newPredefinedValues.push(field as PredefinedValue);
 			}
-			else if (field.required) {
+			else if (required) {
 				newPredefinedValues.push({
 					inputAsValue: false,
-					name: field.name,
+					name,
 					value: '',
 				});
 			}
@@ -253,15 +252,11 @@ export default function ActionBuilder({
 
 		const items = await getObjectFields(objectDefinitionId);
 
-		const allFields: ObjectField[] = [];
+		const validFields: ObjectField[] = [];
 
 		items.forEach((field) => {
-			if (
-				field.businessType !== 'Aggregation' &&
-				field.businessType !== 'Relationship' &&
-				!field.system
-			) {
-				allFields.push(field);
+			if (isValidField(field)) {
+				validFields.push(field);
 
 				if (field.required) {
 					(parameters.predefinedValues as PredefinedValue[]).push({
@@ -273,7 +268,7 @@ export default function ActionBuilder({
 			}
 		});
 
-		setCurrentObjectDefinitionFields(allFields);
+		setCurrentObjectDefinitionFields(validFields);
 
 		const normalizedParameters = {...values.parameters};
 
@@ -295,24 +290,29 @@ export default function ActionBuilder({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const hasEmptyValues = values.parameters?.predefinedValues?.some((item) =>
-		invalidateRequired(item.value)
-	);
+	useEffect(() => {
+		const predefinedValues = values.parameters?.predefinedValues;
 
-	const predefinedValuesAlertMessage =
-		!hasEmptyValues && Object.keys(errors).length > 1
-			? Liferay.Language.get('syntax-error')
-			: Liferay.Language.get(
-					'required-fields-must-have-predefined-values'
-			  );
+		const requiredFields = predefinedValues
+			? predefinedValues.filter(
+					({name}) => objectFieldsMap.get(name)?.required
+			  )
+			: [];
+
+		const hasEmptyValues = requiredFields?.some((item) =>
+			invalidateRequired(item.value)
+		);
+
+		setWarningAlert(hasEmptyValues);
+	}, [values.parameters?.predefinedValues, objectFieldsMap, setWarningAlert]);
 
 	return (
 		<>
-			{showAlert && (
+			{infoAlert && (
 				<ClayAlert
 					className="lfr-objects__side-panel-content-container"
 					displayType="info"
-					onClose={() => setShowAlert(false)}
+					onClose={() => setInfoAlert(false)}
 					title={`${Liferay.Language.get('info')}:`}
 				>
 					{Liferay.Language.get(
@@ -326,17 +326,6 @@ export default function ActionBuilder({
 					>
 						{Liferay.Language.get('click-here-for-documentation')}
 					</a>
-				</ClayAlert>
-			)}
-
-			{Object.keys(errors).length > 1 && (
-				<ClayAlert
-					className="lfr-objects__side-panel-content-container"
-					displayType="danger"
-					onClose={() => {}}
-					title={`${Liferay.Language.get('error')}:`}
-				>
-					{predefinedValuesAlertMessage}
 				</ClayAlert>
 			)}
 
@@ -452,7 +441,7 @@ export default function ActionBuilder({
 									)}
 									error={errors.objectDefinitionId}
 									onChange={handleSelectObject}
-									options={objectsOptionsList}
+									options={objectsOptions}
 									value={
 										values.parameters?.objectDefinitionId
 									}
@@ -524,7 +513,7 @@ export default function ActionBuilder({
 							currentObjectDefinitionFields={
 								currentObjectDefinitionFields
 							}
-							errors={errors as {[key: string]: string}}
+							errors={errors.predefinedValues as any}
 							objectFieldsMap={objectFieldsMap}
 							setValues={setValues}
 							validateExpressionURL={validateExpressionURL}
@@ -593,6 +582,7 @@ interface IProps {
 	objectActionTriggers: CustomItem[];
 	objectDefinitionsRelationshipsURL: string;
 	setValues: (values: Partial<ObjectAction>) => void;
+	setWarningAlert: (value: boolean) => void;
 	validateExpressionURL: string;
 	values: Partial<ObjectAction>;
 }

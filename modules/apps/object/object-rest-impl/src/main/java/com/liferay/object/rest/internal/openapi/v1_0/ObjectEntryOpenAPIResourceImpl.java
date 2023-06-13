@@ -313,17 +313,19 @@ public class ObjectEntryOpenAPIResourceImpl
 					new DTOProperty(
 						Collections.singletonMap("x-parent-map", "properties"),
 						"name", String.class.getSimpleName())));
+			dtoProperty.setRequired(objectField.isRequired());
 
 			return dtoProperty;
 		}
 
 		return new DTOProperty(
-			HashMapBuilder.<String, Object>put(
-				"x-parent-map", "properties"
-			).put(
-				"x-required", String.valueOf(objectField.isRequired())
-			).build(),
-			objectField.getName(), objectField.getDBType());
+			Collections.singletonMap("x-parent-map", "properties"),
+			objectField.getName(), objectField.getDBType()) {
+
+			{
+				setRequired(objectField.isRequired());
+			}
+		};
 	}
 
 	private OpenAPISchemaFilter _getOpenAPISchemaFilter(
@@ -342,7 +344,7 @@ public class ObjectEntryOpenAPIResourceImpl
 					_objectDefinition.getObjectDefinitionId()),
 				this::_getDTOProperty));
 
-		openAPISchemaFilter.setDTOProperty(dtoProperty);
+		openAPISchemaFilter.setDTOProperties(Arrays.asList(dtoProperty));
 
 		openAPISchemaFilter.setSchemaMappings(
 			HashMapBuilder.put(

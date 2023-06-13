@@ -516,7 +516,7 @@ public class ObjectViewLocalServiceTest {
 			_objectViewFilterColumnPersistence.create(0);
 
 		objectViewFilterColumn.setFilterType(filterType);
-		objectViewFilterColumn.setJson(json);
+		objectViewFilterColumn.setJSON(json);
 		objectViewFilterColumn.setObjectFieldName(objectFieldName);
 
 		return objectViewFilterColumn;
