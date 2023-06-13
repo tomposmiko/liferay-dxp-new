@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -100,13 +101,17 @@ public class PropagateGroupFragmentEntryChangesMVCActionCommandTest {
 			ServiceContextTestUtil.getServiceContext(
 				_group, TestPropsValues.getUserId());
 
+		long defaultSegmentsExperienceId =
+			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
+				_layout.getPlid());
+
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
 				TestPropsValues.getUserId(), _group.getGroupId(), 0,
-				_fragmentEntry.getFragmentEntryId(), 0, _layout.getPlid(),
-				"css value", "<div>HTML value</div>", "js value",
-				"{fieldSets: []}", StringPool.BLANK, StringPool.BLANK, 0, null,
-				serviceContext);
+				_fragmentEntry.getFragmentEntryId(),
+				defaultSegmentsExperienceId, _layout.getPlid(), "css value",
+				"<div>HTML value</div>", "js value", "{fieldSets: []}",
+				StringPool.BLANK, StringPool.BLANK, 0, null, serviceContext);
 
 		_fragmentEntry.setCss("new css value");
 		_fragmentEntry.setHtml("<div>new updated HTML value</div>");
@@ -156,6 +161,12 @@ public class PropagateGroupFragmentEntryChangesMVCActionCommandTest {
 
 		mockLiferayPortletActionRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());
+
+		mockLiferayPortletActionRequest.setParameter(
+			"segmentsExperienceId",
+			String.valueOf(
+				_segmentsExperienceLocalService.
+					fetchDefaultSegmentsExperienceId(_layout.getPlid())));
 		mockLiferayPortletActionRequest.setParameter(
 			"fragmentEntryId",
 			String.valueOf(_fragmentEntry.getFragmentEntryId()));
@@ -224,5 +235,8 @@ public class PropagateGroupFragmentEntryChangesMVCActionCommandTest {
 
 	@Inject
 	private PortletLocalService _portletLocalService;
+
+	@Inject
+	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 }

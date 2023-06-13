@@ -133,7 +133,7 @@ AUI.add(
 
 		var STR_THUMBNAIL_PATH = PATH_THEME_IMAGES + '/file_system/large/';
 
-		var TPL_ENTRIES_CONTAINER = '<ul class="{cssClass}"></ul>';
+		var TPL_ENTRIES_CONTAINER = '<dl class="{cssClass}"></dl>';
 
 		var TPL_ENTRY_ROW_TITLE =
 			'<span class="' +
@@ -152,7 +152,7 @@ AUI.add(
 			'</span>';
 
 		var TPL_ENTRY_WRAPPER =
-			'<li class="card-page-item card-page-item-asset" data-title="{title}"></li>';
+			'<dd class="card-page-item card-page-item-asset" data-title="{title}"></dd>';
 
 		var TPL_ERROR_FOLDER = new A.Template(
 			'<span class="lfr-status-success-label">{validFilesLength}</span>',
@@ -511,7 +511,7 @@ AUI.add(
 
 					searchContainer
 						.one('.searchcontainer-content')
-						.prepend(entriesContainer);
+						.append(entriesContainer);
 
 					return entriesContainer;
 				},
@@ -534,11 +534,19 @@ AUI.add(
 					}
 					else {
 						var entriesContainerSelector =
-							'ul.list-group:last-of-type';
+							'dl.list-group:last-of-type';
 
 						if (displayStyle === CSS_ICON) {
 							entriesContainerSelector =
-								'ul.card-page:last-of-type';
+								'dl.card-page:last-of-type';
+
+							if (
+								entriesContainer
+									.one(entriesContainerSelector)
+									?.one('.card-type-directory')
+							) {
+								entriesContainerSelector = null;
+							}
 						}
 
 						entriesContainer =
@@ -652,9 +660,15 @@ AUI.add(
 				},
 
 				_createOverlay(target, background) {
+					var instance = this;
+
+					var displayStyle = instance._getDisplayStyle();
 					var overlay = new A.OverlayMask({
 						background: background || null,
-						target,
+						target:
+							displayStyle !== CSS_ICON
+								? target
+								: target.one('.card'),
 					}).render();
 
 					overlay
@@ -665,12 +679,8 @@ AUI.add(
 				},
 
 				_createProgressBar(target) {
-					var height = target.height() / 5;
-
-					var width = target.width() * 0.8;
-
 					return new A.ProgressBar({
-						height,
+						height: 16,
 						on: {
 							complete() {
 								this.set(STR_LABEL, 'complete!');
@@ -679,7 +689,7 @@ AUI.add(
 								this.set(STR_LABEL, event.newVal + '%');
 							},
 						},
-						width,
+						width: target.width() * 0.8,
 					});
 				},
 
@@ -1436,12 +1446,12 @@ AUI.add(
 						var folderEntryNodeOverlay = folderEntryNode.overlay;
 
 						if (folderEntryNodeOverlay) {
-							folderEntryNodeOverlay.show();
-
 							instance._updateProgress(
 								folderEntryNode.progressBar,
 								0
 							);
+
+							folderEntryNodeOverlay.show();
 						}
 						else {
 							instance._createUploadStatus(folderEntryNode);

@@ -107,6 +107,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.ThemeLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -341,16 +342,18 @@ public class BundleSiteInitializer implements SiteInitializer {
 			User user = _userLocalService.getUser(
 				PrincipalThreadLocal.getUserId());
 
-			ServiceContext serviceContext = new ServiceContext() {
-				{
-					setAddGroupPermissions(true);
-					setAddGuestPermissions(true);
-					setCompanyId(user.getCompanyId());
-					setScopeGroupId(groupId);
-					setTimeZone(user.getTimeZone());
-					setUserId(user.getUserId());
-				}
-			};
+			ServiceContext serviceContextThreadLocal =
+				ServiceContextThreadLocal.getServiceContext();
+
+			ServiceContext serviceContext =
+				(ServiceContext)serviceContextThreadLocal.clone();
+
+			serviceContext.setAddGroupPermissions(true);
+			serviceContext.setAddGuestPermissions(true);
+			serviceContext.setCompanyId(user.getCompanyId());
+			serviceContext.setScopeGroupId(groupId);
+			serviceContext.setTimeZone(user.getTimeZone());
+			serviceContext.setUserId(user.getUserId());
 
 			SiteNavigationMenuItemSettingsBuilder
 				siteNavigationMenuItemSettingsBuilder =
@@ -380,7 +383,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 					serviceContext, siteNavigationMenuItemSettingsBuilder));
 
 			_invoke(() -> _addPortletSettings(serviceContext));
-			_invoke(() -> _updateLayoutSets(serviceContext));
+			_invoke(
+				() -> _updateLayoutSets(
+					documentsStringUtilReplaceValues, serviceContext));
 
 			_invoke(
 				() -> _addDDMTemplates(
@@ -1391,8 +1396,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 						String.valueOf(serviceContext.getScopeGroupId())
 					});
 
-				String css = SiteInitializerUtil.read(
-					FileUtil.getPath(urlPath) + "/css.css", _servletContext);
+				String css = StringUtil.replace(
+					SiteInitializerUtil.read(
+						FileUtil.getPath(urlPath) + "/css.css",
+						_servletContext),
+					"[$", "$]", documentsStringUtilReplaceValues);
 
 				if (Validator.isNotNull(css)) {
 					JSONObject jsonObject = _jsonFactory.createJSONObject(json);
@@ -2577,6 +2585,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 		UserAccountResource userAccountResource =
 			userAccountResourceBuilder.user(
 				serviceContext.fetchUser()
+			).httpServletRequest(
+				serviceContext.getRequest()
 			).build();
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray(json);
@@ -2960,6 +2970,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 	}
 
 	private void _updateLayoutSet(
+			Map<String, String> documentsStringUtilReplaceValues,
 			boolean privateLayout, ServiceContext serviceContext)
 		throws Exception {
 
@@ -2981,9 +2992,10 @@ public class BundleSiteInitializer implements SiteInitializer {
 		JSONObject metadataJSONObject = JSONFactoryUtil.createJSONObject(
 			(metadataJSON == null) ? "{}" : metadataJSON);
 
-		String css = GetterUtil.getString(
+		String css = StringUtil.replace(
 			SiteInitializerUtil.read(
-				resourcePath + "/css.css", _servletContext));
+				resourcePath + "/css.css", _servletContext),
+			"[$", "$]", documentsStringUtilReplaceValues);
 
 		_layoutSetLocalService.updateLookAndFeel(
 			serviceContext.getScopeGroupId(), privateLayout,
@@ -3025,11 +3037,15 @@ public class BundleSiteInitializer implements SiteInitializer {
 			unicodeProperties.toString());
 	}
 
-	private void _updateLayoutSets(ServiceContext serviceContext)
+	private void _updateLayoutSets(
+			Map<String, String> documentsStringUtilReplaceValues,
+			ServiceContext serviceContext)
 		throws Exception {
 
-		_updateLayoutSet(false, serviceContext);
-		_updateLayoutSet(true, serviceContext);
+		_updateLayoutSet(
+			documentsStringUtilReplaceValues, false, serviceContext);
+		_updateLayoutSet(
+			documentsStringUtilReplaceValues, true, serviceContext);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

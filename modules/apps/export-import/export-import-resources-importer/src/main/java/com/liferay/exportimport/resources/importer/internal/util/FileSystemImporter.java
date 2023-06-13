@@ -759,10 +759,10 @@ public class FileSystemImporter extends BaseImporter {
 		try {
 			try {
 				fileEntry = dlAppLocalService.addFileEntry(
-					userId, groupId, parentFolderId, fileName,
+					null, userId, groupId, parentFolderId, fileName,
 					mimeTypes.getContentType(fileName), fileName,
-					StringPool.BLANK, StringPool.BLANK, inputStream, length,
-					serviceContext);
+					StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+					inputStream, length, null, null, serviceContext);
 			}
 			catch (DuplicateFileEntryException duplicateFileEntryException) {
 
@@ -780,7 +780,7 @@ public class FileSystemImporter extends BaseImporter {
 				fileEntry = dlAppLocalService.updateFileEntry(
 					userId, fileEntry.getFileEntryId(), fileName,
 					mimeTypes.getContentType(fileName), fileName,
-					StringPool.BLANK, StringPool.BLANK,
+					StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
 					DLVersionNumberIncrease.MAJOR, inputStream, length,
 					fileEntry.getExpirationDate(), fileEntry.getReviewDate(),
 					serviceContext);

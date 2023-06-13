@@ -113,42 +113,60 @@ definition {
 		task ("When the user selects CSV as Export File Format and exports the accounts") {
 			ImportExport.openImportExportAdmin();
 
-			ImportExport.gotoExport();
-
-			ImportExport.selectEntity(
+			ImportExport.exportFile(
 				entityType = "Account",
+				exportFields = "name,type,description,externalReferenceCode",
+				exportFileFormat = "CSV",
 				headlessEndpoint = "/headless-admin-user");
-
-			Select(
-				key_selectFieldLabel = "Export File Format",
-				locator1 = "ImportExport#SELECT",
-				value1 = "CSV");
-
-			ImportExport.mapExport(exportFields = "name,type,description,externalReferenceCode");
-
-			Button.click(button = "Export");
 		}
 
 		task ("Then a CSV file should be generated for download which contains account data") {
-			WaitForElementPresent(locator1 = "ImportExport#EXECUTION_SUCCESS");
+			ImportExport.assertExportFileContent(
+				comparisonFileName = "csv_account_import_auto_map.csv",
+				exportFileName = "export.csv");
+		}
+	}
 
-			Button.click(button = "Download");
+	@description = "Verify users can export entity data via CSV files without headers"
+	@priority = "3"
+	test CanExportCSVFileWithoutHeaders {
+		property portal.acceptance = "true";
 
-			DownloadTempFile();
+		task ("Given several accounts") {
+			JSONAccountEntry.addAccountEntry(
+				accountEntryDescription = "Test Business Account Description",
+				accountEntryName = "Test Business Account",
+				accountEntryType = "Business",
+				externalReferenceCode = "101");
 
-			DMDocument.assertFileNameFromTempFolder(fileName = "Export.zip");
+			JSONAccountEntry.addAccountEntry(
+				accountEntryDescription = "Test Guest Account Description",
+				accountEntryName = "Test Guest Account",
+				accountEntryType = "Guest",
+				externalReferenceCode = "102");
 
-			AntCommand(
-				locator1 = "build-test.xml",
-				value1 = "unzip-temp-file -DfileName=Export.zip");
+			JSONAccountEntry.addAccountEntry(
+				accountEntryDescription = "Test Person Account Description",
+				accountEntryName = "Test Person Account",
+				accountEntryType = "Person",
+				externalReferenceCode = "103");
+		}
 
-			var exportFileContent = TestCase.getTempFileContent(fileName = "export.csv");
+		task ("When the user exports the accounts in CSV format with Contains Headers not checked") {
+			ImportExport.openImportExportAdmin();
 
-			var expectedFileContent = TestCase.getFileContent(fileName = "csv_account_import_defaultHeaders.csv");
+			ImportExport.exportFile(
+				containsHeaders = "false",
+				entityType = "Account",
+				exportFields = "name,type,description,externalReferenceCode",
+				exportFileFormat = "CSV",
+				headlessEndpoint = "/headless-admin-user");
+		}
 
-			if ("${exportFileContent}" != "${expectedFileContent}") {
-				fail("The exported file content does not match the expected file content.");
-			}
+		task ("Then the generated CSV file should contains account data with no headers") {
+			ImportExport.assertExportFileContent(
+				comparisonFileName = "csv_account_import_no_headers.csv",
+				exportFileName = "export.csv");
 		}
 	}
 
@@ -180,42 +198,17 @@ definition {
 		task ("When the user selects JSON as Export File Format and exports the accounts") {
 			ImportExport.openImportExportAdmin();
 
-			ImportExport.gotoExport();
-
-			ImportExport.selectEntity(
+			ImportExport.exportFile(
 				entityType = "Account",
+				exportFields = "name,type,description,externalReferenceCode",
+				exportFileFormat = "JSON",
 				headlessEndpoint = "/headless-admin-user");
-
-			Select(
-				key_selectFieldLabel = "Export File Format",
-				locator1 = "ImportExport#SELECT",
-				value1 = "JSON");
-
-			ImportExport.mapExport(exportFields = "name,type,description,externalReferenceCode");
-
-			Button.click(button = "Export");
 		}
 
 		task ("Then a JSON file should be generated for download which contains account data") {
-			WaitForElementPresent(locator1 = "ImportExport#EXECUTION_SUCCESS");
-
-			Button.click(button = "Download");
-
-			DownloadTempFile();
-
-			DMDocument.assertFileNameFromTempFolder(fileName = "Export.zip");
-
-			AntCommand(
-				locator1 = "build-test.xml",
-				value1 = "unzip-temp-file -DfileName=Export.zip");
-
-			var exportFileContent = TestCase.getTempFileContent(fileName = "export.json");
-
-			var expectedFileContent = TestCase.getFileContent(fileName = "json_account_export.txt");
-
-			if ("${exportFileContent}" != "${expectedFileContent}") {
-				fail("The exported file content does not match the expected file content.");
-			}
+			ImportExport.assertExportFileContent(
+				comparisonFileName = "json_account_export.txt",
+				exportFileName = "export.json");
 		}
 	}
 
@@ -247,42 +240,91 @@ definition {
 		task ("When the user selects JSONL as Export File Format and exports the accounts") {
 			ImportExport.openImportExportAdmin();
 
-			ImportExport.gotoExport();
-
-			ImportExport.selectEntity(
+			ImportExport.exportFile(
 				entityType = "Account",
+				exportFields = "name,type,description,externalReferenceCode",
+				exportFileFormat = "JSONL",
 				headlessEndpoint = "/headless-admin-user");
-
-			Select(
-				key_selectFieldLabel = "Export File Format",
-				locator1 = "ImportExport#SELECT",
-				value1 = "JSONL");
-
-			ImportExport.mapExport(exportFields = "name,type,description,externalReferenceCode");
-
-			Button.click(button = "Export");
 		}
 
 		task ("Then a JSONL file should be generated for download which contains account data") {
-			WaitForElementPresent(locator1 = "ImportExport#EXECUTION_SUCCESS");
+			ImportExport.assertExportFileContent(
+				comparisonFileName = "jsonl_account_export.jsonl",
+				exportFileName = "export.jsonl");
+		}
+	}
 
-			Button.click(button = "Download");
+	@description = "Verify users can filter Import/Export executions by Action."
+	@priority = "3"
+	test CanFilterExecutionsByAction {
+		property portal.acceptance = "true";
 
-			DownloadTempFile();
+		task ("Given an account import and export") {
+			ImportExport.openImportExportAdmin();
 
-			DMDocument.assertFileNameFromTempFolder(fileName = "Export.zip");
+			ImportExport.importFile(
+				entityType = "Account",
+				fieldMappings = "name:Account Name,type:Account Type,description:Account Description,externalReferenceCode:External Reference Code",
+				fileName = "csv_account_import.csv",
+				headlessEndpoint = "/headless-admin-user");
 
-			AntCommand(
-				locator1 = "build-test.xml",
-				value1 = "unzip-temp-file -DfileName=Export.zip");
+			ImportExport.openImportExportAdmin();
 
-			var exportFileContent = TestCase.getTempFileContent(fileName = "export.jsonl");
+			ImportExport.exportFile(
+				entityType = "Account",
+				exportFields = "name,type,description,externalReferenceCode",
+				exportFileFormat = "CSV",
+				headlessEndpoint = "/headless-admin-user");
+		}
 
-			var expectedFileContent = TestCase.getFileContent(fileName = "jsonl_account_import.jsonl");
+		task ("When I go to the Import/Export Center and filter action by all") {
+			ImportExport.openImportExportAdmin();
 
-			if ("${exportFileContent}" != "${expectedFileContent}") {
-				fail("The exported file content does not match the expected file content.");
-			}
+			ManagementBar.setFilterAndOrder(filterBy = "All");
+		}
+
+		task ("Then both the export and import should be shown") {
+			ImportExport.assertExecutionEntry(
+				entityType = "Account",
+				executionAction = "Import",
+				executionStatus = "Completed");
+
+			ImportExport.assertExecutionEntry(
+				entityType = "Account",
+				executionAction = "Export",
+				executionStatus = "Completed");
+		}
+
+		task ("When I filter Action by Import") {
+			ManagementBar.setFilterAndOrder(filterBy = "Import");
+		}
+
+		task ("Then only the import should be shown") {
+			ImportExport.assertExecutionEntry(
+				entityType = "Account",
+				executionAction = "Import",
+				executionStatus = "Completed");
+
+			ImportExport.assertNoExecutionEntry(
+				entityType = "Account",
+				executionAction = "Export",
+				executionStatus = "Completed");
+		}
+
+		task ("When I filter Action by Export") {
+			ManagementBar.setFilterAndOrder(filterBy = "Export");
+		}
+
+		task ("Then only the export should be shown") {
+			ImportExport.assertExecutionEntry(
+				entityType = "Account",
+				executionAction = "Export",
+				executionStatus = "Completed");
+
+			ImportExport.assertNoExecutionEntry(
+				entityType = "Account",
+				executionAction = "Import",
+				executionStatus = "Completed");
 		}
 	}
 
@@ -357,7 +399,7 @@ definition {
 
 			ImportExport.gotoImport();
 
-			UploadDependencyFile.uploadFile(fileName = "csv_account_import_noHeaders.csv");
+			UploadDependencyFile.uploadFile(fileName = "csv_account_import_no_headers.csv");
 		}
 
 		task ("When the user unchecks "Contains Headers" and selects Account as Entity Type") {
@@ -371,7 +413,7 @@ definition {
 		}
 
 		task ("Then the user should be able to map account fields to columns in the CSV file") {
-			ImportExport.mapImport(fieldMappings = "name:Column 1,type:Column 2,description:Column 3,externalReferenceCode:Column 4");
+			ImportExport.mapImport(fieldMappings = "name:Column 3,type:Column 4,description:Column 1,externalReferenceCode:Column 2");
 		}
 
 		task ("When the user imports the file") {
@@ -538,6 +580,64 @@ definition {
 		}
 	}
 
+	@description = "Verify users can order Import/Export executions by Create Date."
+	@priority = "3"
+	test CanOrderExecutionsByCreateDate {
+		property portal.acceptance = "true";
+
+		task ("Given an account import and export") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.importFile(
+				entityType = "Account",
+				fieldMappings = "name:Account Name,type:Account Type,description:Account Description,externalReferenceCode:External Reference Code",
+				fileName = "csv_account_import.csv",
+				headlessEndpoint = "/headless-admin-user");
+
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.exportFile(
+				entityType = "Account",
+				exportFields = "name,type,description",
+				exportFileFormat = "CSV",
+				headlessEndpoint = "/headless-admin-user");
+		}
+
+		task ("When I go to the Import/Export Center and order by create date") {
+			ImportExport.openImportExportAdmin();
+
+			ManagementBar.setFilterAndOrder(orderBy = "Create Date");
+		}
+
+		task ("Then the executions should be ordered by create date in descending order") {
+			AssertTextEquals.assertPartialText(
+				key_rowNumber = "1",
+				locator1 = "ContentRow#ENTRY_CONTENT_ROW_NUMBER",
+				value1 = "Export Account");
+
+			AssertTextEquals.assertPartialText(
+				key_rowNumber = "2",
+				locator1 = "ContentRow#ENTRY_CONTENT_ROW_NUMBER",
+				value1 = "Import Account");
+		}
+
+		task ("When I click on the Reverse Sort Direction button") {
+			ManagementBar.toggleViewOrder();
+		}
+
+		task ("Then the executions should be ordered by create date in descending order") {
+			AssertTextEquals.assertPartialText(
+				key_rowNumber = "1",
+				locator1 = "ContentRow#ENTRY_CONTENT_ROW_NUMBER",
+				value1 = "Import Account");
+
+			AssertTextEquals.assertPartialText(
+				key_rowNumber = "2",
+				locator1 = "ContentRow#ENTRY_CONTENT_ROW_NUMBER",
+				value1 = "Export Account");
+		}
+	}
+
 	@description = "Verify users can save export configuration as a template during the export process"
 	@priority = "3"
 	test CanSaveTemplateDuringExport {
@@ -617,6 +717,136 @@ definition {
 		}
 	}
 
+	@description = "Verify users receive a notification when an export is triggered."
+	@priority = "3"
+	test CanViewExportNotifications {
+		property portal.acceptance = "true";
+
+		task ("Given a failed export") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.gotoExport();
+
+			ImportExport.selectEntity(
+				entityType = "Account",
+				headlessEndpoint = "/headless-admin-user");
+
+			Uncheck.uncheckNotVisible(
+				key_checkboxOption = "Attribute Code",
+				locator1 = "Checkbox#SPECIFIC_CHECKBOX_IN_TABLE");
+
+			Button.click(button = "Export");
+
+			WaitForElementPresent(locator1 = "Message#ERROR_FORM_FIELD_REQUIRED");
+		}
+
+		task ("And given a succesful export") {
+			Button.clickCancel();
+
+			ImportExport.mapExport(exportFields = "name,type,description,externalReferenceCode");
+
+			Button.click(button = "Export");
+
+			WaitForElementPresent(locator1 = "ImportExport#EXECUTION_SUCCESS");
+		}
+
+		task ("When the exports are finished") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.assertExecutionEntry(
+				entityType = "Account",
+				executionAction = "Export",
+				executionStatus = "Failed");
+
+			ImportExport.assertExecutionEntry(
+				entityType = "Account",
+				executionAction = "Export",
+				executionStatus = "Completed");
+		}
+
+		task ("Then the the user should receive a notification for the failed and successful exports") {
+			Notifications.viewBadgeCount(notificationCount = "2");
+
+			Notifications.gotoNotifications();
+
+			ImportExport.assertExecutionNotification(
+				entityType = "Account",
+				executionAction = "Export",
+				executionStatus = "Completed");
+
+			ImportExport.assertExecutionNotification(
+				entityType = "Account",
+				executionAction = "Export",
+				executionStatus = "Failed");
+		}
+	}
+
+	@description = "Verify users receive a notification when an import is triggered."
+	@priority = "3"
+	test CanViewImportNotifications {
+		property portal.acceptance = "true";
+
+		task ("Given a failed import") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.gotoImport();
+
+			UploadDependencyFile.uploadFile(fileName = "csv_account_import.csv");
+
+			ImportExport.selectEntity(
+				entityType = "Account",
+				headlessEndpoint = "/headless-admin-user");
+
+			ImportExport.mapImport(fieldMappings = "name:Account Name,type:Account Description");
+
+			Button.click(button = "Import");
+
+			WaitForElementPresent(locator1 = "Message#ERROR_FORM_FIELD_REQUIRED");
+		}
+
+		task ("And given a succesful import") {
+			Button.clickCancel();
+
+			ImportExport.mapImport(fieldMappings = "name:Account Name,type:Account Type,description:Account Description,externalReferenceCode:External Reference Code");
+
+			Button.click(button = "Import");
+
+			WaitForElementPresent(locator1 = "ImportExport#EXECUTION_SUCCESS");
+		}
+
+		task ("When the imports are finished") {
+			Button.clickDone();
+
+			Button.clickCancel();
+
+			ImportExport.assertExecutionEntry(
+				entityType = "Account",
+				executionAction = "Import",
+				executionStatus = "Failed");
+
+			ImportExport.assertExecutionEntry(
+				entityType = "Account",
+				executionAction = "Import",
+				executionStatus = "Completed");
+		}
+
+		task ("Then the the user should receive a notification for the failed and successful imports") {
+			Notifications.viewBadgeCount(notificationCount = "2");
+
+			Notifications.gotoNotifications();
+
+			ImportExport.assertExecutionNotification(
+				entityType = "Account",
+				executionAction = "Import",
+				executionStatus = "Completed");
+
+			ImportExport.assertExecutionNotification(
+				entityType = "Account",
+				executionAction = "Import",
+				executionStatus = "Failed");
+		}
+	}
+
 	@description = "Verify CSV fields are automatically mapped to fields in Liferay when the names are the same"
 	@priority = "3"
 	test CSVFieldsAreAutoMapped {
@@ -627,7 +857,7 @@ definition {
 
 			ImportExport.gotoImport();
 
-			UploadDependencyFile.uploadFile(fileName = "csv_account_import_defaultHeaders.csv");
+			UploadDependencyFile.uploadFile(fileName = "csv_account_import_auto_map.csv");
 		}
 
 		task ("When I select the entity type") {
@@ -638,6 +868,84 @@ definition {
 
 		task ("Then The fields are automatically mapped") {
 			ImportExport.assertImportMappings(fieldMappings = "name:name,type:type,description:description");
+		}
+	}
+
+	@description = "Verify users are shown a preview for the first row being imported in a CSV file."
+	@priority = "3"
+	test ViewCSVImportPreview {
+		property portal.acceptance = "true";
+
+		task ("Given the user is importing a CSV file") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.gotoImport();
+
+			UploadDependencyFile.uploadFile(fileName = "csv_account_import.csv");
+
+			ImportExport.selectEntity(
+				entityType = "Account",
+				headlessEndpoint = "/headless-admin-user");
+		}
+
+		task ("When the user maps the import fields") {
+			ImportExport.mapImport(fieldMappings = "name:Account Name,type:Account Type,description:Account Description,externalReferenceCode:External Reference Code");
+		}
+
+		task ("Then a preview of the first row being imported should be shown.") {
+			ImportExport.assertImportPreviews(importPreviews = "name:Test Business Account,type:business,description:Test Business Account Description,externalReferenceCode:101");
+		}
+	}
+
+	@description = "Verify users are shown a preview for the first row being imported in a JSON file."
+	@priority = "3"
+	test ViewJSONImportPreview {
+		property portal.acceptance = "true";
+
+		task ("Given the user is importing a JSON file") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.gotoImport();
+
+			UploadDependencyFile.uploadFile(fileName = "json_account_import.json");
+
+			ImportExport.selectEntity(
+				entityType = "Account",
+				headlessEndpoint = "/headless-admin-user");
+		}
+
+		task ("When the user maps the import fields") {
+			ImportExport.mapImport(fieldMappings = "name:name,type:type,description:description,externalReferenceCode:externalReferenceCode");
+		}
+
+		task ("Then a preview of the first row being imported should be shown.") {
+			ImportExport.assertImportPreviews(importPreviews = "name:Test Business Account,type:business,description:Test Business Account Description,externalReferenceCode:101");
+		}
+	}
+
+	@description = "Verify users are shown a preview for the first row being imported in a JSONL file."
+	@priority = "3"
+	test ViewJSONLImportPreview {
+		property portal.acceptance = "true";
+
+		task ("Given the user is importing a JSONL file") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.gotoImport();
+
+			UploadDependencyFile.uploadFile(fileName = "jsonl_account_import.jsonl");
+
+			ImportExport.selectEntity(
+				entityType = "Account",
+				headlessEndpoint = "/headless-admin-user");
+		}
+
+		task ("When the user maps the import fields") {
+			ImportExport.mapImport(fieldMappings = "name:name,type:type,description:description,externalReferenceCode:externalReferenceCode");
+		}
+
+		task ("Then a preview of the first row being imported should be shown.") {
+			ImportExport.assertImportPreviews(importPreviews = "name:Test Business Account,type:business,description:Test Business Account Description,externalReferenceCode:101");
 		}
 	}
 

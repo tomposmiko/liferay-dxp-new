@@ -1,12 +1,12 @@
 @component-name = "portal-object"
 definition {
 
+	property osgi.module.configuration.file.names = "com.liferay.object.web.internal.configuration.FFObjectViewConfiguration.config";
+	property osgi.module.configurations = "enabled=&quot;true&quot;";
 	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Object";
-	property osgi.module.configuration.file.names = "com.liferay.object.web.internal.configuration.FFObjectViewConfiguration.config";
-	property osgi.module.configurations = "enabled=&quot;true&quot;";
 
 	setUp {
 		TestCase.setUpPortalInstance();
@@ -92,12 +92,28 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify it is possible to cancel the creation of a View"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanCancelViewCreation {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Object 147754",
+			objectName = "Object147754",
+			pluralLabelName = "Objects 147754");
 
-		// TODO LPS-147754 CanCancelViewCreation pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Object 147754");
+
+		ObjectCustomViews.goToViewsTab();
+
+		LexiconEntry.gotoAdd();
+
+		Button.clickCancel();
+
+		AssertElementNotPresent(locator1 = "Portlet#MODAL_TITLE");
+
+		AssertTextEquals(
+			locator1 = "Message#EMPTY_INFO",
+			value1 = "No Items were found.");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to create a View"
@@ -167,13 +183,42 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify it is possible to delete a column for the View through the delete button"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanDeleteColumnThroughDeleteButton {
 		property portal.acceptance = "true";
 
-		// TODO LPS-147767 CanDeleteColumnThroughDeleteButton pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147767",
+			objectName = "CustomObject147767",
+			pluralLabelName = "Custom Objects 147767");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147767");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.markViewAsDefault();
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		Click.clickAtNotVisible(
+			key_columnOption = "Author",
+			locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+
+		ObjectCustomViews.saveColumnsModal();
+
+		ObjectCustomViews.deleteSpecificColumn(columnName = "Author");
+
+		ObjectCustomViews.assertColumnNotPresent(colunmName = "Author");
+
+		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "No columns added yet.");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to delete a View"
@@ -267,12 +312,24 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify the Name is required when creating a View"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotLeaveNameFieldEmpty {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147755",
+			objectName = "CustomObject147755",
+			pluralLabelName = "Custom Objects 147755");
 
-		// TODO LPS-147755 CannotLeaveNameFieldEmpty pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147755");
+
+		ObjectCustomViews.goToViewsTab();
+
+		LexiconEntry.gotoAdd();
+
+		Button.clickSave();
+
+		AssertElementPresent(locator1 = "ObjectCustomViews#CUSTOM_VIEW_FIELD_REQUIRED");
 	}
 
 	@description = "LPS-135394 - Verify that it is not possible to save another View as default"
@@ -291,17 +348,33 @@ definition {
 
 		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views A");
 
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views A");
+
+		ObjectCustomViews.markViewAsDefault();
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
 		ObjectCustomViews.addColumnsViaUI(
 			columnOption = "Workflow Status",
 			viewLabel = "Custom Views A");
+
+		Button.clickSave();
 
 		Refresh();
 
 		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views B");
 
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views B");
+
+		ObjectCustomViews.markViewAsDefault();
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
 		ObjectCustomViews.addColumnsViaUI(
 			columnOption = "Author",
 			viewLabel = "Custom Views B");
+
+		Button.clickSave();
 
 		Alert.viewErrorMessage(errorMessage = "There can only be one default object view");
 	}
@@ -429,12 +502,92 @@ definition {
 	}
 
 	@description = "LPS-148955 - Verify it is possible to view the values of 2 or more relationship fields for a same object"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanView2RelationshipFieldValues {
+		for (var letter : list "A,B,C") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object ${letter} 149238",
+				objectName = "CustomObject${letter}149238",
+				pluralLabelName = "Custom Objects ${letter} 149238");
+		}
 
-		// TODO LPS-149238 CanView2RelationshipFieldValues pending implementation
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectRelationshipViaAPI(
+				objectName_1 = "CustomObject${letter}149238",
+				objectName_2 = "CustomObjectC149238",
+				relationshipLabel = "Relationship",
+				relationshipName = "relationship",
+				relationshipType = "oneToMany");
+		}
 
+		for (var letter : list "A,B,C") {
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Text",
+				fieldLabelName = "Custom Field ${letter} 149238",
+				fieldName = "customObjectField${letter}",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject${letter}149238");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject${letter}149238");
+		}
+
+		for (var letter : list "A,B,C") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customObjectField${letter}",
+				objectName = "CustomObject${letter}149238",
+				value = "Entry ${letter}");
+		}
+
+		for (var letter : list "A,B") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object ${letter} 149238");
+
+			CreateObject.selectTitleField(fieldLabel = "Custom Field ${letter} 149238");
+
+			CreateObject.saveObject();
+		}
+
+		for (var letter : list "A,B") {
+			ObjectAdmin.goToCustomObject(objectName = "CustomObjectC149238");
+
+			ObjectPortlet.viewEntryDetails(entry = "Entry C");
+
+			ObjectPortlet.chooseEntryOnRelationshipFieldSpecific(
+				entryOption = "Entry ${letter}",
+				relationshipFieldLabel = "Custom Object ${letter} 149238");
+		}
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object C 149238");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.markViewAsDefault();
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		ObjectCustomViews.addColumnsViaUI(
+			columnOption = "Custom Object A 149238",
+			viewLabel = "Custom Views");
+
+		ObjectCustomViews.addColumnsViaUI(
+			columnOption = "Custom Object B 149238",
+			viewLabel = "Custom Views");
+
+		Button.clickSave();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObjectC149238");
+
+		ObjectPortlet.viewEntry(entry = "Entry A");
+
+		ObjectPortlet.viewEntry(entry = "Entry B");
 	}
 
 	@description = "LPS-144902 - Verify if the entries from an object in a table view defined as default are presented correctly"
@@ -494,13 +647,61 @@ definition {
 	}
 
 	@description = "LPS-143190 - Verify that the metadata values are correctly displayed on a Custom View"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanViewMetadataValues {
 		property portal.acceptance = "true";
 
-		// TODO LPS-149239 CanViewMetadataValues pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 149239",
+			objectName = "CustomObject149239",
+			pluralLabelName = "Custom Objects 149239");
 
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldBusinessType = "Text",
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject149239");
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject149239");
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customObjectField",
+			objectName = "CustomObject149239",
+			value = "Entry Test");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 149239");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.markViewAsDefault();
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		for (var columnOption : list "Author,Creation Date,Modified Date,Workflow Status,ID") {
+			Click.clickAtNotVisible(
+				key_columnOption = "${columnOption}",
+				locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+		}
+
+		ObjectCustomViews.saveColumnsModal();
+
+		Button.clickSave();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject149239");
+
+		for (var columnName : list "Author,Created Date,Modified Date,Status,ID") {
+			ObjectPortlet.assertEntryColumnPresent(column = "${columnName}");
+		}
 	}
 
 	@description = "LPS-144902 - Verify if selected Columns on custom view are presented correctly during visualization"

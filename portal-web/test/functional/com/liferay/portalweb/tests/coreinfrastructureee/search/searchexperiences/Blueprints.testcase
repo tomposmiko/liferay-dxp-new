@@ -120,9 +120,9 @@ definition {
 
 		SearchPortlets.searchEmbedded(searchTerm = "test");
 
-		AssertTextNotEquals.assertNotPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
-			value1 = "hits");
+		AssertElementNotPresent(
+			key_text = "hits",
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY");
 	}
 
 	test ApplyBlueprintToContentPageViaBlueprintsOptions {
@@ -2079,6 +2079,110 @@ definition {
 			resultTitle = "Liferay");
 	}
 
+	test SortBlueprintsAdminTable {
+		Blueprints.openBlueprintsAdmin();
+
+		for (var count : list "1,2,3") {
+			Blueprints.createBlueprint(title = "Test Blueprint ${count}");
+
+			PortletEntry.save();
+		}
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Blueprint 3,Test Blueprint 2,Test Blueprint 1");
+
+		Button.click(button = "Title");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Blueprint 1,Test Blueprint 2,Test Blueprint 3");
+
+		Button.click(button = "Title");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Blueprint 3,Test Blueprint 2,Test Blueprint 1");
+
+		Button.click(button = "Created");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Blueprint 1,Test Blueprint 2,Test Blueprint 3");
+
+		Button.click(button = "Created");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Blueprint 3,Test Blueprint 2,Test Blueprint 1");
+
+		Blueprints.editBlueprint(title = "Test Blueprint 2");
+
+		Blueprints.addElement(element = "Boost All Keywords Match");
+
+		PortletEntry.save();
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Blueprint 2,Test Blueprint 3,Test Blueprint 1");
+
+		Button.click(button = "Modified");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Blueprint 1,Test Blueprint 3,Test Blueprint 2");
+
+		Button.click(button = "Modified");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Blueprint 2,Test Blueprint 3,Test Blueprint 1");
+	}
+
+	test SortElementsAdminTable {
+		Blueprints.openBlueprintsAdmin();
+
+		for (var count : list "1,2,3") {
+			Blueprints.createElement(title = "Test Element ${count}");
+		}
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Element 3,Test Element 2,Test Element 1");
+
+		Search.searchCP(searchTerm = "Test Element");
+
+		Button.click(button = "Title");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Element 1,Test Element 2,Test Element 3");
+
+		Button.click(button = "Title");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Element 3,Test Element 2,Test Element 1");
+
+		Button.click(button = "Created");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Element 1,Test Element 2,Test Element 3");
+
+		Button.click(button = "Created");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Element 3,Test Element 2,Test Element 1");
+
+		Blueprints.editElement(element = "Test Element 2");
+
+		var elementSourceJson = '''
+{
+	"elementDefinition": {
+		"configuration": {},
+		"uiConfiguration": {}
+	},
+	"title_i18n": {
+		"en_US": "Test Element 2"
+	}
+}
+		''';
+
+		Type.typeCodeMirrorEditorNoError(
+			locator1 = "Blueprints#CODE_MIRROR_EDITOR",
+			value1 = "${elementSourceJson}");
+
+		PortletEntry.save();
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Element 2,Test Element 3,Test Element 1");
+
+		Search.searchCP(searchTerm = "Test Element");
+
+		Button.click(button = "Modified");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Element 1,Test Element 3,Test Element 2");
+
+		Button.click(button = "Modified");
+
+		Blueprints.viewEntriesSpecificOrder(entryList = "Test Element 2,Test Element 3,Test Element 1");
+	}
+
 	test ViewBlueprintEditTitle {
 		Blueprints.openBlueprintsAdmin();
 
@@ -2087,6 +2191,80 @@ definition {
 		AssertTextEquals(
 			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_HEADER_TITLE",
 			value1 = "Test Blueprint");
+	}
+
+	test ViewBlueprintsAdminBulkDeletion {
+		Blueprints.openBlueprintsAdmin();
+
+		for (var count : list "1,2,3,4") {
+			Blueprints.createBlueprint(title = "Test Blueprint ${count}");
+
+			PortletEntry.save();
+		}
+
+		Check.checkNotVisible(
+			entryTitle = "Test Blueprint 1",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+
+		Button.clickTrash();
+
+		Blueprints.viewNoEntry(title = "Test Blueprint 1");
+
+		Check.checkNotVisible(
+			entryTitle = "Test Blueprint 2",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+
+		AssertChecked.assertCheckedNotVisible(locator1 = "Checkbox#FDS_SELECT_ALL");
+
+		Click.clickAtNotVisible(locator1 = "Checkbox#FDS_SELECT_ALL");
+
+		for (var count : list "2,3,4") {
+			AssertChecked.assertCheckedNotVisible(
+				entryTitle = "Test Blueprint ${count}",
+				locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+		}
+
+		Uncheck.uncheckNotVisible(locator1 = "Checkbox#FDS_SELECT_ALL");
+
+		for (var count : list "2,3,4") {
+			AssertNotChecked.assertNotCheckedNotVisible(
+				entryTitle = "Test Blueprint ${count}",
+				locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+		}
+
+		Search.searchCP(searchTerm = "2");
+
+		Click.clickAtNotVisible(locator1 = "Checkbox#FDS_SELECT_ALL");
+
+		Button.clickTrash();
+
+		Blueprints.viewNoEntry(title = "Test Blueprint 2");
+
+		Blueprints.viewEntryTitle(title = "Test Blueprint 3");
+
+		Blueprints.viewEntryTitle(title = "Test Blueprint 4");
+
+		Check.checkNotVisible(
+			entryTitle = "Test Blueprint 3",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+
+		Click(
+			key_text = "Select All",
+			locator1 = "Link#ANY");
+
+		AssertChecked.assertCheckedNotVisible(
+			entryTitle = "Test Blueprint 3",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+
+		AssertChecked.assertCheckedNotVisible(
+			entryTitle = "Test Blueprint 4",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+
+		Button.clickTrash();
+
+		Blueprints.viewNoEntry(title = "Test Blueprint 3");
+
+		Blueprints.viewNoEntry(title = "Test Blueprint 4");
 	}
 
 	test ViewBlueprintsAdminTableValues {
@@ -2209,6 +2387,8 @@ definition {
 	}
 
 	test ViewBlueprintsPreviewLocalizedResults {
+		property app.server.types = "tomcat";
+
 		Blueprints.openBlueprintsAdmin();
 
 		Blueprints.createBlueprint(title = "Test Blueprint");
@@ -2477,6 +2657,43 @@ definition {
 		AssertTextPresent(value1 = "aggs");
 	}
 
+	test ViewCustomElementLocalizedPredefinedVariables {
+		Blueprints.openBlueprintsAdmin();
+
+		Blueprints.createElement(title = "Test Element");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Language Selector Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Guest",
+			layoutName = "Language Selector Page",
+			widgetName = "Language Selector");
+
+		Navigator.openSitePage(
+			pageName = "Language Selector Page",
+			siteName = "Guest");
+
+		LanguagePortlet.selectLanguagePG(
+			locale = "pt_BR",
+			textIcon = "português-Brasil");
+
+		Blueprints.openBlueprintsAdmin();
+
+		Navigator.gotoNavItem(navItem = "Elementos");
+
+		Blueprints.editEntry(title = "Test Element");
+
+		Click(
+			item = "context",
+			locator1 = "Blueprints#ELEMENTS_EDIT_PAGE_PREDEFINED_VARIABLES_SIDEBAR_ITEM");
+
+		AssertElementPresent(
+			item = "Id da Empresa",
+			locator1 = "Blueprints#ELEMENTS_EDIT_PAGE_PREDEFINED_VARIABLES_SIDEBAR_ITEM");
+	}
+
 	test ViewCustomElementsJSONValidation {
 		Blueprints.openBlueprintsAdmin();
 
@@ -2682,6 +2899,80 @@ definition {
 		AssertVisible(
 			key_jsonText = "clauses",
 			locator1 = "Blueprints#BLUEPRINTS_EDIT_PAGE_VIEW_ELEMENT_JSON_TEXT");
+	}
+
+	test ViewElementsAdminBulkDeletion {
+		Blueprints.openBlueprintsAdmin();
+
+		for (var count : list "1,2,3,4") {
+			Blueprints.createElement(title = "Test Element ${count}");
+		}
+
+		Check.checkNotVisible(
+			entryTitle = "Test Element 1",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+
+		Button.clickTrash();
+
+		Blueprints.viewNoEntry(title = "Test Element 1");
+
+		Check.checkNotVisible(
+			entryTitle = "Test Element 2",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+
+		AssertChecked.assertCheckedNotVisible(locator1 = "Checkbox#FDS_SELECT_ALL");
+
+		Click.clickAtNotVisible(locator1 = "Checkbox#FDS_SELECT_ALL");
+
+		for (var count : list "2,3,4") {
+			AssertChecked.assertCheckedNotVisible(
+				entryTitle = "Test Element ${count}",
+				locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+		}
+
+		Uncheck.uncheckNotVisible(locator1 = "Checkbox#FDS_SELECT_ALL");
+
+		for (var count : list "2,3,4") {
+			AssertNotChecked.assertNotCheckedNotVisible(
+				entryTitle = "Test Element ${count}",
+				locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+		}
+
+		Search.searchCP(searchTerm = "2");
+
+		Click.clickAtNotVisible(locator1 = "Checkbox#FDS_SELECT_ALL");
+
+		Button.clickTrash();
+
+		Blueprints.viewNoEntry(title = "Test Element 2");
+
+		Blueprints.viewEntryTitle(title = "Test Element 3");
+
+		Blueprints.viewEntryTitle(title = "Test Element 4");
+
+		Check.checkNotVisible(
+			entryTitle = "Test Element 3",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+
+		Click(
+			key_text = "Select All",
+			locator1 = "Link#ANY");
+
+		AssertChecked.assertCheckedNotVisible(
+			entryTitle = "Test Element 3",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+
+		AssertChecked.assertCheckedNotVisible(
+			entryTitle = "Test Element 4",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_CHECKBOX");
+
+		Button.clickTrash();
+
+		Alert.viewErrorMessage(errorMessage = "System read-only elements cannot be deleted.");
+
+		Blueprints.viewNoEntry(title = "Test Element 3");
+
+		Blueprints.viewNoEntry(title = "Test Element 4");
 	}
 
 	test ViewElementsAdminPreview {

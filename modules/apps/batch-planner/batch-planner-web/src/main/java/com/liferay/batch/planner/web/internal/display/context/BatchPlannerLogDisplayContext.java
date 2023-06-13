@@ -18,6 +18,7 @@ import com.liferay.batch.engine.BatchEngineTaskExecuteStatus;
 import com.liferay.batch.engine.model.BatchEngineExportTask;
 import com.liferay.batch.engine.model.BatchEngineImportTask;
 import com.liferay.batch.engine.service.BatchEngineExportTaskLocalServiceUtil;
+import com.liferay.batch.engine.service.BatchEngineImportTaskErrorLocalServiceUtil;
 import com.liferay.batch.engine.service.BatchEngineImportTaskLocalServiceUtil;
 import com.liferay.batch.planner.constants.BatchPlannerLogConstants;
 import com.liferay.batch.planner.constants.BatchPlannerPortletKeys;
@@ -79,30 +80,20 @@ public class BatchPlannerLogDisplayContext extends BaseDisplayContext {
 		_searchContainer.setOrderByCol(_getOrderByCol());
 		_searchContainer.setOrderByType(_getOrderByType());
 
-		long companyId = PortalUtil.getCompanyId(renderRequest);
-
 		String navigation = ParamUtil.getString(
 			renderRequest, "navigation", "all");
+
+		long companyId = PortalUtil.getCompanyId(renderRequest);
+		String searchByField = ParamUtil.getString(
+			renderRequest, "searchByField", "name");
+		String searchByKeyword = ParamUtil.getString(
+			renderRequest, "keywords", "");
 
 		if (navigation.equals("all")) {
 			_searchContainer.setResultsAndTotal(
 				() -> TransformUtil.transform(
 					BatchPlannerLogServiceUtil.getCompanyBatchPlannerLogs(
-						companyId, _searchContainer.getStart(),
-						_searchContainer.getEnd(),
-						OrderByComparatorFactoryUtil.create(
-							"BatchPlannerLog", _searchContainer.getOrderByCol(),
-							Objects.equals(
-								_searchContainer.getOrderByType(), "asc"))),
-					this::_toBatchPlannerLogDisplay),
-				BatchPlannerLogServiceUtil.getCompanyBatchPlannerLogsCount(
-					companyId));
-		}
-		else {
-			_searchContainer.setResultsAndTotal(
-				() -> TransformUtil.transform(
-					BatchPlannerLogServiceUtil.getCompanyBatchPlannerLogs(
-						companyId, isExport(navigation),
+						companyId, searchByField, searchByKeyword,
 						_searchContainer.getStart(), _searchContainer.getEnd(),
 						OrderByComparatorFactoryUtil.create(
 							"BatchPlannerLog", _searchContainer.getOrderByCol(),
@@ -110,7 +101,23 @@ public class BatchPlannerLogDisplayContext extends BaseDisplayContext {
 								_searchContainer.getOrderByType(), "asc"))),
 					this::_toBatchPlannerLogDisplay),
 				BatchPlannerLogServiceUtil.getCompanyBatchPlannerLogsCount(
-					companyId, isExport(navigation)));
+					companyId, searchByField, searchByKeyword));
+		}
+		else {
+			_searchContainer.setResultsAndTotal(
+				() -> TransformUtil.transform(
+					BatchPlannerLogServiceUtil.getCompanyBatchPlannerLogs(
+						companyId, isExport(navigation), searchByField,
+						searchByKeyword, _searchContainer.getStart(),
+						_searchContainer.getEnd(),
+						OrderByComparatorFactoryUtil.create(
+							"BatchPlannerLog", _searchContainer.getOrderByCol(),
+							Objects.equals(
+								_searchContainer.getOrderByType(), "asc"))),
+					this::_toBatchPlannerLogDisplay),
+				BatchPlannerLogServiceUtil.getCompanyBatchPlannerLogsCount(
+					companyId, isExport(navigation), searchByField,
+					searchByKeyword));
 		}
 
 		return _searchContainer;
@@ -171,10 +178,17 @@ public class BatchPlannerLogDisplayContext extends BaseDisplayContext {
 
 			builder.action(
 				LanguageUtil.get(httpServletRequest, "export")
+			).batchEngineExportTaskERC(
+				String.valueOf(
+					batchEngineExportTask.getBatchEngineExportTaskId())
+			).processedItemsCount(
+				batchEngineExportTask.getProcessedItemsCount()
 			).status(
 				BatchPlannerLogConstants.getStatus(
 					BatchEngineTaskExecuteStatus.valueOf(
 						batchEngineExportTask.getExecuteStatus()))
+			).totalItemsCount(
+				batchEngineExportTask.getTotalItemsCount()
 			);
 		}
 		else {
@@ -185,6 +199,13 @@ public class BatchPlannerLogDisplayContext extends BaseDisplayContext {
 
 			builder.action(
 				LanguageUtil.get(httpServletRequest, "import")
+			).batchEngineImportTaskERC(
+				String.valueOf(
+					batchEngineImportTask.getBatchEngineImportTaskId())
+			).failedItemsCount(
+				BatchEngineImportTaskErrorLocalServiceUtil.
+					getBatchEngineImportTaskErrorsCount(
+						batchEngineImportTask.getBatchEngineImportTaskId())
 			).processedItemsCount(
 				batchEngineImportTask.getProcessedItemsCount()
 			).status(

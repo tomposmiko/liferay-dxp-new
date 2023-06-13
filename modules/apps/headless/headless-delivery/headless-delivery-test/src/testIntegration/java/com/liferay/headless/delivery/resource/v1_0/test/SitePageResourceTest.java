@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsEntry;
@@ -228,7 +229,8 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			Group group, boolean importPageDefinition, String title)
 		throws Exception {
 
-		Layout layout = LayoutTestUtil.addTypeContentLayout(group, title);
+		Layout layout = LayoutTestUtil.addTypeContentPublishedLayout(
+			group, title, WorkflowConstants.STATUS_APPROVED);
 
 		if (importPageDefinition) {
 			String name = PrincipalThreadLocal.getName();
@@ -280,6 +282,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 
 		SegmentsExperience segmentsExperience =
 			_segmentsExperienceLocalService.addSegmentsExperience(
+				TestPropsValues.getUserId(), layout.getGroupId(),
 				segmentsEntry.getSegmentsEntryId(),
 				_portal.getClassNameId(Layout.class.getName()),
 				layout.getPlid(),
@@ -293,12 +296,16 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 				fetchLayoutPageTemplateStructure(
 					testGroup.getGroupId(), layout.getPlid());
 
+		long defaultSegmentsExperienceId =
+			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
+				layout.getPlid());
+
 		LayoutPageTemplateStructureRel layoutPageTemplateStructureRel =
 			_layoutPageTemplateStructureRelLocalService.
 				fetchLayoutPageTemplateStructureRel(
 					layoutPageTemplateStructure.
 						getLayoutPageTemplateStructureId(),
-					SegmentsExperienceConstants.ID_DEFAULT);
+					defaultSegmentsExperienceId);
 
 		layoutPageTemplateStructureRel.setSegmentsExperienceId(
 			segmentsExperience.getSegmentsExperienceId());

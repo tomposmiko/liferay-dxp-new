@@ -16,12 +16,14 @@ import {ClayModalProvider} from '@clayui/modal';
 import {HashRouter, Route, Routes} from 'react-router-dom';
 
 import Layout from './components/Layout/Layout';
+import Users from './pages/Manage/User';
+import UserManagement from './pages/Manage/User/User';
 import OutletBridge from './pages/OutletBridge';
+import Projects from './pages/Project';
 import Cases from './pages/Project/Cases';
 import Case from './pages/Project/Cases/Case';
 import CaseOutlet from './pages/Project/Cases/CaseOutlet';
 import CaseRequirement from './pages/Project/Cases/CaseRequirement';
-import Home from './pages/Project/Home';
 import Overview from './pages/Project/Overview';
 import ProjectOutlet from './pages/Project/ProjectOutlet';
 import Requirements from './pages/Project/Requirements';
@@ -47,21 +49,19 @@ import Subtasks from './pages/Testflow/Subtask';
 import TestflowArchived from './pages/Testflow/TestflowArchived';
 import TestflowOutlet from './pages/Testflow/TestflowOutlet';
 import TestFlowTasks from './pages/Testflow/TestflowTasks';
-import UserManagement from './pages/UserManagement';
-import UserList from './pages/UserManagement/UsersList';
 
 const TestrayRoute = () => (
 	<HashRouter>
 		<ClayModalProvider>
 			<Routes>
 				<Route element={<Layout />} path="/">
-					<Route element={<Home />} index />
+					<Route element={<Projects />} index />
 
 					<Route
 						element={<ProjectOutlet />}
 						path="project/:projectId"
 					>
-						<Route element={<Home />} index />
+						<Route element={<Projects />} index />
 
 						<Route element={<Overview />} path="overview" />
 
@@ -154,9 +154,9 @@ const TestrayRoute = () => (
 					</Route>
 
 					<Route element={<OutletBridge />} path="manage">
-						<Route element={<UserManagement />} path="user" />
+						<Route element={<Users />} path="user" />
 
-						<Route element={<UserList />} path="userlist" />
+						<Route element={<UserManagement />} path="user/me" />
 					</Route>
 
 					<Route element={<TestflowOutlet />} path="testflow">

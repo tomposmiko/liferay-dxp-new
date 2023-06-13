@@ -93,7 +93,7 @@ definition {
 		if ("${invalidSize}" == "true") {
 			AssertTextEquals.assertPartialText(
 				locator1 = "MessageBoardsThread#MESSAGE_ATTACHMENT_INVALID_SIZE_ERROR",
-				value1 = "Request is larger than ${maxAttachmentFileSize}KB and could not be processed.");
+				value1 = "Please enter a file with a valid file size no larger than ${maxAttachmentFileSize}KB.");
 		}
 	}
 
@@ -2000,6 +2000,24 @@ definition {
 				locator1 = "MessageBoardsThread#MESSAGE_ATTACHMENT_IMAGE",
 				value1 = "${mbThreadAttachment}");
 		}
+	}
+
+	macro viewThreadInRecycleBin {
+		LexiconEntry.gotoEntry(rowEntry = "${threadSubject}");
+
+		AssertTextEquals(
+			locator1 = "Message#WORKFLOW_STATUS",
+			value1 = "In Recycle Bin");
+
+		AssertTextEquals(
+			key_threadSubject = "${threadSubject}",
+			locator1 = "MessageBoardsThread#THREAD_SUBJECT",
+			value1 = "${threadSubject}");
+
+		AssertTextEquals(
+			key_threadBody = "${threadBody}",
+			locator1 = "MessageBoardsThread#THREAD_BODY",
+			value1 = "${threadBody}");
 	}
 
 	macro viewThreadSubscribeLink {

@@ -122,6 +122,21 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testExceptionMapper() throws Exception {
+		test(
+			"ExceptionMapperService.testjava",
+				"The value of 'osgi.jaxrs.name' should end with " +
+					"'ExceptionMapper'", 30);
+	}
+
+	@Test
+	public void testExceptionPrintStackTrace() throws Exception {
+		test(
+			"ExceptionPrintStackTrace.testjava",
+			"Avoid using method 'printStackTrace'" ,31);
+	}
+
+	@Test
 	public void testExceptionVariableName() throws Exception {
 		test(
 			"ExceptionVariableName.testjava",
@@ -137,13 +152,6 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 				"Rename exception variable 'ioe2' to 'ioException'"
 			},
 			new Integer[] {37, 50, 61, 66, 70, 81, 85, 96, 102});
-	}
-
-	@Test
-	public void testExceptionPrintStackTrace() throws Exception {
-		test(
-			"ExceptionPrintStackTrace.testjava",
-			"Avoid using method 'printStackTrace'" ,31);
 	}
 
 	@Test
@@ -442,6 +450,16 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testServiceProxyFactoryNewServiceTrackedInstance() throws Exception {
+		test(
+			"ServiceProxyFactoryNewServiceTrackedInstance.testjava",
+			"Pass 'ServiceProxyFactoryNewServiceTrackedInstance.class' as " +
+				"the second parameter when calling method " +
+					"'ServiceProxyFactory.newServiceTrackedInstance'",
+			30);
+	}
+
+	@Test
 	public void testSingleStatementClause() throws Exception {
 		test(
 			"SingleStatementClause.testjava",
@@ -520,18 +538,6 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 				"Method '_getString' is unused"
 			},
 			new Integer[] {33, 41});
-	}
-	
-	
-	@Test
-	public void testExceptionMapper() throws Exception {
-		test(
-			"ExceptionMapperService.testjava",
-			new String[] {
-				"The value of 'osgi.jaxrs.name' should end with " +
-					"'ExceptionMapper'"
-			},
-			new Integer[] {30});
 	}
 
 	@Test

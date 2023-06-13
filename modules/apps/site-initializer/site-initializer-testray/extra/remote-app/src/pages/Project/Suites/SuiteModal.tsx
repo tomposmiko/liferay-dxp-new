@@ -20,7 +20,7 @@ import React, {useState} from 'react';
 
 import Input from '../../../components/Input';
 import Modal from '../../../components/Modal';
-import {CreateTestraySuite} from '../../../graphql/mutations';
+import {CreateSuite} from '../../../graphql/mutations';
 import useFormModal, {FormModalOptions} from '../../../hooks/useFormModal';
 import i18n from '../../../i18n';
 import {Liferay} from '../../../services/liferay/liferay';
@@ -106,9 +106,9 @@ const SuiteForm: React.FC<SuiteFormProps> = ({form, onChange}) => {
 };
 
 const SuiteModal: React.FC<SuiteModalProps> = ({
-	modal: {observer, onClose, onSave, visible},
+	modal: {observer, onChange, onClose, onSave, visible},
 }) => {
-	const [onCreateTestraySuite] = useMutation(CreateTestraySuite);
+	const [onCreateSuite] = useMutation(CreateSuite);
 
 	const [form, setForm] = useState<SuiteFormData>({
 		caseParameters: '',
@@ -116,23 +116,6 @@ const SuiteModal: React.FC<SuiteModalProps> = ({
 		name: '',
 		smartSuite: false,
 	});
-
-	const onChange = (event: any) => {
-		const {
-			target: {checked, name, type, ...target},
-		} = event;
-
-		let {value} = target;
-
-		if (type === 'checkbox') {
-			value = checked;
-		}
-
-		setForm({
-			...form,
-			[name]: value,
-		});
-	};
 
 	const onSubmit = async () => {
 		try {
@@ -143,9 +126,9 @@ const SuiteModal: React.FC<SuiteModalProps> = ({
 
 			delete newForm.smartSuite;
 
-			await onCreateTestraySuite({
+			await onCreateSuite({
 				variables: {
-					TestraySuite: newForm,
+					Suite: newForm,
 				},
 			});
 
@@ -179,7 +162,7 @@ const SuiteModal: React.FC<SuiteModalProps> = ({
 			title={i18n.translate('new-suite')}
 			visible={visible}
 		>
-			<SuiteForm form={form} onChange={onChange} />
+			<SuiteForm form={form} onChange={onChange({form, setForm})} />
 		</Modal>
 	);
 };

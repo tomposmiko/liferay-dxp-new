@@ -62,6 +62,18 @@ EditBatchPlannerPlanDisplayContext editBatchPlannerPlanDisplayContext = (EditBat
 								/>
 							</div>
 
+							<clay:alert
+								displayType="info"
+								title="download-a-sample-file-for-this-entity"
+							>
+								<clay:link
+									cssClass="link-primary single-link"
+									disabled="<%= true %>"
+									href="#"
+									label="download"
+								/>
+							</clay:alert>
+
 							<div class="mt-2">
 								<clay:checkbox
 									checked="<%= false %>"

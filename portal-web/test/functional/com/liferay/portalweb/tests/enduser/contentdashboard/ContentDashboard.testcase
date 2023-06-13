@@ -139,6 +139,455 @@ definition {
 		}
 	}
 
+	@description = "LPS-132510 Given The Content Dashboard
+	When the info panel of a blog is open
+	Then the blog author's avatar and name are shown"
+	@priority = "3"
+	test BlogAuthorInInfoPanel {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Go to Content Dashboard and check the author's avatar and name in the Info panel") {
+			ContentDashboard.openInfoPanelByDropdownMenu();
+
+			AssertElementPresent(
+				assetAuthor = "Test Test",
+				locator1 = "ContentDashboard#INFO_PANEL_AUTHOR");
+
+			AssertElementPresent(locator1 = "ContentDashboard#INFO_PANEL_AVATAR");
+		}
+	}
+
+	@description = "LPS-132510 Given The Content Dashboard
+	When the info panel of a blog is open
+	Then the list of categories assigned to the content will be divided between public and internal vocabularies"
+	@priority = "3"
+	test BlogCategoriesInInfoPanel {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Add an internal vocabulary for Test Site Name") {
+			JSONCategory.addVocabulary(
+				groupName = "Test Site Name",
+				title = "Vocabulary Internal",
+				visibility = "internal");
+		}
+
+		task ("Add a public vocabulary for Test Site Name") {
+			JSONCategory.addVocabulary(
+				groupName = "Test Site Name",
+				title = "Vocabulary Public");
+		}
+
+		task ("Create a category for Vocabulary Internal") {
+			var categoryId1 = JSONCategory.addCategory(
+				groupName = "Test Site Name",
+				title = "CategoryInternal",
+				vocabularyName = "Vocabulary Internal");
+		}
+
+		task ("Create a category for Vocabulary Internal") {
+			var categoryId2 = JSONCategory.addCategory(
+				groupName = "Test Site Name",
+				title = "CategoryPublic",
+				vocabularyName = "Vocabulary Public");
+		}
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				assetCategoryIds = "${categoryId1},${categoryId2}",
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Go to Content Dashboard and check the vocabularies, public and internal, and their categories are shown in the Info panel") {
+			ContentDashboard.openInfoPanelByDropdownMenu();
+
+			AssertElementPresent(
+				locator1 = "ContentDashboard#INFO_PANEL_VOCABULARY_NAME",
+				vocabularyName = "Vocabulary Public");
+
+			AssertElementPresent(
+				categoryName = "CategoryPublic",
+				locator1 = "ContentDashboard#CATEGORY_LABEL_INFO_PANEL");
+
+			AssertElementPresent(
+				locator1 = "ContentDashboard#INFO_PANEL_VOCABULARY_NAME",
+				vocabularyName = "Vocabulary Internal");
+
+			AssertElementPresent(
+				categoryName = "CategoryInternal",
+				locator1 = "ContentDashboard#CATEGORY_LABEL_INFO_PANEL");
+		}
+	}
+
+	@description = "LPS-132510 Given The Content Dashboard
+	When the info panel of a blog is open
+	Then the Creation date of the blog is shown in the Details section"
+	@priority = "3"
+	test BlogCreationDateInInfoPanel {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Go to Content Dashboard and check the Creation date in the Info panel") {
+			ContentDashboard.openInfoPanelByDropdownMenu();
+
+			Panel.expandPanel(panel = "Details");
+
+			AssertElementPresent(
+				locator1 = "ContentDashboard#INFO_PANEL_TYPE_OF_DATE",
+				typeOfDate = "Creation Date");
+		}
+	}
+
+	@description = "LPS-132510 Given The Content Dashboard
+	When the info panel of a blog is open
+	Then the Display date of the blog is shown in the Details section"
+	@priority = "3"
+	test BlogDisplayDateInInfoPanel {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Go to Content Dashboard and check the Display date in the Info panel") {
+			ContentDashboard.openInfoPanelByDropdownMenu();
+
+			Panel.expandPanel(panel = "Details");
+
+			AssertElementPresent(
+				locator1 = "ContentDashboard#INFO_PANEL_TYPE_OF_DATE",
+				typeOfDate = "Display Date");
+		}
+	}
+
+	@description = "LPS-132510 Given The Content Dashboard
+	When the info panel of a blog is open
+	Then the ID of the blog is shown in the Details section"
+	@priority = "3"
+	test BlogIDDateInInfoPanel {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Go to Content Dashboard and check the ID in the Info panel") {
+			ContentDashboard.openInfoPanelByDropdownMenu();
+
+			Panel.expandPanel(panel = "Details");
+
+			AssertElementPresent(locator1 = "ContentDashboard#INFO_PANEL_ID");
+		}
+	}
+
+	@description = "LPS-132510 Given The Content Dashboard
+	When the info panel of a blog is open
+	Then the Modification date of the blog is shown in the Details section"
+	@priority = "3"
+	test BlogModificationDateInInfoPanel {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Go to Content Dashboard and check the Modified date in the Info panel") {
+			ContentDashboard.openInfoPanelByDropdownMenu();
+
+			Panel.expandPanel(panel = "Details");
+
+			AssertElementPresent(
+				locator1 = "ContentDashboard#INFO_PANEL_TYPE_OF_DATE",
+				typeOfDate = "Modified Date");
+		}
+	}
+
+	@description = "LPS-132509 Given a blog created in site A in the instance, and another one created in the site B
+	When the user goes to the content dashboard
+	Then the user can see both listed"
+	@priority = "5"
+	test BlogsFromDifferentSitesAreListed {
+		property portal.acceptance = "true";
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create another site") {
+			JSONGroup.addGroup(groupName = "Test Site Name 2");
+		}
+
+		task ("Create a blog in the first site") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content 1",
+				entryTitle = "Blogs Entry Title 1",
+				groupName = "Test Site Name");
+		}
+
+		task ("Create a blog in the first site") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content 2",
+				entryTitle = "Blogs Entry Title 2",
+				groupName = "Test Site Name 2");
+		}
+
+		task ("Go to Content Dashboard") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Check both blogs are listed") {
+			ContentDashboard.filterBySite(
+				filterOption = "Site or Asset Library",
+				siteName = "Test Site Name");
+
+			AssertTextPresent(
+				locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
+				value1 = "Blogs Entry Title 1");
+
+			ContentDashboard.filterBySite(
+				filterOption = "Site or Asset Library",
+				siteName = "Test Site Name 2");
+
+			AssertTextPresent(
+				locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
+				value1 = "Blogs Entry Title 2");
+		}
+
+		task ("Delete site created for this test") {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+		}
+	}
+
+	@description = "LPS-119966 Given the Content Dashboard
+	When a blog is listed in the assets list
+	Then the following metadata are shown: Title, Author (Owner), Type, Site or Asset Library, Status, Category 1, Category 2, Modified Date"
+	@priority = "3"
+	test BlogsMetadata {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Assert columns displayed") {
+			for (var columnHeader : list "Title,Author,Subtype,Site or Asset Library,Status,Audience,Stage,Modified Date") {
+				AssertElementPresent(
+					key_tableHeader = "${columnHeader}",
+					locator1 = "LexiconTable#TABLE_HEADER");
+			}
+		}
+	}
+
+	@description = "LPS-132510 Given The Content Dashboard
+	When the info panel of a blog is open
+	Then the blog status label is shown"
+	@priority = "3"
+	test BlogStatusInInfoPanel {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Go to Content Dashboard and check the status in the Info panel") {
+			ContentDashboard.openInfoPanelByDropdownMenu();
+
+			AssertElementPresent(
+				assetStatus = "Approved",
+				locator1 = "ContentDashboard#INFO_PANEL_STATUS");
+		}
+	}
+
+	@description = "LPS-132510 Given The Content Dashboard
+	When the info panel of a blog is open
+	Then all the tags assigned to the blog appear as labels in the Tags section"
+	@priority = "3"
+	test BlogTagsInInfoPanel {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog with the tag") {
+			JSONBlog.addEntry(
+				assetTagNames = "tagname",
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Go to Content Dashboard and check the tags are shown in the Info panel") {
+			ContentDashboard.openInfoPanelByDropdownMenu();
+
+			AssertElementPresent(locator1 = "ContentDashboard#INFO_PANEL_TAGS_TITLE");
+
+			AssertElementPresent(
+				locator1 = "ContentDashboard#TAG_LABEL_INFO_PANEL",
+				tagName = "tagname");
+		}
+	}
+
+	@description = "LPS-132510 Given The Content Dashboard
+    When the info panel of a blog is open
+    Then the title of the blog is shown"
+	@priority = "3"
+	test BlogTitleInInfoPanel {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ContentDashboard.openInfoPanelByDropdownMenu();
+
+			AssertTextPresent(
+				locator1 = "ContentDashboard#INFO_PANEL_TITLE",
+				value1 = "Blogs Entry Title");
+		}
+	}
+
+	@description = "LPS-132510 Given The Content Dashboard
+	When the info panel of a blog is open
+	Then the blog version labels are shown"
+	@priority = "3"
+	test BlogVersionInInfoPanel {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard and check the title in the Info panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+		}
+
+		task ("Go to Content Dashboard and check the version in the Info panel") {
+			ContentDashboard.openInfoPanelByDropdownMenu();
+
+			AssertElementPresent(
+				assetVersion = "Version",
+				locator1 = "ContentDashboard#INFO_PANEL_VERSION");
+		}
+	}
+
 	@description = "LPS-114911 When the user selects vocabularies from the selection panel, vocabularies selected show in the table as headers and categories assigned to contents will show "
 	@priority = "5"
 	test CategorieShowInTable {
@@ -1035,6 +1484,262 @@ definition {
 		}
 	}
 
+	@description = "LPS-132509 Given a user with NO permissions to edit
+	And a Blog entry that is associated with a Display Page Template
+	When the user clicks on the title link in the content dashboard
+	Then the user should be led to a preview of the Display Page Template, with no editing options"
+	@priority = "4"
+	@uitest
+	test ClickTitleBlogDPTWithNoPermissions {
+		property portal.acceptance = "true";
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Add Display Page and mark it as default") {
+			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
+				contentType = "Blogs Entry",
+				displayPageTemplateEntryName = "Display Page Name",
+				groupName = "Test Site Name");
+
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
+
+			Button.clickPublish();
+
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+		}
+
+		task ("Create a blog in the first site") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Create an User") {
+			JSONUser.addUser(
+				userEmailAddress = "userea@liferay.com",
+				userFirstName = "userfn",
+				userLastName = "userln",
+				userScreenName = "usersn");
+
+			JSONUser.setFirstPassword(
+				agreeToTermsAndAnswerReminderQuery = "true",
+				newPassword = "test",
+				requireReset = "false",
+				userEmailAddress = "userea@liferay.com");
+		}
+
+		task ("Add a role with NO permissions") {
+			JSONRole.addRegularRole(
+				roleKey = "Blog Creator No Edit Permissions",
+				roleTitle = "Blog Creator No Edit Permissions");
+
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "VIEW_SITE_ADMINISTRATION",
+				resourceName = "com.liferay.portal.kernel.model.Group",
+				roleTitle = "Blog Creator No Edit Permissions");
+
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "ACCESS_IN_CONTROL_PANEL",
+				resourceName = "com_liferay_content_dashboard_web_portlet_ContentDashboardAdminPortlet",
+				roleTitle = "Blog Creator No Edit Permissions");
+
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "VIEW_CONTROL_PANEL",
+				resourceName = "90",
+				roleTitle = "Blog Creator No Edit Permissions");
+
+			JSONRole.assignRoleToUser(
+				roleTitle = "Blog Creator No Edit Permissions",
+				userEmailAddress = "userea@liferay.com");
+
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "userea@liferay.com",
+				userLoginFullName = "userfn userln");
+		}
+
+		task ("Go to Content Dashboard") {
+			ContentDashboard.goToContentDashboard();
+		}
+
+		task ("Click on the title") {
+			LexiconTable.clickTableEntryColumnLink(
+				columnName = "title",
+				tableEntry = "");
+
+			AssertTextPresent(
+				locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
+				value1 = "Blogs Entry Title");
+		}
+
+		task ("Delete Role and User created") {
+			JSONRole.deleteRole(roleTitle = "Blog Creator No Edit Permissions");
+
+			JSONUser.deleteUserByEmailAddress(userEmailAddress = "userea@liferay.com");
+		}
+	}
+
+	@description = "LPS-132509 Given a user with permissions to edit
+	And a Blog entry that is associated with a Display Page Template
+	When the user clicks on the title link in the content dashboard
+	Then the user is led to a preview of the Display Page Template with editing options"
+	@priority = "4"
+	@uitest
+	test ClickTitleBlogDPTWithPermissions {
+		property portal.acceptance = "true";
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Add Display Page and mark it as default") {
+			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
+				contentType = "Blogs Entry",
+				displayPageTemplateEntryName = "Display Page Name",
+				groupName = "Test Site Name");
+
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
+
+			Button.clickPublish();
+
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+		}
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard") {
+			ContentDashboard.goToContentDashboard();
+		}
+
+		task ("Click on the title") {
+			LexiconTable.clickTableEntryColumnLink(
+				columnName = "title",
+				tableEntry = "");
+
+			AssertTextPresent(
+				locator1 = "ContentDashboard#DISPLAY_PAGE_TITLE",
+				value1 = "Display Page Name");
+		}
+	}
+
+	@description = "LPS-132509 Given a user with NO permissions to edit
+	And a Blog entry that is not associated with a Display Page Template
+	When the user clicks on the title link in the content dashboard
+	Then the user cannot click on the title"
+	@priority = "4"
+	@uitest
+	test ClickTitleBlogNoDPTWithNoPermissions {
+		property portal.acceptance = "true";
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Create an User") {
+			JSONUser.addUser(
+				userEmailAddress = "userea@liferay.com",
+				userFirstName = "userfn",
+				userLastName = "userln",
+				userScreenName = "usersn");
+
+			JSONUser.setFirstPassword(
+				agreeToTermsAndAnswerReminderQuery = "true",
+				newPassword = "test",
+				requireReset = "false",
+				userEmailAddress = "userea@liferay.com");
+		}
+
+		task ("Add a role with NO permissions") {
+			JSONRole.addRegularRole(
+				roleKey = "Blog Creator No Edit Permissions",
+				roleTitle = "Blog Creator No Edit Permissions");
+
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "VIEW_SITE_ADMINISTRATION",
+				resourceName = "com.liferay.portal.kernel.model.Group",
+				roleTitle = "Blog Creator No Edit Permissions");
+
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "ACCESS_IN_CONTROL_PANEL",
+				resourceName = "com_liferay_content_dashboard_web_portlet_ContentDashboardAdminPortlet",
+				roleTitle = "Blog Creator No Edit Permissions");
+
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "VIEW_CONTROL_PANEL",
+				resourceName = "90",
+				roleTitle = "Blog Creator No Edit Permissions");
+
+			JSONRole.assignRoleToUser(
+				roleTitle = "Blog Creator No Edit Permissions",
+				userEmailAddress = "userea@liferay.com");
+
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "userea@liferay.com",
+				userLoginFullName = "userfn userln");
+		}
+
+		task ("Go to Content Dashboard") {
+			ContentDashboard.goToContentDashboard();
+		}
+
+		task ("Assert the view and edit options are not available") {
+			Click(locator1 = "ContentDashboard#ASSET_MENU_DROPDOWN_BUTTON");
+
+			AssertElementNotPresent(locator1 = "ContentDashboard#VIEW_OPTION");
+
+			AssertElementNotPresent(locator1 = "ContentDashboard#EDIT_OPTION");
+		}
+	}
+
+	@description = "LPS-132509 Given a user with permissions to edit
+	And a Blog entry that is not associated with a Display Page Template
+	When the user clicks on the title link in the content dashboard
+	Then the user is led to the edit mode"
+	@priority = "4"
+	@uitest
+	test ClickTitleBlogNoDPTWithPermissions {
+		property portal.acceptance = "true";
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard") {
+			ContentDashboard.goToContentDashboard();
+		}
+
+		task ("Click on the title") {
+			LexiconTable.clickTableEntryColumnLink(
+				columnName = "title",
+				tableEntry = "");
+
+			AssertElementPresent(
+				locator1 = "Button#PUBLISH",
+				value1 = "Publish");
+		}
+	}
+
 	@description = "LPS-119966 Given a user with NO permissions to edit documents
 	When the user clicks on the title link in the content dashboard
 	than the user cannot click on the title"
@@ -1531,6 +2236,37 @@ definition {
 				value1 = "DM Document Title");
 
 			Click(locator1 = "ContentDashboard#CLOSE_INFO_PANEL_BUTTON");
+		}
+	}
+
+	@description = " Given a document with and associated Display Page Template
+	When the user with permissions clicks on the edit button
+	Then the user is lead to the edit mode"
+	@priority = "4"
+	test EditBlog {
+		property osgi.module.configuration.file.names = "com.liferay.content.dashboard.web.internal.configuration.FFBlogsEntryContentDashboardItemConfiguration.config";
+		property osgi.module.configurations = "blogsEntryEnabled=B&quot;true&quot;";
+		property portal.acceptance = "true";
+
+		task ("Create a blog") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Go to Content Dashboard") {
+			ContentDashboard.goToContentDashboard();
+		}
+
+		task ("Edit the Blog") {
+			ContentDashboard.editAsset();
+		}
+
+		task ("Assert the document has been edited") {
+			AssertTextPresent(
+				locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
+				value1 = "Blogs Entry Title");
 		}
 	}
 
@@ -2103,7 +2839,9 @@ definition {
 		task ("Filter asset by Global Site status in Content Dashboard") {
 			ContentDashboard.goToContentDashboard();
 
-			ContentDashboard.filterBySiteGlobal(filterOption = "Site or Asset Library");
+			ContentDashboard.filterBySite(
+				filterOption = "Site or Asset Library",
+				siteName = "Global");
 
 			AssertTextPresent(
 				locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
@@ -2782,11 +3520,13 @@ definition {
 	@priority = "4"
 	test MimeTypeCompressed {
 		task ("Add a compressed file") {
-			JSONDocument.addFileWithUploadedFile(
+			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
+
+			DMDocument.addCP(
+				dmDocumentDescription = "Document Description",
+				dmDocumentFileName = "document.zip",
 				dmDocumentTitle = "Document_1",
-				groupName = "Test Site Name",
-				mimeType = "compressed/zip",
-				sourceFileName = "fragment-collection.zip");
+				nullFile = "true");
 		}
 
 		task ("Navigate to the content Dashboard and filter by file extension") {
@@ -3661,6 +4401,8 @@ definition {
 	@description = "When the user selects one or more authors in the item selector, the list of contents displays content where the selected users are the creators"
 	@priority = "5"
 	test ShowAllContentsCreatedByUsers {
+		property custom.properties = "jsonws.web.service.paths.excludes=";
+
 		task ("Create and configure second user") {
 			JSONUser.addUser(
 				userEmailAddress = "userea@liferay.com",
@@ -3692,12 +4434,18 @@ definition {
 		}
 
 		task ("Create a Web Content authored by userfn userln") {
-			JSONWebcontent.addWebContent(
-				content = "WC Content",
-				groupName = "Test Site Name",
-				title = "WC Title 2",
-				userEmailAddress = "userea@liferay.com",
-				userPassword = "test");
+
+			// WC content was not being created using JSONWebcontent.addWebContent . Refactor in the future
+
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+			WebContentNavigator.gotoAddCP();
+
+			WebContent.addCP(
+				webContentContent = "WC Content",
+				webContentTitle = "WC Title 2");
+
+			PortletEntry.publish();
 		}
 
 		task ("Navigate to Content Dashboard") {
@@ -3726,6 +4474,8 @@ definition {
 	@description = "LPS-133181 When the user selects the option Filter by Author: Me in the 'Filter and Order' dropdown, the list of contents displays content where the user is the creator"
 	@priority = "5"
 	test ShowOnlyContentCreatedByUser {
+		property custom.properties = "jsonws.web.service.paths.excludes=";
+
 		task ("Create and configure second user") {
 			JSONUser.addUser(
 				userEmailAddress = "userea@liferay.com",
@@ -3757,12 +4507,18 @@ definition {
 		}
 
 		task ("Add a Web Content using second user") {
-			JSONWebcontent.addWebContent(
-				content = "WC Content",
-				groupName = "Test Site Name",
-				title = "WC Title 2",
-				userEmailAddress = "userea@liferay.com",
-				userPassword = "test");
+
+			// WC content was not being created using JSONWebcontent.addWebContent . Refactor in the future
+
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+
+			WebContentNavigator.gotoAddCP();
+
+			WebContent.addCP(
+				webContentContent = "WC Content",
+				webContentTitle = "WC Title 2");
+
+			PortletEntry.publish();
 		}
 
 		task ("Edit Web Content created by Test user") {

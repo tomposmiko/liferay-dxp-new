@@ -221,7 +221,7 @@
 			<finder-column name="name" />
 		</finder>
 	</entity>
-	<entity local-service="true" name="ObjectFieldSetting" remote-service="true" uuid="true">
+	<entity local-service="true" name="ObjectFieldSetting" remote-service="false" uuid="true">
 
 		<!-- PK fields -->
 
@@ -239,7 +239,6 @@
 
 		<column name="objectFieldId" type="long" />
 		<column name="name" type="String" />
-		<column name="required" type="boolean" />
 		<column name="value" type="String" />
 
 		<!-- Finder methods -->
@@ -525,6 +524,7 @@
 		<!-- Other fields -->
 
 		<column name="objectViewId" type="long" />
+		<column localized="true" name="label" type="String" />
 		<column name="objectFieldName" type="String" />
 		<column name="priority" type="int" />
 
@@ -589,6 +589,7 @@
 		<exception>ObjectFieldLabel</exception>
 		<exception>ObjectFieldName</exception>
 		<exception>ObjectFieldRelationshipType</exception>
+		<exception>ObjectFieldSettingName</exception>
 		<exception>ObjectFieldSettingValue</exception>
 		<exception>ObjectLayoutColumnSize</exception>
 		<exception>ObjectRelationshipName</exception>

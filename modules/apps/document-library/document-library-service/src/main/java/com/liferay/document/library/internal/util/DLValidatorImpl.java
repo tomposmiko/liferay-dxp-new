@@ -15,7 +15,7 @@
 package com.liferay.document.library.internal.util;
 
 import com.liferay.document.library.configuration.DLConfiguration;
-import com.liferay.document.library.internal.configuration.admin.service.MimeTypeSizeLimitManagedServiceFactory;
+import com.liferay.document.library.internal.configuration.admin.service.DLSizeLimitManagedServiceFactory;
 import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.exception.FileNameException;
 import com.liferay.document.library.kernel.exception.FileSizeException;
@@ -54,7 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	configurationPid = {
 		"com.liferay.document.library.configuration.DLConfiguration",
-		"com.liferay.document.library.internal.configuration.MimeTypeSizeLimitConfiguration"
+		"com.liferay.document.library.internal.configuration.DLSizeLimitConfiguration"
 	},
 	service = DLValidator.class
 )
@@ -80,10 +80,11 @@ public final class DLValidatorImpl implements DLValidator {
 
 	@Override
 	public long getMaxAllowableSize(String mimeType) {
-		long globalMaxAllowableSize = _getGlobalMaxAllowableSize();
+		long globalMaxAllowableSize = _getGlobalMaxAllowableSize(
+			CompanyThreadLocal.getCompanyId());
 
 		long mimeTypeFileMaxSize =
-			_mimeTypeSizeLimitManagedServiceFactory.getCompanyMimeTypeSizeLimit(
+			_dlSizeLimitManagedServiceFactory.getCompanyMimeTypeSizeLimit(
 				CompanyThreadLocal.getCompanyId(), mimeType);
 
 		if (mimeTypeFileMaxSize == 0) {
@@ -291,12 +292,10 @@ public final class DLValidatorImpl implements DLValidator {
 		_dlConfiguration = dlConfiguration;
 	}
 
-	protected void setMimeTypeSizeLimitManagedServiceFactory(
-		MimeTypeSizeLimitManagedServiceFactory
-			mimeTypeSizeLimitManagedServiceFactory) {
+	protected void setDLSizeLimitManagedServiceFactory(
+		DLSizeLimitManagedServiceFactory dlSizeLimitManagedServiceFactory) {
 
-		_mimeTypeSizeLimitManagedServiceFactory =
-			mimeTypeSizeLimitManagedServiceFactory;
+		_dlSizeLimitManagedServiceFactory = dlSizeLimitManagedServiceFactory;
 	}
 
 	protected void setUploadServletRequestConfigurationHelper(
@@ -307,8 +306,9 @@ public final class DLValidatorImpl implements DLValidator {
 			uploadServletRequestConfigurationHelper;
 	}
 
-	private long _getGlobalMaxAllowableSize() {
-		long dlFileMaxSize = _dlConfiguration.fileMaxSize();
+	private long _getGlobalMaxAllowableSize(long companyId) {
+		long dlFileMaxSize =
+			_dlSizeLimitManagedServiceFactory.getCompanyFileMaxSize(companyId);
 		long uploadServletRequestFileMaxSize =
 			_uploadServletRequestConfigurationHelper.getMaxSize();
 
@@ -379,8 +379,7 @@ public final class DLValidatorImpl implements DLValidator {
 	private volatile DLConfiguration _dlConfiguration;
 
 	@Reference
-	private MimeTypeSizeLimitManagedServiceFactory
-		_mimeTypeSizeLimitManagedServiceFactory;
+	private DLSizeLimitManagedServiceFactory _dlSizeLimitManagedServiceFactory;
 
 	@Reference
 	private UploadServletRequestConfigurationHelper

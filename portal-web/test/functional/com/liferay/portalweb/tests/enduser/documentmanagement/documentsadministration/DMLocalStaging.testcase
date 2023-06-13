@@ -253,6 +253,15 @@ definition {
 		DMDocument.viewDocumentVersionNumberCmdPG(dmDocumentVersionNumber = "1.1");
 	}
 
+	@description = "This is a test for LPS-91043. It asserts that user can publish an old file entry version to live."
+	@ignore = "Test Stub"
+	@priority = "5"
+	test CanPublishOldVerion {
+
+		// TODO LPS-149384 CanPublishOldVerion pending implementation
+
+	}
+
 	@description = "This is a test for LPS-136827. It checks that the related asset of a file can be published."
 	@priority = "3"
 	test CanPublishRelatedAsset {
@@ -1373,21 +1382,7 @@ definition {
 		property test.name.skip.portal.instance = "DMLocalStaging#StagingDemoDocumentsAndMedia";
 		property testray.component.names = "Training";
 
-		SystemSettings.openSystemSettingsAdmin();
-
-		SystemSettings.gotoConfiguration(
-			configurationCategory = "Documents and Media",
-			configurationName = "Service",
-			configurationScope = "System Scope");
-
-		Type(
-			key_fieldLabel = "Maximum File Size",
-			locator1 = "TextInput#GENERIC_TEXT_INPUT",
-			value1 = "30000000");
-
-		ScrollWebElementIntoView(locator1 = "Button#SAVE");
-
-		PortletEntry.save();
+		DMDocument.updateMaximumFileSize(fieldValue = "30000000");
 
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging DM Page",

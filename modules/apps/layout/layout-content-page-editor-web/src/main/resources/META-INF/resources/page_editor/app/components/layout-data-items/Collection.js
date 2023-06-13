@@ -27,6 +27,7 @@ import {
 import {useDisplayPagePreviewItem} from '../../contexts/DisplayPagePreviewItemContext';
 import {useDispatch, useSelector} from '../../contexts/StoreContext';
 import selectLanguageId from '../../selectors/selectLanguageId';
+import selectSegmentsExperienceId from '../../selectors/selectSegmentsExperienceId';
 import CollectionService from '../../services/CollectionService';
 import updateItemConfig from '../../thunks/updateItemConfig';
 import {getResponsiveConfig} from '../../utils/getResponsiveConfig';
@@ -35,6 +36,10 @@ import UnsafeHTML from '../UnsafeHTML';
 import CollectionPagination from './CollectionPagination';
 
 const COLLECTION_ID_DIVIDER = '$';
+
+function paginationIsEnabled(collectionConfig) {
+	return collectionConfig.paginationType !== 'none';
+}
 
 function collectionIsMapped(collectionConfig) {
 	return collectionConfig.collection;
@@ -101,8 +106,14 @@ const Grid = ({
 			collectionLength,
 			getNumberOfItems(collection, collectionConfig)
 		) || 1;
+
+	const numberOfItemsToDisplay = Math.min(
+		maxNumberOfItems,
+		config.maxNumberOfItemsEditMode
+	);
+
 	const numberOfRows = Math.ceil(
-		maxNumberOfItems / collectionConfig.numberOfColumns
+		numberOfItemsToDisplay / collectionConfig.numberOfColumns
 	);
 
 	return (
@@ -124,7 +135,7 @@ const Grid = ({
 										][collectionConfig.numberOfColumns][j]
 									}
 								>
-									{index < maxNumberOfItems && (
+									{index < numberOfItemsToDisplay && (
 										<ColumnContext
 											collectionConfig={collectionConfig}
 											collectionId={collectionId}
@@ -216,6 +227,7 @@ const Collection = React.memo(
 
 		const dispatch = useDispatch();
 		const languageId = useSelector(selectLanguageId);
+		const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
 
 		const [activePage, setActivePage] = useState(1);
 		const [collection, setCollection] = useState(emptyCollection);
@@ -318,6 +330,7 @@ const Collection = React.memo(
 										},
 									},
 									itemId: item.itemId,
+									segmentsExperienceId,
 								})
 							);
 						}
@@ -340,6 +353,7 @@ const Collection = React.memo(
 			itemClassNameId,
 			itemClassPK,
 			languageId,
+			segmentsExperienceId,
 		]);
 
 		const selectedViewportSize = useSelector(
@@ -390,21 +404,22 @@ const Collection = React.memo(
 					</>
 				)}
 
-				{collectionConfig.paginationType && (
-					<CollectionPagination
-						activePage={activePage}
-						collectionConfig={collectionConfig}
-						collectionId={item.itemId}
-						onPageChange={setActivePage}
-						totalNumberOfItems={
-							collection.fakeCollection ? 0 : numberOfItems
-						}
-						totalPages={getNumberOfPages(
-							collection,
-							collectionConfig
-						)}
-					/>
-				)}
+				{collectionIsMapped(collectionConfig) &&
+					paginationIsEnabled(collectionConfig) && (
+						<CollectionPagination
+							activePage={activePage}
+							collectionConfig={collectionConfig}
+							collectionId={item.itemId}
+							onPageChange={setActivePage}
+							totalNumberOfItems={
+								collection.fakeCollection ? 0 : numberOfItems
+							}
+							totalPages={getNumberOfPages(
+								collection,
+								collectionConfig
+							)}
+						/>
+					)}
 			</div>
 		);
 	})
@@ -413,7 +428,7 @@ const Collection = React.memo(
 Collection.displayName = 'Collection';
 
 function getNumberOfItems(collection, collectionConfig) {
-	if (collectionConfig.paginationType) {
+	if (paginationIsEnabled(collectionConfig)) {
 		const itemsPerPage = Math.min(
 			collectionConfig.numberOfItemsPerPage,
 			config.searchContainerPageMaxDelta

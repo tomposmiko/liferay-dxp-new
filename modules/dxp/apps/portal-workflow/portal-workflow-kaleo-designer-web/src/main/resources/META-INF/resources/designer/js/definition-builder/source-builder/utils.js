@@ -125,7 +125,27 @@ export function parseNotifications(node) {
 				assignmentType: ['taskAssignees'],
 			};
 		}
-		else if (item.roles) {
+		else if (item['user']) {
+			const emailAddress = [];
+
+			item['user'].forEach((item) =>
+				emailAddress.push(replaceTabSpaces(removeNewLine(item)))
+			);
+
+			notifications.recipients[index] = {
+				assignmentType: ['user'],
+				emailAddress,
+			};
+		}
+		else if (item['role-type']) {
+			notifications.recipients[index] = {
+				assignmentType: ['roleType'],
+				autoCreate: item['auto-create'],
+				roleName: item['role-name'],
+				roleType: item['role-type'],
+			};
+		}
+		else if (item['role-id']) {
 			notifications.recipients[index] = {
 				assignmentType: ['roleId'],
 				roleId: replaceTabSpaces(removeNewLine(item.roles[0])),
@@ -142,11 +162,6 @@ export function parseNotifications(node) {
 				assignmentType: ['scriptedRecipient'],
 				script: [script],
 				scriptLanguage: [DEFAULT_LANGUAGE],
-			};
-		}
-		else if (item.user) {
-			notifications.recipients[index] = {
-				assignmentType: ['user'],
 			};
 		}
 	});

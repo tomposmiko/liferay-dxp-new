@@ -171,13 +171,14 @@ function appendXMLAssignments(
 						XMLUtil.create('name', roleName)
 					);
 
-					if (dataAssignments.autoCreate?.[index]) {
-						buffer.push(
-							XMLUtil.create(
-								'autoCreate',
-								dataAssignments.autoCreate[index]
-							)
-						);
+					let autoCreate = dataAssignments.autoCreate?.[index];
+
+					if (autoCreate !== undefined && autoCreate !== null) {
+						if (!autoCreate) {
+							autoCreate = 'false';
+						}
+
+						buffer.push(XMLUtil.create('autoCreate', autoCreate));
 					}
 
 					buffer.push(xmlRole.close);
@@ -545,7 +546,7 @@ function serializeDefinition(
 
 		appendXMLActions(buffer, item.data.actions, item.data.notifications);
 
-		appendXMLTaskTimers(buffer, item.data.taskTimers);
+		appendXMLAssignments(buffer, item.data.assignments);
 
 		if (initial) {
 			buffer.push(XMLUtil.create('initial', initial));
@@ -566,6 +567,8 @@ function serializeDefinition(
 
 		buffer.push(xmlLabels.close);
 
+		appendXMLTaskTimers(buffer, item.data.taskTimers);
+
 		if (script) {
 			buffer.push(XMLUtil.create('script', cdata(script)));
 		}
@@ -573,10 +576,6 @@ function serializeDefinition(
 		if (xmlType === 'condition') {
 			buffer.push(XMLUtil.create('scriptLanguage', DEFAULT_LANGUAGE));
 		}
-
-		appendXMLAssignments(buffer, item.data.assignments);
-
-		appendXMLTaskTimers(buffer, item.data.taskTimers);
 
 		const nodeTransitions = transitions.filter(
 			(transition) => transition.source === id

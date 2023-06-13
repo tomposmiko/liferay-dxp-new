@@ -104,7 +104,6 @@
 		<field name="modifiedDate" type="Date" />
 		<field name="objectFieldId" type="long" />
 		<field name="name" type="String" />
-		<field name="required" type="boolean" />
 		<field name="value" type="String" />
 	</model>
 	<model name="com.liferay.object.model.ObjectLayout">
@@ -231,6 +230,7 @@
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
 		<field name="objectViewId" type="long" />
+		<field localized="true" name="label" type="String" />
 		<field name="objectFieldName" type="String" />
 		<field name="priority" type="int" />
 	</model>
