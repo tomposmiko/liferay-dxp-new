@@ -14,13 +14,17 @@
 
 package com.liferay.asset.list.web.internal.frontend.taglib.clay.servlet.taglib;
 
+import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.web.internal.display.context.AssetListDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.BaseVerticalCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
@@ -70,7 +74,9 @@ public class AssetListEntryVerticalCard extends BaseVerticalCard {
 
 	@Override
 	public String getIcon() {
-		if (_assetListEntry.getType() == 0) {
+		if (_assetListEntry.getType() ==
+				AssetListEntryTypeConstants.TYPE_DYNAMIC) {
+
 			return "bolt";
 		}
 
@@ -80,6 +86,33 @@ public class AssetListEntryVerticalCard extends BaseVerticalCard {
 	@Override
 	public String getInputValue() {
 		return null;
+	}
+
+	@Override
+	public List<LabelItem> getLabels() {
+		int assetListEntrySegmentsEntryRelsCount =
+			_assetListDisplayContext.getAssetListEntrySegmentsEntryRelsCount(
+				_assetListEntry);
+
+		if (assetListEntrySegmentsEntryRelsCount > 0) {
+			return LabelItemListBuilder.add(
+				labelItem -> {
+					labelItem.setDisplayType("info");
+					labelItem.setLabel(
+						LanguageUtil.format(
+							themeDisplay.getLocale(), "x-variations",
+							new String[] {
+								String.valueOf(
+									assetListEntrySegmentsEntryRelsCount)
+							}));
+				}
+			).build();
+		}
+
+		return LabelItemListBuilder.add(
+			labelItem -> labelItem.setLabel(
+				LanguageUtil.get(themeDisplay.getLocale(), "no-variations"))
+		).build();
 	}
 
 	@Override

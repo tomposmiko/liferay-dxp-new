@@ -15,11 +15,11 @@
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.fragment.constants.FragmentConstants;
-import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
 import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.renderer.FragmentRenderer;
-import com.liferay.fragment.renderer.FragmentRendererTracker;
+import com.liferay.fragment.renderer.FragmentRendererRegistry;
 import com.liferay.fragment.service.FragmentCompositionService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.info.item.InfoItemServiceRegistry;
@@ -117,14 +117,14 @@ public class UpdateFragmentsHighlightedConfigurationMVCActionCommand
 		}
 
 		FragmentRenderer fragmentRenderer =
-			_fragmentRendererTracker.getFragmentRenderer(fragmentEntryKey);
+			_fragmentRendererRegistry.getFragmentRenderer(fragmentEntryKey);
 
 		if (fragmentRenderer != null) {
 			return fragmentEntryKey;
 		}
 
 		FragmentEntry fragmentEntry =
-			_fragmentCollectionContributorTracker.getFragmentEntry(
+			_fragmentCollectionContributorRegistry.getFragmentEntry(
 				fragmentEntryKey);
 
 		if (fragmentEntry != null) {
@@ -132,7 +132,7 @@ public class UpdateFragmentsHighlightedConfigurationMVCActionCommand
 		}
 
 		FragmentComposition fragmentComposition =
-			_fragmentCollectionContributorTracker.getFragmentComposition(
+			_fragmentCollectionContributorRegistry.getFragmentComposition(
 				fragmentEntryKey);
 
 		if (fragmentComposition != null) {
@@ -238,7 +238,7 @@ public class UpdateFragmentsHighlightedConfigurationMVCActionCommand
 			}
 
 			FragmentRenderer fragmentRenderer =
-				_fragmentRendererTracker.getFragmentRenderer(key);
+				_fragmentRendererRegistry.getFragmentRenderer(key);
 
 			if (fragmentRenderer != null) {
 				String label = fragmentRenderer.getLabel(
@@ -291,7 +291,7 @@ public class UpdateFragmentsHighlightedConfigurationMVCActionCommand
 			}
 
 			FragmentComposition fragmentComposition =
-				_fragmentCollectionContributorTracker.getFragmentComposition(
+				_fragmentCollectionContributorRegistry.getFragmentComposition(
 					key);
 
 			if (fragmentComposition == null) {
@@ -479,8 +479,8 @@ public class UpdateFragmentsHighlightedConfigurationMVCActionCommand
 		UpdateFragmentsHighlightedConfigurationMVCActionCommand.class);
 
 	@Reference
-	private FragmentCollectionContributorTracker
-		_fragmentCollectionContributorTracker;
+	private FragmentCollectionContributorRegistry
+		_fragmentCollectionContributorRegistry;
 
 	@Reference
 	private FragmentCompositionService _fragmentCompositionService;
@@ -492,7 +492,7 @@ public class UpdateFragmentsHighlightedConfigurationMVCActionCommand
 	private FragmentEntryLocalService _fragmentEntryLocalService;
 
 	@Reference
-	private FragmentRendererTracker _fragmentRendererTracker;
+	private FragmentRendererRegistry _fragmentRendererRegistry;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

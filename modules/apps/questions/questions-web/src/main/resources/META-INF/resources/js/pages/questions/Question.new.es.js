@@ -18,6 +18,7 @@ import {ClayDropDownWithItems} from '@clayui/drop-down';
 import ClayEmptyState from '@clayui/empty-state';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import ClayTabs from '@clayui/tabs';
 import ClayUpperToolbar from '@clayui/upper-toolbar';
 import classNames from 'classnames';
@@ -68,6 +69,7 @@ import {
 	historyPushWithSlug,
 } from '../../utils/utils.es';
 import FlagsContainer from './components/FlagsContainer';
+import useActiviyQuestionKebabOptions from './hooks/useActivityQuestionKebabOptions.es';
 
 const tabs = [
 	{label: Liferay.Language.get('newest'), sortBy: 'dateCreated:desc'},
@@ -101,28 +103,36 @@ const Question = ({
 			block: 'start',
 		});
 
-	const context = useContext(AppContext);
-	const historyPushParser = historyPushWithSlug(history.push);
-
-	const [error, setError] = useState(null);
-	const [isPageScroll, setIsPageScroll] = useState(false);
 	const [activeIndex, setActiveIndex] = useState(0);
 
-	const editorRef = useRef('');
-
-	const [isModerate, setIsModerate] = useState(false);
-	const [isPostButtonDisable, setIsPostButtonDisable] = useState(true);
-	const [isVisibleEditor, setIsVisibleEditor] = useState(false);
-	const [showDeleteModalPanel, setShowDeleteModalPanel] = useState(false);
-
 	const [allowSubscription, setAllowSubscription] = useState(false);
-	const [page, setPage] = useState(1);
-	const [pageSize, setPageSize] = useState(20);
+	const [answers, setAnswers] = useState({});
+	const [createAnswer] = useMutation(createAnswerQuery);
+	const [error, setError] = useState(null);
+	const [isModerate, setIsModerate] = useState(false);
+	const [isPageScroll, setIsPageScroll] = useState(false);
+	const [isPostButtonDisable, setIsPostButtonDisable] = useState(true);
 
+	const [isVisibleEditor, setIsVisibleEditor] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [loadingAnswer, setLoadingAnswer] = useState(true);
+	const [page, setPage] = useState(1);
+	const [pageSize, setPageSize] = useState(20);
 	const [question, setQuestion] = useState({});
-	const [answers, setAnswers] = useState({});
+	const [showDeleteModalPanel, setShowDeleteModalPanel] = useState(false);
+	const [subscribe] = useMutation(subscribeQuery);
+	const context = useContext(AppContext);
+	const editorRef = useRef('');
+	const historyPushParser = historyPushWithSlug(history.push);
+
+	const {kebabOptions, setIsSubscribe} = useActiviyQuestionKebabOptions({
+		context,
+		question,
+		questionId,
+		sectionTitle,
+		setError,
+		setShowDeleteModalPanel,
+	});
 
 	const fetchMessages = useCallback(() => {
 		const sortBy = tabs[activeIndex].sortBy;
@@ -134,10 +144,16 @@ const Question = ({
 					setLoadingAnswer(false);
 				}
 			);
+
+			setIsSubscribe(question.subscribed);
 		}
-	}, [activeIndex, question, page, pageSize]);
+	}, [activeIndex, question, page, pageSize, setIsSubscribe]);
 
 	useEffect(() => {
+		if (!questionId) {
+			return;
+		}
+
 		getThread(questionId, context.siteKey)
 			.then(({data: {messageBoardThreadByFriendlyUrlPath}, error}) => {
 				if (error) {
@@ -148,7 +164,9 @@ const Question = ({
 						),
 						Liferay.Language.get('the-question-is-not-found')
 					);
+
 					setError(errorObject);
+
 					setLoading(false);
 				}
 				else {
@@ -187,6 +205,10 @@ const Question = ({
 	const questionVisited = context?.questionsVisited?.includes(question.id);
 
 	useEffect(() => {
+		setIsSubscribe(question.subscribed);
+	}, [question.subscribed, setIsSubscribe]);
+
+	useEffect(() => {
 		if (question.id && context?.questionsVisited && !questionVisited) {
 			context.setQuestionsVisited([
 				...context.questionsVisited,
@@ -194,9 +216,6 @@ const Question = ({
 			]);
 		}
 	}, [context, question, questionVisited]);
-
-	const [createAnswer] = useMutation(createAnswerQuery);
-	const [subscribe] = useMutation(subscribeQuery);
 
 	const onSubscription = useCallback(
 		async ({
@@ -388,7 +407,7 @@ const Question = ({
 
 			<div
 				className={classNames('', {
-					' c-mt-2': display.styled,
+					'c-mt-2': display.styled,
 					'c-mt-5': !display.styled,
 				})}
 			>
@@ -480,36 +499,10 @@ const Question = ({
 										</h1>
 
 										{display.kebab && (
-											<>
+											<ClayManagementToolbar.ItemList>
 												<ClayUpperToolbar.Item>
 													<ClayDropDownWithItems
-														items={[
-															{
-																label: Liferay.Language.get(
-																	'view-question'
-																),
-															},
-															{
-																label: Liferay.Language.get(
-																	'share'
-																),
-															},
-															{
-																label: Liferay.Language.get(
-																	'edit'
-																),
-															},
-															{
-																label: Liferay.Language.get(
-																	'unsubscribe'
-																),
-															},
-															{
-																label: Liferay.Language.get(
-																	'delete'
-																),
-															},
-														]}
+														items={kebabOptions}
 														trigger={
 															<ClayButtonWithIcon
 																displayType="unstyled"
@@ -519,7 +512,7 @@ const Question = ({
 														}
 													/>
 												</ClayUpperToolbar.Item>
-											</>
+											</ClayManagementToolbar.ItemList>
 										)}
 									</div>
 
@@ -532,8 +525,12 @@ const Question = ({
 											)}
 										/>
 
-										{`
-										/ ${lang.sub(Liferay.Language.get('viewed-x-times'), [question.viewCount])}`}
+										{`/ ${lang.sub(
+											Liferay.Language.get(
+												'viewed-x-times'
+											),
+											[question.viewCount]
+										)}`}
 									</p>
 								</div>
 
@@ -541,7 +538,7 @@ const Question = ({
 									<div className="col-md-5 text-right">
 										<ClayButton.Group
 											className="questions-actions"
-											spaced={true}
+											spaced
 										>
 											{display.actions &&
 												question.actions.subscribe && (
@@ -584,32 +581,20 @@ const Question = ({
 
 											{display.actions &&
 												question.actions.delete && (
-													<>
-														<DeleteQuestion
-															deleteModalVisibility={
-																showDeleteModalPanel
-															}
-															question={question}
-															setDeleteModalVisibility={
-																setShowDeleteModalPanel
-															}
-														/>
-
-														<ClayButton
-															data-tooltip-align="top"
-															displayType="secondary"
-															onClick={() =>
-																setShowDeleteModalPanel(
-																	true
-																)
-															}
-															title={Liferay.Language.get(
-																'delete'
-															)}
-														>
-															<ClayIcon symbol="trash" />
-														</ClayButton>
-													</>
+													<ClayButton
+														data-tooltip-align="top"
+														displayType="secondary"
+														onClick={() =>
+															setShowDeleteModalPanel(
+																true
+															)
+														}
+														title={Liferay.Language.get(
+															'delete'
+														)}
+													>
+														<ClayIcon symbol="trash" />
+													</ClayButton>
 												)}
 
 											<FlagsContainer
@@ -816,6 +801,12 @@ const Question = ({
 					/>
 				</Helmet>
 			)}
+
+			<DeleteQuestion
+				deleteModalVisibility={showDeleteModalPanel}
+				question={question}
+				setDeleteModalVisibility={setShowDeleteModalPanel}
+			/>
 		</section>
 	);
 };

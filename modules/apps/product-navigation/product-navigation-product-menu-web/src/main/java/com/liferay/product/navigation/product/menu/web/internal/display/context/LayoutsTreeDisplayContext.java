@@ -319,11 +319,18 @@ public class LayoutsTreeDisplayContext {
 			"config",
 			HashMapBuilder.<String, Object>put(
 				"loadMoreItemsURL",
-				() -> ResourceURLBuilder.createResourceURL(
-					_renderResponse
-				).setResourceID(
-					"/product_navigation_product_menu/get_layouts"
-				).buildString()
+				() -> {
+					LiferayPortletURL liferayPortletURL =
+						(LiferayPortletURL)ResourceURLBuilder.createResourceURL(
+							_renderResponse
+						).setResourceID(
+							"/product_navigation_product_menu/get_layouts"
+						).buildResourceURL();
+
+					liferayPortletURL.setCopyCurrentRenderParameters(false);
+
+					return liferayPortletURL.toString();
+				}
 			).put(
 				"maxPageSize",
 				GetterUtil.getInteger(
@@ -341,6 +348,17 @@ public class LayoutsTreeDisplayContext {
 				}
 			).put(
 				"namespace", getNamespace()
+			).put(
+				"stagingEnabled",
+				() -> {
+					Group scopeGroup = _themeDisplay.getScopeGroup();
+
+					if (scopeGroup.hasLocalOrRemoteStagingGroup()) {
+						return true;
+					}
+
+					return false;
+				}
 			).build()
 		).put(
 			"isPrivateLayoutsTree", isPrivateLayout()

@@ -38,7 +38,7 @@ import com.liferay.headless.delivery.resource.v1_0.KnowledgeBaseArticleResource;
 import com.liferay.headless.delivery.resource.v1_0.KnowledgeBaseFolderResource;
 import com.liferay.headless.delivery.resource.v1_0.StructuredContentFolderResource;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporter;
+import com.liferay.layout.importer.LayoutsImporter;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.util.LayoutCopyHelper;
@@ -133,11 +133,10 @@ public class SiteInitializerExtender
 				_knowledgeBaseArticleResourceFactory,
 				_knowledgeBaseFolderResourceFactory, _layoutCopyHelper,
 				_layoutLocalService, _layoutPageTemplateEntryLocalService,
-				_layoutPageTemplatesImporter,
 				_layoutPageTemplateStructureLocalService,
-				_layoutSetLocalService, _listTypeDefinitionResource,
-				_listTypeDefinitionResourceFactory, _listTypeEntryResource,
-				_listTypeEntryResourceFactory,
+				_layoutSetLocalService, _layoutsImporter,
+				_listTypeDefinitionResource, _listTypeDefinitionResourceFactory,
+				_listTypeEntryResource, _listTypeEntryResourceFactory,
 				_notificationTemplateResourceFactory, _objectActionLocalService,
 				_objectDefinitionLocalService, _objectDefinitionResourceFactory,
 				_objectRelationshipLocalService,
@@ -244,11 +243,10 @@ public class SiteInitializerExtender
 				_knowledgeBaseArticleResourceFactory,
 				_knowledgeBaseFolderResourceFactory, _layoutCopyHelper,
 				_layoutLocalService, _layoutPageTemplateEntryLocalService,
-				_layoutPageTemplatesImporter,
 				_layoutPageTemplateStructureLocalService,
-				_layoutSetLocalService, _listTypeDefinitionResource,
-				_listTypeDefinitionResourceFactory, _listTypeEntryResource,
-				_listTypeEntryResourceFactory,
+				_layoutSetLocalService, _layoutsImporter,
+				_listTypeDefinitionResource, _listTypeDefinitionResourceFactory,
+				_listTypeEntryResource, _listTypeEntryResourceFactory,
 				_notificationTemplateResourceFactory, _objectActionLocalService,
 				_objectDefinitionLocalService, _objectDefinitionResourceFactory,
 				_objectRelationshipLocalService,
@@ -355,14 +353,14 @@ public class SiteInitializerExtender
 		_layoutPageTemplateEntryLocalService;
 
 	@Reference
-	private LayoutPageTemplatesImporter _layoutPageTemplatesImporter;
-
-	@Reference
 	private LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
 
 	@Reference
 	private LayoutSetLocalService _layoutSetLocalService;
+
+	@Reference
+	private LayoutsImporter _layoutsImporter;
 
 	@Reference
 	private ListTypeDefinitionResource _listTypeDefinitionResource;

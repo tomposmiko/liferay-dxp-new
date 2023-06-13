@@ -16,19 +16,12 @@
 
 <%@ include file="/init.jsp" %>
 
-<liferay-ui:icon
-	id="importIcon"
-	message="import"
-	onClick='<%= liferayPortletResponse.getNamespace() + "openImportModal();" %>'
-	url="javascript:void(0);"
-/>
-
 <div>
 	<react:component
 		module="sxp_blueprint_admin/js/view_sxp_blueprints/ImportSXPBlueprintModal"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
-				"componentId", liferayPortletResponse.getNamespace() + "importModal"
+				"portletNamespace", liferayPortletResponse.getNamespace()
 			).put(
 				"redirectURL", currentURL
 			).build()
@@ -37,11 +30,14 @@
 </div>
 
 <aui:script>
-	function <portlet:namespace />openImportModal() {
-		Liferay.componentReady('<portlet:namespace />importModal').then(
-			(importModal) => {
-				importModal.open();
-			}
-		);
-	}
+	Liferay.Util.setPortletConfigurationIconAction(
+		'<portlet:namespace />importModal',
+		() => {
+			Liferay.componentReady('<portlet:namespace />importModal').then(
+				(importModal) => {
+					importModal.open();
+				}
+			);
+		}
+	);
 </aui:script>

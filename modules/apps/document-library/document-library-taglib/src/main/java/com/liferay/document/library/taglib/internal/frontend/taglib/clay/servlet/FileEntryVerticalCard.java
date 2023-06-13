@@ -18,19 +18,22 @@ import com.liferay.document.library.taglib.internal.display.context.RepositoryBr
 import com.liferay.document.library.util.DLURLHelperUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.VerticalCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,56 +44,23 @@ import javax.servlet.http.HttpServletRequest;
 public class FileEntryVerticalCard implements VerticalCard {
 
 	public FileEntryVerticalCard(
-			FileEntry fileEntry,
-			ModelResourcePermission<FileEntry> fileEntryModelResourcePermission,
-			HttpServletRequest httpServletRequest,
+			FileEntry fileEntry, HttpServletRequest httpServletRequest,
 			RepositoryBrowserTagDisplayContext
 				repositoryBrowserTagDisplayContext)
 		throws PortalException {
 
 		_fileEntry = fileEntry;
-		_fileEntryModelResourcePermission = fileEntryModelResourcePermission;
 		_httpServletRequest = httpServletRequest;
 		_repositoryBrowserTagDisplayContext =
 			repositoryBrowserTagDisplayContext;
 
 		_fileVersion = fileEntry.getFileVersion();
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
 	}
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
-		return DropdownItemListBuilder.add(
-			() -> _fileEntryModelResourcePermission.contains(
-				_themeDisplay.getPermissionChecker(), _fileEntry,
-				ActionKeys.UPDATE),
-			dropdownItem -> {
-				dropdownItem.putData("action", "rename");
-				dropdownItem.putData(
-					"renameURL",
-					_repositoryBrowserTagDisplayContext.getRenameFileEntryURL(
-						_fileEntry));
-				dropdownItem.putData("value", _fileEntry.getTitle());
-				dropdownItem.setIcon("pencil");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "rename"));
-			}
-		).add(
-			() -> _fileEntryModelResourcePermission.contains(
-				_themeDisplay.getPermissionChecker(), _fileEntry,
-				ActionKeys.DELETE),
-			dropdownItem -> {
-				dropdownItem.putData("action", "delete");
-				dropdownItem.putData(
-					"deleteURL",
-					_repositoryBrowserTagDisplayContext.getDeleteFileEntryURL(
-						_fileEntry));
-				dropdownItem.setIcon("trash");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "delete"));
-			}
-		).build();
+		return _repositoryBrowserTagDisplayContext.getActionDropdownItems(
+			_fileEntry);
 	}
 
 	@Override
@@ -136,17 +106,45 @@ public class FileEntryVerticalCard implements VerticalCard {
 	}
 
 	@Override
+	public List<LabelItem> getLabels() {
+		return LabelItemListBuilder.add(
+			labelItem -> labelItem.setStatus(
+				BeanPropertiesUtil.getInteger(
+					_fileEntry.getModel(), "status",
+					WorkflowConstants.STATUS_APPROVED))
+		).build();
+	}
+
+	@Override
+	public String getSubtitle() {
+		Date modifiedDate = _fileEntry.getModifiedDate();
+
+		String modifiedDateDescription = LanguageUtil.getTimeDescription(
+			_httpServletRequest,
+			System.currentTimeMillis() - modifiedDate.getTime(), true);
+
+		return LanguageUtil.format(
+			_httpServletRequest, "x-ago-by-x",
+			new Object[] {
+				modifiedDateDescription,
+				HtmlUtil.escape(_fileEntry.getUserName())
+			});
+	}
+
+	@Override
 	public String getTitle() {
 		return _fileEntry.getTitle();
 	}
 
+	@Override
+	public Boolean isFlushHorizontal() {
+		return true;
+	}
+
 	private final FileEntry _fileEntry;
-	private final ModelResourcePermission<FileEntry>
-		_fileEntryModelResourcePermission;
 	private final FileVersion _fileVersion;
 	private final HttpServletRequest _httpServletRequest;
 	private final RepositoryBrowserTagDisplayContext
 		_repositoryBrowserTagDisplayContext;
-	private final ThemeDisplay _themeDisplay;
 
 }

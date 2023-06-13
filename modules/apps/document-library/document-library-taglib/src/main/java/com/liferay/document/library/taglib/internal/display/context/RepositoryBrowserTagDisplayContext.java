@@ -19,12 +19,18 @@ import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
+import com.liferay.document.library.kernel.util.comparator.RepositoryModelModifiedDateComparator;
+import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
 import com.liferay.document.library.taglib.internal.frontend.taglib.clay.servlet.FileEntryVerticalCard;
 import com.liferay.document.library.taglib.internal.frontend.taglib.clay.servlet.FileShortcutVerticalCard;
 import com.liferay.document.library.taglib.internal.frontend.taglib.clay.servlet.FolderHorizontalCard;
+import com.liferay.document.library.util.DLURLHelperUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.HorizontalCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.VerticalCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.ManagementToolbarDisplayContext;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.ResultRow;
 import com.liferay.portal.kernel.dao.search.ResultRowSplitter;
@@ -38,6 +44,7 @@ import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.repository.model.RepositoryEntry;
 import com.liferay.portal.kernel.search.Hits;
@@ -47,11 +54,13 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.SearchResult;
 import com.liferay.portal.kernel.search.SearchResultUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -60,9 +69,11 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.portlet.PortletRequest;
 
@@ -101,6 +112,25 @@ public class RepositoryBrowserTagDisplayContext {
 			WebKeys.THEME_DISPLAY);
 	}
 
+	public List<DropdownItem> getActionDropdownItems(
+		RepositoryEntry repositoryEntry) {
+
+		if (repositoryEntry instanceof FileEntry) {
+			return _getActionDropdownItems((FileEntry)repositoryEntry);
+		}
+
+		if (repositoryEntry instanceof FileShortcut) {
+			return _getActionDropdownItems((FileShortcut)repositoryEntry);
+		}
+
+		if (repositoryEntry instanceof Folder) {
+			return _getActionDropdownItems((Folder)repositoryEntry);
+		}
+
+		throw new IllegalArgumentException(
+			"Invalid repository model " + repositoryEntry);
+	}
+
 	public Map<String, Object> getAdditionalProps() {
 		return HashMapBuilder.<String, Object>put(
 			"repositoryBrowserURL", _getRepositoryBrowserURL()
@@ -132,21 +162,15 @@ public class RepositoryBrowserTagDisplayContext {
 		return breadcrumbEntries;
 	}
 
-	public String getDeleteFileEntryURL(FileEntry fileEntry) {
-		return HttpComponentsUtil.addParameter(
-			_getRepositoryBrowserURL(), "fileEntryId",
-			fileEntry.getFileEntryId());
-	}
+	public String getDisplayStyle() {
+		if (_displayStyle != null) {
+			return _displayStyle;
+		}
 
-	public String getDeleteFileShortcutURL(FileShortcut fileShortcut) {
-		return HttpComponentsUtil.addParameter(
-			_getRepositoryBrowserURL(), "fileShortcutId",
-			fileShortcut.getFileShortcutId());
-	}
+		_displayStyle = ParamUtil.getString(
+			_httpServletRequest, "displayStyle", "icon");
 
-	public String getDeleteFolderURL(Folder folder) {
-		return HttpComponentsUtil.addParameter(
-			_getRepositoryBrowserURL(), "folderId", folder.getFolderId());
+		return _displayStyle;
 	}
 
 	public String getFolderURL(Folder folder) {
@@ -161,9 +185,7 @@ public class RepositoryBrowserTagDisplayContext {
 				"Invalid repository model " + repositoryEntry);
 		}
 
-		return new FolderHorizontalCard(
-			(Folder)repositoryEntry, _folderModelResourcePermission,
-			_httpServletRequest, this);
+		return new FolderHorizontalCard((Folder)repositoryEntry, this);
 	}
 
 	public ManagementToolbarDisplayContext getManagementToolbarDisplayContext()
@@ -175,17 +197,6 @@ public class RepositoryBrowserTagDisplayContext {
 			getSearchContainer());
 	}
 
-	public String getRenameFileEntryURL(FileEntry fileEntry) {
-		return HttpComponentsUtil.addParameter(
-			_getRepositoryBrowserURL(), "fileEntryId",
-			fileEntry.getFileEntryId());
-	}
-
-	public String getRenameFolderURL(Folder folder) {
-		return HttpComponentsUtil.addParameter(
-			_getRepositoryBrowserURL(), "folderId", folder.getFolderId());
-	}
-
 	public Map<String, Object> getRepositoryBrowserComponentContext() {
 		return HashMapBuilder.<String, Object>put(
 			"parentFolderId", String.valueOf(_folderId)
@@ -194,6 +205,83 @@ public class RepositoryBrowserTagDisplayContext {
 		).put(
 			"repositoryId", String.valueOf(_repositoryId)
 		).build();
+	}
+
+	public String getRepositoryEntryIcon(RepositoryEntry repositoryEntry) {
+		if (repositoryEntry instanceof FileEntry) {
+			return "documents-and-media";
+		}
+
+		if (repositoryEntry instanceof FileShortcut) {
+			return "shortcut";
+		}
+
+		if (repositoryEntry instanceof Folder) {
+			return "folder";
+		}
+
+		throw new IllegalArgumentException(
+			"Repository entry model not a file entry, file shortcut or folder" +
+				repositoryEntry);
+	}
+
+	public String getRepositoryEntryModifiedDateDescription(
+		RepositoryEntry repositoryEntry) {
+
+		Date modifiedDate = repositoryEntry.getModifiedDate();
+
+		return LanguageUtil.getTimeDescription(
+			_httpServletRequest,
+			System.currentTimeMillis() - modifiedDate.getTime(), true);
+	}
+
+	public String getRepositoryEntrySizeValue(RepositoryEntry repositoryEntry)
+		throws PortalException {
+
+		if (repositoryEntry instanceof Folder) {
+			return StringPool.BLANK;
+		}
+
+		FileEntry fileEntry = _getFileEntry(repositoryEntry);
+
+		return LanguageUtil.formatStorageSize(
+			fileEntry.getSize(), _themeDisplay.getLocale());
+	}
+
+	public String getRepositoryEntryThumbnailSrc(
+			RepositoryEntry repositoryEntry)
+		throws Exception {
+
+		return DLURLHelperUtil.getThumbnailSrc(
+			(FileEntry)repositoryEntry, _themeDisplay);
+	}
+
+	public String getRepositoryEntryTitle(RepositoryEntry repositoryEntry) {
+		if (repositoryEntry instanceof FileEntry) {
+			FileEntry fileEntry = (FileEntry)repositoryEntry;
+
+			return fileEntry.getTitle();
+		}
+
+		if (repositoryEntry instanceof FileShortcut) {
+			FileShortcut fileShortcut = (FileShortcut)repositoryEntry;
+
+			return fileShortcut.getToTitle();
+		}
+
+		if (repositoryEntry instanceof Folder) {
+			Folder folder = (Folder)repositoryEntry;
+
+			return folder.getName();
+		}
+
+		throw new IllegalArgumentException(
+			"Repository entry model not a file entry, file shortcut or folder" +
+				repositoryEntry);
+	}
+
+	public String getRepositoryEntryURL(RepositoryEntry repositoryEntry) {
+		return getFolderURL((Folder)repositoryEntry);
 	}
 
 	public ResultRowSplitter getResultRowSplitter() {
@@ -251,19 +339,53 @@ public class RepositoryBrowserTagDisplayContext {
 
 		if (repositoryEntry instanceof FileEntry) {
 			return new FileEntryVerticalCard(
-				(FileEntry)repositoryEntry, _fileEntryModelResourcePermission,
-				_httpServletRequest, this);
+				(FileEntry)repositoryEntry, _httpServletRequest, this);
 		}
 
 		if (repositoryEntry instanceof FileShortcut) {
 			return new FileShortcutVerticalCard(
-				(FileShortcut)repositoryEntry,
-				_fileShortcutModelResourcePermission, _httpServletRequest,
-				this);
+				(FileShortcut)repositoryEntry, _httpServletRequest, this);
 		}
 
 		throw new IllegalArgumentException(
 			"Invalid repository model " + repositoryEntry);
+	}
+
+	public boolean isDescriptiveDisplayStyle() {
+		if (Objects.equals(getDisplayStyle(), "descriptive")) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isIconDisplayStyle() {
+		if (Objects.equals(getDisplayStyle(), "icon")) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isRepositoryEntryNavigable(RepositoryEntry repositoryEntry) {
+		if (repositoryEntry instanceof Folder) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isRepositoryEntryThumbnailAvailable(
+			RepositoryEntry repositoryEntry)
+		throws Exception {
+
+		if (!(repositoryEntry instanceof FileEntry) ||
+			Validator.isNull(getRepositoryEntryThumbnailSrc(repositoryEntry))) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	public boolean isVerticalCard(RepositoryEntry repositoryEntry) {
@@ -285,6 +407,97 @@ public class RepositoryBrowserTagDisplayContext {
 		return breadcrumbEntry;
 	}
 
+	private List<DropdownItem> _getActionDropdownItems(FileEntry fileEntry) {
+		return DropdownItemListBuilder.add(
+			() -> _fileEntryModelResourcePermission.contains(
+				_themeDisplay.getPermissionChecker(), fileEntry,
+				ActionKeys.UPDATE),
+			dropdownItem -> {
+				dropdownItem.putData("action", "rename");
+				dropdownItem.putData(
+					"renameURL", _getRenameFileEntryURL(fileEntry));
+				dropdownItem.putData("value", fileEntry.getTitle());
+				dropdownItem.setIcon("pencil");
+				dropdownItem.setLabel(
+					LanguageUtil.get(_httpServletRequest, "rename"));
+			}
+		).add(
+			() -> _fileEntryModelResourcePermission.contains(
+				_themeDisplay.getPermissionChecker(), fileEntry,
+				ActionKeys.DELETE),
+			dropdownItem -> {
+				dropdownItem.putData("action", "delete");
+				dropdownItem.putData(
+					"deleteURL", _getDeleteFileEntryURL(fileEntry));
+				dropdownItem.setIcon("trash");
+				dropdownItem.setLabel(
+					LanguageUtil.get(_httpServletRequest, "delete"));
+			}
+		).build();
+	}
+
+	private List<DropdownItem> _getActionDropdownItems(
+		FileShortcut fileShortcut) {
+
+		return DropdownItemListBuilder.add(
+			() -> _fileShortcutModelResourcePermission.contains(
+				_themeDisplay.getPermissionChecker(), fileShortcut,
+				ActionKeys.DELETE),
+			dropdownItem -> {
+				dropdownItem.putData("action", "delete");
+				dropdownItem.putData(
+					"deleteURL", _getDeleteFileShortcutURL(fileShortcut));
+				dropdownItem.setIcon("trash");
+				dropdownItem.setLabel(
+					LanguageUtil.get(_httpServletRequest, "delete"));
+			}
+		).build();
+	}
+
+	private List<DropdownItem> _getActionDropdownItems(Folder folder) {
+		return DropdownItemListBuilder.add(
+			() -> _folderModelResourcePermission.contains(
+				_themeDisplay.getPermissionChecker(), folder,
+				ActionKeys.UPDATE),
+			dropdownItem -> {
+				dropdownItem.putData("action", "rename");
+				dropdownItem.putData("renameURL", _getRenameFolderURL(folder));
+				dropdownItem.putData("value", folder.getName());
+				dropdownItem.setIcon("pencil");
+				dropdownItem.setLabel(
+					LanguageUtil.get(_httpServletRequest, "rename"));
+			}
+		).add(
+			() -> _folderModelResourcePermission.contains(
+				_themeDisplay.getPermissionChecker(), folder,
+				ActionKeys.DELETE),
+			dropdownItem -> {
+				dropdownItem.putData("action", "delete");
+				dropdownItem.putData("deleteURL", _getDeleteFolderURL(folder));
+				dropdownItem.setIcon("trash");
+				dropdownItem.setLabel(
+					LanguageUtil.get(_httpServletRequest, "delete"));
+			}
+		).build();
+	}
+
+	private String _getDeleteFileEntryURL(FileEntry fileEntry) {
+		return HttpComponentsUtil.addParameter(
+			_getRepositoryBrowserURL(), "fileEntryId",
+			fileEntry.getFileEntryId());
+	}
+
+	private String _getDeleteFileShortcutURL(FileShortcut fileShortcut) {
+		return HttpComponentsUtil.addParameter(
+			_getRepositoryBrowserURL(), "fileShortcutId",
+			fileShortcut.getFileShortcutId());
+	}
+
+	private String _getDeleteFolderURL(Folder folder) {
+		return HttpComponentsUtil.addParameter(
+			_getRepositoryBrowserURL(), "folderId", folder.getFolderId());
+	}
+
 	private SearchContainer<Object> _getDLSearchContainer()
 		throws PortalException {
 
@@ -294,11 +507,19 @@ public class RepositoryBrowserTagDisplayContext {
 				_liferayPortletRequest, _liferayPortletResponse),
 			null, "there-are-no-documents-in-this-folder");
 
+		searchContainer.setOrderByCol(
+			ParamUtil.getString(
+				_httpServletRequest, searchContainer.getOrderByColParam()));
+		searchContainer.setOrderByType(
+			ParamUtil.getString(
+				_httpServletRequest, searchContainer.getOrderByTypeParam()));
+
 		searchContainer.setResultsAndTotal(
 			() -> DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcuts(
 				_repositoryId, _folderId, WorkflowConstants.STATUS_APPROVED,
 				null, false, false, searchContainer.getStart(),
-				searchContainer.getEnd(), null),
+				searchContainer.getEnd(),
+				_getOrderByComparator(searchContainer)),
 			DLAppServiceUtil.getFoldersAndFileEntriesAndFileShortcutsCount(
 				_repositoryId, _folderId, WorkflowConstants.STATUS_APPROVED,
 				null, false, false));
@@ -306,6 +527,20 @@ public class RepositoryBrowserTagDisplayContext {
 			new EmptyOnClickRowChecker(_liferayPortletResponse));
 
 		return searchContainer;
+	}
+
+	private FileEntry _getFileEntry(RepositoryEntry repositoryEntry)
+		throws PortalException {
+
+		if (repositoryEntry instanceof FileEntry) {
+			return (FileEntry)repositoryEntry;
+		}
+
+		FileShortcut fileShortcut = (FileShortcut)repositoryEntry;
+
+		FileVersion fileVersion = fileShortcut.getFileVersion();
+
+		return fileVersion.getFileEntry();
 	}
 
 	private String _getFolderURL(long folderId) {
@@ -338,6 +573,37 @@ public class RepositoryBrowserTagDisplayContext {
 		searchContext.setStart(searchContainer.getStart());
 
 		return DLAppServiceUtil.search(_repositoryId, searchContext);
+	}
+
+	private OrderByComparator<?> _getOrderByComparator(
+		SearchContainer<Object> searchContainer) {
+
+		boolean ascending = false;
+
+		if (Objects.equals(searchContainer.getOrderByType(), "asc")) {
+			ascending = true;
+		}
+
+		if (Objects.equals(searchContainer.getOrderByCol(), "modified-date")) {
+			return new RepositoryModelModifiedDateComparator<>(ascending);
+		}
+
+		if (Objects.equals(searchContainer.getOrderByCol(), "title")) {
+			return new RepositoryModelTitleComparator<>(ascending);
+		}
+
+		return null;
+	}
+
+	private String _getRenameFileEntryURL(FileEntry fileEntry) {
+		return HttpComponentsUtil.addParameter(
+			_getRepositoryBrowserURL(), "fileEntryId",
+			fileEntry.getFileEntryId());
+	}
+
+	private String _getRenameFolderURL(Folder folder) {
+		return HttpComponentsUtil.addParameter(
+			_getRepositoryBrowserURL(), "folderId", folder.getFolderId());
 	}
 
 	private String _getRepositoryBrowserURL() {
@@ -410,6 +676,7 @@ public class RepositoryBrowserTagDisplayContext {
 		return searchContainer;
 	}
 
+	private String _displayStyle;
 	private final DLAppService _dlAppService;
 	private final ModelResourcePermission<FileEntry>
 		_fileEntryModelResourcePermission;

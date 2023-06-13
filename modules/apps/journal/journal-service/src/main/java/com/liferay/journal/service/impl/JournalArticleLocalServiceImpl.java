@@ -100,14 +100,13 @@ import com.liferay.journal.util.comparator.ArticleIDComparator;
 import com.liferay.journal.util.comparator.ArticleVersionComparator;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderRegistry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.petra.sql.dsl.DSLFunctionFactoryUtil;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.petra.xml.XMLUtil;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -1355,7 +1354,9 @@ public class JournalArticleLocalServiceImpl
 
 		// Trash
 
-		if (article.isInTrash() && (article.getTrashEntry() != null)) {
+		if (article.isInTrash() &&
+			(_trashHelper.getTrashEntry(article) != null)) {
+
 			_trashVersionLocalService.deleteTrashVersion(
 				JournalArticle.class.getName(), article.getId());
 		}
@@ -1638,7 +1639,9 @@ public class JournalArticleLocalServiceImpl
 					articleResources.add(articleResource);
 				}
 
-				if (includeTrashedEntries || !article.isInTrashExplicitly()) {
+				if (includeTrashedEntries ||
+					!_trashHelper.isInTrashExplicitly(article)) {
+
 					journalArticleLocalService.deleteArticle(
 						article, null, null);
 				}
@@ -4130,7 +4133,7 @@ public class JournalArticleLocalServiceImpl
 				RestoreEntryException.INVALID_STATUS);
 		}
 
-		if (article.isInTrashExplicitly()) {
+		if (_trashHelper.isInTrashExplicitly(article)) {
 			article = restoreArticleFromTrash(userId, article);
 		}
 		else {
@@ -7675,10 +7678,13 @@ public class JournalArticleLocalServiceImpl
 
 			format(user, groupId, article, document.getRootElement());
 
-			content = XMLUtil.formatXML(document);
+			content = document.formattedString(StringPool.DOUBLE_SPACE);
 		}
 		catch (DocumentException documentException) {
 			_log.error(documentException);
+		}
+		catch (IOException ioException) {
+			throw new SystemException(ioException);
 		}
 
 		return content;
@@ -9001,7 +9007,7 @@ public class JournalArticleLocalServiceImpl
 		Map<String, String> friendlyURLMap = new HashMap<>();
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
-			_layoutDisplayPageProviderTracker.
+			_layoutDisplayPageProviderRegistry.
 				getLayoutDisplayPageProviderByClassName(
 					JournalArticle.class.getName());
 
@@ -9490,7 +9496,8 @@ public class JournalArticleLocalServiceImpl
 	private Language _language;
 
 	@Reference
-	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
+	private LayoutDisplayPageProviderRegistry
+		_layoutDisplayPageProviderRegistry;
 
 	@Reference
 	private LayoutPageTemplateEntryLocalService

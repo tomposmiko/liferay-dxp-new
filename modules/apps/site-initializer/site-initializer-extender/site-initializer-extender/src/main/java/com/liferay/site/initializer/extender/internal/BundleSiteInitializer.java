@@ -69,7 +69,7 @@ import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporter;
+import com.liferay.layout.importer.LayoutsImporter;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
@@ -229,7 +229,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		LayoutCopyHelper layoutCopyHelper,
 		LayoutLocalService layoutLocalService,
 		LayoutPageTemplateEntryLocalService layoutPageTemplateEntryLocalService,
-		LayoutPageTemplatesImporter layoutPageTemplatesImporter,
+		LayoutsImporter layoutsImporter,
 		LayoutPageTemplateStructureLocalService
 			layoutPageTemplateStructureLocalService,
 		LayoutSetLocalService layoutSetLocalService,
@@ -295,7 +295,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_layoutLocalService = layoutLocalService;
 		_layoutPageTemplateEntryLocalService =
 			layoutPageTemplateEntryLocalService;
-		_layoutPageTemplatesImporter = layoutPageTemplatesImporter;
+		_layoutsImporter = layoutsImporter;
 		_layoutPageTemplateStructureLocalService =
 			layoutPageTemplateStructureLocalService;
 		_layoutSetLocalService = layoutSetLocalService;
@@ -470,20 +470,13 @@ public class BundleSiteInitializer implements SiteInitializer {
 			Map<String, String> listTypeDefinitionIdsStringUtilReplaceValues =
 				_invoke(() -> _addOrUpdateListTypeDefinitions(serviceContext));
 
-			ObjectDefinitionResource.Builder objectDefinitionResourceBuilder =
-				_objectDefinitionResourceFactory.create();
-
-			ObjectDefinitionResource objectDefinitionResource =
-				objectDefinitionResourceBuilder.user(
-					serviceContext.fetchUser()
-				).build();
-
 			Map<String, String>
 				objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues =
 					_invoke(
 						() -> _addObjectDefinitions(
+							documentsStringUtilReplaceValues,
 							listTypeDefinitionIdsStringUtilReplaceValues,
-							objectDefinitionResource, serviceContext,
+							serviceContext,
 							siteNavigationMenuItemSettingsBuilder));
 
 			_invoke(
@@ -759,11 +752,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 					});
 
 				zipWriter.addEntry(
-					StringUtil.removeFirst(fileName, parentResourcePath), json);
+					_removeFirst(fileName, parentResourcePath), json);
 			}
 			else {
 				zipWriter.addEntry(
-					StringUtil.removeFirst(fileName, parentResourcePath),
+					_removeFirst(fileName, parentResourcePath),
 					url.openStream());
 			}
 		}
@@ -872,13 +865,13 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 					for (int i = 0; i < jsonArray.length(); i++) {
 						if (segmentsExperienceId == 0) {
-							_layoutPageTemplatesImporter.importPageElement(
+							_layoutsImporter.importPageElement(
 								draftLayout, layoutStructure,
 								layoutStructure.getMainItemId(),
 								jsonArray.getString(i), i);
 						}
 						else {
-							_layoutPageTemplatesImporter.importPageElement(
+							_layoutsImporter.importPageElement(
 								draftLayout, layoutStructure,
 								layoutStructure.getMainItemId(),
 								jsonArray.getString(i), i,
@@ -1008,19 +1001,19 @@ public class BundleSiteInitializer implements SiteInitializer {
 				}
 
 				zipWriter.addEntry(
-					StringUtil.removeFirst(
+					_removeFirst(
 						urlPath, "/site-initializer/layout-page-templates"),
 					json);
 			}
 			else {
 				zipWriter.addEntry(
-					StringUtil.removeFirst(
+					_removeFirst(
 						urlPath, "/site-initializer/layout-page-templates"),
 					url.openStream());
 			}
 		}
 
-		_layoutPageTemplatesImporter.importFile(
+		_layoutsImporter.importFile(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 			zipWriter.getFile(), true);
 	}
@@ -1054,8 +1047,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 	}
 
 	private Map<String, String> _addObjectDefinitions(
+			Map<String, String> documentsStringUtilReplaceValues,
 			Map<String, String> listTypeDefinitionIdsStringUtilReplaceValues,
-			ObjectDefinitionResource objectDefinitionResource,
 			ServiceContext serviceContext,
 			SiteNavigationMenuItemSettingsBuilder
 				siteNavigationMenuItemSettingsBuilder)
@@ -1083,6 +1076,14 @@ public class BundleSiteInitializer implements SiteInitializer {
 				"OBJECT_DEFINITION_ID:" + objectDefinition.getName(),
 				String.valueOf(objectDefinition.getObjectDefinitionId()));
 		}
+
+		ObjectDefinitionResource.Builder objectDefinitionResourceBuilder =
+			_objectDefinitionResourceFactory.create();
+
+		ObjectDefinitionResource objectDefinitionResource =
+			objectDefinitionResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
 
 		for (String resourcePath : resourcePaths) {
 			if (resourcePath.endsWith(".object-actions.json")) {
@@ -1177,7 +1178,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 		Map<String, String> objectEntryIdsStringUtilReplaceValues = _invoke(
 			() -> _addOrUpdateObjectEntries(
-				serviceContext, siteNavigationMenuItemSettingsBuilder));
+				documentsStringUtilReplaceValues, serviceContext,
+				siteNavigationMenuItemSettingsBuilder));
 
 		return HashMapBuilder.putAll(
 			objectDefinitionIdsStringUtilReplaceValues
@@ -2462,6 +2464,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 	}
 
 	private Map<String, String> _addOrUpdateObjectEntries(
+			Map<String, String> documentsStringUtilReplaceValues,
 			ServiceContext serviceContext,
 			SiteNavigationMenuItemSettingsBuilder
 				siteNavigationMenuItemSettingsBuilder)
@@ -2492,7 +2495,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 				continue;
 			}
 
-			json = _replace(json, objectEntryIdsStringUtilReplaceValues);
+			json = _replace(
+				json, documentsStringUtilReplaceValues,
+				objectEntryIdsStringUtilReplaceValues);
 
 			JSONObject jsonObject = _jsonFactory.createJSONObject(json);
 
@@ -3533,7 +3538,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		throws Exception {
 
 		String json = SiteInitializerUtil.read(
-			"site-initializer/site-settings.json", _servletContext);
+			"/site-initializer/site-settings.json", _servletContext);
 
 		if (json == null) {
 			return;
@@ -3585,8 +3590,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			}
 
 			zipWriter.addEntry(
-				StringUtil.removeFirst(
-					fileName, "/site-initializer/style-books/"),
+				_removeFirst(fileName, "/site-initializer/style-books/"),
 				url.openStream());
 		}
 
@@ -4069,6 +4073,12 @@ public class BundleSiteInitializer implements SiteInitializer {
 		return t;
 	}
 
+	private String _removeFirst(String s, String oldSub) {
+		int index = s.indexOf(oldSub);
+
+		return s.substring(index + oldSub.length());
+	}
+
 	private String _replace(
 		String s, Map<String, String>... stringUtilReplaceValuesArray) {
 
@@ -4326,10 +4336,10 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final LayoutLocalService _layoutLocalService;
 	private final LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
-	private final LayoutPageTemplatesImporter _layoutPageTemplatesImporter;
 	private final LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
 	private final LayoutSetLocalService _layoutSetLocalService;
+	private final LayoutsImporter _layoutsImporter;
 	private final ListTypeDefinitionResource _listTypeDefinitionResource;
 	private final ListTypeDefinitionResource.Factory
 		_listTypeDefinitionResourceFactory;

@@ -71,10 +71,12 @@ export default function ({
 	model,
 	modelTimeout = '',
 	namespace = '',
-	sentenceTransformProvider = SENTENCE_TRANSFORM_PROVIDER_TYPES.HUGGING_FACE,
+	sentenceTransformProvider = SENTENCE_TRANSFORM_PROVIDER_TYPES.HUGGING_FACE_INFERENCE_API,
 	sentenceTransformerEnabled,
 	textTruncationStrategy,
 	txtaiHostAddress,
+	txtaiPassword,
+	txtaiUsername,
 }) {
 	const _handleFormikValidate = (values) => {
 		const errors = {};
@@ -161,7 +163,7 @@ export default function ({
 		if (
 			values.modelTimeout === '' &&
 			values.sentenceTransformProvider ===
-				SENTENCE_TRANSFORM_PROVIDER_TYPES.HUGGING_FACE
+				SENTENCE_TRANSFORM_PROVIDER_TYPES.HUGGING_FACE_INFERENCE_API
 		) {
 			errors.modelTimeout = Liferay.Language.get(
 				'this-field-is-required'
@@ -205,8 +207,11 @@ export default function ({
 			sentenceTransformerEnabled,
 			textTruncationStrategy,
 			txtaiHostAddress,
+			txtaiPassword,
+			txtaiUsername,
 		},
 		validate: _handleFormikValidate,
+		validateOnMount: true,
 	});
 
 	const _handleCheckboxChange = (name) => (event) => {
@@ -260,21 +265,48 @@ export default function ({
 
 				{formik.values.sentenceTransformProvider ===
 					SENTENCE_TRANSFORM_PROVIDER_TYPES.TXTAI && (
-					<Input
-						error={formik.errors.txtaiHostAddress}
-						helpText={Liferay.Language.get(
-							'sentence-transformer-txtai-host-address-help'
-						)}
-						label={Liferay.Language.get('txtai-host-address')}
-						name={`${namespace}txtaiHostAddress`}
-						onBlur={_handleInputBlur('txtaiHostAddress')}
-						onChange={_handleInputChange('txtaiHostAddress')}
-						value={formik.values.txtaiHostAddress}
-					/>
+					<>
+						<Input
+							error={formik.errors.txtaiHostAddress}
+							helpText={Liferay.Language.get(
+								'sentence-transformer-txtai-host-address-help'
+							)}
+							label={Liferay.Language.get('txtai-host-address')}
+							name={`${namespace}txtaiHostAddress`}
+							onBlur={_handleInputBlur('txtaiHostAddress')}
+							onChange={_handleInputChange('txtaiHostAddress')}
+							value={formik.values.txtaiHostAddress}
+						/>
+
+						<Input
+							error={formik.errors.txtaiUsername}
+							helpText={Liferay.Language.get(
+								'sentence-transformer-txtai-username-help'
+							)}
+							label={Liferay.Language.get('username')}
+							name={`${namespace}txtaiUsername`}
+							onBlur={_handleInputBlur('txtaiUsername')}
+							onChange={_handleInputChange('txtaiUsername')}
+							value={formik.values.txtaiUsername}
+						/>
+
+						<Input
+							error={formik.errors.txtaiPassword}
+							helpText={Liferay.Language.get(
+								'sentence-transformer-txtai-password-help'
+							)}
+							label={Liferay.Language.get('password')}
+							name={`${namespace}txtaiPassword`}
+							onBlur={_handleInputBlur('txtaiPassword')}
+							onChange={_handleInputChange('txtaiPassword')}
+							type="password"
+							value={formik.values.txtaiPassword}
+						/>
+					</>
 				)}
 
 				{formik.values.sentenceTransformProvider ===
-					SENTENCE_TRANSFORM_PROVIDER_TYPES.HUGGING_FACE && (
+					SENTENCE_TRANSFORM_PROVIDER_TYPES.HUGGING_FACE_INFERENCE_API && (
 					<>
 						<Input
 							error={formik.errors.huggingFaceAccessToken}
@@ -372,6 +404,7 @@ export default function ({
 						formik.values.embeddingVectorDimensions
 					}
 					enableGPU={formik.values.enableGPU}
+					errors={formik.errors}
 					huggingFaceAccessToken={
 						formik.values.huggingFaceAccessToken
 					}

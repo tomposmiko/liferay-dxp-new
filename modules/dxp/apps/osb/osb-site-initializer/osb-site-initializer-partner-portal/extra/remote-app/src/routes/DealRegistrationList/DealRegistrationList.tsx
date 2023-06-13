@@ -18,9 +18,9 @@ import Table from '../../common/components/Table';
 import {DealRegistrationColumnKey} from '../../common/enums/dealRegistrationColumnKey';
 import {PRMPageRoute} from '../../common/enums/prmPageRoute';
 import useLiferayNavigate from '../../common/hooks/useLiferayNavigate';
+import usePagination from '../../common/hooks/usePagination';
 import {DealRegistrationListItem} from '../../common/interfaces/dealRegistrationListItem';
 import {Liferay} from '../../common/services/liferay';
-import usePagination from '../MDFRequestList/hooks/usePagination';
 import useGetListItemsFromDealRegistration from './hooks/useGetListItemsFromDealRegistration';
 type DealRegistrationItem = {
 	[key in DealRegistrationColumnKey]?: any;
@@ -46,6 +46,22 @@ const DealRegistrationList = () => {
 		{
 			columnKey: DealRegistrationColumnKey.END_DATE,
 			label: 'End Date',
+		},
+		{
+			columnKey: DealRegistrationColumnKey.DEAL_AMOUNT,
+			label: 'Amount',
+		},
+		{
+			columnKey: DealRegistrationColumnKey.PARTNER_REP,
+			label: 'Partner Rep',
+		},
+		{
+			columnKey: DealRegistrationColumnKey.LIFERAY_REP,
+			label: 'Liferay Rep',
+		},
+		{
+			columnKey: DealRegistrationColumnKey.STAGE,
+			label: 'Stage',
 		},
 	];
 
@@ -84,7 +100,7 @@ const DealRegistrationList = () => {
 	};
 
 	return (
-		<div className="border-0 pb-3 pt-5 px-6 sheet">
+		<div className="border-0 my-4">
 			<h1>Partner Deal Registration</h1>
 
 			<div className="bg-neutral-1 d-flex justify-content-end p-3 rounded">

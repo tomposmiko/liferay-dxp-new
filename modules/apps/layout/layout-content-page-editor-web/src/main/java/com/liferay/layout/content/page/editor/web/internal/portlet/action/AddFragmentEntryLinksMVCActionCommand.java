@@ -14,17 +14,17 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
-import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
 import com.liferay.fragment.exception.NoSuchEntryException;
 import com.liferay.fragment.listener.FragmentEntryLinkListener;
-import com.liferay.fragment.listener.FragmentEntryLinkListenerTracker;
+import com.liferay.fragment.listener.FragmentEntryLinkListenerRegistry;
 import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentCompositionService;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkManager;
 import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
-import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporter;
+import com.liferay.layout.importer.LayoutsImporter;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -98,7 +98,7 @@ public class AddFragmentEntryLinksMVCActionCommand
 			actionRequest, "fragmentEntryKey");
 
 		FragmentComposition fragmentComposition =
-			_fragmentCollectionContributorTracker.getFragmentComposition(
+			_fragmentCollectionContributorRegistry.getFragmentComposition(
 				fragmentEntryKey);
 
 		if (fragmentComposition == null) {
@@ -126,13 +126,13 @@ public class AddFragmentEntryLinksMVCActionCommand
 		int position = ParamUtil.getInteger(actionRequest, "position");
 
 		List<FragmentEntryLink> fragmentEntryLinks =
-			_layoutPageTemplatesImporter.importPageElement(
+			_layoutsImporter.importPageElement(
 				themeDisplay.getLayout(), layoutStructure, parentItemId,
 				fragmentComposition.getData(), position, segmentsExperienceId);
 
 		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
 			for (FragmentEntryLinkListener fragmentEntryLinkListener :
-					_fragmentEntryLinkListenerTracker.
+					_fragmentEntryLinkListenerRegistry.
 						getFragmentEntryLinkListeners()) {
 
 				fragmentEntryLinkListener.onAddFragmentEntryLink(
@@ -176,14 +176,15 @@ public class AddFragmentEntryLinksMVCActionCommand
 	}
 
 	@Reference
-	private FragmentCollectionContributorTracker
-		_fragmentCollectionContributorTracker;
+	private FragmentCollectionContributorRegistry
+		_fragmentCollectionContributorRegistry;
 
 	@Reference
 	private FragmentCompositionService _fragmentCompositionService;
 
 	@Reference
-	private FragmentEntryLinkListenerTracker _fragmentEntryLinkListenerTracker;
+	private FragmentEntryLinkListenerRegistry
+		_fragmentEntryLinkListenerRegistry;
 
 	@Reference
 	private FragmentEntryLinkManager _fragmentEntryLinkManager;
@@ -195,7 +196,7 @@ public class AddFragmentEntryLinksMVCActionCommand
 	private Language _language;
 
 	@Reference
-	private LayoutPageTemplatesImporter _layoutPageTemplatesImporter;
+	private LayoutsImporter _layoutsImporter;
 
 	@Reference
 	private Portal _portal;

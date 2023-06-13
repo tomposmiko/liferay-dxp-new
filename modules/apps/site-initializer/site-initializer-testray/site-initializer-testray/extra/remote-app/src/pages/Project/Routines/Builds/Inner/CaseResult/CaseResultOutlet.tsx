@@ -25,10 +25,14 @@ import useHeader from '../../../../../../hooks/useHeader';
 import i18n from '../../../../../../i18n';
 import {
 	TestrayBuild,
+	TestrayCaseResult,
 	TestrayProject,
 	TestrayRoutine,
+	liferayMessageBoardImpl,
 	testrayCaseResultImpl,
 } from '../../../../../../services/rest';
+import {testrayCaseResultsIssuesImpl} from '../../../../../../services/rest/TestrayCaseresultsIssues';
+import {searchUtil} from '../../../../../../util/search';
 import useCaseResultActions from './useCaseResultActions';
 
 type OutletContext = {
@@ -47,13 +51,30 @@ const CaseResultOutlet = () => {
 		testrayRoutine,
 	}: OutletContext = useOutletContext();
 
-	const {
-		data: testrayCaseResult,
-		mutate: mutateCaseResult,
-	} = useFetch(
-		testrayCaseResultImpl.getResource(caseResultId as string),
-		(response) => testrayCaseResultImpl.transformData(response)
+	const {data: testrayCaseResult, mutate: mutateCaseResult} = useFetch<
+		TestrayCaseResult
+	>(testrayCaseResultImpl.getResource(caseResultId as string), (response) =>
+		testrayCaseResultImpl.transformData(response)
 	);
+
+	const {data: mbMessage} = useFetch(
+		testrayCaseResult?.mbMessageId
+			? liferayMessageBoardImpl.getMessagesIdURL(
+					testrayCaseResult.mbMessageId
+			  )
+			: null
+	);
+
+	const {data, mutate: mutateCaseResultIssues} = useFetch(
+		`${testrayCaseResultsIssuesImpl.resource}&filter=${searchUtil.eq(
+			'caseResultId',
+			caseResultId as string
+		)}`,
+		(response) =>
+			testrayCaseResultsIssuesImpl.transformDataFromList(response)
+	);
+
+	const caseResultsIssues = data?.items || [];
 
 	const basePath = `/project/${projectId}/routines/${routineId}/build/${buildId}/case-result/${caseResultId}`;
 
@@ -121,7 +142,10 @@ const CaseResultOutlet = () => {
 			<Outlet
 				context={{
 					caseResult: testrayCaseResult,
+					caseResultsIssues,
+					mbMessage,
 					mutateCaseResult,
+					mutateCaseResultIssues,
 					projectId,
 				}}
 			/>

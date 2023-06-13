@@ -184,6 +184,9 @@ function Table({items, itemsActions, schema, style}) {
 														onChange={() =>
 															selectItems(itemId)
 														}
+														title={Liferay.Language.get(
+															'select-item'
+														)}
 														value={itemId}
 													/>
 												</DndTable.Cell>

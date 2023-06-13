@@ -10788,6 +10788,10 @@ ${update.properties}</echo>
 		<prepare-chrome-driver />
 	</target>
 
+	<target name="prepare-database-upgrade-configuration">
+		<prepare-database-upgrade-configuration />
+	</target>
+
 	<target name="prepare-encryption-PCKS12-certificate">
 		<if>
 			<equals arg1="${app.server.type}" arg2="tomcat" />
@@ -14714,6 +14718,15 @@ mail.send.blacklist=</echo>
 				</if>
 
 				<print-file file.name="${liferay.home}/osgi/modules/com.liferay.simple.socks.proxy.SocksProxyConfiguration.cfg" />
+			</then>
+		</if>
+
+		<get-testcase-property property.name="txtai.enabled" />
+
+		<if>
+			<equals arg1="${txtai.enabled}" arg2="true" />
+			<then>
+				<ant antfile="build-test-semantic-search.xml" target="set-up-txtai" />
 			</then>
 		</if>
 

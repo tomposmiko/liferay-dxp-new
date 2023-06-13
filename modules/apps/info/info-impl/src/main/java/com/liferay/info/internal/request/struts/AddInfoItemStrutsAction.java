@@ -15,7 +15,7 @@
 package com.liferay.info.internal.request.struts;
 
 import com.liferay.captcha.util.CaptchaUtil;
-import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
@@ -36,7 +36,7 @@ import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.creator.InfoItemCreator;
-import com.liferay.layout.page.template.util.LayoutStructureUtil;
+import com.liferay.layout.provider.LayoutStructureProvider;
 import com.liferay.layout.util.constants.LayoutDataItemTypeConstants;
 import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
@@ -347,7 +347,7 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 
 		if (Validator.isNotNull(rendererKey)) {
 			fragmentEntry =
-				_fragmentCollectionContributorTracker.getFragmentEntry(
+				_fragmentCollectionContributorRegistry.getFragmentEntry(
 					rendererKey);
 		}
 
@@ -389,7 +389,7 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 		throws InfoFormException {
 
 		LayoutStructure layoutStructure =
-			LayoutStructureUtil.getLayoutStructure(
+			_layoutStructureProvider.getLayoutStructure(
 				ParamUtil.getLong(httpServletRequest, "plid"),
 				ParamUtil.getLong(httpServletRequest, "segmentsExperienceId"));
 
@@ -468,7 +468,7 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 		throws InfoFormException {
 
 		LayoutStructure layoutStructure =
-			LayoutStructureUtil.getLayoutStructure(
+			_layoutStructureProvider.getLayoutStructure(
 				ParamUtil.getLong(httpServletRequest, "plid"),
 				ParamUtil.getLong(httpServletRequest, "segmentsExperienceId"));
 
@@ -512,8 +512,8 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 		AddInfoItemStrutsAction.class);
 
 	@Reference
-	private FragmentCollectionContributorTracker
-		_fragmentCollectionContributorTracker;
+	private FragmentCollectionContributorRegistry
+		_fragmentCollectionContributorRegistry;
 
 	@Reference
 	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
@@ -538,6 +538,9 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private LayoutStructureProvider _layoutStructureProvider;
 
 	@Reference
 	private Portal _portal;

@@ -136,6 +136,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>TABLE</td>
+	<td>//*[contains(@class, 'cp-activation-key-table')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TOOLTIPS_TEXT</td>
 	<td>//*[@role='tooltip']//*[text()='${key_text}']</td>
 	<td></td>
@@ -143,6 +148,11 @@
 <tr>
 	<td>TABLES_DOWNLOAD_BUTTON</td>
 	<td>//tbody//*[contains(., '${key_entitlementName}')]/following-sibling::*//*[contains(@class, 'btn')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TABLE_ELEMENT_BY_STATUS</td>
+	<td>//*[contains(@class, 'cp-activation-key-table')]/tbody/tr[${key_linePosition}]//*[@title='${key_status}']//*[contains(@class, 'sticker-overlay')]</td>
 	<td></td>
 </tr>
 

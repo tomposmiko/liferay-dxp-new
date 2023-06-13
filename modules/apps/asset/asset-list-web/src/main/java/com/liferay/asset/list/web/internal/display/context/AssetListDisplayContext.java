@@ -23,6 +23,7 @@ import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalServiceUtil;
+import com.liferay.asset.list.service.AssetListEntrySegmentsEntryRelLocalServiceUtil;
 import com.liferay.asset.list.service.AssetListEntryServiceUtil;
 import com.liferay.asset.list.service.AssetListEntryUsageLocalServiceUtil;
 import com.liferay.asset.list.util.AssetListPortletUtil;
@@ -43,6 +44,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
@@ -62,6 +64,7 @@ import com.liferay.staging.StagingGroupHelper;
 import com.liferay.staging.StagingGroupHelperUtil;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -121,7 +124,9 @@ public class AssetListDisplayContext {
 		String assetEntryTypeLabel = getAssetEntryTypeLabel(assetListEntry);
 		String classTypeLabel = getClassTypeLabel(assetListEntry);
 
-		if (Validator.isNull(classTypeLabel)) {
+		if (Validator.isNull(classTypeLabel) ||
+			Objects.equals(StringPool.DASH, classTypeLabel)) {
+
 			return HtmlUtil.escape(assetEntryTypeLabel);
 		}
 
@@ -217,6 +222,21 @@ public class AssetListDisplayContext {
 		return _assetListEntryId;
 	}
 
+	public int getAssetListEntrySegmentsEntryRelsCount(
+		AssetListEntry assetListEntry) {
+
+		int assetListEntrySegmentsEntryRelsCount =
+			AssetListEntrySegmentsEntryRelLocalServiceUtil.
+				getAssetListEntrySegmentsEntryRelsCount(
+					assetListEntry.getAssetListEntryId());
+
+		if (assetListEntrySegmentsEntryRelsCount < 2) {
+			return 0;
+		}
+
+		return assetListEntrySegmentsEntryRelsCount;
+	}
+
 	public String getAssetListEntryTitle() {
 		AssetListEntry assetListEntry = getAssetListEntry();
 
@@ -259,7 +279,28 @@ public class AssetListDisplayContext {
 		return _assetListEntryType;
 	}
 
+	public String getAssetListEntryTypeLabel(AssetListEntry assetListEntry) {
+		if (assetListEntry.getType() ==
+				AssetListEntryTypeConstants.TYPE_DYNAMIC) {
+
+			return LanguageUtil.get(
+				_themeDisplay.getLocale(), "dynamic-collection");
+		}
+
+		return LanguageUtil.get(_themeDisplay.getLocale(), "manual-collection");
+	}
+
 	public int getAssetListEntryUsageCount(AssetListEntry assetListEntry) {
+		Group group = _themeDisplay.getScopeGroup();
+
+		if (group.getType() == GroupConstants.TYPE_DEPOT) {
+			return AssetListEntryUsageLocalServiceUtil.
+				getCompanyAssetListEntryUsagesCount(
+					_themeDisplay.getCompanyId(),
+					PortalUtil.getClassNameId(AssetListEntry.class),
+					String.valueOf(assetListEntry.getAssetListEntryId()));
+		}
+
 		return AssetListEntryUsageLocalServiceUtil.getAssetListEntryUsagesCount(
 			_themeDisplay.getScopeGroupId(),
 			PortalUtil.getClassNameId(AssetListEntry.class),
@@ -297,10 +338,10 @@ public class AssetListDisplayContext {
 			assetListEntry.getAssetEntrySubtype(), -1);
 
 		if (classTypeId < 0) {
-			return StringPool.BLANK;
+			return StringPool.DASH;
 		}
 
-		String classTypeLabel = StringPool.BLANK;
+		String classTypeLabel = StringPool.DASH;
 
 		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(

@@ -141,6 +141,7 @@ export default {
 	'demote': 'Demote',
 	'description': 'Description',
 	'description-type': 'Description type',
+	'deselect-items': 'Deselect Items',
 	'details': 'Details',
 	'edit': 'Edit',
 	'edit-build': 'Edit Build',
@@ -205,6 +206,9 @@ export default {
 	'mark-at-least-one-case-to-export': 'Mark at least one case to export.',
 	'mark-at-least-one-case-type-for-processing':
 		'Mark at least one case type for processing.',
+	'merge-selected-subtasks-into-the-highest-scoring-subtask':
+		'Merge selected subtasks into the highest scoring subtask.',
+	'merge-subtasks': 'Merge Subtasks',
 	'merged-with': 'Merged With',
 	'metrics': 'Metrics',
 	'minimum-x-characters': 'Minimum {0} characters.',
@@ -242,6 +246,8 @@ export default {
 	'password-may-contain-letters-and-numbers':
 		'Password may contain letters and numbers.',
 	'passwords-do-not-match': 'Passwords do not match.',
+	'please-select-at-least-two-subtasks-to-merge':
+		'Please select at least two subtasks to merge.',
 	'please-select-one-or-more-roles': 'Please, select one or more roles.',
 	'priority': 'Priority',
 	'product-version': 'Product Version',
@@ -304,6 +310,8 @@ export default {
 	'subtask': 'Subtask',
 	'subtask-details': 'Subtask Details',
 	'subtask-name': 'Subtask Name',
+	'subtask-x-must-be-assigned-to-you-to-be-user-id-a-merge':
+		'Subtask {0} must be assigned to you to be used in a merge.',
 	'subtasks': 'Subtasks',
 	'suite': 'Suite',
 	'suite-name': 'Suite Name',
@@ -319,6 +327,7 @@ export default {
 	'template-name': 'Template Name',
 	'template-test': 'Template Test',
 	'templates': 'Templates',
+	'test-details': 'Test Details',
 	'test-fix': 'Test Fix',
 	'test-history': 'Test History',
 	'test-lead-should-only-have-access-to-builds-test-plans-test-suites-and-test-cases-.-this-role-will-be-responsible-for-creating-builds-and-for-creating-test-plans-test-runs-the-people-assigned-to-these-would-be-our-current-product-leads':

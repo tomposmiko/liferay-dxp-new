@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alec Sloan
  */
-@Component(immediate = true, service = UpgradeStepRegistrator.class)
+@Component(service = UpgradeStepRegistrator.class)
 public class CommerceWishListItemServiceUpgradeStepRegistrator
 	implements UpgradeStepRegistrator {
 
@@ -48,7 +48,7 @@ public class CommerceWishListItemServiceUpgradeStepRegistrator
 			new MVCCVersionUpgradeProcess() {
 
 				@Override
-				protected String[] getModuleTableNames() {
+				protected String[] getTableNames() {
 					return new String[] {
 						"CommerceWishList", "CommerceWishListItem"
 					};

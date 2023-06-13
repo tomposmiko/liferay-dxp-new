@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(immediate = true, service = UpgradeStepRegistrator.class)
+@Component(service = UpgradeStepRegistrator.class)
 public class CommerceNotificationServiceUpgradeStepRegistrator
 	implements UpgradeStepRegistrator {
 
@@ -69,7 +69,7 @@ public class CommerceNotificationServiceUpgradeStepRegistrator
 			new MVCCVersionUpgradeProcess() {
 
 				@Override
-				protected String[] getModuleTableNames() {
+				protected String[] getTableNames() {
 					return new String[] {
 						"CNTemplateCAccountGroupRel", "CNotificationAttachment",
 						"CommerceNotificationQueueEntry",

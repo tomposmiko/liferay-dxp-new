@@ -16,6 +16,7 @@ package com.liferay.asset.list.web.internal.servlet.taglib.util;
 
 import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.model.AssetListEntry;
+import com.liferay.asset.list.service.AssetListEntryUsageLocalServiceUtil;
 import com.liferay.asset.list.web.internal.security.permission.resource.AssetListEntryPermission;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
@@ -23,6 +24,7 @@ import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
@@ -59,6 +61,7 @@ public class AssetListEntryActionDropdownItemsProvider {
 	}
 
 	public List<DropdownItem> getActionDropdownItems() {
+		Group group = _themeDisplay.getScopeGroup();
 		boolean liveGroup = _isLiveGroup();
 
 		return DropdownItemListBuilder.addGroup(
@@ -85,6 +88,7 @@ public class AssetListEntryActionDropdownItemsProvider {
 								_assetListEntry, ActionKeys.UPDATE),
 						_getRenameAssetListEntryActionUnsafeConsumer()
 					).add(
+						() -> group.getType() != GroupConstants.TYPE_DEPOT,
 						_getViewAssetListEntryUsagesActionUnsafeConsumer()
 					).build());
 				dropdownGroupItem.setSeparator(true);
@@ -202,7 +206,14 @@ public class AssetListEntryActionDropdownItemsProvider {
 	private UnsafeConsumer<DropdownItem, Exception>
 		_getViewAssetListEntryUsagesActionUnsafeConsumer() {
 
+		long count =
+			AssetListEntryUsageLocalServiceUtil.getAssetListEntryUsagesCount(
+				_themeDisplay.getScopeGroupId(),
+				PortalUtil.getClassNameId(AssetListEntry.class),
+				String.valueOf(_assetListEntry.getAssetListEntryId()));
+
 		return dropdownItem -> {
+			dropdownItem.setDisabled(count == 0);
 			dropdownItem.setHref(
 				_liferayPortletResponse.createRenderURL(), "mvcPath",
 				"/view_asset_list_entry_usages.jsp", "redirect",

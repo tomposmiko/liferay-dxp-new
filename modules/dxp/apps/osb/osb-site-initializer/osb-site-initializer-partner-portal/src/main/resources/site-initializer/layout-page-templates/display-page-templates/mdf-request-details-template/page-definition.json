@@ -723,166 +723,17 @@
 													},
 													{
 														"definition": {
-															"fragmentStyle": {
-																"borderRadius": "",
-																"borderWidth": "0",
-																"shadow": "",
-																"textAlign": ""
+															"fragment": {
+																"key": "claims-list-on-mdf-request-detail"
 															},
-															"indexed": true,
-															"layout": {
-																"borderWidth": 0,
-																"contentDisplay": "FlexRow",
-																"justify": "SpaceBetween",
-																"marginBottom": 0,
-																"marginLeft": 0,
-																"marginRight": 0,
-																"marginTop": 0,
-																"opacity": 100,
-																"paddingBottom": 0,
-																"paddingLeft": 0,
-																"paddingRight": 0,
-																"paddingTop": 0,
-																"widthType": "Fluid"
-															}
+															"fragmentConfig": {
+																"textColor": ""
+															},
+															"fragmentFields": [
+															],
+															"indexed": true
 														},
-														"pageElements": [
-															{
-																"definition": {
-																	"fragmentStyle": {
-																		"borderRadius": "",
-																		"borderWidth": "0",
-																		"shadow": "",
-																		"textAlign": ""
-																	},
-																	"indexed": true,
-																	"layout": {
-																		"borderWidth": 0,
-																		"marginBottom": 0,
-																		"marginLeft": 0,
-																		"marginRight": 0,
-																		"marginTop": 0,
-																		"opacity": 100,
-																		"paddingBottom": 0,
-																		"paddingLeft": 0,
-																		"paddingRight": 0,
-																		"paddingTop": 0,
-																		"widthType": "Fluid"
-																	}
-																},
-																"pageElements": [
-																	{
-																		"definition": {
-																			"fragment": {
-																				"key": "DIALECT-dialect-text"
-																			},
-																			"fragmentConfig": {
-																				"textType": "h6",
-																				"truncateText": false
-																			},
-																			"fragmentFields": [
-																				{
-																					"id": "element-text",
-																					"value": {
-																						"fragmentLink": {
-																						},
-																						"text": {
-																							"value_i18n": {
-																								"ar_SA": "Get Reimbursed",
-																								"ca_ES": "Get Reimbursed",
-																								"de_DE": "Get Reimbursed",
-																								"en_US": "Get Reimbursed",
-																								"es_ES": "Get Reimbursed",
-																								"fi_FI": "Get Reimbursed",
-																								"fr_FR": "Get Reimbursed",
-																								"hu_HU": "Get Reimbursed",
-																								"ja_JP": "Get Reimbursed",
-																								"nl_NL": "Get Reimbursed",
-																								"pt_BR": "Get Reimbursed",
-																								"sv_SE": "Get Reimbursed",
-																								"zh_CN": "Get Reimbursed"
-																							}
-																						}
-																					}
-																				}
-																			],
-																			"fragmentStyle": {
-																				"borderRadius": "",
-																				"fontWeight": "fontWeightNormal",
-																				"marginBottom": "1",
-																				"shadow": "",
-																				"textAlign": "",
-																				"textColor": "colorNeutral10"
-																			},
-																			"indexed": true
-																		},
-																		"type": "Fragment"
-																	},
-																	{
-																		"definition": {
-																			"fragment": {
-																				"key": "DIALECT-dialect-text"
-																			},
-																			"fragmentConfig": {
-																				"textType": "h6",
-																				"truncateText": false
-																			},
-																			"fragmentFields": [
-																				{
-																					"id": "element-text",
-																					"value": {
-																						"fragmentLink": {
-																						},
-																						"text": {
-																							"value_i18n": {
-																								"ar_SA": "You can submit up to 2 claim(s).",
-																								"ca_ES": "You can submit up to 2 claim(s).",
-																								"de_DE": "You can submit up to 2 claim(s).",
-																								"en_US": "You can submit up to 2 claim(s).",
-																								"es_ES": "You can submit up to 2 claim(s).",
-																								"fi_FI": "You can submit up to 2 claim(s).",
-																								"fr_FR": "You can submit up to 2 claim(s).",
-																								"hu_HU": "You can submit up to 2 claim(s).",
-																								"ja_JP": "You can submit up to 2 claim(s).",
-																								"nl_NL": "You can submit up to 2 claim(s).",
-																								"pt_BR": "You can submit up to 2 claim(s).",
-																								"sv_SE": "You can submit up to 2 claim(s).",
-																								"zh_CN": "You can submit up to 2 claim(s)."
-																							}
-																						}
-																					}
-																				}
-																			],
-																			"fragmentStyle": {
-																				"borderRadius": "",
-																				"fontWeight": "fontWeightNormal",
-																				"marginBottom": "1",
-																				"shadow": "",
-																				"textAlign": "",
-																				"textColor": "colorNeutral8"
-																			},
-																			"indexed": true
-																		},
-																		"type": "Fragment"
-																	}
-																],
-																"type": "Section"
-															},
-															{
-																"definition": {
-																	"fragment": {
-																		"key": "new-claim-button"
-																	},
-																	"fragmentConfig": {
-																	},
-																	"fragmentFields": [
-																	],
-																	"indexed": true
-																},
-																"type": "Fragment"
-															}
-														],
-														"type": "Section"
+														"type": "Fragment"
 													},
 													{
 														"definition": {

@@ -303,6 +303,21 @@ public class ObjectDefinitionResourceImpl
 			_addListTypeDefinition(objectDefinition);
 		}
 
+		long accountEntryRestrictedObjectFieldId = 0;
+
+		com.liferay.object.model.ObjectField
+			accountEntryRestrictedServiceBuilderObjectField =
+				_objectFieldLocalService.fetchObjectField(
+					objectDefinitionId,
+					objectDefinition.
+						getAccountEntryRestrictedObjectFieldName());
+
+		if (accountEntryRestrictedServiceBuilderObjectField != null) {
+			accountEntryRestrictedObjectFieldId =
+				accountEntryRestrictedServiceBuilderObjectField.
+					getObjectFieldId();
+		}
+
 		long titleObjectFieldId = 0;
 
 		com.liferay.object.model.ObjectField titleServiceBuilderObjectField =
@@ -324,9 +339,8 @@ public class ObjectDefinitionResourceImpl
 		serviceBuilderObjectDefinition =
 			_objectDefinitionService.updateCustomObjectDefinition(
 				objectDefinition.getExternalReferenceCode(), objectDefinitionId,
-				GetterUtil.getLong(
-					objectDefinition.getAccountEntryRestrictedObjectFieldId()),
-				0, titleObjectFieldId,
+				GetterUtil.getLong(accountEntryRestrictedObjectFieldId), 0,
+				titleObjectFieldId,
 				GetterUtil.getBoolean(
 					objectDefinition.getAccountEntryRestricted()),
 				GetterUtil.getBoolean(objectDefinition.getActive(), true),
@@ -568,8 +582,6 @@ public class ObjectDefinitionResourceImpl
 			{
 				accountEntryRestricted =
 					objectDefinition.isAccountEntryRestricted();
-				accountEntryRestrictedObjectFieldId =
-					objectDefinition.getAccountEntryRestrictedObjectFieldId();
 				actions = HashMapBuilder.put(
 					"delete",
 					() -> {
@@ -705,6 +717,20 @@ public class ObjectDefinitionResourceImpl
 
 				system = objectDefinition.isSystem();
 
+				setAccountEntryRestrictedObjectFieldName(
+					() -> {
+						com.liferay.object.model.ObjectField
+							serviceBuilderObjectField =
+								_objectFieldLocalService.fetchObjectField(
+									objectDefinition.
+										getAccountEntryRestrictedObjectFieldId());
+
+						if (serviceBuilderObjectField == null) {
+							return "";
+						}
+
+						return serviceBuilderObjectField.getName();
+					});
 				setTitleObjectFieldName(
 					() -> {
 						com.liferay.object.model.ObjectField

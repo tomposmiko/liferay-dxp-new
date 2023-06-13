@@ -19,14 +19,21 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.initializer.SiteInitializer;
+import com.liferay.site.initializer.SiteInitializerFactory;
 import com.liferay.site.initializer.SiteInitializerRegistry;
 import com.liferay.site.initializer.extender.web.internal.constants.SiteInitializerExtenderPortletKeys;
+
+import java.io.File;
+import java.io.InputStream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -71,6 +78,20 @@ public class SynchronizeSiteInitializerMVCActionCommand
 			return;
 		}
 
+		UploadPortletRequest uploadPortletRequest =
+			_portal.getUploadPortletRequest(actionRequest);
+
+		try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
+				"siteInitializerFile")) {
+
+			if (inputStream != null) {
+				_initialize(
+					group.getGroupId(), inputStream, siteInitializerKey);
+
+				return;
+			}
+		}
+
 		SiteInitializer siteInitializer =
 			_siteInitializerRegistry.getSiteInitializer(siteInitializerKey);
 
@@ -78,11 +99,42 @@ public class SynchronizeSiteInitializerMVCActionCommand
 			return;
 		}
 
-		siteInitializer.initialize(themeDisplay.getScopeGroupId());
+		siteInitializer.initialize(group.getGroupId());
+	}
+
+	private void _initialize(
+			long groupId, InputStream inputStream, String siteInitializerKey)
+		throws Exception {
+
+		File tempFile = FileUtil.createTempFile();
+
+		FileUtil.write(tempFile, inputStream);
+
+		File tempFolder = FileUtil.createTempFolder();
+
+		FileUtil.unzip(tempFile, tempFolder);
+
+		tempFile.delete();
+
+		try {
+			SiteInitializer siteInitializer = _siteInitializerFactory.create(
+				new File(tempFolder, "site-initializer"), siteInitializerKey);
+
+			siteInitializer.initialize(groupId);
+		}
+		finally {
+			tempFolder.delete();
+		}
 	}
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private SiteInitializerFactory _siteInitializerFactory;
 
 	@Reference
 	private SiteInitializerRegistry _siteInitializerRegistry;

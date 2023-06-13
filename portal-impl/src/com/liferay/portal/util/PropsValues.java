@@ -538,10 +538,10 @@ public class PropsValues {
 	public static final String DEFAULT_PORTLET_DECORATOR_ID = PropsUtil.get(
 		PropsKeys.DEFAULT_PORTLET_DECORATOR_ID);
 
-	public static final String DEFAULT_REGULAR_COLOR_SCHEME_ID = PropsUtil.get(
+	public static String DEFAULT_REGULAR_COLOR_SCHEME_ID = PropsUtil.get(
 		PropsKeys.DEFAULT_REGULAR_COLOR_SCHEME_ID);
 
-	public static final String DEFAULT_REGULAR_THEME_ID = PropsUtil.get(
+	public static String DEFAULT_REGULAR_THEME_ID = PropsUtil.get(
 		PropsKeys.DEFAULT_REGULAR_THEME_ID);
 
 	public static final String DEFAULT_USER_PRIVATE_LAYOUT_FRIENDLY_URL =
@@ -1382,11 +1382,6 @@ public class PropsValues {
 	public static final String MODULE_FRAMEWORK_CONFIGS_DIR = PropsUtil.get(
 		PropsKeys.MODULE_FRAMEWORK_CONFIGS_DIR);
 
-	public static String[]
-		MODULE_FRAMEWORK_CONFIGURATION_BUNDLE_SYMBOLIC_NAMES =
-			PropsUtil.getArray(
-				PropsKeys.MODULE_FRAMEWORK_CONFIGURATION_BUNDLE_SYMBOLIC_NAMES);
-
 	public static final boolean MODULE_FRAMEWORK_EXPORT_PASSWORD_ATTRIBUTES =
 		GetterUtil.getBoolean(
 			PropsUtil.get(
@@ -1443,9 +1438,6 @@ public class PropsValues {
 
 	public static final String MODULE_FRAMEWORK_STATE_DIR = PropsUtil.get(
 		PropsKeys.MODULE_FRAMEWORK_STATE_DIR);
-
-	public static final String[] MODULE_FRAMEWORK_STATIC_JARS =
-		PropsUtil.getArray(PropsKeys.MODULE_FRAMEWORK_STATIC_JARS);
 
 	public static final long MODULE_FRAMEWORK_STOP_WAIT_TIMEOUT =
 		GetterUtil.getLong(
@@ -1518,6 +1510,10 @@ public class PropsValues {
 
 	public static final int NOTIFICATIONS_MAX_EVENTS = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.NOTIFICATIONS_MAX_EVENTS));
+
+	public static final int OBJECT_ENTRY_SCRIPT_VARIABLES_VERSION =
+		GetterUtil.getInteger(
+			PropsUtil.get(PropsKeys.OBJECT_ENTRY_SCRIPT_VARIABLES_VERSION));
 
 	public static final int OBJECT_NESTED_FIELDS_MAX_QUERY_DEPTH =
 		GetterUtil.getInteger(

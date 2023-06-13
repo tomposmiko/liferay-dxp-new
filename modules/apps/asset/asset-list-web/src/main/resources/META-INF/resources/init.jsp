@@ -53,6 +53,7 @@ page import="com.liferay.asset.list.web.internal.display.context.InfoCollectionP
 page import="com.liferay.asset.list.web.internal.display.context.InfoCollectionProviderItemsDisplayContext" %><%@
 page import="com.liferay.asset.list.web.internal.display.context.SelectStructureFieldDisplayContext" %><%@
 page import="com.liferay.asset.list.web.internal.frontend.taglib.clay.servlet.taglib.AssetListEntryVerticalCard" %><%@
+page import="com.liferay.asset.list.web.internal.servlet.taglib.util.AssetListEntryVariationActionDropdownItemsProvider" %><%@
 page import="com.liferay.asset.list.web.internal.servlet.taglib.util.InfoCollectionProviderActionDropdownItems" %><%@
 page import="com.liferay.asset.list.web.internal.servlet.taglib.util.ListItemsActionDropdownItems" %><%@
 page import="com.liferay.asset.list.web.internal.util.comparator.ClassTypeNameComparator" %><%@
@@ -86,7 +87,6 @@ page import="com.liferay.portal.kernel.util.UnicodeProperties" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %><%@
-page import="com.liferay.segments.constants.SegmentsEntryConstants" %><%@
 page import="com.liferay.site.navigation.taglib.servlet.taglib.util.BreadcrumbEntriesUtil" %><%@
 page import="com.liferay.taglib.search.ResultRow" %>
 

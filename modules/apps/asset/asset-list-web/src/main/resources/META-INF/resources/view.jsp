@@ -57,14 +57,20 @@ AssetListManagementToolbarDisplayContext assetListManagementToolbarDisplayContex
 							"actions", assetListManagementToolbarDisplayContext.getAvailableActions(assetListEntry)
 						).build());
 
+					int assetListEntrySegmentsEntryRelsCount = assetListDisplayContext.getAssetListEntrySegmentsEntryRelsCount(assetListEntry);
 					Date createDate = assetListEntry.getCreateDate();
 					%>
 
 					<c:choose>
 						<c:when test='<%= Objects.equals(assetListDisplayContext.getDisplayStyle(), "descriptive") %>'>
-							<liferay-ui:search-container-column-icon
-								icon='<%= (assetListEntry.getType() == 0) ? "bolt" : "list" %>'
-							/>
+							<liferay-ui:search-container-column-text>
+								<div class="lfr-portal-tooltip sticker sticker-secondary" title="<%= assetListDisplayContext.getAssetListEntryTypeLabel(assetListEntry) %>">
+									<clay:icon
+										cssClass="mr-2 text-secondary"
+										symbol='<%= (assetListEntry.getType() == AssetListEntryTypeConstants.TYPE_DYNAMIC) ? "bolt" : "list" %>'
+									/>
+								</div>
+							</liferay-ui:search-container-column-text>
 
 							<liferay-ui:search-container-column-text
 								colspan="<%= 2 %>"
@@ -82,6 +88,22 @@ AssetListManagementToolbarDisplayContext assetListManagementToolbarDisplayContex
 								<h6 class="text-default">
 									<liferay-ui:message arguments="<%= assetListDisplayContext.getAssetListEntryUsageCount(assetListEntry) %>" key="x-usages" translateArguments="<%= false %>" />
 								</h6>
+
+								<c:choose>
+									<c:when test="<%= assetListEntrySegmentsEntryRelsCount > 0 %>">
+										<clay:label
+											cssClass="mr-auto"
+											displayType="info"
+											label='<%= LanguageUtil.format(locale, "x-variations", new String[] {String.valueOf(assetListEntrySegmentsEntryRelsCount)}) %>'
+										/>
+									</c:when>
+									<c:otherwise>
+										<clay:label
+											cssClass="mr-auto"
+											label='<%= LanguageUtil.get(request, "no-variations") %>'
+										/>
+									</c:otherwise>
+								</c:choose>
 							</liferay-ui:search-container-column-text>
 
 							<liferay-ui:search-container-column-text>
@@ -105,10 +127,12 @@ AssetListManagementToolbarDisplayContext assetListManagementToolbarDisplayContex
 								cssClass="table-cell-expand text-truncate"
 								name="name"
 							>
-								<clay:icon
-									cssClass="mr-2 text-secondary"
-									symbol='<%= (assetListEntry.getType() == 0) ? "bolt" : "list" %>'
-								/>
+								<span class="lfr-portal-tooltip" title="<%= assetListDisplayContext.getAssetListEntryTypeLabel(assetListEntry) %>">
+									<clay:icon
+										cssClass="mr-2 text-secondary"
+										symbol='<%= (assetListEntry.getType() == AssetListEntryTypeConstants.TYPE_DYNAMIC) ? "bolt" : "list" %>'
+									/>
+								</span>
 
 								<aui:a href="<%= assetListDisplayContext.getEditURL(assetListEntry) %>">
 									<%= HtmlUtil.escape(assetListEntry.getTitle()) %>
@@ -116,7 +140,7 @@ AssetListManagementToolbarDisplayContext assetListManagementToolbarDisplayContex
 							</liferay-ui:search-container-column-text>
 
 							<liferay-ui:search-container-column-text
-								cssClass="table-cell-expand text-truncate"
+								cssClass="text-truncate"
 								name="type"
 							>
 								<liferay-ui:message key="<%= HtmlUtil.escape(assetListEntry.getTypeLabel()) %>" />
@@ -132,6 +156,12 @@ AssetListManagementToolbarDisplayContext assetListManagementToolbarDisplayContex
 								cssClass="table-cell-expand text-truncate"
 								name="subtype"
 								value="<%= assetListDisplayContext.getClassTypeLabel(assetListEntry) %>"
+							/>
+
+							<liferay-ui:search-container-column-text
+								cssClass="text-truncate"
+								name="variations"
+								value="<%= String.valueOf(assetListEntrySegmentsEntryRelsCount) %>"
 							/>
 
 							<liferay-ui:search-container-column-text

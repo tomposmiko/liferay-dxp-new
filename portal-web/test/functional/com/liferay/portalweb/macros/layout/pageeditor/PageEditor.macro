@@ -1704,9 +1704,7 @@ definition {
 	}
 
 	macro createPageTemplate {
-		Click(
-			key_text = "page-template",
-			locator1 = "Icon#ANY");
+		LexiconEntry.gotoHeaderMenuItem(menuItem = "Convert to Page Template");
 
 		if (isSet(experienceName)) {
 			AssertTextEquals(
@@ -4191,14 +4189,14 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 
 		if ("${displayStyle}" == "card") {
 			Click.clickAtNotVisible(
-				ariaLabel = "Mark Favorite",
+				ariaLabel = "Mark ${fragmentName} as Favorite",
 				key_collectionName = "${collectionName}",
 				key_fragmentName = "${fragmentName}",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT_CARD_ITEM_BUTTON_WITH_ARIA_LABEL");
 		}
 		else {
 			Click.clickAtNotVisible(
-				ariaLabel = "Mark Favorite",
+				ariaLabel = "Mark ${fragmentName} as Favorite",
 				key_collectionName = "${collectionName}",
 				key_fragmentName = "${fragmentName}",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT_BUTTON_WITH_ARIA_LABEL");
@@ -4594,14 +4592,14 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 
 		if ("${displayStyle}" == "card") {
 			Click.clickAtNotVisible(
-				ariaLabel = "Unmark Favorite",
+				ariaLabel = "Unmark ${fragmentName} as Favorite",
 				key_collectionName = "${collectionName}",
 				key_fragmentName = "${fragmentName}",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT_CARD_ITEM_BUTTON_WITH_ARIA_LABEL");
 		}
 		else {
 			Click.clickAtNotVisible(
-				ariaLabel = "Unmark Favorite",
+				ariaLabel = "Unmark ${fragmentName} as Favorite",
 				key_collectionName = "${collectionName}",
 				key_fragmentName = "${fragmentName}",
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT_BUTTON_WITH_ARIA_LABEL");

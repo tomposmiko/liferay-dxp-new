@@ -30,7 +30,7 @@ import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.info.list.renderer.InfoListRenderer;
 import com.liferay.info.list.renderer.InfoListRendererRegistry;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderRegistry;
 import com.liferay.layout.helper.CollectionPaginationHelper;
 import com.liferay.layout.list.retriever.DefaultLayoutListRetrieverContext;
 import com.liferay.layout.list.retriever.LayoutListRetriever;
@@ -38,7 +38,7 @@ import com.liferay.layout.list.retriever.LayoutListRetrieverRegistry;
 import com.liferay.layout.list.retriever.ListObjectReference;
 import com.liferay.layout.list.retriever.ListObjectReferenceFactory;
 import com.liferay.layout.list.retriever.ListObjectReferenceFactoryRegistry;
-import com.liferay.layout.taglib.internal.info.search.InfoSearchClassMapperTrackerUtil;
+import com.liferay.layout.taglib.internal.info.search.InfoSearchClassMapperRegistryUtil;
 import com.liferay.layout.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.layout.util.structure.CollectionStyledLayoutStructureItem;
 import com.liferay.petra.string.CharPool;
@@ -197,12 +197,12 @@ public class RenderCollectionLayoutStructureItemDisplayContext {
 			return null;
 		}
 
-		LayoutDisplayPageProviderTracker layoutDisplayPageProviderTracker =
-			ServletContextUtil.getLayoutDisplayPageProviderTracker();
+		LayoutDisplayPageProviderRegistry layoutDisplayPageProviderRegistry =
+			ServletContextUtil.getLayoutDisplayPageProviderRegistry();
 
-		return layoutDisplayPageProviderTracker.
+		return layoutDisplayPageProviderRegistry.
 			getLayoutDisplayPageProviderByClassName(
-				InfoSearchClassMapperTrackerUtil.getClassName(
+				InfoSearchClassMapperRegistryUtil.getClassName(
 					listObjectReference.getItemType()));
 	}
 

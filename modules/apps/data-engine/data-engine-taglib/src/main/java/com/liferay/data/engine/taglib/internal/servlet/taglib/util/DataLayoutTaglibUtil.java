@@ -28,7 +28,7 @@ import com.liferay.data.engine.rest.resource.v2_0.DataLayoutResource;
 import com.liferay.data.engine.rest.resource.v2_0.DataRecordResource;
 import com.liferay.data.engine.taglib.servlet.taglib.definition.DataLayoutBuilderDefinition;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormTemplateContextFactory;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializer;
@@ -61,7 +61,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
@@ -580,7 +579,7 @@ public class DataLayoutTaglibUtil {
 	private JSONObject _getFunctionsMetadataJSONObject(Locale locale)
 		throws JSONException {
 
-		return JSONFactoryUtil.createJSONObject(
+		return _jsonFactory.createJSONObject(
 			_ddmFormBuilderSettingsRetrieverHelper.
 				getSerializedDDMExpressionFunctionsMetadata(locale));
 	}
@@ -591,19 +590,19 @@ public class DataLayoutTaglibUtil {
 
 	private boolean _hasJavascriptModule(String name) {
 		DDMFormFieldType ddmFormFieldType =
-			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(name);
+			_ddmFormFieldTypeServicesRegistry.getDDMFormFieldType(name);
 
 		return Validator.isNotNull(ddmFormFieldType.getModuleName());
 	}
 
 	private String _resolveFieldTypeModule(String name) {
 		return _resolveModuleName(
-			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(name));
+			_ddmFormFieldTypeServicesRegistry.getDDMFormFieldType(name));
 	}
 
 	private String _resolveFieldTypesModules() {
 		Set<String> ddmFormFieldTypeNames =
-			_ddmFormFieldTypeServicesTracker.getDDMFormFieldTypeNames();
+			_ddmFormFieldTypeServicesRegistry.getDDMFormFieldTypeNames();
 
 		Stream<String> stream = ddmFormFieldTypeNames.stream();
 
@@ -690,7 +689,7 @@ public class DataLayoutTaglibUtil {
 		_ddmFormBuilderSettingsRetrieverHelper;
 
 	@Reference
-	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
+	private DDMFormFieldTypeServicesRegistry _ddmFormFieldTypeServicesRegistry;
 
 	@Reference
 	private DDMFormTemplateContextFactory _ddmFormTemplateContextFactory;
@@ -738,7 +737,7 @@ public class DataLayoutTaglibUtil {
 					_httpServletRequest.getParameter("dataDefinition"));
 
 				ddmForm = DataDefinitionDDMFormUtil.toDDMForm(
-					dataDefinition, _ddmFormFieldTypeServicesTracker);
+					dataDefinition, _ddmFormFieldTypeServicesRegistry);
 			}
 			else {
 				ddmForm = _getDDMForm();
@@ -773,7 +772,7 @@ public class DataLayoutTaglibUtil {
 			throws Exception {
 
 			DDMFormFieldType ddmFormFieldType =
-				_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(
+				_ddmFormFieldTypeServicesRegistry.getDDMFormFieldType(
 					ddmFormField.getType());
 
 			DDMForm ddmForm = DDMFormFactory.create(

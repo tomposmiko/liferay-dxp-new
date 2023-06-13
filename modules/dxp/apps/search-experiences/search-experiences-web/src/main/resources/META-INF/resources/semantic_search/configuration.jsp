@@ -50,8 +50,6 @@ SemanticSearchCompanyConfigurationDisplayContext semanticSearchCompanyConfigurat
 			).put(
 				"embeddingVectorDimensions", semanticSearchCompanyConfigurationDisplayContext.getEmbeddingVectorDimensions()
 			).put(
-				"enableGPU", semanticSearchCompanyConfigurationDisplayContext.isEnableGPU()
-			).put(
 				"huggingFaceAccessToken", semanticSearchCompanyConfigurationDisplayContext.getHuggingFaceAccessToken()
 			).put(
 				"languageIds", semanticSearchCompanyConfigurationDisplayContext.getLanguageIds()
@@ -71,6 +69,10 @@ SemanticSearchCompanyConfigurationDisplayContext semanticSearchCompanyConfigurat
 				"textTruncationStrategy", semanticSearchCompanyConfigurationDisplayContext.getTextTruncationStrategy()
 			).put(
 				"txtaiHostAddress", semanticSearchCompanyConfigurationDisplayContext.getTxtaiHostAddress()
+			).put(
+				"txtaiPassword", semanticSearchCompanyConfigurationDisplayContext.getTxtaiPassword()
+			).put(
+				"txtaiUsername", semanticSearchCompanyConfigurationDisplayContext.getTxtaiUserName()
 			).build()
 		%>'
 	/>

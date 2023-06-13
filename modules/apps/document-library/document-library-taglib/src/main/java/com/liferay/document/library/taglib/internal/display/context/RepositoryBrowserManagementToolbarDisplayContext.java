@@ -129,7 +129,7 @@ public class RepositoryBrowserManagementToolbarDisplayContext
 
 	@Override
 	public String[] getDisplayViews() {
-		return new String[] {"icon"};
+		return new String[] {"icon", "descriptive", "list"};
 	}
 
 	@Override
@@ -145,6 +145,11 @@ public class RepositoryBrowserManagementToolbarDisplayContext
 	@Override
 	protected String getDefaultDisplayStyle() {
 		return "icon";
+	}
+
+	@Override
+	protected String[] getOrderByKeys() {
+		return new String[] {"modified-date", "title"};
 	}
 
 	private final long _folderId;

@@ -557,6 +557,39 @@ definition {
 		Elasticsearch.viewClusterStatus(clusterStatus = "\"cluster_name\" : \"LiferayElasticsearchCluster1\"");
 	}
 
+	@description = "Assert search is functional after Elasticsearch connector is redeployed from GogoShell"
+	@priority = "3"
+	test SearchAfterRedeployingElasticsearchConnector {
+		property test.assert.warning.exceptions = "true";
+		property test.name.skip.portal.instance = "Elasticsearch7#SearchAfterRedeployingElasticsearchConnector";
+
+		GogoShell.openGogoShellAdmin();
+
+		var moduleId = GogoShell.getModuleID(moduleName = "com.liferay.portal.search.elasticsearch7.impl");
+
+		GogoShell.stopModule(moduleId = "${moduleId}");
+
+		GogoShell.viewModuleStatus(
+			moduleName = "com.liferay.portal.search.elasticsearch7.impl",
+			moduleStatus = "Resolved");
+
+		GogoShell.startModule(moduleId = "${moduleId}");
+
+		GogoShell.viewModuleStatus(
+			moduleName = "com.liferay.portal.search.elasticsearch7.impl",
+			moduleStatus = "Active");
+
+		SearchAdministration.executeReindex();
+
+		Navigator.gotoPage(pageName = "Home");
+
+		SearchPortlets.searchEmbedded(searchTerm = "test");
+
+		AssertElementPresent(
+			key_searchAssetTitle = "Test Test",
+			locator1 = "SearchResults#ASSET_ENTRY_TABLE_TITLE");
+	}
+
 	@priority = "5"
 	test SearchWithNonLiferayIndex {
 		property embedded.elasticsearch.only = "true";

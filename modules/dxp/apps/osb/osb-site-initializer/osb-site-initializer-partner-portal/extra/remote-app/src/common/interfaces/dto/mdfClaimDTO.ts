@@ -9,6 +9,7 @@
  * distribution rights of the Software.
  */
 
+import AccountEntry from '../accountEntry';
 import MDFClaim from '../mdfClaim';
 
 export default interface MDFClaimDTO
@@ -18,4 +19,7 @@ export default interface MDFClaimDTO
 	mdfRequestExternalReferenceCodeSF?: string;
 	mdfRequestTotalCostOfExpense?: number;
 	mdfRequestedAmount?: number;
+	paymentReceived?: number;
+	r_accountToMdfClaims_accountEntry?: AccountEntry;
+	r_accountToMdfClaims_accountEntryId?: number;
 }

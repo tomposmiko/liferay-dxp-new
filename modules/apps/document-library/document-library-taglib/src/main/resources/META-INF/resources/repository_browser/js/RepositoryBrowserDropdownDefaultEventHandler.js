@@ -12,64 +12,17 @@
  * details.
  */
 
-import {
-	DefaultEventHandler,
-	fetch,
-	openConfirmModal,
-	openSimpleInputModal,
-	openToast,
-} from 'frontend-js-web';
+import {DefaultEventHandler} from 'frontend-js-web';
+
+import {deleteEntry, renameEntry} from './RepositoryBrowserDropdownActions';
 
 class ElementsDefaultEventHandler extends DefaultEventHandler {
 	delete({deleteURL}) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					fetch(deleteURL, {
-						method: 'DELETE',
-					}).then((response) => {
-						if (response.ok) {
-							window.location.reload();
-						}
-						else {
-							openToast({
-								message: Liferay.Language.get(
-									'an-unexpected-error-occurred'
-								),
-								type: 'danger',
-							});
-						}
-					});
-				}
-			},
-		});
+		deleteEntry(deleteURL);
 	}
 
 	rename({renameURL, value}) {
-		openSimpleInputModal({
-			dialogTitle: Liferay.Language.get('rename'),
-			formSubmitURL: renameURL,
-			mainFieldLabel: Liferay.Language.get('name'),
-			mainFieldName: 'name',
-			mainFieldValue: value,
-			namespace: '',
-			onFormSuccess: (response) => {
-				if (response.success) {
-					window.location.reload();
-				}
-				else {
-					openToast({
-						message: Liferay.Language.get(
-							'an-unexpected-error-occurred'
-						),
-						type: 'danger',
-					});
-				}
-			},
-		});
+		renameEntry(renameURL, value);
 	}
 }
 

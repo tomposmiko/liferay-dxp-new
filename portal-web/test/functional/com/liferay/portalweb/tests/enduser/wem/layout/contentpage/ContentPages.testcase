@@ -277,11 +277,11 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertChecked(
+			AssertChecked.assertCheckedNotVisible(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
-			Uncheck(
+			Uncheck.uncheckNotVisible(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
@@ -1732,11 +1732,11 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertChecked(
+			AssertChecked.assertCheckedNotVisible(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
-			Uncheck(
+			Uncheck.uncheckNotVisible(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
@@ -1773,7 +1773,7 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertNotChecked(
+			AssertNotChecked.assertNotCheckedNotVisible(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 		}
@@ -1823,15 +1823,15 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertChecked(
+			AssertChecked.assertCheckedNotVisible(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
-			Uncheck(
+			Uncheck.uncheckNotVisible(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
-			AssertNotChecked(
+			AssertNotChecked.assertNotCheckedNotVisible(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
@@ -1876,6 +1876,91 @@ definition {
 				locator1 = "AP#ASSET_ABSTRACT_TITLE");
 
 			Alert.viewErrorMessage(errorMessage = "You do not have the roles required to access this portlet.");
+		}
+	}
+
+	@description = "This is a test for LPS-162323. The pages propagated from a Site Template should refer to the master page from site."
+	@priority = "4"
+	test ViewReferredMasterPageOfPagesPropagatedFromSiteTemplate {
+		task ("Given a page creator has a site with a page from a site template") {
+			task ("Add a site template") {
+				JSONSiteTemplate.addSiteTemplate(
+					description = "Site description",
+					siteTemplateName = "Site Template Name");
+
+				SiteTemplatesNavigator.openSiteTemplatesAdmin();
+
+				LexiconEntry.gotoEntryMenuItem(
+					menuItem = "Manage",
+					rowEntry = "Site Template Name");
+			}
+
+			task ("Add a master page template") {
+				ProductMenu.gotoPortlet(
+					category = "Design",
+					portlet = "Page Templates");
+
+				MastersPageTemplatesAdmin.addMasters(masterLayoutName = "Custom Masters Page Template");
+
+				MastersPageTemplates.publishMaster();
+			}
+
+			task ("Add a page based on master page in the site template") {
+				SiteTemplates.addSitePageViaSiteTemplateCP(
+					masterLayoutName = "Custom Masters Page Template",
+					pageName = "Test Page Name 1",
+					sitePageType = "Content Page",
+					siteTemplateName = "Site Template Name");
+
+				PageEditor.publish();
+			}
+
+			task ("Add a site based on site template") {
+				Site.openSitesAdmin();
+
+				Site.addSiteTemplateCP(
+					siteName = "Test Site Name 2",
+					siteTemplateName = "Site Template Name");
+			}
+
+			task ("Add another page based on master page in the site template") {
+				SiteTemplates.addSitePageViaSiteTemplateCP(
+					masterLayoutName = "Custom Masters Page Template",
+					pageName = "Test Page Name 2",
+					sitePageType = "Content Page",
+					siteTemplateName = "Site Template Name");
+
+				PageEditor.publish();
+			}
+		}
+
+		task ("When the page creator makes some changes in master page from site") {
+			MastersPageTemplatesAdmin.openMastersAdmin(siteURLKey = "Test Site Name 2");
+
+			MastersPageTemplatesAdmin.gotoMastersEllipsisItem(
+				item = "Edit",
+				masterLayoutName = "Custom Masters Page Template");
+
+			PageEditor.addFragment(
+				collectionName = "Basic Components",
+				dropTarget = "Header",
+				fragmentName = "Heading",
+				scope = "Master");
+
+			MastersPageTemplates.propagateChange();
+		}
+
+		task ("Then the page creator can see changes on propagated pages") {
+			for (var pageName : list "Test Page Name 1,Test Page Name 2") {
+				ContentPagesNavigator.openViewContentPage(
+					pageName = "${pageName}",
+					siteName = "Test Site Name 2");
+
+				ContentPages.viewFragmentText(
+					fragmentName = "heading",
+					id = "element-text",
+					text = "Heading Example");
+			}
 		}
 	}
 
