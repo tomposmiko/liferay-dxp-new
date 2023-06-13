@@ -123,12 +123,15 @@ public class UpdateObjectEntryObjectActionExecutorImpl
 			_objectFieldLocalService.getObjectFields(
 				objectDefinition.getObjectDefinitionId(), false);
 
+		Map<String, Object> objectEntry = (Map<String, Object>)variables.get(
+			"objectEntry");
+
 		objectFields.forEach(
 			objectField -> {
 				if (!values.containsKey(objectField.getName())) {
 					values.put(
 						objectField.getName(),
-						variables.get(objectField.getName()));
+						objectEntry.get(objectField.getName()));
 				}
 			});
 

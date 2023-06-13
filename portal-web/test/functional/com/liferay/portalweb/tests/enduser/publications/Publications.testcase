@@ -714,6 +714,7 @@ definition {
 		PublicationsNavigator.openPublicationsAdmin();
 
 		Publications.inviteUsers(
+			gotoReviewChanges = "true",
 			publicationName = "Publication Name",
 			publicationRole = "Editor",
 			userInvite = "userea@liferay.com",
@@ -788,7 +789,7 @@ definition {
 
 		PublicationsNavigator.openPublicationsAdmin();
 
-		PublicationsNavigator._gotoPublicationEllipsisItem(
+		PublicationsNavigator.gotoPublicationEllipsisItem(
 			menuItem = "Permissions",
 			publicationName = "Publication Name");
 
@@ -804,7 +805,7 @@ definition {
 
 		Publications.workOnProduction();
 
-		PublicationsNavigator._gotoPublicationEllipsisItem(
+		PublicationsNavigator.gotoPublicationEllipsisItem(
 			menuItem = "Permissions",
 			publicationName = "Publication Name");
 

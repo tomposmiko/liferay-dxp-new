@@ -45,6 +45,7 @@ interface IProps {
 	aggregationFilter?: boolean;
 	creationLanguageId?: Locale;
 	currentFilters: CurrentFilter[];
+	disableAutoClose?: boolean;
 	disableDateValues?: boolean;
 	editingFilter: boolean;
 	editingObjectFieldName: string;
@@ -125,6 +126,7 @@ export function ModalAddFilter({
 	aggregationFilter,
 	creationLanguageId,
 	currentFilters,
+	disableAutoClose = false,
 	disableDateValues,
 	editingFilter,
 	editingObjectFieldName,
@@ -158,7 +160,7 @@ export function ModalAddFilter({
 	const filteredAvailableFields = useMemo(() => {
 		return filterArrayByQuery({
 			array: objectFields,
-			creationLanguageId: creationLanguageId!,
+			creationLanguageId: creationLanguageId as Locale,
 			query,
 			str: 'label',
 		});
@@ -449,7 +451,7 @@ export function ModalAddFilter({
 			selectedFilterBy?.businessType === 'Relationship');
 
 	return (
-		<ClayModal observer={observer}>
+		<ClayModal disableAutoClose={disableAutoClose} observer={observer}>
 			<ClayModal.Header>{header}</ClayModal.Header>
 
 			<ClayModal.Body>
@@ -488,7 +490,7 @@ export function ModalAddFilter({
 						query={query}
 						required
 						value={getLocalizableLabel(
-							creationLanguageId!,
+							creationLanguageId as Locale,
 							selectedFilterBy?.label
 						)}
 					>
@@ -496,7 +498,7 @@ export function ModalAddFilter({
 							<div className="d-flex justify-content-between">
 								<div>
 									{getLocalizableLabel(
-										creationLanguageId!,
+										creationLanguageId as Locale,
 										label,
 										name
 									)}

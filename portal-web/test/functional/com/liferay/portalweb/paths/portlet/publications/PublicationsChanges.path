@@ -57,7 +57,7 @@
 </tr>
 <tr>
 	<td>CONFLICTING_CHANGES_DETAILS_IFRAME_TITLE</td>
-	<td>//div[contains(@class,'modal-header')]/div[@class='modal-title' and contains(.,'${key_iframeTitle}')]</td>
+	<td>//div[contains(@class,'modal-header')]//div[@class='modal-title' and contains(.,'${key_iframeTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -73,6 +73,11 @@
 <tr>
 	<td>DISCARD_CHANGE_BUTTON</td>
 	<td>//li[contains(.,'${key_changeTitle}') and contains(.,'${key_changeCategory}')]//a[contains(.,'Discard Change')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INVITE_USERS_ICON</td>
+	<td>//span[contains(@title,'Invite Users')]</td>
 	<td></td>
 </tr>
 <tr>

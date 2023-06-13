@@ -31,7 +31,7 @@ import '../css/ApplicationsMenu.scss';
 const getOpenMenuTooltip = (keyLabel) => (
 	<>
 		<div>{Liferay.Language.get('open-applications-menu')}</div>
-		<kbd className="c-kbd c-kbd-dark">
+		<kbd className="c-kbd c-kbd-dark mt-1">
 			<kbd className="c-kbd">Ctrl</kbd>
 
 			<span className="c-kbd-separator">+</span>
@@ -518,9 +518,9 @@ const ApplicationsMenu = ({
 				symbol="grid"
 			/>
 
-			<p className="sr-only" id={buttonTitleId}>
+			<div className="sr-only" id={buttonTitleId}>
 				{buttonTitle}
-			</p>
+			</div>
 		</>
 	);
 };

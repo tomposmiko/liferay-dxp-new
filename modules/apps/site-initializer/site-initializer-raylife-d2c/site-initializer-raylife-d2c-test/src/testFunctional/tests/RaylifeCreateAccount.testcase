@@ -163,6 +163,7 @@ definition {
 	@description = "LPS-144334 - Verify if after filling in the password and the email with all correct information, the create account button is active"
 	@priority = "5"
 	test IsCreateAccountButtonActive {
+		property solutions.acceptance = "true";
 		property test.name.skip.portal.instance = "RaylifeCreateAccount#IsAccountButtonActive";
 
 		ApplicationsMenu.gotoSite(key_site = "${testSiteName}");
@@ -234,6 +235,10 @@ definition {
 		Click(
 			locator1 = "RaylifeCreateAccount#SELECT_QUOTE",
 			title = "standard");
+
+		Click(
+			key_text = "CREATE NEW ACCOUNT",
+			locator1 = "Button#ANY");
 
 		AssertElementPresent(locator1 = "RaylifeCreateAccount#CREATE_ACCOUNT_DISABLED");
 	}
@@ -403,6 +408,8 @@ definition {
 			label = "password",
 			locator1 = "RaylifeCreateAccount#PASSWORD_FIELD",
 			value1 = "test@ 123");
+
+		Click(locator1 = "RaylifeCreateAccount#CREATE_NEW_ACCOUNT");
 
 		Type(
 			label = "rePassword",

@@ -60,26 +60,21 @@ export default function SearchBar({
 
 	/**
 	 * Returns the lowest suggestions display threshold available.
-	 * If no blueprint suggestions contributor sets its own threshold,
-	 * this value will default to the global one.
+	 * If a suggestions contributor does not set its own threshold,
+	 * it uses the global one.
 	 */
 
 	const _getLowestSuggestionsDisplayThreshold = useCallback(() => {
-		if (!isSearchExperiencesSupported) {
-			return parseInt(suggestionsDisplayThreshold, 10);
-		}
+		const characterThresholdArray = cleanSuggestionsContributorConfiguration(
+			suggestionsContributorConfiguration,
+			isSearchExperiencesSupported
+		).map((config) =>
+			config.attributes?.characterThreshold
+				? parseInt(config.attributes.characterThreshold, 10)
+				: parseInt(suggestionsDisplayThreshold, 10)
+		);
 
-		const characterThresholdArray = JSON.parse(
-			suggestionsContributorConfiguration
-		)
-			.filter((config) => config.attributes?.characterThreshold)
-			.map((config) =>
-				parseInt(config.attributes.characterThreshold, 10)
-			);
-
-		return characterThresholdArray.length
-			? Math.min(...characterThresholdArray)
-			: parseInt(suggestionsDisplayThreshold, 10);
+		return Math.min(...characterThresholdArray);
 	}, [
 		suggestionsContributorConfiguration,
 		suggestionsDisplayThreshold,

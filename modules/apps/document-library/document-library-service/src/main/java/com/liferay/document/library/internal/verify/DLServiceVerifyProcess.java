@@ -71,9 +71,7 @@ import com.liferay.portal.verify.VerifyProcess;
 import java.io.InputStream;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -152,35 +150,29 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 	private void _checkDDMStructureDefinition() throws Exception {
 		_companyLocalService.forEachCompanyId(
 			companyId -> {
-				Map<String, Set<String>> fieldNames =
-					RawMetadataProcessorUtil.getFieldNames();
-
 				Group group = _groupLocalService.getCompanyGroup(companyId);
+				String name =
+					com.liferay.portal.kernel.metadata.RawMetadataProcessor.
+						TIKA_RAW_METADATA;
 
-				for (Map.Entry<String, Set<String>> entry :
-						fieldNames.entrySet()) {
+				DDMStructure ddmStructure =
+					_ddmStructureLocalService.fetchStructure(
+						group.getGroupId(),
+						_portal.getClassNameId(RawMetadataProcessor.class),
+						name);
 
-					String name = entry.getKey();
+				if (ddmStructure != null) {
+					DDMForm ddmForm = DDMFormUtil.buildDDMForm(
+						RawMetadataProcessorUtil.getFieldNames(),
+						_portal.getSiteDefaultLocale(group.getGroupId()));
 
-					DDMStructure ddmStructure =
-						_ddmStructureLocalService.fetchStructure(
-							group.getGroupId(),
-							_portal.getClassNameId(RawMetadataProcessor.class),
-							name);
+					String definition = _serializeJSONDDMForm(ddmForm);
 
-					if (ddmStructure != null) {
-						DDMForm ddmForm = DDMFormUtil.buildDDMForm(
-							entry.getValue(),
-							_portal.getSiteDefaultLocale(group.getGroupId()));
+					if (!definition.equals(ddmStructure.getDefinition())) {
+						ddmStructure.setDDMForm(ddmForm);
 
-						String definition = _serializeJSONDDMForm(ddmForm);
-
-						if (!definition.equals(ddmStructure.getDefinition())) {
-							ddmStructure.setDDMForm(ddmForm);
-
-							_ddmStructureLocalService.updateDDMStructure(
-								ddmStructure);
-						}
+						_ddmStructureLocalService.updateDDMStructure(
+							ddmStructure);
 					}
 				}
 			});

@@ -928,6 +928,7 @@ const ClaimsTable = () => {
 									setFilterCheckedLabel([]);
 									setFilterProductCheck([]);
 									setFilterStatusCheck([]);
+									setIsRemaining(false);
 									setParameters(generateParameters());
 								}}
 							>
