@@ -12,7 +12,7 @@
 <tbody>
 <tr>
 	<td>POLICY_ID_SELECTED_QUOTE</td>
-	<td>//div[contains(@class, 'text-uppercase') and contains(., 'Policy')]</td>
+	<td>//div[contains(@class, 'text-uppercase') and contains(., 'Application ')]</td>
 	<td></td>
 </tr>
 </tbody>

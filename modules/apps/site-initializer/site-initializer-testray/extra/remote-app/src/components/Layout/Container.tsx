@@ -12,13 +12,16 @@
  * details.
  */
 
+import classNames from 'classnames';
+
 type ContainerProps = {
+	className?: string;
 	title?: string;
 };
 
-const Container: React.FC<ContainerProps> = ({children, title}) => (
-	<div className="bg-white border-1 p-4">
-		{title && <h3>{title}</h3>}
+const Container: React.FC<ContainerProps> = ({children, className, title}) => (
+	<div className={classNames('bg-white border-1 rounded-xs p-4', className)}>
+		{title && <h5>{title}</h5>}
 
 		{children}
 	</div>

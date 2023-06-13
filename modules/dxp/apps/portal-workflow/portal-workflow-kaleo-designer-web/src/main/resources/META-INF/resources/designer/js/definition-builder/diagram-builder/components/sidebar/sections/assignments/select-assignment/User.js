@@ -16,19 +16,27 @@ import ClayDropDown from '@clayui/drop-down';
 import ClayForm, {ClayInput} from '@clayui/form';
 import React, {useContext, useState} from 'react';
 
-import {headers} from '../../../../../../util/fetchUtil';
+import {headers, userBaseURL} from '../../../../../../util/fetchUtil';
 import {DiagramBuilderContext} from '../../../../../DiagramBuilderContext';
 import SidebarPanel from '../../../SidebarPanel';
 
-const User = ({displayDelete, identifier, index, setSections}) => {
+const User = ({
+	emailAddress = '',
+	identifier,
+	index,
+	screenName = '',
+	sectionsLength,
+	setSections,
+	userId = null,
+}) => {
 	const {setSelectedItem} = useContext(DiagramBuilderContext);
 
 	const [search, setSearch] = useState('');
 	const [networkStatus, setNetworkStatus] = useState(4);
 	const [user, setUser] = useState({
-		emailAddress: '',
-		screenName: '',
-		userId: null,
+		emailAddress,
+		screenName,
+		userId,
 	});
 
 	const {resource} = useResource({
@@ -39,12 +47,12 @@ const User = ({displayDelete, identifier, index, setSections}) => {
 				'x-csrf-token': Liferay.authToken,
 			},
 		},
-		link: `${window.location.origin}/o/headless-admin-user/v1.0/user-accounts`,
+		link: `${window.location.origin}${userBaseURL}/user-accounts`,
 		onNetworkStatusChange: setNetworkStatus,
 		variables: {search},
 	});
 
-	const serializer = (values) => {
+	const updateSelectedItem = (values) => {
 		setSelectedItem((previousItem) => ({
 			...previousItem,
 			data: {
@@ -52,6 +60,7 @@ const User = ({displayDelete, identifier, index, setSections}) => {
 				assignments: {
 					assignmentType: ['user'],
 					emailAddress: values.map(({emailAddress}) => emailAddress),
+					sectionsData: values.map((values) => values),
 				},
 			},
 		}));
@@ -66,7 +75,7 @@ const User = ({displayDelete, identifier, index, setSections}) => {
 				...item,
 			};
 
-			serializer(prev);
+			updateSelectedItem(prev);
 
 			return prev;
 		});
@@ -80,7 +89,7 @@ const User = ({displayDelete, identifier, index, setSections}) => {
 				(prevSection) => prevSection.identifier !== identifier
 			);
 
-			serializer(newSections);
+			updateSelectedItem(newSections);
 
 			return newSections;
 		});
@@ -97,6 +106,7 @@ const User = ({displayDelete, identifier, index, setSections}) => {
 
 				<ClayAutocomplete>
 					<ClayAutocomplete.Input
+						autoComplete="off"
 						id="search"
 						onChange={(event) => setSearch(event.target.value)}
 						value={search}
@@ -200,7 +210,7 @@ const User = ({displayDelete, identifier, index, setSections}) => {
 					{Liferay.Language.get('new-section')}
 				</ClayButton>
 
-				{displayDelete && (
+				{sectionsLength > 1 && (
 					<ClayButtonWithIcon
 						className="delete-button"
 						displayType="unstyled"

@@ -158,6 +158,15 @@ public class ObjectFieldLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.object.model.ObjectField
+			deleteRelationshipTypeObjectField(long objectFieldId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectFieldLocalService.deleteRelationshipTypeObjectField(
+			objectFieldId);
+	}
+
+	@Override
 	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
 		return _objectFieldLocalService.dslQuery(dslQuery);
 	}
@@ -461,13 +470,6 @@ public class ObjectFieldLocalServiceWrapper
 		com.liferay.object.model.ObjectField objectField) {
 
 		return _objectFieldLocalService.updateObjectField(objectField);
-	}
-
-	@Override
-	public void validateDBType(String dbType)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_objectFieldLocalService.validateDBType(dbType);
 	}
 
 	@Override

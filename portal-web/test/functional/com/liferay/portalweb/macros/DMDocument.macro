@@ -799,15 +799,25 @@ definition {
 
 	macro assertFileNameFromTempFolder {
 		var tempDir = PropsUtil.get("output.dir.name");
-		var documentFileName = FileUtil.getFileName("${tempDir}/${downloadedFileName}");
+		var downloadedFile = FileUtil.exists("${tempDir}/${fileName}");
 
-		echo("## downloadedFileName: ${documentFileName}");
-
-		if ("${downloadedFileName}" == "${documentFileName}") {
+		if ("${downloadedFile}" == "true") {
 			echo("This is a correct file name.");
 		}
 		else {
 			fail("FAIL!");
+		}
+	}
+
+	macro assertNoFileNameFromTempFolder {
+		var tempDir = PropsUtil.get("output.dir.name");
+		var exportedFile = FileUtil.exists("${tempDir}/${fileName}");
+
+		if ("${exportedFile}" == "true") {
+			fail("FAIL! There is a file named ${fileName}.");
+		}
+		else {
+			echo("This is no file named ${fileName}.");
 		}
 	}
 
@@ -1122,7 +1132,11 @@ definition {
 	}
 
 	macro deletePGViaMG {
-		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Move to Recycle Bin");
+		Click(
+			key_rowEntry = "${mgDocumentTitle}",
+			locator1 = "Icon#ROW_VERTICAL_ELLIPSIS");
+
+		MenuItem.click(menuItem = "Move to Recycle Bin");
 
 		VerifyElementPresent(locator1 = "Message#SUCCESS");
 

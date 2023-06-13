@@ -98,9 +98,7 @@ public class ObjectEntryInfoItemFieldValuesProvider
 				ObjectEntry.class.getName(), objectEntry)
 		).infoFieldValues(
 			_templateInfoItemFieldSetProvider.getInfoFieldValues(
-				ObjectEntry.class.getName(),
-				String.valueOf(objectEntry.getObjectDefinitionId()),
-				objectEntry)
+				objectEntry.getModelClassName(), objectEntry)
 		).infoItemReference(
 			new InfoItemReference(
 				ObjectEntry.class.getName(), objectEntry.getObjectEntryId())
@@ -168,7 +166,7 @@ public class ObjectEntryInfoItemFieldValuesProvider
 					objectEntry.getUserName()));
 			objectEntryFieldValues.add(
 				new InfoFieldValue<>(
-					ObjectEntryInfoItemFields.userProfileImage,
+					ObjectEntryInfoItemFields.userProfileImageInfoField,
 					_getWebImage(objectEntry.getUserId())));
 
 			ThemeDisplay themeDisplay = _getThemeDisplay();

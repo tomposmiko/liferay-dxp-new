@@ -31,13 +31,9 @@ import {
 	publishDefinitionRequest,
 	saveDefinitionRequest,
 } from '../../../util/fetchUtil';
+import {isObjectEmpty} from '../../../util/utils';
 
-export default function UpperToolbar({
-	displayNames,
-	languageIds,
-	translations,
-	version,
-}) {
+export default function UpperToolbar({displayNames, languageIds, version}) {
 	const {
 		active,
 		currentEditor,
@@ -51,7 +47,9 @@ export default function UpperToolbar({
 		setSelectedLanguageId,
 		setShowInvalidContentMessage,
 		setSourceView,
+		setTranslations,
 		sourceView,
+		translations,
 	} = useContext(DefinitionBuilderContext);
 	const inputRef = useRef(null);
 	const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -93,8 +91,16 @@ export default function UpperToolbar({
 	};
 
 	const onInputBlur = () => {
-		if (definitionTitle && selectedLanguageId) {
-			translations[selectedLanguageId] = definitionTitle;
+		if (definitionTitle) {
+			let languageId = defaultLanguageId;
+
+			if (selectedLanguageId) {
+				languageId = selectedLanguageId;
+			}
+
+			setTranslations((previous) => {
+				return {...previous, [languageId]: definitionTitle};
+			});
 		}
 	};
 
@@ -127,6 +133,7 @@ export default function UpperToolbar({
 				content: getXMLContent(true),
 				name: definitionId,
 				title: definitionTitle,
+				title_i18n: translations,
 				version,
 			}).then((response) => {
 				if (response.ok) {
@@ -148,6 +155,7 @@ export default function UpperToolbar({
 			content: getXMLContent(),
 			name: definitionId,
 			title: definitionTitle,
+			title_i18n: translations,
 			version,
 		}).then((response) => {
 			if (response.ok) {
@@ -159,10 +167,16 @@ export default function UpperToolbar({
 	};
 
 	useEffect(() => {
+		if (isObjectEmpty(translations)) {
+			setTranslations({
+				[defaultLanguageId]: Liferay.Language.get('new-workflow'),
+			});
+		}
+
 		if (selectedLanguageId) {
 			setDefinitionTitle(translations[selectedLanguageId]);
 		}
-	}, [selectedLanguageId, setDefinitionTitle, translations]);
+	}, [selectedLanguageId, setDefinitionTitle, setTranslations, translations]);
 
 	return (
 		<>
@@ -184,6 +198,7 @@ export default function UpperToolbar({
 
 						<ClayToolbar.Item expand>
 							<ClayInput
+								autoComplete="off"
 								className="form-control-inline"
 								id="definition-title"
 								onBlur={() => onInputBlur()}

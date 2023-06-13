@@ -21,10 +21,11 @@ import com.liferay.object.exception.ObjectFieldLabelException;
 import com.liferay.object.exception.ObjectFieldNameException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.exception.RequiredObjectFieldException;
+import com.liferay.object.field.business.type.ObjectFieldBusinessType;
+import com.liferay.object.field.business.type.ObjectFieldBusinessTypeServicesTracker;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
-import com.liferay.object.model.ObjectView;
 import com.liferay.object.service.base.ObjectFieldLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
@@ -39,6 +40,8 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -139,43 +142,30 @@ public class ObjectFieldLocalServiceImpl
 	public ObjectField deleteObjectField(ObjectField objectField)
 		throws PortalException {
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionPersistence.findByPrimaryKey(
-				objectField.getObjectDefinitionId());
-
-		if ((objectDefinition.isApproved() || objectDefinition.isSystem()) &&
-			!Objects.equals(
-				objectDefinition.getExtensionDBTableName(),
-				objectField.getDBTableName())) {
-
-			throw new RequiredObjectFieldException();
+		if (Validator.isNotNull(objectField.getRelationshipType())) {
+			throw new ObjectFieldRelationshipTypeException(
+				"Object field cannot be deleted because it has a " +
+					"relationship type");
 		}
 
-		objectField = objectFieldPersistence.remove(objectField);
+		return _deleteObjectField(objectField);
+	}
 
-		_objectLayoutColumnPersistence.removeByObjectFieldId(
-			objectField.getObjectFieldId());
+	@Indexable(type = IndexableType.DELETE)
+	@Override
+	public ObjectField deleteRelationshipTypeObjectField(long objectFieldId)
+		throws PortalException {
 
-		List<ObjectView> objectViews =
-			_objectViewPersistence.findByObjectDefinitionId(
-				objectField.getObjectDefinitionId());
+		ObjectField objectField = objectFieldPersistence.findByPrimaryKey(
+			objectFieldId);
 
-		for (ObjectView objectView : objectViews) {
-			_objectViewColumnPersistence.removeByOVI_OFN(
-				objectView.getObjectViewId(), objectField.getName());
+		if (Validator.isNull(objectField.getRelationshipType())) {
+			throw new ObjectFieldRelationshipTypeException(
+				"Object field cannot be deleted because it does not have a " +
+					"relationship type");
 		}
 
-		if (Objects.equals(
-				objectDefinition.getExtensionDBTableName(),
-				objectField.getDBTableName())) {
-
-			runSQL(
-				DynamicObjectDefinitionTable.getAlterTableDropColumnSQL(
-					objectField.getDBTableName(),
-					objectField.getDBColumnName()));
-		}
-
-		return objectField;
+		return _deleteObjectField(objectField);
 	}
 
 	@Override
@@ -258,15 +248,13 @@ public class ObjectFieldLocalServiceImpl
 			}
 		}
 		else {
-			_validateBusinessType(businessType);
-			validateDBType(dbType);
 			_validateName(objectFieldId, objectDefinition, name);
 		}
 
+		_setBusinessTypeAndDBType(businessType, dbType, objectField);
+
 		objectField.setListTypeDefinitionId(listTypeDefinitionId);
-		objectField.setBusinessType(businessType);
 		objectField.setDBColumnName(name + StringPool.UNDERLINE);
-		objectField.setDBType(dbType);
 		objectField.setIndexed(indexed);
 		objectField.setIndexedAsKeyword(indexedAsKeyword);
 		objectField.setIndexedLanguageId(indexedLanguageId);
@@ -274,13 +262,6 @@ public class ObjectFieldLocalServiceImpl
 		objectField.setRequired(required);
 
 		return objectFieldPersistence.update(objectField);
-	}
-
-	@Override
-	public void validateDBType(String dbType) throws PortalException {
-		if (!_dbTypes.contains(dbType)) {
-			throw new ObjectFieldDBTypeException("Invalid DB type " + dbType);
-		}
 	}
 
 	private ObjectField _addObjectField(
@@ -294,14 +275,14 @@ public class ObjectFieldLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		_validateBusinessType(businessType);
-		validateDBType(dbType);
 		_validateIndexed(dbType, indexed, indexedAsKeyword, indexedLanguageId);
 		_validateLabel(labelMap);
 		_validateName(0, objectDefinition, name);
 
 		ObjectField objectField = objectFieldPersistence.create(
 			counterLocalService.increment());
+
+		_setBusinessTypeAndDBType(businessType, dbType, objectField);
 
 		User user = _userLocalService.getUser(userId);
 
@@ -311,10 +292,8 @@ public class ObjectFieldLocalServiceImpl
 
 		objectField.setListTypeDefinitionId(listTypeDefinitionId);
 		objectField.setObjectDefinitionId(objectDefinitionId);
-		objectField.setBusinessType(businessType);
 		objectField.setDBColumnName(dbColumnName);
 		objectField.setDBTableName(dbTableName);
-		objectField.setDBType(dbType);
 		objectField.setIndexed(indexed);
 		objectField.setIndexedAsKeyword(indexedAsKeyword);
 		objectField.setIndexedLanguageId(indexedLanguageId);
@@ -326,14 +305,67 @@ public class ObjectFieldLocalServiceImpl
 		return objectFieldPersistence.update(objectField);
 	}
 
-	private void _validateBusinessType(String businessType)
+	private ObjectField _deleteObjectField(ObjectField objectField)
 		throws PortalException {
 
-		if (Validator.isNotNull(businessType) &&
-			!_businessTypes.contains(businessType)) {
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.findByPrimaryKey(
+				objectField.getObjectDefinitionId());
 
-			throw new ObjectFieldBusinessTypeException(
-				"Invalid business type " + businessType);
+		if ((objectDefinition.isApproved() || objectDefinition.isSystem()) &&
+			!Objects.equals(
+				objectDefinition.getExtensionDBTableName(),
+				objectField.getDBTableName())) {
+
+			throw new RequiredObjectFieldException();
+		}
+
+		objectField = objectFieldPersistence.remove(objectField);
+
+		_objectLayoutColumnPersistence.removeByObjectFieldId(
+			objectField.getObjectFieldId());
+
+		if (Objects.equals(
+				objectDefinition.getExtensionDBTableName(),
+				objectField.getDBTableName())) {
+
+			runSQL(
+				DynamicObjectDefinitionTable.getAlterTableDropColumnSQL(
+					objectField.getDBTableName(),
+					objectField.getDBColumnName()));
+		}
+
+		return objectField;
+	}
+
+	private void _setBusinessTypeAndDBType(
+			String businessType, String dbType, ObjectField objectField)
+		throws PortalException {
+
+		ObjectFieldBusinessType objectFieldBusinessType =
+			_objectFieldBusinessTypeServicesTracker.getObjectFieldBusinessType(
+				GetterUtil.getString(businessType));
+
+		Set<String> objectFieldDBTypes =
+			_objectFieldBusinessTypeServicesTracker.getObjectFieldDBTypes();
+
+		if (objectFieldBusinessType != null) {
+			objectField.setBusinessType(businessType);
+			objectField.setDBType(objectFieldBusinessType.getDBType());
+		}
+		else if (objectFieldDBTypes.contains(dbType) &&
+				 _businessTypes.containsKey(dbType)) {
+
+			objectField.setBusinessType(_businessTypes.get(dbType));
+			objectField.setDBType(dbType);
+		}
+		else {
+			if (!businessType.isEmpty()) {
+				throw new ObjectFieldBusinessTypeException(
+					"Invalid business type " + businessType);
+			}
+
+			throw new ObjectFieldDBTypeException("Invalid DB type " + dbType);
 		}
 	}
 
@@ -408,15 +440,30 @@ public class ObjectFieldLocalServiceImpl
 		}
 	}
 
-	private final Set<String> _businessTypes = SetUtil.fromArray(
-		"Boolean", "Date", "Decimal", "Integer", "LongInteger", "LongText",
-		"Picklist", "PrecisionDecimal", "Relationship", "Text");
-	private final Set<String> _dbTypes = SetUtil.fromArray(
-		"BigDecimal", "Blob", "Boolean", "Clob", "Date", "Double", "Integer",
-		"Long", "String");
+	private final Map<String, String> _businessTypes = HashMapBuilder.put(
+		"BigDecimal", "PrecisionDecimal"
+	).put(
+		"Boolean", "Boolean"
+	).put(
+		"Clob", "LongText"
+	).put(
+		"Date", "Date"
+	).put(
+		"Double", "Decimal"
+	).put(
+		"Integer", "Integer"
+	).put(
+		"Long", "LongInteger"
+	).put(
+		"String", "Text"
+	).build();
 
 	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
+
+	@Reference
+	private ObjectFieldBusinessTypeServicesTracker
+		_objectFieldBusinessTypeServicesTracker;
 
 	@Reference
 	private ObjectLayoutColumnPersistence _objectLayoutColumnPersistence;
