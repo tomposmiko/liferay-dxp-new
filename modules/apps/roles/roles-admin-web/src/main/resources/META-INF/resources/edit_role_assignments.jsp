@@ -109,7 +109,7 @@ renderResponse.setTitle(role.getTitle(locale));
 		<strong class="lead"><%= LanguageUtil.get(request, "assigning-roles-by-segment-is-disabled") %></strong>
 
 		<%
-		String segmentsConfigurationURL = SegmentsEntryDisplayContext.getSegmentsConfigurationURL(request);
+		String segmentsConfigurationURL = SegmentsEntryDisplayContext.getSegmentsCompanyConfigurationURL(request);
 		%>
 
 		<c:choose>
@@ -123,7 +123,7 @@ renderResponse.setTitle(role.getTitle(locale));
 			<c:otherwise>
 				<span><%=
 				LanguageUtil.get(
-					request, "to-enable,-go-to-instance-settings") %></span>
+					request, "contact-your-system-administrator-to-enable-it") %></span>
 			</c:otherwise>
 		</c:choose>
 	</clay:stripe>

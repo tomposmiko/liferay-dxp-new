@@ -14,6 +14,7 @@
 
 /// <reference types="react" />
 
+import './ModalAddFilter.scss';
 export declare function ModalAddFilter({
 	currentFilters,
 	editingFilter,
@@ -30,13 +31,17 @@ interface IProps {
 	editingFilter: boolean;
 	editingObjectFieldName: string;
 	header: string;
-	objectFields: TObjectField[];
+	objectFields: ObjectField[];
 	observer: any;
 	onClose: () => void;
 	onSave: (
+		filterBy?: string,
+		fieldLabel?: LocalizedValue<string>,
+		objectFieldBusinessType?: string,
 		filterType?: string,
 		objectFieldName?: string,
-		valueList?: IItem[]
+		valueList?: IItem[],
+		value?: string
 	) => void;
 	workflowStatusJSONArray: TWorkflowStatus[];
 }
@@ -62,20 +67,5 @@ declare type TWorkflowStatus = {
 };
 declare type TName = {
 	[key: string]: string;
-};
-declare type TObjectField = {
-	businessType: string;
-	checked: boolean;
-	filtered?: boolean;
-	hasFilter?: boolean;
-	id: number;
-	indexed: boolean;
-	indexedAsKeyword: boolean;
-	indexedLanguageId: string;
-	label: TName;
-	listTypeDefinitionId: boolean;
-	name: string;
-	required: boolean;
-	type: string;
 };
 export {};

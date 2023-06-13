@@ -29,6 +29,7 @@ import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.configuration.ObjectConfiguration;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
@@ -2404,13 +2405,21 @@ public class ObjectEntryLocalServiceImpl
 					throw new ObjectEntryValuesException.ExceedsLongSize(
 						16, objectField.getName());
 				}
-				else if (value > _MAX_SAFE_LONG) {
+				else if (value > ObjectFieldValidationConstants.
+							BUSINESS_TYPE_LONG_VALUE_MAX) {
+
 					throw new ObjectEntryValuesException.ExceedsLongMaxSize(
-						_MAX_SAFE_LONG, objectField.getName());
+						ObjectFieldValidationConstants.
+							BUSINESS_TYPE_LONG_VALUE_MAX,
+						objectField.getName());
 				}
-				else if (value < _MIN_SAFE_LONG) {
+				else if (value < ObjectFieldValidationConstants.
+							BUSINESS_TYPE_LONG_VALUE_MIN) {
+
 					throw new ObjectEntryValuesException.ExceedsLongMinSize(
-						_MIN_SAFE_LONG, objectField.getName());
+						ObjectFieldValidationConstants.
+							BUSINESS_TYPE_LONG_VALUE_MIN,
+						objectField.getName());
 				}
 			}
 		}
@@ -2443,10 +2452,6 @@ public class ObjectEntryLocalServiceImpl
 			}
 		}
 	}
-
-	private static final long _MAX_SAFE_LONG = 9007199254740991L;
-
-	private static final long _MIN_SAFE_LONG = -9007199254740991L;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectEntryLocalServiceImpl.class);

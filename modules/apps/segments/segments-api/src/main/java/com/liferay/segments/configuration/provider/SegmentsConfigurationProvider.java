@@ -20,10 +20,17 @@ import com.liferay.segments.configuration.SegmentsCompanyConfiguration;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * @author Cristina González
  */
+@ProviderType
 public interface SegmentsConfigurationProvider {
+
+	public String getCompanyConfigurationURL(
+			HttpServletRequest httpServletRequest)
+		throws PortalException;
 
 	public String getConfigurationURL(HttpServletRequest httpServletRequest)
 		throws PortalException;

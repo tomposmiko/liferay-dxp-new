@@ -44,6 +44,7 @@ import statusCode from './status_code';
 import addParams from './util/add_params';
 import getCountries from './util/address/get_countries.es';
 import getRegions from './util/address/get_regions.es';
+import Cookie from './util/cookie';
 import fetch from './util/fetch.es';
 import focusFormField from './util/focus_form_field';
 import getFormElement from './util/form/get_form_element.es';
@@ -343,5 +344,7 @@ Liferay.Util.toggleRadio = toggleRadio;
 Liferay.Util.toggleSelectBox = toggleSelectBox;
 Liferay.Util.unescape = unescape;
 Liferay.Util.unescapeHTML = unescapeHTML;
+
+Liferay.Util.Cookie = Cookie;
 
 export {portlet};

@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Object Service
 Bundle-SymbolicName: com.liferay.object.service
-Bundle-Version: 1.0.75
+Bundle-Version: 1.0.77
 Import-Package:\
 	!org.apache.commons.cli.*,\
 	!org.apache.ivy.*,\
@@ -8,6 +8,6 @@ Import-Package:\
 	!org.fusesource.jansi.*,\
 	\
 	*
-Liferay-Require-SchemaVersion: 3.14.0
+Liferay-Require-SchemaVersion: 3.17.0
 Liferay-Service: true
 -dsannotations-options: inherit

@@ -288,7 +288,7 @@ public class ObjectDefinitionLocalServiceTest {
 			TestPropsValues.getUserId(), 0,
 			objectDefinition.getObjectDefinitionId(), "Text", "String", null,
 			false, false, null, LocalizedMapUtil.getLocalizedMap("Charlie"),
-			"charlie", true, Collections.emptyList());
+			"charlie", true, false, Collections.emptyList());
 
 		// Before publish, database table
 
@@ -334,7 +334,7 @@ public class ObjectDefinitionLocalServiceTest {
 			TestPropsValues.getUserId(), 0,
 			objectDefinition.getObjectDefinitionId(), "Text", "String", null,
 			false, false, null, LocalizedMapUtil.getLocalizedMap("Dog"), "dog",
-			true, Collections.emptyList());
+			true, false, Collections.emptyList());
 
 		// After publish, database table
 
@@ -794,7 +794,7 @@ public class ObjectDefinitionLocalServiceTest {
 			TestPropsValues.getUserId(), 0,
 			objectDefinition.getObjectDefinitionId(), "Text", "String", null,
 			false, false, null, LocalizedMapUtil.getLocalizedMap("Able"),
-			"able", true, Collections.emptyList());
+			"able", true, false, Collections.emptyList());
 
 		// Database table
 
@@ -966,7 +966,7 @@ public class ObjectDefinitionLocalServiceTest {
 			objectDefinition.getObjectDefinitionId(), "Text", "String", null,
 			false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), true, Collections.emptyList());
+			StringUtil.randomId(), true, false, Collections.emptyList());
 
 		objectDefinition =
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
@@ -1069,7 +1069,7 @@ public class ObjectDefinitionLocalServiceTest {
 			objectDefinition.getObjectDefinitionId(), "Text", "String", null,
 			false, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), true, Collections.emptyList());
+			StringUtil.randomId(), true, false, Collections.emptyList());
 
 		objectDefinition =
 			_objectDefinitionLocalService.updateTitleObjectFieldId(
@@ -1205,7 +1205,7 @@ public class ObjectDefinitionLocalServiceTest {
 			_objectRelationshipLocalService.addObjectRelationship(
 				TestPropsValues.getUserId(),
 				objectDefinition1.getObjectDefinitionId(),
-				objectDefinition2.getObjectDefinitionId(),
+				objectDefinition2.getObjectDefinitionId(), 0,
 				ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				StringUtil.randomId(),

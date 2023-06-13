@@ -12,7 +12,7 @@
  * details.
  */
 
-import {navigate} from 'frontend-js-web';
+import {addParams, navigate} from 'frontend-js-web';
 
 import openDeleteLayoutModal from './openDeleteLayoutModal';
 
@@ -50,23 +50,24 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 	};
 
 	const exportTranslation = ({exportTranslationURL}) => {
+		const keys = Array.from(
+			document.querySelectorAll(
+				`[name=${portletNamespace}rowIds]:checked`
+			)
+		).map(({value}) => value);
+
 		const url = new URL(exportTranslationURL);
 
-		const urlSearchParams = new URLSearchParams(url.search);
-
-		const paramName = `_${urlSearchParams.get('p_p_id')}_classPK`;
-
-		const nodes = Array.from(
-			document.getElementsByName(`${portletNamespace}rowIds`)
+		navigate(
+			addParams(
+				{
+					[`_${url.searchParams.get('p_p_id')}_classPK`]: keys.join(
+						','
+					),
+				},
+				exportTranslationURL
+			)
 		);
-
-		nodes.forEach((node) => {
-			if (node.checked) {
-				url.searchParams.append(paramName, node.value);
-			}
-		});
-
-		navigate(url.toString());
 	};
 
 	return {

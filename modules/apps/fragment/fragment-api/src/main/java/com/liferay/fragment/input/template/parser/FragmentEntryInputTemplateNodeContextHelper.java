@@ -19,17 +19,23 @@ import com.liferay.fragment.util.configuration.FragmentConfigurationField;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.info.exception.InfoFormValidationException;
 import com.liferay.info.field.InfoField;
-import com.liferay.info.field.type.ImageInfoFieldType;
+import com.liferay.info.field.type.FileInfoFieldType;
 import com.liferay.info.field.type.InfoFieldType;
 import com.liferay.info.field.type.NumberInfoFieldType;
 import com.liferay.info.field.type.SelectInfoFieldType;
 import com.liferay.info.form.InfoForm;
+import com.liferay.item.selector.ItemSelector;
+import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
+import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.math.BigDecimal;
 
@@ -38,6 +44,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -48,10 +56,12 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 
 	public FragmentEntryInputTemplateNodeContextHelper(
 		String defaultInputLabel,
-		FragmentEntryConfigurationParser fragmentEntryConfigurationParser) {
+		FragmentEntryConfigurationParser fragmentEntryConfigurationParser,
+		ItemSelector itemSelector) {
 
 		_defaultInputLabel = defaultInputLabel;
 		_fragmentEntryConfigurationParser = fragmentEntryConfigurationParser;
+		_itemSelector = itemSelector;
 	}
 
 	public InputTemplateNode toInputTemplateNode(
@@ -86,6 +96,8 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 
 			errorMessage = infoFormValidationException.getLocalizedMessage(
 				locale);
+
+			SessionErrors.remove(httpServletRequest, infoField.getUniqueId());
 		}
 
 		String inputHelpText = GetterUtil.getString(
@@ -149,21 +161,81 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 			inputShowHelpText, inputShowLabel, infoFieldType.getName(),
 			"value");
 
-		if (infoFieldType instanceof ImageInfoFieldType) {
+		if (infoFieldType instanceof FileInfoFieldType) {
 			Optional<String> acceptedFileExtensionsOptional =
 				infoField.getAttributeOptional(
-					ImageInfoFieldType.ALLOWED_FILE_EXTENSIONS);
+					FileInfoFieldType.ALLOWED_FILE_EXTENSIONS);
+
+			String allowedFileExtensions =
+				acceptedFileExtensionsOptional.orElse(StringPool.BLANK);
+
+			if (Validator.isNotNull(allowedFileExtensions)) {
+				StringBundler sb = new StringBundler();
+
+				for (String allowedFileExtension :
+						StringUtil.split(allowedFileExtensions)) {
+
+					sb.append(StringPool.PERIOD);
+					sb.append(allowedFileExtension.trim());
+					sb.append(StringPool.COMMA);
+				}
+
+				sb.setIndex(sb.index() - 1);
+
+				allowedFileExtensions = sb.toString();
+			}
 
 			inputTemplateNode.addAttribute(
-				"allowedFileExtensions",
-				acceptedFileExtensionsOptional.orElse(StringPool.BLANK));
+				"allowedFileExtensions", allowedFileExtensions);
 
 			Optional<Long> maximumFileSizeOptional =
-				infoField.getAttributeOptional(
-					ImageInfoFieldType.MAX_FILE_SIZE);
+				infoField.getAttributeOptional(FileInfoFieldType.MAX_FILE_SIZE);
 
 			inputTemplateNode.addAttribute(
 				"maxFileSize", maximumFileSizeOptional.orElse(0L));
+
+			Optional<FileInfoFieldType.FileSourceType> fileSourceTypeOptional =
+				infoField.getAttributeOptional(FileInfoFieldType.FILE_SOURCE);
+
+			FileInfoFieldType.FileSourceType fileSourceType =
+				fileSourceTypeOptional.orElse(null);
+
+			if (fileSourceType != null) {
+				boolean selectFromDocumentLibrary = false;
+
+				if (fileSourceType ==
+						FileInfoFieldType.FileSourceType.DOCUMENTS_AND_MEDIA) {
+
+					selectFromDocumentLibrary = true;
+				}
+
+				inputTemplateNode.addAttribute(
+					"selectFromDocumentLibrary", selectFromDocumentLibrary);
+
+				if (selectFromDocumentLibrary) {
+					FileItemSelectorCriterion fileItemSelectorCriterion =
+						new FileItemSelectorCriterion();
+
+					fileItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+						new FileEntryItemSelectorReturnType());
+
+					RequestBackedPortletURLFactory
+						requestBackedPortletURLFactory =
+							RequestBackedPortletURLFactoryUtil.create(
+								httpServletRequest);
+
+					PortletURL itemSelectorURL =
+						_itemSelector.getItemSelectorURL(
+							requestBackedPortletURLFactory,
+							fragmentEntryLink.getNamespace() +
+								"selectFileEntry",
+							fileItemSelectorCriterion);
+
+					inputTemplateNode.addAttribute(
+						"selectFromDocumentLibraryURL",
+						itemSelectorURL.toString());
+				}
+			}
 		}
 		else if (infoField.getInfoFieldType() instanceof NumberInfoFieldType) {
 			String dataType = "integer";
@@ -198,16 +270,42 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 				minValue -> inputTemplateNode.addAttribute("min", minValue));
 		}
 		else if (infoField.getInfoFieldType() instanceof SelectInfoFieldType) {
+			List<InputTemplateNode.Option> options = new ArrayList<>();
+
 			Optional<List<SelectInfoFieldType.Option>> optionsOptional =
 				infoField.getAttributeOptional(SelectInfoFieldType.OPTIONS);
 
-			List<SelectInfoFieldType.Option> options = optionsOptional.orElse(
-				new ArrayList<>());
+			for (SelectInfoFieldType.Option option :
+					optionsOptional.orElse(Collections.emptyList())) {
 
-			for (SelectInfoFieldType.Option option : options) {
-				inputTemplateNode.addOption(
-					option.getLabel(locale), option.getValue());
+				options.add(
+					new InputTemplateNode.Option(
+						option.getLabel(locale), option.getValue()));
 			}
+
+			inputTemplateNode.addAttribute("options", options);
+
+			Optional<String> optionsLabelFieldNameOptional =
+				infoField.getAttributeOptional(
+					SelectInfoFieldType.OPTIONS_LABEL_FIELD_NAME);
+
+			inputTemplateNode.addAttribute(
+				"optionsLabelFieldName",
+				optionsLabelFieldNameOptional.orElse(null));
+
+			Optional<String> optionsURLOptional =
+				infoField.getAttributeOptional(SelectInfoFieldType.OPTIONS_URL);
+
+			inputTemplateNode.addAttribute(
+				"optionsURL", optionsURLOptional.orElse(null));
+
+			Optional<String> optionsValueFieldNameOptional =
+				infoField.getAttributeOptional(
+					SelectInfoFieldType.OPTIONS_VALUE_FIELD_NAME);
+
+			inputTemplateNode.addAttribute(
+				"optionsValueFieldName",
+				optionsValueFieldNameOptional.orElse(null));
 		}
 
 		return inputTemplateNode;
@@ -233,5 +331,6 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 	private final String _defaultInputLabel;
 	private final FragmentEntryConfigurationParser
 		_fragmentEntryConfigurationParser;
+	private final ItemSelector _itemSelector;
 
 }

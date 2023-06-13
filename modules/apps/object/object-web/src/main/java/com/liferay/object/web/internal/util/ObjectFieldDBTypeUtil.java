@@ -14,23 +14,16 @@
 
 package com.liferay.object.web.internal.util;
 
-import com.liferay.info.field.InfoField;
 import com.liferay.info.field.type.BooleanInfoFieldType;
 import com.liferay.info.field.type.DateInfoFieldType;
-import com.liferay.info.field.type.ImageInfoFieldType;
+import com.liferay.info.field.type.FileInfoFieldType;
 import com.liferay.info.field.type.InfoFieldType;
 import com.liferay.info.field.type.NumberInfoFieldType;
 import com.liferay.info.field.type.SelectInfoFieldType;
 import com.liferay.info.field.type.TextInfoFieldType;
-import com.liferay.info.localized.bundle.FunctionInfoLocalizedValue;
-import com.liferay.list.type.model.ListTypeEntry;
-import com.liferay.list.type.service.ListTypeEntryLocalServiceUtil;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectField;
-import com.liferay.portal.kernel.util.Validator;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,36 +31,10 @@ import java.util.Objects;
  */
 public class ObjectFieldDBTypeUtil {
 
-	public static InfoField<?> addAttributes(
-		InfoField.FinalStep finalStep, ObjectField objectField) {
-
+	public static InfoFieldType getInfoFieldType(ObjectField objectField) {
 		if (Objects.equals(
 				objectField.getBusinessType(),
-				ObjectFieldConstants.BUSINESS_TYPE_DECIMAL) ||
-			Objects.equals(
-				objectField.getBusinessType(),
-				ObjectFieldConstants.BUSINESS_TYPE_PRECISION_DECIMAL)) {
-
-			finalStep.attribute(NumberInfoFieldType.DECIMAL, true);
-		}
-		else if (Objects.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
-
-			finalStep.attribute(
-				SelectInfoFieldType.OPTIONS, _getOptions(objectField));
-		}
-
-		return finalStep.build();
-	}
-
-	public static InfoFieldType getInfoFieldType(ObjectField objectField) {
-		if (Validator.isNotNull(objectField.getRelationshipType())) {
-			return TextInfoFieldType.INSTANCE;
-		}
-		else if (Objects.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_BOOLEAN)) {
+				ObjectFieldConstants.BUSINESS_TYPE_BOOLEAN)) {
 
 			return BooleanInfoFieldType.INSTANCE;
 		}
@@ -90,7 +57,7 @@ public class ObjectFieldDBTypeUtil {
 					objectField.getBusinessType(),
 					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
 
-			return ImageInfoFieldType.INSTANCE;
+			return FileInfoFieldType.INSTANCE;
 		}
 		else if (Objects.equals(
 					objectField.getBusinessType(),
@@ -109,25 +76,6 @@ public class ObjectFieldDBTypeUtil {
 		}
 
 		return TextInfoFieldType.INSTANCE;
-	}
-
-	private static List<SelectInfoFieldType.Option> _getOptions(
-		ObjectField objectField) {
-
-		List<SelectInfoFieldType.Option> options = new ArrayList<>();
-
-		List<ListTypeEntry> listTypeEntries =
-			ListTypeEntryLocalServiceUtil.getListTypeEntries(
-				objectField.getListTypeDefinitionId());
-
-		for (ListTypeEntry listTypeEntry : listTypeEntries) {
-			options.add(
-				new SelectInfoFieldType.Option(
-					new FunctionInfoLocalizedValue<>(listTypeEntry::getName),
-					listTypeEntry.getKey()));
-		}
-
-		return options;
 	}
 
 }

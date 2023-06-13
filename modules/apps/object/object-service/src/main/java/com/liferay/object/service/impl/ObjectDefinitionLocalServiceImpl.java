@@ -224,7 +224,7 @@ public class ObjectDefinitionLocalServiceImpl
 					newObjectField.getDBType(),
 					newObjectField.getDefaultValue(), false, false, "",
 					newObjectField.getLabelMap(), newObjectField.getName(),
-					newObjectField.isRequired());
+					newObjectField.isRequired(), newObjectField.isState());
 			}
 			else {
 				if (!Objects.equals(
@@ -763,23 +763,25 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinition.getObjectDefinitionId(), false, true, true);
 
 		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-154872"))) {
-			_objectFieldLocalService.addSystemObjectField(
-				userId, objectDefinition.getObjectDefinitionId(), "Date",
-				ObjectEntryTable.INSTANCE.status.getName(),
-				ObjectEntryTable.INSTANCE.getTableName(), "Date", null, false,
-				false, null,
-				LocalizedMapUtil.getLocalizedMap(
-					LanguageUtil.get(LocaleUtil.getDefault(), "create-date")),
-				"dateCreated", false);
+			if (!objectDefinition.isSystem()) {
+				dbTableName = "ObjectEntry";
+			}
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Text",
-				ObjectEntryTable.INSTANCE.status.getName(),
-				ObjectEntryTable.INSTANCE.getTableName(), "String", null, false,
-				false, null,
+				ObjectEntryTable.INSTANCE.userName.getName(), dbTableName,
+				"String", null, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "author")),
-				"creator", false);
+				"creator", false, false);
+
+			_objectFieldLocalService.addSystemObjectField(
+				userId, objectDefinition.getObjectDefinitionId(), "Date",
+				ObjectEntryTable.INSTANCE.status.getName(), dbTableName, "Date",
+				null, false, false, null,
+				LocalizedMapUtil.getLocalizedMap(
+					LanguageUtil.get(LocaleUtil.getDefault(), "create-date")),
+				"dateCreated", false, false);
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Integer",
@@ -788,25 +790,23 @@ public class ObjectDefinitionLocalServiceImpl
 				false, false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "id")),
-				"id", false);
+				"id", false, false);
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Date",
-				ObjectEntryTable.INSTANCE.status.getName(),
-				ObjectEntryTable.INSTANCE.getTableName(), "Date", null, false,
-				false, null,
+				ObjectEntryTable.INSTANCE.status.getName(), dbTableName, "Date",
+				null, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "modified-date")),
-				"dateModified", false);
+				"dateModified", false, false);
 
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Text",
-				ObjectEntryTable.INSTANCE.status.getName(),
-				ObjectEntryTable.INSTANCE.getTableName(), "Integer", null,
-				false, false, null,
+				ObjectEntryTable.INSTANCE.status.getName(), dbTableName,
+				"Integer", null, false, false, null,
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "status")),
-				"status", false);
+				"status", false, false);
 		}
 
 		if (objectFields != null) {
@@ -822,7 +822,7 @@ public class ObjectDefinitionLocalServiceImpl
 						objectField.isIndexedAsKeyword(),
 						objectField.getIndexedLanguageId(),
 						objectField.getLabelMap(), objectField.getName(),
-						objectField.isRequired());
+						objectField.isRequired(), objectField.isState());
 				}
 				else {
 					_objectFieldLocalService.addCustomObjectField(
@@ -833,7 +833,7 @@ public class ObjectDefinitionLocalServiceImpl
 						objectField.isIndexedAsKeyword(),
 						objectField.getIndexedLanguageId(),
 						objectField.getLabelMap(), objectField.getName(),
-						objectField.isRequired(),
+						objectField.isRequired(), objectField.isState(),
 						objectField.getObjectFieldSettings());
 				}
 			}

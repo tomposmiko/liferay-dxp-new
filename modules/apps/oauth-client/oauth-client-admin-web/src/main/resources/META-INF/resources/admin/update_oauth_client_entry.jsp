@@ -42,15 +42,82 @@ renderResponse.setTitle((oAuthClientEntry == null) ? LanguageUtil.get(request, "
 	>
 		<div class="sheet">
 			<aui:fieldset>
+				<liferay-ui:error exception="<%= DuplicateOAuthClientEntryException.class %>" message="oauth-client-duplicate-client" />
+
+				<liferay-ui:error exception="<%= OAuthClientEntryAuthRequestParametersJSONException.class %>">
+					<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuthClientEntryAuthRequestParametersJSONException)errorException).getMessage()) %>" key="oauth-client-invalid-auth-request-parameters-json-x" />
+				</liferay-ui:error>
+
+				<liferay-ui:error exception="<%= OAuthClientEntryAuthServerWellKnownURIException.class %>" message="oauth-client-invalid-auth-server-well-known-uri" />
+
+				<liferay-ui:error exception="<%= OAuthClientEntryInfoJSONException.class %>">
+					<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuthClientEntryInfoJSONException)errorException).getMessage()) %>" key="oauth-client-invalid-info-json-x" />
+				</liferay-ui:error>
+
+				<liferay-ui:error exception="<%= OAuthClientEntryTokenRequestParametersJSONException.class %>">
+					<liferay-ui:message arguments="<%= HtmlUtil.escape(((OAuthClientEntryTokenRequestParametersJSONException)errorException).getMessage()) %>" key="oauth-client-invalid-token-request-parameters-json-x" />
+				</liferay-ui:error>
+
 				<aui:input helpMessage="oauth-client-as-well-known-uri-help" label="oauth-client-as-well-known-uri" name="authServerWellKnownURI" type="text" />
 
-				<aui:input helpMessage="oauth-client-info-json-help" label="oauth-client-info-json" name="infoJSON" style="min-height: 600px;" type="textarea" value='{"client_id":"","client_secret":"","redirect_uris":[""],"client_name":"example_client","scope":"openid email profile","subject_type":"public"}' />
+				<aui:input
+					helpMessage="oauth-client-info-json-help"
+					label="oauth-client-info-json"
+					name="infoJSON"
+					style="min-height: 600px;"
+					type="textarea"
+					value='<%=
+						JSONUtil.put(
+							"client_id", ""
+						).put(
+							"client_name", "example_client"
+						).put(
+							"client_secret", ""
+						).put(
+							"redirect_uris", JSONUtil.put("")
+						).put(
+							"scope", "openid email profile"
+						).put(
+							"subject_type", "public"
+						)
+					%>'
+				/>
 
 				<aui:input name="oAuthClientEntryId" type="hidden" value="<%= (oAuthClientEntry != null) ? oAuthClientEntry.getOAuthClientEntryId() : 0 %>" />
 
-				<aui:input helpMessage='<%= LanguageUtil.format(request, "oauth-client-default-auth-request-parameters-json-help", "https://www.iana.org/assignments/oauth-parameters", false) %>' label="oauth-client-default-auth-request-parameters-json" name="authRequestParametersJSON" style="min-height: 200px;" type="textarea" value='{"response_type":"code","resource":[],"scope":"","custom_request_parameters":{"example_key":["example_value"]}}' />
+				<aui:input
+					helpMessage='<%= LanguageUtil.format(request, "oauth-client-default-auth-request-parameters-json-help", "https://www.iana.org/assignments/oauth-parameters", false) %>'
+					label="oauth-client-default-auth-request-parameters-json"
+					name="authRequestParametersJSON"
+					style="min-height: 200px;"
+					type="textarea"
+					value='<%=
+						JSONUtil.put(
+							"custom_request_parameters", JSONUtil.put("example_key", JSONUtil.put(""))
+						).put(
+							"resource", JSONUtil.put("")
+						).put(
+							"response_type", "code"
+						).put(
+							"scope", "openid email profile"
+						)
+					%>'
+				/>
 
-				<aui:input helpMessage='<%= LanguageUtil.format(request, "oauth-client-default-token-request-parameters-json-help", "https://www.iana.org/assignments/oauth-parameters", false) %>' label="oauth-client-default-token-request-parameters-json" name="tokenRequestParametersJSON" style="min-height: 200px;" type="textarea" value='{"resource":[],"custom_request_parameters":{"example_key":["example_value"]}}' />
+				<aui:input
+					helpMessage='<%= LanguageUtil.format(request, "oauth-client-default-token-request-parameters-json-help", "https://www.iana.org/assignments/oauth-parameters", false) %>'
+					label="oauth-client-default-token-request-parameters-json"
+					name="tokenRequestParametersJSON"
+					style="min-height: 200px;"
+					type="textarea"
+					value='<%=
+						JSONUtil.put(
+							"custom_request_parameters", JSONUtil.put("example_key", JSONUtil.put(""))
+						).put(
+							"resource", JSONUtil.put("")
+						)
+					%>'
+				/>
 
 				<aui:button-row>
 					<aui:button onClick='<%= liferayPortletResponse.getNamespace() + "doSubmit();" %>' type="submit" />

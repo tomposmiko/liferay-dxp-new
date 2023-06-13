@@ -289,21 +289,6 @@ definition {
 		VerifyElementPresent(locator1 = "Message#SUCCESS");
 	}
 
-	macro subscribePG {
-		AssertTextEquals.assertPartialText(
-			key_assetDescription = "${folderDescription}",
-			locator1 = "Bookmarks#DESCRIPTIVE_ENTRY_DESCRIPTION",
-			value1 = "${folderDescription}");
-
-		Click.clickAt(locator1 = "Icon#INFO");
-
-		Pause(locator1 = "1000");
-
-		Click(locator1 = "Icon#SUBSCRIBE");
-
-		Alert.viewSuccessMessage();
-	}
-
 	macro tearDownCP {
 		Navigator.openURL();
 

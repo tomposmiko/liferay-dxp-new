@@ -20,7 +20,7 @@ import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.field.type.BooleanInfoFieldType;
 import com.liferay.info.field.type.DateInfoFieldType;
-import com.liferay.info.field.type.ImageInfoFieldType;
+import com.liferay.info.field.type.FileInfoFieldType;
 import com.liferay.info.field.type.NumberInfoFieldType;
 import com.liferay.info.field.type.SelectInfoFieldType;
 import com.liferay.info.field.type.TextInfoFieldType;
@@ -89,6 +89,7 @@ public class InfoRequestFieldValuesProviderHelper {
 			ParamUtil.getLong(uploadServletRequest, "classNameId"));
 		String classTypeId = ParamUtil.getString(
 			uploadServletRequest, "classTypeId");
+		long groupId = ParamUtil.getLong(uploadServletRequest, "groupId");
 
 		Map<String, FileItem[]> multipartParameterMap =
 			uploadServletRequest.getMultipartParameterMap();
@@ -97,19 +98,18 @@ public class InfoRequestFieldValuesProviderHelper {
 			uploadServletRequest.getRegularParameterMap();
 
 		for (InfoField<?> infoField :
-				_getInfoFields(
-					className, classTypeId, themeDisplay.getScopeGroupId())) {
+				_getInfoFields(className, classTypeId, groupId)) {
 
 			FileItem[] multipartParameters = multipartParameterMap.get(
 				infoField.getName());
 
 			if ((multipartParameters != null) &&
-				(infoField.getInfoFieldType() instanceof ImageInfoFieldType)) {
+				(infoField.getInfoFieldType() instanceof FileInfoFieldType)) {
 
 				for (FileItem fileItem : multipartParameters) {
 					infoFieldValues.add(
-						_getImageInfoFieldValue(
-							fileItem, infoField, themeDisplay));
+						_getFileInfoFieldValue(
+							fileItem, groupId, infoField, themeDisplay));
 				}
 			}
 
@@ -154,8 +154,9 @@ public class InfoRequestFieldValuesProviderHelper {
 		return null;
 	}
 
-	private InfoFieldValue<Object> _getImageInfoFieldValue(
-			FileItem fileItem, InfoField infoField, ThemeDisplay themeDisplay)
+	private InfoFieldValue<Object> _getFileInfoFieldValue(
+			FileItem fileItem, long groupId, InfoField infoField,
+			ThemeDisplay themeDisplay)
 		throws InfoFormFileUploadException {
 
 		try (InputStream inputStream = fileItem.getInputStream()) {
@@ -170,7 +171,7 @@ public class InfoRequestFieldValuesProviderHelper {
 			}
 
 			FileEntry fileEntry = TempFileEntryUtil.addTempFileEntry(
-				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
+				groupId, themeDisplay.getUserId(),
 				InfoRequestFieldValuesProviderHelper.class.getName(),
 				TempFileEntryUtil.getTempFileName(fileItem.getFileName()), file,
 				fileItem.getContentType());
@@ -250,7 +251,7 @@ public class InfoRequestFieldValuesProviderHelper {
 			return _getNumberInfoFieldValue(infoField, locale, value);
 		}
 
-		if (infoField.getInfoFieldType() instanceof ImageInfoFieldType ||
+		if (infoField.getInfoFieldType() instanceof FileInfoFieldType ||
 			infoField.getInfoFieldType() instanceof SelectInfoFieldType ||
 			infoField.getInfoFieldType() instanceof TextInfoFieldType) {
 

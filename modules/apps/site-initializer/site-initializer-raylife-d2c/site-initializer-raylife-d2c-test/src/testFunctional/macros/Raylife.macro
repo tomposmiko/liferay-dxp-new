@@ -1,5 +1,63 @@
 definition {
 
+	macro assertAllObjectsForRaylifeD2c {
+		ObjectAdmin.openObjectAdmin();
+
+		Raylife.waitForObject(key_object = "Raylife Application");
+
+		ObjectPortlet.selectCustomObject(label = "Raylife Application");
+
+		CreateObject.assertObjectLabel(labelName = "Raylife Application");
+
+		Navigator.gotoBack();
+
+		ObjectPortlet.selectCustomObject(label = "Raylife Claim");
+
+		CreateObject.assertObjectLabel(labelName = "Raylife Claim");
+
+		Navigator.gotoBack();
+
+		ObjectPortlet.selectCustomObject(label = "Raylife Document");
+
+		CreateObject.assertObjectLabel(labelName = "Raylife Document");
+
+		Navigator.gotoBack();
+
+		ObjectPortlet.selectCustomObject(label = "Raylife Goal");
+
+		CreateObject.assertObjectLabel(labelName = "Raylife Goal");
+
+		Navigator.gotoBack();
+
+		ObjectPortlet.selectCustomObject(label = "Raylife Policy");
+
+		CreateObject.assertObjectLabel(labelName = "Raylife Policy");
+
+		Navigator.gotoBack();
+
+		ObjectPortlet.selectCustomObject(label = "Quote Comparison");
+
+		CreateObject.assertObjectLabel(labelName = "Quote Comparison");
+
+		Navigator.gotoBack();
+
+		ObjectPortlet.selectCustomObject(label = "Quote Retrieve");
+
+		CreateObject.assertObjectLabel(labelName = "Quote Retrieve");
+
+		Navigator.gotoBack();
+
+		ObjectPortlet.selectCustomObject(label = "Raylife Quote");
+
+		CreateObject.assertObjectLabel(labelName = "Raylife Quote");
+
+		Navigator.gotoBack();
+
+		ObjectPortlet.selectCustomObject(label = "Raylife Sales Goal");
+
+		CreateObject.assertObjectLabel(labelName = "Raylife Sales Goal");
+	}
+
 	macro commerceApisTearDowm {
 		CommerceJSONAccountsAPI._deleteAllCommerceAccounts();
 
@@ -20,9 +78,14 @@ definition {
 		CommerceJSONTaxCategoriesAPI._deleteCommerceTaxCategories();
 
 		CommerceJSONWarehousesAndInventoriesAPI._deleteAllWarehouseItems();
+
+		ObjectAdmin.deleteAllCustomObjectsViaAPI();
 	}
 
 	macro createRaylifeSite {
+		var testSiteName = "Raylife D2C";
+		var testSiteURL = "raylife-d2c";
+
 		Site.openSitesAdmin();
 
 		LexiconEntry.gotoAdd();
@@ -33,13 +96,13 @@ definition {
 			key_title = "Add Site",
 			locator1 = "IFrame#MODAL_ANY");
 
-		PortletEntry.inputName(name = "${siteName}");
+		PortletEntry.inputName(name = "${testSiteName}");
 
 		Click(locator1 = "Button#ADD");
 
 		Site.openSitesAdmin();
 
-		while (IsElementNotPresent(key_siteName = "${siteName}", locator1 = "Sites#SITE_TABLE_NAME")) {
+		while (IsElementNotPresent(key_siteName = "${testSiteName}", locator1 = "Sites#SITE_TABLE_NAME")) {
 			Refresh();
 
 			WaitForPageLoad();
@@ -110,6 +173,14 @@ definition {
 				key_productsName = "${productsList}",
 				locator1 = "Raylife#PRODUCTS_NAME",
 				value1 = "${productsName}");
+		}
+	}
+
+	macro waitForObject {
+		while (IsElementNotPresent(label = "${key_object}", locator1 = "ObjectPortlet#SELECT_CUSTOM_OBJECT")) {
+			Refresh();
+
+			WaitForPageLoad();
 		}
 	}
 

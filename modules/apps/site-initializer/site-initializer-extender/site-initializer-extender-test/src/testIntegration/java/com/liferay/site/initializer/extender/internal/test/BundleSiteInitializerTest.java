@@ -103,6 +103,7 @@ import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -114,6 +115,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
@@ -244,6 +246,7 @@ public class BundleSiteInitializerTest {
 			_assertSiteConfiguration(group.getGroupId());
 			_assertSiteNavigationMenu(group);
 			_assertStyleBookEntry(group);
+			_assertUserGroups(group);
 			_assertUserRoles(group);
 			_assertWorkflowDefinitions(group, serviceContext);
 		}
@@ -1393,6 +1396,27 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals(totalCount, page.getTotalCount());
 	}
 
+	private void _assertUserGroups(Group group) {
+		List<UserGroup> userGroups = _userGroupLocalService.getGroupUserGroups(
+			group.getGroupId());
+
+		Assert.assertTrue(userGroups.size() == 2);
+
+		UserGroup userGroup1 =
+			_userGroupLocalService.fetchUserGroupByExternalReferenceCode(
+				group.getCompanyId(), "TESTUSERGROUP1");
+
+		Assert.assertNotNull(userGroup1);
+		Assert.assertTrue(userGroups.contains(userGroup1));
+
+		UserGroup userGroup2 =
+			_userGroupLocalService.fetchUserGroupByExternalReferenceCode(
+				group.getCompanyId(), "TESTUSERGROUP2");
+
+		Assert.assertNotNull(userGroup2);
+		Assert.assertTrue(userGroups.contains(userGroup2));
+	}
+
 	private void _assertUserOrganizations(
 			String organizationId, int totalCount,
 			UserAccountResource userAccountResource)
@@ -1653,6 +1677,9 @@ public class BundleSiteInitializerTest {
 
 	@Inject
 	private UserAccountResource.Factory _userAccountResourceFactory;
+
+	@Inject
+	private UserGroupLocalService _userGroupLocalService;
 
 	@Inject
 	private UserLocalService _userLocalService;

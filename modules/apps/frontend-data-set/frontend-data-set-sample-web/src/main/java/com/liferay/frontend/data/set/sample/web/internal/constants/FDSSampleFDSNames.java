@@ -22,6 +22,9 @@ public class FDSSampleFDSNames {
 	public static final String CLASSIC =
 		FDSSamplePortletKeys.FDS_SAMPLE + "-classic";
 
+	public static final String CONTROLLED =
+		FDSSamplePortletKeys.FDS_SAMPLE + "-controlled";
+
 	public static final String CUSTOMIZED =
 		FDSSamplePortletKeys.FDS_SAMPLE + "-customized";
 

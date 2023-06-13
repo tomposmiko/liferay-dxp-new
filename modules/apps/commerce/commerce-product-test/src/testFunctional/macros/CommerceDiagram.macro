@@ -109,6 +109,18 @@ definition {
 			locator1 = "CommerceDiagrams#DIAGRAM_SETTINGS_SELECTED_TYPE");
 	}
 
+	macro assertPinSize {
+		if ("${pinSize}" == "Small") {
+			AssertElementPresent(locator1 = "CommerceDiagrams#DIAGRAM_PIN_SIZE_SMALL");
+		}
+		else if ("${pinSize}" == "Medium") {
+			AssertElementPresent(locator1 = "CommerceDiagrams#DIAGRAM_PIN_SIZE_MEDIUM");
+		}
+		else if ("${pinSize}" == "Large") {
+			AssertElementPresent(locator1 = "CommerceDiagrams#DIAGRAM_PIN_SIZE_LARGE");
+		}
+	}
+
 	macro assertPinToolTipInfo {
 		AssertElementPresent(
 			key_positionValue = "${pinNumber}",
@@ -252,6 +264,15 @@ definition {
 		Click(locator1 = "CommerceDiagrams#DIAGRAM_EXPAND");
 	}
 
+	macro selectPinSize {
+		Click(locator1 = "CommerceDiagrams#DIAGRAM_PIN_SIZE_BUTTON");
+
+		AssertClick(
+			key_pinSize = "${pinSize}",
+			locator1 = "CommerceDiagrams#DIAGRAM_PIN_SIZE_DROPDOWN",
+			value1 = "${pinSize}");
+	}
+
 	macro setVisibility {
 		CommerceEntry.gotoMenuTab(menuTab = "Visibility");
 
@@ -361,8 +382,6 @@ definition {
 		Click(
 			key_text = "Reset Zoom",
 			locator1 = "Button#ANY");
-
-		Pause(locator1 = "2000");
 
 		var actual_position = selenium.getAttribute("//div[contains(@class,'diagram-pins-container')]//*[name()='svg']//*[name()='g']@transform");
 

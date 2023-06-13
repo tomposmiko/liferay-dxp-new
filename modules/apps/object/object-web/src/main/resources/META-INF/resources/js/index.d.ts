@@ -12,10 +12,6 @@
  * details.
  */
 
-interface ItemIdName {
-	id: string;
-	name: string;
-}
 type Locale = Liferay.Language.Locale;
 type LocalizedValue<T> = Liferay.Language.LocalizedValue<T>;
 
@@ -53,7 +49,9 @@ type ObjectFieldBusinessType =
 	| 'LongInteger'
 	| 'Integer'
 	| 'Decimal'
-	| 'PrecisionDecimal';
+	| 'PrecisionDecimal'
+	| 'Workflow Status'
+	| 'Date';
 interface ObjectFieldType {
 	businessType: ObjectFieldBusinessType;
 	dbType: string;
@@ -62,10 +60,10 @@ interface ObjectFieldType {
 }
 interface ObjectField {
 	DBType: string;
-	businessType: ObjectFieldBusinessType;
+	businessType: ObjectFieldBusinessType | string;
 	defaultValue?: string;
 	externalReferenceCode?: string;
-	id?: number;
+	id: number;
 	indexed: boolean;
 	indexedAsKeyword: boolean;
 	indexedLanguageId: Locale | null;
@@ -77,6 +75,13 @@ interface ObjectField {
 	required: boolean;
 	state: boolean;
 	system?: boolean;
+}
+
+interface ObjectFieldView extends ObjectField {
+	checked?: boolean;
+	filtered?: boolean;
+	hasFilter?: boolean;
+	type?: string;
 }
 
 interface ObjectDefinition {
@@ -91,6 +96,7 @@ interface ObjectDefinition {
 	objectLayouts: [];
 	objectViews: [];
 	panelCategoryKey: string;
+	parameterRequired?: boolean;
 	pluralLabel: LocalizedValue<string>;
 	portlet: boolean;
 	scope: string;
@@ -99,13 +105,34 @@ interface ObjectDefinition {
 		label: string;
 		label_i18n: string;
 	};
+	storageType?: string;
 	system: boolean;
 	titleObjectFieldId: number;
 }
 
 interface ObjectFieldSetting {
 	name: ObjectFieldSettingName;
-	value: string | number | boolean;
+	value: string | number | boolean | ObjectFieldFilterSetting[];
+}
+
+type ObjectFieldFilterSetting = {
+	filterBy?: string;
+	filterType?: string;
+	json?: {
+		[key: string]:
+			| string
+			| string[]
+			| ObjectFieldDateRangeFilterSettings
+			| undefined;
+	};
+};
+
+type ObjectFieldDateRangeFilterSettings = {
+	[key: string]: string;
+};
+
+interface IItem extends LabelValueObject {
+	checked?: boolean;
 }
 
 type ObjectFieldSettingName =
@@ -118,7 +145,8 @@ type ObjectFieldSettingName =
 	| 'storageDLFolderPath'
 	| 'relationship'
 	| 'function'
-	| 'summarizeField';
+	| 'summarizeField'
+	| 'filters';
 
 interface ObjectValidation {
 	active: boolean;
@@ -134,26 +162,42 @@ interface ObjectValidation {
 
 interface ObjectRelationship {
 	deletionType: string;
-	id: string;
+	id: number;
 	label: LocalizedValue<string>;
 	name: string;
 	objectDefinitionId1: number;
 	objectDefinitionId2: number;
-	objectDefinitionName2: string;
+	readonly objectDefinitionName2: string;
 	objectRelationshipId: number;
+	parameterObjectFieldId?: number;
 	reverse?: boolean;
-	type: string;
+	type: ObjectRelationshipType;
 }
 
-interface PickListItem {
-	key: string;
-	name: string;
+interface ObjectDefinitionsRelationship {
+	id: number;
+	label: string;
+	related?: boolean;
 }
+
+type ObjectRelationshipType = 'manyToMany' | 'oneToMany' | 'oneToOne';
 
 type ObjectValidationType = {
 	label: string;
 	name: string;
 };
+
+interface PickList {
+	id: number;
+	listTypeEntries: PickListItem[];
+	name: string;
+}
+
+interface PickListItem {
+	id: number;
+	key: string;
+	name: string;
+}
 
 interface PredefinedValue {
 	inputAsValue: boolean;

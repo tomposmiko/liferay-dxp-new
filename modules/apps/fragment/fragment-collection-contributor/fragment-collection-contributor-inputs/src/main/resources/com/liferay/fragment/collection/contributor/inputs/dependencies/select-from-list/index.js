@@ -7,6 +7,9 @@ const wrapper = fragmentElement;
 
 const button = wrapper.querySelector('.form-control');
 const buttonLabel = button.querySelector('.forms-select-from-list-label');
+const defaultOptionLabel = document.getElementById(
+	`${fragmentNamespace}-option--`
+).textContent;
 const dropdown = wrapper.querySelector('.dropdown-menu');
 const inputElement = wrapper.querySelector('input');
 const listbox = wrapper.querySelector('.list-unstyled');
@@ -17,11 +20,15 @@ const noResultsMessage = wrapper.querySelector(
 	'.forms-select-from-list-no-results'
 );
 const searchInput = wrapper.querySelector('.forms-select-from-list-search');
+const searchInputWrapper = wrapper.querySelector(
+	'.forms-select-from-list-search-wrapper'
+);
 
-let currentSearch = {
-	abortController: new AbortController(),
-	query: '',
-};
+const MAX_ITEMS = 10;
+
+let defaultOptions = (input.attributes.options || []).slice(0, MAX_ITEMS);
+let lastSearchAbortController = new AbortController();
+let lastSearchQuery = null;
 
 function debounce(fn, delay) {
 	let debounceId = null;
@@ -30,6 +37,20 @@ function debounce(fn, delay) {
 		clearTimeout(debounceId);
 		debounceId = setTimeout(() => fn(...args), delay);
 	};
+}
+
+function hideElement(element) {
+	element.classList.add('d-none');
+	element.setAttribute('aria-hidden', 'true');
+}
+
+function isVisible(element) {
+	return !element.hasAttribute('aria-hidden');
+}
+
+function showElement(element) {
+	element.classList.remove('d-none');
+	element.removeAttribute('aria-hidden');
 }
 
 function repositionDropdown() {
@@ -63,9 +84,34 @@ function repositionDropdown() {
 }
 
 function showDropdown() {
-	repositionDropdown();
-	button.setAttribute('aria-expanded', 'true');
-	dropdown.classList.add('show');
+	const canFetchOptions = input.attributes.optionsURL && searchInput;
+
+	if (canFetchOptions || defaultOptions.length) {
+		repositionDropdown();
+		button.setAttribute('aria-expanded', 'true');
+		dropdown.classList.add('show');
+	}
+
+	if (canFetchOptions && !defaultOptions.length) {
+		showElement(loadingResultsMessage);
+
+		fetchRemoteOptions('', lastSearchAbortController)
+			.then((items) => {
+				defaultOptions = items.slice(0, MAX_ITEMS);
+
+				if (items.length > MAX_ITEMS) {
+					showElement(searchInputWrapper);
+				}
+				else {
+					hideElement(searchInputWrapper);
+				}
+
+				setListboxItems(defaultOptions);
+			})
+			.finally(() => {
+				hideElement(loadingResultsMessage);
+			});
+	}
 }
 
 function hideDropdown() {
@@ -79,24 +125,37 @@ function getActiveDesdendant() {
 	);
 }
 
-function setActiveDescendant(item) {
+function setActiveDescendant(element) {
 	const previousItem = getActiveDesdendant();
 
-	if (previousItem && previousItem !== item) {
+	if (previousItem && previousItem !== element) {
 		previousItem.classList.remove('active');
 		previousItem.removeAttribute('aria-selected');
 	}
 
-	buttonLabel.textContent = item.textContent;
-	listbox.setAttribute('aria-activedescendant', item.id);
-	inputElement.value = item.dataset.optionValue;
+	if (element) {
+		buttonLabel.textContent = element.textContent;
 
-	item.classList.add('active');
-	item.setAttribute('aria-selected', 'true');
+		buttonLabel.classList.toggle(
+			'text-muted',
+			!element.dataset.optionValue
+		);
 
-	item.scrollIntoView({
-		block: 'nearest',
-	});
+		listbox.setAttribute('aria-activedescendant', element.id);
+		inputElement.value = element.dataset.optionValue;
+
+		element.classList.add('active');
+		element.setAttribute('aria-selected', 'true');
+
+		element.scrollIntoView({
+			block: 'nearest',
+		});
+	}
+	else {
+		buttonLabel.textContent = '';
+		listbox.removeAttribute('aria-activedescendant');
+		inputElement.value = '';
+	}
 }
 
 function handleButtonClick() {
@@ -107,12 +166,9 @@ function handleButtonClick() {
 	else {
 		showDropdown();
 
-		if (searchInput) {
+		if (isVisible(searchInputWrapper)) {
 			searchInput.focus();
-
-			if (searchInput) {
-				searchInput.setSelectionRange(0, searchInput.value.length);
-			}
+			searchInput.setSelectionRange(0, searchInput.value.length);
 		}
 		else {
 			listbox.focus();
@@ -201,7 +257,7 @@ function handleKeydown(event) {
 }
 
 function handleListboxClick(event) {
-	if (event.target.dataset?.optionValue) {
+	if (event.target.dataset?.optionValue !== undefined) {
 		setActiveDescendant(event.target);
 		hideDropdown();
 		button.focus();
@@ -238,36 +294,41 @@ function handleWindowResizeOrScroll() {
 	}
 }
 
-function filterLocalOptions() {
+function filterLocalOptions(query) {
 	const preferedItems = [];
 	const restItems = [];
 
-	for (const item of input.options) {
-		if (preferedItems.length + restItems.length === 10) {
+	for (const item of input.attributes.options) {
+		if (preferedItems.length + restItems.length === MAX_ITEMS) {
 			break;
 		}
 
 		const label = item.label.trim().toLowerCase();
 
-		if (label.startsWith(currentSearch.query)) {
+		if (label.startsWith(query)) {
 			preferedItems.push(item);
 		}
-		else if (label.includes(currentSearch.query)) {
+		else if (label.includes(query)) {
 			restItems.push(item);
 		}
 	}
 
-	return Promise.resolve({
-		items: [...preferedItems, ...restItems].slice(0, 10).map((item) => ({
-			key: item.value,
-			name: item.label,
-		})),
-	});
+	return Promise.resolve(
+		[...preferedItems, ...restItems].slice(0, MAX_ITEMS)
+	);
 }
 
-function fetchRemoteOptions() {
-	const url = new URL(input.attributes.autocompleteURL);
-	url.searchParams.set('search', currentSearch.query);
+function fetchRemoteOptions(query, abortController) {
+	if (
+		!input.attributes.optionsLabelFieldName ||
+		!input.attributes.optionsURL ||
+		!input.attributes.optionsValueFieldName
+	) {
+		return Promise.resolve({items: []});
+	}
+
+	const url = new URL(input.attributes.optionsURL);
+	url.searchParams.set('search', query);
 
 	return Liferay.Util.fetch(url, {
 		headers: new Headers({
@@ -275,111 +336,104 @@ function fetchRemoteOptions() {
 			'Content-Type': 'application/json',
 		}),
 		method: 'GET',
-		signal: currentSearch.abortController.signal,
-	}).then((response) => response.json());
+		signal: abortController.signal,
+	})
+		.then((response) => response.json())
+		.then((result) => {
+			return result.items.map((entry) => ({
+				label: entry[input.attributes.optionsLabelFieldName],
+				value: entry[input.attributes.optionsValueFieldName],
+			}));
+		});
 }
 
-function handleSearchKeyup() {
-	if (searchInput.value === currentSearch.query) {
-		return;
-	}
+function setListboxItems(items) {
+	listbox.innerHTML = '';
 
-	currentSearch.abortController.abort();
-
-	currentSearch = {
-		abortController: new AbortController(),
-		query: searchInput.value,
-	};
-
-	const setListboxItems = (items) => {
-		listbox.innerHTML = '';
-
-		items.forEach((item) => {
-			const element = document.createElement('li');
-
-			element.classList.add('dropdown-item');
-			element.dataset.optionValue = item.value;
-			element.id = `${fragmentNamespace}-option-${item.value}`;
-			element.setAttribute('role', 'option');
-			element.textContent = item.label;
-
-			listbox.appendChild(element);
-		});
-
-		if (items.length) {
-			setActiveDescendant(listbox.firstElementChild);
-		}
-	};
-
-	if (currentSearch.query) {
-		listbox.innerHTML = '';
+	if (items.length) {
+		showElement(listbox);
+		hideElement(noResultsMessage);
 	}
 	else {
-		setListboxItems(input.options);
+		hideElement(listbox);
+		showElement(noResultsMessage);
+	}
+
+	[{label: defaultOptionLabel, value: ''}, ...items].forEach((item) => {
+		const element = document.createElement('li');
+
+		element.classList.add('dropdown-item');
+
+		if (!item.value) {
+			element.classList.add('text-muted');
+		}
+
+		element.dataset.optionValue = item.value;
+		element.id = `${fragmentNamespace}-option-${item.value}`;
+		element.setAttribute('role', 'option');
+		element.textContent = item.label;
+
+		listbox.appendChild(element);
+	});
+
+	setActiveDescendant(listbox.firstElementChild);
+}
+
+function handleSearchInput() {
+	if (searchInput.value === lastSearchQuery) {
+		return;
+	}
+
+	lastSearchAbortController.abort();
+	lastSearchAbortController = new AbortController();
+	lastSearchQuery = searchInput.value;
+
+	if (!lastSearchQuery) {
+		setListboxItems(defaultOptions);
 
 		return;
 	}
 
-	loadingResultsMessage.classList.remove('d-none');
-	loadingResultsMessage.removeAttribute('aria-hidden');
+	showElement(loadingResultsMessage);
 
-	const fetcher = input.attributes.autocompleteURL
+	const fetcher = input.attributes.optionsURL
 		? fetchRemoteOptions
 		: filterLocalOptions;
 
-	fetcher()
-		.then((result) => {
-			setListboxItems(
-				result.items.map((entry) => ({
-					label: entry.name,
-					value: entry.key,
-				}))
-			);
-
-			if (listbox.children.length) {
-				listbox.removeAttribute('aria-hidden');
-				listbox.classList.remove('d-none');
-				noResultsMessage.setAttribute('aria-hidden', 'true');
-				noResultsMessage.classList.add('d-none');
-			}
-			else {
-				listbox.setAttribute('aria-hidden', 'true');
-				listbox.classList.add('d-none');
-				noResultsMessage.removeAttribute('aria-hidden');
-				noResultsMessage.classList.remove('d-none');
-			}
+	fetcher(lastSearchQuery, lastSearchAbortController)
+		.then((items) => {
+			setListboxItems(items.slice(0, MAX_ITEMS));
 		})
 		.finally(() => {
-			loadingResultsMessage.classList.add('d-none');
-			loadingResultsMessage.setAttribute('aria-hidden', 'true');
+			hideElement(loadingResultsMessage);
 		});
 }
 
-if (listbox.children.length) {
-	button.addEventListener('click', handleButtonClick);
-	button.addEventListener('keydown', handleKeydown);
-	listbox.addEventListener('keydown', handleKeydown);
-	listbox.addEventListener('click', handleListboxClick);
-	document.addEventListener('click', handleDocumentClick);
+button.addEventListener('click', handleButtonClick);
+button.addEventListener('keydown', handleKeydown);
+listbox.addEventListener('keydown', handleKeydown);
+listbox.addEventListener('click', handleListboxClick);
+document.addEventListener('click', handleDocumentClick);
 
-	if (searchInput) {
-		searchInput.addEventListener('keydown', handleMovementKeys);
-		searchInput.addEventListener('keyup', debounce(handleSearchKeyup, 500));
-	}
+searchInput.addEventListener('keydown', handleMovementKeys);
+searchInput.addEventListener('input', debounce(handleSearchInput, 500));
 
-	window.addEventListener('resize', handleWindowResizeOrScroll, {
-		passive: true,
-	});
-	window.addEventListener('scroll', handleWindowResizeOrScroll, {
-		passive: true,
-	});
-
-	if (!getActiveDesdendant()) {
-		setActiveDescendant(listbox.firstElementChild);
-	}
-
-	dropdown.style.left = '0';
-	dropdown.style.top = '0';
-
-	repositionDropdown();
+if ((input.attributes.options || []).length > MAX_ITEMS) {
+	showElement(searchInputWrapper);
 }
+
+window.addEventListener('resize', handleWindowResizeOrScroll, {
+	passive: true,
+});
+window.addEventListener('scroll', handleWindowResizeOrScroll, {
+	passive: true,
+});
+
+if (!getActiveDesdendant()) {
+	setActiveDescendant(listbox.firstElementChild);
+}
+
+dropdown.style.left = '0';
+dropdown.style.top = '0';
+
+repositionDropdown();

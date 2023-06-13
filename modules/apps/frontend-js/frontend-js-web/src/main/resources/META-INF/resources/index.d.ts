@@ -755,3 +755,41 @@ export class RenderState {
 	 */
 	setWindowState(windowState: string): void;
 }
+
+export function sub(
+	string: string,
+	data: string | number | string[] | number[] | Array<string> | Array<number>,
+	...args: string[] | number[]
+): string;
+
+/* Returns the stored value of a cookie, undefined if not present */
+export function getCookie(name: string): string | undefined;
+
+/* Sets a cookie of a specific type if user has consented */
+export function setCookie(
+	name: string,
+	value: string,
+	type: TYPE_VALUES,
+	options?: {
+		'domain'?: string;
+		'expires'?: string;
+		'max-age'?: string;
+		'path'?: string;
+		'samesite'?: string;
+		'secure'?: boolean;
+	}
+): boolean;
+
+/* Removes a cookie by expiring it */
+export function removeCookie(name: string): void;
+
+/**
+ * Object with cookie consent types as keys, for use with {@link setCookie}
+ */
+export const TYPES: {[key: string]: TYPE_VALUES};
+
+export type TYPE_VALUES =
+	| 'CONSENT_TYPE_FUNCTIONAL'
+	| 'CONSENT_TYPE_NECESSARY'
+	| 'CONSENT_TYPE_PERFORMANCE'
+	| 'CONSENT_TYPE_PERSONALIZATION';

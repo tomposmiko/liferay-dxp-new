@@ -20,21 +20,6 @@ export declare type TWorkflowStatus = {
 	label: string;
 	value: string;
 };
-export declare type TObjectField = {
-	businessType: string;
-	checked: boolean;
-	filtered?: boolean;
-	hasFilter?: boolean;
-	id: number;
-	indexed: boolean;
-	indexedAsKeyword: boolean;
-	indexedLanguageId: string;
-	label: TName;
-	listTypeDefinitionId: boolean;
-	name: string;
-	required: boolean;
-	type: string;
-};
 export declare type TObjectColumn = {
 	defaultSort?: boolean;
 	fieldLabel?: string;
@@ -52,6 +37,7 @@ export declare type TObjectViewColumn = {
 	defaultSort: boolean;
 	fieldLabel: string;
 	label: TName;
+	objectFieldBusinessType?: string;
 	objectFieldName: string;
 	priority?: number;
 };
@@ -66,6 +52,7 @@ export declare type TObjectViewFilterColumn = {
 	definition: {
 		[key: string]: string[];
 	} | null;
+	disableEdit?: boolean;
 	fieldLabel: string;
 	filterBy: string;
 	filterType: string | null;
@@ -85,7 +72,7 @@ export declare type TObjectView = {
 export declare type TState = {
 	ffUseMetadataAsSystemFields: boolean;
 	isViewOnly: boolean;
-	objectFields: TObjectField[];
+	objectFields: ObjectField[];
 	objectView: TObjectView;
 	objectViewId: string;
 	workflowStatusJSONArray: TWorkflowStatus[];
