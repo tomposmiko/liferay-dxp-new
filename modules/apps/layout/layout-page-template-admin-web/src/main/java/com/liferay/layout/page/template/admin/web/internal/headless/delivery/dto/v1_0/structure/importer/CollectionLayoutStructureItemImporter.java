@@ -22,7 +22,6 @@ import com.liferay.headless.delivery.dto.v1_0.PageElement;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.info.collection.provider.RelatedInfoItemCollectionProvider;
 import com.liferay.info.collection.provider.SingleFormVariationInfoCollectionProvider;
-import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.list.provider.item.selector.criterion.InfoListProviderItemSelectorReturnType;
 import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
 import com.liferay.layout.util.structure.CollectionStyledLayoutStructureItem;
@@ -35,6 +34,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
@@ -165,6 +165,13 @@ public class CollectionLayoutStructureItemImporter
 			}
 		}
 
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147895")) &&
+			definitionMap.containsKey("name")) {
+
+			collectionStyledLayoutStructureItem.setName(
+				GetterUtil.getString(definitionMap.get("name")));
+		}
+
 		return collectionStyledLayoutStructureItem;
 	}
 
@@ -243,11 +250,11 @@ public class CollectionLayoutStructureItemImporter
 		String className = (String)collectionReference.get("className");
 
 		InfoCollectionProvider<?> infoCollectionProvider =
-			_infoItemServiceTracker.getInfoItemService(
+			infoItemServiceTracker.getInfoItemService(
 				InfoCollectionProvider.class, className);
 
 		if (infoCollectionProvider == null) {
-			infoCollectionProvider = _infoItemServiceTracker.getInfoItemService(
+			infoCollectionProvider = infoItemServiceTracker.getInfoItemService(
 				RelatedInfoItemCollectionProvider.class, className);
 		}
 
@@ -366,8 +373,5 @@ public class CollectionLayoutStructureItemImporter
 
 	@Reference
 	private AssetListEntryLocalService _assetListEntryLocalService;
-
-	@Reference
-	private InfoItemServiceTracker _infoItemServiceTracker;
 
 }

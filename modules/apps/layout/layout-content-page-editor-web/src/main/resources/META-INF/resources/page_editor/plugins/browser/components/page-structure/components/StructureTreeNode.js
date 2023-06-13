@@ -16,11 +16,10 @@ import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {addMappingFields} from '../../../../../app/actions/index';
 import {fromControlsId} from '../../../../../app/components/layout-data-items/Collection';
-import {EDITABLE_TYPES} from '../../../../../app/config/constants/editableTypes';
 import {REQUIRED_FIELD_DATA} from '../../../../../app/config/constants/formModalData';
 import {ITEM_ACTIVATION_ORIGINS} from '../../../../../app/config/constants/itemActivationOrigins';
 import {ITEM_TYPES} from '../../../../../app/config/constants/itemTypes';
@@ -42,6 +41,8 @@ import selectSegmentsExperienceId from '../../../../../app/selectors/selectSegme
 import CollectionService from '../../../../../app/services/CollectionService';
 import deleteItem from '../../../../../app/thunks/deleteItem';
 import moveItem from '../../../../../app/thunks/moveItem';
+import updateItemConfig from '../../../../../app/thunks/updateItemConfig';
+import canBeRenamed from '../../../../../app/utils/canBeRenamed';
 import {deepEqual} from '../../../../../app/utils/checkDeepEqual';
 import checkAllowedChild from '../../../../../app/utils/drag-and-drop/checkAllowedChild';
 import {DRAG_DROP_TARGET_TYPE} from '../../../../../app/utils/drag-and-drop/constants/dragDropTargetType';
@@ -62,17 +63,10 @@ import hideFragment from '../../../../../app/utils/hideFragment';
 import openWarningModal from '../../../../../app/utils/openWarningModal';
 import updateItemStyle from '../../../../../app/utils/updateItemStyle';
 import useHasRequiredChild from '../../../../../app/utils/useHasRequiredChild';
+import useControlledState from '../../../../../core/hooks/useControlledState';
+import StructureTreeNodeActions from './StructureTreeNodeActions';
 
 const HOVER_EXPAND_DELAY = 1000;
-
-const EDITABLE_LABEL = {
-	[EDITABLE_TYPES.backgroundImage]: Liferay.Language.get('background-image'),
-	[EDITABLE_TYPES.html]: Liferay.Language.get('html'),
-	[EDITABLE_TYPES.image]: Liferay.Language.get('image'),
-	[EDITABLE_TYPES.link]: Liferay.Language.get('link'),
-	[EDITABLE_TYPES['rich-text']]: Liferay.Language.get('rich-text'),
-	[EDITABLE_TYPES.text]: Liferay.Language.get('text'),
-};
 
 const loadCollectionFields = (
 	dispatch,
@@ -197,16 +191,22 @@ function StructureTreeNodeContent({
 
 	const layoutDataRef = useSelectorRef((store) => store.layoutData);
 
-	const item = {
-		children: node.children,
-		config: layoutDataRef.current.items[node.id]?.config,
-		icon: node.icon,
-		itemId: node.id,
-		name: node.name,
-		origin: ITEM_ACTIVATION_ORIGINS.sidebar,
-		parentId: node.parentItemId,
-		type: node.type || node.itemType,
-	};
+	const [editingName, setEditingName] = useState(false);
+
+	const item = useMemo(
+		() => ({
+			children:
+				node.itemType === ITEM_TYPES.editable ? [] : node.children,
+			config: layoutDataRef.current.items[node.id]?.config,
+			icon: node.icon,
+			itemId: node.id,
+			name: node.name,
+			origin: ITEM_ACTIVATION_ORIGINS.sidebar,
+			parentId: node.parentItemId,
+			type: node.type || node.itemType,
+		}),
+		[layoutDataRef, node]
+	);
 
 	const {isOverTarget, targetPosition, targetRef} = useDropTarget(
 		item,
@@ -225,6 +225,22 @@ function StructureTreeNodeContent({
 				})
 			)
 	);
+
+	const onEditName = (nextName) => {
+		const trimmedName = nextName?.trim();
+
+		if (trimmedName && node.name !== trimmedName) {
+			dispatch(
+				updateItemConfig({
+					itemConfig: {name: trimmedName},
+					itemId: node.id,
+					segmentsExperienceId,
+				})
+			);
+		}
+
+		setEditingName(false);
+	};
 
 	useEffect(() => {
 		if (
@@ -254,7 +270,13 @@ function StructureTreeNodeContent({
 		};
 	}, [isOverTarget, node]);
 
-	const isEditable = node.itemType === ITEM_TYPES.editable;
+	const showOptions =
+		Liferay.FeatureFlags['LPS-147895'] &&
+		canUpdatePageStructure &&
+		node.itemType !== ITEM_TYPES.editable &&
+		node.type !== LAYOUT_DATA_ITEM_TYPES.dropZone &&
+		node.activable &&
+		!node.isMasterItem;
 
 	return (
 		<div
@@ -294,20 +316,10 @@ function StructureTreeNodeContent({
 				aria-label={Liferay.Util.sub(Liferay.Language.get('select-x'), [
 					node.name,
 				])}
-				className={classNames(
-					'page-editor__page-structure__tree-node__mask',
-					{
-						'lfr-portal-tooltip': isEditable,
-					}
-				)}
-				data-title={
-					isEditable ? EDITABLE_LABEL[node.editableType] : null
-				}
-				data-tooltip-align={isEditable ? 'left' : null}
-				onClick={(event) => {
-					event.stopPropagation();
-					event.target.focus();
-
+				className="lfr-portal-tooltip page-editor__page-structure__tree-node__mask"
+				data-title={node.tooltipTitle}
+				data-tooltip-align="left"
+				onClick={() => {
 					const itemId = getFirstControlsId({
 						item: node,
 						layoutData: layoutDataRef.current,
@@ -320,12 +332,19 @@ function StructureTreeNodeContent({
 						});
 					}
 				}}
-				onDoubleClick={(event) => event.stopPropagation()}
+				onDoubleClick={(event) => {
+					event.stopPropagation();
+
+					if (canBeRenamed(item)) {
+						setEditingName(true);
+					}
+				}}
 				ref={handlerRef}
 				role="button"
 			/>
 
 			<NameLabel
+				editingName={editingName}
 				hidden={node.hidden || node.hiddenAncestor}
 				icon={node.icon}
 				isActive={isActive}
@@ -333,61 +352,129 @@ function StructureTreeNodeContent({
 				isMasterItem={node.isMasterItem}
 				name={node.name}
 				nameInfo={node.nameInfo}
+				onEditName={onEditName}
 				ref={nodeRef}
 			/>
 
-			<div
-				className={classNames({
-					'page-editor__page-structure__tree-node__buttons--hidden':
-						node.hidden || node.hiddenAncestor,
-				})}
-			>
-				{(node.hidable || node.hidden) && (
-					<VisibilityButton
-						dispatch={dispatch}
-						node={node}
-						segmentsExperienceId={segmentsExperienceId}
-						selectedViewportSize={selectedViewportSize}
-						visible={node.hidden || isHovered || isSelected}
-					/>
-				)}
+			{!editingName && (
+				<div
+					className={classNames({
+						'page-editor__page-structure__tree-node__buttons--hidden':
+							node.hidden || node.hiddenAncestor,
+					})}
+				>
+					{(node.hidable || node.hidden) && (
+						<VisibilityButton
+							dispatch={dispatch}
+							node={node}
+							segmentsExperienceId={segmentsExperienceId}
+							selectedViewportSize={selectedViewportSize}
+							visible={node.hidden || isHovered || isSelected}
+						/>
+					)}
 
-				{node.removable && canUpdatePageStructure && (
-					<RemoveButton
-						node={node}
-						visible={isHovered || isSelected}
-					/>
-				)}
-			</div>
+					{!Liferay.FeatureFlags['LPS-147895'] &&
+						node.removable &&
+						canUpdatePageStructure && (
+							<RemoveButton
+								node={node}
+								visible={isHovered || isSelected}
+							/>
+						)}
+
+					{showOptions && (
+						<StructureTreeNodeActions
+							item={item}
+							setEditingName={setEditingName}
+							visible={node.hidden || isHovered || isSelected}
+						/>
+					)}
+				</div>
+			)}
 		</div>
 	);
 }
 
 const NameLabel = React.forwardRef(
-	({hidden, icon, isActive, isMapped, isMasterItem, name, nameInfo}, ref) => (
-		<div
-			className={classNames(
-				'page-editor__page-structure__tree-node__name',
-				{
-					'page-editor__page-structure__tree-node__name--active': isActive,
-					'page-editor__page-structure__tree-node__name--hidden': hidden,
-					'page-editor__page-structure__tree-node__name--mapped': isMapped,
-					'page-editor__page-structure__tree-node__name--master-item': isMasterItem,
-				}
-			)}
-			ref={ref}
-		>
-			{icon && <ClayIcon symbol={icon || ''} />}
+	(
+		{
+			editingName,
+			hidden,
+			icon,
+			isActive,
+			isMapped,
+			isMasterItem,
+			name: defaultName,
+			nameInfo,
+			onEditName,
+		},
+		ref
+	) => {
+		const inputRef = useRef();
 
-			{name || Liferay.Language.get('element')}
+		const [name, setName] = useControlledState(defaultName);
 
-			{nameInfo && (
-				<span className="ml-3 page-editor__page-structure__tree-node__name-info position-relative">
-					{nameInfo}
-				</span>
-			)}
-		</div>
-	)
+		useEffect(() => {
+			if (editingName && inputRef.current) {
+				inputRef.current.focus();
+			}
+		}, [editingName]);
+
+		return (
+			<div
+				className={classNames(
+					'page-editor__page-structure__tree-node__name d-flex align-items-center',
+					{
+						'page-editor__page-structure__tree-node__name--active': isActive,
+						'page-editor__page-structure__tree-node__name--hidden': hidden,
+						'page-editor__page-structure__tree-node__name--mapped': isMapped,
+						'page-editor__page-structure__tree-node__name--master-item': isMasterItem,
+						'w-100': editingName,
+					}
+				)}
+				ref={ref}
+			>
+				{icon && <ClayIcon className="mt-0" symbol={icon || ''} />}
+
+				{editingName ? (
+					<input
+						className="flex-grow-1"
+						onBlur={() => {
+							onEditName(name);
+						}}
+						onChange={(event) => {
+							setName(event.target.value);
+						}}
+						onFocus={() => {
+							inputRef.current.setSelectionRange(0, name.length);
+						}}
+						onKeyDown={(event) => {
+							if (event.key === 'Enter') {
+								onEditName(name);
+							}
+
+							if (!event.key.match(/[a-z0-9-_ ]/gi)) {
+								event.preventDefault();
+							}
+
+							event.stopPropagation();
+						}}
+						ref={inputRef}
+						type="text"
+						value={name}
+					/>
+				) : (
+					name || defaultName || Liferay.Language.get('element')
+				)}
+
+				{!editingName && nameInfo && (
+					<span className="ml-3 page-editor__page-structure__tree-node__name-info position-relative">
+						{nameInfo}
+					</span>
+				)}
+			</div>
+		);
+	}
 );
 
 const VisibilityButton = ({

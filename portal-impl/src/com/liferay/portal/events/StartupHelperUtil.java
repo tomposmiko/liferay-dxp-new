@@ -28,8 +28,10 @@ import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.version.Version;
@@ -38,6 +40,8 @@ import com.liferay.portal.util.PropsValues;
 
 import java.sql.Connection;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -146,10 +150,28 @@ public class StartupHelperUtil {
 	}
 
 	public static void upgradeProcess(int buildNumber) throws UpgradeException {
+		List<String> upgradeProcessClassNames = new ArrayList<>();
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-157670"))) {
+			Collections.addAll(
+				upgradeProcessClassNames,
+				"com.liferay.portal.upgrade.UpgradeProcess_6_1_1",
+				"com.liferay.portal.upgrade.UpgradeProcess_6_2_0");
+		}
+
+		Collections.addAll(
+			upgradeProcessClassNames,
+			"com.liferay.portal.upgrade.UpgradeProcess_7_0_0",
+			"com.liferay.portal.upgrade.UpgradeProcess_7_0_1",
+			"com.liferay.portal.upgrade.UpgradeProcess_7_0_3",
+			"com.liferay.portal.upgrade.UpgradeProcess_7_0_5",
+			"com.liferay.portal.upgrade.UpgradeProcess_7_0_6",
+			"com.liferay.portal.upgrade.PortalUpgradeProcess");
+
 		List<UpgradeProcess> upgradeProcesses =
 			UpgradeProcessUtil.initUpgradeProcesses(
 				PortalClassLoaderUtil.getClassLoader(),
-				_UPGRADE_PROCESS_CLASS_NAMES);
+				upgradeProcessClassNames.toArray(new String[0]));
 
 		_upgraded = UpgradeProcessUtil.upgradeProcess(
 			buildNumber, upgradeProcesses);
@@ -190,15 +212,6 @@ public class StartupHelperUtil {
 			throw new RuntimeException(msg);
 		}
 	}
-
-	private static final String[] _UPGRADE_PROCESS_CLASS_NAMES = {
-		"com.liferay.portal.upgrade.UpgradeProcess_7_0_0",
-		"com.liferay.portal.upgrade.UpgradeProcess_7_0_1",
-		"com.liferay.portal.upgrade.UpgradeProcess_7_0_3",
-		"com.liferay.portal.upgrade.UpgradeProcess_7_0_5",
-		"com.liferay.portal.upgrade.UpgradeProcess_7_0_6",
-		"com.liferay.portal.upgrade.PortalUpgradeProcess"
-	};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		StartupHelperUtil.class);

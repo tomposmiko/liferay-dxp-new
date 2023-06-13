@@ -449,6 +449,36 @@ public class ObjectField implements Serializable {
 
 	@Schema
 	@Valid
+	public ObjectStateFlow getObjectStateFlow() {
+		return objectStateFlow;
+	}
+
+	public void setObjectStateFlow(ObjectStateFlow objectStateFlow) {
+		this.objectStateFlow = objectStateFlow;
+	}
+
+	@JsonIgnore
+	public void setObjectStateFlow(
+		UnsafeSupplier<ObjectStateFlow, Exception>
+			objectStateFlowUnsafeSupplier) {
+
+		try {
+			objectStateFlow = objectStateFlowUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected ObjectStateFlow objectStateFlow;
+
+	@Schema
+	@Valid
 	public RelationshipType getRelationshipType() {
 		return relationshipType;
 	}
@@ -513,6 +543,34 @@ public class ObjectField implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean required;
+
+	@Schema
+	public Boolean getState() {
+		return state;
+	}
+
+	public void setState(Boolean state) {
+		this.state = state;
+	}
+
+	@JsonIgnore
+	public void setState(
+		UnsafeSupplier<Boolean, Exception> stateUnsafeSupplier) {
+
+		try {
+			state = stateUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean state;
 
 	@Schema
 	public Boolean getSystem() {
@@ -770,6 +828,16 @@ public class ObjectField implements Serializable {
 			sb.append("]");
 		}
 
+		if (objectStateFlow != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectStateFlow\": ");
+
+			sb.append(String.valueOf(objectStateFlow));
+		}
+
 		if (relationshipType != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -792,6 +860,16 @@ public class ObjectField implements Serializable {
 			sb.append("\"required\": ");
 
 			sb.append(required);
+		}
+
+		if (state != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"state\": ");
+
+			sb.append(state);
 		}
 
 		if (system != null) {

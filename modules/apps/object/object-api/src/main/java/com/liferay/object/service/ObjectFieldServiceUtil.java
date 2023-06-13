@@ -44,7 +44,7 @@ public class ObjectFieldServiceUtil {
 			String businessType, String dbType, String defaultValue,
 			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
 			Map<java.util.Locale, String> labelMap, String name,
-			boolean required,
+			boolean required, boolean state,
 			List<com.liferay.object.model.ObjectFieldSetting>
 				objectFieldSettings)
 		throws PortalException {
@@ -52,7 +52,7 @@ public class ObjectFieldServiceUtil {
 		return getService().addCustomObjectField(
 			listTypeDefinitionId, objectDefinitionId, businessType, dbType,
 			defaultValue, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, name, required, objectFieldSettings);
+			labelMap, name, required, state, objectFieldSettings);
 	}
 
 	public static ObjectField deleteObjectField(long objectFieldId)
@@ -81,15 +81,17 @@ public class ObjectFieldServiceUtil {
 			long listTypeDefinitionId, String businessType, String dbType,
 			String defaultValue, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId, Map<java.util.Locale, String> labelMap,
-			String name, boolean required,
+			String name, boolean required, boolean state,
 			List<com.liferay.object.model.ObjectFieldSetting>
-				objectFieldSettings)
+				objectFieldSettings,
+			com.liferay.object.model.ObjectStateFlow objectStateFlow)
 		throws PortalException {
 
 		return getService().updateObjectField(
 			objectFieldId, externalReferenceCode, listTypeDefinitionId,
 			businessType, dbType, defaultValue, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, name, required, objectFieldSettings);
+			indexedLanguageId, labelMap, name, required, state,
+			objectFieldSettings, objectStateFlow);
 	}
 
 	public static ObjectFieldService getService() {

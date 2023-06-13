@@ -17,23 +17,12 @@ import React from 'react';
 
 import {useSelector, useSelectorCallback} from '../../contexts/StoreContext';
 import selectLanguageId from '../../selectors/selectLanguageId';
-import FormService from '../../services/FormService';
-import {CACHE_KEYS} from '../../utils/cache';
 import {formIsMapped} from '../../utils/formIsMapped';
 import {getEditableLocalizedValue} from '../../utils/getEditableLocalizedValue';
 import isItemEmpty from '../../utils/isItemEmpty';
-import useCache from '../../utils/useCache';
 import ContainerWithControls from './ContainerWithControls';
 
 const FormWithControls = React.forwardRef(({children, item, ...rest}, ref) => {
-
-	// Ensure form types are loaded if this component is rendered
-
-	useCache({
-		fetcher: () => FormService.getAvailableEditPageInfoItemFormProviders(),
-		key: [CACHE_KEYS.formTypes],
-	});
-
 	const isMapped = formIsMapped(item);
 
 	const isEmpty = useSelectorCallback(
@@ -46,7 +35,9 @@ const FormWithControls = React.forwardRef(({children, item, ...rest}, ref) => {
 
 	return (
 		<form
-			className="page-editor__form"
+			className={classNames('page-editor__form', {
+				'page-editor__form--success': showMessagePreview,
+			})}
 			onSubmit={(event) => event.preventDefault()}
 			ref={ref}
 		>

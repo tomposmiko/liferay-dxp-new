@@ -1,0 +1,160 @@
+@component-name = "portal-headless-frontend-infrastructure"
+definition {
+
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Headless Frontend Infrastructure";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		task ("Given an asset library is created") {
+			JSONDepot.addDepot(depotName = "Test Depot Name");
+		}
+
+		task ("Given a content structure created in asset library") {
+			var depotId = JSONGroupAPI._getDepotIdByName(depotName = "Test Depot Name");
+
+			WebContentNavigator.openWebContentStructuresAdminInAssetLibrary(depotId = "${depotId}");
+
+			WebContentStructures.addCP(structureName = "content-structure");
+
+			FormViewBuilder.addFieldByDoubleClick(fieldType = "Text");
+
+			FormFields.editFieldReference(key_fieldReference = "Text");
+
+			Button.clickSave();
+		}
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONDepot.deleteDepot(depotName = "Test Depot Name");
+		}
+	}
+
+	@description = "Structured content is created in an asset library with custom erc"
+	@priority = "5"
+	test StructuredContentIsCreatedInAssetLibraryWithCustomErc {
+		property portal.acceptance = "true";
+
+		task ("When with POST request I create a structured content with a custom erc in asset library") {
+			var depotId = JSONGroupAPI._getDepotIdByName(depotName = "Test Depot Name");
+			var ddmStructureId = WebContentStructures.getDdmStructureId(structureName = "content-structure");
+
+			var response = HeadlessWebcontentAPI.createStructuredContentInAssetLibrary(
+				assetLibraryId = "${depotId}",
+				data = "<p>My content</p>",
+				ddmStructureId = "${ddmStructureId}",
+				externalReferenceCode = "erc",
+				label = "Text",
+				name = "Text",
+				title = "WC WebContent Title");
+		}
+
+		task ("Then I can see the custom erc in the body response") {
+			HeadlessWebcontentAPI.assertExternalReferenceCodeWithCorrectValue(
+				expectedExternalReferenceCodeValue = "erc",
+				responseToParse = "${response}");
+		}
+
+		task ("And Then structured content is created properly") {
+			var response = HeadlessWebcontentAPI.filterStructuredContentInAssetLibrary(
+				assetLibraryId = "${depotId}",
+				filtervalue = "title%20eq%20%27WC%20WebContent%20Title%27");
+
+			HeadlessWebcontentAPI.assertProperNumberOfItems(
+				expectedTotalElement = "1",
+				responseToParse = "${response}");
+		}
+	}
+
+	@description = "Structured content is created in an asset library with default erc"
+	@priority = "5"
+	test StructuredContentIsCreatedInAssetLibraryWithErcByDefault {
+		property portal.acceptance = "true";
+
+		task ("When with POST request I create a structured content without erc in asset library") {
+			var depotId = JSONGroupAPI._getDepotIdByName(depotName = "Test Depot Name");
+			var ddmStructureId = WebContentStructures.getDdmStructureId(structureName = "content-structure");
+
+			var response = HeadlessWebcontentAPI.createStructuredContentInAssetLibrary(
+				assetLibraryId = "${depotId}",
+				data = "<p>My content</p>",
+				ddmStructureId = "${ddmStructureId}",
+				label = "Text",
+				name = "Text",
+				title = "WC WebContent Title");
+		}
+
+		task ("Then I can see erc equals to the uuid in the body response") {
+			HeadlessWebcontentAPI.assertExternalReferenceCodeWithCorrectValue(responseToParse = "${response}");
+		}
+
+		task ("And Then the structured content is created properly") {
+			var response = HeadlessWebcontentAPI.filterStructuredContentInAssetLibrary(
+				assetLibraryId = "${depotId}",
+				filtervalue = "title%20eq%20%27WC%20WebContent%20Title%27");
+
+			HeadlessWebcontentAPI.assertProperNumberOfItems(
+				expectedTotalElement = "1",
+				responseToParse = "${response}");
+		}
+	}
+
+	@description = "Structured content is created in an asset library with structured content id as erc"
+	@priority = "5"
+	test StructuredContentIsCreatedInAssetLibraryWithStructuredContentIdAsErc {
+		property portal.acceptance = "true";
+
+		task ("Given a structured content with custom erc is created with a POST request in asset library") {
+			var depotId = JSONGroupAPI._getDepotIdByName(depotName = "Test Depot Name");
+			var ddmStructureId = WebContentStructures.getDdmStructureId(structureName = "content-structure");
+
+			var response = HeadlessWebcontentAPI.createStructuredContentInAssetLibrary(
+				assetLibraryId = "${depotId}",
+				data = "<p>My content</p>",
+				ddmStructureId = "${ddmStructureId}",
+				externalReferenceCode = "erc",
+				label = "Text",
+				name = "Text",
+				title = "WC WebContent Title");
+		}
+
+		task ("When with POST request I create a structured content with erc equals to the internal id of the previously created structured content") {
+			var structuredContentId = HeadlessWebcontentAPI.getWebContentIdFromResponse(responseToParse = "${response}");
+			var response = HeadlessWebcontentAPI.createStructuredContentInAssetLibrary(
+				assetLibraryId = "${depotId}",
+				data = "<p>My content</p>",
+				ddmStructureId = "${ddmStructureId}",
+				externalReferenceCode = "${customErc}",
+				label = "Text",
+				name = "Text",
+				title = "WC Second WebContent Title");
+		}
+
+		task ("Then I can see erc equals to the previous id in the body response") {
+			HeadlessWebcontentAPI.assertExternalReferenceCodeWithCorrectValue(
+				expectedactualExternalReferenceCodeValueValue = "${structuredContentId}",
+				responseToParse = "${response}");
+		}
+
+		task ("Then structured content is created properly") {
+			var response = HeadlessWebcontentAPI.filterStructuredContentInAssetLibrary(
+				assetLibraryId = "${depotId}",
+				filtervalue = "title%20eq%20%27WC%20WebContent%20Title%27");
+
+			HeadlessWebcontentAPI.assertProperNumberOfItems(
+				expectedTotalElement = "1",
+				responseToParse = "${response}");
+		}
+	}
+
+}

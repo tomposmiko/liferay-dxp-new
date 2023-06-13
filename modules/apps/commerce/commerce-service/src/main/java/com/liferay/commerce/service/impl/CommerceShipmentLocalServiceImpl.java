@@ -26,7 +26,9 @@ import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceShipment;
 import com.liferay.commerce.model.CommerceShipmentItem;
+import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.service.base.CommerceShipmentLocalServiceBaseImpl;
+import com.liferay.expando.kernel.service.ExpandoRowLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -48,7 +50,6 @@ import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
@@ -68,6 +69,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.TimeZone;
 
 /**
  * @author Alessio Antonio Rendina
@@ -167,10 +169,22 @@ public class CommerceShipmentLocalServiceImpl
 		commerceShipment.setUserName(user.getFullName());
 		commerceShipment.setCommerceAccountId(commerceAccountId);
 		commerceShipment.setCommerceAddressId(commerceAddressId);
-		commerceShipment.setCommerceShippingMethodId(commerceShippingMethodId);
-		commerceShipment.setShippingOptionName(commerceShippingOptionName);
+
+		CommerceShippingMethod commerceShippingMethod =
+			commerceShippingMethodLocalService.fetchCommerceShippingMethod(
+				commerceShippingMethodId);
+
+		if (commerceShippingMethod != null) {
+			commerceShipment.setCommerceShippingMethodId(
+				commerceShippingMethodId);
+			commerceShipment.setShippingOptionName(commerceShippingOptionName);
+			commerceShipment.setTrackingURL(
+				commerceShippingMethod.getTrackingURL());
+		}
+
 		commerceShipment.setStatus(
 			CommerceShipmentConstants.SHIPMENT_STATUS_PROCESSING);
+		commerceShipment.setExpandoBridgeAttributes(serviceContext);
 
 		return commerceShipmentPersistence.update(commerceShipment);
 	}
@@ -227,14 +241,15 @@ public class CommerceShipmentLocalServiceImpl
 			CommerceShipment commerceShipment, boolean restoreStockQuantity)
 		throws PortalException {
 
-		// Commerce shipment items
+		commerceShipment = commerceShipmentPersistence.remove(commerceShipment);
 
 		commerceShipmentItemLocalService.deleteCommerceShipmentItems(
 			commerceShipment.getCommerceShipmentId(), restoreStockQuantity);
 
-		// Commerce shipment
+		_expandoRowLocalService.deleteRows(
+			commerceShipment.getCommerceShipmentId());
 
-		return commerceShipmentPersistence.remove(commerceShipment);
+		return commerceShipment;
 	}
 
 	@Override
@@ -418,7 +433,6 @@ public class CommerceShipmentLocalServiceImpl
 	 * String, long, long, String, ServiceContext)}
 	 */
 	@Deprecated
-	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CommerceShipment updateAddress(
 			long commerceShipmentId, String name, String description,
@@ -426,7 +440,7 @@ public class CommerceShipmentLocalServiceImpl
 			String zip, long regionId, long countryId, String phoneNumber)
 		throws PortalException {
 
-		return updateAddress(
+		return commerceShipmentLocalService.updateAddress(
 			commerceShipmentId, name, description, street1, street2, street3,
 			city, zip, regionId, countryId, phoneNumber, null);
 	}
@@ -470,11 +484,12 @@ public class CommerceShipmentLocalServiceImpl
 
 	@Override
 	public CommerceShipment updateCommerceShipment(
-			long commerceShipmentId, String carrier, String trackingNumber,
-			int status, int shippingDateMonth, int shippingDateDay,
-			int shippingDateYear, int shippingDateHour, int shippingDateMinute,
-			int expectedDateMonth, int expectedDateDay, int expectedDateYear,
-			int expectedDateHour, int expectedDateMinute)
+			long commerceShipmentId, long commerceShippingMethodId,
+			String carrier, int expectedDateMonth, int expectedDateDay,
+			int expectedDateYear, int expectedDateHour, int expectedDateMinute,
+			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
+			int shippingDateHour, int shippingDateMinute, String trackingNumber,
+			String trackingURL, int status, ServiceContext serviceContext)
 		throws PortalException {
 
 		String name = null;
@@ -508,58 +523,68 @@ public class CommerceShipmentLocalServiceImpl
 		}
 
 		return commerceShipmentLocalService.updateCommerceShipment(
-			commerceShipmentId, name, description, street1, street2, street3,
-			city, zip, regionId, countryId, phoneNumber, carrier,
-			trackingNumber, status, shippingDateMonth, shippingDateDay,
-			shippingDateYear, shippingDateHour, shippingDateMinute,
+			commerceShipmentId, commerceShippingMethodId, carrier,
 			expectedDateMonth, expectedDateDay, expectedDateYear,
-			expectedDateHour, expectedDateMinute);
+			expectedDateHour, expectedDateMinute, shippingDateMonth,
+			shippingDateDay, shippingDateYear, shippingDateHour,
+			shippingDateMinute, trackingNumber, trackingURL, status, name,
+			description, street1, street2, street3, city, zip, regionId,
+			countryId, phoneNumber, serviceContext);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CommerceShipment updateCommerceShipment(
-			long commerceShipmentId, String name, String description,
+			long commerceShipmentId, long commerceShippingMethodId,
+			String carrier, int expectedDateMonth, int expectedDateDay,
+			int expectedDateYear, int expectedDateHour, int expectedDateMinute,
+			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
+			int shippingDateHour, int shippingDateMinute, String trackingNumber,
+			String trackingURL, int status, String name, String description,
 			String street1, String street2, String street3, String city,
 			String zip, long regionId, long countryId, String phoneNumber,
-			String carrier, String trackingNumber, int status,
-			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
-			int shippingDateHour, int shippingDateMinute, int expectedDateMonth,
-			int expectedDateDay, int expectedDateYear, int expectedDateHour,
-			int expectedDateMinute)
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		CommerceShipment commerceShipment =
 			commerceShipmentPersistence.findByPrimaryKey(commerceShipmentId);
 
-		User user = userLocalService.getUser(commerceShipment.getUserId());
+		User user = userLocalService.getUser(serviceContext.getUserId());
 
 		int oldStatus = commerceShipment.getStatus();
 
 		_validateStatus(status, oldStatus);
 
-		Date shippingDate = PortalUtil.getDate(
-			shippingDateMonth, shippingDateDay, shippingDateYear,
-			shippingDateHour, shippingDateMinute, user.getTimeZone(),
-			CommerceShipmentShippingDateException.class);
-
-		Date expectedDate = PortalUtil.getDate(
-			expectedDateMonth, expectedDateDay, expectedDateYear,
-			expectedDateHour, expectedDateMinute, user.getTimeZone(),
-			CommerceShipmentExpectedDateException.class);
-
 		CommerceAddress commerceAddress = updateCommerceShipmentAddress(
 			commerceShipment, name, description, street1, street2, street3,
-			city, zip, regionId, countryId, phoneNumber, null);
+			city, zip, regionId, countryId, phoneNumber, serviceContext);
 
 		commerceShipment.setCommerceAddressId(
 			commerceAddress.getCommerceAddressId());
 
 		commerceShipment.setCarrier(carrier);
 		commerceShipment.setTrackingNumber(trackingNumber);
-		commerceShipment.setShippingDate(shippingDate);
-		commerceShipment.setExpectedDate(expectedDate);
+
+		Date shippingDate = _getDate(
+			shippingDateMonth, shippingDateDay, shippingDateYear,
+			shippingDateHour, shippingDateMinute, user.getTimeZone(),
+			CommerceShipmentShippingDateException.class);
+
+		if (shippingDate != null) {
+			commerceShipment.setShippingDate(shippingDate);
+		}
+
+		Date expectedDate = _getDate(
+			expectedDateMonth, expectedDateDay, expectedDateYear,
+			expectedDateHour, expectedDateMinute, user.getTimeZone(),
+			CommerceShipmentExpectedDateException.class);
+
+		if (expectedDate != null) {
+			commerceShipment.setExpectedDate(expectedDate);
+		}
+
 		commerceShipment.setStatus(status);
+		commerceShipment.setExpandoBridgeAttributes(serviceContext);
 
 		return commerceShipmentPersistence.update(commerceShipment);
 	}
@@ -577,7 +602,7 @@ public class CommerceShipmentLocalServiceImpl
 		User user = userLocalService.getUser(commerceShipment.getUserId());
 
 		commerceShipment.setExpectedDate(
-			PortalUtil.getDate(
+			_getDate(
 				expectedDateMonth, expectedDateDay, expectedDateYear,
 				expectedDateHour, expectedDateMinute, user.getTimeZone(),
 				CommerceShipmentShippingDateException.class));
@@ -623,7 +648,7 @@ public class CommerceShipmentLocalServiceImpl
 		User user = userLocalService.getUser(commerceShipment.getUserId());
 
 		commerceShipment.setShippingDate(
-			PortalUtil.getDate(
+			_getDate(
 				shippingDateMonth, shippingDateDay, shippingDateYear,
 				shippingDateHour, shippingDateMinute, user.getTimeZone(),
 				CommerceShipmentShippingDateException.class));
@@ -757,7 +782,7 @@ public class CommerceShipmentLocalServiceImpl
 									LocaleUtil.getSiteDefault(), null, null));
 
 							return JSONFactoryUtil.createJSONObject(
-								object.toString());
+								JSONFactoryUtil.looseSerializeDeep(object));
 						}
 					).put(
 						"commerceShipmentId",
@@ -777,10 +802,6 @@ public class CommerceShipmentLocalServiceImpl
 			String zip, long regionId, long countryId, String phoneNumber,
 			ServiceContext serviceContext)
 		throws PortalException {
-
-		if (serviceContext == null) {
-			serviceContext = ServiceContextThreadLocal.getServiceContext();
-		}
 
 		CommerceAddress commerceAddress =
 			commerceShipment.fetchCommerceAddress();
@@ -812,6 +833,23 @@ public class CommerceShipmentLocalServiceImpl
 		CommerceShipmentConstants.SHIPMENT_STATUS_SHIPPED,
 		CommerceShipmentConstants.SHIPMENT_STATUS_DELIVERED
 	};
+
+	private Date _getDate(
+			int dateMonth, int dateDay, int dateYear, int dateHour,
+			int dateMinute, TimeZone timeZone,
+			Class<? extends PortalException> clazz)
+		throws PortalException {
+
+		if ((dateMonth == 0) && (dateDay == 0) && (dateYear == 0) &&
+			(dateHour == 0) && (dateMinute == 0)) {
+
+			return null;
+		}
+
+		return PortalUtil.getDate(
+			dateMonth, dateDay, dateYear, dateHour, dateMinute, timeZone,
+			clazz);
+	}
 
 	private void _validateExternalReferenceCode(
 			long commerceShipmentId, long companyId,
@@ -847,5 +885,8 @@ public class CommerceShipmentLocalServiceImpl
 
 	@ServiceReference(type = DTOConverterRegistry.class)
 	private DTOConverterRegistry _dtoConverterRegistry;
+
+	@ServiceReference(type = ExpandoRowLocalService.class)
+	private ExpandoRowLocalService _expandoRowLocalService;
 
 }

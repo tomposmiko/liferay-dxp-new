@@ -108,6 +108,7 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -122,6 +123,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.ThemeLocalService;
+import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.settings.SettingsFactory;
@@ -246,6 +248,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		TaxonomyVocabularyResource.Factory taxonomyVocabularyResourceFactory,
 		ThemeLocalService themeLocalService,
 		UserAccountResource.Factory userAccountResourceFactory,
+		UserGroupLocalService userGroupLocalService,
 		UserLocalService userLocalService,
 		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService,
 		WorkflowDefinitionResource.Factory workflowDefinitionResourceFactory) {
@@ -308,6 +311,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_taxonomyVocabularyResourceFactory = taxonomyVocabularyResourceFactory;
 		_themeLocalService = themeLocalService;
 		_userAccountResourceFactory = userAccountResourceFactory;
+		_userGroupLocalService = userGroupLocalService;
 		_userLocalService = userLocalService;
 		_workflowDefinitionLinkLocalService =
 			workflowDefinitionLinkLocalService;
@@ -404,6 +408,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			_invoke(() -> _addSAPEntries(serviceContext));
 			_invoke(() -> _addSiteConfiguration(serviceContext));
 			_invoke(() -> _addStyleBookEntries(serviceContext));
+			_invoke(() -> _addUserGroups(serviceContext));
 
 			Map<String, String> taxonomyCategoryIdsStringUtilReplaceValues =
 				_invoke(
@@ -2975,7 +2980,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 		Page<TaxonomyCategory> taxonomyCategoryPage =
 			taxonomyCategoryResource.getTaxonomyCategoryTaxonomyCategoriesPage(
-				parentTaxonomyCategoryId, "",
+				parentTaxonomyCategoryId, "", null,
 				taxonomyCategoryResource.toFilter(
 					StringBundler.concat(
 						"name eq '", taxonomyCategory.getName(), "'")),
@@ -3043,7 +3048,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 			Page<TaxonomyVocabulary> taxonomyVocabularyPage =
 				taxonomyVocabularyResource.getSiteTaxonomyVocabulariesPage(
-					groupId, "",
+					groupId, "", null,
 					taxonomyVocabularyResource.toFilter(
 						StringBundler.concat(
 							"name eq '", taxonomyVocabulary.getName(), "'")),
@@ -3111,7 +3116,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		Page<TaxonomyCategory> taxonomyCategoryPage =
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoriesPage(
-					vocabularyId, "",
+					vocabularyId, "", null,
 					taxonomyCategoryResource.toFilter(
 						StringBundler.concat(
 							"name eq '", taxonomyCategory.getName(), "'")),
@@ -3219,6 +3224,32 @@ public class BundleSiteInitializer implements SiteInitializer {
 					accountBriefsJSONObject,
 					jsonObject.getString("emailAddress"), serviceContext);
 			}
+		}
+	}
+
+	private void _addUserGroups(ServiceContext serviceContext)
+		throws Exception {
+
+		String json = SiteInitializerUtil.read(
+			"/site-initializer/user-groups.json", _servletContext);
+
+		if (json == null) {
+			return;
+		}
+
+		JSONArray jsonArray = _jsonFactory.createJSONArray(json);
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			UserGroup userGroup = _userGroupLocalService.addOrUpdateUserGroup(
+				jsonObject.getString("externalReferenceCode"),
+				serviceContext.getUserId(), serviceContext.getCompanyId(),
+				jsonObject.getString("name"),
+				jsonObject.getString("description"), serviceContext);
+
+			_userGroupLocalService.addGroupUserGroup(
+				serviceContext.getScopeGroupId(), userGroup);
 		}
 	}
 
@@ -3731,6 +3762,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_taxonomyVocabularyResourceFactory;
 	private final ThemeLocalService _themeLocalService;
 	private final UserAccountResource.Factory _userAccountResourceFactory;
+	private final UserGroupLocalService _userGroupLocalService;
 	private final UserLocalService _userLocalService;
 	private final WorkflowDefinitionLinkLocalService
 		_workflowDefinitionLinkLocalService;

@@ -47,6 +47,9 @@ export function FilterScreen() {
 	};
 
 	const saveFilterColumn = (
+		filterBy?: string,
+		fieldLabel?: LocalizedValue<string>,
+		objectFieldBusinessType?: string,
 		filterType?: string,
 		objectFieldName?: string,
 		valueList?: IItem[]
@@ -76,10 +79,6 @@ export function FilterScreen() {
 	return (
 		<>
 			<BuilderScreen
-				disableEdit={(businessType: string) =>
-					businessType !== 'Picklist' &&
-					businessType !== 'Workflow Status'
-				}
 				emptyState={{
 					buttonText: Liferay.Language.get('new-filter'),
 					description: Liferay.Language.get(
@@ -89,7 +88,24 @@ export function FilterScreen() {
 				}}
 				filter
 				firstColumnHeader={Liferay.Language.get('filter-by')}
-				objectColumns={objectViewFilterColumns ?? []}
+				objectColumns={
+					objectViewFilterColumns.map((filterColumn) => {
+						if (
+							filterColumn.objectFieldBusinessType ===
+								'Modified Date' ||
+							filterColumn.objectFieldBusinessType ===
+								'Creation Date'
+						) {
+							return {
+								...filterColumn,
+								disableEdit: true,
+							};
+						}
+						else {
+							return filterColumn;
+						}
+					}) ?? []
+				}
 				onDeleteColumn={handleDeleteColumn}
 				onEditing={setEditingFilter}
 				onEditingObjectFieldName={setEditingObjectFieldName}
@@ -106,7 +122,26 @@ export function FilterScreen() {
 					editingFilter={editingFilter}
 					editingObjectFieldName={editingObjectFieldName}
 					header={Liferay.Language.get('new-filter')}
-					objectFields={objectFields}
+					objectFields={
+						editingFilter
+							? objectFields
+							: objectFields.filter(
+									(objectField: ObjectFieldView) => {
+										if (
+											objectField.businessType ===
+												'Picklist' ||
+											objectField.name ===
+												'dateCreated' ||
+											objectField.name ===
+												'dateModified' ||
+											(objectField.name === 'status' &&
+												!objectField.hasFilter)
+										) {
+											return objectField;
+										}
+									}
+							  )
+					}
 					observer={observer}
 					onClose={onClose}
 					onSave={saveFilterColumn}

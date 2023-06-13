@@ -11,6 +11,11 @@
 
 <tbody>
 <tr>
+	<td>PRODUCT_COMPARISON_TABLE_SPECIFICATION</td>
+	<td>//td[contains(.,'${key_specification}')]/following-sibling::td[${key_columnNumber}][contains(.,'${key_value}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FS_IMAGE_GALLERY_ARROW_NEXT</td>
 	<td>//div[@class='arrow next']</td>
 	<td></td>
@@ -141,8 +146,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MINI_COMPARE_COMPARE_BUTTON</td>
+	<td>//div[@class='mini-compare active']/a[@class='btn btn-primary']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MINI_COMPARE_ITEM_ACTIVE_N</td>
 	<td>//div[@class='mini-compare-item active'][${key_value}]//div[@class='mini-compare-thumbnail']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MINI_COMPARE_ITEM_N</td>
+	<td>//div[contains(@class,'mini-compare-item')][${key_value}]//div[@class='mini-compare-thumbnail']</td>
 	<td></td>
 </tr>
 <tr>

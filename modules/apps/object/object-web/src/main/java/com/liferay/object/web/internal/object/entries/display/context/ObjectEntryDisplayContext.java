@@ -565,6 +565,8 @@ public class ObjectEntryDisplayContext {
 		if (objectEntry != null) {
 			objectFieldRenderingContext.setExternalReferenceCode(
 				objectEntry.getExternalReferenceCode());
+			objectFieldRenderingContext.setProperties(
+				objectEntry.getProperties());
 		}
 
 		objectFieldRenderingContext.setPortletId(
@@ -685,6 +687,21 @@ public class ObjectEntryDisplayContext {
 			ddmFormField.setProperty(
 				"objectDefinitionId",
 				String.valueOf(objectRelationship.getObjectDefinitionId1()));
+
+			long parameterObjectFieldId =
+				objectRelationship.getParameterObjectFieldId();
+
+			if (GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-155537")) &&
+				(parameterObjectFieldId > 0)) {
+
+				ObjectField parameterObjectField =
+					_objectFieldLocalService.getObjectField(
+						parameterObjectFieldId);
+
+				ddmFormField.setProperty(
+					"parameterObjectFieldName", parameterObjectField.getName());
+			}
 		}
 
 		ddmFormField.setReadOnly(readOnly);

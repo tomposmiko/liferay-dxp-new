@@ -100,13 +100,14 @@ public class InfoFormValidationException extends InfoFormException {
 
 		@Override
 		public String getLocalizedMessage(Locale locale) {
-			return LanguageUtil.get(locale, "value-exceeds-minimum-value-of-x");
+			return LanguageUtil.get(
+				locale, "value-falls-bellow-the-minimum-value-of-x");
 		}
 
 		@Override
 		public String getLocalizedMessage(String fieldLabel, Locale locale) {
 			return LanguageUtil.format(
-				locale, "value-exceeds-minimum-value-of-x-for-field-x",
+				locale, "value-falls-bellow-the-minimum-value-of-x-for-field-x",
 				new String[] {String.valueOf(_minValue), fieldLabel}, false);
 		}
 
@@ -135,8 +136,7 @@ public class InfoFormValidationException extends InfoFormException {
 		public String getLocalizedMessage(String fieldLabel, Locale locale) {
 			return LanguageUtil.format(
 				locale,
-				"x-file-size-is-larger-than-the-allowed-overall-maximum-" +
-					"upload-request-size-x",
+				"x-file-size-is-larger-than-the-allowed-maximum-upload-size-x",
 				new String[] {fieldLabel, _maximumSizeAllowed}, false);
 		}
 

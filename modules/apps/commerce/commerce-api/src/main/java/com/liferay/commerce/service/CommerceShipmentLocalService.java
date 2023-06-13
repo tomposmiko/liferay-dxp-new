@@ -451,7 +451,6 @@ public interface CommerceShipmentLocalService
 	 String, long, long, String, ServiceContext)}
 	 */
 	@Deprecated
-	@Indexable(type = IndexableType.REINDEX)
 	public CommerceShipment updateAddress(
 			long commerceShipmentId, String name, String description,
 			String street1, String street2, String street3, String city,
@@ -486,23 +485,25 @@ public interface CommerceShipmentLocalService
 		CommerceShipment commerceShipment);
 
 	public CommerceShipment updateCommerceShipment(
-			long commerceShipmentId, String carrier, String trackingNumber,
-			int status, int shippingDateMonth, int shippingDateDay,
-			int shippingDateYear, int shippingDateHour, int shippingDateMinute,
-			int expectedDateMonth, int expectedDateDay, int expectedDateYear,
-			int expectedDateHour, int expectedDateMinute)
+			long commerceShipmentId, long commerceShippingMethodId,
+			String carrier, int expectedDateMonth, int expectedDateDay,
+			int expectedDateYear, int expectedDateHour, int expectedDateMinute,
+			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
+			int shippingDateHour, int shippingDateMinute, String trackingNumber,
+			String trackingURL, int status, ServiceContext serviceContext)
 		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceShipment updateCommerceShipment(
-			long commerceShipmentId, String name, String description,
+			long commerceShipmentId, long commerceShippingMethodId,
+			String carrier, int expectedDateMonth, int expectedDateDay,
+			int expectedDateYear, int expectedDateHour, int expectedDateMinute,
+			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
+			int shippingDateHour, int shippingDateMinute, String trackingNumber,
+			String trackingURL, int status, String name, String description,
 			String street1, String street2, String street3, String city,
 			String zip, long regionId, long countryId, String phoneNumber,
-			String carrier, String trackingNumber, int status,
-			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
-			int shippingDateHour, int shippingDateMinute, int expectedDateMonth,
-			int expectedDateDay, int expectedDateYear, int expectedDateHour,
-			int expectedDateMinute)
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)

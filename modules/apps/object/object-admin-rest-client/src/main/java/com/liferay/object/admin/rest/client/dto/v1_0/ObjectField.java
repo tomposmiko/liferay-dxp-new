@@ -324,6 +324,28 @@ public class ObjectField implements Cloneable, Serializable {
 
 	protected ObjectFieldSetting[] objectFieldSettings;
 
+	public ObjectStateFlow getObjectStateFlow() {
+		return objectStateFlow;
+	}
+
+	public void setObjectStateFlow(ObjectStateFlow objectStateFlow) {
+		this.objectStateFlow = objectStateFlow;
+	}
+
+	public void setObjectStateFlow(
+		UnsafeSupplier<ObjectStateFlow, Exception>
+			objectStateFlowUnsafeSupplier) {
+
+		try {
+			objectStateFlow = objectStateFlowUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected ObjectStateFlow objectStateFlow;
+
 	public RelationshipType getRelationshipType() {
 		return relationshipType;
 	}
@@ -374,6 +396,27 @@ public class ObjectField implements Cloneable, Serializable {
 	}
 
 	protected Boolean required;
+
+	public Boolean getState() {
+		return state;
+	}
+
+	public void setState(Boolean state) {
+		this.state = state;
+	}
+
+	public void setState(
+		UnsafeSupplier<Boolean, Exception> stateUnsafeSupplier) {
+
+		try {
+			state = stateUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean state;
 
 	public Boolean getSystem() {
 		return system;

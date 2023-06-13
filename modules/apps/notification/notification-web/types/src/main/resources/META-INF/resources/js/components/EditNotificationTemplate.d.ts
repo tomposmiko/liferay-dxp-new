@@ -25,4 +25,17 @@ interface IProps {
 	editorConfig: string;
 	notificationTemplateId: number;
 }
+export declare type TNotificationTemplate = {
+	attachmentObjectFieldIds: string[] | number[];
+	bcc: string;
+	body: LocalizedValue<string>;
+	cc: string;
+	description: string;
+	from: string;
+	fromName: LocalizedValue<string>;
+	name: string;
+	objectDefinitionId: number | null;
+	subject: LocalizedValue<string>;
+	to: LocalizedValue<string>;
+};
 export {};

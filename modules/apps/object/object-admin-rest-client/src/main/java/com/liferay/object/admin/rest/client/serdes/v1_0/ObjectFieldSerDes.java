@@ -224,6 +224,16 @@ public class ObjectFieldSerDes {
 			sb.append("]");
 		}
 
+		if (objectField.getObjectStateFlow() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectStateFlow\": ");
+
+			sb.append(String.valueOf(objectField.getObjectStateFlow()));
+		}
+
 		if (objectField.getRelationshipType() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -246,6 +256,16 @@ public class ObjectFieldSerDes {
 			sb.append("\"required\": ");
 
 			sb.append(objectField.getRequired());
+		}
+
+		if (objectField.getState() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"state\": ");
+
+			sb.append(objectField.getState());
 		}
 
 		if (objectField.getSystem() != null) {
@@ -394,6 +414,15 @@ public class ObjectFieldSerDes {
 				String.valueOf(objectField.getObjectFieldSettings()));
 		}
 
+		if (objectField.getObjectStateFlow() == null) {
+			map.put("objectStateFlow", null);
+		}
+		else {
+			map.put(
+				"objectStateFlow",
+				String.valueOf(objectField.getObjectStateFlow()));
+		}
+
 		if (objectField.getRelationshipType() == null) {
 			map.put("relationshipType", null);
 		}
@@ -408,6 +437,13 @@ public class ObjectFieldSerDes {
 		}
 		else {
 			map.put("required", String.valueOf(objectField.getRequired()));
+		}
+
+		if (objectField.getState() == null) {
+			map.put("state", null);
+		}
+		else {
+			map.put("state", String.valueOf(objectField.getState()));
 		}
 
 		if (objectField.getSystem() == null) {
@@ -537,6 +573,13 @@ public class ObjectFieldSerDes {
 						));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "objectStateFlow")) {
+				if (jsonParserFieldValue != null) {
+					objectField.setObjectStateFlow(
+						ObjectStateFlowSerDes.toDTO(
+							(String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "relationshipType")) {
 				if (jsonParserFieldValue != null) {
 					objectField.setRelationshipType(
@@ -547,6 +590,11 @@ public class ObjectFieldSerDes {
 			else if (Objects.equals(jsonParserFieldName, "required")) {
 				if (jsonParserFieldValue != null) {
 					objectField.setRequired((Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "state")) {
+				if (jsonParserFieldValue != null) {
+					objectField.setState((Boolean)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "system")) {

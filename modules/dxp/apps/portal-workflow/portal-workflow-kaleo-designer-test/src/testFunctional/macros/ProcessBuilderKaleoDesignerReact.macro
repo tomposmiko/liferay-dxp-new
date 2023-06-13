@@ -14,6 +14,20 @@ definition {
 				locator1 = "ProcessBuilderKaleoDesignerReact#CONNECTOR_SOURCE_SELECTED",
 				value1 = "0,0");
 		}
+
+		if (isSet(connectorOutLabel)) {
+			MouseOver.mouseOverInvisible(
+				key_direction = "${direction}",
+				key_nodeLabel = "${connectorOutLabel}",
+				locator1 = "ProcessBuilderKaleoDesignerReact#CONNECTOR_SOURCE_BY_LABEL",
+				value1 = "0,0");
+
+			MouseDown.mouseDownAt(
+				key_direction = "${direction}",
+				key_nodeLabel = "${connectorOutLabel}",
+				locator1 = "ProcessBuilderKaleoDesignerReact#CONNECTOR_SOURCE_BY_LABEL",
+				value1 = "0,0");
+		}
 		else {
 			MouseOver.mouseOverInvisible(
 				key_direction = "${direction}",
@@ -28,15 +42,30 @@ definition {
 				value1 = "0,0");
 		}
 
-		MouseMove(
-			key_nodeType = "${connectorIn}",
-			locator1 = "ProcessBuilderKaleoDesignerReact#DIAGRAM_NODE",
-			value1 = "0,47");
+		if (isSet(connectorInLabel)) {
+			MouseMove(
+				key_nodeLabel = "${connectorInLabel}",
+				key_nodeType = "${nodeType}",
+				locator1 = "ProcessBuilderKaleoDesignerReact#DIAGRAM_NODE_TYPE_LABEL",
+				value1 = "0,47");
 
-		MouseUp.mouseUpAt(
-			key_nodeType = "${connectorIn}",
-			locator1 = "ProcessBuilderKaleoDesignerReact#DIAGRAM_NODE",
-			value1 = "0,47");
+			MouseUp.mouseUpAt(
+				key_nodeLabel = "${connectorInLabel}",
+				key_nodeType = "${nodeType}",
+				locator1 = "ProcessBuilderKaleoDesignerReact#DIAGRAM_NODE_TYPE_LABEL",
+				value1 = "0,47");
+		}
+		else {
+			MouseMove(
+				key_nodeType = "${connectorIn}",
+				locator1 = "ProcessBuilderKaleoDesignerReact#DIAGRAM_NODE",
+				value1 = "0,47");
+
+			MouseUp.mouseUpAt(
+				key_nodeType = "${connectorIn}",
+				locator1 = "ProcessBuilderKaleoDesignerReact#DIAGRAM_NODE",
+				value1 = "0,47");
+		}
 
 		if (isSet(connectorLabel)) {
 			Type(
@@ -90,6 +119,19 @@ definition {
 
 	macro closeModal {
 		Click(locator1 = "ProcessBuilderKaleoDesignerReact#BUTTON_CLOSE_MODAL");
+	}
+
+	macro deleteBySidebarCard {
+		Click(
+			key_propertyName = "${sidebarCardName}",
+			key_propertyValue = "${propertyValue}",
+			locator1 = "ProcessBuilderKaleoDesignerReact#SIDEBAR_PROPERTY");
+
+		Click(
+			locator1 = "WorkflowConfiguration#BLOGS_MOVE_TO_RECYCLE_BIN",
+			sidebarCard = "${sidebarCardName}");
+
+		Click(locator1 = "ProcessBuilderKaleoDesignerReact#BUTTON_DELETE_MODAL");
 	}
 
 	macro deleteLanguage {
@@ -739,6 +781,24 @@ definition {
 				}
 			}
 		}
+
+		if ("${recurrenceOption}" == "True") {
+			Check.checkToggleSwitch(locator1 = "ProcessBuilderKaleoDesignerReact#DEFAULT_TOGGLE_SWITCH");
+		}
+
+		if (isSet(recurrenceScaleTypeOption)) {
+			Select(
+				key_selectorField = "Scale",
+				locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_SELECTORS_WITHOUT_TEXT_WARNING",
+				value1 = "${recurrenceScaleTypeOption}");
+		}
+
+		if (isSet(recurrenceDurationValue)) {
+			Type(
+				key_inputOption = "Duration",
+				locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_WITHOUT_TEXT_WARNING",
+				value1 = "${recurrenceDurationValue}");
+		}
 	}
 
 	macro viewConnectorID {
@@ -1161,6 +1221,12 @@ definition {
 			locator1 = "ProcessBuilderKaleoDesignerReact#SIDEBAR_MESSAGE_FEEDBACK");
 	}
 
+	macro viewSidebarHeaderPresent {
+		AssertElementPresent(
+			key_header = "${header}",
+			locator1 = "ProcessBuilderKaleoDesignerReact#SIDEBAR_HEADER");
+	}
+
 	macro viewSourceDiagramToolTipDisplayed {
 		MouseOver(
 			locator1 = "ProcessBuilderKaleoDesignerReact#BUTTON_DIAGRAM_SOURCE_SWITCH",
@@ -1183,9 +1249,9 @@ definition {
 			value1 = "${nodeLabel}");
 	}
 
-	macro viewTimerNotPresentSidebar {
+	macro viewTimerNotPresent {
 		AssertElementNotPresent(
-			key_propertyName = "${propertyName}",
+			key_propertyName = "Timers",
 			key_propertyValue = "${propertyValue}",
 			locator1 = "ProcessBuilderKaleoDesignerReact#SIDEBAR_PROPERTY");
 	}
@@ -1252,6 +1318,24 @@ definition {
 				locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT",
 				value1 = "${priorityValue}");
 		}
+	}
+
+	macro viewTimersRequiredFields {
+		AssertElementPresent(
+			key_requiredField = "name",
+			locator1 = "ProcessBuilderKaleoDesignerReact#REQUIRED_FIELD");
+
+		AssertElementPresent(
+			key_requiredField = "script",
+			locator1 = "ProcessBuilderKaleoDesignerReact#REQUIRED_FIELD");
+
+		AssertElementPresent(
+			key_requiredField = "timerScale",
+			locator1 = "ProcessBuilderKaleoDesignerReact#REQUIRED_FIELD");
+
+		AssertElementPresent(
+			key_requiredField = "timerValue",
+			locator1 = "ProcessBuilderKaleoDesignerReact#REQUIRED_FIELD");
 	}
 
 	macro viewToolTip {

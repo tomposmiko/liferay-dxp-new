@@ -17,17 +17,23 @@ package com.liferay.notification.service.impl;
 import com.liferay.mail.kernel.model.MailMessage;
 import com.liferay.mail.kernel.service.MailService;
 import com.liferay.notification.model.NotificationQueueEntry;
+import com.liferay.notification.model.NotificationQueueEntryAttachment;
+import com.liferay.notification.service.NotificationQueueEntryAttachmentLocalService;
 import com.liferay.notification.service.base.NotificationQueueEntryLocalServiceBaseImpl;
+import com.liferay.notification.service.persistence.NotificationQueueEntryAttachmentPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
@@ -55,7 +61,7 @@ public class NotificationQueueEntryLocalServiceImpl
 			long userId, long notificationTemplateId, String bcc, String body,
 			String cc, String className, long classPK, String from,
 			String fromName, double priority, String subject, String to,
-			String toName)
+			String toName, List<Long> fileEntryIds)
 		throws PortalException {
 
 		NotificationQueueEntry notificationQueueEntry =
@@ -82,14 +88,32 @@ public class NotificationQueueEntryLocalServiceImpl
 		notificationQueueEntry.setTo(to);
 		notificationQueueEntry.setToName(toName);
 
-		return notificationQueueEntryPersistence.update(notificationQueueEntry);
+		notificationQueueEntry = notificationQueueEntryPersistence.update(
+			notificationQueueEntry);
+
+		for (long fileEntryId : fileEntryIds) {
+			_notificationQueueEntryAttachmentLocalService.
+				addNotificationQueueEntryAttachment(
+					notificationQueueEntry.getCompanyId(), fileEntryId,
+					notificationQueueEntry.getNotificationQueueEntryId());
+		}
+
+		return notificationQueueEntry;
 	}
 
 	@Override
 	public void deleteNotificationQueueEntries(Date sentDate)
 		throws PortalException {
 
-		notificationQueueEntryPersistence.removeByLtSentDate(sentDate);
+		for (NotificationQueueEntry notificationQueueEntry :
+				notificationQueueEntryPersistence.findByLtSentDate(sentDate)) {
+
+			notificationQueueEntryPersistence.remove(notificationQueueEntry);
+
+			_notificationQueueEntryAttachmentLocalService.
+				deleteNotificationQueueEntryAttachments(
+					notificationQueueEntry.getNotificationQueueEntryId());
+		}
 	}
 
 	@Override
@@ -108,9 +132,15 @@ public class NotificationQueueEntryLocalServiceImpl
 	@Override
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public NotificationQueueEntry deleteNotificationQueueEntry(
-		NotificationQueueEntry notificationQueueEntry) {
+			NotificationQueueEntry notificationQueueEntry)
+		throws PortalException {
 
-		notificationQueueEntryPersistence.remove(notificationQueueEntry);
+		notificationQueueEntry = notificationQueueEntryPersistence.remove(
+			notificationQueueEntry);
+
+		_notificationQueueEntryAttachmentLocalService.
+			deleteNotificationQueueEntryAttachments(
+				notificationQueueEntry.getNotificationQueueEntryId());
 
 		return notificationQueueEntry;
 	}
@@ -130,6 +160,10 @@ public class NotificationQueueEntryLocalServiceImpl
 						notificationQueueEntry.getToName()),
 					notificationQueueEntry.getSubject(),
 					notificationQueueEntry.getBody(), true);
+
+				_addFileAttachments(
+					mailMessage,
+					notificationQueueEntry.getNotificationQueueEntryId());
 
 				mailMessage.setBCC(
 					_toInternetAddresses(notificationQueueEntry.getBcc()));
@@ -176,6 +210,30 @@ public class NotificationQueueEntryLocalServiceImpl
 		return notificationQueueEntryPersistence.update(notificationQueueEntry);
 	}
 
+	private void _addFileAttachments(
+		MailMessage mailMessage, long notificationQueueEntryId) {
+
+		for (NotificationQueueEntryAttachment notificationQueueEntryAttachment :
+				_notificationQueueEntryAttachmentPersistence.
+					findByNotificationQueueEntryId(notificationQueueEntryId)) {
+
+			try {
+				FileEntry fileEntry =
+					_portletFileRepository.getPortletFileEntry(
+						notificationQueueEntryAttachment.getFileEntryId());
+
+				mailMessage.addFileAttachment(
+					FileUtil.createTempFile(fileEntry.getContentStream()),
+					fileEntry.getFileName());
+			}
+			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception);
+				}
+			}
+		}
+	}
+
 	private InternetAddress[] _toInternetAddresses(String string)
 		throws Exception {
 
@@ -193,6 +251,17 @@ public class NotificationQueueEntryLocalServiceImpl
 
 	@Reference
 	private MailService _mailService;
+
+	@Reference
+	private NotificationQueueEntryAttachmentLocalService
+		_notificationQueueEntryAttachmentLocalService;
+
+	@Reference
+	private NotificationQueueEntryAttachmentPersistence
+		_notificationQueueEntryAttachmentPersistence;
+
+	@Reference
+	private PortletFileRepository _portletFileRepository;
 
 	@Reference
 	private UserLocalService _userLocalService;

@@ -21,6 +21,7 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectLayout;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectView;
 import com.liferay.object.admin.rest.dto.v1_0.Status;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
+import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectFieldDTOConverter;
 import com.liferay.object.admin.rest.internal.dto.v1_0.converter.ObjectViewDTOConverter;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldUtil;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
@@ -36,7 +37,10 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
+import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
 import com.liferay.object.util.LocalizedMapUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -294,8 +298,12 @@ public class ObjectDefinitionResourceImpl
 				objectFields = transformToArray(
 					_objectFieldLocalService.getObjectFields(
 						objectDefinition.getObjectDefinitionId()),
-					objectField -> ObjectFieldUtil.toObjectField(
-						null, objectField),
+					objectField -> _objectFieldDTOConverter.toDTO(
+						new DefaultDTOConverterContext(
+							false, null, null, null,
+							contextAcceptLanguage.getPreferredLocale(), null,
+							null),
+						objectField),
 					ObjectField.class);
 				objectLayouts = transformToArray(
 					_objectLayoutLocalService.getObjectLayouts(
@@ -314,6 +322,33 @@ public class ObjectDefinitionResourceImpl
 						objectView),
 					ObjectView.class);
 				panelCategoryKey = objectDefinition.getPanelCategoryKey();
+
+				if (GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LPS-155537"))) {
+
+					String restContextPath = StringPool.BLANK;
+
+					if (!objectDefinition.isSystem()) {
+						restContextPath = objectDefinition.getRESTContextPath();
+					}
+					else {
+						SystemObjectDefinitionMetadata
+							systemObjectDefinitionMetadata =
+								_systemObjectDefinitionMetadataTracker.
+									getSystemObjectDefinitionMetadata(
+										objectDefinition.getName());
+
+						if (systemObjectDefinitionMetadata != null) {
+							restContextPath =
+								systemObjectDefinitionMetadata.
+									getRESTContextPath();
+						}
+					}
+
+					parameterRequired = restContextPath.matches(
+						".*/\\{\\w+}/.*");
+				}
+
 				pluralLabel = LocalizedMapUtil.getLanguageIdMap(
 					objectDefinition.getPluralLabelMap());
 				portlet = objectDefinition.getPortlet();
@@ -353,6 +388,9 @@ public class ObjectDefinitionResourceImpl
 	private ObjectDefinitionService _objectDefinitionService;
 
 	@Reference
+	private ObjectFieldDTOConverter _objectFieldDTOConverter;
+
+	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Reference
@@ -366,5 +404,9 @@ public class ObjectDefinitionResourceImpl
 
 	@Reference
 	private ObjectViewLocalService _objectViewLocalService;
+
+	@Reference
+	private SystemObjectDefinitionMetadataTracker
+		_systemObjectDefinitionMetadataTracker;
 
 }

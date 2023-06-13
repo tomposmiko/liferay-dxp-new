@@ -62,7 +62,6 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsUtil;
@@ -212,6 +211,13 @@ public class FragmentLayoutStructureItemImporter
 		if (definitionMap.containsKey("indexed")) {
 			fragmentStyledLayoutStructureItem.setIndexed(
 				GetterUtil.getBoolean(definitionMap.get("indexed")));
+		}
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147895")) &&
+			definitionMap.containsKey("name")) {
+
+			fragmentStyledLayoutStructureItem.setName(
+				GetterUtil.getString(definitionMap.get("name")));
 		}
 
 		return fragmentStyledLayoutStructureItem;
@@ -793,7 +799,7 @@ public class FragmentLayoutStructureItemImporter
 			locale = serviceContext.getLocale();
 		}
 		else {
-			locale = _portal.getSiteDefaultLocale(groupId);
+			locale = portal.getSiteDefaultLocale(groupId);
 		}
 
 		return _language.format(
@@ -1140,9 +1146,6 @@ public class FragmentLayoutStructureItemImporter
 
 	@Reference
 	private Language _language;
-
-	@Reference
-	private Portal _portal;
 
 	@Reference
 	private PortletConfigurationImporterHelper

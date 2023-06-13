@@ -37,8 +37,8 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
 import java.io.Serializable;
@@ -63,10 +63,6 @@ public class AddObjectEntryObjectActionExecutorImpl
 			long companyId, UnicodeProperties parametersUnicodeProperties,
 			JSONObject payloadJSONObject, long userId)
 		throws Exception {
-
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-152180"))) {
-			throw new UnsupportedOperationException();
-		}
 
 		ObjectDefinition targetObjectDefinition =
 			_objectDefinitionLocalService.getObjectDefinition(
@@ -203,6 +199,10 @@ public class AddObjectEntryObjectActionExecutorImpl
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
 			Serializable value = (Serializable)jsonObject.get("value");
+
+			if (Validator.isNull(value)) {
+				continue;
+			}
 
 			if (!jsonObject.getBoolean("inputAsValue")) {
 				value = _evaluateExpression(value.toString(), variables);

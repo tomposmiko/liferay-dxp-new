@@ -95,6 +95,20 @@ public class PageSectionDefinitionSerDes {
 				String.valueOf(pageSectionDefinition.getBackgroundImage()));
 		}
 
+		if (pageSectionDefinition.getContentVisibility() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"contentVisibility\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(pageSectionDefinition.getContentVisibility()));
+
+			sb.append("\"");
+		}
+
 		if (pageSectionDefinition.getCssClasses() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -239,6 +253,20 @@ public class PageSectionDefinitionSerDes {
 			sb.append(String.valueOf(pageSectionDefinition.getLayout()));
 		}
 
+		if (pageSectionDefinition.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"name\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(pageSectionDefinition.getName()));
+
+			sb.append("\"");
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -286,6 +314,15 @@ public class PageSectionDefinitionSerDes {
 			map.put(
 				"backgroundImage",
 				String.valueOf(pageSectionDefinition.getBackgroundImage()));
+		}
+
+		if (pageSectionDefinition.getContentVisibility() == null) {
+			map.put("contentVisibility", null);
+		}
+		else {
+			map.put(
+				"contentVisibility",
+				String.valueOf(pageSectionDefinition.getContentVisibility()));
 		}
 
 		if (pageSectionDefinition.getCssClasses() == null) {
@@ -367,6 +404,13 @@ public class PageSectionDefinitionSerDes {
 				"layout", String.valueOf(pageSectionDefinition.getLayout()));
 		}
 
+		if (pageSectionDefinition.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(pageSectionDefinition.getName()));
+		}
+
 		return map;
 	}
 
@@ -408,6 +452,12 @@ public class PageSectionDefinitionSerDes {
 					pageSectionDefinition.setBackgroundImage(
 						BackgroundImageSerDes.toDTO(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "contentVisibility")) {
+				if (jsonParserFieldValue != null) {
+					pageSectionDefinition.setContentVisibility(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "cssClasses")) {
@@ -480,6 +530,11 @@ public class PageSectionDefinitionSerDes {
 				if (jsonParserFieldValue != null) {
 					pageSectionDefinition.setLayout(
 						LayoutSerDes.toDTO((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "name")) {
+				if (jsonParserFieldValue != null) {
+					pageSectionDefinition.setName((String)jsonParserFieldValue);
 				}
 			}
 		}

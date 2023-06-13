@@ -19,6 +19,7 @@ import com.liferay.headless.delivery.dto.v1_0.PageElement;
 import com.liferay.layout.page.template.util.AlignConverter;
 import com.liferay.layout.page.template.util.BorderRadiusConverter;
 import com.liferay.layout.page.template.util.ContentDisplayConverter;
+import com.liferay.layout.page.template.util.ContentVisibilityConverter;
 import com.liferay.layout.page.template.util.FlexWrapConverter;
 import com.liferay.layout.page.template.util.HtmlTagConverter;
 import com.liferay.layout.page.template.util.JustifyConverter;
@@ -108,6 +109,18 @@ public class ContainerLayoutStructureItemImporter
 			}
 
 			stylesJSONObject.put("backgroundImage", jsonObject);
+		}
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147895"))) {
+			String contentVisibility = String.valueOf(
+				definitionMap.getOrDefault(
+					"contentVisibility", StringPool.BLANK));
+
+			if (Validator.isNotNull(contentVisibility)) {
+				containerStyledLayoutStructureItem.setContentVisibility(
+					ContentVisibilityConverter.convertToInternalValue(
+						contentVisibility));
+			}
 		}
 
 		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-147511"))) {
@@ -384,6 +397,15 @@ public class ContainerLayoutStructureItemImporter
 		if (definitionMap.containsKey("indexed")) {
 			containerStyledLayoutStructureItem.setIndexed(
 				GetterUtil.getBoolean(definitionMap.get("indexed")));
+		}
+
+		if (GetterUtil.getBoolean(
+				com.liferay.portal.kernel.util.PropsUtil.get(
+					"feature.flag.LPS-147895")) &&
+			definitionMap.containsKey("name")) {
+
+			containerStyledLayoutStructureItem.setName(
+				GetterUtil.getString(definitionMap.get("name")));
 		}
 
 		return containerStyledLayoutStructureItem;

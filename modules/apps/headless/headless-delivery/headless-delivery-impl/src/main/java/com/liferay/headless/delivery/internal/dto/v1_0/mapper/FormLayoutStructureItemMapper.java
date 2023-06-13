@@ -96,6 +96,17 @@ public class FormLayoutStructureItemMapper
 							() -> getFragmentViewPorts(
 								formStyledLayoutStructureItem.
 									getItemConfigJSONObject()));
+						setName(
+							() -> {
+								if (!GetterUtil.getBoolean(
+										PropsUtil.get(
+											"feature.flag.LPS-147895"))) {
+
+									return null;
+								}
+
+								return formStyledLayoutStructureItem.getName();
+							});
 					}
 				};
 				type = Type.FORM;
@@ -113,7 +124,7 @@ public class FormLayoutStructureItemMapper
 				{
 					className = _portal.getClassName(
 						formStyledLayoutStructureItem.getClassNameId());
-					subtypeId = formStyledLayoutStructureItem.getClassTypeId();
+					classType = formStyledLayoutStructureItem.getClassTypeId();
 				}
 			};
 		}

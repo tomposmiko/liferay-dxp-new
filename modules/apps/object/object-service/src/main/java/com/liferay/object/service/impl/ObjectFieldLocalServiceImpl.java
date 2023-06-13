@@ -15,6 +15,8 @@
 package com.liferay.object.service.impl;
 
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.list.type.model.ListTypeEntry;
+import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.exception.DuplicateObjectFieldExternalReferenceCodeException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
@@ -24,6 +26,7 @@ import com.liferay.object.exception.ObjectFieldDefaultValueException;
 import com.liferay.object.exception.ObjectFieldLabelException;
 import com.liferay.object.exception.ObjectFieldNameException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
+import com.liferay.object.exception.ObjectFieldStateException;
 import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeServicesTracker;
@@ -34,7 +37,10 @@ import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.model.ObjectStateFlow;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
+import com.liferay.object.service.ObjectStateFlowLocalService;
+import com.liferay.object.service.ObjectStateTransitionLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.base.ObjectFieldLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
@@ -96,7 +102,7 @@ public class ObjectFieldLocalServiceImpl
 			String businessType, String dbType, String defaultValue,
 			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, String name, boolean required,
-			List<ObjectFieldSetting> objectFieldSettings)
+			boolean state, List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
 
 		name = StringUtil.trim(name);
@@ -114,7 +120,7 @@ public class ObjectFieldLocalServiceImpl
 			userId, listTypeDefinitionId, objectDefinitionId, businessType,
 			name + StringPool.UNDERLINE, dbTableName, dbType, defaultValue,
 			indexed, indexedAsKeyword, indexedLanguageId, labelMap, name,
-			required, false);
+			required, state, false);
 
 		if (objectDefinition.isApproved() &&
 			!Objects.equals(
@@ -128,6 +134,8 @@ public class ObjectFieldLocalServiceImpl
 
 		_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
 
+		_objectStateFlowLocalService.addDefaultObjectStateFlow(objectField);
+
 		return objectField;
 	}
 
@@ -138,7 +146,7 @@ public class ObjectFieldLocalServiceImpl
 			String dbColumnName, String dbTableName, String dbType,
 			String defaultValue, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId, Map<Locale, String> labelMap, String name,
-			boolean required)
+			boolean required, boolean state)
 		throws PortalException {
 
 		ObjectField existingObjectField = objectFieldPersistence.fetchByODI_N(
@@ -148,7 +156,7 @@ public class ObjectFieldLocalServiceImpl
 			return addSystemObjectField(
 				userId, objectDefinitionId, businessType, dbColumnName,
 				dbTableName, dbType, defaultValue, indexed, indexedAsKeyword,
-				indexedLanguageId, labelMap, name, required);
+				indexedLanguageId, labelMap, name, required, state);
 		}
 
 		_validateLabel(labelMap);
@@ -165,7 +173,7 @@ public class ObjectFieldLocalServiceImpl
 			String dbColumnName, String dbTableName, String dbType,
 			String defaultValue, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId, Map<Locale, String> labelMap, String name,
-			boolean required)
+			boolean required, boolean state)
 		throws PortalException {
 
 		name = StringUtil.trim(name);
@@ -177,7 +185,7 @@ public class ObjectFieldLocalServiceImpl
 		return _addObjectField(
 			userId, 0, objectDefinitionId, businessType, dbColumnName,
 			dbTableName, dbType, defaultValue, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, name, required, true);
+			indexedLanguageId, labelMap, name, required, state, true);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -295,6 +303,13 @@ public class ObjectFieldLocalServiceImpl
 	}
 
 	@Override
+	public List<ObjectField> getListTypeDefinitionObjectFields(
+		long listTypeDefinitionId, boolean state) {
+
+		return objectFieldPersistence.findByLTDI_S(listTypeDefinitionId, state);
+	}
+
+	@Override
 	public ObjectField getObjectField(long objectFieldId)
 		throws PortalException {
 
@@ -407,9 +422,11 @@ public class ObjectFieldLocalServiceImpl
 	public ObjectField updateCustomObjectField(
 			long objectFieldId, String externalReferenceCode,
 			long listTypeDefinitionId, String businessType, String dbType,
-			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
-			Map<Locale, String> labelMap, String name, boolean required,
-			List<ObjectFieldSetting> objectFieldSettings)
+			String defaultValue, boolean indexed, boolean indexedAsKeyword,
+			String indexedLanguageId, Map<Locale, String> labelMap, String name,
+			boolean required, boolean state,
+			List<ObjectFieldSetting> objectFieldSettings,
+			ObjectStateFlow objectStateFlow)
 		throws PortalException {
 
 		ObjectField objectField = objectFieldPersistence.findByPrimaryKey(
@@ -436,11 +453,17 @@ public class ObjectFieldLocalServiceImpl
 
 			_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
 
+			_objectStateTransitionLocalService.updateObjectStateTransitions(
+				objectStateFlow);
+
 			return objectField;
 		}
 
+		_validateDefaultValue(
+			businessType, defaultValue, listTypeDefinitionId, state);
 		_validateIndexed(
 			businessType, dbType, indexed, indexedAsKeyword, indexedLanguageId);
+		_validateState(required, state);
 
 		if (Validator.isNotNull(objectField.getRelationshipType())) {
 			if (!Objects.equals(objectField.getDBType(), dbType) ||
@@ -459,15 +482,20 @@ public class ObjectFieldLocalServiceImpl
 
 		objectField.setListTypeDefinitionId(listTypeDefinitionId);
 		objectField.setDBColumnName(name + StringPool.UNDERLINE);
+		objectField.setDefaultValue(defaultValue);
 		objectField.setIndexed(indexed);
 		objectField.setIndexedAsKeyword(indexedAsKeyword);
 		objectField.setIndexedLanguageId(indexedLanguageId);
 		objectField.setName(name);
 		objectField.setRequired(required);
+		objectField.setState(state);
 
 		objectField = objectFieldPersistence.update(objectField);
 
 		_addOrUpdateObjectFieldSettings(objectField, objectFieldSettings);
+
+		_objectStateTransitionLocalService.updateObjectStateTransitions(
+			objectStateFlow);
 
 		return objectField;
 	}
@@ -480,20 +508,23 @@ public class ObjectFieldLocalServiceImpl
 			String dbType, String defaultValue, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, String name, boolean required,
-			boolean system, List<ObjectFieldSetting> objectFieldSettings)
+			boolean state, boolean system,
+			List<ObjectFieldSetting> objectFieldSettings,
+			ObjectStateFlow objectStateFlow)
 		throws PortalException {
 
 		if (system) {
 			return objectFieldLocalService.addOrUpdateSystemObjectField(
 				userId, objectDefinitionId, businessType, dbColumnName,
 				dbTableName, dbType, defaultValue, indexed, indexedAsKeyword,
-				indexedLanguageId, labelMap, name, required);
+				indexedLanguageId, labelMap, name, required, state);
 		}
 
 		return objectFieldLocalService.updateCustomObjectField(
 			objectFieldId, externalReferenceCode, listTypeDefinitionId,
-			businessType, dbType, indexed, indexedAsKeyword, indexedLanguageId,
-			labelMap, name, required, objectFieldSettings);
+			businessType, dbType, defaultValue, indexed, indexedAsKeyword,
+			indexedLanguageId, labelMap, name, required, state,
+			objectFieldSettings, objectStateFlow);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -515,17 +546,19 @@ public class ObjectFieldLocalServiceImpl
 			String dbType, String defaultValue, boolean indexed,
 			boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, String name, boolean required,
-			boolean system)
+			boolean state, boolean system)
 		throws PortalException {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		_validateDefaultValue(businessType, defaultValue);
+		_validateDefaultValue(
+			businessType, defaultValue, listTypeDefinitionId, state);
 		_validateIndexed(
 			businessType, dbType, indexed, indexedAsKeyword, indexedLanguageId);
 		_validateLabel(labelMap);
 		_validateName(0, objectDefinition, name, system);
+		_validateState(required, state);
 
 		ObjectField objectField = objectFieldPersistence.create(
 			counterLocalService.increment());
@@ -550,6 +583,7 @@ public class ObjectFieldLocalServiceImpl
 		objectField.setName(name);
 		objectField.setRelationshipType(null);
 		objectField.setRequired(required);
+		objectField.setState(state);
 		objectField.setSystem(system);
 
 		return objectFieldPersistence.update(objectField);
@@ -677,6 +711,11 @@ public class ObjectFieldLocalServiceImpl
 		_objectLayoutColumnPersistence.removeByObjectFieldId(
 			objectField.getObjectFieldId());
 
+		if (objectField.isState()) {
+			_objectStateFlowLocalService.deleteObjectFieldObjectStateFlow(
+				objectField.getObjectFieldId());
+		}
+
 		_objectViewLocalService.unassociateObjectField(objectField);
 
 		if ((Objects.equals(
@@ -735,7 +774,9 @@ public class ObjectFieldLocalServiceImpl
 		}
 	}
 
-	private void _validateDefaultValue(String businessType, String defaultValue)
+	private void _validateDefaultValue(
+			String businessType, String defaultValue, long listTypeDefinitionId,
+			boolean state)
 		throws PortalException {
 
 		if (Validator.isNull(defaultValue)) {
@@ -754,6 +795,23 @@ public class ObjectFieldLocalServiceImpl
 					"Object field can only have a default type when the ",
 					"business type is \"",
 					ObjectFieldConstants.BUSINESS_TYPE_PICKLIST, "\""));
+		}
+
+		ListTypeEntry listTypeEntry =
+			_listTypeEntryLocalService.fetchListTypeEntry(
+				listTypeDefinitionId, defaultValue);
+
+		if (listTypeEntry == null) {
+			throw new ObjectFieldDefaultValueException(
+				StringBundler.concat(
+					"Default value \"", defaultValue, "\" is not a list entry ",
+					"in list definition " + listTypeDefinitionId));
+		}
+
+		if (!state) {
+			throw new ObjectFieldStateException(
+				"Object field default value can only be set when the " +
+					"picklist is a state");
 		}
 	}
 
@@ -855,6 +913,15 @@ public class ObjectFieldLocalServiceImpl
 		}
 	}
 
+	private void _validateState(boolean required, boolean state)
+		throws PortalException {
+
+		if (state && !required) {
+			throw new ObjectFieldStateException(
+				"Object field must be required when the state is true");
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectFieldLocalServiceImpl.class);
 
@@ -882,6 +949,9 @@ public class ObjectFieldLocalServiceImpl
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 
 	@Reference
+	private ListTypeEntryLocalService _listTypeEntryLocalService;
+
+	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
 
 	@Reference
@@ -905,6 +975,13 @@ public class ObjectFieldLocalServiceImpl
 
 	@Reference
 	private ObjectRelationshipPersistence _objectRelationshipPersistence;
+
+	@Reference
+	private ObjectStateFlowLocalService _objectStateFlowLocalService;
+
+	@Reference
+	private ObjectStateTransitionLocalService
+		_objectStateTransitionLocalService;
 
 	@Reference
 	private ObjectViewLocalService _objectViewLocalService;

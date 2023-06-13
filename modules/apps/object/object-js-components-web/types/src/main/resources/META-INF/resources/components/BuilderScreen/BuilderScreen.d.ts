@@ -40,8 +40,9 @@ declare type TLabelValueObject = {
 	label: string;
 	value: string;
 };
-declare type TObjectColumn = {
+declare type TBuilderScreenColumn = {
 	defaultSort?: boolean;
+	disableEdit?: boolean;
 	fieldLabel?: string;
 	filterBy?: string;
 	label: TName;
@@ -55,7 +56,7 @@ declare type TObjectColumn = {
 };
 interface IProps {
 	defaultSort?: boolean;
-	disableEdit?: (businessType: string) => boolean;
+	disableEdit?: boolean;
 	emptyState: {
 		buttonText: string;
 		description: string;
@@ -64,7 +65,7 @@ interface IProps {
 	filter?: boolean;
 	firstColumnHeader: string;
 	hasDragAndDrop?: boolean;
-	objectColumns: TObjectColumn[];
+	objectColumns: TBuilderScreenColumn[];
 	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
 	onDeleteColumn: (objectFieldName: string) => void;
 	onEditing?: (boolean: boolean) => void;

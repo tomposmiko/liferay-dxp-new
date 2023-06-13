@@ -32,12 +32,8 @@ import React, {useEffect, useMemo, useState} from 'react';
 import PredefinedValuesTable from '../PredefinedValuesTable';
 
 import './ActionBuilder.scss';
+import {getObjectFields} from '../../../utils/api';
 import {ActionError} from '../index';
-
-const HEADERS = new Headers({
-	'Accept': 'application/json',
-	'Content-Type': 'application/json',
-});
 
 let objectsOptionsList: Array<
 	(
@@ -183,27 +179,22 @@ export default function ActionBuilder({
 	};
 
 	const fetchObjectDefinitionFields = async () => {
-		const response = await fetch(
-			`/o/object-admin/v1.0/object-definitions/${values.parameters?.objectDefinitionId}/object-fields`,
-			{
-				headers: HEADERS,
-				method: 'GET',
-			}
-		);
-
-		const {items} = (await response.json()) as {items: ObjectField[]};
-
 		const allFields: ObjectField[] = [];
 
-		items.forEach((field) => {
-			if (
-				field.businessType !== 'Aggregation' &&
-				field.businessType !== 'Relationship' &&
-				!field.system
-			) {
-				allFields.push(field);
-			}
-		});
+		if (values.parameters?.objectDefinitionId) {
+			const items = await getObjectFields(
+				values.parameters.objectDefinitionId
+			);
+			items.forEach((field) => {
+				if (
+					field.businessType !== 'Aggregation' &&
+					field.businessType !== 'Relationship' &&
+					!field.system
+				) {
+					allFields.push(field);
+				}
+			});
+		}
 
 		setCurrentObjectDefinitionFields(allFields);
 
@@ -258,15 +249,7 @@ export default function ActionBuilder({
 			parameters.relatedObjectEntries = false;
 		}
 
-		const response = await fetch(
-			`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
-			{
-				headers: HEADERS,
-				method: 'GET',
-			}
-		);
-
-		const {items} = (await response.json()) as {items: ObjectField[]};
+		const items = await getObjectFields(objectDefinitionId);
 
 		const allFields: ObjectField[] = [];
 
@@ -323,25 +306,23 @@ export default function ActionBuilder({
 
 	return (
 		<>
-			{Liferay.FeatureFlags['LPS-152180'] && (
-				<ClayAlert
-					className="lfr-objects__side-panel-content-container"
-					displayType="info"
-					title={`${Liferay.Language.get('info')}:`}
-				>
-					{Liferay.Language.get(
-						'create-conditions-and-predefined-values-using-expressions'
-					) + ' '}
+			<ClayAlert
+				className="lfr-objects__side-panel-content-container"
+				displayType="info"
+				title={`${Liferay.Language.get('info')}:`}
+			>
+				{Liferay.Language.get(
+					'create-conditions-and-predefined-values-using-expressions'
+				) + ' '}
 
-					<a
-						className="alert-link"
-						href="https://learn.liferay.com/dxp/latest/en/building-applications/objects/creating-and-managing-objects/expression-builder-validations-reference.html"
-						target="_blank"
-					>
-						{Liferay.Language.get('click-here-for-documentation')}
-					</a>
-				</ClayAlert>
-			)}
+				<a
+					className="alert-link"
+					href="https://learn.liferay.com/dxp/latest/en/building-applications/objects/creating-and-managing-objects/expression-builder-validations-reference.html"
+					target="_blank"
+				>
+					{Liferay.Language.get('click-here-for-documentation')}
+				</a>
+			</ClayAlert>
 
 			{Object.keys(errors).length > 1 && (
 				<ClayAlert
