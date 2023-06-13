@@ -1,5 +1,6 @@
 definition {
 
+	property osgi.modules.includes = "frontend-taglib-clay-sample-web";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.component.names = "Clay";
@@ -77,7 +78,7 @@ definition {
 	test DisappearsAfter5SecsWithoutActions {
 		task ("When a toast alert appears") {
 			Click(
-				key_text = "DisappearsAfter5Secs",
+				key_text = "Disappears After 5 Seconds",
 				locator1 = "Button#ANY");
 		}
 
@@ -94,6 +95,34 @@ definition {
 			AssertElementNotPresent(
 				key_type = "dismissible alert-danger",
 				locator1 = "ClayAlertToast#ALERT_TOAST");
+		}
+	}
+
+	@description = "LPS-170577 - Verify toast alert with action button disappears after 10 seconds"
+	@priority = "5"
+	test DisappearsAfter10SecsWithActions {
+		task ("When a toast alert appears") {
+			Click(
+				key_text = "Disappears After 10 Seconds",
+				locator1 = "Button#ANY");
+		}
+
+		task ("And When there is an action button on it") {
+			VerifyElementPresent(locator1 = "//*[@id='ToastAlertContainer']//*[contains(@class, 'alert-info')]//a");
+		}
+
+		task ("Then the alert disappears after 10 secs") {
+
+			// For LPS-170577, need this pause to see if after 10 seconds, the alert is not showing anymore
+
+			Pause(locator1 = "10000");
+
+			if (!(IsElementPresent.isElementPresentNoSPARefresh(key_type = "info", locator1 = "ClayAlertToast#ALERT_TOAST"))) {
+				TestUtils.pass(message = "Test passed: Alert toast with action disappeared after 10 seconds");
+			}
+			else {
+				fail("Test failed: Clay Toast alert with action is still present after 10 seconds.");
+			}
 		}
 	}
 

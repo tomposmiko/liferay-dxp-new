@@ -220,12 +220,6 @@ definition {
 			groupName = "Site Name",
 			userEmailAddress = "userea@liferay.com");
 
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ACCESS",
-			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
-			roleTitle = "Site Member",
-			roleType = "site");
-
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
 			layoutName = "Documents and Media Page");
@@ -1133,35 +1127,6 @@ definition {
 		User.viewLoginPG();
 	}
 
-	@description = "This ensures that a guest cannot access a DM folder without permissions."
-	@priority = "3"
-	test GuestCannotAccessFolderWithoutPermissions {
-		JSONLayout.addPublicLayout(
-			groupName = "Guest",
-			layoutName = "Documents and Media Page");
-
-		JSONLayout.addWidgetToPublicLayout(
-			column = "1",
-			groupName = "Guest",
-			layoutName = "Documents and Media Page",
-			widgetName = "Documents and Media");
-
-		JSONFolder.addFolder(
-			dmFolderDescription = "DM Folder Description",
-			dmFolderName = "DM Folder Name",
-			groupName = "Guest");
-
-		User.logoutPG();
-
-		Navigator.gotoPage(pageName = "Documents and Media Page");
-
-		DMNavigator.gotoFolder(
-			dmFolderName = "DM Folder Name",
-			noPermissions = "true");
-
-		Alert.viewErrorMessage(errorMessage = "You do not have the required permissions");
-	}
-
 	@description = "This is a test for LPS-136833. It checks that a guest cannot add a document in a folder without permissions."
 	@priority = "3"
 	test GuestCannotAddDocumentInFolder {
@@ -1179,11 +1144,6 @@ definition {
 			dmFolderDescription = "DM Folder Description",
 			dmFolderName = "DM Folder Name",
 			groupName = "Guest");
-
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ACCESS",
-			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
-			roleTitle = "Guest");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
@@ -1253,11 +1213,6 @@ definition {
 			dmFolderName = "DM Folder Name",
 			groupName = "Guest");
 
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ACCESS",
-			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
-			roleTitle = "Guest");
-
 		User.logoutPG();
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
@@ -1324,11 +1279,6 @@ definition {
 			dmFolderDescription = "DM Folder Description",
 			dmFolderName = "DM Folder Name",
 			groupName = "Guest");
-
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ACCESS",
-			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
-			roleTitle = "Guest");
 
 		User.logoutPG();
 
@@ -1589,12 +1539,6 @@ definition {
 		JSONUser.addUserToSite(
 			groupName = "Guest",
 			userEmailAddress = "userea@liferay.com");
-
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ACCESS",
-			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
-			roleTitle = "Site Member",
-			roleType = "site");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
@@ -1888,12 +1832,6 @@ definition {
 			groupName = "Guest",
 			userEmailAddress = "userea@liferay.com");
 
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ACCESS",
-			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
-			roleTitle = "Site Member",
-			roleType = "site");
-
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Documents and Media Page");
@@ -2055,12 +1993,6 @@ definition {
 			groupName = "Guest",
 			userEmailAddress = "userea@liferay.com");
 
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ACCESS",
-			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
-			roleTitle = "Site Member",
-			roleType = "site");
-
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Documents and Media Page");
@@ -2114,12 +2046,6 @@ definition {
 		JSONUser.addUserToSite(
 			groupName = "Guest",
 			userEmailAddress = "userea@liferay.com");
-
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ACCESS",
-			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
-			roleTitle = "Site Member",
-			roleType = "site");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",

@@ -14,6 +14,7 @@
 
 package com.liferay.journal.web.internal.portlet.template;
 
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
@@ -181,16 +182,22 @@ public class JournalTemplateHandler extends BaseDDMTemplateHandler {
 
 			String dataType = ddmStructure.getFieldDataType(fieldName);
 
+			DDMFormField ddmFormField = ddmStructure.getDDMFormField(fieldName);
+
+			if (Objects.equals(
+					ddmFormField.getType(),
+					DDMFormFieldTypeConstants.FIELDSET)) {
+
+				dataType = DDMFormFieldTypeConstants.FIELDSET;
+			}
+
 			if (Validator.isNull(dataType)) {
 				continue;
 			}
 
 			if (Objects.equals(
 					ddmStructure.getFieldType(fieldName),
-					"checkbox_multiple")) {
-
-				DDMFormField ddmFormField = ddmStructure.getDDMFormField(
-					fieldName);
+					DDMFormFieldTypeConstants.CHECKBOX_MULTIPLE)) {
 
 				DDMFormFieldOptions ddmFormFieldOptions =
 					(DDMFormFieldOptions)ddmFormField.getProperty("options");
@@ -241,7 +248,7 @@ public class JournalTemplateHandler extends BaseDDMTemplateHandler {
 			JournalTemplateHandler.class.getClassLoader(),
 			"com/liferay/journal/web/portlet/template/dependencies/",
 			SetUtil.fromArray(
-				"boolean", "date", "document-library", "geolocation", "image",
-				"journal-article", "link-to-page"));
+				"boolean", "date", "document-library", "fieldset",
+				"geolocation", "image", "journal-article", "link-to-page"));
 
 }

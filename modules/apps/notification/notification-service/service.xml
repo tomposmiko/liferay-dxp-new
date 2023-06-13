@@ -178,6 +178,7 @@
 		<exception>NotificationTemplateFrom</exception>
 		<exception>NotificationTemplateName</exception>
 		<exception>NotificationTemplateObjectDefinitionId</exception>
+		<exception>NotificationTemplateSubject</exception>
 		<exception>NotificationTemplateType</exception>
 	</exceptions>
 </service-builder>

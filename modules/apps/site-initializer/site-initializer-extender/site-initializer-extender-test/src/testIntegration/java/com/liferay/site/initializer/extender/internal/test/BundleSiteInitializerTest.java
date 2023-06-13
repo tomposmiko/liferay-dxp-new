@@ -115,6 +115,7 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
+import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
@@ -130,6 +131,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -1257,11 +1259,11 @@ public class BundleSiteInitializerTest {
 
 		Layout privateLayout = privateLayouts.get(0);
 
-		Assert.assertTrue(privateLayout.isHidden());
 		Assert.assertEquals(
 			"Test Private Layout",
 			privateLayout.getName(LocaleUtil.getSiteDefault()));
 		Assert.assertEquals("content", privateLayout.getType());
+		Assert.assertTrue(privateLayout.isHidden());
 
 		List<Layout> privateChildLayouts = privateLayout.getAllChildren();
 
@@ -1282,94 +1284,85 @@ public class BundleSiteInitializerTest {
 		int publicLayoutsCount = _layoutLocalService.getLayoutsCount(
 			group, false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
-		Assert.assertEquals(4, publicLayoutsCount);
+		Assert.assertEquals(5, publicLayoutsCount);
 
-		Layout publicLayout = _layoutLocalService.getLayoutByFriendlyURL(
+		Layout layout = _layoutLocalService.getLayoutByFriendlyURL(
 			group.getGroupId(), false, "/test-public-layout");
 
-		Assert.assertFalse(publicLayout.isHidden());
 		Assert.assertEquals(
-			"Test Public Layout",
-			publicLayout.getName(LocaleUtil.getSiteDefault()));
-		Assert.assertEquals("content", publicLayout.getType());
+			"Test Public Layout", layout.getName(LocaleUtil.getSiteDefault()));
+		Assert.assertEquals("content", layout.getType());
+		Assert.assertFalse(layout.isHidden());
 
-		Layout publicPermissionsLayout =
-			_layoutLocalService.getLayoutByFriendlyURL(
-				group.getGroupId(), false, "/test-public-permissions-layout");
+		List<Layout> layouts = layout.getAllChildren();
 
-		Role guestRole = _roleLocalService.getRole(
-			publicLayout.getCompanyId(), RoleConstants.GUEST);
+		Assert.assertEquals(layouts.toString(), 1, layouts.size());
+
+		layout = layouts.get(0);
+
+		Assert.assertEquals(
+			"Test Public Child Layout",
+			layout.getName(LocaleUtil.getSiteDefault()));
+
+		layout = _layoutLocalService.getLayoutByFriendlyURL(
+			group.getGroupId(), false, "/test-public-permissions-layout");
+
+		Role role = _roleLocalService.getRole(
+			layout.getCompanyId(), RoleConstants.GUEST);
 
 		boolean hasGuestViewPermission =
 			_resourcePermissionLocalService.hasResourcePermission(
-				publicPermissionsLayout.getCompanyId(),
-				publicPermissionsLayout.getModelClassName(),
+				layout.getCompanyId(), layout.getModelClassName(),
 				ResourceConstants.SCOPE_INDIVIDUAL,
-				String.valueOf(publicPermissionsLayout.getPlid()),
-				guestRole.getRoleId(), ActionKeys.VIEW);
+				String.valueOf(layout.getPlid()), role.getRoleId(),
+				ActionKeys.VIEW);
 
 		Assert.assertFalse(hasGuestViewPermission);
 
-		Role siteMemberRole = _roleLocalService.getRole(
-			publicLayout.getCompanyId(), RoleConstants.SITE_MEMBER);
+		role = _roleLocalService.getRole(
+			layout.getCompanyId(), RoleConstants.SITE_MEMBER);
 
 		boolean hasSiteMemberViewPermission =
 			_resourcePermissionLocalService.hasResourcePermission(
-				publicPermissionsLayout.getCompanyId(),
-				publicPermissionsLayout.getModelClassName(),
+				layout.getCompanyId(), layout.getModelClassName(),
 				ResourceConstants.SCOPE_INDIVIDUAL,
-				String.valueOf(publicPermissionsLayout.getPlid()),
-				siteMemberRole.getRoleId(), ActionKeys.VIEW);
+				String.valueOf(layout.getPlid()), role.getRoleId(),
+				ActionKeys.VIEW);
 
 		Assert.assertTrue(hasSiteMemberViewPermission);
 
 		boolean hasSiteMemberUpdateLayoutContentPermission =
 			_resourcePermissionLocalService.hasResourcePermission(
-				publicPermissionsLayout.getCompanyId(),
-				publicPermissionsLayout.getModelClassName(),
+				layout.getCompanyId(), layout.getModelClassName(),
 				ResourceConstants.SCOPE_INDIVIDUAL,
-				String.valueOf(publicPermissionsLayout.getPlid()),
-				siteMemberRole.getRoleId(), ActionKeys.UPDATE_LAYOUT_CONTENT);
+				String.valueOf(layout.getPlid()), role.getRoleId(),
+				ActionKeys.UPDATE_LAYOUT_CONTENT);
 
 		Assert.assertTrue(hasSiteMemberUpdateLayoutContentPermission);
 
-		Role testRole4Role = _roleLocalService.getRole(
-			publicLayout.getCompanyId(), "Test Role 4");
+		role = _roleLocalService.getRole(layout.getCompanyId(), "Test Role 4");
 
 		boolean hasTestRole4ViewPermission =
 			_resourcePermissionLocalService.hasResourcePermission(
-				publicPermissionsLayout.getCompanyId(),
-				publicPermissionsLayout.getModelClassName(),
+				layout.getCompanyId(), layout.getModelClassName(),
 				ResourceConstants.SCOPE_GROUP_TEMPLATE,
-				String.valueOf(publicPermissionsLayout.getPlid()),
-				testRole4Role.getRoleId(), ActionKeys.VIEW);
+				String.valueOf(layout.getPlid()), role.getRoleId(),
+				ActionKeys.VIEW);
 
 		Assert.assertTrue(hasTestRole4ViewPermission);
 
-		List<Layout> publicChildLayouts = publicLayout.getAllChildren();
-
-		Assert.assertEquals(
-			publicChildLayouts.toString(), 1, publicChildLayouts.size());
-
-		Layout publicChildLayout = publicChildLayouts.get(0);
-
-		Assert.assertEquals(
-			"Test Public Child Layout",
-			publicChildLayout.getName(LocaleUtil.getSiteDefault()));
-
-		publicLayout = _layoutLocalService.getLayoutByFriendlyURL(
+		layout = _layoutLocalService.getLayoutByFriendlyURL(
 			group.getGroupId(), false, "/home");
 
 		Assert.assertEquals(
 			PropsUtil.get("default.guest.public.layout.name"),
-			publicLayout.getName(LocaleUtil.getSiteDefault()));
+			layout.getName(LocaleUtil.getSiteDefault()));
 		Assert.assertNotEquals(
 			PropsUtil.get("default.user.private.layout.name"),
-			publicLayout.getName(LocaleUtil.SPAIN));
-
+			layout.getName(LocaleUtil.SPAIN));
 		Assert.assertEquals(
 			PropsUtil.get("default.guest.public.layout.friendly.url"),
-			publicLayout.getFriendlyURL(LocaleUtil.getSiteDefault()));
+			layout.getFriendlyURL(LocaleUtil.getSiteDefault()));
 
 		SitePageResource.Builder sitePageResourceBuilder =
 			_sitePageResourceFactory.create();
@@ -1395,6 +1388,36 @@ public class BundleSiteInitializerTest {
 		Assert.assertFalse(
 			pageDefinitionString.contains(
 				"[$OBJECT_DEFINITION_ID:TestObjectDefinition3$]"));
+
+		layout = _layoutLocalService.getLayoutByFriendlyURL(
+			group.getGroupId(), false, "/test-url-layout");
+
+		Assert.assertEquals(
+			"Test URL Layout", layout.getName(LocaleUtil.getSiteDefault()));
+		Assert.assertEquals("url", layout.getType());
+		Assert.assertEquals(
+			"url=/test-public-layout\n", layout.getTypeSettings());
+		Assert.assertFalse(layout.isHidden());
+	}
+
+	private void _assertResourceAction(
+			String[] actionIds, ResourcePermission resourcePermission)
+		throws Exception {
+
+		long resourceActionBitwiseValue = 0;
+
+		for (String actionId : actionIds) {
+			ResourceAction resourceAction =
+				_resourceActionLocalService.getResourceAction(
+					resourcePermission.getName(), actionId);
+
+			Assert.assertNotNull(resourceAction);
+
+			resourceActionBitwiseValue += resourceAction.getBitwiseValue();
+		}
+
+		Assert.assertEquals(
+			resourceActionBitwiseValue, resourcePermission.getActionIds());
 	}
 
 	private void _assertResourcePermission(Group group) throws Exception {
@@ -1403,19 +1426,42 @@ public class BundleSiteInitializerTest {
 
 		ResourcePermission resourcePermission =
 			_resourcePermissionLocalService.fetchResourcePermission(
-				group.getCompanyId(), "com.liferay.commerce.product", 1,
+				group.getCompanyId(), "com.liferay.commerce.product",
+				ResourceConstants.SCOPE_COMPANY,
 				String.valueOf(group.getCompanyId()), role.getRoleId());
 
 		Assert.assertNotNull(resourcePermission);
+
+		_assertResourceAction(new String[] {"VIEW_PRICE"}, resourcePermission);
 
 		role = _roleLocalService.fetchRole(group.getCompanyId(), "Test Role 2");
 
 		resourcePermission =
 			_resourcePermissionLocalService.fetchResourcePermission(
-				group.getCompanyId(), "com.liferay.commerce.product", 2,
+				group.getCompanyId(), "com.liferay.commerce.product",
+				ResourceConstants.SCOPE_GROUP,
 				String.valueOf(group.getGroupId()), role.getRoleId());
 
 		Assert.assertNotNull(resourcePermission);
+
+		_assertResourceAction(new String[] {"VIEW_PRICE"}, resourcePermission);
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				group.getCompanyId(), "C_TestObjectDefinition3");
+
+		resourcePermission =
+			_resourcePermissionLocalService.fetchResourcePermission(
+				group.getCompanyId(),
+				"com.liferay.object.model.ObjectDefinition#" +
+					objectDefinition.getObjectDefinitionId(),
+				ResourceConstants.SCOPE_COMPANY,
+				String.valueOf(group.getCompanyId()), role.getRoleId());
+
+		Assert.assertNotNull(resourcePermission);
+
+		_assertResourceAction(
+			new String[] {"DELETE", "UPDATE", "VIEW"}, resourcePermission);
 	}
 
 	private void _assertRoles(Group group) {
@@ -2074,6 +2120,9 @@ public class BundleSiteInitializerTest {
 	@Inject
 	private ProductSpecificationResource.Factory
 		_productSpecificationResourceFactory;
+
+	@Inject
+	private ResourceActionLocalService _resourceActionLocalService;
 
 	@Inject
 	private ResourcePermissionLocalService _resourcePermissionLocalService;

@@ -382,6 +382,12 @@ public abstract class BaseBuild implements Build {
 		return gitRepositoryGitDetailsTempMap.get("github.upstream.branch.sha");
 	}
 
+	public String getBatchName(String jobVariant) {
+		jobVariant = jobVariant.replaceAll("(.*)/.*", "$1");
+
+		return jobVariant.replaceAll("_stable$", "");
+	}
+
 	@Override
 	public String getBranchName() {
 		return branchName;
@@ -1891,17 +1897,26 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public boolean isUniqueFailure() {
-		if (_uniqueFailure != null) {
-			return _uniqueFailure;
+		if (!isFailing()) {
+			return false;
 		}
 
-		if (!Objects.equals(getStatus(), "completed")) {
-			return isFailing();
+		List<TestResult> testResults = new ArrayList<>();
+
+		testResults.addAll(getTestResults("FAILED"));
+		testResults.addAll(getTestResults("REGRESSION"));
+
+		if (testResults.isEmpty()) {
+			return true;
 		}
 
-		_uniqueFailure = isFailing();
+		for (TestResult testResult : testResults) {
+			if (testResult.isUniqueFailure()) {
+				return true;
+			}
+		}
 
-		return _uniqueFailure;
+		return false;
 	}
 
 	@Override
@@ -4391,6 +4406,5 @@ public abstract class BaseBuild implements Build {
 	private Map<String, TestClassResult> _testClassResults;
 	private List<URL> _testrayAttachmentURLs;
 	private List<URL> _testrayS3AttachmentURLs;
-	private Boolean _uniqueFailure;
 
 }

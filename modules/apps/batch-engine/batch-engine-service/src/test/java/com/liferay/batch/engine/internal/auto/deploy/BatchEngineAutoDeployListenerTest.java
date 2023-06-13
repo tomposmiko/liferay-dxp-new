@@ -142,7 +142,11 @@ public class BatchEngineAutoDeployListenerTest {
 					BatchEngineImportTask batchEngineImportTask =
 						new BatchEngineImportTaskImpl();
 
+					batchEngineImportTask.setExternalReferenceCode(
+						(String)invocationOnMock.getArguments()[0]);
 					batchEngineImportTask.setCompanyId(
+						(long)invocationOnMock.getArguments()[1]);
+					batchEngineImportTask.setUserId(
 						(long)invocationOnMock.getArguments()[2]);
 					batchEngineImportTask.setBatchSize(
 						(long)invocationOnMock.getArguments()[3]);
@@ -154,8 +158,6 @@ public class BatchEngineAutoDeployListenerTest {
 						(String)invocationOnMock.getArguments()[7]);
 					batchEngineImportTask.setExecuteStatus(
 						(String)invocationOnMock.getArguments()[8]);
-					batchEngineImportTask.setExternalReferenceCode(
-						(String)invocationOnMock.getArguments()[0]);
 					batchEngineImportTask.setFieldNameMapping(
 						(Map<String, Serializable>)
 							invocationOnMock.getArguments()[9]);
@@ -165,9 +167,9 @@ public class BatchEngineAutoDeployListenerTest {
 						(String)invocationOnMock.getArguments()[11]);
 					batchEngineImportTask.setParameters(
 						(Map<String, Serializable>)
-							invocationOnMock.getArguments()[9]);
+							invocationOnMock.getArguments()[12]);
 					batchEngineImportTask.setTaskItemDelegateName(
-						(String)invocationOnMock.getArguments()[12]);
+						(String)invocationOnMock.getArguments()[13]);
 
 					return batchEngineImportTask;
 				}

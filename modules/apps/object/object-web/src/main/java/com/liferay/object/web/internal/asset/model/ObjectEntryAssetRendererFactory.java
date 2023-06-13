@@ -40,6 +40,7 @@ public class ObjectEntryAssetRendererFactory
 		ObjectEntryService objectEntryService, ServletContext servletContext) {
 
 		setClassName(objectDefinition.getClassName());
+		setSearchable(true);
 		setPortletId(objectDefinition.getPortletId());
 
 		_objectDefinition = objectDefinition;
@@ -84,6 +85,15 @@ public class ObjectEntryAssetRendererFactory
 
 			return false;
 		}
+	}
+
+	@Override
+	public boolean isActive(long companyId) {
+		if (_objectDefinition.getCompanyId() == companyId) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

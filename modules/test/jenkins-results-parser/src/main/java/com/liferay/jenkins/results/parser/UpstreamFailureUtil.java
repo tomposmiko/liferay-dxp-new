@@ -34,6 +34,60 @@ import org.json.JSONObject;
  */
 public class UpstreamFailureUtil {
 
+	public static synchronized List<String> getUpstreamJobFailures(
+		String type, TopLevelBuild topLevelBuild) {
+
+		if (_upstreamFailures.containsKey(type)) {
+			return _upstreamFailures.get(type);
+		}
+
+		List<String> upstreamFailures = new ArrayList<>();
+
+		_upstreamFailures.put(type, upstreamFailures);
+
+		TopLevelBuildReport topLevelBuildReport =
+			getUpstreamTopLevelBuildReport(topLevelBuild);
+
+		if (topLevelBuildReport == null) {
+			return upstreamFailures;
+		}
+
+		for (DownstreamBuildReport downstreamBuildReport :
+				topLevelBuildReport.getDownstreamBuildReports()) {
+
+			String result = downstreamBuildReport.getResult();
+
+			if (!result.equals("FAILURE") && !result.equals("REGRESSION") &&
+				!result.equals("UNSTABLE")) {
+
+				continue;
+			}
+
+			String batchName = _getBatchName(
+				downstreamBuildReport.getBatchName());
+
+			if (type.equals("build")) {
+				upstreamFailures.add(
+					_formatUpstreamBuildFailure(batchName, result));
+			}
+			else if (type.equals("test")) {
+				for (TestReport testReport :
+						downstreamBuildReport.getTestReports()) {
+
+					String testReportStatus = testReport.getStatus();
+
+					if (!testReportStatus.equals("PASSED")) {
+						upstreamFailures.add(
+							_formatUpstreamTestFailure(
+								batchName, testReport.getTestName()));
+					}
+				}
+			}
+		}
+
+		return upstreamFailures;
+	}
+
 	public static String getUpstreamJobFailuresSHA(
 		TopLevelBuild topLevelBuild) {
 
@@ -180,41 +234,6 @@ public class UpstreamFailureUtil {
 		return null;
 	}
 
-	public static boolean isTestFailingInUpstreamJob(TestResult testResult) {
-		Build build = testResult.getBuild();
-
-		if (!_upstreamComparisonAvailable || !build.isCompareToUpstream()) {
-			return false;
-		}
-
-		TopLevelBuild topLevelBuild = build.getTopLevelBuild();
-
-		try {
-			String batchName = _getBatchName(build.getJobVariant());
-
-			for (String failure :
-					_getUpstreamJobFailures("test", topLevelBuild)) {
-
-				if (failure.equals(
-						_formatUpstreamTestFailure(
-							batchName, testResult.getDisplayName()))) {
-
-					return true;
-				}
-			}
-
-			return false;
-		}
-		catch (Exception exception) {
-			System.out.println(
-				"Unable to get upstream acceptance failure data.");
-
-			exception.printStackTrace();
-
-			return false;
-		}
-	}
-
 	public static boolean isUpstreamComparisonAvailable(
 		TopLevelBuild topLevelBuild) {
 
@@ -251,60 +270,6 @@ public class UpstreamFailureUtil {
 		jobVariant = jobVariant.replaceAll("(.*)/.*", "$1");
 
 		return jobVariant.replaceAll("_stable$", "");
-	}
-
-	private static synchronized List<String> _getUpstreamJobFailures(
-		String type, TopLevelBuild topLevelBuild) {
-
-		if (_upstreamFailures.containsKey(type)) {
-			return _upstreamFailures.get(type);
-		}
-
-		List<String> upstreamFailures = new ArrayList<>();
-
-		_upstreamFailures.put(type, upstreamFailures);
-
-		TopLevelBuildReport topLevelBuildReport =
-			getUpstreamTopLevelBuildReport(topLevelBuild);
-
-		if (topLevelBuildReport == null) {
-			return upstreamFailures;
-		}
-
-		for (DownstreamBuildReport downstreamBuildReport :
-				topLevelBuildReport.getDownstreamBuildReports()) {
-
-			String result = downstreamBuildReport.getResult();
-
-			if (!result.equals("FAILURE") && !result.equals("REGRESSION") &&
-				!result.equals("UNSTABLE")) {
-
-				continue;
-			}
-
-			String batchName = _getBatchName(
-				downstreamBuildReport.getBatchName());
-
-			if (type.equals("build")) {
-				upstreamFailures.add(
-					_formatUpstreamBuildFailure(batchName, result));
-			}
-			else if (type.equals("test")) {
-				for (TestReport testReport :
-						downstreamBuildReport.getTestReports()) {
-
-					String testReportStatus = testReport.getStatus();
-
-					if (!testReportStatus.equals("PASSED")) {
-						upstreamFailures.add(
-							_formatUpstreamTestFailure(
-								batchName, testReport.getTestName()));
-					}
-				}
-			}
-		}
-
-		return upstreamFailures;
 	}
 
 	private static String _getUpstreamJobFailuresSHA(

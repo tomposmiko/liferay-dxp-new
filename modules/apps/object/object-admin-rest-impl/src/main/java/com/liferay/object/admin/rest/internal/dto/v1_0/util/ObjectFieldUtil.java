@@ -53,10 +53,18 @@ public class ObjectFieldUtil {
 			ObjectField objectField, long userId)
 		throws Exception {
 
-		if (Validator.isNull(
-				objectField.getListTypeDefinitionExternalReferenceCode())) {
+		if (!(StringUtil.equals(
+				objectField.getBusinessTypeAsString(),
+				ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST) ||
+			  StringUtil.equals(
+				  objectField.getBusinessTypeAsString(),
+				  ObjectFieldConstants.BUSINESS_TYPE_PICKLIST))) {
 
 			return 0;
+		}
+
+		if (objectField.getListTypeDefinitionId() != null) {
+			return objectField.getListTypeDefinitionId();
 		}
 
 		ListTypeDefinition listTypeDefinition =
@@ -241,7 +249,8 @@ public class ObjectFieldUtil {
 				}
 
 				listTypeEntryLocalService.addListTypeEntry(
-					userId, listTypeDefinition.getListTypeDefinitionId(), key,
+					null, userId, listTypeDefinition.getListTypeDefinitionId(),
+					key,
 					Collections.singletonMap(LocaleUtil.getDefault(), key));
 			}
 		}

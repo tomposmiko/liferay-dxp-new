@@ -16,9 +16,11 @@ import ClayAlert from '@clayui/alert';
 import ClayBreadcrumb from '@clayui/breadcrumb';
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayDropDown, {ClayDropDownWithItems} from '@clayui/drop-down';
+import ClayEmptyState from '@clayui/empty-state';
 import {ClayCheckbox, ClayInput, ClayToggle} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
+import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
 import ClayNavigationBar from '@clayui/navigation-bar';
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
@@ -2582,15 +2584,13 @@ export default function ChangeTrackingChangesView({
 				<ClayTable.Head>
 					<ClayTable.Row>
 						<ClayTable.Cell colSpan={6}>
-							<div className="taglib-empty-result-message">
-								<div className="taglib-empty-search-result-message-header" />
-
-								<div className="sheet-text text-center">
-									{Liferay.Language.get(
-										'there-are-no-changes-to-display-in-this-view'
-									)}
-								</div>
-							</div>
+							<ClayEmptyState
+								description={Liferay.Language.get(
+									'there-are-no-changes-to-display-in-this-view'
+								)}
+								imgSrc={`${themeDisplay.getPathThemeImages()}/states/search_state.gif`}
+								title={null}
+							/>
 						</ClayTable.Cell>
 					</ClayTable.Row>
 				</ClayTable.Head>
@@ -2688,13 +2688,16 @@ export default function ChangeTrackingChangesView({
 				<div className="container-fluid container-fluid-max-xl">
 					{renderExpiredBanner()}
 
-					<div className="sheet taglib-empty-result-message">
-						<div className="taglib-empty-result-message-header" />
-
-						<div className="sheet-text text-center">
-							{Liferay.Language.get('no-changes-were-found')}
-						</div>
-					</div>
+					<ClayLayout.Sheet>
+						<ClayEmptyState
+							className="mt-0"
+							description={Liferay.Language.get(
+								'no-changes-were-found'
+							)}
+							imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.gif`}
+							title={null}
+						/>
+					</ClayLayout.Sheet>
 				</div>
 			);
 		}
