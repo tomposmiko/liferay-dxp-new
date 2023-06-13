@@ -12,8 +12,6 @@
  * details.
  */
 
-import {Link} from 'react-router-dom';
-
 import Container from '../../../components/Layout/Container';
 import ListView from '../../../components/ListView/ListView';
 import ProgressBar from '../../../components/ProgressBar';
@@ -29,10 +27,8 @@ const Routines = () => {
 				tableProps={{
 					columns: [
 						{
+							clickable: true,
 							key: 'name',
-							render: (routine: string) => (
-								<Link to="build">{routine}</Link>
-							),
 							value: 'ROUTINE',
 						},
 						{key: 'execution_date', value: 'EXECUTION DATE'},
@@ -45,6 +41,8 @@ const Routines = () => {
 							value: 'METRICS',
 						},
 					],
+					navigateTo: ({testrayRoutineId}) =>
+						testrayRoutineId?.toString(),
 				}}
 				transformData={(data) => data?.c?.testrayRoutines}
 				variables={{scopeKey: Liferay.ThemeDisplay.getSiteGroupId()}}

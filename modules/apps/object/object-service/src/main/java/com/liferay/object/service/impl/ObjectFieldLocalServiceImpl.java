@@ -443,6 +443,8 @@ public class ObjectFieldLocalServiceImpl
 	private final Map<String, String> _businessTypes = HashMapBuilder.put(
 		"BigDecimal", "PrecisionDecimal"
 	).put(
+		"Blob", "LargeFile"
+	).put(
 		"Boolean", "Boolean"
 	).put(
 		"Clob", "LongText"
@@ -475,9 +477,10 @@ public class ObjectFieldLocalServiceImpl
 	private ObjectViewPersistence _objectViewPersistence;
 
 	private final Set<String> _reservedNames = SetUtil.fromArray(
-		"companyid", "createdate", "groupid", "id", "lastpublishdate",
-		"modifieddate", "status", "statusbyuserid", "statusbyusername",
-		"statusdate", "userid", "username");
+		"actions", "companyid", "createdate", "creator", "datecreated",
+		"datemodified", "externalreferencecode", "groupid", "id",
+		"lastpublishdate", "modifieddate", "status", "statusbyuserid",
+		"statusbyusername", "statusdate", "userid", "username");
 
 	@Reference
 	private UserLocalService _userLocalService;

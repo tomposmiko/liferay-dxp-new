@@ -167,6 +167,10 @@ public interface Build {
 
 	public List<TestClassResult> getTestClassResults();
 
+	public List<URL> getTestrayAttachmentURLs();
+
+	public List<URL> getTestrayS3AttachmentURLs();
+
 	public JSONObject getTestReportJSONObject(boolean checkCache);
 
 	public List<TestResult> getTestResults();

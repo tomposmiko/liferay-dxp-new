@@ -19,6 +19,7 @@ import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.TestClassResult;
 import com.liferay.jenkins.results.parser.TestResult;
 import com.liferay.jenkins.results.parser.TopLevelBuild;
+import com.liferay.jenkins.results.parser.test.clazz.JUnitTestClass;
 import com.liferay.jenkins.results.parser.test.clazz.TestClass;
 import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
 
@@ -38,7 +39,13 @@ public class JUnitBatchTestrayCaseResult extends BatchTestrayCaseResult {
 
 		super(testrayBuild, topLevelBuild, axisTestClassGroup);
 
-		_testClass = testClass;
+		_jUnitTestClass = (JUnitTestClass)testClass;
+	}
+
+	@Override
+	public String getComponentName() {
+		return JenkinsResultsParserUtil.getProperty(
+			_jUnitTestClass.getTestProperties(), "testray.main.component.name");
 	}
 
 	@Override
@@ -122,7 +129,7 @@ public class JUnitBatchTestrayCaseResult extends BatchTestrayCaseResult {
 	@Override
 	public String getName() {
 		String testClassName = JenkinsResultsParserUtil.getCanonicalPath(
-			_testClass.getTestClassFile());
+			_jUnitTestClass.getTestClassFile());
 
 		testClassName = testClassName.replaceAll(".*/(com/.*)\\.java", "$1");
 
@@ -204,7 +211,7 @@ public class JUnitBatchTestrayCaseResult extends BatchTestrayCaseResult {
 		return false;
 	}
 
-	private final TestClass _testClass;
+	private final JUnitTestClass _jUnitTestClass;
 	private List<TestClassResult> _testClassResults;
 
 }

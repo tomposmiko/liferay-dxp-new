@@ -1,9 +1,24 @@
 definition {
 
+	macro clickManagementBar {
+		Click(locator1 = "StyleBookEditor#MANAGEMENT_BAR");
+	}
+
 	macro clickPublish {
 		Button.clickNoError(button = "Publish");
 
-		AssertConfirm.assertConfirmationNoError(value1 = "Once published, these changes will affect all instances of the site using these properties. Do you want to publish now?");
+		if (IsElementPresent(locator1 = "Modal#HEADER")) {
+			AssertTextEquals(
+				locator1 = "Modal#BODY",
+				value1 = "Once published, these changes will affect all instances of the site using these properties. Do you want to publish now?");
+
+			Click(
+				key_text = "Continue",
+				locator1 = "Modal#MODAL_FOOTER_BUTTON");
+		}
+		else {
+			AssertConfirm.assertConfirmationNoError(value1 = "Once published, these changes will affect all instances of the site using these properties. Do you want to publish now?");
+		}
 
 		Alert.viewSuccessMessage();
 	}
@@ -25,6 +40,24 @@ definition {
 		Click(locator1 = "StyleBookEditor#PAGE_PREVIEW_INFO_BAR_TOGGLE");
 
 		MenuItem.click(menuItem = "${pageName}");
+	}
+
+	macro linkValueFromStyleBook {
+		Click.clickNoWaitForVisible(
+			key_fieldLabel = "${fieldLabel}",
+			key_text = "theme",
+			locator1 = "Icon#ANY_ITEM_SELECTOR");
+
+		Click(
+			key_colorSwatchItem = "${colorSwatchItem}",
+			locator1 = "Button#COLOR_SWATCH_ITEM");
+
+		StyleBooks.waitForAutoSave();
+
+		AssertElementPresent(
+			key_fieldLabel = "${fieldLabel}",
+			key_text = "chain-broken",
+			locator1 = "Icon#ANY_ITEM_SELECTOR");
 	}
 
 	macro selectForm {

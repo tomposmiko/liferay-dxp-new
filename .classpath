@@ -132,7 +132,6 @@
 	<classpathentry kind="lib" path="lib/portal/asm.jar"/>
 	<classpathentry kind="lib" path="lib/portal/axis.jar"/>
 	<classpathentry kind="lib" path="lib/portal/c3p0.jar"/>
-	<classpathentry kind="lib" path="lib/portal/closure-compiler.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-beanutils.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-codec.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-collections.jar"/>
@@ -141,7 +140,6 @@
 	<classpathentry kind="lib" path="lib/portal/commons-configuration.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-dbcp.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-digester.jar"/>
-	<classpathentry kind="lib" path="lib/portal/commons-discovery.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-exec.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-fileupload.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-io.jar"/>
@@ -175,7 +173,6 @@
 	<classpathentry kind="lib" path="lib/portal/jaxrs-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jaxws-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jaxws-rt.jar"/>
-	<classpathentry kind="lib" path="lib/portal/jazzy.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jbig2-imageio.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jcl-over-slf4j.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jdom2.jar"/>
@@ -191,7 +188,6 @@
 	<classpathentry kind="lib" path="lib/portal/json-java.jar"/>
 	<classpathentry kind="lib" path="lib/portal/juniversalchardet.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jws-api.jar"/>
-	<classpathentry kind="lib" path="lib/portal/liferay-icu4j.jar"/>
 	<classpathentry kind="lib" path="lib/portal/log4j-1.2-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/log4j-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/log4j-core.jar"/>
@@ -201,7 +197,6 @@
 	<classpathentry kind="lib" path="lib/portal/mime4j-dom.jar"/>
 	<classpathentry kind="lib" path="lib/portal/mimepull.jar"/>
 	<classpathentry kind="lib" path="lib/portal/mp4parser.jar"/>
-	<classpathentry kind="lib" path="lib/portal/nekohtml.jar"/>
 	<classpathentry kind="lib" path="lib/portal/netcdf.jar"/>
 	<classpathentry kind="lib" path="lib/portal/pdfbox.jar"/>
 	<classpathentry kind="lib" path="lib/portal/persistence.jar"/>

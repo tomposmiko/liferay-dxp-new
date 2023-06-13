@@ -95,7 +95,6 @@
 /portal/asm.jar
 /portal/axis.jar
 /portal/c3p0.jar
-/portal/closure-compiler.jar
 /portal/commons-beanutils.jar
 /portal/commons-codec.jar
 /portal/commons-collections.jar
@@ -104,7 +103,6 @@
 /portal/commons-configuration.jar
 /portal/commons-dbcp.jar
 /portal/commons-digester.jar
-/portal/commons-discovery.jar
 /portal/commons-exec.jar
 /portal/commons-fileupload.jar
 /portal/commons-io.jar
@@ -142,7 +140,6 @@
 /portal/jaxrs-api.jar
 /portal/jaxws-api.jar
 /portal/jaxws-rt.jar
-/portal/jazzy.jar
 /portal/jbig2-imageio.jar
 /portal/jcl-over-slf4j.jar
 /portal/jdom2.jar
@@ -159,7 +156,6 @@
 /portal/json-java.jar
 /portal/juniversalchardet.jar
 /portal/jws-api.jar
-/portal/liferay-icu4j.jar
 /portal/log4j-1.2-api.jar
 /portal/log4j-api.jar
 /portal/log4j-core.jar
@@ -169,7 +165,6 @@
 /portal/mime4j-dom.jar
 /portal/mimepull.jar
 /portal/mp4parser.jar
-/portal/nekohtml.jar
 /portal/netcdf.jar
 /portal/pdfbox.jar
 /portal/persistence.jar

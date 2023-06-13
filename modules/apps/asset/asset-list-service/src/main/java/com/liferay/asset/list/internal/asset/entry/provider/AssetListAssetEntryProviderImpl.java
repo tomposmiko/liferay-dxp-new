@@ -722,7 +722,7 @@ public class AssetListAssetEntryProviderImpl
 		).map(
 			AssetListEntrySegmentsEntryRelModel::getSegmentsEntryId
 		).mapToLong(
-			i -> i
+			segmentsEntryId -> segmentsEntryId
 		).toArray();
 	}
 
@@ -879,7 +879,7 @@ public class AssetListAssetEntryProviderImpl
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException, portalException);
+				_log.debug(portalException);
 			}
 
 			return fieldName;

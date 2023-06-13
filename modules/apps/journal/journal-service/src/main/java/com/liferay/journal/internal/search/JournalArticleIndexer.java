@@ -419,7 +419,6 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 			Field.TREE_PATH,
 			StringUtil.split(journalArticle.getTreePath(), CharPool.SLASH));
 		document.addKeyword(Field.VERSION, journalArticle.getVersion());
-
 		document.addKeyword(
 			"ddmStructureKey", journalArticle.getDDMStructureKey());
 		document.addKeyword(
@@ -470,6 +469,9 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 				}
 			}
 		}
+
+		document.addNumber(
+			"versionCount", GetterUtil.getDouble(journalArticle.getVersion()));
 
 		if (ddmStructure != null) {
 			_addDDMStructureAttributes(ddmStructure, document, journalArticle);
@@ -598,7 +600,7 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 			return journalServiceConfiguration.indexAllArticleVersionsEnabled();
 		}
 		catch (Exception exception) {
-			_log.error(exception, exception);
+			_log.error(exception);
 		}
 
 		return false;
@@ -674,7 +676,7 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception, exception);
+				_log.debug(exception);
 			}
 
 			return;
@@ -771,7 +773,7 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception, exception);
+				_log.debug(exception);
 			}
 
 			return StringPool.BLANK;
@@ -831,7 +833,7 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception, exception);
+				_log.debug(exception);
 			}
 		}
 

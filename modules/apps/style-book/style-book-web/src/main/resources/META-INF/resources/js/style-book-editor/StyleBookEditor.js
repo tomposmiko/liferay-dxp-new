@@ -35,10 +35,18 @@ const StyleBookEditor = ({
 		initialFrontendTokensValues
 	);
 	const [draftStatus, setDraftStatus] = useState(DRAFT_STATUS.notSaved);
-	const [previewLayout, setPreviewLayout] = useState(
+	const [previewLayout, setPreviewLayout] = useState(() =>
 		config.templatesPreviewEnabled
 			? getMostRecentLayout(config.previewOptions)
 			: initialPreviewLayout
+	);
+	const [previewLayoutType, setPreviewLayoutType] = useState(
+		() =>
+			config.previewOptions.find((type) =>
+				type.data.recentLayouts.find(
+					(layout) => layout === previewLayout
+				)
+			)?.type
 	);
 	const [loading, setLoading] = useState(true);
 
@@ -74,9 +82,11 @@ const StyleBookEditor = ({
 				frontendTokensValues,
 				loading,
 				previewLayout,
+				previewLayoutType,
 				setFrontendTokensValues,
 				setLoading,
 				setPreviewLayout,
+				setPreviewLayoutType,
 			}}
 		>
 			<div className="cadmin style-book-editor">
@@ -173,6 +183,7 @@ function getMostRecentLayout(previewOptions) {
 		LAYOUT_TYPES.master,
 		LAYOUT_TYPES.pageTemplate,
 		LAYOUT_TYPES.displayPageTemplate,
+		LAYOUT_TYPES.fragmentCollection,
 	];
 
 	for (let i = 0; i < types.length; i++) {

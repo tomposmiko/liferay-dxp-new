@@ -1756,6 +1756,7 @@ public class ContentPageEditorDisplayContext {
 		layoutItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new UUIDItemSelectorReturnType());
 		layoutItemSelectorCriterion.setMultiSelection(false);
+		layoutItemSelectorCriterion.setShowHiddenPages(true);
 		layoutItemSelectorCriterion.setShowPrivatePages(true);
 
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
@@ -2154,7 +2155,7 @@ public class ContentPageEditorDisplayContext {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception, exception);
+				_log.debug(exception);
 			}
 		}
 
@@ -2172,7 +2173,7 @@ public class ContentPageEditorDisplayContext {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception, exception);
+				_log.debug(exception);
 			}
 		}
 
