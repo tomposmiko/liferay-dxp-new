@@ -41,6 +41,9 @@ function SelectAssetCategory({
 	});
 
 	const [filterQuery, setFilterQuery] = useState('');
+	const [selectedKeys, setSelectedKeys] = useState(
+		new Set(selectedCategoryIds)
+	);
 	const [selectedItemsCount, setSelectedItemsCount] = useState(0);
 
 	return (
@@ -92,26 +95,37 @@ function SelectAssetCategory({
 
 			{selectedItemsCount && multiSelection ? (
 				<ClayLayout.Container
-					className="align-items-center category-tree-count-feedback d-flex px-4"
+					className="align-items-center category-tree-count-feedback d-flex justify-content-between px-3"
 					containerElement="section"
 					fluid
 				>
-					<div className="container p-0">
-						<p className="m-0 text-2">
-							{selectedItemsCount > 1
-								? `${selectedItemsCount} ${Liferay.Language.get(
-										'items-selected'
-								  )}`
-								: `${selectedItemsCount} ${Liferay.Language.get(
-										'item-selected'
-								  )}`}
-						</p>
-					</div>
+					<p className="m-0 text-2">
+						{selectedItemsCount > 1
+							? `${selectedItemsCount} ${Liferay.Language.get(
+									'items-selected'
+							  )}`
+							: `${selectedItemsCount} ${Liferay.Language.get(
+									'item-selected'
+							  )}`}
+					</p>
+
+					<ClayButton
+						className="text-3 text-dark text-weight-semi-bold"
+						displayType="link"
+						onClick={() => {
+							setSelectedKeys(new Set([]));
+						}}
+					>
+						{Liferay.Language.get('clear-all')}
+					</ClayButton>
 				</ClayLayout.Container>
 			) : null}
 
 			<form name={`${namespace}selectCategoryFm`}>
-				<ClayLayout.ContainerFluid containerElement="fieldset">
+				<ClayLayout.ContainerFluid
+					className="px-3"
+					containerElement="fieldset"
+				>
 					<div
 						className="category-tree mt-3"
 						id={`${namespace}categoryContainer`}
@@ -125,7 +139,8 @@ function SelectAssetCategory({
 								multiSelection={multiSelection}
 								onItems={setItems}
 								onSelectedItemsCount={setSelectedItemsCount}
-								selectedCategoryIds={selectedCategoryIds}
+								selectedKeys={selectedKeys}
+								setSelectedKeys={setSelectedKeys}
 							/>
 						) : (
 							<ClayEmptyState

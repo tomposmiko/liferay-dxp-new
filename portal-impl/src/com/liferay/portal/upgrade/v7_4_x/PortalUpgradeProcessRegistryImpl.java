@@ -264,6 +264,33 @@ public class PortalUpgradeProcessRegistryImpl
 		upgradeVersionTreeMap.put(
 			new Version(25, 2, 0),
 			new CTModelUpgradeProcess("LayoutPrototype"));
+
+		upgradeVersionTreeMap.put(
+			new Version(25, 3, 0),
+			UpgradeProcessFactory.addColumns(
+				"DLFileVersion", "storeUUID VARCHAR(255) null"));
+
+		upgradeVersionTreeMap.put(
+			new Version(25, 3, 1),
+			UpgradeProcessFactory.alterColumnType(
+				"UserGroupGroupRole", "userGroupGroupRoleId", "LONG not null"),
+			UpgradeProcessFactory.alterColumnType(
+				"UserGroupGroupRole", "userGroupId", "LONG null"),
+			UpgradeProcessFactory.alterColumnType(
+				"UserGroupGroupRole", "groupId", "LONG null"),
+			UpgradeProcessFactory.alterColumnType(
+				"UserGroupGroupRole", "roleId", "LONG null"),
+			//
+			UpgradeProcessFactory.alterColumnType(
+				"UserGroupRole", "userGroupRoleId", "LONG not null"),
+			UpgradeProcessFactory.alterColumnType(
+				"UserGroupRole", "userId", "LONG null"),
+			UpgradeProcessFactory.alterColumnType(
+				"UserGroupRole", "groupId", "LONG null"),
+			UpgradeProcessFactory.alterColumnType(
+				"UserGroupRole", "roleId", "LONG null"),
+			//
+			new UpgradeUsersUserGroups());
 	}
 
 }

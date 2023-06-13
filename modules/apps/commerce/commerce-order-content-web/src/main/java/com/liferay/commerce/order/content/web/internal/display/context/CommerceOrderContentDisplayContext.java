@@ -185,13 +185,13 @@ public class CommerceOrderContentDisplayContext {
 			DateFormat.MEDIUM, themeDisplay.getLocale(),
 			themeDisplay.getTimeZone());
 
-		_commerceContext = (CommerceContext)_httpServletRequest.getAttribute(
+		_commerceContext = (CommerceContext)httpServletRequest.getAttribute(
 			CommerceWebKeys.COMMERCE_CONTEXT);
 
 		_commerceAccount = _commerceContext.getCommerceAccount();
 
 		_commerceOrderNoteId = ParamUtil.getLong(
-			_httpServletRequest, "commerceOrderNoteId");
+			httpServletRequest, "commerceOrderNoteId");
 	}
 
 	public CommerceChannel fetchCommerceChannel() {
@@ -208,11 +208,13 @@ public class CommerceOrderContentDisplayContext {
 	}
 
 	public List<CommerceAddress> getBillingCommerceAddresses(
-			long commerceAccountId, long companyId)
+			long commerceAccountId)
 		throws PortalException {
 
 		return _commerceAddressService.getBillingCommerceAddresses(
-			companyId, AccountEntry.class.getName(), commerceAccountId);
+			_commerceContext.getCommerceChannelId(),
+			AccountEntry.class.getName(), commerceAccountId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS);
 	}
 
 	public CommerceAccount getCommerceAccount() {
@@ -968,11 +970,13 @@ public class CommerceOrderContentDisplayContext {
 	}
 
 	public List<CommerceAddress> getShippingCommerceAddresses(
-			long commerceAccountId, long companyId)
+			long commerceAccountId)
 		throws PortalException {
 
 		return _commerceAddressService.getShippingCommerceAddresses(
-			companyId, AccountEntry.class.getName(), commerceAccountId);
+			_commerceContext.getCommerceChannelId(),
+			AccountEntry.class.getName(), commerceAccountId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS);
 	}
 
 	public PortletURL getTransitionOrderPortletURL() throws PortalException {

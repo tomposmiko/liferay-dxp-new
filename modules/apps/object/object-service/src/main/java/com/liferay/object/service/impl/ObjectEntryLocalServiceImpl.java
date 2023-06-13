@@ -2043,6 +2043,11 @@ public class ObjectEntryLocalServiceImpl
 			return repository;
 		}
 
+		serviceContext = (ServiceContext)serviceContext.clone();
+
+		serviceContext.setAddGroupPermissions(true);
+		serviceContext.setAddGuestPermissions(true);
+
 		try {
 			return _portletFileRepository.addPortletRepository(
 				groupId, portletId, serviceContext);
@@ -3019,6 +3024,10 @@ public class ObjectEntryLocalServiceImpl
 			}
 		}
 		else if (sqlType == Types.DECIMAL) {
+			if (Validator.isNull(String.valueOf(value))) {
+				value = BigDecimal.ZERO;
+			}
+
 			preparedStatement.setBigDecimal(
 				index, new BigDecimal(String.valueOf(value)));
 		}
