@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
-	property = "form.navigator.entry.order:Integer=180",
+	property = "form.navigator.entry.order:Integer=200",
 	service = FormNavigatorEntry.class
 )
 public class LayoutSetLogoFormNavigatorEntry
@@ -77,16 +77,10 @@ public class LayoutSetLogoFormNavigatorEntry
 		return "/layout_set/logo.jsp";
 	}
 
-	@Reference(unbind = "-")
-	protected void setCompanyLocalService(
-		CompanyLocalService companyLocalService) {
-
-		_companyLocalService = companyLocalService;
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutSetLogoFormNavigatorEntry.class);
 
+	@Reference
 	private CompanyLocalService _companyLocalService;
 
 	@Reference(target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)")

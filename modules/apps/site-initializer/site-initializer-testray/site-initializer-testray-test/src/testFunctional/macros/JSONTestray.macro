@@ -191,6 +191,7 @@ definition {
 
 		var subtaskId = JSONTestrayAPI.createSubtaskAPI(
 			key = ${key},
+			messageError = ${messageError},
 			score = ${score},
 			statusSubtask = ${statusSubtask},
 			subtaskName = ${subtaskName},

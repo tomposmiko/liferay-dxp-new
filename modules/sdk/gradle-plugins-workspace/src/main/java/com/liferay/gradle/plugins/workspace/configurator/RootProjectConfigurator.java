@@ -63,6 +63,7 @@ import java.net.URI;
 import java.net.URL;
 
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1158,9 +1159,34 @@ public class RootProjectConfigurator implements Plugin<Project> {
 
 		initBundleTask.dependsOn(
 			verifyProductTask, downloadBundleTask, verifyBundleTask);
+		initBundleTask.doLast(
+			new Action<Task>() {
 
+				@Override
+				public void execute(Task task) {
+					String tomcatVersion =
+						workspaceExtension.getAppServerTomcatVersion();
+
+					String tomcatDir = "tomcat-" + tomcatVersion;
+
+					File targetAppServerDir = new File(
+						workspaceExtension.getHomeDir(), tomcatDir);
+
+					File sourceTomcatDir = new File(
+						workspaceExtension.getConfigsDir(), "tomcat");
+
+					if (Files.exists(
+							sourceTomcatDir.toPath(),
+							LinkOption.NOFOLLOW_LINKS)) {
+
+						_copyTomcatConfiguration(
+							task.getProject(), sourceTomcatDir,
+							targetAppServerDir);
+					}
+				}
+
+			});
 		initBundleTask.mustRunAfter(verifyProductTask);
-
 		initBundleTask.setClasspath(configurationBundleSupport);
 		initBundleTask.setConfigEnvironment(
 			new Callable<String>() {
@@ -1856,6 +1882,23 @@ public class RootProjectConfigurator implements Plugin<Project> {
 							new File(destinationDir, rootDirName),
 							destinationDir);
 					}
+
+					WorkspaceExtension workspaceExtension =
+						GradleUtil.getExtension(
+							(ExtensionAware)project.getGradle(),
+							WorkspaceExtension.class);
+
+					String tomcatVersion =
+						workspaceExtension.getAppServerTomcatVersion();
+
+					File targetTomcatDir = new File(
+						destinationDir, "tomcat-" + tomcatVersion);
+
+					File sourceTomcatDir = new File(
+						workspaceExtension.getConfigsDir(), "tomcat");
+
+					_copyTomcatConfiguration(
+						task.getProject(), sourceTomcatDir, targetTomcatDir);
 				}
 
 			});
@@ -1987,6 +2030,22 @@ public class RootProjectConfigurator implements Plugin<Project> {
 					"%s-liferay:%s",
 					StringUtil.getDockerSafeName(project.getName()), version));
 		}
+	}
+
+	private void _copyTomcatConfiguration(
+		Project project, File sourceDir, File destinationDir) {
+
+		project.copy(
+			new Action<CopySpec>() {
+
+				@Override
+				public void execute(CopySpec copySpec) {
+					copySpec.from(sourceDir);
+					copySpec.include("**/*");
+					copySpec.into(destinationDir);
+				}
+
+			});
 	}
 
 	private void _createTouchFile(File dir) throws IOException {

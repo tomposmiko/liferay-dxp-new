@@ -29,6 +29,8 @@ definition {
 			menuItem = "Configure",
 			pageName = ${pageName});
 
+		Navigator.gotoNavTab(navTab = "Design");
+
 		Navigator.gotoNavTab(navTab = "Advanced");
 
 		Panel.expandPanel(panel = "Customization Settings");

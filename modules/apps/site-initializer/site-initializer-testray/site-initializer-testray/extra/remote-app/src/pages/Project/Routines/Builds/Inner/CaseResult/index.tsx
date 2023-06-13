@@ -57,6 +57,8 @@ const CaseResult = () => {
 		[caseResult.attachments]
 	);
 
+	const hasCaseResultEditPermission = !!caseResult?.actions?.update;
+
 	return (
 		<>
 			<CaseResultHeaderActions
@@ -232,6 +234,7 @@ const CaseResult = () => {
 											}
 										/>
 									),
+									visible: hasCaseResultEditPermission,
 								},
 								{
 									divider: true,

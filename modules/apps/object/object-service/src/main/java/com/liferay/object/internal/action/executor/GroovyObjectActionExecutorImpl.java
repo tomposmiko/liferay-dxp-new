@@ -20,7 +20,7 @@ import com.liferay.object.internal.action.util.ObjectEntryVariablesUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.scripting.executor.ObjectScriptingExecutor;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.scripting.ScriptingException;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -52,7 +52,7 @@ public class GroovyObjectActionExecutorImpl implements ObjectActionExecutor {
 		Map<String, Object> inputObjects =
 			ObjectEntryVariablesUtil.getVariables(
 				_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-				_systemObjectDefinitionMetadataRegistry);
+				_systemObjectDefinitionManagerRegistry);
 
 		Map<String, Object> results = _objectScriptingExecutor.execute(
 			(Map<String, Object>)inputObjects.get("baseModel"), new HashSet<>(),
@@ -78,7 +78,7 @@ public class GroovyObjectActionExecutorImpl implements ObjectActionExecutor {
 	private ObjectScriptingExecutor _objectScriptingExecutor;
 
 	@Reference
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 }

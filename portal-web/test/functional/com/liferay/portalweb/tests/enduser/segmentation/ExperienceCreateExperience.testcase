@@ -355,6 +355,40 @@ definition {
 		}
 	}
 
+	@description = "This is a test for LPS-127312. The page editor could add new experience after cancel edit experience."
+	@priority = 4
+	test AddNewExperienceAfterCancelEditExperience {
+		task ("Given a page editor has an experience") {
+			ContentPages.gotoPageEditor();
+
+			PageEditor.addExperience(
+				experienceName = "Test Exp",
+				segmentName = "Anyone");
+		}
+
+		task ("When the page editor cancels the experience editing") {
+			Click(locator1 = "PageEditor#EXPERIENCE_EDIT_BUTTON");
+
+			Type(
+				locator1 = "PageEditor#EXPERIENCE_NAME",
+				value1 = "Test Exp Edited");
+
+			Button.clickCancel();
+		}
+
+		task ("Then the page editor could add a new experience") {
+			Click(
+				key_text = "New Experience",
+				locator1 = "Button#ANY");
+
+			AssertElementPresent(locator1 = "PageEditor#EXPERIENCE_MODAL");
+
+			AssertTextNotEquals(
+				locator1 = "PageEditor#EXPERIENCE_NAME",
+				value1 = "Test Exp");
+		}
+	}
+
 	@description = "LPS-130344: Segment member preview count shows the correct number of users when segments are combined"
 	@priority = 5
 	test AddNewExperienceBasedOtherSegmentsSegment {

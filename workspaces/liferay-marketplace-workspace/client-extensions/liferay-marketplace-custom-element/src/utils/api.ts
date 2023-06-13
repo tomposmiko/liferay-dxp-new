@@ -1,3 +1,5 @@
+/* eslint-disable @liferay/portal/no-global-fetch */
+
 declare let Liferay: {Service: any; ThemeDisplay: any; authToken: string};
 const headers = {
 	'Content-Type': 'application/json',
@@ -22,20 +24,16 @@ export async function addSkuExpandoValue({
 	skuId: number;
 	versionValue: string;
 }) {
-	await Liferay.Service(
-		'/expandovalue/add-values',
-		{
-			attributeValues: {
-				'version': versionValue,
-				'version description': notesValue,
-			},
-			className: 'com.liferay.commerce.product.model.CPInstance',
-			classPK: skuId,
-			companyId,
-			tableName: 'CUSTOM_FIELDS',
+	await Liferay.Service('/expandovalue/add-values', {
+		attributeValues: {
+			'version': versionValue,
+			'version description': notesValue,
 		},
-		(obj: any) => {}
-	);
+		className: 'com.liferay.commerce.product.model.CPInstance',
+		classPK: skuId,
+		companyId,
+		tableName: 'CUSTOM_FIELDS',
+	});
 }
 
 export function createApp({
@@ -158,25 +156,6 @@ export async function createProductSpecification({
 	return await response.json();
 }
 
-export async function createProductSubscriptionConfiguration({
-	body,
-	externalReferenceCode,
-}: {
-	body: Object;
-	externalReferenceCode: string;
-}) {
-	const response = await fetch(
-		`/o/headless-commerce-admin-catalog/v1.0/products/by-externalReferenceCode/${externalReferenceCode}/subscriptionConfiguration`,
-		{
-			body: JSON.stringify(body),
-			headers,
-			method: 'PATCH',
-		}
-	);
-
-	return await response.json();
-}
-
 export async function createSpecification({body}: {body: Object}) {
 	const response = await fetch(
 		`/o/headless-commerce-admin-catalog/v1.0/specifications`,
@@ -195,6 +174,16 @@ export async function deleteTrialSKU(skuTrialId: number) {
 		headers,
 		method: 'DELETE',
 	});
+}
+
+export async function getAccountGroup(accountId: number) {
+	const response = await fetch(
+		`/o/headless-commerce-admin-account/v1.0/accounts/${accountId}/accountGroups`,
+		{headers, method: 'GET'}
+	);
+	const {items} = await response.json();
+
+	return items as AccountGroup[];
 }
 
 export async function getAccountInfo({accountId}: {accountId: number}) {
@@ -237,11 +226,9 @@ export async function getCatalogs() {
 	return response.json();
 }
 
-export async function getCatalogByExternalReferenceCode(
-	externalReferenceCode: string
-) {
+export async function getCatalog(catalogId: number) {
 	const response = await fetch(
-		`/o/headless-commerce-admin-catalog/v1.0/catalog/by-externalReferenceCode/${externalReferenceCode}`,
+		`/o/headless-commerce-admin-catalog/v1.0/catalog/${catalogId}`,
 		{headers, method: 'GET'}
 	);
 
@@ -295,6 +282,18 @@ export async function getDeliveryProduct({
 }) {
 	const response = await fetch(
 		`/o/headless-commerce-delivery-catalog/v1.0/channels/${channelId}/products/${appId}?nestedFields=skus`,
+		{
+			headers,
+			method: 'GET',
+		}
+	);
+
+	return await response.json();
+}
+
+export async function getMyUserAccount() {
+	const response = await fetch(
+		'/o/headless-admin-user/v1.0/my-user-account',
 		{
 			headers,
 			method: 'GET',
@@ -442,14 +441,14 @@ export async function getSKUCustomFieldExpandoValue({
 	await Liferay.Service(
 		'/expandovalue/get-data',
 		{
-			columnName: customFieldName,
 			className: 'com.liferay.commerce.product.model.CPInstance',
 			classPK: skuId,
+			columnName: customFieldName,
 			companyId,
 			tableName: 'CUSTOM_FIELDS',
 		},
-		(obj: any) => {
-			response = obj;
+		(object: any) => {
+			response = object;
 		}
 	);
 
@@ -495,7 +494,7 @@ export async function getUserAccountsById() {
 		}
 	);
 
-	return (await response.json()) as UserAccount;
+	return response;
 }
 
 export async function getVocabularies() {
@@ -601,13 +600,13 @@ export async function postOptionValue(
 		const response = await fetch(
 			`/o/headless-commerce-admin-catalog/v1.0/productOptions/${optionId}/productOptionValues`,
 			{
-				headers,
-				method: 'POST',
 				body: JSON.stringify({
 					key,
 					name: {en_US: name},
 					priority,
 				}),
+				headers,
+				method: 'POST',
 			}
 		);
 
@@ -621,13 +620,13 @@ export async function postTrialOption() {
 	const response = await fetch(
 		`/o/headless-commerce-admin-catalog/v1.0/options`,
 		{
-			headers,
-			method: 'POST',
 			body: JSON.stringify({
 				fieldType: 'radio',
 				key: 'trial',
 				name: {en_US: 'Trial'},
 			}),
+			headers,
+			method: 'POST',
 		}
 	);
 
@@ -643,14 +642,12 @@ export async function postTrialProductOption(
 	const response = await fetch(
 		`/o/headless-commerce-admin-catalog/v1.0/products/${productId}/productOptions`,
 		{
-			headers,
-			method: 'POST',
 			body: JSON.stringify([
 				{
-					facetable: true,
 					description: {
 						en_US: 'Specifies if a trial exists for a given app or solution submission.',
 					},
+					facetable: true,
 					fieldType: 'radio',
 					key: 'trial',
 					name: {
@@ -662,6 +659,8 @@ export async function postTrialProductOption(
 					skuContributor: true,
 				},
 			]),
+			headers,
+			method: 'POST',
 		}
 	);
 

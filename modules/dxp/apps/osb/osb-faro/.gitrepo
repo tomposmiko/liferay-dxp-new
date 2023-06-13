@@ -1,0 +1,11 @@
+;
+; Do not manually edit this file.
+;
+[subrepo]
+	autopull = false
+	cmdver = liferay
+	commit = bed6f3ecc746549841b0582e3f3b1d8f5fde429b
+	mergebuttonmergecommits = false
+	mode = push
+	parent = e9019ed94a25571b030d396af8ba8113eeb806b6
+	remote = git@github.com:liferay/com-liferay-osb-faro-private.git

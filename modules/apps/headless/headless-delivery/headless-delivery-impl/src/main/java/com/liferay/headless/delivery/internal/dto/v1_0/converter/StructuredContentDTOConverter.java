@@ -67,7 +67,6 @@ import com.liferay.subscription.service.SubscriptionLocalService;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,7 +84,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "dto.class.name=com.liferay.journal.model.JournalArticle",
-	service = {DTOConverter.class, StructuredContentDTOConverter.class}
+	service = DTOConverter.class
 )
 public class StructuredContentDTOConverter
 	implements DTOConverter<JournalArticle, StructuredContent> {
@@ -254,10 +253,9 @@ public class StructuredContentDTOConverter
 		DDMStructure ddmStructure, DTOConverterContext dtoConverterContext,
 		JournalArticle journalArticle) {
 
-		Optional<UriInfo> uriInfoOptional =
-			dtoConverterContext.getUriInfoOptional();
+		UriInfo uriInfo = dtoConverterContext.getUriInfo();
 
-		if (!uriInfoOptional.isPresent()) {
+		if (uriInfo == null) {
 			return null;
 		}
 
@@ -265,7 +263,6 @@ public class StructuredContentDTOConverter
 		HttpServletRequest httpServletRequest =
 			dtoConverterContext.getHttpServletRequest();
 		Locale locale = dtoConverterContext.getLocale();
-		UriInfo uriInfo = uriInfoOptional.get();
 
 		RenderedContent[] renderedContents = TransformUtil.transformToArray(
 			ddmStructure.getTemplates(),
@@ -295,17 +292,8 @@ public class StructuredContentDTOConverter
 						});
 					setRenderedContentValue(
 						() -> {
-							if (!uriInfoOptional.map(
-									UriInfo::getQueryParameters
-								).map(
-									parameters -> parameters.getFirst(
-										"nestedFields")
-								).map(
-									fields -> fields.contains(
-										"renderedContentValue")
-								).orElse(
-									false
-								)) {
+							if (!dtoConverterContext.containsNestedFieldsValue(
+									"renderedContentValue")) {
 
 								return null;
 							}

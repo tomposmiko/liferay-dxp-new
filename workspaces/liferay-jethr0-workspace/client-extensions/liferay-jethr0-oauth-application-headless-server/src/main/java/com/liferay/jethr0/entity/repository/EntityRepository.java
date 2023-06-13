@@ -15,21 +15,28 @@
 package com.liferay.jethr0.entity.repository;
 
 import com.liferay.jethr0.entity.Entity;
+import com.liferay.jethr0.entity.dalo.EntityDALO;
 
 import java.util.List;
+
+import org.json.JSONObject;
 
 /**
  * @author Michael Hashimoto
  */
 public interface EntityRepository<T extends Entity> {
 
-	public void add(List<T> entities);
+	public T add(JSONObject jsonObject);
 
-	public void add(T entity);
+	public T add(T entity);
 
-	public List<T> get();
+	public void addAll(List<T> entities);
+
+	public List<T> getAll();
 
 	public T getById(long id);
+
+	public EntityDALO<T> getEntityDALO();
 
 	public void remove(List<T> entities);
 

@@ -15,8 +15,10 @@ definition {
 			User.firstLoginPG();
 		}
 
-		task ("Create a new Partner Portal Site") {
-			PRMUtils.addPRMSite();
+		task ("Create a new Partner Portal Site and connect with Salesforce") {
+			PRMUtils.addSite();
+
+			PRMUtils.connectWithSalesforce();
 		}
 
 		task ("Add a partner user") {
@@ -47,17 +49,11 @@ definition {
 		}
 
 		task ("Add a new account and assign the created user to the account") {
-			JSONAccountEntry.addAccountEntry(
-				accountEntryName = "Company Name 1",
-				accountEntryType = "Business");
+			JSONPRM.addAccount();
 
 			JSONAccountEntryUser.addExistUsertoAccount(
 				accountEntryName = "Company Name 1",
 				userEmailAddress = "partner@liferay.com");
-		}
-
-		task ("Add a currency to the created account") {
-			JSONPRM.addCurrency();
 		}
 
 		task ("Go to Partner Portal and login with the created user") {
@@ -84,15 +80,71 @@ definition {
 				userLoginEmailAddress = "test@liferay.com",
 				userLoginFullName = "Test Test");
 
-			JSONGroup.deleteGroupByName(groupName = "Partner Portal");
+			PRMUtils.tearDown();
+		}
+	}
 
-			Account.tearDownCP();
+	@description = "This is a test for LPS-178087. Verify that it is possible to edit a created MDF"
+	@priority = 5
+	test CanEditMDF {
+		PRMMarketing.gotoAddNewMDF();
+
+		PRMMDFRequest.createNewRequest(
+			accountName = "Company Name 1",
+			activityDescription = "Activity Description",
+			activityName = "Activity Name 1",
+			budgetList = "Sponsorship Fee-2000",
+			campaignDescription = "Campaign Description",
+			campaignName = "Campaign Name",
+			countryName = "Global",
+			followUpStrategy = "test",
+			goalsOptions = "Lead generation",
+			leadFollowUpList = "Other",
+			leadList = "No",
+			tactic = "Other",
+			targetMarketOptions = "Education,Energy",
+			targetOfLeads = "test",
+			targetRolesOptions = "Administrator",
+			typeOfActivity = "Miscellaneous Marketing");
+
+		task ("When the manager go to see the submitted MDF") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "manager@liferay.com",
+				userLoginFullName = "manager");
+
+			PRMNavigator.openSitePage(pageName = "MDF Requests");
+
+			PRMMDFRequest.goToMDF(campaignName = "Campaign Name");
+		}
+
+		task ("Then the manager user can edit the MDF Request") {
+			PRMMDFRequest.editMDFinformations(
+				campaignDescription = "Campaign Description Edited",
+				campaignName = "Campaign Name Edited");
+
+			PRMMDFRequest.editMDFActivity(
+				leadList = "No",
+				newActivityName = "Activity Name Edited");
+		}
+
+		task ("And the user can verify that some informations were edited") {
+			PRMMDFRequest.goToMDF(campaignName = "Campaign Name Edited");
+
+			PRMMDFRequest.viewMDFActivityDetails(
+				activityName = "Activity Name Edited",
+				activityNameButton = "Activity Name Edited");
+
+			PRMMDFRequest.viewMDFCompanyDetails(campaignName = "Campaign Name Edited");
 		}
 	}
 
 	@description = "This is a test for LPS-172917. Verify that If there are multiple activities, the review page will display them as dropdown items that can be expandable"
 	@priority = 5
 	test CanExpandAndSeeMultipleActivities {
+		property test.name.skip.portal.instance = "PRMMDFRequest#CanExpandAndSeeMultipleActivities";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given I go to add a MDF Request") {
 			PRMMarketing.gotoAddNewMDF();
 		}
@@ -192,6 +244,11 @@ definition {
 	@description = "This is a test for LPS-173817. Verify that is possible to export all visible MDFs"
 	@priority = 5
 	test CanExportAllVisibleMDFs {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#CanExportAllVisibleMDFs";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given I go to add three new MDF Requests") {
 			for (var n : list "1,2,3") {
 				PRMNavigator.goToNavItem(navItem = "Marketing");
@@ -229,13 +286,15 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-174679. Verify that is possible to export filtered MDF’s"
+	@description = "This is a test for LPS-174679. Verify that is possible to export filtered MDFs"
 	@priority = 4
 	test CanExportFilteredMDFs {
+		property test.name.skip.portal.instance = "PRMMDFRequest#CanExportFilteredMDFs";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given a new account is created") {
-			JSONAccountEntry.addAccountEntry(
-				accountEntryName = "Company Name 2",
-				accountEntryType = "Business");
+			JSONPRM.addAccount(accountName = "Company Name 2");
 
 			JSONAccountEntryUser.addExistUsertoAccount(
 				accountEntryName = "Company Name 2",
@@ -297,9 +356,74 @@ definition {
 		}
 	}
 
+	@description = "This is a test for LPS-173731. Verify that is possible to export filtered MDFs"
+	@priority = 4
+	test CanExportSearchedMDFs {
+		property solutions.acceptance = "true";
+
+		task ("Given a new account is created") {
+			JSONPRM.addAccount(accountName = "Company Name 2");
+
+			JSONAccountEntryUser.addExistUsertoAccount(
+				accountEntryName = "Company Name 2",
+				userEmailAddress = "partner@liferay.com");
+		}
+
+		task ("And I add two different MDF's") {
+			JSONPRM.createMDFRequest(
+				accountEntryName = "Company Name 1",
+				campaignName = "Campaign Name 1");
+
+			JSONPRM.createMDFRequest(
+				accountEntryName = "Company Name 2",
+				campaignName = "Campaign Name 2");
+		}
+
+		task ("And I go to MDF Listing Page") {
+			PRMUtils.gotoPRM();
+
+			PRMHomePage.gotoQuickLinksOption(
+				buttonLink = "mdf",
+				buttonText = "MDF");
+		}
+
+		task ("When I search for the first MDF") {
+			PRMMDFRequest.searchMDF(campaignName = "Campaign Name 1");
+		}
+
+		task ("And I click on the 'Export MDF Report' button") {
+			Button.click(button = "Export MDF Report");
+		}
+
+		task ("Then the information of the searched MDF will be inside the exported file") {
+			PRMMDFRequest.viewExportedMDF(
+				fileContentList = "Campaign Name 1",
+				fileName = "MDF Requests.csv");
+		}
+
+		task ("When I search for the second MDF") {
+			PRMMDFRequest.searchMDF(campaignName = "Campaign Name 2");
+		}
+
+		task ("And I click on the 'Export MDF Report' button") {
+			Button.click(button = "Export MDF Report");
+		}
+
+		task ("Then the information of the searched MDF will be inside the exported file") {
+			PRMMDFRequest.viewExportedMDF(
+				fileContentList = "Campaign Name 2",
+				fileName = "MDF Requests.csv");
+		}
+	}
+
 	@description = "This is a test for LPS-171637. Verify that an alert will appear when user don't fill a mandatory* field and that “Continue” button only will be clickable after fill all mandatory fields"
 	@priority = 5
 	test CannotContinueWithoutFillRequiredField {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#CannotContinueWithoutFillRequiredField";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given I go to add a new MDF Request") {
 			PRMMarketing.gotoAddNewMDF();
 		}
@@ -346,13 +470,20 @@ definition {
 		}
 
 		task ("Then an alert will appear") {
-			FieldBase.assertRequiredFieldErrorPresent(fieldLabel = "Choose your target audience");
+			AssertElementPresent(
+				key_fieldLabel = "Choose your target audience",
+				locator1 = "FieldBase#ERROR_MESSAGE_REQUIRED_FIELD");
 		}
 	}
 
 	@description = "This is for LPS-174826. Verify that is not possible to put a value higher than the Total MDF Request Amount"
 	@priority = 5
 	test CannotExceedTheValueOfMDFRequestedAmount {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#CannotExceedTheValueOfMDFRequestedAmount";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given I go to add a MDF Request") {
 			PRMMarketing.gotoAddNewMDF();
 		}
@@ -396,6 +527,10 @@ definition {
 	@description = "This is a test for LPS-169960. Verify that a submited MDF will be displayed on the list"
 	@priority = 5
 	test CanViewMDFStatusOnListing {
+		property test.name.skip.portal.instance = "PRMMDFRequest#CanViewMDFStatusOnListing";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given I go to add a new MDF Request and when I fill all the goals") {
 			PRMMarketing.gotoAddNewMDF();
 
@@ -428,41 +563,44 @@ definition {
 	@description = "This is a test for LPS-173507. Verify that the detail page displays all the information the partner entered on MDF Request Form"
 	@priority = 5
 	test DetailPageDisplaysAllMDFInformation {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#DetailPageDisplaysAllMDFInformation";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given I go to add a new MDF Request") {
 			var accountName = "Company Name 1";
 			var campaignName = "Campaign Name";
 			var countryName = "Global";
+			var campaignDescription = "Campaign Description";
 			var goalsOptions = "Lead generation";
 			var targetMarketOptions = "Education";
 			var targetRolesOptions = "Administrator";
 			var activityName = "Activity Name 1";
 			var activityDescription = "Activity Description";
-			var budgetList = "Sponsorship Fee-2000";
-			var followUpStrategy = "test";
 			var leadFollowUpList = "Other";
-			var leadList = "No";
 			var tactic = "Other";
 			var targetOfLeads = "test";
 			var typeOfActivity = "Miscellaneous Marketing";
-			var startDate = DateUtil.getFormattedDate("+1", "M/d/yyyy");
-			var endDate = DateUtil.getFormattedDate("+2", "M/d/yyyy");
-			var expense = "Sponsorship Fee";
-			var budget = "$2,000.00";
+			var startDate = DateUtil.getFormattedDate("+2", "yyyy-MM-dd");
+			var endDate = DateUtil.getFormattedDate("+3", "yyyy-MM-dd");
+			var expenseOption = "Content Creation";
+			var budgetValueList = 2000;
+			var leadList = "No";
 
-			PRMMarketing.gotoAddNewMDF();
-
-			PRMMDFRequest.createNewRequest(
+			JSONPRM.createMDFRequest(
 				accountName = ${accountName},
 				activityDescription = ${activityDescription},
 				activityName = ${activityName},
-				budgetList = ${budgetList},
-				campaignDescription = "Campaign Description",
+				budgetValueList = ${budgetValueList},
+				campaignDescription = ${campaignDescription},
 				campaignName = ${campaignName},
 				countryName = ${countryName},
-				followUpStrategy = ${followUpStrategy},
+				endDate = ${endDate},
+				expenseOption = ${expenseOption},
 				goalsOptions = ${goalsOptions},
 				leadFollowUpList = ${leadFollowUpList},
-				leadList = ${leadList},
+				startDate = ${startDate},
 				tactic = ${tactic},
 				targetMarketOptions = ${targetMarketOptions},
 				targetOfLeads = ${targetOfLeads},
@@ -471,16 +609,22 @@ definition {
 		}
 
 		task ("When I go to View MDF details page") {
+			PRMNavigator.openSitePage(pageName = "MDF Requests");
+
 			PRMMDFRequest.goToMDF(campaignName = "Campaign Name");
 		}
 
 		task ("Then verify that all the filled in fields are present") {
+			var startDate = DateUtil.getFormattedDate("+2", "M/d/yy");
+			var endDate = DateUtil.getFormattedDate("+3", "M/d/yy");
+			var bugdetValue = "2,000";
+
 			PRMMDFRequest.viewMDFActivityDetails(
 				activityDescription = ${activityDescription},
 				activityName = ${activityName},
 				budget = ${budget},
 				endDate = ${endDate},
-				expense = ${expense},
+				expenseOption = ${expenseOption},
 				leadList = ${leadList},
 				startDate = ${startDate},
 				tactic = ${tactic},
@@ -499,6 +643,11 @@ definition {
 	@description = "This is a test for LPS-172479. Verify that the difference between the start date and end date cannot be higher than six months."
 	@priority = 5
 	test DifferenceBetweenStartAndEndDateCannotExceedSixMonths {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#DifferenceBetweenStartAndEndDateCannotExceedSixMonths";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given I go to add a new MDF Request") {
 			PRMMarketing.gotoAddNewMDF();
 		}
@@ -523,14 +672,14 @@ definition {
 		task ("When a date is set on 'Start date' field") {
 			PRMMDFRequest.insertDate(
 				dateFormat = "MMddYYYY",
-				dateRange = "+1",
+				dateRange = "+2",
 				fieldName = "startDate");
 		}
 
 		task ("And a date that exceed 6 months is set on 'End date' field") {
 			PRMMDFRequest.insertDate(
 				dateFormat = "MMddYYYY",
-				dateRange = "+1851",
+				dateRange = "+700",
 				fieldName = "endDate");
 		}
 
@@ -542,6 +691,11 @@ definition {
 	@description = "This is a test for LPS-174501. Verify that the only user with the right roles can see/change the state manager"
 	@priority = 5
 	test OnlyManagersCanSeeStateManager {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#OnlyManagersCanSeeStateManager";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given I go to add a new MDF Request") {
 			PRMUtils.gotoPRM();
 
@@ -612,6 +766,11 @@ definition {
 	@description = "This is for LPS-172427. Verify that the value of Total MDF Requested Amount* will be according to the Total cost and Claim percent"
 	@priority = 5
 	test RequestedValueIsEqualsTo50PercentOfTotalCost {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#RequestedValueIsEqualsTo50PercentOfTotalCost";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given a new MDF request") {
 			PRMMarketing.gotoAddNewMDF();
 
@@ -650,6 +809,11 @@ definition {
 	@description = "This is a test for LPS-172957. Verify that the review page displays all the information the partner user entered to the activity"
 	@priority = 5
 	test ReviewPageDisplaysAllInputedInformation {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#ReviewPageDisplaysAllInputedInformation";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		var accountName = "Company Name 1";
 		var campaignName = "Campaign Name";
 		var countryName = "Global";
@@ -660,12 +824,11 @@ definition {
 		var activityName = "Activity Name 1";
 		var budgetList = "Sponsorship Fee-2000";
 		var expense = "Sponsorship Fee";
-		var budget = "$2,000.00";
 		var leadList = "No";
 		var tactic = "Other";
 		var typeOfActivity = "Miscellaneous Marketing";
-		var startDate = DateUtil.getFormattedDate("+1", "M/d/yyyy");
-		var endDate = DateUtil.getFormattedDate("+2", "M/d/yyyy");
+		var startDate = DateUtil.getFormattedDate("+2", "MMddyyyy");
+		var endDate = DateUtil.getFormattedDate("+3", "MMddyyyy");
 
 		task ("Given I go to add a new MDF Request") {
 			PRMMarketing.gotoAddNewMDF();
@@ -701,7 +864,7 @@ definition {
 		}
 
 		task ("Then all inputted information are displayed on Review Page") {
-			PRMMarketing.viewMDFGoals(
+			PRMMDFRequest.viewGoalsInReviewPage(
 				accountName = ${accountName},
 				campaignDescription = "Campaign Description",
 				campaignName = ${campaignName},
@@ -710,13 +873,16 @@ definition {
 				targetMarketOptions = ${targetMarketOptions},
 				targetRolesOptions = ${targetRolesOptions});
 
-			PRMMarketing.viewMDFActivity(
+			var startDate = DateUtil.getFormattedDate("+2", "M/d/yyyy");
+			var endDate = DateUtil.getFormattedDate("+3", "M/d/yyyy");
+			var budgetValue = "2,000";
+
+			PRMMDFRequest.viewActivityInReviewPage(
 				activityDescription = ${activityDescription},
 				activityName = ${activityName},
-				budget = ${budget},
-				budgetList = ${budgetList},
+				bugdetValue = ${budgetValue},
 				endDate = ${endDate},
-				expense = ${expense},
+				expenseOption = ${expense},
 				leadList = ${leadList},
 				startDate = ${startDate},
 				tactic = ${tactic},
@@ -727,6 +893,11 @@ definition {
 	@description = "This is test is for LPS-173510. Verify that the start date cannot be before the current date"
 	@priority = 5
 	test StartDateCannotBeBeforeToCurrentDate {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#StartDateCannotBeBeforeToCurrentDate";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given I go to add a new MDF Request") {
 			PRMMarketing.gotoAddNewMDF();
 		}
@@ -764,6 +935,11 @@ definition {
 	@description = "This is a test for LPS-172891. Verify that the start date cannot be equals to the current date"
 	@priority = 5
 	test StartDateCannotBeEqualsToCurrentDate {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#StartDateCannotBeEqualsToCurrentDate";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given I go to add a new MDF Request and fill all Goals form with my information") {
 			PRMMarketing.gotoAddNewMDF();
 
@@ -799,11 +975,18 @@ definition {
 	@description = "This is a test for LPS-169960. Verify that a submited MDF will be displayed on the list"
 	@priority = 5
 	test SubmittedMDFAppearsOnListing {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFRequest#SubmittedMDFAppearsOnListing";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given that a new MDF Request is submitted") {
 			JSONPRM.createMDFRequest();
 		}
 
 		task ("Then the MDF appears on listing page") {
+			PRMNavigator.openSitePage(pageName = "MDF Requests");
+
 			PRMMDFListing.viewOnList(campaignName = "Campaign Name");
 		}
 	}
@@ -811,6 +994,10 @@ definition {
 	@description = "This is a test for LPS-173512. Verify that If no claim was made, the message ‘You can submit up to 2 claims’ appears"
 	@priority = 5
 	test VerifyMessageWhenNoClaimWasMade {
+		property test.name.skip.portal.instance = "PRMMDFRequest#VerifyMessageWhenNoClaimWasMade";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given that a partner submit a new MDF Request") {
 			var campaignName = "Campaign Name";
 
@@ -853,13 +1040,17 @@ definition {
 		}
 
 		task ("Then I can see the message 'You can submit up to 2 claim(s)'") {
-			PRMMDFRequest.assertClaimMessage(key_claimMessage = "You can submit up to 2 claim(s).");
+			PRMMDFRequest.assertClaimMessage(claimMessage = "You can submit up to 2 claim(s).");
 		}
 	}
 
 	@description = "This is a test for LPS-174284. Verify that If just one claim was made, so the message 'You can submit up to 1 claim' appears"
 	@priority = 5
 	test VerifyMessageWhenOneClaimWasMade {
+		property test.name.skip.portal.instance = "PRMMDFRequest#VerifyMessageWhenOneClaimWasMade";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given that a partner submit a new MDF Request") {
 			JSONPRM.createMDFRequest();
 		}

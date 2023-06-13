@@ -4,7 +4,8 @@
 		content: '';
 		display: block;
 		height: 1px;
-		margin-top: 6px;
+		margin-bottom: 20px;
+		margin-left: 27px;
 		position: absolute;
 		width: 25px;
 	}
@@ -97,6 +98,8 @@
 		font-weight: 700;
 
 		&.border-header {
+			border-left: 0 !important;
+			border-right: 0 !important;
 			border-top: 1px solid #ccdae8;
 		}
 		&.border-bottom {
@@ -130,7 +133,6 @@
 		.font-table,
 		.font-table-bold {
 			font-size: 0.835rem;
-			margin-right: 6rem;
 		}
 	}
 
@@ -138,7 +140,6 @@
 		.font-table,
 		.font-table-bold {
 			font-size: 0.775rem;
-			margin-right: 2rem;
 		}
 	}
 }
@@ -146,6 +147,12 @@
 @media screen and (max-width: 1500px) {
 	.activities-detail-content {
 		display: flex;
+		flex-wrap: wrap;
+	}
+}
+
+@media screen and (max-width: 576px) {
+	.activities-detail-content {
 		flex-wrap: wrap;
 	}
 }

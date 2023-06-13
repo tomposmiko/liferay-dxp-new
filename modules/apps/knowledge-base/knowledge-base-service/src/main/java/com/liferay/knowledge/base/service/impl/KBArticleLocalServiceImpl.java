@@ -49,6 +49,7 @@ import com.liferay.knowledge.base.internal.util.KBArticleDiffUtil;
 import com.liferay.knowledge.base.internal.util.KBCommentUtil;
 import com.liferay.knowledge.base.internal.util.KBSectionEscapeUtil;
 import com.liferay.knowledge.base.internal.util.constants.KnowledgeBaseConstants;
+import com.liferay.knowledge.base.markdown.converter.factory.MarkdownConverterFactory;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBArticleTable;
 import com.liferay.knowledge.base.model.KBFolder;
@@ -63,6 +64,7 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.bean.BeanProperties;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -144,6 +146,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -153,6 +156,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Edward Han
  */
 @Component(
+	configurationPid = "com.liferay.knowledge.base.internal.configuration.KBServiceConfiguration",
 	property = "model.class.name=com.liferay.knowledge.base.model.KBArticle",
 	service = AopService.class
 )
@@ -326,7 +330,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			WorkflowThreadLocal.setEnabled(false);
 
 			KBArticleImporter kbArticleImporter = new KBArticleImporter(
-				_kbArchiveFactory, this, _portal, _dlURLHelper);
+				_markdownConverterFactory.create(), _kbArchiveFactory, this,
+				_portal, _dlURLHelper);
 
 			return kbArticleImporter.processZipFile(
 				userId, groupId, parentKbFolderId, prioritizeByNumericalPrefix,
@@ -1479,6 +1484,12 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return kbArticle;
 	}
 
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		_kbServiceConfiguration = ConfigurableUtil.createConfigurable(
+			KBServiceConfiguration.class, properties);
+	}
+
 	private void _addKBArticleAttachment(
 			long userId, long groupId, long resourcePrimKey,
 			String selectedFileName)
@@ -1667,8 +1678,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			Company company, Date expirationDate)
 		throws PortalException {
 
-		long userId = _userLocalService.getDefaultUserId(
-			company.getCompanyId());
+		long userId = _userLocalService.getGuestUserId(company.getCompanyId());
 
 		List<KBArticle> kbArticles = _getKBArticlesByCompanyIdAndExpirationDate(
 			company.getCompanyId(), expirationDate);
@@ -2191,8 +2201,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			Company company, Date reviewDate)
 		throws PortalException {
 
-		long userId = _userLocalService.getDefaultUserId(
-			company.getCompanyId());
+		long userId = _userLocalService.getGuestUserId(company.getCompanyId());
 
 		List<KBArticle> kbArticles = _getKBArticlesByCompanyIdAndReviewDate(
 			company.getCompanyId(), _dates.get(company.getCompanyId()),
@@ -2548,8 +2557,10 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	@Reference
 	private KBFolderPersistence _kbFolderPersistence;
 
-	@Reference
 	private KBServiceConfiguration _kbServiceConfiguration;
+
+	@Reference
+	private MarkdownConverterFactory _markdownConverterFactory;
 
 	@Reference
 	private Portal _portal;

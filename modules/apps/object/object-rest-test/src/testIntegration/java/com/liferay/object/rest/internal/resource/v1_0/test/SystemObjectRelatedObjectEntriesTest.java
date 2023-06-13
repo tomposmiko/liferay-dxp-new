@@ -29,8 +29,8 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -109,13 +109,13 @@ public class SystemObjectRelatedObjectEntriesTest {
 
 		_user = TestPropsValues.getUser();
 
-		_userSystemObjectDefinitionMetadata =
-			_systemObjectDefinitionMetadataRegistry.
-				getSystemObjectDefinitionMetadata("User");
+		_userSystemObjectDefinitionManager =
+			_systemObjectDefinitionManagerRegistry.
+				getSystemObjectDefinitionManager("User");
 
 		_userSystemObjectDefinition =
 			_objectDefinitionLocalService.fetchSystemObjectDefinition(
-				_userSystemObjectDefinitionMetadata.getName());
+				_userSystemObjectDefinitionManager.getName());
 	}
 
 	@After
@@ -524,7 +524,7 @@ public class SystemObjectRelatedObjectEntriesTest {
 
 	private String _getLocation() {
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		return jaxRsApplicationDescriptor.getRESTContextPath();
 	}
@@ -756,11 +756,11 @@ public class SystemObjectRelatedObjectEntriesTest {
 		new ArrayList<>();
 
 	@Inject
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 	private User _user;
 	private ObjectDefinition _userSystemObjectDefinition;
-	private SystemObjectDefinitionMetadata _userSystemObjectDefinitionMetadata;
+	private SystemObjectDefinitionManager _userSystemObjectDefinitionManager;
 
 }

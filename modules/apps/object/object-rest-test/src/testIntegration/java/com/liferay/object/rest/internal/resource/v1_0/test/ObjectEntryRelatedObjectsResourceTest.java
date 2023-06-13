@@ -15,6 +15,7 @@
 package com.liferay.object.rest.internal.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
@@ -26,13 +27,14 @@ import com.liferay.object.rest.internal.resource.v1_0.test.util.ObjectEntryTestU
 import com.liferay.object.rest.internal.resource.v1_0.test.util.ObjectRelationshipTestUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
@@ -46,17 +48,23 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.portal.util.PropsUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,6 +84,22 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
+
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-153117", "true"
+			).build());
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-153117", "false"
+			).build());
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -104,13 +128,13 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		_user1 = TestPropsValues.getUser();
 		_user2 = UserTestUtil.addUser(TestPropsValues.getGroupId());
 
-		_userSystemObjectDefinitionMetadata =
-			_systemObjectDefinitionMetadataRegistry.
-				getSystemObjectDefinitionMetadata("User");
+		_userSystemObjectDefinitionManager =
+			_systemObjectDefinitionManagerRegistry.
+				getSystemObjectDefinitionManager("User");
 
 		_userSystemObjectDefinition =
 			_objectDefinitionLocalService.fetchSystemObjectDefinition(
-				_userSystemObjectDefinitionMetadata.getName());
+				_userSystemObjectDefinitionManager.getName());
 	}
 
 	@After
@@ -371,13 +395,13 @@ public class ObjectEntryRelatedObjectsResourceTest {
 	public void testGetRelatedSystemObjectsWhenRelationExists()
 		throws Exception {
 
-		_userSystemObjectDefinitionMetadata =
-			_systemObjectDefinitionMetadataRegistry.
-				getSystemObjectDefinitionMetadata("User");
+		_userSystemObjectDefinitionManager =
+			_systemObjectDefinitionManagerRegistry.
+				getSystemObjectDefinitionManager("User");
 
 		ObjectDefinition relatedObjectDefinition =
 			_objectDefinitionLocalService.fetchSystemObjectDefinition(
-				_userSystemObjectDefinitionMetadata.getName());
+				_userSystemObjectDefinitionManager.getName());
 
 		// Many to many relationships
 
@@ -422,13 +446,13 @@ public class ObjectEntryRelatedObjectsResourceTest {
 
 		// Many to many relationships
 
-		_userSystemObjectDefinitionMetadata =
-			_systemObjectDefinitionMetadataRegistry.
-				getSystemObjectDefinitionMetadata("User");
+		_userSystemObjectDefinitionManager =
+			_systemObjectDefinitionManagerRegistry.
+				getSystemObjectDefinitionManager("User");
 
 		ObjectDefinition relatedObjectDefinition =
 			_objectDefinitionLocalService.fetchSystemObjectDefinition(
-				_userSystemObjectDefinitionMetadata.getName());
+				_userSystemObjectDefinitionManager.getName());
 
 		ObjectRelationship objectRelationship = _addObjectRelationship(
 			_objectDefinition1, relatedObjectDefinition,
@@ -464,6 +488,99 @@ public class ObjectEntryRelatedObjectsResourceTest {
 			objectRelationship, TestPropsValues.getUserId());
 
 		_assertPagination(_user1, objectRelationship);
+	}
+
+	@Test
+	public void testPostCustomObjectEntryWithInvalidNestedSystemObjectEntries()
+		throws Exception {
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.portal.vulcan.internal.jaxrs.exception.mapper." +
+					"WebApplicationExceptionMapper",
+				LoggerTestUtil.WARN)) {
+
+			// Many to many
+
+			_testPostCustomObjectEntryWithInvalidNestedSystemObjectEntries(
+				_addObjectRelationship(
+					_userSystemObjectDefinition, _objectDefinition1,
+					ObjectRelationshipConstants.TYPE_MANY_TO_MANY),
+				false);
+
+			// Many to one
+
+			_testPostCustomObjectEntryWithInvalidNestedSystemObjectEntries(
+				_addObjectRelationship(
+					_userSystemObjectDefinition, _objectDefinition1,
+					ObjectRelationshipConstants.TYPE_ONE_TO_MANY),
+				true);
+
+			// One to many
+
+			_testPostCustomObjectEntryWithInvalidNestedSystemObjectEntries(
+				_addObjectRelationship(
+					_objectDefinition1, _userSystemObjectDefinition,
+					ObjectRelationshipConstants.TYPE_ONE_TO_MANY),
+				false);
+		}
+	}
+
+	@Test
+	public void testPostCustomObjectEntryWithNestedSystemObjectEntry()
+		throws Exception {
+
+		// Many to many
+
+		_testPostCustomObjectEntryWithNestedSystemObjectEntry(
+			_addObjectRelationship(
+				_userSystemObjectDefinition, _objectDefinition1,
+				ObjectRelationshipConstants.TYPE_MANY_TO_MANY),
+			false);
+
+		// Many to one
+
+		_testPostCustomObjectEntryWithNestedSystemObjectEntry(
+			_addObjectRelationship(
+				_userSystemObjectDefinition, _objectDefinition1,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY),
+			true);
+
+		// One to many
+
+		_testPostCustomObjectEntryWithNestedSystemObjectEntry(
+			_addObjectRelationship(
+				_objectDefinition1, _userSystemObjectDefinition,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY),
+			false);
+	}
+
+	@Test
+	public void testPutCustomObjectEntryWithNestedSystemObjectEntry()
+		throws Exception {
+
+		// Many to many
+
+		_testPutCustomObjectEntryWithNestedSystemObjectEntry(
+			_addObjectRelationship(
+				_userSystemObjectDefinition, _objectDefinition1,
+				ObjectRelationshipConstants.TYPE_MANY_TO_MANY),
+			false);
+
+		// Many to one
+
+		_testPutCustomObjectEntryWithNestedSystemObjectEntry(
+			_addObjectRelationship(
+				_userSystemObjectDefinition, _objectDefinition1,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY),
+			true);
+
+		// One to many
+
+		_testPutCustomObjectEntryWithNestedSystemObjectEntry(
+			_addObjectRelationship(
+				_objectDefinition1, _userSystemObjectDefinition,
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY),
+			false);
 	}
 
 	@Test
@@ -534,13 +651,13 @@ public class ObjectEntryRelatedObjectsResourceTest {
 
 	@Test
 	public void testPutObjectEntryRelatedSystemObject() throws Exception {
-		_userSystemObjectDefinitionMetadata =
-			_systemObjectDefinitionMetadataRegistry.
-				getSystemObjectDefinitionMetadata("User");
+		_userSystemObjectDefinitionManager =
+			_systemObjectDefinitionManagerRegistry.
+				getSystemObjectDefinitionManager("User");
 
 		ObjectDefinition relatedObjectDefinition =
 			_objectDefinitionLocalService.fetchSystemObjectDefinition(
-				_userSystemObjectDefinitionMetadata.getName());
+				_userSystemObjectDefinitionManager.getName());
 
 		// Many to many relationship
 
@@ -677,6 +794,41 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		Assert.assertEquals(2, itemsJSONArray.length());
 	}
 
+	private void _assertSystemObjectEntryValue(
+			String customObjectEntryId, boolean manyToOne,
+			ObjectRelationship objectRelationship,
+			String systemObjectEntryValue, String systemObjectFieldName)
+		throws Exception {
+
+		JSONObject systemObjectEntryJSONObject = null;
+
+		JSONObject customObjectEntryJSONObject =
+			JSONFactoryUtil.createJSONObject(
+				_invoke(
+					Http.Method.GET,
+					_getLocation(
+						manyToOne, customObjectEntryId,
+						objectRelationship.getName())));
+
+		if (manyToOne) {
+			systemObjectEntryJSONObject =
+				customObjectEntryJSONObject.getJSONObject(
+					objectRelationship.getName());
+		}
+		else {
+			JSONArray itemsJSONArray = customObjectEntryJSONObject.getJSONArray(
+				"items");
+
+			Assert.assertEquals(1, itemsJSONArray.length());
+
+			systemObjectEntryJSONObject = itemsJSONArray.getJSONObject(0);
+		}
+
+		Assert.assertEquals(
+			systemObjectEntryJSONObject.get(systemObjectFieldName),
+			systemObjectEntryValue);
+	}
+
 	private Http.Options _createOptions(
 		Http.Method httpMethod, String location) {
 
@@ -691,6 +843,23 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		options.setMethod(httpMethod);
 
 		return options;
+	}
+
+	private String _getLocation(
+		boolean manyToOne, String objectEntryId,
+		String objectRelationshipName) {
+
+		if (manyToOne) {
+			return StringBundler.concat(
+				"http://localhost:8080/o/",
+				_objectDefinition1.getRESTContextPath(), StringPool.SLASH,
+				objectEntryId, "?nestedFields=", objectRelationshipName);
+		}
+
+		return StringBundler.concat(
+			"http://localhost:8080/o/", _objectDefinition1.getRESTContextPath(),
+			StringPool.SLASH, objectEntryId, StringPool.SLASH,
+			objectRelationshipName);
 	}
 
 	private String _getLocation(String name) {
@@ -721,6 +890,44 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		Http.Response response = options.getResponse();
 
 		return response.getResponseCode();
+	}
+
+	private UserAccount _randomUserAccount() throws Exception {
+		return new UserAccount() {
+			{
+				additionalName = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				alternateName = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				birthDate = RandomTestUtil.nextDate();
+				currentPassword = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				dashboardURL = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				dateCreated = RandomTestUtil.nextDate();
+				dateModified = RandomTestUtil.nextDate();
+				emailAddress =
+					StringUtil.toLowerCase(RandomTestUtil.randomString()) +
+						"@liferay.com";
+				familyName = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				givenName = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				honorificPrefix = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				honorificSuffix = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				image = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				jobTitle = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				lastLoginDate = RandomTestUtil.nextDate();
+				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				password = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				profileURL = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+			}
+		};
 	}
 
 	private void _testDeleteCustomObjectDefinition1WithCustomObjectDefinition2(
@@ -844,6 +1051,124 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		Assert.assertEquals(1, itemsJSONArray.length());
 	}
 
+	private void _testPostCustomObjectEntryWithInvalidNestedSystemObjectEntries(
+			ObjectRelationship objectRelationship, boolean manyToOne)
+		throws Exception {
+
+		// Flip manyToOne to ensure invalid nested system object entries
+
+		manyToOne = !manyToOne;
+
+		UserAccount userAccount = _randomUserAccount();
+
+		JSONObject jsonObject = HTTPTestUtil.invoke(
+			_toBody(manyToOne, objectRelationship, userAccount),
+			_objectDefinition1.getRESTContextPath(), Http.Method.POST);
+
+		Assert.assertEquals("BAD_REQUEST", jsonObject.get("status"));
+	}
+
+	private void _testPostCustomObjectEntryWithNestedSystemObjectEntry(
+			ObjectRelationship objectRelationship, boolean manyToOne)
+		throws Exception {
+
+		UserAccount userAccount = _randomUserAccount();
+
+		userAccount.setEmailAddress(
+			StringUtil.toLowerCase(RandomTestUtil.randomString()) +
+				"@liferay.com");
+
+		JSONObject jsonObject = HTTPTestUtil.invoke(
+			_toBody(manyToOne, objectRelationship, userAccount),
+			_objectDefinition1.getRESTContextPath(), Http.Method.POST);
+
+		Assert.assertEquals(
+			0,
+			jsonObject.getJSONObject(
+				"status"
+			).get(
+				"code"
+			));
+
+		_assertSystemObjectEntryValue(
+			jsonObject.getString("id"), manyToOne, objectRelationship,
+			userAccount.getEmailAddress(), "emailAddress");
+	}
+
+	private void _testPutCustomObjectEntryWithNestedSystemObjectEntry(
+			ObjectRelationship objectRelationship, boolean manyToOne)
+		throws Exception {
+
+		UserAccount postUserAccount = _randomUserAccount();
+
+		JSONObject customObjectEntryJSONObject = HTTPTestUtil.invoke(
+			_toBody(manyToOne, objectRelationship, postUserAccount),
+			_objectDefinition1.getRESTContextPath(), Http.Method.POST);
+
+		String customObjectEntryId = customObjectEntryJSONObject.getString(
+			"id");
+
+		UserAccount putUserAccount = _randomUserAccount();
+
+		putUserAccount.setExternalReferenceCode(
+			() -> {
+				JSONObject systemObjectEntryJSONObject =
+					JSONFactoryUtil.createJSONObject(
+						_invoke(
+							Http.Method.GET,
+							_getLocation(
+								manyToOne, customObjectEntryId,
+								objectRelationship.getName())));
+
+				if (manyToOne) {
+					return systemObjectEntryJSONObject.getString(
+						StringBundler.concat(
+							"r_", objectRelationship.getName(), "_",
+							StringUtil.replaceLast(
+								_userSystemObjectDefinition.
+									getPKObjectFieldName(),
+								"Id", "ERC")));
+				}
+
+				JSONArray itemsJSONArray =
+					systemObjectEntryJSONObject.getJSONArray("items");
+
+				systemObjectEntryJSONObject = itemsJSONArray.getJSONObject(0);
+
+				return systemObjectEntryJSONObject.getString(
+					"externalReferenceCode");
+			});
+		putUserAccount.setEmailAddress(
+			StringUtil.toLowerCase(RandomTestUtil.randomString()) +
+				"@liferay.com");
+
+		HTTPTestUtil.invoke(
+			_toBody(manyToOne, objectRelationship, putUserAccount),
+			StringBundler.concat(
+				_objectDefinition1.getRESTContextPath(), StringPool.SLASH,
+				customObjectEntryId),
+			Http.Method.PUT);
+
+		_assertSystemObjectEntryValue(
+			customObjectEntryId, manyToOne, objectRelationship, "emailAddress",
+			putUserAccount.getEmailAddress());
+	}
+
+	private String _toBody(
+			boolean manyToOne, ObjectRelationship objectRelationship,
+			UserAccount userAccount)
+		throws Exception {
+
+		JSONObject userAccountJSONObject = JSONFactoryUtil.createJSONObject(
+			userAccount.toString());
+
+		return JSONUtil.put(
+			objectRelationship.getName(),
+			manyToOne ? userAccountJSONObject :
+				JSONUtil.put(userAccountJSONObject)
+		).toString();
+	}
+
 	private static final String _OBJECT_FIELD_NAME_1 =
 		"x" + RandomTestUtil.randomString();
 
@@ -883,12 +1208,12 @@ public class ObjectEntryRelatedObjectsResourceTest {
 		new ArrayList<>();
 
 	@Inject
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 	private User _user1;
 	private User _user2;
 	private ObjectDefinition _userSystemObjectDefinition;
-	private SystemObjectDefinitionMetadata _userSystemObjectDefinitionMetadata;
+	private SystemObjectDefinitionManager _userSystemObjectDefinitionManager;
 
 }

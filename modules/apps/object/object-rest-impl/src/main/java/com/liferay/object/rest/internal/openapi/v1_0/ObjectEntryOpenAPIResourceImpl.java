@@ -33,7 +33,7 @@ import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.TreeMapBuilder;
 import com.liferay.portal.vulcan.batch.engine.Field;
@@ -77,8 +77,8 @@ public class ObjectEntryOpenAPIResourceImpl
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		OpenAPIResource openAPIResource,
-		SystemObjectDefinitionMetadataRegistry
-			systemObjectDefinitionMetadataRegistry) {
+		SystemObjectDefinitionManagerRegistry
+			systemObjectDefinitionManagerRegistry) {
 
 		_bundleContext = bundleContext;
 		_dtoConverterRegistry = dtoConverterRegistry;
@@ -90,8 +90,8 @@ public class ObjectEntryOpenAPIResourceImpl
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_openAPIResource = openAPIResource;
-		_systemObjectDefinitionMetadataRegistry =
-			systemObjectDefinitionMetadataRegistry;
+		_systemObjectDefinitionManagerRegistry =
+			systemObjectDefinitionManagerRegistry;
 	}
 
 	@Override
@@ -222,7 +222,7 @@ public class ObjectEntryOpenAPIResourceImpl
 				_objectDefinitionLocalService, this,
 				_objectEntryOpenAPIResourceProvider,
 				_objectRelationshipLocalService, _openAPIResource,
-				_systemObjectDefinitionMetadataRegistry),
+				_systemObjectDefinitionManagerRegistry),
 			_getOpenAPISchemaFilter(_objectDefinition),
 			new HashSet<Class<?>>() {
 				{
@@ -343,7 +343,7 @@ public class ObjectEntryOpenAPIResourceImpl
 	private final ObjectRelationshipLocalService
 		_objectRelationshipLocalService;
 	private final OpenAPIResource _openAPIResource;
-	private final SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private final SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 }

@@ -591,8 +591,8 @@ public class PullRequest {
 	}
 
 	public String getURL() {
-		return JenkinsResultsParserUtil.getGitHubApiUrl(
-			_gitHubRemoteGitRepositoryName, _ownerUsername, "pulls/" + _number);
+		return getURL(
+			getReceiverUsername(), getGitRepositoryName(), getNumber());
 	}
 
 	public boolean hasLabel(String labelName) {
@@ -1032,6 +1032,11 @@ public class PullRequest {
 		refresh();
 	}
 
+	protected String getGitHubApiUrl() {
+		return JenkinsResultsParserUtil.getGitHubApiUrl(
+			_gitHubRemoteGitRepositoryName, _ownerUsername, "pulls/" + _number);
+	}
+
 	protected String getIssueURL() {
 		return _jsonObject.getString("issue_url");
 	}
@@ -1146,7 +1151,7 @@ public class PullRequest {
 	private void _refreshJSONObject() {
 		try {
 			_jsonObject = JenkinsResultsParserUtil.toJSONObject(
-				getURL(), false);
+				getGitHubApiUrl(), false);
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);

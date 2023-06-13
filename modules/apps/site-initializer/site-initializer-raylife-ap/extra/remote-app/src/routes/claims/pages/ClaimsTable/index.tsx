@@ -691,7 +691,12 @@ const ClaimsTable = () => {
 		item: TableHeaders,
 		rowContent: TableRowContentType
 	) => {
-		if (item.clickable && item.key === 'id') {
+		const hasDetails =
+			item.clickable &&
+			item.key === 'id' &&
+			rowContent.productName === 'Auto';
+
+		if (hasDetails) {
 			handleRedirectToDetailsPages(
 				rowContent['id'] as number,
 				'claim-details'

@@ -19,6 +19,7 @@ import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductResource
 import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.search.Sort;
@@ -46,7 +47,6 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.ActionUtil;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
@@ -206,7 +206,7 @@ public abstract class BaseProductResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-admin-catalog/v1.0/products' -d $'{"active": ___, "attachments": ___, "catalogId": ___, "categories": ___, "configuration": ___, "createDate": ___, "customFields": ___, "defaultSku": ___, "description": ___, "diagram": ___, "displayDate": ___, "expando": ___, "expirationDate": ___, "externalReferenceCode": ___, "images": ___, "linkedProducts": ___, "mappedProducts": ___, "metaDescription": ___, "metaKeyword": ___, "metaTitle": ___, "modifiedDate": ___, "name": ___, "neverExpire": ___, "pins": ___, "productAccountGroupFilter": ___, "productAccountGroups": ___, "productChannelFilter": ___, "productChannels": ___, "productConfiguration": ___, "productOptions": ___, "productSpecifications": ___, "productStatus": ___, "productType": ___, "relatedProducts": ___, "shippingConfiguration": ___, "shortDescription": ___, "skus": ___, "subscriptionConfiguration": ___, "tags": ___, "taxConfiguration": ___, "urls": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-admin-catalog/v1.0/products' -d $'{"active": ___, "attachments": ___, "catalogId": ___, "categories": ___, "configuration": ___, "createDate": ___, "customFields": ___, "defaultSku": ___, "description": ___, "diagram": ___, "displayDate": ___, "expando": ___, "expirationDate": ___, "externalReferenceCode": ___, "images": ___, "linkedProducts": ___, "mappedProducts": ___, "metaDescription": ___, "metaKeyword": ___, "metaTitle": ___, "modifiedDate": ___, "name": ___, "neverExpire": ___, "pins": ___, "productAccountGroupFilter": ___, "productAccountGroups": ___, "productChannelFilter": ___, "productChannels": ___, "productConfiguration": ___, "productOptions": ___, "productSpecifications": ___, "productStatus": ___, "productType": ___, "productVirtualSettings": ___, "relatedProducts": ___, "shippingConfiguration": ___, "shortDescription": ___, "skus": ___, "subscriptionConfiguration": ___, "tags": ___, "taxConfiguration": ___, "urls": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "Product")}
@@ -329,7 +329,7 @@ public abstract class BaseProductResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-admin-catalog/v1.0/products/by-externalReferenceCode/{externalReferenceCode}' -d $'{"active": ___, "attachments": ___, "catalogId": ___, "categories": ___, "configuration": ___, "createDate": ___, "customFields": ___, "defaultSku": ___, "description": ___, "diagram": ___, "displayDate": ___, "expando": ___, "expirationDate": ___, "externalReferenceCode": ___, "images": ___, "linkedProducts": ___, "mappedProducts": ___, "metaDescription": ___, "metaKeyword": ___, "metaTitle": ___, "modifiedDate": ___, "name": ___, "neverExpire": ___, "pins": ___, "productAccountGroupFilter": ___, "productAccountGroups": ___, "productChannelFilter": ___, "productChannels": ___, "productConfiguration": ___, "productOptions": ___, "productSpecifications": ___, "productStatus": ___, "productType": ___, "relatedProducts": ___, "shippingConfiguration": ___, "shortDescription": ___, "skus": ___, "subscriptionConfiguration": ___, "tags": ___, "taxConfiguration": ___, "urls": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-admin-catalog/v1.0/products/by-externalReferenceCode/{externalReferenceCode}' -d $'{"active": ___, "attachments": ___, "catalogId": ___, "categories": ___, "configuration": ___, "createDate": ___, "customFields": ___, "defaultSku": ___, "description": ___, "diagram": ___, "displayDate": ___, "expando": ___, "expirationDate": ___, "externalReferenceCode": ___, "images": ___, "linkedProducts": ___, "mappedProducts": ___, "metaDescription": ___, "metaKeyword": ___, "metaTitle": ___, "modifiedDate": ___, "name": ___, "neverExpire": ___, "pins": ___, "productAccountGroupFilter": ___, "productAccountGroups": ___, "productChannelFilter": ___, "productChannels": ___, "productConfiguration": ___, "productOptions": ___, "productSpecifications": ___, "productStatus": ___, "productType": ___, "productVirtualSettings": ___, "relatedProducts": ___, "shippingConfiguration": ___, "shortDescription": ___, "skus": ___, "subscriptionConfiguration": ___, "tags": ___, "taxConfiguration": ___, "urls": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -583,7 +583,7 @@ public abstract class BaseProductResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-admin-catalog/v1.0/products/{id}' -d $'{"active": ___, "attachments": ___, "catalogId": ___, "categories": ___, "configuration": ___, "createDate": ___, "customFields": ___, "defaultSku": ___, "description": ___, "diagram": ___, "displayDate": ___, "expando": ___, "expirationDate": ___, "externalReferenceCode": ___, "images": ___, "linkedProducts": ___, "mappedProducts": ___, "metaDescription": ___, "metaKeyword": ___, "metaTitle": ___, "modifiedDate": ___, "name": ___, "neverExpire": ___, "pins": ___, "productAccountGroupFilter": ___, "productAccountGroups": ___, "productChannelFilter": ___, "productChannels": ___, "productConfiguration": ___, "productOptions": ___, "productSpecifications": ___, "productStatus": ___, "productType": ___, "relatedProducts": ___, "shippingConfiguration": ___, "shortDescription": ___, "skus": ___, "subscriptionConfiguration": ___, "tags": ___, "taxConfiguration": ___, "urls": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-admin-catalog/v1.0/products/{id}' -d $'{"active": ___, "attachments": ___, "catalogId": ___, "categories": ___, "configuration": ___, "createDate": ___, "customFields": ___, "defaultSku": ___, "description": ___, "diagram": ___, "displayDate": ___, "expando": ___, "expirationDate": ___, "externalReferenceCode": ___, "images": ___, "linkedProducts": ___, "mappedProducts": ___, "metaDescription": ___, "metaKeyword": ___, "metaTitle": ___, "modifiedDate": ___, "name": ___, "neverExpire": ___, "pins": ___, "productAccountGroupFilter": ___, "productAccountGroups": ___, "productChannelFilter": ___, "productChannels": ___, "productConfiguration": ___, "productOptions": ___, "productSpecifications": ___, "productStatus": ___, "productType": ___, "productVirtualSettings": ___, "relatedProducts": ___, "shippingConfiguration": ___, "shortDescription": ___, "skus": ___, "subscriptionConfiguration": ___, "tags": ___, "taxConfiguration": ___, "urls": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {

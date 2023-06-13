@@ -70,7 +70,7 @@ public class DLFileEntryDDMFormInstanceRecordUpgradeProcess
 					String attributeValue = StringUtil.unquote(
 						resultSet.getString("largeAttributeValue"));
 
-					if (attributeValue.isEmpty()) {
+					if ((attributeValue == null) || attributeValue.isEmpty()) {
 						attributeValue = StringUtil.unquote(
 							resultSet.getString("smallAttributeValue"));
 					}

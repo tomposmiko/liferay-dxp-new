@@ -16,7 +16,7 @@ definition {
 
 			User.firstLoginPG();
 
-			Testray.addTR2Site(siteName = ${testSiteName});
+			Testray.addTestraySite(siteName = ${testSiteName});
 		}
 
 		task ("Add a user") {
@@ -37,7 +37,11 @@ definition {
 
 		Testray.tearDownCP();
 
-		Testray.testrayApisTearDown();
+		Testray.tearDownCP();
+
+		ClientExtensionGeneral.goToRemoteAppsPortlet();
+
+		ClientExtensionGeneral.deleteRemoteApp(tableEntry = "Testray");
 
 		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
@@ -106,15 +110,6 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-162987 - Verify if as an Administrador can change his Role"
-	@ignore = "true"
-	@priority = 5
-	test CanChangeRole {
-
-		// TODO LPS-162987 CanChangeRole pending implementation
-
-	}
-
 	@description = "This is a test for LPS-162986 - Verify if as an User can edit account information"
 	@priority = 4
 	test CanEditAccountInformation {
@@ -133,9 +128,7 @@ definition {
 
 			TestrayManage.selectOptionsManage(itemValue = "Manage Users");
 
-			TestrayContextMenu.clickContextMenuProjects(name = "changedfirstname Updateln");
-
-			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Edit");
+			Testray.goToProjectPage(projectName = "changedfirstname Updateln");
 		}
 
 		task ("Then the account information is displayed in Manage Users and Manage Account") {

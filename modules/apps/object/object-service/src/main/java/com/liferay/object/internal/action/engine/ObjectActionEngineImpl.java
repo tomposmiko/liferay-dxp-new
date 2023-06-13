@@ -30,7 +30,7 @@ import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -80,7 +80,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 				objectAction, objectDefinition, payloadJSONObject, userId,
 				ObjectEntryVariablesUtil.getVariables(
 					_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-					_systemObjectDefinitionMetadataRegistry));
+					_systemObjectDefinitionManagerRegistry));
 		}
 		finally {
 			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(false);
@@ -125,7 +125,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			Map<String, Object> variables =
 				ObjectEntryVariablesUtil.getVariables(
 					_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-					_systemObjectDefinitionMetadataRegistry);
+					_systemObjectDefinitionManagerRegistry);
 
 			for (ObjectAction objectAction :
 					_objectActionLocalService.getObjectActions(
@@ -255,8 +255,8 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 	private PermissionCheckerFactory _permissionCheckerFactory;
 
 	@Reference
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

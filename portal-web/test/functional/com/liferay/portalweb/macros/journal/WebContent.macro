@@ -1362,7 +1362,7 @@ definition {
 				value1 = "Draft");
 		}
 		else {
-			PortletEntry.publish();
+			Button.clickPublish();
 		}
 	}
 
@@ -2372,15 +2372,6 @@ definition {
 		AssertTextEquals.assertPartialText(
 			locator1 = "APAsset#ASSET_VIEW_CONTENT",
 			value1 = ${webContentContent});
-	}
-
-	macro viewPublicationTimelineEntry {
-		Click(locator1 = "WCEditWebContent#TIMELINE_TAB");
-
-		AssertElementPresent(
-			key_index = ${index},
-			key_publicationName = ${publicationName},
-			locator1 = "WCEditWebContent#TIMELINE_ENTRY_SPECIFIC");
 	}
 
 	macro viewRepeatedField {

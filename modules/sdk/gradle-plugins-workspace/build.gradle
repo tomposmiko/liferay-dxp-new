@@ -119,20 +119,20 @@ copyWorkspacesSamples {
 
 dependencies {
 	compile group: "com.bmuschko", name: "gradle-docker-plugin", version: "6.7.0"
-	compile group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "2.13.3"
+	compile group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "2.10.3"
 	compile group: "com.github.docker-java", name: "docker-java", version: "3.2.8"
 	compile group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
 	compile group: "com.liferay", name: "com.liferay.ant.bnd", version: "3.2.9"
-	compile(group: "com.liferay", name: "com.liferay.gradle.plugins", version: "14.0.107") {
+	compile(group: "com.liferay", name: "com.liferay.gradle.plugins", version: "14.0.111") {
 		exclude group: "biz.aQute.bnd", module: "biz.aQute.bnd"
 	}
 	compile(group: "com.liferay", name: "com.liferay.gradle.plugins.css.builder", version: "5.0.7") {
 		exclude group: "biz.aQute.bnd", module: "biz.aQute.bnd"
 	}
-	compile(group: "com.liferay", name: "com.liferay.gradle.plugins.poshi.runner", version: "3.0.65") {
+	compile(group: "com.liferay", name: "com.liferay.gradle.plugins.poshi.runner", version: "3.0.66") {
 		exclude group: "biz.aQute.bnd", module: "biz.aQute.bnd"
 	}
-	compile group: "com.liferay", name: "com.liferay.gradle.plugins.source.formatter", version: "5.2.7"
+	compile group: "com.liferay", name: "com.liferay.gradle.plugins.source.formatter", version: "5.2.12"
 	compile group: "com.liferay", name: "com.liferay.gradle.plugins.target.platform", version: "3.0.9"
 	compile(group: "com.liferay", name: "com.liferay.gradle.plugins.theme.builder", version: "2.0.23") {
 		exclude group: "biz.aQute.bnd", module: "biz.aQute.bnd"
@@ -214,4 +214,9 @@ liferayOSGi {
 
 processResources {
 	from downloadProductInfo
+}
+
+updateFileVersions {
+	match(/name: "com\.liferay\.gradle\.plugins\.workspace", version: "(\d.+)"/, "../../../workspaces/liferay-sample-workspace/settings.gradle")
+	match(/name: "com\.liferay\.gradle\.plugins\.workspace", version: "(\d.+)"/, "../../../workspaces/refresh_liferay_sample_workspace.sh")
 }

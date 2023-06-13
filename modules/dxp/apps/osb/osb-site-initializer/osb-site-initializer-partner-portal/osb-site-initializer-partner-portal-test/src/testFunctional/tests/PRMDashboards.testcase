@@ -15,8 +15,10 @@ definition {
 			User.firstLoginPG();
 		}
 
-		task ("Create a new Partner Portal Site") {
-			PRMUtils.addPRMSite();
+		task ("Create a new Partner Portal Site and connect with Salesforce") {
+			PRMUtils.addSite();
+
+			PRMUtils.connectWithSalesforce();
 		}
 
 		task ("Add a partner user") {
@@ -47,17 +49,11 @@ definition {
 		}
 
 		task ("Add a new account and assign the created user to the account") {
-			JSONAccountEntry.addAccountEntry(
-				accountEntryName = "Company Name 1",
-				accountEntryType = "Business");
+			JSONPRM.addAccount();
 
 			JSONAccountEntryUser.addExistUsertoAccount(
 				accountEntryName = "Company Name 1",
 				userEmailAddress = "partner@liferay.com");
-		}
-
-		task ("Add a currency to the created account") {
-			JSONPRM.addCurrency();
 		}
 
 		task ("Go to Partner Portal and login with the created user") {
@@ -89,15 +85,18 @@ definition {
 				userLoginEmailAddress = "test@liferay.com",
 				userLoginFullName = "Test Test");
 
-			JSONGroup.deleteGroupByName(groupName = "Partner Portal");
-
-			Account.tearDownCP();
+			PRMUtils.tearDown();
 		}
 	}
 
 	@description = "This is a test for LPS-179914. Verify that the value of Approved MDFs are displayed on MDF Dashboard"
 	@priority = 4
 	test MDFApprovedValueAppearInDashboard {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMDashboards#MDFApprovedValueAppearInDashboard";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		var budgetValue = 2000;
 
 		task ("Given I get the current amount of Approved MDF Value") {
@@ -143,6 +142,11 @@ definition {
 	@description = "This is a test for LPS-177308. Verify that the value of Requested MDFs are displayed on MDF Dashboard"
 	@priority = 4
 	test MDFRequestedValueAppearInDashboard {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMDashboards#MDFRequestedValueAppearInDashboard";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		var budgetValue = 2000;
 
 		task ("Given I get the current amount of requested MDF Value") {

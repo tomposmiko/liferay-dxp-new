@@ -37,8 +37,6 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
-import java.util.Optional;
-
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
@@ -55,7 +53,7 @@ import org.osgi.service.component.annotations.Reference;
 		"dto.class.name=com.liferay.asset.kernel.model.AssetCategory",
 		"version=v1.0"
 	},
-	service = {DTOConverter.class, TaxonomyCategoryDTOConverter.class}
+	service = DTOConverter.class
 )
 public class TaxonomyCategoryDTOConverter
 	implements DTOConverter<AssetCategory, TaxonomyCategory> {
@@ -171,12 +169,9 @@ public class TaxonomyCategoryDTOConverter
 					});
 				setTaxonomyCategoryUsageCount(
 					() -> {
-						Optional<UriInfo> uriInfoOptional =
-							dtoConverterContext.getUriInfoOptional();
+						UriInfo uriInfo = dtoConverterContext.getUriInfo();
 
-						if (uriInfoOptional.isPresent()) {
-							UriInfo uriInfo = uriInfoOptional.get();
-
+						if (uriInfo != null) {
 							MultivaluedMap<String, String> queryParameters =
 								uriInfo.getQueryParameters();
 

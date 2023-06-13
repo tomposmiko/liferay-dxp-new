@@ -91,14 +91,18 @@ export function CreateNewAppPage({onClickContinue}: CreateNewAppPageProps) {
 
 			<NewAppPageFooterButtons
 				onClickContinue={() => {
-					getCatalogId().then((catalogId: number) => {
-						dispatch({
-							payload: {
-								value: catalogId,
-							},
-							type: TYPES.UPDATE_CATALOG_ID,
+					getCatalogId()
+						.then((catalogId: number) => {
+							dispatch({
+								payload: {
+									value: catalogId,
+								},
+								type: TYPES.UPDATE_CATALOG_ID,
+							});
+						})
+						.catch((error: string) => {
+							console.error(error);
 						});
-					});
 
 					onClickContinue();
 				}}

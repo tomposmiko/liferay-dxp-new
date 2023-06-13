@@ -67,7 +67,7 @@ import com.liferay.object.service.base.ObjectDefinitionLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectEntryPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
@@ -222,41 +222,40 @@ public class ObjectDefinitionLocalServiceImpl
 	@Override
 	public ObjectDefinition addOrUpdateSystemObjectDefinition(
 			long companyId,
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata)
+			SystemObjectDefinitionManager systemObjectDefinitionManager)
 		throws PortalException {
 
 		ObjectDefinition objectDefinition =
 			objectDefinitionPersistence.fetchByC_N(
-				companyId, systemObjectDefinitionMetadata.getName());
+				companyId, systemObjectDefinitionManager.getName());
 
-		long userId = _userLocalService.getDefaultUserId(companyId);
+		long userId = _userLocalService.getGuestUserId(companyId);
 
 		if (objectDefinition == null) {
-			Table table = systemObjectDefinitionMetadata.getTable();
+			Table table = systemObjectDefinitionManager.getTable();
 			Column<?, Long> primaryKeyColumn =
-				systemObjectDefinitionMetadata.getPrimaryKeyColumn();
+				systemObjectDefinitionManager.getPrimaryKeyColumn();
 
 			return addSystemObjectDefinition(
-				userId, systemObjectDefinitionMetadata.getModelClassName(),
+				userId, systemObjectDefinitionManager.getModelClassName(),
 				table.getTableName(), false,
-				systemObjectDefinitionMetadata.getLabelMap(), false,
-				systemObjectDefinitionMetadata.getName(), null, null,
+				systemObjectDefinitionManager.getLabelMap(), false,
+				systemObjectDefinitionManager.getName(), null, null,
 				primaryKeyColumn.getName(), primaryKeyColumn.getName(),
-				systemObjectDefinitionMetadata.getPluralLabelMap(),
-				systemObjectDefinitionMetadata.getScope(),
-				systemObjectDefinitionMetadata.getTitleObjectFieldName(),
-				systemObjectDefinitionMetadata.getVersion(),
+				systemObjectDefinitionManager.getPluralLabelMap(),
+				systemObjectDefinitionManager.getScope(),
+				systemObjectDefinitionManager.getTitleObjectFieldName(),
+				systemObjectDefinitionManager.getVersion(),
 				WorkflowConstants.STATUS_APPROVED,
-				systemObjectDefinitionMetadata.getObjectFields());
+				systemObjectDefinitionManager.getObjectFields());
 		}
 
-		objectDefinition.setVersion(
-			systemObjectDefinitionMetadata.getVersion());
+		objectDefinition.setVersion(systemObjectDefinitionManager.getVersion());
 
 		objectDefinition = objectDefinitionPersistence.update(objectDefinition);
 
 		List<ObjectField> newObjectFields =
-			systemObjectDefinitionMetadata.getObjectFields();
+			systemObjectDefinitionManager.getObjectFields();
 
 		List<ObjectField> oldObjectFields =
 			_objectFieldPersistence.findByODI_DTN(

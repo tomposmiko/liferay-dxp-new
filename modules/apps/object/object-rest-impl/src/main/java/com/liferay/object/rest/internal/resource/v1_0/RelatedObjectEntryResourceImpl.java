@@ -26,8 +26,8 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.GuestOrUserUtil;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
@@ -272,13 +272,13 @@ public class RelatedObjectEntryResourceImpl
 	}
 
 	private ObjectDefinition _getSystemObjectDefinition(String previousPath) {
-		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-			_getSystemObjectDefinitionMetadata(previousPath);
+		SystemObjectDefinitionManager systemObjectDefinitionManager =
+			_getSystemObjectDefinitionManager(previousPath);
 
 		ObjectDefinition systemObjectDefinition =
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				CompanyThreadLocal.getCompanyId(),
-				systemObjectDefinitionMetadata.getName());
+				systemObjectDefinitionManager.getName());
 
 		if (systemObjectDefinition != null) {
 			return systemObjectDefinition;
@@ -286,10 +286,10 @@ public class RelatedObjectEntryResourceImpl
 
 		throw new NotFoundException(
 			"No system object definition metadata for name \"" +
-				systemObjectDefinitionMetadata.getName() + "\"");
+				systemObjectDefinitionManager.getName() + "\"");
 	}
 
-	private SystemObjectDefinitionMetadata _getSystemObjectDefinitionMetadata(
+	private SystemObjectDefinitionManager _getSystemObjectDefinitionManager(
 		String previousPath) {
 
 		URI uri = _uriInfo.getBaseUri();
@@ -301,19 +301,19 @@ public class RelatedObjectEntryResourceImpl
 		for (ObjectDefinition systemObjectDefinition :
 				_objectDefinitionLocalService.getSystemObjectDefinitions()) {
 
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						systemObjectDefinition.getName());
 
 			JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-				systemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+				systemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 			if (StringUtil.equals(
 					jaxRsApplicationDescriptor.getRESTContextPath(),
 					restContextPath)) {
 
-				return systemObjectDefinitionMetadata;
+				return systemObjectDefinitionManager;
 			}
 		}
 
@@ -346,8 +346,8 @@ public class RelatedObjectEntryResourceImpl
 		_persistedModelLocalServiceRegistry;
 
 	@Reference
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 	@Context
 	private UriInfo _uriInfo;

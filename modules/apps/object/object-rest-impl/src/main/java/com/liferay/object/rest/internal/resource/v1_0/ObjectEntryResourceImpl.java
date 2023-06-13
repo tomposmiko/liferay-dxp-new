@@ -26,8 +26,8 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -66,8 +66,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipService objectRelationshipService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
-		SystemObjectDefinitionMetadataRegistry
-			systemObjectDefinitionMetadataRegistry) {
+		SystemObjectDefinitionManagerRegistry
+			systemObjectDefinitionManagerRegistry) {
 
 		_dtoConverterRegistry = dtoConverterRegistry;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
@@ -76,8 +76,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectRelationshipService = objectRelationshipService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
-		_systemObjectDefinitionMetadataRegistry =
-			systemObjectDefinitionMetadataRegistry;
+		_systemObjectDefinitionManagerRegistry =
+			systemObjectDefinitionManagerRegistry;
 	}
 
 	@Override
@@ -456,25 +456,6 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			_objectDefinition.getObjectDefinitionId();
 	}
 
-	@Override
-	protected void preparePatch(
-		ObjectEntry objectEntry, ObjectEntry existingObjectEntry) {
-
-		if (objectEntry.getProperties() == null) {
-			return;
-		}
-
-		existingObjectEntry.setProperties(
-			() -> {
-				Map<String, Object> properties =
-					existingObjectEntry.getProperties();
-
-				properties.putAll(objectEntry.getProperties());
-
-				return properties;
-			});
-	}
-
 	private DefaultDTOConverterContext _getDTOConverterContext(
 		Long objectEntryId) {
 
@@ -494,13 +475,13 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				objectDefinitionId);
 
 		if (objectDefinition.isSystem()) {
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						objectDefinition.getName());
 
 			BaseModel<?> baseModel =
-				systemObjectDefinitionMetadata.
+				systemObjectDefinitionManager.
 					getBaseModelByExternalReferenceCode(
 						externalReferenceCode, objectDefinition.getCompanyId());
 
@@ -595,7 +576,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	@Context
 	private Predicate _predicate;
 
-	private final SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private final SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 }

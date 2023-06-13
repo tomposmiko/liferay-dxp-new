@@ -2,6 +2,7 @@ import {DashboardListItems} from 'liferay-marketplace-custom-element/src/compone
 import {AppProps} from 'liferay-marketplace-custom-element/src/components/DashboardTable/DashboardTable';
 
 import appsIcon from '../../assets/icons/apps-fill.svg';
+import businessIcon from '../../assets/icons/business-center.svg';
 import membersIcon from '../../assets/icons/person-fill.svg';
 
 export const appList: AppProps[] = [];
@@ -32,6 +33,12 @@ export const initialDashboardNavigationItems: DashboardListItems[] = [
 		itemSelected: false,
 		itemTitle: 'Members',
 	},
+	{
+		itemIcon: businessIcon,
+		itemName: 'account',
+		itemSelected: false,
+		itemTitle: 'Account',
+	},
 ];
 
 export type MemberProps = {
@@ -39,6 +46,8 @@ export type MemberProps = {
 	dateCreated: string;
 	email: string;
 	image: string;
+	isCustomerAccount: boolean;
+	isPublisherAccount: boolean;
 	lastLoginDate: string;
 	name: string;
 	role: string;
@@ -49,16 +58,16 @@ export type ProductResponseProps = {
 	catalogId: number;
 	externalReferenceCode: string;
 	lastUpdatedBy: string;
+	modifiedDate: string;
 	name: {en_US: string};
 	productId: number;
-	workflowStatusInfo: {label: string};
 	thumbnail: string;
-	modifiedDate: string;
+	workflowStatusInfo: {label: string};
 };
 
 export type ProductSpecificationProps = {
-	items: [];
 	id: number;
+	items: [];
 	productId: number;
 	specificationKey: string;
 	value: {};
@@ -70,12 +79,12 @@ export type RoleBriefProps = {
 };
 
 export type UserAccountProps = {
-	accountBriefs: AccountBriefProps[];
+	accountBriefs: AccountBrief[];
 	dateCreated: string;
 	emailAddress: string;
+	id: number;
 	image: string;
 	lastLoginDate: string;
 	name: string;
 	roleBriefs: RoleBriefProps[];
-	id: number;
 };

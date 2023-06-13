@@ -56,8 +56,8 @@ import com.liferay.object.service.ObjectValidationRuleLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.ObjectViewService;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
@@ -448,39 +448,45 @@ public class ObjectDefinitionResourceImpl
 		}
 
 		if (serviceBuilderObjectDefinition.isUnmodifiableSystemObject()) {
-			return _toObjectDefinition(
+			serviceBuilderObjectDefinition =
 				_objectDefinitionService.updateSystemObjectDefinition(
 					objectDefinition.getExternalReferenceCode(),
-					objectDefinitionId, titleObjectFieldId));
+					objectDefinitionId, titleObjectFieldId);
 		}
-
-		serviceBuilderObjectDefinition =
-			_objectDefinitionService.updateCustomObjectDefinition(
-				objectDefinition.getExternalReferenceCode(), objectDefinitionId,
-				GetterUtil.getLong(accountEntryRestrictedObjectFieldId), 0,
-				titleObjectFieldId,
-				GetterUtil.getBoolean(
-					objectDefinition.getAccountEntryRestricted()),
-				GetterUtil.getBoolean(
-					objectDefinition.getActive(),
-					serviceBuilderObjectDefinition.getActive()),
-				GetterUtil.getBoolean(
-					objectDefinition.getEnableCategorization(), true),
-				GetterUtil.getBoolean(objectDefinition.getEnableComments()),
-				GetterUtil.getBoolean(objectDefinition.getEnableLocalization()),
-				GetterUtil.getBoolean(
-					objectDefinition.getEnableObjectEntryHistory()),
-				LocalizedMapUtil.getLocalizedMap(objectDefinition.getLabel()),
-				objectDefinition.getName(), objectDefinition.getPanelAppOrder(),
-				objectDefinition.getPanelCategoryKey(),
-				GetterUtil.getBoolean(objectDefinition.getPortlet()),
-				LocalizedMapUtil.getLocalizedMap(
-					objectDefinition.getPluralLabel()),
-				objectDefinition.getScope());
+		else {
+			serviceBuilderObjectDefinition =
+				_objectDefinitionService.updateCustomObjectDefinition(
+					objectDefinition.getExternalReferenceCode(),
+					objectDefinitionId,
+					GetterUtil.getLong(accountEntryRestrictedObjectFieldId), 0,
+					titleObjectFieldId,
+					GetterUtil.getBoolean(
+						objectDefinition.getAccountEntryRestricted()),
+					GetterUtil.getBoolean(
+						objectDefinition.getActive(),
+						serviceBuilderObjectDefinition.getActive()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableCategorization(), true),
+					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableLocalization()),
+					GetterUtil.getBoolean(
+						objectDefinition.getEnableObjectEntryHistory()),
+					LocalizedMapUtil.getLocalizedMap(
+						objectDefinition.getLabel()),
+					objectDefinition.getName(),
+					objectDefinition.getPanelAppOrder(),
+					objectDefinition.getPanelCategoryKey(),
+					GetterUtil.getBoolean(objectDefinition.getPortlet()),
+					LocalizedMapUtil.getLocalizedMap(
+						objectDefinition.getPluralLabel()),
+					objectDefinition.getScope());
+		}
 
 		List<com.liferay.object.model.ObjectField> serviceBuilderObjectFields =
 			new ArrayList<>(
-				_objectFieldLocalService.getObjectFields(objectDefinitionId));
+				_objectFieldLocalService.getObjectFields(
+					objectDefinitionId, false));
 
 		if (objectDefinition.getObjectFields() != null) {
 			for (ObjectField objectField : objectDefinition.getObjectFields()) {
@@ -705,14 +711,14 @@ public class ObjectDefinitionResourceImpl
 		String restContextPath = StringPool.BLANK;
 
 		if (objectDefinition.isSystem()) {
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						objectDefinition.getName());
 
-			if (systemObjectDefinitionMetadata != null) {
+			if (systemObjectDefinitionManager != null) {
 				JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-					systemObjectDefinitionMetadata.
+					systemObjectDefinitionManager.
 						getJaxRsApplicationDescriptor();
 
 				restContextPath =
@@ -1011,7 +1017,7 @@ public class ObjectDefinitionResourceImpl
 	private ObjectViewService _objectViewService;
 
 	@Reference
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 }

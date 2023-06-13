@@ -1,7 +1,6 @@
-import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
-import {Dispatch, useState} from 'react';
+import {Dispatch} from 'react';
 
 import {DashboardNavigationList} from './DashboardNavigationList';
 
@@ -21,7 +20,8 @@ interface DashboardNavigationProps {
 	accounts: Account[];
 	currentAccount: Account;
 	dashboardNavigationItems: DashboardListItems[];
-	onSelectAppChange: (value: AppProps) => void;
+	onSelectAppChange?: (value: AppProps) => void;
+	selectedApp?: AppProps;
 	setDashboardNavigationItems: (values: DashboardListItems[]) => void;
 	setSelectedAccount: Dispatch<React.SetStateAction<Account>>;
 }

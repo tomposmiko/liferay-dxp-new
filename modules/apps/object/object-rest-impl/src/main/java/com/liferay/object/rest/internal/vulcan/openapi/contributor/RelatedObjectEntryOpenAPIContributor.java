@@ -22,8 +22,8 @@ import com.liferay.object.rest.openapi.v1_0.ObjectEntryOpenAPIResourceProvider;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -65,36 +65,36 @@ public class RelatedObjectEntryOpenAPIContributor
 			return;
 		}
 
-		Map<ObjectDefinition, SystemObjectDefinitionMetadata>
-			systemObjectDefinitionMetadataMap = new HashMap<>();
+		Map<ObjectDefinition, SystemObjectDefinitionManager>
+			systemObjectDefinitionManagerMap = new HashMap<>();
 
 		for (ObjectDefinition systemObjectDefinition :
 				_objectDefinitionLocalService.getSystemObjectDefinitions()) {
 
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						systemObjectDefinition.getName());
 
-			if (systemObjectDefinitionMetadata == null) {
+			if (systemObjectDefinitionManager == null) {
 				continue;
 			}
 
 			JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-				systemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+				systemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 			String path = openAPIContext.getPath();
 
 			if (path.contains(
 					jaxRsApplicationDescriptor.getApplicationPath())) {
 
-				systemObjectDefinitionMetadataMap.put(
-					systemObjectDefinition, systemObjectDefinitionMetadata);
+				systemObjectDefinitionManagerMap.put(
+					systemObjectDefinition, systemObjectDefinitionManager);
 			}
 		}
 
-		for (Map.Entry<ObjectDefinition, SystemObjectDefinitionMetadata> entry :
-				systemObjectDefinitionMetadataMap.entrySet()) {
+		for (Map.Entry<ObjectDefinition, SystemObjectDefinitionManager> entry :
+				systemObjectDefinitionManagerMap.entrySet()) {
 
 			ObjectDefinition systemObjectDefinition = entry.getKey();
 
@@ -111,12 +111,12 @@ public class RelatedObjectEntryOpenAPIContributor
 
 	@Activate
 	protected void activate() {
-		init(_dtoConverterRegistry, _systemObjectDefinitionMetadataRegistry);
+		init(_dtoConverterRegistry, _systemObjectDefinitionManagerRegistry);
 	}
 
 	private void _contribute(
 			OpenAPI openAPI, ObjectDefinition systemObjectDefinition,
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata,
+			SystemObjectDefinitionManager systemObjectDefinitionManager,
 			ObjectRelationship systemObjectRelationship, String version)
 		throws Exception {
 
@@ -143,7 +143,7 @@ public class RelatedObjectEntryOpenAPIContributor
 			relatedObjectDefinition.isUnmodifiableSystemObject(), openAPI);
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			systemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			systemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 		String schemaName = getSchemaName(systemObjectDefinition);
 
 		String name = StringBundler.concat(
@@ -380,7 +380,7 @@ public class RelatedObjectEntryOpenAPIContributor
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Reference
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 }

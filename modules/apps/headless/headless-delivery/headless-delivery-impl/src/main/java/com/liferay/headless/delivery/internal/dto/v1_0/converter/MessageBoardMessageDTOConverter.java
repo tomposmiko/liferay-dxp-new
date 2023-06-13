@@ -41,10 +41,6 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
-import java.util.Optional;
-
-import javax.ws.rs.core.UriInfo;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -53,7 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "dto.class.name=com.liferay.message.boards.model.MBMessage",
-	service = {DTOConverter.class, MessageBoardMessageDTOConverter.class}
+	service = DTOConverter.class
 )
 public class MessageBoardMessageDTOConverter
 	implements DTOConverter<MBMessage, MessageBoardMessage> {
@@ -132,19 +128,16 @@ public class MessageBoardMessageDTOConverter
 				setCreatorStatistics(
 					() -> {
 						if (mbMessage.isAnonymous() || (user == null) ||
-							user.isDefaultUser()) {
+							user.isGuestUser()) {
 
 							return null;
 						}
-
-						Optional<UriInfo> uriInfoOptional =
-							dtoConverterContext.getUriInfoOptional();
 
 						return CreatorStatisticsUtil.toCreatorStatistics(
 							mbMessage.getGroupId(),
 							String.valueOf(dtoConverterContext.getLocale()),
 							_mbStatsUserLocalService,
-							uriInfoOptional.orElse(null), user);
+							dtoConverterContext.getUriInfo(), user);
 					});
 				setParentMessageBoardMessageId(
 					() -> {

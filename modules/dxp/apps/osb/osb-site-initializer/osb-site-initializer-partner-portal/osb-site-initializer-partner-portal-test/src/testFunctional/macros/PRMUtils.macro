@@ -1,17 +1,42 @@
 definition {
 
-	macro addPRMSite {
+	macro addSite {
+		var siteTemplateName = "Liferay OSB Site Initializer Partner Portal";
+		var siteName = "Partner Portal";
+
 		Site.openSitesAdmin();
 
-		TeamExtranet.addSiteTemplateCP(
-			siteName = "Partner Portal",
-			siteTemplateName = "Liferay OSB Site Initializer Partner Portal");
+		if (IsElementPresent(key_tableEntry = "Partner Portal", locator1 = "LexiconTable#TABLE_ENTRY")) {
+			PRMUtils.tearDown();
+
+			Site.openSitesAdmin();
+		}
+
+		LexiconEntry.gotoAdd();
+
+		LexiconCard.clickCard(card = ${siteTemplateName});
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		PortletEntry.inputName(name = ${siteName});
+
+		Button.clickAdd();
+
+		SelectFrameTop();
+
+		Alert.viewSuccessMessage();
 	}
 
 	macro assertPageTitle {
 		AssertElementPresent(
 			key_title = ${pageTitle},
 			locator1 = "Header#H1_TITLE");
+	}
+
+	macro checkDownloadedFile {
+		var testDependenciesDir = PropsUtil.get("output.dir.name");
+
+		var fileExists = FileUtil.exists("${testDependenciesDir}/${fileName}");
 	}
 
 	macro connectWithSalesforce {
@@ -34,6 +59,10 @@ definition {
 		Navigator.gotoNavTab(navTab = "Salesforce Integration");
 
 		if (IsTextEqual(key_fieldName = "loginURL", locator1 = "PRMUtils#SALESFORCE_FIELD", value1 = ${salesforceLoginURL})) {
+			Button.clickSubmitButton();
+
+			Alert.viewSuccessMessage();
+
 			Navigator.openURL();
 		}
 		else {
@@ -58,11 +87,12 @@ definition {
 				value1 = ${salesforceUsername});
 
 			Type(
-				key_fieldName = "password",
-				locator1 = "PRMUtils#SALESFORCE_FIELD",
+				locator1 = "PRMUtils#SALESFORCE_PASSWORD_FIELD",
 				value1 = ${salesforcePassword});
 
 			Button.clickSubmitButton();
+
+			Alert.viewSuccessMessage();
 		}
 	}
 
@@ -111,9 +141,15 @@ definition {
 	macro gotoPRM {
 		Navigator.openSiteURL(siteName = "Partner Portal");
 
+		while ((IsElementPresent(fragmentName = "paragraph", id = "element-text", index = 1, locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT")) && (maxIterations = "10")) {
+			Refresh();
+		}
+
 		if (IsElementPresent(locator1 = "PRMUtils#SIGN_IN")) {
 			Click(locator1 = "PRMUtils#SIGN_IN");
 		}
+
+		WaitForPageLoad();
 	}
 
 	@summary = "Publish an object"
@@ -125,6 +161,30 @@ definition {
 		CreateObject.selectPanelCategoryKey(panelCategoryKey = "Control Panel > Object");
 
 		CreateObject.saveObject();
+	}
+
+	macro tearDown {
+		Site.openSitesAdmin();
+
+		if (IsElementPresent(key_tableEntry = "Partner Portal", locator1 = "LexiconTable#TABLE_ENTRY")) {
+			Site.openSitesAdmin();
+
+			PortletEntry.selectAll();
+
+			Click(locator1 = "Icon#SITES_VERTICAL_ELLIPSIS");
+
+			MenuItem.clickNoError(menuItem = "Delete");
+
+			Click(locator1 = "Button#MODAL_DELETE");
+
+			Alert.viewSuccessMessage();
+		}
+
+		Account.openAccountsAdmin();
+
+		if (IsElementPresent(key_tableEntry = "Company Name", locator1 = "LexiconTable#TABLE_ENTRY")) {
+			Account.tearDownCP();
+		}
 	}
 
 }

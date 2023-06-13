@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd $(dirname "${0}")
+
 function check_blade {
 	if [ -e ~/jpm/bin/blade ]
 	then
@@ -44,11 +46,11 @@ function refresh_liferay_sample_workspace {
 
 	pushd ${temp_dir}
 
-	${BLADE_PATH} init --liferay-version dxp-7.4-u65
+	${BLADE_PATH} init --liferay-version dxp-7.4-u71
 
 	echo -en "\n**/dist\n**/node_modules_cache\n.DS_Store" >> .gitignore
 
-	echo -en "\n\nfeature.flag.LPS-166479=true" >> configs/local/portal-ext.properties
+	echo -en "\n\nfeature.flag.LPS-166479=true\n\nfeature.flag.LPS-177027=true" >> configs/local/portal-ext.properties
 
 	#echo -en "\nliferay.workspace.docker.image.liferay=liferay/dxp:7.4.13-u54-d5.0.5-20221208173455" >> gradle.properties
 	echo -en "\nliferay.workspace.node.package.manager=yarn" >> gradle.properties
@@ -62,7 +64,7 @@ function refresh_liferay_sample_workspace {
 
 	mv gradle.properties.tmp gradle.properties
 
-	sed -i 's/name: "com.liferay.gradle.plugins.workspace", version: ".*"/name: "com.liferay.gradle.plugins.workspace", version: "4.3.0"/' settings.gradle
+	sed -i 's/name: "com.liferay.gradle.plugins.workspace", version: ".*"/name: "com.liferay.gradle.plugins.workspace", version: "4.3.7"/' settings.gradle
 
 	popd
 
@@ -108,13 +110,15 @@ class DadJoke extends React.Component {
 	}
 
 	componentDidMount() {
-		this._request = this.oAuth2Client.fetch(
-			'/dad/joke'
-		).then(response => response.text()
-		).then(text => {
-			this._request = null;
-			this.setState({"joke": text});
-		});
+		if (this.oAuth2Client) {
+			this._request = this.oAuth2Client.fetch(
+				'/dad/joke'
+			).then(response => response.text()
+			).then(text => {
+				this._request = null;
+				this.setState({"joke": text});
+			});
+		}
 	}
 
 	componentWillUnmount() {
@@ -175,9 +179,14 @@ class WebComponent extends HTMLElement {
 	constructor() {
 		super();
 
-		this.oAuth2Client = Liferay.OAuth2Client.FromUserAgentApplication(
-			'liferay-sample-oauth-application-user-agent'
-		);
+		try {
+			this.oAuth2Client = Liferay.OAuth2Client.FromUserAgentApplication(
+				'liferay-sample-oauth-application-user-agent'
+			);
+		}
+		catch (error) {
+			console.log("Unable to get user agent application");
+		}
 	}
 
 	connectedCallback() {
@@ -227,76 +236,6 @@ EOF
 	../tools/create_custom_element.sh liferay-sample-custom-element-3 angular
 
 	mv liferay-sample-custom-element-3 liferay-sample-workspace/client-extensions
-
-	#
-	# Client Extension: Sample Theme Spritemap 2
-	#
-
-	rm -fr liferay-sample-workspace/client-extensions/liferay-sample-theme-spritemap-2
-
-	pushd liferay-sample-workspace/client-extensions
-
-	cat <<EOF > liferay-sample-theme-spritemap-2-config.json
-{
-	"extendClay": false,
-	"platform": "dxp-7.4",
-	"target": "Liferay Theme Spritemap Client Extension"
-}
-EOF
-
-	npx --yes @liferay/cli new liferay-sample-theme-spritemap-2 --batch --options liferay-sample-theme-spritemap-2-config.json
-
-	rm liferay-sample-theme-spritemap-2-config.json
-	rm liferay-sample-theme-spritemap-2/README.md
-
-	echo "assemble:" > liferay-sample-theme-spritemap-2/client-extension.yaml
-	echo "    - from: build" >> liferay-sample-theme-spritemap-2/client-extension.yaml
-	echo "      into: static" >> liferay-sample-theme-spritemap-2/client-extension.yaml
-	echo "liferay-sample-theme-spritemap-2:" >> liferay-sample-theme-spritemap-2/client-extension.yaml
-	echo "    name: Liferay Sample Theme Spritemap 2" >> liferay-sample-theme-spritemap-2/client-extension.yaml
-	echo "    type: themeSpritemap" >> liferay-sample-theme-spritemap-2/client-extension.yaml
-	echo -n "    url: spritemap.svg" >> liferay-sample-theme-spritemap-2/client-extension.yaml
-
-	cat <<EOF > liferay-sample-theme-spritemap-2/src/cog.svg
-<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-	<path class="lexicon-icon-outline books-1-spine-top" d="M96.1,32h-64c-17.7,0-32,14.3-32,32v32h128V64C128.1,46.3,113.8,32,96.1,32z" />
-	<path class="lexicon-icon-outline books-1-spine-bottom" d="M0.1,448c0,17.7,14.3,32,32,32h64c17.7,0,32-14.3,32-32v-32H0.1V448z" />
-	<rect class="lexicon-icon-outline books-1-spine" height="256" width="128" x="0.1" y="128" />
-	<path class="lexicon-icon-outline books-2-spine-top" d="M256.1,32h-64c-17.7,0-32,14.3-32,32v32h128V64C288.1,46.3,273.8,32,256.1,32z" />
-	<path class="lexicon-icon-outline books-2-spine-bottom" d="M160.1,448c0,17.7,14.3,32,32,32h64c17.7,0,32-14.3,32-32v-32h-128V448z" />
-	<rect class="lexicon-icon-outline books-2-spine" height="256" width="128" x="160.1" y="128" />
-	<path class="lexicon-icon-outline books-3-spine-top" d="M359.2,35.2l-31,8.1c-17.1,4.5-27.4,21.9-22.9,39l8.1,31l92.9-24.2l-8.1-31C393.7,41,376.3,30.7,359.2,35.2z" />
-	<rect class="lexicon-icon-outline books-3-spine" height="256" transform="matrix(0.9678 -0.2518 0.2518 0.9678 -51.571 108.9927)" width="96" x="352.1" y="128" />
-	<path class="lexicon-icon-outline books-3-spine-bottom" d="M402,453.9c4.5,17.1,21.9,27.4,39,22.9l31-8.1c17.1-4.5,27.4-21.9,22.9-39l-8.1-31l-92.9,24.2L402,453.9z" />
-</svg>
-EOF
-
-	#
-	# Client Extension: Sample Theme Spritemap 3
-	#
-
-	rm -fr liferay-sample-workspace/client-extensions/liferay-sample-theme-spritemap-3
-
-	cat <<EOF > liferay-sample-theme-spritemap-3-config.json
-{
-	"extendClay": true,
-	"platform": "dxp-7.4",
-	"target": "Liferay Theme Spritemap Client Extension"
-}
-EOF
-
-	npx --yes @liferay/cli new liferay-sample-theme-spritemap-3 --batch --options liferay-sample-theme-spritemap-3-config.json
-
-	rm liferay-sample-theme-spritemap-3-config.json
-	rm liferay-sample-theme-spritemap-3/README.md
-
-	cp liferay-sample-theme-spritemap-2/client-extension.yaml liferay-sample-theme-spritemap-3
-
-	sed -i 's/2/3/' liferay-sample-theme-spritemap-3/client-extension.yaml
-
-	cp liferay-sample-theme-spritemap-2/src/cog.svg liferay-sample-theme-spritemap-3/src
-
-	popd
 }
 
 function main {

@@ -25,7 +25,7 @@ import com.liferay.object.rest.openapi.v1_0.ObjectEntryOpenAPIResourceProvider;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -70,8 +70,8 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		ObjectEntryOpenAPIResourceProvider objectEntryOpenAPIResourceProvider,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		OpenAPIResource openAPIResource,
-		SystemObjectDefinitionMetadataRegistry
-			systemObjectDefinitionMetadataRegistry) {
+		SystemObjectDefinitionManagerRegistry
+			systemObjectDefinitionManagerRegistry) {
 
 		_addRelatedSchemas = addRelatedSchemas;
 		_bundleContext = bundleContext;
@@ -84,7 +84,7 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_openAPIResource = openAPIResource;
 
-		init(dtoConverterRegistry, systemObjectDefinitionMetadataRegistry);
+		init(dtoConverterRegistry, systemObjectDefinitionManagerRegistry);
 	}
 
 	@Override

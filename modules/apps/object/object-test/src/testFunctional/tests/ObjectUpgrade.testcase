@@ -32,17 +32,24 @@ definition {
 		property data.archive.type = "data-archive-object";
 		property database.types = "mariadb,mysql,postgresql,sqlserver";
 		property portal.version = "7.4.13.u33";
+		property test.name.skip.portal.instance = "ObjectUpgrade#ViewObjectDefinitionDetailsAfterUpgrade7413U33";
 
 		task ("View an Object Definition Details after Upgrade") {
 			ObjectAdmin.openObjectAdmin();
 
 			ObjectPortlet.selectCustomObject(label = "Custom Object1");
 
-			CreateObject.assertObjectLabel(labelName = "Custom Object1");
+			AssertTextEquals(
+				locator1 = "CreateObject#OBJECT_LABEL",
+				value1 = "Custom Object1");
 
-			CreateObject.assertObjectPluralLabel(pluralLabelName = "Custom Objects1");
+			AssertTextEquals(
+				locator1 = "CreateObject#OBJECT_PLURAL_LABEL",
+				value1 = "Custom Objects1");
 
-			CreateObject.assertTitleFieldIsSelected(fieldLabel = "Custom Field Text");
+			AssertElementPresent(
+				locator1 = "CreateObject#TITLE_FIELD",
+				value1 = "Custom Field Text");
 
 			AssertTextEquals(
 				locator1 = "ObjectAdmin#SELECT_OBJECT_SCOPE",
@@ -102,13 +109,92 @@ definition {
 	}
 
 	@priority = 5
+	test ViewObjectRelationshipAfterUpgrade7413U33 {
+		property data.archive.type = "data-archive-object";
+		property database.types = "mariadb,mysql,postgresql,sqlserver";
+		property portal.version = "7.4.13.u33";
+		property test.name.skip.portal.instance = "ObjectUpgrade#ViewObjectRelationshipAfterUpgrade7413U33";
+
+		task ("View Object Relationships after Upgrade") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object1");
+
+			ObjectAdmin.gotoRelationshipsTab();
+
+			AssertElementPresent(
+				key_label = "MTM - Custom Object",
+				key_relatedObject = "CustomObject2",
+				locator1 = "ObjectRelationships#OPTIONS_TAB_RELATIONSHIPS_LABEL_AND_RELATED_OBJECT");
+
+			AssertElementPresent(
+				key_relationHierarchy = "Parent",
+				key_relationType = "oneToMany",
+				locator1 = "ObjectRelationships#OPTIONS_TAB_RELATIONSHIPS_TYPE_AND_HIERARCHY");
+
+			AssertElementPresent(
+				key_label = "OTM - System Object",
+				key_relatedObject = "AccountEntry",
+				locator1 = "ObjectRelationships#OPTIONS_TAB_RELATIONSHIPS_LABEL_AND_RELATED_OBJECT");
+
+			AssertElementPresent(
+				key_relationHierarchy = "Parent",
+				key_relationType = "manyToMany",
+				locator1 = "ObjectRelationships#OPTIONS_TAB_RELATIONSHIPS_TYPE_AND_HIERARCHY");
+		}
+
+		task ("Edit Object Relationships after Upgrade") {
+			ObjectAdmin.goToRelationshipsDetails(fieldName = "MTM - Custom Object");
+
+			CreateObject.editLabel(labelName = "MTM - Custom Object Edit After Upgrade");
+
+			PortletEntry.save();
+
+			ObjectAdmin.goToRelationshipsDetails(fieldName = "OTM - System Object");
+
+			CreateObject.editLabel(labelName = "OTM - System Object Edit After Upgrade");
+
+			PortletEntry.save();
+
+			AssertElementPresent(
+				key_name = "MTM - Custom Object Edit After Upgrade",
+				locator1 = "CreateObject#SELECT_OBJECT_FIELD_IN_TABLE");
+
+			AssertElementPresent(
+				key_name = "OTM - System Object Edit After Upgrade",
+				locator1 = "CreateObject#SELECT_OBJECT_FIELD_IN_TABLE");
+		}
+
+		task ("Delete Object Relationships after Upgrade") {
+			ObjectAdmin.deleteRelationshipViaUI(
+				relationshipLabel = "MTM - Custom Object Edit After Upgrade",
+				relationshipName = "mTMCustomObject");
+
+			ObjectAdmin.deleteRelationshipViaUI(
+				relationshipLabel = "OTM - System Object",
+				relationshipName = "oTMSystemObject");
+
+			AssertElementNotPresent(
+				key_label = "MTM - Custom Object Edit After Upgrade",
+				locator1 = "ObjectAdmin#RELATIONSHIP_LABEL");
+
+			AssertElementNotPresent(
+				key_label = "OTM - System Object Edit After Upgrade",
+				locator1 = "ObjectAdmin#RELATIONSHIP_LABEL");
+		}
+	}
+
+	@priority = 5
 	test ViewPicklistAfterUpgrade7413U33 {
 		property data.archive.type = "data-archive-object";
 		property database.types = "mariadb,mysql,postgresql,sqlserver";
 		property portal.version = "7.4.13.u33";
+		property test.name.skip.portal.instance = "ObjectUpgrade#ViewPicklistAfterUpgrade7413U33";
 
 		task ("View a Picklist after Upgrade") {
 			Picklist.gotoPicklists();
+
+			WaitForPageLoad();
 
 			Picklist.optionsPicklist(
 				menuItem = "View",

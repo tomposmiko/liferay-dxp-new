@@ -14,51 +14,25 @@
 
 package com.liferay.jethr0.project.prioritizer;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.liferay.jethr0.entity.factory.BaseEntityFactory;
 
 import org.json.JSONObject;
+
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Michael Hashimoto
  */
-public class ProjectPrioritizerFactory {
+@Configuration
+public class ProjectPrioritizerFactory
+	extends BaseEntityFactory<ProjectPrioritizer> {
 
-	public static ProjectPrioritizer newProjectPrioritizer(
-		JSONObject jsonObject) {
-
-		long id = jsonObject.getLong("id");
-
-		ProjectPrioritizer projectPrioritizer = null;
-
-		synchronized (_projectPrioritizers) {
-			if (_projectPrioritizers.containsKey(id)) {
-				return _projectPrioritizers.get(id);
-			}
-
-			projectPrioritizer = new DefaultProjectPrioritizer(jsonObject);
-
-			_projectPrioritizers.put(
-				projectPrioritizer.getId(), projectPrioritizer);
-		}
-
-		return projectPrioritizer;
+	public ProjectPrioritizer newEntity(JSONObject jsonObject) {
+		return new DefaultProjectPrioritizer(jsonObject);
 	}
 
-	public static void removeProjectPrioritizer(
-		ProjectPrioritizer projectPrioritizer) {
-
-		if (projectPrioritizer == null) {
-			return;
-		}
-
-		synchronized (_projectPrioritizers) {
-			_projectPrioritizers.remove(projectPrioritizer.getId());
-		}
+	protected ProjectPrioritizerFactory() {
+		super(ProjectPrioritizer.class);
 	}
-
-	private static final Map<Long, ProjectPrioritizer> _projectPrioritizers =
-		Collections.synchronizedMap(new HashMap<>());
 
 }

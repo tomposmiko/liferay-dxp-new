@@ -180,9 +180,9 @@ public class FieldValuesAssert {
 
 		SearchHits searchHits = searchResponse.getSearchHits();
 
-		List<SearchHit> searchHitList = searchHits.getSearchHits();
+		List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
-		SearchHit searchHit = searchHitList.get(0);
+		SearchHit searchHit = searchHitsList.get(0);
 
 		return searchHit.getSourcesMap();
 	}

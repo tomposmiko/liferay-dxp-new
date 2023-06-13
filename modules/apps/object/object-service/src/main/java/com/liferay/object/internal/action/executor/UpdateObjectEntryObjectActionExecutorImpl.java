@@ -26,8 +26,8 @@ import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -73,7 +73,7 @@ public class UpdateObjectEntryObjectActionExecutorImpl
 						ObjectEntryVariablesUtil.getVariables(
 							_dtoConverterRegistry, objectDefinition,
 							payloadJSONObject,
-							_systemObjectDefinitionMetadataRegistry)));
+							_systemObjectDefinitionManagerRegistry)));
 
 				return null;
 			});
@@ -90,12 +90,12 @@ public class UpdateObjectEntryObjectActionExecutorImpl
 		throws Exception {
 
 		if (objectDefinition.isSystem()) {
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						objectDefinition.getName());
 
-			systemObjectDefinitionMetadata.updateBaseModel(
+			systemObjectDefinitionManager.updateBaseModel(
 				primaryKey, user, values);
 
 			return;
@@ -177,8 +177,8 @@ public class UpdateObjectEntryObjectActionExecutorImpl
 		new String[] {"creator", "createDate", "id", "modifiedDate", "status"});
 
 	@Reference
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

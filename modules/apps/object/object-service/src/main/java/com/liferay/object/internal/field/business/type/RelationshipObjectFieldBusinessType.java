@@ -28,8 +28,8 @@ import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -153,13 +153,13 @@ public class RelationshipObjectFieldBusinessType
 				objectRelationship.getObjectDefinitionId1());
 
 		if (objectDefinition.isUnmodifiableSystemObject()) {
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						objectDefinition.getName());
 
 			BaseModel<?> baseModel =
-				systemObjectDefinitionMetadata.
+				systemObjectDefinitionManager.
 					getBaseModelByExternalReferenceCode(
 						externalReferenceCode, objectDefinition.getCompanyId());
 
@@ -190,7 +190,7 @@ public class RelationshipObjectFieldBusinessType
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Reference
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 }
