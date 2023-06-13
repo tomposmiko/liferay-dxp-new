@@ -22,7 +22,9 @@ import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.service.RegionService;
+import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
@@ -49,6 +51,14 @@ import org.osgi.service.component.annotations.ServiceScope;
 	scope = ServiceScope.PROTOTYPE, service = RegionResource.class
 )
 public class RegionResourceImpl extends BaseRegionResourceImpl {
+
+	@Override
+	public Region getCountryRegionByRegionCode(
+			Long countryId, String regionCode)
+		throws Exception {
+
+		return _toRegion(_regionService.getRegion(countryId, regionCode));
+	}
 
 	@Override
 	public Page<Region> getCountryRegionsPage(
@@ -80,6 +90,11 @@ public class RegionResourceImpl extends BaseRegionResourceImpl {
 	}
 
 	@Override
+	public Region getRegion(Long regionId) throws Exception {
+		return _toRegion(_regionService.getRegion(regionId));
+	}
+
+	@Override
 	public Page<Region> getRegionsPage(
 			Boolean active, String search, Pagination pagination, Sort[] sorts)
 		throws Exception {
@@ -93,6 +108,18 @@ public class RegionResourceImpl extends BaseRegionResourceImpl {
 		return Page.of(
 			transform(baseModelSearchResult.getBaseModels(), this::_toRegion),
 			pagination, baseModelSearchResult.getLength());
+	}
+
+	@Override
+	public Region postRegion(Region region) throws Exception {
+		com.liferay.portal.kernel.model.Region serviceBuilderRegion =
+			_regionService.addRegion(
+				region.getCountryId(), GetterUtil.get(region.getActive(), true),
+				region.getName(), region.getPosition(), region.getRegionCode(),
+				ServiceContextFactory.getInstance(
+					Region.class.getName(), contextHttpServletRequest));
+
+		return _toRegion(serviceBuilderRegion);
 	}
 
 	private OrderByComparator<com.liferay.portal.kernel.model.Region>

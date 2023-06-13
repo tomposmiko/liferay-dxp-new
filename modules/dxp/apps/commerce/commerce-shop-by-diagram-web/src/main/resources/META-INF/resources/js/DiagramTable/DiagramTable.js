@@ -211,7 +211,7 @@ function DiagramTable({
 									onDelete={handleMappedProductDelete}
 									product={product}
 									quantity={
-										newQuantities[product.skuId] ||
+										newQuantities[product.skuId] ??
 										product.initialQuantity
 									}
 									setMappedProducts={setMappedProducts}
@@ -272,7 +272,7 @@ function DiagramTable({
 						mappedProducts || [],
 						newQuantities
 					)}
-					disabled={!commerceAccount.id || !selectedProductsCounter}
+					disabled={!commerceAccount?.id || !selectedProductsCounter}
 					hideIcon={true}
 					onAdd={() => {
 						const message =

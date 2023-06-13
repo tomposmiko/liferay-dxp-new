@@ -581,6 +581,33 @@ definition {
 		Portlet.viewNoPermissionPG();
 	}
 
+	@description = "This is a use case for LPS-132856."
+	test AssertTitleAndDescriptionNoXSS {
+		Blueprints.openBlueprintsAdmin();
+
+		Click(locator1 = "Button#PLUS");
+
+		PortletEntry.inputTitle(title = "<script>alert(123);</script>");
+
+		PortletEntry.inputDescription(description = "<script>alert(123);</script>");
+
+		PortletEntry.create();
+
+		AssertAlertNotPresent();
+
+		PortletEntry.save();
+
+		AssertAlertNotPresent();
+
+		Search.openSearchPage();
+
+		Blueprints.applyBlueprintViaOptionsWidget(blueprintTitle = "<script>alert(123);</script>");
+
+		Refresh();
+
+		AssertAlertNotPresent();
+	}
+
 	test AssertUsingCopiedElementJSONWithinCustomElement {
 		JSONBlog.addEntry(
 			entryContent = "",

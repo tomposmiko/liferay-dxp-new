@@ -22,6 +22,7 @@ import com.liferay.petra.sql.dsl.query.JoinStep;
 import com.liferay.petra.sql.dsl.query.OrderByStep;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.DuplicateRegionException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.RegionCodeException;
 import com.liferay.portal.kernel.exception.RegionNameException;
@@ -62,6 +63,11 @@ public class RegionLocalServiceImpl extends RegionLocalServiceBaseImpl {
 		throws PortalException {
 
 		_countryPersistence.findByPrimaryKey(countryId);
+
+		if (fetchRegion(countryId, regionCode) != null) {
+			throw new DuplicateRegionException(
+				"Region code belongs to another region");
+		}
 
 		validate(name, regionCode);
 
@@ -248,12 +254,12 @@ public class RegionLocalServiceImpl extends RegionLocalServiceBaseImpl {
 	protected void validate(String name, String regionCode)
 		throws PortalException {
 
-		if (Validator.isNull(regionCode)) {
-			throw new RegionCodeException();
+		if (Validator.isNull(name)) {
+			throw new RegionNameException("Name is null");
 		}
 
-		if (Validator.isNull(name)) {
-			throw new RegionNameException();
+		if (Validator.isNull(regionCode)) {
+			throw new RegionCodeException("Region code is null");
 		}
 	}
 
@@ -270,16 +276,22 @@ public class RegionLocalServiceImpl extends RegionLocalServiceBaseImpl {
 		);
 
 		return joinStep.where(
-			() -> {
-				Predicate predicate = RegionTable.INSTANCE.companyId.eq(
-					companyId);
+			RegionTable.INSTANCE.companyId.eq(
+				companyId
+			).and(
+				() -> {
+					if (active != null) {
+						return RegionTable.INSTANCE.active.eq(active);
+					}
 
-				if (active != null) {
-					predicate = predicate.and(
-						RegionTable.INSTANCE.active.eq(active));
+					return null;
 				}
+			).and(
+				() -> {
+					if (Validator.isNull(keywords)) {
+						return null;
+					}
 
-				if (Validator.isNotNull(keywords)) {
 					String[] terms = CustomSQLUtil.keywords(keywords, true);
 
 					Predicate keywordsPredicate = null;
@@ -289,43 +301,35 @@ public class RegionLocalServiceImpl extends RegionLocalServiceBaseImpl {
 							RegionTable.INSTANCE.name
 						).like(
 							term
+						).or(
+							DSLFunctionFactoryUtil.lower(
+								RegionLocalizationTable.INSTANCE.title
+							).like(
+								term
+							)
 						);
 
-						Predicate titlePredicate = DSLFunctionFactoryUtil.lower(
-							RegionLocalizationTable.INSTANCE.title
-						).like(
-							term
-						);
-
-						Predicate termPredicate = namePredicate.or(
-							titlePredicate);
-
-						if (keywordsPredicate == null) {
-							keywordsPredicate = termPredicate;
-						}
-						else {
-							keywordsPredicate = keywordsPredicate.or(
-								termPredicate);
-						}
+						keywordsPredicate = Predicate.or(
+							keywordsPredicate, namePredicate);
 					}
 
-					if (keywordsPredicate != null) {
-						predicate = predicate.and(
-							keywordsPredicate.withParentheses());
-					}
+					return Predicate.withParentheses(keywordsPredicate);
 				}
+			).and(
+				() -> {
+					if (MapUtil.isEmpty(params)) {
+						return null;
+					}
 
-				if (MapUtil.isNotEmpty(params)) {
 					long countryId = (long)params.get("countryId");
 
 					if (countryId > 0) {
-						predicate = predicate.and(
-							RegionTable.INSTANCE.countryId.eq(countryId));
+						return RegionTable.INSTANCE.countryId.eq(countryId);
 					}
-				}
 
-				return predicate;
-			});
+					return null;
+				}
+			));
 	}
 
 	@BeanReference(type = AddressLocalService.class)

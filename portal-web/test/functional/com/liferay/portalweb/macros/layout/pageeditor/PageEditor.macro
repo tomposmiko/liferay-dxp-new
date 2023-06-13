@@ -1729,28 +1729,28 @@ definition {
 				key_fieldLabel = "Pagination",
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "${pagination}");
+		}
 
-			if ("${displayAllPages}" == "true") {
-				Check.checkNotVisible(
-					checkboxName = "Display All Pages",
-					locator1 = "Checkbox#ANY_CHECKBOX");
-			}
-			else if ("${displayAllPages}" == "false") {
-				Uncheck.uncheckNotVisible(
-					checkboxName = "Display All Pages",
-					locator1 = "Checkbox#ANY_CHECKBOX");
-			}
+		if ("${displayAllPages}" == "true") {
+			Check.checkNotVisible(
+				checkboxName = "Display All Pages",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+		else if ("${displayAllPages}" == "false") {
+			Uncheck.uncheckNotVisible(
+				checkboxName = "Display All Pages",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
 
-			if ("${displayAllCollectionItems}" == "true") {
-				Check.checkNotVisible(
-					checkboxName = "Display All Collection Items",
-					locator1 = "Checkbox#ANY_CHECKBOX");
-			}
-			else if ("${displayAllCollectionItems}" == "false") {
-				Uncheck.uncheckNotVisible(
-					checkboxName = "Display All Collection Items",
-					locator1 = "Checkbox#ANY_CHECKBOX");
-			}
+		if ("${displayAllCollectionItems}" == "true") {
+			Check.checkNotVisible(
+				checkboxName = "Display All Collection Items",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+		else if ("${displayAllCollectionItems}" == "false") {
+			Uncheck.uncheckNotVisible(
+				checkboxName = "Display All Collection Items",
+				locator1 = "Checkbox#ANY_CHECKBOX");
 		}
 
 		if (isSet(maxNumberOfItemsToDisplay)) {
@@ -3052,6 +3052,19 @@ definition {
 			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COLLECTION_PANEL_EXPANDED");
 	}
 
+	macro getCommonStylesClass {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		var class = selenium.getAttribute("xpath=(//div[@aria-label='${fragmentName}'])[${index}]@class");
+		var class = StringUtil.extractFirst("${class}", " page-editor__topper");
+		var class = StringUtil.extractLast("${class}", "lfr-layout-structure-item-topper-");
+		var commonStylesClass = StringUtil.add("lfr-layout-structure-item-", "${class}", "");
+
+		return "${commonStylesClass}";
+	}
+
 	macro getFileSizeOfSelectedImageResolution {
 		var key_resolutionLabel = "File Size";
 
@@ -4050,6 +4063,24 @@ definition {
 			index = "${position}",
 			key_fragmentName = "${fragmentName}",
 			locator1 = "Fragment#FRAGMENT_LABEL");
+	}
+
+	macro viewFragmentCommonStyle {
+		var commonStylesClass = PageEditor.getCommonStylesClass(
+			fragmentName = "${fragmentName}",
+			index = "${index}");
+
+		var actualStyleValue = Css.getStyleValue(
+			className = "${commonStylesClass}",
+			id = "layout-common-styles",
+			styleName = "${styleName}");
+
+		if (contains("${actualStyleValue}", "${styleValue}")) {
+			echo("PASSED");
+		}
+		else {
+			TestUtils.fail(message = "FAILED: expected '${styleValue}', actual was '${actualStyleValue}'");
+		}
 	}
 
 	macro viewFragmentEditableImage {
