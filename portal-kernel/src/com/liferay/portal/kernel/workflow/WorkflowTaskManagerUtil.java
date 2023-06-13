@@ -228,6 +228,14 @@ public class WorkflowTaskManagerUtil {
 			orderByComparator);
 	}
 
+	public static List<WorkflowTransition> getWorkflowTaskWorkflowTransitions(
+			long workflowTaskId)
+		throws WorkflowException {
+
+		return _workflowTaskManager.getWorkflowTaskWorkflowTransitions(
+			workflowTaskId);
+	}
+
 	public static boolean hasAssignableUsers(
 			long companyId, long workflowTaskId)
 		throws WorkflowException {

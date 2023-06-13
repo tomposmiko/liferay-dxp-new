@@ -23,7 +23,7 @@ import {FormModalOptions} from '../../hooks/useFormModal';
 import i18n from '../../i18n';
 import {
 	testrayBuildRest,
-	testrayProjectRest,
+	testrayProjectImpl,
 	testrayRoutineRest,
 } from '../../services/rest';
 
@@ -62,7 +62,7 @@ const TestflowForm = () => {
 				onSearch={(keyword) => `contains(name, '${keyword}')`}
 				resource="/projects"
 				transformData={(response) =>
-					testrayProjectRest.transformDataFromList(response)
+					testrayProjectImpl.transformDataFromList(response)
 				}
 			/>
 
@@ -142,7 +142,9 @@ const TestflowModal: React.FC<TestflowModalProps> = ({
 					isModal
 					onClose={onClose}
 					onSubmit={onSubmit}
-					primaryButtonTitle="analyse"
+					primaryButtonProps={{
+						title: i18n.translate('analyse'),
+					}}
 				/>
 			}
 			observer={observer}

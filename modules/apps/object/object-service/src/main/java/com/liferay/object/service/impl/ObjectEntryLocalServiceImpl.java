@@ -119,6 +119,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -701,11 +702,16 @@ public class ObjectEntryLocalServiceImpl
 				continue;
 			}
 
-			modelAttributes.put(
-				objectField.getName(),
-				GetterUtil.getObject(
-					baseModelAttributes.get(objectField.getDBColumnName()),
-					primaryKey));
+			Object value = GetterUtil.getObject(
+				baseModelAttributes.get(objectField.getDBColumnName()),
+				primaryKey);
+
+			if (value instanceof String) {
+				value = LocalizationUtil.getLocalization(
+					(String)value, null, true);
+			}
+
+			modelAttributes.put(objectField.getName(), value);
 		}
 
 		modelAttributes.putAll(
@@ -1292,6 +1298,8 @@ public class ObjectEntryLocalServiceImpl
 			return predicate;
 		}
 
+		Predicate searchPredicate = null;
+
 		List<ObjectField> objectFields =
 			_objectFieldPersistence.findByODI_DBT_I(
 				objectDefinitionId, "String", true);
@@ -1305,15 +1313,23 @@ public class ObjectEntryLocalServiceImpl
 
 			Predicate likePredicate = column.like("%" + search + "%");
 
-			if (predicate == null) {
-				predicate = likePredicate;
+			if (searchPredicate == null) {
+				searchPredicate = likePredicate;
 			}
 			else {
-				predicate = predicate.and(likePredicate);
+				searchPredicate = searchPredicate.or(likePredicate);
 			}
 		}
 
-		return predicate;
+		if (searchPredicate == null) {
+			return predicate;
+		}
+
+		if (predicate == null) {
+			return searchPredicate;
+		}
+
+		return predicate.and(searchPredicate.withParentheses());
 	}
 
 	private DLFolder _getDLFolder(

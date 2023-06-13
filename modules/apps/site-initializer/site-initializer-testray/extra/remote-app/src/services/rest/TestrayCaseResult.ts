@@ -13,6 +13,7 @@
  */
 
 import yupSchema from '../../schema/yup';
+import {TEST_STATUS} from '../../util/constants';
 import {Liferay} from '../liferay';
 import Rest from './Rest';
 import {TestrayCaseResult} from './types';
@@ -129,6 +130,36 @@ class TestrayCaseResultRest extends Rest<CaseResultForm, TestrayCaseResult> {
 				} as any),
 			uri: 'caseresults',
 		});
+	}
+
+	public assignTo(caseResult: TestrayCaseResult, userId: number) {
+		const data = {
+			dueStatus: caseResult.dueStatus,
+			r_userToCaseResults_userId: userId,
+			startDate: caseResult.startDate,
+		};
+
+		return this.fetcher.put(`/caseresults/${caseResult.id}`, data);
+	}
+
+	public assignToMe(caseResult: TestrayCaseResult) {
+		const data = {
+			dueStatus: TEST_STATUS['In Progress'],
+			r_userToCaseResults_userId: Liferay.ThemeDisplay.getUserId(),
+			startDate: caseResult.startDate,
+		};
+
+		return this.fetcher.put(`/caseresults/${caseResult.id}`, data);
+	}
+
+	removeAssign(caseResult: TestrayCaseResult) {
+		const data = {
+			dueStatus: TEST_STATUS.Untested,
+			r_userToCaseResults_userId: 0,
+			startDate: null,
+		};
+
+		return this.fetcher.put(`/caseresults/${caseResult.id}`, data);
 	}
 }
 

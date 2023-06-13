@@ -17,6 +17,8 @@ import * as yup from 'yup';
 
 import i18n from '../i18n';
 
+const MINIMUM_CHARACTERS_PASSWORD = 8;
+
 const userSchema = yup.object({
 	alternateName: yup.string().required(),
 	emailAddress: yup.string().email().required(),
@@ -25,23 +27,35 @@ const userSchema = yup.object({
 });
 
 const passwordStructure = {
+	currentPassword: yup.string(),
 	password: yup
 		.string()
-		.required(i18n.translate('no-password-provided'))
+		.required(i18n.translate('this-field-is-required'))
 		.min(
-			8,
-			i18n.translate('password-is-too-short-should-be-8-chars-minimum')
+			MINIMUM_CHARACTERS_PASSWORD,
+			i18n.sub(
+				'minimum-x-characters',
+				MINIMUM_CHARACTERS_PASSWORD.toString()
+			)
 		)
 		.matches(
-			/[a-zA-Z]/,
-			i18n.translate('password-can-only-contain-latin-letters')
+			/[a-zA-Z0-9]/,
+			i18n.translate('password-may-contain-letters-and-number')
 		),
-	repassword: yup
+	rePassword: yup
 		.string()
+		.required(i18n.translate('this-field-is-required'))
 		.oneOf(
 			[yup.ref('password'), null],
-			i18n.translate('passwords-must-match')
+			i18n.translate('passwords-do-not-match')
 		),
+};
+
+const passwordRequiredStructure = {
+	...passwordStructure,
+	currentPassword: yup
+		.string()
+		.required(i18n.translate('this-field-is-required')),
 };
 
 const yupSchema = {
@@ -86,7 +100,12 @@ const yupSchema = {
 		id: yup.string(),
 		name: yup.string().required(),
 		projectId: yup.string(),
-		teamId: yup.string(),
+		teamId: yup.number(),
+	}),
+	enviroment: yup.object({
+		factorCategoryIds: yup.mixed(),
+		factorOptionIds: yup.mixed(),
+		routineId: yup.number(),
 	}),
 	factor: yup.object({
 		factorCategoryId: yup.string().required(),
@@ -102,12 +121,14 @@ const yupSchema = {
 	}),
 	factorOption: yup.object({
 		factorCategoryId: yup.string().required(),
+		id: yup.string(),
 		name: yup.string().required(),
 	}),
 	option: yup.object({
 		name: yup.string(),
 	}),
 	password: yup.object(passwordStructure),
+	passwordRequired: yup.object(passwordRequiredStructure),
 	productVersion: yup.object({
 		id: yup.string(),
 		name: yup.string().required(),
@@ -156,6 +177,7 @@ const yupSchema = {
 	}),
 	user: userSchema,
 	userWithPassword: userSchema.shape(passwordStructure),
+	userWithPasswordRequired: userSchema.shape(passwordRequiredStructure),
 };
 
 export {yupResolver};

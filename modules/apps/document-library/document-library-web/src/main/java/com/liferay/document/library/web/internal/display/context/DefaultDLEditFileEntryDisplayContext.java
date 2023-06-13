@@ -72,11 +72,11 @@ public class DefaultDLEditFileEntryDisplayContext
 	implements DLEditFileEntryDisplayContext {
 
 	public DefaultDLEditFileEntryDisplayContext(
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
+		DDMBeanTranslator ddmBeanTranslator,
+		DDMFormValuesFactory ddmFormValuesFactory,
 		DLFileEntryType dlFileEntryType, DLValidator dlValidator,
-		StorageEngine storageEngine, DDMBeanTranslator ddmBeanTranslator,
-		DDMFormValuesFactory ddmFormValuesFactory) {
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse, StorageEngine storageEngine) {
 
 		this(
 			httpServletRequest, dlFileEntryType, dlValidator, null,
@@ -84,15 +84,20 @@ public class DefaultDLEditFileEntryDisplayContext
 	}
 
 	public DefaultDLEditFileEntryDisplayContext(
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, DLValidator dlValidator,
-		FileEntry fileEntry, StorageEngine storageEngine,
 		DDMBeanTranslator ddmBeanTranslator,
-		DDMFormValuesFactory ddmFormValuesFactory) {
+		DDMFormValuesFactory ddmFormValuesFactory, DLValidator dlValidator,
+		FileEntry fileEntry, HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse, StorageEngine storageEngine) {
 
 		this(
 			httpServletRequest, (DLFileEntryType)null, dlValidator, fileEntry,
 			storageEngine, ddmBeanTranslator, ddmFormValuesFactory);
+	}
+
+	@Override
+	public Map<String, Long> getAllMimeTypeSizeLimit() {
+		return _dlValidator.getMimeTypeSizeLimit(
+			_dlRequestHelper.getSiteGroupId());
 	}
 
 	@Override
@@ -111,8 +116,12 @@ public class DefaultDLEditFileEntryDisplayContext
 		}
 
 		DLFileEntryMetadata fileEntryMetadata =
-			DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(
+			DLFileEntryMetadataLocalServiceUtil.fetchFileEntryMetadata(
 				ddmStructure.getStructureId(), fileVersionId);
+
+		if (fileEntryMetadata == null) {
+			return null;
+		}
 
 		return getDDMFormValues(fileEntryMetadata.getDDMStorageId());
 	}
@@ -413,7 +422,7 @@ public class DefaultDLEditFileEntryDisplayContext
 		DynamicServletRequest dynamicServletRequest = new DynamicServletRequest(
 			httpServletRequest, new HashMap<>());
 
-		String namespace = String.valueOf(structureId) + StringPool.UNDERLINE;
+		String namespace = structureId + StringPool.UNDERLINE;
 
 		Map<String, String[]> parameterMap =
 			httpServletRequest.getParameterMap();
@@ -466,9 +475,7 @@ public class DefaultDLEditFileEntryDisplayContext
 		Enumeration<String> enumeration =
 			_httpServletRequest.getParameterNames();
 
-		String namespace =
-			String.valueOf(ddmStructure.getStructureId()) +
-				StringPool.UNDERLINE;
+		String namespace = ddmStructure.getStructureId() + StringPool.UNDERLINE;
 
 		while (enumeration.hasMoreElements()) {
 			String parameterName = enumeration.nextElement();
@@ -501,7 +508,7 @@ public class DefaultDLEditFileEntryDisplayContext
 	private final FileVersion _fileVersion;
 	private final FileVersionDisplayContextHelper
 		_fileVersionDisplayContextHelper;
-	private HttpServletRequest _httpServletRequest;
+	private final HttpServletRequest _httpServletRequest;
 	private Boolean _neverExpire;
 	private Boolean _neverReview;
 	private final boolean _showSelectFolder;

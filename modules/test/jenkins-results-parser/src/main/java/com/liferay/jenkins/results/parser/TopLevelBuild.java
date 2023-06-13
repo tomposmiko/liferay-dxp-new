@@ -1943,13 +1943,15 @@ public abstract class TopLevelBuild extends BaseBuild {
 				"Unable to archive " + urlSuffix, ioException);
 		}
 		finally {
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"Archived ", String.valueOf(getArchiveFile(urlSuffix)),
-					" in ",
-					JenkinsResultsParserUtil.toDurationString(
-						JenkinsResultsParserUtil.getCurrentTimeMillis() -
-							start)));
+			if (JenkinsResultsParserUtil.debug) {
+				System.out.println(
+					JenkinsResultsParserUtil.combine(
+						"Archived ", String.valueOf(getArchiveFile(urlSuffix)),
+						" in ",
+						JenkinsResultsParserUtil.toDurationString(
+							JenkinsResultsParserUtil.getCurrentTimeMillis() -
+								start)));
+			}
 		}
 	}
 
@@ -1988,12 +1990,14 @@ public abstract class TopLevelBuild extends BaseBuild {
 				"Unable to copy the Jenkins report", ioException);
 		}
 		finally {
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"Archived ", String.valueOf(archiveFile), " in ",
-					JenkinsResultsParserUtil.toDurationString(
-						JenkinsResultsParserUtil.getCurrentTimeMillis() -
-							start)));
+			if (JenkinsResultsParserUtil.debug) {
+				System.out.println(
+					JenkinsResultsParserUtil.combine(
+						"Archived ", String.valueOf(archiveFile), " in ",
+						JenkinsResultsParserUtil.toDurationString(
+							JenkinsResultsParserUtil.getCurrentTimeMillis() -
+								start)));
+			}
 		}
 
 		try {
@@ -2004,12 +2008,14 @@ public abstract class TopLevelBuild extends BaseBuild {
 			System.out.println("Unable to archive Jenkins report");
 		}
 		finally {
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"Archived ", String.valueOf(archiveFile), " in ",
-					JenkinsResultsParserUtil.toDurationString(
-						JenkinsResultsParserUtil.getCurrentTimeMillis() -
-							start)));
+			if (JenkinsResultsParserUtil.debug) {
+				System.out.println(
+					JenkinsResultsParserUtil.combine(
+						"Archived ", String.valueOf(archiveFile), " in ",
+						JenkinsResultsParserUtil.toDurationString(
+							JenkinsResultsParserUtil.getCurrentTimeMillis() -
+								start)));
+			}
 		}
 	}
 
@@ -2050,12 +2056,14 @@ public abstract class TopLevelBuild extends BaseBuild {
 				"Unable to archive properties", ioException);
 		}
 		finally {
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"Archived ", String.valueOf(archiveFile), " in ",
-					JenkinsResultsParserUtil.toDurationString(
-						JenkinsResultsParserUtil.getCurrentTimeMillis() -
-							start)));
+			if (JenkinsResultsParserUtil.debug) {
+				System.out.println(
+					JenkinsResultsParserUtil.combine(
+						"Archived ", String.valueOf(archiveFile), " in ",
+						JenkinsResultsParserUtil.toDurationString(
+							JenkinsResultsParserUtil.getCurrentTimeMillis() -
+								start)));
+			}
 		}
 	}
 
@@ -2119,7 +2127,19 @@ public abstract class TopLevelBuild extends BaseBuild {
 				continue;
 			}
 
-			urlAxisNames.put(url, downstreamBuildURLMatcher.group("axisName"));
+			String jobVariant = downstreamBuildURLMatcher.group("jobVariant");
+
+			if (!JenkinsResultsParserUtil.isNullOrEmpty(jobVariant)) {
+				String jobName = downstreamBuildURLMatcher.group("jobName");
+
+				if (!JenkinsResultsParserUtil.isNullOrEmpty(jobName) &&
+					jobVariant.contains(jobName + "/")) {
+
+					jobVariant = jobVariant.replaceAll(jobName + "/", "");
+				}
+			}
+
+			urlAxisNames.put(url, jobVariant);
 		}
 
 		addDownstreamBuilds(urlAxisNames);
@@ -2188,7 +2208,8 @@ public abstract class TopLevelBuild extends BaseBuild {
 			"/index.html";
 
 	private static final Pattern _downstreamBuildURLPattern = Pattern.compile(
-		"[\\'\\\"][^/]*(/(?<axisName>.*))?[\\'\\\"] started at (?<url>.+)\\.");
+		"[\\'\\\"](?<jobVariant>[^\\'\\\"]+)[\\'\\\"] started at " +
+			"(?<url>.+/job/(?<jobName>[^/]+)/.+)\\.");
 	private static final ExecutorService _executorService =
 		JenkinsResultsParserUtil.getNewThreadPoolExecutor(10, true);
 

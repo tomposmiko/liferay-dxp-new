@@ -86,6 +86,7 @@ interface ObjectField {
 	listTypeDefinitionId: number;
 	name: string;
 	objectFieldSettings?: ObjectFieldSetting[];
+	relationshipId?: number;
 	relationshipType?: unknown;
 	required: boolean;
 	state: boolean;
@@ -103,8 +104,8 @@ interface ObjectDefinition {
 	active: boolean;
 	dateCreated: string;
 	dateModified: string;
-	enabledCategorization: boolean;
-	enabledComments: boolean;
+	enableCategorization: boolean;
+	enableComments: boolean;
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;

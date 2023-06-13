@@ -1874,7 +1874,17 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public boolean isUniqueFailure() {
-		return !UpstreamFailureUtil.isBuildFailingInUpstreamJob(this);
+		if (_uniqueFailure != null) {
+			return _uniqueFailure;
+		}
+
+		if (!Objects.equals(getStatus(), "completed")) {
+			return !UpstreamFailureUtil.isBuildFailingInUpstreamJob(this);
+		}
+
+		_uniqueFailure = !UpstreamFailureUtil.isBuildFailingInUpstreamJob(this);
+
+		return _uniqueFailure;
 	}
 
 	@Override
@@ -2700,13 +2710,14 @@ public abstract class BaseBuild implements Build {
 			StringBuilder sb = new StringBuilder();
 
 			sb.append("Build \"");
-			sb.append(jobName);
 
 			if (this instanceof DownstreamBuild) {
 				DownstreamBuild downstreamBuild = (DownstreamBuild)this;
 
-				sb.append("/");
 				sb.append(downstreamBuild.getAxisName());
+			}
+			else {
+				sb.append(jobName);
 			}
 
 			sb.append("\"");
@@ -3987,13 +3998,15 @@ public abstract class BaseBuild implements Build {
 			throw new RuntimeException("Unable to write file", ioException);
 		}
 		finally {
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"Archived ", String.valueOf(getArchiveFile(urlSuffix)),
-					" in ",
-					JenkinsResultsParserUtil.toDurationString(
-						JenkinsResultsParserUtil.getCurrentTimeMillis() -
-							start)));
+			if (JenkinsResultsParserUtil.debug) {
+				System.out.println(
+					JenkinsResultsParserUtil.combine(
+						"Archived ", String.valueOf(getArchiveFile(urlSuffix)),
+						" in ",
+						JenkinsResultsParserUtil.toDurationString(
+							JenkinsResultsParserUtil.getCurrentTimeMillis() -
+								start)));
+			}
 		}
 	}
 
@@ -4303,5 +4316,6 @@ public abstract class BaseBuild implements Build {
 	private Map<String, TestClassResult> _testClassResults;
 	private List<URL> _testrayAttachmentURLs;
 	private List<URL> _testrayS3AttachmentURLs;
+	private Boolean _uniqueFailure;
 
 }
