@@ -20,7 +20,7 @@ export default function useFilters(setFilterTerm, productName, baseFilter) {
 	const [filters, setFilters] = useState(INITIAL_FILTER);
 
 	useEffect(() => {
-		let initialFilter = `active eq true and ${baseFilter}`;
+		let initialFilter = baseFilter;
 		let hasFilterPill = false;
 
 		if (filters.searchTerm) {

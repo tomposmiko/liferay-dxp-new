@@ -71,6 +71,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>TABLE_ENTRY_CONFIGURED_FROM_SPECIFIC</td>
+	<td>xpath=(//div[contains(@class,'dnd-tr')][.//div[contains(@class,'table-list-title') and contains(.,'${key_tableEntryName}')]]//div[contains(@class,'dnd-td')])[4]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TABLE_ENTRY_NAME</td>
 	<td>//table//tbody//td//*[contains(@class,'table-list-title')]//*[text() = '${key_tableEntryName}']</td>
 	<td></td>
@@ -86,8 +91,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>TABLE_ENTRY_TYPE_SPECIFIC</td>
+	<td>xpath=(//div[contains(@class,'dnd-tr')][.//div[contains(@class,'table-list-title') and contains(.,'${key_tableEntryName}')]]//div[contains(@class,'dnd-td')])[2]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TABLE_ENTRY_STATUS_REMOTE_TABLE</td>
 	<td>//div[contains(@class,'dnd-td')]//*[contains(@class,'workflow-status') and contains(.,'${key_tableEntryStatus}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TABLE_ENTRY_STATUS_SPECIFIC</td>
+	<td>xpath=(//div[contains(@class,'dnd-tr')][.//div[contains(@class,'table-list-title') and contains(.,'${key_tableEntryName}')]]//div[contains(@class,'dnd-td')])[3]</td>
 	<td></td>
 </tr>
 <tr>
@@ -113,6 +128,41 @@
 <tr>
 	<td>THEME_SPRITEMAP_CLIENT_EXTENSION_INPUT</td>
 	<td>//div[@class="input-group-item"]//input[contains(@id,themeSpritemapExtensionNameInput)][@placeholder="Name"]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAMPLE_CUSTOM_ELEMENT_1_COUNTER</td>
+	<td>css=vanilla-counter>>>.counter</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAMPLE_CUSTOM_ELEMENT_1_DECREMENT_BUTTON</td>
+	<td>css=vanilla-counter>>>.decrement</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAMPLE_CUSTOM_ELEMENT_1_INCREMENT_BUTTON</td>
+	<td>css=vanilla-counter>>>.increment</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAMPLE_IFRAME_1_COUNTER_CART_TOTAL</td>
+	<td>//div[contains(@class,'navbar-brand') and contains(.,'Items')]//span[contains(@class,'badge-pill')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAMPLE_IFRAME_1_COUNTER_INCREMENT_BUTTON</td>
+	<td>//button[.//i[contains(@class,'fa-plus-circle')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAMPLE_THEME_FAVICON_CONFIGURATION_IMAGE</td>
+	<td>//div[contains(@class,'lfr-tooltip-scope')][./input[contains(@name,'favicon')]]//img[@alt='Liferay Sample Theme Favicon']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAMPLE_THEME_SPRITEMAP_1_PAGE_PENCIL_ICON</td>
+	<td>//li[@class='control-menu-nav-item']//*[contains(@href,'/o/liferay-sample-theme-spritemap-1/spritemap.svg#pencil')]</td>
 	<td></td>
 </tr>
 <tr>

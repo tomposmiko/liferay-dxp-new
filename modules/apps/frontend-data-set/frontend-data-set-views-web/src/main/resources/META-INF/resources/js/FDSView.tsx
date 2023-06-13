@@ -25,6 +25,7 @@ import Details from './fds_view/Details';
 import Fields from './fds_view/Fields';
 import Filters from './fds_view/Filters';
 import Pagination from './fds_view/Pagination';
+import Sorting from './fds_view/Sorting';
 
 const NAVIGATION_BAR_ITEMS = [
 	{
@@ -34,6 +35,10 @@ const NAVIGATION_BAR_ITEMS = [
 	{
 		Component: Fields,
 		label: Liferay.Language.get('fields'),
+	},
+	{
+		Component: Sorting,
+		label: Liferay.Language.get('sorting'),
 	},
 	{
 		Component: Filters,
@@ -49,15 +54,22 @@ interface FDSViewSectionInterface {
 	fdsView: FDSViewType;
 	fdsViewsURL: string;
 	namespace: string;
+	saveFDSFieldsURL: string;
 }
 
 interface FDSViewInterface {
 	fdsViewId: string;
 	fdsViewsURL: string;
 	namespace: string;
+	saveFDSFieldsURL: string;
 }
 
-const FDSView = ({fdsViewId, fdsViewsURL, namespace}: FDSViewInterface) => {
+const FDSView = ({
+	fdsViewId,
+	fdsViewsURL,
+	namespace,
+	saveFDSFieldsURL,
+}: FDSViewInterface) => {
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [fdsView, setFDSView] = useState<FDSViewType>();
 	const [loading, setLoading] = useState(true);
@@ -120,6 +132,7 @@ const FDSView = ({fdsViewId, fdsViewsURL, namespace}: FDSViewInterface) => {
 						fdsView={fdsView}
 						fdsViewsURL={fdsViewsURL}
 						namespace={namespace}
+						saveFDSFieldsURL={saveFDSFieldsURL}
 					/>
 				)
 			)}

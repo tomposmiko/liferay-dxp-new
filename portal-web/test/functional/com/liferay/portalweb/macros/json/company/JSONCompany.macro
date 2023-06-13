@@ -9,9 +9,11 @@ definition {
 			var portalURL = JSONCompany.getPortalURL();
 		}
 
+		var userLoginInfo = JSONUtil2.formatJSONUser();
+
 		var curl = '''
 			${portalURL}/api/jsonws/company/get-companies \
-				-u test@liferay.com:test
+				-u ${userLoginInfo}
 		''';
 
 		var companies = JSONCurlUtil.get(${curl}, "$..['mx']");
@@ -70,12 +72,12 @@ definition {
 				}
 			}
 			else {
-				var creatorEmailAddress = "test@liferay.com";
+				var creatorEmailAddress = JSONUtil2.getDefaultUserEmail();
 			}
 		}
 
 		if (!(isSet(creatorPassword))) {
-			var creatorPassword = "test";
+			var creatorPassword = JSONUtil2.getDefaultUserPassword();
 		}
 
 		var curl = '''
@@ -98,11 +100,11 @@ definition {
 		}
 
 		if (!(isSet(creatorEmailAddress))) {
-			var creatorEmailAddress = "test@liferay.com";
+			var creatorEmailAddress = JSONUtil2.getDefaultUserEmail();
 		}
 
 		if (!(isSet(creatorPassword))) {
-			var creatorPassword = "test";
+			var creatorPassword = JSONUtil2.getDefaultUserPassword();
 		}
 
 		var curl = '''
@@ -176,6 +178,43 @@ definition {
 		var portalURL = PropsUtil.get("portal.url");
 
 		return ${portalURL};
+	}
+
+	macro getWebId {
+		if (!(isSet(portalInstanceName)) || (${portalInstanceName} == "liferay.com")) {
+			var portalInstanceName = JSONCompany.getPortalInstanceName();
+		}
+
+		if (!(isSet(portalURL))) {
+			var portalURL = JSONCompany.getPortalURL();
+		}
+
+		if (!(isSet(creatorEmailAddress))) {
+			if (${authenticationMethod} == "By Screen Name") {
+				if (!(isSet(userScreenName))) {
+					var creatorEmailAddress = "test";
+				}
+				else {
+					var creatorEmailAddress = ${userScreenName};
+				}
+			}
+			else {
+				var creatorEmailAddress = "test@liferay.com";
+			}
+		}
+
+		if (!(isSet(creatorPassword))) {
+			var creatorPassword = "test";
+		}
+
+		var curl = '''
+			${portalURL}/api/jsonws/company/get-company-by-virtual-host/virtual-host/${portalInstanceName} \
+				-u ${creatorEmailAddress}:${creatorPassword}
+		''';
+
+		var webId = JSONCurlUtil.get(${curl}, "$['webId']");
+
+		return ${webId};
 	}
 
 	macro parsePortalInstanceURL {

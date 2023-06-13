@@ -77,7 +77,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.SegmentsEntryRetriever;
 import com.liferay.segments.constants.SegmentsEntryConstants;
-import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.context.RequestContextMapper;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
@@ -218,19 +217,6 @@ public class GetCollectionFieldMVCResourceCommand
 			return jsonObject;
 		}
 
-		DefaultLayoutListRetrieverContext defaultLayoutListRetrieverContext =
-			new DefaultLayoutListRetrieverContext();
-
-		defaultLayoutListRetrieverContext.setConfiguration(
-			LayoutObjectReferenceUtil.getConfiguration(
-				layoutObjectReferenceJSONObject));
-
-		Object infoItem = _getInfoItem(httpServletRequest);
-
-		if (infoItem != null) {
-			defaultLayoutListRetrieverContext.setContextObject(infoItem);
-		}
-
 		ListObjectReference listObjectReference =
 			listObjectReferenceFactory.getListObjectReference(
 				layoutObjectReferenceJSONObject);
@@ -273,21 +259,6 @@ public class GetCollectionFieldMVCResourceCommand
 			return jsonObject;
 		}
 
-		int listCount = layoutListRetriever.getListCount(
-			listObjectReference, defaultLayoutListRetrieverContext);
-
-		if (activePage < 1) {
-			activePage = 1;
-		}
-
-		defaultLayoutListRetrieverContext.setPagination(
-			_collectionPaginationHelper.getPagination(
-				activePage, listCount, displayAllPages, displayAllItems,
-				numberOfItems, numberOfItemsPerPage, numberOfPages,
-				paginationType));
-		defaultLayoutListRetrieverContext.setSegmentsEntryIds(
-			_getSegmentsEntryIds(httpServletRequest, segmentsExperienceId));
-
 		String itemType = _infoSearchClassMapperRegistry.getClassName(
 			originalItemType);
 
@@ -305,6 +276,47 @@ public class GetCollectionFieldMVCResourceCommand
 
 			return _jsonFactory.createJSONObject();
 		}
+
+		DefaultLayoutListRetrieverContext defaultLayoutListRetrieverContext =
+			new DefaultLayoutListRetrieverContext();
+
+		defaultLayoutListRetrieverContext.setConfiguration(
+			LayoutObjectReferenceUtil.getConfiguration(
+				layoutObjectReferenceJSONObject));
+		defaultLayoutListRetrieverContext.setContextObject(
+			_getInfoItem(httpServletRequest));
+
+		SegmentsExperience segmentsExperience =
+			_segmentsExperienceLocalService.fetchSegmentsExperience(
+				segmentsExperienceId);
+
+		defaultLayoutListRetrieverContext.setSegmentsEntryIds(
+			new long[] {segmentsExperience.getSegmentsEntryId()});
+
+		if (activePage < 1) {
+			activePage = 1;
+		}
+
+		int listCount = layoutListRetriever.getListCount(
+			listObjectReference, defaultLayoutListRetrieverContext);
+
+		if ((listCount == 0) &&
+			!Objects.equals(
+				SegmentsEntryConstants.KEY_DEFAULT,
+				segmentsExperience.getSegmentsExperienceKey())) {
+
+			defaultLayoutListRetrieverContext.setSegmentsEntryIds(
+				new long[] {SegmentsEntryConstants.ID_DEFAULT});
+
+			listCount = layoutListRetriever.getListCount(
+				listObjectReference, defaultLayoutListRetrieverContext);
+		}
+
+		defaultLayoutListRetrieverContext.setPagination(
+			_collectionPaginationHelper.getPagination(
+				activePage, listCount, displayAllPages, displayAllItems,
+				numberOfItems, numberOfItemsPerPage, numberOfPages,
+				paginationType));
 
 		JSONArray jsonArray = _jsonFactory.createJSONArray();
 
@@ -363,9 +375,7 @@ public class GetCollectionFieldMVCResourceCommand
 		).put(
 			"itemType", originalItemType
 		).put(
-			"length",
-			layoutListRetriever.getListCount(
-				listObjectReference, defaultLayoutListRetrieverContext)
+			"length", listCount
 		).put(
 			"totalNumberOfItems",
 			_collectionPaginationHelper.getTotalNumberOfItems(
@@ -521,34 +531,6 @@ public class GetCollectionFieldMVCResourceCommand
 		}
 
 		return null;
-	}
-
-	private long[] _getSegmentsEntryIds(
-			HttpServletRequest httpServletRequest, long segmentsExperienceId)
-		throws PortalException {
-
-		if (!FeatureFlagManagerUtil.isEnabled("LPS-179502")) {
-			return _segmentsEntryRetriever.getSegmentsEntryIds(
-				_portal.getScopeGroupId(httpServletRequest),
-				_portal.getUserId(httpServletRequest),
-				_requestContextMapper.map(httpServletRequest));
-		}
-
-		SegmentsExperience segmentsExperience =
-			_segmentsExperienceLocalService.fetchSegmentsExperience(
-				segmentsExperienceId);
-
-		if (Objects.equals(
-				SegmentsExperienceConstants.KEY_DEFAULT,
-				segmentsExperience.getSegmentsExperienceKey())) {
-
-			return new long[] {SegmentsEntryConstants.ID_DEFAULT};
-		}
-
-		return new long[] {
-			segmentsExperience.getSegmentsEntryId(),
-			SegmentsEntryConstants.ID_DEFAULT
-		};
 	}
 
 	private boolean _hasViewPermission(

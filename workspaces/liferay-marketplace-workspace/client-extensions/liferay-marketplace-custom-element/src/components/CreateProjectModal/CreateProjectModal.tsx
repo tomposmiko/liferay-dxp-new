@@ -3,10 +3,9 @@ import ClayModal, {useModal} from '@clayui/modal';
 import classNames from 'classnames';
 import {useState} from 'react';
 
-import checkFillIcon from '../../assets/icons/check_fill.svg';
-import circleFillIcon from '../../assets/icons/circle_fill.svg';
+import checkFillIcon from '../../assets/icons/check_fill_icon.svg';
+import circleFillIcon from '../../assets/icons/circle_fill_icon.svg';
 import {
-	getChannels,
 	getOrderTypes,
 	getProductSKU,
 	getProducts,
@@ -19,6 +18,7 @@ import {RulesAndGuidelines} from './RulesAndGuidelines';
 
 import './CreateProjectModal.scss';
 interface CreateProjectModalProps {
+	currentChannel: Channel;
 	handleClose: () => void;
 	selectedAccount: Account;
 	setShowDashboardNavigation: (value: boolean) => void;
@@ -39,6 +39,7 @@ const multiStepItemsInitialValues = [
 ];
 
 export function CreateProjectModal({
+	currentChannel,
 	handleClose,
 	selectedAccount,
 	setShowDashboardNavigation,
@@ -64,13 +65,7 @@ export function CreateProjectModal({
 	});
 
 	const createNewProject = async () => {
-		const channels = await getChannels();
 		const {items} = await getProducts();
-
-		const marketplaceChannel =
-			channels.find(
-				(channel) => channel.name === 'Marketplace Channel'
-			) ?? channels[0];
 
 		const projectProduct = items.find(({categories}) => {
 			return !!categories.find(({name}) => name === 'Project');
@@ -93,21 +88,23 @@ export function CreateProjectModal({
 				},
 				accountId: selectedAccount.id,
 				channel: {
-					currencyCode: marketplaceChannel.currencyCode,
-					id: marketplaceChannel.id,
-					type: marketplaceChannel.type,
+					currencyCode: currentChannel.currencyCode,
+					id: currentChannel.id,
+					type: currentChannel.type,
 				},
-				channelId: marketplaceChannel.id,
-				currencyCode: marketplaceChannel.currencyCode,
+				channelId: currentChannel.id,
+				currencyCode: currentChannel.currencyCode,
 				orderItems: [
 					{
 						skuId: projectSKU.id,
 						unitPriceWithTaxAmount: 0,
 					},
 				],
+				orderTypeExternalReferenceCode:
+					projectOrderType?.externalReferenceCode,
 				orderTypeId: projectOrderType?.id as number,
 				orderStatus: 1,
-				marketplaceOrderType: 'Project',
+				marketplaceOrderType: projectOrderType?.externalReferenceCode,
 			};
 
 			const orderResponse = await postOrder(newOrder);

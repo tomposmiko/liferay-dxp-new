@@ -1,17 +1,18 @@
-import accountLogo from '../../assets/icons/mainAppLogo.svg';
 import {AccountHeaderButton} from './AccountHeaderButton';
 
 import './AccountDetailsPage.scss';
 
 import {useEffect, useState} from 'react';
 
-import creditCartIcon from '../../assets/icons/credit-card.svg';
-import downloadIcon from '../../assets/icons/download-icon.svg';
-import locationIcon from '../../assets/icons/location-on-icon.svg';
-import phoneIcon from '../../assets/icons/phone-icon.svg';
-import userIcon from '../../assets/icons/user-icon.svg';
+import creditCartIcon from '../../assets/icons/credit_card_icon.svg';
+import downloadIcon from '../../assets/icons/download_icon.svg';
+import locationIcon from '../../assets/icons/location_icon.svg';
+import phoneIcon from '../../assets/icons/phone_icon.svg';
+import userIcon from '../../assets/icons/user_icon.svg';
 import {DetailedCard} from '../../components/DetailedCard/DetailedCard';
 import {getAccountPostalAddressesByAccountId} from '../../utils/api';
+import {showAccountImage} from '../../utils/util';
+
 import {getCustomFieldValue} from '../../utils/customFieldUtil';
 import {DashboardListItems} from '../DashBoardPage/DashboardPage';
 
@@ -42,6 +43,13 @@ export function AccountDetailsPage({
 
 		return first3Digits + maskedDigits;
 	};
+
+	const {type} = selectedAccount;
+
+	const accountType =
+		type === 'person'
+			? 'Individual'
+			: type.charAt(0).toUpperCase() + type.slice(1);
 
 	const updateDashboardNavigationItems = (itemName: string) => {
 		const newDashboardNavigationItems = dashboardNavigationItems.map(
@@ -83,7 +91,7 @@ export function AccountDetailsPage({
 						<img
 							alt="Account Image"
 							className="account-details-header-left-content-image"
-							src={commerceAccount?.logoURL ?? accountLogo}
+							src={showAccountImage(commerceAccount?.logoURL)}
 						/>
 
 						<div className="account-details-header-left-content-text-container">
@@ -92,7 +100,7 @@ export function AccountDetailsPage({
 							</span>
 
 							<span className="account-details-header-left-content-description">
-								{selectedAccount.type} account
+								{accountType} Account
 							</span>
 						</div>
 					</div>

@@ -2,10 +2,13 @@ import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
 import {ReactNode, useState} from 'react';
 
+import {showAccountImage, showAppImage} from '../../utils/util';
+
 import {AccountAndAppCard} from '../../components/Card/AccountAndAppCard';
 import {Footer} from '../../components/Footer/Footer';
 import {Header} from '../../components/Header/Header';
 import {NewAppPageFooterButtons} from '../../components/NewAppPageFooterButtons/NewAppPageFooterButtons';
+import {Liferay} from '../../liferay/liferay';
 
 import {
 	getAccountInfoFromCommerce,
@@ -88,7 +91,11 @@ export function NextStepPage({
 							<div className="next-step-page-cards">
 								<AccountAndAppCard
 									category="Application"
-									logo={appLogo ?? ''}
+									logo={
+										showAppImage(
+											appLogo as string
+										) as string
+									}
 									title={appName ?? ''}
 								></AccountAndAppCard>
 
@@ -99,7 +106,9 @@ export function NextStepPage({
 
 								<AccountAndAppCard
 									category="DXP Console"
-									logo={accountLogo ?? ''}
+									logo={showAccountImage(
+										accountLogo as string
+									)}
 									title={accountName ?? ''}
 								></AccountAndAppCard>
 							</div>
@@ -132,9 +141,14 @@ export function NextStepPage({
 						continueButtonText={
 							continueButtonText ?? 'Continue Configuration'
 						}
-						onClickBack={() =>
-							(window.location.href = `${window.location.origin}/web/guest/publisher-dashboard`)
-						}
+						onClickBack={() => {
+							const customerDashboardCallbackURL = `${Liferay.ThemeDisplay.getCanonicalURL().replace(
+								`/next-steps`,
+								''
+							)}/customer-dashboard`;
+
+							window.location.href = customerDashboardCallbackURL;
+						}}
 						onClickContinue={
 							onClickContinue ??
 							(() =>

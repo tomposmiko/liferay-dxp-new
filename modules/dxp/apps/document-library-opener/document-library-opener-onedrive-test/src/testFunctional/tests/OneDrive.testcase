@@ -388,7 +388,7 @@ definition {
 			tagNameList = "liferay");
 	}
 
-	@description = "This test ensures that no residual data is left in the Portal UI after canceling checkout under site admin on an Excel document during creation."
+	@description = "This test ensures that the document is in draft status after canceling checkout under site admin on an Excel document during creation."
 	@priority = 4
 	test CancelCheckoutOnExcelSheet {
 		property test.name.skip.portal.instance = "OneDrive#CancelCheckoutOnExcelSheet";
@@ -407,17 +407,18 @@ definition {
 			dmDocumentTitle = "Cancel Checkout Excel Sheet Title ${num}",
 			dmDocumentTypeName = "Excel");
 
+		DMDocument.viewIconLockedCP(dmDocumentTitle = "Cancel Checkout Excel Sheet Title ${num}");
+
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		DMDocument.cancelCheckoutCP(dmDocumentTitle = "Cancel Checkout Excel Sheet Title ${num}");
 
 		AssertElementNotPresent(
-			key_rowEntry = "Cancel Checkout Excel Sheet Title ${num}",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
-			value1 = "Cancel Checkout Excel Sheet Title ${num}");
+			key_dmDocumentTitle = "Cancel Checkout Excel Sheet Title ${num}",
+			locator1 = "DocumentsAndMedia#ICON_DOCUMENT_ICON_LOCKED");
 	}
 
-	@description = "This test ensures that no residual data is left in the Portal UI after canceling checkout on a Word document during creation."
+	@description = "This test ensures that the document is in draft status after canceling checkout on a Word document during creation."
 	@priority = 4
 	test CancelCheckoutOnWordDocument {
 		property test.name.skip.portal.instance = "OneDrive#CancelCheckoutOnWordDocument";
@@ -436,13 +437,15 @@ definition {
 			dmDocumentTitle = "Cancel Checkout Word Doc Title ${num}",
 			dmDocumentTypeName = "Word");
 
+		DMDocument.viewIconLockedCP(dmDocumentTitle = "Cancel Checkout Word Doc Title ${num}");
+
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		DMDocument.cancelCheckoutPG(dmDocumentTitle = "Cancel Checkout Word Doc Title ${num}");
 
 		AssertElementNotPresent(
 			key_dmDocumentTitle = "Cancel Checkout Word Doc Title ${num}",
-			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE");
+			locator1 = "DocumentsAndMedia#ICON_DOCUMENT_ICON_LOCKED");
 	}
 
 	@description = "This test covers LPS-130200. It ensures that users can edit the entry through Office 365 after checkin the entry from the document editor."
@@ -561,11 +564,11 @@ definition {
 		DMDocument.deletePG(dmDocumentTitle = "Delete Word Doc Title ${num}");
 	}
 
-	@description = "This test covers LPS-102478. It ensures that an Office 365 document is deleted automatically after the lock is expired."
+	@description = "This test covers LPS-102478. It ensures that an Office 365 document is automatically unchecked out after the lock is expired."
 	@priority = 4
-	test DocumentIsDeletedAfterLockExpiration {
+	test DocumentCheckoutIsCanceledAfterLockExpiration {
 		property custom.properties = "lock.expiration.time.com.liferay.document.library.kernel.model.DLFileEntry=90000";
-		property test.name.skip.portal.instance = "OneDrive#DocumentIsDeletedAfterLockExpiration";
+		property test.name.skip.portal.instance = "OneDrive#DocumentCheckoutIsCanceledAfterLockExpiration";
 
 		var num = MathUtil.randomNumber(10);
 
@@ -589,9 +592,16 @@ definition {
 
 		Refresh();
 
-		AssertElementNotPresent(
+		LexiconEntry.changeDisplayStyle(displayStyle = "cards");
+
+		AssertTextEquals(
 			key_dmDocumentTitle = "Auto Checkin Word Doc Title ${num}",
-			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE");
+			locator1 = "DocumentsAndMedia#ICON_DOCUMENT_WORKFLOW_STATUS",
+			value1 = "DRAFT");
+
+		AssertElementNotPresent(
+			key_dmDocumentTitle = "Cancel Checkout Word Doc Title ${num}",
+			locator1 = "DocumentsAndMedia#ICON_DOCUMENT_ICON_LOCKED");
 	}
 
 	@description = "This test ensures that an Excel sheet title can be changed via the OneDrive editor."

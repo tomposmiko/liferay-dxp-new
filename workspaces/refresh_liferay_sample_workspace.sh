@@ -46,7 +46,7 @@ function refresh_liferay_sample_workspace {
 
 	pushd ${temp_dir}
 
-	${BLADE_PATH} init --liferay-version dxp-7.4-u72
+	${BLADE_PATH} init -v $(${BLADE_PATH} init --all --list | grep dxp-7.4 | head -1)
 
 	echo -en "\n**/dist\n**/node_modules_cache\n.DS_Store" >> .gitignore
 
@@ -65,7 +65,7 @@ function refresh_liferay_sample_workspace {
 	mv gradle.properties.tmp gradle.properties
 
 	sed -i 's/name: "biz.aQute.bnd", version: ".*"/name: "biz.aQute.bnd.gradle", version: "5.2.0"/' settings.gradle
-	sed -i 's/name: "com.liferay.gradle.plugins.workspace", version: ".*"/name: "com.liferay.gradle.plugins.workspace", version: "6.0.2"/' settings.gradle
+	sed -i 's/name: "com.liferay.gradle.plugins.workspace", version: ".*"/name: "com.liferay.gradle.plugins.workspace", version: "6.1.1"/' settings.gradle
 
 	echo -en "\ninclude \"poshi\"" >> settings.gradle
 

@@ -46,7 +46,7 @@ public class SampleCommandLineRunner implements CommandLineRunner {
 		OAuth2AuthorizedClient oAuth2AuthorizedClient =
 			_authorizedClientServiceOAuth2AuthorizedClientManager.authorize(
 				OAuth2AuthorizeRequest.withClientRegistrationId(
-					"liferay-sample-etc-cron"
+					"liferay-sample-etc-cron-oauth-application-headless-server"
 				).principal(
 					"SampleCommandLineRunner"
 				).build());

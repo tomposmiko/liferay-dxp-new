@@ -22,6 +22,110 @@ definition {
 		}
 	}
 
+	@description = "This is a test for LPS-167387. The page creator could go back to button from link on the experience selector via shift + tab shortcuts."
+	@priority = 3
+	test BackToButtonFromLinkOnExperienceSelectorViaKeyboard {
+		task ("Given a page creator has a content page") {
+			JSONLayout.addPublicLayout(
+				groupName = ${randomSiteName},
+				layoutName = "Test Page Name",
+				type = "content");
+		}
+
+		task ("When the page creator focuses on the link on the experience selector") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = ${randomSiteName});
+
+			PageEditor.openExperienceMenu();
+
+			KeyPress(
+				key_text = "New Experience",
+				locator1 = "Button#ANY",
+				value1 = "\TAB");
+
+			TestUtils.assertElementFocused(element = "//a[contains(.,'Content Page Personalization')]");
+		}
+
+		task ("Then the page creator could go back to the button on the experience selector via shift + tab shortcuts") {
+			Type.sendKeys(
+				key_text = "Content Page Personalization",
+				locator1 = "Link#ANY",
+				value1 = "keys=SHIFT,TAB");
+
+			TestUtils.assertElementFocused(element = "//*[not(self::div)][contains(@class,'btn')][normalize-space()='New Experience'][not(contains(@class,'navbar'))]");
+		}
+	}
+
+	@description = "This is a test for LPS-166297. The page creator could go back to the node on the Browser panel via shift + tab shortcuts."
+	@priority = 3
+	test BackToNodeOnBrowserPanelViaKeyboard {
+		task ("Given a page creator has a fragment composition on a content page") {
+			JSONLayout.addPublicLayout(
+				groupName = ${randomSiteName},
+				layoutName = "Test Page Name",
+				type = "content");
+
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = ${randomSiteName});
+
+			PageEditor.addFragment(
+				collectionName = "Layout Elements",
+				fragmentName = "Container");
+
+			PageEditor.addElementToContainer(
+				collectionName = "Basic Components",
+				fragmentName = "Heading",
+				navTab = "Fragments");
+
+			PageEditor.addElementToContainer(
+				collectionName = "Basic Components",
+				fragmentName = "Button",
+				navTab = "Fragments",
+				targetElementName = "Heading");
+		}
+
+		task ("When the page creator accesses to the Browser panel") {
+			PageEditor.gotoTab(tabName = "Browser");
+
+			KeyPress(
+				key_text = "times",
+				locator1 = "Icon#ANY",
+				value1 = "\TAB");
+		}
+
+		task ("Then the page creator could expand the Container node via keyboard") {
+			KeyPress(
+				key_nodeName = "Container",
+				locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE_COLLAPSED",
+				value1 = "\RIGHT");
+
+			for (var nodeName : list "Heading,Button") {
+				AssertVisible(
+					key_nodeName = ${nodeName},
+					locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE");
+			}
+		}
+
+		task ("When the page creator focuses on the drag handler of Container node via Tab key") {
+			KeyPress(
+				locator1 = "//div[contains(@data-qa-id,'Container') and contains(@role,'treeitem') and @aria-expanded='true']",
+				value1 = "\TAB");
+
+			TestUtils.assertElementFocused(element = "//button[@aria-label='Move Container']");
+		}
+
+		task ("Then the page creator could go back to the Container node via shift + tab shortcuts") {
+			Type.sendKeys(
+				ariaLabel = "Move Container",
+				locator1 = "Button#ANY_WITH_ARIA_LABEL",
+				value1 = "keys=SHIFT,TAB");
+
+			TestUtils.assertElementFocused(element = "//div[contains(@data-qa-id,'Container') and contains(@role,'treeitem') and @aria-expanded='true']");
+		}
+	}
+
 	@description = "This is a test for LPS-165295. The page creator cannot access to disabled area via keyboard."
 	@priority = 3
 	test CannotAccessToDisabledAreaViaKeyboard {
@@ -329,7 +433,7 @@ definition {
 				value1 = "rgba(240, 245, 255, 1)");
 		}
 
-		task ("Then the page creator could go back to the times icon vis shift + tab shortcuts") {
+		task ("Then the page creator could go back to the times icon via shift + tab shortcuts") {
 			Type.sendKeys(
 				data_qa_id = "Button",
 				locator1 = "Treeview#NODE_ITEM_BY_DATA_QA_ID",

@@ -1140,7 +1140,7 @@ definition {
 
 		Alert.viewSuccessMessage();
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "Message#CHECKOUT_SUCCESS",
 			value1 = "You now have a lock on this document. No one else can edit this document until you unlock it. This lock will automatically expire in 1 day.");
 	}
@@ -1415,6 +1415,19 @@ definition {
 		AssertClick.assertPartialTextClickAt(
 			locator1 = "Button#DOWNLOAD_SIDEBAR",
 			value1 = "Download");
+	}
+
+	macro downloadViaURL {
+		var portalURL = PropsUtil.get("portal.url");
+
+		if (isSet(siteURLKey)) {
+			var key_siteURLKey = ${siteURLKey};
+		}
+		else {
+			var key_siteURLKey = "guest";
+		}
+
+		Navigator.openSpecificURL(url = "${portalURL}/documents/d/${key_siteURLKey}/${dmDocumentTitle}?download=true");
 	}
 
 	macro downloadWithDirectoryIndexing {
@@ -3758,7 +3771,18 @@ definition {
 
 		DMDocument.expandInfo();
 
-		DMDocument.viewDocumentInfoTitleCmdPG(dmDocumentTitle = ${dmDocumentTitle});
+		if (isSet(noDownloadPermissions)) {
+			AssertElementNotPresent(
+				locator1 = "Button#DOWNLOAD_SIDEBAR",
+				value1 = "Download");
+
+			AssertElementNotPresent(
+				locator1 = "MenuItem#DOWNLOAD",
+				value1 = "Download");
+		}
+		else {
+			DMDocument.viewDocumentInfoTitleCmdPG(dmDocumentTitle = ${dmDocumentTitle});
+		}
 
 		if (isSet(dmDocumentDescription)) {
 			var key_dmDocumentDescription = ${dmDocumentDescription};

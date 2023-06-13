@@ -17,6 +17,7 @@ package com.liferay.notification.type;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.context.NotificationContext;
 import com.liferay.notification.exception.NotificationTemplateAttachmentObjectFieldIdException;
+import com.liferay.notification.exception.NotificationTemplateDescriptionException;
 import com.liferay.notification.exception.NotificationTemplateEditorTypeException;
 import com.liferay.notification.exception.NotificationTemplateNameException;
 import com.liferay.notification.exception.NotificationTemplateObjectDefinitionIdException;
@@ -147,6 +148,13 @@ public abstract class BaseNotificationType implements NotificationType {
 			if (objectDefinition == null) {
 				throw new NotificationTemplateObjectDefinitionIdException();
 			}
+		}
+
+		String description = notificationTemplate.getDescription();
+
+		if (description.length() > 255) {
+			throw new NotificationTemplateDescriptionException(
+				"The description cannot contain more than 255 characters");
 		}
 
 		if (Validator.isNull(notificationTemplate.getEditorType())) {
@@ -304,7 +312,7 @@ public abstract class BaseNotificationType implements NotificationType {
 
 		List<String> termNames = new ArrayList<>();
 
-		Matcher matcher = _pattern.matcher(content);
+		Matcher matcher = _termNamePattern.matcher(content);
 
 		while (matcher.find()) {
 			termNames.add(matcher.group());
@@ -397,7 +405,7 @@ public abstract class BaseNotificationType implements NotificationType {
 	@Reference
 	protected UserLocalService userLocalService;
 
-	private static final Pattern _pattern = Pattern.compile(
+	private static final Pattern _termNamePattern = Pattern.compile(
 		"\\[%[^\\[%]+%\\]", Pattern.CASE_INSENSITIVE);
 
 }

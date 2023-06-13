@@ -15,7 +15,6 @@
 package com.liferay.object.rest.internal.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
@@ -25,6 +24,7 @@ import com.liferay.object.rest.internal.resource.v1_0.test.util.HTTPTestUtil;
 import com.liferay.object.rest.internal.resource.v1_0.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.rest.internal.resource.v1_0.test.util.ObjectEntryTestUtil;
 import com.liferay.object.rest.internal.resource.v1_0.test.util.ObjectRelationshipTestUtil;
+import com.liferay.object.rest.internal.resource.v1_0.test.util.UserAccountTestUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -50,6 +51,8 @@ import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+
+import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -278,29 +281,22 @@ public class SystemObjectRelatedObjectEntriesTest {
 
 		_objectRelationships.add(objectRelationship);
 
-		UserAccount userAccount = _randomUserAccount();
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			userAccount.toString());
-
-		JSONObject objectEntryJSONObject = jsonObject.put(
-			objectRelationship.getName(),
-			JSONFactoryUtil.createJSONObject(
-				JSONUtil.put(
-					_OBJECT_FIELD_NAME, _NEW_OBJECT_FIELD_VALUE_1
-				).put(
-					"externalReferenceCode", _ERC_VALUE_1
-				).toString()));
-
-		jsonObject = HTTPTestUtil.invoke(
-			objectEntryJSONObject.toString(), _getLocation(), Http.Method.POST);
-
-		String systemObjectEntryId = jsonObject.getString("id");
+		JSONObject jsonObject = UserAccountTestUtil.addUserAccountJSONObject(
+			_userSystemObjectDefinitionManager,
+			HashMapBuilder.<String, Serializable>put(
+				objectRelationship.getName(),
+				JSONFactoryUtil.createJSONObject(
+					JSONUtil.put(
+						_OBJECT_FIELD_NAME, _NEW_OBJECT_FIELD_VALUE_1
+					).put(
+						"externalReferenceCode", _ERC_VALUE_1
+					).toString())
+			).build());
 
 		jsonObject = HTTPTestUtil.invoke(
 			null,
 			StringBundler.concat(
-				_getLocation(), StringPool.SLASH, systemObjectEntryId),
+				_getLocation(), StringPool.SLASH, jsonObject.getString("id")),
 			Http.Method.GET);
 
 		Assert.assertEquals(
@@ -326,20 +322,11 @@ public class SystemObjectRelatedObjectEntriesTest {
 			_objectEntry.getPrimaryKey(), _user.getUserId(),
 			ObjectRelationshipConstants.TYPE_ONE_TO_MANY);
 
-		UserAccount userAccount = new UserAccount() {
-			{
-				name = RandomTestUtil.randomString();
-			}
-		};
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			userAccount.toString());
-
-		jsonObject.put(
-			objectRelationship.getName(), JSONFactoryUtil.createJSONArray());
-
-		JSONObject postJSONObject = HTTPTestUtil.invoke(
-			jsonObject.toString(), _getLocation(), Http.Method.POST);
+		JSONObject jsonObject = UserAccountTestUtil.addUserAccountJSONObject(
+			_userSystemObjectDefinitionManager,
+			HashMapBuilder.<String, Serializable>put(
+				objectRelationship.getName(), JSONFactoryUtil.createJSONArray()
+			).build());
 
 		Assert.assertEquals(
 			HttpStatus.BAD_REQUEST.getReasonPhrase(
@@ -347,7 +334,7 @@ public class SystemObjectRelatedObjectEntriesTest {
 			).replace(
 				StringPool.SPACE, StringPool.UNDERLINE
 			),
-			postJSONObject.getString("status"));
+			jsonObject.getString("status"));
 	}
 
 	@Test
@@ -391,44 +378,29 @@ public class SystemObjectRelatedObjectEntriesTest {
 
 		_objectRelationships.add(objectRelationship);
 
-		UserAccount userAccount = _randomUserAccount();
+		JSONObject jsonObject = UserAccountTestUtil.addUserAccountJSONObject(
+			_userSystemObjectDefinitionManager,
+			HashMapBuilder.<String, Serializable>put(
+				objectRelationship.getName(),
+				JSONFactoryUtil.createJSONObject(
+					JSONUtil.put(
+						_OBJECT_FIELD_NAME, RandomTestUtil.randomString()
+					).put(
+						"externalReferenceCode", _ERC_VALUE_1
+					).toString())
+			).build());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			userAccount.toString());
-
-		JSONObject objectEntryJSONObject = jsonObject.put(
-			objectRelationship.getName(),
-			JSONFactoryUtil.createJSONObject(
-				JSONUtil.put(
-					_OBJECT_FIELD_NAME, RandomTestUtil.randomString()
-				).put(
-					"externalReferenceCode", _ERC_VALUE_1
-				).toString()));
-
-		jsonObject = HTTPTestUtil.invoke(
-			objectEntryJSONObject.toString(), _getLocation(), Http.Method.POST);
-
-		String systemObjectEntryId = jsonObject.getString("id");
-
-		UserAccount newUserAccount = _randomUserAccount();
-
-		jsonObject = JSONFactoryUtil.createJSONObject(
-			newUserAccount.toString());
-
-		JSONObject newObjectEntryJSONObject = jsonObject.put(
-			objectRelationship.getName(),
-			JSONFactoryUtil.createJSONObject(
-				JSONUtil.put(
-					_OBJECT_FIELD_NAME, _NEW_OBJECT_FIELD_VALUE_1
-				).put(
-					"externalReferenceCode", _ERC_VALUE_1
-				).toString()));
-
-		HTTPTestUtil.invoke(
-			newObjectEntryJSONObject.toString(),
-			StringBundler.concat(
-				_getLocation(), StringPool.SLASH, systemObjectEntryId),
-			Http.Method.PUT);
+		UserAccountTestUtil.updateUserAccountJSONObject(
+			_userSystemObjectDefinitionManager, jsonObject,
+			HashMapBuilder.<String, Serializable>put(
+				objectRelationship.getName(),
+				JSONFactoryUtil.createJSONObject(
+					JSONUtil.put(
+						_OBJECT_FIELD_NAME, _NEW_OBJECT_FIELD_VALUE_1
+					).put(
+						"externalReferenceCode", _ERC_VALUE_1
+					).toString())
+			).build());
 
 		_assertObjectEntryField(
 			_getObjectEntryByExternalReferenceCodeJSONObject(_ERC_VALUE_1),
@@ -526,82 +498,42 @@ public class SystemObjectRelatedObjectEntriesTest {
 
 		return HTTPTestUtil.invoke(
 			null,
-			com.liferay.portal.kernel.util.StringBundler.concat(
+			StringBundler.concat(
 				_objectDefinition.getRESTContextPath(),
 				"/by-external-reference-code/", externalReferenceCode),
 			Http.Method.GET);
-	}
-
-	private UserAccount _randomUserAccount() throws Exception {
-		return new UserAccount() {
-			{
-				additionalName = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				alternateName = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				birthDate = RandomTestUtil.nextDate();
-				currentPassword = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				dashboardURL = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				dateCreated = RandomTestUtil.nextDate();
-				dateModified = RandomTestUtil.nextDate();
-				emailAddress =
-					StringUtil.toLowerCase(RandomTestUtil.randomString()) +
-						"@liferay.com";
-				familyName = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				givenName = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				honorificPrefix = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				honorificSuffix = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				image = StringUtil.toLowerCase(RandomTestUtil.randomString());
-				jobTitle = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				lastLoginDate = RandomTestUtil.nextDate();
-				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
-				password = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				profileURL = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-			}
-		};
 	}
 
 	private void _testPostSystemObjectEntryWithInvalidNestedCustomObjectEntries(
 			ObjectRelationship objectRelationship, boolean manyToOne)
 		throws Exception {
 
-		JSONObject objectEntryJSONObject;
-
-		UserAccount userAccount = _randomUserAccount();
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			userAccount.toString());
+		JSONObject jsonObject = null;
 
 		if (manyToOne) {
-			objectEntryJSONObject = jsonObject.put(
-				objectRelationship.getName(),
-				_createObjectEntriesJSONArray(
-					new String[] {_ERC_VALUE_1, _ERC_VALUE_2},
-					_OBJECT_FIELD_NAME,
-					new String[] {
-						_NEW_OBJECT_FIELD_VALUE_1, _NEW_OBJECT_FIELD_VALUE_2
-					}));
+			jsonObject = UserAccountTestUtil.addUserAccountJSONObject(
+				_userSystemObjectDefinitionManager,
+				HashMapBuilder.<String, Serializable>put(
+					objectRelationship.getName(),
+					_createObjectEntriesJSONArray(
+						new String[] {_ERC_VALUE_1, _ERC_VALUE_2},
+						_OBJECT_FIELD_NAME,
+						new String[] {
+							_NEW_OBJECT_FIELD_VALUE_1, _NEW_OBJECT_FIELD_VALUE_2
+						})
+				).build());
 		}
 		else {
-			objectEntryJSONObject = jsonObject.put(
-				objectRelationship.getName(),
-				JSONFactoryUtil.createJSONObject(
-					JSONUtil.put(
-						"externalReferenceCode", _ERC_VALUE_1
-					).toString()));
+			jsonObject = UserAccountTestUtil.addUserAccountJSONObject(
+				_userSystemObjectDefinitionManager,
+				HashMapBuilder.<String, Serializable>put(
+					objectRelationship.getName(),
+					JSONFactoryUtil.createJSONObject(
+						JSONUtil.put(
+							"externalReferenceCode", _ERC_VALUE_1
+						).toString())
+				).build());
 		}
-
-		jsonObject = HTTPTestUtil.invoke(
-			objectEntryJSONObject.toString(), _getLocation(), Http.Method.POST);
 
 		Assert.assertEquals("BAD_REQUEST", jsonObject.get("status"));
 	}
@@ -610,30 +542,37 @@ public class SystemObjectRelatedObjectEntriesTest {
 			ObjectRelationship objectRelationship)
 		throws Exception {
 
-		UserAccount userAccount = _randomUserAccount();
+		JSONObject jsonObject = UserAccountTestUtil.addUserAccountJSONObject(
+			_userSystemObjectDefinitionManager,
+			HashMapBuilder.<String, Serializable>put(
+				objectRelationship.getName(),
+				_createObjectEntriesJSONArray(
+					new String[] {_ERC_VALUE_1, _ERC_VALUE_2},
+					_OBJECT_FIELD_NAME,
+					new String[] {
+						_NEW_OBJECT_FIELD_VALUE_1, _NEW_OBJECT_FIELD_VALUE_2
+					})
+			).build());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			userAccount.toString());
+		JSONArray nestedObjectEntriesJSONArray = jsonObject.getJSONArray(
+			objectRelationship.getName());
 
-		JSONObject objectEntryJSONObject = jsonObject.put(
-			objectRelationship.getName(),
-			_createObjectEntriesJSONArray(
-				new String[] {_ERC_VALUE_1, _ERC_VALUE_2}, _OBJECT_FIELD_NAME,
-				new String[] {
-					_NEW_OBJECT_FIELD_VALUE_1, _NEW_OBJECT_FIELD_VALUE_2
-				}));
+		Assert.assertEquals(2, nestedObjectEntriesJSONArray.length());
 
-		jsonObject = HTTPTestUtil.invoke(
-			objectEntryJSONObject.toString(), _getLocation(), Http.Method.POST);
-
-		String systemObjectEntryId = jsonObject.getString("id");
+		_assertObjectEntryField(
+			(JSONObject)nestedObjectEntriesJSONArray.get(0), _OBJECT_FIELD_NAME,
+			_NEW_OBJECT_FIELD_VALUE_1);
+		_assertObjectEntryField(
+			(JSONObject)nestedObjectEntriesJSONArray.get(1), _OBJECT_FIELD_NAME,
+			_NEW_OBJECT_FIELD_VALUE_2);
 
 		jsonObject = HTTPTestUtil.invoke(
 			null,
-			_getLocation(systemObjectEntryId, objectRelationship.getName()),
+			_getLocation(
+				jsonObject.getString("id"), objectRelationship.getName()),
 			Http.Method.GET);
 
-		JSONArray nestedObjectEntriesJSONArray = jsonObject.getJSONArray(
+		nestedObjectEntriesJSONArray = jsonObject.getJSONArray(
 			objectRelationship.getName());
 
 		Assert.assertEquals(2, nestedObjectEntriesJSONArray.length());
@@ -650,49 +589,50 @@ public class SystemObjectRelatedObjectEntriesTest {
 			ObjectRelationship objectRelationship)
 		throws Exception {
 
-		UserAccount userAccount = _randomUserAccount();
+		JSONObject jsonObject = UserAccountTestUtil.addUserAccountJSONObject(
+			_userSystemObjectDefinitionManager,
+			HashMapBuilder.<String, Serializable>put(
+				objectRelationship.getName(),
+				_createObjectEntriesJSONArray(
+					new String[] {_ERC_VALUE_1, _ERC_VALUE_2},
+					_OBJECT_FIELD_NAME,
+					new String[] {
+						RandomTestUtil.randomString(),
+						RandomTestUtil.randomString()
+					})
+			).build());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			userAccount.toString());
+		jsonObject = UserAccountTestUtil.updateUserAccountJSONObject(
+			_userSystemObjectDefinitionManager, jsonObject,
+			HashMapBuilder.<String, Serializable>put(
+				objectRelationship.getName(),
+				_createObjectEntriesJSONArray(
+					new String[] {_ERC_VALUE_1, _ERC_VALUE_2},
+					_OBJECT_FIELD_NAME,
+					new String[] {
+						_NEW_OBJECT_FIELD_VALUE_1, _NEW_OBJECT_FIELD_VALUE_2
+					})
+			).build());
 
-		JSONObject objectEntryJSONObject = jsonObject.put(
-			objectRelationship.getName(),
-			_createObjectEntriesJSONArray(
-				new String[] {_ERC_VALUE_1, _ERC_VALUE_2}, _OBJECT_FIELD_NAME,
-				new String[] {
-					RandomTestUtil.randomString(), RandomTestUtil.randomString()
-				}));
+		JSONArray nestedObjectEntriesJSONArray = jsonObject.getJSONArray(
+			objectRelationship.getName());
 
-		jsonObject = HTTPTestUtil.invoke(
-			objectEntryJSONObject.toString(), _getLocation(), Http.Method.POST);
+		Assert.assertEquals(2, nestedObjectEntriesJSONArray.length());
 
-		String systemObjectEntryId = jsonObject.getString("id");
-
-		UserAccount newUserAccount = _randomUserAccount();
-
-		jsonObject = JSONFactoryUtil.createJSONObject(
-			newUserAccount.toString());
-
-		JSONObject newObjectEntryJSONObject = jsonObject.put(
-			objectRelationship.getName(),
-			_createObjectEntriesJSONArray(
-				new String[] {_ERC_VALUE_1, _ERC_VALUE_2}, _OBJECT_FIELD_NAME,
-				new String[] {
-					_NEW_OBJECT_FIELD_VALUE_1, _NEW_OBJECT_FIELD_VALUE_2
-				}));
-
-		HTTPTestUtil.invoke(
-			newObjectEntryJSONObject.toString(),
-			StringBundler.concat(
-				_getLocation(), StringPool.SLASH, systemObjectEntryId),
-			Http.Method.PUT);
+		_assertObjectEntryField(
+			(JSONObject)nestedObjectEntriesJSONArray.get(0), _OBJECT_FIELD_NAME,
+			_NEW_OBJECT_FIELD_VALUE_1);
+		_assertObjectEntryField(
+			(JSONObject)nestedObjectEntriesJSONArray.get(1), _OBJECT_FIELD_NAME,
+			_NEW_OBJECT_FIELD_VALUE_2);
 
 		jsonObject = HTTPTestUtil.invoke(
 			null,
-			_getLocation(systemObjectEntryId, objectRelationship.getName()),
+			_getLocation(
+				jsonObject.getString("id"), objectRelationship.getName()),
 			Http.Method.GET);
 
-		JSONArray nestedObjectEntriesJSONArray = jsonObject.getJSONArray(
+		nestedObjectEntriesJSONArray = jsonObject.getJSONArray(
 			objectRelationship.getName());
 
 		Assert.assertEquals(2, nestedObjectEntriesJSONArray.length());

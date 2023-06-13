@@ -259,9 +259,16 @@ definition {
 		var passwordRaylife = "portal4all";
 		var email = "${email}@mailinator.com";
 
-		User.loginUserPG(
-			password = ${passwordRaylife},
-			userEmailAddress = ${email});
+		Navigator.openURL();
+
+		SignIn._signIn(
+			licenseExpired = "true",
+			userEmailAddress = ${email},
+			userPassword = ${passwordRaylife});
+
+		Button.click(button = "I Agree");
+
+		User.answerPasswordReminder();
 	}
 
 }

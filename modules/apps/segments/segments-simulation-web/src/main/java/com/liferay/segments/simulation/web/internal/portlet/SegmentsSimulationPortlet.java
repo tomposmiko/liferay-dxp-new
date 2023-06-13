@@ -15,11 +15,21 @@
 package com.liferay.segments.simulation.web.internal.portlet;
 
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.segments.configuration.provider.SegmentsConfigurationProvider;
 import com.liferay.segments.constants.SegmentsPortletKeys;
+import com.liferay.segments.simulation.web.internal.display.context.SegmentsSimulationDisplayContext;
+
+import java.io.IOException;
 
 import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eduardo García
@@ -48,4 +58,25 @@ import org.osgi.service.component.annotations.Component;
 	service = Portlet.class
 )
 public class SegmentsSimulationPortlet extends MVCPortlet {
+
+	@Override
+	public void render(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
+
+		renderRequest.setAttribute(
+			WebKeys.PORTLET_DISPLAY_CONTEXT,
+			new SegmentsSimulationDisplayContext(
+				_portal.getHttpServletRequest(renderRequest),
+				_segmentsConfigurationProvider));
+
+		super.render(renderRequest, renderResponse);
+	}
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private SegmentsConfigurationProvider _segmentsConfigurationProvider;
+
 }

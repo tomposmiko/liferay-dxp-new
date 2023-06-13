@@ -24,6 +24,7 @@ import com.liferay.headless.delivery.client.dto.v1_0.StructuredContent;
 import com.liferay.headless.delivery.client.dto.v1_0.StructuredContentFolder;
 import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
+import com.liferay.headless.delivery.client.permission.Permission;
 import com.liferay.headless.delivery.client.resource.v1_0.StructuredContentFolderResource;
 import com.liferay.headless.delivery.client.resource.v1_0.StructuredContentResource;
 import com.liferay.petra.string.CharPool;
@@ -149,6 +150,11 @@ public class Main {
 		_markdownImportDirName = markdownImportDirName;
 		_offline = offline;
 
+		_taxonomyCategoriesJSONObject = new JSONObject(
+			FileUtils.readFileToString(
+				new File(markdownImportDirName + "/taxonomy-categories.json"),
+				StandardCharsets.UTF_8));
+
 		System.out.println("Liferay URL: " + _liferayURL);
 
 		_addFileNames(_markdownImportDirName);
@@ -271,6 +277,8 @@ public class Main {
 						_structuredContentResource.putStructuredContent(
 							siteStructuredContent.getId(), structuredContent);
 
+					_setVisibility(fileName, siteStructuredContent);
+
 					updatedStructuredContentCount++;
 				}
 				else {
@@ -302,6 +310,8 @@ public class Main {
 								structuredContent.
 									getStructuredContentFolderId(),
 								structuredContent);
+
+					_setVisibility(fileName, structuredContent);
 
 					addedStructuredContentCount++;
 				}
@@ -782,6 +792,54 @@ public class Main {
 		_structuredContentFolderIds.put(key, structuredContentFolderId);
 
 		return structuredContentFolderId;
+	}
+
+	private Long[] _getTaxonomyCategoryIds(String text) {
+		SnakeYamlFrontMatterVisitor snakeYamlFrontMatterVisitor =
+			new SnakeYamlFrontMatterVisitor();
+
+		snakeYamlFrontMatterVisitor.visit(_parser.parse(text));
+
+		Map<String, Object> data = snakeYamlFrontMatterVisitor.getData();
+
+		if ((data == null) || !data.containsKey("taxonomy-category-names")) {
+			return new Long[0];
+		}
+
+		Object taxonomyCategoryNames = data.get("taxonomy-category-names");
+
+		if (!(taxonomyCategoryNames instanceof ArrayList)) {
+			return new Long[0];
+		}
+
+		List<Long> taxonomyCategoryIds = new ArrayList<>();
+
+		for (Object taxonomyCategoryNameObject :
+				(ArrayList)taxonomyCategoryNames) {
+
+			if (!(taxonomyCategoryNameObject instanceof String)) {
+				continue;
+			}
+
+			String taxonomyCategoryName = (String)taxonomyCategoryNameObject;
+
+			if (!_taxonomyCategoriesJSONObject.has(taxonomyCategoryName)) {
+				_warn(
+					"No taxonomy category exists with the name: " +
+						taxonomyCategoryName);
+
+				continue;
+			}
+
+			taxonomyCategoryIds.add(
+				_taxonomyCategoriesJSONObject.getLong(taxonomyCategoryName));
+		}
+
+		if (taxonomyCategoryIds.isEmpty()) {
+			return new Long[0];
+		}
+
+		return taxonomyCategoryIds.toArray(new Long[0]);
 	}
 
 	private String _getTitle(String text) {
@@ -1329,6 +1387,65 @@ public class Main {
 		return line;
 	}
 
+	private void _setVisibility(
+			String fileName, StructuredContent structuredContent)
+		throws Exception {
+
+		SnakeYamlFrontMatterVisitor snakeYamlFrontMatterVisitor =
+			new SnakeYamlFrontMatterVisitor();
+
+		File file = new File(fileName);
+
+		snakeYamlFrontMatterVisitor.visit(
+			_parser.parse(
+				_processMarkdown(
+					FileUtils.readFileToString(file, StandardCharsets.UTF_8),
+					file)));
+
+		Map<String, Object> data = snakeYamlFrontMatterVisitor.getData();
+
+		if ((data == null) || !data.containsKey("visibility")) {
+			return;
+		}
+
+		Object roleNames = data.get("visibility");
+
+		if (!(roleNames instanceof ArrayList)) {
+			return;
+		}
+
+		List<Permission> permissions = new ArrayList<>();
+
+		for (Object roleNamesObject : (ArrayList)roleNames) {
+			if (!(roleNamesObject instanceof String)) {
+				continue;
+			}
+
+			permissions.add(
+				new Permission() {
+					{
+						actionIds = new String[] {"ADD_DISCUSSION", "VIEW"};
+						roleName = (String)roleNamesObject;
+					}
+				});
+		}
+
+		if (permissions.isEmpty()) {
+			return;
+		}
+
+		permissions.add(
+			new Permission() {
+				{
+					actionIds = new String[0];
+					roleName = "Guest";
+				}
+			});
+
+		_structuredContentResource.putStructuredContentPermissionsPage(
+			structuredContent.getId(), permissions.toArray(new Permission[0]));
+	}
+
 	private String _toFriendlyURLPath(File file) {
 		String filePathString = file.getPath();
 
@@ -1569,6 +1686,8 @@ public class Main {
 		structuredContent.setContentStructureId(_liferayContentStructureId);
 		structuredContent.setExternalReferenceCode(_getUuid(englishText));
 		structuredContent.setFriendlyUrlPath(_toFriendlyURLPath(englishFile));
+		structuredContent.setTaxonomyCategoryIds(
+			_getTaxonomyCategoryIds(englishText));
 
 		if (!_offline) {
 			structuredContent.setStructuredContentFolderId(
@@ -1578,7 +1697,6 @@ public class Main {
 		}
 
 		structuredContent.setTitle(englishTitle);
-		structuredContent.setViewableBy(StructuredContent.ViewableBy.ANYONE);
 
 		return structuredContent;
 	}
@@ -1776,6 +1894,7 @@ public class Main {
 		new HashMap<>();
 	private StructuredContentFolderResource _structuredContentFolderResource;
 	private StructuredContentResource _structuredContentResource;
+	private final JSONObject _taxonomyCategoriesJSONObject;
 	private final List<String> _warningMessages = new ArrayList<>();
 	private final Yaml _yaml = new Yaml();
 

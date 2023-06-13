@@ -318,6 +318,22 @@ components:
             required:
                 - className
             type: object
+        ClientExtension:
+            # @review
+            description:
+                Represents a client extension
+            properties:
+                externalReferenceCode:
+                    # @review
+                    description:
+                        The client extension's external reference code.
+                    type: string
+                name:
+                    description:
+                        The client extension's name.
+                    readOnly: true
+                    type: string
+            type: object
         CollectionViewport:
             # @review
             description:
@@ -4060,6 +4076,12 @@ components:
                     # @review
                     description:
                         The page's SEO settings.
+                sitePageNavigationMenuSettings:
+                    allOf:
+                        - $ref: "#/components/schemas/SitePageNavigationMenuSettings"
+                    # @review
+                    description:
+                        The page's site navigation menu settings.
             type: object
         PageTemplate:
             # @review
@@ -4537,6 +4559,25 @@ components:
                     description:
                         The page's CSS.
                     type: string
+                favIcon:
+                    # @review
+                    description:
+                        The FavIcon of the page
+                    oneOf:
+                        - $ref: "#/components/schemas/ClientExtension"
+                        - $ref: "#/components/schemas/ContentDocument"
+                globalCSSClientExtensions:
+                    description:
+                        The client extensions for global css associated to the page.
+                    items:
+                        $ref: "#/components/schemas/ClientExtension"
+                    type: array
+                globalJSClientExtensions:
+                    description:
+                        The client extensions for global js associated to the page.
+                    items:
+                        $ref: "#/components/schemas/ClientExtension"
+                    type: array
                 javascript:
                     # @review
                     description:
@@ -4564,6 +4605,12 @@ components:
                                 The stylebook's name.
                             type: string
                     type: object
+                themeCSSClientExtension:
+                    allOf:
+                        - $ref: "#/components/schemas/ClientExtension"
+                    # @review
+                    description:
+                        The Client Extension for the theme css of a page
                 themeName:
                     # @review
                     description:
@@ -4789,6 +4836,28 @@ components:
                     # @review
                     description:
                         The localized submission of page type.
+            type: object
+        SitePageNavigationMenuSettings:
+            # @review
+            description:
+                Represents settings related with the site navigation menu of a page.
+            properties:
+                queryString:
+                    # @review
+                    description:
+                        The default parameter for a page.
+                    type: string
+                target:
+                    # @review
+                    description:
+                        The page's description to be used as summary for search engines.
+                    type: string
+                targetType:
+                    # @review
+                    description:
+                        The target's type (specific frame or new tab).
+                    enum: [SpecificFrame, NewTab]
+                    type: string
             type: object
         StructuredContent:
             description:
@@ -5162,7 +5231,7 @@ components:
                     # @review
                     description:
                         The utility page template type.
-                    enum: [Error, ErrorCode404, TermsOfUse]
+                    enum: [Error, ErrorCode404, ErrorCode500, TermsOfUse]
                     type: string
             type: object
         WidgetInstance:
@@ -5485,7 +5554,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.delivery.client', and version '4.0.56'."
+        'com.liferay.headless.delivery.client', and version '4.0.57'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"

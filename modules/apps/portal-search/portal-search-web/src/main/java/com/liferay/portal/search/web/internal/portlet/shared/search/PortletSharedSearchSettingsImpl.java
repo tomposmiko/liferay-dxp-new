@@ -98,12 +98,6 @@ public class PortletSharedSearchSettingsImpl
 	}
 
 	@Override
-	public Optional<String> getParameter71(String name) {
-		return Optional.ofNullable(
-			_portletSharedRequestHelper.getParameter(name, _renderRequest));
-	}
-
-	@Override
 	public Optional<String> getParameterOptional(String name) {
 		return Optional.ofNullable(
 			_portletSharedRequestHelper.getParameter(name, _renderRequest));
@@ -118,20 +112,8 @@ public class PortletSharedSearchSettingsImpl
 	}
 
 	@Override
-	public Optional<String[]> getParameterValues71(String name) {
-		return Optional.ofNullable(
-			_portletSharedRequestHelper.getParameterValues(
-				name, _renderRequest));
-	}
-
-	@Override
 	public String getPortletId() {
 		return _portletId;
-	}
-
-	@Override
-	public Optional<PortletPreferences> getPortletPreferences71() {
-		return _portletPreferencesOptional;
 	}
 
 	@Override

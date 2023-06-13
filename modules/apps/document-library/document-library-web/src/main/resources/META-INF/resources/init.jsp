@@ -132,7 +132,6 @@ page import="com.liferay.document.library.web.internal.util.DLBreadcrumbUtil" %>
 page import="com.liferay.document.library.web.internal.util.DLSubscriptionUtil" %><%@
 page import="com.liferay.document.library.web.internal.util.DLWebComponentProvider" %><%@
 page import="com.liferay.document.library.web.internal.util.IGUtil" %><%@
-page import="com.liferay.dynamic.data.mapping.kernel.DDMStructure" %><%@
 page import="com.liferay.dynamic.data.mapping.kernel.DDMStructureManager" %><%@
 page import="com.liferay.dynamic.data.mapping.kernel.DDMStructureManagerUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.kernel.NoSuchStructureException" %><%@
@@ -140,6 +139,7 @@ page import="com.liferay.dynamic.data.mapping.kernel.StorageFieldRequiredExcepti
 page import="com.liferay.dynamic.data.mapping.kernel.StructureDefinitionException" %><%@
 page import="com.liferay.dynamic.data.mapping.kernel.StructureDuplicateElementException" %><%@
 page import="com.liferay.dynamic.data.mapping.kernel.StructureNameException" %><%@
+page import="com.liferay.dynamic.data.mapping.model.DDMStructure" %><%@
 page import="com.liferay.dynamic.data.mapping.service.DDMStorageLinkLocalServiceUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil" %><%@
 page import="com.liferay.dynamic.data.mapping.storage.DDMFormValues" %><%@
@@ -233,10 +233,8 @@ page import="java.util.Objects" %>
 <%
 DLTrashHelper dlTrashHelper = (DLTrashHelper)request.getAttribute(DLWebKeys.DOCUMENT_LIBRARY_TRASH_HELPER);
 
-DLWebComponentProvider dlWebComponentProvider = DLWebComponentProvider.getDLWebComponentProvider();
-
-DLDisplayContextProvider dlDisplayContextProvider = dlWebComponentProvider.getDLDisplayContextProvider();
-IGDisplayContextProvider igDisplayContextProvider = dlWebComponentProvider.getIGDisplayContextProvider();
+DLDisplayContextProvider dlDisplayContextProvider = DLWebComponentProvider.getDLDisplayContextProvider();
+IGDisplayContextProvider igDisplayContextProvider = DLWebComponentProvider.getIGDisplayContextProvider();
 
 Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);

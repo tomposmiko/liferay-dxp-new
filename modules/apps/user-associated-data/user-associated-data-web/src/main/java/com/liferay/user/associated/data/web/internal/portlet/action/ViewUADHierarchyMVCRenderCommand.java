@@ -70,7 +70,8 @@ public class ViewUADHierarchyMVCRenderCommand implements MVCRenderCommand {
 
 			UADDisplay<Object> uadDisplay =
 				(UADDisplay<Object>)_uadRegistry.getUADDisplay(
-					ParamUtil.getString(renderRequest, "parentContainerClass"));
+					ParamUtil.getString(
+						renderRequest, "parentContainerTypeKey"));
 
 			renderRequest.setAttribute(
 				UADWebKeys.UAD_INFO_PANEL_DISPLAY,
@@ -135,12 +136,11 @@ public class ViewUADHierarchyMVCRenderCommand implements MVCRenderCommand {
 				_portal.getLiferayPortletResponse(renderResponse),
 				renderRequest, applicationKey,
 				PortletURLUtil.getCurrent(renderRequest, renderResponse),
-				groupIds, uadDisplay.getTypeClass(),
+				groupIds, uadDisplay.getTypeKey(),
 				ParamUtil.getLong(renderRequest, "parentContainerId"),
 				_selectedUserHelper.getSelectedUser(renderRequest),
 				uadHierarchyDisplay));
-		viewUADEntitiesDisplay.setTypeClasses(
-			uadHierarchyDisplay.getTypeClasses());
+		viewUADEntitiesDisplay.setTypeKeys(uadHierarchyDisplay.getTypeKeys());
 
 		return viewUADEntitiesDisplay;
 	}

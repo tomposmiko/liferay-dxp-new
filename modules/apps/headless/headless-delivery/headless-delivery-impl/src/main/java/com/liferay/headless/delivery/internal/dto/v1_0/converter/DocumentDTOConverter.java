@@ -33,12 +33,13 @@ import com.liferay.document.library.kernel.model.DLFileVersion;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryMetadataLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
+import com.liferay.document.library.util.DLFileEntryTypeUtil;
 import com.liferay.document.library.util.DLURLHelper;
-import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
-import com.liferay.dynamic.data.mapping.kernel.StorageEngineManagerUtil;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.storage.DDMStorageEngineManager;
 import com.liferay.dynamic.data.mapping.util.DDMBeanTranslator;
 import com.liferay.headless.delivery.dto.v1_0.AdaptedImage;
 import com.liferay.headless.delivery.dto.v1_0.ContentField;
@@ -233,7 +234,9 @@ public class DocumentDTOConverter
 
 		List<DDMFormValues> ddmFormValues = new ArrayList<>();
 
-		for (DDMStructure ddmStructure : dlFileEntryType.getDDMStructures()) {
+		for (DDMStructure ddmStructure :
+				DLFileEntryTypeUtil.getDDMStructures(dlFileEntryType)) {
+
 			DLFileEntryMetadata dlFileEntryMetadata =
 				_dlFileEntryMetadataLocalService.fetchFileEntryMetadata(
 					ddmStructure.getStructureId(),
@@ -244,9 +247,8 @@ public class DocumentDTOConverter
 			}
 
 			ddmFormValues.add(
-				_ddmBeanTranslator.translate(
-					StorageEngineManagerUtil.getDDMFormValues(
-						dlFileEntryMetadata.getDDMStorageId())));
+				_ddmStorageEngineManager.getDDMFormValues(
+					dlFileEntryMetadata.getDDMStorageId()));
 		}
 
 		return ddmFormValues;
@@ -269,9 +271,8 @@ public class DocumentDTOConverter
 			return 0;
 		}
 
-		com.liferay.dynamic.data.mapping.model.DDMStructure ddmStructure =
-			_ddmStructureService.getStructure(
-				dlFileEntryType.getDataDefinitionId());
+		DDMStructure ddmStructure = _ddmStructureService.getStructure(
+			dlFileEntryType.getDataDefinitionId());
 
 		return ddmStructure.getStructureId();
 	}
@@ -387,6 +388,9 @@ public class DocumentDTOConverter
 
 	@Reference
 	private DDMBeanTranslator _ddmBeanTranslator;
+
+	@Reference
+	private DDMStorageEngineManager _ddmStorageEngineManager;
 
 	@Reference
 	private DDMStructureService _ddmStructureService;

@@ -17,7 +17,13 @@ const API_URL = {
 	FDS_DYNAMIC_FILTERS: '/o/c/fdsdynamicfilters',
 	FDS_ENTRIES: '/o/c/fdsentries',
 	FDS_FIELDS: '/o/c/fdsfields',
+	FDS_SORTS: '/o/c/fdssorts',
 	FDS_VIEWS: '/o/c/fdsviews',
+};
+
+const FUZZY_OPTIONS = {
+	post: '</strong>',
+	pre: '<strong>',
 };
 
 const OBJECT_RELATIONSHIP = {
@@ -31,6 +37,8 @@ const OBJECT_RELATIONSHIP = {
 		'r_fdsViewFDSDynamicFilterRelationship_c_fdsViewId',
 	FDS_VIEW_FDS_FIELD: 'fdsViewFDSFieldRelationship',
 	FDS_VIEW_FDS_FIELD_ID: 'r_fdsViewFDSFieldRelationship_c_fdsViewId',
+	FDS_VIEW_FDS_SORT: 'fdsViewFDSSortRelationship',
+	FDS_VIEW_FDS_SORT_ID: 'r_fdsViewFDSSortRelationship_c_fdsViewId',
 } as const;
 
 const PAGINATION_PROPS = {
@@ -40,4 +48,4 @@ const PAGINATION_PROPS = {
 	},
 };
 
-export {API_URL, OBJECT_RELATIONSHIP, PAGINATION_PROPS};
+export {API_URL, FUZZY_OPTIONS, OBJECT_RELATIONSHIP, PAGINATION_PROPS};

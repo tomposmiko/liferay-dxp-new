@@ -1,13 +1,12 @@
 import {useEffect, useState} from 'react';
 
-import brightnessEmptyIcon from '../../assets/icons/brightness-empty.svg';
-import documentationIcon from '../../assets/icons/documentation-icon.svg';
-import emptyImage from '../../assets/icons/emptyImage.svg';
-import globeIcon from '../../assets/icons/globe-icon.svg';
-import guideIcon from '../../assets/icons/guide-icon.svg';
-import phoneIcon from '../../assets/icons/phone-icon.svg';
-import scheduleIcon from '../../assets/icons/schedule-icon.svg';
-import usageTermsIcon from '../../assets/icons/usage-terms-icon.svg';
+import brightnessEmptyIcon from '../../assets/icons/brightness_empty_icon.svg';
+import documentationIcon from '../../assets/icons/documentation_icon.svg';
+import globeIcon from '../../assets/icons/globe_icon.svg';
+import guideIcon from '../../assets/icons/guide_icon.svg';
+import phoneIcon from '../../assets/icons/phone_icon.svg';
+import scheduleIcon from '../../assets/icons/schedule_icon.svg';
+import usageTermsIcon from '../../assets/icons/usage_terms_icon.svg';
 import {Checkbox} from '../../components/Checkbox/Checkbox';
 import {Header} from '../../components/Header/Header';
 import {NewAppPageFooterButtons} from '../../components/NewAppPageFooterButtons/NewAppPageFooterButtons';
@@ -22,6 +21,7 @@ import {
 } from '../../utils/api';
 import {CardSection} from './CardSection';
 import {ReviewAndSubmitAppPageUtilProps} from './ReviewAndSubmitAppPageUtil';
+import {showAppImage} from '../../utils/util';
 
 import './ReviewAndSubmitAppPage.scss';
 
@@ -189,58 +189,52 @@ export function ReviewAndSubmitAppPage({
 			const newCardInfos: {icon: string; link: string; title: string}[] =
 				[];
 
-			productSpecificationsResponse.items.map(
-				(specification: {
-					specificationKey: string;
-					title: {[key: string]: string};
-					value: {[key: string]: string};
-				}) => {
-					const {specificationKey, value} = specification;
-					const localizedValue = value['en_US'];
+			productSpecificationsResponse.map((specification) => {
+				const {specificationKey, value} = specification;
+				const localizedValue = value['en_US'];
 
-					if (specificationKey === 'version') {
-						setVersion(localizedValue);
-					}
-					else if (specificationKey === 'notes') {
-						setNotes(localizedValue);
-					}
-					else if (specificationKey === 'supporturl') {
-						newCardInfos.push({
-							icon: phoneIcon,
-							link: localizedValue,
-							title: 'Support URL',
-						});
-					}
-					else if (specificationKey === 'publisherwebsiteurl') {
-						newCardInfos.push({
-							icon: globeIcon,
-							link: localizedValue,
-							title: 'Publisher website URL',
-						});
-					}
-					else if (specificationKey === 'appusagetermsurl') {
-						newCardInfos.push({
-							icon: usageTermsIcon,
-							link: localizedValue,
-							title: 'App usage terms (EULA) URL',
-						});
-					}
-					else if (specificationKey === 'appdocumentationurl') {
-						newCardInfos.push({
-							icon: documentationIcon,
-							link: localizedValue,
-							title: 'App documentation URL',
-						});
-					}
-					else if (specificationKey === 'appinstallationguideurl') {
-						newCardInfos.push({
-							icon: guideIcon,
-							link: localizedValue,
-							title: 'App installation guide URL',
-						});
-					}
+				if (specificationKey === 'version') {
+					setVersion(localizedValue);
 				}
-			);
+				else if (specificationKey === 'notes') {
+					setNotes(localizedValue);
+				}
+				else if (specificationKey === 'supporturl') {
+					newCardInfos.push({
+						icon: phoneIcon,
+						link: localizedValue,
+						title: 'Support URL',
+					});
+				}
+				else if (specificationKey === 'publisherwebsiteurl') {
+					newCardInfos.push({
+						icon: globeIcon,
+						link: localizedValue,
+						title: 'Publisher website URL',
+					});
+				}
+				else if (specificationKey === 'appusagetermsurl') {
+					newCardInfos.push({
+						icon: usageTermsIcon,
+						link: localizedValue,
+						title: 'App usage terms (EULA) URL',
+					});
+				}
+				else if (specificationKey === 'appdocumentationurl') {
+					newCardInfos.push({
+						icon: documentationIcon,
+						link: localizedValue,
+						title: 'App documentation URL',
+					});
+				}
+				else if (specificationKey === 'appinstallationguideurl') {
+					newCardInfos.push({
+						icon: guideIcon,
+						link: localizedValue,
+						title: 'App installation guide URL',
+					});
+				}
+			});
 
 			setCardInfos(newCardInfos);
 		};
@@ -275,9 +269,9 @@ export function ReviewAndSubmitAppPage({
 									<div
 										className="upload-logo-icon"
 										style={{
-											backgroundImage: `url(${
-												appLogo?.preview || emptyImage
-											})`,
+											backgroundImage: `url(${showAppImage(
+												appLogo?.preview
+											)})`,
 											backgroundPosition: '50% 50%',
 											backgroundRepeat: 'no-repeat',
 											backgroundSize: 'cover',

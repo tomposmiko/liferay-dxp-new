@@ -142,16 +142,16 @@ portletDisplay.setURLBack(backURL);
 				</clay:row>
 			</div>
 
-			<div class="form-group">
-				<h3 class="sheet-subtitle">
-					<liferay-ui:message key="password" />
-				</h3>
+			<c:if test="<%= PrefsPropsUtil.getBoolean(company.getCompanyId(), PropsKeys.LOGIN_CREATE_ACCOUNT_ALLOW_CUSTOM_PASSWORD, PropsValues.LOGIN_CREATE_ACCOUNT_ALLOW_CUSTOM_PASSWORD) %>">
+				<div class="form-group">
+					<h3 class="sheet-subtitle">
+						<liferay-ui:message key="password" />
+					</h3>
 
-				<clay:row>
-					<clay:col
-						md="6"
-					>
-						<c:if test="<%= PropsValues.LOGIN_CREATE_ACCOUNT_ALLOW_CUSTOM_PASSWORD %>">
+					<clay:row>
+						<clay:col
+							md="6"
+						>
 							<aui:input label="password" name="password1" size="30" type="password" value="">
 								<aui:validator name="required" />
 							</aui:input>
@@ -163,10 +163,10 @@ portletDisplay.setURLBack(backURL);
 
 								<aui:validator name="required" />
 							</aui:input>
-						</c:if>
-					</clay:col>
-				</clay:row>
-			</div>
+						</clay:col>
+					</clay:row>
+				</div>
+			</c:if>
 		</clay:sheet-section>
 	</liferay-frontend:edit-form-body>
 

@@ -22,8 +22,10 @@ import com.liferay.content.dashboard.item.action.ContentDashboardItemAction;
 import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtype;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.info.item.InfoItemReference;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.url.builder.ResourceURLBuilder;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletRenderRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletRenderResponse;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletURL;
@@ -31,11 +33,10 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.language.LanguageImpl;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PortalImpl;
 
 import java.util.Collections;
 import java.util.Date;
@@ -45,12 +46,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import javax.portlet.PortletRequest;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import org.mockito.Mockito;
 
 /**
  * @author Cristina González
@@ -65,13 +70,15 @@ public class ContentDashboardDropdownItemsProviderTest {
 	public static void setUpClass() {
 		_language = new LanguageImpl();
 
-		LanguageUtil languageUtil = new LanguageUtil();
+		_mockResourceURL();
 
-		languageUtil.setLanguage(_language);
+		_portal = Mockito.mock(Portal.class);
 
-		PortalUtil portalUtil = new PortalUtil();
-
-		portalUtil.setPortal(new PortalImpl());
+		Mockito.when(
+			_portal.getCurrentURL(Mockito.any(PortletRequest.class))
+		).thenReturn(
+			StringPool.BLANK
+		);
 	}
 
 	@Test
@@ -88,7 +95,7 @@ public class ContentDashboardDropdownItemsProviderTest {
 			contentDashboardDropdownItemsProvider =
 				new ContentDashboardDropdownItemsProvider(
 					_language, mockLiferayPortletRenderRequest,
-					new MockLiferayPortletRenderResponse(), new PortalImpl());
+					new MockLiferayPortletRenderResponse(), _portal);
 
 		DropdownItem dropdownItem = _findFirstDropdownItem(
 			contentDashboardDropdownItemsProvider.getDropdownItems(
@@ -119,7 +126,7 @@ public class ContentDashboardDropdownItemsProviderTest {
 			contentDashboardDropdownItemsProvider =
 				new ContentDashboardDropdownItemsProvider(
 					_language, mockLiferayPortletRenderRequest,
-					new MockLiferayPortletRenderResponse(), new PortalImpl());
+					new MockLiferayPortletRenderResponse(), _portal);
 
 		DropdownItem dropdownItem = _findFirstDropdownItem(
 			contentDashboardDropdownItemsProvider.getDropdownItems(
@@ -155,7 +162,7 @@ public class ContentDashboardDropdownItemsProviderTest {
 			contentDashboardDropdownItemsProvider =
 				new ContentDashboardDropdownItemsProvider(
 					_language, mockLiferayPortletRenderRequest,
-					new MockLiferayPortletRenderResponse(), new PortalImpl());
+					new MockLiferayPortletRenderResponse(), _portal);
 
 		DropdownItem dropdownItems = _findFirstDropdownItem(
 			contentDashboardDropdownItemsProvider.getDropdownItems(
@@ -170,6 +177,68 @@ public class ContentDashboardDropdownItemsProviderTest {
 		Assert.assertNotNull(dropdownItems);
 		Assert.assertEquals(
 			"validURL", String.valueOf(dropdownItems.get("href")));
+	}
+
+	private static void _mockResourceURL() {
+		Mockito.mockStatic(ResourceURLBuilder.class);
+
+		ResourceURLBuilder.ResourceURLStep resourceURLStep = Mockito.mock(
+			ResourceURLBuilder.ResourceURLStep.class);
+
+		Mockito.when(
+			ResourceURLBuilder.createResourceURL(
+				Mockito.any(LiferayPortletResponse.class))
+		).thenReturn(
+			resourceURLStep
+		);
+
+		ResourceURLBuilder.AfterBackURLStep afterBackURLStep = Mockito.mock(
+			ResourceURLBuilder.AfterBackURLStep.class);
+
+		Mockito.when(
+			resourceURLStep.setBackURL(Mockito.anyString())
+		).thenReturn(
+			afterBackURLStep
+		);
+
+		Mockito.when(
+			resourceURLStep.setBackURL(
+				Mockito.any(ResourceURLBuilder.UnsafeSupplier.class))
+		).thenReturn(
+			afterBackURLStep
+		);
+
+		ResourceURLBuilder.AfterParameterStep afterParameterStep = Mockito.mock(
+			ResourceURLBuilder.AfterParameterStep.class);
+
+		Mockito.when(
+			afterBackURLStep.setParameter(
+				Mockito.anyString(), Mockito.anyString())
+		).thenReturn(
+			afterParameterStep
+		);
+
+		Mockito.when(
+			afterParameterStep.setParameter(
+				Mockito.anyString(), Mockito.anyLong())
+		).thenReturn(
+			afterParameterStep
+		);
+
+		ResourceURLBuilder.AfterResourceIDStep afterResourceIDStep =
+			Mockito.mock(ResourceURLBuilder.AfterResourceIDStep.class);
+
+		Mockito.when(
+			afterParameterStep.setResourceID(Mockito.anyString())
+		).thenReturn(
+			afterResourceIDStep
+		);
+
+		Mockito.when(
+			afterResourceIDStep.buildString()
+		).thenReturn(
+			StringPool.BLANK
+		);
 	}
 
 	private DropdownItem _findFirstDropdownItem(
@@ -361,5 +430,6 @@ public class ContentDashboardDropdownItemsProviderTest {
 	}
 
 	private static Language _language;
+	private static Portal _portal;
 
 }

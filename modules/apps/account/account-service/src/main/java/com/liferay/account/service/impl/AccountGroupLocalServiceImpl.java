@@ -16,6 +16,7 @@ package com.liferay.account.service.impl;
 
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.exception.AccountGroupNameException;
+import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountGroup;
 import com.liferay.account.model.AccountGroupRel;
 import com.liferay.account.service.base.AccountGroupLocalServiceBaseImpl;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.SortFactoryUtil;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -50,6 +52,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -193,6 +196,25 @@ public class AccountGroupLocalServiceImpl
 	}
 
 	@Override
+	public List<AccountGroup> getAccountGroupsByAccountEntryId(
+		long accountEntryId, int start, int end) {
+
+		List<AccountGroupRel> accountGroupRels =
+			_accountGroupRelPersistence.findByC_C(
+				_classNameLocalService.getClassNameId(
+					AccountEntry.class.getName()),
+				accountEntryId, start, end, null);
+
+		if (accountGroupRels.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		return accountGroupPersistence.findByAccountGroupId(
+			TransformUtil.transformToLongArray(
+				accountGroupRels, AccountGroupRel::getAccountGroupId));
+	}
+
+	@Override
 	public List<AccountGroup> getAccountGroupsByAccountGroupId(
 		long[] accountGroupIds) {
 
@@ -212,6 +234,13 @@ public class AccountGroupLocalServiceImpl
 
 		return accountGroupPersistence.countByC_LikeN(
 			companyId, StringUtil.quote(name, StringPool.PERCENT));
+	}
+
+	@Override
+	public int getAccountGroupsCountByAccountEntryId(long accountEntryId) {
+		return _accountGroupRelPersistence.countByC_C(
+			_classNameLocalService.getClassNameId(AccountEntry.class.getName()),
+			accountEntryId);
 	}
 
 	@Override
@@ -402,6 +431,9 @@ public class AccountGroupLocalServiceImpl
 
 	@Reference
 	private AccountGroupRelPersistence _accountGroupRelPersistence;
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
 	private ResourceLocalService _resourceLocalService;

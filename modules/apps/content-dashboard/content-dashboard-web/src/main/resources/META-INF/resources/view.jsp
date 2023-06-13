@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (ContentDashboardAdminDisplayContext)request.getAttribute(ContentDashboardWebKeys.CONTENT_DASHBOARD_ADMIN_DISPLAY_CONTEXT);
+ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (ContentDashboardAdminDisplayContext)request.getAttribute(ContentDashboardAdminDisplayContext.class.getName());
 %>
 
 <div class="cadmin sidebar-wrapper">
@@ -105,7 +105,7 @@ ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (Conte
 
 			<clay:management-toolbar
 				cssClass="content-dashboard-management-toolbar"
-				managementToolbarDisplayContext="<%= (ContentDashboardAdminManagementToolbarDisplayContext)request.getAttribute(ContentDashboardWebKeys.CONTENT_DASHBOARD_ADMIN_MANAGEMENT_TOOLBAR_DISPLAY_CONTEXT) %>"
+				managementToolbarDisplayContext="<%= (ContentDashboardAdminManagementToolbarDisplayContext)request.getAttribute(ContentDashboardAdminManagementToolbarDisplayContext.class.getName()) %>"
 				propsTransformer="js/ContentDashboardManagementToolbarPropsTransformer"
 			/>
 

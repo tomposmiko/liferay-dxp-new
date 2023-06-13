@@ -1,7 +1,7 @@
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
 import {useEffect, useState} from 'react';
 
-import accountLogo from '../../assets/icons/mainAppLogo.svg';
+import {showAccountImage} from '../../utils/util';
 import {DashboardNavigation} from '../../components/DashboardNavigation/DashboardNavigation';
 import {DashboardMemberTableRow} from '../../components/DashboardTable/DashboardMemberTableRow';
 import {DashboardTable} from '../../components/DashboardTable/DashboardTable';
@@ -12,7 +12,8 @@ import {
 	getAccounts,
 	getChannels,
 	getMyUserAccount,
-	getOrders,
+	getAccountInfoFromCommerce,
+	getPlacedOrders,
 	getSKUCustomFieldExpandoValue,
 	getUserAccounts,
 } from '../../utils/api';
@@ -86,8 +87,41 @@ const memberTableHeaders = [
 	},
 ];
 
+const appMessages = {
+	description: 'Manage apps purchase from the Marketplace',
+	emptyStateMessage: {
+		description1:
+			'Purchase and install new apps and they will show up here.',
+		description2: 'Click on “Add Apps” to start.',
+		title: 'No Apps Yet',
+	},
+	title: 'My Apps',
+};
+
+const memberMessages = {
+	description: 'Manage users in your development team and invite new ones',
+	emptyStateMessage: {
+		description1: 'Create new members and they will show up here.',
+		description2: 'Click on “New Member” to start.',
+		title: 'No Members Yet',
+	},
+	title: 'Members',
+};
+
+const solutionMessages = {
+	description: 'Manage solution trial and purchases from the Marketplace',
+	emptyStateMessage: {
+		description1:
+			'Purchase and install new solutions and they will show up here.',
+		description2: 'Click on “New Solutions” to start.',
+		title: 'No Solutions Yet',
+	},
+	title: 'My Solutions',
+};
+
 export function PurchasedAppsDashboardPage() {
 	const [accounts, setAccounts] = useState<Account[]>(initialAccountState);
+	const [commerceAccount, setCommerceAccount] = useState<CommerceAccount>();
 	const [selectedAccount, setSelectedAccount] = useState<Account>(
 		accounts[0]
 	);
@@ -98,31 +132,10 @@ export function PurchasedAppsDashboardPage() {
 		initialDashboardNavigationItems
 	);
 	const [members, setMembers] = useState<MemberProps[]>(Array<MemberProps>());
+	const [solutionsItems, setSolutionsItems] = useState<PlacedOrder[]>([]);
 	const [selectedMember, setSelectedMember] = useState<MemberProps>();
 	const [selectedNavigationItem, setSelectedNavigationItem] =
 		useState('My Apps');
-
-	const messages = {
-		description: 'Manage apps purchase from the Marketplace',
-		emptyStateMessage: {
-			description1:
-				'Purchase and install new apps and they will show up here.',
-			description2: 'Click on “Add Apps” to start.',
-			title: 'No apps yet',
-		},
-		title: 'My Apps',
-	};
-
-	const memberMessages = {
-		description:
-			'Manage users in your development team and invite new ones',
-		emptyStateMessage: {
-			description1: 'Create new members and they will show up here.',
-			description2: 'Click on “New Member” to start.',
-			title: 'No members yet',
-		},
-		title: 'Members',
-	};
 
 	useEffect(() => {
 		const makeFetch = async () => {
@@ -153,15 +166,32 @@ export function PurchasedAppsDashboardPage() {
 					(channel) => channel.name === 'Marketplace Channel'
 				) || channels[0];
 
-			const placedOrders = await getOrders(
+			const placedOrders = await getPlacedOrders(
 				selectedAccount?.id || 50307,
 				channel.id,
 				page,
 				purchasedAppTable.pageSize
 			);
 
-			const newOrderItems = await Promise.all(
-				placedOrders.items.map(async (order) => {
+			const commerceAccountResponse = await getAccountInfoFromCommerce(
+				selectedAccount.id
+			);
+
+			setCommerceAccount(commerceAccountResponse);
+
+			const filteredAppOrders = placedOrders.items.filter(
+				({orderTypeExternalReferenceCode}) =>
+					orderTypeExternalReferenceCode === 'CLOUDAPP' ||
+					orderTypeExternalReferenceCode === 'DXPAPP'
+			);
+
+			const filteredSolutionsOrders = placedOrders.items.filter(
+				({orderTypeExternalReferenceCode}) =>
+					orderTypeExternalReferenceCode === 'SOLUTION30'
+			);
+
+			const newAppOrderItems = await Promise.all(
+				filteredAppOrders.map(async (order) => {
 					const [placeOrderItem] = order.placedOrderItems;
 
 					const date = new Date(order.createDate);
@@ -197,10 +227,12 @@ export function PurchasedAppsDashboardPage() {
 				})
 			);
 
+			setSolutionsItems(filteredSolutionsOrders);
+
 			setPurchasedAppTable((previousPurchasedAppTable) => {
 				return {
 					...previousPurchasedAppTable,
-					items: newOrderItems,
+					items: newAppOrderItems,
 					totalCount: placedOrders.totalCount,
 				};
 			});
@@ -229,7 +261,7 @@ export function PurchasedAppsDashboardPage() {
 					dashboardNavigationItem.itemSelected
 			) || dashboardNavigationItems[0];
 
-		setSelectedNavigationItem(clickedNavigationItem?.itemTitle as string);
+		setSelectedNavigationItem(clickedNavigationItem?.itemName as string);
 
 		if (clickedNavigationItem.itemTitle !== 'Members') {
 			setSelectedMember(undefined);
@@ -340,7 +372,7 @@ export function PurchasedAppsDashboardPage() {
 		<div className="purchased-apps-dashboard-page-container">
 			<DashboardNavigation
 				accountAppsNumber={purchasedAppTable.items.length.toString()}
-				accountIcon={accountLogo}
+				accountIcon={showAccountImage(commerceAccount?.logoURL)}
 				accounts={accounts}
 				currentAccount={selectedAccount}
 				dashboardNavigationItems={dashboardNavigationItems}
@@ -348,15 +380,15 @@ export function PurchasedAppsDashboardPage() {
 				setSelectedAccount={setSelectedAccount}
 			/>
 
-			{selectedNavigationItem === 'My Apps' && (
+			{selectedNavigationItem === 'myApps' && (
 				<DashboardPage
 					buttonMessage="Add Apps"
 					buttonHref="https://marketplace.liferay.com/"
 					dashboardNavigationItems={dashboardNavigationItems}
-					messages={messages}
+					messages={appMessages}
 				>
 					<DashboardTable<PurchasedAppProps>
-						emptyStateMessage={messages.emptyStateMessage}
+						emptyStateMessage={appMessages.emptyStateMessage}
 						items={purchasedAppTable.items}
 						tableHeaders={tableHeaders}
 					>
@@ -388,7 +420,22 @@ export function PurchasedAppsDashboardPage() {
 				</DashboardPage>
 			)}
 
-			{selectedNavigationItem === 'Members' && (
+			{selectedNavigationItem === 'solutions' && (
+				<DashboardPage
+					dashboardNavigationItems={dashboardNavigationItems}
+					messages={solutionMessages}
+				>
+					<DashboardTable
+						emptyStateMessage={solutionMessages.emptyStateMessage}
+						items={solutionsItems}
+						tableHeaders={[]}
+					>
+						{(item) => <></>}
+					</DashboardTable>
+				</DashboardPage>
+			)}
+
+			{selectedNavigationItem === 'members' && (
 				<DashboardPage
 					dashboardNavigationItems={dashboardNavigationItems}
 					messages={memberMessages}
