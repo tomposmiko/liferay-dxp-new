@@ -39,7 +39,10 @@ import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -149,12 +152,20 @@ public class BatchEngineImportTaskExecutorImpl
 	private void _importItems(BatchEngineImportTask batchEngineImportTask)
 		throws Throwable {
 
+		Map<String, Serializable> parameters =
+			batchEngineImportTask.getParameters();
+
+		if (parameters == null) {
+			parameters = Collections.emptyMap();
+		}
+
 		try (BatchEngineImportTaskItemReader batchEngineImportTaskItemReader =
 				_batchEngineImportTaskItemReaderFactory.create(
 					BatchEngineTaskContentType.valueOf(
 						batchEngineImportTask.getContentType()),
 					_batchEngineImportTaskLocalService.openContentInputStream(
-						batchEngineImportTask.getBatchEngineImportTaskId()));
+						batchEngineImportTask.getBatchEngineImportTaskId()),
+					parameters);
 			BatchEngineTaskItemDelegateExecutor
 				batchEngineTaskItemDelegateExecutor =
 					_batchEngineTaskItemDelegateExecutorFactory.create(
@@ -162,7 +173,7 @@ public class BatchEngineImportTaskExecutorImpl
 						batchEngineImportTask.getClassName(),
 						_companyLocalService.getCompany(
 							batchEngineImportTask.getCompanyId()),
-						batchEngineImportTask.getParameters(),
+						parameters,
 						_userLocalService.getUser(
 							batchEngineImportTask.getUserId()))) {
 

@@ -19,8 +19,12 @@ import {
 	STORAGE_KEYS,
 	Storage,
 } from '../../../../../../common/services/liferay/storage';
+import {RAYLIFE_PAGES} from '../../../../../../common/utils/constants';
 import {clearExitAlert} from '../../../../../../common/utils/exitAlert';
-import {getLiferaySiteName} from '../../../../../../common/utils/liferay';
+import {
+	getLiferaySiteName,
+	redirectTo,
+} from '../../../../../../common/utils/liferay';
 import {createQuoteRetrieve} from '../../../../services/QuoteRetrieve';
 
 const liferaySiteName = getLiferaySiteName();
@@ -45,7 +49,7 @@ const ProgressSaved = ({
 
 			clearExitAlert();
 
-			window.location.href = liferaySiteName;
+			redirectTo(RAYLIFE_PAGES.HOME);
 		}
 		catch (error) {
 			setError('Unable to save your information. Please try again.');

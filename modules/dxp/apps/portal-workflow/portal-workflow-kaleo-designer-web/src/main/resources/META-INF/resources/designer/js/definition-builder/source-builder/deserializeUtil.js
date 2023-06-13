@@ -83,17 +83,6 @@ DeserializeUtil.prototype = {
 					return;
 				}
 
-				// To be removed after next stories
-
-				if (
-					type !== 'start' &&
-					type !== 'end' &&
-					type !== 'state' &&
-					type !== 'task'
-				) {
-					type = 'state';
-				}
-
 				elements.push({
 					data,
 					id: nodeId,

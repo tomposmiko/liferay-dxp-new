@@ -126,7 +126,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -708,7 +708,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -1021,7 +1021,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Object A");
 
 		ObjectAdmin.gotoRelationshipsTab();
 
@@ -1081,7 +1081,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.goToFieldsTab();
 
@@ -1326,9 +1326,9 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		CreateObject.deleteObjectViaUI(objectName = "Custom Object");
+		CreateObject.deleteObjectViaUI(objectLabel = "Custom Object");
 
-		CreateObject.assertObjectNotPresent(objectName = "Custom Object");
+		CreateObject.assertObjectNotPresent(objectLabel = "Custom Object");
 	}
 
 	@description = "LPS-135401 - Verify that it is possible to delete a relation with an entry on the Relationship tab"
@@ -1444,7 +1444,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.gotoRelationshipsTab();
 
@@ -1660,7 +1660,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.gotoRelationshipsTab();
 
@@ -1879,7 +1879,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.gotoRelationshipsTab();
 
@@ -1923,7 +1923,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.gotoRelationshipsTab();
 
@@ -2130,7 +2130,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -2437,12 +2437,44 @@ definition {
 	}
 
 	@description = "LPS-135390 - Verify it is not possible to view an Object without the View permission"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotViewObjectWithoutViewPermission {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141607 CannotViewObjectWithoutViewPermission pending implementation
+		JSONRole.addRegularRole(
+			roleKey = "Regular Role",
+			roleTitle = "Regular Role");
 
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "VIEW_CONTROL_PANEL",
+			resourceName = "90",
+			roleTitle = "Regular Role");
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONRole.assignRoleToUser(
+			roleTitle = "Regular Role",
+			userEmailAddress = "userea@liferay.com");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		ObjectAdmin.openObjectAdmin();
+
+		CreateObject.assertCustomObjectNotPresent(labelName = "Custom Object");
 	}
 
 	@description = "LPS-135549 - Verify it is possible to Publish a Custom Object"
@@ -2964,7 +2996,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -3225,7 +3257,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		CreateObject.viewObject(labelName = "Custom Object");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		CreateObject.editLabel(labelName = "Update Custom Object");
 
@@ -3233,7 +3265,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		CreateObject.viewObject(labelName = "Custom Object");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		CreateObject.assertObjectLabel(labelName = "Update Custom Object");
 	}
@@ -3357,7 +3389,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		CreateObject.viewObject(labelName = "Custom Object");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		CreateObject.editPluralLabel(pluralLabelName = "Update Plural Label Custom Object");
 
@@ -3365,7 +3397,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		CreateObject.viewObject(labelName = "Custom Object");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		CreateObject.assertObjectPluralLabel(pluralLabelName = "Update Plural Label Custom Object");
 	}
@@ -3444,7 +3476,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.gotoRelationshipsTab();
 
@@ -3494,7 +3526,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -3582,7 +3614,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -3648,7 +3680,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -3699,7 +3731,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.gotoRelationshipsTab();
 
@@ -3844,8 +3876,7 @@ definition {
 
 		Button.clickSave();
 
-		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
-			fieldName = "customObjectField",
+		ObjectAdmin.addObjectBoleanFieldEntryViaUI(
 			objectName = "CustomObject",
 			value = "true");
 
@@ -3928,7 +3959,7 @@ definition {
 
 		Button.clickSave();
 
-		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+		ObjectAdmin.addObjectSingleFieldNumericAndBooleanEntryViaAPI(
 			fieldName = "customObjectField",
 			objectName = "CustomObject",
 			value = "12.34");
@@ -3970,7 +4001,7 @@ definition {
 
 		Button.clickSave();
 
-		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+		ObjectAdmin.addObjectSingleFieldNumericAndBooleanEntryViaAPI(
 			fieldName = "customObjectField",
 			objectName = "CustomObject",
 			value = "123");
@@ -4012,10 +4043,9 @@ definition {
 
 		Button.clickSave();
 
-		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
-			fieldName = "customObjectField",
-			objectName = "CustomObject",
-			value = "12345678912345678");
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectAdmin.addObjectLongFieldEntryViaUI(entryValue = "12345678912345678");
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
 
@@ -4327,7 +4357,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.assertObjectDetailsPage();
 	}
@@ -4377,7 +4407,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.gotoRelationshipsTab();
 
@@ -4416,7 +4446,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.goToLayoutsTab();
 
@@ -4589,12 +4619,102 @@ definition {
 	}
 
 	@description = "LPS-135401 - Verify that when adding an entry that was already related to another it will keep related to both entries"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ChoosingAlreadyRelatedEntryWillKeepOnBothEntries {
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object ${letter}",
+				objectName = "CustomObject${letter}",
+				pluralLabelName = "Custom Objects ${letter}");
+		}
 
-		// TODO LPS-141663 ChoosingAlreadyRelatedEntryWillKeepOnBothEntries pending implementation
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldLabelName = "Custom Field ${letter}",
+				fieldName = "customObjectField${letter}",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject${letter}");
 
+			ObjectAdmin.addObjectLayoutViaAPI(
+				layoutName = "Layout Name",
+				objectName = "CustomObject${letter}");
+		}
+
+		ObjectAdmin.addObjectRelationshipViaAPI(
+			objectName_1 = "CustomObjectA",
+			objectName_2 = "CustomObjectB",
+			relationshipLabel = "Relationship",
+			relationshipName = "relationship",
+			relationshipType = "manyToMany");
+
+		for (var letter : list "A,B") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object ${letter}");
+
+			CreateObject.selectTitleField(fieldLabel = "Custom Field ${letter}");
+
+			CreateObject.saveObject();
+
+			ObjectAdmin.goToLayoutsTab();
+
+			ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+			ObjectAdmin.markLayoutAsDefault();
+
+			ObjectAdmin.goToLayoutTabOnLayouts();
+
+			ObjectAdmin.addTabFieldsOnLayout(
+				blockName = "Block 1",
+				columnsNumber = "1",
+				fieldLabelName = "Custom Field ${letter}",
+				tabName = "Field Tab");
+
+			ObjectAdmin.addTabRelationshipsOnLayout(
+				relationshipsLabelName = "Relationship",
+				tabName = "Relationship Tab");
+
+			Button.clickSave();
+		}
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObjectA");
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObjectB");
+
+		for (var nameEntry : list "A,B") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customObjectFieldA",
+				objectName = "CustomObjectA",
+				value = "Entry ${nameEntry}");
+		}
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customObjectFieldB",
+			objectName = "CustomObjectB",
+			value = "Entry C");
+
+		for (var nameEntry : list "A,B") {
+			ObjectAdmin.goToCustomObject(objectName = "CustomObjectA");
+
+			ObjectPortlet.viewEntryDetails(entry = "Entry ${nameEntry}");
+
+			ObjectAdmin.gotoRelationshipsTab();
+
+			CreateObject.addRelationshipAndSelectEntry(titleFieldName = "Entry C");
+
+			Refresh();
+
+			ObjectPortlet.viewEntry(entry = "Entry C");
+		}
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObjectA");
+
+		ObjectPortlet.viewEntryDetails(entry = "Entry A");
+
+		ObjectAdmin.gotoRelationshipsTab();
+
+		ObjectPortlet.viewEntry(entry = "Entry C");
 	}
 
 	@description = "LPS-135549 - Verify that the columns Name and Type are displayed for the Fields table"
@@ -4999,7 +5119,7 @@ definition {
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
 
 		ObjectAdmin.gotoRelationshipsTab();
 
@@ -5059,12 +5179,46 @@ definition {
 	}
 
 	@description = "LPS-140097 - Verify that other fields are not deleted when a Relationship field is deleted after a Relationship is deleted"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test FieldsAreNotDeletedWhenRelationshipDeleted {
+		for (var nameObject : list "A,B") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object ${nameObject}",
+				objectName = "CustomObject${nameObject}",
+				pluralLabelName = "Custom Objects ${nameObject}");
+		}
 
-		// TODO LPS-141687 FieldsAreNotDeletedWhenRelationshipDeleted pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field B",
+			fieldName = "customObjectFieldB",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObjectB");
 
+		ObjectAdmin.addObjectRelationshipViaAPI(
+			objectName_1 = "CustomObjectA",
+			objectName_2 = "CustomObjectB",
+			relationshipLabel = "Relationship",
+			relationshipName = "relationship",
+			relationshipType = "oneToMany");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object A");
+
+		ObjectAdmin.gotoRelationshipsTab();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "Delete");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object B");
+
+		ObjectAdmin.goToFieldsTab();
+
+		ObjectAdmin.assertObjectField(
+			fieldLabel = "Custom Field",
+			fieldType = "String");
 	}
 
 	@description = "LPS-137874 - Verify that Objects created on a Virtual Instance are not displayed on the Forms Settings, Collection Providers and Display Page Template of the Main Instance and vice versa"
@@ -5107,12 +5261,31 @@ definition {
 	}
 
 	@description = "LPS-135635 - Verify that the options Keyword and Text disappears under the Searchable section when updating the field type from String to another type"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test KeywordAndTextDisappearsWhenUpdateFieldType {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-138852 KeywordAndTextDisappearsWhenUpdateFieldType pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field",
+			fieldName = "customField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		ObjectAdmin.goToFieldsDetails(label = "Custom Field");
+
+		CreateObject.editType(fieldType = "Integer");
+
+		ObjectAdmin.assertKeywordAndTextNotPresent();
 	}
 
 	@description = "LPS-135549 - Verify that the field with String type has the options Keyword and Text under the Searchable section"
@@ -5379,6 +5552,8 @@ definition {
 	@description = "LPS-135649 - Verify that pending and completed Object entries disappears from Workflow Metrics page when they are deleted"
 	@priority = "4"
 	test ObjectEntriesDisappearsWorkflowMetricsWhenDeleted {
+		property test.run.environment = "EE";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object",
 			objectName = "CustomObject",
@@ -5424,12 +5599,51 @@ definition {
 	}
 
 	@description = "LPS-135649 - Verify that pending and completed Object entries disappears from Workflow pages (My Workflow Tasks, Submissions, and My Submissions) when they are deleted"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ObjectEntriesDisappearsWorkflowPagesWhenDeleted {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141635 ObjectEntriesDisappearsWorkflowPagesWhenDeleted pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.openWorkflowProcessBuilderConfiguration();
+
+		Workflow.configureWorkflow(
+			workflowDefinition = "Single Approver",
+			workflowResourceValue = "Custom Object");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectPortlet.addSingleFieldEntryViaUI(entry = "Entry Test");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectPortlet.deleteEntry(entry = "Entry Test");
+
+		Navigator.openURL();
+
+		ObjectAdmin.openMyWorkflowTasks();
+
+		Navigator.gotoNavTab(navTab = "Assigned to My Roles");
+
+		Workflow.viewCompletedTasksTaskNotPresentCP(workflowAssetTitle = "Custom Object");
+
+		ObjectAdmin.openMySubmissions();
+
+		CreateObject.assertObjectNotPresentInSubmissions(objectName = "Custom Object");
+
+		ObjectAdmin.openSubmissions();
+
+		CreateObject.assertObjectNotPresentInSubmissions(objectName = "Custom Object");
 	}
 
 	@description = "LPS-139005 - Verify that pending and completed Object entries with workflow are not displayed on the workflow pages (My Workflow Tasks, My Submissions, and Submissions) when inactivated"
@@ -6282,12 +6496,27 @@ definition {
 	}
 
 	@description = "LPS-135401 - Verify that by default the Prevent deletion type of Relationship is selected"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test PreventDeletionIsDefault {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141664 PreventDeletionIsDefault pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.gotoRelationshipsTab();
+
+		ObjectAdmin.addObjectRelationshipViaUI(
+			label = "Relationship",
+			object = "CustomObject",
+			type = "One to Many");
+
+		ObjectAdmin.goToRelationshipsDetails(fieldName = "Relationship");
+
+		CreateObject.assertSelectedValueInDeletionType(deletionType = "Prevent");
 	}
 
 	@description = "LPS-135401 - Verify if Prevent deletion type of Relationship Many to Many won't allow the user to delete an entry with relation"
@@ -6591,13 +6820,39 @@ definition {
 	}
 
 	@description = "LPS-135401 - Verify that the Relationship is created on both objects for a Many to Many Relationship"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test RelationshipCreatedBothObjectsManyToMany {
 		property portal.acceptance = "true";
 
-		// TODO LPS-145353 RelationshipCreatedBothObjectsManyToMany pending implementation
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object ${letter}",
+				objectName = "CustomObject${letter}",
+				pluralLabelName = "Custom Objects ${letter}");
+		}
 
+		ObjectAdmin.addObjectRelationshipViaAPI(
+			objectName_1 = "CustomObjectA",
+			objectName_2 = "CustomObjectB",
+			relationshipLabel = "Relationship",
+			relationshipName = "relationship",
+			relationshipType = "manyToMany");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object A");
+
+		ObjectAdmin.gotoRelationshipsTab();
+
+		CreateObject.assertRelatedObject(relatedObject = "CustomObjectB");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object B");
+
+		ObjectAdmin.gotoRelationshipsTab();
+
+		CreateObject.assertRelatedObject(relatedObject = "CustomObjectA");
 	}
 
 	@description = "LPS-135400 - Verify that relationship field is automatically created"
@@ -6877,12 +7132,103 @@ definition {
 	}
 
 	@description = "LPS-139005 - Verify that the Relationship tab is no longer displayed when the other object is inactivated (Many to Many)"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test RelationshipTabDisappearsWhenInactivatedManyToMany {
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object ${letter}",
+				objectName = "CustomObject${letter}",
+				pluralLabelName = "Custom Objects ${letter}");
+		}
 
-		// TODO LPS-140874 RelationshipTabDisappearsWhenInactivatedManyToMany pending implementation
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldLabelName = "Custom Field ${letter}",
+				fieldName = "customObjectField${letter}",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject${letter}");
+		}
 
+		ObjectAdmin.addObjectRelationshipViaAPI(
+			objectName_1 = "CustomObjectA",
+			objectName_2 = "CustomObjectB",
+			relationshipLabel = "Relationship",
+			relationshipName = "relationship",
+			relationshipType = "manyToMany");
+
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectLayoutViaAPI(
+				layoutName = "Layout",
+				objectName = "CustomObject${letter}");
+		}
+
+		for (var letter : list "A,B") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object ${letter}");
+
+			ObjectAdmin.goToLayoutsTab();
+
+			ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+			ObjectAdmin.markLayoutAsDefault();
+
+			ObjectAdmin.goToLayoutTabOnLayouts();
+
+			ObjectAdmin.addTabFieldsOnLayout(
+				blockName = "Block 1",
+				columnsNumber = "1",
+				fieldLabelName = "Custom Field ${letter}",
+				tabName = "Field Tab");
+
+			ObjectAdmin.addTabRelationshipsOnLayout(
+				relationshipsLabelName = "Relationship",
+				tabName = "Relationship Tab");
+
+			Button.clickSave();
+		}
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObjectA");
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObjectB");
+
+		for (var fieldEntry : list "A,B") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customObjectField${fieldEntry}",
+				objectName = "CustomObject${fieldEntry}",
+				value = "Entry ${fieldEntry}");
+		}
+
+		ObjectAdmin.openObjectAdmin();
+
+		CreateObject.inactiveCustomObject(objectName = "Custom Object B");
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObjectA");
+
+		ObjectPortlet.viewEntryDetails(entry = "Entry A");
+
+		ObjectAdmin.assertRelationshipTabNotPresent();
+
+		Navigator.openURL();
+
+		ObjectAdmin.openObjectAdmin();
+
+		CreateObject.activeCustomObject(objectName = "Custom Object B");
+
+		ObjectAdmin.openObjectAdmin();
+
+		CreateObject.inactiveCustomObject(objectName = "Custom Object A");
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObjectB");
+
+		ObjectPortlet.viewEntryDetails(entry = "Entry B");
+
+		ObjectAdmin.assertRelationshipTabNotPresent();
 	}
 
 	@description = "LPS-139005 - Verify that the Relationship tab is no longer displayed when the child object is inactivated (One to Many)"

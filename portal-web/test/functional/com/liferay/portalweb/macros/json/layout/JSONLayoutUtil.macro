@@ -56,11 +56,17 @@ definition {
 		else if ("${widgetName}" == "Breadcrumb") {
 			var portletId = "com_liferay_site_navigation_breadcrumb_web_portlet_SiteNavigationBreadcrumbPortlet";
 		}
-		else if ("${widgetName}" == "Categories Navigation") {
+		else if ("${widgetName}" == "Category Filter") {
 			var portletId = "com_liferay_asset_categories_navigation_web_portlet_AssetCategoriesNavigationPortlet";
+		}
+		else if ("${widgetName}" == "Category Content") {
+			var portletId = "com_liferay_commerce_product_content_web_internal_portlet_CPCategoryContentPortlet";
 		}
 		else if ("${widgetName}" == "Clay Sample") {
 			var portletId = "com_liferay_clay_sample_web_portlet_ClaySamplePortlet";
+		}
+		else if ("${widgetName}" == "Commerce Categories Navigation") {
+			var portletId = "com_liferay_commerce_product_asset_categories_navigation_web_internal_portlet_CPAssetCategoriesNavigationPortlet";
 		}
 		else if ("${widgetName}" == "Contacts Center") {
 			var portletId = "com_liferay_contacts_web_portlet_ContactsCenterPortlet";
@@ -86,10 +92,10 @@ definition {
 		else if ("${widgetName}" == "Invite Members") {
 			var portletId = "com_liferay_invitation_invite_members_web_portlet_InviteMembersPortlet";
 		}
-		else if ("${widgetName}" == "JS A11y Sample Web") {
+		else if ("${widgetName}" == "JS A11y Sample") {
 			var portletId = "com_liferay_frontend_js_a11y_sample_web_internal_portlet_FrontendJSA11ySampleWebPortlet";
 		}
-		else if ("${widgetName}" == "JS Clay Sample Web") {
+		else if ("${widgetName}" == "JS Clay Sample") {
 			var portletId = "com_liferay_frontend_js_clay_sample_web_internal_portlet_FrontendJSClaySampleWebPortlet";
 		}
 		else if ("${widgetName}" == "Knowledge Base Article") {
@@ -128,7 +134,7 @@ definition {
 		else if ("${widgetName}" == "My Sites") {
 			var portletId = "com_liferay_site_my_sites_web_portlet_MySitesPortlet";
 		}
-		else if ("${widgetName}" == "Navigation Menu") {
+		else if ("${widgetName}" == "Menu Display Widget") {
 			var portletId = "com_liferay_site_navigation_menu_web_portlet_SiteNavigationMenuPortlet";
 		}
 		else if ("${widgetName}" == "Nested Applications") {
@@ -173,7 +179,7 @@ definition {
 		else if ("${widgetName}" == "Sites Directory") {
 			var portletId = "com_liferay_site_navigation_directory_web_portlet_SitesDirectoryPortlet";
 		}
-		else if ("${widgetName}" == "Tags Navigation") {
+		else if ("${widgetName}" == "Tag Filter") {
 			var portletId = "com_liferay_asset_tags_navigation_web_portlet_AssetTagsNavigationPortlet";
 		}
 		else if ("${widgetName}" == "Tree Menu") {

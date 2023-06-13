@@ -86,8 +86,10 @@ public abstract class BaseDBColumnSizeUpgradeProcess extends UpgradeProcess {
 					}
 				}
 
-				try (ResultSet indexResultSet = databaseMetaData.getIndexInfo(
-						catalog, schema, tableName, false, false)) {
+				DB db = DBManagerUtil.getDB();
+
+				try (ResultSet indexResultSet = db.getIndexResultSet(
+						connection, tableName)) {
 
 					while (indexResultSet.next()) {
 						invalidColumnNames.add(

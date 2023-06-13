@@ -82,13 +82,14 @@ const QuickLinksPanel = ({accountKey}) => {
 	}, [quickLinks, fetchQuickLinksPanelContent]);
 
 	return (
-		<div>
+		<>
 			{quickLinksContents.length ? (
 				<div
 					className={classNames(
-						'link-body p-4 quick-links-container rounded',
+						'link-body quick-links-container rounded',
 						{
-							'position-absolute': !expandedPanel,
+							'p-4': expandedPanel,
+							'position-absolute px-3 py-4': !expandedPanel,
 						}
 					)}
 				>
@@ -96,7 +97,12 @@ const QuickLinksPanel = ({accountKey}) => {
 						<h5 className="m-0 text-neutral-10">Quick Links</h5>
 
 						<a
-							className="btn p-2 text-neutral-8 text-paragraph-sm"
+							className={classNames(
+								'btn font-weight-bold p-2 text-neutral-8 text-paragraph-sm',
+								{
+									'pl-3': !expandedPanel,
+								}
+							)}
 							onClick={() => {
 								setExpandedPanel(!expandedPanel);
 								Storage.setItem(
@@ -107,12 +113,10 @@ const QuickLinksPanel = ({accountKey}) => {
 						>
 							<ClayIcon
 								className="mr-1"
-								symbol={
-									expandedPanel ? 'hr' : 'order-arrow-left'
-								}
+								symbol={expandedPanel ? 'hr' : 'plus'}
 							/>
 
-							{expandedPanel ? 'Hide' : 'Show'}
+							{expandedPanel ? 'Hide' : ''}
 						</a>
 					</div>
 
@@ -120,7 +124,7 @@ const QuickLinksPanel = ({accountKey}) => {
 						<div>
 							{quickLinksContents.map((quickLinkContent) => (
 								<div
-									className="bg-white link-body my-3 p-3 rounded-lg"
+									className="bg-white link-body my-3 p-3 quick-links-card rounded-lg"
 									dangerouslySetInnerHTML={{
 										__html: DOMPurify.sanitize(
 											quickLinkContent,
@@ -138,7 +142,7 @@ const QuickLinksPanel = ({accountKey}) => {
 			) : (
 				<QuickLinksSkeleton />
 			)}
-		</div>
+		</>
 	);
 };
 

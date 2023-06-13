@@ -42,7 +42,12 @@
 </tr>
 <tr>
 	<td>NODE_LIST</td>
-	<td>//div[contains(@class,'treeview-node-list')] | //li[contains(@class,'tree-node')]</td>
+	<td>//div[contains(@class,'treeview-node-list')] | //ul[contains(@class,'tree-pages')] | //div[contains(@class,'navigation-menu-items-tree')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NODE_LIST_ITEM</td>
+	<td>//li[contains(@class,'tree-node')]//a[contains(text(),'${key_itemName}')]</td>
 	<td></td>
 </tr>
 <tr>

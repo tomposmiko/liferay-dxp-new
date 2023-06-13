@@ -76,6 +76,23 @@ public class DispatchLogLocalServiceImpl
 	}
 
 	@Override
+	public DispatchLog deleteDispatchLog(long dispatchLogId)
+		throws PortalException {
+
+		DispatchLog dispatchLog = dispatchLogPersistence.findByPrimaryKey(
+			dispatchLogId);
+
+		if (DispatchTaskStatus.valueOf(dispatchLog.getStatus()) ==
+				DispatchTaskStatus.IN_PROGRESS) {
+
+			throw new DispatchLogStatusException(
+				"Dispatch log cannot be deleted while task is in progress");
+		}
+
+		return dispatchLogPersistence.remove(dispatchLogId);
+	}
+
+	@Override
 	public void deleteDispatchLogs(long dispatchTriggerId) {
 		dispatchLogPersistence.removeByDispatchTriggerId(dispatchTriggerId);
 	}

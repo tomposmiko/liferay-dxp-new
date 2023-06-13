@@ -9,19 +9,13 @@
  * distribution rights of the Software.
  */
 
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-	useReducer,
-} from 'react';
+import {createContext, useContext, useEffect, useReducer} from 'react';
 import client from '../../../apolloClient';
 import {useApplicationProvider} from '../../../common/context/ApplicationPropertiesProvider';
-import {useCustomEvent} from '../../../common/hooks/useCustomEvent';
-import {LiferayTheme} from '../../../common/services/liferay';
+import {Liferay} from '../../../common/services/liferay';
 import {fetchSession} from '../../../common/services/liferay/api';
 import {
+	getAccountRoles,
 	getAccountSubscriptionGroups,
 	getKoroneikiAccounts,
 	getStructuredContentFolders,
@@ -31,6 +25,7 @@ import {
 	PARAMS_KEYS,
 	SearchParams,
 } from '../../../common/services/liferay/search-params';
+import {ROLES_PERMISSIONS} from '../../../common/utils/constants';
 import {isValidPage} from '../../../common/utils/page.validation';
 import {CUSTOM_EVENTS} from '../utils/constants';
 import reducer, {actionTypes} from './reducer';
@@ -44,11 +39,20 @@ const getCurrentPageName = () => {
 	return pathSplit.length > 2 ? pathSplit[2] : '';
 };
 
+const EVENT_OPTION = {
+	async: true,
+	fireOnce: true,
+};
+
 const AppContextProvider = ({assetsPath, children, page}) => {
 	const {oktaSessionURL} = useApplicationProvider();
-	const dispatchEventUserAccount = useCustomEvent(CUSTOM_EVENTS.USER_ACCOUNT);
-	const dispatchEventSubscriptionGroups = useCustomEvent(
-		CUSTOM_EVENTS.SUBSCRIPTION_GROUPS
+	const eventUserAccount = Liferay.publish(
+		CUSTOM_EVENTS.USER_ACCOUNT,
+		EVENT_OPTION
+	);
+	const eventSubscriptionGroups = Liferay.publish(
+		CUSTOM_EVENTS.SUBSCRIPTION_GROUPS,
+		EVENT_OPTION
 	);
 
 	const [state, dispatch] = useReducer(reducer, {
@@ -62,61 +66,74 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 		userAccount: undefined,
 	});
 
-	const onPageMenuChange = useCallback(({detail}) => {
-		dispatch({
-			payload: detail,
-			type: actionTypes.UPDATE_PAGE,
-		});
-	}, []);
-
 	useEffect(() => {
-		window.addEventListener(CUSTOM_EVENTS.MENU_PAGE, onPageMenuChange);
+		const handler = ({detail}) =>
+			dispatch({
+				payload: detail,
+				type: actionTypes.UPDATE_PAGE,
+			});
 
-		return () => {
-			window.removeEventListener(
-				CUSTOM_EVENTS.MENU_PAGE,
-				onPageMenuChange
-			);
-		};
-	}, [onPageMenuChange]);
+		Liferay.on(CUSTOM_EVENTS.MENU_PAGE, handler);
+
+		return () => Liferay.detach(CUSTOM_EVENTS.MENU_PAGE, handler);
+	}, []);
 
 	useEffect(() => {
 		const getUser = async () => {
 			const {data} = await client.query({
 				query: getUserAccount,
 				variables: {
-					id: LiferayTheme.getUserId(),
+					id: Liferay.ThemeDisplay.getUserId(),
 				},
 			});
 
 			if (data) {
+				const {data: accountRolesData} = await client.query({
+					query: getAccountRoles,
+					variables: {
+						accountId: data.userAccount.id,
+					},
+				});
+
+				const isAccountAdministrator = !!accountRolesData.accountAccountRoles?.items?.find(
+					({name}) => name === ROLES_PERMISSIONS.ACCOUNT_ADMINISTRATOR
+				);
+
+				const userAccount = {
+					...data.userAccount,
+					isAdmin: isAccountAdministrator,
+				};
+
 				dispatch({
-					payload: data.userAccount,
+					payload: userAccount,
 					type: actionTypes.UPDATE_USER_ACCOUNT,
 				});
 
-				dispatchEventUserAccount(data.userAccount);
+				eventUserAccount.fire({
+					detail: data.userAccount,
+				});
 
-				return data.userAccount;
+				return userAccount;
 			}
 		};
 
-		const getProject = async (projectExternalReferenceCode) => {
+		const getProject = async (externalReferenceCode, accountBrief) => {
 			const {data: projects} = await client.query({
 				query: getKoroneikiAccounts,
 				variables: {
-					filter: `accountKey eq '${projectExternalReferenceCode}'`,
+					filter: `accountKey eq '${externalReferenceCode}'`,
 				},
 			});
 
 			if (projects) {
-				const project = projects?.c?.koroneikiAccounts?.items[0];
 				dispatch({
-					payload: project,
+					payload: {
+						...projects.c.koroneikiAccounts.items[0],
+						id: accountBrief.id,
+						name: accountBrief.name,
+					},
 					type: actionTypes.UPDATE_PROJECT,
 				});
-
-				return project;
 			}
 		};
 
@@ -136,7 +153,9 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 					type: actionTypes.UPDATE_SUBSCRIPTION_GROUPS,
 				});
 
-				dispatchEventSubscriptionGroups(items);
+				eventSubscriptionGroups.fire({
+					detail: items,
+				});
 			}
 		};
 
@@ -156,7 +175,7 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 				query: getStructuredContentFolders,
 				variables: {
 					filter: `name eq 'actions'`,
-					siteKey: LiferayTheme.getScopeGroupId(),
+					siteKey: Liferay.ThemeDisplay.getScopeGroupId(),
 				},
 			});
 
@@ -184,10 +203,18 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 				);
 
 				if (isValid) {
-					getProject(projectExternalReferenceCode);
-					getSubscriptionGroups(projectExternalReferenceCode);
-					getStructuredContents();
-					getSessionId();
+					const accountBrief = user.accountBriefs?.find(
+						(accountBrief) =>
+							accountBrief.externalReferenceCode ===
+							projectExternalReferenceCode
+					);
+
+					if (accountBrief) {
+						getProject(projectExternalReferenceCode, accountBrief);
+						getSubscriptionGroups(projectExternalReferenceCode);
+						getStructuredContents();
+						getSessionId();
+					}
 				}
 			}
 		};

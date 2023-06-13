@@ -31,13 +31,11 @@ import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.service.RegionService;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -260,28 +258,22 @@ public class CommerceAddressDisplayContext {
 		}
 
 		_searchContainer = new SearchContainer<>(
-			_liferayPortletRequest, getPortletURL(), null, null);
-
-		_searchContainer.setEmptyResultsMessage("there-are-no-addresses");
-
-		OrderByComparator<CommerceAddress> orderByComparator =
-			CommerceUtil.getCommerceAddressOrderByComparator(
-				"create-date", "desc");
+			_liferayPortletRequest, getPortletURL(), null,
+			"there-are-no-addresses");
 
 		_searchContainer.setOrderByCol("create-date");
-		_searchContainer.setOrderByComparator(orderByComparator);
+		_searchContainer.setOrderByComparator(
+			CommerceUtil.getCommerceAddressOrderByComparator(
+				"create-date", "desc"));
 		_searchContainer.setOrderByType("desc");
 
 		CommerceAccount commerceAccount = getCommerceAccount();
 
-		BaseModelSearchResult<CommerceAddress> baseModelSearchResult =
+		_searchContainer.setResultsAndTotal(
 			_commerceAddressService.searchCommerceAddresses(
 				commerceAccount.getCompanyId(), CommerceAccount.class.getName(),
 				commerceAccount.getCommerceAccountId(), null,
-				_searchContainer.getStart(), _searchContainer.getEnd(), null);
-
-		_searchContainer.setTotal(baseModelSearchResult.getLength());
-		_searchContainer.setResults(baseModelSearchResult.getBaseModels());
+				_searchContainer.getStart(), _searchContainer.getEnd(), null));
 
 		return _searchContainer;
 	}

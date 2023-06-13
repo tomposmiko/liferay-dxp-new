@@ -168,8 +168,14 @@ definition {
 
 	macro assertObjectNotPresent {
 		AssertElementNotPresent(
-			key_tabName = "${objectName}",
+			key_tabName = "${objectLabel}",
 			locator1 = "ObjectAdmin#ANY_TAB_ON_ENTRY");
+	}
+
+	macro assertObjectNotPresentInSubmissions {
+		AssertElementNotPresent(
+			key_submissionName = "${objectName}",
+			locator1 = "WorkflowSubmissions#SUBMISSION_BY_NAME");
 	}
 
 	macro assertObjectPluralLabel {
@@ -194,6 +200,17 @@ definition {
 		AssertElementPresent(
 			key_radioOption = "${radioOption}",
 			locator1 = "ObjectAdmin#FIELDS_RADIO_OPTION");
+	}
+
+	macro assertSelectedValueInDeletionType {
+		WaitForSPARefresh();
+
+		SelectFrame.selectFrameNoLoading(locator1 = "CommerceEntry#IFRAME_SIDE_PANEL");
+
+		AssertElementPresent(
+			key_fieldLabel = "Deletion Type",
+			key_value = "${deletionType}",
+			locator1 = "CreateObject#ASSERT_SELECTED_VALUE");
 	}
 
 	macro assertTitleFieldIsSelected {
@@ -254,8 +271,8 @@ definition {
 
 	macro deleteObjectViaUI {
 		Click(
-			key_text = "${objectName}",
-			locator1 = "Icon#ANY_VERTICAL_ELLIPSIS");
+			key_objectLabel = "${objectLabel}",
+			locator1 = "ObjectAdmin#OBJECT_KEBAB_MENU");
 
 		MenuItem.clickNoError(menuItem = "Delete");
 	}

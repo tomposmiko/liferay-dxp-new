@@ -84,7 +84,7 @@ export function Forms({currentStepIndex, form}) {
 	}
 
 	const Component =
-		STEP_ORDERED.at(currentStepIndex)?.Component || (() => <></>);
+		STEP_ORDERED[currentStepIndex]?.Component || (() => <></>);
 
 	return <Component form={form} />;
 }

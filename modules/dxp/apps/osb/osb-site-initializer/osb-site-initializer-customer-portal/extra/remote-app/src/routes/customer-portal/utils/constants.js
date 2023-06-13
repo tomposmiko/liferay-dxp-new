@@ -41,6 +41,8 @@ export const status = {
 	active: 1,
 	expired: 2,
 	future: 3,
+	inProgress: 4,
+	notActivated: 5,
 };
 
 export const STATUS_CODE = {
@@ -57,11 +59,12 @@ export const WEB_CONTENTS_BY_LIFERAY_VERSION = {
 
 export const pages = {
 	COMMERCE: 'commerce',
-	DXP_CLOUD: 'dxp',
-	ENTERPRISE_SEARCH: 'enterprise',
+	DXP: 'dxp',
+	DXP_CLOUD: 'dxp_cloud',
+	ENTERPRISE_SEARCH: 'enterprise_search',
 	HOME: 'home',
 	OVERVIEW: 'overview',
-	TEAM_MEMBERS: 'team',
+	TEAM_MEMBERS: 'team_members',
 };
 
 export const PRODUCTS = {

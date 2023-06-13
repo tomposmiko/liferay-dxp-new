@@ -20,16 +20,12 @@ import com.liferay.commerce.product.item.selector.web.internal.util.CPItemSelect
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPInstanceService;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
-import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-
-import java.util.List;
 
 import javax.portlet.PortletURL;
 
@@ -74,21 +70,13 @@ public class CPInstanceItemSelectorViewDisplayContext
 		}
 
 		searchContainer = new SearchContainer<>(
-			liferayPortletRequest, getPortletURL(), null, null);
-
-		searchContainer.setEmptyResultsMessage("no-skus-were-found");
-
-		OrderByComparator<CPInstance> orderByComparator =
-			CPItemSelectorViewUtil.getCPInstanceOrderByComparator(
-				getOrderByCol(), getOrderByType());
-
-		RowChecker rowChecker = new CPInstanceItemSelectorChecker(
-			cpRequestHelper.getRenderResponse(), _getCheckedCPInstanceIds());
+			liferayPortletRequest, getPortletURL(), null, "no-skus-were-found");
 
 		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(orderByComparator);
+		searchContainer.setOrderByComparator(
+			CPItemSelectorViewUtil.getCPInstanceOrderByComparator(
+				getOrderByCol(), getOrderByType()));
 		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setRowChecker(rowChecker);
 
 		Sort sort = CPItemSelectorViewUtil.getCPInstanceSort(
 			getOrderByCol(), getOrderByType());
@@ -110,12 +98,11 @@ public class CPInstanceItemSelectorViewDisplayContext
 					searchContainer.getStart(), searchContainer.getEnd(), sort);
 		}
 
-		List<CPInstance> cpInstances =
-			cpInstanceBaseModelSearchResult.getBaseModels();
-		int totalCPInstances = cpInstanceBaseModelSearchResult.getLength();
-
-		searchContainer.setResults(cpInstances);
-		searchContainer.setTotal(totalCPInstances);
+		searchContainer.setResultsAndTotal(cpInstanceBaseModelSearchResult);
+		searchContainer.setRowChecker(
+			new CPInstanceItemSelectorChecker(
+				cpRequestHelper.getRenderResponse(),
+				_getCheckedCPInstanceIds()));
 
 		return searchContainer;
 	}

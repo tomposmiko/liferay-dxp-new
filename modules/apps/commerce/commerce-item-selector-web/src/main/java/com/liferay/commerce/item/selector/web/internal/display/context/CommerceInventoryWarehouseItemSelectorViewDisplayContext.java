@@ -27,12 +27,10 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.service.CountryService;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -137,56 +135,47 @@ public class CommerceInventoryWarehouseItemSelectorViewDisplayContext
 			cpRequestHelper.getRenderRequest(), getPortletURL(), null,
 			emptyResultsMessage);
 
-		String orderByCol = getOrderByCol();
-		String orderByType = getOrderByType();
-
-		OrderByComparator<CommerceInventoryWarehouse> orderByComparator =
+		searchContainer.setOrderByCol(getOrderByCol());
+		searchContainer.setOrderByComparator(
 			CommerceUtil.getCommerceInventoryWarehouseOrderByComparator(
-				orderByCol, orderByType);
+				getOrderByCol(), getOrderByType()));
+		searchContainer.setOrderByType(getOrderByType());
 
-		searchContainer.setOrderByCol(orderByCol);
-		searchContainer.setOrderByComparator(orderByComparator);
-		searchContainer.setOrderByType(orderByType);
+		String a2 = country.getA2();
+
+		if (_search && (country != null)) {
+			searchContainer.setResultsAndTotal(
+				() -> _commerceInventoryWarehouseService.search(
+					cpRequestHelper.getCompanyId(), true, a2, getKeywords(),
+					searchContainer.getStart(), searchContainer.getEnd(),
+					CommerceUtil.getCommerceInventoryWarehouseSort(
+						searchContainer.getOrderByCol(),
+						searchContainer.getOrderByType())),
+				_commerceInventoryWarehouseService.
+					searchCommerceInventoryWarehousesCount(
+						cpRequestHelper.getCompanyId(), true, a2,
+						getKeywords()));
+		}
+		else if (country != null) {
+			searchContainer.setResultsAndTotal(
+				() ->
+					_commerceInventoryWarehouseService.
+						getCommerceInventoryWarehouses(
+							cpRequestHelper.getCompanyId(), true, a2,
+							searchContainer.getStart(),
+							searchContainer.getEnd(),
+							searchContainer.getOrderByComparator()),
+				_commerceInventoryWarehouseService.
+					getCommerceInventoryWarehousesCount(
+						cpRequestHelper.getCompanyId(), true, a2));
+		}
+
 		searchContainer.setRowChecker(
 			new CommerceInventoryWarehouseChecker(
 				cpRequestHelper.getRenderResponse(),
 				_getCheckedCommerceInventoryWarehouseIds(),
 				_getDisabledCommerceInventoryWarehouseIds()));
 		searchContainer.setSearch(_search);
-
-		int total = 0;
-		List<CommerceInventoryWarehouse> results = Collections.emptyList();
-
-		if (searchContainer.isSearch() && (country != null)) {
-			total =
-				_commerceInventoryWarehouseService.
-					searchCommerceInventoryWarehousesCount(
-						cpRequestHelper.getCompanyId(), true, country.getA2(),
-						getKeywords());
-
-			results = _commerceInventoryWarehouseService.search(
-				cpRequestHelper.getCompanyId(), true, country.getA2(),
-				getKeywords(), searchContainer.getStart(),
-				searchContainer.getEnd(),
-				CommerceUtil.getCommerceInventoryWarehouseSort(
-					orderByCol, orderByType));
-		}
-		else if (country != null) {
-			total =
-				_commerceInventoryWarehouseService.
-					getCommerceInventoryWarehousesCount(
-						cpRequestHelper.getCompanyId(), true, country.getA2());
-
-			results =
-				_commerceInventoryWarehouseService.
-					getCommerceInventoryWarehouses(
-						cpRequestHelper.getCompanyId(), true, country.getA2(),
-						searchContainer.getStart(), searchContainer.getEnd(),
-						orderByComparator);
-		}
-
-		searchContainer.setTotal(total);
-		searchContainer.setResults(results);
 
 		return searchContainer;
 	}

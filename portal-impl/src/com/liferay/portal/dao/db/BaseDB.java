@@ -169,8 +169,8 @@ public abstract class BaseDB implements DB {
 				String tableName = dbInspector.normalizeName(
 					tableResultSet.getString("TABLE_NAME"));
 
-				try (ResultSet indexResultSet = databaseMetaData.getIndexInfo(
-						catalog, schema, tableName, false, false)) {
+				try (ResultSet indexResultSet = getIndexResultSet(
+						connection, tableName)) {
 
 					while (indexResultSet.next()) {
 						String indexName = indexResultSet.getString(
@@ -202,6 +202,19 @@ public abstract class BaseDB implements DB {
 	}
 
 	@Override
+	public ResultSet getIndexResultSet(Connection connection, String tableName)
+		throws SQLException {
+
+		DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+		DBInspector dbInspector = new DBInspector(connection);
+
+		return databaseMetaData.getIndexInfo(
+			dbInspector.getCatalog(), dbInspector.getSchema(), tableName, false,
+			false);
+	}
+
+	@Override
 	public int getMajorVersion() {
 		return _majorVersion;
 	}
@@ -209,6 +222,19 @@ public abstract class BaseDB implements DB {
 	@Override
 	public int getMinorVersion() {
 		return _minorVersion;
+	}
+
+	@Override
+	public ResultSet getPrimaryKeysResultSet(
+			Connection connection, String tableName)
+		throws SQLException {
+
+		DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+		DBInspector dbInspector = new DBInspector(connection);
+
+		return databaseMetaData.getPrimaryKeys(
+			dbInspector.getCatalog(), dbInspector.getSchema(), tableName);
 	}
 
 	@Override

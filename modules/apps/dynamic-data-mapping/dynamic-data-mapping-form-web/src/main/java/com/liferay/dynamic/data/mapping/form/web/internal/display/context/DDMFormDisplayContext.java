@@ -23,6 +23,7 @@ import com.liferay.dynamic.data.mapping.form.web.internal.configuration.DDMFormW
 import com.liferay.dynamic.data.mapping.form.web.internal.configuration.activator.FFSubmissionsSettingsConfigurationActivator;
 import com.liferay.dynamic.data.mapping.form.web.internal.display.context.util.DDMFormGuestUploadFieldUtil;
 import com.liferay.dynamic.data.mapping.form.web.internal.display.context.util.DDMFormInstanceStagingUtil;
+import com.liferay.dynamic.data.mapping.form.web.internal.display.context.util.DDMFormInstanceSubmissionLimitStatusUtil;
 import com.liferay.dynamic.data.mapping.form.web.internal.security.permission.resource.DDMFormInstancePermission;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
@@ -79,7 +80,6 @@ import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -97,7 +97,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -296,14 +295,8 @@ public class DDMFormDisplayContext {
 		ddmFormRenderingContext.setShowSubmitButton(isShowSubmitButton());
 		ddmFormRenderingContext.setSubmitLabel(getSubmitLabel());
 
-		return HashMapBuilder.<String, Object>put(
-			"ffShowPartialResultsEnabled",
-			_ffSubmissionsSettingsConfigurationActivator.
-				showPartialResultsEnabled()
-		).putAll(
-			_ddmFormRenderer.getDDMFormTemplateContext(
-				ddmForm, ddmFormLayout, ddmFormRenderingContext)
-		).build();
+		return _ddmFormRenderer.getDDMFormTemplateContext(
+			ddmForm, ddmFormLayout, ddmFormRenderingContext);
 	}
 
 	public DDMFormSuccessPageSettings getDDMFormSuccessPageSettings()
@@ -508,33 +501,6 @@ public class DDMFormDisplayContext {
 		return _hasAddFormInstanceRecordPermission;
 	}
 
-	public boolean hasSubmittedAnEntry() throws PortalException {
-		if (isDefaultUser() || !isLimitToOneSubmissionPerUserEnabled()) {
-			return false;
-		}
-
-		List<DDMFormInstanceRecordVersion> ddmFormInstanceRecordVersions =
-			_ddmFormInstanceRecordVersionLocalService.
-				getFormInstanceRecordVersions(
-					_getUserId(), getFormInstanceId());
-
-		Stream<DDMFormInstanceRecordVersion> stream =
-			ddmFormInstanceRecordVersions.stream();
-
-		Optional<DDMFormInstanceRecordVersion>
-			ddmFormInstanceRecordVersionOptional = stream.filter(
-				ddmFormInstanceRecordVersion ->
-					ddmFormInstanceRecordVersion.getStatus() !=
-						WorkflowConstants.STATUS_DRAFT
-			).findFirst();
-
-		if (ddmFormInstanceRecordVersionOptional.isPresent()) {
-			return true;
-		}
-
-		return false;
-	}
-
 	public boolean hasValidStorageType(DDMFormInstance ddmFormInstance) {
 		try {
 			DDMStorageAdapter ddmStorageAdapter =
@@ -602,11 +568,6 @@ public class DDMFormDisplayContext {
 			expirationDateEnabled();
 	}
 
-	public boolean isFFShowPartialResultsEnabled() {
-		return _ffSubmissionsSettingsConfigurationActivator.
-			showPartialResultsEnabled();
-	}
-
 	public boolean isFormAvailable() throws PortalException {
 		if (isPreview()) {
 			return true;
@@ -668,21 +629,6 @@ public class DDMFormDisplayContext {
 		}
 
 		return ParamUtil.getBoolean(_renderRequest, "shared");
-	}
-
-	public boolean isLimitToOneSubmissionPerUserEnabled()
-		throws PortalException {
-
-		DDMFormInstance ddmFormInstance = getFormInstance();
-
-		if (ddmFormInstance == null) {
-			return false;
-		}
-
-		DDMFormInstanceSettings ddmFormInstanceSettings =
-			ddmFormInstance.getSettingsModel();
-
-		return ddmFormInstanceSettings.limitToOneSubmissionPerUser();
 	}
 
 	public boolean isLoggedUser() {
@@ -808,6 +754,13 @@ public class DDMFormDisplayContext {
 			getDDMFormSuccessPageSettings();
 
 		return ddmFormSuccessPageSettings.isEnabled();
+	}
+
+	public boolean isSubmissionLimitReached() throws PortalException {
+		return DDMFormInstanceSubmissionLimitStatusUtil.
+			isSubmissionLimitReached(
+				getFormInstance(), _ddmFormInstanceRecordVersionLocalService,
+				getUser());
 	}
 
 	protected DDMFormRenderingContext createDDMFormRenderingContext(

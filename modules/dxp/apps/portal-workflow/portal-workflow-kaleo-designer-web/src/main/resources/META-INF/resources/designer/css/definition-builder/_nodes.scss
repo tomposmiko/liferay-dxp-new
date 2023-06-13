@@ -49,9 +49,18 @@
 		}
 	}
 
+	&.condition-node,
+	&.fork-node,
 	&.state-node {
 		.node-icon svg {
 			fill: #ffb46e;
+		}
+	}
+
+	&.join-node,
+	&.join-xor-node {
+		.node-icon svg {
+			fill: #7785ff;
 		}
 	}
 

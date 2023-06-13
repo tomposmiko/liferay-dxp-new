@@ -15,6 +15,9 @@
 package com.liferay.object.internal.upgrade;
 
 import com.liferay.object.internal.upgrade.v1_1_0.ObjectDefinitionUpgradeProcess;
+import com.liferay.object.internal.upgrade.v1_2_0.ObjectViewUpgradeProcess;
+import com.liferay.object.internal.upgrade.v2_0_0.ObjectFieldUpgradeProcess;
+import com.liferay.object.internal.upgrade.v2_1_0.ObjectFieldBusinessTypeUpgradeProcess;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import org.osgi.service.component.annotations.Component;
@@ -29,6 +32,13 @@ public class ObjectServiceUpgrade implements UpgradeStepRegistrator {
 	public void register(Registry registry) {
 		registry.register(
 			"1.0.0", "1.1.0", new ObjectDefinitionUpgradeProcess());
+
+		registry.register("1.1.0", "1.2.0", new ObjectViewUpgradeProcess());
+
+		registry.register("1.2.0", "2.0.0", new ObjectFieldUpgradeProcess());
+
+		registry.register(
+			"2.0.0", "2.1.0", new ObjectFieldBusinessTypeUpgradeProcess());
 	}
 
 }

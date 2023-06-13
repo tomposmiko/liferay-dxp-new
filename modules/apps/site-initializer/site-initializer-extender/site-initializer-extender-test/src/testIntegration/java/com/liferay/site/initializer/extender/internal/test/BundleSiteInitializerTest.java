@@ -44,6 +44,13 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentEntryLocalService;
+import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeDefinition;
+import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeEntry;
+import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeDefinitionResource;
+import com.liferay.headless.admin.user.dto.v1_0.Account;
+import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
+import com.liferay.headless.admin.user.resource.v1_0.AccountResource;
+import com.liferay.headless.admin.user.resource.v1_0.UserAccountResource;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalArticleLocalService;
@@ -151,6 +158,7 @@ public class BundleSiteInitializerTest {
 
 		try {
 			siteInitializer.initialize(group.getGroupId());
+			_assertAccounts(serviceContext);
 			_assertAssetListEntries(group);
 			_assertAssetVocabularies(group);
 			_assertCommerceCatalogs(group);
@@ -165,6 +173,7 @@ public class BundleSiteInitializerTest {
 			_assertLayoutPageTemplateEntry(group);
 			_assertLayouts(group);
 			_assertLayoutSets(group);
+			_assertListTypeDefinitions(serviceContext);
 			_assertObjectDefinitions(group, serviceContext);
 			_assertPermissions(group);
 			_assertSiteNavigationMenu(group);
@@ -210,6 +219,52 @@ public class BundleSiteInitializerTest {
 
 			bundle.uninstall();
 		}
+	}
+
+	private void _assertAccounts(ServiceContext serviceContext)
+		throws Exception {
+
+		AccountResource.Builder accountResourceBuilder =
+			_accountResourceFactory.create();
+
+		AccountResource accountResource = accountResourceBuilder.user(
+			serviceContext.fetchUser()
+		).build();
+
+		UserAccountResource.Builder userAccountResourceBuilder =
+			_userAccountResourceFactory.create();
+
+		UserAccountResource userAccountResource =
+			userAccountResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
+
+		Account account1 = accountResource.getAccountByExternalReferenceCode(
+			"TESTACC0001");
+
+		Assert.assertNotNull(account1);
+		Assert.assertEquals("Test Account 1", account1.getName());
+		Assert.assertEquals("business", account1.getTypeAsString());
+
+		_assertUserAccounts(account1.getId(), 1, userAccountResource);
+
+		Account account2 = accountResource.getAccountByExternalReferenceCode(
+			"TESTACC0002");
+
+		Assert.assertNotNull(account2);
+		Assert.assertEquals("Test Account 2", account2.getName());
+		Assert.assertEquals("guest", account2.getTypeAsString());
+
+		_assertUserAccounts(account2.getId(), 1, userAccountResource);
+
+		Account account3 = accountResource.getAccountByExternalReferenceCode(
+			"TESTACC0003");
+
+		Assert.assertNotNull(account3);
+		Assert.assertEquals("Test Account 3", account3.getName());
+		Assert.assertEquals("person", account3.getTypeAsString());
+
+		_assertUserAccounts(account3.getId(), 0, userAccountResource);
 	}
 
 	private void _assertAssetCategories(Group group) throws Exception {
@@ -594,6 +649,43 @@ public class BundleSiteInitializerTest {
 					"lfr-theme:regular:show-header")));
 	}
 
+	private void _assertListTypeDefinitions(ServiceContext serviceContext)
+		throws Exception {
+
+		ListTypeDefinitionResource.Builder listTypeDefinitionResourceBuilder =
+			_listTypeDefinitionResourceFactory.create();
+
+		ListTypeDefinitionResource listTypeDefinitionResource =
+			listTypeDefinitionResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
+
+		Page<ListTypeDefinition> listTypeDefinitionsPage =
+			listTypeDefinitionResource.getListTypeDefinitionsPage(
+				null, null,
+				listTypeDefinitionResource.toFilter(
+					"name eq 'Test List Type Definition'"),
+				null, null);
+
+		ListTypeDefinition listTypeDefinition =
+			listTypeDefinitionsPage.fetchFirstItem();
+
+		Assert.assertNotNull(listTypeDefinition);
+
+		ListTypeEntry[] listTypeEntries =
+			listTypeDefinition.getListTypeEntries();
+
+		ListTypeEntry listTypeEntry1 = listTypeEntries[0];
+
+		Assert.assertNotNull(listTypeEntry1);
+		Assert.assertEquals("testlisttypeentry1", listTypeEntry1.getKey());
+
+		ListTypeEntry listTypeEntry2 = listTypeEntries[1];
+
+		Assert.assertNotNull(listTypeEntry2);
+		Assert.assertEquals("testlisttypeentry2", listTypeEntry2.getKey());
+	}
+
 	private void _assertObjectDefinitions(
 			Group group, ServiceContext serviceContext)
 		throws Exception {
@@ -606,7 +698,7 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals(
 			objectDefinition1.getStatus(), WorkflowConstants.STATUS_APPROVED);
 
-		_assertObjectEntries(0, group.getGroupId(), objectDefinition1);
+		_assertObjectEntries(group.getGroupId(), objectDefinition1, 0);
 		_assertObjectRelationships(objectDefinition1, serviceContext);
 
 		ObjectDefinition objectDefinition2 =
@@ -617,7 +709,7 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals(
 			objectDefinition2.getStatus(), WorkflowConstants.STATUS_APPROVED);
 
-		_assertObjectEntries(0, group.getGroupId(), objectDefinition2);
+		_assertObjectEntries(group.getGroupId(), objectDefinition2, 0);
 
 		ObjectDefinition objectDefinition3 =
 			_objectDefinitionLocalService.fetchObjectDefinition(
@@ -630,15 +722,16 @@ public class BundleSiteInitializerTest {
 		Assert.assertEquals(
 			objectDefinition3.getStatus(), WorkflowConstants.STATUS_APPROVED);
 
-		_assertObjectEntries(5, 0, objectDefinition3);
+		_assertObjectEntries(0, objectDefinition3, 5);
 	}
 
 	private void _assertObjectEntries(
-			int expected, long groupId, ObjectDefinition objectDefinition)
+			long groupId, ObjectDefinition objectDefinition,
+			int objectEntriesCount)
 		throws Exception {
 
 		Assert.assertEquals(
-			expected,
+			objectEntriesCount,
 			_objectEntryLocalService.getObjectEntriesCount(
 				groupId, objectDefinition.getObjectDefinitionId()));
 	}
@@ -816,6 +909,18 @@ public class BundleSiteInitializerTest {
 			frontendTokensValues.contains("blockquote-small-color"));
 	}
 
+	private void _assertUserAccounts(
+			Long accountId, int totalCount,
+			UserAccountResource userAccountResource)
+		throws Exception {
+
+		Page<UserAccount> page = userAccountResource.getAccountUserAccountsPage(
+			accountId, null, null, null, null);
+
+		Assert.assertNotNull(page);
+		Assert.assertEquals(totalCount, page.getTotalCount());
+	}
+
 	private Bundle _installBundle(BundleContext bundleContext, String location)
 		throws Exception {
 
@@ -825,6 +930,9 @@ public class BundleSiteInitializerTest {
 			return bundleContext.installBundle(location, inputStream);
 		}
 	}
+
+	@Inject
+	private AccountResource.Factory _accountResourceFactory;
 
 	@Inject
 	private AssetCategoryLocalService _assetCategoryLocalService;
@@ -887,6 +995,10 @@ public class BundleSiteInitializerTest {
 	private LayoutSetLocalService _layoutSetLocalService;
 
 	@Inject
+	private ListTypeDefinitionResource.Factory
+		_listTypeDefinitionResourceFactory;
+
+	@Inject
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Inject
@@ -920,6 +1032,9 @@ public class BundleSiteInitializerTest {
 
 	@Inject
 	private StyleBookEntryLocalService _styleBookEntryLocalService;
+
+	@Inject
+	private UserAccountResource.Factory _userAccountResourceFactory;
 
 	@Inject
 	private UserLocalService _userLocalService;

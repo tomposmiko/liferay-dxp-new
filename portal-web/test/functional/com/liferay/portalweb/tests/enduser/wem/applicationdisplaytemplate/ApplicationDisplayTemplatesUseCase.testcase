@@ -157,7 +157,7 @@ definition {
 			JSONLayout.addWidgetToPublicLayout(
 				groupName = "Test Site Name",
 				layoutName = "ADT Test Page",
-				widgetName = "Categories Navigation");
+				widgetName = "Category Filter");
 		}
 
 		task ("View the displayed content in Categories Navigation") {
@@ -179,7 +179,7 @@ definition {
 
 			ApplicationDisplayTemplates.addCP(
 				adtFile = "adt_categories_navigation_multi_column.ftl",
-				adtType = "Categories Navigation");
+				adtType = "Category Filter");
 		}
 
 		task ("Select the widget template in Categories Navigation") {
@@ -187,7 +187,7 @@ definition {
 				pageName = "ADT Test Page",
 				siteName = "Test Site Name");
 
-			ApplicationDisplayTemplates.selectPortletADT(templateName = "Categories Navigation Test ADT");
+			ApplicationDisplayTemplates.selectPortletADT(templateName = "Category Filter Test ADT");
 		}
 
 		task ("View the widget template applied to Categories Navigation") {
@@ -330,7 +330,7 @@ definition {
 			JSONLayout.addWidgetToPublicLayout(
 				groupName = "Test Site Name",
 				layoutName = "ADT Test Page",
-				widgetName = "Tags Navigation");
+				widgetName = "Tag Filter");
 		}
 
 		task ("Add a widget page") {

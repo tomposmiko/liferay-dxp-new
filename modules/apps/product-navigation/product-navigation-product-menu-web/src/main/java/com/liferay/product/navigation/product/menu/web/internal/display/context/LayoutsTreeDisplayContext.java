@@ -316,13 +316,6 @@ public class LayoutsTreeDisplayContext {
 				return _setSelPlid(getConfigureLayoutSetURL());
 			}
 		).put(
-			"isPrivateLayoutsEnabled",
-			() -> {
-				Group group = _themeDisplay.getScopeGroup();
-
-				return group.isPrivateLayoutsEnabled();
-			}
-		).put(
 			"namespace", getNamespace()
 		).put(
 			"pageTypeOptions", _getPageTypeOptionsJSONArray()
@@ -607,7 +600,8 @@ public class LayoutsTreeDisplayContext {
 				ProductNavigationProductMenuWebKeys.PUBLIC_LAYOUT)) {
 
 			if (!isPrivateLayoutsEnabled()) {
-				return LanguageUtil.get(_themeDisplay.getLocale(), "pages");
+				return LanguageUtil.get(
+					_themeDisplay.getLocale(), "pages-hierarchy");
 			}
 
 			return LanguageUtil.get(

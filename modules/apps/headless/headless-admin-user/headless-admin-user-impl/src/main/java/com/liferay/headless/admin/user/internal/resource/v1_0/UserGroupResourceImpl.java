@@ -47,6 +47,13 @@ public class UserGroupResourceImpl extends BaseUserGroupResourceImpl {
 		_userGroupService.deleteUserGroup(userGroupId);
 	}
 
+	public void deleteUserGroupUsers(Long userGroupId, Long[] userIds)
+		throws Exception {
+
+		_userService.unsetUserGroupUsers(
+			userGroupId, ArrayUtil.toArray(userIds));
+	}
+
 	@Override
 	public UserGroup getUserGroup(Long userGroupId) throws Exception {
 		return _toUserGroup(_userGroupService.getUserGroup(userGroupId));
@@ -55,8 +62,10 @@ public class UserGroupResourceImpl extends BaseUserGroupResourceImpl {
 	@Override
 	public UserGroup postUserGroup(UserGroup userGroup) throws Exception {
 		return _toUserGroup(
-			_userGroupService.addUserGroup(
-				userGroup.getName(), userGroup.getDescription(), null));
+			_userGroupService.updateExternalReferenceCode(
+				_userGroupService.addUserGroup(
+					userGroup.getName(), userGroup.getDescription(), null),
+				userGroup.getExternalReferenceCode()));
 	}
 
 	@Override
@@ -71,9 +80,11 @@ public class UserGroupResourceImpl extends BaseUserGroupResourceImpl {
 		throws Exception {
 
 		return _toUserGroup(
-			_userGroupService.updateUserGroup(
-				userGroupId, userGroup.getName(), userGroup.getDescription(),
-				null));
+			_userGroupService.updateExternalReferenceCode(
+				_userGroupService.updateUserGroup(
+					userGroupId, userGroup.getName(),
+					userGroup.getDescription(), null),
+				userGroup.getExternalReferenceCode()));
 	}
 
 	private DTOConverterContext _getDTOConverterContext(long userGroupId) {
@@ -84,6 +95,11 @@ public class UserGroupResourceImpl extends BaseUserGroupResourceImpl {
 				addAction(
 					ActionKeys.DELETE, userGroupId, "deleteUserGroup",
 					_userGroupModelResourcePermission)
+			).put(
+				"delete-user-group-users",
+				addAction(
+					ActionKeys.ASSIGN_MEMBERS, userGroupId,
+					"deleteUserGroupUsers", _userGroupModelResourcePermission)
 			).put(
 				"get",
 				addAction(

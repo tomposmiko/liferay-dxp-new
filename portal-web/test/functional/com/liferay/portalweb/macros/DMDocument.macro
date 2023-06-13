@@ -1879,7 +1879,7 @@ definition {
 	macro moveToSubFolderCP {
 		var key_dmDocumentTitle = "${dmDocumentTitle}";
 
-		Click(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_VERTICAL_ELLIPSIS");
+		Click(locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
 
 		MenuItem.click(menuItem = "Move");
 
@@ -1910,6 +1910,12 @@ definition {
 
 	macro openDocumentsAndMediaAdmin {
 		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_document_library_web_portlet_DLAdminPortlet");
+	}
+
+	macro previewImage {
+		while (IsElementNotPresent(key_dmDocumentFileName = "${dmDocumentFileName}", locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW")) {
+			Refresh();
+		}
 	}
 
 	macro publishExpiredDocument {

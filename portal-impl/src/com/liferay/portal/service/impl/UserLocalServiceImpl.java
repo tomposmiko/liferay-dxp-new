@@ -5203,13 +5203,23 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			boolean passwordReset, boolean silentUpdate)
 		throws PortalException {
 
+		User user = userPersistence.findByPrimaryKey(userId);
+
+		String newEncPwd = null;
+
+		if (user.isPasswordEncrypted()) {
+			newEncPwd = PasswordEncryptorUtil.encrypt(
+				password1, user.getPassword());
+		}
+		else {
+			newEncPwd = PasswordEncryptorUtil.encrypt(password1);
+		}
+
 		// Password hashing takes a long time. Therefore, encrypt the password
 		// before we get the user to avoid
 		// an org.hibernate.StaleObjectStateException.
 
-		String newEncPwd = PasswordEncryptorUtil.encrypt(password1);
-
-		User user = userPersistence.findByPrimaryKey(userId);
+		user = userPersistence.findByPrimaryKey(userId);
 
 		if (!silentUpdate) {
 			validatePassword(user.getCompanyId(), userId, password1, password2);
