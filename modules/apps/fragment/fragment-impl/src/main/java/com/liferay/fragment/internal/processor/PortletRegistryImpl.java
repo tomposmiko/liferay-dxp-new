@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
-import com.liferay.portal.kernel.portlet.PortletJSONUtil;
+import com.liferay.portal.kernel.portlet.PortletPathsUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -164,17 +164,13 @@ public class PortletRegistryImpl implements PortletRegistry {
 		);
 
 		for (Portlet portlet : portlets) {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
 			try {
-				PortletJSONUtil.populatePortletJSONObject(
-					httpServletRequest, StringPool.BLANK, portlet, jsonObject);
+				Map<String, Object> paths = PortletPathsUtil.getPortletPaths(
+					httpServletRequest, StringPool.BLANK, portlet);
 
-				PortletJSONUtil.writeHeaderPaths(
-					httpServletResponse, jsonObject);
+				PortletPathsUtil.writeHeaderPaths(httpServletResponse, paths);
 
-				PortletJSONUtil.writeFooterPaths(
-					httpServletResponse, jsonObject);
+				PortletPathsUtil.writeFooterPaths(httpServletResponse, paths);
 			}
 			catch (Exception exception) {
 				_log.error(

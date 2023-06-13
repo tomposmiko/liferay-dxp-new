@@ -669,11 +669,9 @@ definition {
 
 		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
 
-		while (IsElementNotPresent(key_searchAssetTitle = "WC Title 1", locator1 = "SearchResults#ASSET_ENTRY_TABLE_TITLE")) {
-			Pause(locator1 = "5000");
-		}
-
-		WaitForLiferayEvent.initializeLiferayEventLog();
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "WC Title 1",
+			searchAssetType = "Web Content Article");
 
 		Portlet.gotoPortletOptions(
 			portletName = "Search Results",
@@ -1628,8 +1626,7 @@ definition {
 	@description = "This is a use case for LPS-81931"
 	@priority = "5"
 	test SearchGlobalTemplateSmoke {
-		property portal.acceptance = "false";
-		property portal.upstream = "false";
+		property portal.acceptance = "true";
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
@@ -1714,6 +1711,22 @@ definition {
 		User.editUserSiteCP(
 			siteName = "${siteName}",
 			userScreenName = "usersn");
+
+		Navigator.gotoBack();
+
+		Search.searchCP(searchTerm = "userfn");
+
+		User.viewUserTableName(
+			key_userScreenName = "usersn",
+			userfn = "userfn",
+			userln = "userln");
+
+		Search.searchCP(searchTerm = "userln");
+
+		User.viewUserTableName(
+			key_userScreenName = "usersn",
+			userfn = "userfn",
+			userln = "userln");
 
 		Navigator.openURL();
 

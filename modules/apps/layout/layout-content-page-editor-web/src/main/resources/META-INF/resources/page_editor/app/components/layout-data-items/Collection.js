@@ -12,7 +12,6 @@
  * details.
  */
 
-import ClayAlert from '@clayui/alert';
 import ClayLayout from '@clayui/layout';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import React, {useContext, useEffect, useMemo, useState} from 'react';
@@ -93,6 +92,19 @@ const EmptyCollectionGridMessage = () => (
 	</div>
 );
 
+const EditModeMaxItemsAlert = () => (
+	<div className="alert alert-fluid alert-info">
+		<div className="container-fluid">
+			{Liferay.Util.sub(
+				Liferay.Language.get(
+					'in-edit-mode,-the-number-of-elements-displayed-is-limited-to-x-due-to-performance'
+				),
+				config.maxNumberOfItemsInEditMode
+			)}
+		</div>
+	</div>
+);
+
 const Grid = ({
 	child,
 	collection,
@@ -109,7 +121,7 @@ const Grid = ({
 
 	const numberOfItemsToDisplay = Math.min(
 		maxNumberOfItems,
-		config.maxNumberOfItemsEditMode
+		config.maxNumberOfItemsInEditMode
 	);
 
 	const numberOfRows = Math.ceil(
@@ -156,19 +168,8 @@ const Grid = ({
 					)}
 				</ClayLayout.Row>
 			))}
-			{maxNumberOfItems > config.maxNumberOfItemsEditMode && (
-				<ClayAlert
-					className="border-0 mb-0"
-					displayType="info"
-					variant="stripe"
-				>
-					{Liferay.Util.sub(
-						Liferay.Language.get(
-							'in-edit-mode,-the-number-of-elements-displayed-is-limited-to-x-due-to-performance'
-						),
-						config.maxNumberOfItemsEditMode
-					)}
-				</ClayAlert>
+			{maxNumberOfItems > config.maxNumberOfItemsInEditMode && (
+				<EditModeMaxItemsAlert />
 			)}
 		</>
 	);

@@ -103,6 +103,45 @@ definition {
 		}
 	}
 
+	@description = "LPS-147850. Assert the order button can sort results by descending order"
+	@priority = "5"
+	test OrderButtonCanSortOptionsByDescending {
+		task ("When the user opens any section with the management toolbar") {
+
+			// Using tags as workaround until LPS-150056
+
+			JSONAssettag.addTag(
+				groupName = "Guest",
+				tagName = "a");
+
+			JSONAssettag.addTag(
+				groupName = "Guest",
+				tagName = "b");
+
+			Tag.openTagsAdmin(siteURLKey = "guest");
+		}
+
+		task ("And clicks on the order button") {
+			Click(
+				key_filter = "Order",
+				locator1 = "ManagementBar#FILTER_OR_ORDER",
+				value1 = "Order");
+		}
+
+		task ("Then the user can select one item to order the results") {
+			AssertClick(
+				key_item = "Descending",
+				locator1 = "ManagementBar#ACTIVE_DROPDOWN_ITEM",
+				value1 = "Descending");
+		}
+
+		task ("And the results are displayed accordingly to the selected option") {
+			AssertElementPresent(locator1 = "xpath=(//*[@data-qa-id='row'][1]//*[contains(.,'b')])");
+
+			AssertElementPresent(locator1 = "xpath=(//*[@data-qa-id='row'][2]//*[contains(.,'a')])");
+		}
+	}
+
 	@description = "LPS-147849. Assert the filter and order buttons are independent dropdowns"
 	@priority = "5"
 	test RendersIndependentFilterAndOrderButtons {
@@ -164,6 +203,42 @@ definition {
 			AssertElementPresent(
 				key_text = "trash",
 				locator1 = "ManagementBar#ANY_ICON");
+		}
+	}
+
+	@description = "LPS-147836. Assert tooltip message will be displayed when hovered over an action button in responsive mode"
+	@priority = "3"
+	test ResponsiveModeActionButtonsShouldDisplayTooltips {
+		task ("Given a window size set to tablet size") {
+			SetWindowSize(value1 = "800,1024");
+		}
+
+		task ("And hovers over an action button") {
+			MouseOver(
+				key_text = "download",
+				locator1 = "ManagementBar#ANY_ICON");
+		}
+
+		task ("Then a tooltip message will be displayed") {
+			AssertTextEquals(
+				locator1 = "Message#TOOLTIP",
+				value1 = "Download");
+		}
+	}
+
+	@description = "LPS-147859. Assert the clear button will be displayed as an icon button in responsive mode"
+	@priority = "4"
+	test ResponsiveModeClearButtonShouldDisplayAsIcon {
+		task ("Given a window size set to phone size") {
+			SetWindowSize(value1 = "360,720");
+		}
+
+		task ("Then clear button is not displayed as a text button") {
+			AssertNotVisible(locator1 = "ManagementBar#CLEAR_BUTTON");
+		}
+
+		task ("Then clear button is displayed as an icon button") {
+			AssertElementPresent(locator1 = "ManagementBar#CLEAR_BUTTON_MOBILE");
 		}
 	}
 

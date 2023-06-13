@@ -336,8 +336,8 @@ public class EditStyleBookEntryDisplayContext {
 				layoutSet.getThemeId());
 
 		if (frontendTokenDefinition != null) {
-			return JSONFactoryUtil.createJSONObject(
-				frontendTokenDefinition.getJSON(_themeDisplay.getLocale()));
+			return frontendTokenDefinition.getJSONObject(
+				_themeDisplay.getLocale());
 		}
 
 		return JSONFactoryUtil.createJSONObject();
@@ -509,7 +509,7 @@ public class EditStyleBookEntryDisplayContext {
 				layoutURL, "styleBookEntryPreview", true);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException.getMessage(), portalException);
+			_log.error(portalException);
 		}
 
 		return null;
@@ -552,7 +552,7 @@ public class EditStyleBookEntryDisplayContext {
 			return _getPreviewURL(layout);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException.getMessage(), portalException);
+			_log.error(portalException);
 		}
 
 		return null;

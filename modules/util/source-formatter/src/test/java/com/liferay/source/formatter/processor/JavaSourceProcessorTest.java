@@ -338,6 +338,11 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testLogParameters() throws Exception {
+		test("LogParameters.testjava");
+	}
+
+	@Test
 	public void testMissingAuthor() throws Exception {
 		test("MissingAuthor.testjava", "Missing author", 20);
 	}

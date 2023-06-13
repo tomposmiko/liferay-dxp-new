@@ -16,7 +16,9 @@ import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
 import React, {useEffect, useRef, useState} from 'react';
 
+import {useGlobalContext} from '../../app/contexts/GlobalContext';
 import {useId} from '../../app/utils/useId';
+import {Tooltip} from './Tooltip';
 
 /**
  * These elements must be sorted from the most outer circle to the most inner
@@ -157,10 +159,10 @@ function SpacingSelectorButton({
 }) {
 	const [active, setActive] = useState(false);
 	const itemListRef = useRef();
-	const title = `${capitalize(type)} ${capitalize(position)}: ${
-		value || defaultValue
-	}px`;
+	const [labelElement, setLabelElement] = useState(null);
+	const tooltipId = useId();
 	const triggerId = useId();
+	const [triggerElement, setTriggerElement] = useState(null);
 
 	useEffect(() => {
 		if (active && itemListRef.current) {
@@ -173,8 +175,10 @@ function SpacingSelectorButton({
 			active={active}
 			className={`${DROPDOWN_CLASSNAME} ${DROPDOWN_CLASSNAME}--${type} ${DROPDOWN_CLASSNAME}--${type}-${position} align-items-stretch d-flex text-center`}
 			onActiveChange={setActive}
+			renderMenuOnClick
 			trigger={
 				<ClayButton
+					aria-describedby={tooltipId}
 					aria-expanded={active}
 					aria-haspopup={true}
 					className={`${BUTTON_CLASSNAME} b-0 flex-grow-1 mb-0 text-center`}
@@ -183,31 +187,77 @@ function SpacingSelectorButton({
 					displayType="unstyled"
 					id={triggerId}
 					onClick={() => setActive(!active)}
-					title={title}
+					ref={setTriggerElement}
 					type="button"
 				>
-					{value || defaultValue}
+					<Tooltip
+						hoverElement={triggerElement}
+						id={tooltipId}
+						label={`${capitalize(type)} ${capitalize(position)}: ${
+							value || defaultValue
+						}`}
+						positionElement={labelElement}
+					/>
+
+					<span ref={setLabelElement}>{value || defaultValue}</span>
 				</ClayButton>
 			}
 		>
 			<div ref={itemListRef}>
 				<ClayDropDown.ItemList aria-labelledby={triggerId}>
-					{options.map((option) => (
-						<ClayDropDown.Item
-							key={option.value}
-							onClick={() => {
-								onChange(option.value);
-								setActive(false);
-								document.getElementById(triggerId)?.focus();
-							}}
-						>
-							{option.label}
-						</ClayDropDown.Item>
-					))}
+					<ClayDropDown.Group
+						header={`${capitalize(type)} ${capitalize(position)}`}
+					>
+						{options.map((option) => (
+							<ClayDropDown.Item
+								className="d-flex"
+								key={option.value}
+								onClick={() => {
+									onChange(option.value);
+									setActive(false);
+									document.getElementById(triggerId)?.focus();
+								}}
+							>
+								<span className="flex-grow-1 text-truncate">
+									{option.label}
+								</span>
+
+								<strong className="flex-shrink-0 pl-2">
+									<SpacingOptionValue
+										option={option}
+										position={position}
+										type={type}
+									/>
+								</strong>
+							</ClayDropDown.Item>
+						))}
+					</ClayDropDown.Group>
 				</ClayDropDown.ItemList>
 			</div>
 		</ClayDropDown>
 	);
+}
+
+function SpacingOptionValue({option, position, type}) {
+	const globalContext = useGlobalContext();
+	const [value, setValue] = useState(option.value);
+
+	useEffect(() => {
+		const element = globalContext.document.createElement('div');
+		element.style.display = 'none';
+		element.classList.add(`${type[0]}${position[0]}-${option.value}`);
+		globalContext.document.body.appendChild(element);
+
+		setValue(
+			globalContext.window
+				.getComputedStyle(element)
+				.getPropertyValue(`${type}-${position}`)
+		);
+
+		globalContext.document.body.removeChild(element);
+	}, [globalContext, option, position, type]);
+
+	return value;
 }
 
 function capitalize(str) {
