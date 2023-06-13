@@ -284,8 +284,7 @@ public class ObjectDefinitionLocalServiceUtil {
 	}
 
 	public static ObjectDefinition fetchObjectDefinitionByClassName(
-			long companyId, String className)
-		throws PortalException {
+		long companyId, String className) {
 
 		return getService().fetchObjectDefinitionByClassName(
 			companyId, className);
@@ -534,6 +533,15 @@ public class ObjectDefinitionLocalServiceUtil {
 		ObjectDefinition objectDefinition) {
 
 		return getService().updateObjectDefinition(objectDefinition);
+	}
+
+	public static ObjectDefinition updateSystemObjectDefinition(
+			String externalReferenceCode, long objectDefinitionId,
+			long titleObjectFieldId)
+		throws PortalException {
+
+		return getService().updateSystemObjectDefinition(
+			externalReferenceCode, objectDefinitionId, titleObjectFieldId);
 	}
 
 	public static ObjectDefinition updateTitleObjectFieldId(

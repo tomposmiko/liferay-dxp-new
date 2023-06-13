@@ -80,6 +80,14 @@ public class ObjectDefinitionServiceUtil {
 		return getService().getObjectDefinition(objectDefinitionId);
 	}
 
+	public static ObjectDefinition getObjectDefinitionByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		return getService().getObjectDefinitionByExternalReferenceCode(
+			externalReferenceCode, companyId);
+	}
+
 	public static List<ObjectDefinition> getObjectDefinitions(
 		int start, int end) {
 
@@ -145,6 +153,15 @@ public class ObjectDefinitionServiceUtil {
 
 		return getService().updateExternalReferenceCode(
 			objectDefinitionId, externalReferenceCode);
+	}
+
+	public static ObjectDefinition updateSystemObjectDefinition(
+			String externalReferenceCode, long objectDefinitionId,
+			long titleObjectFieldId)
+		throws PortalException {
+
+		return getService().updateSystemObjectDefinition(
+			externalReferenceCode, objectDefinitionId, titleObjectFieldId);
 	}
 
 	public static ObjectDefinition updateTitleObjectFieldId(

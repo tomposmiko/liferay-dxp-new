@@ -14,17 +14,8 @@
 
 package com.liferay.portal.kernel.search;
 
-import java.util.Map;
-
 /**
  * @author Brian Wing Shun Chan
  */
 public interface SearchEngineConfigurator {
-
-	public void afterPropertiesSet();
-
-	public void destroy();
-
-	public void setSearchEngines(Map<String, SearchEngine> searchEngines);
-
 }

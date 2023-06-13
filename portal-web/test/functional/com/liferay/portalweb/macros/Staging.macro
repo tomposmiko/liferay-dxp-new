@@ -33,12 +33,12 @@ definition {
 
 		if ("${pageVersioningEnabled}" == "true") {
 			if (IsElementPresent(key_fieldLabel = "Enabled", locator1 = "Checkbox#CHECKBOX_LABEL")) {
-				Click(locator1 = "Checkbox#ENABLED_ON_PUBLIC_PAGES");
+				Click.clickAtNotVisible(locator1 = "Checkbox#ENABLED_ON_PUBLIC_PAGES");
 			}
 			else {
-				Click(locator1 = "Checkbox#ENABLED_ON_PUBLIC_PAGES");
+				Click.clickAtNotVisible(locator1 = "Checkbox#ENABLED_ON_PUBLIC_PAGES");
 
-				Click(locator1 = "Checkbox#ENABLED_ON_PRIVATE_PAGES");
+				Click.clickAtNotVisible(locator1 = "Checkbox#ENABLED_ON_PRIVATE_PAGES");
 			}
 		}
 
@@ -239,7 +239,7 @@ definition {
 
 		Role.openRolesAdmin();
 
-		Role.definePermissionsCP(
+		Role.definePermissionCmdCP(
 			permissionDefinitionKeys = "SITE_ADMIN_PAGES_SITE_PAGES_GENERAL_PERMISSIONS_ACTION_CHECKBOX,SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_SITE_ACTION_CHECKBOX,SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_PAGE_ACTION_CHECKBOX,SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_PAGE_VARIATION_ACTION_CHECKBOX,SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_SITE_PAGES_VARIATION_ACTION_CHECKBOX",
 			roleTitle = "Staging Admin",
 			roleType = "Site");
@@ -838,7 +838,7 @@ definition {
 
 		if (isSet(checkContentNameList)) {
 			for (var contentName : list "${checkContentNameList}") {
-				Check(
+				Check.checkNotVisible(
 					key_contentName = "${contentName}",
 					locator1 = "Staging#STAGING_CONTENT_CHECKBOX");
 			}

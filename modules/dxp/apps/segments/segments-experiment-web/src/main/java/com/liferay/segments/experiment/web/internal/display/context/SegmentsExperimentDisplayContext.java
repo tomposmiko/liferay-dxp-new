@@ -21,10 +21,12 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -51,6 +53,7 @@ import com.liferay.segments.model.SegmentsExperimentRel;
 import com.liferay.segments.service.SegmentsExperienceService;
 import com.liferay.segments.service.SegmentsExperimentRelService;
 import com.liferay.segments.service.SegmentsExperimentService;
+import com.liferay.staging.StagingGroupHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -72,25 +75,29 @@ import javax.servlet.http.HttpServletResponse;
 public class SegmentsExperimentDisplayContext {
 
 	public SegmentsExperimentDisplayContext(
-		LayoutLocalService layoutLocalService, Portal portal,
+		GroupLocalService groupLocalService,
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, String pathToAssets,
+		HttpServletResponse httpServletResponse,
+		LayoutLocalService layoutLocalService, String pathToAssets,
+		Portal portal, SegmentsExperienceManager segmentsExperienceManager,
 		SegmentsExperienceService segmentsExperienceService,
 		SegmentsExperimentConfiguration segmentsExperimentConfiguration,
-		SegmentsExperienceManager segmentsExperienceManager,
 		SegmentsExperimentRelService segmentsExperimentRelService,
-		SegmentsExperimentService segmentsExperimentService) {
+		SegmentsExperimentService segmentsExperimentService,
+		StagingGroupHelper stagingGroupHelper) {
 
-		_layoutLocalService = layoutLocalService;
-		_portal = portal;
+		_groupLocalService = groupLocalService;
 		_httpServletRequest = httpServletRequest;
 		_httpServletResponse = httpServletResponse;
+		_layoutLocalService = layoutLocalService;
 		_pathToAssets = pathToAssets;
+		_portal = portal;
+		_segmentsExperienceManager = segmentsExperienceManager;
 		_segmentsExperienceService = segmentsExperienceService;
 		_segmentsExperimentConfiguration = segmentsExperimentConfiguration;
-		_segmentsExperienceManager = segmentsExperienceManager;
 		_segmentsExperimentRelService = segmentsExperimentRelService;
 		_segmentsExperimentService = segmentsExperimentService;
+		_stagingGroupHelper = stagingGroupHelper;
 
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -185,8 +192,14 @@ public class SegmentsExperimentDisplayContext {
 	}
 
 	private String _getCreateSegmentsVariantURL() {
-		return _getContentPageEditorActionURL(
-			"/layout_content_page_editor/add_segments_experience");
+		return HttpComponentsUtil.addParameter(
+			HttpComponentsUtil.addParameter(
+				_getContentPageEditorActionURL(
+					"/layout_content_page_editor/add_segments_experience"),
+				_getContentPageEditorPortletNamespace() + "plid",
+				_themeDisplay.getPlid()),
+			_getContentPageEditorPortletNamespace() + "groupId",
+			_themeDisplay.getScopeGroupId());
 	}
 
 	private String _getDeleteSegmentsExperimentURL() {
@@ -304,6 +317,17 @@ public class SegmentsExperimentDisplayContext {
 		return _pathToAssets + "/images";
 	}
 
+	private long _getLiveGroupId() throws Exception {
+		Group group = _groupLocalService.getGroup(
+			_themeDisplay.getScopeGroupId());
+
+		if (_stagingGroupHelper.isStagingGroup(group)) {
+			return group.getLiveGroupId();
+		}
+
+		return _themeDisplay.getScopeGroupId();
+	}
+
 	private Map<String, Object> _getPage() {
 		return HashMapBuilder.<String, Object>put(
 			"classNameId", PortalUtil.getClassNameId(Layout.class.getName())
@@ -325,7 +349,7 @@ public class SegmentsExperimentDisplayContext {
 		return HashMapBuilder.<String, Object>put(
 			"analyticsData",
 			_getAnalyticsDataJSONObject(
-				_themeDisplay.getCompanyId(), _themeDisplay.getScopeGroupId())
+				_themeDisplay.getCompanyId(), _getLiveGroupId())
 		).put(
 			"hideSegmentsExperimentPanelURL",
 			PortletURLBuilder.create(
@@ -552,6 +576,7 @@ public class SegmentsExperimentDisplayContext {
 	}
 
 	private Map<String, Object> _data;
+	private final GroupLocalService _groupLocalService;
 	private final HttpServletRequest _httpServletRequest;
 	private final HttpServletResponse _httpServletResponse;
 	private final LayoutLocalService _layoutLocalService;
@@ -565,6 +590,7 @@ public class SegmentsExperimentDisplayContext {
 		_segmentsExperimentConfiguration;
 	private final SegmentsExperimentRelService _segmentsExperimentRelService;
 	private final SegmentsExperimentService _segmentsExperimentService;
+	private final StagingGroupHelper _stagingGroupHelper;
 	private final ThemeDisplay _themeDisplay;
 
 }

@@ -78,7 +78,7 @@ public class OnDemandAdminManagerImpl implements OnDemandAdminManager {
 			Company company, PortletRequest portletRequest, long userId)
 		throws PortalException {
 
-		StringBundler sb = new StringBundler(3);
+		StringBundler sb = new StringBundler(4);
 
 		boolean secure = _portal.isSecure(
 			_portal.getHttpServletRequest(portletRequest));
@@ -88,6 +88,7 @@ public class OnDemandAdminManagerImpl implements OnDemandAdminManager {
 				company.getVirtualHostname(),
 				_portal.getPortalServerPort(secure), secure));
 
+		sb.append(_portal.getPathContext());
 		sb.append("?ticketKey=");
 
 		Ticket ticket = _onDemandAdminTicketGenerator.generate(

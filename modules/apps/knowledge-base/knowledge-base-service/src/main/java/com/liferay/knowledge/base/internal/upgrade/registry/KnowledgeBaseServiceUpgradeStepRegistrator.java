@@ -176,6 +176,12 @@ public class KnowledgeBaseServiceUpgradeStepRegistrator
 				}
 
 			});
+
+		registry.register(
+			"4.2.0", "4.3.0",
+			UpgradeProcessFactory.addColumns(
+				"KBArticle", "expirationDate DATE null",
+				"reviewDate DATE null"));
 	}
 
 	@Reference

@@ -20,8 +20,9 @@ import com.liferay.object.exception.ObjectViewColumnFieldNameException;
 import com.liferay.object.exception.ObjectViewFilterColumnException;
 import com.liferay.object.exception.ObjectViewSortColumnException;
 import com.liferay.object.exception.ObjectViewSortColumnObjectFieldNameException;
-import com.liferay.object.field.filter.parser.ObjectFieldFilterParser;
-import com.liferay.object.field.filter.parser.ObjectFieldFilterParserTracker;
+import com.liferay.object.field.filter.parser.ObjectFieldFilterContext;
+import com.liferay.object.field.filter.parser.ObjectFieldFilterContributor;
+import com.liferay.object.field.filter.parser.ObjectFieldFilterContributorTracker;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectView;
@@ -43,13 +44,14 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -402,21 +404,14 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 		ObjectView objectView = objectViewPersistence.findByPrimaryKey(
 			objectViewId);
 
-		List<ObjectField> objectFields =
-			_objectFieldPersistence.findByObjectDefinitionId(
-				objectView.getObjectDefinitionId());
-
-		Set<String> objectFieldNames = new HashSet<>(_objectFieldNames);
-
-		objectFields.forEach(
-			objectField -> objectFieldNames.add(objectField.getName()));
-
 		Set<String> objectViewColumnFieldNames = new LinkedHashSet<>();
 
 		for (ObjectViewColumn objectViewColumn : objectViewColumns) {
-			if (!objectFieldNames.contains(
-					objectViewColumn.getObjectFieldName())) {
+			ObjectField objectField = _objectFieldPersistence.fetchByODI_N(
+				objectView.getObjectDefinitionId(),
+				objectViewColumn.getObjectFieldName());
 
+			if (objectField == null) {
 				throw new ObjectViewColumnFieldNameException(
 					"There is no object field with the name: " +
 						objectViewColumn.getObjectFieldName());
@@ -448,42 +443,33 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 					"Object field name is null");
 			}
 
-			long listTypeDefinitionId = 0L;
+			ObjectField objectField = _objectFieldPersistence.findByODI_N(
+				objectDefinitionId,
+				objectViewFilterColumn.getObjectFieldName());
 
-			if (_objectFieldNames.contains(
-					objectViewFilterColumn.getObjectFieldName())) {
+			if (!(_filterableObjectFieldBusinessTypes.contains(
+					objectField.getBusinessType()) ||
+				  _filterableObjectFieldNames.contains(
+					  objectField.getName()))) {
 
-				if (Objects.equals(
+				throw new ObjectViewFilterColumnException(
+					StringBundler.concat(
+						"Object field name \"",
 						objectViewFilterColumn.getObjectFieldName(),
-						"creator") ||
-					Objects.equals(
-						objectViewFilterColumn.getObjectFieldName(), "id")) {
-
-					throw new ObjectViewFilterColumnException(
-						StringBundler.concat(
-							"Object field name \"",
-							objectViewFilterColumn.getObjectFieldName(),
-							"\" is not filterable"));
-				}
+						"\" is not filterable"));
 			}
-			else {
-				ObjectField objectField = _objectFieldPersistence.findByODI_N(
-					objectDefinitionId,
-					objectViewFilterColumn.getObjectFieldName());
 
-				if (!Objects.equals(
-						objectField.getBusinessType(),
-						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST) &&
-					!objectField.isSystem()) {
+			if (!GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-152650")) &&
+				StringUtil.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
 
-					throw new ObjectViewFilterColumnException(
-						StringBundler.concat(
-							"Object field name \"",
-							objectViewFilterColumn.getObjectFieldName(),
-							"\" is not filterable"));
-				}
-
-				listTypeDefinitionId = objectField.getObjectDefinitionId();
+				throw new ObjectViewFilterColumnException(
+					StringBundler.concat(
+						"Object field name \"",
+						objectViewFilterColumn.getObjectFieldName(),
+						"\" is not filterable"));
 			}
 
 			if (Validator.isNull(objectViewFilterColumn.getFilterType()) &&
@@ -504,12 +490,14 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 						"\" needs to have the filter type and JSON specified"));
 			}
 
-			ObjectFieldFilterParser objectFieldFilterParser =
-				_objectFieldFilterParserTracker.getObjectFieldFilterParser(
-					objectViewFilterColumn.getFilterType());
+			ObjectFieldFilterContributor objectFieldFilterContributor =
+				_objectFieldFilterContributorTracker.
+					getObjectFieldFilterContributor(
+						new ObjectFieldFilterContext(
+							null, objectField.getObjectDefinitionId(),
+							objectViewFilterColumn));
 
-			objectFieldFilterParser.validate(
-				listTypeDefinitionId, objectViewFilterColumn);
+			objectFieldFilterContributor.validate();
 		}
 	}
 
@@ -545,38 +533,39 @@ public class ObjectViewLocalServiceImpl extends ObjectViewLocalServiceBaseImpl {
 						objectViewSortColumn.getSortOrder());
 			}
 
-			if (!_objectFieldNames.contains(
-					objectViewSortColumn.getObjectFieldName())) {
+			ObjectField objectField = _objectFieldPersistence.findByODI_N(
+				objectDefinitionId, objectViewSortColumn.getObjectFieldName());
 
-				ObjectField objectField = _objectFieldPersistence.findByODI_N(
-					objectDefinitionId,
-					objectViewSortColumn.getObjectFieldName());
+			if (Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
+				Objects.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
 
-				if (Objects.equals(
-						objectField.getBusinessType(),
-						ObjectFieldConstants.BUSINESS_TYPE_AGGREGATION) ||
-					Objects.equals(
-						objectField.getBusinessType(),
-						ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
-
-					throw new ObjectViewSortColumnObjectFieldNameException(
-						"Object field " +
-							objectViewSortColumn.getObjectFieldName() +
-								" is not sortable");
-				}
+				throw new ObjectViewSortColumnObjectFieldNameException(
+					"Object field " +
+						objectViewSortColumn.getObjectFieldName() +
+							" is not sortable");
 			}
 		}
 	}
+
+	private static final Set<String> _filterableObjectFieldBusinessTypes =
+		Collections.unmodifiableSet(
+			SetUtil.fromArray(
+				ObjectFieldConstants.BUSINESS_TYPE_PICKLIST,
+				ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP));
+	private static final Set<String> _filterableObjectFieldNames =
+		Collections.unmodifiableSet(
+			SetUtil.fromArray("status", "createDate", "modifiedDate"));
 
 	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
 
 	@Reference
-	private ObjectFieldFilterParserTracker _objectFieldFilterParserTracker;
-
-	private final Set<String> _objectFieldNames = Collections.unmodifiableSet(
-		SetUtil.fromArray(
-			"creator", "dateCreated", "dateModified", "id", "status"));
+	private ObjectFieldFilterContributorTracker
+		_objectFieldFilterContributorTracker;
 
 	@Reference
 	private ObjectFieldPersistence _objectFieldPersistence;

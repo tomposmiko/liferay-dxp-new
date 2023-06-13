@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.log4j.internal.Log4jConfigUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -96,6 +97,10 @@ public class Log4JUtil {
 
 			jdkLogger.setLevel(Log4jConfigUtil.getJDKLevel(entry.getValue()));
 		}
+	}
+
+	public static File getCompanyLogDirectory(long companyId) {
+		return Log4jConfigUtil.getCompanyLogDirectory(companyId);
 	}
 
 	public static Map<String, String> getCustomLogSettings() {

@@ -16,6 +16,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo} from 'react';
 
+import {APP_LAYOUT_CONTENT_CLASS_NAME} from '../constants/appLayoutClassName';
 import {
 	useSetSidebarPanelId,
 	useSidebarPanelId,
@@ -48,10 +49,6 @@ export function AppLayout({
 	}, [setSidebarPanelId]);
 
 	useEffect(() => {
-		setSidebarPanelId(null);
-	}, [setSidebarPanelId, sidebarPanels]);
-
-	useEffect(() => {
 		if (SidebarPanel) {
 			closeProductMenu();
 		}
@@ -68,12 +65,9 @@ export function AppLayout({
 			</div>
 
 			<div
-				className={classNames(
-					'site_navigation_menu_editor_AppLayout-content',
-					{
-						'site_navigation_menu_editor_AppLayout-content--with-sidebar': !!SidebarPanel,
-					}
-				)}
+				className={classNames(APP_LAYOUT_CONTENT_CLASS_NAME, {
+					[`${APP_LAYOUT_CONTENT_CLASS_NAME}--with-sidebar`]: !!SidebarPanel,
+				})}
 			>
 				{contentChildren}
 

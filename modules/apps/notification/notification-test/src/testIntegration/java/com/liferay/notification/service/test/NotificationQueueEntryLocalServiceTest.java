@@ -15,6 +15,7 @@
 package com.liferay.notification.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationTemplate;
@@ -24,10 +25,8 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.util.PropsUtil;
 
 import java.util.Collections;
 
@@ -65,16 +64,13 @@ public class NotificationQueueEntryLocalServiceTest {
 
 	@Test
 	public void testResendNotificationQueueEntry() throws Exception {
-		PropsUtil.addProperties(
-			UnicodePropertiesBuilder.setProperty(
-				"feature.flag.LPS-159052", "true"
-			).build());
-
 		NotificationQueueEntry notificationQueueEntry =
 			_addNotificationQueueEntry();
 
-		notificationQueueEntry = _notificationQueueEntryLocalService.updateSent(
-			notificationQueueEntry.getNotificationQueueEntryId(), true);
+		notificationQueueEntry =
+			_notificationQueueEntryLocalService.updateStatus(
+				notificationQueueEntry.getNotificationQueueEntryId(),
+				NotificationQueueEntryConstants.STATUS_SENT);
 
 		Assert.assertEquals(
 			NotificationQueueEntryConstants.STATUS_SENT,
@@ -87,11 +83,6 @@ public class NotificationQueueEntryLocalServiceTest {
 		Assert.assertEquals(
 			NotificationQueueEntryConstants.STATUS_UNSENT,
 			notificationQueueEntry.getStatus());
-
-		PropsUtil.addProperties(
-			UnicodePropertiesBuilder.setProperty(
-				"feature.flag.LPS-159052", "false"
-			).build());
 	}
 
 	private NotificationQueueEntry _addNotificationQueueEntry()
@@ -106,12 +97,12 @@ public class NotificationQueueEntryLocalServiceTest {
 				RandomTestUtil.randomString(),
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()),
-				RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), null,
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()),
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()),
-				Collections.emptyList());
+				NotificationConstants.TYPE_EMAIL, Collections.emptyList());
 
 		return _notificationQueueEntryLocalService.addNotificationQueueEntry(
 			TestPropsValues.getUserId(),

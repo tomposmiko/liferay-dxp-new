@@ -42,6 +42,8 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
@@ -71,20 +73,20 @@ public class COREntryRelLocalServiceImpl
 		COREntryRel corEntryRel = corEntryRelPersistence.create(
 			counterLocalService.increment());
 
-		User user = userLocalService.getUser(userId);
+		User user = _userLocalService.getUser(userId);
 
 		corEntryRel.setCompanyId(user.getCompanyId());
 		corEntryRel.setUserId(user.getUserId());
 		corEntryRel.setUserName(user.getFullName());
 
 		corEntryRel.setClassNameId(
-			classNameLocalService.getClassNameId(className));
+			_classNameLocalService.getClassNameId(className));
 		corEntryRel.setClassPK(classPK);
 		corEntryRel.setCOREntryId(corEntryId);
 
 		corEntryRel = corEntryRelPersistence.update(corEntryRel);
 
-		reindexCOREntry(corEntryId);
+		_reindexCOREntry(corEntryId);
 
 		return corEntryRel;
 	}
@@ -96,7 +98,7 @@ public class COREntryRelLocalServiceImpl
 
 		corEntryRelPersistence.remove(corEntryRel);
 
-		reindexCOREntry(corEntryRel.getCOREntryId());
+		_reindexCOREntry(corEntryRel.getCOREntryId());
 
 		return corEntryRel;
 	}
@@ -126,7 +128,7 @@ public class COREntryRelLocalServiceImpl
 		throws PortalException {
 
 		List<COREntryRel> corEntryRels = corEntryRelPersistence.findByC_C(
-			classNameLocalService.getClassNameId(className), corEntryId);
+			_classNameLocalService.getClassNameId(className), corEntryId);
 
 		for (COREntryRel corEntryRel : corEntryRels) {
 			corEntryRelLocalService.deleteCOREntryRel(corEntryRel);
@@ -138,7 +140,7 @@ public class COREntryRelLocalServiceImpl
 		String className, long classPK, long corEntryId) {
 
 		return corEntryRelPersistence.fetchByC_C_C(
-			classNameLocalService.getClassNameId(className), classPK,
+			_classNameLocalService.getClassNameId(className), classPK,
 			corEntryId);
 	}
 
@@ -289,13 +291,6 @@ public class COREntryRelLocalServiceImpl
 		return corEntryRelPersistence.countByCOREntryId(corEntryId);
 	}
 
-	protected void reindexCOREntry(long corEntryId) throws PortalException {
-		Indexer<COREntry> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-			COREntry.class);
-
-		indexer.reindex(COREntry.class.getName(), corEntryId);
-	}
-
 	private GroupByStep _getGroupByStep(
 		FromStep fromStep, Table innerJoinTable, Predicate innerJoinPredicate,
 		Long corEntryId, String className, String keywords,
@@ -316,7 +311,7 @@ public class COREntryRelLocalServiceImpl
 				corEntryId
 			).and(
 				COREntryRelTable.INSTANCE.classNameId.eq(
-					classNameLocalService.getClassNameId(className))
+					_classNameLocalService.getClassNameId(className))
 			).and(
 				() -> {
 					if (Validator.isNotNull(keywords)) {
@@ -332,7 +327,20 @@ public class COREntryRelLocalServiceImpl
 			));
 	}
 
+	private void _reindexCOREntry(long corEntryId) throws PortalException {
+		Indexer<COREntry> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+			COREntry.class);
+
+		indexer.reindex(COREntry.class.getName(), corEntryId);
+	}
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
+
 	@Reference
 	private CustomSQL _customSQL;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

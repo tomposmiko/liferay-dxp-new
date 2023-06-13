@@ -132,9 +132,11 @@ public class NotificationTemplateResourceImpl
 				LocalizedMapUtil.getLocalizedMap(
 					notificationTemplate.getFromName()),
 				notificationTemplate.getName(),
+				notificationTemplate.getRecipientTypeAsString(),
 				LocalizedMapUtil.getLocalizedMap(
 					notificationTemplate.getSubject()),
 				LocalizedMapUtil.getLocalizedMap(notificationTemplate.getTo()),
+				notificationTemplate.getTypeAsString(),
 				ListUtil.fromArray(
 					notificationTemplate.getAttachmentObjectFieldIds())));
 	}
@@ -159,9 +161,11 @@ public class NotificationTemplateResourceImpl
 				LocalizedMapUtil.getLocalizedMap(
 					notificationTemplate.getFromName()),
 				notificationTemplate.getName(),
+				notificationTemplate.getRecipientTypeAsString(),
 				LocalizedMapUtil.getLocalizedMap(
 					notificationTemplate.getSubject()),
 				LocalizedMapUtil.getLocalizedMap(notificationTemplate.getTo()),
+				notificationTemplate.getTypeAsString(),
 				ListUtil.fromArray(
 					notificationTemplate.getAttachmentObjectFieldIds())));
 	}
@@ -233,10 +237,14 @@ public class NotificationTemplateResourceImpl
 					serviceBuilderNotificationTemplate.getNameMap());
 				objectDefinitionId =
 					serviceBuilderNotificationTemplate.getObjectDefinitionId();
+				recipientType = NotificationTemplate.RecipientType.create(
+					serviceBuilderNotificationTemplate.getRecipientType());
 				subject = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderNotificationTemplate.getSubjectMap());
 				to = LocalizedMapUtil.getLanguageIdMap(
 					serviceBuilderNotificationTemplate.getToMap());
+				type = NotificationTemplate.Type.create(
+					serviceBuilderNotificationTemplate.getType());
 			}
 		};
 	}

@@ -14,12 +14,15 @@
 
 package com.liferay.portal.log4j.internal;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LogEntry;
@@ -258,6 +261,26 @@ public class Log4jConfigUtilTest {
 		}
 	}
 
+	@NewEnv(type = NewEnv.Type.CLASSLOADER)
+	@Test
+	public void testGetCompanyLogDirectoryWithCompanyLogDisabled()
+		throws Exception {
+
+		PropsTestUtil.setProps(PropsKeys.COMPANY_LOG_ENABLED, "false");
+
+		_testGetCompanyLogDirectory(false);
+	}
+
+	@NewEnv(type = NewEnv.Type.CLASSLOADER)
+	@Test
+	public void testGetCompanyLogDirectoryWithCompanyLogEnabled()
+		throws Exception {
+
+		PropsTestUtil.setProps(PropsKeys.COMPANY_LOG_ENABLED, "true");
+
+		_testGetCompanyLogDirectory(true);
+	}
+
 	@Test
 	public void testGetJDKLevel() {
 		Assert.assertEquals(
@@ -402,6 +425,30 @@ public class Log4jConfigUtilTest {
 		}
 	}
 
+	private String _generateCompanyLogRoutingAppenderConfigurationContent(
+		String appenderName, String filePattern, String loggerName,
+		String priority) {
+
+		StringBundler sb = new StringBundler(14);
+
+		sb.append("<?xml version=\"1.0\"?><Configuration strict=\"true\">");
+		sb.append("<Appenders><Appender name=\"");
+		sb.append(appenderName);
+		sb.append("\" filePattern=\"");
+		sb.append(filePattern);
+		sb.append("\" type=\"CompanyLogRouting\">");
+		sb.append("<TimeBasedTriggeringPolicy /><DirectWriteRolloverStrategy ");
+		sb.append("/></Appender></Appenders><Loggers><Logger level= \"");
+		sb.append(priority);
+		sb.append("\" name=\"");
+		sb.append(loggerName);
+		sb.append("\"><AppenderRef ref=\"");
+		sb.append(appenderName);
+		sb.append("\" /></Logger></Loggers></Configuration>");
+
+		return sb.toString();
+	}
+
 	private String _generateLog4j1XMLConfigurationContent(
 			String loggerName, String priority, Class<?>... appenderTypes)
 		throws Exception {
@@ -517,6 +564,64 @@ public class Log4jConfigUtilTest {
 		sb.append("</Logger></Loggers></Configuration>");
 
 		return sb.toString();
+	}
+
+	private void _testGetCompanyLogDirectory(boolean enabled) throws Exception {
+		long companyId = CompanyThreadLocal.getCompanyId();
+
+		String loggerName = StringUtil.randomString();
+
+		Log4jConfigUtil.configureLog4J(
+			_generateXMLConfigurationContent(loggerName, _INFO));
+
+		Assert.assertNull(Log4jConfigUtil.getCompanyLogDirectory(companyId));
+
+		File tempLogFileDir = null;
+
+		try {
+			Path path = Files.createTempDirectory(
+				Log4jConfigUtilTest.class.getName());
+
+			tempLogFileDir = path.toFile();
+
+			String tempLogFileDirPathString = tempLogFileDir.getPath();
+
+			String filePattern = "liferay-@company.id@.%d{yyyy-MM-dd}.xml.log";
+
+			Log4jConfigUtil.configureLog4J(
+				_generateCompanyLogRoutingAppenderConfigurationContent(
+					"COMPANY_LOG_ROUTING_TEXT_FILE",
+					StringBundler.concat(
+						tempLogFileDirPathString, CharPool.FORWARD_SLASH,
+						filePattern),
+					loggerName, _INFO));
+
+			Logger logger = (Logger)LogManager.getLogger(loggerName);
+
+			logger.info("Test message");
+
+			File companyLogDirectory = Log4jConfigUtil.getCompanyLogDirectory(
+				companyId);
+
+			if (enabled) {
+				Assert.assertEquals(
+					"Company log directory should be " +
+						tempLogFileDirPathString,
+					tempLogFileDirPathString, companyLogDirectory.getPath());
+			}
+			else {
+				Assert.assertNull(companyLogDirectory);
+			}
+		}
+		finally {
+			if (tempLogFileDir != null) {
+				for (File file : tempLogFileDir.listFiles()) {
+					file.delete();
+				}
+
+				tempLogFileDir.delete();
+			}
+		}
 	}
 
 	private static final String _ALL = "ALL";

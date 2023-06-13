@@ -494,6 +494,15 @@ public class ObjectEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.object.model.ObjectEntry getObjectEntry(
+			String externalReferenceCode, long objectDefinitionId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryLocalService.getObjectEntry(
+			externalReferenceCode, objectDefinitionId);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectEntry getObjectEntry(
 			String externalReferenceCode, long companyId, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -568,6 +577,14 @@ public class ObjectEntryLocalServiceWrapper
 
 		return _objectEntryLocalService.getSystemModelAttributes(
 			objectDefinition, primaryKey);
+	}
+
+	@Override
+	public String getTitleValue(long objectDefinitionId, long primaryKey)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectEntryLocalService.getTitleValue(
+			objectDefinitionId, primaryKey);
 	}
 
 	@Override

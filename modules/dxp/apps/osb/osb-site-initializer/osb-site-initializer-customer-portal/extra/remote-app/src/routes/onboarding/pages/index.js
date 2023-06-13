@@ -42,9 +42,7 @@ const Pages = () => {
 	const {client} = useAppPropertiesContext();
 
 	const subscriptionDXPCloud = subscriptionGroups?.find(
-		(subscriptionGroup) =>
-			subscriptionGroup.name.replaceAll(' ', '') ===
-			PRODUCT_TYPES.dxpCloud
+		(subscriptionGroup) => subscriptionGroup.name === PRODUCT_TYPES.dxpCloud
 	);
 
 	const subscriptionAnalyticsCloud = subscriptionGroups?.find(

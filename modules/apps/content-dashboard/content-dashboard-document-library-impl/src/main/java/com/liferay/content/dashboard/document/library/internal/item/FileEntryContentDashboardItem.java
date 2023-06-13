@@ -20,8 +20,12 @@ import com.liferay.content.dashboard.item.ContentDashboardItemVersion;
 import com.liferay.content.dashboard.item.VersionableContentDashboardItem;
 import com.liferay.content.dashboard.item.action.ContentDashboardItemAction;
 import com.liferay.content.dashboard.item.action.ContentDashboardItemActionProviderTracker;
+import com.liferay.content.dashboard.item.action.ContentDashboardItemVersionAction;
+import com.liferay.content.dashboard.item.action.ContentDashboardItemVersionActionProviderTracker;
 import com.liferay.content.dashboard.item.action.exception.ContentDashboardItemActionException;
+import com.liferay.content.dashboard.item.action.exception.ContentDashboardItemVersionActionException;
 import com.liferay.content.dashboard.item.action.provider.ContentDashboardItemActionProvider;
+import com.liferay.content.dashboard.item.action.provider.ContentDashboardItemVersionActionProvider;
 import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtype;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.info.field.InfoFieldValue;
@@ -78,6 +82,8 @@ public class FileEntryContentDashboardItem
 		List<AssetCategory> assetCategories, List<AssetTag> assetTags,
 		ContentDashboardItemActionProviderTracker
 			contentDashboardItemActionProviderTracker,
+		ContentDashboardItemVersionActionProviderTracker
+			contentDashboardItemVersionActionProviderTracker,
 		ContentDashboardItemSubtype contentDashboardItemSubtype,
 		DLURLHelper dlURLHelper, FileEntry fileEntry, Group group,
 		InfoItemFieldValuesProvider<FileEntry> infoItemFieldValuesProvider,
@@ -99,6 +105,8 @@ public class FileEntryContentDashboardItem
 
 		_contentDashboardItemActionProviderTracker =
 			contentDashboardItemActionProviderTracker;
+		_contentDashboardItemVersionActionProviderTracker =
+			contentDashboardItemVersionActionProviderTracker;
 		_contentDashboardItemSubtype = contentDashboardItemSubtype;
 		_dlURLHelper = dlURLHelper;
 		_fileEntry = fileEntry;
@@ -110,9 +118,13 @@ public class FileEntryContentDashboardItem
 
 	@Override
 	public List<ContentDashboardItemVersion> getAllContentDashboardItemVersions(
-		ThemeDisplay themeDisplay) {
+		HttpServletRequest httpServletRequest) {
 
 		int status = WorkflowConstants.STATUS_APPROVED;
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
@@ -132,10 +144,14 @@ public class FileEntryContentDashboardItem
 
 		return stream.map(
 			fileVersion -> new ContentDashboardItemVersion(
-				fileVersion.getChangeLog(), fileVersion.getCreateDate(),
+				fileVersion.getChangeLog(),
+				_getContentDashboardItemVersionActions(
+					fileVersion, httpServletRequest),
+				fileVersion.getCreateDate(),
 				_language.get(
 					themeDisplay.getLocale(),
 					WorkflowConstants.getStatusLabel(fileVersion.getStatus())),
+				themeDisplay.getLocale(),
 				WorkflowConstants.getStatusStyle(fileVersion.getStatus()),
 				fileVersion.getUserName(),
 				String.valueOf(fileVersion.getVersion()))
@@ -444,6 +460,51 @@ public class FileEntryContentDashboardItem
 		);
 	}
 
+	private List<ContentDashboardItemVersionAction>
+		_getContentDashboardItemVersionActions(
+			FileVersion fileVersion, HttpServletRequest httpServletRequest) {
+
+		List<ContentDashboardItemVersionAction>
+			contentDashboardItemVersionActions = new ArrayList<>();
+
+		List<ContentDashboardItemVersionActionProvider>
+			contentDashboardItemVersionActionProviders =
+				_contentDashboardItemVersionActionProviderTracker.
+					getContentDashboardItemVersionActionProviders(
+						FileVersion.class.getName());
+
+		for (ContentDashboardItemVersionActionProvider
+				contentDashboardItemVersionActionProvider :
+					contentDashboardItemVersionActionProviders) {
+
+			if (!contentDashboardItemVersionActionProvider.isShow(
+					fileVersion, httpServletRequest)) {
+
+				continue;
+			}
+
+			try {
+				ContentDashboardItemVersionAction
+					contentDashboardItemVersionAction =
+						contentDashboardItemVersionActionProvider.
+							getContentDashboardItemVersionAction(
+								fileVersion, httpServletRequest);
+
+				if (contentDashboardItemVersionAction != null) {
+					contentDashboardItemVersionActions.add(
+						contentDashboardItemVersionAction);
+				}
+			}
+			catch (ContentDashboardItemVersionActionException
+						contentDashboardItemVersionActionException) {
+
+				_log.error(contentDashboardItemVersionActionException);
+			}
+		}
+
+		return contentDashboardItemVersionActions;
+	}
+
 	private String _getExtension() {
 		return FileUtil.getExtension(_getFileName());
 	}
@@ -561,11 +622,13 @@ public class FileEntryContentDashboardItem
 			fileVersion
 		).map(
 			curFileVersion -> new ContentDashboardItemVersion(
-				curFileVersion.getChangeLog(), curFileVersion.getCreateDate(),
+				curFileVersion.getChangeLog(), null,
+				curFileVersion.getCreateDate(),
 				_language.get(
 					locale,
 					WorkflowConstants.getStatusLabel(
 						curFileVersion.getStatus())),
+				null,
 				WorkflowConstants.getStatusStyle(curFileVersion.getStatus()),
 				curFileVersion.getUserName(), curFileVersion.getVersion())
 		);
@@ -579,6 +642,8 @@ public class FileEntryContentDashboardItem
 	private final ContentDashboardItemActionProviderTracker
 		_contentDashboardItemActionProviderTracker;
 	private final ContentDashboardItemSubtype _contentDashboardItemSubtype;
+	private final ContentDashboardItemVersionActionProviderTracker
+		_contentDashboardItemVersionActionProviderTracker;
 	private final DLURLHelper _dlURLHelper;
 	private final FileEntry _fileEntry;
 	private final Group _group;

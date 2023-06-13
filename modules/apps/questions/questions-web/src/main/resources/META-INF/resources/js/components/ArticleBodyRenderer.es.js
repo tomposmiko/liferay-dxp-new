@@ -19,7 +19,9 @@ import Highlight from './Highlight.es';
 export default function ArticleBodyRenderer({
 	articleBody,
 	compactMode = false,
+	companyName,
 	encodingFormat,
+	hasCompanyMx,
 	id,
 	signature,
 }) {
@@ -31,6 +33,8 @@ export default function ArticleBodyRenderer({
 	useEffect(() => {
 		setArticleBodyContainsParagraph(articleBody.includes('<p>'));
 	}, [articleBody]);
+
+	const _companyName = hasCompanyMx && companyName ? `(${companyName})` : '';
 
 	return (
 		<>
@@ -51,7 +55,7 @@ export default function ArticleBodyRenderer({
 					dangerouslySetInnerHTML={{
 						__html: `.questions-article-body-${id} ${
 							articleBodyContainsParagraph ? 'p' : 'div'
-						}:last-child:after {content: " - ${signature}"; font-weight: bold;}`,
+						}:last-child:after {content: " - ${signature} ${_companyName}"; font-weight: bold;}`,
 					}}
 				/>
 			)}

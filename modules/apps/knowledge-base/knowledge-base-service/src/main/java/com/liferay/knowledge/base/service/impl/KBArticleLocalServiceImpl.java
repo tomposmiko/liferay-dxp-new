@@ -30,8 +30,10 @@ import com.liferay.knowledge.base.constants.KBConstants;
 import com.liferay.knowledge.base.constants.KBFolderConstants;
 import com.liferay.knowledge.base.exception.DuplicateKBArticleExternalReferenceCodeException;
 import com.liferay.knowledge.base.exception.KBArticleContentException;
+import com.liferay.knowledge.base.exception.KBArticleExpirationDateException;
 import com.liferay.knowledge.base.exception.KBArticleParentException;
 import com.liferay.knowledge.base.exception.KBArticlePriorityException;
+import com.liferay.knowledge.base.exception.KBArticleReviewDateException;
 import com.liferay.knowledge.base.exception.KBArticleSourceURLException;
 import com.liferay.knowledge.base.exception.KBArticleStatusException;
 import com.liferay.knowledge.base.exception.KBArticleTitleException;
@@ -100,6 +102,7 @@ import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.HtmlParser;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -163,7 +166,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			long parentResourceClassNameId, long parentResourcePrimKey,
 			String title, String urlTitle, String content, String description,
 			String sourceURL, String[] sections, String[] selectedFileNames,
-			ServiceContext serviceContext)
+			Date expirationDate, Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		// KB article
@@ -178,7 +181,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		_validateExternalReferenceCode(externalReferenceCode, groupId);
 
-		validate(title, content, sourceURL);
+		_validate(expirationDate, content, reviewDate, sourceURL, title);
 		validateParent(parentResourceClassNameId, parentResourcePrimKey);
 
 		long kbFolderId = KnowledgeBaseUtil.getKBFolderId(
@@ -219,6 +222,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		kbArticle.setLatest(true);
 		kbArticle.setMain(false);
 		kbArticle.setSourceURL(sourceURL);
+		kbArticle.setExpirationDate(expirationDate);
+		kbArticle.setReviewDate(reviewDate);
 		kbArticle.setStatus(WorkflowConstants.STATUS_DRAFT);
 		kbArticle.setExpandoBridgeAttributes(serviceContext);
 
@@ -1069,7 +1074,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			userId, resourcePrimKey, kbArticle.getTitle(),
 			kbArticle.getContent(), kbArticle.getDescription(),
 			kbArticle.getSourceURL(), StringUtil.split(kbArticle.getSections()),
-			null, null, serviceContext);
+			null, null, kbArticle.getExpirationDate(),
+			kbArticle.getReviewDate(), serviceContext);
 	}
 
 	@Override
@@ -1122,14 +1128,14 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			long userId, long resourcePrimKey, String title, String content,
 			String description, String sourceURL, String[] sections,
 			String[] selectedFileNames, long[] removeFileEntryIds,
-			ServiceContext serviceContext)
+			Date expirationDate, Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		// KB article
 
 		User user = _userLocalService.getUser(userId);
 
-		validate(title, content, sourceURL);
+		_validate(expirationDate, content, reviewDate, sourceURL, title);
 
 		KBArticle oldKBArticle = getLatestKBArticle(
 			resourcePrimKey, WorkflowConstants.STATUS_ANY);
@@ -1187,6 +1193,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		kbArticle.setLatest(true);
 		kbArticle.setMain(false);
 		kbArticle.setSourceURL(sourceURL);
+		kbArticle.setExpirationDate(expirationDate);
+		kbArticle.setReviewDate(reviewDate);
 		kbArticle.setExpandoBridgeAttributes(serviceContext);
 
 		kbArticle = kbArticlePersistence.update(kbArticle);
@@ -1240,9 +1248,10 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			userId, kbArticle.getGroupId(), kbArticle.getCreateDate(),
 			kbArticle.getModifiedDate(), KBArticle.class.getName(),
 			kbArticle.getClassPK(), kbArticle.getUuid(), 0, assetCategoryIds,
-			assetTagNames, true, visible, null, null, null, null,
-			ContentTypes.TEXT_HTML, kbArticle.getTitle(),
-			kbArticle.getDescription(), summary, null, null, 0, 0, null);
+			assetTagNames, true, visible, null, null, null,
+			kbArticle.getExpirationDate(), ContentTypes.TEXT_HTML,
+			kbArticle.getTitle(), kbArticle.getDescription(), summary, null,
+			null, 0, 0, null);
 
 		_assetLinkLocalService.updateLinks(
 			userId, assetEntry.getEntryId(), assetLinkEntryIds,
@@ -1932,20 +1941,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	protected void validate(String title, String content, String sourceURL)
-		throws PortalException {
-
-		if (Validator.isNull(title)) {
-			throw new KBArticleTitleException("Title is null");
-		}
-
-		if (Validator.isNull(content)) {
-			throw new KBArticleContentException("Content is null");
-		}
-
-		validateSourceURL(sourceURL);
-	}
-
 	protected void validateParent(
 			KBArticle kbArticle, long parentResourceClassNameId,
 			long parentResourcePrimKey)
@@ -2018,16 +2013,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	protected void validateSourceURL(String sourceURL) throws PortalException {
-		if (Validator.isNull(sourceURL)) {
-			return;
-		}
-
-		if (!Validator.isUrl(sourceURL)) {
-			throw new KBArticleSourceURLException(sourceURL);
-		}
-	}
-
 	protected void validateUrlTitle(
 			long groupId, long kbFolderId, String urlTitle)
 		throws PortalException {
@@ -2057,6 +2042,40 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
+	private void _validate(
+			Date expirationDate, String content, Date reviewDate,
+			String sourceURL, String title)
+		throws PortalException {
+
+		if (Validator.isNull(title)) {
+			throw new KBArticleTitleException("Title is null");
+		}
+
+		if (Validator.isNull(content)) {
+			throw new KBArticleContentException("Content is null");
+		}
+
+		_validateExpirationReviewDate(expirationDate, reviewDate);
+		_validateSourceURL(sourceURL);
+	}
+
+	private void _validateExpirationReviewDate(
+			Date expirationDate, Date reviewDate)
+		throws PortalException {
+
+		if ((expirationDate != null) &&
+			expirationDate.before(DateUtil.newDate())) {
+
+			throw new KBArticleExpirationDateException(
+				"Expiration date is in the past");
+		}
+
+		if ((reviewDate != null) && reviewDate.before(DateUtil.newDate())) {
+			throw new KBArticleReviewDateException(
+				"Review date is in the past");
+		}
+	}
+
 	private void _validateExternalReferenceCode(
 			String externalReferenceCode, long groupId)
 		throws PortalException {
@@ -2073,6 +2092,16 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 				StringBundler.concat(
 					"Duplicate knowledge base article external reference code ",
 					externalReferenceCode, " in group ", groupId));
+		}
+	}
+
+	private void _validateSourceURL(String sourceURL) throws PortalException {
+		if (Validator.isNull(sourceURL)) {
+			return;
+		}
+
+		if (!Validator.isUrl(sourceURL)) {
+			throw new KBArticleSourceURLException(sourceURL);
 		}
 	}
 

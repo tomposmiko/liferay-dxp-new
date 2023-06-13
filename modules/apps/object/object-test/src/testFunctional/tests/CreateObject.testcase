@@ -1546,7 +1546,7 @@ definition {
 
 			ObjectPortlet.selectCustomObject(label = "Custom Object 156824");
 
-			CreateObject.assertAccountRestrictedFieldDisabled();
+			CreateObject.assertAccountRestrictedFieldDisabled(valueName = "Choose an Option");
 
 			CreateObject.viewToogleAccountRestrictionDisabled();
 		}
@@ -2990,6 +2990,44 @@ definition {
 		}
 	}
 
+	@description = "LPS-155962 - Verify that it's possible to restrict a previously created Object"
+	@priority = "4"
+	test CanRestrictExistingObject {
+		task ("Add Custom Object (via API)") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 161897",
+				objectName = "CustomObject161897",
+				pluralLabelName = "Custom Objects 161897");
+		}
+
+		task ("Add Relationship Account to Custom Object (via API)") {
+			ObjectAdmin.addObjectRelationshipViaAPI(
+				objectName_1 = "AccountEntry",
+				objectName_2 = "CustomObject161897",
+				relationshipLabel = "RelationshipAccount",
+				relationshipName = "relationshipAccount",
+				relationshipType = "oneToMany");
+		}
+
+		task ("Publish the Custom Object (via API)") {
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject161897");
+		}
+
+		task ("Go to Custom Object and active Account Restriction") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 161897");
+
+			CreateObject.activeToogleAccountRestriction();
+
+			CreateObject.selectAccountRestrictedField(accountRestrictedField = "RelationshipAccount");
+
+			Button.clickSave();
+
+			Alert.viewSuccessMessage();
+		}
+	}
+
 	@description = "LPS-135551 - Verify it is possible to scope the Object by Company"
 	@priority = "5"
 	test CanScopeObjectByCompany {
@@ -3145,6 +3183,8 @@ definition {
 	@description = "LPS-139803 - Verify it is possible to search for the Object Entry Title on the Relationship field"
 	@priority = "4"
 	test CanSearchObjectEntryTitleOnRelationshipField {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 79",
 			objectName = "CustomObject79",
@@ -3604,6 +3644,8 @@ definition {
 	@description = "LPS-135635 - Verify it is possible to update the Name of a Field before the Object is published"
 	@priority = "4"
 	test CanUpdateFieldNameBeforePublished {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 90",
 			objectName = "CustomObject90",
@@ -5272,6 +5314,8 @@ definition {
 	@description = "LPS-135401 - Verify if Cascade deletion type of Relationship Many to Many will allow to delete only the entry with relation but not its relations"
 	@priority = "4"
 	test CascadeDeletionManyToManyWillAllowDelete {
+		property portal.upstream = "quarantine";
+
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter} 122",
@@ -7119,6 +7163,8 @@ definition {
 	@description = "LPS-135649 - Verify that when Objects are not scoped by Site it should not be displayed on the Workflow settings from the Site Menu"
 	@priority = "4"
 	test ObjectNotScopedBySiteNotDisplayedOnSiteMenu {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 151",
 			objectName = "CustomObject151",
@@ -7135,6 +7181,7 @@ definition {
 	@priority = "5"
 	test ObjectPorletDisappearsOpenMenuWhenInactivated {
 		property portal.acceptance = "true";
+		property portal.upstream = "quarantine";
 
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 140856",
@@ -7172,6 +7219,8 @@ definition {
 	@description = "LPS-139005 - Verify that the Object portlet is no longer displayed on the Site Menu when inactivated"
 	@priority = "4"
 	test ObjectPorletDisappearsSiteMenuWhenInactivated {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 152",
 			objectName = "CustomObject152",
@@ -7640,6 +7689,8 @@ definition {
 	@description = "LPS-135401 - Verify if Prevent deletion type of Relationship Many to Many won't allow the user to delete an entry with relation"
 	@priority = "4"
 	test PreventDeletionManyToManyWontAllowDelete {
+		property portal.upstream = "quarantine";
+
 		for (var nameObject : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${nameObject} 163",
@@ -8169,6 +8220,8 @@ definition {
 	@description = "LPS-139005 - Verify that the Relationship field is no longer displayed when the parent object is inactivated (One to Many)"
 	@priority = "4"
 	test RelationshipFieldDisappearsWhenInactivatedOneToMany {
+		property portal.upstream = "quarantine";
+
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter} 171",
@@ -8237,6 +8290,8 @@ definition {
 	@description = "LPS-135401 - Verify that the Relationship field is not created"
 	@priority = "4"
 	test RelationshipFieldNotCreatedOnManyToMany {
+		property portal.upstream = "quarantine";
+
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object 141659 ${letter}",
@@ -8263,6 +8318,8 @@ definition {
 	@description = "LPS-139005 - Verify that the Relationship field is displayed again when the parent object is reactivated (One to Many)"
 	@priority = "4"
 	test RelationshipFieldReappearsWhenReactivatedOneToMany {
+		property portal.upstream = "quarantine";
+
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter} 172",
@@ -8337,6 +8394,8 @@ definition {
 	@description = "LPS-139005 - Verify that the Relationship tab is no longer displayed when the other object is inactivated (Many to Many)"
 	@priority = "4"
 	test RelationshipTabDisappearsWhenInactivatedManyToMany {
+		property portal.upstream = "quarantine";
+
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter} 173",
@@ -8739,6 +8798,8 @@ definition {
 	@description = "LPS-138213 - Verify that updated data is kept when clicking on the Publish button"
 	@priority = "4"
 	test UpdatedDataIsKeptWhenPublishing {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 141685",
 			objectName = "CustomObject141685",

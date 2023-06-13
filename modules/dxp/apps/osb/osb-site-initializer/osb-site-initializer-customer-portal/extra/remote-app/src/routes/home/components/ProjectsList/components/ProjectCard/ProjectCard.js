@@ -54,15 +54,7 @@ const ProjectCard = ({compressed, loading, onClick, ...koroneikiAccount}) => (
 						'autofit-col autofit-col-expand': compressed,
 					})}
 				>
-					<div
-						className={classNames(
-							'mb-1 text-neutral-7 text-truncate',
-							{
-								h3: !compressed,
-								h4: compressed,
-							}
-						)}
-					>
+					<h4 className="mb-1 text-neutral-7 text-truncate">
 						{loading ? (
 							<Skeleton
 								className="mb-1"
@@ -72,7 +64,7 @@ const ProjectCard = ({compressed, loading, onClick, ...koroneikiAccount}) => (
 						) : (
 							koroneikiAccount.name
 						)}
-					</div>
+					</h4>
 
 					{compressed &&
 						(loading ? (
@@ -109,7 +101,10 @@ const ProjectCard = ({compressed, loading, onClick, ...koroneikiAccount}) => (
 
 							<span className="font-weight-bold ml-1 text-paragraph">
 								{getDateCustomFormat(
-									koroneikiAccount.slaCurrentEndDate,
+									koroneikiAccount.status ===
+										SLA_STATUS_TYPES.future
+										? koroneikiAccount.slaFutureStartDate
+										: koroneikiAccount.slaCurrentEndDate,
 									FORMAT_DATE_TYPES.day2DMonthSYearN
 								)}
 							</span>

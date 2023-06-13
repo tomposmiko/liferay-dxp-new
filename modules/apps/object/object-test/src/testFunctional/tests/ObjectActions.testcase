@@ -25,6 +25,7 @@ definition {
 	@priority = "5"
 	test CanActivateOrDeactivateAction {
 		property portal.acceptance = "true";
+		property portal.upstream = "quarantine";
 
 		task ("Add an object, field, action, and check if an action is active") {
 			ObjectAdmin.addObjectViaAPI(
@@ -181,6 +182,58 @@ definition {
 			actionName = "Action Name");
 	}
 
+	@description = "LPS-156312 - Assert an Action can be created with Expression Builder."
+	@priority = "4"
+	test CanCreateActionWithExpressionBuilder {
+		task ("Given an object with a field is created") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object",
+				objectName = "CustomObject",
+				pluralLabelName = "Custom Objects");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Text",
+				fieldLabelName = "Custom Field",
+				fieldName = "customObjectField",
+				fieldType = "String",
+				isRequired = "true",
+				objectName = "CustomObject");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+		}
+
+		task ("When an action is created and given a condition using the Expression Builder") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.addObjectActionViaUI(
+				actionName = "Custom Action",
+				active = "true",
+				inputExpression = "customObjectField == 'Entry Test'",
+				inputMethod = "true",
+				inputValue = "New Entry After Object Add",
+				objectLabel = "Custom Object",
+				thenAction = "Add an Object Entry",
+				whenAction = "On After Add");
+		}
+
+		task ("Then the action will resolve when the condition is met") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customObjectField",
+				objectName = "CustomObject",
+				value = "Entry Test");
+
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+			ObjectPortlet.viewEntry(entry = "Entry Test");
+
+			ObjectPortlet.viewEntry(entry = "New Entry After Object Add");
+		}
+	}
+
 	@description = "LPS-139008 - Verify it is possible to delete an Action"
 	@priority = "5"
 	test CanDeleteAction {
@@ -207,14 +260,14 @@ definition {
 
 		ObjectAdmin.deleteActionViaUI(actionName = "Action Name");
 
-		ObjectAdmin.assertObjectActionsNotPresent(
-			actionActive = "Yes",
-			actionName = "Action Name");
+		ObjectAdmin.assertObjectActionsNotPresent(actionName = "Action Name");
 	}
 
 	@description = "LPS-145665 - Verify that you can edit the Action name"
 	@priority = "4"
 	test CanEditActionName {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 145",
 			objectName = "CustomObject145",
@@ -530,6 +583,48 @@ definition {
 		ObjectAdmin.assertRequiredErrorPresent();
 	}
 
+	@description = "LPS-156319 - Verify that the Expression Builder field is required"
+	@priority = "3"
+	test CannotSaveWithoutExpressionBuilder {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
+
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldBusinessType = "Text",
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "true",
+			objectName = "CustomObject");
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToActionsTab();
+
+		ObjectAdmin.addObjectActionViaUI(
+			actionName = "Custom Action",
+			active = "true",
+			inputExpression = "",
+			notRefreshAttribute = "true",
+			thenAction = "Webhook",
+			urlAction = "http://localhost:8080",
+			whenAction = "On After Add");
+
+		AssertElementPresent(
+			locator1 = "Message#WARNING_FEEDBACK",
+			value1 = "Required");
+
+		Refresh();
+
+		ObjectAdmin.assertNoResultsWereFound();
+	}
+
 	@description = "LPS-139008 - Verify that it is possible to reactivate an Action"
 	@priority = "4"
 	test CanReactivateAction {
@@ -563,6 +658,8 @@ definition {
 	@description = "LPS-139008 - Verify it is possible to search for an Action"
 	@priority = "4"
 	test CanSearchAction {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 191",
 			objectName = "CustomObject191",

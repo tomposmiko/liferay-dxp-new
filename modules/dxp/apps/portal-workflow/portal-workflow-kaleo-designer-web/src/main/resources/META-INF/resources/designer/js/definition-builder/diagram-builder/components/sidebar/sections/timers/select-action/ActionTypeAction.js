@@ -14,8 +14,20 @@
 import PropTypes from 'prop-types';
 import React, {useContext, useState} from 'react';
 
+import {DEFAULT_LANGUAGE} from '../../../../../../source-builder/constants';
 import {DiagramBuilderContext} from '../../../../../DiagramBuilderContext';
 import BaseActionsInfo from '../../shared-components/BaseActionsInfo';
+
+const scriptLanguageOptions = [
+	{
+		label: Liferay.Language.get('groovy'),
+		value: 'groovy',
+	},
+	{
+		label: Liferay.Language.get('java'),
+		value: 'java',
+	},
+];
 
 const ActionTypeAction = ({
 	actionData,
@@ -27,6 +39,10 @@ const ActionTypeAction = ({
 	const validActionData =
 		actionData.actionType === 'timerActions' ? actionData : null;
 	const [script, setScript] = useState(validActionData?.script || '');
+	const [scriptLanguage, setScriptLanguage] = useState(
+		validActionData?.scriptLanguage?.[actionSectionsIndex] ||
+			DEFAULT_LANGUAGE
+	);
 	const [description, setDescription] = useState(
 		validActionData?.description || ''
 	);
@@ -57,13 +73,14 @@ const ActionTypeAction = ({
 			placeholderScript="${userName} sent you a ${entryType} for review in the workflow."
 			priority={priority}
 			script={script}
-			scriptLabel={Liferay.Language.get('script')}
-			scriptLabelSecondary={Liferay.Language.get('groovy')}
+			scriptLanguage={scriptLanguage}
+			scriptLanguageOptions={scriptLanguageOptions}
 			selectedItem={selectedItem}
 			setDescription={setDescription}
 			setName={setName}
 			setPriority={setPriority}
 			setScript={setScript}
+			setScriptLanguage={setScriptLanguage}
 			updateActionInfo={updateActionInfo}
 		/>
 	);

@@ -421,6 +421,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SKU_ERC_FIELD</td>
+	<td>//div/input[contains(@id,'externalReferenceCode')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SKU_GLOBAL_TRADE_ITEM_NUMBER_FIELD</td>
 	<td>//div/input[contains(@id,'gtin')]</td>
 	<td></td>
@@ -678,6 +683,11 @@
 <tr>
 	<td>TABLE_ENTRY_EDIT_BUTTON</td>
 	<td>//h4[contains(.,'${key_table}')]//..//div/a[contains(.,'${key_entryName}')]//..//..//../div/a[contains(.,'Edit')] | //div[contains(.,'${key_table}')]//div[@class='dnd-tr'][contains(.,'${key_entryName}')]//a[contains(text(),'Edit')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TABLE_ASSERT_TWO_COLUMNS_ELLIPSIS</td>
+	<td>//div[contains(@id,'${key_table}')]//div[1][@class='dnd-td' and contains(.,'${key_firstColumnValue}')]/following::div[@class='dnd-td' and contains (.,'${key_secondColumnValue}')]/following::div[@class='dropdown']</td>
 	<td></td>
 </tr>
 <tr>

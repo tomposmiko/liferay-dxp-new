@@ -16,6 +16,8 @@ package com.liferay.portal.log4j.internal;
 
 import com.liferay.petra.reflect.ReflectionUtil;
 
+import java.io.File;
+
 import java.lang.reflect.Field;
 
 import java.util.ArrayList;
@@ -66,6 +68,17 @@ public class CentralizedConfiguration extends AbstractConfiguration {
 		loggerContext.updateLoggers();
 	}
 
+	public File getCompanyLogDirectory(long companyId) {
+		CompanyLogRoutingAppender companyLogRoutingAppender =
+			_companyLogRoutingAppender;
+
+		if (companyLogRoutingAppender == null) {
+			return null;
+		}
+
+		return companyLogRoutingAppender.getCompanyLogDirectory(companyId);
+	}
+
 	@Override
 	public void start() {
 		LoggerConfig rootLoggerConfig = getRootLogger();
@@ -80,6 +93,7 @@ public class CentralizedConfiguration extends AbstractConfiguration {
 	private void _aggregateAppenders(
 		AbstractConfiguration abstractConfiguration) {
 
+		CompanyLogRoutingAppender companyLogRoutingAppender = null;
 		Map<String, Appender> currentAppenders = getAppenders();
 
 		Map<String, Appender> newAppenders =
@@ -89,6 +103,13 @@ public class CentralizedConfiguration extends AbstractConfiguration {
 			newAppender.start();
 
 			String appenderName = newAppender.getName();
+
+			if ((newAppender instanceof CompanyLogRoutingAppender) &&
+				appenderName.equals("COMPANY_LOG_ROUTING_TEXT_FILE")) {
+
+				companyLogRoutingAppender =
+					(CompanyLogRoutingAppender)newAppender;
+			}
 
 			Appender currentAppender = currentAppenders.put(
 				appenderName, newAppender);
@@ -122,6 +143,10 @@ public class CentralizedConfiguration extends AbstractConfiguration {
 			}
 
 			currentAppender.stop();
+		}
+
+		if (companyLogRoutingAppender != null) {
+			_companyLogRoutingAppender = companyLogRoutingAppender;
 		}
 	}
 
@@ -254,5 +279,7 @@ public class CentralizedConfiguration extends AbstractConfiguration {
 			throw new ExceptionInInitializerError(exception);
 		}
 	}
+
+	private volatile CompanyLogRoutingAppender _companyLogRoutingAppender;
 
 }

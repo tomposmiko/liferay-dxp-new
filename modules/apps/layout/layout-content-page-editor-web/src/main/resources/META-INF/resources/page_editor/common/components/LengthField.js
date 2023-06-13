@@ -17,6 +17,7 @@ import ClayDropDown, {Align} from '@clayui/drop-down';
 import ClayForm, {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
+import {sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
@@ -83,6 +84,11 @@ export function LengthField({
 			</label>
 
 			<LengthInput
+				defaultUnit={
+					Liferay.FeatureFlags['LPS-163362']
+						? field.typeOptions?.defaultUnit
+						: null
+				}
 				field={field}
 				id={inputId}
 				initialValue={initialValue}
@@ -104,6 +110,7 @@ LengthField.propTypes = {
 };
 
 const LengthInput = ({
+	defaultUnit,
 	field,
 	id,
 	initialValue,
@@ -230,7 +237,9 @@ const LengthInput = ({
 					onKeyUp={handleKeyUp}
 					ref={inputRef}
 					sizing="sm"
-					type={nextUnit === CUSTOM ? 'text' : 'number'}
+					type={
+						!defaultUnit && nextUnit === CUSTOM ? 'text' : 'number'
+					}
 					value={nextValue}
 				/>
 
@@ -267,21 +276,23 @@ const LengthInput = ({
 						<ClayButton
 							aria-expanded={active}
 							aria-haspopup="true"
-							aria-label={Liferay.Util.sub(
+							aria-label={sub(
 								Liferay.Language.get('select-a-unit'),
 								nextUnit
 							)}
 							className="p-1 page-editor__length-field__button"
+							disabled={defaultUnit}
 							displayType="secondary"
 							id={triggerId}
 							small
 							title={Liferay.Language.get('select-units')}
 						>
-							{nextUnit === CUSTOM ? (
-								<ClayIcon symbol="code" />
-							) : (
-								nextUnit.toUpperCase()
-							)}
+							{defaultUnit ||
+								(nextUnit === CUSTOM ? (
+									<ClayIcon symbol="code" />
+								) : (
+									nextUnit.toUpperCase()
+								))}
 						</ClayButton>
 					}
 				>

@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -80,6 +81,24 @@ public class KBArticleNavigationFragmentRenderer implements FragmentRenderer {
 							"name", "itemSelector"
 						).put(
 							"type", "itemSelector"
+						),
+						JSONUtil.put(
+							"defaultValue", String.valueOf(_MAX_NESTING_LEVEL)
+						).put(
+							"label", "max-nesting-level"
+						).put(
+							"name", "maxNestingLevel"
+						).put(
+							"type", "text"
+						).put(
+							"typeOptions",
+							JSONUtil.put(
+								"validation",
+								JSONUtil.put(
+									"min", 1
+								).put(
+									"type", "number"
+								))
 						))))
 		).toString();
 	}
@@ -132,7 +151,8 @@ public class KBArticleNavigationFragmentRenderer implements FragmentRenderer {
 			httpServletRequest.setAttribute(
 				KBArticleNavigationFragmentDisplayContext.class.getName(),
 				new KBArticleNavigationFragmentDisplayContext(
-					_infoItemFriendlyURLProvider, kbArticle));
+					_infoItemFriendlyURLProvider, kbArticle,
+					_getMaxNestingLevel(fragmentRendererContext)));
 
 			RequestDispatcher requestDispatcher =
 				_servletContext.getRequestDispatcher("/navigation/view.jsp");
@@ -204,6 +224,20 @@ public class KBArticleNavigationFragmentRenderer implements FragmentRenderer {
 		}
 	}
 
+	private int _getMaxNestingLevel(
+		FragmentRendererContext fragmentRendererContext) {
+
+		FragmentEntryLink fragmentEntryLink =
+			fragmentRendererContext.getFragmentEntryLink();
+
+		return GetterUtil.getInteger(
+			_fragmentEntryConfigurationParser.getFieldValue(
+				getConfiguration(fragmentRendererContext),
+				fragmentEntryLink.getEditableValues(),
+				fragmentRendererContext.getLocale(), "maxNestingLevel"),
+			_MAX_NESTING_LEVEL);
+	}
+
 	private void _printPortletMessageInfo(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse, String message) {
@@ -235,6 +269,8 @@ public class KBArticleNavigationFragmentRenderer implements FragmentRenderer {
 					"fragmentElementId", fragmentElementId
 				).build()));
 	}
+
+	private static final int _MAX_NESTING_LEVEL = 3;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		KBArticleNavigationFragmentRenderer.class);

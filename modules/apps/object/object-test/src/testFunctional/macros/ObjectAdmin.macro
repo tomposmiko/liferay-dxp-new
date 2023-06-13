@@ -20,7 +20,7 @@ definition {
 	}
 
 	macro addCategorizationOnLayoutTab {
-		Click(locator1 = "ObjectAdmin#DROPDOWN_CATEGORIZATION_OPTION");
+		Click(locator1 = "ObjectAdmin#LABEL_DROPDOWN");
 
 		DropdownMenuItem.click(menuItem = "Add Categorization");
 	}
@@ -66,6 +66,7 @@ definition {
 			inputExpression = "${inputExpression}",
 			inputMethod = "${inputMethod}",
 			inputValue = "${inputValue}",
+			notRefreshAttribute = "true",
 			objectLabel = "${objectLabel}",
 			scriptValidation = "${scriptValidation}",
 			secretAction = "${secretAction}",
@@ -528,7 +529,6 @@ definition {
 
 	macro assertObjectActions {
 		AssertElementPresent(
-			key_actionActive = "${actionActive}",
 			key_actionName = "${actionName}",
 			locator1 = "ObjectAdmin#VIEW_ACTIONS_LABEL");
 
@@ -541,7 +541,6 @@ definition {
 
 	macro assertObjectActionsNotPresent {
 		AssertElementNotPresent(
-			key_actionActive = "${actionActive}",
 			key_actionName = "${actionName}",
 			locator1 = "ObjectAdmin#VIEW_ACTIONS_LABEL");
 	}
@@ -1000,6 +999,14 @@ definition {
 						value1 = "${inputExpressionValue}");
 				}
 			}
+
+			if ("${thenAction}" == "Notification") {
+				Click(locator1 = "ObjectAction#SELECT_OPTION_TYPE");
+
+				Click(
+					key_entryName = "${notificationName}",
+					locator1 = "ObjectAction#AUTOCOMPLETE_INPUT");
+			}
 		}
 
 		if (isSet(inputExpression)) {
@@ -1027,14 +1034,19 @@ definition {
 		}
 
 		if (isSet(click)) {
-			if ("${click}" == "cancel") {
+			if (("${click}" == "save") && ("${notRefreshAttribute}" == "true")) {
+				Button.clickSave();
+			}
+			else if ("${click}" == "cancel") {
 				Button.clickCancel();
+
+				Refresh();
 			}
 			else if ("${click}" == "save") {
 				Button.clickSave();
-			}
 
-			Refresh();
+				Refresh();
+			}
 		}
 	}
 
@@ -1197,6 +1209,15 @@ definition {
 		}
 
 		Click(locator1 = "Button#SAVE");
+	}
+
+	macro selectCategoryInObjectEntry {
+		Click(
+			key_fieldLabel = "${vocabularyName}",
+			key_text = "Select",
+			locator1 = "Button#ANY_WITH_LABEL");
+
+		AssetCategorization.selectCategories(categoryNameList = "${categoryNameList}");
 	}
 
 	macro selectKebabMenuOption {

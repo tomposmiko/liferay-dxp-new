@@ -456,8 +456,7 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Override
 	public ObjectDefinition fetchObjectDefinitionByClassName(
-			long companyId, String className)
-		throws PortalException {
+		long companyId, String className) {
 
 		return objectDefinitionPersistence.fetchByC_C(companyId, className);
 	}
@@ -711,6 +710,24 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
 		objectDefinition.setExternalReferenceCode(externalReferenceCode);
+
+		return objectDefinitionPersistence.update(objectDefinition);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public ObjectDefinition updateSystemObjectDefinition(
+			String externalReferenceCode, long objectDefinitionId,
+			long titleObjectFieldId)
+		throws PortalException {
+
+		ObjectDefinition objectDefinition =
+			objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId);
+
+		_validateObjectFieldId(objectDefinition, titleObjectFieldId);
+
+		objectDefinition.setExternalReferenceCode(externalReferenceCode);
+		objectDefinition.setTitleObjectFieldId(titleObjectFieldId);
 
 		return objectDefinitionPersistence.update(objectDefinition);
 	}
@@ -1142,7 +1159,7 @@ public class ObjectDefinitionLocalServiceImpl
 		}
 
 		_validateEnableObjectEntryHistory(
-			objectDefinition.isActive(),
+			objectDefinition.isApproved(),
 			objectDefinition.isEnableObjectEntryHistory() !=
 				enableObjectEntryHistory,
 			objectDefinition.getStorageType(), objectDefinition.isSystem());
@@ -1352,7 +1369,7 @@ public class ObjectDefinitionLocalServiceImpl
 	}
 
 	private void _validateEnableObjectEntryHistory(
-			boolean active, boolean enableObjectEntryHistoryChanged,
+			boolean approved, boolean enableObjectEntryHistoryChanged,
 			String storageType, boolean system)
 		throws PortalException {
 
@@ -1378,9 +1395,9 @@ public class ObjectDefinitionLocalServiceImpl
 					"definitions with the default storage type");
 		}
 
-		if (active) {
+		if (approved) {
 			throw new ObjectDefinitionEnableObjectEntryHistoryException(
-				"Enable object entry histroy cannot be updated when the " +
+				"Enable object entry history cannot be updated when the " +
 					"object definition is published");
 		}
 	}

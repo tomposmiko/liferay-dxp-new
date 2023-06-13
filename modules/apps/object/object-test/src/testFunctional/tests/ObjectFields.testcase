@@ -911,6 +911,110 @@ definition {
 		}
 	}
 
+	@description = "LPS-154872 - Verify that it's possible to filter and sort entries using metadata fields"
+	@priority = "4"
+	test CanFilterAndSortEntriesViaMetadataFields {
+		property portal.upstream = "quarantine";
+
+		task ("Create Custom Object and Custom Field (via API)") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 161889",
+				objectName = "CustomObject161889",
+				pluralLabelName = "Custom Objects 161889");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Text",
+				fieldLabelName = "Custom Field",
+				fieldName = "customField",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject161889");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject161889");
+		}
+
+		task ("Go to Custom Object") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 161889");
+		}
+
+		task ("Create Custom View and go to it") {
+			ObjectCustomViews.goToViewsTab();
+
+			ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+			ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+		}
+
+		var listMetaData = "Author,Create Date,Custom Field,External Reference Code,ID,Modified Date,Status";
+
+		task ("Mark Custom View as default, go to View Builder and add ERC") {
+			ObjectCustomViews.markViewAsDefault();
+
+			ObjectCustomViews.goToViewsBuilderTab();
+
+			ObjectCustomViews.addColumnsViaUI(addColumns = "${listMetaData}");
+		}
+
+		task ("Set order to ERC on Default Sort") {
+			ObjectCustomViews.goToDefaultSortTab();
+
+			for (var columnName : list "${listMetaData}") {
+				ObjectCustomViews.addDefaultSort(
+					columnOption = "${columnName}",
+					sortOption = "Ascending");
+			}
+
+			for (var columnName : list "${listMetaData}") {
+				ObjectCustomViews.assertColumnPresentOnDefaultSort(
+					columnName = "${columnName}",
+					sortingLabel = "Ascending");
+			}
+
+			Button.clickSave();
+		}
+
+		task ("Create an entry via API") {
+			for (var letters : list "A,B") {
+				ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+					fieldName = "customField",
+					objectName = "CustomObject161889",
+					value = "Entry ${letters}");
+			}
+		}
+
+		task ("Go to the Custom Object entries and assert the columns are present") {
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject161889");
+
+			for (var columnName : list "${listMetaData}") {
+				ObjectPortlet.assertEntryColumnPresent(column = "${columnName}");
+			}
+		}
+
+		task ("Click on arrows and assert the entries change the position") {
+			ObjectCustomViews.viewFieldsEntryByPosition(
+				entryName = "Entry A",
+				position = "1");
+
+			ObjectCustomViews.viewFieldsEntryByPosition(
+				entryName = "Entry B",
+				position = "2");
+
+			Click(
+				key_orderColumn = "External Reference Code",
+				locator1 = "ObjectPortlet#ARROW_ORDER_COLUMN");
+
+			ObjectCustomViews.viewFieldsEntryByPosition(
+				entryName = "Entry B",
+				position = "1");
+
+			ObjectCustomViews.viewFieldsEntryByPosition(
+				entryName = "Entry A",
+				position = "2");
+		}
+	}
+
 	@description = "LPS-161887 - Verify that it's not possible to create an Object without adding a field."
 	@priority = "5"
 	test CannotCreateEmptyObject {
@@ -1119,6 +1223,100 @@ definition {
 		}
 	}
 
+	@description = "LPS-158821 - Verify that the user is able to use the ERC field in Sort, on the Custom Views tab"
+	@priority = "4"
+	test CanSortWithERCField {
+		task ("Create Custom Object and Custom Field (via API)") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 162181",
+				objectName = "CustomObject162181",
+				pluralLabelName = "Custom Objects 162181");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Text",
+				fieldLabelName = "Custom Field",
+				fieldName = "customField",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject162181");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject162181");
+		}
+
+		task ("Go to Custom Object") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 162181");
+		}
+
+		task ("Create Custom View and go to it") {
+			ObjectCustomViews.goToViewsTab();
+
+			ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+			ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+		}
+
+		task ("Mark Custom View as default, go to View Builder and add ERC") {
+			ObjectCustomViews.markViewAsDefault();
+
+			ObjectCustomViews.goToViewsBuilderTab();
+
+			ObjectCustomViews.addColumnsViaUI(addColumns = "Custom Field,External Reference Code");
+		}
+
+		task ("Set order to ERC on Default Sort") {
+			ObjectCustomViews.goToDefaultSortTab();
+
+			ObjectCustomViews.addDefaultSort(
+				columnOption = "External Reference Code",
+				sortOption = "Ascending");
+
+			ObjectCustomViews.assertColumnPresentOnDefaultSort(
+				columnName = "External Reference Code",
+				sortingLabel = "Ascending");
+
+			Button.clickSave();
+		}
+
+		task ("Create an entry via API") {
+			for (var letters : list "A,B") {
+				ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+					fieldName = "customField",
+					objectName = "CustomObject162181",
+					value = "Entry ${letters}");
+			}
+		}
+
+		task ("Go to Custom Object entries and assert that the column ERC is present") {
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject162181");
+
+			ObjectPortlet.assertEntryColumnPresent(column = "External Reference Code");
+		}
+
+		task ("Click on arrows and assert the entries change the position") {
+			ObjectCustomViews.viewFieldsEntryByPosition(
+				entryName = "Entry A",
+				position = "1");
+
+			ObjectCustomViews.viewFieldsEntryByPosition(
+				entryName = "Entry B",
+				position = "2");
+
+			Click(
+				key_orderColumn = "External Reference Code",
+				locator1 = "ObjectPortlet#ARROW_ORDER_COLUMN");
+
+			ObjectCustomViews.viewFieldsEntryByPosition(
+				entryName = "Entry B",
+				position = "1");
+
+			ObjectCustomViews.viewFieldsEntryByPosition(
+				entryName = "Entry A",
+				position = "2");
+		}
+	}
+
 	@description = "LPS-135404 - Verify that it's possible to update created custom fields in a System Object"
 	@priority = "4"
 	test CanUpdateCustomFieldInSystemObject {
@@ -1199,6 +1397,155 @@ definition {
 		ObjectAdmin.goToFieldsDetails(label = "Custom Attachment");
 
 		ObjectField.viewToogleOnSidePanelShowFilesInDM(isDisabled = "Yes");
+	}
+
+	@description = "LPS-158821 - Verify that the user is able to use the ERC field in View Builder, on the Custom Views tab"
+	@priority = "5"
+	test CanUseERCFieldWithCustomView {
+		property portal.acceptance = "true";
+
+		task ("Create Custom Object and Custom Field (via API)") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 162180",
+				objectName = "CustomObject162180",
+				pluralLabelName = "Custom Objects 162180");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Text",
+				fieldLabelName = "Custom Field",
+				fieldName = "customField",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject162180");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject162180");
+		}
+
+		task ("Go to Custom Object") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 162180");
+		}
+
+		task ("Create Custom View and go to it") {
+			ObjectCustomViews.goToViewsTab();
+
+			ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+			ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+		}
+
+		task ("Mark Custom View as default, go to View Builder and add ERC") {
+			ObjectCustomViews.markViewAsDefault();
+
+			ObjectCustomViews.goToViewsBuilderTab();
+
+			ObjectCustomViews.addColumnsViaUI(addColumns = "Custom Field,External Reference Code");
+
+			Button.clickSave();
+		}
+
+		task ("Create an entry via API") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customField",
+				objectName = "CustomObject162180",
+				value = "Entry Test");
+		}
+
+		task ("Assert the entry is visible with an ERC column") {
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject162180");
+
+			ObjectPortlet.viewEntry(entry = "Entry Test");
+
+			ObjectPortlet.assertEntryColumnPresent(column = "External Reference Code");
+		}
+	}
+
+	@description = "LPS-158821 - Verify that the user is able to use the ERC field in Expression Builder, on the Validations tab"
+	@priority = "4"
+	test CanUseERCFieldWithExpressionBuilder {
+		task ("Create Custom Object and Custom Field (via API)") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 162179",
+				objectName = "CustomObject162179",
+				pluralLabelName = "Custom Objects 162179");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Integer",
+				fieldLabelName = "Custom Integer",
+				fieldName = "customInteger",
+				fieldType = "Integer",
+				isRequired = "false",
+				objectName = "CustomObject162179");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject162179");
+		}
+
+		task ("On Custom Object, go to Validations tab") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 162179");
+
+			ObjectAdmin.goToValidationsTab();
+		}
+
+		task ("Add a Custom Validation using an expression 'is Greater Than'") {
+			ObjectCustomValidation.addObjectValidation(
+				validationName = "Custom Validation",
+				validationType = "Expression Builder");
+
+			ObjectCustomValidation.gotoCustomValidation(validationName = "Custom Validation");
+
+			ObjectCustomValidation.activeValidation();
+
+			ObjectCustomValidation.gotoTab(tabName = "Conditions");
+
+			ObjectCustomValidation.insertScriptOnValidation(scriptValidation = "customInteger > externalReferenceCode");
+
+			ObjectCustomValidation.addErrorMessage(errorMessage = "This entry is not possible.");
+
+			Button.clickSave();
+		}
+
+		task ("Create Custom View and go to it") {
+			ObjectCustomViews.goToViewsTab();
+
+			ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+			ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+		}
+
+		task ("Mark Custom View as default, go to View Builder and add ERC") {
+			ObjectCustomViews.markViewAsDefault();
+
+			ObjectCustomViews.goToViewsBuilderTab();
+
+			ObjectCustomViews.addColumnsViaUI(addColumns = "Custom Integer,External Reference Code");
+
+			Button.clickSave();
+		}
+
+		task ("Assert the entry is created only when the ERC value is greater than the integer value") {
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject162179");
+
+			ObjectPortlet.addCustomFieldEntryViaUI(
+				customField = "Custom Integer",
+				entry = "123");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "Message#ERROR",
+				value1 = "This entry is not possible.");
+
+			Navigator.gotoBack();
+
+			ObjectPortlet.addCustomFieldEntryViaUI(
+				customField = "Custom Integer",
+				entry = "2147483647");
+
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject162179");
+
+			ObjectPortlet.viewEntry(entry = "2147483647");
+		}
 	}
 
 	@description = "LPS-148112 - Verify if on the side panel that only valid paths can be used on the 'Show files' settings"
@@ -1644,6 +1991,8 @@ definition {
 	@description = "LPS-146523 - Verify if the default folder will be the Global Documents and Media Home Folder"
 	@priority = "4"
 	test GlobalDocumentsAndMediaHomeFolderIsDefaultWhenScopedByCompany {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 151565",
 			objectName = "CustomObject151565",
@@ -1680,6 +2029,8 @@ definition {
 	@description = "LPS-143065 - Change the Maximum File Size to 0 (zero) and verify if the Maximum File Size is now set by the System configurations"
 	@priority = "4"
 	test MaximumFileSizeIsSetBySystemConfigurationsWhenZero {
+		property test.name.skip.portal.instance = "ObjectFields#MaximumFileSizeIsSetBySystemConfigurationsWhenZero";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 151561",
 			objectName = "CustomObject151561",

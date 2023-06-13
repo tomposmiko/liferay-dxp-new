@@ -434,6 +434,14 @@ public class ObjectEntryLocalServiceUtil {
 	}
 
 	public static ObjectEntry getObjectEntry(
+			String externalReferenceCode, long objectDefinitionId)
+		throws PortalException {
+
+		return getService().getObjectEntry(
+			externalReferenceCode, objectDefinitionId);
+	}
+
+	public static ObjectEntry getObjectEntry(
 			String externalReferenceCode, long companyId, long groupId)
 		throws PortalException {
 
@@ -499,6 +507,12 @@ public class ObjectEntryLocalServiceUtil {
 
 		return getService().getSystemModelAttributes(
 			objectDefinition, primaryKey);
+	}
+
+	public static String getTitleValue(long objectDefinitionId, long primaryKey)
+		throws PortalException {
+
+		return getService().getTitleValue(objectDefinitionId, primaryKey);
 	}
 
 	public static Map<String, Serializable> getValues(long objectEntryId)

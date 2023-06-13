@@ -14,6 +14,7 @@
 
 package com.liferay.portal.upgrade.internal.release.osgi.commands;
 
+import com.liferay.gogo.shell.logging.TeeLoggingUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
@@ -24,7 +25,6 @@ import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
 import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.upgrade.PortalUpgradeProcess;
-import com.liferay.portal.upgrade.internal.executor.SwappedLogExecutor;
 import com.liferay.portal.upgrade.internal.executor.UpgradeExecutor;
 import com.liferay.portal.upgrade.internal.graph.ReleaseGraphManager;
 import com.liferay.portal.upgrade.internal.registry.UpgradeInfo;
@@ -77,18 +77,18 @@ public class ReleaseManagerOSGiCommands {
 			return "No upgrade processes registered for " + bundleSymbolicName;
 		}
 
-		try {
-			_upgradeExecutor.execute(bundleSymbolicName, upgradeInfos, null);
-		}
-		catch (Throwable throwable) {
-			_swappedLogExecutor.execute(
-				bundleSymbolicName,
-				() -> _log.error(
-					"Failed upgrade process for module ".concat(
-						bundleSymbolicName),
-					throwable),
-				null);
-		}
+		TeeLoggingUtil.runWithTeeLogging(
+			() -> {
+				try {
+					_upgradeExecutor.execute(bundleSymbolicName, upgradeInfos);
+				}
+				catch (Throwable throwable) {
+					_log.error(
+						"Failed upgrade process for module ".concat(
+							bundleSymbolicName),
+						throwable);
+				}
+			});
 
 		return null;
 	}
@@ -105,12 +105,13 @@ public class ReleaseManagerOSGiCommands {
 		ReleaseGraphManager releaseGraphManager = new ReleaseGraphManager(
 			upgradeInfos);
 
-		_upgradeExecutor.executeUpgradeInfos(
-			bundleSymbolicName,
-			releaseGraphManager.getUpgradeInfos(
-				_releaseManagerImpl.getSchemaVersionString(bundleSymbolicName),
-				toVersionString),
-			null);
+		TeeLoggingUtil.runWithTeeLogging(
+			() -> _upgradeExecutor.executeUpgradeInfos(
+				bundleSymbolicName,
+				releaseGraphManager.getUpgradeInfos(
+					_releaseManagerImpl.getSchemaVersionString(
+						bundleSymbolicName),
+					toVersionString)));
 
 		return null;
 	}
@@ -119,7 +120,8 @@ public class ReleaseManagerOSGiCommands {
 	public String executeAll() {
 		Set<String> upgradeThrewExceptionBundleSymbolicNames = new HashSet<>();
 
-		executeAll(upgradeThrewExceptionBundleSymbolicNames);
+		TeeLoggingUtil.runWithTeeLogging(
+			() -> executeAll(upgradeThrewExceptionBundleSymbolicNames));
 
 		if (upgradeThrewExceptionBundleSymbolicNames.isEmpty()) {
 			return "All modules were successfully upgraded";
@@ -189,42 +191,39 @@ public class ReleaseManagerOSGiCommands {
 	protected void executeAll(
 		Set<String> upgradeThrewExceptionBundleSymbolicNames) {
 
-		Set<String> upgradableBundleSymbolicNames =
-			_releaseManagerImpl.getUpgradableBundleSymbolicNames();
+		while (true) {
+			Set<String> upgradableBundleSymbolicNames =
+				_releaseManagerImpl.getUpgradableBundleSymbolicNames();
 
-		upgradableBundleSymbolicNames.removeAll(
-			upgradeThrewExceptionBundleSymbolicNames);
+			upgradableBundleSymbolicNames.removeAll(
+				upgradeThrewExceptionBundleSymbolicNames);
 
-		if (upgradableBundleSymbolicNames.isEmpty()) {
-			return;
-		}
-
-		for (String upgradableBundleSymbolicName :
-				upgradableBundleSymbolicNames) {
-
-			try {
-				List<UpgradeInfo> upgradeInfos =
-					_releaseManagerImpl.getUpgradeInfos(
-						upgradableBundleSymbolicName);
-
-				_upgradeExecutor.execute(
-					upgradableBundleSymbolicName, upgradeInfos, null);
+			if (upgradableBundleSymbolicNames.isEmpty()) {
+				return;
 			}
-			catch (Throwable throwable) {
-				_swappedLogExecutor.execute(
-					upgradableBundleSymbolicName,
-					() -> _log.error(
+
+			for (String upgradableBundleSymbolicName :
+					upgradableBundleSymbolicNames) {
+
+				try {
+					List<UpgradeInfo> upgradeInfos =
+						_releaseManagerImpl.getUpgradeInfos(
+							upgradableBundleSymbolicName);
+
+					_upgradeExecutor.execute(
+						upgradableBundleSymbolicName, upgradeInfos);
+				}
+				catch (Throwable throwable) {
+					_log.error(
 						"Failed upgrade process for module ".concat(
 							upgradableBundleSymbolicName),
-						throwable),
-					null);
+						throwable);
 
-				upgradeThrewExceptionBundleSymbolicNames.add(
-					upgradableBundleSymbolicName);
+					upgradeThrewExceptionBundleSymbolicNames.add(
+						upgradableBundleSymbolicName);
+				}
 			}
 		}
-
-		executeAll(upgradeThrewExceptionBundleSymbolicNames);
 	}
 
 	private String _check(boolean showUpgradeSteps) {
@@ -402,9 +401,6 @@ public class ReleaseManagerOSGiCommands {
 
 	@Reference
 	private ReleaseManagerImpl _releaseManagerImpl;
-
-	@Reference
-	private SwappedLogExecutor _swappedLogExecutor;
 
 	@Reference
 	private UpgradeExecutor _upgradeExecutor;

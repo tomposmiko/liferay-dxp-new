@@ -20,8 +20,12 @@ import com.liferay.content.dashboard.item.ContentDashboardItemVersion;
 import com.liferay.content.dashboard.item.VersionableContentDashboardItem;
 import com.liferay.content.dashboard.item.action.ContentDashboardItemAction;
 import com.liferay.content.dashboard.item.action.ContentDashboardItemActionProviderTracker;
+import com.liferay.content.dashboard.item.action.ContentDashboardItemVersionAction;
+import com.liferay.content.dashboard.item.action.ContentDashboardItemVersionActionProviderTracker;
 import com.liferay.content.dashboard.item.action.exception.ContentDashboardItemActionException;
+import com.liferay.content.dashboard.item.action.exception.ContentDashboardItemVersionActionException;
 import com.liferay.content.dashboard.item.action.provider.ContentDashboardItemActionProvider;
+import com.liferay.content.dashboard.item.action.provider.ContentDashboardItemVersionActionProvider;
 import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtype;
 import com.liferay.info.item.InfoItemClassDetails;
 import com.liferay.info.item.InfoItemFieldValues;
@@ -50,8 +54,10 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -78,6 +84,8 @@ public class JournalArticleContentDashboardItem
 		List<AssetCategory> assetCategories, List<AssetTag> assetTags,
 		ContentDashboardItemActionProviderTracker
 			contentDashboardItemActionProviderTracker,
+		ContentDashboardItemVersionActionProviderTracker
+			contentDashboardItemVersionActionProviderTracker,
 		ContentDashboardItemSubtype contentDashboardItemSubtype, Group group,
 		InfoItemFieldValuesProvider<JournalArticle> infoItemFieldValuesProvider,
 		JournalArticle journalArticle,
@@ -100,6 +108,8 @@ public class JournalArticleContentDashboardItem
 
 		_contentDashboardItemActionProviderTracker =
 			contentDashboardItemActionProviderTracker;
+		_contentDashboardItemVersionActionProviderTracker =
+			contentDashboardItemVersionActionProviderTracker;
 		_contentDashboardItemSubtype = contentDashboardItemSubtype;
 		_group = group;
 		_infoItemFieldValuesProvider = infoItemFieldValuesProvider;
@@ -119,9 +129,13 @@ public class JournalArticleContentDashboardItem
 
 	@Override
 	public List<ContentDashboardItemVersion> getAllContentDashboardItemVersions(
-		ThemeDisplay themeDisplay) {
+		HttpServletRequest httpServletRequest) {
 
 		int status = WorkflowConstants.STATUS_APPROVED;
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
@@ -144,11 +158,15 @@ public class JournalArticleContentDashboardItem
 		return ListUtil.toList(
 			journalArticles,
 			journalArticle -> new ContentDashboardItemVersion(
-				null, journalArticle.getStatusDate(),
+				null,
+				_getContentDashboardItemVersionActions(
+					httpServletRequest, journalArticle),
+				journalArticle.getStatusDate(),
 				_language.get(
 					themeDisplay.getLocale(),
 					WorkflowConstants.getStatusLabel(
 						journalArticle.getStatus())),
+				themeDisplay.getLocale(),
 				WorkflowConstants.getStatusStyle(journalArticle.getStatus()),
 				journalArticle.getUserName(),
 				String.valueOf(journalArticle.getVersion())));
@@ -454,6 +472,52 @@ public class JournalArticleContentDashboardItem
 		);
 	}
 
+	private List<ContentDashboardItemVersionAction>
+		_getContentDashboardItemVersionActions(
+			HttpServletRequest httpServletRequest,
+			JournalArticle journalArticleVersion) {
+
+		List<ContentDashboardItemVersionAction>
+			contentDashboardItemVersionActions = new ArrayList<>();
+
+		List<ContentDashboardItemVersionActionProvider>
+			contentDashboardItemVersionActionProviders =
+				_contentDashboardItemVersionActionProviderTracker.
+					getContentDashboardItemVersionActionProviders(
+						JournalArticle.class.getName());
+
+		for (ContentDashboardItemVersionActionProvider
+				contentDashboardItemVersionActionProvider :
+					contentDashboardItemVersionActionProviders) {
+
+			if (!contentDashboardItemVersionActionProvider.isShow(
+					journalArticleVersion, httpServletRequest)) {
+
+				continue;
+			}
+
+			try {
+				ContentDashboardItemVersionAction
+					contentDashboardItemVersionAction =
+						contentDashboardItemVersionActionProvider.
+							getContentDashboardItemVersionAction(
+								journalArticleVersion, httpServletRequest);
+
+				if (contentDashboardItemVersionAction != null) {
+					contentDashboardItemVersionActions.add(
+						contentDashboardItemVersionAction);
+				}
+			}
+			catch (ContentDashboardItemVersionActionException
+						contentDashboardItemVersionActionException) {
+
+				_log.error(contentDashboardItemVersionActionException);
+			}
+		}
+
+		return contentDashboardItemVersionActions;
+	}
+
 	private ContentDashboardItemVersion _getLastContentDashboardItemVersion(
 		Locale locale) {
 
@@ -503,11 +567,12 @@ public class JournalArticleContentDashboardItem
 			journalArticle
 		).map(
 			curJournalArticle -> new ContentDashboardItemVersion(
-				null, curJournalArticle.getCreateDate(),
+				null, null, curJournalArticle.getCreateDate(),
 				_language.get(
 					locale,
 					WorkflowConstants.getStatusLabel(
 						curJournalArticle.getStatus())),
+				null,
 				WorkflowConstants.getStatusStyle(curJournalArticle.getStatus()),
 				curJournalArticle.getUserName(),
 				String.valueOf(curJournalArticle.getVersion()))
@@ -522,6 +587,8 @@ public class JournalArticleContentDashboardItem
 	private final ContentDashboardItemActionProviderTracker
 		_contentDashboardItemActionProviderTracker;
 	private final ContentDashboardItemSubtype _contentDashboardItemSubtype;
+	private final ContentDashboardItemVersionActionProviderTracker
+		_contentDashboardItemVersionActionProviderTracker;
 	private final Group _group;
 	private final InfoItemFieldValuesProvider<JournalArticle>
 		_infoItemFieldValuesProvider;

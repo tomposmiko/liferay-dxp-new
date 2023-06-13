@@ -328,7 +328,7 @@ public class ContentPageEditorDisplayContext {
 				"formTypes",
 				MappingTypesUtil.getMappingTypesJSONArray(
 					infoItemServiceTracker, EditPageInfoItemCapability.KEY,
-					themeDisplay.getScopeGroupId(), themeDisplay.getLocale())
+					themeDisplay)
 			).put(
 				"fragmentCompositionDescriptionMaxLength",
 				() -> ModelHintsUtil.getMaxLength(
@@ -340,9 +340,12 @@ public class ContentPageEditorDisplayContext {
 			).put(
 				"frontendTokens",
 				() -> {
+					Group group = themeDisplay.getScopeGroup();
+
 					LayoutSet layoutSet =
 						LayoutSetLocalServiceUtil.fetchLayoutSet(
-							themeDisplay.getSiteGroupId(), false);
+							themeDisplay.getSiteGroupId(),
+							group.isLayoutSetPrototype());
 
 					FrontendTokenDefinition frontendTokenDefinition =
 						_frontendTokenDefinitionRegistry.

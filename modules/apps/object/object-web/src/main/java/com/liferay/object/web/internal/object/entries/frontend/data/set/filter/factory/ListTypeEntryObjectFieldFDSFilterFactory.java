@@ -15,22 +15,15 @@
 package com.liferay.object.web.internal.object.entries.frontend.data.set.filter.factory;
 
 import com.liferay.frontend.data.set.filter.FDSFilter;
-import com.liferay.list.type.model.ListTypeDefinition;
-import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectViewFilterColumnConstants;
-import com.liferay.object.field.filter.parser.ObjectFieldFilterParser;
-import com.liferay.object.model.ObjectField;
+import com.liferay.object.field.filter.parser.ObjectFieldFilterContext;
+import com.liferay.object.field.filter.parser.ObjectFieldFilterContributor;
+import com.liferay.object.field.filter.parser.ObjectFieldFilterContributorTracker;
 import com.liferay.object.model.ObjectViewFilterColumn;
-import com.liferay.object.service.ObjectFieldLocalService;
-import com.liferay.object.web.internal.object.entries.frontend.data.set.filter.ListTypeEntryAutocompleteFDSFilter;
-import com.liferay.object.web.internal.object.entries.frontend.data.set.filter.ObjectEntryStatusSelectionFDSFilter;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -39,9 +32,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Feliphe Marinho
  */
 @Component(
-	immediate = true,
 	property = {
 		"object.field.business.type.key=" + ObjectFieldConstants.BUSINESS_TYPE_PICKLIST,
+		"object.field.business.type.key=" + ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP,
 		"object.field.filter.type.key=" + ObjectViewFilterColumnConstants.FILTER_TYPE_EXCLUDES,
 		"object.field.filter.type.key=" + ObjectViewFilterColumnConstants.FILTER_TYPE_INCLUDES
 	},
@@ -55,46 +48,17 @@ public class ListTypeEntryObjectFieldFDSFilterFactory
 			ObjectViewFilterColumn objectViewFilterColumn)
 		throws PortalException {
 
-		Map<String, Object> preloadedData = null;
+		ObjectFieldFilterContributor objectFieldFilterContributor =
+			_objectFieldFilterContributorTracker.
+				getObjectFieldFilterContributor(
+					new ObjectFieldFilterContext(
+						locale, objectDefinitionId, objectViewFilterColumn));
 
-		if (Objects.equals(
-				objectViewFilterColumn.getObjectFieldName(), "status")) {
-
-			if (Validator.isNotNull(objectViewFilterColumn.getFilterType())) {
-				preloadedData = _objectFieldFilterParser.parse(
-					0L, locale, objectViewFilterColumn);
-			}
-
-			return new ObjectEntryStatusSelectionFDSFilter(preloadedData);
-		}
-
-		ObjectField objectField = _objectFieldLocalService.fetchObjectField(
-			objectDefinitionId, objectViewFilterColumn.getObjectFieldName());
-
-		if (Validator.isNotNull(objectViewFilterColumn.getFilterType())) {
-			preloadedData = _objectFieldFilterParser.parse(
-				objectField.getListTypeDefinitionId(), locale,
-				objectViewFilterColumn);
-		}
-
-		ListTypeDefinition listTypeDefinition =
-			_listTypeDefinitionLocalService.getListTypeDefinition(
-				objectField.getListTypeDefinitionId());
-
-		return new ListTypeEntryAutocompleteFDSFilter(
-			objectField.getName(), listTypeDefinition.getName(locale),
-			objectField.getListTypeDefinitionId(), preloadedData);
+		return objectFieldFilterContributor.getFDSFilter();
 	}
 
 	@Reference
-	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
-
-	@Reference(
-		target = "(object.field.filter.type.key=" + ObjectViewFilterColumnConstants.FILTER_TYPE_EXCLUDES + ")"
-	)
-	private ObjectFieldFilterParser _objectFieldFilterParser;
-
-	@Reference
-	private ObjectFieldLocalService _objectFieldLocalService;
+	private ObjectFieldFilterContributorTracker
+		_objectFieldFilterContributorTracker;
 
 }

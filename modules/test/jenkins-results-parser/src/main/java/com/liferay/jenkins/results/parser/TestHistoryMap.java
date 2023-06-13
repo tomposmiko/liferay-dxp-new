@@ -125,7 +125,7 @@ public class TestHistoryMap {
 		_minimumTestDuration = minimumTestDuration;
 	}
 
-	public void writeAverageDurationJSONObjectFile(String filePath)
+	public void writeCIHistoryJSONObjectFile(String filePath)
 		throws IOException {
 
 		JSONArray batchesJSONArray = new JSONArray();
@@ -165,18 +165,15 @@ public class TestHistoryMap {
 
 			batchJSONObject.put(
 				"averageDuration", batchHistory.getAverageDuration());
-			batchJSONObject.put(
-				"averageOverheadDuration",
-				batchHistory.getAverageOverheadDuration());
 			batchJSONObject.put("batchName", batchHistory.getBatchName());
 			batchJSONObject.put("tests", testsJSONArray);
 
 			batchesJSONArray.put(batchJSONObject);
 		}
 
-		JSONObject averageDurationJSONObject = new JSONObject();
+		JSONObject ciHistoryJSONObject = new JSONObject();
 
-		averageDurationJSONObject.put("batches", batchesJSONArray);
+		ciHistoryJSONObject.put("batches", batchesJSONArray);
 
 		File file = new File(filePath);
 
@@ -186,7 +183,7 @@ public class TestHistoryMap {
 
 		try {
 			JenkinsResultsParserUtil.write(
-				tempFile, averageDurationJSONObject.toString());
+				tempFile, ciHistoryJSONObject.toString());
 
 			JenkinsResultsParserUtil.gzip(tempFile, file);
 		}
@@ -416,30 +413,6 @@ public class TestHistoryMap {
 					_downstreamBuildReports) {
 
 				long duration = downstreamBuildReport.getDuration();
-
-				if (duration > _MAXIMUM_BATCH_DURATION) {
-					continue;
-				}
-
-				count++;
-				totalDuration = totalDuration + duration;
-			}
-
-			if (count == 0) {
-				return 0;
-			}
-
-			return totalDuration / count;
-		}
-
-		public long getAverageOverheadDuration() {
-			long count = 0;
-			long totalDuration = 0;
-
-			for (DownstreamBuildReport downstreamBuildReport :
-					_downstreamBuildReports) {
-
-				long duration = downstreamBuildReport.getOverheadDuration();
 
 				if (duration > _MAXIMUM_BATCH_DURATION) {
 					continue;

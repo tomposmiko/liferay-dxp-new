@@ -13,10 +13,12 @@
  */
 
 import ClayLayout from '@clayui/layout';
+import ClayLink from '@clayui/link';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {fetch, sub} from 'frontend-js-web';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
+import VersionActions, {IAction} from './VersionActions';
 import formatDate from './utils/formatDate';
 
 const useIsFirstRender = (): boolean => {
@@ -37,8 +39,14 @@ const VersionsContent = ({
 	onError,
 }: IProps) => {
 	const [loading, setLoading] = useState(false);
-	const [versions, setVersions] = useState([] as IVersion[]);
+
+	const [versionsData, setVersionsData] = useState({
+		versions: [],
+		viewVersionsURL: '',
+	} as IData);
+
 	const isFirst: boolean = useIsFirstRender();
+
 	const getVersionsData = useCallback(async (): Promise<void> => {
 		try {
 			setLoading(true);
@@ -48,8 +56,9 @@ const VersionsContent = ({
 				throw new Error(`Failed to fetch ${getItemVersionsURL}`);
 			}
 
-			const {versions}: IData = await response.json();
-			setVersions(versions);
+			const data: IData = await response.json();
+
+			setVersionsData(data);
 		}
 		catch (error: unknown) {
 			onError();
@@ -70,8 +79,11 @@ const VersionsContent = ({
 		if (isFirst) {
 			return;
 		}
+
 		getVersionsData();
 	}, [getVersionsData, isFirst]);
+
+	const {versions, viewVersionsURL} = versionsData;
 
 	return (
 		<>
@@ -80,45 +92,77 @@ const VersionsContent = ({
 					<ClayLoadingIndicator small />
 				</div>
 			) : (
-				<ul className="list-group sidebar-list-group">
-					{versions.map((version) => (
-						<li
-							className="list-group-item list-group-item-flex"
-							key={version.version}
-						>
-							<ClayLayout.ContentCol expand>
-								<div className="list-group-title">
-									{Liferay.Language.get('version') + ' '}
+				<>
+					<ul className="list-group sidebar-list-group">
+						{versions.map(
+							({
+								actions,
+								changeLog,
+								createDate,
+								userName,
+								version,
+							}) => (
+								<li
+									className="list-group-item list-group-item-flex"
+									key={version}
+								>
+									<ClayLayout.ContentCol expand>
+										<div className="list-group-title">
+											{Liferay.Language.get('version') +
+												' '}
 
-									{version.version}
-								</div>
+											{version}
+										</div>
 
-								<div className="list-group-subtitle">
-									{sub(Liferay.Language.get('x-by-x'), [
-										formatDate(
-											version.createDate,
-											languageTag
-										),
-										version.userName,
-									])}
-								</div>
+										<div className="list-group-subtitle">
+											{sub(
+												Liferay.Language.get('x-by-x'),
+												[
+													formatDate(
+														createDate,
+														languageTag
+													),
+													userName,
+												]
+											)}
+										</div>
 
-								<div className="list-group-subtext">
-									{version.changeLog
-										? version.changeLog
-										: Liferay.Language.get('no-change-log')}
-								</div>
-							</ClayLayout.ContentCol>
-						</li>
-					))}
-				</ul>
+										<div className="list-group-subtext">
+											{changeLog
+												? changeLog
+												: Liferay.Language.get(
+														'no-change-log'
+												  )}
+										</div>
+									</ClayLayout.ContentCol>
+
+									{actions && !!actions.length && (
+										<VersionActions actions={actions} />
+									)}
+								</li>
+							)
+						)}
+					</ul>
+					{viewVersionsURL && (
+						<div className="d-flex justify-content-center">
+							<ClayLink
+								button
+								className="mt-3"
+								displayType="secondary"
+								href={viewVersionsURL}
+							>
+								{Liferay.Language.get('view-more')}
+							</ClayLink>
+						</div>
+					)}
+				</>
 			)}
 		</>
 	);
 };
-
 interface IData {
 	versions: IVersion[];
+	viewVersionsURL: string;
 }
 
 interface IProps {
@@ -128,6 +172,7 @@ interface IProps {
 }
 
 interface IVersion {
+	actions: IAction[];
 	changeLog?: string;
 	createDate: string;
 	statusLabel: string;

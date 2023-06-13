@@ -9,9 +9,11 @@
  * distribution rights of the Software.
  */
 
+import Checkbox from './components/fields/Checkbox';
 import CheckboxGroup from './components/fields/CheckboxGroup';
 import DatePicker from './components/fields/DatePicker';
 import InputCurrency from './components/fields/InputCurrency';
+import InputFile from './components/fields/InputFile';
 import InputText from './components/fields/InputText';
 import RadioGroup from './components/fields/RadioGroup';
 import Select from './components/fields/Select';
@@ -50,15 +52,17 @@ const PRMForm = ({
 	</div>
 );
 
-PRMForm.Section = Section;
-PRMForm.Group = Group;
 PRMForm.Footer = Footer;
+PRMForm.Group = Group;
+PRMForm.Section = Section;
 
+PRMForm.Checkbox = Checkbox;
 PRMForm.CheckboxGroup = CheckboxGroup;
-PRMForm.InputText = InputText;
+PRMForm.DatePicker = DatePicker;
 PRMForm.InputCurrency = InputCurrency;
+PRMForm.InputFile = InputFile;
+PRMForm.InputText = InputText;
 PRMForm.RadioGroup = RadioGroup;
 PRMForm.Select = Select;
-PRMForm.DatePicker = DatePicker;
 
 export default PRMForm;

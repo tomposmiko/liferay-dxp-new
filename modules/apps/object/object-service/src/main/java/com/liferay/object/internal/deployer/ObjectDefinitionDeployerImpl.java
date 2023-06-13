@@ -51,6 +51,7 @@ import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
@@ -65,6 +66,7 @@ import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xml.Document;
@@ -328,6 +330,28 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			objectDefinition.getClassName());
 	}
 
+	private String _getPermissionsGuestUnsupported(
+		ObjectDefinition objectDefinition) {
+
+		if (objectDefinition.isEnableComments()) {
+			return "<action-key>DELETE_DISCUSSION</action-key>" +
+				"<action-key>UPDATE_DISCUSSION</action-key>";
+		}
+
+		return StringPool.BLANK;
+	}
+
+	private String _getPermissionsSupports(ObjectDefinition objectDefinition) {
+		if (objectDefinition.isEnableComments()) {
+			return StringBundler.concat(
+				"<action-key>ADD_DISCUSSION</action-key>",
+				"<action-key>DELETE_DISCUSSION</action-key>",
+				"<action-key>UPDATE_DISCUSSION</action-key>");
+		}
+
+		return StringPool.BLANK;
+	}
+
 	private void _readResourceActions(ObjectDefinition objectDefinition)
 		throws Exception {
 
@@ -339,10 +363,14 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				StringUtil.read(
 					classLoader, "resource-actions/resource-actions.xml.tpl"),
 				new String[] {
-					"[$MODEL_NAME$]", "[$PORTLET_NAME$]", "[$RESOURCE_NAME$]"
+					"[$MODEL_NAME$]", "[$PERMISSIONS_GUEST_UNSUPPORTED$]",
+					"[$PERMISSIONS_SUPPORTS$]", "[$PORTLET_NAME$]",
+					"[$RESOURCE_NAME$]"
 				},
 				new String[] {
 					objectDefinition.getClassName(),
+					_getPermissionsGuestUnsupported(objectDefinition),
+					_getPermissionsSupports(objectDefinition),
 					objectDefinition.getPortletId(),
 					objectDefinition.getResourceName()
 				}));

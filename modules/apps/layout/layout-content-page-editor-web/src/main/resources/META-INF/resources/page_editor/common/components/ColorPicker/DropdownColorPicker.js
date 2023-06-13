@@ -32,6 +32,7 @@ export function DropdownColorPicker({
 	active,
 	colors,
 	fieldLabel = null,
+	inherited = false,
 	label = null,
 	onValueChange = () => {},
 	onSetActive,
@@ -148,6 +149,13 @@ export function DropdownColorPicker({
 						/>
 
 						<span className="text-truncate">{label}</span>
+
+						{Liferay.FeatureFlags['LPS-163362'] && inherited ? (
+							<span
+								className="inherited"
+								title={Liferay.Language.get('inherited-value')}
+							></span>
+						) : null}
 					</span>
 				</ClayButton>
 			) : (

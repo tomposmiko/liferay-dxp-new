@@ -16,11 +16,14 @@ package com.liferay.jenkins.results.parser.test.clazz.group;
 
 import com.google.common.collect.Lists;
 
+import com.liferay.jenkins.results.parser.BatchHistory;
+import com.liferay.jenkins.results.parser.HistoryUtil;
 import com.liferay.jenkins.results.parser.JenkinsMaster;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.Job;
 import com.liferay.jenkins.results.parser.PortalGitWorkingDirectory;
 import com.liferay.jenkins.results.parser.PortalTestClassJob;
+import com.liferay.jenkins.results.parser.TestHistory;
 import com.liferay.jenkins.results.parser.TestSuiteJob;
 import com.liferay.jenkins.results.parser.job.property.GlobJobProperty;
 import com.liferay.jenkins.results.parser.job.property.JobProperty;
@@ -56,55 +59,52 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 		axisTestClassGroups.add(axisTestClassGroup);
 	}
 
-	public long getAverageDuration() {
-		Job job = getJob();
-
-		Long averageDuration = job.getAverageBatchDuration(getBatchName());
-
-		if (averageDuration == null) {
-			return 0L;
-		}
-
-		return averageDuration;
-	}
-
-	public long getAverageOverheadDuration() {
-		Job job = getJob();
-
-		Long averageOverheadDuration = job.getAverageBatchOverheadDuration(
-			getBatchName());
-
-		if (averageOverheadDuration == null) {
-			return 0L;
-		}
-
-		return averageOverheadDuration;
-	}
-
 	public long getAverageTestDuration(String testName) {
-		Job job = getJob();
-
-		Long averageDuration = job.getAverageTestDuration(
-			getBatchName(), testName);
-
-		if (averageDuration != null) {
-			return averageDuration;
+		if (_averageTestDurations.containsKey(testName)) {
+			return _averageTestDurations.get(testName);
 		}
 
-		return _getDefaultTestDuration();
+		long averageTestDuration = _getDefaultTestDuration();
+
+		BatchHistory batchHistory = HistoryUtil.getBatchHistory(
+			batchName, getJob());
+
+		if (batchHistory != null) {
+			TestHistory testHistory = batchHistory.getTestHistory(testName);
+
+			if (testHistory != null) {
+				averageTestDuration = testHistory.getAverageDuration();
+			}
+		}
+
+		_averageTestDurations.put(testName, averageTestDuration);
+
+		return averageTestDuration;
 	}
 
 	public long getAverageTestOverheadDuration(String testName) {
-		Job job = getJob();
-
-		Long averageOverheadDuration = job.getAverageTestOverheadDuration(
-			getBatchName(), testName);
-
-		if (averageOverheadDuration != null) {
-			return averageOverheadDuration;
+		if (_averageTestOverheadDurations.containsKey(testName)) {
+			return _averageTestOverheadDurations.get(testName);
 		}
 
-		return 0L;
+		long averageTestOverheadDuration = _getDefaultTestDuration();
+
+		BatchHistory batchHistory = HistoryUtil.getBatchHistory(
+			batchName, getJob());
+
+		if (batchHistory != null) {
+			TestHistory testHistory = batchHistory.getTestHistory(testName);
+
+			if (testHistory != null) {
+				averageTestOverheadDuration =
+					testHistory.getAverageOverheadDuration();
+			}
+		}
+
+		_averageTestOverheadDurations.put(
+			testName, averageTestOverheadDuration);
+
+		return averageTestOverheadDuration;
 	}
 
 	public int getAxisCount() {
@@ -222,9 +222,6 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 		jsonObject = new JSONObject();
 
-		jsonObject.put("average_duration", getAverageDuration());
-		jsonObject.put(
-			"average_overhead_duration", getAverageOverheadDuration());
 		jsonObject.put("batch_name", getBatchName());
 		jsonObject.put("include_stable_test_suite", includeStableTestSuite);
 		jsonObject.put("job_properties", _getJobPropertiesMap());
@@ -1112,6 +1109,9 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 	private static final Pattern _jobNamePattern = Pattern.compile(
 		"(?<jobBaseName>.*)(?<jobVariant>\\([^\\)]+\\))");
 
+	private final Map<String, Long> _averageTestDurations = new HashMap<>();
+	private final Map<String, Long> _averageTestOverheadDurations =
+		new HashMap<>();
 	private final List<JobProperty> _jobProperties = new ArrayList<>();
 	private final List<SegmentTestClassGroup> _segmentTestClassGroups =
 		new ArrayList<>();

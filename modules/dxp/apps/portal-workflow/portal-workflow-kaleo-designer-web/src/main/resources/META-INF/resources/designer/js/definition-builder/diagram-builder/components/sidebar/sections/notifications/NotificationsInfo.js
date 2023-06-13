@@ -80,6 +80,17 @@ const templateLanguageOptions = [
 	},
 ];
 
+const scriptLanguageOptions = [
+	{
+		label: Liferay.Language.get('groovy'),
+		value: 'groovy',
+	},
+	{
+		label: Liferay.Language.get('java'),
+		value: 'java',
+	},
+];
+
 const NotificationsInfo = ({
 	identifier,
 	index: notificationIndex,
@@ -157,6 +168,11 @@ const NotificationsInfo = ({
 		] || 'freemarker'
 	);
 
+	const [scriptLanguage, setScriptLanguage] = useState(
+		selectedItem.data.notifications?.recipients[notificationIndex]
+			?.scriptLanguage || DEFAULT_LANGUAGE
+	);
+
 	const deleteSection = () => {
 		setSections((prevSections) => {
 			const newSections = prevSections.filter(
@@ -174,7 +190,7 @@ const NotificationsInfo = ({
 			previousItem.data.notifications.recipients[notificationIndex] = {
 				assignmentType: ['scriptedRecipient'],
 				script: [target.value],
-				scriptLanguage: [DEFAULT_LANGUAGE],
+				scriptLanguage: [scriptLanguage],
 			};
 
 			return previousItem;
@@ -534,6 +550,41 @@ const NotificationsInfo = ({
 			{recipientType !== 'assetCreator' &&
 				recipientType !== 'taskAssignees' && (
 					<SidebarPanel panelTitle={Liferay.Language.get('type')}>
+						<label htmlFor="script-language">
+							{Liferay.Language.get('script-language')}
+						</label>
+
+						<ClaySelect
+							aria-label="Select"
+							defaultValue={scriptLanguage}
+							id="script-language"
+							onChange={({target}) => {
+								setScriptLanguage(target.value);
+							}}
+							onClickCapture={() =>
+								setSelectedItem((previousItem) => {
+									previousItem.data.notifications.recipients[
+										notificationIndex
+									] = {
+										...previousItem.data.notifications
+											.recipients[notificationIndex],
+										scriptLanguage: [scriptLanguage],
+									};
+
+									return previousItem;
+								})
+							}
+						>
+							{scriptLanguageOptions &&
+								scriptLanguageOptions.map((item) => (
+									<ClaySelect.Option
+										key={item.value}
+										label={item.label}
+										value={item.value}
+									/>
+								))}
+						</ClaySelect>
+
 						<ClayForm.Group className="recipient-type-form-group">
 							{internalSections.map((props, index) => (
 								<RecipientTypeComponent

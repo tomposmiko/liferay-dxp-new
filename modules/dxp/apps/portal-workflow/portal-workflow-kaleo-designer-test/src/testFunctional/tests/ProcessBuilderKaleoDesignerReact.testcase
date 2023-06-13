@@ -244,7 +244,7 @@ definition {
 			newNotification = "true",
 			newSection = "New Notification",
 			notificationTemplateValue = "Liferay Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			sectionOptionList = "1,2,");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -312,7 +312,6 @@ definition {
 	@description = "Verify that Notification can be added"
 	@priority = "4"
 	test CanAddNotification {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanAddNotification";
 
 		Workflow.openWorkflowListView();
@@ -327,7 +326,7 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "userNotification",
+			notificationTypeOption = "User Notification",
 			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -853,7 +852,6 @@ definition {
 	@description = "Verify that the user can create a Template for Notification"
 	@priority = "4"
 	test CanCreateNotificationTemplate {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanCreateNotificationTemplate";
 
 		Workflow.openWorkflowListView();
@@ -873,7 +871,7 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = "${userName} sent you a ${entryType} for review in the workflow.",
-			notificationTypeOption = "userNotification",
+			notificationTypeOption = "User Notification",
 			singleAction = "true",
 			templateLanguageOption = "FreeMarker");
 
@@ -1251,13 +1249,13 @@ definition {
 			newNotification = "true",
 			newSection = "New Notification",
 			notificationTemplateValue = "Liferay Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			sectionOptionList = "1,2,");
 
 		ProcessBuilderKaleoDesignerReact.viewMultipleNotificationPresent(
 			name = "Liferay Notification",
 			notificationTemplateValue = "Liferay Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			sectionOptionList = "1,2");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -1341,13 +1339,13 @@ definition {
 			newNotification = "true",
 			newSection = "New Notification",
 			notificationTemplateValue = "Liferay Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			sectionOptionList = "1,2,");
 
 		ProcessBuilderKaleoDesignerReact.viewMultipleNotificationPresent(
 			name = "Liferay Notification",
 			notificationTemplateValue = "Liferay Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			sectionOptionList = "1,2");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -1631,7 +1629,6 @@ definition {
 	@description = "Verify that the user can edit the Description of the Notification"
 	@priority = "4"
 	test CanEditNotificationDescription {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanEditNotificationDescription";
 
 		Workflow.openWorkflowListView();
@@ -1645,7 +1642,7 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "userNotification",
+			notificationTypeOption = "User Notification",
 			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -1668,7 +1665,6 @@ definition {
 	@description = "Verify that the user can edit the Name of the Notification"
 	@priority = "4"
 	test CanEditNotificationName {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanEditNotificationName";
 
 		Workflow.openWorkflowListView();
@@ -1681,7 +1677,7 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "New Notification Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -1704,7 +1700,6 @@ definition {
 	@description = "Verify that the user can edit a Template for Notification"
 	@priority = "4"
 	test CanEditNotificationTemplate {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanEditNotificationTemplate";
 
 		Workflow.openWorkflowListView();
@@ -1717,7 +1712,7 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			singleAction = "true",
 			templateLanguageOption = "Text");
 
@@ -1794,7 +1789,6 @@ definition {
 	@description = "Verify that the user can edit the Template Language of the Notification to FreeMarker"
 	@priority = "4"
 	test CanEditTemplateLanguageToFreeMarker {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanEditTemplateLanguageToFreeMarker";
 
 		Workflow.openWorkflowListView();
@@ -1807,7 +1801,7 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = "New Notification Template",
-			notificationTypeOption = "userNotification",
+			notificationTypeOption = "User Notification",
 			singleAction = "true",
 			templateLanguageOption = "FreeMarker");
 
@@ -1821,7 +1815,6 @@ definition {
 	@description = "Verify that the user can edit the Template Language of the Notification to Text"
 	@priority = "4"
 	test CanEditTemplateLanguageToText {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanEditTemplateLanguageToText";
 
 		Workflow.openWorkflowListView();
@@ -1834,7 +1827,7 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			singleAction = "true",
 			templateLanguageOption = "Text");
 
@@ -1848,7 +1841,6 @@ definition {
 	@description = "Verify that the user can edit the Template Language of the Notification to Velocity"
 	@priority = "4"
 	test CanEditTemplateLanguageToVelocity {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanEditTemplateLanguageToVelocity";
 
 		Workflow.openWorkflowListView();
@@ -1861,7 +1853,7 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			singleAction = "true",
 			templateLanguageOption = "Velocity");
 
@@ -2794,7 +2786,6 @@ definition {
 	@description = "Verify that the is able to select who receives the notification: Asset Creator"
 	@priority = "5"
 	test CanSelectAssetCreatorAsNotificationRecipientType {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectAssetCreatorAsNotificationRecipientType";
 
 		Workflow.openWorkflowListView();
@@ -2807,7 +2798,7 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = "New Notification Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			recipientTypeOption = "Asset Creator",
 			singleAction = "true");
 
@@ -2821,7 +2812,6 @@ definition {
 	@description = "Verify that the user can select Email as Notification type"
 	@priority = "5"
 	test CanSelectEmailAsNotificationType {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectEmailAsNotificationType";
 
 		Workflow.openWorkflowListView();
@@ -2834,14 +2824,14 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = "New Notification Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
 		ProcessBuilderKaleoDesignerReact.gotoNotification(notificationName = "New Notification");
 
-		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationTypeOption = "email");
+		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationTypeOption = "Email");
 	}
 
 	@description = "Verify that the user can select each node in Diagram"
@@ -2899,7 +2889,6 @@ definition {
 	@description = "Verify that the user can select On Assignment as the time when the notification will be sent in a task"
 	@priority = "4"
 	test CanSelectOnAssignmentAsExecutionTypeAtTaskNotifications {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectOnAssignmentAsExecutionTypeAtTaskNotifications";
 
 		Workflow.openWorkflowListView();
@@ -2915,7 +2904,7 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -2928,7 +2917,6 @@ definition {
 	@description = "Verify that the user can select On Entry as the time when the notification will be sent"
 	@priority = "4"
 	test CanSelectOnEntryAsExecutionTypeAtNodeNotifications {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectOnEntryAsExecutionTypeAtNodeNotifications";
 
 		Workflow.openWorkflowListView();
@@ -2942,7 +2930,7 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -3011,7 +2999,6 @@ definition {
 	@description = "Verify that the user can select On Exit as the time when the notification will be sent"
 	@priority = "4"
 	test CanSelectOnExitAsExecutionTypeAtNodeNotifications {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectOnExitAsExecutionTypeAtNodeNotifications";
 
 		Workflow.openWorkflowListView();
@@ -3025,7 +3012,7 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
@@ -3038,7 +3025,6 @@ definition {
 	@description = "Verify that the is able to select who receives the notification: Role"
 	@priority = "5"
 	test CanSelectRoleAsNotificationRecipientType {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectRoleAsNotificationRecipientType";
 
 		Workflow.openWorkflowListView();
@@ -3052,7 +3038,7 @@ definition {
 			newNotification = "true",
 			notificationsRecipientTypeRoleName = "Account Manager",
 			notificationTemplateValue = "New Notification Template",
-			notificationTypeOption = "email",
+			notificationTypeOption = "Email",
 			recipientTypeOption = "Role",
 			singleAction = "true");
 
@@ -3066,7 +3052,6 @@ definition {
 	@description = "Verify that the is able to select who receives the notification: Scripted Recipient"
 	@priority = "5"
 	test CanSelectScriptedRecipientAsNotificationRecipientType {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectScriptedRecipientAsNotificationRecipientType";
 
 		Workflow.openWorkflowListView();
@@ -3080,7 +3065,7 @@ definition {
 			newNotification = "true",
 			notificationScript = '''returnValue = "Transition Name";''',
 			notificationTemplateValue = '''${userName} sent you a ${entryType} for review in the workflow.''',
-			notificationTypeOption = "userNotification",
+			notificationTypeOption = "User Notification",
 			recipientTypeOption = "Scripted Recipient",
 			singleAction = "true");
 
@@ -3094,7 +3079,6 @@ definition {
 	@description = "Verify that the is able to select who receives the notification: Task Assignees"
 	@priority = "5"
 	test CanSelectTaskAssigneesAsNotificationRecipientTypeAtTaskNode {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectTaskAssigneesAsNotificationRecipientTypeAtTaskNode";
 
 		Workflow.openWorkflowListView();
@@ -3109,7 +3093,7 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = '''${userName} sent you a ${entryType} for review in the workflow.''',
-			notificationTypeOption = "userNotification",
+			notificationTypeOption = "User Notification",
 			recipientTypeOption = "Task Assignees",
 			singleAction = "true");
 
@@ -3123,7 +3107,6 @@ definition {
 	@description = "Verify that the user can select Email and User Notification as Notification type"
 	@priority = "5"
 	test CanSelectUserNotificationAndEmailAsNotificationType {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectUserNotificationAndEmailAsNotificationType";
 
 		Workflow.openWorkflowListView();
@@ -3136,26 +3119,29 @@ definition {
 			name = "Liferay Notification",
 			newNotification = "true",
 			notificationTemplateValue = "Notification Template",
-			notificationTypeOption = "email",
-			singleAction = "true");
-
-		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(
-			notificationTypeOption = "userNotification",
+			notificationTypeOption = "Email",
 			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
 		ProcessBuilderKaleoDesignerReact.gotoNotification(notificationName = "Liferay Notification");
 
-		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationTypeOption = "email");
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(
+			notificationTypeOption = "User Notification",
+			singleAction = "true");
 
-		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationTypeOption = "userNotification");
+		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
+
+		ProcessBuilderKaleoDesignerReact.gotoNotification(notificationName = "Liferay Notification");
+
+		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationTypeOption = "Email");
+
+		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationTypeOption = "User Notification");
 	}
 
 	@description = "Verify that the user can select User Notification as Notification type"
 	@priority = "5"
 	test CanSelectUserNotificationAsNotificationType {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectUserNotificationAsNotificationType";
 
 		Workflow.openWorkflowListView();
@@ -3168,14 +3154,14 @@ definition {
 			name = "New Notification",
 			newNotification = "true",
 			notificationTemplateValue = '''${userName} sent you a ${entryType} for review in the workflow.''',
-			notificationTypeOption = "userNotification",
+			notificationTypeOption = "User Notification",
 			singleAction = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
 		ProcessBuilderKaleoDesignerReact.gotoNotification(notificationName = "New Notification");
 
-		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationTypeOption = "userNotification");
+		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationTypeOption = "User Notification");
 	}
 
 	@description = "Verify that the user can set the Priority for the Action"

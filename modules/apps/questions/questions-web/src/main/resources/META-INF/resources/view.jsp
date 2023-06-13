@@ -28,6 +28,8 @@
 		module="js/index.es"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
+				"companyName", renderRequest.getAttribute(QuestionsWebKeys.COMPANY_NAME)
+			).put(
 				"defaultRank", renderRequest.getAttribute(QuestionsWebKeys.DEFAULT_RANK)
 			).put(
 				"flagsProperties", renderRequest.getAttribute(QuestionsWebKeys.FLAGS_PROPERTIES)

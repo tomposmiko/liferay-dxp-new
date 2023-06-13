@@ -115,7 +115,8 @@ const ActivationStatusAnalyticsCloud = ({
 			title: i18n.translate('analytics-cloud-activation'),
 		},
 		[STATUS_TAG_TYPE_NAMES.inProgress]: {
-			dropdownIcon: userAccount.isStaff && userAccount.isProvisioning && (
+			dropdownIcon: (userAccount.isStaff ||
+				userAccount.isProvisioning) && (
 				<ButtonDropDown
 					align={Align.BottomRight}
 					customDropDownButton={
@@ -191,6 +192,9 @@ const ActivationStatusAnalyticsCloud = ({
 	const updateGroupId = async () => {
 		await Promise.all([
 			await client.mutate({
+				context: {
+					displaySuccess: false,
+				},
 				mutation: updateAccountSubscriptionGroups,
 				variables: {
 					accountSubscriptionGroup: {

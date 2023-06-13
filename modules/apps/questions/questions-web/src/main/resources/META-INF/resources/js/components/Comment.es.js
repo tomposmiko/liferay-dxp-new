@@ -63,6 +63,7 @@ export default withRouter(
 					<div className="c-mb-0">
 						<ArticleBodyRenderer
 							{...comment}
+							companyName={context.companyName}
 							signature={comment.creator && comment.creator.name}
 						/>
 					</div>

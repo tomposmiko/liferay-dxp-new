@@ -25,6 +25,7 @@ interface NotificationTemplate {
 	objectDefinitionId: number | null;
 	subject: LocalizedValue<string>;
 	to: LocalizedValue<string>;
+	type: string;
 }
 declare type ObjectRelationshipType = 'manyToMany' | 'oneToMany' | 'oneToOne';
 interface ObjectRelationship {
@@ -44,11 +45,24 @@ interface PickListItem {
 	id: number;
 	key: string;
 	name: string;
+	name_i18n: LocalizedValue<string>;
 }
 interface PickList {
+	actions: Actions;
 	id: number;
 	listTypeEntries: PickListItem[];
 	name: string;
+	name_i18n: LocalizedValue<string>;
+}
+interface Actions {
+	delete: HTTPMethod;
+	get: HTTPMethod;
+	permissions: HTTPMethod;
+	update: HTTPMethod;
+}
+interface HTTPMethod {
+	href: string;
+	method: string;
 }
 export declare function deleteObjectDefinitions(id: number): Promise<void>;
 export declare function deleteObjectRelationships(id: number): Promise<void>;
@@ -76,6 +90,7 @@ export declare function getObjectFields(
 export declare function getObjectRelationships(
 	objectDefinitionId: number
 ): Promise<ObjectRelationship[]>;
+export declare function getPickList(pickListId: number): Promise<PickList>;
 export declare function getPickLists(): Promise<PickList[]>;
 export declare function getPickListItems(
 	pickListId: number
@@ -92,4 +107,19 @@ export declare function updateRelationship({
 export declare function getRelationship<T>(
 	objectRelationshipId: number
 ): Promise<T>;
+export declare function updatePickList({
+	id,
+	name_i18n,
+}: Partial<PickListItem>): Promise<void>;
+export declare function deletePickList(pickListId: number): Promise<void>;
+export declare function addPickListItem({
+	id,
+	key,
+	name_i18n,
+}: Partial<PickListItem>): Promise<void>;
+export declare function deletePickListItem(id: number): Promise<void>;
+export declare function updatePickListItem({
+	id,
+	name_i18n,
+}: Partial<PickListItem>): Promise<void>;
 export {};

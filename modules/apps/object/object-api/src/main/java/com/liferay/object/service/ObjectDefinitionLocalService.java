@@ -250,8 +250,7 @@ public interface ObjectDefinitionLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectDefinition fetchObjectDefinitionByClassName(
-			long companyId, String className)
-		throws PortalException;
+		long companyId, String className);
 
 	/**
 	 * Returns the object definition with the matching external reference code and company.
@@ -425,6 +424,12 @@ public interface ObjectDefinitionLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectDefinition updateObjectDefinition(
 		ObjectDefinition objectDefinition);
+
+	@Indexable(type = IndexableType.REINDEX)
+	public ObjectDefinition updateSystemObjectDefinition(
+			String externalReferenceCode, long objectDefinitionId,
+			long titleObjectFieldId)
+		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectDefinition updateTitleObjectFieldId(

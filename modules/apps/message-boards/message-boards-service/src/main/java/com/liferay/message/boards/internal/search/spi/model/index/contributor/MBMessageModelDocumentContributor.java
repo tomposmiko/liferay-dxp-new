@@ -14,10 +14,12 @@
 
 package com.liferay.message.boards.internal.search.spi.model.index.contributor;
 
+import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.message.boards.model.MBDiscussion;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.MBDiscussionLocalService;
+import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.message.boards.service.MBThreadLocalService;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -34,12 +36,16 @@ import com.liferay.portal.kernel.search.RelatedEntryIndexer;
 import com.liferay.portal.kernel.search.RelatedEntryIndexerRegistryUtil;
 import com.liferay.portal.kernel.util.HtmlParser;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
+import com.liferay.ratings.kernel.model.RatingsStats;
+import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -65,10 +71,10 @@ public class MBMessageModelDocumentContributor
 			String languageId = LocaleUtil.toLanguageId(locale);
 
 			document.addText(
-				LocalizationUtil.getLocalizedName(Field.CONTENT, languageId),
+				_localization.getLocalizedName(Field.CONTENT, languageId),
 				_processContent(mbMessage));
 			document.addText(
-				LocalizationUtil.getLocalizedName(Field.TITLE, languageId),
+				_localization.getLocalizedName(Field.TITLE, languageId),
 				mbMessage.getSubject());
 		}
 
@@ -96,16 +102,42 @@ public class MBMessageModelDocumentContributor
 		}
 
 		document.addKeyword("parentMessageId", mbMessage.getParentMessageId());
+		document.addKeyword("threadId", mbMessage.getThreadId());
+		document.addKeywordSortable("urlSubject", mbMessage.getUrlSubject());
 
 		if (mbMessage.getMessageId() == mbMessage.getRootMessageId()) {
+			document.addKeyword(
+				"answered",
+				Stream.of(
+					_mbMessageLocalService.getChildMessages(
+						mbMessage.getMessageId(),
+						WorkflowConstants.STATUS_APPROVED)
+				).flatMap(
+					List::stream
+				).anyMatch(
+					MBMessage::isAnswer
+				));
+			document.addKeyword(
+				"childMessagesCount",
+				_mbMessageLocalService.getChildMessagesCount(
+					mbMessage.getMessageId(),
+					WorkflowConstants.STATUS_APPROVED));
+
 			MBThread mbThread = mbThreadLocalService.fetchMBThread(
 				mbMessage.getThreadId());
 
 			document.addKeyword("question", mbThread.isQuestion());
-		}
 
-		document.addKeyword("threadId", mbMessage.getThreadId());
-		document.addKeywordSortable("urlSubject", mbMessage.getUrlSubject());
+			RatingsStats ratingsStats = _ratingsStatsLocalService.fetchStats(
+				MBMessage.class.getName(), mbThread.getRootMessageId());
+
+			if (ratingsStats != null) {
+				document.addNumber(
+					"ratingsStatTotalScore", ratingsStats.getTotalScore());
+			}
+
+			document.addNumber("viewCount", mbThread.getViewCount());
+		}
 
 		if (!mbMessage.isDiscussion()) {
 			return;
@@ -169,9 +201,21 @@ public class MBMessageModelDocumentContributor
 		MBMessageModelDocumentContributor.class);
 
 	@Reference
+	private AssetTagLocalService _assetTagLocalService;
+
+	@Reference
 	private HtmlParser _htmlParser;
 
 	@Reference
 	private Language _language;
+
+	@Reference
+	private Localization _localization;
+
+	@Reference
+	private MBMessageLocalService _mbMessageLocalService;
+
+	@Reference
+	private RatingsStatsLocalService _ratingsStatsLocalService;
 
 }
