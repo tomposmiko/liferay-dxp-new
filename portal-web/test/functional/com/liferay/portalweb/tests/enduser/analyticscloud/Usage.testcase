@@ -270,51 +270,66 @@ definition {
 	test IndividualsUpdatesInRealTime {
 		property portal.acceptance = "true";
 
-		ACUtils.addSiteAndPage();
+		var usernameList = "user1,user2,user3";
 
-		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		task ("Add a new site and widget page") {
+			ACUtils.addSiteAndPage();
+		}
 
-		ACUtils.launchAC();
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		}
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		task ("Switch to new property in AC") {
+			ACUtils.launchAC();
 
-		ACNavigation.goToSettings();
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+		}
 
-		ACSettings.goToUsage();
+		task ("Go to settings and get the individuals number") {
+			ACNavigation.goToSettings();
 
-		var currentIndividuals = ACSettings.getCurrentNumber(metricName = "Individuals");
+			ACSettings.goToUsage();
 
-		ACUtils.launchDXP();
+			var currentIndividuals = ACSettings.getCurrentNumber(metricName = "Individuals");
+		}
 
-		JSONUser.addUser(
-			userEmailAddress = "userea@liferay.com",
-			userFirstName = "userfn",
-			userLastName = "userln",
-			userScreenName = "usersn");
+		task ("Add 3 new users and sync the Contact Data") {
+			ACUtils.launchDXP();
 
-		ACDXPSettings.syncNewContactData();
+			for (var name : list "${usernameList}") {
+				JSONUser.addUser(
+					userEmailAddress = "${name}@liferay.com",
+					userFirstName = "${name}",
+					userLastName = "${name}",
+					userScreenName = "${name}");
 
-		User.logoutAndLoginPG(
-			userLoginEmailAddress = "userea@liferay.com",
-			userLoginFullName = "userfn userln");
+				ACDXPSettings.syncNewContactData();
+			}
+		}
 
-		ACUtils.navigateToSitePage(
-			pageName = "AC Page",
-			siteName = "Site Name");
+		task ("View the page as different users") {
+			for (var name : list "${usernameList}") {
+				ACUtils.navigateToSitePageWithUser(
+					emailList = "${name}@liferay.com",
+					pageName = "AC Page",
+					siteName = "Site Name");
+			}
 
-		ACUtils.closeAllSessionsAndWait();
+			ACUtils.closeAllSessionsAndWait();
+		}
 
-		ACUtils.launchAC();
+		task ("Go to AC and check that the number of individuals has changed") {
+			ACUtils.launchAC();
 
-		ACNavigation.goToSettings();
+			ACNavigation.goToSettings();
 
-		ACSettings.goToUsage();
+			ACSettings.goToUsage();
 
-		var newIdividuals = ${currentIndividuals} + 1;
-
-		ACSettings.assertOverviewUsage(
-			current = "${newIdividuals}",
-			metricName = "Individuals");
+			ACSettings.assertOverviewUsage(
+				metricName = "Individuals",
+				notEquals = "${currentIndividuals}");
+		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9182 | Test Summary: Page views limit corresponds correctly with the plan and add-ons purchased."

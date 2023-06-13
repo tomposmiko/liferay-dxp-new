@@ -26,6 +26,7 @@ const Pages = () => {
 			sessionId,
 			step,
 			subscriptionGroups,
+			totalAdministratorAccounts,
 		},
 		dispatch,
 	] = useOnboarding();
@@ -46,10 +47,14 @@ const Pages = () => {
 		}
 	};
 
+	const availableAdministratorAssets =
+		project && project.maxRequestors - totalAdministratorAccounts;
+
 	const StepsLayout = {
 		[ONBOARDING_STEP_TYPES.invites]: {
 			Component: (
 				<InviteTeamMembersForm
+					availableAdministratorAssets={availableAdministratorAssets}
 					handlePage={invitesPageHandle}
 					leftButton="Skip for now"
 					project={project}

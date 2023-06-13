@@ -2951,8 +2951,8 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!elasticsearch-cli.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch#elasticsearch-cli;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch#elasticsearch-cli;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
@@ -2963,8 +2963,8 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!elasticsearch-core.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch#elasticsearch-core;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch#elasticsearch-core;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
@@ -2975,20 +2975,8 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!elasticsearch-geo.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch#elasticsearch-geo;7.17.0</project-name>
-				<project-url>https://github.com/elastic/elasticsearch</project-url>
-				<licenses>
-					<license>
-						<license-name>Server Side Public License, v 1</license-name>
-						<license-url>https://www.mongodb.com/licensing/server-side-public-license</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!elasticsearch-lz4.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch#elasticsearch-lz4;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch#elasticsearch-geo;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
@@ -2999,8 +2987,8 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!elasticsearch-rest-client.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch.client#rest;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch.client#rest;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
@@ -3011,20 +2999,20 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!elasticsearch-rest-high-level-client.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch.client#rest-high-level;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch.client#rest-high-level;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
 						<license-name>Elastic License 2.0</license-name>
-						<license-url>https://raw.githubusercontent.com/elastic/elasticsearch/v7.17.0/licenses/ELASTIC-LICENSE-2.0.txt</license-url>
+						<license-url>https://raw.githubusercontent.com/elastic/elasticsearch/v7.14.1/licenses/ELASTIC-LICENSE-2.0.txt</license-url>
 					</license>
 				</licenses>
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!elasticsearch-x-content.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch#elasticsearch-x-content;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch#elasticsearch-x-content;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
@@ -3035,8 +3023,8 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!elasticsearch.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch#server;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch#server;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
@@ -3176,8 +3164,8 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!lang-mustache-client.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch.plugin#lang-mustache;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch.plugin#lang-mustache;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
@@ -3188,7 +3176,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!lucene-core.jar</file-name>
-				<version>8.11.1</version>
+				<version>8.9.0</version>
 				<project-name>Lucene Core</project-name>
 				<licenses>
 					<license>
@@ -3199,7 +3187,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!lucene-highlighter.jar</file-name>
-				<version>8.11.1</version>
+				<version>8.9.0</version>
 				<project-name>Lucene Highlighter</project-name>
 				<licenses>
 					<license>
@@ -3210,7 +3198,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!lucene-join.jar</file-name>
-				<version>8.11.1</version>
+				<version>8.9.0</version>
 				<project-name>Lucene Join</project-name>
 				<licenses>
 					<license>
@@ -3221,7 +3209,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!lucene-queries.jar</file-name>
-				<version>8.11.1</version>
+				<version>8.9.0</version>
 				<project-name>Lucene Queries</project-name>
 				<licenses>
 					<license>
@@ -3232,7 +3220,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!lucene-queryparser.jar</file-name>
-				<version>8.11.1</version>
+				<version>8.9.0</version>
 				<project-name>Lucene QueryParsers</project-name>
 				<licenses>
 					<license>
@@ -3243,7 +3231,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!lucene-sandbox.jar</file-name>
-				<version>8.11.1</version>
+				<version>8.9.0</version>
 				<project-name>Lucene Sandbox</project-name>
 				<licenses>
 					<license>
@@ -3254,7 +3242,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!lucene-suggest.jar</file-name>
-				<version>8.11.1</version>
+				<version>8.9.0</version>
 				<project-name>Lucene Suggest</project-name>
 				<licenses>
 					<license>
@@ -3289,8 +3277,8 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!parent-join-client.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch.plugin#parent-join;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch.plugin#parent-join;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
@@ -3301,8 +3289,8 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!percolator-client.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch.plugin#percolator;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch.plugin#percolator;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
@@ -3313,8 +3301,8 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.search.elasticsearch7.impl.jar!rank-eval-client.jar</file-name>
-				<version>7.17.0</version>
-				<project-name>org.elasticsearch.plugin#rank-eval;7.17.0</project-name>
+				<version>7.14.1</version>
+				<project-name>org.elasticsearch.plugin#rank-eval;7.14.1</project-name>
 				<project-url>https://github.com/elastic/elasticsearch</project-url>
 				<licenses>
 					<license>
@@ -4232,6 +4220,18 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>com.liferay.portal.tika.jar!SparseBitSet.jar</file-name>
+				<version>1.2</version>
+				<project-name>SparseBitSet</project-name>
+				<project-url>https://github.com/brettwooldridge/SparseBitSet</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>com.liferay.portal.tika.jar!apache-mime4j-core.jar</file-name>
 				<version>0.8.3</version>
 				<project-name>Apache James :: Mime4j :: Core</project-name>
@@ -4268,6 +4268,30 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>com.liferay.portal.tika.jar!java-libpst.jar</file-name>
+				<version>0.8.1</version>
+				<project-name>java-libpst</project-name>
+				<project-url>https://code.google.com/p/java-libpst/</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.tika.jar!jhighlight.jar</file-name>
+				<version>1.0</version>
+				<project-name>JHighlight</project-name>
+				<project-url>https://jhighlight.dev.java.net/</project-url>
+				<licenses>
+					<license>
+						<license-name>LGPL, v2.1 or later</license-name>
+						<license-url>http://www.opensource.org/licenses/lgpl-license.php</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>com.liferay.portal.tika.jar!jmatio.jar</file-name>
 				<version>1.2</version>
 				<project-name>JMatIO</project-name>
@@ -4280,9 +4304,56 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>com.liferay.portal.tika.jar!jna.jar</file-name>
+				<version>4.1.0</version>
+				<project-name>Java Native Access</project-name>
+				<project-url>https://github.com/twall/jna</project-url>
+				<licenses>
+					<license>
+						<license-name>LGPL, version 2.1</license-name>
+						<license-url>http://www.gnu.org/licenses/licenses.html</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.tika.jar!juniversalchardet.jar</file-name>
+				<version>1.0.3</version>
+				<project-name>juniversalchardet</project-name>
+				<project-url>http://juniversalchardet.googlecode.com/</project-url>
+				<licenses>
+					<license>
+						<license-name>Mozilla Public License 1.1 (MPL 1.1)</license-name>
+						<license-url>http://www.mozilla.org/MPL/MPL-1.1.html</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.tika.jar!metadata-extractor.jar</file-name>
+				<version>2.13.0</version>
+				<project-name>metadata-extractor</project-name>
+				<project-url>https://drewnoakes.com/code/exif/</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>com.liferay.portal.tika.jar!org.gagravarr.tika.jar</file-name>
 				<version>0.8.LIFERAY-PATCHED-1</version>
 				<project-name>org.gagravarr.tika</project-name>
+				<licenses>
+					<license>
+						<license-name>LGPL 2.1</license-name>
+						<license-url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.tika.jar!org.mp4parser.jar</file-name>
+				<version>1.9.41.2.LIFERAY-PATCHED-2</version>
+				<project-name>org.mp4parser</project-name>
 				<licenses>
 					<license>
 						<license-name>LGPL 2.1</license-name>
@@ -4383,6 +4454,18 @@
 					<license>
 						<license-name>The Apache Software License, Version 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.tika.jar!xmpcore.jar</file-name>
+				<version>6.0.6</version>
+				<project-name>XMP Library for Java</project-name>
+				<project-url>https://zerowing.corp.adobe.com/display/granite</project-url>
+				<licenses>
+					<license>
+						<license-name>The BSD License</license-name>
+						<license-url>http://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -4993,6 +5076,30 @@
 					<license>
 						<license-name>GNU Lesser General Public Licence</license-name>
 						<license-url>http://www.gnu.org/licenses/lgpl.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.shared.dependencies.apache.commons.jar!commons-digester.jar</file-name>
+				<version>1.8.1</version>
+				<project-name>Commons Digester</project-name>
+				<project-url>http://commons.apache.org/digester/</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.shared.dependencies.apache.commons.jar!commons-validator.jar</file-name>
+				<version>1.5.1</version>
+				<project-name>Apache Commons Validator</project-name>
+				<project-url>http://commons.apache.org/proper/commons-validator/</project-url>
+				<licenses>
+					<license>
+						<license-name>Apache License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -5796,6 +5903,18 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>lib/development/jhighlight.jar</file-name>
+				<version>1.0</version>
+				<project-name>JHighlight</project-name>
+				<project-url>http://jhighlight.dev.java.net</project-url>
+				<licenses>
+					<license>
+						<license-name>CDDL 1.0</license-name>
+						<license-url>http://glassfish.java.net/public/CDDLv1.0.html</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>lib/development/jndi.jar</file-name>
 				<version>1.2.1</version>
 				<project-name>Java Naming and Directory Interface</project-name>
@@ -6403,18 +6522,6 @@
 				<comments>This was recompiled for compatibility with JDK 5.</comments>
 			</library>
 			<library>
-				<file-name>lib/portal/ant.jar</file-name>
-				<version>1.10.11</version>
-				<project-name>Ant</project-name>
-				<project-url>http://ant.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/asm-analysis.jar</file-name>
 				<version>7.0</version>
 				<project-name>ASM</project-name>
@@ -6571,18 +6678,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/commons-digester.jar</file-name>
-				<version>1.8.1</version>
-				<project-name>Commons Digester</project-name>
-				<project-url>http://commons.apache.org/digester</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/commons-exec.jar</file-name>
 				<version>1.3</version>
 				<project-name>Commons Exec</project-name>
@@ -6678,19 +6773,6 @@
 					<license>
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/commons-validator.jar</file-name>
-				<version>1.5.1</version>
-				<project-name>Commons Validator</project-name>
-				<project-url>http://commons.apache.org/validator</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>Copyright (c) 2001-2015 The Apache Software Foundation</copyright-notice>
 					</license>
 				</licenses>
 			</library>
@@ -6849,18 +6931,6 @@
 					<license>
 						<license-name>BSD Style License</license-name>
 						<license-url>http://en.wikipedia.org/wiki/BSD_licenses</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/java-libpst.jar</file-name>
-				<version>0.8.1</version>
-				<project-name>java-libpst</project-name>
-				<project-url>http://code.google.com/p/java-libpst</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -7037,30 +7107,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/jhighlight.jar</file-name>
-				<version>1.0</version>
-				<project-name>JHighlight</project-name>
-				<project-url>http://jhighlight.dev.java.net</project-url>
-				<licenses>
-					<license>
-						<license-name>CDDL 1.0</license-name>
-						<license-url>http://glassfish.java.net/public/CDDLv1.0.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/jna.jar</file-name>
-				<version>4.1.0</version>
-				<project-name>Java Native Access</project-name>
-				<project-url>https://github.com/twall/jna</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/jodd-json.jar</file-name>
 				<version>6.0.3</version>
 				<project-name>Jodd JSON</project-name>
@@ -7108,18 +7154,6 @@
 					</license>
 				</licenses>
 				<comments>See the Ant target "build-json-java-jar" in portal-impl/build.xml.</comments>
-			</library>
-			<library>
-				<file-name>lib/portal/juniversalchardet.jar</file-name>
-				<version>1.0.3</version>
-				<project-name>Universal Character Detection</project-name>
-				<project-url>http://juniversalchardet.googlecode.com</project-url>
-				<licenses>
-					<license>
-						<license-name>MPL 1.1</license-name>
-						<license-url>http://www.mozilla.org/MPL/1.1</license-url>
-					</license>
-				</licenses>
 			</library>
 			<library>
 				<file-name>lib/portal/jws-api.jar</file-name>
@@ -7182,18 +7216,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/metadata-extractor.jar</file-name>
-				<version>2.13.0</version>
-				<project-name>Metadata Extractor</project-name>
-				<project-url>http://www.drewnoakes.com/code/exif</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/mimepull.jar</file-name>
 				<version>1.3</version>
 				<project-name>MIME pull</project-name>
@@ -7202,18 +7224,6 @@
 					<license>
 						<license-name>CDDL 1.1</license-name>
 						<license-url>https://glassfish.java.net/public/CDDL+GPL_1_1.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/mp4parser.jar</file-name>
-				<version>1.9.41.2.LIFERAY-PATCHED-2</version>
-				<project-name>ISO Parser</project-name>
-				<project-url>https://github.com/tballison/mp4parser</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -7274,18 +7284,6 @@
 					<license>
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/rmi-api.jar</file-name>
-				<version>1.0.5.Final</version>
-				<project-name>The javax.rmi and javax.rmi.CORBA classes</project-name>
-				<project-url>https://github.com/jboss/jboss-rmi-api_spec</project-url>
-				<licenses>
-					<license>
-						<license-name>LGPL 2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -7396,16 +7394,6 @@
 						<license-url>http://www.apache.org/licenses/LICENSE-1.1</license-url>
 						<copyright-notice>Copyright (c) 1999 The Apache Software Foundation. All rights reserved.</copyright-notice>
 					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/sparse-bit-set.jar</file-name>
-				<version>1.2</version>
-				<project-name>SparseBitSet</project-name>
-				<project-url>https://github.com/brettwooldridge/SparseBitSet</project-url>
-				<licenses>
-					<license>Apache License 2.0</license>
-					<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
 				</licenses>
 			</library>
 			<library>
@@ -7764,18 +7752,6 @@
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
 						<copyright-notice>(c) 2001, Institute for Data Communications Systems, http://www.nue.et-inf.uni-siegen.de</copyright-notice>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/xmpcore.jar</file-name>
-				<version>6.0.6</version>
-				<project-name>Extensible Metadata Platform</project-name>
-				<project-url>http://www.adobe.com/devnet/xmp.html</project-url>
-				<licenses>
-					<license>
-						<license-name>BSD Style License</license-name>
-						<license-url>http://en.wikipedia.org/wiki/BSD_licenses</license-url>
 					</license>
 				</licenses>
 			</library>

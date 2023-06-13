@@ -1,6 +1,8 @@
 @component-name = "portal-publications"
 definition {
 
+	property app.server.types = "jboss,tomcat,weblogic,websphere,wildfly";
+	property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Publications";
@@ -221,18 +223,6 @@ definition {
 		PublicationsNavigator.gotoPublish(
 			gotoPublicationsAdmin = "true",
 			publicationName = "Publication Name 1");
-
-		PublicationsChanges.discardChanges(
-			changeCategory = "Content Page Name",
-			changeTitle = "Content Page Name",
-			conflictingChanges = "true",
-			entryTitle = "Content Page Name");
-
-		PublicationsChanges.discardChanges(
-			changeCategory = "com.liferay.layout.page.template.model.LayoutPageTemplateStructure",
-			changeTitle = "com.liferay.layout.page.template.model.LayoutPageTemplateStructure",
-			conflictingChanges = "true",
-			entryTitle = "com.liferay.layout.page.template.model.LayoutPageTemplateStructure");
 
 		PublicationsChanges.discardChanges(
 			changeCategory = "Content Page Name",

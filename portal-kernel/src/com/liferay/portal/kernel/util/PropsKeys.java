@@ -151,9 +151,6 @@ public interface PropsKeys {
 	public static final String ASSET_BROWSER_SEARCH_WITH_DATABASE =
 		"asset.browser.search.with.database";
 
-	public static final String ASSET_CATEGORIES_PROPERTIES_DEFAULT =
-		"asset.categories.properties.default";
-
 	public static final String ASSET_CATEGORIES_SEARCH_HIERARCHICAL =
 		"asset.categories.search.hierarchical";
 
@@ -418,9 +415,6 @@ public interface PropsKeys {
 		"calendar.event.ratings.enabled";
 
 	public static final String CALENDAR_EVENT_TYPES = "calendar.event.types";
-
-	public static final String CALENDAR_PUBLISH_TO_LIVE_BY_DEFAULT =
-		"calendar.publish.to.live.by.default";
 
 	public static final String CDN_DYNAMIC_RESOURCES_ENABLED =
 		"cdn.dynamic.resources.enabled";
@@ -908,10 +902,6 @@ public interface PropsKeys {
 	public static final String DL_FILE_ENTRY_LOCK_POLICY =
 		"dl.file.entry.lock.policy";
 
-	public static final String
-		DL_FILE_ENTRY_OPEN_IN_MS_OFFICE_MANUAL_CHECK_IN_REQUIRED =
-			"dl.file.entry.open.in.ms.office.manual.check.in.required";
-
 	public static final String DL_FILE_ENTRY_PREVIEW_AUDIO =
 		"dl.file.entry.preview.audio.";
 
@@ -926,12 +916,6 @@ public interface PropsKeys {
 
 	public static final String DL_FILE_ENTRY_PREVIEW_AUDIO_SAMPLE_RATE =
 		"dl.file.entry.preview.audio.sample.rate";
-
-	public static final String DL_FILE_ENTRY_PREVIEW_AUTO_CREATE_ON_UPGRADE =
-		"dl.file.entry.preview.auto.create.on.upgrade";
-
-	public static final String DL_FILE_ENTRY_PREVIEW_DOCUMENT_DEPTH =
-		"dl.file.entry.preview.document.depth";
 
 	public static final String DL_FILE_ENTRY_PREVIEW_DOCUMENT_DPI =
 		"dl.file.entry.preview.document.dpi";
@@ -1019,9 +1003,6 @@ public interface PropsKeys {
 	public static final String DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH =
 		"dl.file.entry.thumbnail.max.width";
 
-	public static final String DL_FILE_ENTRY_THUMBNAIL_VIDEO_FRAME_PERCENTAGE =
-		"dl.file.entry.thumbnail.video.frame.percentage";
-
 	/**
 	 * @deprecated As of Mueller (7.2.x), with no direct replacement
 	 */
@@ -1029,9 +1010,6 @@ public interface PropsKeys {
 	public static final String
 		DL_FILE_ENTRY_TYPE_IG_IMAGE_AUTO_CREATE_ON_UPGRADE =
 			"dl.file.entry.type.ig.image.auto.create.on.upgrade";
-
-	public static final String DL_FILE_ENTRY_VERSION_POLICY =
-		"dl.file.entry.version.policy";
 
 	public static final String DL_FILE_EXTENSIONS_STRICT_CHECK =
 		"dl.file.extensions.strict.check";
@@ -1053,9 +1031,6 @@ public interface PropsKeys {
 		"dl.file.indexing.max.size";
 
 	public static final String DL_FOLDER_COLUMNS = "dl.folder.columns";
-
-	public static final String DL_FOLDER_ICON_CHECK_COUNT =
-		"dl.folder.icon.check.count";
 
 	public static final String DL_FOLDERS_SEARCH_VISIBLE =
 		"dl.folders.search.visible";
@@ -1472,9 +1447,6 @@ public interface PropsKeys {
 	public static final String LAYOUT_BROWSABLE = "layout.browsable";
 
 	public static final String LAYOUT_CLONE_IMPL = "layout.clone.impl";
-
-	public static final String LAYOUT_COMMENTS_ENABLED =
-		"layout.comments.enabled";
 
 	public static final String LAYOUT_CONFIGURATION_ACTION_DELETE =
 		"layout.configuration.action.delete";
@@ -2076,9 +2048,6 @@ public interface PropsKeys {
 	public static final String MY_SITES_DIRECTORY_SITE_EXCLUDES =
 		"my.sites.directory.site.excludes";
 
-	public static final String MY_SITES_DISPLAY_STYLE =
-		"my.sites.display.style";
-
 	public static final String MY_SITES_MAX_ELEMENTS = "my.sites.max.elements";
 
 	public static final String MY_SITES_SHOW_PRIVATE_SITES_WITH_NO_LAYOUTS =
@@ -2099,6 +2068,9 @@ public interface PropsKeys {
 
 	public static final String NOTIFICATIONS_MAX_EVENTS =
 		"notifications.max.events";
+
+	public static final String OBJECT_NESTED_FIELDS_MAX_QUERY_DEPTH =
+		"object.nested.fields.max.query.depth";
 
 	public static final String OMNIADMIN_USERS = "omniadmin.users";
 
@@ -2607,9 +2579,6 @@ public interface PropsKeys {
 	public static final String RSS_FEED_TYPES = "rss.feed.types";
 
 	public static final String RSS_FEEDS_ENABLED = "rss.feeds.enabled";
-
-	public static final String RSS_PUBLISH_TO_LIVE_BY_DEFAULT =
-		"rss.publish.to.live.by.default";
 
 	public static final String SANITIZER_IMPL = "sanitizer.impl";
 
@@ -3390,9 +3359,6 @@ public interface PropsKeys {
 
 	public static final String YUI_COMPRESSOR_CSS_LINE_BREAK =
 		"yui.compressor.css.line.break";
-
-	public static final String ZIP_FILE_NAME_ENCODING =
-		"zip.file.name.encoding";
 
 	public static final String ZIP_FILE_WRITER_EXPORT_BUFFER_SIZE =
 		"zip.file.writer.export.buffer.size";

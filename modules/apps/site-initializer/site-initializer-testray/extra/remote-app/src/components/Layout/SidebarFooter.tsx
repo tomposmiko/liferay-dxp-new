@@ -12,29 +12,65 @@
  * details.
  */
 
+import ClayButton from '@clayui/button';
 import {Align} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import {Context} from '@clayui/modal';
+import {Size} from '@clayui/modal/lib/types';
 import {ReactElement, useContext} from 'react';
 
+import i18n from '../../i18n';
+import NewProject from '../../pages/Project/NewProject';
 import {Liferay} from '../../services/liferay/liferay';
-import {USER_DROPDOWN} from '../../util/constants';
 import {Avatar} from '../Avatar';
 import DropDown from '../DropDown';
 import CaseTypeModal from '../Modal/CaseTypeModal';
 import CategoryModal from '../Modal/CategoryModal';
 import OptionsModal from '../Modal/OptionsModal';
 
-const SidebarFooter = () => {
-	const [, dispatch] = useContext(Context);
+const USER_DROPDOWN = [
+	{
+		items: [
+			{
+				icon: 'user',
+				label: i18n.translate('manage-account'),
+				path: '/manage/user',
+			},
+			{
+				icon: 'logout',
+				label: i18n.translate('sign-out'),
+				path: `${window.location.origin}/c/portal/logout`,
+			},
+		],
+		title: '',
+	},
+];
 
-	const onOpenModal = (title: string, body: ReactElement) => {
+const SidebarFooter = () => {
+	const [state, dispatch] = useContext(Context);
+
+	const onOpenModal = (title: string, body: ReactElement, size: Size) => {
 		dispatch({
 			payload: {
 				body,
-				footer: [],
+				footer: [
+					undefined,
+					undefined,
+					<ClayButton.Group key={3} spaced>
+						<ClayButton
+							displayType="secondary"
+							onClick={state.onClose}
+						>
+							Cancel
+						</ClayButton>
+
+						<ClayButton key={4} onClick={state.onClose}>
+							Save
+						</ClayButton>
+					</ClayButton.Group>,
+				],
 				header: title,
-				size: 'lg',
+				size,
 			},
 			type: 1,
 		});
@@ -43,48 +79,88 @@ const SidebarFooter = () => {
 	const MANAGE_DROPDOWN = [
 		{
 			items: [
-				{icon: 'plus', label: 'New Project', path: '/'},
+				{
+					icon: 'plus',
+					label: i18n.translate('new-project'),
+					onClick: () =>
+						onOpenModal(
+							i18n.translate('new-project'),
+							<NewProject onClose={() => state.onClose()} />,
+							'lg'
+						),
+					path: '/',
+				},
 				{
 					icon: 'cog',
-					label: 'Case Types',
-					onClick: () => onOpenModal('CaseTypes', <CaseTypeModal />),
+					label: i18n.translate('case-types'),
+					onClick: () =>
+						onOpenModal(
+							i18n.translate('case-types'),
+							<CaseTypeModal />,
+							'full-screen'
+						),
 					path: '/',
 				},
 			],
-			title: 'System',
+			title: i18n.translate('system'),
 		},
 		{
 			items: [
 				{
 					icon: 'cog',
-					label: 'Categories',
-					onClick: () => onOpenModal('Categories', <CategoryModal />),
+					label: i18n.translate('categories'),
+					onClick: () =>
+						onOpenModal(
+							i18n.translate('categories'),
+							<CategoryModal />,
+							'full-screen'
+						),
 					path: '/',
 				},
 				{
 					icon: 'cog',
-					label: 'Options',
-					onClick: () => onOpenModal('Options', <OptionsModal />),
+					label: i18n.translate('options'),
+					onClick: () =>
+						onOpenModal(
+							i18n.translate('options'),
+							<OptionsModal />,
+							'full-screen'
+						),
 					path: '/',
 				},
 			],
-			title: 'Enviroment Factors',
+			title: i18n.translate('environment-factors'),
+		},
+		{
+			items: [
+				{
+					icon: 'plus',
+					label: i18n.translate('add-case'),
+					path: '/manage/addcase',
+				},
+				{
+					icon: 'plus',
+					label: i18n.translate('add-requirement'),
+					path: '/manage/requirements',
+				},
+			],
+			title: '',
 		},
 		{
 			items: [
 				{
 					icon: 'pencil',
-					label: 'Manage Users',
+					label: i18n.translate('manage-users'),
+					path: '/manage/userlist',
+				},
+				{
+					icon: 'pencil',
+					label: i18n.translate('manage-user-groups'),
 					path: '/',
 				},
 				{
 					icon: 'pencil',
-					label: 'Manager User Groups',
-					path: '/',
-				},
-				{
-					icon: 'pencil',
-					label: 'Manage Roles',
+					label: i18n.translate('manage-roles'),
 					path: '/',
 				},
 			],
@@ -94,12 +170,12 @@ const SidebarFooter = () => {
 			items: [
 				{
 					icon: 'filter',
-					label: 'Manage Indexers',
+					label: i18n.translate('manage-indexers'),
 					path: '/',
 				},
 				{
 					icon: 'pencil',
-					label: 'Manage Server',
+					label: i18n.translate('manage-server'),
 					path: '/',
 				},
 			],
@@ -119,7 +195,7 @@ const SidebarFooter = () => {
 						<ClayIcon fontSize={16} symbol="cog" />
 
 						<span className="ml-1 testray-sidebar-text">
-							Manage
+							{i18n.translate('manage')}
 						</span>
 					</div>
 				}

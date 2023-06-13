@@ -10576,6 +10576,15 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		</if>
 
 		<if>
+			<isset property="marketplace.email.address.6" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					marketplace.email.address.6=${marketplace.email.address.6}
+				</echo>
+			</then>
+		</if>
+
+		<if>
 			<isset property="marketplace.email.password.1" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
@@ -10616,6 +10625,15 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
 					marketplace.email.password.5=${marketplace.email.password.5}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="marketplace.email.password.6" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					marketplace.email.password.6=${marketplace.email.password.6}
 				</echo>
 			</then>
 		</if>
@@ -11112,6 +11130,19 @@ tokenLocation="REQUEST"</echo>
 	</target>
 
 	<target name="prepare-selenium-testcase-properties">
+		<get-testcase-property property.name="asset.publisher.selection.style" />
+
+		<if>
+			<not>
+				<isset property="asset.publisher.selection.style" />
+			</not>
+			<then>
+				<property name="asset.publisher.selection.style" value="dynamic" />
+			</then>
+		</if>
+
+		<echo file="${liferay.home}/osgi/configs/com.liferay.asset.publisher.web.internal.configuration.AssetPublisherSelectionStyleConfiguration.config">defaultSelectionStyle="${asset.publisher.selection.style}"</echo>
+
 		<get-testcase-property property.name="cmis.repository.type" />
 
 		<if>
@@ -11751,20 +11782,6 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 					src="${java.io.tmpdir}/${bundle.file.name}"
 				/>
 
-				<move
-					todir="${project.dir}/sql"
-				>
-					<fileset
-						dir="${java.io.tmpdir}/bundle"
-						includes="liferay-*/data/hypersonic/*"
-					/>
-					<mapper
-						from="liferay-[^/]+/data/hypersonic/([^/]+)"
-						to="\1"
-						type="regexp"
-					/>
-				</move>
-
 				<delete dir="${java.io.tmpdir}/bundle" />
 
 				<delete file="${java.io.tmpdir}/${bundle.file.name}" />
@@ -12110,31 +12127,6 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 									</else>
 								</if>
 							</then>
-							<elseif>
-								<and>
-									<available file="sql/${database.name}.properties" />
-									<available file="sql/${database.name}.script" />
-									<equals arg1="${database.type}" arg2="hypersonic" />
-								</and>
-								<then>
-									<delete failonerror="false" includeemptydirs="true">
-										<fileset
-											dir="${liferay.home}/data"
-										>
-											<exclude name="hypersonic/lportal.lobs" />
-										</fileset>
-									</delete>
-
-									<copy
-										file="sql/${database.name}.properties"
-										tofile="${liferay.home}/data/hypersonic/${database.name}.properties"
-									/>
-									<copy
-										file="sql/${database.name}.script"
-										tofile="${liferay.home}/data/hypersonic/${database.name}.script"
-									/>
-								</then>
-							</elseif>
 							<elseif>
 								<or>
 									<equals arg1="${database.type}" arg2="mariadb" />

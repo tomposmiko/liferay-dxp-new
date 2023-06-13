@@ -32,6 +32,7 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -131,7 +132,9 @@ public class KBFolderLocalServiceImpl extends KBFolderLocalServiceBaseImpl {
 			deleteKBFolder(childKBFolder.getKbFolderId());
 		}
 
-		// Expando
+		resourceLocalService.deleteResource(
+			kbFolder.getCompanyId(), KBFolder.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL, kbFolder.getKbFolderId());
 
 		_expandoRowLocalService.deleteRows(kbFolder.getKbFolderId());
 

@@ -11,7 +11,7 @@
 
 import {useMutation} from '@apollo/client';
 import ClayForm from '@clayui/form';
-import {Formik} from 'formik';
+import {FieldArray, Formik} from 'formik';
 import {useEffect, useState} from 'react';
 import client from '../../../../apolloClient';
 import {Badge, Button} from '../../../components';
@@ -29,22 +29,19 @@ import Layout from '../Layout';
 import TeamMemberInputs from './TeamMemberInputs';
 
 const MAXIMUM_INVITES_COUNT = 10;
-const INITIAL_INVITES_COUNT = 3;
+const INITIAL_INVITES_COUNT = 1;
 
 const SLA = {
 	gold: 'Gold',
 	platinum: 'Platinum',
 };
 
-const ROLE_NAME_KEY = {
-	[ROLE_TYPES.admin.key]: ROLE_TYPES.admin.name,
-	[ROLE_TYPES.member.key]: ROLE_TYPES.member.name,
-};
-
 const InviteTeamMembersPage = ({
+	availableAdministratorAssets = 0,
 	errors,
 	handlePage,
 	leftButton,
+	mutateUserData,
 	project,
 	sessionId,
 	setFieldValue,
@@ -69,11 +66,20 @@ const InviteTeamMembersPage = ({
 	const [accountRolesOptions, setAccountRolesOptions] = useState([]);
 	const [accountRoles, setAccountRoles] = useState([]);
 	const [availableAdminsRoles, setAvailableAdminsRoles] = useState(1);
+	const [isLoadingUserInvitation, setIsLoadingUserInvitation] = useState(
+		false
+	);
+	const [showEmptyEmailError, setshowEmptyEmailError] = useState(false);
 
-	const maxRequestors = project.maxRequestors < 1 ? 1 : project.maxRequestors;
 	const projectHasSLAGoldPlatinum =
 		project?.slaCurrent?.includes(SLA.gold) ||
 		project?.slaCurrent?.includes(SLA.platinum);
+
+	const getCurrentRoleType = (roleKey) => {
+		const roleValues = Object.values(ROLE_TYPES);
+
+		return roleValues.find((roleType) => roleType.key === roleKey);
+	};
 
 	useEffect(() => {
 		const isProjectPartner = project.partner;
@@ -91,25 +97,29 @@ const InviteTeamMembersPage = ({
 					(rolesAccumulator, role) => {
 						let isValidRole = true;
 
-						if (!projectHasSLAGoldPlatinum) {
-							isValidRole =
-								role.name !== ROLE_TYPES.requestor.key;
-						}
+						const roleType = getCurrentRoleType(role.name);
 
-						if (!isProjectPartner) {
-							isValidRole =
-								role.name !== ROLE_TYPES.partnerManager.key &&
-								role.name !== ROLE_TYPES.partnerMember.key;
-						}
+						if (roleType?.raysourceName) {
+							if (!projectHasSLAGoldPlatinum) {
+								isValidRole =
+									role.name !== ROLE_TYPES.requester.key;
+							}
 
-						if (isValidRole) {
-							const roleName =
-								ROLE_NAME_KEY[role.name] || role.name;
+							if (!isProjectPartner) {
+								isValidRole =
+									role.name !==
+										ROLE_TYPES.partnerManager.key &&
+									role.name !== ROLE_TYPES.partnerMember.key;
+							}
 
-							rolesAccumulator.push({
-								...role,
-								name: roleName,
-							});
+							if (isValidRole) {
+								rolesAccumulator.push({
+									...role,
+									key: roleType?.key,
+									name: roleType?.name,
+									raysourceName: roleType?.raysourceName,
+								});
+							}
 						}
 
 						return rolesAccumulator;
@@ -125,11 +135,11 @@ const InviteTeamMembersPage = ({
 
 				setFieldValue(
 					'invites[0].role',
-					maxRequestors < 2
+					availableAdministratorAssets < 1
 						? accountMember
 						: roles?.find(
 								({name}) =>
-									name === ROLE_TYPES.requestor.name ||
+									name === ROLE_TYPES.requester.name ||
 									name === ROLE_TYPES.admin.name
 						  )
 				);
@@ -150,14 +160,19 @@ const InviteTeamMembersPage = ({
 		};
 
 		getRoles();
-	}, [maxRequestors, project, projectHasSLAGoldPlatinum, setFieldValue]);
+	}, [
+		availableAdministratorAssets,
+		project,
+		projectHasSLAGoldPlatinum,
+		setFieldValue,
+	]);
 
 	useEffect(() => {
 		if (values && accountRoles?.length) {
 			const totalAdmins = values.invites?.reduce(
 				(totalInvites, currentInvite) => {
 					if (
-						currentInvite.role.name === ROLE_TYPES.requestor.name ||
+						currentInvite.role.name === ROLE_TYPES.requester.name ||
 						currentInvite.role.name === ROLE_TYPES.admin.name
 					) {
 						return ++totalInvites;
@@ -165,10 +180,9 @@ const InviteTeamMembersPage = ({
 
 					return totalInvites;
 				},
-				1
+				0
 			);
-
-			const remainingAdmins = maxRequestors - totalAdmins;
+			const remainingAdmins = availableAdministratorAssets - totalAdmins;
 
 			if (remainingAdmins < 1) {
 				setAccountRolesOptions((previousAccountRoles) =>
@@ -176,15 +190,17 @@ const InviteTeamMembersPage = ({
 						...previousAccountRole,
 						disabled:
 							previousAccountRole.label ===
-								ROLE_TYPES.requestor.name ||
+								ROLE_TYPES.requester.name ||
 							previousAccountRole.label === ROLE_TYPES.admin.name,
 					}))
 				);
-			}
+				setAvailableAdminsRoles(0);
 
+				return;
+			}
 			setAvailableAdminsRoles(remainingAdmins);
 		}
-	}, [values, project, maxRequestors, accountRoles]);
+	}, [values, project, accountRoles, availableAdministratorAssets]);
 
 	useEffect(() => {
 		const filledEmails =
@@ -198,6 +214,7 @@ const InviteTeamMembersPage = ({
 
 			setInitialError(false);
 			setBaseButtonDisabled(sucessfullyEmails !== totalEmails);
+			setshowEmptyEmailError(false);
 		}
 		else if (touched['invites']?.some((field) => field?.email)) {
 			setInitialError(true);
@@ -209,19 +226,20 @@ const InviteTeamMembersPage = ({
 		const filledEmails = values?.invites?.filter(({email}) => email) || [];
 
 		if (filledEmails.length) {
-			await Promise.all(
+			setIsLoadingUserInvitation(true);
+			const newMembersData = await Promise.all(
 				filledEmails.map(async ({email, role}) => {
-					addTeamMemberInvitation({
+					const invitedUser = await addTeamMemberInvitation({
 						variables: {
 							TeamMembersInvitation: {
 								email,
-								role: role.name,
+								role: role.key,
 							},
 							scopeKey: Liferay.ThemeDisplay.getScopeGroupId(),
 						},
 					});
 
-					associateUserAccount({
+					await associateUserAccount({
 						variables: {
 							accountKey: project.accountKey,
 							accountRoleId: role.id,
@@ -229,17 +247,28 @@ const InviteTeamMembersPage = ({
 						},
 					});
 
-					associateContactRoleNameByEmailByProject(
+					await associateContactRoleNameByEmailByProject(
 						project.accountKey,
 						licenseKeyDownloadURL,
 						sessionId,
 						encodeURI(email),
-						role.name
+						role.raysourceName
 					);
+
+					return invitedUser;
 				})
 			);
 
-			if (!addTeamMemberError && !associateUserAccountError) {
+			setIsLoadingUserInvitation(false);
+
+			if (
+				!addTeamMemberError &&
+				!associateUserAccountError &&
+				newMembersData
+			) {
+				if (mutateUserData) {
+					mutateUserData(newMembersData);
+				}
 				handlePage();
 			}
 		}
@@ -252,6 +281,25 @@ const InviteTeamMembersPage = ({
 		}
 	};
 
+	const isAnyEmptyEmail = () => {
+		const hasEmptyEmails = values?.invites?.some(({email}) => !email);
+
+		setshowEmptyEmailError(hasEmptyEmails);
+
+		return hasEmptyEmails;
+	};
+
+	useEffect(() => {
+		if (availableAdminsRoles > 0) {
+			setAccountRolesOptions((previousAccountRoles) =>
+				previousAccountRoles.map((previousAccountRoles) => ({
+					...previousAccountRoles,
+					disabled: false,
+				}))
+			);
+		}
+	}, [availableAdminsRoles]);
+
 	return (
 		<Layout
 			footerProps={{
@@ -262,8 +310,9 @@ const InviteTeamMembersPage = ({
 				),
 				middleButton: (
 					<Button
-						disabled={baseButtonDisabled}
+						disabled={baseButtonDisabled || isLoadingUserInvitation}
 						displayType="primary"
+						isLoading={isLoadingUserInvitation}
 						onClick={handleSubmit}
 					>
 						Send Invitations
@@ -285,93 +334,136 @@ const InviteTeamMembersPage = ({
 				</Badge>
 			)}
 
-			<div className="invites-form overflow-auto px-3">
-				<div className="px-3">
-					<label>Project Name</label>
+			<FieldArray
+				name="invites"
+				render={({pop, push}) => (
+					<>
+						<div className="invites-form overflow-auto px-3">
+							<div className="px-3">
+								<label>Project Name</label>
 
-					<p className="invites-project-name text-neutral-6 text-paragraph-lg">
-						<strong>{project.name}</strong>
-					</p>
-				</div>
+								<p className="invites-project-name text-neutral-6 text-paragraph-lg">
+									<strong>{project.name}</strong>
+								</p>
+							</div>
 
-				<ClayForm.Group className="m-0">
-					{values?.invites?.map((invite, index) => (
-						<TeamMemberInputs
-							disableError={hasInitialError}
-							id={index}
-							invite={invite}
-							key={index}
-							options={accountRolesOptions}
-							placeholderEmail={`username@${
-								project?.code?.toLowerCase() || 'example'
-							}.com`}
-							selectOnChange={(roleId) =>
-								setFieldValue(
-									`invites[${index}].role`,
-									accountRoles?.find(({id}) => id === +roleId)
-								)
-							}
-						/>
-					))}
-				</ClayForm.Group>
+							<ClayForm.Group className="m-0">
+								{values?.invites?.map((invite, index) => (
+									<TeamMemberInputs
+										disableError={hasInitialError}
+										id={index}
+										invite={invite}
+										key={index}
+										options={accountRolesOptions}
+										placeholderEmail={`username@${
+											project?.code?.toLowerCase() ||
+											'example'
+										}.com`}
+										selectOnChange={(roleId) =>
+											setFieldValue(
+												`invites[${index}].role`,
+												accountRoles?.find(
+													({id}) => id === +roleId
+												)
+											)
+										}
+									/>
+								))}
+							</ClayForm.Group>
 
-				<div className="mb-4 ml-3 mt-5">
-					<Button
-						className="mr-3 py-2 text-brandy-secondary"
-						displayType="secondary"
-						prependIcon="hr"
-						small
-					>
-						Remove this Member
-					</Button>
+							{showEmptyEmailError && (
+								<Badge badgeClassName="cp-badge-error-message">
+									<span className="pl-1">
+										Please enter your email address.
+									</span>
+								</Badge>
+							)}
 
-					{values?.invites?.length < MAXIMUM_INVITES_COUNT && (
-						<Button
-							className="btn-outline-primary cp-btn-add-members py-2 rounded-xs"
-							onClick={() => {
-								setBaseButtonDisabled(false);
-								setFieldValue('invites', [
-									...values?.invites,
-									getInitialInvite(accountMemberRole),
-								]);
-							}}
-							prependIcon="plus"
-							small
-						>
-							Add More Members
-						</Button>
-					)}
-				</div>
-			</div>
+							<div className="ml-3 my-4">
+								{values?.invites?.length > 1 && (
+									<Button
+										className="mr-3 py-2 text-brandy-secondary"
+										displayType="secondary"
+										onClick={() => {
+											const removedItem = pop();
 
-			<div className="invites-helper px-3">
-				<div className="mx-3 pt-3">
-					<h5 className="text-neutral-7">
-						{`${
-							projectHasSLAGoldPlatinum
-								? ROLE_TYPES.requestor.name
-								: ROLE_TYPES.admin.name
-						}	roles available: ${availableAdminsRoles} of ${maxRequestors}`}
-					</h5>
+											if (
+												removedItem.role.name ===
+													ROLE_TYPES.admin.name ||
+												removedItem.role.name ===
+													ROLE_TYPES.requester.name
+											) {
+												setAvailableAdminsRoles(
+													(previousAdmins) =>
+														previousAdmins + 1
+												);
+											}
+										}}
+										prependIcon="hr"
+										small
+									>
+										Remove this Member
+									</Button>
+								)}
 
-					<p className="mb-0 text-neutral-7 text-paragraph-sm">
-						{`Only ${maxRequestors} member${
-							maxRequestors > 1 ? 's' : ''
-						} per project (including yourself) have
-						 role permissions (Admins & Requestors) to open Support
-						 tickets. `}
+								{values?.invites?.length <
+									MAXIMUM_INVITES_COUNT && (
+									<Button
+										className="btn-outline-primary cp-btn-add-members py-2 rounded-xs"
+										onClick={() => {
+											setBaseButtonDisabled(false);
 
-						<a
-							className="font-weight-bold text-neutral-9"
-							href={supportLink}
-							rel="noreferrer"
-							target="_blank"
-						>
-							Learn more about Customer Portal roles
-						</a>
-					</p>
-				</div>
-			</div>
+											const hasEmptyEmails = isAnyEmptyEmail();
+
+											if (!hasEmptyEmails) {
+												push(
+													getInitialInvite(
+														accountMemberRole
+													)
+												);
+											}
+										}}
+										prependIcon="plus"
+										small
+									>
+										Add More Members
+									</Button>
+								)}
+							</div>
+						</div>
+						<div className="invites-helper px-3">
+							<div className="mx-3 pt-3">
+								<h5 className="text-neutral-7">
+									{`${
+										projectHasSLAGoldPlatinum
+											? ROLE_TYPES.requester.name
+											: ROLE_TYPES.admin.name
+									}	roles available: ${availableAdminsRoles} of ${
+										project.maxRequestors
+									}`}
+								</h5>
+
+								<p className="mb-0 text-neutral-7 text-paragraph-sm">
+									{`Only ${project.maxRequestors} member${
+										project.maxRequestors > 1 ? 's' : ''
+									} per project (including yourself) have
+								 role permissions (Admins & Requestors) to open Support
+								 tickets. `}
+
+									<a
+										className="font-weight-bold text-neutral-9"
+										href={supportLink}
+										rel="noreferrer"
+										target="_blank"
+									>
+										Learn more about Customer Portal roles
+									</a>
+								</p>
+							</div>
+						</div>
+					</>
+				)}
+			/>
 		</Layout>
 	);
 };

@@ -48,6 +48,7 @@ import com.liferay.commerce.util.CommerceShippingEngineRegistry;
 import com.liferay.commerce.util.CommerceShippingHelper;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -121,10 +122,10 @@ public class DefaultCommerceCheckoutStepHttpHelper
 	@Override
 	public boolean isActiveDeliveryTermCommerceCheckoutStep(
 			HttpServletRequest httpServletRequest, CommerceOrder commerceOrder,
-			String languageId, boolean visible)
+			String languageId)
 		throws PortalException {
 
-		if (commerceOrder.getCommerceShippingMethodId() < 1) {
+		if (commerceOrder.getCommerceShippingMethodId() <= 0) {
 			return false;
 		}
 
@@ -178,15 +179,48 @@ public class DefaultCommerceCheckoutStepHttpHelper
 			return false;
 		}
 
-		if ((deliveryCommerceTermEntries.size() == 1) || !visible) {
-			CommerceTermEntry commerceTermEntry =
-				deliveryCommerceTermEntries.get(0);
+		if (deliveryCommerceTermEntries.size() == 1) {
+			if (commerceOrder.isOpen()) {
+				CommerceTermEntry commerceTermEntry =
+					deliveryCommerceTermEntries.get(0);
 
-			_commerceOrderService.updateTermsAndConditions(
-				commerceOrder.getCommerceOrderId(),
-				commerceTermEntry.getCommerceTermEntryId(), 0, languageId);
+				_commerceOrderService.updateTermsAndConditions(
+					commerceOrder.getCommerceOrderId(),
+					commerceTermEntry.getCommerceTermEntryId(), 0, languageId);
+			}
 
 			return false;
+		}
+
+		if ((commerceOrder.getDeliveryCommerceTermEntryId() <= 0) &&
+			commerceOrder.isOpen()) {
+
+			CommerceAccount commerceAccount =
+				commerceContext.getCommerceAccount();
+
+			AccountEntry accountEntry =
+				_accountEntryLocalService.getAccountEntry(
+					commerceAccount.getCommerceAccountId());
+
+			CommerceTermEntry commerceTermEntry =
+				_commerceTermEntryLocalService.fetchCommerceTermEntry(
+					accountEntry.getDefaultDeliveryCTermEntryId());
+
+			if ((commerceTermEntry != null) && commerceTermEntry.isActive() &&
+				deliveryCommerceTermEntries.contains(commerceTermEntry)) {
+
+				_commerceOrderService.updateTermsAndConditions(
+					commerceOrder.getCommerceOrderId(),
+					accountEntry.getDefaultDeliveryCTermEntryId(), 0,
+					LanguageUtil.getLanguageId(httpServletRequest.getLocale()));
+			}
+			else {
+				commerceTermEntry = deliveryCommerceTermEntries.get(0);
+
+				_commerceOrderService.updateTermsAndConditions(
+					commerceOrder.getCommerceOrderId(),
+					commerceTermEntry.getCommerceTermEntryId(), 0, languageId);
+			}
 		}
 
 		return true;
@@ -201,7 +235,7 @@ public class DefaultCommerceCheckoutStepHttpHelper
 			_commercePaymentEngine.getCommercePaymentMethodGroupRelsCount(
 				commerceOrder.getGroupId());
 
-		if (commercePaymentMethodGroupRelsCount < 1) {
+		if (commercePaymentMethodGroupRelsCount <= 0) {
 			return false;
 		}
 
@@ -310,7 +344,7 @@ public class DefaultCommerceCheckoutStepHttpHelper
 
 	@Override
 	public boolean isActivePaymentTermCommerceCheckoutStep(
-			CommerceOrder commerceOrder, String languageId, boolean visible)
+			CommerceOrder commerceOrder, String languageId)
 		throws PortalException {
 
 		String commercePaymentMethodKey =
@@ -336,15 +370,47 @@ public class DefaultCommerceCheckoutStepHttpHelper
 			return false;
 		}
 
-		if ((paymentCommerceTermEntries.size() == 1) || !visible) {
-			CommerceTermEntry commerceTermEntry =
-				paymentCommerceTermEntries.get(0);
+		if (paymentCommerceTermEntries.size() == 1) {
+			if (commerceOrder.isOpen()) {
+				CommerceTermEntry commerceTermEntry =
+					paymentCommerceTermEntries.get(0);
 
-			_commerceOrderService.updateTermsAndConditions(
-				commerceOrder.getCommerceOrderId(), 0,
-				commerceTermEntry.getCommerceTermEntryId(), languageId);
+				_commerceOrderService.updateTermsAndConditions(
+					commerceOrder.getCommerceOrderId(), 0,
+					commerceTermEntry.getCommerceTermEntryId(), languageId);
+			}
 
 			return false;
+		}
+
+		if ((commerceOrder.getPaymentCommerceTermEntryId() <= 0) &&
+			commerceOrder.isOpen()) {
+
+			CommerceAccount commerceAccount =
+				commerceOrder.getCommerceAccount();
+
+			AccountEntry accountEntry =
+				_accountEntryLocalService.getAccountEntry(
+					commerceAccount.getCommerceAccountId());
+
+			CommerceTermEntry commerceTermEntry =
+				_commerceTermEntryLocalService.fetchCommerceTermEntry(
+					accountEntry.getDefaultPaymentCTermEntryId());
+
+			if ((commerceTermEntry != null) && commerceTermEntry.isActive() &&
+				paymentCommerceTermEntries.contains(commerceTermEntry)) {
+
+				_commerceOrderService.updateTermsAndConditions(
+					commerceOrder.getCommerceOrderId(), 0,
+					accountEntry.getDefaultPaymentCTermEntryId(), languageId);
+			}
+			else {
+				commerceTermEntry = paymentCommerceTermEntries.get(0);
+
+				_commerceOrderService.updateTermsAndConditions(
+					commerceOrder.getCommerceOrderId(), 0,
+					commerceTermEntry.getCommerceTermEntryId(), languageId);
+			}
 		}
 
 		return true;
@@ -391,10 +457,12 @@ public class DefaultCommerceCheckoutStepHttpHelper
 					_portal.getLocale(httpServletRequest));
 
 			if (commerceShippingOptions.size() == 1) {
-				_updateCommerceOrder(
-					commerceContext, commerceOrder,
-					commerceShippingMethod.getCommerceShippingMethodId(),
-					commerceShippingOptions.get(0), httpServletRequest);
+				if (commerceOrder.isOpen()) {
+					_updateCommerceOrder(
+						commerceContext, commerceOrder,
+						commerceShippingMethod.getCommerceShippingMethodId(),
+						commerceShippingOptions.get(0), httpServletRequest);
+				}
 
 				return false;
 			}
@@ -467,6 +535,10 @@ public class DefaultCommerceCheckoutStepHttpHelper
 			HttpServletRequest httpServletRequest, CommerceOrder commerceOrder,
 			String commercePaymentMethodKey)
 		throws PortalException {
+
+		if (!commerceOrder.isOpen()) {
+			return;
+		}
 
 		CommerceAddress commerceAddress = commerceOrder.getBillingAddress();
 
