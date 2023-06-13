@@ -554,6 +554,9 @@
 			return Math.ceil(Math.random() * new Date().getTime());
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		reorder(box, down) {
 			box = Util.getElement(box);
 
@@ -604,6 +607,9 @@
 			}
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		rowCheckerCheckAllBox(
 			ancestorTable,
 			ancestorRow,
@@ -618,6 +624,9 @@
 			}
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+		 */
 		savePortletTitle(params) {
 			params = {
 				doAsUserId: 0,

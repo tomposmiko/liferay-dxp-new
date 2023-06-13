@@ -337,12 +337,83 @@ definition {
 	}
 
 	@description = "This is a test for LPS-90864. It checks that a site member can add shortcut to folder with permissions."
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanAddShortcutToFolderAsSiteMemberWithPermissions {
+		property custom.properties = "jsonws.web.service.paths.excludes=";
 
-		// TODO LPS-149366 CanAddShortcutToFolderAsSiteMemberWithPermissions pending implementation
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
 
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		JSONUser.addUserToSite(
+			groupName = "Site Name",
+			userEmailAddress = "userea@liferay.com");
+
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ACCESS",
+			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
+			roleTitle = "Site Member",
+			roleType = "site");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Documents and Media Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "2",
+			groupName = "Site Name",
+			layoutName = "Documents and Media Page",
+			widgetName = "Documents and Media");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Site Name",
+			mimeType = "text/plain",
+			sourceFileName = "Document_1.txt");
+
+		JSONFolder.addFolder(
+			dmFolderDescription = "DM Folder Description",
+			dmFolderName = "DM Folder Name",
+			groupName = "Site Name");
+
+		Navigator.gotoSitePage(
+			pageName = "Documents and Media Page",
+			siteName = "Site Name");
+
+		DMDocument.enableActionsMenuOnPortlet();
+
+		DMNavigator.gotoFolderPermissions(dmFolderName = "DM Folder Name");
+
+		PermissionsInline.addOrRemoveAnyPermissionsFromSpecificRole(
+			addOrRemoveViewPermission = "Add",
+			permissionsKeyList = "INLINE_PERMISSIONS_ADD_SHORTCUT_CHECKBOX",
+			roleTitle = "Site Member");
+
+		User.logoutAndLoginPG(
+			userLoginEmailAddress = "userea@liferay.com",
+			userLoginFullName = "userfn userln");
+
+		Navigator.gotoSitePage(
+			pageName = "Documents and Media Page",
+			siteName = "Site Name");
+
+		DMNavigator.gotoFolder(dmFolderName = "DM Folder Name");
+
+		DMDocument.addDMShortcutPG(
+			dmDocumentTitle = "DM Document Title",
+			siteName = "Site Name");
+
+		DMDocument.viewPG(dmDocumentTitle = "DM Document Title");
 	}
 
 	@priority = "5"
@@ -591,7 +662,7 @@ definition {
 			key_dmFolderName = "DM Folder Name",
 			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_VERTICAL_ELLIPSIS");
 
-		MenuItem.viewNotPresent(menuItem = "Move to Recycle Bin");
+		MenuItem.viewNotPresent(menuItem = "Delete");
 
 		User.logoutAndLoginPG(
 			userLoginEmailAddress = "test@liferay.com",
@@ -717,6 +788,35 @@ definition {
 		User.viewLoginPG();
 	}
 
+	@description = "This ensures that a guest cannot access a DM folder without permissions."
+	@priority = "3"
+	test GuestCannotAccessFolderWithoutPermissions {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Documents and Media Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Documents and Media Page",
+			widgetName = "Documents and Media");
+
+		JSONFolder.addFolder(
+			dmFolderDescription = "DM Folder Description",
+			dmFolderName = "DM Folder Name",
+			groupName = "Guest");
+
+		User.logoutPG();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoFolder(
+			dmFolderName = "DM Folder Name",
+			noPermissions = "true");
+
+		Alert.viewErrorMessage(errorMessage = "You do not have the required permissions");
+	}
+
 	@description = "This is a test for LPS-136833. It checks that a guest cannot add a document in a folder without permissions."
 	@priority = "3"
 	test GuestCannotAddDocumentInFolder {
@@ -783,7 +883,7 @@ definition {
 
 		LexiconCard.viewMenuItemNotPresent(
 			card = "DM Document Title",
-			item = "Move to Recycle Bin");
+			item = "Delete");
 
 		LexiconCard.checkCardCheckbox(card = "DM Document Title");
 
@@ -1402,7 +1502,7 @@ definition {
 
 		LexiconCard.viewMenuItemNotPresent(
 			card = "DM Document Title",
-			item = "Move to Recycle Bin");
+			item = "Delete");
 
 		LexiconCard.checkCardCheckbox(card = "DM Document Title");
 
@@ -1464,7 +1564,7 @@ definition {
 
 		LexiconCard.viewMenuItemNotPresent(
 			card = "DM Document Title",
-			item = "Move to Recycle Bin");
+			item = "Delete");
 
 		LexiconCard.checkCardCheckbox(card = "DM Document Title");
 
@@ -1552,6 +1652,12 @@ definition {
 		JSONUser.addUserToSite(
 			groupName = "Guest",
 			userEmailAddress = "userea@liferay.com");
+
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ACCESS",
+			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
+			roleTitle = "Site Member",
+			roleType = "site");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
@@ -1719,6 +1825,12 @@ definition {
 			groupName = "Guest",
 			userEmailAddress = "userea@liferay.com");
 
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ACCESS",
+			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
+			roleTitle = "Site Member",
+			roleType = "site");
+
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Documents and Media Page");
@@ -1774,6 +1886,12 @@ definition {
 		JSONUser.addUserToSite(
 			groupName = "Guest",
 			userEmailAddress = "userea@liferay.com");
+
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "ACCESS",
+			resourceName = "com.liferay.document.library.kernel.model.DLFolder",
+			roleTitle = "Site Member",
+			roleType = "site");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",

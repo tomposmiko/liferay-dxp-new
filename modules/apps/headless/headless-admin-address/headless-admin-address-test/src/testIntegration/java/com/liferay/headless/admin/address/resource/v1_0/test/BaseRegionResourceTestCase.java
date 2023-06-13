@@ -51,7 +51,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import java.text.DateFormat;
 
@@ -60,9 +60,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,8 +72,6 @@ import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -280,7 +280,7 @@ public abstract class BaseRegionResourceTestCase {
 		testGetCountryRegionsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, region1, region2) -> {
-				BeanUtils.setProperty(
+				BeanTestUtil.setProperty(
 					region1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
 			});
@@ -291,8 +291,8 @@ public abstract class BaseRegionResourceTestCase {
 		testGetCountryRegionsPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, region1, region2) -> {
-				BeanUtils.setProperty(region1, entityField.getName(), 0.1);
-				BeanUtils.setProperty(region2, entityField.getName(), 0.5);
+				BeanTestUtil.setProperty(region1, entityField.getName(), 0.1);
+				BeanTestUtil.setProperty(region2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -301,8 +301,8 @@ public abstract class BaseRegionResourceTestCase {
 		testGetCountryRegionsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, region1, region2) -> {
-				BeanUtils.setProperty(region1, entityField.getName(), 0);
-				BeanUtils.setProperty(region2, entityField.getName(), 1);
+				BeanTestUtil.setProperty(region1, entityField.getName(), 0);
+				BeanTestUtil.setProperty(region2, entityField.getName(), 1);
 			});
 	}
 
@@ -315,27 +315,27 @@ public abstract class BaseRegionResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				java.lang.reflect.Method method = clazz.getMethod(
+				Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -343,12 +343,12 @@ public abstract class BaseRegionResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -421,6 +421,81 @@ public abstract class BaseRegionResourceTestCase {
 	}
 
 	@Test
+	public void testGetCountryRegionByRegionCode() throws Exception {
+		Region postRegion = testGetCountryRegionByRegionCode_addRegion();
+
+		Region getRegion = regionResource.getCountryRegionByRegionCode(
+			postRegion.getCountryId(), postRegion.getRegionCode());
+
+		assertEquals(postRegion, getRegion);
+		assertValid(getRegion);
+	}
+
+	protected Region testGetCountryRegionByRegionCode_addRegion()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetCountryRegionByRegionCode() throws Exception {
+		Region region = testGraphQLGetCountryRegionByRegionCode_addRegion();
+
+		Assert.assertTrue(
+			equals(
+				region,
+				RegionSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"countryRegionByRegionCode",
+								new HashMap<String, Object>() {
+									{
+										put("countryId", region.getCountryId());
+										put(
+											"regionCode",
+											"\"" + region.getRegionCode() +
+												"\"");
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/countryRegionByRegionCode"))));
+	}
+
+	@Test
+	public void testGraphQLGetCountryRegionByRegionCodeNotFound()
+		throws Exception {
+
+		Long irrelevantCountryId = RandomTestUtil.randomLong();
+		String irrelevantRegionCode =
+			"\"" + RandomTestUtil.randomString() + "\"";
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"countryRegionByRegionCode",
+						new HashMap<String, Object>() {
+							{
+								put("countryId", irrelevantCountryId);
+								put("regionCode", irrelevantRegionCode);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected Region testGraphQLGetCountryRegionByRegionCode_addRegion()
+		throws Exception {
+
+		return testGraphQLRegion_addRegion();
+	}
+
+	@Test
 	public void testGetRegionsPage() throws Exception {
 		Page<Region> page = regionResource.getRegionsPage(
 			null, null, Pagination.of(1, 10), null);
@@ -484,7 +559,7 @@ public abstract class BaseRegionResourceTestCase {
 		testGetRegionsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, region1, region2) -> {
-				BeanUtils.setProperty(
+				BeanTestUtil.setProperty(
 					region1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
 			});
@@ -495,8 +570,8 @@ public abstract class BaseRegionResourceTestCase {
 		testGetRegionsPageWithSort(
 			EntityField.Type.DOUBLE,
 			(entityField, region1, region2) -> {
-				BeanUtils.setProperty(region1, entityField.getName(), 0.1);
-				BeanUtils.setProperty(region2, entityField.getName(), 0.5);
+				BeanTestUtil.setProperty(region1, entityField.getName(), 0.1);
+				BeanTestUtil.setProperty(region2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -505,8 +580,8 @@ public abstract class BaseRegionResourceTestCase {
 		testGetRegionsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, region1, region2) -> {
-				BeanUtils.setProperty(region1, entityField.getName(), 0);
-				BeanUtils.setProperty(region2, entityField.getName(), 1);
+				BeanTestUtil.setProperty(region1, entityField.getName(), 0);
+				BeanTestUtil.setProperty(region2, entityField.getName(), 1);
 			});
 	}
 
@@ -519,27 +594,27 @@ public abstract class BaseRegionResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				java.lang.reflect.Method method = clazz.getMethod(
+				Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -547,12 +622,12 @@ public abstract class BaseRegionResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanUtils.setProperty(
+					BeanTestUtil.setProperty(
 						region2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -650,6 +725,81 @@ public abstract class BaseRegionResourceTestCase {
 	}
 
 	protected Region testGraphQLGetRegionsPage_addRegion() throws Exception {
+		return testGraphQLRegion_addRegion();
+	}
+
+	@Test
+	public void testPostRegion() throws Exception {
+		Region randomRegion = randomRegion();
+
+		Region postRegion = testPostRegion_addRegion(randomRegion);
+
+		assertEquals(randomRegion, postRegion);
+		assertValid(postRegion);
+	}
+
+	protected Region testPostRegion_addRegion(Region region) throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGetRegion() throws Exception {
+		Region postRegion = testGetRegion_addRegion();
+
+		Region getRegion = regionResource.getRegion(postRegion.getId());
+
+		assertEquals(postRegion, getRegion);
+		assertValid(getRegion);
+	}
+
+	protected Region testGetRegion_addRegion() throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetRegion() throws Exception {
+		Region region = testGraphQLGetRegion_addRegion();
+
+		Assert.assertTrue(
+			equals(
+				region,
+				RegionSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"region",
+								new HashMap<String, Object>() {
+									{
+										put("regionId", region.getId());
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/region"))));
+	}
+
+	@Test
+	public void testGraphQLGetRegionNotFound() throws Exception {
+		Long irrelevantRegionId = RandomTestUtil.randomLong();
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"region",
+						new HashMap<String, Object>() {
+							{
+								put("regionId", irrelevantRegionId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	protected Region testGraphQLGetRegion_addRegion() throws Exception {
 		return testGraphQLRegion_addRegion();
 	}
 
@@ -1141,6 +1291,115 @@ public abstract class BaseRegionResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
+	protected static class BeanTestUtil {
+
+		public static void copyProperties(Object source, Object target)
+			throws Exception {
+
+			Class<?> sourceClass = _getSuperClass(source.getClass());
+
+			Class<?> targetClass = target.getClass();
+
+			for (java.lang.reflect.Field field :
+					sourceClass.getDeclaredFields()) {
+
+				if (field.isSynthetic()) {
+					continue;
+				}
+
+				Method getMethod = _getMethod(
+					sourceClass, field.getName(), "get");
+
+				Method setMethod = _getMethod(
+					targetClass, field.getName(), "set",
+					getMethod.getReturnType());
+
+				setMethod.invoke(target, getMethod.invoke(source));
+			}
+		}
+
+		public static boolean hasProperty(Object bean, String name) {
+			Method setMethod = _getMethod(
+				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
+
+			if (setMethod != null) {
+				return true;
+			}
+
+			return false;
+		}
+
+		public static void setProperty(Object bean, String name, Object value)
+			throws Exception {
+
+			Class<?> clazz = bean.getClass();
+
+			Method setMethod = _getMethod(
+				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
+
+			if (setMethod == null) {
+				throw new NoSuchMethodException();
+			}
+
+			Class<?>[] parameterTypes = setMethod.getParameterTypes();
+
+			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
+		}
+
+		private static Method _getMethod(Class<?> clazz, String name) {
+			for (Method method : clazz.getMethods()) {
+				if (name.equals(method.getName()) &&
+					(method.getParameterCount() == 1) &&
+					_parameterTypes.contains(method.getParameterTypes()[0])) {
+
+					return method;
+				}
+			}
+
+			return null;
+		}
+
+		private static Method _getMethod(
+				Class<?> clazz, String fieldName, String prefix,
+				Class<?>... parameterTypes)
+			throws Exception {
+
+			return clazz.getMethod(
+				prefix + StringUtil.upperCaseFirstLetter(fieldName),
+				parameterTypes);
+		}
+
+		private static Class<?> _getSuperClass(Class<?> clazz) {
+			Class<?> superClass = clazz.getSuperclass();
+
+			if ((superClass == null) || (superClass == Object.class)) {
+				return clazz;
+			}
+
+			return superClass;
+		}
+
+		private static Object _translateValue(
+			Class<?> parameterType, Object value) {
+
+			if ((value instanceof Integer) &&
+				parameterType.equals(Long.class)) {
+
+				Integer intValue = (Integer)value;
+
+				return intValue.longValue();
+			}
+
+			return value;
+		}
+
+		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
+			Arrays.asList(
+				Boolean.class, Date.class, Double.class, Integer.class,
+				Long.class, Map.class, String.class));
+
+	}
+
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1215,18 +1474,6 @@ public abstract class BaseRegionResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseRegionResourceTestCase.class);
 
-	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
-
-		@Override
-		public void copyProperty(Object bean, String name, Object value)
-			throws IllegalAccessException, InvocationTargetException {
-
-			if (value != null) {
-				super.copyProperty(bean, name, value);
-			}
-		}
-
-	};
 	private static DateFormat _dateFormat;
 
 	@Inject

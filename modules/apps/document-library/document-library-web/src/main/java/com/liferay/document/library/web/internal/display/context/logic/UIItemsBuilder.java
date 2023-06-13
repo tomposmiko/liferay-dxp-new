@@ -701,7 +701,7 @@ public class UIItemsBuilder {
 		_addJavaScriptUIItem(
 			new JavaScriptToolbarItem(), toolbarItems,
 			DLUIItemKeys.MOVE_TO_THE_RECYCLE_BIN,
-			LanguageUtil.get(_resourceBundle, "move-to-recycle-bin"),
+			LanguageUtil.get(_resourceBundle, "delete"),
 			_getSubmitFormJavaScript(
 				Constants.MOVE_TO_TRASH, portletURL.toString()));
 	}
@@ -951,21 +951,6 @@ public class UIItemsBuilder {
 			).build();
 		}
 
-		String javaScript =
-			"/com/liferay/document/library/web/display/context/dependencies" +
-				"/checkin_js.ftl";
-		Class<?> clazz = getClass();
-
-		URLTemplateResource urlTemplateResource = new URLTemplateResource(
-			javaScript, clazz.getResource(javaScript));
-
-		Template template = TemplateManagerUtil.getTemplate(
-			TemplateConstants.LANG_TYPE_FTL, urlTemplateResource, false);
-
-		template.put("namespace", _getNamespace());
-
-		template.processTemplate(new UnsyncStringWriter());
-
 		return DropdownItemBuilder.putData(
 			"action", "checkin"
 		).putData(
@@ -1020,14 +1005,9 @@ public class UIItemsBuilder {
 
 	public DropdownItem createDeleteDropdownItem() throws PortalException {
 		String cmd = null;
-		String icon = "trash";
-		String label = LanguageUtil.get(
-			_httpServletRequest, "move-to-recycle-bin");
 
 		if (_isDeleteActionAvailable()) {
 			cmd = Constants.DELETE;
-			icon = "times-circle";
-			label = LanguageUtil.get(_httpServletRequest, "delete");
 		}
 		else if (_isMoveToTheRecycleBinActionAvailable()) {
 			cmd = Constants.MOVE_TO_TRASH;
@@ -1052,9 +1032,9 @@ public class UIItemsBuilder {
 		).putData(
 			"deleteURL", portletURL.toString()
 		).setIcon(
-			icon
+			"trash"
 		).setLabel(
-			label
+			LanguageUtil.get(_httpServletRequest, "delete")
 		).build();
 	}
 

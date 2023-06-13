@@ -202,7 +202,7 @@ definition {
 
 		var output = JSONCurlUtil.post("${curl}");
 
-		if (contains("${output}", ""agreedToTermsOfUse":true") && contains("${output}", ""companyId":"${companyId}"")) {
+		if (contains("${output}", "\"agreedToTermsOfUse\":true") && contains("${output}", "\"companyId\":\"${companyId}\"")) {
 			echo("Get current user successful.");
 		}
 		else {
@@ -301,6 +301,13 @@ definition {
 			key_configurationName = "${configurationName}",
 			key_configurationScope = "${configurationScope}",
 			locator1 = "SystemSettings#SCOPED_CONFIGURATION_NAME");
+	}
+
+	macro viewInputText {
+		AssertTextEquals(
+			key_fieldLabel = "${fieldLabel}",
+			locator1 = "TextInput#GENERIC_TEXT_INPUT",
+			value1 = "${fieldValue}");
 	}
 
 	macro viewSettingsText {

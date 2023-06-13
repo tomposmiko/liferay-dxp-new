@@ -97,7 +97,6 @@
 /portal/commons-collections.jar
 /portal/commons-compress.jar
 /portal/commons-configuration.jar
-/portal/commons-io.jar
 /portal/commons-lang.jar
 /portal/commons-logging.jar
 /portal/dom4j.jar
@@ -130,7 +129,6 @@
 /portal/log4j-core.jar
 /portal/persistence.jar
 /portal/portlet.jar
-/portal/portletmvc4spring-framework.jar
 /portal/simplecaptcha.jar
 /portal/slf4j-api.jar
 /portal/soap-api.jar
