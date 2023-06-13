@@ -434,17 +434,9 @@ public class LiferayOAuthDataProvider
 				_populateClient(oAuth2Application), refreshTokenKey, lifetime,
 				issuedAt);
 
-			refreshToken.setSubject(
-				_populateUserSubject(
-					oAuth2Authorization.getCompanyId(),
-					oAuth2Authorization.getUserId(),
-					oAuth2Authorization.getUserName()));
-
-			List<String> accessTokens = Collections.singletonList(
-				oAuth2Authorization.getAccessTokenContent());
-
-			refreshToken.setAccessTokens(accessTokens);
-
+			refreshToken.setAccessTokens(
+				Collections.singletonList(
+					oAuth2Authorization.getAccessTokenContent()));
 			refreshToken.setScopes(
 				convertScopeToPermissions(
 					refreshToken.getClient(),
@@ -452,6 +444,11 @@ public class LiferayOAuthDataProvider
 						getScopeAliasesList(
 							oAuth2Authorization.
 								getOAuth2ApplicationScopeAliasesId())));
+			refreshToken.setSubject(
+				_populateUserSubject(
+					oAuth2Authorization.getCompanyId(),
+					oAuth2Authorization.getUserId(),
+					oAuth2Authorization.getUserName()));
 
 			Map<String, String> extraProperties =
 				refreshToken.getExtraProperties();
@@ -1008,10 +1005,14 @@ public class LiferayOAuthDataProvider
 			clientSecret = null;
 		}
 
+		String clientAuthenticationMethod =
+			oAuth2Application.getClientAuthenticationMethod();
+
 		Client client = new Client(
 			oAuth2Application.getClientId(), clientSecret,
-			!Validator.isBlank(clientSecret), oAuth2Application.getName(),
-			oAuth2Application.getHomePageURL());
+			!clientAuthenticationMethod.equals(
+				OAuthConstants.TOKEN_ENDPOINT_AUTH_NONE),
+			oAuth2Application.getName(), oAuth2Application.getHomePageURL());
 
 		List<String> clientGrantTypes = client.getAllowedGrantTypes();
 
@@ -1086,6 +1087,7 @@ public class LiferayOAuthDataProvider
 				oAuth2Application.getCompanyId(),
 				oAuth2Application.getClientCredentialUserId(),
 				oAuth2Application.getClientCredentialUserName()));
+		client.setTokenEndpointAuthMethod(clientAuthenticationMethod);
 
 		Map<String, String> properties = client.getProperties();
 
@@ -1095,6 +1097,9 @@ public class LiferayOAuthDataProvider
 		properties.put(
 			OAuth2ProviderRESTEndpointConstants.PROPERTY_KEY_CLIENT_FEATURES,
 			oAuth2Application.getFeatures());
+		properties.put(
+			OAuth2ProviderRESTEndpointConstants.PROPERTY_KEY_CLIENT_JWKS,
+			oAuth2Application.getJwks());
 		properties.put(
 			OAuth2ProviderRESTEndpointConstants.
 				PROPERTY_KEY_CLIENT_REMEMBER_DEVICE,

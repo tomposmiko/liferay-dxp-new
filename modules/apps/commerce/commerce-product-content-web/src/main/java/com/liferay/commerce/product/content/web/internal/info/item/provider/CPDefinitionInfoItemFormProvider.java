@@ -81,13 +81,21 @@ public class CPDefinitionInfoItemFormProvider
 	private InfoFieldSet _getBasicInformationInfoFieldSet() {
 		return InfoFieldSet.builder(
 		).infoFieldSetEntry(
+			CPDefinitionInfoItemFields.availabilityStatusInfoField
+		).infoFieldSetEntry(
 			CPDefinitionInfoItemFields.descriptionInfoField
+		).infoFieldSetEntry(
+			CPDefinitionInfoItemFields.finalPriceInfoField
+		).infoFieldSetEntry(
+			CPDefinitionInfoItemFields.inventoryInfoField
 		).infoFieldSetEntry(
 			CPDefinitionInfoItemFields.nameInfoField
 		).infoFieldSetEntry(
 			CPDefinitionInfoItemFields.productTypeNameInfoField
 		).infoFieldSetEntry(
 			CPDefinitionInfoItemFields.shortDescriptionInfoField
+		).infoFieldSetEntry(
+			CPDefinitionInfoItemFields.skuInfoField
 		).infoFieldSetEntry(
 			CPDefinitionInfoItemFields.userNameInfoField
 		).labelInfoLocalizedValue(

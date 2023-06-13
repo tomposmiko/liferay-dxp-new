@@ -129,6 +129,14 @@ definition {
 
 		if (isSet(fieldType)) {
 			ObjectField.selectType(fieldType = "${fieldType}");
+
+			if ("${fieldType}" == "Attachment") {
+				Click(locator1 = "ObjectField#REQUEST_FILES_INPUT");
+
+				Click(
+					key_fieldType = "${fieldAttachment}",
+					locator1 = "ObjectField#TYPE_OPTION");
+			}
 		}
 
 		if ("${isMandatory}" == "true") {
@@ -185,7 +193,14 @@ definition {
 			key_picklistOption = "${picklistOption}",
 			locator1 = "ObjectAdmin#ENTRY_PICKLIST_OPTION");
 
-		Button.clickSave();
+		if (IsElementPresent(key_text = "${saveName}", locator1 = "Button#ANY")) {
+			Click(
+				key_text = "${saveName}",
+				locator1 = "Button#ANY");
+		}
+		else {
+			Button.clickSave();
+		}
 
 		WaitForSPARefresh();
 	}
@@ -456,7 +471,7 @@ definition {
 
 		AssertElementPresent(locator1 = "ObjectAdmin#OBJECT_LAYOUTS_FIELD_INPUT_HAS_REQUIRED_ERROR");
 
-		AssertElementPresent(locator1 = "ObjectAdmin#OBJECT_FIELDS_REQUIRED_ERROR_MESSAGE");
+		AssertElementPresent(locator1 = "ObjectAdmin#REQUIRED_ERROR_MESSAGE");
 	}
 
 	macro assertObjectActions {
@@ -546,7 +561,7 @@ definition {
 	macro assertObjectLayoutRelationshipFieldRequiredError {
 		AssertElementPresent(locator1 = "ObjectAdmin#OBJECT_LAYOUTS_RELATIONSHIP_FIELD_HAD_REQUIRED_ERROR");
 
-		AssertElementPresent(locator1 = "ObjectAdmin#OBJECT_FIELDS_REQUIRED_ERROR_MESSAGE");
+		AssertElementPresent(locator1 = "ObjectAdmin#REQUIRED_ERROR_MESSAGE");
 	}
 
 	macro assertObjectNameFieldRequired {
@@ -1019,12 +1034,6 @@ definition {
 		AssertElementPresent(locator1 = "ObjectAdmin#FIELDS_DETAILS_TITLE");
 	}
 
-	macro viewFieldErrorMessage {
-		AssertTextEquals(
-			locator1 = "ObjectAdmin#OBJECT_FIELDS_REQUIRED_ERROR_MESSAGE",
-			value1 = "${errorMessage}");
-	}
-
 	macro viewFieldValueDisabled {
 		AssertElementPresent(
 			key_fieldValue = "${fieldValue}",
@@ -1053,6 +1062,12 @@ definition {
 				key_optionName = "${optionNameNotPresent}",
 				locator1 = "ObjectAdmin#VIEW_OPTION_TITLE_FIELD");
 		}
+	}
+
+	macro viewPicklistOptionsOnFields {
+		AssertElementPresent(
+			key_optionName = "${optionName}",
+			locator1 = "ObjectAdmin#VIEW_PICKLIST_OPTIONS");
 	}
 
 	macro viewRequiredAlert {

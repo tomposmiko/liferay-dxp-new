@@ -971,6 +971,11 @@
 				"store": true,
 				"type": "keyword"
 			},
+			"roleNames": {
+				"normalizer": "lowercase",
+				"store": true,
+				"type": "keyword"
+			},
 			"rootEntryClassName": {
 				"store": true,
 				"type": "keyword"
@@ -1029,6 +1034,11 @@
 				"type": "keyword"
 			},
 			"userGroupIds": {
+				"store": true,
+				"type": "keyword"
+			},
+			"userGroupRoleNames": {
+				"normalizer": "lowercase",
 				"store": true,
 				"type": "keyword"
 			},

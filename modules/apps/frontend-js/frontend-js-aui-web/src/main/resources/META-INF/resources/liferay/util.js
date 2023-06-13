@@ -655,12 +655,18 @@
 			});
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setSelectionRange}
+		 */
 		setCursorPosition(element, position) {
 			var instance = this;
 
 			instance.setSelectionRange(element, position, position);
 		},
 
+		/**
+		 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setSelectionRange}
+		 */
 		setSelectionRange(element, selectionStart, selectionEnd) {
 			element = Util.getDOM(element);
 
@@ -682,29 +688,6 @@
 				textRange.moveEnd('character', selectionStart);
 
 				textRange.select();
-			}
-		},
-
-		showCapsLock(event, spanId) {
-			const span = document.getElementById(spanId);
-
-			if (span) {
-				var keyCode = event.keyCode ? event.keyCode : event.which;
-
-				var shiftKeyCode = keyCode === 16;
-
-				var shiftKey = event.shiftKey ? event.shiftKey : shiftKeyCode;
-
-				var display = 'none';
-
-				if (
-					(keyCode >= 65 && keyCode <= 90 && !shiftKey) ||
-					(keyCode >= 97 && keyCode <= 122 && shiftKey)
-				) {
-					display = '';
-				}
-
-				span.style.display = display;
 			}
 		},
 

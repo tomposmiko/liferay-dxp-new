@@ -56,10 +56,30 @@ definition {
 		Click(locator1 = "WorkflowAllItems#WORKFLOW_ALL_ITEMS_CREATION_DATE");
 	}
 
-	macro selectAndChangeNodeName {
-		KaleoDesigner.selectNode(nodeNodeLabel = "${nodeNodeLabel}");
+	macro selectAndChangeNodeID {
+		Click(
+			key_nodeLabel = "${nodeLabel}",
+			key_nodeType = "${nodeType}",
+			locator1 = "ProcessBuilderKaleoDesignerReact#DIAGRAM_NODE_LABEL_SPECIFIC");
 
-		KaleoDesigner.editNodeName(nodeName = "${nodeName}");
+		ProcessBuilderKaleoDesignerReact.editNodeInformationField(
+			infoOption = "Id",
+			infoValue = "${nodeID}");
+
+		if (isSet(update)) {
+			Button.click(button = "Update");
+		}
+	}
+
+	macro selectAndChangeNodeName {
+		Click(
+			key_nodeLabel = "${nodeLabel}",
+			key_nodeType = "${nodeType}",
+			locator1 = "ProcessBuilderKaleoDesignerReact#DIAGRAM_NODE_LABEL_SPECIFIC");
+
+		ProcessBuilderKaleoDesignerReact.editNodeInformationField(
+			infoOption = "Label",
+			infoValue = "${nodeName}");
 
 		if (isSet(update)) {
 			Button.click(button = "Update");
