@@ -36,6 +36,8 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.Valid;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -58,20 +60,21 @@ public class AdvancedConfiguration implements Serializable {
 	}
 
 	@Schema
-	public String[] getExcludes() {
-		return excludes;
+	@Valid
+	public Source getSource() {
+		return source;
 	}
 
-	public void setExcludes(String[] excludes) {
-		this.excludes = excludes;
+	public void setSource(Source source) {
+		this.source = source;
 	}
 
 	@JsonIgnore
-	public void setExcludes(
-		UnsafeSupplier<String[], Exception> excludesUnsafeSupplier) {
+	public void setSource(
+		UnsafeSupplier<Source, Exception> sourceUnsafeSupplier) {
 
 		try {
-			excludes = excludesUnsafeSupplier.get();
+			source = sourceUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -83,63 +86,7 @@ public class AdvancedConfiguration implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String[] excludes;
-
-	@Schema
-	public Boolean getFetchSource() {
-		return fetchSource;
-	}
-
-	public void setFetchSource(Boolean fetchSource) {
-		this.fetchSource = fetchSource;
-	}
-
-	@JsonIgnore
-	public void setFetchSource(
-		UnsafeSupplier<Boolean, Exception> fetchSourceUnsafeSupplier) {
-
-		try {
-			fetchSource = fetchSourceUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Boolean fetchSource;
-
-	@Schema
-	public String[] getIncludes() {
-		return includes;
-	}
-
-	public void setIncludes(String[] includes) {
-		this.includes = includes;
-	}
-
-	@JsonIgnore
-	public void setIncludes(
-		UnsafeSupplier<String[], Exception> includesUnsafeSupplier) {
-
-		try {
-			includes = includesUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String[] includes;
+	protected Source source;
 
 	@Override
 	public boolean equals(Object object) {
@@ -169,62 +116,14 @@ public class AdvancedConfiguration implements Serializable {
 
 		sb.append("{");
 
-		if (excludes != null) {
+		if (source != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"excludes\": ");
+			sb.append("\"source\": ");
 
-			sb.append("[");
-
-			for (int i = 0; i < excludes.length; i++) {
-				sb.append("\"");
-
-				sb.append(_escape(excludes[i]));
-
-				sb.append("\"");
-
-				if ((i + 1) < excludes.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (fetchSource != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"fetchSource\": ");
-
-			sb.append(fetchSource);
-		}
-
-		if (includes != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"includes\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < includes.length; i++) {
-				sb.append("\"");
-
-				sb.append(_escape(includes[i]));
-
-				sb.append("\"");
-
-				if ((i + 1) < includes.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
+			sb.append(String.valueOf(source));
 		}
 
 		sb.append("}");

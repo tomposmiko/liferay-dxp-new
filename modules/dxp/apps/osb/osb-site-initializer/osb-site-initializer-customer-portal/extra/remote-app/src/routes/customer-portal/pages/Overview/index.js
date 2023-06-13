@@ -1,57 +1,34 @@
 import {useQuery} from '@apollo/client';
-import {useContext, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useCustomEvent} from '../../../../common/hooks/useCustomEvent';
 import {usePageGuard} from '../../../../common/hooks/usePageGuard';
-import {
-	getAccountSubscriptionGroups,
-	getKoroneikiAccounts,
-} from '../../../../common/services/liferay/graphql/queries';
+import {getAccountSubscriptionGroups} from '../../../../common/services/liferay/graphql/queries';
 import {Storage} from '../../../../common/services/liferay/storage';
 import Subscriptions from '../../components/Subscriptions';
-import {AppContext} from '../../context';
+import {useCustomerPortal} from '../../context';
 import {actionTypes} from '../../context/reducer';
 import {CUSTOM_EVENTS} from '../../utils/constants';
 import {getWebContents} from '../../utils/webContentsGenerator';
 
-const Overview = ({userAccount}) => {
-	const [{project}, dispatch] = useContext(AppContext);
+const Overview = ({project, userAccount}) => {
+	const [, dispatch] = useCustomerPortal();
 	const [
 		slaCurrentVersionAndProducts,
 		setSLACurrentVersionAndProducts,
 	] = useState([]);
-
 	const dispatchEvent = useCustomEvent(CUSTOM_EVENTS.PROJECT);
-	const {isLoading} = usePageGuard(
-		userAccount,
-		project.accountKey,
-		'overview'
-	);
-
-	const {data, loading: isLoadingKoroneiki} = useQuery(getKoroneikiAccounts, {
-		variables: {
-			filter: `accountKey eq '${project.accountKey}'`,
-		},
-	});
+	const {loading} = usePageGuard(userAccount, project.accountKey, 'overview');
 
 	useEffect(() => {
-		if (!isLoadingKoroneiki && data) {
-			const koroneikiAccount = data.c?.koroneikiAccounts?.items[0];
+		setSLACurrentVersionAndProducts((prevSlaCurrentVersionAndProducts) => [
+			...prevSlaCurrentVersionAndProducts,
+			project.slaCurrent,
+			project.dxpVersion,
+		]);
 
-			setSLACurrentVersionAndProducts([
-				...slaCurrentVersionAndProducts,
-				koroneikiAccount.slaCurrent,
-				koroneikiAccount.dxpVersion,
-			]);
-
-			dispatch({
-				payload: koroneikiAccount,
-				type: actionTypes.UPDATE_PROJECT,
-			});
-
-			dispatchEvent(koroneikiAccount);
-		}
+		dispatchEvent(project);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [data, dispatch, isLoadingKoroneiki, slaCurrentVersionAndProducts]);
+	}, [project]);
 
 	const {
 		data: dataSubscriptionGroups,
@@ -63,37 +40,29 @@ const Overview = ({userAccount}) => {
 	});
 
 	useEffect(() => {
-		if (!isLoadingSubscritionsGroups && dataSubscriptionGroups) {
+		if (dataSubscriptionGroups) {
 			const subscriptionGroupsItems =
 				dataSubscriptionGroups.c?.accountSubscriptionGroups?.items;
-
 			dispatch({
 				payload: subscriptionGroupsItems,
 				type: actionTypes.UPDATE_SUBSCRIPTION_GROUPS,
 			});
-
 			setSLACurrentVersionAndProducts(
 				...slaCurrentVersionAndProducts,
 				...subscriptionGroupsItems.map((group) => group.name)
 			);
 		}
-
 		Storage.setItem(
 			'cp-tip-container-primary',
 			JSON.stringify(getWebContents(slaCurrentVersionAndProducts))
 		);
-	}, [
-		dataSubscriptionGroups,
-		dispatch,
-		isLoadingSubscritionsGroups,
-		slaCurrentVersionAndProducts,
-	]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [dataSubscriptionGroups, slaCurrentVersionAndProducts]);
 
-	if (isLoading || isLoadingKoroneiki) {
+	if (loading || isLoadingSubscritionsGroups) {
 		return <div>Overview Skeleton</div>;
 	}
 
 	return <Subscriptions accountKey={project.accountKey} />;
 };
-
 export default Overview;

@@ -1,46 +1,48 @@
-import {useContext} from 'react';
-import {AppContext} from '../context';
+import {useCustomerPortal} from '../context';
 import {pages} from '../utils/constants';
 import ActivationKeys from './ActivationKeys';
+import DXPCloud from './DXPCloud';
 import Home from './Home';
 import Overview from './Overview';
+import TeamMembers from './TeamMembers';
 
 const Pages = () => {
-	const [{page, project, userAccount}] = useContext(AppContext);
+	const [{page, project, sessionId, userAccount}] = useCustomerPortal();
 
-	if (page === pages.OVERVIEW) {
-		if (userAccount) {
-			return <Overview userAccount={userAccount} />;
-		}
+	const PageSkeletons = {
+		[pages.COMMERCE]: <ActivationKeys.Skeleton />,
+		[pages.DXP_CLOUD]: <ActivationKeys.Skeleton />,
+		[pages.ENTERPRISE_SEARCH]: <ActivationKeys.Skeleton />,
+		[pages.HOME]: <Home.Skeleton />,
+		[pages.OVERVIEW]: <div>Overview Skeleton</div>,
+		[pages.TEAM_MEMBERS]: <ActivationKeys.Skeleton />,
+	};
+	const PageComponent = {
+		[pages.COMMERCE]: (
+			<ActivationKeys.Commerce
+				accountKey={project?.accountKey}
+				sessionId={sessionId}
+			/>
+		),
+		[pages.DXP_CLOUD]: <DXPCloud />,
+		[pages.ENTERPRISE_SEARCH]: (
+			<ActivationKeys.EnterpriseSearch
+				accountKey={project?.accountKey}
+				sessionId={sessionId}
+			/>
+		),
+		[pages.HOME]: <Home userAccount={userAccount} />,
+		[pages.OVERVIEW]: (
+			<Overview project={project} userAccount={userAccount} />
+		),
+		[pages.TEAM_MEMBERS]: <TeamMembers />,
+	};
 
-		return <ActivationKeys.Skeleton />;
+	if ((project || page === pages.HOME) && userAccount && sessionId) {
+		return PageComponent[page];
 	}
 
-	if (page === pages.ENTERPRISE_SEARCH) {
-		if (project) {
-			return (
-				<ActivationKeys.EnterpriseSearch
-					accountKey={project.accountKey}
-				/>
-			);
-		}
-
-		return <ActivationKeys.Skeleton />;
-	}
-
-	if (page === pages.COMMERCE) {
-		if (userAccount) {
-			return <ActivationKeys.Commerce accountKey={project.accountKey} />;
-		}
-
-		return <ActivationKeys.Skeleton />;
-	}
-
-	if (userAccount) {
-		return <Home userAccount={userAccount} />;
-	}
-
-	return <Home.Skeleton />;
+	return PageSkeletons[page];
 };
 
 export default Pages;

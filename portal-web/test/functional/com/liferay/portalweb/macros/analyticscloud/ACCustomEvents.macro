@@ -24,7 +24,7 @@ definition {
 
 		MouseOver(locator1 = "ACUtils#NAME_LIST");
 
-		Click(locator1 = "ACCustomEvents#BLOCK_HIDE_BUTTON");
+		Click(locator1 = "ACCustomEvents#BLOCK_UNBLOCK_EVENT_BUTTON");
 
 		ACUtils.clickAnyButton(button = "${key_actionButton}");
 	}
@@ -131,6 +131,13 @@ definition {
 		return "${customEventName}";
 	}
 
+	macro getSampleRawData {
+		var key_attributeName = "${attributeName}";
+		var sampleRawDataValue = selenium.getText("ACCustomEvents#SAMPLE_RAW_DATA_LIST");
+
+		return "${sampleRawDataValue}";
+	}
+
 	macro hideAllCustomEvents {
 		var key_actionButton = "Block";
 
@@ -155,7 +162,7 @@ definition {
 
 		MouseOver(locator1 = "ACUtils#NAME_LIST");
 
-		Click(locator1 = "ACCustomEvents#BLOCK_HIDE_BUTTON");
+		Click(locator1 = "ACDefinitions#HIDE_UNHIDE_EVENT_BUTTON");
 
 		ACUtils.clickAnyButton(button = "${key_actionButton}");
 	}
@@ -186,7 +193,7 @@ definition {
 
 		MouseOver(locator1 = "ACUtils#NAME_LIST");
 
-		Click(locator1 = "ACCustomEvents#BLOCK_HIDE_BUTTON");
+		Click(locator1 = "ACCustomEvents#BLOCK_UNBLOCK_EVENT_BUTTON");
 	}
 
 	macro viewDataAttribute {
@@ -195,6 +202,14 @@ definition {
 				itemName = "${attributeValue}",
 				locator1 = "ACSettings#ITEM_ON_LIST");
 		}
+	}
+
+	macro viewDataAttributeInOrder {
+		var index = "${index}";
+
+		AssertTextEquals(
+			locator1 = "ACCustomEvents#SAMPLE_RAW_DATA_IN_ORDER",
+			value1 = "${attributeValue}");
 	}
 
 	macro viewDataType {
