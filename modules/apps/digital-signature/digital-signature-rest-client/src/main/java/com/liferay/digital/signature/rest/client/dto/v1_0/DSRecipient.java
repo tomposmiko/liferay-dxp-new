@@ -34,6 +34,27 @@ public class DSRecipient implements Cloneable, Serializable {
 		return DSRecipientSerDes.toDTO(json);
 	}
 
+	public String getDsClientUserId() {
+		return dsClientUserId;
+	}
+
+	public void setDsClientUserId(String dsClientUserId) {
+		this.dsClientUserId = dsClientUserId;
+	}
+
+	public void setDsClientUserId(
+		UnsafeSupplier<String, Exception> dsClientUserIdUnsafeSupplier) {
+
+		try {
+			dsClientUserId = dsClientUserIdUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String dsClientUserId;
+
 	public String getEmailAddress() {
 		return emailAddress;
 	}
