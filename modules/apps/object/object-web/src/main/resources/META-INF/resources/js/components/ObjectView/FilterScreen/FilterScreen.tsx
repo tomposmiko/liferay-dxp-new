@@ -13,14 +13,17 @@
  */
 
 import {useModal} from '@clayui/modal';
+import {BuilderScreen} from '@liferay/object-js-components-web';
 import React, {useContext, useState} from 'react';
 
-import {BuilderScreen} from '../BuilderScreen/BuilderScreen';
-import {ModalAddFilterColumn} from '../ModalAddFilterColumn/ModalAddFilterColumn';
-import ViewContext from '../context';
+import {ModalAddFilter} from '../../ModalAddFilter';
+import ViewContext, {TYPES} from '../context';
 
 export function FilterScreen() {
-	const [{objectView}] = useContext(ViewContext);
+	const [
+		{objectFields, objectView, workflowStatusJSONArray},
+		dispatch,
+	] = useContext(ViewContext);
 
 	const {objectViewFilterColumns} = objectView;
 
@@ -35,6 +38,40 @@ export function FilterScreen() {
 			setVisibleModal(false);
 		},
 	});
+
+	const handleDeleteColumn = (objectFieldName: string) => {
+		dispatch({
+			payload: {objectFieldName},
+			type: TYPES.DELETE_OBJECT_VIEW_FILTER_COLUMN,
+		});
+	};
+
+	const saveFilterColumn = (
+		filterType?: string,
+		objectFieldName?: string,
+		valueList?: IItem[]
+	) => {
+		if (editingFilter) {
+			dispatch({
+				payload: {
+					filterType,
+					objectFieldName,
+					valueList,
+				},
+				type: TYPES.EDIT_OBJECT_VIEW_FILTER_COLUMN,
+			});
+		}
+		else {
+			dispatch({
+				payload: {
+					filterType,
+					objectFieldName,
+					valueList,
+				},
+				type: TYPES.ADD_OBJECT_VIEW_FILTER_COLUMN,
+			});
+		}
+	};
 
 	return (
 		<>
@@ -53,6 +90,7 @@ export function FilterScreen() {
 				filter
 				firstColumnHeader={Liferay.Language.get('filter-by')}
 				objectColumns={objectViewFilterColumns ?? []}
+				onDeleteColumn={handleDeleteColumn}
 				onEditing={setEditingFilter}
 				onEditingObjectFieldName={setEditingObjectFieldName}
 				onVisibleEditModal={setVisibleModal}
@@ -63,14 +101,22 @@ export function FilterScreen() {
 			/>
 
 			{visibleModal && (
-				<ModalAddFilterColumn
+				<ModalAddFilter
+					currentFilters={objectViewFilterColumns}
 					editingFilter={editingFilter}
 					editingObjectFieldName={editingObjectFieldName}
 					header={Liferay.Language.get('new-filter')}
+					objectFields={objectFields}
 					observer={observer}
 					onClose={onClose}
+					onSave={saveFilterColumn}
+					workflowStatusJSONArray={workflowStatusJSONArray}
 				/>
 			)}
 		</>
 	);
+}
+
+interface IItem extends LabelValueObject {
+	checked?: boolean;
 }

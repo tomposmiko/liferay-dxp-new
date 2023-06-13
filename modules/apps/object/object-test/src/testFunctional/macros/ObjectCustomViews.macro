@@ -3,7 +3,7 @@ definition {
 	macro addColumnsViaUI {
 		LexiconEntry.gotoAdd();
 
-		Click(locator1 = "ObjectCustomViews#VIEW_MODAL_ADD_COLUMNS");
+		SelectFrame(locator1 = "ObjectCustomViews#VIEW_MODAL_ADD_COLUMNS");
 
 		for (var columnsOptions : list "${addColumns}") {
 			Click.clickAtNotVisible(
@@ -11,7 +11,9 @@ definition {
 				locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
 		}
 
-		ObjectCustomViews.saveColumnsModal();
+		Button.clickSave();
+
+		SelectFrame(locator1 = "IFrame#IFRAME");
 	}
 
 	macro addDefaultSort {
@@ -67,16 +69,16 @@ definition {
 			locator1 = "ObjectCustomViews#VIEW_BUILDER_SEARCH_RESULT");
 	}
 
+	macro assertColumnNotPresentOnAddColumnModal {
+		AssertElementNotPresent(
+			key_columnName = "${columnOption}",
+			locator1 = "ObjectCustomViews#ADD_COLUMNS_COLUMN_LABEL");
+	}
+
 	macro assertColumnNotPresentOnDefaultSort {
 		AssertElementNotPresent(
 			key_columnName = "${columnName}",
 			locator1 = "ObjectCustomViews#DEFAULT_SORT_SEARCH_RESULT");
-	}
-
-	macro assertColumnNotVisibleOnAddColumnModal {
-		AssertNotVisible(
-			key_columnName = "${columnOption}",
-			locator1 = "ObjectCustomViews#ADD_COLUMNS_COLUMN_LABEL");
 	}
 
 	macro assertColumnPresent {
@@ -251,6 +253,8 @@ definition {
 	}
 
 	macro searchOnAddColumnModal {
+		SelectFrame(locator1 = "ObjectCustomViews#VIEW_MODAL_ADD_COLUMNS");
+
 		Click(locator1 = "ObjectCustomViews#ADD_COLUMNS_SEARCH_BAR");
 
 		Type(

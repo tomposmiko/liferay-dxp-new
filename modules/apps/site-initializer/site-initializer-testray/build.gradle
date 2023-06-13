@@ -20,7 +20,7 @@ task forceDeploy
 task zipExtraRemoteApp(type: Zip)
 
 String extraRemoteAppName = "com.liferay.site.initializer.testray.extra.remote.app"
-String extraRemoteAppVersion = "20220623.0249"
+String extraRemoteAppVersion = "20220630.0213"
 
 DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd.HHmm")
 
@@ -29,8 +29,7 @@ dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
 String dateString = dateFormat.format(new Date())
 
 File extraRemoteAppDir = new File(projectDir, "extra/remote-app/")
-File extraRemoteAppBuildDir = new File(projectDir, "extra/remote-app/build")
-File fragmentsSrcDir = new File(projectDir, "src/main/resources/site-initializer/fragments/")
+File fragmentsSrcDir = new File(projectDir, "src/main/resources/site-initializer/fragments/group")
 
 String webContextPath = ""
 
@@ -58,7 +57,7 @@ forceDeploy {
 
 node {
 	global = false
-	nodeVersion = "16.0.0"
+	nodeVersion = "16.15.1"
 	useNpm = false
 	yarnVersion = "1.22.5"
 }
@@ -75,9 +74,9 @@ processResources {
 		dependsOn buildExtraRemoteApp
 
 		into("site-initializer/documents/company/remote-app/" + webContextPath) {
-			File assetManifestFile = new File(extraRemoteAppBuildDir, "asset-manifest.json")
+			File viteConfigTSFile = new File(extraRemoteAppDir, "vite.config.ts")
 
-			if (assetManifestFile.exists()) {
+			if (!viteConfigTSFile.exists()) {
 				from(new File(projectDir, "extra/remote-app/build/static/css")) {
 					include "*.css"
 				}
@@ -104,7 +103,7 @@ processResources {
 			doLast {
 				copy {
 					from new File(fragmentsSrcDir, "build/liferay-fragments/src")
-					into new File(projectDir, "classes/site-initializer/fragments/src")
+					into new File(projectDir, "classes/site-initializer/fragments/group/src")
 				}
 			}
 		}
@@ -171,9 +170,9 @@ zipExtraRemoteApp {
 		destinationDir new File(buildDir, "dist")
 
 		into("remote-app/" + webContextPath) {
-			File assetManifestFile = new File(extraRemoteAppBuildDir, "asset-manifest.json")
+			File viteConfigTSFile = new File(extraRemoteAppDir, "vite.config.ts")
 
-			if (assetManifestFile.exists()) {
+			if (!viteConfigTSFile.exists()) {
 				from(new File(projectDir, "extra/remote-app/build/static/css")) {
 					include "*.css"
 				}
@@ -195,7 +194,7 @@ zipExtraRemoteApp {
 		File packageJSONFile = new File(fragmentsSrcDir, "package.json")
 
 		if (packageJSONFile.exists()) {
-			into("fragments/src") {
+			into("fragments/group/src") {
 				from(new File(fragmentsSrcDir, "build/liferay-fragments/src"))
 			}
 		}

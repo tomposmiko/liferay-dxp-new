@@ -1227,7 +1227,9 @@ public class LayoutsAdminDisplayContext {
 		return _tabs1;
 	}
 
-	public Map<String, Object> getThemeCSSReplacementSelectorProps() {
+	public Map<String, Object> getThemeCSSReplacementSelectorProps()
+		throws PortalException {
+
 		String selectThemeCSSClientExtensionEventName =
 			"selectThemeCSSClientExtension";
 
@@ -1250,6 +1252,8 @@ public class LayoutsAdminDisplayContext {
 					ClientExtensionEntryConstants.TYPE_THEME_CSS);
 
 		return HashMapBuilder.<String, Object>put(
+			"placeholder", _getPlaceholder()
+		).put(
 			"selectThemeCSSClientExtensionEventName",
 			selectThemeCSSClientExtensionEventName
 		).put(
@@ -2087,6 +2091,47 @@ public class LayoutsAdminDisplayContext {
 			httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES, "asc");
 
 		return _orderByType;
+	}
+
+	private String _getPlaceholder() throws PortalException {
+		Layout selLayout = getSelLayout();
+
+		if (selLayout != null) {
+			ClientExtensionEntryRel clientExtensionEntryRel =
+				ClientExtensionEntryRelLocalServiceUtil.
+					fetchClientExtensionEntryRel(
+						PortalUtil.getClassNameId(Layout.class),
+						selLayout.getMasterLayoutPlid(),
+						ClientExtensionEntryConstants.TYPE_THEME_CSS);
+
+			if (clientExtensionEntryRel != null) {
+				return LanguageUtil.get(
+					themeDisplay.getLocale(),
+					"theme-css-is-inherited-from-master");
+			}
+		}
+
+		LayoutSet selLayoutSet = getSelLayoutSet();
+
+		ClientExtensionEntryRel clientExtensionEntryRel =
+			ClientExtensionEntryRelLocalServiceUtil.
+				fetchClientExtensionEntryRel(
+					PortalUtil.getClassNameId(LayoutSet.class),
+					selLayoutSet.getLayoutSetId(),
+					ClientExtensionEntryConstants.TYPE_THEME_CSS);
+
+		if (clientExtensionEntryRel != null) {
+			Group group = selLayoutSet.getGroup();
+
+			return LanguageUtil.format(
+				themeDisplay.getLocale(), "theme-css-is-inherited-from-x",
+				group.getLayoutRootNodeName(
+					selLayoutSet.isPrivateLayout(), themeDisplay.getLocale()),
+				false);
+		}
+
+		return LanguageUtil.get(
+			themeDisplay.getLocale(), "no-theme-css-extension-was-loaded");
 	}
 
 	private String _getStrictRobots() {

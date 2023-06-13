@@ -27,9 +27,7 @@ public class CommercePaymentMethodUpgradeProcess
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		if (!hasColumn(CommerceOrderImpl.TABLE_NAME, "transactionId")) {
-			addColumn("CommerceOrder", "transactionId", "VARCHAR(75)");
-		}
+		addColumn("CommerceOrder", "transactionId", "VARCHAR(75)");
 
 		if (hasColumn(
 				CommerceOrderImpl.TABLE_NAME, "commercePaymentMethodId")) {

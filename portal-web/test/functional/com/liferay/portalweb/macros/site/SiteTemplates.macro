@@ -363,7 +363,7 @@ definition {
 			menuItem = "Manage",
 			rowEntry = "${siteTemplateName}");
 
-		Pause(locator1 = "1000");
+		WaitForElementPresent(locator1 = "ControlMenu#HEADING");
 
 		var currentURL = Navigator.getCurrentURL();
 

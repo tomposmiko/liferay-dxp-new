@@ -15,7 +15,7 @@
 	[/#if]
 
 	<div class="dropdown-menu">
-		[#if configuration.includeSearch == true]
+		[#if 10 <= input.options?size]
 			<div class="dropdown-section">
 				<div class="input-group input-group-sm">
 					<div class="input-group-item">
@@ -26,27 +26,35 @@
 						</span>
 					</div>
 				</div>
+
+				<p class="my-2 text-secondary">
+					${languageUtil.get(locale, "choose-an-option")}.
+				</p>
 			</div>
 		[/#if]
 
 		<ul aria-labelledby="${fragmentEntryLinkNamespace}-label" class="list-unstyled" id="${fragmentEntryLinkNamespace}-listbox" role="listbox" tabindex="0">
 
 		[#list input.options as option]
-			<li class="dropdown-item" data-option-value="${option.value}" id="${fragmentEntryLinkNamespace}-option-${option?index}" role="option">
+			[#if option?index == 10]
+				[#break]
+			[/#if]
+
+			<li class="dropdown-item" data-option-value="${option.value}" id="${fragmentEntryLinkNamespace}-option-${option.value}" role="option">
 				${option.label}
 			</li>
 		[/#list]
 
 		</ul>
 
-		[#if configuration.includeSearch == true]
+		[#if 10 <= input.options?size]
 			<p aria-hidden="true" class="d-none forms-select-from-list-loading-results mt-3 mx-4">
-				<span class="sr-only">Loading results</span>
+				<span class="sr-only">${languageUtil.get(locale, "loading")}.</span>
 				<span aria-hidden="true" class="loading-animation"></span>
 			</p>
 
 			<p aria-hidden="true" class="d-none forms-select-from-list-no-results mt-3 mx-4 text-secondary">
-				No results were found.
+				${languageUtil.get(locale, "no-results-were-found")}
 			</p>
 		[/#if]
 	</div>

@@ -62,6 +62,7 @@ export default function EditObjectField({
 	isApproved,
 	isDefaultStorageType,
 	isSystemObject,
+	objectDefinitionId,
 	objectField: initialValues,
 	objectFieldTypes,
 	objectName,
@@ -167,8 +168,10 @@ export default function EditObjectField({
 
 				<ObjectFieldFormBase
 					disabled={disabled}
+					editingField
 					errors={errors}
 					handleChange={handleChange}
+					objectDefinitionId={objectDefinitionId}
 					objectField={values}
 					objectFieldTypes={objectFieldTypes}
 					objectName={objectName}
@@ -241,7 +244,8 @@ function SearchableContainer({
 		objectField.indexed &&
 		(objectField.DBType === 'Clob' ||
 			objectField.DBType === 'String' ||
-			objectField.businessType === 'Attachment');
+			objectField.businessType === 'Attachment') &&
+		objectField.businessType !== 'Aggregation';
 
 	const selectedLanguage = useMemo(() => {
 		const selectedLabel =
@@ -502,6 +506,7 @@ interface IProps {
 	isApproved: boolean;
 	isDefaultStorageType: boolean;
 	isSystemObject: boolean;
+	objectDefinitionId: number;
 	objectField: ObjectField;
 	objectFieldTypes: ObjectFieldType[];
 	objectName: string;

@@ -38,7 +38,7 @@
 </tr>
 <tr>
 	<td>CONTENT_DISPLAY_ASSET_SUMMARY_TEXT</td>
-	<td>//div[contains(@class, 'text-lg-left')]/ul/li</td>
+	<td>//div[contains(@class, 'text-lg-left')]/ul/li | //ul//li//div[@class='asset-summary']</td>
 	<td></td>
 </tr>
 <tr>
@@ -140,6 +140,11 @@
 
 <!--FORM COMPONENTS-->
 
+<tr>
+	<td>INPUT_CAPTCHA_BODY</td>
+	<td>xpath=(//div[contains(@id,'fragment-')]//fieldset[contains(@class,'form-input-captcha')])[${index}]</td>
+	<td></td>
+</tr>
 <tr>
 	<td>INPUT_FIELD</td>
 	<td>xpath=(//div[contains(@id,'fragment-')]//div[contains(@class,'form')]//input[contains(@id,'${type}')])[${index}]</td>

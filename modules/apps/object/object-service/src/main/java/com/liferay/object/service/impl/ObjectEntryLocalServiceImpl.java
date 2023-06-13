@@ -719,8 +719,12 @@ public class ObjectEntryLocalServiceImpl
 							return null;
 						}
 
+						ObjectDefinition objectDefinition =
+							_objectDefinitionPersistence.fetchByPrimaryKey(
+								objectDefinitionId);
+
 						return _inlineSQLHelper.getPermissionWherePredicate(
-							dynamicObjectDefinitionTable.getName(),
+							objectDefinition.getClassName(),
 							dynamicObjectDefinitionTable.getPrimaryKeyColumn());
 					}
 				)
@@ -786,8 +790,12 @@ public class ObjectEntryLocalServiceImpl
 						return null;
 					}
 
+					ObjectDefinition objectDefinition =
+						_objectDefinitionPersistence.fetchByPrimaryKey(
+							objectDefinitionId);
+
 					return _inlineSQLHelper.getPermissionWherePredicate(
-						dynamicObjectDefinitionTable.getName(),
+						objectDefinition.getClassName(),
 						dynamicObjectDefinitionTable.getPrimaryKeyColumn());
 				}
 			)
@@ -1175,9 +1183,7 @@ public class ObjectEntryLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		if (!objectDefinition.isAccountEntryRestricted() ||
-			(accountEntryIds == null)) {
-
+		if (!objectDefinition.isAccountEntryRestricted()) {
 			return null;
 		}
 
@@ -2376,7 +2382,8 @@ public class ObjectEntryLocalServiceImpl
 				if (!StringUtil.equals(
 						String.valueOf(value), entryValueString)) {
 
-					throw new ObjectEntryValuesException.ExceedsIntegerSize();
+					throw new ObjectEntryValuesException.ExceedsIntegerSize(
+						9, objectField.getName());
 				}
 			}
 		}
@@ -2394,13 +2401,16 @@ public class ObjectEntryLocalServiceImpl
 				if (!StringUtil.equals(
 						String.valueOf(value), entryValue.toString())) {
 
-					throw new ObjectEntryValuesException.ExceedsLongSize();
+					throw new ObjectEntryValuesException.ExceedsLongSize(
+						16, objectField.getName());
 				}
-				else if (value > 9007199254740991L) {
-					throw new ObjectEntryValuesException.ExceedsLongMaxSize();
+				else if (value > _MAX_SAFE_LONG) {
+					throw new ObjectEntryValuesException.ExceedsLongMaxSize(
+						_MAX_SAFE_LONG, objectField.getName());
 				}
-				else if (value < -9007199254740991L) {
-					throw new ObjectEntryValuesException.ExceedsLongMinSize();
+				else if (value < _MIN_SAFE_LONG) {
+					throw new ObjectEntryValuesException.ExceedsLongMinSize(
+						_MIN_SAFE_LONG, objectField.getName());
 				}
 			}
 		}
@@ -2433,6 +2443,10 @@ public class ObjectEntryLocalServiceImpl
 			}
 		}
 	}
+
+	private static final long _MAX_SAFE_LONG = 9007199254740991L;
+
+	private static final long _MIN_SAFE_LONG = -9007199254740991L;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectEntryLocalServiceImpl.class);

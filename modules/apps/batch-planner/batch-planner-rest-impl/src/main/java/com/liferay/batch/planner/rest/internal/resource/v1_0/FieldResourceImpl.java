@@ -15,8 +15,9 @@
 package com.liferay.batch.planner.rest.internal.resource.v1_0;
 
 import com.liferay.batch.planner.rest.dto.v1_0.Field;
-import com.liferay.batch.planner.rest.internal.provider.FieldProvider;
+import com.liferay.batch.planner.rest.internal.vulcan.batch.engine.FieldProvider;
 import com.liferay.batch.planner.rest.resource.v1_0.FieldResource;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 
@@ -41,32 +42,51 @@ public class FieldResourceImpl extends BaseFieldResourceImpl {
 			String internalClassName, Boolean export)
 		throws Exception {
 
-		List<com.liferay.portal.vulcan.batch.engine.Field> fields =
-			_fieldProvider.getFields(internalClassName);
+		List<com.liferay.portal.vulcan.batch.engine.Field> vulcanFields =
+			_getVulcanFields(internalClassName);
 
 		if (GetterUtil.getBoolean(export)) {
-			fields = _fieldProvider.filter(
-				fields,
+			vulcanFields = _fieldProvider.filter(
+				vulcanFields,
 				com.liferay.portal.vulcan.batch.engine.Field.AccessType.WRITE);
 		}
 		else {
-			fields = _fieldProvider.filter(
-				fields,
+			vulcanFields = _fieldProvider.filter(
+				vulcanFields,
 				com.liferay.portal.vulcan.batch.engine.Field.AccessType.READ);
 		}
 
-		fields.sort(Comparator.comparing(field -> field.getName()));
+		vulcanFields.sort(Comparator.comparing(field -> field.getName()));
 
-		return Page.of(transform(fields, this::_toField));
+		return Page.of(transform(vulcanFields, this::_toField));
 	}
 
-	private Field _toField(com.liferay.portal.vulcan.batch.engine.Field field) {
+	private List<com.liferay.portal.vulcan.batch.engine.Field> _getVulcanFields(
+			String internalClassName)
+		throws Exception {
+
+		int idx = internalClassName.indexOf(StringPool.POUND);
+
+		if (idx < 0) {
+			return _fieldProvider.getFields(internalClassName);
+		}
+
+		String objectDefinitionName = internalClassName.substring(idx + 1);
+
+		return _fieldProvider.getFields(
+			contextCompany.getCompanyId(), objectDefinitionName,
+			contextUriInfo);
+	}
+
+	private Field _toField(
+		com.liferay.portal.vulcan.batch.engine.Field vulcanField) {
+
 		return new Field() {
 			{
-				description = field.getDescription();
-				name = field.getName();
-				required = field.isRequired();
-				type = field.getType();
+				description = vulcanField.getDescription();
+				name = vulcanField.getName();
+				required = vulcanField.isRequired();
+				type = vulcanField.getType();
 			}
 		};
 	}

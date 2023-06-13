@@ -81,6 +81,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.editor.configuration.EditorConfiguration;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigurationFactoryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -580,6 +581,8 @@ public class ContentPageEditorDisplayContext {
 			).put(
 				"searchContainerPageMaxDelta",
 				PropsValues.SEARCH_CONTAINER_PAGE_MAX_DELTA
+			).put(
+				"segmentsConfigurationURL", _getSegmentsConfigurationURL()
 			).put(
 				"sidebarPanels", getSidebarPanels()
 			).put(
@@ -1135,8 +1138,6 @@ public class ContentPageEditorDisplayContext {
 
 		Map<String, List<Map<String, Object>>> fragmentCollectionMap =
 			new HashMap<>();
-		Map<String, FragmentRenderer> fragmentCollectionFragmentRenderers =
-			new HashMap<>();
 
 		List<FragmentRenderer> fragmentRenderers =
 			_fragmentRendererTracker.getFragmentRenderers();
@@ -1174,9 +1175,6 @@ public class ContentPageEditorDisplayContext {
 				fragmentCollectionMap.put(
 					fragmentRenderer.getCollectionKey(),
 					filteredDynamicFragments);
-
-				fragmentCollectionFragmentRenderers.put(
-					fragmentRenderer.getCollectionKey(), fragmentRenderer);
 			}
 			else {
 				fragmentCollections.add(dynamicFragment);
@@ -1949,6 +1947,18 @@ public class ContentPageEditorDisplayContext {
 		resourceURL.setResourceID(resourceID);
 
 		return resourceURL.toString();
+	}
+
+	private String _getSegmentsConfigurationURL() {
+		try {
+			return _segmentsConfigurationProvider.getConfigurationURL(
+				httpServletRequest);
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException);
+		}
+
+		return StringPool.BLANK;
 	}
 
 	private String _getSiteNavigationMenuItemSelectorURL() {

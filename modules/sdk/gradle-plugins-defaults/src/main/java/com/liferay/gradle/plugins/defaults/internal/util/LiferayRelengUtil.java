@@ -101,6 +101,24 @@ public class LiferayRelengUtil {
 		return getRelengDir(project.getProjectDir());
 	}
 
+	public static String getUnpublishedDependencyName(Project project) {
+		List<File> artifactPropertiesFiles = _getArtifactPropertiesFiles(
+			project, false);
+
+		for (File artifactPropertiesFile : artifactPropertiesFiles) {
+			File artifactProjectDir = _getArtifactProjectDir(
+				artifactPropertiesFile);
+
+			if (hasUnpublishedCommits(
+					project, artifactProjectDir, artifactPropertiesFile)) {
+
+				return artifactProjectDir.getName();
+			}
+		}
+
+		return null;
+	}
+
 	public static boolean hasStaleParentTheme(Project project) {
 		WriteDigestTask writeDigestTask = (WriteDigestTask)GradleUtil.getTask(
 			project,
@@ -289,32 +307,6 @@ public class LiferayRelengUtil {
 		}
 
 		_createNewFile(new File(gitResultsDir, sb.toString() + "false"));
-
-		return false;
-	}
-
-	public static boolean hasUnpublishedDependencies(Project project) {
-		List<File> artifactPropertiesFiles = _getArtifactPropertiesFiles(
-			project, false);
-
-		for (File artifactPropertiesFile : artifactPropertiesFiles) {
-			File artifactProjectDir = _getArtifactProjectDir(
-				artifactPropertiesFile);
-
-			if (hasUnpublishedCommits(
-					project, artifactProjectDir, artifactPropertiesFile)) {
-
-				Logger logger = project.getLogger();
-
-				if (logger.isQuietEnabled()) {
-					logger.quiet(
-						"The project dependency '{}' has new commits.",
-						artifactProjectDir.getName());
-				}
-
-				return true;
-			}
-		}
 
 		return false;
 	}

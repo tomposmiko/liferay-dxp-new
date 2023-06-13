@@ -245,6 +245,18 @@ public class PoshiRunnerExecutor {
 		}
 		catch (Exception exception) {
 			if (updateLoggerStatus) {
+				if (Validator.isNotNull(element.attributeValue("method"))) {
+					_poshiLogger.startCommand(element);
+
+					SummaryLogger.startSummary(element);
+
+					SummaryLogger.failSummary(
+						element, exception.getMessage(),
+						_poshiLogger.getDetailsLinkId());
+
+					_poshiLogger.failCommand(element);
+				}
+
 				_poshiLogger.updateStatus(element, "fail");
 			}
 
@@ -782,6 +794,16 @@ public class PoshiRunnerExecutor {
 				executeElement, args, returnValue);
 		}
 		catch (Throwable throwable) {
+			_poshiLogger.startCommand(executeElement);
+
+			SummaryLogger.startSummary(executeElement);
+
+			SummaryLogger.failSummary(
+				executeElement, throwable.getMessage(),
+				_poshiLogger.getDetailsLinkId());
+
+			_poshiLogger.failCommand(executeElement);
+
 			_poshiLogger.updateStatus(executeElement, "fail");
 
 			throw throwable;

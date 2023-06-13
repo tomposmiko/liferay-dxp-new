@@ -75,7 +75,6 @@ public class CommercePriceEntryUpgradeProcess
 				preparedStatement.setLong(1, cpDefinition.getCProductId());
 
 				preparedStatement.setString(2, cpInstance.getCPInstanceUuid());
-
 				preparedStatement.setLong(3, cpInstanceId);
 
 				preparedStatement.execute();
@@ -84,7 +83,7 @@ public class CommercePriceEntryUpgradeProcess
 
 		runSQL("drop index IX_2083879C on CommercePriceEntry");
 
-		runSQL("alter table CommercePriceEntry drop column CPInstanceId");
+		alterTableDropColumn("CommercePriceEntry", "CPInstanceId");
 	}
 
 	private void _addIndexes(String tableName) throws Exception {

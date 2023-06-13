@@ -157,6 +157,9 @@ public class ClientExtensionEntryRelPersistenceTest {
 
 		newClientExtensionEntryRel.setType(RandomTestUtil.randomString());
 
+		newClientExtensionEntryRel.setTypeSettings(
+			RandomTestUtil.randomString());
+
 		_clientExtensionEntryRels.add(
 			_persistence.update(newClientExtensionEntryRel));
 
@@ -209,6 +212,9 @@ public class ClientExtensionEntryRelPersistenceTest {
 		Assert.assertEquals(
 			existingClientExtensionEntryRel.getType(),
 			newClientExtensionEntryRel.getType());
+		Assert.assertEquals(
+			existingClientExtensionEntryRel.getTypeSettings(),
+			newClientExtensionEntryRel.getTypeSettings());
 	}
 
 	@Test
@@ -634,6 +640,8 @@ public class ClientExtensionEntryRelPersistenceTest {
 			RandomTestUtil.randomString());
 
 		clientExtensionEntryRel.setType(RandomTestUtil.randomString());
+
+		clientExtensionEntryRel.setTypeSettings(RandomTestUtil.randomString());
 
 		_clientExtensionEntryRels.add(
 			_persistence.update(clientExtensionEntryRel));

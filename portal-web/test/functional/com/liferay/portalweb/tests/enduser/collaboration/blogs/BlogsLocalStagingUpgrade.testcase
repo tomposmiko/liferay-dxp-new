@@ -27,22 +27,70 @@ definition {
 
 	}
 
-	@description = "This test covers LPS-154446."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154446. It ensures that an image in the Blogs content field can be published and rendered correctly after an upgrade from 7.2.10.4."
 	@priority = "5"
 	test CanPublishImageFromContentFieldAfterUpgradeFrom72104Archive {
+		property data.archive.type = "data-archive-local-staging-with-blogs-entries";
+		property portal.version = "7.2.10.4";
 
-		// TODO LPS-154446
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
 
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		BlogsNavigator.openToBlogEntry(
+			entryTitle = "Blogs Entry Title With Video",
+			layoutName = "Staging Test Page",
+			siteURLKey = "site-name");
+
+		BlogsEntry.viewEntryPG(
+			embedVideo = "true",
+			entryContent = "video",
+			entryTitle = "Blogs Entry Title With Video");
+
+		BlogsNavigator.openToBlogEntry(
+			entryTitle = "Blogs Entry Title With Inline Image",
+			layoutName = "Staging Test Page",
+			siteURLKey = "site-name");
+
+		BlogsEntry.viewInlineImage(
+			entryContent = "Blogs Entry Content 2",
+			uploadFileName = "Document_4");
 	}
 
-	@description = "This test covers LPS-154445."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154445. It ensures that an image in the Blogs content field can be published and rendered correctly after an upgrade from 7.3.10.1."
 	@priority = "5"
 	test CanPublishImageFromContentFieldAfterUpgradeFrom73101Archive {
+		property data.archive.type = "data-archive-local-staging-with-blogs-entries";
+		property portal.version = "7.3.10.1";
 
-		// TODO LPS-154445
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
 
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		BlogsNavigator.openToBlogEntry(
+			entryTitle = "Blogs Entry Title With Video",
+			layoutName = "Staging Test Page",
+			siteURLKey = "site-name");
+
+		BlogsEntry.viewEntryPG(
+			embedVideo = "true",
+			entryContent = "video",
+			entryTitle = "Blogs Entry Title With Video");
+
+		BlogsNavigator.openToBlogEntry(
+			entryTitle = "Blogs Entry Title With Inline Image",
+			layoutName = "Staging Test Page",
+			siteURLKey = "site-name");
+
+		BlogsEntry.viewInlineImage(uploadFileName = "Document_4");
 	}
 
 	@description = "This test covers LPS-154448."
@@ -60,24 +108,6 @@ definition {
 	test CanPublishImageInMGAfterUpgradeFrom71105Archive {
 
 		// TODO LPS-154459
-
-	}
-
-	@description = "This test covers LPS-154458."
-	@ignore = "Test Stub"
-	@priority = "4"
-	test CanPublishImageInMGAfterUpgradeFrom72104Archive {
-
-		// TODO LPS-154458
-
-	}
-
-	@description = "This test covers LPS-154457."
-	@ignore = "Test Stub"
-	@priority = "4"
-	test CanPublishImageInMGAfterUpgradeFrom73101Archive {
-
-		// TODO LPS-154457
 
 	}
 
@@ -99,22 +129,46 @@ definition {
 
 	}
 
-	@description = "This test covers LPS-154454."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154454. It ensures that a blogs small image can be published and rendered correctly after an upgrade from 7.2.10.4."
 	@priority = "4"
 	test CanPublishSmallImageAfterUpgradeFrom72104Archive {
+		property data.archive.type = "data-archive-local-staging-with-blogs-entries";
+		property portal.version = "7.2.10.4";
 
-		// TODO LPS-154454
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
 
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		Navigator.gotoSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		BlogsEntry.viewSmallImage(uploadFileName = "Document_1.jpg");
 	}
 
-	@description = "This test covers LPS-154453."
-	@ignore = "Test Stub"
+	@description = "This test covers LPS-154453. It ensures that a blogs small image can be published and rendered correctly after an upgrade from 7.3.10.1."
 	@priority = "4"
 	test CanPublishSmallImageAfterUpgradeFrom73101Archive {
+		property data.archive.type = "data-archive-local-staging-with-blogs-entries";
+		property portal.version = "7.3.10.1";
 
-		// TODO LPS-154453
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
 
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		Navigator.gotoSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		BlogsEntry.viewSmallImage(uploadFileName = "Document_1.jpg");
 	}
 
 	@description = "This test covers LPS-154456."

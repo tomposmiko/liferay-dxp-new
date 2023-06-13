@@ -27,9 +27,7 @@ public class CProductExternalReferenceCodeUpgradeProcess
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		if (!hasColumn(CProductImpl.TABLE_NAME, "externalReferenceCode")) {
-			addColumn("CProduct", "externalReferenceCode", "VARCHAR(75)");
-		}
+		addColumn("CProduct", "externalReferenceCode", "VARCHAR(75)");
 
 		if (hasColumn(CProductImpl.TABLE_NAME, "externalReferenceCode")) {
 			Class<CProductExternalReferenceCodeUpgradeProcess> clazz =

@@ -18,13 +18,13 @@ import ClayIcon from '@clayui/icon';
 import {ClayTooltipProvider} from '@clayui/tooltip';
 import {
 	Card,
-	CodeMirrorEditor,
+	CodeEditor,
 	CustomItem,
 	ExpressionBuilder,
 	FormCustomSelect,
-	FormError,
 	Input,
 	SelectWithOption,
+	invalidateRequired,
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
@@ -32,6 +32,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import PredefinedValuesTable from '../PredefinedValuesTable';
 
 import './ActionBuilder.scss';
+import {ActionError} from '../index';
 
 const HEADERS = new Headers({
 	'Accept': 'application/json',
@@ -50,7 +51,6 @@ let objectsOptionsList: Array<
 
 export default function ActionBuilder({
 	errors,
-	ffNotificationTemplates,
 	objectActionExecutors,
 	objectActionTriggers,
 	objectDefinitionsRelationshipsURL,
@@ -196,12 +196,50 @@ export default function ActionBuilder({
 		const allFields: ObjectField[] = [];
 
 		items.forEach((field) => {
-			if (field.businessType !== 'Relationship' && !field.system) {
+			if (
+				field.businessType !== 'Aggregation' &&
+				field.businessType !== 'Relationship' &&
+				!field.system
+			) {
 				allFields.push(field);
 			}
 		});
 
 		setCurrentObjectDefinitionFields(allFields);
+
+		const {
+			predefinedValues = [],
+		} = values.parameters as ObjectActionParameters;
+
+		const newPredefinedValues: PredefinedValue[] = [];
+
+		allFields.forEach((field) => {
+			let hasValue;
+			predefinedValues.forEach((item) => {
+				if (item.name === field.name) {
+					hasValue = item;
+
+					return;
+				}
+			});
+
+			if (hasValue) {
+				newPredefinedValues.push(hasValue);
+			}
+			else if (field.required) {
+				newPredefinedValues.push({
+					inputAsValue: false,
+					name: field.name,
+					value: '',
+				});
+			}
+		});
+		setValues({
+			parameters: {
+				...values.parameters,
+				predefinedValues: newPredefinedValues,
+			},
+		});
 	};
 
 	const handleSelectObject = async ({
@@ -233,7 +271,11 @@ export default function ActionBuilder({
 		const allFields: ObjectField[] = [];
 
 		items.forEach((field) => {
-			if (field.businessType !== 'Relationship' && !field.system) {
+			if (
+				field.businessType !== 'Aggregation' &&
+				field.businessType !== 'Relationship' &&
+				!field.system
+			) {
 				allFields.push(field);
 
 				if (field.required) {
@@ -268,6 +310,17 @@ export default function ActionBuilder({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	const hasEmptyValues = values.parameters?.predefinedValues?.some((item) =>
+		invalidateRequired(item.value)
+	);
+
+	const predefinedValuesAlertMessage =
+		!hasEmptyValues && Object.keys(errors).length > 1
+			? Liferay.Language.get('syntax-error')
+			: Liferay.Language.get(
+					'required-fields-must-have-predefined-values'
+			  );
+
 	return (
 		<>
 			{Liferay.FeatureFlags['LPS-152180'] && (
@@ -287,6 +340,17 @@ export default function ActionBuilder({
 					>
 						{Liferay.Language.get('click-here-for-documentation')}
 					</a>
+				</ClayAlert>
+			)}
+
+			{Object.keys(errors).length > 1 && (
+				<ClayAlert
+					className="lfr-objects__side-panel-content-container"
+					displayType="danger"
+					onClose={() => {}}
+					title={`${Liferay.Language.get('error')}:`}
+				>
+					{predefinedValuesAlertMessage}
 				</ClayAlert>
 			)}
 
@@ -351,6 +415,7 @@ export default function ActionBuilder({
 									'openExpressionBuilderModal',
 									{
 										onSave: handleSave,
+										required: true,
 										source: values.conditionExpression,
 										validateExpressionURL,
 									}
@@ -446,26 +511,24 @@ export default function ActionBuilder({
 							</>
 						)}
 
-						{ffNotificationTemplates &&
-							values.objectActionExecutorKey ===
-								'notification' && (
-								<FormCustomSelect
-									className="lfr-object__action-builder-notification-then"
-									error={errors.objectActionExecutorKey}
-									label={Liferay.Language.get('notification')}
-									onChange={({value}) => {
-										setValues({
-											parameters: {
-												...values.parameters,
-												notificationTemplateId: value,
-											},
-										});
-									}}
-									options={notificationTemplates}
-									required
-									value={notificationTemplateId}
-								/>
-							)}
+						{values.objectActionExecutorKey === 'notification' && (
+							<FormCustomSelect
+								className="lfr-object__action-builder-notification-then"
+								error={errors.objectActionExecutorKey}
+								label={Liferay.Language.get('notification')}
+								onChange={({value}) => {
+									setValues({
+										parameters: {
+											...values.parameters,
+											notificationTemplateId: value,
+										},
+									});
+								}}
+								options={notificationTemplates}
+								required
+								value={notificationTemplateId}
+							/>
+						)}
 					</div>
 				</Card>
 
@@ -475,8 +538,10 @@ export default function ActionBuilder({
 							currentObjectDefinitionFields={
 								currentObjectDefinitionFields
 							}
+							errors={errors as {[key: string]: string}}
 							objectFieldsMap={objectFieldsMap}
 							setValues={setValues}
+							validateExpressionURL={validateExpressionURL}
 							values={values}
 						/>
 					)}
@@ -516,7 +581,8 @@ export default function ActionBuilder({
 				)}
 
 				{values.objectActionExecutorKey === 'groovy' && (
-					<CodeMirrorEditor
+					<CodeEditor
+						error={errors.script}
 						fixed
 						mode="groovy"
 						onChange={(script) =>
@@ -536,8 +602,7 @@ export default function ActionBuilder({
 }
 
 interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	ffNotificationTemplates: boolean;
+	errors: ActionError;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 	objectDefinitionsRelationshipsURL: string;

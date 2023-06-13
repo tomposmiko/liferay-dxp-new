@@ -14,6 +14,7 @@
 
 package com.liferay.headless.delivery.client.serdes.v1_0;
 
+import com.liferay.headless.delivery.client.dto.v1_0.CustomCSSViewport;
 import com.liferay.headless.delivery.client.dto.v1_0.FragmentViewport;
 import com.liferay.headless.delivery.client.dto.v1_0.PageRowDefinition;
 import com.liferay.headless.delivery.client.dto.v1_0.RowViewport;
@@ -75,6 +76,46 @@ public class PageRowDefinitionSerDes {
 				sb.append("\"");
 
 				if ((i + 1) < pageRowDefinition.getCssClasses().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		if (pageRowDefinition.getCustomCSS() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"customCSS\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(pageRowDefinition.getCustomCSS()));
+
+			sb.append("\"");
+		}
+
+		if (pageRowDefinition.getCustomCSSViewports() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"customCSSViewports\": ");
+
+			sb.append("[");
+
+			for (int i = 0;
+				 i < pageRowDefinition.getCustomCSSViewports().length; i++) {
+
+				sb.append(
+					String.valueOf(
+						pageRowDefinition.getCustomCSSViewports()[i]));
+
+				if ((i + 1) <
+						pageRowDefinition.getCustomCSSViewports().length) {
+
 					sb.append(", ");
 				}
 			}
@@ -243,6 +284,23 @@ public class PageRowDefinitionSerDes {
 				String.valueOf(pageRowDefinition.getCssClasses()));
 		}
 
+		if (pageRowDefinition.getCustomCSS() == null) {
+			map.put("customCSS", null);
+		}
+		else {
+			map.put(
+				"customCSS", String.valueOf(pageRowDefinition.getCustomCSS()));
+		}
+
+		if (pageRowDefinition.getCustomCSSViewports() == null) {
+			map.put("customCSSViewports", null);
+		}
+		else {
+			map.put(
+				"customCSSViewports",
+				String.valueOf(pageRowDefinition.getCustomCSSViewports()));
+		}
+
 		if (pageRowDefinition.getFragmentStyle() == null) {
 			map.put("fragmentStyle", null);
 		}
@@ -354,6 +412,27 @@ public class PageRowDefinitionSerDes {
 				if (jsonParserFieldValue != null) {
 					pageRowDefinition.setCssClasses(
 						toStrings((Object[])jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "customCSS")) {
+				if (jsonParserFieldValue != null) {
+					pageRowDefinition.setCustomCSS(
+						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "customCSSViewports")) {
+
+				if (jsonParserFieldValue != null) {
+					pageRowDefinition.setCustomCSSViewports(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomCSSViewportSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new CustomCSSViewport[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "fragmentStyle")) {

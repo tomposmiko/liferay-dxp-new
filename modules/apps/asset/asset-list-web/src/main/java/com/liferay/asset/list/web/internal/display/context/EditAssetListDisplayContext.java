@@ -880,6 +880,18 @@ public class EditAssetListDisplayContext {
 		return _searchContainer;
 	}
 
+	public String getSegmentsConfigurationURL() {
+		try {
+			return _segmentsConfigurationProvider.getConfigurationURL(
+				_httpServletRequest);
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException);
+		}
+
+		return StringPool.BLANK;
+	}
+
 	public long getSegmentsEntryId() {
 		if (_segmentsEntryId != null) {
 			return _segmentsEntryId;

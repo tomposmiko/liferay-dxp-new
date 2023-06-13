@@ -15,14 +15,13 @@ import {Align} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import ClayModal, {useModal} from '@clayui/modal';
 import React, {useEffect, useState} from 'react';
-import client from '../../../../../apolloClient';
 import i18n from '../../../../../common/I18n';
 import {Button, ButtonDropDown} from '../../../../../common/components';
-import SetupDXPCloud from '../../../../../common/containers/setup-forms/SetupDXPCloudForm';
+import SetupDXPCloudForm from '../../../../../common/containers/setup-forms/SetupDXPCloudForm';
 import {useAppPropertiesContext} from '../../../../../common/contexts/AppPropertiesContext';
 import {
 	getAccountSubscriptionGroups,
-	getAccountSubscriptionsTerms,
+	getCommerceOrderItems,
 } from '../../../../../common/services/liferay/graphql/queries';
 import getActivationStatusDateRange from '../../../../../common/utils/getActivationStatusDateRange';
 import {ALERT_UPDATE_DXP_CLOUD_STATUS} from '../../../containers/ActivationKeysTable/utils/constants';
@@ -57,6 +56,7 @@ const SetupDXPCloudModal = ({
 	subscriptionGroupId,
 }) => {
 	const [formAlreadySubmitted, setFormAlreadySubmitted] = useState(false);
+	const {client} = useAppPropertiesContext();
 
 	return (
 		<ClayModal center observer={observer}>
@@ -66,7 +66,8 @@ const SetupDXPCloudModal = ({
 					submittedModalTexts={submittedModalTexts}
 				/>
 			) : (
-				<SetupDXPCloud
+				<SetupDXPCloudForm
+					client={client}
 					handlePage={onClose}
 					leftButton={i18n.translate('cancel')}
 					project={project}
@@ -90,7 +91,7 @@ const ActivationStatusDXPCloud = ({
 		setSubscriptionGroupActivationStatus,
 	] = useState(subscriptionGroupDXPCloud?.activationStatus);
 	const [, dispatch] = useCustomerPortal();
-	const {liferayWebDAV} = useAppPropertiesContext();
+	const {client, liferayWebDAV} = useAppPropertiesContext();
 	const [hasFinishedUpdate, setHasFinishedUpdate] = useState(false);
 	const [activationStatusDate, setActivationStatusDate] = useState('');
 	const [visibleSetup, setVisibleSetup] = useState(false);
@@ -210,10 +211,10 @@ const ActivationStatusDXPCloud = ({
 		];
 
 	useEffect(() => {
-		const getSubscriptionTerms = async () => {
-			const filterAccountSubscriptionERC = `accountSubscriptionGroupERC eq '${project.accountKey}_dxp-cloud'`;
+		const fetchCommerceOrderItems = async () => {
+			const filterAccountSubscriptionERC = `customFields/accountSubscriptionGroupERC eq '${project.accountKey}_dxp-cloud'`;
 			const {data} = await client.query({
-				query: getAccountSubscriptionsTerms,
+				query: getCommerceOrderItems,
 				variables: {
 					filter: filterAccountSubscriptionERC,
 				},
@@ -221,14 +222,14 @@ const ActivationStatusDXPCloud = ({
 
 			if (data) {
 				const activationStatusDateRange = getActivationStatusDateRange(
-					data.c?.accountSubscriptionTerms?.items
+					data?.orderItems?.items
 				);
 				setActivationStatusDate(activationStatusDateRange);
 			}
 		};
 
-		getSubscriptionTerms();
-	}, [project]);
+		fetchCommerceOrderItems();
+	}, [client, project]);
 
 	return (
 		<>

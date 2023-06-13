@@ -187,6 +187,25 @@
 			"title": "The ContextReference Schema",
 			"type": "object"
 		},
+		"CustomCSSViewport": {
+			"additionalProperties": false,
+			"properties": {
+				"customCSS": {
+					"title": "The customCSS Schema",
+					"type": "string"
+				},
+				"id": {
+					"title": "The id Schema",
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"customCSS"
+			],
+			"title": "The CustomCSSViewport Schema",
+			"type": "object"
+		},
 		"Fragment": {
 			"additionalProperties": false,
 			"properties": {
@@ -1283,6 +1302,17 @@
 					"title": "The CSS Classes Schema",
 					"type": "array"
 				},
+				"customCSS": {
+					"title": "The Custom CSS Schema",
+					"type": "string"
+				},
+				"customCSSViewports": {
+					"items": {
+						"$ref": "#/definitions/CustomCSSViewport"
+					},
+					"title": "The customCSSViewports Schema",
+					"type": "array"
+				},
 				"formConfig": {
 					"properties": {
 						"formReference": {
@@ -1325,6 +1355,17 @@
 						"type": "string"
 					},
 					"title": "The CSS Classes Schema",
+					"type": "array"
+				},
+				"customCSS": {
+					"title": "The Custom CSS Schema",
+					"type": "string"
+				},
+				"customCSSViewports": {
+					"items": {
+						"$ref": "#/definitions/CustomCSSViewport"
+					},
+					"title": "The customCSSViewports Schema",
 					"type": "array"
 				},
 				"fragment": {
@@ -1392,6 +1433,17 @@
 						"type": "string"
 					},
 					"title": "The CSS Classes Schema",
+					"type": "array"
+				},
+				"customCSS": {
+					"title": "The Custom CSS Schema",
+					"type": "string"
+				},
+				"customCSSViewports": {
+					"items": {
+						"$ref": "#/definitions/CustomCSSViewport"
+					},
+					"title": "The customCSSViewports Schema",
 					"type": "array"
 				},
 				"fragmentStyle": {
@@ -1549,6 +1601,17 @@
 						"type": "string"
 					},
 					"title": "The CSS Classes Schema",
+					"type": "array"
+				},
+				"customCSS": {
+					"title": "The Custom CSS Schema",
+					"type": "string"
+				},
+				"customCSSViewports": {
+					"items": {
+						"$ref": "#/definitions/CustomCSSViewport"
+					},
+					"title": "The customCSSViewports Schema",
 					"type": "array"
 				},
 				"fragmentLink": {

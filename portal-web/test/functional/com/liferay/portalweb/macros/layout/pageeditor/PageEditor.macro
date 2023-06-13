@@ -797,19 +797,33 @@ definition {
 			var position = "1";
 		}
 
-		PageEditor.gotoTab(tabName = "Fragments and Widgets");
+		if (isSet(targetFragmentName)) {
+			PageEditor.addFragment(
+				collectionName = "${collectionName}",
+				fragmentName = "${fragmentName}",
+				targetFragmentName = "Form Container");
 
-		PageEditor.expandFragmentCollection(collectionName = "${collectionName}");
+			PageEditor.moveFragmentToFormContainerViaPageStructure(
+				dropTarget = "${dropTarget}",
+				fragmentName = "${fragmentName}",
+				index = "${index}",
+				targetFragmentName = "${targetFragmentName}");
+		}
+		else {
+			PageEditor.gotoTab(tabName = "Fragments and Widgets");
 
-		DragAndDrop.javaScriptDragAndDropToObject(
-			key_collectionName = "${collectionName}",
-			key_fragmentName = "${fragmentName}",
-			key_position = "${position}",
-			key_targetFragmentName = "Form Container",
-			locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT",
-			locator2 = "PageEditor#FORM_CONTAINER_CONTAINER");
+			PageEditor.expandFragmentCollection(collectionName = "${collectionName}");
 
-		PageEditor.waitForAutoSave();
+			DragAndDrop.javaScriptDragAndDropToObject(
+				key_collectionName = "${collectionName}",
+				key_fragmentName = "${fragmentName}",
+				key_position = "${position}",
+				key_targetFragmentName = "Form Container",
+				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT",
+				locator2 = "PageEditor#FORM_CONTAINER_CONTAINER");
+
+			PageEditor.waitForAutoSave();
+		}
 	}
 
 	macro addVideoFragmentURL {
@@ -901,7 +915,7 @@ definition {
 				echo("The auto image resolution is right.");
 			}
 			else {
-				fail("The auto image resolution is wrong.");
+				TestUtils.fail(message = "The auto image resolution is wrong.");
 			}
 		}
 		else {
@@ -911,7 +925,7 @@ definition {
 				echo("The auto image resolution is right.");
 			}
 			else {
-				fail("The auto image resolution is wrong.");
+				TestUtils.fail(message = "The auto image resolution is wrong.");
 			}
 		}
 	}
@@ -1131,6 +1145,34 @@ definition {
 				key_fieldLabel = "Shadow",
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "${boxShadow}");
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if (isSet(cssClasses)) {
+			if (!(isSet(key))) {
+				Type.sendKeys(
+					key_text = "CSS Classes",
+					locator1 = "TextInput#ANY",
+					value1 = "${cssClasses}");
+
+				Click(
+					key_sidebarButton = "Browser",
+					locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+			}
+			else {
+				for (var cssClass : list "${cssClasses}") {
+					Type.sendKeys(
+						key_text = "CSS Classes",
+						locator1 = "TextInput#ANY",
+						value1 = "${cssClass}");
+
+					KeyPress(
+						key_text = "CSS Classes",
+						locator1 = "TextInput#ANY",
+						value1 = "${key}");
+				}
+			}
 
 			PageEditor.waitForAutoSave();
 		}
@@ -3604,6 +3646,46 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 			locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 	}
 
+	macro moveFragmentToFormContainerViaPageStructure {
+		Variables.assertDefined(parameterList = "${fragmentName}");
+
+		PageEditor.gotoTab(tabName = "Browser");
+
+		Navigator.gotoNavTab(navTab = "Page Elements");
+
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		Click(
+			key_nodeName = "Form Container",
+			locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE_COLLAPSED");
+
+		if ("${dropTarget}" == "Up") {
+			DragAndDrop.javaScriptDragAndDropToUp(
+				index = "${index}",
+				key_elementName = "${fragmentName}",
+				key_targetElementName = "${targetFragmentName}",
+				locator1 = "Treeview#NODE_DRAGGABLE_ELEMENT",
+				locator2 = "Treeview#NODE_DRAGGABLE_TARGET_ELEMENT");
+		}
+		else {
+			DragAndDrop.javaScriptDragAndDropToBottom(
+				index = "${index}",
+				key_elementName = "${fragmentName}",
+				key_targetElementName = "${targetFragmentName}",
+				locator1 = "Treeview#NODE_DRAGGABLE_ELEMENT",
+				locator2 = "Treeview#NODE_DRAGGABLE_TARGET_ELEMENT");
+		}
+
+		PageEditor.waitForAutoSave();
+
+		AssertElementPresent(
+			key_elementHeader = "//div[@aria-label='${fragmentName}']",
+			key_position = "1",
+			locator1 = "PageEditor#FORM_CONTAINER_CONTAINER_NESTED_ELEMENT");
+	}
+
 	macro openExperienceMenu {
 		if (IsElementNotPresent(locator1 = "PageEditor#EXPERIENCE_MENU")) {
 			Click(locator1 = "PageEditor#EXPERIENCE_MENU_BUTTON");
@@ -4091,10 +4173,11 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 		}
 
 		if (isSet(backgroundColor)) {
-			PageEditor.viewFragmentStyle(
-				backgroundColor = "${backgroundColor}",
+			PageEditor.viewFragmentCommonStyle(
 				fragmentName = "Container",
-				position = "${position}");
+				index = "${position}",
+				styleName = "backgroundColor",
+				styleValue = "${backgroundColor}");
 		}
 
 		if (isSet(backgroundImage)) {
@@ -4105,31 +4188,35 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 		}
 
 		if (isSet(borderColor)) {
-			PageEditor.viewFragmentStyle(
-				borderColor = "${borderColor}",
+			PageEditor.viewFragmentCommonStyle(
 				fragmentName = "Container",
-				position = "${position}");
+				index = "${position}",
+				styleName = "borderColor",
+				styleValue = "${borderColor}");
 		}
 
 		if (isSet(borderRadius)) {
-			PageEditor.viewFragmentStyle(
-				borderRadius = "${borderRadius}",
+			PageEditor.viewFragmentCommonStyle(
 				fragmentName = "Container",
-				position = "${position}");
+				index = "${position}",
+				styleName = "borderRadius",
+				styleValue = "${borderRadius}");
 		}
 
 		if (isSet(borderWidth)) {
-			PageEditor.viewFragmentStyle(
-				borderWidth = "${borderWidth}",
+			PageEditor.viewFragmentCommonStyle(
 				fragmentName = "Container",
-				position = "${position}");
+				index = "${position}",
+				styleName = "borderWidth",
+				styleValue = "${borderWidth}");
 		}
 
 		if (isSet(boxShadow)) {
-			PageEditor.viewFragmentStyle(
-				boxShadow = "${boxShadow}",
+			PageEditor.viewFragmentTopperStyle(
 				fragmentName = "Container",
-				position = "${position}");
+				index = "${position}",
+				styleName = "boxShadow",
+				styleValue = "${boxShadow}");
 		}
 
 		if (isSet(containerWidth)) {
@@ -4168,66 +4255,75 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 		}
 
 		if (isSet(marginBottom)) {
-			PageEditor.viewFragmentStyle(
+			PageEditor.viewFragmentTopperStyle(
 				fragmentName = "Container",
-				marginBottom = "${marginBottom}",
-				position = "${position}");
+				index = "${position}",
+				styleName = "marginBottom",
+				styleValue = "spacer-${marginBottom}");
 		}
 
 		if (isSet(marginLeft)) {
-			PageEditor.viewFragmentStyle(
+			PageEditor.viewFragmentTopperStyle(
 				fragmentName = "Container",
-				marginLeft = "${marginLeft}",
-				position = "${position}");
+				index = "${position}",
+				styleName = "marginLeft",
+				styleValue = "spacer-${marginLeft}");
 		}
 
 		if (isSet(marginRight)) {
-			PageEditor.viewFragmentStyle(
+			PageEditor.viewFragmentTopperStyle(
 				fragmentName = "Container",
-				marginRight = "${marginRight}",
-				position = "${position}");
+				index = "${position}",
+				styleName = "marginRight",
+				styleValue = "spacer-${marginRight}");
 		}
 
 		if (isSet(marginTop)) {
-			PageEditor.viewFragmentStyle(
+			PageEditor.viewFragmentTopperStyle(
 				fragmentName = "Container",
-				marginTop = "${marginTop}",
-				position = "${position}");
+				index = "${position}",
+				styleName = "marginTop",
+				styleValue = "spacer-${marginTop}");
 		}
 
 		if (isSet(opacity)) {
-			PageEditor.viewFragmentStyle(
+			PageEditor.viewFragmentCommonStyle(
 				fragmentName = "Container",
-				opacity = "${opacity}",
-				position = "${position}");
+				index = "${position}",
+				styleName = "opacity",
+				styleValue = "${opacity}");
 		}
 
 		if (isSet(paddingBottom)) {
-			PageEditor.viewFragmentStyle(
+			PageEditor.viewFragmentCommonStyle(
 				fragmentName = "Container",
-				paddingBottom = "${paddingBottom}",
-				position = "${position}");
+				index = "${position}",
+				styleName = "paddingBottom",
+				styleValue = "spacer-${paddingBottom}");
 		}
 
 		if (isSet(paddingLeft)) {
-			PageEditor.viewFragmentStyle(
+			PageEditor.viewFragmentCommonStyle(
 				fragmentName = "Container",
-				paddingLeft = "${paddingLeft}",
-				position = "${position}");
+				index = "${position}",
+				styleName = "paddingLeft",
+				styleValue = "spacer-${paddingLeft}");
 		}
 
 		if (isSet(paddingRight)) {
-			PageEditor.viewFragmentStyle(
+			PageEditor.viewFragmentCommonStyle(
 				fragmentName = "Container",
-				paddingRight = "${paddingRight}",
-				position = "${position}");
+				index = "${position}",
+				styleName = "paddingRight",
+				styleValue = "spacer-${paddingRight}");
 		}
 
 		if (isSet(paddingTop)) {
-			PageEditor.viewFragmentStyle(
+			PageEditor.viewFragmentCommonStyle(
 				fragmentName = "Container",
-				paddingTop = "${paddingTop}",
-				position = "${position}");
+				index = "${position}",
+				styleName = "paddingTop",
+				styleValue = "spacer-${paddingTop}");
 		}
 	}
 

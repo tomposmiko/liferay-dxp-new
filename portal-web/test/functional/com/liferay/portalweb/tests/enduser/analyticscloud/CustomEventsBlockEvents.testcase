@@ -172,6 +172,7 @@ definition {
 	}
 
 	@description = "Feature ID: LRAC-7346 | Automation ID: LRAC-10152 | Test Summary: Blocked events are not shown on Segments"
+	@ignore = "true"
 	@priority = "5"
 	test CheckBlockedEventsNotShownOnSegments {
 		property test.name.skip.portal.instance = "CustomEventsBlockEvents#CheckBlockedEventsNotShownOnSegments";

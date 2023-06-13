@@ -14,11 +14,13 @@
 
 package com.liferay.info.internal.request.helper;
 
+import com.liferay.info.exception.InfoFormFileUploadException;
 import com.liferay.info.exception.NoSuchFormVariationException;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.field.type.BooleanInfoFieldType;
 import com.liferay.info.field.type.DateInfoFieldType;
+import com.liferay.info.field.type.ImageInfoFieldType;
 import com.liferay.info.field.type.NumberInfoFieldType;
 import com.liferay.info.field.type.SelectInfoFieldType;
 import com.liferay.info.field.type.TextInfoFieldType;
@@ -26,16 +28,25 @@ import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.info.localized.InfoLocalizedValue;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.upload.FileItem;
+import com.liferay.portal.kernel.upload.UploadServletRequest;
 import com.liferay.portal.kernel.util.DateUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 import java.math.BigDecimal;
 
@@ -62,31 +73,54 @@ public class InfoRequestFieldValuesProviderHelper {
 	}
 
 	public List<InfoFieldValue<Object>> getInfoFieldValues(
-		HttpServletRequest httpServletRequest) {
+			HttpServletRequest httpServletRequest)
+		throws InfoFormFileUploadException {
 
 		List<InfoFieldValue<Object>> infoFieldValues = new ArrayList<>();
 
+		UploadServletRequest uploadServletRequest =
+			PortalUtil.getUploadServletRequest(httpServletRequest);
+
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
+			(ThemeDisplay)uploadServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
 		String className = PortalUtil.getClassName(
-			ParamUtil.getLong(httpServletRequest, "classNameId"));
+			ParamUtil.getLong(uploadServletRequest, "classNameId"));
 		String classTypeId = ParamUtil.getString(
-			httpServletRequest, "classTypeId");
+			uploadServletRequest, "classTypeId");
+
+		Map<String, FileItem[]> multipartParameterMap =
+			uploadServletRequest.getMultipartParameterMap();
+
+		Map<String, List<String>> regularParameterMap =
+			uploadServletRequest.getRegularParameterMap();
 
 		for (InfoField<?> infoField :
 				_getInfoFields(
 					className, classTypeId, themeDisplay.getScopeGroupId())) {
 
-			Map<String, String[]> parameterMap =
-				httpServletRequest.getParameterMap();
+			FileItem[] multipartParameters = multipartParameterMap.get(
+				infoField.getName());
 
-			if (ArrayUtil.isEmpty(parameterMap.get(infoField.getName()))) {
+			if ((multipartParameters != null) &&
+				(infoField.getInfoFieldType() instanceof ImageInfoFieldType)) {
+
+				for (FileItem fileItem : multipartParameters) {
+					infoFieldValues.add(
+						_getImageInfoFieldValue(
+							fileItem, infoField, themeDisplay));
+				}
+			}
+
+			List<String> regularParameters = regularParameterMap.get(
+				infoField.getName());
+
+			if (regularParameters == null) {
 				continue;
 			}
 
-			for (String value : parameterMap.get(infoField.getName())) {
+			for (String value : regularParameters) {
 				infoFieldValues.add(
 					_getInfoFieldValue(
 						infoField, themeDisplay.getLocale(), value));
@@ -120,7 +154,41 @@ public class InfoRequestFieldValuesProviderHelper {
 		return null;
 	}
 
-	private <T> List<InfoField> _getInfoFields(
+	private InfoFieldValue<Object> _getImageInfoFieldValue(
+			FileItem fileItem, InfoField infoField, ThemeDisplay themeDisplay)
+		throws InfoFormFileUploadException {
+
+		try (InputStream inputStream = fileItem.getInputStream()) {
+			if (inputStream == null) {
+				throw new InfoFormFileUploadException(infoField.getUniqueId());
+			}
+
+			File file = FileUtil.createTempFile(inputStream);
+
+			if (file == null) {
+				throw new InfoFormFileUploadException(infoField.getUniqueId());
+			}
+
+			FileEntry fileEntry = TempFileEntryUtil.addTempFileEntry(
+				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
+				InfoRequestFieldValuesProviderHelper.class.getName(),
+				TempFileEntryUtil.getTempFileName(fileItem.getFileName()), file,
+				fileItem.getContentType());
+
+			return _getInfoFieldValue(
+				infoField, themeDisplay.getLocale(),
+				String.valueOf(fileEntry.getFileEntryId()));
+		}
+		catch (IOException | PortalException exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+
+			throw new InfoFormFileUploadException(infoField.getUniqueId());
+		}
+	}
+
+	private <T> List<InfoField<?>> _getInfoFields(
 		String className, String formVariationKey, long groupId) {
 
 		InfoItemFormProvider<T> infoItemFormProvider =
@@ -182,7 +250,8 @@ public class InfoRequestFieldValuesProviderHelper {
 			return _getNumberInfoFieldValue(infoField, locale, value);
 		}
 
-		if (infoField.getInfoFieldType() instanceof SelectInfoFieldType ||
+		if (infoField.getInfoFieldType() instanceof ImageInfoFieldType ||
+			infoField.getInfoFieldType() instanceof SelectInfoFieldType ||
 			infoField.getInfoFieldType() instanceof TextInfoFieldType) {
 
 			return _getInfoFieldValue(infoField, locale, (Object)value);

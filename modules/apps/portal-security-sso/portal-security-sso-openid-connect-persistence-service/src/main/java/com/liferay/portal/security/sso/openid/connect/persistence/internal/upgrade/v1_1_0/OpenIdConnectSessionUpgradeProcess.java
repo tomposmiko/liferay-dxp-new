@@ -23,15 +23,9 @@ public class OpenIdConnectSessionUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		if (!hasColumn("OpenIdConnectSession", "userId")) {
-			alterTableAddColumn("OpenIdConnectSession", "userId", "LONG");
-		}
-
-		if (!hasColumn("OpenIdConnectSession", "configurationPid")) {
-			alterTableAddColumn(
-				"OpenIdConnectSession", "configurationPid",
-				"VARCHAR(256) null");
-		}
+		alterTableAddColumn("OpenIdConnectSession", "userId", "LONG");
+		alterTableAddColumn(
+			"OpenIdConnectSession", "configurationPid", "VARCHAR(256) null");
 	}
 
 }

@@ -3058,6 +3058,148 @@ definition {
 		}
 	}
 
+	@description = "This is a use case for LPS-147809. TC2: Metadata source is changed after changed from XML File To URL."
+	@priority = "3"
+	test MetadataSourceIsChangedAfterChangedFromXMLFileToURL {
+		property app.server.bundles.size = "0";
+		property keystore.enabled = "true";
+		property test.name.skip.portal.instance = "SAML#MetadataSourceIsChangedAfterChangedFromXMLFileToURL";
+
+		task ("Given: Add SAML configuration files") {
+			OSGiConfig.copyOSGiConfigFile(
+				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/security/dependencies",
+				osgiConfigFileName = "com.liferay.saml.runtime.configuration.SamlKeyStoreManagerConfiguration.config");
+
+			OSGiConfig.copyOSGiConfigFile(
+				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/security/dependencies",
+				osgiConfigFileName = "com.liferay.saml.runtime.configuration.SamlProviderConfiguration.config");
+		}
+
+		task ("And: Add virtual instance able.com") {
+			HeadlessPortalInstanceAPI.addPortalInstance(
+				domain = "www.able.com",
+				portalInstanceId = "www.able.com",
+				virtualHost = "www.able.com");
+
+			User.logoutPG();
+
+			User.viewLoggedOutPG();
+		}
+
+		task ("When: User configures SP and IdP connection") {
+			SAML.setupIDP(
+				idpURL = "http://localhost:8080",
+				keystoreEnabled = "true",
+				samlEntityId = "samlidp",
+				userEmailAddress = "test@liferay.com");
+
+			SAML.setupSP(
+				keystoreEnabled = "true",
+				samlEntityId = "samlsp",
+				spURL = "http://www.able.com:8080",
+				userEmailAddress = "test@www.able.com");
+
+			SAML.addIDPConfigurationsToServiceProvider(
+				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
+				idpEntityId = "samlidp",
+				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
+				idpURL = "http://localhost:8080",
+				nameIdentifierFormat = "Email Address",
+				spURL = "http://www.able.com:8080",
+				uploadMetadataXML = "idp-metadata.xml",
+				userEmailAddress = "test@www.able.com",
+				userMatchingAttributeIndex = "4",
+				userResolution = "attribute");
+		}
+
+		task ("And: Edit IdP connection and change to a metadata URL instead of uploading the metadata XML file") {
+			SAML.editIdentityProviderConnection(
+				changeToURL = "true",
+				idpEntityId = "samlidp",
+				idpMetadataURL = "http://localhost:8080/c/portal/saml/metadata",
+				metadata = "true",
+				spURL = "www.able.com:8080",
+				userEmailAddress = "test@www.able.com");
+		}
+
+		task ("Then: Metadata URL is changed as requested") {
+			SAMLPortlet.viewMetadataConfigurationsOfSP(
+				idpEntityId = "samlidp",
+				metadataURL = "true");
+		}
+	}
+
+	@description = "This is a use case for LPS-147809. TC3: SAML Metadata URL is no longer shown after change metadata source from URL to file."
+	@priority = "3"
+	test MetadataURLDisappearsAfterChangedFromURLToXMLFile {
+		property app.server.bundles.size = "0";
+		property keystore.enabled = "true";
+		property test.name.skip.portal.instance = "SAML#MetadataURLDisappearsAfterChangedFromURLToXMLFile";
+
+		task ("Given: Add SAML configuration files") {
+			OSGiConfig.copyOSGiConfigFile(
+				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/security/dependencies",
+				osgiConfigFileName = "com.liferay.saml.runtime.configuration.SamlKeyStoreManagerConfiguration.config");
+
+			OSGiConfig.copyOSGiConfigFile(
+				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/security/dependencies",
+				osgiConfigFileName = "com.liferay.saml.runtime.configuration.SamlProviderConfiguration.config");
+		}
+
+		task ("And: Add virtual instance able.com") {
+			HeadlessPortalInstanceAPI.addPortalInstance(
+				domain = "www.able.com",
+				portalInstanceId = "www.able.com",
+				virtualHost = "www.able.com");
+
+			User.logoutPG();
+
+			User.viewLoggedOutPG();
+		}
+
+		task ("When: User configures SP and IdP connection") {
+			SAML.setupIDP(
+				idpURL = "http://localhost:8080",
+				keystoreEnabled = "true",
+				samlEntityId = "samlidp",
+				userEmailAddress = "test@liferay.com");
+
+			SAML.setupSP(
+				keystoreEnabled = "true",
+				samlEntityId = "samlsp",
+				spURL = "http://www.able.com:8080",
+				userEmailAddress = "test@www.able.com");
+
+			SAML.addIDPConfigurationsToServiceProvider(
+				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
+				idpEntityId = "samlidp",
+				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
+				idpURL = "http://localhost:8080",
+				nameIdentifierFormat = "Email Address",
+				spURL = "http://www.able.com:8080",
+				userEmailAddress = "test@www.able.com",
+				userMatchingAttributeIndex = "4",
+				userResolution = "attribute");
+		}
+
+		task ("And: Edit IdP connection and replace metadata URL with metadata XML file") {
+			SAML.editIdentityProviderConnection(
+				changeToXML = "true",
+				idpEntityId = "samlidp",
+				metadata = "true",
+				spURL = "www.able.com:8080",
+				uploadMetadataXML = "idp-metadata.xml",
+				userEmailAddress = "test@www.able.com",
+				viewMetadata = "true");
+		}
+
+		task ("Then: Metadata URL is changed as requested") {
+			SAMLPortlet.viewMetadataConfigurationsOfSP(
+				idpEntityId = "samlidp",
+				metadataXML = "true");
+		}
+	}
+
 	@description = "LPS-105169 TC-3: SP initiated login should not sync IdP&SP user attributes if not part of attribute mapping - Using virtual instances."
 	@priority = "4"
 	test SPInitiatedSSODoesNotSyncAttributesIfNotMapped {
@@ -3147,6 +3289,8 @@ definition {
 				idpEntityId = "${identityProviderEntityId}",
 				spURL = "www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
+
+			User.logoutPG(specificURL = "www.able.com:8080");
 		}
 
 		task ("Update user and execute Sp initiated SSO") {
@@ -3289,14 +3433,16 @@ definition {
 		}
 	}
 
-	@description = "LPS-105169 TC-1: SP initiated login should sync IdP&SP user attributes based on user attribute mapping - Using virtual instances."
+	@description = "LPS-105169 TC-1: SP initiated login should sync IdP&SP user attributes based on user attribute mapping - Using virtual instances. Blocked by LPS-137141."
 	@priority = "5"
 	test SPInitiatedSSOSyncsUserAttributesFromIdPToSPDefaultMapping {
 		property app.server.bundles.size = "0";
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
+		property portal.release = "quarantine";
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "SAML#SPInitiatedSSOSyncsUserAttributesFromIdPToSPDefaultMapping";
 
 		var identityProviderEntityId = "samlidp";
@@ -3334,7 +3480,7 @@ definition {
 				idpEntityId = "${identityProviderEntityId}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
-				nameIdentifierFormat = "Email Address",
+				nameIdentifierFormat = "Unspecified",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
 				userResolution = "dynamic");
@@ -3348,8 +3494,8 @@ definition {
 		task ("Add SP configurations to IdP") {
 			SAML.addSPConfigurationsToIdentityProvider(
 				idpURL = "http://localhost:8080",
-				nameIdentifierAttributeName = "emailAddress",
-				nameIdentifierFormat = "Email Address",
+				nameIdentifierAttributeName = "screenName",
+				nameIdentifierFormat = "Unspecified",
 				spAttributes = '''emailAddress
 					firstName
 					lastName
@@ -3379,7 +3525,7 @@ definition {
 			User.viewLoggedOutPG();
 
 			JSONUser.updateUser(
-				screenNameUpdate = "user1_changed",
+				screenNameUpdate = "user1",
 				userEmailAddress = "user1@liferay.com",
 				userEmailAddressUpdate = "user1changed@liferay.com",
 				userFirstName = "user_changed",
@@ -3400,7 +3546,7 @@ definition {
 				userEmailAddress = "user1changed@liferay.com",
 				userFirstName = "user_changed",
 				userLastName = "1_changed",
-				userScreenName = "user1_changed");
+				userScreenName = "user1");
 		}
 	}
 

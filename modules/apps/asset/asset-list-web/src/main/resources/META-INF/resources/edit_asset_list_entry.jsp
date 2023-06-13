@@ -40,7 +40,21 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 	>
 		<strong class="lead"><%= LanguageUtil.get(request, "personalized-variations-cannot-be-displayed-because-segmentation-is-disabled") %></strong>
 
-		<span><%= LanguageUtil.get(request, "to-enable,-go-to-instance-settings") %></span>
+		<%
+		String segmentsConfigurationURL = editAssetListDisplayContext.getSegmentsConfigurationURL();
+		%>
+
+		<c:choose>
+			<c:when test="<%= segmentsConfigurationURL != null %>">
+				<clay:link
+					href="<%= segmentsConfigurationURL %>"
+					label='<%= LanguageUtil.get(request, "to-enable,-go-to-instance-settings") %>'
+				/>
+			</c:when>
+			<c:otherwise>
+				<span><liferay-ui:message key="contact-your-system-administrator-to-enable-segmentation" /></span>
+			</c:otherwise>
+		</c:choose>
 	</clay:stripe>
 </c:if>
 

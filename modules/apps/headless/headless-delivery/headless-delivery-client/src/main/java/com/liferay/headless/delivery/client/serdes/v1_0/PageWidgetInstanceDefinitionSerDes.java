@@ -14,6 +14,7 @@
 
 package com.liferay.headless.delivery.client.serdes.v1_0;
 
+import com.liferay.headless.delivery.client.dto.v1_0.CustomCSSViewport;
 import com.liferay.headless.delivery.client.dto.v1_0.FragmentViewport;
 import com.liferay.headless.delivery.client.dto.v1_0.PageWidgetInstanceDefinition;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
@@ -82,6 +83,50 @@ public class PageWidgetInstanceDefinitionSerDes {
 
 				if ((i + 1) <
 						pageWidgetInstanceDefinition.getCssClasses().length) {
+
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		if (pageWidgetInstanceDefinition.getCustomCSS() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"customCSS\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(pageWidgetInstanceDefinition.getCustomCSS()));
+
+			sb.append("\"");
+		}
+
+		if (pageWidgetInstanceDefinition.getCustomCSSViewports() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"customCSSViewports\": ");
+
+			sb.append("[");
+
+			for (int i = 0;
+				 i <
+					 pageWidgetInstanceDefinition.
+						 getCustomCSSViewports().length;
+				 i++) {
+
+				sb.append(
+					String.valueOf(
+						pageWidgetInstanceDefinition.getCustomCSSViewports()
+							[i]));
+
+				if ((i + 1) < pageWidgetInstanceDefinition.
+						getCustomCSSViewports().length) {
 
 					sb.append(", ");
 				}
@@ -173,6 +218,25 @@ public class PageWidgetInstanceDefinitionSerDes {
 				String.valueOf(pageWidgetInstanceDefinition.getCssClasses()));
 		}
 
+		if (pageWidgetInstanceDefinition.getCustomCSS() == null) {
+			map.put("customCSS", null);
+		}
+		else {
+			map.put(
+				"customCSS",
+				String.valueOf(pageWidgetInstanceDefinition.getCustomCSS()));
+		}
+
+		if (pageWidgetInstanceDefinition.getCustomCSSViewports() == null) {
+			map.put("customCSSViewports", null);
+		}
+		else {
+			map.put(
+				"customCSSViewports",
+				String.valueOf(
+					pageWidgetInstanceDefinition.getCustomCSSViewports()));
+		}
+
 		if (pageWidgetInstanceDefinition.getFragmentStyle() == null) {
 			map.put("fragmentStyle", null);
 		}
@@ -228,6 +292,27 @@ public class PageWidgetInstanceDefinitionSerDes {
 				if (jsonParserFieldValue != null) {
 					pageWidgetInstanceDefinition.setCssClasses(
 						toStrings((Object[])jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "customCSS")) {
+				if (jsonParserFieldValue != null) {
+					pageWidgetInstanceDefinition.setCustomCSS(
+						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "customCSSViewports")) {
+
+				if (jsonParserFieldValue != null) {
+					pageWidgetInstanceDefinition.setCustomCSSViewports(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomCSSViewportSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new CustomCSSViewport[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "fragmentStyle")) {

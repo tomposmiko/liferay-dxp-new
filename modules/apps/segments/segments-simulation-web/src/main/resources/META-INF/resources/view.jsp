@@ -40,7 +40,19 @@ SegmentsSimulationDisplayContext segmentsSimulationDisplayContext = (SegmentsSim
 						>
 							<strong class="lead"><%= LanguageUtil.get(request, "experiences-cannot-be-displayed-because-segmentation-is-disabled") %></strong>
 
-							<span><%= LanguageUtil.get(request, "to-enable,-go-to-instance-settings") %></span>
+							<c:choose>
+								<c:when test="<%= segmentsSimulationDisplayContext.getSegmentsConfigurationURL() != null %>">
+									<clay:link
+										href="<%= segmentsSimulationDisplayContext.getSegmentsConfigurationURL() %>"
+										label='<%=
+											LanguageUtil.get(request, "to-enable,-go-to-instance-settings")
+										%>'
+									/>
+								</c:when>
+								<c:otherwise>
+									<span><%= LanguageUtil.get(request, "contact-your-system-administrator-to-enable-segmentation") %></span>
+								</c:otherwise>
+							</c:choose>
 						</clay:alert>
 					</c:if>
 
