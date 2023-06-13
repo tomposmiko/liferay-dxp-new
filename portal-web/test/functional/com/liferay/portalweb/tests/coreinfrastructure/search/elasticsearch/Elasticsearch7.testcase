@@ -18,13 +18,6 @@ definition {
 		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
-		else {
-			MessageboardsThread.tearDownCP();
-
-			DMDocument.tearDownCP();
-
-			PagesAdmin.tearDownCP();
-		}
 	}
 
 	@priority = 4
@@ -152,7 +145,7 @@ definition {
 			engineVendor = "Elasticsearch",
 			serverVersion = ${serverVersion});
 
-		Navigator.gotoNavItem(navItem = "Field Mappings");
+		SearchAdministration.openFieldMappings();
 
 		Click(
 			key_navNested = "liferay-0",

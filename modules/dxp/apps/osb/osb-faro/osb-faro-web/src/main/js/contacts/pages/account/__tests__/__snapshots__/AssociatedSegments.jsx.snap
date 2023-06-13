@@ -43,7 +43,7 @@ exports[`AccountAssociatedSegments should render 1`] = `
                 class="dropdown dropdown-root filter-and-order-root nav-item"
               >
                 <button
-                  class="button-root btn btn-unstyled dropdown-toggle nav-btn show-caret"
+                  class="button-root dropdown-toggle nav-btn show-caret btn btn-unstyled"
                   data-testid="filter-and-order-button"
                   type="button"
                 >
@@ -57,11 +57,11 @@ exports[`AccountAssociatedSegments should render 1`] = `
                     class="caret-root"
                   >
                     <svg
-                      class="icon-root lexicon-icon lexicon-icon-caret-bottom"
-                      viewBox=""
+                      class="lexicon-icon lexicon-icon-caret-bottom icon-root"
+                      role="presentation"
                     >
                       <use
-                        xlink:href="/o/osb-faro-web/dist/sprite.svg#caret-bottom"
+                        xlink:href="#caret-bottom"
                       />
                     </svg>
                   </span>
@@ -72,15 +72,15 @@ exports[`AccountAssociatedSegments should render 1`] = `
                 role="presentation"
               >
                 <a
-                  class="button-root btn btn-unstyled nav-link nav-link-monospaced btn-outline-borderless"
+                  class="btn-root nav-link nav-link-monospaced btn btn-outline-borderless btn-outline-unstyled"
                   href="/?field=name&page=1&sortOrder=DESC"
                 >
                   <svg
-                    class="icon-root lexicon-icon lexicon-icon-order-arrow-ascending"
-                    viewBox=""
+                    class="lexicon-icon lexicon-icon-order-arrow-ascending icon-root"
+                    role="presentation"
                   >
                     <use
-                      xlink:href="/o/osb-faro-web/dist/sprite.svg#order-arrow-ascending"
+                      xlink:href="#order-arrow-ascending"
                     />
                   </svg>
                 </a>
@@ -109,11 +109,11 @@ exports[`AccountAssociatedSegments should render 1`] = `
                       type="button"
                     >
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-search"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-search icon-root"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#search"
+                          xlink:href="#search"
                         />
                       </svg>
                     </button>
@@ -136,7 +136,7 @@ exports[`AccountAssociatedSegments should render 1`] = `
                 class="table-head-title table-cell-expand"
               >
                 <a
-                  class="button-root btn btn-unstyled inline-item text-truncate-inline"
+                  class="button-root inline-item text-truncate-inline btn btn-unstyled"
                   href="/?field=name&page=1&sortOrder=DESC"
                 >
                   <span
@@ -148,11 +148,11 @@ exports[`AccountAssociatedSegments should render 1`] = `
                     class="inline-item inline-item-after"
                   >
                     <svg
-                      class="icon-root lexicon-icon lexicon-icon-order-arrow-up"
-                      viewBox=""
+                      class="lexicon-icon lexicon-icon-order-arrow-up icon-root"
+                      role="presentation"
                     >
                       <use
-                        xlink:href="/o/osb-faro-web/dist/sprite.svg#order-arrow-up"
+                        xlink:href="#order-arrow-up"
                       />
                     </svg>
                   </span>
@@ -167,7 +167,7 @@ exports[`AccountAssociatedSegments should render 1`] = `
                 class="table-head-title"
               >
                 <a
-                  class="button-root btn btn-unstyled inline-item text-truncate-inline"
+                  class="button-root inline-item text-truncate-inline btn btn-unstyled"
                   href="/?field=dateCreated&page=1&sortOrder=DESC"
                 >
                   <span
@@ -196,11 +196,11 @@ exports[`AccountAssociatedSegments should render 1`] = `
                       class="sticker sticker-root sticker-static segment-sticker-root sticker-rounded sticker-light"
                     >
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-individual-dynamic-segment"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-individual-dynamic-segment icon-root"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#individual-dynamic-segment"
+                          xlink:href="#individual-dynamic-segment"
                         />
                       </svg>
                     </div>
@@ -242,7 +242,7 @@ exports[`AccountAssociatedSegments should render 1`] = `
             class="dropdown dropdown-root pagination-items-per-page"
           >
             <button
-              class="button-root btn btn-secondary dropdown-toggle show-caret btn-sm"
+              class="button-root dropdown-toggle show-caret btn btn-sm btn-unstyled"
               type="button"
             >
               <span
@@ -255,11 +255,11 @@ exports[`AccountAssociatedSegments should render 1`] = `
                 class="caret-root"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-caret-bottom"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-caret-bottom icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#caret-bottom"
+                    xlink:href="#caret-bottom"
                   />
                 </svg>
               </span>
@@ -277,14 +277,16 @@ exports[`AccountAssociatedSegments should render 1`] = `
               class="page-item disabled"
             >
               <a
-                class="button-root btn btn-unstyled page-link link-disabled"
+                class="button-root page-link btn btn-unstyled"
+                disabled=""
+                href="/?page=0"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-angle-left"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-angle-left icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-left"
+                    xlink:href="#angle-left"
                   />
                 </svg>
               </a>
@@ -293,7 +295,7 @@ exports[`AccountAssociatedSegments should render 1`] = `
               class="page-item active"
             >
               <a
-                class="button-root btn btn-unstyled page-link"
+                class="button-root page-link btn btn-unstyled"
                 href="/?page=1"
               >
                 1
@@ -303,14 +305,16 @@ exports[`AccountAssociatedSegments should render 1`] = `
               class="page-item disabled"
             >
               <a
-                class="button-root btn btn-unstyled page-link link-disabled"
+                class="button-root page-link btn btn-unstyled"
+                disabled=""
+                href="/?page=2"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-angle-right"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-angle-right icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                    xlink:href="#angle-right"
                   />
                 </svg>
               </a>

@@ -9,13 +9,17 @@
  * distribution rights of the Software.
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {FormikHelpers, setNestedObjectValues} from 'formik';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import PRMFormik from '../../common/components/PRMFormik';
+import {ObjectActionName} from '../../common/enums/objectActionName';
+import {PermissionActionType} from '../../common/enums/permissionActionType';
 import {PRMPageRoute} from '../../common/enums/prmPageRoute';
 import useLiferayNavigate from '../../common/hooks/useLiferayNavigate';
+import usePermissionActions from '../../common/hooks/usePermissionActions';
 import MDFRequestDTO from '../../common/interfaces/dto/mdfRequestDTO';
 import MDFRequest from '../../common/interfaces/mdfRequest';
 import {Liferay} from '../../common/services/liferay';
@@ -37,7 +41,6 @@ const initialFormValues: MDFRequest = {
 	activities: [],
 	additionalOption: {},
 	company: {},
-	country: {},
 	currency: {},
 	liferayBusinessSalesGoals: [],
 	maxDateActivity: '',
@@ -45,6 +48,7 @@ const initialFormValues: MDFRequest = {
 	minDateActivity: '',
 	overallCampaignDescription: '',
 	overallCampaignName: '',
+	partnerCountry: {},
 	targetAudienceRoles: [],
 	targetMarkets: [],
 	totalCostOfExpense: 0,
@@ -67,6 +71,35 @@ const MDFRequestForm = () => {
 
 	const {data, isValidating} = useGetMDFRequestById(mdfRequestId);
 	const {data: myUserAccountData} = useGetMyUserAccount();
+	const actions = usePermissionActions(ObjectActionName.MDF_REQUEST);
+
+	const hasPermissionToAccess = useMemo(
+		() =>
+			actions?.some(
+				(action) =>
+					action === PermissionActionType.CREATE ||
+					action === PermissionActionType.UPDATE
+			),
+		[actions]
+	);
+
+	const hasPermissionToByPass = useMemo(
+		() =>
+			actions?.some(
+				(action) =>
+					action === PermissionActionType.UPDATE_WO_CHANGE_STATUS
+			),
+		[actions]
+	);
+
+	const currentMDFRequestHasValidStatus =
+		data?.mdfRequestStatus.key === Status.DRAFT.key ||
+		data?.mdfRequestStatus.key === Status.REQUEST_MORE_INFO.key;
+
+	const hasPermissionShowForm = mdfRequestId
+		? (hasPermissionToAccess && currentMDFRequestHasValidStatus) ||
+		  hasPermissionToByPass
+		: hasPermissionToAccess;
 
 	const onCancel = () =>
 		Liferay.Util.navigate(
@@ -93,6 +126,7 @@ const MDFRequestForm = () => {
 	const StepFormComponent: StepComponent = {
 		[StepType.GOALS]: (
 			<Goals
+				disableCompany={Boolean(mdfRequestId) && hasPermissionToByPass}
 				onCancel={onCancel}
 				onContinue={onContinue}
 				onSaveAsDraft={(
@@ -137,8 +171,20 @@ const MDFRequestForm = () => {
 		),
 	};
 
-	if (((isValidating || !data) && mdfRequestId) || !myUserAccountData) {
+	if (
+		((isValidating || !data) && mdfRequestId) ||
+		!myUserAccountData ||
+		!actions
+	) {
 		return <ClayLoadingIndicator />;
+	}
+
+	if (!hasPermissionShowForm) {
+		return (
+			<ClayAlert className="m-0 w-100" displayType="info" title="Info:">
+				You don&apos;t have permission
+			</ClayAlert>
+		);
 	}
 
 	return (
@@ -154,7 +200,11 @@ const MDFRequestForm = () => {
 					formikHelpers,
 					siteURL,
 					Status.PENDING,
-					myUserAccountData.roleBriefs
+					actions.every(
+						(action) =>
+							action !==
+							PermissionActionType.UPDATE_WO_CHANGE_STATUS
+					)
 				)
 			}
 		>

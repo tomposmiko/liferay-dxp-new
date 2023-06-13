@@ -335,11 +335,12 @@ public class ObjectEntryInfoItemFieldValuesProvider
 
 		com.liferay.object.rest.dto.v1_0.ObjectEntry objectEntry =
 			objectEntryManager.getObjectEntry(
+				themeDisplay.getCompanyId(),
 				new DefaultDTOConverterContext(
 					false, null, null, null, null, themeDisplay.getLocale(),
 					null, themeDisplay.getUser()),
 				serviceBuilderObjectEntry.getExternalReferenceCode(),
-				themeDisplay.getCompanyId(), _objectDefinition, null);
+				_objectDefinition, null);
 
 		objectEntryFieldValues.add(
 			new InfoFieldValue<>(

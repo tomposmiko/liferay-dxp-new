@@ -1,10 +1,26 @@
 definition {
 
+	macro assertDataSetEntry {
+		for (var key_dataSetName : list ${key_dataSetNameList}) {
+			AssertElementPresent(
+				key_itemName = ${key_dataSetName},
+				locator1 = "FrontendDataSetAdmin#TABLE_CELL");
+		}
+	}
+
 	macro assertDataSetView {
 		for (var key_dataSetViewName : list ${key_dataSetViewNameList}) {
 			AssertElementPresent(
 				entryName = ${key_dataSetViewName},
 				locator1 = "FrontendDataSetAdmin#DATA_SET_VIEW_ENTRY_NAME");
+		}
+	}
+
+	macro assertDataSetViewDescription {
+		for (var key_dataSetViewDescription : list ${key_dataSetViewDescriptionList}) {
+			AssertElementPresent(
+				key_description = ${key_dataSetViewDescription},
+				locator1 = "FrontendDataSetAdmin#DATA_SET_VIEW_DESCRIPTION");
 		}
 	}
 
@@ -15,15 +31,21 @@ definition {
 	}
 
 	macro createDataSet {
-		LexiconEntry.gotoAdd();
+		if (isSet(key_name)) {
+			var key_datasetNameList = ${key_name};
+		}
 
-		Type(
-			locator1 = "TextInput#NAME",
-			value1 = ${key_name});
+		for (var key_datasetName : list ${key_datasetNameList}) {
+			LexiconEntry.gotoAdd();
 
-		FrontendDataSetAdmin.selectProvider(key_type = ${key_type});
+			Type(
+				locator1 = "TextInput#NAME",
+				value1 = ${key_datasetName});
 
-		PortletEntry.save();
+			FrontendDataSetAdmin.selectProvider(key_type = ${key_type});
+
+			PortletEntry.save();
+		}
 	}
 
 	macro createDatasetEntryViaAPI {
@@ -40,27 +62,16 @@ definition {
 	}
 
 	macro createDataSetView {
-		if (isSet(key_dataSetViewNameList)) {
-			for (var key_dataSetViewName : list ${key_dataSetViewNameList}) {
-				LexiconEntry.gotoAdd();
-
-				Type(
-					locator1 = "TextInput#NAME",
-					value1 = ${key_dataSetViewName});
-
-				Type(
-					locator1 = "FrontendDataSetAdmin#NEW_DATA_SET_VIEW_DESCRIPTION",
-					value1 = ${description});
-
-				PortletEntry.save();
-			}
+		if (isSet(key_name)) {
+			var key_dataSetViewNameList = ${key_name};
 		}
-		else {
+
+		for (var key_dataSetViewName : list ${key_dataSetViewNameList}) {
 			LexiconEntry.gotoAdd();
 
 			Type(
 				locator1 = "TextInput#NAME",
-				value1 = ${key_name});
+				value1 = ${key_dataSetViewName});
 
 			Type(
 				locator1 = "FrontendDataSetAdmin#NEW_DATA_SET_VIEW_DESCRIPTION",
@@ -68,6 +79,13 @@ definition {
 
 			PortletEntry.save();
 		}
+	}
+
+	macro createFDSViewViaAPI {
+		JSONFrontendDatasetEntries._createFDSViewViaAPI(
+			datasetName = ${datasetName},
+			dataSetViewDescription = ${dataSetViewDescription},
+			dataSetViewName = ${dataSetViewName});
 	}
 
 	macro deleteAllDatasetEntries {
@@ -108,8 +126,36 @@ definition {
 		Button.clickDelete();
 	}
 
+	macro editView {
+		Click(
+			key_name = ${key_oldName},
+			locator1 = "FrontendDataSetAdmin#DATA_SET_VIEW_ENTRY_KEBAB_MENU");
+
+		MenuItem.click(menuItem = "View");
+
+		Type(
+			key_type = "Name",
+			locator1 = "FrontendDataSetAdmin#EDIT_DATA_SET_VIEW",
+			value1 = ${key_newName});
+
+		Type(
+			key_type = "Description",
+			locator1 = "FrontendDataSetAdmin#EDIT_DATA_SET_VIEW",
+			value1 = ${key_newDescription});
+
+		PortletEntry.save();
+
+		Navigator.gotoBack();
+	}
+
 	macro goToDatasetAdminPage {
 		Navigator.openWithAppendToBaseURL(urlAppend = "group/control_panel/manage?p_p_id=com_liferay_frontend_data_set_views_web_internal_portlet_FDSViewsPortlet");
+	}
+
+	macro goToDatasetViewAdminPage {
+		var datasetEntryId = JSONFrontendDatasetEntries._getDatasetEntryIdByName(datasetName = ${datasetName});
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/control_panel/manage?p_p_id=com_liferay_frontend_data_set_views_web_internal_portlet_FDSViewsPortlet&p_p_lifecycle=0&_com_liferay_frontend_data_set_views_web_internal_portlet_FDSViewsPortlet_mvcPath=%2Ffds_views.jsp&_com_liferay_frontend_data_set_views_web_internal_portlet_FDSViewsPortlet_fdsEntryId=${datasetEntryId}");
 	}
 
 	macro goToViews {

@@ -26,15 +26,28 @@ import org.apache.cxf.message.Message;
 public class NestedFieldsContext {
 
 	public NestedFieldsContext(
-		List<String> fieldNames, Message message,
+		int depth, List<String> fieldNames, Message message,
 		MultivaluedMap<String, String> pathParameters, String resourceVersion,
 		MultivaluedMap<String, String> queryParameters) {
 
+		_depth = depth;
 		_fieldNames = fieldNames;
 		_message = message;
 		_pathParameters = pathParameters;
 		_resourceVersion = resourceVersion;
 		_queryParameters = queryParameters;
+	}
+
+	public void decrementCurrentDepth() {
+		_currentDepth--;
+	}
+
+	public int getCurrentDepth() {
+		return _currentDepth;
+	}
+
+	public int getDepth() {
+		return _depth;
 	}
 
 	public List<String> getFieldNames() {
@@ -57,6 +70,12 @@ public class NestedFieldsContext {
 		return _resourceVersion;
 	}
 
+	public void incrementCurrentDepth() {
+		_currentDepth++;
+	}
+
+	private int _currentDepth;
+	private final int _depth;
 	private final List<String> _fieldNames;
 	private final Message _message;
 	private final MultivaluedMap<String, String> _pathParameters;

@@ -1,7 +1,7 @@
-import Button from 'shared/components/Button';
+import ClayButton from '@clayui/button';
 import ClayDropdown from '@clayui/drop-down';
+import ClayIcon from '@clayui/icon';
 import getCN from 'classnames';
-import Icon from 'shared/components/Icon';
 import InfoCardPopover from '../InfoCardPopover';
 import Overlay from 'shared/components/Overlay';
 import React, {useRef} from 'react';
@@ -46,11 +46,11 @@ const ListItem: React.FC<IListItemProps> = ({
 				})}
 				key={id}
 			>
-				<Button
+				<ClayButton
 					block
-					className='dropdown-item-primary-button'
+					className='button-root dropdown-item-primary-button'
 					disabled={disabled}
-					display='unstyled'
+					displayType='unstyled'
 					onClick={() => {
 						if (_overlayRef && _overlayRef.current) {
 							_overlayRef.current.hideOverlay();
@@ -61,7 +61,8 @@ const ListItem: React.FC<IListItemProps> = ({
 				>
 					{isAttribute(item as Attribute) && (
 						<div className='sticker'>
-							<Icon
+							<ClayIcon
+								className='icon-root'
 								symbol={
 									DATA_TYPE_ICONS_MAP[
 										(item as Attribute).dataType
@@ -72,15 +73,14 @@ const ListItem: React.FC<IListItemProps> = ({
 					)}
 
 					{displayName || name}
-				</Button>
+				</ClayButton>
 
 				{!!onOptionsClick && (
-					<Button
+					<ClayButton
 						borderless
-						className='options-button'
+						className='button-root options-button'
 						disabled={disabled}
-						icon='control-panel'
-						iconAlignment='left'
+						displayType='secondary'
 						onClick={() => {
 							if (_overlayRef && _overlayRef.current) {
 								_overlayRef.current.hideOverlay();
@@ -89,7 +89,12 @@ const ListItem: React.FC<IListItemProps> = ({
 							onOptionsClick(item);
 						}}
 						size='sm'
-					/>
+					>
+						<ClayIcon
+							className='icon-root'
+							symbol='control-panel'
+						/>
+					</ClayButton>
 				)}
 			</ClayDropdown.Item>
 

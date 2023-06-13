@@ -1,8 +1,9 @@
 import * as API from 'shared/api';
 import autobind from 'autobind-decorator';
-import Button from 'shared/components/Button';
+import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
+import ClayLink from '@clayui/link';
 import getCN from 'classnames';
-import Icon from 'shared/components/Icon';
 import React from 'react';
 import Spinner from 'shared/components/Spinner';
 import TextTruncate from 'shared/components/TextTruncate';
@@ -132,13 +133,23 @@ export default class WorkspaceListItem extends React.Component {
 			return this.renderProjectJoin();
 		} else if (deactivated) {
 			return (
-				<Button onClick={this.handleActivate} size='sm'>
+				<ClayButton
+					className='button-root'
+					displayType='secondary'
+					onClick={this.handleActivate}
+					size='sm'
+				>
 					{Liferay.Language.get('activate')}
-				</Button>
+				</ClayButton>
 			);
 		}
 
-		return <Icon symbol={available ? 'angle-right' : 'reload'} />;
+		return (
+			<ClayIcon
+				className='icon-root'
+				symbol={available ? 'angle-right' : 'reload'}
+			/>
+		);
 	}
 
 	@autobind
@@ -228,14 +239,22 @@ export default class WorkspaceListItem extends React.Component {
 					<span className='pr-2'>
 						{Liferay.Language.get('access-requested')}
 					</span>
-					<Icon size='md' symbol='envelope-close' />
+					<ClayIcon
+						className='icon-root icon-size-md'
+						symbol='envelope-close'
+					/>
 				</div>
 			);
 		} else {
 			return (
-				<Button onClick={this.handleSendRequestAccess} size='sm'>
+				<ClayButton
+					className='button-root'
+					displayType='secondary'
+					onClick={this.handleSendRequestAccess}
+					size='sm'
+				>
 					{Liferay.Language.get('request-access')}
-				</Button>
+				</ClayButton>
 			);
 		}
 	}
@@ -259,7 +278,7 @@ export default class WorkspaceListItem extends React.Component {
 			}
 		);
 
-		const contentClasses = getCN('workspace-link', {
+		const contentClasses = getCN('button-root', 'workspace-link', {
 			'border-button': !isJoinableProjects,
 			'request-workspace': isJoinableProjects,
 			'workspace-unavailable': !available || deactivated
@@ -269,15 +288,18 @@ export default class WorkspaceListItem extends React.Component {
 			? {href}
 			: {onClick: this.handleGetProjectState};
 
+		const Button = href ? ClayLink : ClayButton;
+
 		return (
 			<li className={classes} key={name}>
 				{isJoinableProjects || deactivated ? (
 					<div className={contentClasses}>{this.renderContent()}</div>
 				) : (
 					<Button
+						button
 						className={contentClasses}
 						disabled={disabled || loading}
-						display='unstyled'
+						displayType='unstyled'
 						{...buttonAction}
 					>
 						{this.renderContent()}

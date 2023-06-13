@@ -424,14 +424,14 @@ exports[`SegmentEdit renders with given values 1`] = `
         </div>
       </div>
       <div
-        class="contributor-builder-root editing"
+        class="contributor-builder-root h-100 editing"
       >
         <div
-          class="criteria-builder-section-sidebar criteria-builder-section-sidebar--with-warning"
+          class="criteria-builder-section-sidebar overflow-hidden position-fixed criteria-builder-section-sidebar--with-warning"
         >
           <div
             aria-label="segments-contributors-panel"
-            class="criteria-sidebar-root"
+            class="criteria-sidebar-root d-flex flex-column position-absolute"
             role="tabpanel"
             tabindex="-1"
           >
@@ -481,16 +481,16 @@ exports[`SegmentEdit renders with given values 1`] = `
               </div>
             </div>
             <div
-              class="sidebar-collapse"
+              class="overflow-auto position-relative sidebar-collapse"
             >
               <ul
-                class="sidebar-collapse-groups"
+                class="c-mb-0 c-pl-0 d-flex sidebar-collapse-groups"
               >
                 <li
-                  class="sidebar-collapse-item sidebar-collapse-first-test-values-group active"
+                  class="d-flex flex-column sidebar-collapse-item sidebar-collapse-first-test-values-group active"
                 >
                   <a
-                    class="sidebar-collapse-header"
+                    class="d-flex justify-content-between position-relative sidebar-collapse-header text-decoration-none text-uppercase"
                     tabindex="0"
                   >
                     First Test Values Group
@@ -506,18 +506,18 @@ exports[`SegmentEdit renders with given values 1`] = `
                     </span>
                   </a>
                   <div
-                    class="flex-grow-1 sidebar-collapse-body"
+                    class="flex-grow-1 overflow-y-auto sidebar-collapse-body"
                   >
                     <p
-                      class="pt-3 px-4 text-secondary"
+                      class="c-pt-3 c-px-4 text-secondary"
                     >
                       inherited-attributes-are-not-taken-into-account-to-include-members-in-segments
                     </p>
                     <ul
-                      class="pl-0"
+                      class="c-pl-0"
                     >
                       <li
-                        class="criteria-sidebar-item-root color--first-test-values-group"
+                        class="align-items-center criteria-sidebar-item-root c-py-2 c-pr-3 c-pl-3 c-my-1 c-mx-0 d-flex  color--first-test-values-group"
                         draggable="true"
                         tabindex="0"
                       >
@@ -534,7 +534,7 @@ exports[`SegmentEdit renders with given values 1`] = `
                           </svg>
                         </span>
                         <span
-                          class="criteria-sidebar-item-type sticker sticker-dark"
+                          class="c-mx-2 c-my-0 criteria-sidebar-item-type sticker sticker-dark"
                         >
                           <span
                             class="inline-item"
@@ -559,30 +559,30 @@ exports[`SegmentEdit renders with given values 1`] = `
           </div>
         </div>
         <div
-          class="criteria-builder-section-main"
+          class="c-pr-0 criteria-builder-section-main d-flex h-100 w-100"
         >
           <div
-            class="contributor-container"
+            class="contributor-container h-100 overflow-auto position-absolute w-100"
           >
             <div
               class="container-fluid container-fluid-max-xl"
             >
               <div
-                class="content-wrapper p-4"
+                class="c-p-4 content-wrapper"
               >
                 <div
-                  class="sheet"
+                  class="c-pb-4 sheet"
                 >
                   <div
-                    class="d-flex flex-wrap justify-content-between mb-4"
+                    class="c-mb-4 d-flex flex-wrap justify-content-between mb-4"
                   >
                     <h2
-                      class="mb-2 sheet-title"
+                      class="c-mb-2 sheet-title"
                     >
                       conditions
                     </h2>
                     <div
-                      class="criterion-string"
+                      class="c-ml-2 criterion-string"
                     >
                       <div
                         class="btn-group"
@@ -591,11 +591,11 @@ exports[`SegmentEdit renders with given values 1`] = `
                           class="btn-group-item inline-item"
                         >
                           <span
-                            class="mr-4"
+                            class="c-mr-4"
                           >
                             conditions-match
                             <b
-                              class="ml-2 text-dark"
+                              class="c-ml-2 font-weight-bold text-dark"
                             >
                               x-members
                             </b>
@@ -619,17 +619,17 @@ exports[`SegmentEdit renders with given values 1`] = `
                       x-with-property-x
                     </h3>
                     <div
-                      class="criteria-group-root color--first-test-values-group criteria-group-item-root"
+                      class="criteria-group-root w-100 color--first-test-values-group criteria-group-item-root"
                     >
                       <div
-                        class="drop-zone-root"
+                        class="drop-zone-root position-relative"
                       >
                         <div
                           class="drop-zone-target drop-zone-target-before"
                         />
                       </div>
                       <div
-                        class="criterion"
+                        class="criterion position-relative"
                       >
                         <div
                           class="criterion-row-root"
@@ -651,9 +651,11 @@ exports[`SegmentEdit renders with given values 1`] = `
                               </svg>
                             </div>
                             <span
-                              class="criterion-string"
+                              class="c-ml-2 criterion-string"
                             >
-                              <b>
+                              <b
+                                class="font-weight-bold"
+                              >
                                 Value
                               </b>
                             </span>
@@ -691,7 +693,7 @@ exports[`SegmentEdit renders with given values 1`] = `
                             />
                             <button
                               aria-label="duplicate-segment-property"
-                              class="btn-outline-borderless btn-sm mr-1 btn btn-monospaced btn-secondary"
+                              class="btn-outline-borderless btn-sm c-mr-1 btn btn-monospaced btn-secondary"
                               title="duplicate-segment-property"
                               type="button"
                             >
@@ -722,7 +724,7 @@ exports[`SegmentEdit renders with given values 1`] = `
                           </div>
                         </div>
                         <div
-                          class="drop-zone-root"
+                          class="drop-zone-root position-relative"
                         >
                           <div
                             class="drop-zone-target"

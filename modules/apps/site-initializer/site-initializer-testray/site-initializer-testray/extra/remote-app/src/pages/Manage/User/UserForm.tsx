@@ -82,7 +82,7 @@ const UserForm = () => {
 	} = useFormActions();
 
 	const {
-		formState: {errors},
+		formState: {errors, isSubmitting},
 		handleSubmit,
 		register,
 		setValue,
@@ -324,6 +324,7 @@ const UserForm = () => {
 				<Form.Footer
 					onClose={onClose}
 					onSubmit={handleSubmit(_onSubmit)}
+					primaryButtonProps={{loading: isSubmitting}}
 				/>
 			</ClayForm>
 		</Container>

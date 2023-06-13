@@ -29,7 +29,7 @@ export default function CriteriaSidebar({
 	return (
 		<div
 			aria-label={Liferay.Language.get('segments-contributors-panel')}
-			className="criteria-sidebar-root"
+			className="criteria-sidebar-root d-flex flex-column position-absolute"
 			role="tabpanel"
 			tabIndex={-1}
 		>
@@ -44,7 +44,7 @@ export default function CriteriaSidebar({
 				/>
 			</div>
 
-			<div className="sidebar-collapse">
+			<div className="overflow-auto position-relative sidebar-collapse">
 				<CriteriaSidebarCollapse
 					onCollapseClick={onTitleClicked}
 					propertyGroups={propertyGroups}

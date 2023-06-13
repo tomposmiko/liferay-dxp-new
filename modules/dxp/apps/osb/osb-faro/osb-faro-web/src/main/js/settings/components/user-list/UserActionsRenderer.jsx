@@ -1,7 +1,7 @@
 import autobind from 'autobind-decorator';
-import Button from 'shared/components/Button';
+import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
 import getCN from 'classnames';
-import Icon from 'shared/components/Icon';
 import React from 'react';
 import {noop} from 'lodash';
 import {PropTypes} from 'prop-types';
@@ -84,41 +84,51 @@ export default class UserActionsRenderer extends React.Component {
 					data.id !== currentUserId &&
 					(editing ? (
 						<>
-							<Button
+							<ClayButton
+								className='button-root'
 								disabled={itemsSelected}
-								display='primary'
+								displayType='primary'
 								onClick={this.handleSave}
 								size='sm'
 							>
 								{Liferay.Language.get('save')}
-							</Button>
+							</ClayButton>
 
-							<Button
+							<ClayButton
+								className='button-root'
 								disabled={itemsSelected}
+								displayType='secondary'
 								onClick={onRowCancel}
 								size='sm'
 							>
 								{Liferay.Language.get('cancel')}
-							</Button>
+							</ClayButton>
 						</>
 					) : (
 						<>
-							<Button
+							<ClayButton
+								className='button-root'
 								disabled={itemsSelected}
+								displayType='secondary'
 								onClick={this.handleEdit}
 								size='sm'
 							>
 								{Liferay.Language.get('edit')}
-							</Button>
+							</ClayButton>
 
-							<Button
+							<ClayButton
 								borderless
+								className='button-root'
 								disabled={itemsSelected}
+								displayType='secondary'
 								onClick={this.handleDelete}
 								size='sm'
 							>
-								<Icon symbol='trash' />
-							</Button>
+								<ClayIcon
+									className='icon-root'
+									symbol='trash'
+								/>
+							</ClayButton>
 						</>
 					))}
 			</span>

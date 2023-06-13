@@ -19,7 +19,7 @@ import {sub} from '../../utils/utils';
 
 export default function EmptyPlaceholder() {
 	return (
-		<div className="empty-contributors mb-0 p-4 rounded">
+		<div className="c-mb-0 c-p-4 empty-contributors rounded">
 			<ClayEmptyState
 				description={Liferay.Language.get('empty-conditions-message')}
 				imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.gif`}

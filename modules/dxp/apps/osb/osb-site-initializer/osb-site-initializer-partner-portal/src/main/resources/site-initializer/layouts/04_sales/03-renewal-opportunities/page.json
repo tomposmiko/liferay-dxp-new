@@ -1,7 +1,5 @@
 {
-	"friendlyURL_i18n": {
-		"en_US": "/sales/renewal-opportunities"
-	},
+	"friendlyURL": "/sales/renewal-opportunities",
 	"hidden": true,
 	"name_i18n": {
 		"en_US": "Renewal Opportunities"
@@ -11,20 +9,6 @@
 			"actionIds": [
 			],
 			"roleName": "Guest",
-			"scope": 4
-		},
-		{
-			"actionIds": [
-				"VIEW"
-			],
-			"roleName": "User",
-			"scope": 4
-		},
-		{
-			"actionIds": [
-				"VIEW"
-			],
-			"roleName": "Site Member",
 			"scope": 4
 		}
 	],

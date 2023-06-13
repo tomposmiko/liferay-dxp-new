@@ -9,7 +9,7 @@ exports[`EmptyDropZone renders 1`] = `
       class="drop-zone-target p-5"
     >
       <div
-        class="empty-drop-zone-indicator"
+        class="empty-drop-zone-indicator w-100"
       />
     </div>
   </div>
@@ -23,7 +23,7 @@ exports[`EmptyDropZone renders illustration when empty contributors 1`] = `
   >
     <div>
       <div
-        class="empty-contributors mb-0 p-4 rounded"
+        class="c-mb-0 c-p-4 empty-contributors rounded"
       >
         <div
           class="c-empty-state c-empty-state-animation"

@@ -3,10 +3,7 @@
 .criteria-sidebar-root {
 	background-color: $white;
 	border-left: 1px solid $gray-300;
-	display: flex;
-	flex-direction: column;
 	min-height: 100%;
-	position: absolute;
 	right: 0;
 	width: $sidebarWidth;
 
@@ -27,28 +24,14 @@
 		flex-basis: 0;
 		flex-grow: 1;
 		flex-shrink: 1;
-		min-height: 100%;
-		overflow-y: auto;
-		position: relative;
-	}
-
-	.sidebar-collapse-groups,
-	.empty-message {
-		height: 100%;
-		position: relative;
 	}
 
 	.sidebar-collapse-groups {
-		display: flex;
 		flex-flow: column nowrap;
-		margin-bottom: 0;
-		padding-left: 0;
 	}
 
 	.sidebar-collapse-item {
 		cursor: pointer;
-		display: flex;
-		flex-direction: column;
 		transition: flex-grow $segmentsTransition;
 		will-change: flex-grow;
 
@@ -59,18 +42,8 @@
 
 	.sidebar-collapse-header {
 		color: $dark;
-		display: flex;
 		font-size: 0.875rem;
-		justify-content: space-between;
-		position: relative;
-		text-decoration: none;
-		text-transform: uppercase;
 		word-wrap: break-word;
-
-		.badge {
-			margin-left: auto;
-			margin-right: 0.8rem;
-		}
 
 		.lexicon-icon {
 			transition: transform $segmentsTransition;
@@ -91,18 +64,10 @@
 		}
 	}
 
-	.sidebar-collapse-body {
-		overflow-y: auto;
-	}
-
 	.criteria-sidebar-item-root {
-		align-items: center;
 		background-color: $white;
 		border-left: 3px solid transparent;
-		display: flex;
 		font-size: 0.875rem;
-		margin: 0.25rem 0;
-		padding: 0.5rem 1rem 0.5rem 0.5rem;
 		transition: $segmentsTransition;
 		transition-property: border-color, opacity;
 		will-change: border-color, opacity;
@@ -136,15 +101,5 @@
 				'color--'
 			);
 		}
-	}
-
-	.criteria-sidebar-item-type {
-		margin: 0 0.5rem;
-	}
-
-	.empty-message {
-		align-items: center;
-		display: flex;
-		justify-content: center;
 	}
 }

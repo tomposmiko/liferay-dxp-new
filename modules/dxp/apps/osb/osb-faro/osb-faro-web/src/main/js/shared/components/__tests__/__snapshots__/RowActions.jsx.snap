@@ -10,16 +10,16 @@ exports[`RowActions should render 1`] = `
       class="dropdown dropdown-root dropdown-action"
     >
       <button
-        class="button-root btn btn-unstyled dropdown-toggle component-action"
+        class="button-root dropdown-toggle component-action btn btn-unstyled"
         type="button"
       >
         <span>
           <svg
-            class="icon-root lexicon-icon lexicon-icon-ellipsis-v"
-            viewBox=""
+            class="lexicon-icon lexicon-icon-ellipsis-v icon-root"
+            role="presentation"
           >
             <use
-              xlink:href="/o/osb-faro-web/dist/sprite.svg#ellipsis-v"
+              xlink:href="#ellipsis-v"
             />
           </svg>
         </span>

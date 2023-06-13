@@ -16,6 +16,7 @@
 
 import '../../css/OrderableTable.scss';
 interface OrderableTableInterface {
+	disableSave?: boolean;
 	fields: Array<{
 		label: string;
 		name: string;
@@ -26,11 +27,12 @@ interface OrderableTableInterface {
 	noItemsTitle: string;
 	onCancelButtonClick: Function;
 	onCreationButtonClick: Function;
-	onOrderChange: Function;
+	onOrderChange: (args: {orderedItems: any[]}) => void;
 	onSaveButtonClick: Function;
 	title: string;
 }
 declare const OrderableTable: ({
+	disableSave,
 	fields,
 	items: initialItems,
 	noItemsButtonLabel,

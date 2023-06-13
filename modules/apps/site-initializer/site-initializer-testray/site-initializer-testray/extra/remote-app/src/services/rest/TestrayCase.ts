@@ -22,7 +22,7 @@ import {APIResponse, TestrayCase} from './types';
 
 type Case = typeof yupSchema.case.__outputType & {projectId: number};
 
-class TestrayCaseRest extends Rest<Case, TestrayCase> {
+class TestrayCaseImpl extends Rest<Case, TestrayCase> {
 	constructor() {
 		super({
 			adapter: ({
@@ -102,4 +102,6 @@ class TestrayCaseRest extends Rest<Case, TestrayCase> {
 	}
 }
 
-export const testrayCaseRest = new TestrayCaseRest();
+const testrayCaseImpl = new TestrayCaseImpl();
+
+export {testrayCaseImpl};

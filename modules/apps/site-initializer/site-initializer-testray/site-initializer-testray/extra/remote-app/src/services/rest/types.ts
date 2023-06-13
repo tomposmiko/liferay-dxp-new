@@ -112,6 +112,7 @@ export type UserRole = {
 };
 
 export type TestrayBuild = {
+	actions: ObjectActionsItems;
 	buildToTasks: TestrayTask[];
 	creator: {
 		name: string;
@@ -135,6 +136,7 @@ export type TestrayBuild = {
 } & CaseResultAggregation;
 
 export type TestrayCase = {
+	actions: ObjectActionsItems;
 	caseResults?: TestrayCaseResult[];
 	caseToCaseResult?: TestrayCaseResult[];
 	caseType?: TestrayCaseType;
@@ -253,6 +255,7 @@ export type TestrayProject = {
 };
 
 export type TestrayRequirement = {
+	actions: ObjectActionsItems;
 	component?: TestrayComponent;
 	components: string;
 	description: string;
@@ -335,6 +338,7 @@ export type TestraySubTaskIssue = {
 };
 
 export type TestraySuite = {
+	actions: ObjectActionsItems;
 	caseParameters: string;
 	creator: {
 		name: string;
@@ -349,6 +353,7 @@ export type TestraySuite = {
 
 export type TestraySuiteCase = {
 	case: TestrayCase;
+	caseId: Number;
 	id: number;
 	r_caseToSuitesCases_c_case: TestrayCase;
 	r_caseToSuitesCases_c_caseId: number;

@@ -36,11 +36,8 @@ import {
 
 import './PublishedAppsDashboardPage.scss';
 import {ProjectsPage} from '../ProjectsPage/ProjectsPage';
-
-declare let Liferay: {
-	ThemeDisplay: {getLanguageId: () => string};
-	authToken: string;
-};
+import {Liferay} from '../../liferay/liferay';
+import {getProductVersionFromSpecifications} from '../../utils/util';
 
 const appTableHeaders = [
 	{
@@ -93,6 +90,7 @@ interface PublishedAppTable {
 
 export function PublishedAppsDashboardPage() {
 	const [accounts, setAccounts] = useState<Account[]>(initialAccountsState);
+	const [catalogId, setCatalogId] = useState<number>();
 	const [commerceAccount, setCommerceAccount] = useState<CommerceAccount>();
 	const [apps, setApps] = useState<AppProps[]>(Array<AppProps>());
 	const [selectedApp, setSelectedApp] = useState<AppProps>();
@@ -121,6 +119,11 @@ export function PublishedAppsDashboardPage() {
 		},
 		title: 'Apps',
 	};
+
+	const buttonRedirectURL = Liferay.ThemeDisplay.getCanonicalURL().replaceAll(
+		'/publisher-dashboard',
+		'/create-new-app'
+	);
 
 	const memberMessages = {
 		description:
@@ -163,10 +166,10 @@ export function PublishedAppsDashboardPage() {
 		return Promise.all(appListProductSpecifications);
 	}
 
-	function getAppListProductIds(products: {items: AppProps[]}) {
+	function getAppListProductIds(products: {items: Product[]}) {
 		const productIds: number[] = [];
 
-		products.items.map((product: AppProps) => {
+		products.items.map((product) => {
 			productIds.push(product.productId);
 		});
 
@@ -194,25 +197,11 @@ export function PublishedAppsDashboardPage() {
 		return productType;
 	}
 
-	function getProductVersionFromSpecifications(
-		specifications: ProductSpecificationProps
-	) {
-		let productVersion = '0';
-
-		specifications.items.forEach((specification: Specification) => {
-			if (specification.specificationKey === 'version') {
-				productVersion = specification.value.en_US;
-			}
-		});
-
-		return productVersion;
-	}
-
 	function getRolesList(accountBriefs: AccountBrief[]) {
 		const rolesList: string[] = [];
 
 		const accountBrief = accountBriefs.find(
-			(accountBrief) => accountBrief.name === selectedAccount.name
+			(accountBrief) => accountBrief.id === selectedAccount.id
 		);
 
 		accountBrief?.roleBriefs.forEach((role) => {
@@ -245,6 +234,7 @@ export function PublishedAppsDashboardPage() {
 				);
 
 				if (accountCatalogId && accountCatalogId !== 0) {
+					setCatalogId(accountCatalogId);
 					const appList = await getProducts();
 
 					const appListProductIds: number[] =
@@ -257,35 +247,29 @@ export function PublishedAppsDashboardPage() {
 
 					const newAppList: AppProps[] = [];
 
-					appList.items.forEach(
-						(product: ProductResponseProps, index: number) => {
-							if (product.catalogId === accountCatalogId) {
-								newAppList.push({
-									catalogId: product.catalogId,
-									externalReferenceCode:
-										product.externalReferenceCode,
-									lastUpdatedBy: product.lastUpdatedBy,
-									name: product.name.en_US,
-									productId: product.productId,
-									status: product.workflowStatusInfo.label.replace(
-										/(^\w|\s\w)/g,
-										(m: string) => m.toUpperCase()
-									),
-									thumbnail: product.thumbnail,
-									type: getProductTypeFromSpecifications(
-										appListProductSpecifications[index]
-									),
-									updatedDate: formatDate(
-										product.modifiedDate
-									),
-									version:
-										getProductVersionFromSpecifications(
-											appListProductSpecifications[index]
-										),
-								});
-							}
+					appList.items.forEach((product, index: number) => {
+						if (product.catalogId === accountCatalogId) {
+							newAppList.push({
+								catalogId: product.catalogId,
+								externalReferenceCode:
+									product.externalReferenceCode,
+								name: product.name.en_US,
+								productId: product.productId,
+								status: product.workflowStatusInfo.label.replace(
+									/(^\w|\s\w)/g,
+									(m: string) => m.toUpperCase()
+								),
+								thumbnail: product.thumbnail,
+								type: getProductTypeFromSpecifications(
+									appListProductSpecifications[index]
+								),
+								updatedDate: formatDate(product.modifiedDate),
+								version: getProductVersionFromSpecifications(
+									appListProductSpecifications[index]
+								),
+							});
 						}
-					);
+					});
 
 					const commerceAccountResponse =
 						await getAccountInfoFromCommerce(selectedAccount.id);
@@ -336,6 +320,10 @@ export function PublishedAppsDashboardPage() {
 					dashboardNavigationItem.itemSelected
 			) || dashboardNavigationItems[0];
 
+		if (clickedNavigationItem.itemTitle !== 'Members') {
+			setSelectedMember(undefined);
+		}
+
 		setSelectedNavigationItem(clickedNavigationItem?.itemTitle as string);
 	}, [dashboardNavigationItems]);
 
@@ -352,15 +340,16 @@ export function PublishedAppsDashboardPage() {
 
 				const currentUserAccountBriefs =
 					currentUserAccount.accountBriefs.find(
-						(accountBrief: {name: string}) =>
-							accountBrief.name === selectedAccount.name
+						(accountBrief: {id: number}) =>
+							accountBrief.id === selectedAccount.id
 					);
 
 				if (currentUserAccountBriefs) {
 					customerRoles.forEach((customerRole) => {
 						if (
 							currentUserAccountBriefs.roleBriefs.find(
-								(role: {name: string}) => role.name === customerRole
+								(role: {name: string}) =>
+									role.name === customerRole
 							)
 						) {
 							currentUserAccount.isCustomerAccount = true;
@@ -436,7 +425,7 @@ export function PublishedAppsDashboardPage() {
 				setMembers(filteredMembersList);
 			}
 		})();
-	}, [selectedAccount]);
+	}, [selectedAccount, selectedNavigationItem]);
 
 	return (
 		<div className="published-apps-dashboard-page-container">
@@ -455,7 +444,7 @@ export function PublishedAppsDashboardPage() {
 
 			{selectedNavigationItem === 'Apps' && (
 				<DashboardPage
-					buttonHref="/create-new-app"
+					buttonHref={`${buttonRedirectURL}?catalogId=${catalogId}`}
 					buttonMessage="+ New App"
 					dashboardNavigationItems={dashboardNavigationItems}
 					messages={appMessages}

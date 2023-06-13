@@ -173,8 +173,8 @@ public class SalesforceObjectEntryManagerImplTest {
 		Assert.assertNotNull(objectEntry.getExternalReferenceCode());
 
 		_objectEntryManager.deleteObjectEntry(
-			objectEntry.getExternalReferenceCode(),
-			TestPropsValues.getCompanyId(), _objectDefinition,
+			TestPropsValues.getCompanyId(), _getDTOConverterContext(),
+			objectEntry.getExternalReferenceCode(), _objectDefinition,
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 	}
 
@@ -208,8 +208,8 @@ public class SalesforceObjectEntryManagerImplTest {
 			title, MapUtil.getString(objectEntry.getProperties(), "title"));
 
 		_objectEntryManager.deleteObjectEntry(
-			objectEntry.getExternalReferenceCode(),
-			TestPropsValues.getCompanyId(), _objectDefinition,
+			TestPropsValues.getCompanyId(), _getDTOConverterContext(),
+			objectEntry.getExternalReferenceCode(), _objectDefinition,
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 	}
 
@@ -231,16 +231,16 @@ public class SalesforceObjectEntryManagerImplTest {
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		objectEntry = _objectEntryManager.getObjectEntry(
-			dtoConverterContext, objectEntry.getExternalReferenceCode(),
-			TestPropsValues.getCompanyId(), _objectDefinition,
+			TestPropsValues.getCompanyId(), dtoConverterContext,
+			objectEntry.getExternalReferenceCode(), _objectDefinition,
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		Assert.assertEquals(
 			title, MapUtil.getString(objectEntry.getProperties(), "title"));
 
 		_objectEntryManager.deleteObjectEntry(
-			objectEntry.getExternalReferenceCode(),
-			TestPropsValues.getCompanyId(), _objectDefinition,
+			TestPropsValues.getCompanyId(), _getDTOConverterContext(),
+			objectEntry.getExternalReferenceCode(), _objectDefinition,
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 	}
 

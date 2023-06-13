@@ -74,6 +74,8 @@ public class MoveChangesMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, "toCTCollectionId");
 
 		CTProcess ctProcess = null;
+		String displayType = null;
+		String label = null;
 
 		if ((fromCTCollectionId != toCTCollectionId) &&
 			(fromCTCollectionId != CTConstants.CT_COLLECTION_ID_PRODUCTION) &&
@@ -98,6 +100,10 @@ public class MoveChangesMVCActionCommand extends BaseMVCActionCommand {
 				if (conflictInfoMap.isEmpty()) {
 					ctProcess = _ctCollectionService.moveCTEntries(
 						fromCTCollectionId, toCTCollectionId, ctEntryIds);
+				}
+				else {
+					displayType = "danger";
+					label = _language.get(themeDisplay.getLocale(), "conflict");
 				}
 			}
 			catch (PortalException portalException) {
@@ -131,11 +137,10 @@ public class MoveChangesMVCActionCommand extends BaseMVCActionCommand {
 				_backgroundTaskLocalService.fetchBackgroundTask(
 					ctProcess.getBackgroundTaskId());
 
-			String displayType = null;
-			String label = null;
-
-			if (backgroundTask.getStatus() ==
-					BackgroundTaskConstants.STATUS_SUCCESSFUL) {
+			if ((backgroundTask.getStatus() ==
+					BackgroundTaskConstants.STATUS_SUCCESSFUL) ||
+				(backgroundTask.getStatus() ==
+					BackgroundTaskConstants.STATUS_NEW)) {
 
 				displayType = "success";
 				label = _language.get(themeDisplay.getLocale(), "published");
@@ -147,7 +152,9 @@ public class MoveChangesMVCActionCommand extends BaseMVCActionCommand {
 				displayType = "danger";
 				label = _language.get(themeDisplay.getLocale(), "failed");
 			}
+		}
 
+		if ((displayType != null) && (label != null)) {
 			jsonObject.put(
 				"displayType", displayType
 			).put(

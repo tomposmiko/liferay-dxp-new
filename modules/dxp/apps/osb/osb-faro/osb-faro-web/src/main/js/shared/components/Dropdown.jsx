@@ -1,9 +1,10 @@
 import * as Breadcrumbs from './Breadcrumbs';
 import * as Nav from './Nav';
 import autobind from 'autobind-decorator';
-import Button from './Button';
+import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
+import ClayLink from '@clayui/link';
 import getCN from 'classnames';
-import Icon from './Icon';
 import omitDefinedProps from 'shared/util/omitDefinedProps';
 import Overlay, {ALIGNMENTS} from './Overlay';
 import React from 'react';
@@ -143,17 +144,28 @@ class Item extends React.Component {
 			active
 		});
 
-		if (href || onClick) {
+		if (href) {
 			return (
-				<Button
+				<ClayLink
+					{...omitDefinedProps(otherProps, Item.propTypes)}
+					button
+					className={classes}
+					displayType='unstyled'
+					href={href}
+				>
+					{children}
+				</ClayLink>
+			);
+		} else if (onClick) {
+			return (
+				<ClayButton
 					{...omitDefinedProps(otherProps, Item.propTypes)}
 					className={classes}
-					display='unstyled'
-					href={href}
+					displayType='unstyled'
 					onClick={this.handleClick}
 				>
 					{children}
-				</Button>
+				</ClayButton>
 			);
 		} else {
 			return (
@@ -268,36 +280,39 @@ export default class Dropdown extends React.Component {
 		const align = dropdown ? 'rightCenter' : this.props.align;
 
 		const buttonClasses = getCN(
+			'button-root',
 			'dropdown-toggle',
 			get(buttonProps, 'className', ''),
 			{
 				'nav-btn': nav,
-				'nav-link': !buttonProps.display && nav,
+				'nav-link': !buttonProps.displayType && nav,
 				'show-caret': showCaret
 			},
 			toggleClasses
 		);
 
-		const ComponentFn = dropdown ? Item : Button;
+		const ComponentFn = dropdown ? Item : ClayButton;
 
 		const content = (
 			<ComponentFn
 				{...buttonProps}
 				className={buttonClasses}
 				disabled={disabled}
+				displayType='unstyled'
 				onClick={this.handleToggle}
 			>
 				{label && <span className='text-truncate'>{label}</span>}
 
 				{icon && (
 					<span>
-						<Icon symbol={icon} />
+						<ClayIcon className='icon-root' symbol={icon} />
 					</span>
 				)}
 
 				{!readOnly && !icon && showCaret && (
 					<span className='caret-root'>
-						<Icon
+						<ClayIcon
+							className='icon-root'
 							symbol={
 								caretDouble
 									? 'caret-double'

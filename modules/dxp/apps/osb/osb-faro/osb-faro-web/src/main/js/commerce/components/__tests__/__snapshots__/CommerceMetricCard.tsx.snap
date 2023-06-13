@@ -21,12 +21,12 @@ exports[`CommerceMetricCard should render 1`] = `
           class="dropdown dropdown-range-key-root"
         >
           <button
-            class="dropdown-toggle btn btn-outline-borderless btn-sm btn-outline-secondary"
+            class="dropdown-toggle button-root btn btn-outline-borderless btn-sm btn-outline-secondary"
             type="button"
           >
             Last 30 days
             <svg
-              class="lexicon-icon lexicon-icon-caret-bottom ml-2"
+              class="lexicon-icon lexicon-icon-caret-bottom icon-root ml-2"
               role="presentation"
             >
               <use
@@ -56,11 +56,11 @@ exports[`CommerceMetricCard should render 1`] = `
             style="color: rgb(40, 125, 60);"
           >
             <svg
-              class="icon-root lexicon-icon lexicon-icon-caret-top-l"
-              viewBox=""
+              class="lexicon-icon lexicon-icon-caret-top-l icon-root"
+              role="presentation"
             >
               <use
-                xlink:href="/o/osb-faro-web/dist/sprite.svg#caret-top-l"
+                xlink:href="#caret-top-l"
               />
             </svg>
             <span

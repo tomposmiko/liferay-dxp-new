@@ -22,14 +22,13 @@ import com.liferay.osb.faro.web.internal.controller.FaroController;
 import com.liferay.osb.faro.web.internal.model.display.FaroResultsDisplay;
 import com.liferay.osb.faro.web.internal.model.display.contacts.ActivityGroupDisplay;
 import com.liferay.osb.faro.web.internal.param.FaroParam;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -46,10 +45,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Matthew Kong
  */
-@Component(
-	immediate = true,
-	service = {ActivityGroupController.class, FaroController.class}
-)
+@Component(service = {ActivityGroupController.class, FaroController.class})
 @Path("/{groupId}/activity_group")
 @Produces(MediaType.APPLICATION_JSON)
 public class ActivityGroupController extends BaseFaroController {
@@ -78,19 +74,21 @@ public class ActivityGroupController extends BaseFaroController {
 			query, startDateFaroParam.getValue(), endDateFaroParam.getValue(),
 			cur, delta, orderByFieldsFaroParam.getValue());
 
-		List<ActivityGroup> activityGroups = results.getItems();
-
-		Stream<ActivityGroup> stream = activityGroups.stream();
-
 		return new FaroResultsDisplay(
-			stream.map(
-				ActivityGroupDisplay::new
-			).filter(
-				activityGroup -> ListUtil.isNotEmpty(
-					activityGroup.getActivityDisplays())
-			).collect(
-				Collectors.toList()
-			),
+			TransformUtil.transform(
+				results.getItems(),
+				activityGroup -> {
+					ActivityGroupDisplay activityGroupDisplay =
+						new ActivityGroupDisplay(activityGroup);
+
+					if (ListUtil.isEmpty(
+							activityGroupDisplay.getActivityDisplays())) {
+
+						return null;
+					}
+
+					return activityGroupDisplay;
+				}),
 			results.getTotal());
 	}
 

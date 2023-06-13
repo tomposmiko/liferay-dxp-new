@@ -8,13 +8,18 @@
 		padding: 1rem;
 		width: 100%;
 
-		&-selected {
+		&-disabled {
+			opacity: 0.5;
+		}
+
+		&:hover {
 			background-color: #e6edfb;
 			border: 1px solid #004ad7;
 		}
 
-		&-disabled {
-			opacity: 0.5;
+		&-selected {
+			background-color: #e6edfb;
+			border: 1px solid #004ad7;
 		}
 
 		&-small {
@@ -39,8 +44,18 @@
 
 			&-background {
 				background-color: #fff;
+				border: #e2e2e4 1px solid;
+				border-radius: 4px;
+				display: flex;
 				height: 28px;
+				justify-content: center;
+				padding-top: 4px;
 				width: 40px;
+
+				img {
+					height: 18px;
+					width: 15px;
+				}
 			}
 
 			&-text-small {
@@ -65,7 +80,7 @@
 	}
 
 	&-title {
-		align-items: flex-start;
+		align-items: center;
 		display: flex;
 		gap: 0.5rem;
 		justify-content: center;
@@ -89,6 +104,12 @@
 				brightness(86%) contrast(110%);
 
 			transition: filter 0.5s;
+
+			&-rounded {
+				border-radius: 50%;
+				height: 32px;
+				width: 32px;
+			}
 		}
 
 		&-tooltip {

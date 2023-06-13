@@ -21,7 +21,7 @@ import {StatusBadgeType} from '~/components/StatusBadge/StatusBadge';
 import useSearchBuilder from '~/hooks/useSearchBuilder';
 import i18n from '~/i18n';
 import {TestrayCase, TestrayCaseResult, TestrayRun} from '~/services/rest';
-import {testrayCaseRest} from '~/services/rest/TestrayCase';
+import {testrayCaseImpl} from '~/services/rest/TestrayCase';
 import {CaseResultStatuses} from '~/util/statuses';
 
 type RunStatusProps = {
@@ -168,7 +168,7 @@ const CompareRunsCases = () => {
 						filterSchema: 'compareRunsCases',
 					}}
 					resource={`/${
-						testrayCaseRest.uri
+						testrayCaseImpl.uri
 					}?${searchParams.toString()}`}
 					tableProps={{
 						columns: [
@@ -229,7 +229,7 @@ const CompareRunsCases = () => {
 						rowWrap: true,
 					}}
 					transformData={(response) =>
-						testrayCaseRest.transformDataFromList(response)
+						testrayCaseImpl.transformDataFromList(response)
 					}
 					variables={{
 						filter,

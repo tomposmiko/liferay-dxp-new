@@ -8,7 +8,7 @@ exports[`FieldDropDown should render 1`] = `
       class="dropdown dropdown-root searchable-select-root"
     >
       <button
-        class="button-root btn btn-secondary dropdown-toggle show-caret"
+        class="button-root dropdown-toggle show-caret btn btn-unstyled"
         type="button"
       >
         
@@ -17,11 +17,11 @@ exports[`FieldDropDown should render 1`] = `
           class="caret-root"
         >
           <svg
-            class="icon-root lexicon-icon lexicon-icon-caret-double"
-            viewBox=""
+            class="lexicon-icon lexicon-icon-caret-double icon-root"
+            role="presentation"
           >
             <use
-              xlink:href="/o/osb-faro-web/dist/sprite.svg#caret-double"
+              xlink:href="#caret-double"
             />
           </svg>
         </span>

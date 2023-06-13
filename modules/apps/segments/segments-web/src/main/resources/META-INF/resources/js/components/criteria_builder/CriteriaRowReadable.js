@@ -45,11 +45,15 @@ export default function CriteriaRowReadable({
 		return (
 			<span>
 				{propertyLabel && (
-					<b className="mr-1 text-dark">{propertyLabel}</b>
+					<b className="c-mr-1 font-weight-bold text-dark">
+						{propertyLabel}
+					</b>
 				)}
 
 				{operatorLabel && (
-					<span className="mr-1 operator">{operatorLabel}</span>
+					<span className="c-mr-1 font-weight-bold operator">
+						{operatorLabel}
+					</span>
 				)}
 
 				<b>{unescapeSingleQuotes(parsedValue)}</b>
@@ -62,7 +66,7 @@ export default function CriteriaRowReadable({
 	const propertyLabel = selectedProperty ? selectedProperty.label : '';
 
 	return (
-		<span className="criterion-string">
+		<span className="c-ml-2 criterion-string">
 			{_renderCriteriaString({
 				operatorLabel,
 				propertyLabel,

@@ -34,15 +34,15 @@ exports[`InputWithEditToggle should render 1`] = `
             >
               <button
                 aria-label="Edit"
-                class="button-root btn btn-secondary btn-sm"
+                class="button-root btn btn-sm btn-secondary"
                 type="button"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-pencil"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-pencil icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#pencil"
+                    xlink:href="#pencil"
                   />
                 </svg>
               </button>

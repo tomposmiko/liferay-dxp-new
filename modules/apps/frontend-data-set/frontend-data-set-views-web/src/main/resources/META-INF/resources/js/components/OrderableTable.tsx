@@ -19,7 +19,7 @@ import ClayTable from '@clayui/table';
 import classNames from 'classnames';
 import {ManagementToolbar} from 'frontend-js-components-web';
 import fuzzy from 'fuzzy';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {DndProvider, useDrag, useDrop} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 
@@ -152,6 +152,7 @@ const OrderableTableRow = ({
 };
 
 interface OrderableTableInterface {
+	disableSave?: boolean;
 	fields: Array<{
 		label: string;
 		name: string;
@@ -162,12 +163,13 @@ interface OrderableTableInterface {
 	noItemsTitle: string;
 	onCancelButtonClick: Function;
 	onCreationButtonClick: Function;
-	onOrderChange: Function;
+	onOrderChange: (args: {orderedItems: any[]}) => void;
 	onSaveButtonClick: Function;
 	title: string;
 }
 
 const OrderableTable = ({
+	disableSave,
 	fields,
 	items: initialItems,
 	noItemsButtonLabel,
@@ -181,6 +183,8 @@ const OrderableTable = ({
 }: OrderableTableInterface) => {
 	const [items, setItems] = useState(initialItems);
 	const [query, setQuery] = useState('');
+
+	useEffect(() => setItems(initialItems), [initialItems]);
 
 	const onSearch = (query: string) => {
 		setQuery(query);
@@ -296,7 +300,10 @@ const OrderableTable = ({
 			{!!items.length && (
 				<ClayLayout.SheetFooter>
 					<ClayButton.Group spaced>
-						<ClayButton onClick={() => onSaveButtonClick()}>
+						<ClayButton
+							disabled={disableSave}
+							onClick={() => onSaveButtonClick()}
+						>
 							{Liferay.Language.get('save')}
 						</ClayButton>
 

@@ -37,14 +37,12 @@ import com.liferay.portal.vulcan.extension.ExtensionProvider;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 import com.liferay.portal.vulcan.extension.validation.DefaultPropertyValidator;
 import com.liferay.portal.vulcan.extension.validation.PropertyValidator;
-import com.liferay.portal.vulcan.fields.NestedFieldsContext;
-import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
+import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -68,44 +66,53 @@ public class ObjectRelationshipExtensionProvider
 			long companyId, String className, Object entity)
 		throws Exception {
 
-		NestedFieldsContext nestedFieldsContext =
-			NestedFieldsContextThreadLocal.getNestedFieldsContext();
-
-		if (nestedFieldsContext == null) {
-			return Collections.emptyMap();
-		}
-
 		ObjectDefinition objectDefinition = fetchObjectDefinition(
 			companyId, className);
 
-		List<ObjectRelationship> objectRelationships = _getObjectRelationships(
-			nestedFieldsContext.getFieldNames(), objectDefinition);
+		return NestedFieldsSupplier.supply(
+			nestedFieldName -> {
+				ObjectRelationship objectRelationship =
+					_objectRelationshipLocalService.
+						fetchObjectRelationshipByObjectDefinitionId1(
+							objectDefinition.getObjectDefinitionId(),
+							nestedFieldName);
 
-		if (objectRelationships.isEmpty()) {
-			return Collections.emptyMap();
-		}
+				if ((objectRelationship == null) ||
+					(!Objects.equals(
+						objectRelationship.getType(),
+						ObjectRelationshipConstants.TYPE_MANY_TO_MANY) &&
+					 !Objects.equals(
+						 objectRelationship.getType(),
+						 ObjectRelationshipConstants.TYPE_ONE_TO_MANY))) {
 
-		Map<String, Serializable> extendedProperties = new HashMap<>();
+					return null;
+				}
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				objectDefinition.getStorageType());
-		long primaryKey = getPrimaryKey(entity);
+				ObjectDefinition relatedObjectDefinition =
+					_getRelatedObjectDefinition(
+						objectDefinition, objectRelationship);
 
-		for (ObjectRelationship objectRelationship : objectRelationships) {
-			Page<ObjectEntry> relatedObjectEntriesPage =
-				objectEntryManager.getObjectEntryRelatedObjectEntries(
-					_getDefaultDTOConverterContext(
-						objectDefinition, primaryKey, null),
-					objectDefinition, primaryKey, objectRelationship.getName(),
-					Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+				if (!relatedObjectDefinition.isActive() ||
+					relatedObjectDefinition.isUnmodifiableSystemObject()) {
 
-			extendedProperties.put(
-				objectRelationship.getName(),
-				(Serializable)relatedObjectEntriesPage.getItems());
-		}
+					return null;
+				}
 
-		return extendedProperties;
+				ObjectEntryManager objectEntryManager =
+					_objectEntryManagerRegistry.getObjectEntryManager(
+						objectDefinition.getStorageType());
+				long primaryKey = getPrimaryKey(entity);
+
+				Page<ObjectEntry> relatedObjectEntriesPage =
+					objectEntryManager.getObjectEntryRelatedObjectEntries(
+						_getDefaultDTOConverterContext(
+							objectDefinition, primaryKey, null),
+						objectDefinition, primaryKey,
+						objectRelationship.getName(),
+						Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+
+				return (Serializable)relatedObjectEntriesPage.getItems();
+			});
 	}
 
 	@Override
@@ -205,6 +212,7 @@ public class ObjectRelationshipExtensionProvider
 				_objectRelationshipElementsParserRegistry.
 					getObjectRelationshipElementsParser(
 						relatedObjectDefinition.getClassName(),
+						relatedObjectDefinition.getCompanyId(),
 						objectRelationship.getType());
 
 			List<ObjectEntry> nestedObjectEntries =
@@ -241,45 +249,6 @@ public class ObjectRelationshipExtensionProvider
 		defaultDTOConverterContext.setAttribute("addActions", Boolean.FALSE);
 
 		return defaultDTOConverterContext;
-	}
-
-	private List<ObjectRelationship> _getObjectRelationships(
-			List<String> fieldNames, ObjectDefinition objectDefinition)
-		throws Exception {
-
-		List<ObjectRelationship> objectRelationships = new ArrayList<>();
-
-		for (String fieldName : fieldNames) {
-			ObjectRelationship objectRelationship =
-				_objectRelationshipLocalService.
-					fetchObjectRelationshipByObjectDefinitionId1(
-						objectDefinition.getObjectDefinitionId(), fieldName);
-
-			if ((objectRelationship == null) ||
-				(!Objects.equals(
-					objectRelationship.getType(),
-					ObjectRelationshipConstants.TYPE_MANY_TO_MANY) &&
-				 !Objects.equals(
-					 objectRelationship.getType(),
-					 ObjectRelationshipConstants.TYPE_ONE_TO_MANY))) {
-
-				continue;
-			}
-
-			ObjectDefinition relatedObjectDefinition =
-				_getRelatedObjectDefinition(
-					objectDefinition, objectRelationship);
-
-			if (!relatedObjectDefinition.isActive() ||
-				relatedObjectDefinition.isUnmodifiableSystemObject()) {
-
-				continue;
-			}
-
-			objectRelationships.add(objectRelationship);
-		}
-
-		return objectRelationships;
 	}
 
 	private PropertyDefinition.PropertyType _getPropertyType(

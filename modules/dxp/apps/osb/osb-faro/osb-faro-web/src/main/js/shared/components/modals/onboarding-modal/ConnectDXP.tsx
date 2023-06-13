@@ -1,6 +1,8 @@
 import * as API from 'shared/api';
 import BaseScreen from './BaseScreen';
-import Button from 'shared/components/Button';
+import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
+import ClayLink from '@clayui/link';
 import CopyButton from 'shared/components/CopyButton';
 import DataSourceQuery, {
 	DataSource,
@@ -8,7 +10,6 @@ import DataSourceQuery, {
 	DataSourceSyncData
 } from 'shared/queries/DataSourceQuery';
 import getCN from 'classnames';
-import Icon from 'shared/components/Icon';
 import InfoPopover from 'shared/components/InfoPopover';
 import Input from 'shared/components/Input';
 import Label from 'shared/components/form/Label';
@@ -208,16 +209,20 @@ const ConnectDXP: React.FC<IConnectDXPWrapperProps & IConnectDXPProps> = ({
 		<BaseScreen className='connect-dxp' onClose={onClose}>
 			<Modal.Body className='d-flex flex-column align-items-center flex-grow-1 justify-content-center'>
 				<div className='analytics-to-dxp-container'>
-					<Icon size='xl' symbol='dxp-icon' />
+					<ClayIcon
+						className='icon-root icon-size-xl'
+						symbol='dxp-icon'
+					/>
 
-					<Icon
-						className={getCN('arrows', {connected: dxpConnected})}
-						size='lg'
+					<ClayIcon
+						className={getCN('arrows icon-root icon-size-lg', {
+							connected: dxpConnected
+						})}
 						symbol='ac-horizontal-arrows'
 					/>
 
-					<Icon
-						size='xl'
+					<ClayIcon
+						className='icon-root icon-size-xl'
 						symbol={dxpConnected ? 'ac-logo' : 'ac-logo-grayscale'}
 					/>
 				</div>
@@ -351,26 +356,38 @@ const Footer: FC<IFooterProps & IConnectDXPProps> = ({
 		<Modal.Footer className='d-flex justify-content-end'>
 			<div>
 				{!(dxpConnected && onboarding) && (
-					<Button
+					<ClayButton
+						className='button-root'
 						disabled={dxpConnected}
+						displayType='secondary'
 						onClick={onboarding ? () => onNext() : onClose}
 					>
 						{onboarding
 							? Liferay.Language.get('skip')
 							: Liferay.Language.get('cancel')}
-					</Button>
+					</ClayButton>
 				)}
 
-				<Button
-					disabled={!dxpConnected}
-					display='primary'
-					href={onboarding || !dxpConnected ? null : getNavHref()}
-					onClick={onboarding ? () => onNext() : onClose}
-				>
-					{onboarding
-						? Liferay.Language.get('next')
-						: Liferay.Language.get('done')}
-				</Button>
+				{!dxpConnected || onboarding ? (
+					<ClayButton
+						className='button-root'
+						disabled={!dxpConnected}
+						displayType='primary'
+						onClick={onboarding ? () => onNext() : onClose}
+					>
+						{Liferay.Language.get('next')}
+					</ClayButton>
+				) : (
+					<ClayLink
+						button
+						className='button-root'
+						displayType='primary'
+						href={getNavHref()}
+						onClick={() => onClose()}
+					>
+						{Liferay.Language.get('done')}
+					</ClayLink>
+				)}
 			</div>
 		</Modal.Footer>
 	);
@@ -431,17 +448,20 @@ const FixPackSelect: FC<React.HTMLAttributes<HTMLElement>> = () => {
 				</div>
 
 				<div className='fix-pack-button'>
-					<Button
-						borderless
-						className='more-information-link mt-4'
-						externalLink
+					<ClayLink
+						button
+						className='button-root more-information-link mt-4'
+						displayType='secondary'
 						href={DXP_VERSIONS[dxpVersion].url}
-						icon='shortcut'
-						iconAlignment='right'
 						target='_blank'
 					>
+						<ClayIcon
+							className='icon-root mr-2'
+							symbol='shortcut'
+						/>
+
 						{Liferay.Language.get('download')}
-					</Button>
+					</ClayLink>
 				</div>
 			</div>
 		</>
@@ -488,7 +508,7 @@ const TokenInput: FC<ITokenInputProps> = ({token}) => {
 					>
 						<CopyButton
 							className={copyButtonClassName}
-							display='light'
+							displayType='unstyled'
 							onClick={() => {
 								setTokenCopied(true);
 

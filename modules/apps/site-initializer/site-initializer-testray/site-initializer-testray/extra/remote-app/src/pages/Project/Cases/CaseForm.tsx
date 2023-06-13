@@ -16,6 +16,7 @@ import ClayForm, {ClayCheckbox} from '@clayui/form';
 import {useForm} from 'react-hook-form';
 import {useOutletContext, useParams} from 'react-router-dom';
 import {KeyedMutator} from 'swr';
+import {withPagePermission} from '~/hoc/withPagePermission';
 
 import Form from '../../../components/Form';
 import Container from '../../../components/Layout/Container';
@@ -31,7 +32,7 @@ import {
 	TestrayCaseType,
 	TestrayComponent,
 	TestrayProject,
-	testrayCaseRest,
+	testrayCaseImpl,
 } from '../../../services/rest';
 import {DescriptionType} from '../../../types';
 
@@ -100,7 +101,7 @@ const CaseForm = () => {
 
 	const {projectId} = useParams();
 	const {
-		formState: {errors},
+		formState: {errors, isSubmitting},
 		handleSubmit,
 		register,
 		setValue,
@@ -123,11 +124,11 @@ const CaseForm = () => {
 	const _onSubmit = (form: CaseFormData) => {
 		const addAnother = form?.addAnother === true;
 
-		onSubmit(
+		return onSubmit(
 			{...form, projectId},
 			{
-				create: (data) => testrayCaseRest.create(data),
-				update: (id, data) => testrayCaseRest.update(id, data),
+				create: (data) => testrayCaseImpl.create(data),
+				update: (id, data) => testrayCaseImpl.update(id, data),
 			}
 		)
 			.then(mutateTestrayCase)
@@ -273,10 +274,13 @@ const CaseForm = () => {
 				<Form.Footer
 					onClose={onClose}
 					onSubmit={handleSubmit(_onSubmit)}
+					primaryButtonProps={{loading: isSubmitting}}
 				/>
 			</ClayForm>
 		</Container>
 	);
 };
 
-export default CaseForm;
+export default withPagePermission(CaseForm, {
+	restImpl: testrayCaseImpl,
+});

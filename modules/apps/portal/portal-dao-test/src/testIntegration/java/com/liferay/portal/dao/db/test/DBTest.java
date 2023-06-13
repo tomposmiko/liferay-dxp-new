@@ -237,6 +237,57 @@ public class DBTest {
 	}
 
 	@Test
+	public void testAlterTableAddColumnLongDefaultNotNull() throws Exception {
+		_db.alterTableAddColumn(
+			_connection, _TABLE_NAME_1, "testColumn",
+			"LONG default 2 not null");
+
+		_db.runSQL(
+			"insert into " + _TABLE_NAME_1 +
+				" (id, notNilColumn) values (1, '1')");
+
+		try (PreparedStatement preparedStatement = _connection.prepareStatement(
+				"select testColumn from " + _TABLE_NAME_1);
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			resultSet.next();
+
+			Assert.assertEquals(2, resultSet.getLong(1));
+		}
+
+		Assert.assertTrue(
+			_dbInspector.hasColumnType(
+				_TABLE_NAME_1, "testColumn", "LONG default 2 not null"));
+	}
+
+	@Test
+	public void testAlterTableAddColumnVarcharDefaultNotNull()
+		throws Exception {
+
+		_db.alterTableAddColumn(
+			_connection, _TABLE_NAME_1, "testColumn",
+			"VARCHAR(40) default 'test value' not null");
+
+		_db.runSQL(
+			"insert into " + _TABLE_NAME_1 +
+				" (id, notNilColumn) values (1, '1')");
+
+		try (PreparedStatement preparedStatement = _connection.prepareStatement(
+				"select testColumn from " + _TABLE_NAME_1);
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			resultSet.next();
+
+			Assert.assertEquals("test value", resultSet.getString(1));
+		}
+
+		Assert.assertTrue(
+			_dbInspector.hasColumnType(
+				_TABLE_NAME_1, "testColumn",
+				"VARCHAR(40) default 'test value' not null"));
+	}
+
+	@Test
 	public void testAlterTableDropIndexedColumn() throws Exception {
 		_addIndex(new String[] {"typeVarchar", "typeBoolean"});
 
@@ -275,7 +326,10 @@ public class DBTest {
 		_db.runSQL(_SQL_CREATE_TABLE_2);
 
 		Assert.assertArrayEquals(
-			new String[] {"id2", "id1"},
+			new String[] {
+				_dbInspector.normalizeName("id2"),
+				_dbInspector.normalizeName("id1")
+			},
 			_db.getPrimaryKeyColumnNames(_connection, _TABLE_NAME_2));
 	}
 
@@ -285,7 +339,10 @@ public class DBTest {
 
 		Assert.assertFalse(
 			Arrays.equals(
-				new String[] {"id1", "id2"},
+				new String[] {
+					_dbInspector.normalizeName("id1"),
+					_dbInspector.normalizeName("id2")
+				},
 				_db.getPrimaryKeyColumnNames(_connection, _TABLE_NAME_2)));
 	}
 

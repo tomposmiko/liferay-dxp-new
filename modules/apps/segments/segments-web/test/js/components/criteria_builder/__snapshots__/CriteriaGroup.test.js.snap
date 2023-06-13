@@ -12,7 +12,7 @@ exports[`CriteriaGroup renders 1`] = `
         class="drop-zone-target p-5"
       >
         <div
-          class="empty-drop-zone-indicator"
+          class="empty-drop-zone-indicator w-100"
         />
       </div>
     </div>

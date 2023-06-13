@@ -96,7 +96,7 @@ function drop(props, monitor) {
 
 function DropZone({before, canDrop, connectDropTarget, hover}) {
 	return (
-		<div className="drop-zone-root">
+		<div className="drop-zone-root position-relative">
 			{connectDropTarget(
 				<div
 					className={classNames('drop-zone-target', {
@@ -104,7 +104,7 @@ function DropZone({before, canDrop, connectDropTarget, hover}) {
 					})}
 				>
 					{canDrop && hover && (
-						<div className="drop-zone-indicator" />
+						<div className="drop-zone-indicator w-100" />
 					)}
 				</div>
 			)}

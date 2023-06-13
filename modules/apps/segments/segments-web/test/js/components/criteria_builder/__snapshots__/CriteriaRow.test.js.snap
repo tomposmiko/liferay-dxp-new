@@ -21,9 +21,11 @@ exports[`CriteriaRow renders 1`] = `
         </svg>
       </div>
       <span
-        class="criterion-string"
+        class="c-ml-2 criterion-string"
       >
-        <b>
+        <b
+          class="font-weight-bold"
+        >
           Test Property
         </b>
       </span>
@@ -61,7 +63,7 @@ exports[`CriteriaRow renders 1`] = `
       />
       <button
         aria-label="duplicate-segment-property"
-        class="btn-outline-borderless btn-sm mr-1 btn btn-monospaced btn-secondary"
+        class="btn-outline-borderless btn-sm c-mr-1 btn btn-monospaced btn-secondary"
         title="duplicate-segment-property"
         type="button"
       >
@@ -115,9 +117,11 @@ exports[`CriteriaRow renders and inform there is an unknown property 1`] = `
         </svg>
       </div>
       <span
-        class="criterion-string"
+        class="c-ml-2 criterion-string"
       >
-        <b>
+        <b
+          class="font-weight-bold"
+        >
           unknown_prop
         </b>
       </span>

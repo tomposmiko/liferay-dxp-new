@@ -16,11 +16,11 @@ exports[`Workspaces should render a list of projects if there is only one projec
           target="_blank"
         >
           <svg
-            class="icon-root lexicon-icon lexicon-icon-liferay-logo liferay-logo"
-            viewBox=""
+            class="lexicon-icon lexicon-icon-liferay-logo icon-root liferay-logo"
+            role="presentation"
           >
             <use
-              xlink:href="/o/osb-faro-web/dist/sprite.svg#liferay-logo"
+              xlink:href="#liferay-logo"
             />
           </svg>
         </a>
@@ -43,7 +43,7 @@ exports[`Workspaces should render a list of projects if there is only one projec
                 Test Test
               </span>
               <svg
-                class="lexicon-icon lexicon-icon-caret-bottom caret"
+                class="lexicon-icon lexicon-icon-caret-bottom icon-root caret"
                 role="presentation"
               >
                 <use
@@ -67,11 +67,11 @@ exports[`Workspaces should render a list of projects if there is only one projec
               class="logo-container"
             >
               <svg
-                class="icon-root lexicon-icon lexicon-icon-ac-logo logo-icon"
-                viewBox=""
+                class="lexicon-icon lexicon-icon-ac-logo icon-root logo-icon"
+                role="presentation"
               >
                 <use
-                  xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-logo"
+                  xlink:href="#ac-logo"
                 />
               </svg>
               <span
@@ -103,7 +103,7 @@ exports[`Workspaces should render a list of projects if there is only one projec
                 class="list-group-item list-group-item-action list-group-item-flex"
               >
                 <a
-                  class="button-root btn btn-unstyled workspace-link border-button"
+                  class="button-root workspace-link border-button btn btn-unstyled"
                   href="/workspace/23"
                 >
                   <div
@@ -138,11 +138,11 @@ exports[`Workspaces should render a list of projects if there is only one projec
                         </div>
                       </div>
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-angle-right"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-angle-right icon-root"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                          xlink:href="#angle-right"
                         />
                       </svg>
                     </div>
@@ -155,13 +155,13 @@ exports[`Workspaces should render a list of projects if there is only one projec
             class="mt-4"
           >
             <button
-              class="button-root btn btn-primary mr-2 btn-sm"
+              class="button-root mr-2 btn btn-sm btn-primary"
               type="button"
             >
               Buy Paid Tier
             </button>
             <a
-              class="button-root btn btn-secondary btn-sm"
+              class="button-root btn btn-sm btn-secondary"
               href="/workspace/add/trial"
             >
               Start Free Trial
@@ -190,11 +190,11 @@ exports[`Workspaces should render empty state 1`] = `
           target="_blank"
         >
           <svg
-            class="icon-root lexicon-icon lexicon-icon-liferay-logo liferay-logo"
-            viewBox=""
+            class="lexicon-icon lexicon-icon-liferay-logo icon-root liferay-logo"
+            role="presentation"
           >
             <use
-              xlink:href="/o/osb-faro-web/dist/sprite.svg#liferay-logo"
+              xlink:href="#liferay-logo"
             />
           </svg>
         </a>
@@ -217,7 +217,7 @@ exports[`Workspaces should render empty state 1`] = `
                 Test Test
               </span>
               <svg
-                class="lexicon-icon lexicon-icon-caret-bottom caret"
+                class="lexicon-icon lexicon-icon-caret-bottom icon-root caret"
                 role="presentation"
               >
                 <use
@@ -241,11 +241,11 @@ exports[`Workspaces should render empty state 1`] = `
               class="logo-container"
             >
               <svg
-                class="icon-root lexicon-icon lexicon-icon-ac-logo logo-icon"
-                viewBox=""
+                class="lexicon-icon lexicon-icon-ac-logo icon-root logo-icon"
+                role="presentation"
               >
                 <use
-                  xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-logo"
+                  xlink:href="#ac-logo"
                 />
               </svg>
               <span
@@ -277,18 +277,18 @@ exports[`Workspaces should render empty state 1`] = `
                 class="empty-card"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-ac-integration"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-ac-integration icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-integration"
+                    xlink:href="#ac-integration"
                   />
                 </svg>
                 <p>
                   Do more with our Business & Enterprise Plans
                 </p>
                 <button
-                  class="button-root btn btn-primary"
+                  class="btn btn-secondary"
                   type="button"
                 >
                   Contact Sales
@@ -302,22 +302,23 @@ exports[`Workspaces should render empty state 1`] = `
                 class="empty-card"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-ac-page-analytics"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-ac-page-analytics icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-page-analytics"
+                    xlink:href="#ac-page-analytics"
                   />
                 </svg>
                 <p>
                   90 Day Full Feature Trial
                 </p>
-                <a
-                  class="button-root btn btn-secondary"
+                <button
+                  class="btn btn-secondary"
                   href="/workspace/add/trial"
+                  type="button"
                 >
                   Start Free Trial
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -344,11 +345,11 @@ exports[`Workspaces should render with a message that all basic tier plans have 
           target="_blank"
         >
           <svg
-            class="icon-root lexicon-icon lexicon-icon-liferay-logo liferay-logo"
-            viewBox=""
+            class="lexicon-icon lexicon-icon-liferay-logo icon-root liferay-logo"
+            role="presentation"
           >
             <use
-              xlink:href="/o/osb-faro-web/dist/sprite.svg#liferay-logo"
+              xlink:href="#liferay-logo"
             />
           </svg>
         </a>
@@ -371,7 +372,7 @@ exports[`Workspaces should render with a message that all basic tier plans have 
                 Test Test
               </span>
               <svg
-                class="lexicon-icon lexicon-icon-caret-bottom caret"
+                class="lexicon-icon lexicon-icon-caret-bottom icon-root caret"
                 role="presentation"
               >
                 <use
@@ -395,11 +396,11 @@ exports[`Workspaces should render with a message that all basic tier plans have 
               class="logo-container"
             >
               <svg
-                class="icon-root lexicon-icon lexicon-icon-ac-logo logo-icon"
-                viewBox=""
+                class="lexicon-icon lexicon-icon-ac-logo icon-root logo-icon"
+                role="presentation"
               >
                 <use
-                  xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-logo"
+                  xlink:href="#ac-logo"
                 />
               </svg>
               <span
@@ -431,7 +432,7 @@ exports[`Workspaces should render with a message that all basic tier plans have 
                 class="list-group-item list-group-item-action list-group-item-flex"
               >
                 <a
-                  class="button-root btn btn-unstyled workspace-link border-button"
+                  class="button-root workspace-link border-button btn btn-unstyled"
                   href="/workspace/123"
                 >
                   <div
@@ -466,11 +467,11 @@ exports[`Workspaces should render with a message that all basic tier plans have 
                         </div>
                       </div>
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-angle-right"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-angle-right icon-root"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                          xlink:href="#angle-right"
                         />
                       </svg>
                     </div>
@@ -481,7 +482,7 @@ exports[`Workspaces should render with a message that all basic tier plans have 
                 class="list-group-item list-group-item-action list-group-item-flex"
               >
                 <a
-                  class="button-root btn btn-unstyled workspace-link border-button"
+                  class="button-root workspace-link border-button btn btn-unstyled"
                   href="/workspace/124"
                 >
                   <div
@@ -516,11 +517,11 @@ exports[`Workspaces should render with a message that all basic tier plans have 
                         </div>
                       </div>
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-angle-right"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-angle-right icon-root"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                          xlink:href="#angle-right"
                         />
                       </svg>
                     </div>
@@ -533,13 +534,13 @@ exports[`Workspaces should render with a message that all basic tier plans have 
             class="mt-4"
           >
             <button
-              class="button-root btn btn-primary mr-2 btn-sm"
+              class="button-root mr-2 btn btn-sm btn-primary"
               type="button"
             >
               Buy Paid Tier
             </button>
             <a
-              class="button-root btn btn-secondary btn-sm"
+              class="button-root btn btn-sm btn-secondary"
               href="/workspace/add/trial"
             >
               Start Free Trial
@@ -568,11 +569,11 @@ exports[`Workspaces should render with a message that one or more basic tier wor
           target="_blank"
         >
           <svg
-            class="icon-root lexicon-icon lexicon-icon-liferay-logo liferay-logo"
-            viewBox=""
+            class="lexicon-icon lexicon-icon-liferay-logo icon-root liferay-logo"
+            role="presentation"
           >
             <use
-              xlink:href="/o/osb-faro-web/dist/sprite.svg#liferay-logo"
+              xlink:href="#liferay-logo"
             />
           </svg>
         </a>
@@ -595,7 +596,7 @@ exports[`Workspaces should render with a message that one or more basic tier wor
                 Test Test
               </span>
               <svg
-                class="lexicon-icon lexicon-icon-caret-bottom caret"
+                class="lexicon-icon lexicon-icon-caret-bottom icon-root caret"
                 role="presentation"
               >
                 <use
@@ -619,11 +620,11 @@ exports[`Workspaces should render with a message that one or more basic tier wor
               class="logo-container"
             >
               <svg
-                class="icon-root lexicon-icon lexicon-icon-ac-logo logo-icon"
-                viewBox=""
+                class="lexicon-icon lexicon-icon-ac-logo icon-root logo-icon"
+                role="presentation"
               >
                 <use
-                  xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-logo"
+                  xlink:href="#ac-logo"
                 />
               </svg>
               <span
@@ -655,7 +656,7 @@ exports[`Workspaces should render with a message that one or more basic tier wor
                 class="list-group-item list-group-item-action list-group-item-flex"
               >
                 <a
-                  class="button-root btn btn-unstyled workspace-link border-button"
+                  class="button-root workspace-link border-button btn btn-unstyled"
                   href="/workspace/124"
                 >
                   <div
@@ -690,11 +691,11 @@ exports[`Workspaces should render with a message that one or more basic tier wor
                         </div>
                       </div>
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-angle-right"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-angle-right icon-root"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                          xlink:href="#angle-right"
                         />
                       </svg>
                     </div>
@@ -705,7 +706,7 @@ exports[`Workspaces should render with a message that one or more basic tier wor
                 class="list-group-item list-group-item-action list-group-item-flex"
               >
                 <a
-                  class="button-root btn btn-unstyled workspace-link border-button"
+                  class="button-root workspace-link border-button btn btn-unstyled"
                   href="/workspace/123"
                 >
                   <div
@@ -740,11 +741,11 @@ exports[`Workspaces should render with a message that one or more basic tier wor
                         </div>
                       </div>
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-angle-right"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-angle-right icon-root"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                          xlink:href="#angle-right"
                         />
                       </svg>
                     </div>
@@ -757,13 +758,13 @@ exports[`Workspaces should render with a message that one or more basic tier wor
             class="mt-4"
           >
             <button
-              class="button-root btn btn-primary mr-2 btn-sm"
+              class="button-root mr-2 btn btn-sm btn-primary"
               type="button"
             >
               Buy Paid Tier
             </button>
             <a
-              class="button-root btn btn-secondary btn-sm"
+              class="button-root btn btn-sm btn-secondary"
               href="/workspace/add/trial"
             >
               Start Free Trial

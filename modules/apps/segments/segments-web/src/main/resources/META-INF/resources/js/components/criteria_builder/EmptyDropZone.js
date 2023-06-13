@@ -70,7 +70,7 @@ function EmptyDropZone({canDrop, connectDropTarget, emptyContributors, hover}) {
 							}
 						)}
 					>
-						<div className="empty-drop-zone-indicator" />
+						<div className="empty-drop-zone-indicator w-100" />
 					</div>
 				) : (
 					<div>

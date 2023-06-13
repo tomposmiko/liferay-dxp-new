@@ -1704,6 +1704,7 @@ public class VerifyProperties {
 		"com.liferay.portal.servlet.filters.doubleclick.DoubleClickFilter",
 		"com.liferay.portal.servlet.filters.charbufferpool." +
 			"CharBufferPoolFilter",
+		"com.liferay.portal.servlet.filters.i18n.I18nFilter",
 		"com.liferay.portal.servlet.filters.jsoncontenttype." +
 			"JSONContentTypeFilter",
 		"com.liferay.portal.servlet.filters.monitoring.MonitoringFilter",

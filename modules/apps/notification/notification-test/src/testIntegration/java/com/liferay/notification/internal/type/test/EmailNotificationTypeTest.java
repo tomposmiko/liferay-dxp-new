@@ -20,20 +20,23 @@ import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.constants.NotificationRecipientConstants;
 import com.liferay.notification.constants.NotificationTemplateConstants;
 import com.liferay.notification.context.NotificationContext;
-import com.liferay.notification.context.NotificationContextBuilder;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.util.NotificationRecipientSettingUtil;
-import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.constants.ObjectActionExecutorConstants;
+import com.liferay.object.constants.ObjectActionTriggerConstants;
+import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,32 +67,32 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			notificationQueueEntryLocalService.
 				getNotificationQueueEntriesCount());
 
-		ObjectEntry objectEntry = objectEntryLocalService.addObjectEntry(
-			user2.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
-			randomObjectEntryValues,
-			ServiceContextTestUtil.getServiceContext());
+		NotificationTemplate notificationTemplate =
+			notificationTemplateLocalService.addNotificationTemplate(
+				_createNotificationContext());
 
-		sendNotification(
-			new NotificationContextBuilder(
-			).className(
-				objectDefinition.getClassName()
-			).classPK(
-				objectEntry.getObjectEntryId()
-			).notificationTemplate(
-				notificationTemplateLocalService.addNotificationTemplate(
-					_createNotificationContext())
-			).termValues(
-				HashMapBuilder.<String, Object>put(
-					"creator", user2.getUserId()
-				).put(
-					"currentUserId", user2.getUserId()
-				).putAll(
-					randomObjectEntryValues
-				).build()
-			).userId(
-				user1.getUserId()
-			).build(),
-			NotificationConstants.TYPE_EMAIL);
+		objectActionLocalService.addObjectAction(
+			RandomTestUtil.randomString(), TestPropsValues.getUserId(),
+			objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
+			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			RandomTestUtil.randomString(),
+			ObjectActionExecutorConstants.KEY_NOTIFICATION,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"notificationTemplateId",
+				notificationTemplate.getNotificationTemplateId()
+			).build());
+
+		objectEntryManager.addObjectEntry(
+			dtoConverterContext, objectDefinition,
+			new ObjectEntry() {
+				{
+					setProperties(randomObjectEntryValues);
+				}
+			},
+			ObjectDefinitionConstants.SCOPE_COMPANY);
 
 		List<NotificationQueueEntry> notificationQueueEntries =
 			notificationQueueEntryLocalService.getNotificationEntries(
@@ -102,10 +105,6 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 
 		NotificationQueueEntry notificationQueueEntry =
 			notificationQueueEntries.get(0);
-
-		Assert.assertEquals(
-			NotificationQueueEntryConstants.STATUS_SENT,
-			notificationQueueEntry.getStatus());
 
 		NotificationRecipient notificationRecipient =
 			notificationQueueEntry.getNotificationRecipient();
@@ -130,17 +129,20 @@ public class EmailNotificationTypeTest extends BaseNotificationTypeTest {
 			user2.getEmailAddress(),
 			notificationRecipientSettingsMap.get("to"));
 
-		assertTerms(
+		assertTermValues(
 			getTermValues(),
 			ListUtil.fromString(
 				notificationQueueEntry.getBody(), StringPool.COMMA));
-		assertTerms(
+		assertTermValues(
 			getTermValues(),
 			ListUtil.fromString(
 				notificationQueueEntry.getSubject(), StringPool.COMMA));
+
+		notificationQueueEntryLocalService.deleteNotificationQueueEntry(
+			notificationQueueEntry);
 	}
 
-	private NotificationContext _createNotificationContext() throws Exception {
+	private NotificationContext _createNotificationContext() {
 		NotificationContext notificationContext = new NotificationContext();
 
 		notificationContext.setNotificationRecipient(

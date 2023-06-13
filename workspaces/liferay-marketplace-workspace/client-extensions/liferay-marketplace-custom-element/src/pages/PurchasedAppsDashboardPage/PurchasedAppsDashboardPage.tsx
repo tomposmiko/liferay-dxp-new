@@ -4,10 +4,7 @@ import {useEffect, useState} from 'react';
 import accountLogo from '../../assets/icons/mainAppLogo.svg';
 import {DashboardNavigation} from '../../components/DashboardNavigation/DashboardNavigation';
 import {DashboardMemberTableRow} from '../../components/DashboardTable/DashboardMemberTableRow';
-import {
-	AppProps,
-	DashboardTable,
-} from '../../components/DashboardTable/DashboardTable';
+import {DashboardTable} from '../../components/DashboardTable/DashboardTable';
 import {PurchasedAppsDashboardTableRow} from '../../components/DashboardTable/PurchasedAppsDashboardTableRow';
 import {MemberProfile} from '../../components/MemberProfile/MemberProfile';
 import {getCompanyId} from '../../liferay/constants';
@@ -104,7 +101,6 @@ export function PurchasedAppsDashboardPage() {
 	const [selectedMember, setSelectedMember] = useState<MemberProps>();
 	const [selectedNavigationItem, setSelectedNavigationItem] =
 		useState('My Apps');
-	const [selectedApp, setSelectedApp] = useState<AppProps>();
 
 	const messages = {
 		description: 'Manage apps purchase from the Marketplace',
@@ -195,7 +191,8 @@ export function PurchasedAppsDashboardPage() {
 						type: placeOrderItem.subscription
 							? 'Subscription'
 							: 'Perpetual',
-						version: version ?? '',
+						version:
+							Object.keys(version).length === 0 ? '' : version,
 					};
 				})
 			);
@@ -233,6 +230,10 @@ export function PurchasedAppsDashboardPage() {
 			) || dashboardNavigationItems[0];
 
 		setSelectedNavigationItem(clickedNavigationItem?.itemTitle as string);
+
+		if (clickedNavigationItem.itemTitle !== 'Members') {
+			setSelectedMember(undefined);
+		}
 	}, [dashboardNavigationItems]);
 
 	useEffect(() => {
@@ -246,24 +247,18 @@ export function PurchasedAppsDashboardPage() {
 					isPublisherAccount: false,
 				};
 
-				const currentUserAccountRoleBriefs =
-					currentUserAccount.accountBriefs.find(
-						(accountBrief: {name: string}) =>
-							accountBrief.name === selectedAccount.name
-					).roleBriefs;
-
-
 				const currentUserAccountBriefs =
 					currentUserAccount.accountBriefs.find(
-						(accountBrief: {name: string}) =>
-							accountBrief.name === selectedAccount.name
+						(accountBrief: {id: number}) =>
+							accountBrief.id === selectedAccount.id
 					);
 
 				if (currentUserAccountBriefs) {
 					customerRoles.forEach((customerRole) => {
 						if (
 							currentUserAccountBriefs.roleBriefs.find(
-								(role: {name: string}) => role.name === customerRole
+								(role: {name: string}) =>
+									role.name === customerRole
 							)
 						) {
 							currentUserAccount.isCustomerAccount = true;
@@ -349,8 +344,6 @@ export function PurchasedAppsDashboardPage() {
 				accounts={accounts}
 				currentAccount={selectedAccount}
 				dashboardNavigationItems={dashboardNavigationItems}
-				onSelectAppChange={setSelectedApp}
-				selectedApp={selectedApp}
 				setDashboardNavigationItems={setDashboardNavigationItems}
 				setSelectedAccount={setSelectedAccount}
 			/>
@@ -358,6 +351,7 @@ export function PurchasedAppsDashboardPage() {
 			{selectedNavigationItem === 'My Apps' && (
 				<DashboardPage
 					buttonMessage="Add Apps"
+					buttonHref="https://marketplace.liferay.com/"
 					dashboardNavigationItems={dashboardNavigationItems}
 					messages={messages}
 				>

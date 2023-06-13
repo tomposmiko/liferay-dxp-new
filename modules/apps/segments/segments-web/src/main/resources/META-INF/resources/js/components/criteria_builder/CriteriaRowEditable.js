@@ -107,8 +107,8 @@ export default function CriteriaRowEditable({
 
 		return (
 			<>
-				<span className="criterion-string">
-					<b>{propertyLabel}</b>
+				<span className="c-ml-2 criterion-string">
+					<b className="font-weight-bold">{propertyLabel}</b>
 				</span>
 
 				<ClaySelectWithOption
@@ -209,7 +209,7 @@ export default function CriteriaRowEditable({
 						aria-label={Liferay.Language.get(
 							'duplicate-segment-property'
 						)}
-						className="btn-outline-borderless btn-sm mr-1"
+						className="btn-outline-borderless btn-sm c-mr-1"
 						displayType="secondary"
 						monospaced
 						onClick={_handleDuplicate}

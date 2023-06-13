@@ -203,6 +203,8 @@ export default function ObjectFieldFormBase({
 		const objectFieldSettings: ObjectFieldSetting[] =
 			fieldSettingsMap.get(option.businessType) || [];
 
+		const indexed = option.businessType !== 'Encrypted';
+
 		const isSearchableByText =
 			option.businessType === 'Attachment' ||
 			option.dbType === 'Clob' ||
@@ -218,6 +220,7 @@ export default function ObjectFieldFormBase({
 		setValues({
 			DBType: option.dbType,
 			businessType: option.businessType,
+			indexed,
 			indexedAsKeyword,
 			indexedLanguageId,
 			listTypeDefinitionExternalReferenceCode: '',
@@ -499,15 +502,14 @@ export default function ObjectFieldFormBase({
 				</ClayForm.Group>
 			)}
 
-			{Liferay.FeatureFlags['LPS-135398'] &&
-				(values.businessType === 'Text' ||
-					values.businessType === 'Integer') && (
-					<UniqueValues
-						disabled={disabled}
-						objectField={values}
-						setValues={setValues}
-					/>
-				)}
+			{(values.businessType === 'Text' ||
+				values.businessType === 'Integer') && (
+				<UniqueValues
+					disabled={disabled}
+					objectField={values}
+					setValues={setValues}
+				/>
+			)}
 		</>
 	);
 }

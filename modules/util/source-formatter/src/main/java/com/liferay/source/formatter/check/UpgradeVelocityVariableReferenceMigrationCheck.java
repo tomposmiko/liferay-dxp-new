@@ -17,6 +17,7 @@ package com.liferay.source.formatter.check;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.source.formatter.check.constants.VelocityMigrationConstants;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +30,7 @@ public class UpgradeVelocityVariableReferenceMigrationCheck
 
 	@Override
 	protected String migrateContent(String content) {
-		String[] lines = content.split(StringPool.NEW_LINE);
+		String[] lines = StringUtil.splitLines(content);
 
 		for (String line : lines) {
 			String newLine = line;
@@ -61,7 +62,9 @@ public class UpgradeVelocityVariableReferenceMigrationCheck
 				}
 				else {
 					String startNewMatch = StringUtil.replace(
-						match, CharPool.DOLLAR, _ENCAPSULATION_START);
+						match, CharPool.DOLLAR,
+						VelocityMigrationConstants.
+							FREEMARKER_ENCAPSULATION_START);
 
 					newLine = StringUtil.replace(
 						newLine, match,
@@ -107,7 +110,8 @@ public class UpgradeVelocityVariableReferenceMigrationCheck
 				String fullMatch = match + endMatch;
 
 				String newReference = StringUtil.replace(
-					match, CharPool.DOLLAR, _ENCAPSULATION_START);
+					match, CharPool.DOLLAR,
+					VelocityMigrationConstants.FREEMARKER_ENCAPSULATION_START);
 
 				newLine = StringUtil.replaceFirst(
 					newLine, fullMatch,
@@ -170,6 +174,7 @@ public class UpgradeVelocityVariableReferenceMigrationCheck
 		String lineBegin = line.substring(0, 2);
 
 		if ((lineBegin.equals(StringPool.LESS_THAN + StringPool.POUND) ||
+			 lineBegin.equals(StringPool.LESS_THAN + StringPool.AT) ||
 			 (line.charAt(0) == CharPool.POUND)) &&
 			!_isAttribute(line, match)) {
 
@@ -184,8 +189,6 @@ public class UpgradeVelocityVariableReferenceMigrationCheck
 
 		return validReplacement;
 	}
-
-	private static final String _ENCAPSULATION_START = "${";
 
 	private static final Pattern _variableReferencePattern = Pattern.compile(
 		"\\$[\\w\\.]+");

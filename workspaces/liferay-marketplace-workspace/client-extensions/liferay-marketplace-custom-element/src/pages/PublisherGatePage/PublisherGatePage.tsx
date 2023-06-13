@@ -7,14 +7,15 @@ import {Footer} from '../../components/Footer/Footer';
 import {Header} from '../../components/Header/Header';
 
 import './PublisherGatePage.scss';
+import ClayLink from '@clayui/link';
 
 export function PublisherGatePage() {
 	return (
 		<div className="publisher-gate-page-container">
 			<div className="publisher-gate-page-body">
 				<Header
-					description="We are happy to have you interested in the Liferay Marketplace. At the moment, we are working on enhancing the experience for our customers in the Marketplace and access is invite only. If you are an existing Liferay customer, please keep an eye out for an announcement related to the new Marketplace in the coming months!"
-					title="Becoming a Liferay Marketplace Customer"
+					description="We are happy to have you interested in the Liferay Marketplace. At the moment, we are working on enhancing the experience for our publishers in the Marketplace and access is invite only. If you are an existing Liferay developer or partner, please keep an eye out for an announcement related to the new Marketplace in the coming months!"
+					title="Becoming a Liferay Marketplace Publisher"
 				/>
 
 				<GateCard
@@ -24,7 +25,10 @@ export function PublisherGatePage() {
 						svg: cloudUpload,
 					}}
 					label="Free"
-					link="Learn More"
+					link={{
+						href: '',
+						label: 'Learn More',
+					}}
 					title="Publish Apps to the Liferay Marketplace"
 				/>
 
@@ -34,23 +38,29 @@ export function PublisherGatePage() {
 						description: 'Cash',
 						svg: cash,
 					}}
-					link="Learn More"
+					link={{
+						href: '',
+						label: 'Learn More',
+					}}
 					title="Monetize Your Apps and Solutions"
 				/>
 
 				<hr className="publisher-gate-page-divider" />
 
 				<div className="publisher-gate-page-button-container">
-					<div>
-						<ClayButton
-							onClick={() => {
-								window.location.href =
-									'http://marketplace.liferay.com/';
-							}}
-						>
-							Go Back to Marketplace
-						</ClayButton>
-					</div>
+					<ClayButton
+						className="publisher-gate-page-button"
+						onClick={() => {
+							window.location.href =
+								'https://marketplace.liferay.com/';
+						}}
+					>
+						Go Back to Marketplace
+					</ClayButton>
+
+					<ClayLink className="publisher-gate-page-link" href="">
+						Learn More About Becoming a Liferay Publisher
+					</ClayLink>
 				</div>
 			</div>
 

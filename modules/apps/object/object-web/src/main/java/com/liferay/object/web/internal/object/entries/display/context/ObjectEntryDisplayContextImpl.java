@@ -1048,8 +1048,8 @@ public class ObjectEntryDisplayContextImpl
 
 		try {
 			_objectEntry = objectEntryManager.getObjectEntry(
-				_getDTOConverterContext(), externalReferenceCode,
-				_objectRequestHelper.getCompanyId(), objectDefinition,
+				_objectRequestHelper.getCompanyId(), _getDTOConverterContext(),
+				externalReferenceCode, objectDefinition,
 				String.valueOf(_getGroupId()));
 		}
 		catch (Exception exception) {

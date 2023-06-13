@@ -6,18 +6,18 @@ exports[`Workspace Empty State - CardEmpty should render CardEmpty 1`] = `
     class="empty-card"
   >
     <svg
-      class="icon-root lexicon-icon lexicon-icon-home"
-      viewBox=""
+      class="lexicon-icon lexicon-icon-home icon-root"
+      role="presentation"
     >
       <use
-        xlink:href="/o/osb-faro-web/dist/sprite.svg#home"
+        xlink:href="#home"
       />
     </svg>
     <p>
       CardEmpty Description
     </p>
     <button
-      class="button-root btn btn-primary"
+      class="btn btn-primary"
       type="button"
     >
       CardEmpty Button Label
@@ -38,18 +38,18 @@ exports[`Workspace Empty State should render 1`] = `
         class="empty-card"
       >
         <svg
-          class="icon-root lexicon-icon lexicon-icon-ac-integration"
-          viewBox=""
+          class="lexicon-icon lexicon-icon-ac-integration icon-root"
+          role="presentation"
         >
           <use
-            xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-integration"
+            xlink:href="#ac-integration"
           />
         </svg>
         <p>
           Do more with our Business & Enterprise Plans
         </p>
         <button
-          class="button-root btn btn-primary"
+          class="btn btn-secondary"
           type="button"
         >
           Contact Sales
@@ -63,22 +63,23 @@ exports[`Workspace Empty State should render 1`] = `
         class="empty-card"
       >
         <svg
-          class="icon-root lexicon-icon lexicon-icon-ac-page-analytics"
-          viewBox=""
+          class="lexicon-icon lexicon-icon-ac-page-analytics icon-root"
+          role="presentation"
         >
           <use
-            xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-page-analytics"
+            xlink:href="#ac-page-analytics"
           />
         </svg>
         <p>
           90 Day Full Feature Trial
         </p>
-        <a
-          class="button-root btn btn-secondary"
+        <button
+          class="btn btn-secondary"
           href="/workspace/add/trial"
+          type="button"
         >
           Start Free Trial
-        </a>
+        </button>
       </div>
     </div>
   </div>

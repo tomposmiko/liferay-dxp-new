@@ -14,8 +14,8 @@
 
 package com.liferay.friendly.url.internal.servlet;
 
-import com.liferay.friendly.url.internal.configuration.FriendlyURLRedirectionConfiguration;
-import com.liferay.friendly.url.internal.configuration.admin.service.FriendlyURLRedirectionManagedServiceFactory;
+import com.liferay.friendly.url.configuration.FriendlyURLRedirectionConfiguration;
+import com.liferay.friendly.url.configuration.FriendlyURLRedirectionConfigurationProvider;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -683,8 +683,8 @@ public class FriendlyURLServlet extends HttpServlet {
 	protected FriendlyURLNormalizer friendlyURLNormalizer;
 
 	@Reference
-	protected FriendlyURLRedirectionManagedServiceFactory
-		friendlyURLRedirectionManagedServiceFactory;
+	protected FriendlyURLRedirectionConfigurationProvider
+		friendlyURLRedirectionConfigurationProvider;
 
 	@Reference
 	protected GroupLocalService groupLocalService;
@@ -769,6 +769,15 @@ public class FriendlyURLServlet extends HttpServlet {
 		}
 
 		return alternativeSiteFriendlyURL;
+	}
+
+	private String _getFriendlyURLRedirectionType(long companyId) {
+		FriendlyURLRedirectionConfiguration
+			friendlyURLRedirectionConfiguration =
+				friendlyURLRedirectionConfigurationProvider.
+					getCompanyFriendlyURLRedirectionConfiguration(companyId);
+
+		return friendlyURLRedirectionConfiguration.redirectionType();
 	}
 
 	private Group _getGroup(String path, String friendlyURL, long companyId)
@@ -913,14 +922,8 @@ public class FriendlyURLServlet extends HttpServlet {
 	}
 
 	private boolean _isPermanentRedirect(long companyId) {
-		FriendlyURLRedirectionConfiguration
-			friendlyURLRedirectionConfiguration =
-				friendlyURLRedirectionManagedServiceFactory.
-					getCompanyFriendlyURLConfiguration(companyId);
-
 		if (Objects.equals(
-				friendlyURLRedirectionConfiguration.redirectionType(),
-				"permanent")) {
+				_getFriendlyURLRedirectionType(companyId), "permanent")) {
 
 			return true;
 		}

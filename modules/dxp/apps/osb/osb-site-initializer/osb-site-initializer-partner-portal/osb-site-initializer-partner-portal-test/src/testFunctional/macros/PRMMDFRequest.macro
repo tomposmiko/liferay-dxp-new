@@ -314,22 +314,22 @@ definition {
 	}
 
 	@summary = "Get the hidden value of 'Total MDF Requested Amount' field using JS script"
-	macro getRequestedAmoundValue {
-		if (!(isSet(activityIndex))) {
-			var activityIndex = 0;
-		}
+	macro getValueByFieldName {
+		Click.pauseClickAt(
+			key_fieldName = ${fieldName},
+			locator1 = "PRMMDFRequest#TEXT_FIELD");
 
 		var javaScriptCountElement = '''
         
-        return document.querySelector("input[name='activities[${activityIndex}].mdfRequestAmount']").value;
+        return document.querySelector("input[name='${fieldName}']").value;
 
         ''';
 
-		var value = selenium.getEval(${javaScriptCountElement});
+		var fieldValue = selenium.getEval(${javaScriptCountElement});
 
-		var value = StringUtil.extractDigits(${value});
+		var fieldDigits = StringUtil.extractDigits(${fieldValue});
 
-		return ${value};
+		return ${fieldDigits};
 	}
 
 	@summary = "Go to MDF"
@@ -466,6 +466,13 @@ definition {
 		}
 	}
 
+	@summary = "Click on the '-' button, inside the activities page of the MDF Request, to remove a budget value"
+	macro removeBudgetValue {
+		Click(
+			key_index = ${index},
+			locator1 = "PRMMDFRequest#REMOVE_ICON_INDEX");
+	}
+
 	@summary = "Search for an MDF Request"
 	macro searchMDF {
 		Type(
@@ -566,6 +573,13 @@ definition {
 			key_fieldName = "Is a lead list an outcome of this activity?",
 			key_fieldValue = ${leadList},
 			locator1 = "PRMMDFRequest#SUMMARY_FIELD");
+	}
+
+	@summary = "Assert the Total Cost value of the budget, inside the activities page of the MDF Request"
+	macro viewBudgetValue {
+		AssertTextEquals(
+			locator1 = "PRMMDFRequest#ACTIVITY_TOTAL_COST",
+			value1 = ${totalCost});
 	}
 
 	@summary = "Assert button is not clickable"

@@ -574,6 +574,13 @@ public interface CompanyLocalService
 	@Async
 	public void updateDisplayGroupNames(long companyId) throws PortalException;
 
+	public Company updateIndexNameNext(long companyId, String indexNameNext)
+		throws PortalException;
+
+	public Company updateIndexNames(
+			long companyId, String indexNameCurrent, String indexNameNext)
+		throws PortalException;
+
 	/**
 	 * Updates the company's logo.
 	 *

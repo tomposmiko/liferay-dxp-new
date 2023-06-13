@@ -21,7 +21,7 @@ import {APIResponse, TestraySuite} from './types';
 
 type Suite = typeof yupSchema.suite.__outputType & {projectId: number};
 
-class TestraySuiteRest extends Rest<Suite, TestraySuite> {
+class TestraySuiteImpl extends Rest<Suite, TestraySuite> {
 	constructor() {
 		super({
 			adapter: ({
@@ -76,4 +76,6 @@ class TestraySuiteRest extends Rest<Suite, TestraySuite> {
 	}
 }
 
-export const testraySuiteRest = new TestraySuiteRest();
+const testraySuiteImpl = new TestraySuiteImpl();
+
+export {testraySuiteImpl};

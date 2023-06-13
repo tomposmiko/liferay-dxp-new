@@ -35,6 +35,7 @@ import com.liferay.portal.workflow.metrics.internal.petra.executor.WorkflowMetri
 import com.liferay.portal.workflow.metrics.internal.search.index.WorkflowMetricsIndex;
 import com.liferay.portal.workflow.metrics.search.background.task.WorkflowMetricsReindexStatusMessageSender;
 import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexer;
+import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexerRegistry;
 
 import java.io.Serializable;
 
@@ -86,7 +87,7 @@ public class WorkflowMetricsReindexBackgroundTaskExecutor
 
 		for (String indexEntityName : indexEntityNames) {
 			WorkflowMetricsIndex workflowMetricsIndex =
-				_workflowMetricsIndexes.getService(indexEntityName);
+				_serviceTrackerMap.getService(indexEntityName);
 
 			workflowMetricsIndex.removeIndex(backgroundTask.getCompanyId());
 
@@ -103,8 +104,8 @@ public class WorkflowMetricsReindexBackgroundTaskExecutor
 				_workflowMetricsPortalExecutor.execute(
 					() -> {
 						WorkflowMetricsReindexer workflowMetricsReindexer =
-							_workflowMetricsReindexers.getService(
-								indexEntityName);
+							_workflowMetricsReindexerRegistry.
+								getWorkflowMetricsReindexer(indexEntityName);
 
 						workflowMetricsReindexer.reindex(
 							backgroundTask.getCompanyId());
@@ -136,19 +137,14 @@ public class WorkflowMetricsReindexBackgroundTaskExecutor
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_workflowMetricsIndexes = ServiceTrackerMapFactory.openSingleValueMap(
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, WorkflowMetricsIndex.class,
 			"workflow.metrics.index.entity.name");
-		_workflowMetricsReindexers =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, WorkflowMetricsReindexer.class,
-				"workflow.metrics.index.entity.name");
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_workflowMetricsIndexes.close();
-		_workflowMetricsReindexers.close();
+		_serviceTrackerMap.close();
 	}
 
 	private String[] _getIndexEntityNames(BackgroundTask backgroundTask) {
@@ -160,8 +156,8 @@ public class WorkflowMetricsReindexBackgroundTaskExecutor
 				(String[])taskContextMap.get(
 					"workflow.metrics.index.entity.names"),
 				name -> {
-					if (_workflowMetricsIndexes.containsKey(name) &&
-						_workflowMetricsReindexers.containsKey(name)) {
+					if (_serviceTrackerMap.containsKey(name) &&
+						_workflowMetricsReindexerRegistry.containsKey(name)) {
 
 						return name;
 					}
@@ -207,14 +203,13 @@ public class WorkflowMetricsReindexBackgroundTaskExecutor
 	private BackgroundTaskStatusMessageSender
 		_backgroundTaskStatusMessageSender;
 
-	private ServiceTrackerMap<String, WorkflowMetricsIndex>
-		_workflowMetricsIndexes;
+	private ServiceTrackerMap<String, WorkflowMetricsIndex> _serviceTrackerMap;
 
 	@Reference
 	private WorkflowMetricsPortalExecutor _workflowMetricsPortalExecutor;
 
-	private ServiceTrackerMap<String, WorkflowMetricsReindexer>
-		_workflowMetricsReindexers;
+	@Reference
+	private WorkflowMetricsReindexerRegistry _workflowMetricsReindexerRegistry;
 
 	@Reference
 	private WorkflowMetricsReindexStatusMessageSender

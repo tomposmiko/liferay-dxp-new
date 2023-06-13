@@ -32,6 +32,8 @@ import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.related.models.ObjectRelatedModelsProvider;
+import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.AuditEvent;
 import com.liferay.object.rest.dto.v1_0.AuditFieldChange;
 import com.liferay.object.rest.dto.v1_0.FileEntry;
@@ -53,9 +55,9 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -63,6 +65,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -74,23 +77,24 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.security.audit.event.generators.constants.EventTypes;
 import com.liferay.portal.security.audit.storage.service.AuditEventLocalService;
-import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
-import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.extension.EntityExtensionHandler;
+import com.liferay.portal.vulcan.extension.ExtensionProviderRegistry;
+import com.liferay.portal.vulcan.extension.util.ExtensionUtil;
+import com.liferay.portal.vulcan.fields.NestedFieldsSupplier;
+import com.liferay.portal.vulcan.jaxrs.extension.ExtendedEntity;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.service.component.annotations.Component;
@@ -117,100 +121,10 @@ public class ObjectEntryDTOConverter
 			com.liferay.object.model.ObjectEntry objectEntry)
 		throws Exception {
 
-		UriInfo uriInfo = dtoConverterContext.getUriInfo();
-
-		if (uriInfo == null) {
-			return _toDTO(
-				dtoConverterContext,
-				Math.min(1, PropsValues.OBJECT_NESTED_FIELDS_MAX_QUERY_DEPTH),
-				objectEntry);
-		}
-
-		MultivaluedMap<String, String> queryParameters =
-			uriInfo.getQueryParameters();
-
-		return _toDTO(
-			dtoConverterContext,
-			Math.min(
-				GetterUtil.getInteger(
-					queryParameters.getFirst("nestedFieldsDepth"), 1),
-				PropsValues.OBJECT_NESTED_FIELDS_MAX_QUERY_DEPTH),
-			objectEntry);
+		return _toDTO(dtoConverterContext, objectEntry);
 	}
 
-	private void _addNestedFields(
-			DTOConverterContext dtoConverterContext, Map<String, Object> map,
-			int nestedFieldsDepth, String objectFieldName,
-			ObjectRelationship objectRelationship, long primaryKey)
-		throws Exception {
-
-		UriInfo uriInfo = dtoConverterContext.getUriInfo();
-
-		if (uriInfo == null) {
-			return;
-		}
-
-		MultivaluedMap<String, String> queryParameters =
-			uriInfo.getQueryParameters();
-
-		String nestedFields = queryParameters.getFirst("nestedFields");
-
-		if (nestedFields == null) {
-			return;
-		}
-
-		Object value = null;
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId1());
-
-		if (objectDefinition.isUnmodifiableSystemObject()) {
-			if (FeatureFlagManagerUtil.isEnabled("LPS-172094")) {
-				SystemObjectDefinitionManager systemObjectDefinitionManager =
-					_systemObjectDefinitionManagerRegistry.
-						getSystemObjectDefinitionManager(
-							objectDefinition.getName());
-
-				value = DTOConverterUtil.toDTO(
-					systemObjectDefinitionManager.
-						getBaseModelByExternalReferenceCode(
-							systemObjectDefinitionManager.
-								getExternalReferenceCode(primaryKey),
-							objectDefinition.getCompanyId()),
-					_dtoConverterRegistry, systemObjectDefinitionManager,
-					dtoConverterContext.getUser());
-			}
-			else {
-				value = _objectEntryLocalService.getSystemModelAttributes(
-					objectDefinition, primaryKey);
-			}
-		}
-		else {
-			value = _toDTO(
-				_getDTOConverterContext(dtoConverterContext, primaryKey),
-				nestedFieldsDepth - 1,
-				_objectEntryLocalService.getObjectEntry(primaryKey));
-		}
-
-		String objectFieldNameNestedField = StringUtil.replaceLast(
-			objectFieldName.substring(
-				objectFieldName.lastIndexOf(StringPool.UNDERLINE) + 1),
-			"Id", "");
-
-		for (String nestedField : nestedFields.split(",")) {
-			if (nestedField.contains(objectFieldNameNestedField)) {
-				map.put(
-					StringUtil.replaceLast(objectFieldName, "Id", ""), value);
-			}
-
-			if (nestedField.equals(objectRelationship.getName())) {
-				map.put(nestedField, value);
-			}
-		}
-	}
-
-	private void _addObjectRelationshipNames(
+	private void _addManyToOneObjectRelationshipNames(
 		Map<String, Object> map, ObjectField objectField,
 		String objectFieldName, ObjectRelationship objectRelationship,
 		long primaryKey, Map<String, Serializable> values) {
@@ -232,6 +146,122 @@ public class ObjectEntryDTOConverter
 		map.put(objectFieldName, primaryKey);
 
 		map.put(objectRelationshipERCObjectFieldName, relatedObjectEntryERC);
+	}
+
+	private void _addManyToOneRelatedObjectEntries(
+			DTOConverterContext dtoConverterContext, Map<String, Object> map,
+			String objectFieldName, ObjectRelationship objectRelationship,
+			long primaryKey)
+		throws Exception {
+
+		String relatedObjectDefinitionName = StringUtil.replaceLast(
+			objectFieldName.substring(
+				objectFieldName.lastIndexOf(StringPool.UNDERLINE) + 1),
+			"Id", "");
+
+		String manyToOneRelationshipName = StringUtil.removeLast(
+			objectFieldName, "Id");
+
+		AtomicReference<Serializable> relatedObjectEntryAtomicReference =
+			new AtomicReference<>();
+
+		Map<String, Serializable> nestedFieldValues =
+			NestedFieldsSupplier.supply(
+				nestedFieldName -> {
+					if (!nestedFieldName.contains(
+							relatedObjectDefinitionName) &&
+						!StringUtil.equals(
+							nestedFieldName, objectRelationship.getName())) {
+
+						return null;
+					}
+
+					if (!StringUtil.equals(
+							nestedFieldName, manyToOneRelationshipName) &&
+						!StringUtil.equals(
+							nestedFieldName, objectRelationship.getName()) &&
+						!StringUtil.equals(
+							nestedFieldName, relatedObjectDefinitionName) &&
+						_log.isWarnEnabled()) {
+
+						_log.warn(
+							StringBundler.concat(
+								"Replace the deprecated nested field \"",
+								nestedFieldName, "\" with \"",
+								objectRelationship.getName()));
+					}
+
+					if (relatedObjectEntryAtomicReference.get() != null) {
+						return relatedObjectEntryAtomicReference.get();
+					}
+
+					ObjectDefinition objectDefinition =
+						_objectDefinitionLocalService.getObjectDefinition(
+							objectRelationship.getObjectDefinitionId1());
+
+					if (objectDefinition.isUnmodifiableSystemObject()) {
+						if (FeatureFlagManagerUtil.isEnabled("LPS-172094")) {
+							SystemObjectDefinitionManager
+								systemObjectDefinitionManager =
+									_systemObjectDefinitionManagerRegistry.
+										getSystemObjectDefinitionManager(
+											objectDefinition.getName());
+
+							relatedObjectEntryAtomicReference.set(
+								(Serializable)DTOConverterUtil.toDTO(
+									systemObjectDefinitionManager.
+										getBaseModelByExternalReferenceCode(
+											systemObjectDefinitionManager.
+												getExternalReferenceCode(
+													primaryKey),
+											objectDefinition.getCompanyId()),
+									dtoConverterContext.
+										getDTOConverterRegistry(),
+									systemObjectDefinitionManager,
+									dtoConverterContext.getUser()));
+						}
+						else {
+							relatedObjectEntryAtomicReference.set(
+								(Serializable)
+									_objectEntryLocalService.
+										getSystemModelAttributes(
+											objectDefinition, primaryKey));
+						}
+					}
+					else {
+						relatedObjectEntryAtomicReference.set(
+							toDTO(
+								_getDTOConverterContext(
+									dtoConverterContext, primaryKey),
+								_objectEntryLocalService.getObjectEntry(
+									primaryKey)));
+					}
+
+					return relatedObjectEntryAtomicReference.get();
+				});
+
+		if (nestedFieldValues == null) {
+			return;
+		}
+
+		for (Map.Entry<String, Serializable> entry :
+				nestedFieldValues.entrySet()) {
+
+			String nestedFieldName = entry.getKey();
+
+			if (StringUtil.equals(
+					nestedFieldName, objectRelationship.getName())) {
+
+				map.put(objectRelationship.getName(), entry.getValue());
+			}
+
+			if (nestedFieldName.contains(relatedObjectDefinitionName) ||
+				StringUtil.equals(
+					nestedFieldName, objectRelationship.getName())) {
+
+				map.put(manyToOneRelationshipName, entry.getValue());
+			}
+		}
 	}
 
 	private DTOConverterContext _getDTOConverterContext(
@@ -270,28 +300,84 @@ public class ObjectEntryDTOConverter
 		};
 	}
 
-	private ObjectEntry[] _getManyToManyRelationshipObjectEntries(
-		DTOConverterContext dtoConverterContext, int nestedFieldsDepth,
-		com.liferay.object.model.ObjectEntry objectEntry,
-		ObjectRelationship objectRelationship) {
+	private Map<String, Serializable> _getNestedFieldsRelatedProperties(
+			DTOConverterContext dtoConverterContext, long groupId,
+			ObjectDefinition objectDefinition, long primaryKey)
+		throws Exception {
 
-		try {
-			return _toObjectEntries(
-				dtoConverterContext, nestedFieldsDepth,
-				_objectEntryLocalService.getManyToManyObjectEntries(
-					objectEntry.getGroupId(),
-					objectRelationship.getObjectRelationshipId(),
-					objectEntry.getObjectEntryId(), true,
-					objectRelationship.isReverse(), QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS));
-		}
-		catch (PortalException portalException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
-			}
+		return NestedFieldsSupplier.supply(
+			nestedFieldName -> {
+				ObjectRelationship objectRelationship =
+					_objectRelationshipLocalService.
+						fetchObjectRelationshipByObjectDefinitionId1(
+							objectDefinition.getObjectDefinitionId(),
+							nestedFieldName);
 
-			return null;
-		}
+				if ((objectRelationship == null) ||
+					(!Objects.equals(
+						objectRelationship.getType(),
+						ObjectRelationshipConstants.TYPE_MANY_TO_MANY) &&
+					 !Objects.equals(
+						 objectRelationship.getType(),
+						 ObjectRelationshipConstants.TYPE_ONE_TO_MANY))) {
+
+					return null;
+				}
+
+				ObjectDefinition relatedObjectDefinition =
+					_objectDefinitionLocalService.getObjectDefinition(
+						objectRelationship.getObjectDefinitionId2());
+
+				if (!relatedObjectDefinition.isActive()) {
+					return null;
+				}
+
+				ObjectRelatedModelsProvider objectRelatedModelsProvider =
+					_objectRelatedModelsProviderRegistry.
+						getObjectRelatedModelsProvider(
+							relatedObjectDefinition.getClassName(),
+							relatedObjectDefinition.getCompanyId(),
+							objectRelationship.getType());
+
+				List<?> relatedModels =
+					objectRelatedModelsProvider.getRelatedModels(
+						groupId, objectRelationship.getObjectRelationshipId(),
+						primaryKey, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+				if (relatedObjectDefinition.isSystem()) {
+					if (!FeatureFlagManagerUtil.isEnabled("LPS-165819")) {
+						return null;
+					}
+
+					SystemObjectDefinitionManager
+						systemObjectDefinitionManager =
+							_systemObjectDefinitionManagerRegistry.
+								getSystemObjectDefinitionManager(
+									relatedObjectDefinition.getName());
+
+					return TransformUtil.transformToArray(
+						relatedModels,
+						relatedModel -> _toExtendedEntity(
+							(BaseModel<?>)relatedModel, dtoConverterContext,
+							relatedObjectDefinition,
+							systemObjectDefinitionManager),
+						Object.class);
+				}
+
+				return TransformUtil.transformToArray(
+					relatedModels,
+					relatedModel -> {
+						com.liferay.object.model.ObjectEntry objectEntry =
+							(com.liferay.object.model.ObjectEntry)relatedModel;
+
+						return _toDTO(
+							_getDTOConverterContext(
+								dtoConverterContext,
+								objectEntry.getObjectEntryId()),
+							objectEntry);
+					},
+					ObjectEntry.class);
+			});
 	}
 
 	private ObjectDefinition _getObjectDefinition(
@@ -310,29 +396,6 @@ public class ObjectEntryDTOConverter
 		}
 
 		return objectDefinition;
-	}
-
-	private ObjectEntry[] _getOneToManyRelationshipObjectEntries(
-		DTOConverterContext dtoConverterContext, int nestedFieldsDepth,
-		com.liferay.object.model.ObjectEntry objectEntry,
-		ObjectRelationship objectRelationship) {
-
-		try {
-			return _toObjectEntries(
-				dtoConverterContext, nestedFieldsDepth,
-				_objectEntryLocalService.getOneToManyObjectEntries(
-					objectEntry.getGroupId(),
-					objectRelationship.getObjectRelationshipId(),
-					objectEntry.getObjectEntryId(), true, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS));
-		}
-		catch (PortalException portalException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
-			}
-
-			return null;
-		}
 	}
 
 	private String _getScopeKey(
@@ -363,48 +426,44 @@ public class ObjectEntryDTOConverter
 			com.liferay.object.model.ObjectEntry objectEntry)
 		throws Exception {
 
-		if (!objectDefinition.isEnableObjectEntryHistory()) {
-			return null;
-		}
+		return NestedFieldsSupplier.supply(
+			"auditEvents",
+			nestedFieldNames -> {
+				if (!objectDefinition.isEnableObjectEntryHistory() ||
+					!_objectEntryService.hasModelResourcePermission(
+						objectDefinition.getObjectDefinitionId(),
+						objectEntry.getObjectEntryId(),
+						ObjectActionKeys.OBJECT_ENTRY_HISTORY)) {
 
-		UriInfo uriInfo = dtoConverterContext.getUriInfo();
-
-		if (uriInfo == null) {
-			return null;
-		}
-
-		MultivaluedMap<String, String> queryParameters =
-			uriInfo.getQueryParameters();
-
-		String nestedFields = queryParameters.getFirst("nestedFields");
-
-		if ((nestedFields == null) || !nestedFields.contains("auditEvents") ||
-			!_objectEntryService.hasModelResourcePermission(
-				objectDefinition.getObjectDefinitionId(),
-				objectEntry.getObjectEntryId(),
-				ObjectActionKeys.OBJECT_ENTRY_HISTORY)) {
-
-			return null;
-		}
-
-		return TransformUtil.transformToArray(
-			_auditEventLocalService.getAuditEvents(
-				0, 0, null, null, null, null, null,
-				String.valueOf(objectEntry.getObjectEntryId()), null, null,
-				null, 0, null, false, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
-			auditEvent -> new AuditEvent() {
-				{
-					auditFieldChanges = _toAuditFieldChanges(
-						auditEvent.getAdditionalInfo(),
-						auditEvent.getEventType());
-					creator = CreatorUtil.toCreator(
-						_portal, dtoConverterContext.getUriInfo(),
-						_userLocalService.fetchUser(auditEvent.getUserId()));
-					dateCreated = auditEvent.getCreateDate();
-					eventType = auditEvent.getEventType();
+					return null;
 				}
-			},
-			AuditEvent.class);
+
+				return TransformUtil.transformToArray(
+					_auditEventLocalService.getAuditEvents(
+						0, 0, null, null, null, null, null,
+						String.valueOf(objectEntry.getObjectEntryId()), null,
+						null, null, 0, null, false, QueryUtil.ALL_POS,
+						QueryUtil.ALL_POS),
+					auditEvent -> {
+						AuditEvent newAuditEvent = new AuditEvent();
+
+						newAuditEvent.setAuditFieldChanges(
+							_toAuditFieldChanges(
+								auditEvent.getAdditionalInfo(),
+								auditEvent.getEventType()));
+						newAuditEvent.setCreator(
+							CreatorUtil.toCreator(
+								_portal, dtoConverterContext.getUriInfo(),
+								_userLocalService.fetchUser(
+									auditEvent.getUserId())));
+						newAuditEvent.setDateCreated(
+							auditEvent.getCreateDate());
+						newAuditEvent.setEventType(auditEvent.getEventType());
+
+						return newAuditEvent;
+					},
+					AuditEvent.class);
+			});
 	}
 
 	private AuditFieldChange[] _toAuditFieldChanges(
@@ -440,7 +499,7 @@ public class ObjectEntryDTOConverter
 	}
 
 	private ObjectEntry _toDTO(
-			DTOConverterContext dtoConverterContext, int nestedFieldsDepth,
+			DTOConverterContext dtoConverterContext,
 			com.liferay.object.model.ObjectEntry objectEntry)
 		throws Exception {
 
@@ -469,8 +528,7 @@ public class ObjectEntryDTOConverter
 				}
 
 				properties = _toProperties(
-					dtoConverterContext, nestedFieldsDepth, objectDefinition,
-					objectEntry);
+					dtoConverterContext, objectDefinition, objectEntry);
 				scopeKey = _getScopeKey(objectDefinition, objectEntry);
 				status = new Status() {
 					{
@@ -505,33 +563,39 @@ public class ObjectEntryDTOConverter
 		};
 	}
 
-	private ObjectEntry[] _toObjectEntries(
-		DTOConverterContext dtoConverterContext, int nestedFieldsDepth,
-		List<com.liferay.object.model.ObjectEntry> objectEntries) {
+	private ExtendedEntity _toExtendedEntity(
+			BaseModel<?> baseModel, DTOConverterContext dtoConverterContext,
+			ObjectDefinition objectDefinition,
+			SystemObjectDefinitionManager systemObjectDefinitionManager)
+		throws Exception {
 
-		return TransformUtil.transformToArray(
-			objectEntries,
-			objectEntry -> {
-				try {
-					return _toDTO(
-						_getDTOConverterContext(
-							dtoConverterContext,
-							objectEntry.getObjectEntryId()),
-						nestedFieldsDepth - 1, objectEntry);
-				}
-				catch (Exception exception) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(exception);
-					}
+		DTOConverter<BaseModel<?>, ?> dtoConverter =
+			DTOConverterUtil.getDTOConverter(
+				dtoConverterContext.getDTOConverterRegistry(),
+				systemObjectDefinitionManager);
 
-					return null;
-				}
-			},
-			ObjectEntry.class);
+		Object dto = DTOConverterUtil.toDTO(
+			baseModel, dtoConverterContext.getDTOConverterRegistry(),
+			systemObjectDefinitionManager, dtoConverterContext.getUser());
+
+		Map<String, Serializable> nestedFieldsRelatedProperties = null;
+
+		EntityExtensionHandler entityExtensionHandler =
+			ExtensionUtil.getEntityExtensionHandler(
+				dtoConverter.getExternalDTOClassName(),
+				objectDefinition.getCompanyId(), _extensionProviderRegistry);
+
+		if (entityExtensionHandler != null) {
+			nestedFieldsRelatedProperties =
+				entityExtensionHandler.getExtendedProperties(
+					objectDefinition.getCompanyId(), dto);
+		}
+
+		return ExtendedEntity.extend(dto, nestedFieldsRelatedProperties, null);
 	}
 
 	private Map<String, Object> _toProperties(
-			DTOConverterContext dtoConverterContext, int nestedFieldsDepth,
+			DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition,
 			com.liferay.object.model.ObjectEntry objectEntry)
 		throws Exception {
@@ -545,45 +609,42 @@ public class ObjectEntryDTOConverter
 				objectDefinition.getObjectDefinitionId(), false);
 
 		for (ObjectField objectField : objectFields) {
-			long listTypeDefinitionId = objectField.getListTypeDefinitionId();
-
 			String objectFieldName = objectField.getName();
 
 			Serializable serializable = values.get(objectFieldName);
 
-			if (listTypeDefinitionId != 0) {
-				if (StringUtil.equals(
+			if (StringUtil.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
+
+				if (objectField.getListTypeDefinitionId() == 0) {
+					continue;
+				}
+
+				map.put(
+					objectFieldName,
+					TransformUtil.transformToList(
+						StringUtil.split(
+							(String)serializable, StringPool.COMMA_AND_SPACE),
+						key -> _getListEntry(
+							dtoConverterContext, key,
+							objectField.getListTypeDefinitionId())));
+			}
+			else if (StringUtil.equals(
 						objectField.getBusinessType(),
-						ObjectFieldConstants.
-							BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
+						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
 
-					List<ListEntry> listEntries = new ArrayList<>();
-
-					for (String key :
-							StringUtil.split(
-								(String)serializable,
-								StringPool.COMMA_AND_SPACE)) {
-
-						listEntries.add(
-							_getListEntry(
-								dtoConverterContext, key,
-								listTypeDefinitionId));
-					}
-
-					map.put(objectFieldName, listEntries);
-
+				if (objectField.getListTypeDefinitionId() == 0) {
 					continue;
 				}
 
 				ListEntry listEntry = _getListEntry(
 					dtoConverterContext, (String)serializable,
-					listTypeDefinitionId);
+					objectField.getListTypeDefinitionId());
 
-				if (listEntry == null) {
-					continue;
+				if (listEntry != null) {
+					map.put(objectFieldName, listEntry);
 				}
-
-				map.put(objectFieldName, listEntry);
 			}
 			else if (Objects.equals(
 						objectField.getBusinessType(),
@@ -596,27 +657,22 @@ public class ObjectEntryDTOConverter
 					continue;
 				}
 
+				FileEntry fileEntry = new FileEntry();
+
 				DLFileEntry dlFileEntry =
 					_dLFileEntryLocalService.fetchDLFileEntry(fileEntryId);
 
 				if (dlFileEntry != null) {
-					map.put(
-						objectFieldName,
-						new FileEntry() {
-							{
-								id = dlFileEntry.getFileEntryId();
-								link = LinkUtil.toLink(
-									_dlAppService, dlFileEntry, _dlURLHelper,
-									objectDefinition.getExternalReferenceCode(),
-									objectEntry.getExternalReferenceCode(),
-									_portal);
-								name = dlFileEntry.getFileName();
-							}
-						});
+					fileEntry.setId(dlFileEntry.getFileEntryId());
+					fileEntry.setLink(
+						LinkUtil.toLink(
+							_dlAppService, dlFileEntry, _dlURLHelper,
+							objectDefinition.getExternalReferenceCode(),
+							objectEntry.getExternalReferenceCode(), _portal));
+					fileEntry.setName(dlFileEntry.getFileName());
 				}
-				else {
-					map.put(objectFieldName, new FileEntry());
-				}
+
+				map.put(objectFieldName, fileEntry);
 			}
 			else if (Objects.equals(
 						objectField.getBusinessType(),
@@ -627,10 +683,9 @@ public class ObjectEntryDTOConverter
 					objectFieldName + "RawText",
 					ObjectEntryValuesUtil.getValueString(objectField, values));
 			}
-			else if ((nestedFieldsDepth > 0) &&
-					 Objects.equals(
-						 objectField.getRelationshipType(),
-						 ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
+			else if (Objects.equals(
+						objectField.getRelationshipType(),
+						ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
 
 				long primaryKey = GetterUtil.getLong(serializable);
 
@@ -640,88 +695,30 @@ public class ObjectEntryDTOConverter
 							objectField.getObjectFieldId());
 
 				if (primaryKey > 0) {
-					_addNestedFields(
-						dtoConverterContext, map, nestedFieldsDepth,
-						objectFieldName, objectRelationship, primaryKey);
+					_addManyToOneRelatedObjectEntries(
+						dtoConverterContext, map, objectFieldName,
+						objectRelationship, primaryKey);
 				}
 
-				_addObjectRelationshipNames(
+				_addManyToOneObjectRelationshipNames(
 					map, objectField, objectFieldName, objectRelationship,
 					primaryKey, values);
-			}
-			else if ((nestedFieldsDepth == 0) &&
-					 Objects.equals(
-						 objectField.getRelationshipType(),
-						 ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
-
-				ObjectRelationship objectRelationship =
-					_objectRelationshipLocalService.
-						fetchObjectRelationshipByObjectFieldId2(
-							objectField.getObjectFieldId());
-
-				_addObjectRelationshipNames(
-					map, objectField, objectFieldName, objectRelationship,
-					(long)serializable, values);
 			}
 			else {
 				map.put(objectFieldName, serializable);
 			}
 		}
 
-		if (nestedFieldsDepth > 0) {
-			UriInfo uriInfo = dtoConverterContext.getUriInfo();
-
-			if (uriInfo != null) {
-				MultivaluedMap<String, String> queryParameters =
-					uriInfo.getQueryParameters();
-
-				String nestedFields = queryParameters.getFirst("nestedFields");
-
-				if (nestedFields == null) {
-					values.remove(objectDefinition.getPKObjectFieldName());
-
-					return map;
-				}
-
-				List<ObjectRelationship> objectRelationships =
-					_objectRelationshipLocalService.getObjectRelationships(
-						objectDefinition.getObjectDefinitionId());
-
-				for (ObjectRelationship objectRelationship :
-						objectRelationships) {
-
-					List<String> strings = Arrays.asList(
-						nestedFields.split(","));
-
-					if (!strings.contains(objectRelationship.getName())) {
-						continue;
-					}
-
-					ObjectEntry[] objectEntries = new ObjectEntry[0];
-
-					if (Objects.equals(
-							objectRelationship.getType(),
-							ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
-
-						objectEntries = _getManyToManyRelationshipObjectEntries(
-							dtoConverterContext, nestedFieldsDepth, objectEntry,
-							objectRelationship);
-					}
-					else if (Objects.equals(
-								objectRelationship.getType(),
-								ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
-
-						objectEntries = _getOneToManyRelationshipObjectEntries(
-							dtoConverterContext, nestedFieldsDepth, objectEntry,
-							objectRelationship);
-					}
-
-					map.put(objectRelationship.getName(), objectEntries);
-				}
-			}
-		}
-
 		values.remove(objectDefinition.getPKObjectFieldName());
+
+		Map<String, Serializable> nestedFieldsRelatedProperties =
+			_getNestedFieldsRelatedProperties(
+				dtoConverterContext, objectEntry.getGroupId(), objectDefinition,
+				objectEntry.getObjectEntryId());
+
+		if (nestedFieldsRelatedProperties != null) {
+			map.putAll(nestedFieldsRelatedProperties);
+		}
 
 		return map;
 	}
@@ -748,7 +745,7 @@ public class ObjectEntryDTOConverter
 	private DLURLHelper _dlURLHelper;
 
 	@Reference
-	private DTOConverterRegistry _dtoConverterRegistry;
+	private ExtensionProviderRegistry _extensionProviderRegistry;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
@@ -773,6 +770,10 @@ public class ObjectEntryDTOConverter
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectRelatedModelsProviderRegistry
+		_objectRelatedModelsProviderRegistry;
 
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;

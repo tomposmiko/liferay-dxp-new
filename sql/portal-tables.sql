@@ -1,8 +1,9 @@
 create table Address (
 	mvccVersion LONG default 0 not null,
+	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
-	addressId LONG not null primary key,
+	addressId LONG not null,
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,
@@ -25,7 +26,8 @@ create table Address (
 	street3 VARCHAR(255) null,
 	validationDate DATE null,
 	validationStatus INTEGER,
-	zip VARCHAR(75) null
+	zip VARCHAR(75) null,
+	primary key (addressId, ctCollectionId)
 );
 
 create table AnnouncementsDelivery (
@@ -221,7 +223,9 @@ create table Company (
 	tickerSymbol VARCHAR(75) null,
 	industry VARCHAR(75) null,
 	type_ VARCHAR(75) null,
-	size_ VARCHAR(75) null
+	size_ VARCHAR(75) null,
+	indexNameCurrent VARCHAR(75) null,
+	indexNameNext VARCHAR(75) null
 );
 
 create table CompanyInfo (
@@ -937,8 +941,9 @@ create table PasswordTracker (
 
 create table Phone (
 	mvccVersion LONG default 0 not null,
+	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	phoneId LONG not null primary key,
+	phoneId LONG not null,
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,
@@ -949,7 +954,8 @@ create table Phone (
 	number_ VARCHAR(75) null,
 	extension VARCHAR(75) null,
 	listTypeId LONG,
-	primary_ BOOLEAN
+	primary_ BOOLEAN,
+	primary key (phoneId, ctCollectionId)
 );
 
 create table PluginSetting (

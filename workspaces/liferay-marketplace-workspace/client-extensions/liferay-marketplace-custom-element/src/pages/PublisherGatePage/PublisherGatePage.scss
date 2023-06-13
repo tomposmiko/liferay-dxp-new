@@ -4,6 +4,8 @@
 		width: 37.5rem;
 	}
 	&-button {
+		margin-bottom: 1.5rem;
+
 		&-container {
 			align-items: end;
 			display: flex;
@@ -17,13 +19,6 @@
 			line-height: 24px;
 		}
 	}
-	&-cards {
-		align-items: center;
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 2rem;
-		margin-top: 1.25rem;
-	}
 	&-container {
 		align-items: center;
 		display: flex;
@@ -31,17 +26,15 @@
 		justify-content: center;
 		width: 100%;
 	}
-	&-content {
-		margin-bottom: 12rem;
-		margin-top: 10rem;
-		width: 37.5rem;
-	}
 	&-divider {
 		margin-bottom: 1.5rem;
 		margin-top: 2rem;
 	}
 	&-icon {
 		color: #0b5fff;
+	}
+	&-link {
+		font-size: 16px;
 	}
 	&-text {
 		margin-bottom: 2rem;

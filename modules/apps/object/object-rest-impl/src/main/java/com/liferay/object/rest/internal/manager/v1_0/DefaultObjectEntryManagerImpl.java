@@ -236,20 +236,9 @@ public class DefaultObjectEntryManagerImpl
 
 	@Override
 	public void deleteObjectEntry(
-			ObjectDefinition objectDefinition, long objectEntryId)
-		throws Exception {
-
-		_checkObjectEntryObjectDefinitionId(
-			objectDefinition,
-			_objectEntryService.getObjectEntry(objectEntryId));
-
-		_objectEntryService.deleteObjectEntry(objectEntryId);
-	}
-
-	@Override
-	public void deleteObjectEntry(
-			String externalReferenceCode, long companyId,
-			ObjectDefinition objectDefinition, String scopeKey)
+			long companyId, DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectDefinition objectDefinition,
+			String scopeKey)
 		throws Exception {
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
@@ -262,6 +251,18 @@ public class DefaultObjectEntryManagerImpl
 
 		_objectEntryService.deleteObjectEntry(
 			serviceBuilderObjectEntry.getObjectEntryId());
+	}
+
+	@Override
+	public void deleteObjectEntry(
+			ObjectDefinition objectDefinition, long objectEntryId)
+		throws Exception {
+
+		_checkObjectEntryObjectDefinitionId(
+			objectDefinition,
+			_objectEntryService.getObjectEntry(objectEntryId));
+
+		_objectEntryService.deleteObjectEntry(objectEntryId);
 	}
 
 	@Override
@@ -526,9 +527,9 @@ public class DefaultObjectEntryManagerImpl
 
 	@Override
 	public ObjectEntry getObjectEntry(
-			DTOConverterContext dtoConverterContext,
-			String externalReferenceCode, long companyId,
-			ObjectDefinition objectDefinition, String scopeKey)
+			long companyId, DTOConverterContext dtoConverterContext,
+			String externalReferenceCode, ObjectDefinition objectDefinition,
+			String scopeKey)
 		throws Exception {
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
@@ -728,6 +729,7 @@ public class DefaultObjectEntryManagerImpl
 				_objectRelationshipElementsParserRegistry.
 					getObjectRelationshipElementsParser(
 						relatedObjectDefinition.getClassName(),
+						relatedObjectDefinition.getCompanyId(),
 						objectRelationship.getType());
 
 			if (relatedObjectDefinition.isSystem()) {

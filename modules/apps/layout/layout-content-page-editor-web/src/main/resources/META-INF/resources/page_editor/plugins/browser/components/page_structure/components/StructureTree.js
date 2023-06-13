@@ -16,7 +16,6 @@ import ClayAlert from '@clayui/alert';
 import {TreeView as ClayTreeView} from '@clayui/core';
 import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
-import {Treeview} from 'frontend-js-components-web';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import getAllEditables from '../../../../../app/components/fragment_content/getAllEditables';
@@ -62,9 +61,8 @@ import {formIsRestricted} from '../../../../../app/utils/formIsRestricted';
 import getMappingFieldsKey from '../../../../../app/utils/getMappingFieldsKey';
 import {getResponsiveConfig} from '../../../../../app/utils/getResponsiveConfig';
 import getSelectedField from '../../../../../app/utils/getSelectedField';
-import StructureClayTreeNode from './StructureClayTreeNode';
-import StructureClayTreeNodeActions from './StructureClayTreeNodeActions';
 import StructureTreeNode from './StructureTreeNode';
+import StructureTreeNodeActions from './StructureTreeNodeActions';
 import VisibilityButton from './VisibilityButton';
 
 const EDITABLE_LABEL = {
@@ -144,11 +142,10 @@ export default function PageStructureSidebar() {
 				activeItemId,
 				canUpdateEditables,
 				canUpdateItemConfiguration,
-				dragAndDropHoveredItemId,
 				editingNodeId,
 				fragmentEntryLinks,
+				hoveredItemId,
 				isMasterPage,
-				keyboardMovementTargetId,
 				layoutData,
 				layoutDataRef,
 				mappingFields,
@@ -165,11 +162,10 @@ export default function PageStructureSidebar() {
 			canUpdateItemConfiguration,
 			data.items,
 			data.rootItems.main,
-			dragAndDropHoveredItemId,
 			editingNodeId,
 			fragmentEntryLinks,
+			hoveredItemId,
 			isMasterPage,
-			keyboardMovementTargetId,
 			layoutData,
 			layoutDataRef,
 			mappingFields,
@@ -196,8 +192,6 @@ export default function PageStructureSidebar() {
 	};
 
 	const handleButtonsKeyDown = (event) => {
-		event.stopPropagation();
-
 		if (
 			[
 				ARROW_DOWN_KEY_CODE,
@@ -207,8 +201,11 @@ export default function PageStructureSidebar() {
 			].includes(event.nativeEvent.code)
 		) {
 			document.activeElement
-				.closest('.lfr-treeview-node-list-item')
+				.closest('.page-editor__page-structure__clay-tree-node')
 				?.focus();
+		}
+		else {
+			event.stopPropagation();
 		}
 	};
 
@@ -252,7 +249,7 @@ export default function PageStructureSidebar() {
 				)}
 
 				{showOptions && (
-					<StructureClayTreeNodeActions
+					<StructureTreeNodeActions
 						item={item}
 						setEditingNodeId={setEditingNodeId}
 						visible={item.hidden || isHovered || isSelected}
@@ -262,19 +259,43 @@ export default function PageStructureSidebar() {
 		);
 	};
 
-	useEffect(() => {
-		const getAncestorsIds = (layoutDataItem) => {
+	const getAncestorsIds = useCallback(
+		(layoutDataItem, data) => {
 			if (!layoutDataItem.parentId) {
-				return [layoutDataItem.itemId];
+				const itemInMasterLayout =
+					masterLayoutData?.items[layoutDataItem.itemId];
+				if (
+					!itemInMasterLayout &&
+					masterLayoutData?.rootItems?.dropZone
+				) {
+					const dropZoneItem =
+						masterLayoutData.items[
+							masterLayoutData.rootItems.dropZone
+						];
+
+					return [
+						...[layoutDataItem.itemId],
+						...getAncestorsIds(
+							masterLayoutData.items[dropZoneItem.parentId],
+							masterLayoutData
+						),
+					];
+				}
+				else {
+					return [layoutDataItem.itemId];
+				}
 			}
 
 			return [
 				...[layoutDataItem.itemId],
-				...getAncestorsIds(layoutData.items[layoutDataItem.parentId]),
+				...getAncestorsIds(data.items[layoutDataItem.parentId], data),
 			];
-		};
+		},
+		[masterLayoutData]
+	);
 
-		if (Liferay.FeatureFlags['LPS-151678'] && activeItemId) {
+	useEffect(() => {
+		if (activeItemId) {
 			const layoutDataActiveItem = layoutData.items[activeItemId];
 
 			if (!layoutDataActiveItem) {
@@ -284,11 +305,40 @@ export default function PageStructureSidebar() {
 			setExpandedKeys((previousExpanedKeys) => [
 				...new Set([
 					...previousExpanedKeys,
-					...getAncestorsIds(layoutDataActiveItem),
+					...getAncestorsIds(layoutDataActiveItem, layoutData),
 				]),
 			]);
 		}
-	}, [activeItemId, layoutData.items]);
+	}, [activeItemId, getAncestorsIds, layoutData, masterLayoutData]);
+
+	useEffect(() => {
+		if (dragAndDropHoveredItemId) {
+			setExpandedKeys((previousExpanedKeys) => [
+				...new Set([
+					...previousExpanedKeys,
+					...[dragAndDropHoveredItemId],
+				]),
+			]);
+		}
+	}, [dragAndDropHoveredItemId]);
+
+	useEffect(() => {
+		if (keyboardMovementTargetId) {
+			const layoutDataTargetItem =
+				layoutData.items[keyboardMovementTargetId];
+
+			if (!layoutDataTargetItem) {
+				return;
+			}
+
+			setExpandedKeys((previousExpanedKeys) => [
+				...new Set([
+					...previousExpanedKeys,
+					...getAncestorsIds(layoutDataTargetItem, layoutData),
+				]),
+			]);
+		}
+	}, [getAncestorsIds, keyboardMovementTargetId, layoutData]);
 
 	return (
 		<div
@@ -306,99 +356,84 @@ export default function PageStructureSidebar() {
 			)}
 
 			<DragAndDropContextProvider>
-				<>
-					{!Liferay.FeatureFlags['LPS-151678'] ? (
-						<Treeview
-							NodeComponent={StructureTreeNode}
-							nodes={nodes}
-							selectedNodeIds={[activeItemId]}
-						/>
-					) : (
-						<ClayTreeView
-							displayType="light"
-							expandDoubleClick={false}
-							expandedKeys={new Set(expandedKeys)}
-							expanderIcons={{
-								close: <ClayIcon symbol="hr" />,
-								open: <ClayIcon symbol="plus" />,
-							}}
-							items={nodes}
-							onExpandedChange={setExpandedNodes}
-							onItemsChange={() => {}}
-							showExpanderOnHover={false}
+				<ClayTreeView
+					displayType="light"
+					expandDoubleClick={false}
+					expandedKeys={new Set(expandedKeys)}
+					expanderIcons={{
+						close: <ClayIcon symbol="hr" />,
+						open: <ClayIcon symbol="plus" />,
+					}}
+					items={nodes}
+					onExpandedChange={setExpandedNodes}
+					onItemsChange={() => {}}
+					showExpanderOnHover={false}
+				>
+					{(item) => (
+						<ClayTreeView.Item
+							actions={<ItemActions item={item} />}
+							active={item.active && item.activable}
 						>
-							{(item) => (
-								<ClayTreeView.Item
-									actions={<ItemActions item={item} />}
-									active={item.active && item.activable}
-								>
-									<ClayTreeView.ItemStack
-										className={classNames(
-											'page-editor__page-structure__clay-tree-node',
-											{
-												'page-editor__page-structure__clay-tree-node--active':
-													item.active &&
-													item.activable,
-												'page-editor__page-structure__clay-tree-node--hovered':
-													item.itemId ===
-													hoveredItemId,
-												'page-editor__page-structure__clay-tree-node--mapped':
-													item.mapped,
-												'page-editor__page-structure__clay-tree-node--master-item':
-													item.isMasterItem,
-											}
-										)}
-										data-title={
-											item.isMasterItem || !item.activable
-												? ''
-												: item.tooltipTitle
-										}
-										data-tooltip-align={
-											item.isMasterItem || !item.activable
-												? ''
-												: 'right'
-										}
-										onMouseLeave={(event) => {
-											if (
-												item.id ===
-												fromControlsId(hoveredItemId)
-											) {
-												event.stopPropagation();
-												hoverItem(null);
-											}
-										}}
-										onMouseOver={(event) => {
-											event.stopPropagation();
-											hoverItem(item.id);
-										}}
+							<ClayTreeView.ItemStack
+								className={classNames(
+									'page-editor__page-structure__clay-tree-node',
+									{
+										'page-editor__page-structure__clay-tree-node--active':
+											item.active && item.activable,
+										'page-editor__page-structure__clay-tree-node--hovered':
+											item.hovered,
+										'page-editor__page-structure__clay-tree-node--mapped':
+											item.mapped,
+										'page-editor__page-structure__clay-tree-node--master-item':
+											item.isMasterItem,
+									}
+								)}
+								data-qa-id={item.tooltipTitle}
+								data-title={
+									item.isMasterItem || !item.activable
+										? ''
+										: item.tooltipTitle
+								}
+								data-tooltip-align={
+									item.isMasterItem || !item.activable
+										? ''
+										: 'right'
+								}
+								onMouseLeave={(event) => {
+									if (
+										item.id ===
+										fromControlsId(hoveredItemId)
+									) {
+										event.stopPropagation();
+										hoverItem(null);
+									}
+								}}
+								onMouseOver={(event) => {
+									event.stopPropagation();
+									hoverItem(item.id);
+								}}
+							>
+								<StructureTreeNode
+									node={item}
+									setEditingNodeId={setEditingNodeId}
+								/>
+							</ClayTreeView.ItemStack>
+
+							<ClayTreeView.Group items={item.children}>
+								{(item) => (
+									<ClayTreeView.Item
+										actions={<ItemActions item={item} />}
 									>
-										<StructureClayTreeNode
+										<StructureTreeNode
 											node={item}
 											setEditingNodeId={setEditingNodeId}
 										/>
-									</ClayTreeView.ItemStack>
-
-									<ClayTreeView.Group items={item.children}>
-										{(item) => (
-											<ClayTreeView.Item
-												actions={
-													<ItemActions item={item} />
-												}
-											>
-												<StructureClayTreeNode
-													node={item}
-													setEditingNodeId={
-														setEditingNodeId
-													}
-												/>
-											</ClayTreeView.Item>
-										)}
-									</ClayTreeView.Group>
-								</ClayTreeView.Item>
-							)}
-						</ClayTreeView>
+									</ClayTreeView.Item>
+								)}
+							</ClayTreeView.Group>
+						</ClayTreeView.Item>
 					)}
-				</>
+				</ClayTreeView>
 			</DragAndDropContextProvider>
 		</div>
 	);
@@ -584,12 +619,11 @@ function visit(
 		activeItemId,
 		canUpdateEditables,
 		canUpdateItemConfiguration,
-		dragAndDropHoveredItemId,
 		editingNodeId,
 		fragmentEntryLinks,
 		hasHiddenAncestor,
+		hoveredItemId,
 		isMasterPage,
-		keyboardMovementTargetId,
 		layoutData,
 		layoutDataRef,
 		mappingFields,
@@ -668,12 +702,11 @@ function visit(
 						canActivateEditable(selectedViewportSize, type),
 					active: childId === activeItemId,
 					children: [],
-					dragAndDropHoveredItemId,
 					draggable: false,
-					expanded: childId === activeItemId,
 					hidable: false,
 					hidden: false,
 					hiddenAncestor: hasHiddenAncestor || hidden,
+					hovered: childId === hoveredItemId,
 					icon: EDITABLE_TYPE_ICONS[type],
 					id: childId,
 					isMasterItem: !isMasterPage && itemInMasterLayout,
@@ -694,10 +727,10 @@ function visit(
 						activeItemId,
 						canUpdateEditables,
 						canUpdateItemConfiguration,
-						dragAndDropHoveredItemId,
 						editingNodeId,
 						fragmentEntryLinks,
 						hasHiddenAncestor: hasHiddenAncestor || hidden,
+						hoveredItemId,
 						isMasterPage,
 						layoutData,
 						layoutDataRef,
@@ -743,12 +776,11 @@ function visit(
 						activeItemId,
 						canUpdateEditables,
 						canUpdateItemConfiguration,
-						dragAndDropHoveredItemId,
 						editingNodeId,
 						fragmentEntryLinks,
 						hasHiddenAncestor: hasHiddenAncestor || hidden,
+						hoveredItemId,
 						isMasterPage,
-						keyboardMovementTargetId,
 						layoutData,
 						layoutDataRef,
 						mappingFields,
@@ -767,12 +799,11 @@ function visit(
 					activeItemId,
 					canUpdateEditables,
 					canUpdateItemConfiguration,
-					dragAndDropHoveredItemId,
 					editingNodeId,
 					fragmentEntryLinks,
 					hasHiddenAncestor: hasHiddenAncestor || hidden,
+					hoveredItemId,
 					isMasterPage,
-					keyboardMovementTargetId,
 					layoutData,
 					layoutDataRef,
 					mappingFields,
@@ -796,18 +827,15 @@ function visit(
 			canUpdateItemConfiguration,
 		active: item.itemId === activeItemId,
 		children,
-		config: layoutDataRef.current.items[item.itemId]?.config,
+		config: layoutDataRef?.current?.items[item.itemId]?.config,
 		draggable: true,
 		editingName: editingNodeId === item.itemId,
-		expanded:
-			item.itemId === activeItemId ||
-			item.itemId === dragAndDropHoveredItemId ||
-			item.itemId === keyboardMovementTargetId,
 		hidable:
 			!itemInMasterLayout &&
 			isHidable(item, fragmentEntryLinks, layoutData),
 		hidden,
 		hiddenAncestor: hasHiddenAncestor,
+		hovered: item.itemId === hoveredItemId,
 		icon,
 		id: item.itemId,
 		isMasterItem: !isMasterPage && itemInMasterLayout,

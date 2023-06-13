@@ -20,6 +20,7 @@ import com.liferay.osb.faro.constants.FaroProjectConstants;
 import com.liferay.osb.faro.engine.client.ContactsEngineClient;
 import com.liferay.osb.faro.model.FaroProject;
 import com.liferay.osb.faro.service.FaroProjectLocalService;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -32,7 +33,7 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
-import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
+import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import com.liferay.portal.kernel.service.RoleLocalService;
@@ -45,8 +46,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 import javax.mail.internet.InternetAddress;
 
@@ -59,25 +58,41 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Matthew Kong
  */
-@Component(immediate = true, service = CheckFaroProjectsMessageListener.class)
+@Component(service = CheckFaroProjectsMessageListener.class)
 public class CheckFaroProjectsMessageListener extends BaseMessageListener {
 
 	@Activate
 	protected void activate() {
-		Class<?> clazz = getClass();
+		try {
+			Class<?> clazz = getClass();
 
-		Trigger trigger = _triggerFactory.createTrigger(
-			clazz.getName(), clazz.getName(), new Date(), null,
-			"0 0/15 * * * ?");
+			_trigger = _triggerFactory.createTrigger(
+				clazz.getName(), clazz.getName(), new Date(), null,
+				"0 0/15 * * * ?");
 
-		_schedulerEngineHelper.register(
-			this, new SchedulerEntryImpl(clazz.getName(), trigger),
-			DestinationNames.SCHEDULER_DISPATCH);
+			_schedulerEngineHelper.schedule(
+				_trigger, StorageType.PERSISTED, null,
+				DestinationNames.SCHEDULER_DISPATCH, null);
+		}
+		catch (Exception exception) {
+			_log.error(exception);
+		}
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_schedulerEngineHelper.unregister(this);
+		try {
+			if (_trigger == null) {
+				return;
+			}
+
+			_schedulerEngineHelper.unschedule(
+				_trigger.getJobName(), _trigger.getGroupName(),
+				StorageType.PERSISTED);
+		}
+		catch (Exception exception) {
+			_log.error(exception);
+		}
 	}
 
 	@Override
@@ -99,7 +114,7 @@ public class CheckFaroProjectsMessageListener extends BaseMessageListener {
 					faroProject, (String)null, true, 0, 0, null);
 			}
 			catch (Exception exception) {
-				_log.error(exception, exception);
+				_log.error(exception);
 
 				projectExceptions.put(faroProject, exception);
 			}
@@ -167,32 +182,27 @@ public class CheckFaroProjectsMessageListener extends BaseMessageListener {
 
 		List<User> users = _userLocalService.getRoleUsers(role.getRoleId());
 
-		Stream<User> stream = users.stream();
-
-		InternetAddress[] bcc = stream.filter(
-			user -> !StringUtil.equals(
-				user.getEmailAddress(), "test@liferay.com")
-		).map(
+		List<InternetAddress> bcc = TransformUtil.transform(
+			users,
 			user -> {
-				try {
-					return new InternetAddress(
-						user.getEmailAddress(), user.getFullName());
-				}
-				catch (Exception exception) {
-					_log.error(exception, exception);
+				if (!StringUtil.equals(
+						user.getEmailAddress(), "test@liferay.com")) {
 
-					return null;
+					try {
+						return new InternetAddress(
+							user.getEmailAddress(), user.getFullName());
+					}
+					catch (Exception exception) {
+						_log.error(exception);
+					}
 				}
-			}
-		).filter(
-			Objects::nonNull
-		).toArray(
-			InternetAddress[]::new
-		);
+
+				return null;
+			});
 
 		MailMessage mailMessage = new MailMessage(from, subject, body, false);
 
-		mailMessage.setBCC(bcc);
+		mailMessage.setBCC((InternetAddress[])bcc.toArray());
 
 		_mailService.sendEmail(mailMessage);
 	}
@@ -219,6 +229,8 @@ public class CheckFaroProjectsMessageListener extends BaseMessageListener {
 
 	@Reference
 	private SchedulerEngineHelper _schedulerEngineHelper;
+
+	private Trigger _trigger;
 
 	@Reference
 	private TriggerFactory _triggerFactory;

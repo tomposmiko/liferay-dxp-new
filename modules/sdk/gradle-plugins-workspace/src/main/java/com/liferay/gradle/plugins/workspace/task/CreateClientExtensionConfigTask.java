@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -82,20 +81,8 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 			_PLUGIN_PACKAGE_PROPERTIES_PATH);
 	}
 
-	public void addClientExtensionProfile(
-		String profileName, ClientExtension clientExtension) {
-
-		_clientExtensionsMap.compute(
-			profileName,
-			(key, value) -> {
-				if (value == null) {
-					value = new LinkedHashSet<>();
-				}
-
-				value.add(clientExtension);
-
-				return value;
-			});
+	public void addClientExtension(ClientExtension clientExtension) {
+		_clientExtensions.add(clientExtension);
 	}
 
 	public void addClientExtensionProperties(
@@ -108,21 +95,14 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 	public void createClientExtensionConfig() {
 		Properties pluginPackageProperties = _getPluginPackageProperties();
 
-		Set<ClientExtension> clientExtensions = _clientExtensionsMap.get(
-			GradleUtil.getProperty(_project, "profileName", "default"));
-
-		if (clientExtensions == null) {
-			clientExtensions = _clientExtensionsMap.get("default");
-		}
-
 		String classificationGrouping = _validateAndGetClassificationGrouping(
-			clientExtensions);
+			_clientExtensions);
 
 		Map<String, Object> jsonMap = new HashMap<>();
 
 		jsonMap.put(":configurator:policy", "force");
 
-		for (ClientExtension clientExtension : clientExtensions) {
+		for (ClientExtension clientExtension : _clientExtensions) {
 			if (Objects.equals(clientExtension.classification, "batch")) {
 				pluginPackageProperties.put(
 					"Liferay-Client-Extension-Batch", "batch/");
@@ -149,7 +129,7 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 
 		_storePluginPackageProperties(pluginPackageProperties);
 
-		Stream<ClientExtension> stream = clientExtensions.stream();
+		Stream<ClientExtension> stream = _clientExtensions.stream();
 
 		Map<String, String> substitutionMap = stream.flatMap(
 			clientExtension -> {
@@ -521,8 +501,7 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 
 	private final Object _clientExtensionConfigFile;
 	private Properties _clientExtensionProperties;
-	private final Map<String, Set<ClientExtension>> _clientExtensionsMap =
-		new HashMap<>();
+	private final Set<ClientExtension> _clientExtensions = new HashSet<>();
 	private Object _dockerFile;
 	private Object _lcpJsonFile;
 	private final Object _pluginPackagePropertiesFile;

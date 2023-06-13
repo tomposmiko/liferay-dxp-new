@@ -21,6 +21,7 @@ declare type FDSViewType = {
 	defaultItemsPerPage: number;
 	description: string;
 	externalReferenceCode: string;
+	fdsFiltersOrder: string;
 	id: string;
 	label: string;
 	listOfItemsPerPage: string;

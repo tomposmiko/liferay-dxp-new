@@ -9,81 +9,132 @@
  * distribution rights of the Software.
  */
 
+import {KeyedMutator, mutate} from 'swr';
+
 import Dropdown from '../../../common/components/Dropdown';
+import {DropdownOption} from '../../../common/components/Dropdown/Dropdown';
 import StatusBadge from '../../../common/components/StatusBadge';
 import {MDFClaimColumnKey} from '../../../common/enums/mdfClaimColumnKey';
 import {MDFColumnKey} from '../../../common/enums/mdfColumnKey';
+import {PermissionActionType} from '../../../common/enums/permissionActionType';
 import {PRMPageRoute} from '../../../common/enums/prmPageRoute';
+import MDFClaimDTO from '../../../common/interfaces/dto/mdfClaimDTO';
 import {MDFClaimListItem} from '../../../common/interfaces/mdfClaimListItem';
-import Role from '../../../common/interfaces/role';
 import TableColumn from '../../../common/interfaces/tableColumn';
 import {Liferay} from '../../../common/services/liferay';
+import LiferayItems from '../../../common/services/liferay/common/interfaces/liferayItems';
+import {ResourceName} from '../../../common/services/liferay/object/enum/resourceName';
+import deleteMDFClaim from '../../../common/services/liferay/object/mdf-claim/deleteMDFClaim';
 import {Status} from '../../../common/utils/constants/status';
-import {isLiferayManager} from '../../../common/utils/isLiferayManager';
 
 export default function getMDFClaimListColumns(
-	isPartnerManagerRole?: boolean,
 	siteURL?: string,
-	roleEntries?: Role[]
+	actions?: PermissionActionType[],
+	mutated?: KeyedMutator<LiferayItems<MDFClaimDTO[]>>
 ): TableColumn<MDFClaimListItem>[] | undefined {
 	const getDropdownOptions = (row: MDFClaimListItem) => {
-		const userAccountRolesCanEdit =
-			isLiferayManager(roleEntries as Role[]) || isPartnerManagerRole;
+		const options = actions?.reduce<DropdownOption[]>(
+			(previousValue, currentValue) => {
+				const currentMDFClaimHasValidStatusToEdit =
+					row[MDFClaimColumnKey.STATUS] === Status.DRAFT.name ||
+					row[MDFClaimColumnKey.STATUS] ===
+						Status.REQUEST_MORE_INFO.name;
 
-		if (
-			!userAccountRolesCanEdit &&
-			row[MDFClaimColumnKey.STATUS] !== Status.DRAFT.name &&
-			row[MDFClaimColumnKey.STATUS] !== Status.REQUEST_MORE_INFO.name
-		) {
-			return (
-				<Dropdown
-					closeOnClick={true}
-					options={[
-						{
-							icon: 'view',
-							key: 'approve',
-							label: ' View',
-							onClick: () =>
-								Liferay.Util.navigate(
-									`${siteURL}/l/${
-										row[MDFClaimColumnKey.CLAIM_ID]
-									}`
-								),
+				const currentMDFClaimHasValidStatusToDelete =
+					row[MDFClaimColumnKey.STATUS] === Status.DRAFT.name;
+
+				if (currentValue === PermissionActionType.VIEW) {
+					previousValue.push({
+						icon: 'view',
+						key: 'approve',
+						label: 'View',
+						onClick: () =>
+							Liferay.Util.navigate(
+								`${siteURL}/l/${
+									row[MDFClaimColumnKey.CLAIM_ID]
+								}`
+							),
+					});
+				}
+
+				if (
+					currentValue === PermissionActionType.UPDATE &&
+					currentMDFClaimHasValidStatusToEdit
+				) {
+					previousValue.push({
+						icon: 'pencil',
+						key: 'edit',
+						label: 'Edit',
+						onClick: () =>
+							Liferay.Util.navigate(
+								`${siteURL}/${
+									PRMPageRoute.EDIT_MDF_CLAIM
+								}/#/mdf-request/${
+									row[MDFClaimColumnKey.REQUEST_ID]
+								}/mdf-claim/${row[MDFClaimColumnKey.CLAIM_ID]}`
+							),
+					});
+				}
+
+				if (
+					currentValue === PermissionActionType.DELETE &&
+					currentMDFClaimHasValidStatusToDelete
+				) {
+					previousValue.push({
+						icon: 'trash',
+						key: 'delete',
+						label: ' Delete',
+						onClick: () => {
+							Liferay.Util.openConfirmModal({
+								message: 'Are you sure?',
+								onConfirm: async (isConfirmed: boolean) => {
+									if (isConfirmed) {
+										try {
+											await deleteMDFClaim(
+												ResourceName.MDF_CLAIM_DXP,
+												Number(
+													row[
+														MDFClaimColumnKey
+															.CLAIM_ID
+													]
+												)
+											);
+
+											Liferay.Util.openToast({
+												message:
+													'MDF Claim successfully deleted!',
+												title: 'Success',
+												type: 'success',
+											});
+
+											mutate(mutated);
+										}
+										catch (error: unknown) {
+											Liferay.Util.openToast({
+												message:
+													'Fail to delete MDF Claim.',
+												title: 'Error',
+												type: 'danger',
+											});
+										}
+									}
+								},
+							});
 						},
-					]}
-				></Dropdown>
-			);
-		}
+					});
+				}
 
-		const options = [
-			{
-				icon: 'view',
-				key: 'approve',
-				label: ' View',
-				onClick: () =>
-					Liferay.Util.navigate(
-						`${siteURL}/l/${row[MDFClaimColumnKey.CLAIM_ID]}`
-					),
+				return previousValue;
 			},
-			{
-				icon: 'pencil',
-				key: 'edit',
-				label: ' Edit',
-				onClick: () =>
-					Liferay.Util.navigate(
-						`${siteURL}/${
-							PRMPageRoute.CREATE_MDF_CLAIM
-						}/#/mdfrequest/${
-							row[MDFClaimColumnKey.REQUEST_ID]
-						}/mdfclaim/${row[MDFClaimColumnKey.CLAIM_ID]}`
-					),
-			},
-		];
+			[]
+		);
 
-		return <Dropdown closeOnClick={true} options={options}></Dropdown>;
+		return (
+			<Dropdown closeOnClick={true} options={options || []}></Dropdown>
+		);
 	};
 
-	const columns = [
+	return [
 		{
 			columnKey: MDFClaimColumnKey.CLAIM_ID,
 			label: 'Claim ID',
@@ -137,16 +188,10 @@ export default function getMDFClaimListColumns(
 			columnKey: MDFClaimColumnKey.DATE_SUBMITTED,
 			label: 'Date Submitted',
 		},
+		{
+			columnKey: MDFColumnKey.ACTION,
+			label: '',
+			render: (_, row) => getDropdownOptions(row),
+		},
 	];
-
-	return (
-		columns && [
-			...columns,
-			{
-				columnKey: MDFColumnKey.ACTION,
-				label: '',
-				render: (_, row) => getDropdownOptions(row),
-			},
-		]
-	);
 }

@@ -9,11 +9,10 @@
  * distribution rights of the Software.
  */
 
-import ClayAlert from '@clayui/alert';
 import Button from '@clayui/button';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {useFormikContext} from 'formik';
-import {useCallback, useMemo} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 
 import PRMForm from '../../../../common/components/PRMForm';
 import PRMFormik from '../../../../common/components/PRMFormik';
@@ -21,17 +20,14 @@ import PRMFormikPageProps from '../../../../common/components/PRMFormik/interfac
 import {LiferayPicklistName} from '../../../../common/enums/liferayPicklistName';
 import useCompanyOptions from '../../../../common/hooks/useCompanyOptions';
 import MDFRequest from '../../../../common/interfaces/mdfRequest';
-import Role from '../../../../common/interfaces/role';
-import {Status} from '../../../../common/utils/constants/status';
 import getPicklistOptions from '../../../../common/utils/getPicklistOptions';
-import {isLiferayManager} from '../../../../common/utils/isLiferayManager';
 import isObjectEmpty from '../../../../common/utils/isObjectEmpty';
-import {isPartnerManager} from '../../../../common/utils/isPartnerManager';
 import {StepType} from '../../enums/stepType';
 import MDFRequestStepProps from '../../interfaces/mdfRequestStepProps';
 import useDynamicFieldEntries from './hooks/useDynamicFieldEntries';
 
 const Goals = ({
+	disableCompany,
 	onCancel,
 	onContinue,
 	onSaveAsDraft,
@@ -44,19 +40,20 @@ const Goals = ({
 		values,
 		...formikHelpers
 	} = useFormikContext<MDFRequest>();
-	const {
-		accountRoleEntries,
-		companiesEntries,
-		fieldEntries,
-		roleEntries,
-	} = useDynamicFieldEntries();
+	const {companiesEntries, fieldEntries} = useDynamicFieldEntries(
+		disableCompany
+	);
 
 	const {companyOptions, onCompanySelected} = useCompanyOptions(
-		companiesEntries,
 		useCallback(
-			(country, company, currency, accountExternalReferenceCode) => {
+			(
+				partnerCountry,
+				company,
+				currency,
+				accountExternalReferenceCode
+			) => {
 				setFieldValue('company', company);
-				setFieldValue('country', country);
+				setFieldValue('partnerCountry', partnerCountry);
 				setFieldValue('currency', currency);
 				setFieldValue(
 					'accountExternalReferenceCode',
@@ -65,19 +62,14 @@ const Goals = ({
 			},
 			[setFieldValue]
 		),
+		companiesEntries,
 		fieldEntries[LiferayPicklistName.CURRENCIES],
 		!isObjectEmpty(values.currency) ? values.currency : undefined,
-		fieldEntries[LiferayPicklistName.REGIONS],
-		!isObjectEmpty(values.country) ? values.country : undefined,
+		fieldEntries[LiferayPicklistName.COUNTRIES],
+		!isObjectEmpty(values.partnerCountry)
+			? values.partnerCountry
+			: undefined,
 		!isObjectEmpty(values.company) ? values.company : undefined
-	);
-
-	const {
-		onSelected: onCountrySelected,
-		options: countryOptions,
-	} = getPicklistOptions(
-		fieldEntries[LiferayPicklistName.REGIONS],
-		(selected) => setFieldValue('country', selected)
 	);
 
 	const {
@@ -88,73 +80,26 @@ const Goals = ({
 		(selected) => setFieldValue('additionalOption', selected)
 	);
 
-	const {
-		onSelected: onCurrencySelected,
-		options: currencyOptions,
-	} = getPicklistOptions(
-		fieldEntries[LiferayPicklistName.CURRENCIES],
-		(selected) => setFieldValue('currency', selected)
-	);
-
-	const companyCurrencies =
-		currencyOptions &&
-		values.currency &&
-		currencyOptions.filter(
-			(currency) => currency.value === values.currency.key
-		);
-
 	const goalsErrors = useMemo(() => {
 		delete errors.activities;
 
 		return errors;
 	}, [errors]);
 
-	const isPartnerManagerRole = useMemo(() => {
-		const roles = accountRoleEntries(values.company?.id);
-
-		return isPartnerManager(roles as Role[]);
-	}, [accountRoleEntries, values.company?.id]);
+	useEffect(() => {
+		if (
+			!values.liferayBusinessSalesGoals?.includes(
+				'Other - Please describe'
+			)
+		) {
+			setFieldValue(`liferayBusinessSalesGoalsOther`, '');
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [values.liferayBusinessSalesGoals]);
 
 	const getRequestPage = () => {
-		if (!fieldEntries || !roleEntries || !companiesEntries) {
+		if (!fieldEntries) {
 			return <ClayLoadingIndicator />;
-		}
-
-		const userAccountRolesCanEdit = isLiferayManager(roleEntries);
-
-		if (
-			values.id &&
-			roleEntries &&
-			!isPartnerManagerRole &&
-			!userAccountRolesCanEdit &&
-			values.mdfRequestStatus?.key !== 'draft' &&
-			values.mdfRequestStatus?.key !== 'moreInfoRequested'
-		) {
-			return (
-				<PRMForm name="" title="MDF Request">
-					<div className="d-flex justify-content-center mt-4">
-						<ClayAlert
-							className="m-0 w-100"
-							displayType="info"
-							title="Info:"
-						>
-							This MDF Request can not be edited.
-						</ClayAlert>
-					</div>
-
-					<PRMForm.Footer>
-						<div className="d-flex mr-auto">
-							<Button
-								className="mr-4"
-								displayType="secondary"
-								onClick={() => onCancel()}
-							>
-								Cancel
-							</Button>
-						</div>
-					</PRMForm.Footer>
-				</PRMForm>
-			);
 		}
 
 		return (
@@ -163,28 +108,11 @@ const Goals = ({
 					<PRMForm.Group>
 						<PRMFormik.Field
 							component={PRMForm.Select}
+							disabled={disableCompany}
 							label="Company Name"
 							name="company"
 							onChange={onCompanySelected}
 							options={companyOptions}
-							required
-						/>
-
-						<PRMFormik.Field
-							component={PRMForm.Select}
-							label="Country"
-							name="country"
-							onChange={onCountrySelected}
-							options={countryOptions}
-							required
-						/>
-
-						<PRMFormik.Field
-							component={PRMForm.Select}
-							label="Currency"
-							name="currency"
-							onChange={onCurrencySelected}
-							options={companyCurrencies}
 							required
 						/>
 					</PRMForm.Group>
@@ -215,7 +143,17 @@ const Goals = ({
 						label="Select Liferay business/sales goals this Campaign serves (choose up to three)"
 						name="liferayBusinessSalesGoals"
 						required
-					/>
+					>
+						{values.liferayBusinessSalesGoals?.includes(
+							'Other - Please describe'
+						) && (
+							<PRMFormik.Field
+								component={PRMForm.InputText}
+								name="liferayBusinessSalesGoalsOther"
+								required
+							/>
+						)}
+					</PRMFormik.Field>
 				</PRMForm.Section>
 
 				<PRMForm.Section title="Target Market">
@@ -251,24 +189,24 @@ const Goals = ({
 				<PRMForm.Footer>
 					<div className="d-flex justify-content-end mr-auto">
 						<Button
-							className="inline-item inline-item-after"
-							disabled={isSubmitting}
+							className="inline-item inline-item-after pl-0"
+							disabled={isSubmitting || !values.company?.id}
 							displayType={null}
 							onClick={() =>
 								onSaveAsDraft?.(values, formikHelpers)
 							}
 						>
 							Save as Draft
-							{isSubmitting &&
-								values.mdfRequestStatus === Status.DRAFT && (
-									<ClayLoadingIndicator className="inline-item inline-item-after ml-2" />
-								)}
+							{isSubmitting && (
+								<ClayLoadingIndicator className="inline-item inline-item-after ml-2" />
+							)}
 						</Button>
 					</div>
 
 					<div className="d-flex justify-content-between px-2 px-md-0">
 						<Button
 							className="mr-4"
+							disabled={isSubmitting}
 							displayType="secondary"
 							onClick={onCancel}
 						>
@@ -276,6 +214,7 @@ const Goals = ({
 						</Button>
 
 						<Button
+							className="inline-item inline-item-after"
 							disabled={
 								(!isValid && !isObjectEmpty(goalsErrors)) ||
 								isSubmitting
@@ -285,6 +224,9 @@ const Goals = ({
 							}
 						>
 							Continue
+							{isSubmitting && (
+								<ClayLoadingIndicator className="inline-item inline-item-after ml-2" />
+							)}
 						</Button>
 					</div>
 				</PRMForm.Footer>

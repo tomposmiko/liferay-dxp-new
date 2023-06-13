@@ -14,16 +14,12 @@
 
 import {useEffect} from 'react';
 import {Outlet, useOutletContext, useParams} from 'react-router-dom';
+import PageRenderer from '~/components/PageRenderer';
 
 import {useHeader} from '../../../hooks';
 import {useFetch} from '../../../hooks/useFetch';
 import i18n from '../../../i18n';
-import {
-	TestrayProject,
-	TestrayRequirement,
-	getRequirementQuery,
-	getRequirementTransformData,
-} from '../../../services/rest';
+import {TestrayProject, TestrayRequirement} from '../../../services/rest';
 import useRequirementActions from './useRequirementActions';
 
 const RequirementsOutlet = () => {
@@ -33,12 +29,9 @@ const RequirementsOutlet = () => {
 		testrayProject,
 	}: {testrayProject: TestrayProject} = useOutletContext();
 
-	const {data: testrayRequirement, mutate} = useFetch<TestrayRequirement>(
-		getRequirementQuery(requirementId),
-		{
-			transformData: getRequirementTransformData,
-		}
-	);
+	const {data: testrayRequirement, error, loading, mutate} = useFetch<
+		TestrayRequirement
+	>(`/requirements/${requirementId}`);
 
 	const {setHeaderActions, setHeading} = useHeader({
 		timeout: 100,
@@ -50,36 +43,33 @@ const RequirementsOutlet = () => {
 
 	useEffect(() => {
 		if (testrayRequirement && testrayProject) {
-			setTimeout(() => {
-				setHeading([
-					{
-						category: i18n.translate('project').toUpperCase(),
-						path: `/project/${testrayProject.id}/requirements`,
-						title: testrayProject.name,
-					},
-					{
-						category: i18n.translate('requirement').toUpperCase(),
-						path: `/project/${testrayProject.id}/requirements/${testrayRequirement.id}`,
-						title: testrayRequirement?.key,
-					},
-				]);
-			}, 0);
+			setHeading([
+				{
+					category: i18n.translate('project').toUpperCase(),
+					path: `/project/${testrayProject.id}/requirements`,
+					title: testrayProject.name,
+				},
+				{
+					category: i18n.translate('requirement').toUpperCase(),
+					path: `/project/${testrayProject.id}/requirements/${testrayRequirement.id}`,
+					title: testrayRequirement?.key,
+				},
+			]);
 		}
 	}, [testrayProject, setHeading, testrayRequirement]);
 
-	if (testrayRequirement && testrayProject) {
-		return (
+	return (
+		<PageRenderer error={error} loading={loading}>
 			<Outlet
 				context={{
+					actions: testrayRequirement?.actions,
 					mutateTestrayRequirement: mutate,
 					testrayProject,
 					testrayRequirement,
 				}}
 			/>
-		);
-	}
-
-	return null;
+		</PageRenderer>
+	);
 };
 
 export default RequirementsOutlet;

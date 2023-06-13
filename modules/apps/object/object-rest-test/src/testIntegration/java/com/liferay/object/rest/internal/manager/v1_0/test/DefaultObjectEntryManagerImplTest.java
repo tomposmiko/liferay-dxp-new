@@ -109,7 +109,6 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
-import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.FeatureFlags;
@@ -121,6 +120,8 @@ import com.liferay.portal.vulcan.aggregation.Facet;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
+import com.liferay.portal.vulcan.fields.NestedFieldsContext;
+import com.liferay.portal.vulcan.fields.NestedFieldsContextThreadLocal;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
@@ -140,11 +141,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 
 import org.hamcrest.CoreMatchers;
 
@@ -195,6 +191,10 @@ public class DefaultObjectEntryManagerImplTest {
 
 	@Before
 	public void setUp() throws Exception {
+		_dtoConverterContext = new DefaultDTOConverterContext(
+			false, Collections.emptyMap(), _dtoConverterRegistry, null,
+			LocaleUtil.getDefault(), null, _adminUser);
+
 		_objectDefinition1 = _createObjectDefinition(
 			Arrays.asList(
 				new TextObjectFieldBuilder(
@@ -206,8 +206,6 @@ public class DefaultObjectEntryManagerImplTest {
 				).objectFieldSettings(
 					Collections.emptyList()
 				).build()));
-
-		_setUpDTOConverterContext();
 
 		_listTypeDefinition =
 			_listTypeDefinitionLocalService.addListTypeDefinition(
@@ -387,10 +385,26 @@ public class DefaultObjectEntryManagerImplTest {
 			_companyId,
 			AccountRoleConstants.REQUIRED_ROLE_NAME_ACCOUNT_MANAGER);
 		_buyerRole = _roleLocalService.getRole(_companyId, "Buyer");
+
+		_originalNestedFieldsContext =
+			NestedFieldsContextThreadLocal.getNestedFieldsContext();
+
+		NestedFieldsContextThreadLocal.setNestedFieldsContext(
+			new NestedFieldsContext(
+				1,
+				Arrays.asList(
+					StringUtil.removeLast(
+						StringUtil.removeFirst(
+							_objectDefinition1.getPKObjectFieldName(), "c_"),
+						"Id")),
+				null, null, null, null));
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		NestedFieldsContextThreadLocal.setNestedFieldsContext(
+			_originalNestedFieldsContext);
+
 		PermissionThreadLocal.setPermissionChecker(_originalPermissionChecker);
 
 		PrincipalThreadLocal.setName(_originalName);
@@ -1114,7 +1128,8 @@ public class DefaultObjectEntryManagerImplTest {
 
 		try {
 			_objectEntryManager.deleteObjectEntry(
-				"externalReferenceCode1", _companyId, objectDefinition1, null);
+				_companyId, _simpleDTOConverterContext,
+				"externalReferenceCode1", objectDefinition1, null);
 
 			Assert.fail();
 		}
@@ -1139,12 +1154,13 @@ public class DefaultObjectEntryManagerImplTest {
 				objectRelationship.getLabelMap());
 
 		_objectEntryManager.deleteObjectEntry(
-			"externalReferenceCode1", _companyId, objectDefinition1, null);
+			_companyId, _simpleDTOConverterContext, "externalReferenceCode1",
+			objectDefinition1, null);
 
 		try {
 			_objectEntryManager.getObjectEntry(
-				_simpleDTOConverterContext, "externalReferenceCode1",
-				_companyId, objectDefinition1, null);
+				_companyId, _simpleDTOConverterContext,
+				"externalReferenceCode1", objectDefinition1, null);
 
 			Assert.fail();
 		}
@@ -1158,8 +1174,8 @@ public class DefaultObjectEntryManagerImplTest {
 
 		Assert.assertNotNull(
 			_objectEntryManager.getObjectEntry(
-				_simpleDTOConverterContext, "externalReferenceCode2",
-				_companyId, objectDefinition2, null));
+				_companyId, _simpleDTOConverterContext,
+				"externalReferenceCode2", objectDefinition2, null));
 
 		_addRelatedObjectEntries(
 			objectDefinition1, objectDefinition2, "externalReferenceCode3",
@@ -1179,7 +1195,8 @@ public class DefaultObjectEntryManagerImplTest {
 
 		try {
 			_objectEntryManager.deleteObjectEntry(
-				"externalReferenceCode3", _companyId, objectDefinition1, null);
+				_companyId, _simpleDTOConverterContext,
+				"externalReferenceCode3", objectDefinition1, null);
 
 			Assert.fail();
 		}
@@ -2181,10 +2198,10 @@ public class DefaultObjectEntryManagerImplTest {
 
 				_assertEquals(
 					_objectEntryManager.getObjectEntry(
+						_objectDefinition1.getCompanyId(),
 						_simpleDTOConverterContext,
 						GetterUtil.getString(expectedEntry.getValue()),
-						_objectDefinition1.getCompanyId(), _objectDefinition1,
-						null),
+						_objectDefinition1, null),
 					(ObjectEntry)actualObjectEntryProperties.get(
 						StringUtil.replaceLast(
 							_objectRelationshipFieldName, "Id",
@@ -2401,44 +2418,6 @@ public class DefaultObjectEntryManagerImplTest {
 			role.getRoleId(), actionId);
 	}
 
-	private void _setUpDTOConverterContext() {
-		UriInfo uriInfo = (UriInfo)ProxyUtil.newProxyInstance(
-			DefaultObjectEntryManagerImplTest.class.getClassLoader(),
-			new Class<?>[] {UriInfo.class},
-			(proxy, method, arguments) -> {
-				if (Objects.equals(method.getName(), "getBaseUriBuilder")) {
-					return UriBuilder.fromPath(RandomTestUtil.randomString());
-				}
-				else if (Objects.equals(method.getName(), "getMatchedURIs")) {
-					return Arrays.asList(StringPool.BLANK);
-				}
-				else if (Objects.equals(
-							method.getName(), "getPathParameters")) {
-
-					return new MultivaluedHashMap<>();
-				}
-				else if (Objects.equals(
-							method.getName(), "getQueryParameters")) {
-
-					MultivaluedMap<String, String> multivaluedMap =
-						new MultivaluedHashMap<>();
-
-					multivaluedMap.add(
-						"nestedFields",
-						_objectDefinition1.getPKObjectFieldName());
-
-					return multivaluedMap;
-				}
-
-				throw new UnsupportedOperationException(
-					"Unsupported method " + method.getName());
-			});
-
-		_dtoConverterContext = new DefaultDTOConverterContext(
-			false, Collections.emptyMap(), _dtoConverterRegistry, null,
-			LocaleUtil.getDefault(), uriInfo, _adminUser);
-	}
-
 	private void _testGetObjectEntries(
 			Map<String, String> context, ObjectEntry... expectedObjectEntries)
 		throws Exception {
@@ -2560,6 +2539,8 @@ public class DefaultObjectEntryManagerImplTest {
 
 	@Inject
 	private OrganizationLocalService _organizationLocalService;
+
+	private NestedFieldsContext _originalNestedFieldsContext;
 
 	@Inject
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
