@@ -20,8 +20,6 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.service.JournalArticleLocalServiceUtil;
-import com.liferay.journal.util.comparator.ArticleVersionComparator;
 import com.liferay.journal.web.internal.constants.JournalWebConstants;
 import com.liferay.journal.web.internal.security.permission.resource.JournalArticlePermission;
 import com.liferay.journal.web.internal.servlet.taglib.util.JournalArticleActionDropdownItemsProvider;
@@ -165,7 +163,8 @@ public class JournalArticleVerticalCard extends BaseVerticalCard {
 
 	@Override
 	public String getStickerCssClass() {
-		User user = _getOriginalAuthorUser();
+		User user = UserLocalServiceUtil.fetchUser(
+			_article.getStatusByUserId());
 
 		if (user == null) {
 			return StringPool.BLANK;
@@ -176,7 +175,8 @@ public class JournalArticleVerticalCard extends BaseVerticalCard {
 
 	@Override
 	public String getStickerIcon() {
-		User user = _getOriginalAuthorUser();
+		User user = UserLocalServiceUtil.fetchUser(
+			_article.getStatusByUserId());
 
 		if (user == null) {
 			return StringPool.BLANK;
@@ -192,7 +192,8 @@ public class JournalArticleVerticalCard extends BaseVerticalCard {
 	@Override
 	public String getStickerImageSrc() {
 		try {
-			User user = _getOriginalAuthorUser();
+			User user = UserLocalServiceUtil.fetchUser(
+				_article.getStatusByUserId());
 
 			if (user == null) {
 				return StringPool.BLANK;
@@ -237,17 +238,6 @@ public class JournalArticleVerticalCard extends BaseVerticalCard {
 			_article.getDefaultLanguageId());
 
 		return HtmlUtil.escape(_article.getTitle(defaultLanguage));
-	}
-
-	private User _getOriginalAuthorUser() {
-		List<JournalArticle> articles =
-			JournalArticleLocalServiceUtil.getArticles(
-				_article.getGroupId(), _article.getArticleId(), 0, 1,
-				new ArticleVersionComparator(true));
-
-		JournalArticle article = articles.get(0);
-
-		return UserLocalServiceUtil.fetchUser(article.getUserId());
 	}
 
 	private final JournalArticle _article;

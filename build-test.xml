@@ -1379,7 +1379,6 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 
 	<macrodef name="get-test-url">
 		<sequential>
-			<get-browser-property property.name="browser.docker.image" />
 			<get-operating-system-property property.name="operating.system.docker.image" />
 			<get-testcase-property property.name="analytics.cloud.enabled" />
 			<get-testcase-property property.name="testcase.url" />
@@ -1418,10 +1417,7 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 					</then>
 				</elseif>
 				<elseif>
-					<or>
-						<contains string="${test.class}" substring="," />
-						<isset property="browser.docker.image" />
-					</or>
+					<contains string="${test.class}" substring="," />
 					<then>
 						<if>
 							<os family="unix" />
@@ -6314,9 +6310,17 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			<get-browser-property property.name="browser.docker.image" />
 			<get-browser-property property.name="browser.docker.run.options" />
 			<get-browser-property property.name="browser.host" />
+			<get-ip-address />
 
 			<start-docker-container image="${browser.docker.image}" name="${browser.host}" options="${browser.docker.browser.options}">\
 				${browser.docker.run.options} \
+				--add-host ${env.HOSTNAME}:${ip.address} \
+				--add-host www.able.com:${ip.address} \
+				--add-host www.baker.com:${ip.address} \
+				--add-host www.charlie.com:${ip.address} \
+				--add-host www.dog.com:${ip.address} \
+				--add-host www.easy.com:${ip.address} \
+				--add-host www.fox.com:${ip.address} \
 			</start-docker-container>
 
 			<echo>Waiting for ${browser.host}:4444 to load</echo>
@@ -6324,6 +6328,20 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			<waitfor maxwait="300" maxwaitunit="second">
 				<socket port="4444" server="${browser.host}" />
 			</waitfor>
+
+			<docker-copy dest.path="${browser.host}:/root/.ssh" src.path="/root/.ssh/." />
+
+			<docker-execute container="${browser.host}">
+				ssh -fN -4 -L 8080:${ip.address}:8080 ${browser.host}
+				ssh -fN -4 -L 8282:${ip.address}:8282 ${browser.host}
+				ssh -fN -4 -L 8443:${ip.address}:8443 ${browser.host}
+				ssh -fN -4 -L 9080:${ip.address}:9080 ${browser.host}
+				ssh -fN -4 -L 9200:${ip.address}:9200 ${browser.host}
+				ssh -fN -4 -L 9201:${ip.address}:9201 ${browser.host}
+				ssh -fN -4 -L 9202:${ip.address}:9202 ${browser.host}
+				ssh -fN -4 -L 10080:${ip.address}:10080 ${browser.host}
+				ssh -fN -4 -L 12080:${ip.address}:12080 ${browser.host}
+			</docker-execute>
 		</sequential>
 	</macrodef>
 
@@ -7696,6 +7714,12 @@ war.path=${app.server.portal.dir}/</echo>
 						<equals arg1="${portal.version}" arg2="7.3.5" />
 						<then>
 							<property name="portal.version.url.path" value="7.3.5-ga6" />
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${portal.version}" arg2="7.3.10.u6" />
+						<then>
+							<property name="portal.version.url.path" value="7.3.10-u6" />
 						</then>
 					</elseif>
 					<else>
@@ -11268,6 +11292,8 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 	</target>
 
 	<target name="prepare-poshi-runner-properties">
+		<delete file="${test.ext.properties.file}" />
+
 		<get-ip-address />
 
 		<echo append="true" file="${test.ext.properties.file}">
@@ -11535,28 +11561,18 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		<prepare-selenium-sharepoint-properties />
 		<prepare-selenium-testcase-properties />
 
-		<get-browser-property property.name="browser.docker.image" />
 		<get-operating-system-property property.name="operating.system.docker.image" />
 
 		<if>
-			<isset property="browser.docker.image" />
+			<isset property="operating.system.docker.image" />
 			<then>
+				<get-operating-system-property property.name="operating.system.host.alias" />
+
 				<echo append="true" file="${test.ext.properties.file}">
-					default.portal.url=${test.url}
-					portal.hostname=${env.HOSTNAME}
+					default.portal.url=${operating.system.host.alias}:8080
+					portal.hostname=${operating.system.host.alias}
 				</echo>
 			</then>
-			<elseif>
-				<isset property="operating.system.docker.image" />
-				<then>
-					<get-operating-system-property property.name="operating.system.host.alias" />
-
-					<echo append="true" file="${test.ext.properties.file}">
-						default.portal.url=${operating.system.host.alias}:8080
-						portal.hostname=${operating.system.host.alias}
-					</echo>
-				</then>
-			</elseif>
 			<else>
 				<echo append="true" file="${test.ext.properties.file}">
 					default.portal.url=http://localhost:8080

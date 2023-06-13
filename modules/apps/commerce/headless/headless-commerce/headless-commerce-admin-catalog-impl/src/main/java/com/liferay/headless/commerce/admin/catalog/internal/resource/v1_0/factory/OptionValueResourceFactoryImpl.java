@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
+import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
 import java.lang.reflect.Constructor;
@@ -52,9 +53,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -62,7 +61,10 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Zoltán Takács
  * @generated
  */
-@Component(immediate = true, service = OptionValueResource.Factory.class)
+@Component(
+	property = "resource.locator.key=/headless-commerce-admin-catalog/v1.0/OptionValue",
+	service = OptionValueResource.Factory.class
+)
 @Generated("")
 public class OptionValueResourceFactoryImpl
 	implements OptionValueResource.Factory {
@@ -134,16 +136,6 @@ public class OptionValueResourceFactoryImpl
 			private User _user;
 
 		};
-	}
-
-	@Activate
-	protected void activate() {
-		OptionValueResource.FactoryHolder.factory = this;
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		OptionValueResource.FactoryHolder.factory = null;
 	}
 
 	private static Function<InvocationHandler, OptionValueResource>
@@ -218,6 +210,7 @@ public class OptionValueResourceFactoryImpl
 		optionValueResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		optionValueResource.setRoleLocalService(_roleLocalService);
+		optionValueResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(optionValueResource, arguments);
@@ -266,6 +259,9 @@ public class OptionValueResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
+
+	@Reference
+	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

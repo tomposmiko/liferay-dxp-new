@@ -224,11 +224,18 @@ public class BlogsEntryAssetRenderer
 			String noSuchEntryRedirect)
 		throws PortalException {
 
-		if (_assetDisplayPageFriendlyURLProvider != null) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)liferayPortletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)liferayPortletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
+		return getURLViewInContext(themeDisplay, noSuchEntryRedirect);
+	}
+
+	public String getURLViewInContext(
+			ThemeDisplay themeDisplay, String noSuchEntryRedirect)
+		throws PortalException {
+
+		if (_assetDisplayPageFriendlyURLProvider != null) {
 			String friendlyURL =
 				_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
 					getClassName(), getClassPK(), themeDisplay);
@@ -238,17 +245,13 @@ public class BlogsEntryAssetRenderer
 			}
 		}
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
 		if (!_hasViewInContextGroupLayout(_entry.getGroupId(), themeDisplay)) {
 			return null;
 		}
 
 		return getURLViewInContext(
-			liferayPortletRequest, noSuchEntryRedirect, "/blogs/find_entry",
-			"entryId", _entry.getEntryId());
+			themeDisplay, noSuchEntryRedirect, "/blogs/find_entry", "entryId",
+			_entry.getEntryId());
 	}
 
 	@Override

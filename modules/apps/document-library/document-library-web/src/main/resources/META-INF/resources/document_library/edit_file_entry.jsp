@@ -539,7 +539,7 @@ renderResponse.setTitle(headerTitle);
 			</c:if>
 
 			<c:if test="<%= dlEditFileEntryDisplayContext.isCheckoutDocumentButtonVisible() %>">
-				<aui:button disabled="<%= dlEditFileEntryDisplayContext.isCheckoutDocumentButtonDisabled() %>" onClick='<%= liferayPortletResponse.getNamespace() + "checkOut();" %>' value="checkout[document]" />
+				<aui:button disabled="<%= dlEditFileEntryDisplayContext.isCheckoutDocumentButtonDisabled() %>" onClick='<%= liferayPortletResponse.getNamespace() + "checkOut();" %>' primary="<%= false %>" type="submit" value="checkout[document]" />
 			</c:if>
 
 			<c:if test="<%= dlEditFileEntryDisplayContext.isCheckinButtonVisible() %>">
@@ -547,7 +547,7 @@ renderResponse.setTitle(headerTitle);
 			</c:if>
 
 			<c:if test="<%= dlEditFileEntryDisplayContext.isCancelCheckoutDocumentButtonVisible() %>">
-				<aui:button disabled="<%= dlEditFileEntryDisplayContext.isCancelCheckoutDocumentButtonDisabled() %>" onClick='<%= liferayPortletResponse.getNamespace() + "cancelCheckOut();" %>' value="cancel-checkout[document]" />
+				<aui:button disabled="<%= dlEditFileEntryDisplayContext.isCancelCheckoutDocumentButtonDisabled() %>" onClick='<%= liferayPortletResponse.getNamespace() + "cancelCheckOut();" %>' primary="<%= false %>" type="submit" value="cancel-checkout[document]" />
 			</c:if>
 
 			<aui:button href="<%= redirect %>" type="cancel" />
@@ -574,11 +574,11 @@ renderResponse.setTitle(headerTitle);
 
 	function <portlet:namespace />changeFileEntryType() {
 		function updateFileEntryType() {
-			var uri = '<%= themeDisplay.getURLCurrent() %>';
+			Liferay.Util.setFormValues(form, {
+				<%= Constants.CMD %>: '<%= Constants.PREVIEW %>',
+			});
 
-			form.<portlet:namespace />cmd.value = '<%= Constants.PREVIEW %>';
-
-			submitForm(form, uri, false, false);
+			form.submit();
 		}
 		var fileElement = Liferay.Util.getFormElement(form, 'file');
 		if (
@@ -604,10 +604,8 @@ renderResponse.setTitle(headerTitle);
 	}
 
 	function <portlet:namespace />cancelCheckOut() {
-		Liferay.Util.postForm(form, {
-			data: {
-				<%= Constants.CMD %>: '<%= Constants.CANCEL_CHECKOUT %>',
-			},
+		Liferay.Util.setFormValues(form, {
+			<%= Constants.CMD %>: '<%= Constants.CANCEL_CHECKOUT %>',
 		});
 	}
 
@@ -620,15 +618,13 @@ renderResponse.setTitle(headerTitle);
 			<portlet:namespace />showVersionDetailsDialog(form);
 		}
 		else {
-			submitForm(form);
+			form.submit();
 		}
 	}
 
 	function <portlet:namespace />checkOut() {
-		Liferay.Util.postForm(form, {
-			data: {
-				<%= Constants.CMD %>: '<%= Constants.CHECKOUT %>',
-			},
+		Liferay.Util.setFormValues(form, {
+			<%= Constants.CMD %>: '<%= Constants.CHECKOUT %>',
 		});
 	}
 
@@ -639,10 +635,14 @@ renderResponse.setTitle(headerTitle);
 			<%= HtmlUtil.escape(uploadProgressId) %>.startProgress();
 		}
 
-		Liferay.Util.setFormValues(form, {
-			<%= Constants.CMD %>:
-				'<%= (fileEntry == null) ? Constants.ADD : Constants.UPDATE %>',
-		});
+		var cmdElement = Liferay.Util.getFormElement(form, 'cmd');
+
+		if (cmdElement && !cmdElement.value) {
+			Liferay.Util.setFormValues(form, {
+				<%= Constants.CMD %>:
+					'<%= (fileEntry == null) ? Constants.ADD : Constants.UPDATE %>',
+			});
+		}
 
 		if (draft) {
 			Liferay.Util.setFormValues(form, {
@@ -658,13 +658,12 @@ renderResponse.setTitle(headerTitle);
 			'<portlet:namespace />DocumentLibraryCheckinModal'
 		).then(function (documentLibraryCheckinModal) {
 			documentLibraryCheckinModal.open(function (versionIncrease, changeLog) {
-				Liferay.Util.postForm(form, {
-					data: {
-						changeLog: changeLog,
-						updateVersionDetails: true,
-						versionIncrease: versionIncrease,
-					},
+				Liferay.Util.setFormValues(form, {
+					changeLog: changeLog,
+					updateVersionDetails: true,
+					versionIncrease: versionIncrease,
 				});
+				form.submit();
 			});
 		});
 	}

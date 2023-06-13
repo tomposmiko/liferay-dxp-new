@@ -21,8 +21,11 @@ String layoutUuid = null;
 
 JournalArticle article = journalDisplayContext.getArticle();
 
+boolean newValue = true;
+
 if (article != null) {
 	layoutUuid = article.getLayoutUuid();
+	newValue = article.isNew();
 }
 
 Layout articleLayout = null;
@@ -51,6 +54,7 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 	classPK="<%= (article != null) ? article.getResourcePrimKey() : 0 %>"
 	classTypeId="<%= journalEditArticleDisplayContext.getDDMStructureId() %>"
 	groupId="<%= journalEditArticleDisplayContext.getGroupId() %>"
+	new="<%= newValue %>"
 	showPortletLayouts="<%= true %>"
 	showViewInContextLink="<%= journalEditArticleDisplayContext.getClassNameId() == JournalArticleConstants.CLASS_NAME_ID_DEFAULT %>"
 />
