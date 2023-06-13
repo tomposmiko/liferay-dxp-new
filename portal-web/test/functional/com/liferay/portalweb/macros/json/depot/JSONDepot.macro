@@ -2,12 +2,12 @@ definition {
 
 	@summary = "This calls the JSON WS API to add a Depot entry"
 	macro addDepot {
-		if (!(isSet(portalURL))) {
-			var portalURL = JSONCompany.getPortalURL();
+		if (!(isSet(portalUrl))) {
+			var portalUrl = JSONCompany.getPortalURL();
 		}
 
 		var curl = '''
-			${portalURL}/api/jsonws/depot.depotentry/add-depot-entry \
+			${portalUrl}/api/jsonws/depot.depotentry/add-depot-entry \
 			-u test@liferay.com:test \
 			-d nameMap={"en_US": "${depotName}"} \
 			-d descriptionMap={"en_US": "${depotDescription}"}
@@ -34,10 +34,10 @@ definition {
 			groupName = "${groupName}",
 			site = "${site}");
 
-		var portalURL = JSONCompany.getPortalURL();
+		var portalUrl = JSONCompany.getPortalURL();
 
 		var curl = '''
-			${portalURL}/api/jsonws/depot.depotentrygrouprel/add-depot-entry-group-rel \
+			${portalUrl}/api/jsonws/depot.depotentrygrouprel/add-depot-entry-group-rel \
 				-u test@liferay.com:test \
 				-d depotEntryId=${depotId}
 				-d toGroupId=${groupId}
@@ -56,10 +56,10 @@ definition {
 	macro deleteDepot {
 		var depotId = JSONGroupAPI._getDepotIdByName(depotName = "${depotName}");
 
-		var portalURL = JSONCompany.getPortalURL();
+		var portalUrl = JSONCompany.getPortalURL();
 
 		var curl = '''
-			${portalURL}/api/jsonws/depot.depotentry/delete-depot-entry \
+			${portalUrl}/api/jsonws/depot.depotentry/delete-depot-entry \
 				-u test@liferay.com:test \
 				-d depotEntryId=${depotId}
 			''';
@@ -81,10 +81,10 @@ definition {
 			groupName = "${groupName}",
 			site = "${site}");
 
-		var portalURL = JSONCompany.getPortalURL();
+		var portalUrl = JSONCompany.getPortalURL();
 
 		var curl = '''
-			${portalURL}/api/jsonws/depot.depotentrygrouprel/delete-depot-entry-group-rel \
+			${portalUrl}/api/jsonws/depot.depotentrygrouprel/delete-depot-entry-group-rel \
 				-u test@liferay.com:test \
 				-d depotEntryGroupRelId=${depotEntryGroupRelId}
 			''';
@@ -104,11 +104,11 @@ definition {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a remote depot",
 			depotName = "Remote Depot",
-			portalURL = "http://localhost:${remotePort}");
+			portalUrl = "http://localhost:${remotePort}");
 
 		var remoteGroupId = JSONGroupSetter.setGroupId(
 			groupName = "Remote Depot",
-			portalURL = "http://localhost:${remotePort}",
+			portalUrl = "http://localhost:${remotePort}",
 			site = "${site}");
 
 		JSONStaging.enableRemoteStaging(
@@ -140,10 +140,10 @@ definition {
 			groupName = "${groupName}",
 			site = "${site}");
 
-		var portalURL = JSONCompany.getPortalURL();
+		var portalUrl = JSONCompany.getPortalURL();
 
 		var curl = '''
-			${portalURL}/api/jsonws/depot.depotentrygrouprel/update-ddm-structures-available \
+			${portalUrl}/api/jsonws/depot.depotentrygrouprel/update-ddm-structures-available \
 				-u test@liferay.com:test \
 				-d depotEntryGroupRelId=${depotEntryGroupRelId} \
 				-d ddmStructuresAvailable=${ddmStructuresAvailable}

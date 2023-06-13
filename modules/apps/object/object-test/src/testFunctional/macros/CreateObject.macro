@@ -16,6 +16,10 @@ definition {
 		ClickNoError(
 			key_titleFieldName = "${titleFieldName}",
 			locator1 = "CreateObject#SELECT_ENTRY_IN_RELATIONSHIP_TAB");
+
+		WaitForSPARefresh();
+
+		WaitForPageLoad();
 	}
 
 	macro assertAddedEntryRelationshipIsDisplayed {
@@ -62,6 +66,24 @@ definition {
 		AssertElementNotPresent(
 			key_labelName = "${labelName}",
 			locator1 = "CreateObject#OBJECT_NAME");
+	}
+
+	macro assertDisabledAllFields {
+		CreateObject.assertDisabledObjectName();
+
+		for (var fieldsDisabled : list "Object ID,Name,Label") {
+			AssertElementPresent(
+				key_nameDisabled = "${fieldsDisabled}",
+				locator1 = "CreateObject#VIEW_OBJECT_DATA_DISABLED");
+		}
+
+		for (var fieldsDisabled : list "Title Field,Scope,Panel Category Key") {
+			AssertElementPresent(
+				key_nameDisabled = "${fieldsDisabled}",
+				locator1 = "CreateObject#VIEW_OBJECT_ENTRY_DISPLAY_DISABLED");
+		}
+
+		AssertElementPresent(locator1 = "CreateObject#SAVE_BUTTON_DISABLED");
 	}
 
 	macro assertDisabledFieldName {
@@ -184,16 +206,32 @@ definition {
 			value1 = "${pluralLabelName}");
 	}
 
+	macro assertOneColumnOnFieldEntry {
+		AssertElementPresent(locator1 = "CreateObject#ASSERT_ONE_COLUMN_FIELD_ENTRY");
+
+		AssertElementNotPresent(locator1 = "CreateObject#ASSERT_TWO_COLUMN_FIELD_ENTRY");
+	}
+
 	macro assertPanelCategoryKey {
-		AssertElementPresent(
-			key_panelCategoryKey = "${panelCategoryKey}",
-			locator1 = "CreateObject#PANEL_CATEGORY_KEY_SELECTED");
+		AssertSelectedLabel(
+			locator1 = "CreateObject#PANEL_CATEGORY_KEY_SELECTED",
+			value1 = "${panelCategoryKey}");
 	}
 
 	macro assertRelatedObject {
 		AssertElementPresent(
-			key_RelatedObject = "${relatedObject}",
+			key_relatedObject = "${relatedObject}",
 			locator1 = "CreateObject#VIEW_RELATED_OBJECT_ON_RELATIONSHIP_FIELD");
+	}
+
+	macro assertRequiredPicklistOnField {
+		AssertElementPresent(locator1 = "ObjectAdmin#SELECT_OBJECT_RELATIONSHIP_REQUIRED");
+	}
+
+	macro assertScopeFieldSelected {
+		AssertSelectedLabel(
+			locator1 = "ObjectAdmin#SELECT_OBJECT_SCOPE",
+			value1 = "${fieldScope}");
 	}
 
 	macro assertSearchableSectionOptionsAppears {
@@ -214,7 +252,7 @@ definition {
 	}
 
 	macro assertTitleFieldIsSelected {
-		AssertElementPresent(
+		AssertSelectedLabel(
 			locator1 = "CreateObject#TITLE_FIELD",
 			value1 = "${fieldLabel}");
 	}
@@ -225,6 +263,26 @@ definition {
 
 	macro assertToggleMandatory {
 		AssertChecked.assertCheckedNotVisible(locator1 = "ObjectAdmin#OBJECT_FIELDS_MANDATORY_TOGGLE_SWITCH");
+	}
+
+	macro assertValuesOnObjectData {
+		var key_fieldType = "form-control";
+
+		AssertElementPresent(
+			fieldLabel = "${fieldLabel}",
+			locator1 = "CreateObject#FIELD_VALUE");
+	}
+
+	macro assertValuesOnScope {
+		AssertElementPresent(
+			key_fieldLabel = "Scope",
+			key_value = "${valueScope}",
+			locator1 = "CommerceEntry#SELECT_ASSERT_SELECTED_VALUE");
+
+		AssertElementPresent(
+			key_fieldLabel = "Panel Category Key",
+			key_value = "${valuePanelCategory}",
+			locator1 = "CommerceEntry#SELECT_ASSERT_SELECTED_VALUE");
 	}
 
 	macro checkToggleActive {
@@ -313,6 +371,8 @@ definition {
 		Click(locator1 = "CreateObject#SAVE_BUTTON");
 
 		WaitForSPARefresh();
+
+		WaitForPageLoad();
 	}
 
 	macro selectDeletionType {
@@ -349,6 +409,13 @@ definition {
 
 	macro viewEmptyFieldTable {
 		AssertElementPresent(locator1 = "RemoteApps#EMPTY_REMOTE_TABLE_MESSAGE");
+	}
+
+	macro viewErrorValueInvalid {
+		AssertElementPresent(
+			key_className = "${className}",
+			key_errorMessage = "${errorMessage}",
+			locator1 = "CreateObject#ERROR_MESSAGE");
 	}
 
 	macro viewObject {

@@ -39,13 +39,13 @@ definition {
 		}
 
 		task ("Activate Staging") {
-			Staging.openStagingAdmin(siteURLKey = "site-name");
+			Staging.openStagingAdmin(siteUrlKey = "site-name");
 
 			Staging.activateStagingCP(siteName = "Site Name");
 		}
 
 		task ("Add a web content structure with all fields") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-staging");
 
 			NavItem.gotoStructures();
 
@@ -69,7 +69,7 @@ definition {
 		}
 
 		task ("Add first web content based on new structure and template") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-staging");
 
 			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -105,7 +105,7 @@ definition {
 				confirmMessage = "Are you sure you want to publish the selected web content?",
 				entry = "WC WebContent Title 1");
 
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			WebContent.viewTitle(
 				onLive = "true",
@@ -113,7 +113,7 @@ definition {
 		}
 
 		task ("Delete first web content via SAP") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-staging");
 
 			WebContent.deleteStagedCP(
 				pageName = "Staging Test Page",
@@ -158,7 +158,7 @@ definition {
 		}
 
 		task ("Verify both Web Content exist") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			WebContent.viewTitle(
 				onLive = "true",
@@ -173,8 +173,10 @@ definition {
 	@description = "This is a use case for LPS-121695. Assert imported DDMStructures in Global Staging are not published in Global Live."
 	@priority = "4"
 	test ImportedDDMStructuresInGlobalStagingNotPublishedInLive {
+		property test.name.skip.portal.instance = "WebContentStaging#ImportedDDMStructuresInGlobalStagingNotPublishedInLive";
+
 		task ("Access Global Site") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "global");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "global");
 		}
 
 		task ("Add a web content structure") {
@@ -202,7 +204,7 @@ definition {
 		}
 
 		task ("Export DDMStructures") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "global");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "global");
 
 			LAR.exportPortlet(larFileName = "WebContent_portlet.lar");
 		}
@@ -225,11 +227,11 @@ definition {
 			User.firstLoginPG(
 				password = "test",
 				userEmailAddress = "test@www.able.com",
-				virtualHostsURL = "http://www.able.com:8080");
+				virtualHostsUrl = "http://www.able.com:8080");
 
 			WebContentNavigator.openWebContentAdmin(
-				baseURL = "http://www.able.com:8080",
-				siteURLKey = "global");
+				baseUrl = "http://www.able.com:8080",
+				siteUrlKey = "global");
 
 			ProductMenu.gotoPortlet(
 				category = "Publishing",
@@ -240,16 +242,16 @@ definition {
 
 		task ("Import DDMStructures") {
 			WebContentNavigator.openWebContentAdmin(
-				baseURL = "http://www.able.com:8080",
-				siteURLKey = "global-staging");
+				baseUrl = "http://www.able.com:8080",
+				siteUrlKey = "global-staging");
 
 			LAR.importPortlet(larFileName = "WebContent_portlet.lar");
 		}
 
 		task ("Assert DDMStructures has been imported in Global staging") {
 			WebContentNavigator.openWebContentAdmin(
-				baseURL = "http://www.able.com:8080",
-				siteURLKey = "global-staging");
+				baseUrl = "http://www.able.com:8080",
+				siteUrlKey = "global-staging");
 
 			NavItem.gotoStructures();
 
@@ -268,8 +270,8 @@ definition {
 
 		task ("Assert DDMStructures has not been imported in Global Live") {
 			WebContentNavigator.openWebContentAdmin(
-				baseURL = "http://www.able.com:8080",
-				siteURLKey = "global");
+				baseUrl = "http://www.able.com:8080",
+				siteUrlKey = "global");
 
 			NavItem.gotoStructures();
 
@@ -298,13 +300,13 @@ definition {
 		}
 
 		task ("Activate Staging") {
-			Staging.openStagingAdmin(siteURLKey = "site-name");
+			Staging.openStagingAdmin(siteUrlKey = "site-name");
 
 			Staging.activateStagingCP(siteName = "Site Name");
 		}
 
 		task ("Add a web content structure with all fields") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-staging");
 
 			NavItem.gotoStructures();
 
@@ -328,7 +330,7 @@ definition {
 		}
 
 		task ("Add a web content based on new structure and template") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-staging");
 
 			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -364,7 +366,7 @@ definition {
 		task ("View web content in live") {
 			ProductMenu.gotoLiveSite(site = "Site Name");
 
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			AssertTextEquals.assertPartialText(
 				key_webContentTitle = "Web Content Title",
@@ -387,7 +389,7 @@ definition {
 		}
 
 		task ("Create structure") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			NavItem.gotoStructures();
 
@@ -428,7 +430,7 @@ definition {
 		}
 
 		task ("Create a template") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			NavItem.gotoTemplates();
 
@@ -440,7 +442,7 @@ definition {
 		}
 
 		task ("Create and Publish Web Content") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -455,7 +457,7 @@ definition {
 		}
 
 		task ("Export web content") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			LAR.exportPortlet(larFileName = "WebContent_portlet.lar");
 		}
@@ -465,19 +467,19 @@ definition {
 		}
 
 		task ("Enable Staging in created site") {
-			Staging.openStagingAdmin(siteURLKey = "site-name-b");
+			Staging.openStagingAdmin(siteUrlKey = "site-name-b");
 
 			Staging.activateStagingCP(siteName = "Site Name B");
 		}
 
 		task ("Import web content") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-b-staging");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-b-staging");
 
 			LAR.importPortlet(larFileName = "WebContent_portlet.lar");
 		}
 
 		task ("Assert web content has been imported in staging") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-b-staging");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-b-staging");
 
 			WebContent.viewWithStructureCP(
 				webContentText = "Web Content Text",
@@ -485,7 +487,7 @@ definition {
 		}
 
 		task ("Publish the site to live") {
-			Staging.openStagingAdmin(siteURLKey = "site-name-b-staging");
+			Staging.openStagingAdmin(siteUrlKey = "site-name-b-staging");
 
 			Staging.publishCustomPublication();
 		}
@@ -497,7 +499,7 @@ definition {
 		}
 
 		task ("Assert web content has been published") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-b");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-b");
 
 			AssertTextEquals.assertPartialText(
 				key_webContentTitle = "Web Content Title",
@@ -523,7 +525,7 @@ definition {
 		}
 
 		task ("Create structure") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			NavItem.gotoStructures();
 
@@ -537,7 +539,7 @@ definition {
 		}
 
 		task ("Create a web content as draft") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -567,7 +569,7 @@ definition {
 		}
 
 		task ("Assert web content draft exists") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			WebContentNavigator.gotoViewStatus(
 				webContentStatus = "DRAFT",
@@ -575,7 +577,7 @@ definition {
 		}
 
 		task ("Activate Staging with page versioning") {
-			Staging.openStagingAdmin(siteURLKey = "site-name");
+			Staging.openStagingAdmin(siteUrlKey = "site-name");
 
 			Staging.activateStagingCP(
 				pageVersioningEnabled = "true",
@@ -583,13 +585,13 @@ definition {
 		}
 
 		task ("Check web content draft is not present in staging") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			AssertTextNotPresent(value1 = "WC WebContent Title");
 		}
 
 		task ("Check web content draft is not present in life") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-life");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-life");
 
 			AssertTextNotPresent(value1 = "WC WebContent Title");
 		}
@@ -602,7 +604,7 @@ definition {
 
 		task ("Create three web contents") {
 			for (var webContentTitle : list "WC WebContent Title 1,WC WebContent Title 2,WC WebContent Title 3") {
-				WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+				WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 				WebContentNavigator.gotoAddCP();
 
@@ -612,21 +614,21 @@ definition {
 
 				PortletEntry.publish();
 
-				WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+				WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 				WebContent.viewTitle(webContentTitle = "${webContentTitle}");
 			}
 		}
 
 		task ("Activate Staging") {
-			Staging.openStagingAdmin(siteURLKey = "site-name");
+			Staging.openStagingAdmin(siteUrlKey = "site-name");
 
 			Staging.activateStagingCP(siteName = "Site Name");
 		}
 
 		task ("Edit the web contents") {
 			for (var webContentTitle : list "WC WebContent Title 1,WC WebContent Title 2,WC WebContent Title 3") {
-				WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
+				WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-staging");
 
 				WebContentNavigator.gotoEditCP(webContentTitle = "${webContentTitle}");
 
@@ -639,7 +641,7 @@ definition {
 
 		task ("Assert web content has been edited") {
 			for (var webContentTitle : list "WC WebContent Title 1 Edit,WC WebContent Title 2 Edit,WC WebContent Title 3 Edit") {
-				WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
+				WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name-staging");
 
 				WebContent.viewTitle(webContentTitle = "${webContentTitle}");
 			}

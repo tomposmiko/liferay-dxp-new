@@ -210,7 +210,7 @@ definition {
 			ACUtils.searchBar(searchItem = "${customEventName}");
 
 			AssertElementPresent(
-				key_SegmentField = "No results were found.",
+				key_segmentField = "No results were found.",
 				locator1 = "ACSegments#SEGMENT_CRITERION_ITEM");
 		}
 	}
@@ -218,6 +218,8 @@ definition {
 	@description = "Feature ID: LRAC-7346 | Automation ID: LRAC-10150 | Test Summary: Block/Unblock custom events as non-admin"
 	@priority = "3"
 	test CheckCannotBlockOrUnblockCustomEventsAsNonAdmin {
+		property portal.upstream = "quarantine";
+
 		task ("Fill fields and create custom event") {
 			var customEventName = ACCustomEvents.generateCustomEventName();
 
@@ -366,9 +368,15 @@ definition {
 			ACEventAnalysis.viewAnalysisInformation(informationValueList = "1");
 		}
 
-		task ("Navigation to custom events tab") {
+		task ("Navigation to settings and discard analysis change if needed") {
 			ACNavigation.goToSettings();
 
+			if (IsElementPresent(key_buttonName = "Leave Page", locator1 = "ACUtils#GENERIC_BUTTON")) {
+				ACUtils.clickAnyButton(button = "Leave Page");
+			}
+		}
+
+		task ("Navigation to custom events tab") {
 			ACSettings.goToDefinitions();
 
 			ACSettings.goToEvents();

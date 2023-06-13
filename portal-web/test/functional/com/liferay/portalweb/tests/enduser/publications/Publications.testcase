@@ -249,7 +249,7 @@ definition {
 			groupName = "Guest",
 			title = "WC WebContent Title");
 
-		WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "guest");
+		WebContentStructures.openWebContentStructuresAdmin(siteUrlKey = "guest");
 
 		WebContentStructures.addCP(
 			structureDescription = "WC Structure Description",
@@ -261,7 +261,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		WebContentTemplates.openWebContentTemplatesAdmin(siteURLKey = "guest");
+		WebContentTemplates.openWebContentTemplatesAdmin(siteUrlKey = "guest");
 
 		WebContentTemplates.addCP(
 			structureName = "WC Structure Name",
@@ -269,7 +269,7 @@ definition {
 			templateFieldNames = "Text",
 			templateName = "WC Template Name");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -287,7 +287,7 @@ definition {
 			changeCategory = "Dynamic Data Mapping Structure",
 			changeTitle = "WC Structure Name");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		WebContent.viewNotPresentCP(webContentTitle = "WC WebContent Title 2 Edit");
 
@@ -309,7 +309,7 @@ definition {
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		WebContent.viewNotPresentCP(webContentTitle = "WC WebContent Title 2 Edit");
 
@@ -549,7 +549,7 @@ definition {
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		AssertElementPresent(
 			key_webContentTitle = "WC WebContent Title",
@@ -563,7 +563,7 @@ definition {
 
 		JSONPublications.publishPublication(publicationName = "Revert &quot;Publication Name&quot;");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		AssertTextEquals(
 			locator1 = "Message#EMPTY_INFO",
@@ -645,6 +645,63 @@ definition {
 		for (var publicationName : list "Apple,Banana,Cherry") {
 			Publications.search(publicationName = "${publicationName}");
 		}
+	}
+
+	@description = "Assert Publications change details on Display Data Parents and Children Tabs"
+	@priority = "4"
+	test ViewPublicationsChangeDetails {
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Guest",
+			title = "WC WebContent Title");
+
+		JSONPublications.addPublication(publicationName = "Publication Name");
+
+		JSONPublications.selectPublication(publicationName = "Publication Name");
+
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
+
+		WebContent.editCP(
+			webContentContentEdit = "WC WebContent Content Edited",
+			webContentTitle = "WC WebContent Title",
+			webContentTitleEdit = "WC WebContent Title Edited");
+
+		PublicationsNavigator.gotoReviewChanges(
+			gotoPublicationsAdmin = "true",
+			publicationName = "Publication Name");
+
+		PublicationsNavigator.gotoViewChangeDetails(
+			changeCategory = "Web Content Article",
+			changeTitle = "WC WebContent Title Edited");
+
+		PublicationsChangeDetails.viewChangeDetailsInDisplay(
+			changeType = "Modified",
+			contentValueInProduction = "WC WebContent Content",
+			contentValueInPublication = "WC WebContent Content Edited",
+			diffAddedValue = "Edited");
+
+		PublicationsNavigator.gotoChangeDetailsNavbar(navBarTitle = "Data");
+
+		PublicationsChangeDetails.viewChangeDetailsInData(
+			changeType = "Modified",
+			columnName = "Name",
+			columnValueInProduction = "WC WebContent Title",
+			columnValueInPublication = "WC WebContent Title Edited",
+			diffAddedValue = "Edited");
+
+		PublicationsNavigator.gotoChangeDetailsNavbar(navBarTitle = "Parents");
+
+		PublicationsChangeDetails.viewChangeDetailsInParents(
+			changeParentsCategory = "Dynamic Data Mapping Template",
+			changeParentsTitle = "Basic Web Content");
+
+		PublicationsNavigator.gotoChangeDetailsNavbar(navBarTitle = "Children");
+
+		PublicationsChangeDetails.viewChangeDetailsInChildren(
+			changeChildrenCategory = "Web Content Translation",
+			changeChildrenTitle = "WC WebContent Title Edited");
 	}
 
 }

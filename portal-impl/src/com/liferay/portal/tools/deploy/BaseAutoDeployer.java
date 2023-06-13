@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
@@ -55,6 +54,7 @@ import com.liferay.portal.webserver.DynamicResourceServlet;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -75,8 +75,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import org.apache.oro.io.GlobFilenameFilter;
 
 /**
  * @author Brian Wing Shun Chan
@@ -637,7 +635,9 @@ public class BaseAutoDeployer implements AutoDeployer {
 			}
 
 			try {
-				String portalJarPath = PortalUtil.getPortalLibDir() + portalJar;
+				String portalJarPath =
+					PropsValues.LIFERAY_SHIELDED_CONTAINER_LIB_PORTAL_DIR +
+						portalJar;
 
 				FileUtil.copyFile(
 					portalJarPath, srcFile + "/WEB-INF/lib/" + portalJar, true);
@@ -679,11 +679,12 @@ public class BaseAutoDeployer implements AutoDeployer {
 
 		if (PropsValues.AUTO_DEPLOY_COPY_COMMONS_LOGGING) {
 			String[] commonsLoggingJars = pluginLibDir.list(
-				new GlobFilenameFilter("commons-logging*.jar"));
+				new JarFileNameFilter("commons-logging"));
 
 			if (ArrayUtil.isEmpty(commonsLoggingJars)) {
 				String portalJarPath =
-					PortalUtil.getPortalLibDir() + "commons-logging.jar";
+					PropsValues.LIFERAY_SHIELDED_CONTAINER_LIB_PORTAL_DIR +
+						"commons-logging.jar";
 
 				FileUtil.copyFile(
 					portalJarPath, srcFile + "/WEB-INF/lib/commons-logging.jar",
@@ -695,24 +696,28 @@ public class BaseAutoDeployer implements AutoDeployer {
 
 		if (PropsValues.AUTO_DEPLOY_COPY_LOG4J) {
 			String[] log4jJars = pluginLibDir.list(
-				new GlobFilenameFilter("log4j*.jar"));
+				new JarFileNameFilter("log4j"));
 
 			if (ArrayUtil.isEmpty(log4jJars)) {
 				String portalJarPath =
-					PortalUtil.getPortalLibDir() + "log4j-api.jar";
+					PropsValues.LIFERAY_SHIELDED_CONTAINER_LIB_PORTAL_DIR +
+						"log4j-api.jar";
 
 				FileUtil.copyFile(
 					portalJarPath, srcFile + "/WEB-INF/lib/log4j-api.jar",
 					true);
 
 				portalJarPath =
-					PortalUtil.getPortalLibDir() + "log4j-1.2-api.jar";
+					PropsValues.LIFERAY_SHIELDED_CONTAINER_LIB_PORTAL_DIR +
+						"log4j-1.2-api.jar";
 
 				FileUtil.copyFile(
 					portalJarPath, srcFile + "/WEB-INF/lib/log4j-1.2-api.jar",
 					true);
 
-				portalJarPath = PortalUtil.getPortalLibDir() + "log4j-core.jar";
+				portalJarPath =
+					PropsValues.LIFERAY_SHIELDED_CONTAINER_LIB_PORTAL_DIR +
+						"log4j-core.jar";
 
 				FileUtil.copyFile(
 					portalJarPath, srcFile + "/WEB-INF/lib/log4j-core.jar",
@@ -1607,5 +1612,24 @@ public class BaseAutoDeployer implements AutoDeployer {
 		"util-bridges.jar", "util-java.jar", "util-taglib.jar");
 
 	private final String _pluginType;
+
+	private static class JarFileNameFilter implements FilenameFilter {
+
+		@Override
+		public boolean accept(File file, String fileName) {
+			if (fileName.startsWith(_prefix) && fileName.endsWith(".jar")) {
+				return true;
+			}
+
+			return false;
+		}
+
+		private JarFileNameFilter(String prefix) {
+			_prefix = prefix;
+		}
+
+		private final String _prefix;
+
+	}
 
 }

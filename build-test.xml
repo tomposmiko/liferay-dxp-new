@@ -1750,6 +1750,9 @@ war.path=${app.server.portal.dir}/</echo>
 					<not>
 						<contains string="${patch.requirements}" substring="base-" />
 					</not>
+					<not>
+						<matches pattern="sp\d+" string="${patch.requirements}" />
+					</not>
 				</and>
 				<then>
 					<local name="patch.portal.version" />
@@ -4441,6 +4444,7 @@ go</echo>
 			<var name="app.server.tomcat.classes.portal.dir" value="${app.server.parent.dir}/tomcat-${app.server.tomcat.version}/webapps/ROOT/WEB-INF/classes" />
 			<var name="app.server.tomcat.lib.global.dir" value="${app.server.parent.dir}/tomcat-${app.server.tomcat.version}/lib/ext" />
 			<var name="app.server.tomcat.lib.portal.dir" value="${app.server.parent.dir}/tomcat-${app.server.tomcat.version}/webapps/ROOT/WEB-INF/lib" />
+			<var name="app.server.tomcat.shielded-container-lib.portal.dir" value="${app.server.parent.dir}/tomcat-${app.server.tomcat.version}/webapps/ROOT/WEB-INF/shielded-container-lib" />
 			<var name="app.server.tomcat.zip.name" value="apache-tomcat-${app.server.tomcat.version}.zip" />
 
 			<propertyregex
@@ -4461,6 +4465,7 @@ go</echo>
 				app.server.tomcat.classes.portal.dir=${app.server.tomcat.classes.portal.dir}
 				app.server.tomcat.lib.global.dir=${app.server.tomcat.lib.global.dir}
 				app.server.tomcat.lib.portal.dir=${app.server.tomcat.lib.portal.dir}
+				app.server.tomcat.shielded-container-lib.portal.dir=${app.server.tomcat.shielded-container-lib.portal.dir}
 				app.server.tomcat.version=${app.server.tomcat.version}
 				app.server.tomcat.zip.name=${app.server.tomcat.zip.name}
 				app.server.tomcat.zip.url=${app.server.tomcat.zip.url}
@@ -8972,6 +8977,24 @@ include-and-override=${liferay.home}/portal-setup-wizard.properties</echo>
 		</if>
 
 		<if>
+			<matches pattern="https?://.*" string="${test.build.fix.pack.zip.url}" />
+			<then>
+				<local name="patch.requirements" />
+
+				<get-patch-requirements patch.file.zip.url="${test.build.fix.pack.zip.url}" />
+
+				<if>
+					<matches pattern="sp\d+" string="${patch.requirements}" />
+					<then>
+						<echo append="true" file="portal-impl/src/portal-ext.properties">
+							verify.patch.levels.disabled=true
+						</echo>
+					</then>
+				</if>
+			</then>
+		</if>
+
+		<if>
 			<isset property="test.set.default.portal.properties" />
 			<then>
 				<echo file="portal-impl/src/portal-ext.properties">liferay.home=${liferay.home}</echo>
@@ -12441,6 +12464,69 @@ if (ppstate.equals("normal")) {
 
 	<target name="record-git-commit-portal">
 		<record-git-commit-portal />
+	</target>
+
+	<target name="record-job-summary">
+		<fail message="Please set the property ${test.suite.name}." unless="test.suite.name" />
+
+		<condition else="test-portal-acceptance-pullrequest(${git.working.branch.name})" property="job.name" value="${job.name}">
+			<isset property="job.name" />
+		</condition>
+
+		<beanshell>
+			<![CDATA[
+				import com.liferay.jenkins.results.parser.CIJobSummaryReportUtil;
+				import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+				import com.liferay.jenkins.results.parser.Job;
+				import com.liferay.jenkins.results.parser.JobFactory;
+
+				public Job.BuildProfile getBuildProfile() {
+					String testPortalBuildProfile = project.getProperty("build.profile");
+
+					if ((testPortalBuildProfile != null) && testPortalBuildProfile.equals("dxp")) {
+						return Job.BuildProfile.DXP;
+					}
+
+					return Job.BuildProfile.PORTAL;
+				}
+
+				public String getJobName() {
+					return project.getProperty("job.name");
+				}
+
+				public String getRepositoryName() {
+					String upstreamBranchName = getUpstreamBranchName();
+
+					if (upstreamBranchName.equals("master")) {
+						return "liferay-portal";
+					}
+
+					return "liferay-portal-ee";
+				}
+
+				public File getSummaryDir() {
+					File summaryDir = new File("job/summary");
+
+					summaryDir.mkdirs();
+
+					return JenkinsResultsParserUtil.getCanonicalFile(summaryDir);
+				}
+
+				public String getTestSuiteName() {
+					return project.getProperty("test.suite.name");
+				}
+
+				public String getUpstreamBranchName() {
+					return project.getProperty("git.working.branch.name");
+				}
+
+				Job job = JobFactory.newJob(getJobName(), getTestSuiteName(), getUpstreamBranchName(), getRepositoryName(), getBuildProfile());
+
+				CIJobSummaryReportUtil.writeJobSummaryReport(getSummaryDir(), job);
+
+				System.out.println("Generated job summary file " + new File(getSummaryDir(), "index.html"));
+			]]>
+		</beanshell>
 	</target>
 
 	<target name="record-test-case-method-names">

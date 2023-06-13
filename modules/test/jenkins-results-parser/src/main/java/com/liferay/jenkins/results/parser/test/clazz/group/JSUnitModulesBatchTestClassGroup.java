@@ -17,11 +17,14 @@ package com.liferay.jenkins.results.parser.test.clazz.group;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.PortalGitWorkingDirectory;
 import com.liferay.jenkins.results.parser.PortalTestClassJob;
+import com.liferay.jenkins.results.parser.job.property.JobProperty;
 import com.liferay.jenkins.results.parser.test.clazz.TestClass;
 import com.liferay.jenkins.results.parser.test.clazz.TestClassFactory;
 
 import java.io.File;
 import java.io.IOException;
+
+import java.nio.file.PathMatcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,12 +37,14 @@ public class JSUnitModulesBatchTestClassGroup
 	extends ModulesBatchTestClassGroup {
 
 	public boolean testGitrepoJSUnit() {
-		String testGitrepoJSUnit = JenkinsResultsParserUtil.getProperty(
-			portalTestClassJob.getJobProperties(), "test.gitrepo.js.unit",
-			portalTestClassJob.getJobName(), getTestSuiteName());
+		JobProperty jobProperty = getJobProperty("test.gitrepo.js.unit");
 
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(testGitrepoJSUnit) &&
-			testGitrepoJSUnit.equals("true")) {
+		String jobPropertyValue = jobProperty.getValue();
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(jobPropertyValue) &&
+			jobPropertyValue.equals("true")) {
+
+			recordJobProperty(jobProperty);
 
 			return true;
 		}
@@ -59,6 +64,11 @@ public class JSUnitModulesBatchTestClassGroup
 
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
 			getPortalGitWorkingDirectory();
+
+		List<PathMatcher> excludesPathMatchers = getPathMatchers(
+			getExcludesJobProperties());
+		List<PathMatcher> includesPathMatchers = getPathMatchers(
+			getIncludesJobProperties());
 
 		if (testRelevantChanges) {
 			moduleDirs.addAll(
@@ -83,10 +93,6 @@ public class JSUnitModulesBatchTestClassGroup
 		}
 
 		Collections.sort(testClasses);
-
-		for (TestClass testClass : testClasses) {
-			System.out.println(testClass.getTestClassFile());
-		}
 	}
 
 }

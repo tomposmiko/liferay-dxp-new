@@ -31,15 +31,9 @@ export function useStepWizard() {
 	const {dispatch, state} = useContext(AppContext);
 	const {applicationId, backToEdit} = getLoadedContentFlag();
 	const currentPercentage = state.percentage;
+	const selectedStep = state.steps.find(({active}) => active);
 
 	const loadInitialData = applicationId || backToEdit;
-
-	const dispatchSelectedStep = (payload) => {
-		dispatch({
-			payload,
-			type: ActionTypes.SET_SELECTED_STEP,
-		});
-	};
 
 	const dispatchPercentage = (payload) => {
 		dispatch({
@@ -62,7 +56,7 @@ export function useStepWizard() {
 			hide: true,
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [state.selectedStep.section]);
+	}, [selectedStep.section]);
 
 	useEffect(() => {
 		if (loadInitialData) {
@@ -72,9 +66,10 @@ export function useStepWizard() {
 	}, [loadInitialData]);
 
 	const calculateAllSteps = () => {
-		const stepName = Object.keys(form)[
-			Object.keys(form).length - 1
-		]?.toLowerCase();
+		const formKeys = Object.keys(form).filter(
+			(section) => section !== 'raylife-form-input'
+		);
+		const stepName = formKeys[formKeys.length - 1]?.toLowerCase();
 
 		switch (stepName) {
 			case AVAILABLE_STEPS.BUSINESS.section:
@@ -104,11 +99,11 @@ export function useStepWizard() {
 	};
 
 	const _updateStepPercentage = () => {
-		switch (state.selectedStep.section) {
+		switch (selectedStep.section) {
 			case AVAILABLE_STEPS.BASICS_BUSINESS_TYPE.section:
 				if (loadInitialData) {
 					if (
-						state.selectedStep.subsection ===
+						selectedStep.subsection ===
 						AVAILABLE_STEPS.BASICS_BUSINESS_INFORMATION.subsection
 					) {
 						return setPercentage(
@@ -194,11 +189,12 @@ export function useStepWizard() {
 		}
 	};
 
-	const setSection = (step) =>
-		dispatchSelectedStep({
-			...state.selectedStep,
-			...step,
+	const setSection = (step) => {
+		dispatch({
+			payload: step,
+			type: ActionTypes.SET_STEP_ACTIVE,
 		});
+	};
 
 	const setPercentage = (
 		percentage = 0,
@@ -220,7 +216,7 @@ export function useStepWizard() {
 	};
 
 	return {
-		selectedStep: state.selectedStep,
+		selectedStep,
 		setPercentage,
 		setSection,
 	};

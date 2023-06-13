@@ -240,7 +240,7 @@ definition {
 			siteTemplateName = "Site Template Name");
 
 		Portlet.addPG(
-			defaultURL = "false",
+			defaultUrl = "false",
 			portletName = "IFrame");
 
 		SiteTemplates.addSitePageViaSiteTemplateCP(
@@ -282,7 +282,7 @@ definition {
 			value1 = "Page2 Name");
 
 		Portlet.addPG(
-			defaultURL = "false",
+			defaultUrl = "false",
 			portletName = "IFrame");
 
 		Navigator.gotoSitePage(
@@ -468,7 +468,7 @@ definition {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SitetemplatesUsecase#SiteTemplatePageLinkInWebContentRedirectCorrectly";
 
-		var portalURL = PropsUtil.get("portal.url");
+		var portalUrl = PropsUtil.get("portal.url");
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
@@ -489,9 +489,9 @@ definition {
 			siteName = "${siteName}",
 			siteTemplateName = "Template Site");
 
-		var page2URL = Navigator.getCurrentURL();
+		var page2Url = Navigator.getCurrentURL();
 
-		var entryExternalURL = StringUtil.replace("${page2URL}", "http://", "");
+		var entryExternalUrl = StringUtil.replace("${page2Url}", "http://", "");
 
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
@@ -502,8 +502,8 @@ definition {
 		PortletEntry.inputTitle(title = "Web Content Title");
 
 		CKEditor.addEntryExternalURL(
-			displayText = "${page2URL}",
-			entryExternalURL = "${entryExternalURL}",
+			displayText = "${page2Url}",
+			entryExternalUrl = "${entryExternalUrl}",
 			fieldLabel = "content");
 
 		PortletEntry.publish();
@@ -536,17 +536,16 @@ definition {
 			pageName = "Page1 Name",
 			siteName = "Site Name");
 
-		Click(locator1 = "WCD#WEB_CONTENT_LINK");
-
-		Pause(locator1 = "1000");
-
-		AssertLocation(value1 = "${portalURL}/web/site-name/page2-name");
+		WebContentDisplayPortlet.viewContent(
+			displayText = "${page2Url}",
+			url = "${portalUrl}/web/site-name/page2-name",
+			webContentTitle = "Web Content Title");
 	}
 
 	@description = "This is a use case for LPS-74081."
 	@priority = "4"
 	test ViewImportedSitePageWithNumericFriendlyURL {
-		var portalURL = PropsUtil.get("portal.url");
+		var portalUrl = PropsUtil.get("portal.url");
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
@@ -714,7 +713,7 @@ definition {
 			siteTemplateName = "Site Template Name");
 
 		Portlet.addPG(
-			defaultURL = "false",
+			defaultUrl = "false",
 			portletName = "Web Content Display");
 
 		SiteTemplatesNavigator.gotoSiteTemplatesPage(
@@ -741,7 +740,7 @@ definition {
 			siteTemplateActive = "Yes",
 			siteTemplateName = "Site Template Name");
 
-		var siteTemplateID = SiteTemplates.getSiteTemplateID(siteTemplateName = "Site Template Name");
+		var siteTemplateId = SiteTemplates.getSiteTemplateID(siteTemplateName = "Site Template Name");
 
 		SiteTemplates.addSitePageViaSiteTemplateCP(
 			pageName = "Page1 Name",
@@ -751,7 +750,7 @@ definition {
 			pageName = "Page2 Name",
 			siteTemplateName = "Site Template Name");
 
-		NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "${siteTemplateID}");
+		NavigationMenusAdmin.openNavigationMenusAdmin(siteUrlKey = "${siteTemplateId}");
 
 		NavigationMenusAdmin.addMenu(menuName = "Test Navigation Menu Name");
 
@@ -778,7 +777,7 @@ definition {
 
 		NavigationMenusAdmin.viewItem(itemName = "Google");
 
-		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteTemplateID}");
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteTemplateId}");
 
 		NavigationMenusWidget.gotoNavigationMenuWidgetConfig();
 
@@ -836,21 +835,21 @@ definition {
 			siteTemplateActive = "Yes",
 			siteTemplateName = "Site Template Name");
 
-		var siteTemplateID = SiteTemplates.getSiteTemplateID(siteTemplateName = "Site Template Name");
+		var siteTemplateId = SiteTemplates.getSiteTemplateID(siteTemplateName = "Site Template Name");
 
 		SiteTemplates.addSitePageViaSiteTemplateCP(
 			inheritChanges = "disable",
 			pageName = "Page Name",
-			pageTemplateName = "Blog",
+			pageTemplateName = "Search",
 			siteTemplateName = "Site Template Name");
 
-		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteTemplateID}/page-name");
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteTemplateId}/page-name");
 
 		Portlet.addPG(portletName = "Asset Publisher");
 
 		AssetPublisherPortlet.configureManualAssetSelectionPG();
 
-		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteTemplateID}/page-name");
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteTemplateId}/page-name");
 
 		AssetPublisherPortlet.viewManualAssetSelectionConfigurationPG(portletName = "Asset Publisher");
 

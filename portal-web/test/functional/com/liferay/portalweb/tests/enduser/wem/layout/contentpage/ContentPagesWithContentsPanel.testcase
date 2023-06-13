@@ -336,6 +336,7 @@ definition {
 
 		task ("View the edited web content in Web Content Display") {
 			AssertTextEquals(
+				index = "1",
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "WC WebContent Content Edit");
 
@@ -347,7 +348,7 @@ definition {
 				pageName = "Test Page Name",
 				siteName = "Test Site Name");
 
-			WebContent.viewPGViaWCD(webContentContent = "WC WebContent Content Edit");
+			WebContentDisplayPortlet.viewContent(webContentContent = "WC WebContent Content Edit");
 		}
 	}
 
@@ -459,7 +460,7 @@ definition {
 		}
 
 		task ("Select all assets in manual collection") {
-			AssetListsAdmin.openAssetListsAdmin(siteURLKey = "test-site-name");
+			AssetListsAdmin.openAssetListsAdmin(siteUrlKey = "test-site-name");
 
 			AssetListsAdmin.editAssetList(assetListTitle = "Manual Collection");
 
@@ -866,7 +867,7 @@ definition {
 		}
 
 		task ("Select all assets in manual collection") {
-			AssetListsAdmin.openAssetListsAdmin(siteURLKey = "test-site-name");
+			AssetListsAdmin.openAssetListsAdmin(siteUrlKey = "test-site-name");
 
 			AssetListsAdmin.editAssetList(assetListTitle = "Manual Collection");
 

@@ -14,13 +14,8 @@
 
 import {createContext, useContext, useState} from 'react';
 import {useFormContext} from 'react-hook-form';
-import {STORAGE_KEYS, Storage} from '../../../common/services/liferay/storage';
-import {DEVICES} from '../../../common/utils/constants';
-import {clearExitAlert} from '../../../common/utils/exitAlert';
-import {getLiferaySiteName} from '../../../common/utils/liferay';
 import ProgressSavedModal from '../components/containers/Forms/Modal/ProgressSaved';
 import useFormActions from '../hooks/useFormActions';
-import {STEP_ORDERED} from '../utils/constants';
 import {AppContext} from './AppContextProvider';
 
 export const FormActionContext = createContext();
@@ -38,22 +33,25 @@ const FormActionProvider = ({children, form}) => {
 
 	const {
 		state: {
-			dimensions: {deviceSize},
+			activeMobileSubSection,
+			dimensions: {
+				device: {isMobile},
+			},
 			selectedStep: {index: currentStepIndex = 0},
+			steps,
 		},
 	} = useContext(AppContext);
 
 	const emailHasError = !!errors?.basics?.businessInformation?.business
 		?.email;
 
-	const isMobileDevice = deviceSize === DEVICES.PHONE;
 	const email = getValues('basics.businessInformation.business.email');
 	const productQuote = getValues('basics.productQuoteName');
 
 	const {onNext, onPrevious, onSave} = useFormActions({
 		form,
-		nextSection: STEP_ORDERED[currentStepIndex + 1],
-		previousSection: STEP_ORDERED[currentStepIndex - 1],
+		nextSection: steps[currentStepIndex + 1],
+		previousSection: steps[currentStepIndex - 1],
 		saveData: currentStepIndex > 1,
 	});
 
@@ -66,33 +64,28 @@ const FormActionProvider = ({children, form}) => {
 			.finally(() => setLoading(false));
 	};
 
-	const _onPrevious = () => {
-		if (currentStepIndex !== 0) {
-			return onPrevious();
+	const isContinueButtonVisible = () => {
+		if (!isMobile) {
+			return true;
 		}
 
-		clearExitAlert();
-
-		window.location.href = getLiferaySiteName();
-
-		Storage.removeItem(STORAGE_KEYS.BACK_TO_EDIT);
-	};
-
-	const actionProps = {
-		onClickSaveAndExit,
-		onNext,
-		onPrevious: _onPrevious,
-		onSave,
-		onSaveDisabled: !email || emailHasError || loading,
-		showSaveAndExit: onNext && currentStepIndex >= 2,
+		return activeMobileSubSection?.hideContinueButton ? false : true;
 	};
 
 	return (
 		<FormActionContext.Provider
 			value={{
-				actionProps,
+				actionProps: {
+					onClickSaveAndExit,
+					onNext,
+					onPrevious,
+					onSave,
+					onSaveDisabled: !email || emailHasError || loading,
+					showContinueButton: isContinueButtonVisible(),
+					showSaveAndExit: onNext && currentStepIndex >= 2,
+				},
 				errorModal,
-				isMobileDevice,
+				isMobileDevice: isMobile,
 				isValid,
 				setShowProgressModal,
 			}}
@@ -101,7 +94,7 @@ const FormActionProvider = ({children, form}) => {
 
 			<ProgressSavedModal
 				email={email}
-				isMobileDevice={isMobileDevice}
+				isMobileDevice={isMobile}
 				onClose={() => {
 					setShowProgressModal(false);
 

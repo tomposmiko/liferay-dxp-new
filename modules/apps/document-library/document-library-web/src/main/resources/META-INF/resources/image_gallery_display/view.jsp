@@ -58,13 +58,11 @@ if (defaultFolderView) {
 
 long repositoryId = dlPortletInstanceSettings.getSelectedRepositoryId();
 
-if (repositoryId == 0) {
-	if (folder != null) {
-		repositoryId = folder.getRepositoryId();
-	}
-	else {
-		repositoryId = scopeGroupId;
-	}
+if ((folder != null) && (dlPortletInstanceSettings.getSelectedRepositoryId() != folder.getRepositoryId())) {
+	repositoryId = folder.getRepositoryId();
+}
+else if (repositoryId == 0) {
+	repositoryId = scopeGroupId;
 }
 
 int status = WorkflowConstants.STATUS_APPROVED;
@@ -90,7 +88,7 @@ String[] mediaGalleryMimeTypes = dlPortletInstanceSettings.getMimeTypes();
 	contextObjects="<%= contextObjects %>"
 	displayStyle="<%= displayStyle %>"
 	displayStyleGroupId="<%= displayStyleGroupId %>"
-	entries="<%= DLAppServiceUtil.getGroupFileEntries(scopeGroupId, 0, folderId, mediaGalleryMimeTypes, status, 0, SearchContainer.MAX_DELTA, null) %>"
+	entries="<%= DLAppServiceUtil.getGroupFileEntries(repositoryId, 0, folderId, mediaGalleryMimeTypes, status, 0, SearchContainer.MAX_DELTA, null) %>"
 >
 
 	<%
@@ -199,7 +197,7 @@ String[] mediaGalleryMimeTypes = dlPortletInstanceSettings.getMimeTypes();
 
 					<div class="lfr-asset-metadata">
 						<div class="icon-calendar lfr-asset-icon">
-							<liferay-ui:message arguments="<%= dateFormatDate.format(folder.getModifiedDate()) %>" key="last-updated-x" translateArguments="<%= false %>" />
+							<liferay-ui:message arguments="<%= (folder.getModifiedDate() != null) ? dateFormatDate.format(folder.getModifiedDate()) : StringPool.BLANK %>" key="last-updated-x" translateArguments="<%= false %>" />
 						</div>
 
 						<%

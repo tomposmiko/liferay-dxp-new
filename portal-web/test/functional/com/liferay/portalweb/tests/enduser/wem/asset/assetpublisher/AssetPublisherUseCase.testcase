@@ -70,23 +70,23 @@ definition {
 		}
 
 		task ("Define public virtual host and private virtual host") {
-			Site.openSiteSettingsAdmin(siteURLKey = "organization-name");
+			Site.openSiteSettingsAdmin(siteUrlKey = "organization-name");
 
 			Site.addVirtualHostsURLCP(
-				publicPageVirtualHostURL = "www.able.com",
+				publicPageVirtualHostUrl = "www.able.com",
 				publicVirtualHosts = "true");
 
-			Site.openSiteSettingsAdmin(siteURLKey = "organization-name");
+			Site.openSiteSettingsAdmin(siteUrlKey = "organization-name");
 
 			Site.addVirtualHostsURLCP(
-				privatePageVirtualHostURL = "www.baker.com",
+				privatePageVirtualHostUrl = "www.baker.com",
 				privateVirtualHosts = "true");
 		}
 
 		task ("Sign in the prviate virtual host") {
 			User.logoutPG();
 
-			User.firstLoginUI(specificURL = "http://www.baker.com:8080");
+			User.firstLoginUI(specificUrl = "http://www.baker.com:8080");
 		}
 
 		task ("View prviate pages") {
@@ -98,7 +98,7 @@ definition {
 		}
 
 		task ("Sign in the public virtual host") {
-			User.firstLoginUI(specificURL = "http://www.able.com:8080");
+			User.firstLoginUI(specificUrl = "http://www.able.com:8080");
 		}
 
 		task ("View public pages not shown") {
@@ -191,7 +191,7 @@ definition {
 		}
 
 		task ("View the draft web content in Web Content admin") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentNavigator.gotoViewStatus(
 				webContentStatus = "DRAFT",
@@ -201,6 +201,38 @@ definition {
 				webContentContent = "WC WebContent Content",
 				webContentStatus = "Draft",
 				webContentTitle = "WC Webcontent Title");
+		}
+	}
+
+	@description = "This is a use case for LPS-137055. The show only assets configuration should be unavailable to display page template."
+	@priority = "4"
+	test CannotViewShowOnlyAssetsConfigurationInDisplayPageTemplate {
+		task ("Add a display page template for Web Content Article and Basic Web Content") {
+			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
+				contentType = "Web Content Article",
+				displayPageTemplateEntryName = "Display Page Name",
+				groupName = "Test Site Name",
+				subType = "Basic Web Content");
+		}
+
+		task ("Add an Asset Publisher widget to display page template") {
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
+
+			PageEditor.addWidget(portletName = "Asset Publisher");
+		}
+
+		task ("Cannot view Show only assets with Display Page Name as its display page template. configuration in Asset Publisher") {
+			AssetPublisherPortlet.gotoConfigurationPG();
+
+			Navigator.gotoNavTab(navTab = "Display Settings");
+
+			Panel.expandPanel(panel = "Set and Enable");
+
+			AssertElementNotPresent(
+				checkboxName = "Show only assets with Display Page Name as its display page template.",
+				locator1 = "Checkbox#ANY_CHECKBOX");
 		}
 	}
 
@@ -454,7 +486,7 @@ definition {
 		}
 
 		task ("Add a web content structure with multiple fields") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			NavItem.gotoStructures();
 
@@ -489,7 +521,7 @@ definition {
 		}
 
 		task ("Add the first web content based on new structure") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -555,7 +587,7 @@ definition {
 		}
 
 		task ("Add the second structure with Text field") {
-			WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "test-site-name");
+			WebContentStructures.openWebContentStructuresAdmin(siteUrlKey = "test-site-name");
 
 			WebContentStructures.addCP(structureName = "WC Structure1 Name");
 
@@ -576,7 +608,7 @@ definition {
 		}
 
 		task ("Add the fifth web content based on the second structure") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure1 Name");
 
@@ -732,7 +764,7 @@ definition {
 		}
 
 		task ("Disable the Searchable of the first structure's fields") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			NavItem.gotoStructures();
 
@@ -759,7 +791,7 @@ definition {
 		}
 	}
 
-	@description = "Filter the displayed assets by categories when enable pagination."
+	@description = "This is a test for LPS-135460. Filter the displayed assets by categories when enable pagination."
 	@priority = "5"
 	test FilterAssetsByCategoriesWithPagination {
 		property portal.acceptance = "true";
@@ -881,13 +913,27 @@ definition {
 				paginationNumber = "3",
 				paginationType = "Regular");
 		}
+
+		task ("Assert URL contains delta by click next pagination") {
+			AssertLocation.assertPartialLocation(value1 = "_delta");
+		}
+
+		task ("Assert URL contains delta by dropdown pagination") {
+			ClickNoError(
+				key_pageNumber = "2 of 2",
+				locator1 = "Pagination#PARTICULAR_PAGE");
+
+			SelectFrame(value1 = "relative=top");
+
+			AssertLocation.assertPartialLocation(value1 = "_delta");
+		}
 	}
 
 	@description = "This is a test for LPS-113996. The user could filter documents by field in Asset Publisher."
 	@priority = "4"
 	test FilterDocumentsByField {
 		task ("Add a document type with a Select from List field") {
-			DMDocument.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
+			DMDocument.openDocumentsAndMediaAdmin(siteUrlKey = "test-site-name");
 
 			DMNavigator.gotoDocumentType();
 
@@ -933,20 +979,20 @@ definition {
 		}
 
 		task ("Filter by Option 1 from Select from List field") {
-			AssetListsAdmin.openAssetListsAdmin(siteURLKey = "test-site-name");
+			AssetListsAdmin.openAssetListsAdmin(siteUrlKey = "test-site-name");
 
 			AssetListsAdmin.editAssetList(assetListTitle = "Dynamic Collection");
 
 			AssetListsAdmin.configureFilterByField(fieldName = "Select from List");
 
 			Select(
-				key_fieldFieldLabel = "Select from List",
-				locator1 = "APConfigurationFilterbyfield#SELECT_FROM_LIST",
+				key_fieldLabel = "Select from List",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "Option 1");
 
 			AssertSelectedLabel(
-				key_fieldFieldLabel = "Select from List",
-				locator1 = "APConfigurationFilterbyfield#SELECT_FROM_LIST",
+				key_fieldLabel = "Select from List",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "Option 1");
 
 			Button.click(button = "Apply");
@@ -994,17 +1040,17 @@ definition {
 		property test.name.skip.portal.instance = "AssetPublisherUseCase#RemoveMultipleManualSelectionAssetEntries";
 
 		task ("Stop and start com.liferay.layout.type.controller.portlet bundle via GogoShell") {
-			GogoShell.openGogoShellAdmin(siteURLKey = "test-site-name");
+			GogoShell.openGogoShellAdmin(siteUrlKey = "test-site-name");
 
-			var moduleID = GogoShell.getModuleID(moduleName = "com.liferay.layout.type.controller.portlet");
+			var moduleId = GogoShell.getModuleID(moduleName = "com.liferay.layout.type.controller.portlet");
 
-			GogoShell.stopModule(moduleID = "${moduleID}");
+			GogoShell.stopModule(moduleId = "${moduleId}");
 
 			GogoShell.viewModuleStatus(
 				moduleName = "com.liferay.layout.type.controller.portlet",
 				moduleStatus = "Resolved");
 
-			GogoShell.startModule(moduleID = "${moduleID}");
+			GogoShell.startModule(moduleId = "${moduleId}");
 
 			GogoShell.viewModuleStatus(
 				moduleName = "com.liferay.layout.type.controller.portlet",
@@ -1078,7 +1124,7 @@ definition {
 		}
 
 		task ("Add a web content structure with a Text field") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			NavItem.gotoStructures();
 
@@ -1131,7 +1177,7 @@ definition {
 		}
 
 		task ("Navigate to the new folder in Web Content admin") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentFolder.gotoCP(
 				folderName = "WC Folder Name",
@@ -1191,7 +1237,7 @@ definition {
 		}
 
 		task ("Navigate to the new folder in Web Content admin") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentFolder.gotoCP(
 				folderName = "WC Folder Name",
@@ -1200,6 +1246,51 @@ definition {
 
 		task ("View the web content shown in new folder") {
 			WebContent.viewTitle(webContentTitle = "Web Content Title");
+		}
+	}
+
+	@description = "The user could set as the Default Asset Publisher for This Page."
+	@priority = "5"
+	test SetAsDefaultAssetPublisherForThisPage {
+		property portal.acceptance = "true";
+		property testray.component.names = "Training,Web Content Administration";
+
+		task ("Set the Asset Publisher as default for this page") {
+			Navigator.gotoSitePage(
+				pageName = "Asset Publisher Page",
+				siteName = "Test Site Name");
+
+			AssetPublisherPortlet.configureDisplaySettings(displaySettings = "Set as the Default Asset Publisher for This Page");
+		}
+
+		task ("Add a web content") {
+			JSONWebcontent.addWebContent(
+				content = "Web Content Content",
+				groupName = "Test Site Name",
+				title = "Web Content Title");
+		}
+
+		task ("Select a display page in web content") {
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
+
+			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+
+			WebContent.editDisplayPage(
+				pageName = "Asset Publisher Page",
+				pageType = "Public Pages",
+				webContentTitle = "Web Content Title");
+
+			PortletEntry.publish();
+		}
+
+		task ("View web content is shown in Asset Publisher") {
+			Navigator.gotoSitePage(
+				pageName = "Asset Publisher Page",
+				siteName = "Test Site Name");
+
+			WebContent.viewPGViaAP(
+				webContentContent = "Web Content Content",
+				webContentTitle = "Web Content Title");
 		}
 	}
 
@@ -1458,7 +1549,7 @@ definition {
 	@priority = "4"
 	test ViewDocumentTypeShownInManualSelection {
 		task ("Add a global document type") {
-			DMDocument.openDocumentsAndMediaAdmin(siteURLKey = "global");
+			DMDocument.openDocumentsAndMediaAdmin(siteUrlKey = "global");
 
 			DMNavigator.gotoDocumentType();
 
@@ -1469,7 +1560,7 @@ definition {
 		}
 
 		task ("Add a document type in normal site") {
-			DMDocument.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
+			DMDocument.openDocumentsAndMediaAdmin(siteUrlKey = "test-site-name");
 
 			DMNavigator.gotoDocumentType();
 
@@ -1494,7 +1585,7 @@ definition {
 	@priority = "3"
 	test ViewGlobalWebContentWithCustomStructureInAssetPublisher {
 		task ("Add a web content structure in Global site") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "Global");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "Global");
 
 			NavItem.gotoStructures();
 
@@ -1510,7 +1601,7 @@ definition {
 		}
 
 		task ("Add a web content based on new structure in global site") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "Global");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "Global");
 
 			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -1544,6 +1635,69 @@ definition {
 				groupName = "Global",
 				title = "WC WebContent Title");
 		}
+	}
+
+	@description = "LPS-103624 - URLs are not well formed when changing language in classic Display Pages."
+	@priority = "4"
+	test ViewInContextTranslatedWCWithFriendlyURL {
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Asset Publisher Page",
+			widgetName = "Language Selector");
+
+		Navigator.gotoSitePage(
+			pageName = "Asset Publisher Page",
+			siteName = "Test Site Name");
+
+		AssetPublisherPortlet.configureDisplaySettings(displaySettings = "Set as the Default Asset Publisher for This Page");
+
+		AssetPublisherPortlet.configureAssetLinkBehaviorPG(assetLinkBehavior = "View in Context");
+
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
+
+		WebContentNavigator.gotoAddCP();
+
+		WebContent.addCP(
+			webContentContent = "WC WebContent English Content",
+			webContentTitle = "WC WebContent English Title");
+
+		WebContent.editDisplayPage(
+			pageName = "Asset Publisher Page",
+			pageType = "Public Pages");
+
+		WebContent.editFriendlyURL(webContentFriendlyUrl = "webcontentenglish");
+
+		PortletEntry.changeLocale(locale = "de-DE");
+
+		WebContent.addCP(
+			webContentContent = "WC WebContent German Content",
+			webContentTitle = "WC WebContent German Title");
+
+		WebContent.editFriendlyURL(webContentFriendlyUrl = "webcontentgerman");
+
+		PortletEntry.publish();
+
+		Navigator.gotoSitePage(
+			pageName = "Asset Publisher Page",
+			siteName = "Test Site Name");
+
+		AssetPublisherPortlet.clickAssetTitle(assetTitle = "WC WebContent English Title");
+
+		AssetPublisherPortlet.viewAssetPG(
+			assetContent = "WC WebContent English Content",
+			assetTitle = "WC WebContent English Title");
+
+		AssertLocation.assertPartialLocation(value1 = "-/webcontentenglish");
+
+		LanguagePortlet.selectLanguagePG(
+			locale = "de-DE",
+			textIcon = "deutsch-Deutschland");
+
+		AssetPublisherPortlet.viewAssetPG(
+			assetContent = "WC WebContent German Content",
+			assetTitle = "WC WebContent German Title");
+
+		AssertLocation.assertPartialLocation(value1 = "-/webcontentgerman");
 	}
 
 	@description = "View localized web content with localized categories."
@@ -1658,6 +1812,69 @@ definition {
 			Refresh();
 
 			AssertConsoleTextNotPresent(value1 = "NoSuchResourceActionException");
+		}
+	}
+
+	@description = "This is a use case for LPS-141570. The user could view non-searchable web content in Asset Publisher after disable search with index."
+	@priority = "4"
+	test ViewNonSearchableWebContentAfterDisableSearchWithIndex {
+		property test.name.skip.portal.instance = "AssetPublisherUseCase#ViewNonSearchableWebContentAfterDisableSearchWithIndex";
+
+		task ("Add a normal web content") {
+			JSONWebcontent.addWebContent(
+				content = "WC WebContent Content 1",
+				groupName = "Test Site Name",
+				title = "WC WebContent Title 1");
+		}
+
+		task ("Add a non-searchable web content") {
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
+
+			WebContentNavigator.gotoAddCP();
+
+			WebContent.addCP(
+				webContentContent = "WC WebContent Content 2",
+				webContentTitle = "WC WebContent Title 2");
+
+			Panel.expandPanel(panel = "Search");
+
+			Uncheck.uncheckToggleSwitch(
+				key_toggleSwitchLabel = "Searchable",
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+
+			PortletEntry.publish();
+		}
+
+		task ("Assert both web contents are present in AP") {
+			Navigator.gotoSitePage(
+				pageName = "Asset Publisher Page",
+				siteName = "Test Site Name");
+
+			for (var i : list "1,2") {
+				AssetPublisherPortlet.viewAssetPG(
+					assetContent = "WC WebContent Content ${i}",
+					assetTitle = "WC WebContent Title ${i}");
+			}
+		}
+
+		task ("Disable Search with Index") {
+			APNavigator.openToConfigInSystemSettings(portlet = "Asset Publisher");
+
+			SystemSettings.configureSystemSetting(
+				enableSetting = "false",
+				settingFieldName = "Search with Index");
+		}
+
+		task ("Assert both web contents are present in AP") {
+			Navigator.gotoSitePage(
+				pageName = "Asset Publisher Page",
+				siteName = "Test Site Name");
+
+			for (var i : list "1,2") {
+				AssetPublisherPortlet.viewAssetPG(
+					assetContent = "WC WebContent Content ${i}",
+					assetTitle = "WC WebContent Title ${i}");
+			}
 		}
 	}
 
@@ -1889,9 +2106,9 @@ catch (Exception e) {
 		}
 
 		task ("View the URL") {
-			var baseURL = PropsUtil.get("portal.url");
+			var baseUrl = PropsUtil.get("portal.url");
 
-			AssertLocation(value1 = "${baseURL}/web/test-site-name/asset-publisher-page");
+			AssertLocation(value1 = "${baseUrl}/web/test-site-name/asset-publisher-page");
 		}
 	}
 
@@ -1970,7 +2187,7 @@ catch (Exception e) {
 		}
 
 		task ("Add a web content") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentNavigator.gotoAddCP();
 
@@ -1999,7 +2216,7 @@ catch (Exception e) {
 		}
 
 		task ("Modified the web content") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
 
@@ -2055,7 +2272,7 @@ catch (Exception e) {
 		}
 
 		task ("Select the content page in web content") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentNavigator.gotoEditCP(webContentTitle = "Webcontent Title");
 
@@ -2067,7 +2284,7 @@ catch (Exception e) {
 		}
 
 		task ("View web content in associated public page") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentNavigator.gotoEntryMenuItem(
 				entry = "Webcontent Title",
@@ -2131,7 +2348,7 @@ catch (Exception e) {
 		}
 
 		task ("View web content in associated public page") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentNavigator.gotoEntryMenuItem(
 				entry = "WC WebContent Title",
@@ -2158,7 +2375,7 @@ catch (Exception e) {
 		}
 
 		task ("Add a web content with viewable by Site Members") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "test-site-name");
 
 			WebContentNavigator.gotoAddCP();
 

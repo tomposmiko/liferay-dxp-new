@@ -21,7 +21,6 @@ Export-Package:\
 	\
 	!com.liferay.portal.cache.thread.local,\
 	!com.liferay.portal.dao.jdbc.aop,\
-	!com.liferay.portal.fabric,\
 	!com.liferay.portal.freemarker,\
 	!com.liferay.portal.increment,\
 	!com.liferay.portal.javadoc,\
@@ -31,7 +30,6 @@ Export-Package:\
 	!com.liferay.portal.messaging.async,\
 	!com.liferay.portal.microsofttranslator,\
 	!com.liferay.portal.monitoring.statistics.service,\
-	!com.liferay.portal.nio.intraband.proxy,\
 	!com.liferay.portal.scripting.beanshell,\
 	!com.liferay.portal.scripting.groovy,\
 	!com.liferay.portal.scripting.javascript,\
@@ -229,7 +227,6 @@ Export-Package:\
 	org.apache.logging.log4j.message;version='2.17.1',\
 	org.apache.logging.log4j.spi;version='2.17.1',\
 	org.apache.naming.java,\
-	org.apache.regexp;version='2.7.1',\
 	org.apache.tika.*;version='1.26.0',\
 	org.apache.tools.ant.*;version='1.9.15',\
 	org.apache.xalan.*;version='2.7.2',\
@@ -315,7 +312,6 @@ Provide-Capability:\
 	@../../../lib/portal/asm-tree.jar,\
 	@../../../lib/portal/asm-util.jar,\
 	@../../../lib/portal/asm.jar,\
-	@../../../lib/portal/ccpp.jar,\
 	@../../../lib/portal/commons-beanutils.jar,\
 	@../../../lib/portal/commons-codec.jar,\
 	@../../../lib/portal/commons-collections.jar,\

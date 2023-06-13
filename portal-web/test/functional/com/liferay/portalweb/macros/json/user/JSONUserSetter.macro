@@ -34,8 +34,8 @@ definition {
 	}
 
 	macro setPortalInstanceName {
-		if (isSet(portalURL)) {
-			var portalInstanceName = JSONCompany.parsePortalInstanceURL(portalURL = "${portalURL}");
+		if (isSet(portalUrl)) {
+			var portalInstanceName = JSONCompany.parsePortalInstanceURL(portalUrl = "${portalUrl}");
 		}
 
 		return "${portalInstanceName}";

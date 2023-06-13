@@ -118,6 +118,18 @@ public class LayoutHeaderProductNavigationControlMenuEntry
 	}
 
 	@Override
+	public boolean isRelevant(HttpServletRequest httpServletRequest) {
+		String layoutMode = ParamUtil.getString(
+			httpServletRequest, "p_l_mode", Constants.VIEW);
+
+		if (layoutMode.equals(Constants.EDIT)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean isShow(HttpServletRequest httpServletRequest)
 		throws PortalException {
 

@@ -47,6 +47,17 @@ public class UserGroupResourceImpl extends BaseUserGroupResourceImpl {
 		_userGroupService.deleteUserGroup(userGroupId);
 	}
 
+	@Override
+	public void deleteUserGroupByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception {
+
+		deleteUserGroup(
+			_userGroupResourceDTOConverter.getUserGroupId(
+				externalReferenceCode));
+	}
+
+	@Override
 	public void deleteUserGroupUsers(Long userGroupId, Long[] userIds)
 		throws Exception {
 
@@ -57,6 +68,15 @@ public class UserGroupResourceImpl extends BaseUserGroupResourceImpl {
 	@Override
 	public UserGroup getUserGroup(Long userGroupId) throws Exception {
 		return _toUserGroup(_userGroupService.getUserGroup(userGroupId));
+	}
+
+	@Override
+	public UserGroup getUserGroupByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception {
+
+		return _toUserGroup(
+			_userGroupResourceDTOConverter.getObject(externalReferenceCode));
 	}
 
 	@Override
@@ -96,6 +116,12 @@ public class UserGroupResourceImpl extends BaseUserGroupResourceImpl {
 					ActionKeys.DELETE, userGroupId, "deleteUserGroup",
 					_userGroupModelResourcePermission)
 			).put(
+				"delete-by-external-reference-code",
+				addAction(
+					ActionKeys.DELETE, userGroupId,
+					"deleteUserGroupByExternalReferenceCode",
+					_userGroupModelResourcePermission)
+			).put(
 				"delete-user-group-users",
 				addAction(
 					ActionKeys.ASSIGN_MEMBERS, userGroupId,
@@ -104,6 +130,12 @@ public class UserGroupResourceImpl extends BaseUserGroupResourceImpl {
 				"get",
 				addAction(
 					ActionKeys.VIEW, userGroupId, "getUserGroup",
+					_userGroupModelResourcePermission)
+			).put(
+				"get-by-external-reference-code",
+				addAction(
+					ActionKeys.VIEW, userGroupId,
+					"getUserGroupByExternalReferenceCode",
 					_userGroupModelResourcePermission)
 			).put(
 				"patch",

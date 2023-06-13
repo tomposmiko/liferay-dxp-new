@@ -8,9 +8,9 @@ definition {
 
 	setUp {
 		task ("Open Analytics Cloud") {
-			var analyticsCloudURL = PropsUtil.get("analytics.cloud.url");
+			var analyticsCloudUrl = PropsUtil.get("analytics.cloud.url");
 
-			Navigator.openURL(baseURL = "${analyticsCloudURL}");
+			Navigator.openURL(baseUrl = "${analyticsCloudUrl}");
 		}
 
 		task ("Take token from Analytics Cloud") {
@@ -52,49 +52,131 @@ definition {
 
 		AnalyticsCloud.teardownAnalyticsCloud();
 
-		JSONGroup.deleteGroupByName(groupName = "Test Site Name");
-
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
 
 		JSONUser.tearDownNonAdminUsers();
 	}
 
 	@description = "LPS-144031: When the user accesses to the content performance panel of a blog's display page, the author's field is NOT shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test AuthorNotShowInBlogDisplayPage {
+		task ("Create a Blog Entry") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-128194 AuthorNotShowInBlogDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Blogs Entry Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Assert author is not displayed") {
+			AssertElementNotPresent(
+				key_author = "Test Test",
+				locator1 = "ContentPerformance#PAGE_AUTHOR");
+		}
 	}
 
 	@description = "LPS-144031: When the user accesses to the content performance panel of a content page, the author's field is NOT shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test AuthorNotShowInContentPage {
+		task ("Create and go to content page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Content Page 2",
+				type = "content");
 
-		// TODO LPS-128194 AuthorNotShowInContentPage pending implementation
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/content-page-2");
+		}
 
+		task ("Open Content Performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Assert author is not displayed") {
+			AssertElementNotPresent(
+				key_author = "Test Test",
+				locator1 = "ContentPerformance#PAGE_AUTHOR");
+		}
 	}
 
 	@description = "LPS-144031: When the user accesses to the content performance panel of a document's display page, the author's field is NOT shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test AuthorNotShowInDocumentDisplayPage {
+		task ("Create a Document") {
+			JSONDocument.addFile(
+				dmDocumentDescription = "DM Document Description",
+				dmDocumentTitle = "DM Document Title",
+				groupName = "Test Site Name");
+		}
 
-		// TODO LPS-128194 AuthorNotShowInDocumentDisplayPage pending implementation
+		task ("Add 'Asset Publisher' to page") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name");
 
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Widget Page Name",
+				widgetName = "Asset Publisher");
+		}
+
+		task ("Open Content Performance panel") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-widget-page-name");
+
+			AssetPublisherPortlet.clickAssetTitle(assetTitle = "DM Document Title");
+
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Assert author is not displayed") {
+			AssertElementNotPresent(
+				key_author = "Test Test",
+				locator1 = "ContentPerformance#PAGE_AUTHOR");
+		}
 	}
 
 	@description = "LPS-144031: When the user accesses to the content performance panel of a widget page, the author's field is NOT shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test AuthorNotShowInWidgetPage {
+		task ("Create and go to Widget Page") {
+			PagesAdmin.addPublicPage(
+				pageName = "Widget Page Name",
+				sitePageType = "Widget Page");
 
-		// TODO LPS-128194 AuthorNotShowInWidgetPage pending implementation
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/3");
+		}
 
+		task ("Open Content Performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Assert author is not displayed") {
+			AssertElementNotPresent(
+				key_author = "Test Test",
+				locator1 = "ContentPerformance#PAGE_AUTHOR");
+		}
 	}
 
 	@description = "LPS-126044: When the user changes the language using the flag selector in the panel and so the URL, the metrics corresponding the canonical URL that corresponds to the language selected are shown"
@@ -116,12 +198,54 @@ definition {
 	}
 
 	@description = "LPS-126047: When the user changes the language using the flag selector in the panel and so the URL, the metrics corresponding the canonical URL that corresponds to the language selected are shown"
-	@ignore = "true"
 	@priority = "3"
 	test ChangeLanguageInWidgetPage {
+		property test.name.skip.portal.instance = "ContentPerformance#LanguageSelector";
 
-		// TODO LPS-144029 ChangeLanguageInWidgetPage pending implementation
+		task ("Set portal to use Localized URL") {
+			SystemSettings.openSystemSettingsAdmin();
 
+			SystemSettings.gotoConfiguration(
+				configurationCategory = "Pages",
+				configurationName = "SEO",
+				configurationScope = "Virtual Instance Scope");
+
+			SystemSettings.selectOptionSetting(
+				fieldName = "Canonical URL",
+				selectOption = "Use Localized URL");
+
+			SystemSettings.saveConfiguration();
+		}
+
+		task ("Create Widget Page") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name");
+
+			PagesAdmin.addPublicPage(
+				pageName = "Widget Page Name",
+				sitePageType = "Widget Page");
+		}
+
+		task ("Navigate to Widget page") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/3");
+		}
+
+		task ("Open content performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Change language") {
+			ContentPerformance.changeLocale(locale = "Portuguese");
+		}
+
+		task ("Check that the URL and date is from that translated page") {
+			AssertTextEquals.assertPartialText(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_URL",
+				value1 = "pt/web/test-site-name");
+
+			AssertTextEquals(
+				locator1 = "ContentPerformance#TOTAL_VIEWS_NUMBER",
+				value1 = "0");
+		}
 	}
 
 	@description = "LPS-108856: When user opens Content Performance panel and AC is connected and synced, the Content Performance panel display all its functionalities"
@@ -140,7 +264,7 @@ definition {
 		task ("Assert Title is present") {
 			AssertElementPresent(
 				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE",
-				value1 = "content page");
+				pageName = "Content Page");
 		}
 
 		task ("Assert URL is present") {
@@ -163,12 +287,22 @@ definition {
 	}
 
 	@description = "LPS-127220: When the user opens the flag selector dropdown in the panel, the default language is in top of the list"
-	@ignore = "true"
 	@priority = "3"
 	test DefaultLanguageOnTop {
+		task ("Open content performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
 
-		// TODO LPS-144028 DefaultLanguageOnTop pending implementation
+		task ("Open flag selector dropdown") {
+			Click(locator1 = "ContentPerformance#LANGUAGE_DROPDOWN_BUTTON");
+		}
 
+		task ("Check if top language is the default one") {
+			AssertTextEquals.assertPartialText(
+				key_index = "1",
+				locator1 = "Translation#DROPDOWN_MENU_ITEM_INDEX",
+				value1 = "English");
+		}
 	}
 
 	@description = "LPS-105215: Validate the Content Performance panel default time range is by week"
@@ -249,19 +383,22 @@ definition {
 	}
 
 	@description = "LPS-127220: When the user opens the flag selector dropdown in the panel, the languages are alphabetically ordered"
-	@ignore = "true"
 	@priority = "3"
 	test LanguagesAlphabeticallyOrdered {
+		task ("Open content performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
 
-		// TODO LPS-144028 LanguagesAlphabeticallyOrdered pending implementation
-
+		task ("Check if languages are alphabetically ordered") {
+			ContentPerformance.checkLanguagesOrder();
+		}
 	}
 
 	@description = "LPS-110920: When the user selects a language in the switcher, the title, the URL and the metrics change accordingly"
 	@priority = "5"
 	test LanguageSelector {
 		task ("Add a translation for that page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			PagesAdmin.openPagesAdmin(siteUrlKey = "test-site-name");
 
 			PagesAdmin.gotoPageEllipsisMenuItem(
 				menuItem = "Configure",
@@ -269,12 +406,12 @@ definition {
 
 			PagesAdmin.addLocalizedFriendlyURL(
 				friendlyUrlLocalizedList = "pt-BR",
-				localizedFriendlyURLList = "",
+				localizedFriendlyUrlList = "",
 				localizedNameList = "Pagina principal");
 		}
 
 		task ("Set a custom page as canonical URL and go to Content Performance") {
-			PageAudit.setSEOcanonicalURL(URL = "https://liferay.com.br");
+			PageAudit.setSEOcanonicalURL(url = "https://liferay.com.br");
 		}
 
 		task ("Open Content Performance and Assert if element is not present") {
@@ -309,7 +446,7 @@ definition {
 	@priority = "3"
 	test LanguageSelectorUserLanguage {
 		task ("Set a custom page as canonical URL to have data already loaded") {
-			PageAudit.setSEOcanonicalURL(URL = "https://liferay.com.br");
+			PageAudit.setSEOcanonicalURL(url = "https://liferay.com.br");
 		}
 
 		task ("Open Content Performance and Assert if element is not present") {
@@ -336,12 +473,29 @@ definition {
 	}
 
 	@description = "LPS-127220: When the user opens the flag selector dropdown in the panel, the Translated/Unstraslated label does not appear"
-	@ignore = "true"
 	@priority = "3"
 	test LanguagesLabel {
+		task ("Open content performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
 
-		// TODO LPS-144028 LanguagesLabel pending implementation
+		task ("Open flag selector dropdown") {
+			Click(locator1 = "ContentPerformance#LANGUAGE_DROPDOWN_BUTTON");
+		}
 
+		task ("Check that there is not any  Translated/Unstraslated label") {
+			AssertTextEquals(
+				locator1 = "ContentPerformance#LANGUAGE_LABEL",
+				value1 = "Default");
+
+			AssertTextNotEquals(
+				locator1 = "ContentPerformance#LANGUAGE_LABEL",
+				value1 = "Translated");
+
+			AssertTextNotEquals(
+				locator1 = "ContentPerformance#LANGUAGE_LABEL",
+				value1 = "Untranslated");
+		}
 	}
 
 	@description = "LPS-126044: When DXP is connected and synced to AC and the user clicks on the metrics icon in a blog display page, the content performance panel displays with the metrics of the content page"
@@ -354,12 +508,21 @@ definition {
 	}
 
 	@description = "LPS-127220: When DXP is connected and synced to AC and the user clicks on the metrics icon in a content page, the content performance panel displays with the metrics of the content page"
-	@ignore = "true"
 	@priority = "4"
 	test MetricsIconVisibleInContentPage {
+		task ("Open content performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
 
-		// TODO LPS-144028 MetricsIconVisibleInContentPage pending implementation
+		task ("Check if infomation if from that page") {
+			AssertVisible(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE",
+				pageName = "Content Page");
 
+			AssertTextEquals(
+				locator1 = "ContentPerformance#TOTAL_VIEWS_NUMBER",
+				value1 = "0");
+		}
 	}
 
 	@description = "LPS-126044: When DXP is connected and synced to AC and the user clicks on the metrics icon in a document display page, the content performance panel displays with the metrics of the content page"
@@ -372,12 +535,31 @@ definition {
 	}
 
 	@description = "LPS-126047: When DXP is connected and synced to AC and the user clicks on the metrics icon in a widget page, the content performance panel displays with the metrics of the content page"
-	@ignore = "true"
 	@priority = "4"
 	test MetricsIconVisibleInWidgetPage {
+		task ("Create Widget Page") {
+			PagesAdmin.addPublicPage(
+				pageName = "Widget Page Name",
+				sitePageType = "Widget Page");
+		}
 
-		// TODO LPS-144029 MetricsIconVisibleInWidgetPage pending implementation
+		task ("Navigate to Widget page") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/3");
+		}
 
+		task ("Open content performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Check if infomation if from that page") {
+			AssertVisible(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE",
+				pageName = "Widget Page Name");
+
+			AssertTextEquals(
+				locator1 = "ContentPerformance#TOTAL_VIEWS_NUMBER",
+				value1 = "0");
+		}
 	}
 
 	@description = "LPS-118006: When the DXP is not connected to AC, if the user clicks on the Metrics button, the sidebar panel shows up and displays a button titled Dont show me this again and a message informing the user that the panel will show up again if AC is connected"
@@ -415,7 +597,7 @@ definition {
 				groupName = "Test Site Name",
 				subType = "Basic Web Content");
 
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
@@ -462,11 +644,6 @@ definition {
 				roleTitle = "Content Dashboard Viewer");
 
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW_SITE_ADMINISTRATION",
-				resourceName = "com.liferay.portal.kernel.model.Group",
-				roleTitle = "Content Dashboard Viewer");
-
-			Permissions.definePermissionViaJSONAPI(
 				resourceAction = "ACCESS_IN_CONTROL_PANEL",
 				resourceName = "com_liferay_content_dashboard_web_portlet_ContentDashboardAdminPortlet",
 				roleTitle = "Content Dashboard Viewer");
@@ -503,15 +680,12 @@ definition {
 		}
 
 		task ("Create a default Display Page Template") {
-			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.addDisplayPage(
 				contentType = "Web Content Article",
-				displayPageTemplateEntryName = "Display Page Name",
-				groupName = "Test Site Name",
+				displayPageName = "Display Page Name",
 				subType = "Basic Web Content");
-
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
-
-			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
 			PageEditor.clickPublish();
 
@@ -531,7 +705,7 @@ definition {
 		task ("Assert that 'View metrics' option is not displayed") {
 			Click.clickNoMouseOver(locator1 = "ContentDashboard#ROW_PANEL_WC");
 
-			AssertNotVisible(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
+			AssertElementNotPresent(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
 		}
 
 		task ("Longin with Test Tes user to allow teardown") {
@@ -562,7 +736,7 @@ definition {
 		task ("Assert that 'View metrics' option is not displayed") {
 			Click.clickNoMouseOver(locator1 = "ContentDashboard#ROW_PANEL_WC");
 
-			AssertNotVisible(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
+			AssertElementNotPresent(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_BUTTON");
 		}
 	}
 
@@ -592,30 +766,9 @@ definition {
 				userEmailAddress = "userea@liferay.com");
 		}
 
-		task ("Create a DPT and set as Default") {
-			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
-				contentType = "Web Content Article",
-				displayPageTemplateEntryName = "Display Page Name",
-				groupName = "Test Site Name",
-				subType = "Basic Web Content");
-
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
-
-			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
-
-			PageEditor.clickPublish();
-
-			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
-		}
-
 		task ("Create role and assign to user") {
 			JSONRole.addRegularRole(
 				roleKey = "Content Dashboard Permissions",
-				roleTitle = "Content Dashboard Permissions");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW_SITE_ADMINISTRATION",
-				resourceName = "com.liferay.portal.kernel.model.Group",
 				roleTitle = "Content Dashboard Permissions");
 
 			Permissions.definePermissionViaJSONAPI(
@@ -638,6 +791,19 @@ definition {
 				userEmailAddress = "userea@liferay.com");
 		}
 
+		task ("Create a DPT and set as Default") {
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.addDisplayPage(
+				contentType = "Web Content Article",
+				displayPageName = "Display Page Name",
+				subType = "Basic Web Content");
+
+			PageEditor.clickPublish();
+
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+		}
+
 		task ("Logout and login with created user") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "userea@liferay.com",
@@ -647,9 +813,17 @@ definition {
 		task ("Check if button is present in Content Dashboard") {
 			ContentDashboard.goToContentDashboard();
 
-			Click(locator1 = "ContentDashboard#ROW_PANEL_WC");
+			Click.clickNoMouseOver(locator1 = "ContentDashboard#ROW_PANEL_WC");
 
-			AssertElementPresent(locator1 = "ContentPerformance#ICON_VIEW_METRICS");
+			AssertVisible(locator1 = "ContentPerformance#ICON_VIEW_METRICS");
+		}
+
+		task ("Login with Test user, to allow tearDown") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "test@liferay.com",
+				userLoginFullName = "Test Test");
+
+			JSONRole.deleteRole(roleTitle = "Content Dashboard Permissions");
 		}
 	}
 
@@ -679,25 +853,14 @@ definition {
 				userEmailAddress = "userea@liferay.com");
 		}
 
-		task ("Create a DPT and set as Default") {
-			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
-				contentType = "Web Content Article",
-				displayPageTemplateEntryName = "Display Page Name",
-				groupName = "Test Site Name",
-				subType = "Basic Web Content");
-
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
-
-			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
-
-			PageEditor.clickPublish();
-
-			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
-		}
-
 		task ("Crete a Role with proper permissons") {
 			JSONRole.addRegularRole(
 				roleKey = "Web Content Creator Edit Permissions",
+				roleTitle = "Web Content Creator Edit Permissions");
+
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "VIEW_CONTROL_PANEL",
+				resourceName = "90",
 				roleTitle = "Web Content Creator Edit Permissions");
 
 			Permissions.definePermissionViaJSONAPI(
@@ -711,28 +874,26 @@ definition {
 				roleTitle = "Web Content Creator Edit Permissions");
 
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW",
-				resourceName = "com.liferay.journal",
-				roleTitle = "Web Content Creator Edit Permissions");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "ADD_ARTICLE",
-				resourceName = "com.liferay.journal",
-				roleTitle = "Web Content Creator Edit Permissions");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW_SITE_ADMINISTRATION",
-				resourceName = "com.liferay.portal.kernel.model.Group",
-				roleTitle = "Web Content Creator Edit Permissions");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW_CONTROL_PANEL",
-				resourceName = "90",
+				resourceAction = "UPDATE",
+				resourceName = "com.liferay.journal.model.JournalArticle",
 				roleTitle = "Web Content Creator Edit Permissions");
 
 			JSONRole.assignRoleToUser(
 				roleTitle = "Web Content Creator Edit Permissions",
 				userEmailAddress = "userea@liferay.com");
+		}
+
+		task ("Create a DPT and set as Default") {
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.addDisplayPage(
+				contentType = "Web Content Article",
+				displayPageName = "Display Page Name",
+				subType = "Basic Web Content");
+
+			PageEditor.clickPublish();
+
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}
 
 		task ("Logout and login with created user") {
@@ -746,7 +907,15 @@ definition {
 
 			Click(locator1 = "ContentDashboard#ROW_PANEL_WC");
 
-			AssertElementPresent(locator1 = "ContentPerformance#ICON_VIEW_METRICS");
+			AssertVisible(locator1 = "ContentPerformance#ICON_VIEW_METRICS");
+		}
+
+		task ("Login with Test user, to allow tearDown") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "test@liferay.com",
+				userLoginFullName = "Test Test");
+
+			JSONRole.deleteRole(roleTitle = "Web Content Creator Edit Permissions");
 		}
 	}
 
@@ -774,28 +943,9 @@ definition {
 				userEmailAddress = "userea@liferay.com");
 		}
 
-		task ("Disable option to strangers to verify email") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Configuration",
-				panel = "Control Panel",
-				portlet = "Instance Settings");
-
-			SystemSettings.gotoConfiguration(
-				configurationCategory = "User Authentication",
-				configurationName = "General",
-				configurationScope = "Virtual Instance Scope");
-
-			PortalSettings.uncheckStrangersVerifyEmailCheckbox();
-		}
-
 		task ("Create a Role") {
 			JSONRole.addRegularRole(
 				roleKey = "Content Dashboard Permissions",
-				roleTitle = "Content Dashboard Permissions");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW_SITE_ADMINISTRATION",
-				resourceName = "com.liferay.portal.kernel.model.Group",
 				roleTitle = "Content Dashboard Permissions");
 
 			Permissions.definePermissionViaJSONAPI(
@@ -813,6 +963,22 @@ definition {
 				userEmailAddress = "userea@liferay.com");
 		}
 
+		task ("Create a DPT and set as Default") {
+			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
+				contentType = "Web Content Article",
+				displayPageTemplateEntryName = "Display Page Name",
+				groupName = "Test Site Name",
+				subType = "Basic Web Content");
+
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
+
+			PageEditor.clickPublish();
+
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+		}
+
 		task ("Logout and login with created user") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "userea@liferay.com",
@@ -825,8 +991,14 @@ definition {
 			Click(locator1 = "ContentDashboard#ROW_PANEL_WC");
 
 			AssertElementNotPresent(locator1 = "ContentPerformance#ICON_VIEW_METRICS");
+		}
 
-			Navigator.openURL();
+		task ("Login with Test user, to allow tearDown") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "test@liferay.com",
+				userLoginFullName = "Test Test");
+
+			JSONRole.deleteRole(roleTitle = "Content Dashboard Permissions");
 		}
 	}
 
@@ -856,30 +1028,9 @@ definition {
 				userEmailAddress = "userea@liferay.com");
 		}
 
-		task ("Create a DPT and set as Default") {
-			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
-				contentType = "Web Content Article",
-				displayPageTemplateEntryName = "Display Page Name",
-				groupName = "Test Site Name",
-				subType = "Basic Web Content");
-
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
-
-			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
-
-			PageEditor.clickPublish();
-
-			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
-		}
-
 		task ("Create role and assign to user") {
 			JSONRole.addRegularRole(
 				roleKey = "Content Dashboard Permissions",
-				roleTitle = "Content Dashboard Permissions");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW_SITE_ADMINISTRATION",
-				resourceName = "com.liferay.portal.kernel.model.Group",
 				roleTitle = "Content Dashboard Permissions");
 
 			Permissions.definePermissionViaJSONAPI(
@@ -902,6 +1053,19 @@ definition {
 				userEmailAddress = "userea@liferay.com");
 		}
 
+		task ("Create a DPT and set as Default") {
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
+
+			DisplayPageTemplatesAdmin.addDisplayPage(
+				contentType = "Web Content Article",
+				displayPageName = "Display Page Name",
+				subType = "Basic Web Content");
+
+			PageEditor.clickPublish();
+
+			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
+		}
+
 		task ("Logout and login with created user") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "userea@liferay.com",
@@ -913,7 +1077,15 @@ definition {
 
 			Click(locator1 = "ContentDashboard#ROW_PANEL_WC");
 
-			AssertElementPresent(locator1 = "ContentPerformance#ICON_VIEW_METRICS");
+			AssertVisible(locator1 = "ContentPerformance#ICON_VIEW_METRICS");
+		}
+
+		task ("Login with Test user, to allow tearDown") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "test@liferay.com",
+				userLoginFullName = "Test Test");
+
+			JSONRole.deleteRole(roleTitle = "Content Dashboard Permissions");
 		}
 	}
 
@@ -960,12 +1132,23 @@ definition {
 	}
 
 	@description = "LPS-127220: When the user accesses to the content performance panel of a content page, the name, the URL of the page and the language selector are shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test PanelInformationInContentPage {
+		task ("Open content performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
 
-		// TODO LPS-144028 PanelInformationInContentPage pending implementation
+		task ("Check if the name, the URL and the language selector are shown") {
+			AssertVisible(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE",
+				pageName = "Content Page");
 
+			AssertTextEquals.assertPartialText(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_URL",
+				value1 = "web/test-site-name");
+
+			AssertVisible(locator1 = "ContentPerformance#LANGUAGE_DROPDOWN_BUTTON");
+		}
 	}
 
 	@description = "LPS-126044: When the user accesses to the content performance panel of a document display page, the name, the URL of the page and the language selector are shown in the content performance panel"
@@ -978,12 +1161,33 @@ definition {
 	}
 
 	@description = "LPS-126047: When the user accesses to the content performance panel of a widget page, the name, the URL of the page and the language selector are shown in the content performance panel"
-	@ignore = "true"
 	@priority = "3"
 	test PanelInformationInWidgetPage {
+		task ("Create Widget Page") {
+			PagesAdmin.addPublicPage(
+				pageName = "Widget Page Name",
+				sitePageType = "Widget Page");
+		}
 
-		// TODO LPS-144029 PanelInformationInWidgetPage pending implementation
+		task ("Navigate to Widget page") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/3");
+		}
 
+		task ("Open content performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
+
+		task ("Check if the name, the URL and the language selector are shown") {
+			AssertVisible(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_TITLE",
+				pageName = "Widget Page Name");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "ContentPerformance#CONTENT_PERFORMANCE_URL",
+				value1 = "web/test-site-name/3");
+
+			AssertVisible(locator1 = "ContentPerformance#LANGUAGE_DROPDOWN_BUTTON");
+		}
 	}
 
 	@description = "LPS-109417: When the graphic shows the publication date, all previous dots will be 0"

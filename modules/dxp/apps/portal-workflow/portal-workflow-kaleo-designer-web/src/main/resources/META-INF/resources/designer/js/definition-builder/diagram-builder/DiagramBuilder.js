@@ -65,6 +65,17 @@ export default function DiagramBuilder({version}) {
 	const [selectedItemNewId, setSelectedItemNewId] = useState(null);
 
 	const onConnect = (params) => {
+		if (
+			elements.filter(
+				(element) =>
+					isEdge(element) &&
+					element.source === params.source &&
+					element.target === params.target
+			).length
+		) {
+			return;
+		}
+
 		const defaultEdge = !elements.filter(
 			(element) =>
 				isEdge(element) &&
@@ -211,6 +222,17 @@ export default function DiagramBuilder({version}) {
 						setSelectedItemNewId(null);
 
 						setSelectedItem(element);
+					}
+					else if (isEdge(element)) {
+						element = {
+							...element,
+							...(selectedItem.id === element.source && {
+								source: selectedItemNewId,
+							}),
+							...(selectedItem.id === element.target && {
+								target: selectedItemNewId,
+							}),
+						};
 					}
 
 					return element;

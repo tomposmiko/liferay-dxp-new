@@ -1,0 +1,113 @@
+definition {
+
+	macro activeContactRole {
+		ApplicationsMenu.gotoPortlet(
+			category = "Object",
+			panel = "Control Panel",
+			portlet = "Koroneiki Accounts");
+
+		CustomerPortal.viewKoroneikiInfo();
+
+		Type(
+			locator1 = "CP2LiferayContact#CONTACT_ROLE",
+			value1 = "Quality Assurance Analyst");
+
+		Click(locator1 = "Button#SAVE");
+	}
+
+	macro checkToggleHideWidget {
+		Check.checkToggleSwitch(locator1 = "CP2LiferayContact#HIDE_WIDGET");
+	}
+
+	macro createCPSite {
+		ApplicationsMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites");
+
+		LexiconEntry.gotoAdd();
+
+		LexiconCard.clickCard(card = "Customer Portal");
+
+		SelectFrame(
+			key_title = "Add Site",
+			locator1 = "IFrame#MODAL_ANY");
+
+		PortletEntry.inputName(name = "${siteName}");
+
+		Click(locator1 = "Button#ADD");
+
+		AssertElementPresent(locator1 = "Button#ADD_DISABLED");
+
+		while (IsElementPresent(locator1 = "Button#ADD_DISABLED")) {
+			Pause(locator1 = "1500");
+		}
+
+		Refresh();
+
+		WaitForElementPresent(
+			key_itemName = "Site Configuration",
+			locator1 = "ListGroupItem#ITEM_TEXT");
+
+		Click(
+			key_itemName = "Site Configuration",
+			locator1 = "ListGroupItem#ITEM_TEXT");
+
+		AssertTextEquals(
+			locator1 = "SitesEditSite#DETAILS_NAME",
+			value1 = "${siteName}");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Object",
+			panel = "Control Panel",
+			portlet = "Objects");
+
+		ObjectPortlet.selectCustomObject(label = "Koroneiki Account");
+
+		CreateObject.checkToggleActive();
+
+		CustomerPortal.checkToggleHideWidget();
+
+		CreateObject.saveObject();
+	}
+
+	macro customerPortalApisTearDown {
+		CommerceJSONAccountsAPI._deleteAllCommerceAccounts();
+
+		CommerceJSONChannelsAPI._deleteAllCommerceChannels();
+
+		RemoteApps.goToRemoteAppsPortlet();
+
+		RemoteApps.deleteRemoteApp();
+	}
+
+	macro customerPortalTearDown {
+		ApplicationsMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites");
+
+		Refresh();
+
+		PortletEntry.selectAll();
+
+		ClickNoError(
+			locator1 = "Icon#DELETE",
+			value1 = "Delete");
+
+		AssertConfirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+		Alert.viewSuccessMessage();
+
+		CustomerPortal.customerPortalApisTearDown();
+	}
+
+	macro viewKoroneikiInfo {
+		Click(
+			key_text = "",
+			locator1 = "Icon#ANY_VERTICAL_ELLIPSIS");
+
+		MenuItem.click(menuItem = "View");
+	}
+
+}

@@ -148,6 +148,29 @@ definition {
 		Button.clickCancel();
 	}
 
+	macro gotoBulkExportTranslation {
+		for (var exportTranslationEntry : list "${exportTranslationEntry}") {
+			LexiconEntry.selectEntry(rowEntry = "${exportTranslationEntry}");
+		}
+
+		if (isSet(options)) {
+			Click(locator1 = "Icon#TOOLBAR_ELLIPSIS");
+
+			MenuItem.clickNoError(menuItem = "Export for Translations");
+		}
+		else {
+			Click(locator1 = "Icon#EXPORT_FOR_TRANSLATION");
+		}
+	}
+
+	macro gotoBulkImportTranslation {
+		MouseOver.mouseOverNotVisible(locator1 = "Portlet#OPTIONS_ICON");
+
+		Click(locator1 = "Portlet#OPTIONS_ICON");
+
+		MenuItem.click(menuItem = "Import Translations");
+	}
+
 	macro gotoExportTranslation {
 		if (isSet(pageName)) {
 			WaitForPageLoad();
@@ -196,7 +219,7 @@ definition {
 		if (isSet(pageName)) {
 			Translations.gotoImportTranslation(pageName = "${pageName}");
 		}
-		else {
+		else if (isSet(webContentTitle)) {
 			Translations.gotoImportTranslation(webContentTitle = "${webContentTitle}");
 		}
 
@@ -264,14 +287,14 @@ definition {
 			urlTitle = "${urlTitle}");
 
 		Navigator.openWithAppendToBaseURL(
-			baseURL = "${baseURL}",
-			urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_translation_web_internal_portlet_TranslationPortlet&_com_liferay_translation_web_internal_portlet_TranslationPortlet_mvcRenderCommandName=%2Ftranslation%2Ftranslate&_com_liferay_translation_web_internal_portlet_TranslationPortlet_classNameId=${classNameId}&_com_liferay_translation_web_internal_portlet_TranslationPortlet_classPK=${resourcePrimKey}&_com_liferay_translation_web_internal_portlet_TranslationPortlet_sourceLanguageId=${sourceLanguageId}&_com_liferay_translation_web_internal_portlet_TranslationPortlet_targetLanguageId=${targetLanguageId}");
+			baseUrl = "${baseUrl}",
+			urlAppend = "group/${siteUrlKey}/~/control_panel/manage?p_p_id=com_liferay_translation_web_internal_portlet_TranslationPortlet&_com_liferay_translation_web_internal_portlet_TranslationPortlet_mvcRenderCommandName=%2Ftranslation%2Ftranslate&_com_liferay_translation_web_internal_portlet_TranslationPortlet_classNameId=${classNameId}&_com_liferay_translation_web_internal_portlet_TranslationPortlet_classPK=${resourcePrimKey}&_com_liferay_translation_web_internal_portlet_TranslationPortlet_sourceLanguageId=${sourceLanguageId}&_com_liferay_translation_web_internal_portlet_TranslationPortlet_targetLanguageId=${targetLanguageId}");
 	}
 
 	macro openTranslationAdmin {
 		Navigator.openWithAppendToBaseURL(
-			baseURL = "${baseURL}",
-			urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_translation_web_internal_portlet_TranslationPortlet");
+			baseUrl = "${baseUrl}",
+			urlAppend = "group/${siteUrlKey}/~/control_panel/manage?p_p_id=com_liferay_translation_web_internal_portlet_TranslationPortlet");
 	}
 
 	macro saveInvalidConfiguration {
@@ -402,12 +425,12 @@ definition {
 			SelectFrame(value1 = "relative=top");
 		}
 
-		if (isSet(webContentSourceHTML)) {
+		if (isSet(webContentSourceHtml)) {
 			Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON_2");
 
 			Type.typeCodeMirrorEditorNoError(
 				locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
-				value1 = "${webContentSourceHTML}");
+				value1 = "${webContentSourceHtml}");
 
 			Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON_2");
 		}
@@ -636,8 +659,16 @@ definition {
 
 			if (isSet(successFileName2)) {
 				AssertTextEquals(
-					locator1 = "Message#SUCCESS_IMPORT_TRANSLATIONS_ITEM_2",
+					key_indexNumber = "2",
+					locator1 = "Message#SUCCESS_IMPORT_TRANSLATIONS_ITEM_N",
 					value1 = "${successFileName2}");
+			}
+
+			if (isSet(successFileName3)) {
+				AssertTextEquals(
+					key_indexNumber = "3",
+					locator1 = "Message#SUCCESS_IMPORT_TRANSLATIONS_ITEM_N",
+					value1 = "${successFileName3}");
 			}
 		}
 
@@ -690,12 +721,12 @@ definition {
 			SelectFrame(value1 = "relative=top");
 		}
 
-		if (isSet(webContentHTML)) {
+		if (isSet(webContentHtml)) {
 			SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME_2");
 
 			AssertTextEquals.assertPartialText(
 				locator1 = "CKEditor#BODY",
-				value1 = "${webContentHTML}");
+				value1 = "${webContentHtml}");
 
 			SelectFrame(value1 = "relative=top");
 		}

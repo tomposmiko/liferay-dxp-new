@@ -79,7 +79,7 @@ definition {
 			pageName = "Test New Page Name",
 			siteName = "Site Name");
 
-		WebContentDisplayPortlet.changeWebContent(
+		WebContentDisplayPortlet.selectWebContent(
 			depotName = "Test Depot Name 2",
 			webContentTitle = "WC WebContent Title 2");
 
@@ -87,7 +87,9 @@ definition {
 			pageName = "Test New Page Name",
 			siteName = "Site Name");
 
-		WebContent.viewPGViaWCD(webContentContent = "WC WebContent Depot 2");
+		WebContentDisplayPortlet.viewContent(
+			webContentContent = "WC WebContent Depot 2",
+			webContentTitle = "WC WebContent Title 2");
 	}
 
 	@description = "This ensures that web content using a structure stored in AL can be removed on a connected site."
@@ -126,7 +128,7 @@ definition {
 			siteName = "Site Name",
 			tableEntryText = "Yes");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -144,10 +146,10 @@ definition {
 			structureName = "WC Structure Name",
 			webContentHasReference = "true");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		WebContent.deleteCP(
-			siteURLKey = "site-name",
+			siteUrlKey = "site-name",
 			webContentTitle = "Web Content Title");
 	}
 
@@ -194,7 +196,7 @@ definition {
 			siteName = "Site Name",
 			tableEntryText = "Yes");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -210,7 +212,7 @@ definition {
 
 		Depot.configureDDMStructures(
 			depotName = "Test Remove Customized WC Depot Name",
-			makeWCUnavailable = "true",
+			makeWcUnavailable = "true",
 			siteName = "Site Name",
 			tableEntryText = "No");
 
@@ -229,10 +231,10 @@ definition {
 
 		AssertConsoleTextNotPresent(value1 = "java.lang.NullPointerException");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		WebContent.deleteCP(
-			siteURLKey = "site-name",
+			siteUrlKey = "site-name",
 			webContentTitle = "Web Content Title");
 	}
 
@@ -261,7 +263,7 @@ definition {
 			depotName = "Test Depot Name",
 			groupName = "Site Name");
 
-		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "site-name");
+		PageTemplatesAdmin.openPageTemplatesAdmin(siteUrlKey = "site-name");
 
 		Navigator.gotoNavNested(navNested = "Page Template Collection");
 
@@ -273,7 +275,7 @@ definition {
 			depotName = "Test Depot Name",
 			webContentTitle = "WC Depot WebContent");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "site-name");
+		PagesAdmin.openPagesAdmin(siteUrlKey = "site-name");
 
 		PagesAdmin.addPublicPage(
 			collectionName = "Page Template Collection",
@@ -284,7 +286,9 @@ definition {
 			pageName = "Page Name",
 			siteName = "Site Name");
 
-		WebContent.viewPGViaWCD(webContentContent = "WC WebContent Content");
+		WebContentDisplayPortlet.viewContent(
+			webContentContent = "WC WebContent Content",
+			webContentTitle = "WC Depot WebContent");
 	}
 
 	@description = "This test covers LPS-105119. It ensures that a web content in a depot can be selected through the field."
@@ -305,7 +309,7 @@ definition {
 			depotName = "Test Depot Name",
 			groupName = "Site Name");
 
-		WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "site-name");
+		WebContentStructures.openWebContentStructuresAdmin(siteUrlKey = "site-name");
 
 		WebContentStructures.addCP(
 			structureDescription = "WC Structure Description",
@@ -317,7 +321,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		WebContentNavigator.openWebContentTemplatesAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentTemplatesAdmin(siteUrlKey = "site-name");
 
 		LexiconEntry.gotoAdd();
 
@@ -329,7 +333,7 @@ definition {
 
 		DDLDataDefinition.save();
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -358,7 +362,9 @@ definition {
 			pageName = "Page Name",
 			siteName = "Site Name");
 
-		WebContent.viewPGViaWCD(webContentContent = "WC Depot WebContent");
+		WebContentDisplayPortlet.viewContent(
+			webContentContent = "WC Depot WebContent",
+			webContentTitle = "WC WebContent Title");
 	}
 
 	@description = "This ensures that a depot web content can be selected through the fragment in a content page on a connected site."
@@ -379,7 +385,7 @@ definition {
 			depotName = "Test Fragment Depot Name",
 			groupName = "Site Name");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "site-name");
+		PagesAdmin.openPagesAdmin(siteUrlKey = "site-name");
 
 		ContentPages.addPage(pageName = "Test Content Page Name");
 
@@ -417,7 +423,7 @@ definition {
 			depotName = "Test Depot Name",
 			groupName = "Site Name");
 
-		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "site-name");
+		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "site-name");
 
 		DisplayPageTemplatesAdmin.addDisplayPage(
 			contentType = "Web Content Article",
@@ -437,7 +443,7 @@ definition {
 
 		PageEditor.clickPublish();
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		WebContentNavigator.gotoAddCP();
 
@@ -493,7 +499,9 @@ definition {
 			pageName = "Test Page",
 			siteName = "Site Name");
 
-		WebContent.viewPGViaWCD(webContentContent = "WC WebContent Depot");
+		WebContentDisplayPortlet.viewContent(
+			webContentContent = "WC WebContent Depot",
+			webContentTitle = "WC WebContent Title");
 	}
 
 	@description = "This ensures that a depot web content can be selected through WCD in a content page on a connected site."
@@ -510,22 +518,23 @@ definition {
 			depotName = "Test Depot Name",
 			groupName = "Site Name");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "site-name");
+		PagesAdmin.openPagesAdmin(siteUrlKey = "site-name");
 
 		ContentPages.addPage(pageName = "Test Content Page Name");
 
 		PageEditor.addWidget(portletName = "Web Content Display");
 
 		WebContentDisplayPortlet.selectWebContent(
-			contentPage = "true",
 			depotName = "Test Depot Name",
 			webContentTitle = "WC WebContent Title");
+
+		IFrame.closeFrame();
 
 		PageEditor.clickPublish();
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/site-name/test-content-page-name");
 
-		WebContent.viewPGViaWCD(webContentContent = "WC WebContent Depot");
+		WebContentDisplayPortlet.viewContent(webContentContent = "WC WebContent Depot");
 	}
 
 	@description = "This ensures that a depot web content can be selected through WCD in a display page template on a connected site."
@@ -542,7 +551,7 @@ definition {
 			depotName = "Test Depot Name",
 			groupName = "Site Name");
 
-		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "site-name");
+		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "site-name");
 
 		DisplayPageTemplatesAdmin.addDisplayPage(
 			contentType = "Web Content Article",
@@ -552,13 +561,12 @@ definition {
 		PageEditor.addWidget(portletName = "Web Content Display");
 
 		WebContentDisplayPortlet.selectWebContent(
-			contentPage = "true",
 			depotName = "Test Depot Name",
 			webContentTitle = "WC WebContent Title");
 
-		Refresh();
+		IFrame.closeFrame();
 
-		WebContent.viewPGViaWCD(webContentContent = "WC WebContent Depot");
+		WebContentDisplayPortlet.viewContent(webContentContent = "WC WebContent Depot");
 	}
 
 	@description = "This ensures that a user can use a structure stored in AL to create a template on a connected site."
@@ -588,7 +596,7 @@ definition {
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		WebContentNavigator.openWebContentTemplatesAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentTemplatesAdmin(siteUrlKey = "site-name");
 
 		WebContentTemplates.addCP(
 			structureName = "WC Structure Name",
@@ -648,7 +656,7 @@ definition {
 		}
 
 		for (var count : list "1,2") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+			WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 			WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name${count}");
 
@@ -714,13 +722,13 @@ definition {
 			siteName = "Site Name",
 			tableEntryText = "Yes");
 
-		WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "site-name");
+		WebContentStructures.openWebContentStructuresAdmin(siteUrlKey = "site-name");
 
 		AssertElementNotPresent(
 			key_tableEntry = "WC Structure Name",
 			locator1 = "LexiconTable#TABLE_ENTRY_TITLE");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
@@ -747,7 +755,7 @@ definition {
 			pageName = "Page Name",
 			siteName = "Site Name");
 
-		WebContent.viewPGViaWCD(webContentContent = "Web Content Text");
+		WebContentDisplayPortlet.viewContent(webContentContent = "Web Content Text");
 	}
 
 	@description = "This ensures that a user can see information of WC structure from more iframe about which AL owns it."
@@ -798,7 +806,7 @@ definition {
 		}
 
 		for (var i : list "4,5,6,7,8") {
-			WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "site-name");
+			WebContentStructures.openWebContentStructuresAdmin(siteUrlKey = "site-name");
 
 			WebContentStructures.addCP(
 				structureDescription = "WC Structure Description",
@@ -811,7 +819,7 @@ definition {
 			WebContentStructures.saveCP(structureName = "WC Structure Name${i}");
 		}
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "site-name");
 
 		WebContentNavigator.gotoMoreStructuresViaPlusButton(pageMod = "8 of 10");
 

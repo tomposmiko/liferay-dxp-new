@@ -1,0 +1,216 @@
+@component-name = "portal-user-management-and-portal-configuration"
+definition {
+
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Language Override";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Language Override");
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+	}
+
+	@description = "This test adds a new language key via the Language Override portlet and asserts that a user can search and view it in the main view page."
+	@priority = "5"
+	test CanAddLanguageKey {
+		task ("Given that a user is in the Language Override portlet") {
+			ControlMenu.viewHeaderTitle(headerTitle = "Language Override");
+		}
+
+		task ("When a user clicks on the plus button, fills out the form, and saves it") {
+			LanguageOverride.addLanguageKey(
+				languageKey = "text-contains-error",
+				translationOverrideList = "en-US,fr-FR,pt-BR,es-ES",
+				translationOverrideValueList = "Text contains error,Le texte contient une erreur,O texto contÃƒÂ©m erro,El texto contiene error");
+		}
+
+		task ("Then the language key is successfully saved and can be viewed in the View page") {
+			Search.searchCP(searchTerm = "text-contains-error");
+
+			AssertTextEquals(
+				key_languageKey = "text-contains-error",
+				locator1 = "LanguageOverride#VIEW_PAGE_LANGUAGE_KEY",
+				value1 = "text-contains-error");
+
+			AssertTextEquals(
+				key_translation = "Text contains error",
+				locator1 = "LanguageOverride#VIEW_PAGE_LANGUAGE_KEY_TRANSLATION",
+				value1 = "Text contains error");
+		}
+	}
+
+	@description = "This test asserts that a user can remove all translation overrides on the main view page for language keys that are overridden and doing so will delete the language key"
+	@priority = "5"
+	test CanRemoveAllTranslationOverridesViaMenuItem {
+		task ("Given that a user has created a new language key") {
+			LanguageOverride.addLanguageKey(
+				languageKey = "text-contains-error",
+				translationOverrideList = "en-US,fr-FR,pt-BR,es-ES",
+				translationOverrideValueList = "Text contains error,Le texte contient une erreur,O texto contÃƒÂ©m erro,El texto contiene error");
+		}
+
+		task ("and the user sets the navigation filter to Override") {
+			ManagementBar.setFilterAndOrder(filterBy = "Override");
+		}
+
+		task ("When the user removes all translation overrides via the Menu Item option") {
+			LanguageOverride.removeAllTranslationOverrides(languageKey = "text-contains-error");
+		}
+
+		task ("Then all the translations will be removed and thus deleting the Overridden key") {
+			LanguageOverride.openLanguageOverridePortlet();
+
+			Search.searchCP(searchTerm = "text-contains-error");
+
+			AssertTextEquals(
+				locator1 = "Message#EMPTY_INFO",
+				value1 = "No language entries were found.");
+		}
+	}
+
+	@description = "This test asserts that a user can remove translation override for a selected language for language keys that are overridden via the menu item"
+	@priority = "3"
+	test CanRemoveTranslationOverrideForSelectedLanguageViaMenuItem {
+		task ("Given that a user has created a new language key") {
+			LanguageOverride.addLanguageKey(
+				languageKey = "text-contains-error",
+				translationOverrideList = "en-US,fr-FR,pt-BR,es-ES",
+				translationOverrideValueList = "Text contains error,Le texte contient une erreur,O texto contÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©m erro,El texto contiene error");
+		}
+
+		task ("and the user sets the navigation filter to Override") {
+			ManagementBar.setFilterAndOrder(filterBy = "Override");
+		}
+
+		task ("When the user selects a language and removes translation override for the selected language") {
+			LanguageOverride.removeTranslationOverrideForSelectedLanguage(
+				currentLanguage = "en-US",
+				languageKey = "text-contains-error",
+				newLanguage = "pt-BR");
+		}
+
+		task ("Then only the selected translation override will be removed") {
+			LanguageOverride.openLanguageOverridePortlet();
+
+			Search.searchCP(searchTerm = "text-contains-error");
+
+			LanguageOverride.goToLanguageKey(languageKey = "text-contains-error");
+
+			AssertTextEquals(
+				key_fieldLabel = "pt-BR",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "");
+		}
+	}
+
+	@description = "This test clears all overrides for an overridden language key via the Edit page. Doing so will delete the language key."
+	@priority = "5"
+	test ClearingAllOverridesInEditPageWillDeleteCreatedKey {
+		task ("Given that a user has created a new language key") {
+			LanguageOverride.addLanguageKey(
+				languageKey = "text-contains-error",
+				translationOverrideList = "en-US,es-ES",
+				translationOverrideValueList = "Text contains error,El texto contiene error");
+		}
+
+		task ("and the user is in the Edit language key page") {
+			Search.searchCP(searchTerm = "text-contains-error");
+
+			LanguageOverride.goToLanguageKey(languageKey = "text-contains-error");
+		}
+
+		task ("When the user clicks on Clear All Overrides") {
+			LanguageOverride.clearAllOverridesViaEditPage();
+		}
+
+		task ("Then all the overrides are cleared and the language key no longer exists") {
+			LanguageOverride.openLanguageOverridePortlet();
+
+			Search.searchCP(searchTerm = "text-contains-error");
+
+			AssertTextEquals(
+				locator1 = "Message#EMPTY_INFO",
+				value1 = "No language entries were found.");
+		}
+	}
+
+	@description = "This test updates an existing key's translation override values. It then clears all overrides for the existing language key via the Edit page. Doing so will reset all values. It will not delete the key."
+	@priority = "5"
+	test ClearingAllOverridesInEditPageWillResetValuesForExistingKeys {
+		task ("Given that a user is in the edit page of a language key that is OOTB") {
+			Search.searchCP(searchTerm = "a-configuration-with-this-name-already-exists");
+		}
+
+		task ("and the translation values are updated") {
+			LanguageOverride.updateTranslationOverrideValues(
+				languageKey = "a-configuration-with-this-name-already-exists",
+				translationOverrideList = "nl-NL,de-DE,sv-SE",
+				translationOverrideValueList = "edit1,edit2,edit3");
+
+			ManagementBar.setFilterAndOrder(filterBy = "Override");
+
+			LanguageOverride.goToLanguageKey(languageKey = "a-configuration-with-this-name-already-exists");
+
+			AssertTextEquals(
+				key_fieldLabel = "nl-NL",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "edit1");
+
+			AssertTextEquals(
+				key_fieldLabel = "de-DE",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "edit2");
+
+			AssertTextEquals(
+				key_fieldLabel = "sv-SE",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "edit3");
+		}
+
+		task ("When the user clicks on Clear All Overrides") {
+			LanguageOverride.clearAllOverridesViaEditPage();
+
+			AssertTextEquals(
+				locator1 = "Message#EMPTY_INFO",
+				value1 = "No language entries were found.");
+		}
+
+		task ("Then all the overrides are reset. The existing language key does not get deleted.") {
+			LanguageOverride.openLanguageOverridePortlet();
+
+			Search.searchCP(searchTerm = "a-configuration-with-this-name-already-exists");
+
+			LanguageOverride.goToLanguageKey(languageKey = "a-configuration-with-this-name-already-exists");
+
+			AssertTextEquals(
+				key_fieldLabel = "nl-NL",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "");
+
+			AssertTextEquals(
+				key_fieldLabel = "de-DE",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "");
+
+			AssertTextEquals(
+				key_fieldLabel = "sv-SE",
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "");
+		}
+	}
+
+}

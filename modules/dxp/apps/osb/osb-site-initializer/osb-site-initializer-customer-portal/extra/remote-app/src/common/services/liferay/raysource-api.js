@@ -31,4 +31,24 @@ const fetchLicense = async (
 	return response;
 };
 
-export {fetchLicense};
+const fetchDeveloperKeysLicense = async (
+	accountKey,
+	licenseKeyDownloadURL,
+	sessionId,
+	selectedVersion
+) => {
+	// eslint-disable-next-line @liferay/portal/no-global-fetch
+	const response = await fetch(
+		`${licenseKeyDownloadURL}/accounts/${accountKey}/product-groups/DXP/product-version/${selectedVersion}/development-license-key`,
+
+		{
+			headers: {
+				'Okta-Session-ID': sessionId,
+			},
+		}
+	);
+
+	return response;
+};
+
+export {fetchLicense, fetchDeveloperKeysLicense};

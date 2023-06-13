@@ -126,21 +126,31 @@ definition {
 	}
 
 	@description = "LPS-126047: When DXP is not connected to AC, the metrics icon is shown in the bar above the widget page in the view mode"
-	@ignore = "true"
 	@priority = "3"
 	test MetricsIconNotVisibleInWidgetPageWithoutAC {
+		task ("Create Widget Page") {
+			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-		// TODO LPS-144029 MetricsIconNotVisibleInWidgetPageWithoutAC pending implementation
+			PagesAdmin.addPublicPage(
+				pageName = "Widget Page Name",
+				sitePageType = "Widget Page");
+		}
 
+		task ("Navigate to Widget page") {
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/3");
+		}
+
+		task ("Assert icon is displayed by opening panel") {
+			ContentPerformance.openContentPerformance();
+		}
 	}
 
 	@description = "LPS-127220: When DXP is not connected to AC, the metrics icon is shown in the bar above the content page in the view mode"
-	@ignore = "true"
 	@priority = "3"
 	test MetricsIconVisibleInContentPageWithoutAC {
-
-		// TODO LPS-144028 MetricsIconVisibleInContentPageWithoutAC pending implementation
-
+		task ("Open content performance panel") {
+			ContentPerformance.openContentPerformance();
+		}
 	}
 
 	@description = "LPS-118006: When the DXP is not connected to AC, if the user clicks on the Metrics button, the sidebar panel shows up and displays a button titled Dont show me this again and a message informing the user that the panel will show up again if AC is connected"
@@ -160,13 +170,13 @@ definition {
 				groupName = "Test Site Name",
 				subType = "Basic Web Content");
 
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
 			Button.clickPublish();
 
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteUrlKey = "test-site-name");
 
 			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
 		}

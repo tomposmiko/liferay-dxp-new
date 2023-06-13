@@ -174,12 +174,12 @@ public class SubrepositoryGitRepositoryJob
 					buildProperties.getProperty("base.repository.dir"),
 					"/liferay-jenkins-ee/commands/dependencies",
 					"/test-subrepository-batch.properties")));
-
-		readJobProperties();
 	}
 
 	protected Set<String> getRawDependentBatchNames() {
 		JobProperty jobProperty = getJobProperty("test.batch.names.smoke");
+
+		recordJobProperty(jobProperty);
 
 		return getSetFromString(jobProperty.getValue());
 	}

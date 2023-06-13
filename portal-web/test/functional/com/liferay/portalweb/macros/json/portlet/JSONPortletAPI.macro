@@ -4,12 +4,12 @@ definition {
 	macro _hasPortlet {
 		Variables.assertDefined(parameterList = "${portletId}");
 
-		var portalURL = JSONCompany.getPortalURL();
+		var portalUrl = JSONCompany.getPortalURL();
 
 		var companyId = JSONCompany.getCompanyId();
 
 		var curl = '''
-			${portalURL}/api/jsonws/portlet/has-portlet \
+			${portalUrl}/api/jsonws/portlet/has-portlet \
 				-u test@liferay.com:test \
 				-d companyId=${companyId} \
 				-d portletId=${portletId}

@@ -23,6 +23,33 @@ definition {
 		}
 	}
 
+	@description = "This ensures that a translated zip file contains multiple web contents with multiple available languages can be exported."
+	@priority = "5"
+	test CanExportMultipleWCsWithMultipleLanguages {
+		property osgi.module.configuration.file.names = "com.liferay.journal.web.internal.configuration.FFBulkTranslationConfiguration.config";
+		property osgi.module.configurations = "bulkTranslationEnabled=&quot;true&quot;";
+
+		for (var i : list "1,2,3") {
+			JSONWebcontent.addWebContent(
+				content = "Web Content${i}",
+				description = "Description${i}",
+				groupName = "Guest",
+				title = "Web Content Title${i}");
+		}
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+
+		Translations.gotoBulkExportTranslation(
+			exportTranslationEntry = "Web Content Title1,Web Content Title3",
+			toolbarOptions = "true");
+
+		Translations.exportTranslation(
+			defaultLanguage = "English (United States)",
+			languageList = "French (France),Japanese (Japan),Spanish (Spain)");
+
+		Translations.assertFileNameFromTempFolder(webContentTitle = "Web Content Title3");
+	}
+
 	@description = "This ensures that a translated zip file with all available language can be exported."
 	@priority = "5"
 	@refactordone
@@ -32,7 +59,7 @@ definition {
 			groupName = "Guest",
 			title = "Web Content Title");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.gotoExportTranslation(webContentTitle = "Web Content Title");
 
@@ -54,7 +81,7 @@ definition {
 			groupName = "Guest",
 			title = "Web Content Title");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.gotoExportTranslation(webContentTitle = "Web Content Title");
 
@@ -63,47 +90,6 @@ definition {
 			languageList = "Spanish (Spain)");
 
 		Translations.assertFileNameFromTempFolder(webContentTitle = "Web Content Title");
-	}
-
-	@description = "This is a test for LPS-136977. It checks that a user can export translation with long inputs."
-	@priority = "4"
-	test CanExportWithLongInputs {
-		JSONWebcontent.addWebContent(
-			content = "Since 2004 Liferay has been helping its customers, employees, partners, and community reach their full potential to serve others. With open source roots, Liferay has grown to over 900 employees in 23 offices across the globe. Serving a wide range of enterprises, we strive to stay true to our core values: Produce Excellence, Lead by Serving, Value People, Grow and Get Better.",
-			groupName = "Guest",
-			title = "Long Inputs For Web Content Title To Check The Translations Exporting Process");
-
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
-
-		Translations.gotoExportTranslation(webContentTitle = "Long Inputs For Web Content Title To Check The Translations Exporting Process");
-
-		Translations.exportTranslation(
-			defaultLanguage = "English (United States)",
-			languageList = "Spanish (Spain)");
-
-		Translations.assertFileNameFromTempFolder(webContentTitle = "Long Inputs For Web Content Title To Check The Translations Exporting Process");
-	}
-
-	@description = "This is a test for LPS-136978. It checks that a user can export translation with special characters."
-	@priority = "4"
-	test CanExportWithSpecialCharacters {
-		WebContentNavigator.openToAddBasicArticle(
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		WebContent.addCP(
-			webContentContent = '''Web Content Content &gt;!&#<>''',
-			webContentTitle = '''Web Content Title &gt;!&#<>''');
-
-		PortletEntry.publish();
-
-		Translations.gotoExportTranslation(webContentTitle = "Web Content Title");
-
-		Translations.exportTranslation(
-			defaultLanguage = "English (United States)",
-			languageList = "Spanish (Spain)");
-
-		Translations.assertFileNameFromTempFolder(webContentTitle = '''Web Content Title &gt;!&#''');
 	}
 
 	@description = "This ensures that user can import the exported xliff file with 1.2 version."
@@ -116,7 +102,7 @@ definition {
 			groupName = "Guest",
 			title = "WebContentTitle");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.gotoExportTranslation(webContentTitle = "WebContentTitle");
 
@@ -137,7 +123,7 @@ definition {
 			webContentDescription = "Description",
 			webContentTitle = "WebContentTitle");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.importTranslation(
 			fileName = "WebContentTitle-en_US-es_ES.xlf",
@@ -154,6 +140,78 @@ definition {
 			webContentTitle = "Titulodelcontenidoweb");
 	}
 
+	@description = "This ensures that the translation files contians multiple web contents can be imported from a zip."
+	@priority = "5"
+	test CanImportMultipleWCs {
+		property osgi.module.configuration.file.names = "com.liferay.journal.web.internal.configuration.FFBulkTranslationConfiguration.config";
+		property osgi.module.configurations = "bulkTranslationEnabled=&quot;true&quot;";
+
+		for (var i : list "1,2,3") {
+			JSONWebcontent.addWebContent(
+				content = "WebContent${i}",
+				description = "Description${i}",
+				groupName = "Guest",
+				title = "WebContentTitle${i}");
+		}
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+
+		Translations.gotoBulkExportTranslation(exportTranslationEntry = "WebContentTitle1,WebContentTitle3");
+
+		Translations.exportTranslation(
+			defaultLanguage = "English (United States)",
+			languageList = "Spanish (Spain)");
+
+		Translations.translateFile(
+			contentTranslation = "Contenidoweb1",
+			descriptionTranslation = "Descripcion1",
+			encoding = "false",
+			operation = "unzip",
+			titleTranslation = "Titulodelcontenidoweb1",
+			translationFileName = "WebContentTitle1-en_US-es_ES",
+			translationZipFileName = "WebContentTitle3-en_US",
+			webContentContent = "WebContent1",
+			webContentDescription = "Description1",
+			webContentTitle = "WebContentTitle1");
+
+		Translations.translateFile(
+			contentTranslation = "Contenidoweb3",
+			descriptionTranslation = "Descripcion3",
+			encoding = "false",
+			operation = "zip",
+			titleTranslation = "Titulodelcontenidoweb3",
+			translationFileName = "WebContentTitle3-en_US-es_ES",
+			translationZipFileName = "WebContentTitle3-en_US",
+			webContentContent = "WebContent3",
+			webContentDescription = "Description3",
+			webContentTitle = "WebContentTitle3");
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+
+		Translations.gotoBulkImportTranslation();
+
+		Translations.importTranslation(
+			fileName = "WebContentTitle3-en_US_translated.zip",
+			filePath = "");
+
+		for (var i : list "1,3") {
+			WebContentNavigator.gotoEditCP(webContentTitle = "WebContentTitle${i}");
+
+			PortletEntry.changeLocale(locale = "es-ES");
+
+			WebContent.viewCP(
+				webContentContent = "Contenidoweb${i}",
+				webContentDescription = "Descripcion${i}",
+				webContentTitle = "Titulodelcontenidoweb${i}");
+
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		}
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "WebContentTitle2");
+
+		Translations.viewUntranslatedStatus(locale = "es-ES");
+	}
+
 	@description = "This ensures that the translation files can be imported from a zip."
 	@priority = "5"
 	@refactordone
@@ -164,7 +222,7 @@ definition {
 			groupName = "Guest",
 			title = "WebContentTitle");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.gotoExportTranslation(webContentTitle = "WebContentTitle");
 
@@ -196,7 +254,7 @@ definition {
 			webContentDescription = "Description",
 			webContentTitle = "WebContentTitle");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.importTranslation(
 			fileName = "WebContentTitle-en_US_translated.zip",
@@ -232,7 +290,7 @@ definition {
 			groupName = "Guest",
 			title = "WebContentTitle");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.gotoExportTranslation(webContentTitle = "WebContentTitle");
 
@@ -277,7 +335,7 @@ definition {
 			groupName = "Guest",
 			title = "WebContentTitle");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.gotoExportTranslation(webContentTitle = "WebContentTitle");
 
@@ -297,7 +355,7 @@ definition {
 			webContentDescription = "Description",
 			webContentTitle = "WebContentTitle");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.importTranslation(
 			fileName = "WebContentTitle-en_US-ja_JP_utf8.xlf",
@@ -326,7 +384,7 @@ definition {
 			groupName = "Guest",
 			title = "WebContentTitle");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.gotoExportTranslation(webContentTitle = "WebContentTitle");
 
@@ -347,7 +405,7 @@ definition {
 			webContentDescription = "Description",
 			webContentTitle = "WebContentTitle");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
 		Translations.importTranslation(
 			fileName = "WebContentTitle-en_US-de_DE.xliff",
@@ -367,15 +425,18 @@ definition {
 	@description = "This is a test for LPS-136979. It checks that a user can import translation with long inputs."
 	@priority = "4"
 	test CanImportWithLongInputs {
+		property osgi.module.configuration.file.names = "com.liferay.journal.web.internal.configuration.FFBulkTranslationConfiguration.config";
+		property osgi.module.configurations = "bulkTranslationEnabled=&quot;true&quot;";
+
 		JSONWebcontent.addWebContent(
 			content = "WebContentContent",
 			description = "Description",
 			groupName = "Guest",
 			title = "LongInputsForWebContentTitleToCheckTheTranslationsExportingAndImportingProcess");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		WebContentNavigator.openWebContentAdmin(siteUrlKey = "guest");
 
-		Translations.gotoExportTranslation(webContentTitle = "LongInputsForWebContentTitleToCheckTheTranslationsExportingAndImportingProcess");
+		Translations.gotoBulkExportTranslation(exportTranslationEntry = "LongInputsForWebContentTitleToCheckTheTranslationsExportingAndImportingProcess");
 
 		Translations.exportTranslation(
 			defaultLanguage = "English (United States)",
@@ -413,7 +474,7 @@ definition {
 	test CanImportWithSpecialCharacters {
 		WebContentNavigator.openToAddBasicArticle(
 			groupName = "Guest",
-			siteURLKey = "guest");
+			siteUrlKey = "guest");
 
 		WebContent.addCP(
 			webContentContent = "WebContentContent@!#",
@@ -453,6 +514,113 @@ definition {
 			webContentContent = "Contenidoweb@!#",
 			webContentDescription = "Descripcion@!#",
 			webContentTitle = "Titulodelcontenidoweb@!&#");
+	}
+
+	@description = "This ensures that only the valid translation files can be imported from a zip."
+	@priority = "5"
+	test CanPartiallyImportMultipleWCs {
+		property osgi.module.configuration.file.names = "com.liferay.journal.web.internal.configuration.FFBulkTranslationConfiguration.config";
+		property osgi.module.configurations = "bulkTranslationEnabled=&quot;true&quot;";
+
+		for (var i : list "1,2,3") {
+			JSONWebcontent.addWebContent(
+				content = "WebContent${i}",
+				description = "Description${i}",
+				groupName = "Guest",
+				title = "WebContentTitle${i}");
+		}
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+
+		Translations.gotoBulkExportTranslation(exportTranslationEntry = "WebContentTitle1,WebContentTitle3");
+
+		Translations.exportTranslation(
+			defaultLanguage = "English (United States)",
+			languageList = "Japanese (Japan),Spanish (Spain)");
+
+		Translations.translateFile(
+			contentTranslation = "Contenidoweb1",
+			descriptionTranslation = "Descripcion1",
+			encoding = "false",
+			operation = "unzip",
+			titleTranslation = "Titulodelcontenidoweb1",
+			translationFileName = "WebContentTitle1-en_US-es_ES",
+			translationZipFileName = "WebContentTitle3-en_US",
+			webContentContent = "WebContent1",
+			webContentDescription = "Description1",
+			webContentTitle = "WebContentTitle1");
+
+		Translations.updateTranslateFileID(
+			translationEntryType = "JournalArticle",
+			translationFileName = "WebContentTitle1-en_US-ja_JP",
+			translationZipFileName = "WebContentTitle3-en_US");
+
+		Translations.translateFile(
+			contentTranslation = "Webコンテンツ3",
+			descriptionTranslation = "説明3",
+			encoding = "utf8",
+			operation = "false",
+			titleTranslation = "Webコンテンツのタイトル3",
+			translationFileName = "WebContentTitle3-en_US-ja_JP",
+			translationZipFileName = "WebContentTitle3-en_US",
+			webContentContent = "WebContent3",
+			webContentDescription = "Description3",
+			webContentTitle = "WebContentTitle3");
+
+		Translations.translateFile(
+			contentTranslation = "Contenidoweb3",
+			descriptionTranslation = "Descripcion3",
+			encoding = "false",
+			operation = "zip",
+			titleTranslation = "Titulodelcontenidoweb3",
+			translationFileName = "WebContentTitle3-en_US-es_ES",
+			translationZipFileName = "WebContentTitle3-en_US",
+			webContentContent = "WebContent3",
+			webContentDescription = "Description3",
+			webContentTitle = "WebContentTitle3");
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+
+		Translations.gotoBulkImportTranslation();
+
+		Translations.importTranslation(
+			errorMessage = "1 Error: Some files could not be published, check them and upload another file.",
+			errorMessageItem = "The translation file does not correspond to this web content.",
+			failFileName = "WebContentTitle1-en_US-ja_JP.xlf",
+			fileName = "WebContentTitle3-en_US_translated.zip",
+			filePath = "",
+			successFileName = "WebContentTitle1-en_US-es_ES.xlf",
+			successFileName2 = "WebContentTitle3-en_US-es_ES.xlf",
+			successFileName3 = "WebContentTitle3-en_US-ja_JP_utf8.xlf",
+			successFileNumber = "3 Files Published");
+
+		for (var i : list "1,3") {
+			WebContentNavigator.gotoEditCP(webContentTitle = "WebContentTitle${i}");
+
+			PortletEntry.changeLocale(locale = "es-ES");
+
+			WebContent.viewCP(
+				webContentContent = "Contenidoweb${i}",
+				webContentDescription = "Descripcion${i}",
+				webContentTitle = "Titulodelcontenidoweb${i}");
+
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		}
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "WebContentTitle1");
+
+		Translations.viewUntranslatedStatus(locale = "ja-JP");
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "WebContentTitle3");
+
+		PortletEntry.changeLocale(locale = "ja-JP");
+
+		WebContent.viewCP(
+			webContentContent = "Webコンテンツ3",
+			webContentDescription = "説明3",
+			webContentTitle = "Webコンテンツのタイトル3");
 	}
 
 }

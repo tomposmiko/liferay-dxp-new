@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.image;
 
 import com.liferay.portal.kernel.exception.ImageResolutionException;
 import com.liferay.portal.kernel.model.Image;
+import com.liferay.portal.kernel.util.ServiceProxyFactory;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -52,7 +53,7 @@ public class ImageToolUtil {
 	public static Future<RenderedImage> convertCMYKtoRGB(
 		byte[] bytes, String type) {
 
-		return _imageTool.convertCMYKtoRGB(bytes, type);
+		return CMYKImageToolHolder._cmykImageTool.convertCMYKtoRGB(bytes, type);
 	}
 
 	/**
@@ -290,5 +291,14 @@ public class ImageToolUtil {
 	}
 
 	private static ImageTool _imageTool;
+
+	private static class CMYKImageToolHolder {
+
+		private static volatile CMYKImageTool _cmykImageTool =
+			ServiceProxyFactory.newServiceTrackedInstance(
+				CMYKImageTool.class, CMYKImageToolHolder.class,
+				"_cmykImageTool", true);
+
+	}
 
 }

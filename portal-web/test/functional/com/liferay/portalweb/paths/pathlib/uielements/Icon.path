@@ -176,6 +176,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EXPORT_FOR_TRANSLATION</td>
+	<td>//*[*[name()='svg'][contains(@class,'import-export')]]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>EXPORT_DISABLED</td>
 	<td>//button[*[name()='svg'][contains(@class,'icon-download')] and @disabled]</td>
 	<td></td>
@@ -192,7 +197,7 @@
 </tr>
 <tr>
 	<td>FRIENDLY_URL_HISTORY_ITEM_DELETE</td>
-	<td>//*[normalize-space()='${key_oldFriendlyURL}']//following-sibling::button</td>
+	<td>//*[normalize-space()='${key_oldFriendlyUrl}']//following-sibling::button</td>
 	<td></td>
 </tr>
 <tr>

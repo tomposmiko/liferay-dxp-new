@@ -15,7 +15,6 @@ import {useApplicationProvider} from '../../../common/context/ApplicationPropert
 import {Liferay} from '../../../common/services/liferay';
 import {fetchSession} from '../../../common/services/liferay/api';
 import {
-	getAccountRoles,
 	getAccountSubscriptionGroups,
 	getKoroneikiAccounts,
 	getStructuredContentFolders,
@@ -57,6 +56,7 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 
 	const [state, dispatch] = useReducer(reducer, {
 		assetsPath,
+		isQuickLinksExpanded: true,
 		page,
 		project: undefined,
 		quickLinks: undefined,
@@ -79,7 +79,7 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 	}, []);
 
 	useEffect(() => {
-		const getUser = async () => {
+		const getUser = async (projectExternalReferenceCode) => {
 			const {data} = await client.query({
 				query: getUserAccount,
 				variables: {
@@ -88,16 +88,16 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 			});
 
 			if (data) {
-				const {data: accountRolesData} = await client.query({
-					query: getAccountRoles,
-					variables: {
-						accountId: data.userAccount.id,
-					},
-				});
-
-				const isAccountAdministrator = !!accountRolesData.accountAccountRoles?.items?.find(
-					({name}) => name === ROLES_PERMISSIONS.ACCOUNT_ADMINISTRATOR
-				);
+				const isAccountAdministrator = !!data.userAccount?.accountBriefs
+					?.find(
+						({externalReferenceCode}) =>
+							externalReferenceCode ===
+							projectExternalReferenceCode
+					)
+					?.roleBriefs?.find(
+						({name}) =>
+							name === ROLES_PERMISSIONS.ACCOUNT_ADMINISTRATOR
+					);
 
 				const userAccount = {
 					...data.userAccount,
@@ -190,10 +190,10 @@ const AppContextProvider = ({assetsPath, children, page}) => {
 		};
 
 		const fetchData = async () => {
-			const user = await getUser();
 			const projectExternalReferenceCode = SearchParams.get(
 				PARAMS_KEYS.PROJECT_APPLICATION_EXTERNAL_REFERENCE_CODE
 			);
+			const user = await getUser(projectExternalReferenceCode);
 
 			if (user && getCurrentPageName() === 'overview') {
 				const isValid = await isValidPage(

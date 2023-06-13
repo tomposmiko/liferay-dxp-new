@@ -13,8 +13,10 @@ import ClayForm, {ClaySelect} from '@clayui/form';
 import React, {useState} from 'react';
 
 import SidebarPanel from '../../SidebarPanel';
+import Role from '../assignments/select-assignment/Role';
 import AssetCreator from './select-assignment/AssetCreator';
 import ResourceActions from './select-assignment/ResourceActions';
+import User from './select-assignment/User';
 
 const options = [
 	{
@@ -30,12 +32,10 @@ const options = [
 		value: 'resourceActions',
 	},
 	{
-		disabled: true,
 		label: Liferay.Language.get('role'),
 		value: 'role',
 	},
 	{
-		disabled: true,
 		label: Liferay.Language.get('user'),
 		value: 'user',
 	},
@@ -54,10 +54,13 @@ const options = [
 const AssignmentSectionComponents = {
 	assetCreator: AssetCreator,
 	resourceActions: ResourceActions,
+	role: Role,
+	user: User,
 };
 
 const Assignments = (props) => {
 	const [section, setSection] = useState('');
+	const [sections, setSections] = useState([{identifier: `${Date.now()}-0`}]);
 
 	const AssignmentSectionComponent = AssignmentSectionComponents[section];
 
@@ -78,6 +81,7 @@ const Assignments = (props) => {
 						id="assignment-type"
 						onChange={(event) => {
 							setSection(event.target.value);
+							setSections([{identifier: `${Date.now()}-0`}]);
 						}}
 					>
 						{options.map((item) => (
@@ -92,9 +96,20 @@ const Assignments = (props) => {
 				</ClayForm.Group>
 			</SidebarPanel>
 
-			{AssignmentSectionComponent && (
-				<AssignmentSectionComponent {...props} />
-			)}
+			{sections.map(({identifier}, index) => {
+				return (
+					AssignmentSectionComponent && (
+						<AssignmentSectionComponent
+							{...props}
+							displayDelete={sections?.length > 1}
+							identifier={identifier}
+							index={index}
+							key={`section-${identifier}`}
+							setSections={setSections}
+						/>
+					)
+				);
+			})}
 		</>
 	);
 };

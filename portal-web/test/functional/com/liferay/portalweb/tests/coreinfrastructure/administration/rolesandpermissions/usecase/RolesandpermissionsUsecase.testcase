@@ -423,7 +423,7 @@ definition {
 
 		Bookmark.addPG(
 			bookmarkName = "Test Bookmark1 Name",
-			bookmarkURL = "https://www.liferay.com",
+			bookmarkUrl = "https://www.liferay.com",
 			bookmarkViewableBy = "Owner");
 
 		Navigator.gotoPage(pageName = "Bookmarks Page");
@@ -455,7 +455,7 @@ definition {
 
 		Bookmark.addPG(
 			bookmarkName = "Test Bookmark2 Name",
-			bookmarkURL = "https://www.google.com",
+			bookmarkUrl = "https://www.google.com",
 			bookmarkViewableBy = "Owner");
 
 		Navigator.gotoSitePage(
@@ -514,11 +514,11 @@ definition {
 
 		Bookmark.gotoPG(
 			bookmarkName = "Test Bookmark1 Name",
-			bookmarkURL = "https://www.liferay.com");
+			bookmarkUrl = "https://www.liferay.com");
 
 		Bookmark.viewEntry(
 			bookmarkName = "Test Bookmark1 Name",
-			bookmarkURL = "https://www.liferay.com");
+			bookmarkUrl = "https://www.liferay.com");
 
 		Navigator.gotoSitePage(
 			pageName = "Bookmarks Page",
@@ -526,7 +526,7 @@ definition {
 
 		Bookmark.viewNoPG(
 			bookmarkName = "Test Bookmark2 Name",
-			bookmarkURL = "https://www.google.com");
+			bookmarkUrl = "https://www.google.com");
 
 		User.logoutPG();
 
@@ -612,7 +612,7 @@ definition {
 			siteTemplateName = "Site Template Name");
 
 		Portlet.addPG(
-			defaultURL = "false",
+			defaultUrl = "false",
 			portletName = "Message Boards");
 
 		Close.closeAndSelectWindow(locator1 = "Site Templates - ${siteName}");
@@ -996,7 +996,7 @@ definition {
 
 		Bookmark.addPG(
 			bookmarkName = "Test Bookmark Name",
-			bookmarkURL = "https://www.liferay.com",
+			bookmarkUrl = "https://www.liferay.com",
 			bookmarkViewableBy = "Owner");
 
 		Navigator.gotoPage(pageName = "Bookmarks Page");
@@ -1033,7 +1033,7 @@ definition {
 
 		Bookmark.viewNoPG(
 			bookmarkName = "Test Bookmark Name",
-			bookmarkURL = "https://www.liferay.com");
+			bookmarkUrl = "https://www.liferay.com");
 
 		User.logoutPG();
 
@@ -1060,7 +1060,7 @@ definition {
 
 		Bookmark.viewBookmark(
 			bookmarkName = "Test Bookmark Name",
-			bookmarkURL = "https://www.liferay.com");
+			bookmarkUrl = "https://www.liferay.com");
 
 		Navigator.gotoPage(pageName = "Bookmarks Page");
 
@@ -1108,7 +1108,7 @@ definition {
 
 		Navigator.openURL();
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "Site Name");
+		PagesAdmin.openPagesAdmin(siteUrlKey = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "People",
@@ -1128,18 +1128,18 @@ definition {
 			teamName = "Site Team Name",
 			userScreenName = "usersn1");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "Site Name");
+		PagesAdmin.openPagesAdmin(siteUrlKey = "Site Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
 		PagesAdmin.addPublicPage(
-			pageName = "USA Ice Hockey Team Blog",
-			pageTemplateName = "Blog");
+			pageName = "USA Ice Hockey Team Search",
+			pageTemplateName = "Search");
 
 		PermissionsInline.gotoPagePG(
-			pageName = "USA Ice Hockey Team Blog",
+			pageName = "USA Ice Hockey Team Search",
 			site = "Site Name");
 
 		Role.removePermissionPG(
@@ -1167,15 +1167,14 @@ definition {
 			userEmailAddress = "userea1@liferay.com");
 
 		Navigator.gotoSitePage(
-			pageName = "USA Ice Hockey Team Blog",
+			pageName = "USA Ice Hockey Team Search",
 			siteName = "Site Name");
 
-		for (var portletTitleName : list "Blogs,Tag Cloud,Recent Bloggers") {
-			var key_portletTitleName = "${portletTitleName}";
-
-			AssertTextEquals(
-				locator1 = "Portlet#SPECIFIC_TITLE",
-				value1 = "${portletTitleName}");
+		for (var portletName : list "SearchBar,Suggestions,SiteFacet,TypeFacet,TagFacet,CategoryFacet,FolderFacet,UserFacet,ModifiedFacet,SearchResults,SearchOptions") {
+			AssertVisible(
+				key_decorator = "barebone",
+				key_portletTitleName = "${portletName}",
+				locator1 = "Portlet#SPECIFIC_PORTLET_BORDER_DECORATOR");
 		}
 
 		User.logoutPG();
@@ -1185,7 +1184,7 @@ definition {
 			userEmailAddress = "userea2@liferay.com");
 
 		AssertElementNotPresent(
-			key_pageName = "USA Ice Hockey Team Blog",
+			key_pageName = "USA Ice Hockey Team Search",
 			locator1 = "Home#PAGE");
 
 		User.logoutPG();

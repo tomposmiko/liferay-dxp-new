@@ -48,7 +48,7 @@ definition {
 
 		Portlet.gotoPortletOptions(portletOption = "Configuration");
 
-		IFrame.addCP(sourceURL = "http://iscaliforniaonfire.com");
+		IFrame.addCP(sourceUrl = "http://iscaliforniaonfire.com");
 
 		Navigator.gotoPage(pageName = "IFrame Page");
 
@@ -81,11 +81,9 @@ definition {
 
 		Navigator.gotoPage(pageName = "Test Page Name");
 
-		Content.addPG(
-			assetTitle = "DHS Title",
-			webContentContent = "DHS Content");
+		WidgetPages.addRecentContent(assetTitle = "DHS Title");
 
-		WebContent.viewPGViaWCD(
+		WebContentDisplayPortlet.viewContent(
 			webContentContent = "DHS Content",
 			webContentTitle = "DHS Title");
 

@@ -186,21 +186,31 @@ definition {
 	}
 
 	@description = "LPS-136595 - Verify it is not possible to leave Name field empty for a Picklist item"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotLeavePicklistItemNameFieldEmpty {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-145706 CannotLeavePicklistItemNameFieldEmpty pending implementation
+		Picklist.gotoPicklists();
 
+		Picklist.optionsPicklist(
+			picklistName = "Picklist Test",
+			picklistOption = "View");
+
+		Picklist.addPicklistItemViaUI(picklistItemKey = "PicklistItemKeyTest");
+
+		Picklist.clickSaveButton();
+
+		AssertElementPresent(locator1 = "ObjectAdmin#OBJECT_FIELDS_REQUIRED_ERROR_MESSAGE");
 	}
 
 	@description = "LPS-136595 - Verify it is not possible to leave Name field empty for Picklist"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotLeavePicklistNameFieldEmpty {
+		Picklist.gotoPicklists();
 
-		// TODO LPS-145703 CannotLeavePicklistNameFieldEmpty pending implementation
+		Picklist.addPicklistViaUI(picklistName = "");
 
+		AssertElementPresent(locator1 = "ObjectAdmin#OBJECT_FIELDS_REQUIRED_ERROR_MESSAGE");
 	}
 
 	@description = "LPS-136595 - Verify it is not possible to update a Picklist item's key"
@@ -275,12 +285,44 @@ definition {
 	}
 
 	@description = "LPS-136595 - Verify it is possible to set a different language for Picklists item's name"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanSetDifferentPicklistItemNameLanguage {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-139769 CanSetDifferentPicklistItemNameLanguage pending implementation
+		Picklist.addPicklistItemViaAPI(
+			itemKey = "ItemTest",
+			itemName = "Picklist Item",
+			picklistName = "Picklist Test");
 
+		Picklist.gotoPicklists();
+
+		Picklist.optionsPicklist(
+			picklistName = "Picklist Test",
+			picklistOption = "View");
+
+		Picklist.optionsPicklistItem(
+			itemKey = "ItemTest",
+			picklistItemOption = "View");
+
+		Picklist.addLanguageOnPicklistItem(
+			itemName = "Teste de entrada",
+			newlanguage = "pt-BR");
+
+		Button.clickSave();
+
+		Refresh();
+
+		Picklist.optionsPicklist(
+			picklistName = "Picklist Test",
+			picklistOption = "View");
+
+		Picklist.optionsPicklistItem(
+			itemKey = "ItemTest",
+			picklistItemOption = "View");
+
+		Picklist.assertPicklistItemByLanguage(
+			language = "pt-BR",
+			nameItem = "Teste de entrada");
 	}
 
 	@description = "LPS-136595 - Verify it is possible to set a different language for Picklists item's name when updating it"
@@ -293,32 +335,94 @@ definition {
 	}
 
 	@description = "LPS-136595 - Verify it is possible to set a different language for a Picklist name"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test CanSetDifferentPicklistNameLanguage {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-139768 CanSetDifferentPicklistNameLanguage pending implementation
+		Picklist.gotoPicklists();
 
+		Picklist.optionsPicklist(
+			picklistName = "Picklist Test",
+			picklistOption = "View");
+
+		Picklist.addLanguageOnPicklist(
+			itemName = "Teste na lista",
+			newlanguage = "pt-BR");
+
+		Button.clickSave();
+
+		Refresh();
+
+		Picklist.optionsPicklist(
+			picklistName = "Picklist Test",
+			picklistOption = "View");
+
+		Picklist.assertPicklistNameByLanguage(
+			language = "pt-BR",
+			nameItem = "Teste na lista");
 	}
 
 	@description = "LPS-136595 - Verify it is possible to update a Picklist item's name"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanUpdatePicklistItemName {
 		property portal.acceptance = "true";
 
-		// TODO LPS-145708 CanUpdatePicklistItemName pending implementation
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
+		Picklist.addPicklistItemViaAPI(
+			itemKey = "entryTest",
+			itemName = "Entry Test",
+			picklistName = "Picklist Test");
+
+		Picklist.gotoPicklists();
+
+		Picklist.optionsPicklist(
+			picklistName = "Picklist Test",
+			picklistOption = "View");
+
+		Picklist.assertPicklistItemInTable(
+			picklistItemKey = "entryTest",
+			picklistItemName = "Entry Test");
+
+		Picklist.updatePicklistItemName(
+			itemkey = "entryTest",
+			newItemName = "Update Entry");
+
+		Button.clickSave();
+
+		Refresh();
+
+		Picklist.optionsPicklist(
+			picklistName = "Picklist Test",
+			picklistOption = "View");
+
+		Picklist.assertPicklistItemInTable(
+			picklistItemKey = "entryTest",
+			picklistItemName = "Update Entry");
 	}
 
 	@description = "LPS-136595 - Verify it is possible to update a Picklist name"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanUpdatePicklistName {
 		property portal.acceptance = "true";
 
-		// TODO LPS-145705 CanUpdatePicklistName pending implementation
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
+		Picklist.gotoPicklists();
+
+		Picklist.assertPicklist(picklistName = "Picklist Test");
+
+		Picklist.optionsPicklist(
+			picklistName = "Picklist Test",
+			picklistOption = "View");
+
+		Picklist.updatePicklistName(picklistName = "Update Picklist");
+
+		Button.clickSave();
+
+		Refresh();
+
+		Picklist.assertPicklist(picklistName = "Update Picklist");
 	}
 
 	@description = "LPS-136595 - Verify it is possible to view a Picklist"
@@ -381,21 +485,88 @@ definition {
 	}
 
 	@description = "LPS-140407 - Verify that the Key field is autofilled when the Name field is filled"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test KeyFieldIsAutofilled {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-145707 KeyFieldIsAutofilled pending implementation
+		Picklist.gotoPicklists();
 
+		Picklist.gotoPicklistView(picklistName = "Picklist Test");
+
+		Picklist.addPicklistItemViaUI(picklistItemName = "Item Test");
+
+		Picklist.assertItemNameAndItemKeyOnModal(
+			itemKey = "itemTest",
+			itemName = "Item Test");
 	}
 
 	@description = "LPS-136595 - Verify that the translated Picklist item's name will be displayed on the Object layout"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test ViewTranslatedPicklistItemNameOnObjectLayout {
+		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
-		// TODO LPS-139770 ViewTranslatedPicklistItemNameOnObjectLayout pending implementation
+		Picklist.addPicklistItemViaAPI(
+			itemKey = "entryTest",
+			itemName = "Entry Test",
+			picklistName = "Picklist Test");
 
+		Picklist.gotoPicklists();
+
+		Picklist.gotoPicklistView(picklistName = "Picklist Test");
+
+		Picklist.assertPicklistDetails(title = "Items");
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		Picklist.addLanguageOnPicklistItem(
+			itemName = "Teste de entrada",
+			newlanguage = "pt-BR");
+
+		Button.clickSave();
+
+		Navigator.openURL();
+
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		ObjectAdmin.addObjectFieldViaUI(
+			fieldLabel = "Field Picklist",
+			fieldPicklist = "Picklist Test",
+			fieldType = "Picklist");
+
+		Navigator.openURL();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectAdmin.addObjectPicklistFieldEntryViaUI(picklistOption = "Entry Test");
+
+		User.openUsersAdmin();
+
+		User.editDisplaySettingsCP(
+			languageName = "português (Brasil)",
+			userScreenName = "test");
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectPortlet.viewEntry(entry = "Teste de entrada");
+
+		LexiconEntry.gotoAdd();
+
+		Picklist.assertEntryRelationshipFieldPicklist(
+			newEntry = "Teste de entrada",
+			selectField = "Escolha");
 	}
 
 	@description = "LPS-136595 - Verify that the updating or deleting a picklist item warn message is displayed"

@@ -70,8 +70,6 @@ public class PortalEnvironmentJob
 			new File(
 				jenkinsGitWorkingDirectory.getWorkingDirectory(),
 				"commands/dependencies/test-environment.properties"));
-
-		readJobProperties();
 	}
 
 	protected String getPortalBranchName() {
@@ -81,6 +79,8 @@ public class PortalEnvironmentJob
 	@Override
 	protected Set<String> getRawBatchNames() {
 		JobProperty jobProperty = getJobProperty("environment.job.names");
+
+		recordJobProperty(jobProperty);
 
 		return getSetFromString(jobProperty.getValue());
 	}

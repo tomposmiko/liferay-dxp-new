@@ -41,6 +41,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONObject;
+
 /**
  * @author Yi-Chen Tsai
  */
@@ -49,6 +51,29 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 	@Override
 	public int getAxisCount() {
 		return axisTestClassGroups.size();
+	}
+
+	@Override
+	public JSONObject getJSONObject() {
+		JSONObject jsonObject = super.getJSONObject();
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("(");
+		sb.append(getTestBatchRunPropertyQuery());
+		sb.append(") AND (ignored == null)");
+
+		String testRunEnvironment = PropsUtil.get("test.run.environment");
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(testRunEnvironment)) {
+			sb.append(" AND (test.run.environment == \"");
+			sb.append(testRunEnvironment);
+			sb.append("\" OR test.run.environment == null)");
+		}
+
+		jsonObject.put("pql_query", sb.toString());
+
+		return jsonObject;
 	}
 
 	public List<File> getTestBaseDirs() {
@@ -113,6 +138,8 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 
 		JobProperty jobProperty = getJobProperty(
 			"test.batch.run.property.query", testSuiteName, batchName);
+
+		recordJobProperty(jobProperty);
 
 		return jobProperty.getValue();
 	}
@@ -243,6 +270,8 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 				continue;
 			}
 
+			recordJobProperty(jobProperty);
+
 			for (String functionalRequiredModuleDirPath :
 					jobPropertyValue.split(",")) {
 
@@ -313,9 +342,13 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 
 			String jobPropertyValue = jobProperty.getValue();
 
-			if (JenkinsResultsParserUtil.isNullOrEmpty(jobPropertyValue)) {
+			if (JenkinsResultsParserUtil.isNullOrEmpty(jobPropertyValue) ||
+				jobPropertyValue.equals("false")) {
+
 				continue;
 			}
+
+			recordJobProperty(jobProperty);
 
 			if (sb.length() > 0) {
 				sb.append(" OR (");
@@ -328,15 +361,16 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 			sb.append(")");
 		}
 
-		if (sb.length() == 0) {
-			sb.append("(");
-
-			sb.append(
-				getDefaultTestBatchRunPropertyQuery(
-					testBaseDir, testSuiteName));
-
-			sb.append(")");
+		if (sb.length() > 0) {
+			sb.append(" OR ");
 		}
+
+		sb.append("(");
+
+		sb.append(
+			getDefaultTestBatchRunPropertyQuery(testBaseDir, testSuiteName));
+
+		sb.append(")");
 
 		if (!NAME_STABLE_TEST_SUITE.equals(getTestSuiteName())) {
 			String batchName = getBatchName();
@@ -352,7 +386,9 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 			String jobPropertyValue = jobProperty.getValue();
 
 			if ((jobPropertyValue != null) && includeStableTestSuite &&
-				isStableTestSuiteBatch()) {
+				isStableTestSuiteBatch(batchName)) {
+
+				recordJobProperty(jobProperty);
 
 				sb.append(" OR (");
 				sb.append(jobPropertyValue);
@@ -368,6 +404,8 @@ public class FunctionalBatchTestClassGroup extends BatchTestClassGroup {
 		String jobPropertyValue = jobProperty.getValue();
 
 		if (jobPropertyValue != null) {
+			recordJobProperty(jobProperty);
+
 			testBatchRunPropertyQuery = JenkinsResultsParserUtil.combine(
 				"(", jobPropertyValue, ") AND (", testBatchRunPropertyQuery,
 				")");
