@@ -214,6 +214,7 @@ describe('AddResultModal', () => {
 
 		await waitForElement(() => getByTestId(RESULTS_LIST_ID));
 
+		fireEvent.click(queryAllByText('x-items')[0]);
 		fireEvent.click(queryAllByText('x-items')[4]);
 
 		await waitForElement(() => getByTestId('110'));

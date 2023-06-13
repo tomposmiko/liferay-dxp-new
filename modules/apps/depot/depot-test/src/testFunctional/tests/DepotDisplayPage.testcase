@@ -149,7 +149,7 @@ definition {
 
 		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''"og:title" content="DM Document Title.jpg","og:description" content="image/jpeg"''');
 
-		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''"og:image:alt" content="Test Test","og:image" content="${portalURL}/documents/${siteID}/0/DM+Document+Title.jpg''');
+		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''"og:image:alt" content="Test Test","og:image" content="${portalURL}/documents/${siteID}/0/DM%20Document%20Title.jpg''');
 	}
 
 	@description = "This test ensures that a user can map the display page with SEO when using the DM type from AL on a connect site."

@@ -4,6 +4,7 @@
 /development/ant-apache-bsf.jar
 /development/ant-compress.jar
 /development/appium.jar
+/development/asm-commons.jar
 /development/catalina.jar
 /development/com.liferay.jenkins.results.parser.jar
 /development/com.liferay.poshi.core.jar
@@ -63,6 +64,7 @@
 /development/powermock-module-junit4-common.jar
 /development/powermock-reflect.jar
 /development/qdox.jar
+/development/reflections.jar
 /development/saxpath.jar
 /development/sdk-addon-api-0.2.jar
 /development/servlet-api.jar

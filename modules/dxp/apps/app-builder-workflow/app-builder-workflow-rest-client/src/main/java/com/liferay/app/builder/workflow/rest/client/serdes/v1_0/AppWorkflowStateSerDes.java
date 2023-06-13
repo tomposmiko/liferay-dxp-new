@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -172,15 +171,22 @@ public class AppWorkflowStateSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "appWorkflowTransitions")) {
 				if (jsonParserFieldValue != null) {
+					Object[] jsonParserFieldValues =
+						(Object[])jsonParserFieldValue;
+
+					AppWorkflowTransition[] appWorkflowTransitionsArray =
+						new AppWorkflowTransition[jsonParserFieldValues.length];
+
+					for (int i = 0; i < appWorkflowTransitionsArray.length;
+						 i++) {
+
+						appWorkflowTransitionsArray[i] =
+							AppWorkflowTransitionSerDes.toDTO(
+								(String)jsonParserFieldValues[i]);
+					}
+
 					appWorkflowState.setAppWorkflowTransitions(
-						Stream.of(
-							toStrings((Object[])jsonParserFieldValue)
-						).map(
-							object -> AppWorkflowTransitionSerDes.toDTO(
-								(String)object)
-						).toArray(
-							size -> new AppWorkflowTransition[size]
-						));
+						appWorkflowTransitionsArray);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "initial")) {

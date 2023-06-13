@@ -18,6 +18,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.admin.user.client.dto.v1_0.EmailAddress;
 import com.liferay.headless.admin.user.client.dto.v1_0.Phone;
 import com.liferay.headless.admin.user.client.dto.v1_0.PostalAddress;
+import com.liferay.headless.admin.user.client.dto.v1_0.RoleBrief;
 import com.liferay.headless.admin.user.client.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.client.dto.v1_0.UserAccountContactInformation;
 import com.liferay.headless.admin.user.client.dto.v1_0.WebUrl;
@@ -28,17 +29,29 @@ import com.liferay.headless.admin.user.client.serdes.v1_0.PhoneSerDes;
 import com.liferay.headless.admin.user.client.serdes.v1_0.PostalAddressSerDes;
 import com.liferay.headless.admin.user.client.serdes.v1_0.UserAccountSerDes;
 import com.liferay.headless.admin.user.client.serdes.v1_0.WebUrlSerDes;
+import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.function.UnsafeTriConsumer;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.OrganizationLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.DataGuard;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.RoleTestUtil;
+import com.liferay.portal.kernel.test.util.UserGroupTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -52,6 +65,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -119,6 +133,34 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 			Arrays.asList(userAccount1, userAccount2),
 			(List<UserAccount>)page.getItems());
 		assertValid(page);
+	}
+
+	@Override
+	@Test
+	public void testGetUserAccount() throws Exception {
+		super.testGetUserAccount();
+
+		User user = UserTestUtil.addUser();
+
+		Group group = GroupTestUtil.addGroup();
+
+		_testGetUserAccountWithInheritedRoles(
+			() -> _groupLocalService.addUserGroup(user.getUserId(), group),
+			group, user);
+
+		Organization organization = OrganizationTestUtil.addOrganization();
+
+		_testGetUserAccountWithInheritedRoles(
+			() -> _organizationLocalService.addUserOrganization(
+				user.getUserId(), organization),
+			organization.getGroup(), user);
+
+		UserGroup userGroup = UserGroupTestUtil.addUserGroup();
+
+		_testGetUserAccountWithInheritedRoles(
+			() -> _userGroupLocalService.addUserUserGroup(
+				user.getUserId(), userGroup),
+			userGroup.getGroup(), user);
 	}
 
 	@Override
@@ -489,6 +531,19 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 		}
 	}
 
+	private boolean _hasRole(Role role, User user) throws Exception {
+		UserAccount userAccount = userAccountResource.getUserAccount(
+			user.getUserId());
+
+		for (RoleBrief roleBrief : userAccount.getRoleBriefs()) {
+			if (Objects.equals(role.getRoleId(), roleBrief.getId())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private EmailAddress _randomEmailAddress() throws Exception {
 		return new EmailAddress() {
 			{
@@ -555,8 +610,37 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 		};
 	}
 
+	private void _testGetUserAccountWithInheritedRoles(
+			UnsafeRunnable<Exception> associateUserUnsafeRunnable, Group group,
+			User user)
+		throws Exception {
+
+		Role inheritedRole = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+
+		_roleLocalService.addGroupRole(group.getGroupId(), inheritedRole);
+
+		Assert.assertFalse(_hasRole(inheritedRole, user));
+
+		associateUserUnsafeRunnable.run();
+
+		Assert.assertTrue(_hasRole(inheritedRole, user));
+	}
+
+	@Inject
+	private GroupLocalService _groupLocalService;
+
 	private Organization _organization;
+
+	@Inject
+	private OrganizationLocalService _organizationLocalService;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
+
 	private User _testUser;
+
+	@Inject
+	private UserGroupLocalService _userGroupLocalService;
 
 	@Inject
 	private UserLocalService _userLocalService;

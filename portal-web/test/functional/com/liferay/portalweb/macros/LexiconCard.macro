@@ -77,6 +77,10 @@ definition {
 	macro viewCardPresent {
 		SelectFrameTop();
 
+		if (IsElementPresent(locator1 = "IFrame#MODAL_BODY")) {
+			SelectFrame(locator1 = "IFrame#MODAL_BODY");
+		}
+
 		AssertVisible(
 			key_card = ${card},
 			locator1 = "Card#CARD");

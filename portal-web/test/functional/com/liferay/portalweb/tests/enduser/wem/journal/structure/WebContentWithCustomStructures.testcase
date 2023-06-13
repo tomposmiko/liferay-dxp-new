@@ -1484,7 +1484,8 @@ definition {
 
 			WebContentStructures.addCP(structureName = "WC Structure Name");
 
-			DataEngine.addField(
+			DynamicDataMapping.addField(
+				field = "Text",
 				fieldFieldLabel = "Text",
 				fieldName = "Text");
 
@@ -1494,11 +1495,13 @@ definition {
 		task ("Edit the default values of new structure") {
 			NavItem.gotoStructures();
 
-			WebContentStructures.editStructureDefaultValuesCP(structureName = "WC Structure Name");
+			LexiconEntry.gotoEntryMenuItem(
+				menuItem = "Edit Default Values",
+				rowEntry = "WC Structure Name");
 
 			WebContent.addWithStructureCP(webContentText = "WC WebContent Title");
 
-			PortletEntry.save();
+			WebContentStructures.saveCP();
 		}
 
 		task ("Go to Home page and assert no web content displayed after searching") {

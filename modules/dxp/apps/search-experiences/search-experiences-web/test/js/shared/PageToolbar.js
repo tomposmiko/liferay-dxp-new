@@ -125,7 +125,10 @@ describe('PageToolbar', () => {
 		expect(getByText('save')).toBeDisabled();
 	});
 
-	it('focuses on the title input when clicked on', () => {
+	// Disabled, behavior when opening Modal focuses on the modal first to
+	// announce that it is open.
+
+	xit('focuses on the title input when clicked on', () => {
 		const title = 'Apple';
 
 		const {getByLabelText} = renderPageToolbar({
@@ -139,7 +142,10 @@ describe('PageToolbar', () => {
 		expect(getByLabelText('title')).toHaveFocus();
 	});
 
-	it('focuses on the description input when clicked on', () => {
+	// Disabled, behavior when opening Modal focuses on the modal first to
+	// announce that it is open.
+
+	xit('focuses on the description input when clicked on', () => {
 		const title = 'Apple';
 
 		const {getByLabelText} = renderPageToolbar({

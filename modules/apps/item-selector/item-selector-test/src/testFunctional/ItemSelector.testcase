@@ -713,7 +713,9 @@ definition {
 			locator1 = "Breadcrumb#BREADCRUMB_ENTRY_LINK",
 			value1 = "Sites and Libraries");
 
-		LexiconCard.viewCardPresent(card = "Site X");
+		AssertVisible(
+			key_card = "Site X",
+			locator1 = "Card#CARD");
 
 		LexiconCard.viewCardNotPresent(card = "Site A");
 	}
@@ -767,7 +769,9 @@ definition {
 			locator1 = "ItemSelector#ADD_BUTTON",
 			value1 = "Add");
 
-		BlogsEntry.viewInlineImage(uploadFileName = '''Document_2+%281%29.jpg''');
+		SelectFrameTop();
+
+		BlogsEntry.viewInlineImage(uploadFileName = '''Document_2%20%281%29.jpg''');
 
 		AssertClick(
 			locator1 = "Button#PUBLISH",
@@ -795,7 +799,7 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
 
-		BlogsEntry.viewInlineImage(uploadFileName = '''Document_2+%281%29.jpg''');
+		BlogsEntry.viewInlineImage(uploadFileName = '''Document_2%20%281%29.jpg''');
 
 		ScrollWebElementIntoView(locator1 = "Button#SUBSCRIBE");
 

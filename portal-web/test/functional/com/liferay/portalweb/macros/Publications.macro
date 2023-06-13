@@ -272,8 +272,6 @@ definition {
 
 		Pause(locator1 = 1000);
 
-		SelectFrameTop(value1 = "relative=top");
-
 		AssertElementPresent(
 			key_iframeTitle = ${entryTitle},
 			locator1 = "Publications#CONFLICTING_CHANGES_DIFF_IFRAME_TITLE");
@@ -473,7 +471,7 @@ definition {
 
 			MenuItem.click(menuItem = "Select a Publication");
 
-			SelectFrame(locator1 = "IFrame#MODAL_BODY");
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#IFRAME");
 
 			var key_publicationName = ${publicationName};
 
@@ -482,7 +480,7 @@ definition {
 				value1 = ${publicationName});
 		}
 
-		SelectFrameTop();
+		Refresh();
 
 		AssertTextPresent(
 			locator1 = "Publications#PUBLICATIONS_INDICATOR_TITLE",

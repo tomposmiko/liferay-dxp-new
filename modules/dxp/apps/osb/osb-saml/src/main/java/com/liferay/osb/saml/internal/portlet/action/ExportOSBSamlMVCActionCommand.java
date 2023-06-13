@@ -124,7 +124,7 @@ public class ExportOSBSamlMVCActionCommand extends BaseMVCActionCommand {
 			if (json != null) {
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(json);
 
-				if (Objects.equals("resultError", jsonObject.get("result"))) {
+				if (Objects.equals(jsonObject.get("result"), "resultError")) {
 					SessionErrors.add(actionRequest, "exportError");
 				}
 			}

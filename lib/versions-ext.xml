@@ -77,8 +77,20 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>lib/development/asm-commons.jar</file-name>
+				<version>7.0</version>
+				<project-name>ASM</project-name>
+				<project-url>http://asm.ow2.io</project-url>
+				<licenses>
+					<license>
+						<license-name>ASM License</license-name>
+						<license-url>http://asm.ow2.org/license.html</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>lib/development/catalina.jar</file-name>
-				<version>9.0.71</version>
+				<version>9.0.73</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -308,7 +320,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/jasper.jar</file-name>
-				<version>9.0.71</version>
+				<version>9.0.73</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -731,6 +743,19 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>lib/development/reflections.jar</file-name>
+				<version>0.9.11</version>
+				<project-name>Reflections</project-name>
+				<project-url>http://github.com/ronmamo/reflections</project-url>
+				<licenses>
+					<license>
+						<license-name>http://www.wtfpl.net/, http://www.opensource.org/licenses/bsd-license.html</license-name>
+					</license>
+				</licenses>
+				<current-version-publish-date>2017-03-24 12:37:31</current-version-publish-date>
+				<latest-version-publish-date>2021-10-25 14:23:23</latest-version-publish-date>
+			</library>
+			<library>
 				<file-name>lib/development/qdox.jar</file-name>
 				<version>1.12.1</version>
 				<project-name>QDox</project-name>
@@ -862,7 +887,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/tomcat-api.jar</file-name>
-				<version>9.0.71</version>
+				<version>9.0.73</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -874,7 +899,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/tomcat-coyote.jar</file-name>
-				<version>9.0.71</version>
+				<version>9.0.73</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -886,7 +911,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/tomcat-util.jar</file-name>
-				<version>9.0.71</version>
+				<version>9.0.73</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -898,7 +923,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/tomcat-util-scan.jar</file-name>
-				<version>9.0.71</version>
+				<version>9.0.73</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -3128,7 +3153,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/tomcat-jdbc.jar</file-name>
-				<version>9.0.71</version>
+				<version>9.0.73</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -3140,7 +3165,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/tomcat-juli.jar</file-name>
-				<version>9.0.71</version>
+				<version>9.0.73</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>

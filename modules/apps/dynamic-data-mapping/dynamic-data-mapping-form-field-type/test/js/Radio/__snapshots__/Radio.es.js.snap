@@ -59,6 +59,7 @@ exports[`Field Radio has a helptext 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
+      id="radioField_fieldHelp"
     >
       Type something
     </span>

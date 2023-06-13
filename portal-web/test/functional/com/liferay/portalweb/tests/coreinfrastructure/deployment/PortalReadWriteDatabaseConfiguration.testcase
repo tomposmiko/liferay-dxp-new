@@ -105,7 +105,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Test Page1");
+		SitePages.addPublicPage(pageName = "Test Page1");
 
 		Navigator.gotoPage(pageName = "Test Page1");
 
@@ -150,8 +150,8 @@ definition {
 		ServerAdministration.openServerAdmin();
 
 		ServerAdministration.addCategoryLogLevels(
-			categoryLevel = "ALL",
-			categoryName = "com.liferay.portal.dao.jdbc.util.DynamicDataSource");
+			categoryName = "com.liferay.portal.dao.jdbc.util.DynamicDataSource",
+			categoryPriority = "ALL");
 
 		Smoke.runSmoke();
 
@@ -170,8 +170,8 @@ definition {
 		ServerAdministration.openServerAdmin();
 
 		ServerAdministration.addCategoryLogLevels(
-			categoryLevel = "ALL",
-			categoryName = "com.liferay.portal.dao.jdbc.util.DynamicDataSource");
+			categoryName = "com.liferay.portal.dao.jdbc.util.DynamicDataSource",
+			categoryPriority = "ALL");
 
 		Smoke.runSmoke();
 

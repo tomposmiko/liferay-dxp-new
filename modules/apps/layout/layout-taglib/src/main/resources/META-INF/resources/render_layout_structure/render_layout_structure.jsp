@@ -129,7 +129,7 @@ for (String childrenItemId : childrenItemIds) {
 
 			<c:if test='<%= !Objects.equals(ParamUtil.getString(request, "p_l_mode", Constants.VIEW), Constants.SEARCH) || containerStyledLayoutStructureItem.isIndexed() %>'>
 				<c:if test="<%= Validator.isNotNull(containerLinkHref) %>">
-					<a href="<%= containerLinkHref %>" style="color: inherit; text-decoration: none;" target="<%= renderLayoutStructureDisplayContext.getContainerLinkTarget(containerStyledLayoutStructureItem) %>">
+					<a href="<%= HtmlUtil.escapeHREF(containerLinkHref) %>" style="color: inherit; text-decoration: none;" target="<%= renderLayoutStructureDisplayContext.getContainerLinkTarget(containerStyledLayoutStructureItem) %>">
 				</c:if>
 
 				<div class="<%= renderLayoutStructureDisplayContext.getCssClass(containerStyledLayoutStructureItem) %>" style="<%= renderLayoutStructureDisplayContext.getStyle(containerStyledLayoutStructureItem) %>">

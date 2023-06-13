@@ -1140,7 +1140,7 @@ definition {
 
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-		TestUtils.maximizeWindow();
+		SetWindowSize.maximizeWindow();
 
 		ContentPages.addPage(
 			categoryNameList = "Category Name 1,Category Name 2,Category Name 3",

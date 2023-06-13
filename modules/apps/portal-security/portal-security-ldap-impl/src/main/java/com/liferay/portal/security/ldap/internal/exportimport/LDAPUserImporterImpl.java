@@ -82,6 +82,7 @@ import com.liferay.portal.security.ldap.internal.UserImportTransactionThreadLoca
 import com.liferay.portal.security.ldap.internal.validator.SafeLdapContextImpl;
 import com.liferay.portal.security.ldap.util.LDAPUtil;
 import com.liferay.portal.security.ldap.validator.LDAPFilterValidator;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.Serializable;
 
@@ -183,8 +184,34 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 			_ldapSettings.getUserExpandoMappings(ldapServerId, companyId),
 			_ldapSettings.getUserMappings(ldapServerId, companyId));
 
-		User user = importUser(
-			ldapImportContext, StringPool.BLANK, attributes, password);
+		Attributes userLdapAttributes = _attributesTransformer.transformUser(
+			attributes);
+
+		LDAPUser ldapUser = _ldapToPortalConverter.importLDAPUser(
+			ldapImportContext.getCompanyId(), userLdapAttributes,
+			ldapImportContext.getUserMappings(),
+			ldapImportContext.getUserExpandoMappings(),
+			ldapImportContext.getContactMappings(),
+			ldapImportContext.getContactExpandoMappings(), password);
+
+		if (!PropsValues.LDAP_IGNORE_USER_SEARCH_FILTER_FOR_AUTH &&
+			!_safePortalLDAP.hasUser(
+				ldapServerId, companyId, ldapUser.getScreenName(),
+				ldapUser.getEmailAddress())) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"User with screen name ", ldapUser.getScreenName(),
+						" does not belong to LDAP server ", ldapServerId));
+			}
+
+			return null;
+		}
+
+		User user = _importUser(
+			ldapImportContext, StringPool.BLANK, userLdapAttributes, password,
+			ldapUser);
 
 		importGroups(ldapImportContext, attributes, user);
 
@@ -1139,75 +1166,19 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 			Attributes userLdapAttributes, String password)
 		throws Exception {
 
-		UserImportTransactionThreadLocal.setOriginatesFromImport(true);
+		userLdapAttributes = _attributesTransformer.transformUser(
+			userLdapAttributes);
 
-		try {
-			userLdapAttributes = _attributesTransformer.transformUser(
-				userLdapAttributes);
+		LDAPUser ldapUser = _ldapToPortalConverter.importLDAPUser(
+			ldapImportContext.getCompanyId(), userLdapAttributes,
+			ldapImportContext.getUserMappings(),
+			ldapImportContext.getUserExpandoMappings(),
+			ldapImportContext.getContactMappings(),
+			ldapImportContext.getContactExpandoMappings(), password);
 
-			LDAPUser ldapUser = _ldapToPortalConverter.importLDAPUser(
-				ldapImportContext.getCompanyId(), userLdapAttributes,
-				ldapImportContext.getUserMappings(),
-				ldapImportContext.getUserExpandoMappings(),
-				ldapImportContext.getContactMappings(),
-				ldapImportContext.getContactExpandoMappings(), password);
-
-			User user = getUser(ldapImportContext.getCompanyId(), ldapUser);
-
-			if ((user != null) && user.isDefaultUser()) {
-				return user;
-			}
-
-			ServiceContext serviceContext = ldapUser.getServiceContext();
-
-			serviceContext.setAttribute(
-				"ldapServerId", ldapImportContext.getLdapServerId());
-
-			boolean isNew = false;
-
-			if (user == null) {
-				user = addUser(
-					ldapImportContext.getCompanyId(), ldapUser, password);
-
-				isNew = true;
-			}
-
-			String modifyTimestamp = LDAPUtil.getAttributeString(
-				userLdapAttributes, "modifyTimestamp");
-
-			try {
-				user = updateUser(
-					ldapImportContext, ldapUser, user, password,
-					modifyTimestamp, isNew);
-
-				ldapImportContext.addImportedUserId(
-					fullUserDN, user.getUserId());
-			}
-			catch (GroupFriendlyURLException groupFriendlyURLException) {
-				int type = groupFriendlyURLException.getType();
-
-				if (type == GroupFriendlyURLException.DUPLICATE) {
-					_log.error(
-						"Unable to import user " + user.getUserId() +
-							" because of a duplicate group friendly URL",
-						groupFriendlyURLException);
-				}
-				else {
-					_log.error(
-						"Unable to import user " + user.getUserId(),
-						groupFriendlyURLException);
-				}
-			}
-			catch (Exception exception) {
-				_log.error(
-					"Unable to import user " + user.getUserId(), exception);
-			}
-
-			return user;
-		}
-		finally {
-			UserImportTransactionThreadLocal.setOriginatesFromImport(false);
-		}
+		return _importUser(
+			ldapImportContext, fullUserDN, userLdapAttributes, password,
+			ldapUser);
 	}
 
 	protected UserGroup importUserGroup(
@@ -1816,6 +1787,72 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 		}
 
 		return password;
+	}
+
+	private User _importUser(
+			LDAPImportContext ldapImportContext, String fullUserDN,
+			Attributes userLdapAttributes, String password, LDAPUser ldapUser)
+		throws Exception {
+
+		UserImportTransactionThreadLocal.setOriginatesFromImport(true);
+
+		try {
+			User user = getUser(ldapImportContext.getCompanyId(), ldapUser);
+
+			if ((user != null) && user.isDefaultUser()) {
+				return user;
+			}
+
+			ServiceContext serviceContext = ldapUser.getServiceContext();
+
+			serviceContext.setAttribute(
+				"ldapServerId", ldapImportContext.getLdapServerId());
+
+			boolean isNew = false;
+
+			if (user == null) {
+				user = addUser(
+					ldapImportContext.getCompanyId(), ldapUser, password);
+
+				isNew = true;
+			}
+
+			String modifyTimestamp = LDAPUtil.getAttributeString(
+				userLdapAttributes, "modifyTimestamp");
+
+			try {
+				user = updateUser(
+					ldapImportContext, ldapUser, user, password,
+					modifyTimestamp, isNew);
+
+				ldapImportContext.addImportedUserId(
+					fullUserDN, user.getUserId());
+			}
+			catch (GroupFriendlyURLException groupFriendlyURLException) {
+				int type = groupFriendlyURLException.getType();
+
+				if (type == GroupFriendlyURLException.DUPLICATE) {
+					_log.error(
+						"Unable to import user " + user.getUserId() +
+							" because of a duplicate group friendly URL",
+						groupFriendlyURLException);
+				}
+				else {
+					_log.error(
+						"Unable to import user " + user.getUserId(),
+						groupFriendlyURLException);
+				}
+			}
+			catch (Exception exception) {
+				_log.error(
+					"Unable to import user " + user.getUserId(), exception);
+			}
+
+			return user;
+		}
+		finally {
+			UserImportTransactionThreadLocal.setOriginatesFromImport(false);
+		}
 	}
 
 	private static final String[] _CONTACT_PROPERTY_NAMES = {

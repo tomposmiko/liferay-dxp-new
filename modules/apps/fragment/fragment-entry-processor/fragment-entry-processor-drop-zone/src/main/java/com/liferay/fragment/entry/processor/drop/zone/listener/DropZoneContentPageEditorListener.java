@@ -133,6 +133,10 @@ public class DropZoneContentPageEditorListener
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
+		if (serviceContext == null) {
+			return;
+		}
+
 		String processedHTML =
 			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
 				fragmentEntryLink,

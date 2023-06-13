@@ -42,7 +42,7 @@ definition {
 		if (${type} == "Drop Down") {
 			WaitForElementPresent(locator1 = "//script[contains(@src,'/o/frontend-js-aui-web/liferay/menu_toggle.js')]");
 
-			MouseOver(
+			MouseOver.javaScriptMouseOver(
 				key_pageName = ${pageName},
 				locator1 = "Home#PAGE");
 

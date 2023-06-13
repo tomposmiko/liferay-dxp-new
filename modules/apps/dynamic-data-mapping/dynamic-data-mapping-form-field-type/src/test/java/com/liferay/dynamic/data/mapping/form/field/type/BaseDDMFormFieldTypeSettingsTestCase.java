@@ -14,6 +14,8 @@
 
 package com.liferay.dynamic.data.mapping.form.field.type;
 
+import com.liferay.portal.json.JSONFactoryImpl;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -44,9 +46,16 @@ public abstract class BaseDDMFormFieldTypeSettingsTestCase
 
 	@Before
 	public void setUp() throws Exception {
+		setUpJSONFactoryUtil();
 		setUpLanguageUtil();
 		setUpPortalClassLoaderUtil();
 		setUpResourceBundleUtil();
+	}
+
+	protected void setUpJSONFactoryUtil() {
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
+
+		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
 	protected void setUpLanguageUtil() {

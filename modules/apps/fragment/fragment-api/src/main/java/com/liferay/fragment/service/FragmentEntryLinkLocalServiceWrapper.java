@@ -515,6 +515,22 @@ public class FragmentEntryLinkLocalServiceWrapper
 
 	@Override
 	public java.util.List<FragmentEntryLink> getFragmentEntryLinks(
+		long companyId, String rendererKey) {
+
+		return _fragmentEntryLinkLocalService.getFragmentEntryLinks(
+			companyId, rendererKey);
+	}
+
+	@Override
+	public java.util.List<FragmentEntryLink> getFragmentEntryLinks(
+		long companyId, String[] rendererKeys) {
+
+		return _fragmentEntryLinkLocalService.getFragmentEntryLinks(
+			companyId, rendererKeys);
+	}
+
+	@Override
+	public java.util.List<FragmentEntryLink> getFragmentEntryLinks(
 		String rendererKey) {
 
 		return _fragmentEntryLinkLocalService.getFragmentEntryLinks(
@@ -875,6 +891,16 @@ public class FragmentEntryLinkLocalServiceWrapper
 
 		_fragmentEntryLinkLocalService.updateFragmentEntryLinks(
 			fragmentEntryLinksEditableValuesMap);
+	}
+
+	@Override
+	public void updateLatestChanges(
+			com.liferay.fragment.model.FragmentEntry fragmentEntry,
+			FragmentEntryLink fragmentEntryLink)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_fragmentEntryLinkLocalService.updateLatestChanges(
+			fragmentEntry, fragmentEntryLink);
 	}
 
 	@Override

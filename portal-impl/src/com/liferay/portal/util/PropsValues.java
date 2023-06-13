@@ -1539,6 +1539,14 @@ public class PropsValues {
 			PropsUtil.get(
 				PropsKeys.LAYOUT_USER_PUBLIC_LAYOUTS_POWER_USER_REQUIRED));
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean LDAP_IGNORE_USER_SEARCH_FILTER_FOR_AUTH =
+		GetterUtil.getBoolean(
+			PropsUtil.get(PropsKeys.LDAP_IGNORE_USER_SEARCH_FILTER_FOR_AUTH));
+
 	public static final boolean LEARN_RESOURCES_CDN_ENABLED =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.LEARN_RESOURCES_CDN_ENABLED));

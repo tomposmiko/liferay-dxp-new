@@ -3,16 +3,16 @@
 		"@clayui/alert": "3.5.0",
 		"@clayui/autocomplete": "3.60.0",
 		"@clayui/badge": "3.2.0",
-		"@clayui/button": "3.56.0",
+		"@clayui/button": "3.83.0",
 		"@clayui/card": "3.5.0",
 		"@clayui/drop-down": "3.58.0",
-		"@clayui/form": "3.58.0",
+		"@clayui/form": "3.89.0",
 		"@clayui/icon": "3.56.0",
 		"@clayui/label": "3.56.0",
-		"@clayui/link": "3.56.0",
+		"@clayui/link": "3.88.0",
 		"@clayui/list": "3.4.0",
 		"@clayui/loading-indicator": "3.60.0",
-		"@clayui/modal": "3.8.0",
+		"@clayui/modal": "3.89.0",
 		"@clayui/multi-select": "3.64.0",
 		"@clayui/pagination-bar": "3.2.0",
 		"@clayui/panel": "3.3.6",
@@ -45,5 +45,5 @@
 		"test": "liferay-npm-scripts test",
 		"watch": "liferay-npm-scripts webpack --watch"
 	},
-	"version": "3.0.40"
+	"version": "3.0.41"
 }

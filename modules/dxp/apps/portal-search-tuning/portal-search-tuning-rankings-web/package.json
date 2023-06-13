@@ -1,15 +1,15 @@
 {
 	"dependencies": {
-		"@clayui/button": "3.56.0",
+		"@clayui/button": "3.83.0",
 		"@clayui/data-provider": "3.3.5",
 		"@clayui/drop-down": "3.58.0",
-		"@clayui/form": "3.58.0",
+		"@clayui/form": "3.89.0",
 		"@clayui/icon": "3.56.0",
 		"@clayui/layout": "3.56.0",
-		"@clayui/link": "3.56.0",
+		"@clayui/link": "3.88.0",
 		"@clayui/loading-indicator": "3.60.0",
 		"@clayui/management-toolbar": "3.2.3",
-		"@clayui/modal": "3.8.0",
+		"@clayui/modal": "3.89.0",
 		"@clayui/multi-select": "3.64.0",
 		"@clayui/pagination-bar": "3.2.0",
 		"@clayui/tabs": "3.3.0",
@@ -44,5 +44,5 @@
 		"storybook": "liferay-npm-scripts storybook",
 		"test": "liferay-npm-scripts test"
 	},
-	"version": "2.0.59"
+	"version": "2.0.61"
 }

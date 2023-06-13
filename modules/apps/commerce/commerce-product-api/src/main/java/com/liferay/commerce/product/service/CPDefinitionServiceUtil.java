@@ -401,6 +401,13 @@ public class CPDefinitionServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
+	public static Map<java.util.Locale, String> getUrlTitleMap(
+			long cpDefinitionId)
+		throws PortalException {
+
+		return getService().getUrlTitleMap(cpDefinitionId);
+	}
+
 	public static String getUrlTitleMapAsXML(long cpDefinitionId)
 		throws PortalException {
 

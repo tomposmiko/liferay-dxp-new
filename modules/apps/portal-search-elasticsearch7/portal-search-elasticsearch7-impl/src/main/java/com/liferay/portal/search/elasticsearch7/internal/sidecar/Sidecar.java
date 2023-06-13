@@ -338,7 +338,7 @@ public class Sidecar {
 			return waitForPublishedAddress(noticeableFuture);
 		}
 		catch (IOException ioException) {
-			if (Objects.equals("Stream closed", ioException.getMessage())) {
+			if (Objects.equals(ioException.getMessage(), "Stream closed")) {
 				throw new RuntimeException(
 					StringBundler.concat(
 						"Sidecar JVM did not launch successfully. ",

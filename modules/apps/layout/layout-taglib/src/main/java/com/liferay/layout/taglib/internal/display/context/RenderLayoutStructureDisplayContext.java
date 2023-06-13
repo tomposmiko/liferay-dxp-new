@@ -16,6 +16,7 @@ package com.liferay.layout.taglib.internal.display.context;
 
 import com.liferay.asset.info.display.contributor.util.ContentAccessor;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.fragment.constants.FragmentWebKeys;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
 import com.liferay.frontend.token.definition.FrontendTokenDefinition;
@@ -66,12 +67,8 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
-import com.liferay.portal.kernel.model.LayoutTypeAccessPolicy;
-import com.liferay.portal.kernel.model.Portlet;
-import com.liferay.portal.kernel.model.impl.DefaultLayoutTypeAccessPolicyImpl;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
-import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -349,15 +346,8 @@ public class RenderLayoutStructureDisplayContext {
 			StyledLayoutStructureItem styledLayoutStructureItem)
 		throws Exception {
 
-		String editableValues = fragmentEntryLink.getEditableValues();
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			editableValues);
-
-		String portletId = jsonObject.getString("portletId");
-
-		if (Validator.isNotNull(portletId) &&
-			!_checkAccessAllowedToPortlet(portletId)) {
+		if (!_checkAccessAllowedToFragmentEntryLink(
+				fragmentEntryLink.getFragmentEntryLinkId())) {
 
 			return StringPool.BLANK;
 		}
@@ -588,15 +578,8 @@ public class RenderLayoutStructureDisplayContext {
 			StyledLayoutStructureItem styledLayoutStructureItem)
 		throws Exception {
 
-		String editableValues = fragmentEntryLink.getEditableValues();
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			editableValues);
-
-		String portletId = jsonObject.getString("portletId");
-
-		if (Validator.isNotNull(portletId) &&
-			!_checkAccessAllowedToPortlet(portletId)) {
+		if (!_checkAccessAllowedToFragmentEntryLink(
+				fragmentEntryLink.getFragmentEntryLinkId())) {
 
 			return StringPool.BLANK;
 		}
@@ -778,27 +761,14 @@ public class RenderLayoutStructureDisplayContext {
 		return "var(--" + cssVariable + ")";
 	}
 
-	private boolean _checkAccessAllowedToPortlet(String portletId) {
+	private boolean _checkAccessAllowedToFragmentEntryLink(
+		long fragmentEntryLinkId) {
+
 		try {
-			Layout layout = _themeDisplay.getLayout();
-
-			Portlet portlet = PortletLocalServiceUtil.getPortletById(
-				_themeDisplay.getCompanyId(), portletId);
-
-			LayoutTypeAccessPolicy defaultLayoutTypeAccessPolicy =
-				DefaultLayoutTypeAccessPolicyImpl.create();
-
-			defaultLayoutTypeAccessPolicy.checkAccessAllowedToPortlet(
-				_httpServletRequest, layout, portlet);
-
-			String checkAccessAllowedToPortletCacheKey = StringBundler.concat(
-				"LIFERAY_SHARED_",
-				DefaultLayoutTypeAccessPolicyImpl.class.getName(), "#",
-				layout.getPlid(), "#", portlet.getPortletId());
-
 			return GetterUtil.getBoolean(
 				_httpServletRequest.getAttribute(
-					checkAccessAllowedToPortletCacheKey),
+					FragmentWebKeys.ACCESS_ALLOWED_TO_FRAGMENT_ENTRY_LINK_ID +
+						fragmentEntryLinkId),
 				true);
 		}
 		catch (Exception exception) {

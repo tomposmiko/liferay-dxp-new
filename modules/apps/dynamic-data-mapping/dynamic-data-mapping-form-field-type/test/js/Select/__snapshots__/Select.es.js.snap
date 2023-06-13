@@ -599,6 +599,7 @@ exports[`Select has a help text 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
+      id="undefined_fieldHelp"
     >
       Type something
     </span>

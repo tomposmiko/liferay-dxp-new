@@ -9,6 +9,8 @@ exports[`Field Numeric has a helptext 1`] = `
     tabindex="0"
   >
     <input
+      aria-describedby="numericField_fieldHelp"
+      aria-invalid="true"
       class="form-control"
       id="numericField"
       name="numericField"
@@ -18,6 +20,7 @@ exports[`Field Numeric has a helptext 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
+      id="numericField_fieldHelp"
     >
       Type something
     </span>
@@ -41,6 +44,7 @@ exports[`Field Numeric has a key 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control"
       id="numericField"
       name="numericField"
@@ -66,6 +70,7 @@ exports[`Field Numeric has a label 1`] = `
       label
     </label>
     <input
+      aria-invalid="true"
       class="form-control"
       id="numericField"
       name="numericField"
@@ -92,6 +97,7 @@ exports[`Field Numeric has a placeholder 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control"
       id="numericField"
       name="numericField"
@@ -113,6 +119,7 @@ exports[`Field Numeric has a value 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control"
       id="numericField"
       name="numericField"
@@ -133,6 +140,7 @@ exports[`Field Numeric has an id 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control"
       id="ID"
       name="numericField"
@@ -153,6 +161,7 @@ exports[`Field Numeric is not readOnly 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control"
       id="numericField"
       name="numericField"
@@ -173,6 +182,8 @@ exports[`Field Numeric is not required 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
+      aria-required="false"
       class="form-control"
       id="numericField"
       name="numericField"
@@ -198,6 +209,7 @@ exports[`Field Numeric renders Label if showLabel is true 1`] = `
       Numeric Field
     </label>
     <input
+      aria-invalid="true"
       class="form-control"
       id="numericField"
       name="numericField"
@@ -224,6 +236,7 @@ exports[`Field Numeric renders the default markup 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control"
       id="numericField"
       name="numericField"

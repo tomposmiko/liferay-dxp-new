@@ -173,12 +173,19 @@ public class NavItemUtil {
 				Layout layout = themeDisplay.getLayout();
 
 				Layout rootLayout =
-					_layoutLocalService.getLayoutByUuidAndGroupId(
-						rootLayoutUuid, layout.getGroupId(),
-						layout.isPrivateLayout());
+					_layoutLocalService.fetchLayoutByUuidAndGroupId(
+						rootLayoutUuid, layout.getGroupId(), false);
 
-				rootNavItem = new NavItem(
-					httpServletRequest, themeDisplay, rootLayout);
+				if (rootLayout == null) {
+					rootLayout =
+						_layoutLocalService.fetchLayoutByUuidAndGroupId(
+							rootLayoutUuid, layout.getGroupId(), true);
+				}
+
+				if (rootLayout != null) {
+					rootNavItem = new NavItem(
+						httpServletRequest, themeDisplay, rootLayout);
+				}
 			}
 			else {
 				navItems = themeDisplay.getNavItems();

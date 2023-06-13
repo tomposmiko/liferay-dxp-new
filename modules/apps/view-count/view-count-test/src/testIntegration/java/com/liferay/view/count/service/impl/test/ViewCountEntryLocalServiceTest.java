@@ -150,7 +150,7 @@ public class ViewCountEntryLocalServiceTest {
 			SessionFactory.class.getClassLoader(),
 			new Class<?>[] {SessionFactory.class},
 			(proxy, method, args) -> {
-				if (Objects.equals("openSession", method.getName())) {
+				if (Objects.equals(method.getName(), "openSession")) {
 					return _createSessionProxy(
 						sessionFactory.openSession(), cyclicBarrier);
 				}
@@ -165,7 +165,7 @@ public class ViewCountEntryLocalServiceTest {
 		return ProxyUtil.newProxyInstance(
 			Session.class.getClassLoader(), new Class<?>[] {Session.class},
 			(proxy, method, args) -> {
-				if (Objects.equals("flush", method.getName())) {
+				if (Objects.equals(method.getName(), "flush")) {
 					cyclicBarrier.await();
 				}
 

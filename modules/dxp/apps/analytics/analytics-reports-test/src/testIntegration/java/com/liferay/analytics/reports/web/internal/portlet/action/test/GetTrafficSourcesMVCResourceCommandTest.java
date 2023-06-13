@@ -467,10 +467,10 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 
 		@Override
 		public String getString(long companyId, String name) {
-			if (Objects.equals("liferayAnalyticsDataSourceId", name) ||
+			if (Objects.equals(name, "liferayAnalyticsDataSourceId") ||
 				Objects.equals(
 					name, "liferayAnalyticsFaroBackendSecuritySignature") ||
-				Objects.equals("liferayAnalyticsFaroBackendURL", name)) {
+				Objects.equals(name, "liferayAnalyticsFaroBackendURL")) {
 
 				return null;
 			}
@@ -490,10 +490,10 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 
 		@Override
 		public String getString(long companyId, String name) {
-			if (Objects.equals("liferayAnalyticsDataSourceId", name) ||
+			if (Objects.equals(name, "liferayAnalyticsDataSourceId") ||
 				Objects.equals(
 					name, "liferayAnalyticsFaroBackendSecuritySignature") ||
-				Objects.equals("liferayAnalyticsFaroBackendURL", name)) {
+				Objects.equals(name, "liferayAnalyticsFaroBackendURL")) {
 
 				return "test";
 			}

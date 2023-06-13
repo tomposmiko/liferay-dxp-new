@@ -15,6 +15,7 @@ exports[`KeyValue has a helptext 1`] = `
       tabindex="0"
     >
       <input
+        aria-invalid="true"
         class="form-control ddm-field-text"
         id="keyValueLabelkeyValue"
         name="keyValueLabelkeyValue"
@@ -42,6 +43,7 @@ exports[`KeyValue has a helptext 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
+      id="keyValue_fieldHelp"
     >
       Type something
     </span>
@@ -76,6 +78,7 @@ exports[`KeyValue has a label 1`] = `
       tabindex="0"
     >
       <input
+        aria-invalid="true"
         class="form-control ddm-field-text"
         id="keyValueLabelkeyValue"
         name="keyValueLabelkeyValue"
@@ -126,6 +129,7 @@ exports[`KeyValue has a predefined Value 1`] = `
       tabindex="0"
     >
       <input
+        aria-invalid="true"
         class="form-control ddm-field-text"
         id="keyValueLabelkeyValue"
         name="keyValueLabelkeyValue"
@@ -171,6 +175,7 @@ exports[`KeyValue has a value 1`] = `
       tabindex="0"
     >
       <input
+        aria-invalid="true"
         class="form-control ddm-field-text"
         id="keyValueLabelkeyValue"
         name="keyValueLabelkeyValue"
@@ -215,6 +220,7 @@ exports[`KeyValue has an id 1`] = `
       tabindex="0"
     >
       <input
+        aria-invalid="true"
         class="form-control ddm-field-text"
         id="keyValueLabelkeyValue"
         name="keyValueLabelkeyValue"
@@ -259,6 +265,7 @@ exports[`KeyValue is not editable 1`] = `
       tabindex="0"
     >
       <input
+        aria-invalid="true"
         class="form-control ddm-field-text"
         disabled=""
         id="keyValueLabelkeyValue"
@@ -304,6 +311,8 @@ exports[`KeyValue is not required 1`] = `
       tabindex="0"
     >
       <input
+        aria-invalid="true"
+        aria-required="false"
         class="form-control ddm-field-text"
         id="keyValueLabelkeyValue"
         name="keyValueLabelkeyValue"
@@ -353,6 +362,7 @@ exports[`KeyValue renders Label if showLabel is true 1`] = `
       tabindex="0"
     >
       <input
+        aria-invalid="true"
         class="form-control ddm-field-text"
         id="keyValueLabelkeyValue"
         name="keyValueLabelkeyValue"
@@ -403,6 +413,7 @@ exports[`KeyValue renders component with a key 1`] = `
       tabindex="0"
     >
       <input
+        aria-invalid="true"
         class="form-control ddm-field-text"
         id="keyValueLabelkeyValue"
         name="keyValueLabelkeyValue"

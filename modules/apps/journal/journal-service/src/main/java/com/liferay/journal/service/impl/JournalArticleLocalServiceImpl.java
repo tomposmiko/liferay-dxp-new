@@ -152,7 +152,7 @@ import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GroupSubscriptionCheckSubscriptionSender;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -2065,14 +2065,12 @@ public class JournalArticleLocalServiceImpl
 
 		if (status == WorkflowConstants.STATUS_ANY) {
 			articles = journalArticlePersistence.findByG_UT(
-				groupId,
-				FriendlyURLNormalizerUtil.normalizeWithEncoding(urlTitle), 0, 1,
-				orderByComparator);
+				groupId, _friendlyURLNormalizer.normalizeWithEncoding(urlTitle),
+				0, 1, orderByComparator);
 		}
 		else {
 			articles = journalArticlePersistence.findByG_UT_ST(
-				groupId,
-				FriendlyURLNormalizerUtil.normalizeWithEncoding(urlTitle),
+				groupId, _friendlyURLNormalizer.normalizeWithEncoding(urlTitle),
 				status, 0, 1, orderByComparator);
 		}
 
@@ -3207,8 +3205,7 @@ public class JournalArticleLocalServiceImpl
 		}
 		else {
 			articles = journalArticlePersistence.findByG_UT_ST(
-				groupId,
-				FriendlyURLNormalizerUtil.normalizeWithEncoding(urlTitle),
+				groupId, _friendlyURLNormalizer.normalizeWithEncoding(urlTitle),
 				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS, new ArticleVersionComparator());
 		}
@@ -6105,7 +6102,8 @@ public class JournalArticleLocalServiceImpl
 			String urlTitle = friendlyURLEntryLocalService.getUniqueUrlTitle(
 				groupId,
 				classNameLocalService.getClassNameId(JournalArticle.class),
-				article.getResourcePrimKey(), title,
+				article.getResourcePrimKey(),
+				_friendlyURLNormalizer.normalizeWithPeriods(title),
 				LanguageUtil.getLanguageId(entry.getKey()));
 
 			friendlyURLMap.put(entry.getKey(), urlTitle);
@@ -9230,7 +9228,9 @@ public class JournalArticleLocalServiceImpl
 			String urlTitle = friendlyURLEntryLocalService.getUniqueUrlTitle(
 				groupId,
 				classNameLocalService.getClassNameId(JournalArticle.class),
-				resourcePrimKey, friendlyURL, languageId);
+				resourcePrimKey,
+				_friendlyURLNormalizer.normalizeWithPeriods(friendlyURL),
+				languageId);
 
 			urlTitleMap.put(languageId, urlTitle);
 		}
@@ -9247,7 +9247,9 @@ public class JournalArticleLocalServiceImpl
 						groupId,
 						classNameLocalService.getClassNameId(
 							JournalArticle.class),
-						resourcePrimKey, value, languageId);
+						resourcePrimKey,
+						_friendlyURLNormalizer.normalizeWithPeriods(value),
+						languageId);
 
 				urlTitleMap.put(languageId, urlTitle);
 			}
@@ -9401,6 +9403,9 @@ public class JournalArticleLocalServiceImpl
 
 	@Reference
 	private DLURLHelper _dlURLHelper;
+
+	@Reference
+	private FriendlyURLNormalizer _friendlyURLNormalizer;
 
 	@Reference
 	private Http _http;

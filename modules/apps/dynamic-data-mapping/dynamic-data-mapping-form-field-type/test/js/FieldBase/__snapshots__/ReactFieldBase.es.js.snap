@@ -85,6 +85,7 @@ exports[`ReactFieldBase renders the FieldBase with help text 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
+      id="undefined_fieldHelp"
     >
       Type something!
     </span>

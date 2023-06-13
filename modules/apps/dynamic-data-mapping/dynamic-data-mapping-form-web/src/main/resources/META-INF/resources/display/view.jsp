@@ -185,7 +185,7 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 
 						<div class="ddm-form-basic-info">
 							<clay:container-fluid>
-								<h1 class="ddm-form-name"><%= HtmlUtil.escape(formInstance.getName(displayLocale)) %></h1>
+								<h1 class="ddm-form-name" data-form-title="<%= HtmlUtil.escape(formInstance.getName(displayLocale)) %>"><%= HtmlUtil.escape(formInstance.getName(displayLocale)) %></h1>
 
 								<%
 								String description = StringUtil.trim(HtmlUtil.escape(formInstance.getDescription(displayLocale)));

@@ -86,8 +86,9 @@ public class SelectDDMFormFieldTemplateContextContributor
 		).put(
 			"predefinedValue",
 			getValue(
-				DDMFormFieldTypeUtil.getPredefinedValue(
-					ddmFormField, ddmFormFieldRenderingContext))
+				DDMFormFieldTypeUtil.getPropertyValue(
+					ddmFormField, ddmFormFieldRenderingContext.getLocale(),
+					"predefinedValue"))
 		).put(
 			"strings", getStrings(ddmFormFieldRenderingContext)
 		).put(

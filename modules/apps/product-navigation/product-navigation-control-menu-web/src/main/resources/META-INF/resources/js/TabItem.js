@@ -61,12 +61,15 @@ const TabItem = ({item}) => {
 			})}
 			ref={item.disabled ? null : sourceRef}
 		>
-			<div className="sidebar-body__add-panel__tab-item-body">
+			<div
+				className="sidebar-body__add-panel__tab-item-body"
+				title={item.label}
+			>
 				<div className="icon">
 					<ClayIcon symbol={item.icon} />
 				</div>
 				<div className="text">
-					<div className="text-truncate title">{item.label}</div>
+					<div className="mr-1 text-truncate title">{item.label}</div>
 					{isContent && (
 						<div className="subtitle text-truncate">
 							{item.category}
@@ -77,11 +80,13 @@ const TabItem = ({item}) => {
 
 			{!item.disabled && (
 				<ClayButton
+					aria-label={`${Liferay.Language.get('add-content')}`}
 					className="btn-monospaced sidebar-body__add-panel__tab-item-add"
+					data-tooltip-align="top-left"
 					displayType="unstyled"
 					onClick={() => addItem({item, plid, setWidgets, widgets})}
 					small
-					title={item.name}
+					title={`${Liferay.Language.get('add-content')}`}
 				>
 					<ClayIcon symbol="plus" />
 					<span className="sr-only">{item.name}</span>

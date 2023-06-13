@@ -122,11 +122,7 @@ public class DBUpgrader {
 
 			StartupHelperUtil.printPatchLevel();
 
-			try (SafeClosable safeClosable =
-					ProxyModeThreadLocal.setWithSafeClosable(false)) {
-
-				upgrade();
-			}
+			upgrade();
 
 			_registerModuleServiceLifecycle("portlets.initialized");
 
@@ -154,13 +150,17 @@ public class DBUpgrader {
 
 		StartupHelperUtil.setUpgrading(true);
 
-		_upgradePortal();
+		try (SafeClosable safeClosable =
+				ProxyModeThreadLocal.setWithSafeClosable(false)) {
 
-		DependencyManagerSyncUtil.sync();
+			_upgradePortal();
 
-		DLFileEntryTypeLocalServiceUtil.getBasicDocumentDLFileEntryType();
+			DependencyManagerSyncUtil.sync();
 
-		_upgradeModules(applicationContext);
+			DLFileEntryTypeLocalServiceUtil.getBasicDocumentDLFileEntryType();
+
+			_upgradeModules(applicationContext);
+		}
 	}
 
 	public static void verify() throws VerifyException {

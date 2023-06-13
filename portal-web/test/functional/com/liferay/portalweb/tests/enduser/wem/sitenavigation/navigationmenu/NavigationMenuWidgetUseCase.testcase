@@ -473,7 +473,7 @@ definition {
 		}
 
 		task ("Assert only 2 levels shown in Navigation Menu") {
-			MouseOver(
+			MouseOver.javaScriptMouseOver(
 				key_pageName = "Home",
 				locator1 = "Home#PAGE");
 
@@ -501,7 +501,7 @@ definition {
 		}
 
 		task ("Assert only 2 levels shown in Navigation Menu") {
-			MouseOver(
+			MouseOver.javaScriptMouseOver(
 				key_pageName = "Home",
 				locator1 = "Home#PAGE");
 

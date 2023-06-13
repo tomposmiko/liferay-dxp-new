@@ -66,6 +66,7 @@ exports[`Field Checkbox Multiple has a helptext 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
+      id="undefined_fieldHelp"
     >
       Type something
     </span>

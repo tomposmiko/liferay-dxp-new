@@ -1099,7 +1099,7 @@ definition {
 					key_contentName = ${imageFileName},
 					locator1 = "PageEditor#ITEM_SELECTOR_CONTENT_INPUT");
 
-				var key_imageName = StringUtil.replace(${imageFileName}, " ", "+");
+				var key_imageName = StringUtil.replace(${imageFileName}, " ", "%20");
 
 				AssertElementPresent(
 					key_fragmentName = ${fragmentName},

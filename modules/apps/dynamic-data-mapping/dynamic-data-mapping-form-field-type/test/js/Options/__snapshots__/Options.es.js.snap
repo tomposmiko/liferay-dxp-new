@@ -46,6 +46,7 @@ exports[`Options shows the options 1`] = `
               tabindex="0"
             >
               <input
+                aria-invalid="true"
                 class="form-control ddm-field-text"
                 id="keyValueLabeloption0"
                 name="keyValueLabeloption0"
@@ -139,6 +140,7 @@ exports[`Options shows the options 1`] = `
               tabindex="0"
             >
               <input
+                aria-invalid="true"
                 class="form-control ddm-field-text"
                 id="keyValueLabeloption1"
                 name="keyValueLabeloption1"
@@ -232,6 +234,7 @@ exports[`Options shows the options 1`] = `
               tabindex="0"
             >
               <input
+                aria-invalid="true"
                 class="form-control ddm-field-text"
                 id="keyValueLabeloption2"
                 name="keyValueLabeloption2"

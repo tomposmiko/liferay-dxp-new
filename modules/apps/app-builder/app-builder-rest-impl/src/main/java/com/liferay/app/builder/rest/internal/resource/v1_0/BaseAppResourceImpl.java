@@ -19,21 +19,15 @@ import com.liferay.app.builder.rest.resource.v1_0.AppResource;
 import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupedModel;
-import com.liferay.portal.kernel.model.ResourceAction;
-import com.liferay.portal.kernel.model.ResourceConstants;
-import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
-import com.liferay.portal.kernel.service.ResourceLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -49,20 +43,16 @@ import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
-import com.liferay.portal.vulcan.permission.Permission;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Array;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -609,7 +599,7 @@ public abstract class BaseAppResourceImpl
 		}
 		else {
 			return getAppsPage(
-				Boolean.parseBoolean((String)parameters.get("active")),
+				_parseBoolean((String)parameters.get("active")),
 				(String[])parameters.get("deploymentTypes"),
 				(String)parameters.get("keywords"),
 				(String)parameters.get("scope"),
@@ -652,7 +642,7 @@ public abstract class BaseAppResourceImpl
 		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
 			appUnsafeConsumer = app -> putApp(
 				app.getId() != null ? app.getId() :
-					Long.parseLong((String)parameters.get("appId")),
+					_parseLong((String)parameters.get("appId")),
 				app);
 		}
 
@@ -670,6 +660,22 @@ public abstract class BaseAppResourceImpl
 				appUnsafeConsumer.accept(app);
 			}
 		}
+	}
+
+	private Boolean _parseBoolean(String value) {
+		if (value != null) {
+			return Boolean.parseBoolean(value);
+		}
+
+		return null;
+	}
+
+	private Long _parseLong(String value) {
+		if (value != null) {
+			return Long.parseLong(value);
+		}
+
+		return null;
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
@@ -881,6 +887,17 @@ public abstract class BaseAppResourceImpl
 		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
+	protected <T, R, E extends Throwable> long[] transformToLongArray(
+		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
+
+		try {
+			return unsafeTransformToLongArray(collection, unsafeFunction);
+		}
+		catch (Throwable throwable) {
+			throw new RuntimeException(throwable);
+		}
+	}
+
 	protected <T, R, E extends Throwable> List<R> unsafeTransform(
 			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
 		throws E {
@@ -911,6 +928,14 @@ public abstract class BaseAppResourceImpl
 		return TransformUtil.unsafeTransformToList(array, unsafeFunction);
 	}
 
+	protected <T, R, E extends Throwable> long[] unsafeTransformToLongArray(
+			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
+		throws E {
+
+		return (long[])_unsafeTransformToPrimitiveArray(
+			collection, unsafeFunction, long[].class);
+	}
+
 	protected AcceptLanguage contextAcceptLanguage;
 	protected UnsafeBiConsumer
 		<Collection<App>, UnsafeConsumer<App, Exception>, Exception>
@@ -931,116 +956,21 @@ public abstract class BaseAppResourceImpl
 	protected VulcanBatchEngineImportTaskResource
 		vulcanBatchEngineImportTaskResource;
 
-	private void _checkResources(
-			long companyId, long resourceId, String resourceName)
-		throws PortalException {
+	private <T, R, E extends Throwable> Object _unsafeTransformToPrimitiveArray(
+			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
+			Class<?> clazz)
+		throws E {
 
-		int count = resourcePermissionLocalService.getResourcePermissionsCount(
-			companyId, resourceName, ResourceConstants.SCOPE_INDIVIDUAL,
-			String.valueOf(resourceId));
+		List<R> list = unsafeTransform(collection, unsafeFunction);
 
-		if (count == 0) {
-			ResourceLocalServiceUtil.addResources(
-				companyId, resourceId, 0, resourceName,
-				String.valueOf(resourceId), false, true, true);
-		}
-	}
+		Object array = clazz.cast(
+			Array.newInstance(clazz.getComponentType(), list.size()));
 
-	private Collection<Permission> _getPermissions(
-			long companyId, List<ResourceAction> resourceActions,
-			long resourceId, String resourceName, String[] roleNames)
-		throws Exception {
-
-		_checkResources(companyId, resourceId, resourceName);
-
-		Map<String, Permission> permissions = new LinkedHashMap<>();
-
-		List<ResourcePermission> resourcePermissions = new ArrayList<>();
-
-		try {
-			Method method = ResourcePermissionLocalService.class.getMethod(
-				"getResourcePermissions", String.class);
-
-			resourcePermissions = (List<ResourcePermission>)method.invoke(
-				resourcePermissionLocalService, resourceName);
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			resourcePermissions =
-				resourcePermissionLocalService.getResourcePermissions(
-					companyId, resourceName, ResourceConstants.SCOPE_INDIVIDUAL,
-					String.valueOf(resourceId));
+		for (int i = 0; i < list.size(); i++) {
+			Array.set(array, i, list.get(i));
 		}
 
-		for (ResourcePermission resourcePermission : resourcePermissions) {
-			if ((resourcePermission.getPrimKeyId() == 0) ||
-				(resourcePermission.getPrimKeyId() == resourceId)) {
-
-				com.liferay.portal.kernel.model.Role role =
-					roleLocalService.getRole(resourcePermission.getRoleId());
-
-				if ((roleNames == null) ||
-					((roleNames != null) &&
-					 ArrayUtil.contains(roleNames, role.getName()))) {
-
-					Permission permission = permissions.get(role.getName());
-
-					if (permission == null) {
-						permission = _toPermission(
-							resourceActions, resourcePermission, role);
-
-						if (permission != null) {
-							permissions.put(role.getName(), permission);
-						}
-					}
-					else {
-						Set<String> actionsIdsSet = new HashSet<>();
-
-						Collections.addAll(
-							actionsIdsSet, permission.getActionIds());
-
-						Permission newPermission = _toPermission(
-							resourceActions, resourcePermission, role);
-
-						Collections.addAll(
-							actionsIdsSet, newPermission.getActionIds());
-
-						permission.setActionIds(
-							actionsIdsSet.toArray(new String[0]));
-					}
-				}
-			}
-		}
-
-		return permissions.values();
-	}
-
-	private Permission _toPermission(
-		List<ResourceAction> resourceActions,
-		ResourcePermission resourcePermission,
-		com.liferay.portal.kernel.model.Role role) {
-
-		Set<String> actionsIdsSet = new HashSet<>();
-
-		long actionIds = resourcePermission.getActionIds();
-
-		for (ResourceAction resourceAction : resourceActions) {
-			long bitwiseValue = resourceAction.getBitwiseValue();
-
-			if ((actionIds & bitwiseValue) == bitwiseValue) {
-				actionsIdsSet.add(resourceAction.getActionId());
-			}
-		}
-
-		if (actionsIdsSet.isEmpty()) {
-			return null;
-		}
-
-		return new Permission() {
-			{
-				actionIds = actionsIdsSet.toArray(new String[0]);
-				roleName = role.getName();
-			}
-		};
+		return array;
 	}
 
 	private static final com.liferay.portal.kernel.log.Log _log =

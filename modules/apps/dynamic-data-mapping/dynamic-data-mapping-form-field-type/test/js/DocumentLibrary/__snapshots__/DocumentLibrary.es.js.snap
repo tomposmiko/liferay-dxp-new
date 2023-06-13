@@ -51,6 +51,7 @@ exports[`Field DocumentLibrary has a helptext 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
+      id="textField_fieldHelp"
     >
       Type something
     </span>

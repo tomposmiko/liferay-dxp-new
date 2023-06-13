@@ -56,6 +56,12 @@ public interface ExportImportServiceConfiguration {
 	public boolean publishParentLayoutsByDefault();
 
 	@Meta.AD(
+		deflt = "true", description = "publish-displayed-content-help",
+		name = "publish-displayed-content", required = false
+	)
+	public boolean publishDisplayedContent();
+
+	@Meta.AD(
 		deflt = "false", description = "publish-permissions-by-default-help",
 		name = "publish-permissions-by-default", required = false
 	)

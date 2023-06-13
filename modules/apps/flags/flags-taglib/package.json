@@ -1,9 +1,9 @@
 {
 	"dependencies": {
 		"@clayui/alert": "3.5.0",
-		"@clayui/button": "3.56.0",
+		"@clayui/button": "3.83.0",
 		"@clayui/icon": "3.56.0",
-		"@clayui/modal": "3.8.0",
+		"@clayui/modal": "3.89.0",
 		"clay-button": "2.24.1",
 		"clay-icon": "2.24.1",
 		"frontend-js-web": "*",
@@ -22,5 +22,5 @@
 		"format": "liferay-npm-scripts fix",
 		"test": "liferay-npm-scripts test"
 	},
-	"version": "5.0.44"
+	"version": "5.0.46"
 }

@@ -116,6 +116,7 @@ exports[`Field Color Picker renders field with helptext 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
+      id="colorPicker_fieldHelp"
     >
       Helptext
     </span>
@@ -191,6 +192,7 @@ exports[`Field Color Picker renders field with label 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
+      id="colorPicker_fieldHelp"
     >
       Helptext
     </span>

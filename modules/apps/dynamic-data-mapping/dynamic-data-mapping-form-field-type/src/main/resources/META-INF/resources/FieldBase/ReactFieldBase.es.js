@@ -111,7 +111,7 @@ function FieldBase({
 }) {
 	const {editingLanguageId = themeDisplay.getLanguageId()} = usePage();
 	let fieldDetails = '';
-	const fieldDetailsId = id ? id + '_fieldDetails' : name + '_fieldDetails';
+	const fieldDetailsId = `${id ?? name}_fieldDetails`;
 	const dispatch = useForm();
 	const hasError = displayErrors && errorMessage && !valid;
 	const localizedValueArray = useMemo(() => {
@@ -146,7 +146,8 @@ function FieldBase({
 			type === 'grid' ||
 			type === 'paragraph' ||
 			type === 'radio');
-	const showFor = type === 'text' || type === 'numeric';
+	const showFor = type === 'text' || type === 'numeric' || type === 'select';
+	const readFieldDetails = !showFor || type === 'select';
 
 	if (!renderLabel) {
 		parentDivTabIndex = 0;
@@ -175,9 +176,11 @@ function FieldBase({
 		fieldDetails += requiredText;
 	}
 
+	const hasFieldDetails = fieldDetails && readFieldDetails;
 	const accessibleProps = {
-		...(fieldDetails && {'aria-labelledby': fieldDetailsId}),
-		...(showFor ? {htmlFor: id ?? name} : {tabIndex: 0}),
+		...(hasFieldDetails && {'aria-labelledby': fieldDetailsId}),
+		...(showFor && {htmlFor: id ?? name}),
+		...(readFieldDetails && {tabIndex: 0}),
 	};
 
 	return (
@@ -302,20 +305,29 @@ function FieldBase({
 					))}
 
 				{tip && (
-					<span aria-hidden="true" className="form-text">
+					<span
+						aria-hidden={readFieldDetails}
+						className="form-text"
+						id={`${id ?? name}_fieldHelp`}
+					>
 						{tip}
 					</span>
 				)}
 
 				{hasError && (
-					<span className="form-feedback-group">
-						<div aria-hidden="true" className="form-feedback-item">
+					<div className="form-feedback-group">
+						<div
+							aria-hidden={readFieldDetails}
+							className="form-feedback-item"
+							id={`${id ?? name}_fieldError`}
+							role="alert"
+						>
 							{errorMessage}
 						</div>
-					</span>
+					</div>
 				)}
 
-				{fieldDetails && (
+				{hasFieldDetails && (
 					<span
 						className="sr-only"
 						dangerouslySetInnerHTML={{

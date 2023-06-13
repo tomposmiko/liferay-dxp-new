@@ -87,11 +87,6 @@ public class DataDefinitionResourceTest
 					"ddmStructureId", parentDataDefinition.getId()
 				).put(
 					"ddmStructureLayoutId", ""
-				).put(
-					"rows",
-					new String[] {
-						"[{\"columns\":[{\"fields\":[\"Text\"],\"size\": 12}]}]"
-					}
 				).build());
 		}
 

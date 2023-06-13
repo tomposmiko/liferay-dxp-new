@@ -20,7 +20,7 @@ import {usePage} from '../../hooks/usePage.es';
 import fieldBlur from '../../thunks/fieldBlur.es';
 import fieldChange from '../../thunks/fieldChange.es';
 import fieldFocus from '../../thunks/fieldFocus.es';
-import {getFormId, getFormNode} from '../../util/formId.es';
+import {getFormId, getFormNode, getFormTitle} from '../../util/formId.es';
 import {Field} from '../Field/Field.es';
 import * as DefaultVariant from './DefaultVariant.es';
 
@@ -34,10 +34,12 @@ export const Layout = ({
 		allowNestedFields,
 		containerElement,
 		pageIndex,
+		pages,
 		spritemap,
 	} = usePage();
 	const createFieldChange = useEvaluate(fieldChange);
 	const dispatch = useForm();
+	const title = getFormTitle();
 
 	return (
 		<Components.Rows
@@ -78,7 +80,10 @@ export const Layout = ({
 														containerElement.current
 													)
 												),
+												formPageTitle:
+													pages[activePage].title,
 												properties: event,
+												title,
 											})
 										)
 									}
@@ -98,7 +103,10 @@ export const Layout = ({
 														containerElement.current
 													)
 												),
+												formPageTitle:
+													pages[activePage].title,
 												properties: event,
+												title,
 											})
 										)
 									}

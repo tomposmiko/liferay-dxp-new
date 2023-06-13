@@ -246,6 +246,8 @@ module.framework.properties.osgi.console=11312</echo>
 
 	<macrodef name="docker-execute">
 		<attribute name="container" />
+		<attribute default="/bin/bash" name="shell.path" />
+
 		<text name="script" />
 
 		<sequential>
@@ -253,19 +255,13 @@ module.framework.properties.osgi.console=11312</echo>
 
 			<echo file="${script.sh.file}"><![CDATA[@{script}]]></echo>
 
-			<get-operating-system-property property.name="operating.system.docker.shell.path" />
-
-			<condition else="/bin/bash" property="docker.shell.path" value="${operating.system.docker.shell.path}">
-				<isset property="operating.system.docker.shell.path" />
-			</condition>
-
 			<execute>
 				<![CDATA[
 					docker exec @{container} mkdir -p /tmp
 
 					docker cp ${script.sh.file} @{container}:/tmp/script.sh
 
-					docker exec @{container} ${docker.shell.path} /tmp/script.sh
+					docker exec @{container} @{shell.path} /tmp/script.sh
 
 					docker exec --user root @{container} rm -f /tmp/script.sh
 				]]>
@@ -6156,9 +6152,10 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 									<isset property="operating.system.docker.image" />
 									<then>
 										<sequential>
+											<get-operating-system-property property.name="operating.system.docker.shell.path" />
 											<get-operating-system-property property.name="operating.system.host" />
 
-											<docker-execute container="${operating.system.host}">
+											<docker-execute container="${operating.system.host}" shell.path="${operating.system.docker.shell.path}">
 												chmod +x ${test.app.server.bin.dir}/${app.server.start.executable}
 
 												${test.app.server.bin.dir}/${app.server.start.executable} ${app.server.start.executable.arg.line}
@@ -6255,6 +6252,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 				ssh -fN -4 -L 8082:${ip.address}:8082 ${browser.host}
 				ssh -fN -4 -L 8282:${ip.address}:8282 ${browser.host}
 				ssh -fN -4 -L 8443:${ip.address}:8443 ${browser.host}
+				ssh -fN -4 -L 8983:${ip.address}:8983 ${browser.host}
 				ssh -fN -4 -L 9080:${ip.address}:9080 ${browser.host}
 				ssh -fN -4 -L 9200:${ip.address}:9200 ${browser.host}
 				ssh -fN -4 -L 9201:${ip.address}:9201 ${browser.host}
@@ -6790,7 +6788,7 @@ ${docker.start.error}</fail>
 
 					docker kill @{name}
 
-					docker rm -f @{name}
+					docker rm -fv @{name}
 
 					docker network disconnect -f ${docker.network.name} @{name} 2>/dev/null || true
 				]]>
@@ -11111,6 +11109,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			liferay.app.server.portal.lib.dir=${app.server.lib.portal.dir}
 			liferay.app.server.portal.web.dir=${app.server.portal.dir}
 			logger.resources.url=${test.poshi.logger.resources.url}
+			oauth2.url=${oauth2.url}
 			operating.system.type=${operating.system.type}
 			output.dir.name=${selenium.output.dir.name}
 			product.names=${product.names}
@@ -11523,6 +11522,17 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 				</echo>
 			</then>
 			<elseif>
+				<and>
+					<equals arg1="${test.liferay.virtual.instance}" arg2="true" />
+					<isset property="env.JENKINS_HOME" />
+				</and>
+				<then>
+					<echo append="true" file="${test.ext.properties.file}">
+						test.skip.tear.down=false
+					</echo>
+				</then>
+			</elseif>
+			<elseif>
 				<isset property="test.skip.tear.down" />
 				<then>
 					<echo append="true" file="${test.ext.properties.file}">
@@ -11559,6 +11569,17 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 					</echo>
 				</then>
 			</elseif>
+		</if>
+
+		<get-testcase-property property.name="test.liferay.virtual.instance" />
+
+		<if>
+			<isset property="${test.liferay.virtual.instance}" />
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					test.liferay.virtual.instance=${test.liferay.virtual.instance}
+				</echo>
+			</then>
 		</if>
 
 		<if>
@@ -14159,12 +14180,30 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 			</then>
 		</if>
 
+		<get-testcase-property property.name="oauth2.application.enabled" />
+
+		<if>
+			<equals arg1="${oauth2.application.enabled}" arg2="true" />
+			<then>
+				<ant antfile="build-test-oauth2.xml" target="start-oauth2-application" />
+			</then>
+		</if>
+
 		<antcall target="run-selenium-test" />
 
 		<if>
 			<equals arg1="${analytics.cloud.enabled}" arg2="true" />
 			<then>
 				<ant antfile="build-test-analytics-cloud.xml" target="stop-analytics-cloud" />
+			</then>
+		</if>
+
+		<get-testcase-property property.name="oauth2.application.enabled" />
+
+		<if>
+			<equals arg1="${oauth2.application.enabled}" arg2="true" />
+			<then>
+				<ant antfile="build-test-oauth2.xml" target="stop-oauth2-application" />
 			</then>
 		</if>
 

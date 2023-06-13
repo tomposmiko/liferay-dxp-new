@@ -9,6 +9,8 @@ exports[`Field Text has a helptext 1`] = `
     tabindex="0"
   >
     <input
+      aria-describedby="textField_fieldHelp"
+      aria-invalid="true"
       class="form-control ddm-field-text"
       id="textField"
       name="textField"
@@ -18,6 +20,7 @@ exports[`Field Text has a helptext 1`] = `
     <span
       aria-hidden="true"
       class="form-text"
+      id="textField_fieldHelp"
     >
       Type something
     </span>
@@ -46,6 +49,7 @@ exports[`Field Text has a label 1`] = `
       label
     </label>
     <input
+      aria-invalid="true"
       class="form-control ddm-field-text"
       id="textField"
       name="textField"
@@ -72,6 +76,7 @@ exports[`Field Text has a placeholder 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control ddm-field-text"
       id="textField"
       name="textField"
@@ -93,6 +98,7 @@ exports[`Field Text has a value 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control ddm-field-text"
       id="textField"
       name="textField"
@@ -113,6 +119,7 @@ exports[`Field Text has an id 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control ddm-field-text"
       id="Id"
       name="textField"
@@ -133,6 +140,7 @@ exports[`Field Text is not readOnly 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control ddm-field-text"
       id="textField"
       name="textField"
@@ -153,6 +161,8 @@ exports[`Field Text is not required 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
+      aria-required="false"
       class="form-control ddm-field-text"
       id="textField"
       name="textField"
@@ -173,6 +183,7 @@ exports[`Field Text is readOnly 1`] = `
     tabindex="0"
   >
     <input
+      aria-invalid="true"
       class="form-control ddm-field-text"
       disabled=""
       id="textField"
@@ -199,6 +210,7 @@ exports[`Field Text renders Label if showLabel is true 1`] = `
       text
     </label>
     <input
+      aria-invalid="true"
       class="form-control ddm-field-text"
       id="textField"
       name="textField"

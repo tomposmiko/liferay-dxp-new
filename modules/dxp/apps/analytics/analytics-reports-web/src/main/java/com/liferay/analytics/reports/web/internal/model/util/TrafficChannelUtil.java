@@ -63,28 +63,28 @@ public final class TrafficChannelUtil {
 		List<ReferringURL> pageReferringURLs,
 		List<ReferringSocialMedia> referringSocialMediaList) {
 
-		if (Objects.equals("direct", acquisitionChannel.getName())) {
+		if (Objects.equals(acquisitionChannel.getName(), "direct")) {
 			return new DirectTrafficChannelImpl(
 				acquisitionChannel.getTrafficAmount(),
 				acquisitionChannel.getTrafficShare());
 		}
-		else if (Objects.equals("organic", acquisitionChannel.getName())) {
+		else if (Objects.equals(acquisitionChannel.getName(), "organic")) {
 			return new OrganicTrafficChannelImpl(
 				acquisitionChannel.getTrafficAmount(),
 				acquisitionChannel.getTrafficShare());
 		}
-		else if (Objects.equals("paid", acquisitionChannel.getName())) {
+		else if (Objects.equals(acquisitionChannel.getName(), "paid")) {
 			return new PaidTrafficChannelImpl(
 				acquisitionChannel.getTrafficAmount(),
 				acquisitionChannel.getTrafficShare());
 		}
-		else if (Objects.equals("referral", acquisitionChannel.getName())) {
+		else if (Objects.equals(acquisitionChannel.getName(), "referral")) {
 			return new ReferralTrafficChannelImpl(
 				domainReferringURLs, pageReferringURLs,
 				acquisitionChannel.getTrafficAmount(),
 				acquisitionChannel.getTrafficShare());
 		}
-		else if (Objects.equals("social", acquisitionChannel.getName())) {
+		else if (Objects.equals(acquisitionChannel.getName(), "social")) {
 			return new SocialTrafficChannelImpl(
 				referringSocialMediaList, acquisitionChannel.getTrafficAmount(),
 				acquisitionChannel.getTrafficShare());

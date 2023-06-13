@@ -463,6 +463,18 @@ public class FragmentEntryLinkLocalServiceUtil {
 	}
 
 	public static List<FragmentEntryLink> getFragmentEntryLinks(
+		long companyId, String rendererKey) {
+
+		return getService().getFragmentEntryLinks(companyId, rendererKey);
+	}
+
+	public static List<FragmentEntryLink> getFragmentEntryLinks(
+		long companyId, String[] rendererKeys) {
+
+		return getService().getFragmentEntryLinks(companyId, rendererKeys);
+	}
+
+	public static List<FragmentEntryLink> getFragmentEntryLinks(
 		String rendererKey) {
 
 		return getService().getFragmentEntryLinks(rendererKey);
@@ -785,6 +797,14 @@ public class FragmentEntryLinkLocalServiceUtil {
 
 		getService().updateFragmentEntryLinks(
 			fragmentEntryLinksEditableValuesMap);
+	}
+
+	public static void updateLatestChanges(
+			com.liferay.fragment.model.FragmentEntry fragmentEntry,
+			FragmentEntryLink fragmentEntryLink)
+		throws PortalException {
+
+		getService().updateLatestChanges(fragmentEntry, fragmentEntryLink);
 	}
 
 	public static void updateLatestChanges(long fragmentEntryLinkId)

@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.sql.PreparedStatement;
@@ -130,8 +131,9 @@ public class LayoutPageTemplateStructureUpgradeProcess extends UpgradeProcess {
 			}
 
 			_layoutLocalService.updateStatus(
-				layout.getUserId(), plid, WorkflowConstants.STATUS_APPROVED,
-				serviceContext);
+				PortalUtil.getValidUserId(
+					layout.getCompanyId(), layout.getUserId()),
+				plid, WorkflowConstants.STATUS_APPROVED, serviceContext);
 		}
 	}
 

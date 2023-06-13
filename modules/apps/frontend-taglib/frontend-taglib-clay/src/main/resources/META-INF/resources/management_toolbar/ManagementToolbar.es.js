@@ -194,6 +194,7 @@ class ManagementToolbar extends ClayComponent {
 	}
 
 	_handleFilterLabelCloseClicked(event) {
+		this._searchContainer.fire('clearFilter');
 		const removeLabelURL =
 			event.data.label.data && event.data.label.data.removeLabelURL;
 

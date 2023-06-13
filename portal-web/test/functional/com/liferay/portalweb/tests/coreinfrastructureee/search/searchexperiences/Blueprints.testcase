@@ -1728,7 +1728,6 @@ definition {
 
 	test HotDeploySearchExperiencesApp {
 		property hot.deploy.osgi.app.includes = "search-experiences";
-		property osgi.app.includes = "";
 		property test.assert.warning.exceptions = "true";
 		property test.name.skip.portal.instance = "Blueprints#HotDeploySearchExperiencesApp";
 
@@ -3800,7 +3799,7 @@ definition {
 			linkText = "Learn more",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Search Blueprints Elements Reference — Liferay Learn");
+		SelectWindow(locator1 = "Search Blueprints Elements Reference - Liferay Learn");
 
 		var siteName = TestCase.getSiteName(siteName = ${siteName});
 
@@ -3815,7 +3814,7 @@ definition {
 			linkText = "Learn more",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Creating and Managing Search Blueprints — Liferay Learn");
+		SelectWindow(locator1 = "Creating and Managing Search Blueprints - Liferay Learn");
 
 		Close.closeAndSelectWindow(locator1 = "Edit Blueprint - ${siteName}");
 
@@ -3830,7 +3829,7 @@ definition {
 			linkText = "Learn more",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Creating and Managing Search Blueprints — Liferay Learn");
+		SelectWindow(locator1 = "Creating and Managing Search Blueprints - Liferay Learn");
 
 		Close.closeAndSelectWindow(locator1 = "Edit Blueprint - ${siteName}");
 
@@ -3841,7 +3840,7 @@ definition {
 			linkText = "Learn more",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Search Blueprints Configuration Reference — Liferay Learn");
+		SelectWindow(locator1 = "Search Blueprints Configuration Reference - Liferay Learn");
 
 		Close.closeAndSelectWindow(locator1 = "Edit Blueprint - ${siteName}");
 
@@ -3850,7 +3849,7 @@ definition {
 			linkText = "Learn more",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Search Blueprints Configuration Reference — Liferay Learn");
+		SelectWindow(locator1 = "Search Blueprints Configuration Reference - Liferay Learn");
 
 		Close.closeAndSelectWindow(locator1 = "Edit Blueprint - ${siteName}");
 
@@ -3859,7 +3858,7 @@ definition {
 			linkText = "Learn more",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Search Blueprints Configuration Reference — Liferay Learn");
+		SelectWindow(locator1 = "Search Blueprints Configuration Reference - Liferay Learn");
 
 		Close.closeAndSelectWindow(locator1 = "Edit Blueprint - ${siteName}");
 
@@ -3868,7 +3867,7 @@ definition {
 			linkText = "Learn more",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Search Blueprints Configuration Reference — Liferay Learn");
+		SelectWindow(locator1 = "Search Blueprints Configuration Reference - Liferay Learn");
 
 		Close.closeAndSelectWindow(locator1 = "Edit Blueprint - ${siteName}");
 
@@ -3877,7 +3876,7 @@ definition {
 			linkText = "Learn more",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Search Blueprints Configuration Reference — Liferay Learn");
+		SelectWindow(locator1 = "Search Blueprints Configuration Reference - Liferay Learn");
 
 		Close.closeAndSelectWindow(locator1 = "Edit Blueprint - ${siteName}");
 
@@ -3886,7 +3885,7 @@ definition {
 			linkText = "Learn more",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Search Blueprints Configuration Reference — Liferay Learn");
+		SelectWindow(locator1 = "Search Blueprints Configuration Reference - Liferay Learn");
 
 		Close.closeAndSelectWindow(locator1 = "Edit Blueprint - ${siteName}");
 
@@ -3903,7 +3902,7 @@ definition {
 			linkText = "Learn more",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Creating Elements — Liferay Learn");
+		SelectWindow(locator1 = "Creating Elements - Liferay Learn");
 
 		Close.closeAndSelectWindow(locator1 = "View Element - ${siteName}");
 
@@ -3922,7 +3921,7 @@ definition {
 			linkText = "Learn how",
 			locator1 = "Blueprints#DOC_LINK_GENERIC");
 
-		SelectWindow(locator1 = "Using a Search Blueprint on a Search Page — Liferay Learn");
+		SelectWindow(locator1 = "Using a Search Blueprint on a Search Page - Liferay Learn");
 	}
 
 	test ViewQueryBuilderFieldValidation {

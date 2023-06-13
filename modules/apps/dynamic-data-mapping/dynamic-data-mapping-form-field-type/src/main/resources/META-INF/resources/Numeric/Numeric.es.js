@@ -176,6 +176,16 @@ const Main = ({
 		readOnly={readOnly}
 	>
 		<Numeric
+			{...{
+				...(otherProps.tip && {
+					'aria-describedby': `${id ?? name}_fieldHelp`,
+				}),
+				...(otherProps.errorMessage && {
+					'aria-errormessage': `${id ?? name}_fieldError`,
+				}),
+				'aria-invalid': !otherProps.valid,
+				'aria-required': otherProps.required,
+			}}
 			dataType={dataType}
 			defaultLanguageId={defaultLanguageId}
 			disabled={readOnly}

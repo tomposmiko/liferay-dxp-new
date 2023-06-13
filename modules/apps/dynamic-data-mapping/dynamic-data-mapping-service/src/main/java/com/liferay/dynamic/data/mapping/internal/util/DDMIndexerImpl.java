@@ -21,6 +21,7 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
@@ -68,6 +69,7 @@ import java.math.BigDecimal;
 import java.text.Format;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -349,7 +351,12 @@ public class DDMIndexerImpl implements DDMIndexer {
 
 		Fields fields = toFields(ddmStructure, ddmFormValues);
 
-		for (Field field : fields) {
+		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
+			ddmFormValues.getDDMFormFieldValuesMap(true);
+
+		for (String key : ddmFormFieldValuesMap.keySet()) {
+			Field field = fields.get(key);
+
 			try {
 				String indexType = ddmStructure.getFieldProperty(
 					field.getName(), "indexType");

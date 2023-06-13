@@ -1,9 +1,9 @@
 {
 	"dependencies": {
 		"@clayui/alert": "3.5.0",
-		"@clayui/form": "3.58.0",
+		"@clayui/form": "3.89.0",
 		"@clayui/icon": "3.56.0",
-		"@clayui/modal": "3.8.0",
+		"@clayui/modal": "3.89.0",
 		"@liferay/amd-loader": "4.3.1",
 		"clay": "2.18.1",
 		"clay-alert": "2.24.1",
@@ -41,5 +41,5 @@
 		"test": "liferay-npm-scripts test",
 		"watch": "liferay-npm-scripts webpack --watch"
 	},
-	"version": "4.0.58"
+	"version": "4.0.59"
 }

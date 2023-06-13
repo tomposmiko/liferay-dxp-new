@@ -40,8 +40,6 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 
-import org.hibernate.exception.ConstraintViolationException;
-
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -150,8 +148,11 @@ public class SXPBlueprintLocalServiceTest {
 
 				Assert.fail();
 			}
-			catch (ConstraintViolationException constraintViolationException) {
-				Assert.assertNotNull(constraintViolationException);
+			catch (DuplicateSXPBlueprintExternalReferenceCodeException
+						duplicateSXPBlueprintExternalReferenceCodeException) {
+
+				Assert.assertNotNull(
+					duplicateSXPBlueprintExternalReferenceCodeException);
 			}
 		}
 
