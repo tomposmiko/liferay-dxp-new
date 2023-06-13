@@ -34,6 +34,8 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -265,6 +267,50 @@ public abstract class SXPElementLocalServiceBaseImpl
 		String uuid, long companyId) {
 
 		return sxpElementPersistence.fetchByUuid_C_First(uuid, companyId, null);
+	}
+
+	/**
+	 * Returns the sxp element with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the sxp element's external reference code
+	 * @return the matching sxp element, or <code>null</code> if a matching sxp element could not be found
+	 */
+	@Override
+	public SXPElement fetchSXPElementByExternalReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return sxpElementPersistence.fetchByC_ERC(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchSXPElementByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public SXPElement fetchSXPElementByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return fetchSXPElementByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the sxp element with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the sxp element's external reference code
+	 * @return the matching sxp element
+	 * @throws PortalException if a matching sxp element could not be found
+	 */
+	@Override
+	public SXPElement getSXPElementByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
+		throws PortalException {
+
+		return sxpElementPersistence.findByC_ERC(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -565,5 +611,8 @@ public abstract class SXPElementLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SXPElementLocalServiceBaseImpl.class);
 
 }

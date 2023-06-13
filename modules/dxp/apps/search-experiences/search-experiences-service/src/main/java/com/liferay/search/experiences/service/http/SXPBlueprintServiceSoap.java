@@ -69,7 +69,8 @@ public class SXPBlueprintServiceSoap {
 
 	public static com.liferay.search.experiences.model.SXPBlueprintSoap
 			addSXPBlueprint(
-				String configurationJSON, String[] descriptionMapLanguageIds,
+				String externalReferenceCode, String configurationJSON,
+				String[] descriptionMapLanguageIds,
 				String[] descriptionMapValues, String elementInstancesJSON,
 				String schemaVersion, String[] titleMapLanguageIds,
 				String[] titleMapValues,
@@ -85,8 +86,9 @@ public class SXPBlueprintServiceSoap {
 
 			com.liferay.search.experiences.model.SXPBlueprint returnValue =
 				SXPBlueprintServiceUtil.addSXPBlueprint(
-					configurationJSON, descriptionMap, elementInstancesJSON,
-					schemaVersion, titleMap, serviceContext);
+					externalReferenceCode, configurationJSON, descriptionMap,
+					elementInstancesJSON, schemaVersion, titleMap,
+					serviceContext);
 
 			return com.liferay.search.experiences.model.SXPBlueprintSoap.
 				toSoapModel(returnValue);
@@ -123,6 +125,26 @@ public class SXPBlueprintServiceSoap {
 		try {
 			com.liferay.search.experiences.model.SXPBlueprint returnValue =
 				SXPBlueprintServiceUtil.getSXPBlueprint(sxpBlueprintId);
+
+			return com.liferay.search.experiences.model.SXPBlueprintSoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.search.experiences.model.SXPBlueprintSoap
+			getSXPBlueprintByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws RemoteException {
+
+		try {
+			com.liferay.search.experiences.model.SXPBlueprint returnValue =
+				SXPBlueprintServiceUtil.getSXPBlueprintByExternalReferenceCode(
+					companyId, externalReferenceCode);
 
 			return com.liferay.search.experiences.model.SXPBlueprintSoap.
 				toSoapModel(returnValue);

@@ -50,17 +50,19 @@ public class SXPBlueprintServiceImpl extends SXPBlueprintServiceBaseImpl {
 
 	@Override
 	public SXPBlueprint addSXPBlueprint(
-			String configurationJSON, Map<Locale, String> descriptionMap,
-			String elementInstancesJSON, String schemaVersion,
-			Map<Locale, String> titleMap, ServiceContext serviceContext)
+			String externalReferenceCode, String configurationJSON,
+			Map<Locale, String> descriptionMap, String elementInstancesJSON,
+			String schemaVersion, Map<Locale, String> titleMap,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		_portletResourcePermission.check(
 			getPermissionChecker(), null, SXPActionKeys.ADD_SXP_BLUEPRINT);
 
 		return sxpBlueprintLocalService.addSXPBlueprint(
-			getUserId(), configurationJSON, descriptionMap,
-			elementInstancesJSON, schemaVersion, titleMap, serviceContext);
+			externalReferenceCode, getUserId(), configurationJSON,
+			descriptionMap, elementInstancesJSON, schemaVersion, titleMap,
+			serviceContext);
 	}
 
 	@Override
@@ -79,6 +81,22 @@ public class SXPBlueprintServiceImpl extends SXPBlueprintServiceBaseImpl {
 
 		SXPBlueprint sxpBlueprint = _sxpBlueprintLocalService.getSXPBlueprint(
 			sxpBlueprintId);
+
+		_sxpBlueprintModelResourcePermission.check(
+			getPermissionChecker(), sxpBlueprint,
+			SXPActionKeys.APPLY_SXP_BLUEPRINT);
+
+		return sxpBlueprint;
+	}
+
+	@Override
+	public SXPBlueprint getSXPBlueprintByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
+		throws PortalException {
+
+		SXPBlueprint sxpBlueprint =
+			_sxpBlueprintLocalService.getSXPBlueprintByExternalReferenceCode(
+				companyId, externalReferenceCode);
 
 		_sxpBlueprintModelResourcePermission.check(
 			getPermissionChecker(), sxpBlueprint,

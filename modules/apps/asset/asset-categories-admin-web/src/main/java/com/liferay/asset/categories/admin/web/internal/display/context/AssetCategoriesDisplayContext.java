@@ -107,6 +107,12 @@ public class AssetCategoriesDisplayContext {
 	}
 
 	public String getAddCategoryRedirect() throws PortalException {
+		return getAddCategoryRedirect().toString();
+	}
+
+	public PortletURL getAddCategoryRedirectPortletURL()
+		throws PortalException {
+
 		PortletURL addCategoryURL = _renderResponse.createRenderURL();
 
 		addCategoryURL.setParameter("mvcPath", "/edit_category.jsp");
@@ -119,12 +125,21 @@ public class AssetCategoriesDisplayContext {
 				"parentCategoryId", String.valueOf(parentCategoryId));
 		}
 
-		if (getVocabularyId() > 0) {
+		long vocabularyId = getVocabularyId();
+
+		if (vocabularyId > 0) {
 			addCategoryURL.setParameter(
-				"vocabularyId", String.valueOf(getVocabularyId()));
+				"vocabularyId", String.valueOf(vocabularyId));
 		}
 
-		return addCategoryURL.toString();
+		String itemSelectorEventName = getItemSelectorEventName();
+
+		if (Validator.isNotNull(itemSelectorEventName)) {
+			addCategoryURL.setParameter(
+				"itemSelectorEventName", itemSelectorEventName);
+		}
+
+		return addCategoryURL;
 	}
 
 	public String getAssetType(AssetVocabulary vocabulary)
@@ -755,7 +770,13 @@ public class AssetCategoriesDisplayContext {
 	}
 
 	public boolean isItemSelector() {
-		return Validator.isNotNull(getItemSelectorEventName());
+		if (Validator.isNotNull(getItemSelectorEventName()) ||
+			LiferayWindowState.isPopUp(_httpServletRequest)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean isShowCategoriesAddButton() {

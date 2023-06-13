@@ -12,11 +12,24 @@
  * details.
  */
 
-import {DELETE_WIDGETS} from './types';
+import {LAYOUT_DATA_ITEM_TYPES} from '../config/constants/layoutDataItemTypes';
 
-export default function deleteWidgets(fragmentEntryLinks = []) {
-	return {
-		fragmentEntryLinks,
-		type: DELETE_WIDGETS,
-	};
+export default function getFragmentEntryLinkIdsFromItemId({
+	itemId,
+	layoutData,
+}) {
+	const item = layoutData?.items[itemId];
+
+	return item?.type === LAYOUT_DATA_ITEM_TYPES.fragment
+		? [item?.config?.fragmentEntryLinkId]
+		: item?.children.reduce(
+				(acc, childId) => [
+					...acc,
+					...getFragmentEntryLinkIdsFromItemId({
+						itemId: childId,
+						layoutData,
+					}),
+				],
+				[]
+		  );
 }

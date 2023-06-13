@@ -12,19 +12,7 @@
  * details.
  */
 
-import {DUPLICATE_SEGMENTS_EXPERIENCE} from '../actions';
+import {updateIn} from './updateIn';
 
-export default function duplicateExperience({
-	fragmentEntryLinks,
-	layoutData,
-	segmentsExperience,
-}) {
-	return {
-		payload: {
-			fragmentEntryLinks,
-			layoutData,
-			segmentsExperience,
-		},
-		type: DUPLICATE_SEGMENTS_EXPERIENCE,
-	};
-}
+export const setIn = (objectOrArray, keyPathOrKey, value) =>
+	updateIn(objectOrArray, keyPathOrKey, () => value);

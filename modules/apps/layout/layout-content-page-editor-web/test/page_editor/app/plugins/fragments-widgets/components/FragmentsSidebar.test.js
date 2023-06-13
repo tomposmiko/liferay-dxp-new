@@ -18,7 +18,9 @@ import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 
+import {useWidgets} from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/components/WidgetsContext';
 import {StoreAPIContextProvider} from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/store/index';
+import {setIn} from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/utils/setIn';
 import FragmentsSidebar from '../../../../../../src/main/resources/META-INF/resources/page_editor/plugins/fragments-widgets/components/FragmentsSidebar';
 import TabsPanel from '../../../../../../src/main/resources/META-INF/resources/page_editor/plugins/fragments-widgets/components/TabsPanel';
 
@@ -36,6 +38,14 @@ jest.mock(
 	() => {
 		return jest.fn(() => null);
 	}
+);
+
+jest.mock(
+	'../../../../../../src/main/resources/META-INF/resources/page_editor/app/components/WidgetsContext',
+	() => ({
+		WidgetsContext: ({children}) => <>{children}</>,
+		useWidgets: jest.fn(),
+	})
 );
 
 const STATE = {
@@ -74,23 +84,25 @@ const STATE = {
 			name: 'Collection 1',
 		},
 	],
-	widgets: [
-		{
-			categories: [],
-			path: 'widget-collection-1',
-			portlets: [
-				{
-					instanceable: true,
-					portletId: 'portlet-1',
-					portletItems: [],
-					title: 'Portlet 1',
-					used: false,
-				},
-			],
-			title: 'Widget Collection 1',
-		},
-	],
 };
+
+const NORMALIZED_PORTLET_ITEMS = [
+	{
+		data: {
+			instanceable: true,
+			portletId: 'template-portlet-1',
+			portletItemId: '40063',
+			used: false,
+		},
+		disabled: false,
+		icon: 'cards2',
+		itemId: 'template-portlet-1',
+		label: 'Template Portlet 1',
+		portletItems: null,
+		preview: '',
+		type: 'fragment',
+	},
+];
 
 const NORMALIZED_TABS = [
 	{
@@ -155,7 +167,7 @@ const NORMALIZED_TABS = [
 						icon: 'cards2',
 						itemId: 'portlet-1',
 						label: 'Portlet 1',
-						portletItems: null,
+						portletItems: NORMALIZED_PORTLET_ITEMS,
 						preview: '',
 						type: 'fragment',
 					},
@@ -188,6 +200,34 @@ describe('FragmentsSidebar', () => {
 		jest.useFakeTimers();
 	});
 
+	beforeEach(() => {
+		useWidgets.mockImplementation(() => [
+			{
+				categories: [],
+				path: 'widget-collection-1',
+				portlets: [
+					{
+						instanceable: true,
+						portletId: 'portlet-1',
+						portletItems: [
+							{
+								instanceable: true,
+								portletId: 'template-portlet-1',
+								portletItemId: '40063',
+								preview: '',
+								title: 'Template Portlet 1',
+								used: false,
+							},
+						],
+						title: 'Portlet 1',
+						used: false,
+					},
+				],
+				title: 'Widget Collection 1',
+			},
+		]);
+	});
+
 	it('has a sidebar panel title', () => {
 		const {getByText} = renderComponent(STATE);
 
@@ -197,7 +237,12 @@ describe('FragmentsSidebar', () => {
 	it('normalizes fragments and widgets format', () => {
 		renderComponent(STATE);
 
-		expect(TabsPanel).toHaveBeenCalledWith({tabs: NORMALIZED_TABS}, {});
+		expect(TabsPanel).toHaveBeenCalledWith(
+			expect.objectContaining({
+				tabs: NORMALIZED_TABS,
+			}),
+			{}
+		);
 	});
 
 	it('filters fragments and widgets according to a input value', () => {
@@ -238,149 +283,293 @@ describe('FragmentsSidebar', () => {
 	});
 
 	it('sets square-hole icon when the widget is not instanceable', () => {
-		const tabs = NORMALIZED_TABS;
-		const state = STATE;
-
-		state.widgets[0].portlets[0].instanceable = false;
-		tabs[1].collections[0].children[0] = {
-			data: {
-				instanceable: false,
-				portletId: 'portlet-1',
-				portletItemId: null,
-				used: false,
-			},
-			disabled: false,
-			icon: 'square-hole',
-			itemId: 'portlet-1',
-			label: 'Portlet 1',
-			portletItems: null,
-			preview: '',
-			type: 'fragment',
-		};
-		renderComponent(state);
-
-		expect(TabsPanel).toHaveBeenCalledWith({tabs}, {});
-	});
-
-	it('disables a widget when it is not instanceable and it is used', () => {
-		const tabs = NORMALIZED_TABS;
-		const state = STATE;
-
-		state.widgets[0].portlets[0].instanceable = false;
-		state.widgets[0].portlets[0].used = true;
-		tabs[1].collections[0].children[0] = {
-			data: {
-				instanceable: false,
-				portletId: 'portlet-1',
-				portletItemId: null,
-				used: true,
-			},
-			disabled: true,
-			icon: 'square-hole',
-			itemId: 'portlet-1',
-			label: 'Portlet 1',
-			portletItems: null,
-			preview: '',
-			type: 'fragment',
-		};
-		renderComponent(state);
-
-		expect(TabsPanel).toHaveBeenCalledWith({tabs}, {});
-	});
-
-	it('normalizes collection with portlets items', () => {
-		const tabs = NORMALIZED_TABS;
-		const state = STATE;
-
-		state.widgets[0].portlets[0].portletItems[0] = {
-			instanceable: true,
-			portletId: 'portlet-item-1',
-			title: 'Portlet Item 1',
-			used: false,
-		};
-		tabs[1].collections[0].children[0].portletItems = [
+		useWidgets.mockImplementation(() => [
 			{
-				data: {
-					instanceable: true,
-					portletId: 'portlet-item-1',
-					portletItemId: null,
-					used: false,
-				},
-				disabled: false,
-				icon: 'cards2',
-				itemId: 'portlet-item-1',
-				label: 'Portlet Item 1',
-				portletItems: null,
-				preview: '',
-				type: 'fragment',
-			},
-		];
-		renderComponent(state);
-
-		expect(TabsPanel).toHaveBeenCalledWith({tabs}, {});
-	});
-
-	it('normalizes collection with more collections inside', () => {
-		const tabs = NORMALIZED_TABS;
-		const state = STATE;
-
-		state.widgets[0].categories = [
-			{
-				categories: [
+				categories: [],
+				path: 'widget-collection-1',
+				portlets: [
 					{
-						categories: [],
-						path: 'collection-4',
-						portlets: [
+						instanceable: false,
+						portletId: 'portlet-1',
+						portletItems: [
 							{
-								instanceable: true,
-								portletId: 'collection-4-portlet',
-								portletItems: [],
-								title: 'Collection 4 Portlet',
+								instanceable: false,
+								portletId: 'template-portlet-1',
+								portletItemId: '40063',
+								preview: '',
+								title: 'Template Portlet 1',
 								used: false,
 							},
 						],
-						title: 'Widget Collection 3',
+						title: 'Portlet 1',
+						used: false,
 					},
 				],
-				path: 'widget-collection-2',
-				portlets: [],
-				title: 'Widget Collection 2',
+				title: 'Widget Collection 1',
 			},
-		];
-		tabs[1].collections[0].collections = [
-			{
-				children: [],
-				collectionId: 'widget-collection-2',
-				collections: [
+		]);
+
+		renderComponent(STATE);
+
+		expect(TabsPanel).toHaveBeenCalledWith(
+			expect.objectContaining({
+				tabs: setIn(
+					NORMALIZED_TABS,
+					[1, 'collections', 0, 'children', 0],
 					{
-						children: [
+						data: {
+							instanceable: false,
+							portletId: 'portlet-1',
+							portletItemId: null,
+							used: false,
+						},
+						disabled: false,
+						icon: 'square-hole',
+						itemId: 'portlet-1',
+						label: 'Portlet 1',
+						portletItems: [
 							{
 								data: {
-									instanceable: true,
-									portletId: 'collection-4-portlet',
-									portletItemId: null,
+									instanceable: false,
+									portletId: 'template-portlet-1',
+									portletItemId: '40063',
 									used: false,
 								},
 								disabled: false,
-								icon: 'cards2',
-								itemId: 'collection-4-portlet',
-								label: 'Collection 4 Portlet',
+								icon: 'square-hole',
+								itemId: 'template-portlet-1',
+								label: 'Template Portlet 1',
 								portletItems: null,
 								preview: '',
 								type: 'fragment',
 							},
 						],
-						collectionId: 'collection-4',
-						label: 'Widget Collection 3',
+						preview: '',
+						type: 'fragment',
+					}
+				),
+			}),
+			{}
+		);
+	});
+
+	it('disables a widget when it is not instanceable and it is used', () => {
+		useWidgets.mockImplementation(() => [
+			{
+				categories: [],
+				path: 'widget-collection-1',
+				portlets: [
+					{
+						instanceable: false,
+						portletId: 'portlet-1',
+						portletItems: [
+							{
+								instanceable: false,
+								portletId: 'template-portlet-1',
+								portletItemId: 'template-portlet-item-id-1',
+								preview: '',
+								title: 'Template Portlet 1',
+								used: true,
+							},
+						],
+						title: 'Portlet 1',
+						used: true,
 					},
 				],
-				label: 'Widget Collection 2',
+				title: 'Widget Collection 1',
 			},
-		];
+		]);
 
-		renderComponent(state);
+		renderComponent(STATE);
 
-		expect(TabsPanel).toHaveBeenCalledWith({tabs}, {});
+		expect(TabsPanel).toHaveBeenCalledWith(
+			expect.objectContaining({
+				tabs: setIn(
+					NORMALIZED_TABS,
+					[1, 'collections', 0, 'children', 0],
+					{
+						data: {
+							instanceable: false,
+							portletId: 'portlet-1',
+							portletItemId: null,
+							used: true,
+						},
+						disabled: true,
+						icon: 'square-hole',
+						itemId: 'portlet-1',
+						label: 'Portlet 1',
+						portletItems: [
+							{
+								data: {
+									instanceable: false,
+									portletId: 'template-portlet-1',
+									portletItemId: 'template-portlet-item-id-1',
+									used: true,
+								},
+								disabled: true,
+								icon: 'square-hole',
+								itemId: 'template-portlet-1',
+								label: 'Template Portlet 1',
+								portletItems: null,
+								preview: '',
+								type: 'fragment',
+							},
+						],
+						preview: '',
+						type: 'fragment',
+					}
+				),
+			}),
+			{}
+		);
+	});
+
+	it('normalizes collection with portlets items', () => {
+		useWidgets.mockImplementation(() => [
+			{
+				categories: [],
+				path: 'widget-collection-1',
+				portlets: [
+					{
+						instanceable: true,
+						portletId: 'portlet-1',
+						portletItems: [
+							{
+								instanceable: true,
+								portletId: 'portlet-item-1',
+								title: 'Portlet Item 1',
+								used: false,
+							},
+						],
+						title: 'Portlet 1',
+						used: false,
+					},
+				],
+				title: 'Widget Collection 1',
+			},
+		]);
+
+		renderComponent(STATE);
+
+		expect(TabsPanel).toHaveBeenCalledWith(
+			expect.objectContaining({
+				tabs: setIn(
+					NORMALIZED_TABS,
+					[1, 'collections', 0, 'children', 0, 'portletItems'],
+					[
+						{
+							data: {
+								instanceable: true,
+								portletId: 'portlet-item-1',
+								portletItemId: null,
+								used: false,
+							},
+							disabled: false,
+							icon: 'cards2',
+							itemId: 'portlet-item-1',
+							label: 'Portlet Item 1',
+							portletItems: null,
+							preview: '',
+							type: 'fragment',
+						},
+					]
+				),
+			}),
+			{}
+		);
+	});
+
+	it('normalizes collection with more collections inside', () => {
+		useWidgets.mockImplementation(() => [
+			{
+				categories: [
+					{
+						categories: [
+							{
+								categories: [],
+								path: 'collection-4',
+								portlets: [
+									{
+										instanceable: true,
+										portletId: 'collection-4-portlet',
+										portletItems: [],
+										title: 'Collection 4 Portlet',
+										used: false,
+									},
+								],
+								title: 'Widget Collection 3',
+							},
+						],
+						path: 'widget-collection-2',
+						portlets: [],
+						title: 'Widget Collection 2',
+					},
+				],
+				path: 'widget-collection-1',
+				portlets: [
+					{
+						instanceable: true,
+						portletId: 'portlet-1',
+						portletItems: [
+							{
+								instanceable: true,
+								portletId: 'template-portlet-1',
+								portletItemId: '40063',
+								preview: '',
+								title: 'Template Portlet 1',
+								used: false,
+							},
+						],
+						title: 'Portlet 1',
+						used: false,
+					},
+				],
+				title: 'Widget Collection 1',
+			},
+		]);
+
+		renderComponent(STATE);
+
+		expect(TabsPanel).toHaveBeenCalledWith(
+			expect.objectContaining({
+				tabs: setIn(
+					NORMALIZED_TABS,
+					[1, 'collections', 0, 'collections'],
+					[
+						{
+							children: [],
+							collectionId: 'widget-collection-2',
+							collections: [
+								{
+									children: [
+										{
+											data: {
+												instanceable: true,
+												portletId:
+													'collection-4-portlet',
+												portletItemId: null,
+												used: false,
+											},
+											disabled: false,
+											icon: 'cards2',
+											itemId: 'collection-4-portlet',
+											label: 'Collection 4 Portlet',
+											portletItems: null,
+											preview: '',
+											type: 'fragment',
+										},
+									],
+									collectionId: 'collection-4',
+									label: 'Widget Collection 3',
+								},
+							],
+							label: 'Widget Collection 2',
+						},
+					]
+				),
+			}),
+			{}
+		);
 	});
 
 	it('hides the fragment preview when it is basic component', () => {
