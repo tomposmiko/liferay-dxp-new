@@ -63,7 +63,9 @@ public abstract class BaseMessageSelectionResourceImpl
 		this.contextCompany = contextCompany;
 	}
 
-	protected void preparePatch(MessageSelection messageSelection) {
+	protected void preparePatch(
+		MessageSelection messageSelection,
+		MessageSelection existingMessageSelection) {
 	}
 
 	protected <T, R> List<R> transform(

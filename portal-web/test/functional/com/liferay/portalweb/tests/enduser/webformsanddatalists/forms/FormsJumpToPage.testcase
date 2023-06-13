@@ -28,7 +28,7 @@ definition {
 
 		Form.gotoAddField(fieldType = "Single Selection");
 
-		Form.editFieldLabel(fieldValue = "Choose Your Destiny");
+		Form.editFieldLabelMetal(fieldValue = "Choose Your Destiny");
 
 		FormFields.editOptionsRow(optionName = "Destiny1", optionValue = "Destiny 1");
 
@@ -55,7 +55,7 @@ definition {
 
 			Form.gotoAddField(fieldType = "Text Field");
 
-			Form.editFieldLabel(fieldValue = "Destiny ${option}");
+			Form.editFieldLabelMetal(fieldValue = "Destiny ${option}");
 
 			Form.closeSidebar();
 		}
@@ -127,6 +127,7 @@ definition {
 	@description = "This is a use case for LPS-68227."
 	@priority = "4"
 	test ViewFormRulesSummary {
+		property test.name.skip.portal.instance = "FormsJumpToPage#ViewFormRulesSummary";
 		FormsAdminNavigator.gotoRules();
 
 		FormRules.viewSummary(
@@ -151,6 +152,7 @@ definition {
 	@description = "This is a use case for LPS-69372."
 	@priority = "5"
 	test ViewPagesAfterJump {
+		property test.name.skip.portal.instance = "FormsJumpToPage#ViewPagesAfterJump";
 		Form.publishForm();
 
 		FormsAdminNavigator.openPublishURL(publishFormURL = "${publishedFormPublicURL}");
@@ -198,9 +200,10 @@ definition {
 	@description = "This is a use case for LPS-68227."
 	@priority = "4"
 	test ViewRuleAfterLabelEdit {
+		property test.name.skip.portal.instance = "FormsJumpToPage#ViewRuleAfterLabelEdit";
 		FormsAdminNavigator.gotoEditField(fieldName = "ChooseYourDestiny");
 
-		Form.editFieldLabel(fieldName = "ChooseYourDestiny", fieldValue = "Edit Label");
+		Form.editFieldLabelMetal(fieldName = "ChooseYourDestiny", fieldValue = "Edit Label");
 
 		Form.closeSidebar();
 
@@ -221,6 +224,7 @@ definition {
 	@description = "This is a use case for LPS-68227."
 	@priority = "3"
 	test ViewRuleAfterOptionValueEdit {
+		property test.name.skip.portal.instance = "FormsJumpToPage#ViewRuleAfterOptionValueEdit";
 		FormsAdminNavigator.gotoEditField(fieldName = "ChooseYourDestiny");
 
 		FormFields.editOptionsRow(
@@ -248,6 +252,7 @@ definition {
 	@description = "This is a use case for LPS-68227."
 	@priority = "4"
 	test ViewRuleAfterPageNameChange {
+		property test.name.skip.portal.instance = "FormsJumpToPage#ViewRuleAfterPageNameChange";
 		Form.gotoFormPage(formPageName = "Page 3");
 
 		Form.editPageTitle(formPageName = "Renamed Page");

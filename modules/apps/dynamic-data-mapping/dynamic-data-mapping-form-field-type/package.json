@@ -5,57 +5,80 @@
 				"lint": {
 					"env": {
 						"browser": true,
-						"jest": true,
-						"mocha": true
+						"jest": true
 					},
 					"extends": "liferay",
 					"globals": {
-						"$": true,
-						"AlloyEditor": true,
-						"CKEDITOR": true,
-						"MODULE_PATH": true,
-						"main": true
+						"AlloyEditor": true
 					},
 					"parser": "babel-eslint",
 					"parserOptions": {
-						"ecmaFeatures": {
-							"allowImportExportEverywhere": true,
-							"experimentalObjectRestSpread": true,
-							"jsx": true
-						},
-						"ecmaVersion": 2017,
-						"sourceType": "module"
+						"ecmaVersion": 7
 					},
 					"plugins": [
-						"./node_modules/eslint-plugin-react"
+						"eslint-plugin-react",
+						"sort-class-members"
 					],
 					"rules": {
-						"newline-after-var": 2,
-						"no-console": 0,
-						"no-unknown-property": 0,
-						"react/jsx-uses-react": 0,
-						"react/jsx-uses-vars": 2,
-						"require-jsdoc": 0
+						"react/jsx-handler-names": [
+							2,
+							{
+								"eventHandlerPrefix": "_handle"
+							}
+						],
+						"sort-class-members/sort-class-members": [
+							2,
+							{
+								"groups": {
+									"conventional-private-methods": [
+										{
+											"name": "/^_.+$/",
+											"sort": "alphabetical",
+											"type": "method"
+										}
+									],
+									"methods": [
+										{
+											"sort": "alphabetical",
+											"type": "method"
+										}
+									]
+								},
+								"order": [
+									"[static-properties]",
+									"[static-methods]",
+									"[properties]",
+									"[conventional-private-properties]",
+									"constructor",
+									"[methods]",
+									"[conventional-private-methods]"
+								]
+							}
+						],
+						"sort-keys": [
+							"error",
+							"asc",
+							{
+								"caseSensitive": true,
+								"natural": false
+							}
+						]
 					}
 				}
 			}
 		}
 	},
 	"dependencies": {
-		"autobind-decorator": "^2.1.0",
-		"clay-button": "2.11.1",
-		"clay-checkbox": "2.11.1",
-		"clay-dropdown": "2.11.1",
-		"clay-icon": "2.11.1",
-		"clay-label": "2.11.1",
-		"clay-link": "2.11.1",
-		"clay-radio": "2.11.1",
-		"incremental-dom-string": "0.0.2",
+		"clay-button": "2.13.0",
+		"clay-checkbox": "2.13.0",
+		"clay-dropdown": "2.13.0",
+		"clay-icon": "2.13.0",
+		"clay-label": "2.13.0",
+		"clay-radio": "2.13.0",
 		"metal-component": "^2.14.0",
-		"metal-drag-drop": "^3.2.2",
+		"metal-drag-drop": "3.3.0",
 		"metal-position": "^2.1.2",
 		"metal-soy": "^2.16.0",
-		"metal-web-component": "^2.14.0",
 		"moment": "^2.22.2",
 		"text-mask-addons": "^3.7.1",
 		"vanilla-text-mask": "^5.0.1"
@@ -73,6 +96,7 @@
 		"eslint": "^4.10.0",
 		"eslint-config-liferay": "^2.0.8",
 		"eslint-plugin-react": "^7.4.0",
+		"eslint-plugin-sort-class-members": "^1.4.0",
 		"jest": "^24.5.0",
 		"metal-jest-serializer": "^2.0.0",
 		"metal-soy-critic": "^2.4.0",
@@ -118,11 +142,9 @@
 	"name": "dynamic-data-mapping-form-field-type",
 	"private": true,
 	"scripts": {
-		"build": "npm run build-soy && npm run build-js && npm run bundler && npm run clean",
-		"build-js": "babel --source-maps -d classes/META-INF/resources src/main/resources/META-INF/resources",
+		"build": "npm run build-soy && babel --source-maps -d classes/META-INF/resources src/main/resources/META-INF/resources && liferay-npm-bundler && npm run clean",
 		"build-soy": "metalsoy --externalMsgFormat \"Liferay.Language.get('\\$2')\" --soyDeps \"../../../node_modules/+(clay-*|frontend-js-web)/src/**/*.soy\"",
 		"build-soy-tests": "npm run build-soy && metalsoy -s \"test/**/*.soy\" -d \"test\"",
-		"bundler": "liferay-npm-bundler",
 		"checkFormat": "npm run csf",
 		"clean": "rimraf \"src/**/*.soy.js\" \"test/**/*.soy.js\"",
 		"csf": "csf src/**/*.es.js src/**/*.soy test/**/*.es.js",

@@ -62,6 +62,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Generated("")
 @GraphQLName("${schemaName}")
 @JsonFilter("Liferay.Vulcan")
+<#if schema.requiredPropertySchemaNames?has_content>
+	@Schema(requiredProperties =
+		{
+			<#list schema.requiredPropertySchemaNames as requiredProperty>
+				"${requiredProperty}"
+				<#if requiredProperty_has_next>
+					,
+				</#if>
+			</#list>
+		}
+	)
+</#if>
 @XmlRootElement(name = "${schemaName}")
 public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoParentClassName}</#if> {
 	<#assign enumSchemas = freeMarkerTool.getDTOEnumSchemas(schema) />
@@ -204,11 +216,11 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 
 			sb.append("\"${propertyName}\": ");
 
-			<#if properties[propertyName]?contains("[]")>
-				if (${propertyName} == null) {
-					sb.append("null");
-				}
-				else {
+			if (${propertyName} == null) {
+				sb.append("null");
+			}
+			else {
+				<#if properties[propertyName]?contains("[]")>
 					sb.append("[");
 
 					for (int i = 0; i < ${propertyName}.length; i++) {
@@ -226,16 +238,16 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 					}
 
 					sb.append("]");
-				}
-			<#else>
-				<#if properties[propertyName]?ends_with("Date") || properties[propertyName]?ends_with("String") || enumSchemas?keys?seq_contains(properties[propertyName])>
-					sb.append("\"");
-					sb.append(${propertyName});
-					sb.append("\"");
 				<#else>
-					sb.append(${propertyName});
+					<#if stringUtil.equals(properties[propertyName], "Date[]") || stringUtil.equals(properties[propertyName], "String[]") || enumSchemas?keys?seq_contains(properties[propertyName])>
+						sb.append("\"");
+						sb.append(${propertyName});
+						sb.append("\"");
+					<#else>
+						sb.append(${propertyName});
+					</#if>
 				</#if>
-			</#if>
+			}
 		</#list>
 
 		sb.append("}");

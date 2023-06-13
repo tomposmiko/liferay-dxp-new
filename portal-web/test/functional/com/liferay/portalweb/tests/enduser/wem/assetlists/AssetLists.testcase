@@ -32,7 +32,7 @@ definition {
 			);
 
 			AssetListsAdmin.addManualSelection(
-				title = "Manual Asset List Test"
+				assetListTitle = "Manual Asset List Test"
 			);
 		}
 
@@ -42,7 +42,7 @@ definition {
 			);
 
 			AssetListsAdmin.addDynamicSelection(
-				title = "Dynamic Asset List Test"
+				assetListTitle = "Dynamic Asset List Test"
 			);
 		}
 
@@ -52,12 +52,12 @@ definition {
 			);
 
 			AssetListsAdmin.viewAssetList(
-				title = "Manual Asset List Test",
+				assetListTitle = "Manual Asset List Test",
 				type = "Manual"
 			);
 
 			AssetListsAdmin.viewAssetList(
-				title = "Dynamic Asset List Test",
+				assetListTitle = "Dynamic Asset List Test",
 				type = "Dynamic"
 			);
 		}
@@ -72,7 +72,7 @@ definition {
 			);
 
 			AssetListsAdmin.addManualSelection(
-				title = "Manual Asset List Test"
+				assetListTitle = "Manual Asset List Test"
 			);
 		}
 
@@ -94,7 +94,7 @@ definition {
 		task ("Assert an error displays notifying that the user is not allowed to create a duplicate asset list") {
 			AssertTextEquals.assertPartialText(
 				locator1 = "Message#ERROR_MODAL_CONTENT",
-				value1 = "An asset list with that title already exists."
+				value1 = "A content set with that title already exists."
 			);
 		}
 	}
@@ -108,7 +108,7 @@ definition {
 			);
 
 			AssetListsAdmin.addManualSelection(
-				title = "Manual Asset List Test"
+				assetListTitle = "Manual Asset List Test"
 			);
 		}
 
@@ -118,7 +118,7 @@ definition {
 			);
 
 			AssetListsAdmin.addDynamicSelection(
-				title = "Dynamic Asset List Test"
+				assetListTitle = "Dynamic Asset List Test"
 			);
 		}
 
@@ -127,12 +127,12 @@ definition {
 				siteURLKey = "test-site-name"
 			);
 
-			LexiconEntry.delete(
-				rowEntry = "Manual Asset List Test"
+			AssetListsAdmin.deleteEntry(
+				assetListTitle = "Manual Asset List Test"
 			);
 
-			LexiconEntry.delete(
-				rowEntry = "Dynamic Asset List Test"
+			AssetListsAdmin.deleteEntry(
+				assetListTitle = "Dynamic Asset List Test"
 			);
 		}
 
@@ -152,7 +152,7 @@ definition {
 			);
 
 			AssetListsAdmin.addManualSelection(
-				title = "Manual Asset List Test"
+				assetListTitle = "Manual Asset List Test"
 			);
 		}
 
@@ -162,14 +162,14 @@ definition {
 			);
 
 			AssetListsAdmin.renameAssetList(
-				assetListName = "Manual Asset List Test",
-				title = "Manual Asset List Edit"
+				newAssetListTitle = "Manual Asset List Edit",
+				oldAssetListTitle = "Manual Asset List Test"
 			);
 		}
 
 		task ("Assert that the name of the asset list changed correctly") {
 			AssetListsAdmin.viewAssetList(
-				title = "Manual Asset List Edit",
+				assetListTitle = "Manual Asset List Edit",
 				type = "Manual"
 			);
 		}
@@ -192,7 +192,7 @@ definition {
 			);
 
 			AssetListsAdmin.addManualSelection(
-				title = "Manual Asset List Test"
+				assetListTitle = "Manual Asset List Test"
 			);
 		}
 
@@ -214,7 +214,7 @@ definition {
 			);
 
 			AssetListsAdmin.viewContent(
-				assetListName = "Manual Asset List Test",
+				assetListTitle = "Manual Asset List Test",
 				assetTitle = "WC WebContent Title",
 				assetType = "Web Content Article"
 			);
@@ -237,7 +237,7 @@ definition {
 			);
 
 			AssetListsAdmin.addManualSelection(
-				title = "Manual Asset List Test"
+				assetListTitle = "Manual Asset List Test"
 			);
 		}
 
@@ -267,7 +267,7 @@ definition {
 			);
 
 			AssetListsAdmin.viewUsages(
-				assetListName = "Manual Asset List Test",
+				assetListTitle = "Manual Asset List Test",
 				usageAmount = "1",
 				usageType = "All"
 			);

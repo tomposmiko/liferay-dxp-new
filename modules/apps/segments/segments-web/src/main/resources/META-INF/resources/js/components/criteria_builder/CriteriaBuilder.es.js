@@ -1,4 +1,3 @@
-import ClayToggle from '../shared/ClayToggle.es';
 import CriteriaGroup from './CriteriaGroup.es';
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
@@ -63,7 +62,6 @@ class CriteriaBuilder extends Component {
 		 */
 		modelLabel: PropTypes.string,
 		onChange: PropTypes.func,
-		onEditToggle: PropTypes.func,
 		propertyKey: PropTypes.string.isRequired,
 		supportedConjunctions: PropTypes.arrayOf(
 			PropTypes.shape(
@@ -137,15 +135,6 @@ class CriteriaBuilder extends Component {
 			);
 
 		return criteria;
-	}
-
-	/**
-	 * Switches the edit state between true and false.
-	 */
-	_handleToggleEdit = () => {
-		const {editing, id, onEditToggle} = this.props;
-
-		return onEditToggle && onEditToggle(id, editing);
 	}
 
 	/**
@@ -282,14 +271,6 @@ class CriteriaBuilder extends Component {
 							[modelLabel]
 						)}
 					</div>
-
-					<ClayToggle
-						checked={editing}
-						className="ml-auto"
-						iconOff="pencil"
-						iconOn="pencil"
-						onChange={this._handleToggleEdit}
-					/>
 				</div>
 
 				<CriteriaGroup

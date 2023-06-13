@@ -1,72 +1,6 @@
 definition {
 	var orgName = "Organization Name";
 
-	macro addAdditionalEmailAddressesCP {
-		Organization.gotoIdentificationCP(panel = "Additional Email Addresses");
-
-		Type(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDITIONAL_EMAIL_ADDRESSES_EMAIL_ADDRESS_FIELD",
-			value1 = "${orgAdditionalEmailAddress}"
-		);
-
-		Click(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDITIONAL_EMAIL_ADDRESSES_EMAIL_ADDRESS_FIELD"
-		);
-
-		PortletEntry.save();
-
-		Organization.gotoIdentificationCP(panel = "Additional Email Addresses");
-
-		AssertTextEquals(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDITIONAL_EMAIL_ADDRESSES_EMAIL_ADDRESS_FIELD",
-			value1 = "${orgAdditionalEmailAddress}"
-		);
-	}
-
-	macro addAddressCP {
-		Organization.gotoIdentificationCP();
-
-		Type(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDRESSES_STREET_FIELD_1",
-			value1 = "${orgAddressStreet}"
-		);
-
-		Type(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDRESSES_CITY_FIELD",
-			value1 = "${orgAddressCity}"
-		);
-
-		Type(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDRESSES_POSTAL_CODE_FIELD",
-			value1 = "${orgAddressPostal}"
-		);
-
-		Select(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDRESSES_COUNTRY_SELECT",
-			value1 = "${orgAddressCountry}"
-		);
-
-		Select(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDRESSES_REGION_SELECT",
-			value1 = "${orgAddressRegion}"
-		);
-
-		Select(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDRESSES_TYPE_SELECT",
-			value1 = "${orgAddressType}"
-		);
-
-		Check(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDRESSES_MAILING_CHECKBOX"
-		);
-
-		Click(
-			locator1 = "UsersAndOrganizationsEditOrganization#ADDRESSES_PRIMARY_RADIO"
-		);
-
-		PortletEntry.save();
-	}
-
 	macro addCategorizationCP {
 		var key_tagName = "${tagName}";
 
@@ -91,15 +25,89 @@ definition {
 	}
 
 	macro addCommentCP {
-		Organization.gotoMiscellaneousCP();
+		AssertElementPresent(locator1 = "TextArea#COMMENTS");
 
 		Type(locator1 = "TextArea#COMMENTS", value1 = "${orgComment}");
 
 		PortletEntry.save();
 
-		Organization.gotoMiscellaneousCP();
-
 		AssertTextEquals(locator1 = "TextArea#COMMENTS", value1 = "${orgComment}");
+	}
+
+	macro addContactInformation {
+		if (isSet(contactType)) {
+			var key_contactType = "${contactType}";
+
+			Click.mouseDownMouseUp(
+				locator1 = "UsersAndOrganizationsEditOrganization#CONTACT_ADD_BUTTON"
+			);
+
+			if ("${makePrimary}" == "true") {
+				Check(locator1 = "Checkbox#ANY_CHECKBOX", checkboxName = "Make Primary");
+			}
+
+			// Addresses
+
+			if (isSet(addressType)) {
+				Select(locator1 = "Select#TYPE", value1 = "${addressType}");
+			}
+
+			if (isSet(street1)) {
+				Type(locator1 = "TextInput#STREET_1", value1 = "${street1}");
+			}
+
+			if (isSet(city)) {
+				Type(locator1 = "TextInput#CITY", value1 = "${city}");
+			}
+
+			if (isSet(country)) {
+				Select(locator1 = "Select#COUNTRY", value1 = "${country}");
+			}
+
+			if (isSet(region)) {
+				Select(locator1 = "Select#REGION", value1 = "${region}");
+			}
+
+			if (isSet(postalCode)) {
+				Type(locator1 = "TextInput#POSTAL_CODE", value1 = "${postalCode}");
+			}
+
+			// Phone Numbers
+
+			if (isSet(number)) {
+				Type(locator1 = "TextInput#NUMBER", value1 = "${number}");
+			}
+
+			if (isSet(extension)) {
+				Type(locator1 = "TextInput#EXTENSION", value1 = "${extension}");
+			}
+
+			// Additional Email Addresses
+
+			if (isSet(address)) {
+				Type(locator1 = "TextInput#ADDRESS", value1 = "${address}");
+			}
+
+			// Websites
+
+			if (isSet(url)) {
+				Type(locator1 = "TextInput#URL", value1 = "${url}");
+			}
+
+			// Opening Hours
+
+			if (isSet(mondayOpen)) {
+				Select(locator1 = "Select#MONDAY_OPEN", value1 = "${mondayOpen}");
+			}
+
+			if (isSet(mondayClose)) {
+				Select(locator1 = "Select#MONDAY_CLOSE", value1 = "${mondayClose}");
+			}
+		}
+
+		Click(locator1 = "Button#SAVE");
+
+		Alert.viewSuccessMessage();
 	}
 
 	macro addCP {
@@ -178,92 +186,46 @@ definition {
 		Alert.viewSuccessMessage();
 	}
 
-	macro addPhoneNumbersCP {
-		Organization.gotoIdentificationCP(panel = "Phone Numbers");
+	macro addSecurityQuestionsCP {
+		MenuBar.gotoSecurityQuestions();
 
 		Type(
-			locator1 = "UsersAndOrganizationsEditOrganization#PHONE_NUMBERS_NUMBER_FIELD",
-			value1 = "${orgPhoneNumber}"
+			locator1 = "TextArea#SECURITY_QUESTIONS",
+			value1 = "${securityQuestions}"
 		);
 
-		Click(
-			locator1 = "UsersAndOrganizationsEditOrganization#PHONE_NUMBERS_PRIMARY_RADIO"
-		);
+		if (isSet(localizedLanguage)) {
+			PortletEntry.changeLocale(
+				fieldName = "Security Questions",
+				locale = "${localizedLanguage}"
+			);
+
+			Type(
+				locator1 = "TextArea#SECURITY_QUESTIONS",
+				value1 = "${localizedSecurityQuestions}"
+			);
+		}
 
 		PortletEntry.save();
 
-		Organization.gotoIdentificationCP(panel = "Phone Numbers");
+		MenuBar.gotoSecurityQuestions();
 
 		AssertTextEquals(
-			locator1 = "UsersAndOrganizationsEditOrganization#PHONE_NUMBERS_NUMBER_FIELD",
-			value1 = "${orgPhoneNumber}"
-		);
-	}
-
-	macro addReminderQueriesCP {
-		Organization.gotoMiscellaneousCP(panel = "Reminder Queries");
-
-		Type(
-			locator1 = "UsersAndOrganizationsEditOrganization#REMINDER_QUERIES_DEFAULT_LANGUAGE_FIELD",
-			value1 = "${orgReminderQueriesDefaultLanguage}"
+			locator1 = "TextArea#SECURITY_QUESTIONS",
+			value1 = "${securityQuestions}"
 		);
 
-		Select(
-			locator1 = "UsersAndOrganizationsEditOrganization#REMINDER_QUERIES_LOCALIZED_LANGUAGE_SELECT",
-			value1 = "${orgLocalizedLanguage}"
-		);
+		if (isSet(localizedLanguage)) {
+			PortletEntry.changeLocale(
+				fieldName = "Security Questions",
+				locale = "${localizedLanguage}"
+			);
 
-		Type(
-			locator1 = "UsersAndOrganizationsEditOrganization#REMINDER_QUERIES_TEXT_FIELD",
-			value1 = "${orgReminderQuery}"
-		);
-
-		PortletEntry.save();
-
-		Organization.gotoMiscellaneousCP(panel = "Reminder Queries");
-
-		AssertTextEquals(
-			locator1 = "UsersAndOrganizationsEditOrganization#REMINDER_QUERIES_DEFAULT_LANGUAGE_FIELD",
-			value1 = "${orgReminderQueriesDefaultLanguage}"
-		);
-
-		Select(
-			locator1 = "UsersAndOrganizationsEditOrganization#REMINDER_QUERIES_LOCALIZED_LANGUAGE_SELECT",
-			value1 = "${orgLocalizedLanguage}"
-		);
-
-		AssertSelectedLabel(
-			locator1 = "UsersAndOrganizationsEditOrganization#REMINDER_QUERIES_LOCALIZED_LANGUAGE_SELECT",
-			value1 = "${orgLocalizedLanguage}"
-		);
-	}
-
-	macro addServicesCP {
-		Organization.gotoIdentificationCP(panel = "Services");
-
-		Select(
-			locator1 = "UsersAndOrganizationsEditOrganization#SERVICES_MONDAY_OPEN_SELECT",
-			value1 = "${orgServicesOpen}"
-		);
-
-		Select(
-			locator1 = "UsersAndOrganizationsEditOrganization#SERVICES_MONDAY_CLOSE_SELECT",
-			value1 = "${orgServicesClosed}"
-		);
-
-		PortletEntry.save();
-
-		Organization.gotoIdentificationCP(panel = "Services");
-
-		AssertSelectedLabel(
-			locator1 = "UsersAndOrganizationsEditOrganization#SERVICES_MONDAY_OPEN_SELECT",
-			value1 = "${orgServicesOpen}"
-		);
-
-		AssertSelectedLabel(
-			locator1 = "UsersAndOrganizationsEditOrganization#SERVICES_MONDAY_CLOSE_SELECT",
-			value1 = "${orgServicesClosed}"
-		);
+			AssertTextEquals(
+				locator1 = "TextArea#SECURITY_QUESTIONS",
+				value1 = "${securityQuestions}"
+			);
+		}
 	}
 
 	macro addSiteCP {
@@ -295,26 +257,6 @@ definition {
 		}
 
 		PortletEntry.save();
-	}
-
-	macro addWebsitesCP {
-		Organization.gotoIdentificationCP(panel = "Websites");
-
-		Type(
-			locator1 = "UsersAndOrganizationsEditOrganization#WEBSITES_URL_FIELD",
-			value1 = "${orgWebsite}"
-		);
-
-		Click(locator1 = "UsersAndOrganizationsEditOrganization#WEBSITES_PRIMARY_RADIO");
-
-		PortletEntry.save();
-
-		Organization.gotoIdentificationCP(panel = "Websites");
-
-		AssertTextEquals(
-			locator1 = "UsersAndOrganizationsEditOrganization#WEBSITES_URL_FIELD",
-			value1 = "${orgWebsite}"
-		);
 	}
 
 	macro addWithLocalizedCountryCP {
@@ -459,6 +401,10 @@ definition {
 		LexiconEntry.openEntryMenu(rowEntry = "${orgName}");
 	}
 
+	macro gotoContact {
+		Navigator.gotoNavTab(navTab = "Contact");
+	}
+
 	macro gotoCP {
 		Search.searchCP(searchTerm = "${searchToken}");
 
@@ -475,25 +421,6 @@ definition {
 		);
 
 		Breadcrumb.viewActiveEntry(breadcrumbName = "${orgName}");
-	}
-
-	macro gotoIdentificationCP {
-		Navigator.gotoNavTab(navTab = "Identification");
-
-		if (isSet(panel)) {
-			Panel.expandPanel(panel = "${panel}");
-		}
-	}
-
-	macro gotoMiscellaneousCP {
-		AssertClick(
-			locator1 = "UsersAndOrganizations#MISCELLANEOUS",
-			value1 = "Miscellaneous"
-		);
-
-		if (isSet(panel)) {
-			Panel.expandPanel(panel = "${panel}");
-		}
 	}
 
 	macro manageMembershipOptionsInSites {

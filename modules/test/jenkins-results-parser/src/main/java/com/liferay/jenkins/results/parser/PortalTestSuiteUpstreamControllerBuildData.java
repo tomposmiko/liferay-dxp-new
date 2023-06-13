@@ -14,6 +14,7 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +24,56 @@ import java.util.regex.Pattern;
 public class PortalTestSuiteUpstreamControllerBuildData
 	extends PortalTopLevelBuildData {
 
+	public String getPortalGitHubCompareURL(String previousPortalBranchSHA) {
+		if ((previousPortalBranchSHA == null) ||
+			!previousPortalBranchSHA.matches("[0-9a-f]{40}")) {
+
+			return null;
+		}
+
+		return JenkinsResultsParserUtil.combine(
+			"https://github.com/", getPortalGitHubUsername(), "/",
+			getPortalGitHubRepositoryName(), "/compare/",
+			previousPortalBranchSHA, "...", getPortalBranchSHA());
+	}
+
+	public String getTestrayBuildName() {
+		return JenkinsResultsParserUtil.combine(
+			getTestrayBuildType(), " - ", String.valueOf(getBuildNumber()),
+			" - ",
+			JenkinsResultsParserUtil.toDateString(
+				new Date(getStartTime()), "yyyy-MM-dd[HH:mm:ss]",
+				"America/Los_Angeles"));
+	}
+
+	public String getTestrayBuildType() {
+		return JenkinsResultsParserUtil.combine(
+			"[", getPortalUpstreamBranchName(), "] ci:test:",
+			getTestSuiteName());
+	}
+
+	public String getTestrayProjectName() {
+		String testrayProjectName = System.getenv("TESTRAY_PROJECT_NAME");
+
+		if ((testrayProjectName != null) && !testrayProjectName.isEmpty()) {
+			return testrayProjectName;
+		}
+
+		throw new RuntimeException("Please set 'TESTRAY_PROJECT_NAME'");
+	}
+
+	public String getTestSuiteName() {
+		String jobName = getJobName();
+
+		Matcher matcher = _jobNamePattern.matcher(jobName);
+
+		if (!matcher.find()) {
+			throw new RuntimeException("Invalid job name " + jobName);
+		}
+
+		return matcher.group("testSuiteName");
+	}
+
 	protected PortalTestSuiteUpstreamControllerBuildData(
 		String runID, String jobName, String buildURL) {
 
@@ -31,6 +82,12 @@ public class PortalTestSuiteUpstreamControllerBuildData
 		setPortalBranchSHA(_getPortalBranchSHA());
 		setPortalGitHubURL(_getPortalGitHubURL());
 		setPortalUpstreamBranchName(_getPortalUpstreamBranchName());
+
+		String jenkinsGitHubURL = getBuildParameter("JENKINS_GITHUB_URL");
+
+		if ((jenkinsGitHubURL != null) && !jenkinsGitHubURL.isEmpty()) {
+			setJenkinsGitHubURL(jenkinsGitHubURL);
+		}
 	}
 
 	private String _getPortalBranchSHA() {
@@ -41,6 +98,12 @@ public class PortalTestSuiteUpstreamControllerBuildData
 	}
 
 	private String _getPortalGitHubURL() {
+		String portalGitHubURL = System.getenv("PORTAL_GITHUB_URL");
+
+		if ((portalGitHubURL != null) && !portalGitHubURL.isEmpty()) {
+			return portalGitHubURL;
+		}
+
 		return JenkinsResultsParserUtil.combine(
 			"https://github.com/liferay/", _getPortalRepositoryName(), "/tree/",
 			_getPortalUpstreamBranchName());
@@ -59,16 +122,16 @@ public class PortalTestSuiteUpstreamControllerBuildData
 	private String _getPortalUpstreamBranchName() {
 		String jobName = getJobName();
 
-		Matcher matcher = _pattern.matcher(jobName);
+		Matcher matcher = _jobNamePattern.matcher(jobName);
 
 		if (!matcher.find()) {
 			throw new RuntimeException("Invalid job name " + jobName);
 		}
 
-		return matcher.group("branchName");
+		return matcher.group("upstreamBranchName");
 	}
 
-	private static final Pattern _pattern = Pattern.compile(
-		"[^\\(]+\\((?<branchName>[^_]+)_(?<suiteName>[^\\)]+)\\)");
+	private static final Pattern _jobNamePattern = Pattern.compile(
+		"[^\\(]+\\((?<upstreamBranchName>[^_]+)_(?<testSuiteName>[^\\)]+)\\)");
 
 }

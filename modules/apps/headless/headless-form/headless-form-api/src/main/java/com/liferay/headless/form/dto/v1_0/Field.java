@@ -176,6 +176,33 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Grid grid;
 
+	public Boolean getHasFormRules() {
+		return hasFormRules;
+	}
+
+	public void setHasFormRules(Boolean hasFormRules) {
+		this.hasFormRules = hasFormRules;
+	}
+
+	@JsonIgnore
+	public void setHasFormRules(
+		UnsafeSupplier<Boolean, Exception> hasFormRulesUnsafeSupplier) {
+
+		try {
+			hasFormRules = hasFormRulesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean hasFormRules;
+
 	public Long getId() {
 		return id;
 	}
@@ -388,48 +415,21 @@ public class Field {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
-	public Boolean getNumberOfFormRules() {
-		return numberOfFormRules;
-	}
-
-	public void setNumberOfFormRules(Boolean numberOfFormRules) {
-		this.numberOfFormRules = numberOfFormRules;
-	}
-
-	@JsonIgnore
-	public void setNumberOfFormRules(
-		UnsafeSupplier<Boolean, Exception> numberOfFormRulesUnsafeSupplier) {
-
-		try {
-			numberOfFormRules = numberOfFormRulesUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Boolean numberOfFormRules;
-
 	@Schema(description = "https://www.schema.org/FormFieldOption")
-	public Option getOption() {
-		return option;
+	public Option[] getOptions() {
+		return options;
 	}
 
-	public void setOption(Option option) {
-		this.option = option;
+	public void setOptions(Option[] options) {
+		this.options = options;
 	}
 
 	@JsonIgnore
-	public void setOption(
-		UnsafeSupplier<Option, Exception> optionUnsafeSupplier) {
+	public void setOptions(
+		UnsafeSupplier<Option[], Exception> optionsUnsafeSupplier) {
 
 		try {
-			option = optionUnsafeSupplier.get();
+			options = optionsUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -441,7 +441,7 @@ public class Field {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Option option;
+	protected Option[] options;
 
 	public String getPlaceholder() {
 		return placeholder;
@@ -768,154 +768,297 @@ public class Field {
 
 		sb.append("\"autocomplete\": ");
 
-		sb.append(autocomplete);
+		if (autocomplete == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(autocomplete);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"dataSourceType\": ");
 
-		sb.append("\"");
-		sb.append(dataSourceType);
-		sb.append("\"");
+		if (dataSourceType == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(dataSourceType);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"dataType\": ");
 
-		sb.append("\"");
-		sb.append(dataType);
-		sb.append("\"");
+		if (dataType == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(dataType);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"displayStyle\": ");
 
-		sb.append("\"");
-		sb.append(displayStyle);
-		sb.append("\"");
+		if (displayStyle == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(displayStyle);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"grid\": ");
 
-		sb.append(grid);
+		if (grid == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(grid);
+		}
+
+		sb.append(", ");
+
+		sb.append("\"hasFormRules\": ");
+
+		if (hasFormRules == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(hasFormRules);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"id\": ");
 
-		sb.append(id);
+		if (id == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(id);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"immutable\": ");
 
-		sb.append(immutable);
+		if (immutable == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(immutable);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"inline\": ");
 
-		sb.append(inline);
+		if (inline == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(inline);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"inputControl\": ");
 
-		sb.append("\"");
-		sb.append(inputControl);
-		sb.append("\"");
+		if (inputControl == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(inputControl);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"label\": ");
 
-		sb.append("\"");
-		sb.append(label);
-		sb.append("\"");
+		if (label == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(label);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"localizable\": ");
 
-		sb.append(localizable);
+		if (localizable == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(localizable);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"multiple\": ");
 
-		sb.append(multiple);
+		if (multiple == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(multiple);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"name\": ");
 
-		sb.append("\"");
-		sb.append(name);
-		sb.append("\"");
+		if (name == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(name);
+		}
+
 		sb.append(", ");
 
-		sb.append("\"numberOfFormRules\": ");
+		sb.append("\"options\": ");
 
-		sb.append(numberOfFormRules);
-		sb.append(", ");
+		if (options == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
 
-		sb.append("\"option\": ");
+			for (int i = 0; i < options.length; i++) {
+				sb.append(options[i]);
 
-		sb.append(option);
+				if ((i + 1) < options.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		sb.append(", ");
 
 		sb.append("\"placeholder\": ");
 
-		sb.append("\"");
-		sb.append(placeholder);
-		sb.append("\"");
+		if (placeholder == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(placeholder);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"predefinedValue\": ");
 
-		sb.append("\"");
-		sb.append(predefinedValue);
-		sb.append("\"");
+		if (predefinedValue == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(predefinedValue);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"readOnly\": ");
 
-		sb.append(readOnly);
+		if (readOnly == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(readOnly);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"repeatable\": ");
 
-		sb.append(repeatable);
+		if (repeatable == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(repeatable);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"required\": ");
 
-		sb.append(required);
+		if (required == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(required);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"showAsSwitcher\": ");
 
-		sb.append(showAsSwitcher);
+		if (showAsSwitcher == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(showAsSwitcher);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"showLabel\": ");
 
-		sb.append(showLabel);
+		if (showLabel == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(showLabel);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"style\": ");
 
-		sb.append("\"");
-		sb.append(style);
-		sb.append("\"");
+		if (style == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(style);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"text\": ");
 
-		sb.append("\"");
-		sb.append(text);
-		sb.append("\"");
+		if (text == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(text);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"tooltip\": ");
 
-		sb.append("\"");
-		sb.append(tooltip);
-		sb.append("\"");
+		if (tooltip == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(tooltip);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"validation\": ");
 
-		sb.append(validation);
+		if (validation == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(validation);
+		}
 
 		sb.append("}");
 

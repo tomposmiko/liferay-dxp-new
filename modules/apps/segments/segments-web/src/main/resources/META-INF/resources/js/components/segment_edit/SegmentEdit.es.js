@@ -1,11 +1,12 @@
 import ClayButton from '../shared/ClayButton.es';
 import ClaySpinner from '../shared/ClaySpinner.es';
+import ClayToggle from '../shared/ClayToggle.es';
 import ContributorBuilder from '../criteria_builder/ContributorBuilder.es';
-import debounce from 'lodash.debounce';
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import ThemeContext from '../../ThemeContext.es';
 import TitleEditor from '../title_editor/TitleEditor.es';
+import {debounce} from 'metal-debounce';
 import {FieldArray, withFormik} from 'formik';
 import {getPluralMessage, sub} from '../../utils/utils.es';
 import {
@@ -43,7 +44,7 @@ class SegmentEdit extends Component {
 		portletNamespace: PropTypes.string,
 		previewMembersURL: PropTypes.string,
 		propertyGroups: PropTypes.array,
-		redirect: PropTypes.string,
+		redirect: PropTypes.string.isRequired,
 		requestMembersCountURL: PropTypes.string,
 		setValues: PropTypes.func,
 		source: PropTypes.string,
@@ -59,6 +60,8 @@ class SegmentEdit extends Component {
 	};
 
 	state = {
+		changesUnsaved: false,
+		editing: false,
 		membersCount: this.props.initialMembersCount,
 		membersCountLoading: false
 	};
@@ -110,10 +113,23 @@ class SegmentEdit extends Component {
 	};
 
 	_handleQueryChange = () => {
-		this.setState({membersCountLoading: true});
+		this.setState(
+			{
+				changesUnsaved: true,
+				membersCountLoading: true
+			},
+			this._debouncedFetchMembersCount
+		);
 
-		this._debouncedFetchMembersCount();
 	};
+
+	_handleCriteriaEdit = () => {
+		this.setState(
+			{
+				editing: !this.state.editing
+			}
+		);
+	}
 
 	_handleSegmentNameBlur = event => {
 		const {
@@ -146,9 +162,12 @@ class SegmentEdit extends Component {
 	_renderContributors = () => {
 		const {contributors, propertyGroups} = this.props;
 
+		const {editing} = this.state;
+
 		return (
 			(propertyGroups && contributors) ?
 				<ContributorBuilder
+					editing={editing}
 					initialContributors={contributors}
 					onQueryChange={this._handleQueryChange}
 					propertyGroups={propertyGroups}
@@ -223,9 +242,13 @@ class SegmentEdit extends Component {
 			values
 		} = this.props;
 
-		const {membersCount, membersCountLoading} = this.state;
+		const {changesUnsaved, editing, membersCount, membersCountLoading} = this.state;
 
 		const {assetsPath} = this.context;
+
+		const disabledCancel = !editing;
+		const disabledSave = !editing || this._isQueryEmpty();
+		const editingToggleDisabled = changesUnsaved;
 
 		return (
 			<div className="segment-edit-page-root">
@@ -276,7 +299,7 @@ class SegmentEdit extends Component {
 						</div>
 
 						<div className="form-header-section-right">
-							<div className="btn-group mr-3">
+							<div className="btn-group">
 								<div className="btn-group-item">
 									<ClaySpinner
 										className="mr-4"
@@ -285,7 +308,6 @@ class SegmentEdit extends Component {
 									/>
 
 									<ClayButton
-										className="members-count-button"
 										label={getPluralMessage(
 											Liferay.Language.get('x-member'),
 											Liferay.Language.get('x-members'),
@@ -296,11 +318,22 @@ class SegmentEdit extends Component {
 										type="button"
 									/>
 								</div>
+								<div className="btn-group-item mr-2">
+									<ClayToggle
+										checked={editing}
+										className="toggle-editing"
+										disabled={editingToggleDisabled}
+										iconOff="view"
+										iconOn="pencil"
+										onChange={this._handleCriteriaEdit}
+									/>
+								</div>
 							</div>
 
 							<div className="btn-group">
 								<div className="btn-group-item">
 									<ClayButton
+										disabled={disabledCancel}
 										href={redirect}
 										label={Liferay.Language.get('cancel')}
 										size="sm"
@@ -309,7 +342,7 @@ class SegmentEdit extends Component {
 
 								<div className="btn-group-item">
 									<ClayButton
-										disabled={this._isQueryEmpty()}
+										disabled={disabledSave}
 										label={Liferay.Language.get('save')}
 										onClick={this._handleValidate}
 										size="sm"

@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -49,6 +50,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -91,6 +93,7 @@ public abstract class BaseFormDocumentResourceTestCase {
 	public void setUp() throws Exception {
 		irrelevantGroup = GroupTestUtil.addGroup();
 		testGroup = GroupTestUtil.addGroup();
+		testLocale = LocaleUtil.getDefault();
 
 		_resourceURL = new URL("http://localhost:8080/o/headless-form/v1.0");
 	}
@@ -128,7 +131,7 @@ public abstract class BaseFormDocumentResourceTestCase {
 
 		String location =
 			_resourceURL +
-				_toPath("/form-documents/{form-document-id}", formDocumentId);
+				_toPath("/form-documents/{formDocumentId}", formDocumentId);
 
 		options.setLocation(location);
 
@@ -149,7 +152,7 @@ public abstract class BaseFormDocumentResourceTestCase {
 
 		String location =
 			_resourceURL +
-				_toPath("/form-documents/{form-document-id}", formDocumentId);
+				_toPath("/form-documents/{formDocumentId}", formDocumentId);
 
 		options.setLocation(location);
 
@@ -183,7 +186,7 @@ public abstract class BaseFormDocumentResourceTestCase {
 
 		String location =
 			_resourceURL +
-				_toPath("/form-documents/{form-document-id}", formDocumentId);
+				_toPath("/form-documents/{formDocumentId}", formDocumentId);
 
 		options.setLocation(location);
 
@@ -194,7 +197,7 @@ public abstract class BaseFormDocumentResourceTestCase {
 		}
 
 		try {
-			return _outputObjectMapper.readValue(string, FormDocument.class);
+			return outputObjectMapper.readValue(string, FormDocument.class);
 		}
 		catch (Exception e) {
 			_log.error("Unable to process HTTP response: " + string, e);
@@ -210,7 +213,7 @@ public abstract class BaseFormDocumentResourceTestCase {
 
 		String location =
 			_resourceURL +
-				_toPath("/form-documents/{form-document-id}", formDocumentId);
+				_toPath("/form-documents/{formDocumentId}", formDocumentId);
 
 		options.setLocation(location);
 
@@ -270,8 +273,61 @@ public abstract class BaseFormDocumentResourceTestCase {
 	}
 
 	protected void assertValid(FormDocument formDocument) {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		boolean valid = true;
+
+		if (formDocument.getId() == null) {
+			valid = false;
+		}
+
+		for (String additionalAssertFieldName :
+				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("contentUrl", additionalAssertFieldName)) {
+				if (formDocument.getContentUrl() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("encodingFormat", additionalAssertFieldName)) {
+				if (formDocument.getEncodingFormat() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("fileExtension", additionalAssertFieldName)) {
+				if (formDocument.getFileExtension() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("sizeInBytes", additionalAssertFieldName)) {
+				if (formDocument.getSizeInBytes() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("title", additionalAssertFieldName)) {
+				if (formDocument.getTitle() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		Assert.assertTrue(valid);
 	}
 
 	protected void assertValid(Page<FormDocument> page) {
@@ -291,6 +347,10 @@ public abstract class BaseFormDocumentResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
+	protected String[] getAdditionalAssertFieldNames() {
+		return new String[0];
+	}
+
 	protected boolean equals(
 		FormDocument formDocument1, FormDocument formDocument2) {
 
@@ -298,7 +358,79 @@ public abstract class BaseFormDocumentResourceTestCase {
 			return true;
 		}
 
-		return false;
+		for (String additionalAssertFieldName :
+				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("contentUrl", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formDocument1.getContentUrl(),
+						formDocument2.getContentUrl())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("encodingFormat", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formDocument1.getEncodingFormat(),
+						formDocument2.getEncodingFormat())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("fileExtension", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formDocument1.getFileExtension(),
+						formDocument2.getFileExtension())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("id", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formDocument1.getId(), formDocument2.getId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("sizeInBytes", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formDocument1.getSizeInBytes(),
+						formDocument2.getSizeInBytes())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("title", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formDocument1.getTitle(), formDocument2.getTitle())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		return true;
 	}
 
 	protected Collection<EntityField> getEntityFields() throws Exception {
@@ -405,15 +537,65 @@ public abstract class BaseFormDocumentResourceTestCase {
 	}
 
 	protected FormDocument randomIrrelevantFormDocument() {
-		return randomFormDocument();
+		FormDocument randomIrrelevantFormDocument = randomFormDocument();
+
+		return randomIrrelevantFormDocument;
 	}
 
 	protected FormDocument randomPatchFormDocument() {
 		return randomFormDocument();
 	}
 
+	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
+		{
+			setFilterProvider(
+				new SimpleFilterProvider() {
+					{
+						addFilter(
+							"Liferay.Vulcan",
+							SimpleBeanPropertyFilter.serializeAll());
+					}
+				});
+			setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		}
+	};
+	protected static final ObjectMapper outputObjectMapper =
+		new ObjectMapper() {
+			{
+				addMixIn(FormDocument.class, FormDocumentMixin.class);
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+			}
+		};
+
 	protected Group irrelevantGroup;
+	protected String testContentType = "application/json";
 	protected Group testGroup;
+	protected Locale testLocale;
+	protected String testUserNameAndPassword = "test@liferay.com:test";
+
+	protected static class FormDocumentMixin {
+
+		@JsonProperty
+		String contentUrl;
+		@JsonProperty
+		String encodingFormat;
+		@JsonProperty
+		String fileExtension;
+		@JsonProperty
+		Long id;
+		@JsonProperty
+		Number sizeInBytes;
+		@JsonProperty
+		String title;
+
+	}
 
 	protected static class Page<T> {
 
@@ -458,16 +640,16 @@ public abstract class BaseFormDocumentResourceTestCase {
 		Http.Options options = new Http.Options();
 
 		options.addHeader("Accept", "application/json");
+		options.addHeader(
+			"Accept-Language", LocaleUtil.toW3cLanguageId(testLocale));
 
-		String userNameAndPassword = "test@liferay.com:test";
-
-		String encodedUserNameAndPassword = Base64.encode(
-			userNameAndPassword.getBytes());
+		String encodedTestUserNameAndPassword = Base64.encode(
+			testUserNameAndPassword.getBytes());
 
 		options.addHeader(
-			"Authorization", "Basic " + encodedUserNameAndPassword);
+			"Authorization", "Basic " + encodedTestUserNameAndPassword);
 
-		options.addHeader("Content-Type", "application/json");
+		options.addHeader("Content-Type", testContentType);
 
 		return options;
 	}
@@ -501,31 +683,6 @@ public abstract class BaseFormDocumentResourceTestCase {
 
 	};
 	private static DateFormat _dateFormat;
-	private final static ObjectMapper _inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	private final static ObjectMapper _outputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-		}
-	};
 
 	@Inject
 	private FormDocumentResource _formDocumentResource;

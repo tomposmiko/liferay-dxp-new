@@ -4,7 +4,7 @@ definition {
 
 		PortletEntry.inputText(
 			fieldLabel = "Title",
-			text = "${title}"
+			text = "${assetListTitle}"
 		);
 
 		Button.clickSave();
@@ -17,12 +17,27 @@ definition {
 
 		PortletEntry.inputText(
 			fieldLabel = "Title",
-			text = "${title}"
+			text = "${assetListTitle}"
 		);
 
 		Button.clickSave();
 
 		Alert.viewSuccessMessage();
+	}
+
+	macro deleteEntry {
+		LexiconList.delete(
+			listEntry = "${assetListTitle}"
+		);
+
+		Alert.viewSuccessMessage();
+	}
+
+	macro gotoEntryMenuItem {
+		LexiconList.clickEllipsisItem(
+			item = "${item}",
+			listEntry = "${assetListTitle}"
+		);
 	}
 
 	macro openAssetListsAdmin {
@@ -32,14 +47,14 @@ definition {
 	}
 
 	macro renameAssetList {
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Rename",
-			rowEntry = "${assetListName}"
+		AssetListsAdmin.gotoEntryMenuItem(
+			assetListTitle = "${oldAssetListTitle}",
+			item = "Rename"
 		);
 
 		PortletEntry.inputText(
 			fieldLabel = "Title",
-			text = "${title}"
+			text = "${newAssetListTitle}"
 		);
 
 		Button.clickSave();
@@ -67,12 +82,12 @@ definition {
 	}
 
 	macro viewAssetList {
-		var key_title = "${title}";
+		var key_title = "${assetListTitle}";
 		var key_type = "${type}";
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE",
-			value1 = "${title}"
+			value1 = "${assetListTitle}"
 		);
 
 		AssertTextEquals.assertPartialText(
@@ -82,9 +97,9 @@ definition {
 	}
 
 	macro viewContent {
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "View Content",
-			rowEntry = "${assetListName}"
+		AssetListsAdmin.gotoEntryMenuItem(
+			assetListTitle = "${assetListTitle}",
+			item = "View Content"
 		);
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
@@ -105,9 +120,9 @@ definition {
 	}
 
 	macro viewUsages {
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "View Usages",
-			rowEntry = "${assetListName}"
+		AssetListsAdmin.gotoEntryMenuItem(
+			assetListTitle = "${assetListTitle}",
+			item = "View Usages"
 		);
 
 		var usageAmount = "${usageAmount}";

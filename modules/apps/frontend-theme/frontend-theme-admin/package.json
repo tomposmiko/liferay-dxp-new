@@ -3,11 +3,6 @@
 	"bugs": {
 		"url": "https://issues.liferay.com/"
 	},
-	"devDependencies": {
-		"gulp": "^3.8.10",
-		"liferay-theme-deps-7.1": "8.0.0-rc.2",
-		"liferay-theme-tasks": "8.0.0-rc.2"
-	},
 	"keywords": [
 		"liferay-theme"
 	],
@@ -22,7 +17,7 @@
 	"name": "liferay-admin-theme",
 	"repository": "liferay/liferay-portal",
 	"scripts": {
-		"build": "gulp build --css-common-path ./build_gradle/frontend-css-common --styled-path ../frontend-theme-styled/src/main/resources/META-INF/resources/_styled --unstyled-path ../frontend-theme-unstyled/src/main/resources/META-INF/resources/_unstyled"
+		"build": "liferay-npm-scripts theme build"
 	},
 	"version": "3.0.0"
 }

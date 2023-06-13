@@ -14,21 +14,23 @@
 
 package com.liferay.layout.content.page.editor.web.internal.display.context;
 
-import com.liferay.asset.display.contributor.AssetDisplayContributor;
-import com.liferay.asset.display.contributor.AssetDisplayContributorTracker;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
+import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
-import com.liferay.fragment.constants.FragmentEntryTypeConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
+import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.service.FragmentCollectionServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryServiceUtil;
-import com.liferay.fragment.util.FragmentEntryRenderUtil;
+import com.liferay.info.constants.InfoDisplayWebKeys;
+import com.liferay.info.display.contributor.InfoDisplayContributor;
+import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.ItemSelectorReturnType;
@@ -65,6 +67,7 @@ import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -84,6 +87,7 @@ import com.liferay.portal.template.soy.util.SoyContext;
 import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
 import com.liferay.portal.util.PortletCategoryUtil;
 import com.liferay.portal.util.WebAppPool;
+import com.liferay.segments.constants.SegmentsConstants;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -122,18 +126,20 @@ public class ContentPageEditorDisplayContext {
 
 	public ContentPageEditorDisplayContext(
 		HttpServletRequest request, RenderResponse renderResponse,
-		String className, long classPK) {
+		String className, long classPK,
+		FragmentRendererController fragmentRendererController) {
 
 		this.request = request;
 		_renderResponse = renderResponse;
 		this.classPK = classPK;
 
-		assetDisplayContributorTracker =
-			(AssetDisplayContributorTracker)request.getAttribute(
-				ContentPageEditorWebKeys.ASSET_DISPLAY_CONTRIBUTOR_TRACKER);
 		classNameId = PortalUtil.getClassNameId(className);
+		infoDisplayContributorTracker =
+			(InfoDisplayContributorTracker)request.getAttribute(
+				InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR_TRACKER);
 		themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
+		_fragmentRendererController = fragmentRendererController;
 		_fragmentCollectionContributorTracker =
 			(FragmentCollectionContributorTracker)request.getAttribute(
 				ContentPageEditorWebKeys.
@@ -172,9 +178,12 @@ public class ContentPageEditorDisplayContext {
 
 		if (classNameId == PortalUtil.getClassNameId(Layout.class)) {
 			soyContext.put(
+				"discardDraftRedirectURL", themeDisplay.getURLCurrent()
+			).put(
 				"discardDraftURL",
 				getFragmentEntryActionURL(
-					"/content_layout/discard_draft_layout"));
+					"/content_layout/discard_draft_layout")
+			);
 		}
 
 		soyContext.put(
@@ -183,8 +192,7 @@ public class ContentPageEditorDisplayContext {
 				"/content_layout/edit_fragment_entry_link")
 		).put(
 			"elements",
-			_getSoyContextFragmentCollections(
-				FragmentEntryTypeConstants.TYPE_COMPONENT)
+			_getSoyContextFragmentCollections(FragmentConstants.TYPE_COMPONENT)
 		).put(
 			"fragmentEntryLinks", _getSoyContextFragmentEntryLinks()
 		);
@@ -230,8 +238,7 @@ public class ContentPageEditorDisplayContext {
 			"redirectURL", _getRedirect()
 		).put(
 			"sections",
-			_getSoyContextFragmentCollections(
-				FragmentEntryTypeConstants.TYPE_SECTION)
+			_getSoyContextFragmentCollections(FragmentConstants.TYPE_SECTION)
 		).put(
 			"spritemap",
 			themeDisplay.getPathThemeImages() + "/lexicon/icons.svg"
@@ -312,10 +319,6 @@ public class ContentPageEditorDisplayContext {
 		return _groupId;
 	}
 
-	protected long[] getSegmentsExperienceIds() {
-		return new long[0];
-	}
-
 	protected List<SoyContext> getSidebarPanelSoyContexts(boolean showMapping) {
 		if (_sidebarPanelSoyContexts != null) {
 			return _sidebarPanelSoyContexts;
@@ -382,9 +385,9 @@ public class ContentPageEditorDisplayContext {
 		availableSoyContext.put(
 			"icon", "pages-tree"
 		).put(
-			"label", LanguageUtil.get(resourceBundle, "structure")
+			"label", LanguageUtil.get(resourceBundle, "page-structure")
 		).put(
-			"sidebarPanelId", "structure"
+			"sidebarPanelId", "page-structure"
 		);
 
 		soyContexts.add(availableSoyContext);
@@ -394,10 +397,9 @@ public class ContentPageEditorDisplayContext {
 		return _sidebarPanelSoyContexts;
 	}
 
-	protected final AssetDisplayContributorTracker
-		assetDisplayContributorTracker;
 	protected final long classNameId;
 	protected final long classPK;
+	protected final InfoDisplayContributorTracker infoDisplayContributorTracker;
 	protected final HttpServletRequest request;
 	protected final ThemeDisplay themeDisplay;
 
@@ -410,18 +412,18 @@ public class ContentPageEditorDisplayContext {
 
 		List<SoyContext> soyContexts = new ArrayList<>();
 
-		List<AssetDisplayContributor> assetDisplayContributors =
-			assetDisplayContributorTracker.getAssetDisplayContributors();
+		List<InfoDisplayContributor> infoDisplayContributors =
+			infoDisplayContributorTracker.getInfoDisplayContributors();
 
-		for (AssetDisplayContributor assetDisplayContributor :
-				assetDisplayContributors) {
+		for (InfoDisplayContributor infoDisplayContributor :
+				infoDisplayContributors) {
 
-			if (assetDisplayContributor == null) {
+			if (infoDisplayContributor == null) {
 				continue;
 			}
 
 			PortletURL assetBrowserURL = PortletProviderUtil.getPortletURL(
-				request, assetDisplayContributor.getClassName(),
+				request, infoDisplayContributor.getClassName(),
 				PortletProvider.Action.BROWSE);
 
 			if (assetBrowserURL == null) {
@@ -437,7 +439,7 @@ public class ContentPageEditorDisplayContext {
 				"selectedGroupIds",
 				String.valueOf(themeDisplay.getScopeGroupId()));
 			assetBrowserURL.setParameter(
-				"typeSelection", assetDisplayContributor.getClassName());
+				"typeSelection", infoDisplayContributor.getClassName());
 			assetBrowserURL.setParameter(
 				"showNonindexable", String.valueOf(Boolean.TRUE));
 			assetBrowserURL.setParameter(
@@ -451,7 +453,7 @@ public class ContentPageEditorDisplayContext {
 				"href", assetBrowserURL.toString()
 			).put(
 				"typeName",
-				assetDisplayContributor.getLabel(themeDisplay.getLocale())
+				infoDisplayContributor.getLabel(themeDisplay.getLocale())
 			);
 
 			soyContexts.add(assetBrowserSoyContext);
@@ -567,7 +569,9 @@ public class ContentPageEditorDisplayContext {
 
 		String portletId = _getPortletId(content);
 
-		if (Validator.isNull(portletId)) {
+		PortletConfig portletConfig = PortletConfigFactoryUtil.get(portletId);
+
+		if (portletConfig == null) {
 			return soyContext;
 		}
 
@@ -622,7 +626,8 @@ public class ContentPageEditorDisplayContext {
 				fetchLayoutPageTemplateStructure(
 					themeDisplay.getScopeGroupId(), classNameId, classPK, true);
 
-		_layoutData = layoutPageTemplateStructure.getData();
+		_layoutData = layoutPageTemplateStructure.getData(
+			SegmentsConstants.SEGMENTS_EXPERIENCE_ID_DEFAULT);
 
 		return _layoutData;
 	}
@@ -832,7 +837,9 @@ public class ContentPageEditorDisplayContext {
 		_redirect = ParamUtil.getString(request, "redirect");
 
 		if (Validator.isNull(_redirect)) {
-			_redirect = themeDisplay.getURLCurrent();
+			_redirect = ParamUtil.getString(
+				PortalUtil.getOriginalServletRequest(request), "p_l_back_url",
+				themeDisplay.getURLCurrent());
 		}
 
 		return _redirect;
@@ -927,7 +934,9 @@ public class ContentPageEditorDisplayContext {
 
 		themeDisplay.setIsolated(true);
 
-		long[] segmentsExperienceIds = getSegmentsExperienceIds();
+		long[] segmentsExperienceIds = {
+			SegmentsConstants.SEGMENTS_EXPERIENCE_ID_DEFAULT
+		};
 
 		try {
 			for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
@@ -938,20 +947,39 @@ public class ContentPageEditorDisplayContext {
 				SoyContext soyContext =
 					SoyContextFactoryUtil.createSoyContext();
 
-				String content =
-					FragmentEntryRenderUtil.renderFragmentEntryLink(
-						fragmentEntryLink, FragmentEntryLinkConstants.EDIT,
-						new HashMap<>(), themeDisplay.getLocale(),
-						segmentsExperienceIds, request,
-						PortalUtil.getHttpServletResponse(_renderResponse));
+				DefaultFragmentRendererContext fragmentRendererContext =
+					new DefaultFragmentRendererContext(fragmentEntryLink);
+
+				fragmentRendererContext.setLocale(themeDisplay.getLocale());
+				fragmentRendererContext.setMode(
+					FragmentEntryLinkConstants.EDIT);
+				fragmentRendererContext.setSegmentsExperienceIds(
+					segmentsExperienceIds);
+
+				String content = _fragmentRendererController.render(
+					fragmentRendererContext, request,
+					PortalUtil.getHttpServletResponse(_renderResponse));
+
 				JSONObject editableValuesJSONObject =
 					JSONFactoryUtil.createJSONObject(
 						fragmentEntryLink.getEditableValues());
+
+				boolean error = false;
+
+				if (SessionErrors.contains(
+						request, "fragmentEntryInvalidContent")) {
+
+					error = true;
+
+					SessionErrors.clear(request);
+				}
 
 				soyContext.putHTML(
 					"content", content
 				).put(
 					"editableValues", editableValuesJSONObject
+				).put(
+					"error", error
 				).put(
 					"fragmentEntryLinkId",
 					String.valueOf(fragmentEntryLink.getFragmentEntryLinkId())
@@ -983,8 +1011,8 @@ public class ContentPageEditorDisplayContext {
 		}
 
 		return new String[] {
-			"blue", "cyan", "gray", "gray-dark", "green", "indigo", "orange",
-			"pink", "purple", "red", "teal", "white", "yellow"
+			"primary", "success", "danger", "warning", "info", "dark",
+			"gray-dark", "secondary", "light", "lighter", "white"
 		};
 	}
 
@@ -1082,6 +1110,7 @@ public class ContentPageEditorDisplayContext {
 	private Map<String, Object> _defaultConfigurations;
 	private final FragmentCollectionContributorTracker
 		_fragmentCollectionContributorTracker;
+	private final FragmentRendererController _fragmentRendererController;
 	private Long _groupId;
 	private ItemSelectorCriterion _imageItemSelectorCriterion;
 	private final ItemSelector _itemSelector;

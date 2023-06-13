@@ -60,13 +60,62 @@ public abstract class BaseDataDefinitionResourceImpl
 	implements DataDefinitionResource {
 
 	@Override
-	@Consumes("application/json")
-	@POST
-	@Path("/content-spaces/{content-space-id}/data-definition-permissions")
+	@DELETE
+	@Path("/data-definitions/{dataDefinitionId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataDefinition")})
-	public void postContentSpaceDataDefinitionPermission(
-			@NotNull @PathParam("content-space-id") Long contentSpaceId,
+	public void deleteDataDefinition(
+			@NotNull @PathParam("dataDefinitionId") Long dataDefinitionId)
+		throws Exception {
+	}
+
+	@Override
+	@GET
+	@Path("/data-definitions/{dataDefinitionId}")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "DataDefinition")})
+	public DataDefinition getDataDefinition(
+			@NotNull @PathParam("dataDefinitionId") Long dataDefinitionId)
+		throws Exception {
+
+		return new DataDefinition();
+	}
+
+	@Override
+	@Consumes("application/json")
+	@PUT
+	@Path("/data-definitions/{dataDefinitionId}")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "DataDefinition")})
+	public DataDefinition putDataDefinition(
+			@NotNull @PathParam("dataDefinitionId") Long dataDefinitionId,
+			DataDefinition dataDefinition)
+		throws Exception {
+
+		return new DataDefinition();
+	}
+
+	@Override
+	@Consumes("application/json")
+	@POST
+	@Path("/data-definitions/{dataDefinitionId}/data-definition-permissions")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "DataDefinition")})
+	public void postDataDefinitionDataDefinitionPermission(
+			@NotNull @PathParam("dataDefinitionId") Long dataDefinitionId,
+			@NotNull @QueryParam("operation") String operation,
+			DataDefinitionPermission dataDefinitionPermission)
+		throws Exception {
+	}
+
+	@Override
+	@Consumes("application/json")
+	@POST
+	@Path("/sites/{siteId}/data-definition-permissions")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "DataDefinition")})
+	public void postSiteDataDefinitionPermission(
+			@NotNull @PathParam("siteId") Long siteId,
 			@NotNull @QueryParam("operation") String operation,
 			DataDefinitionPermission dataDefinitionPermission)
 		throws Exception {
@@ -80,11 +129,11 @@ public abstract class BaseDataDefinitionResourceImpl
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
 		}
 	)
-	@Path("/content-spaces/{content-space-id}/data-definitions")
+	@Path("/sites/{siteId}/data-definitions")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataDefinition")})
-	public Page<DataDefinition> getContentSpaceDataDefinitionsPage(
-			@NotNull @PathParam("content-space-id") Long contentSpaceId,
+	public Page<DataDefinition> getSiteDataDefinitionsPage(
+			@NotNull @PathParam("siteId") Long siteId,
 			@QueryParam("keywords") String keywords,
 			@Context Pagination pagination)
 		throws Exception {
@@ -95,71 +144,23 @@ public abstract class BaseDataDefinitionResourceImpl
 	@Override
 	@Consumes("application/json")
 	@POST
-	@Path("/content-spaces/{content-space-id}/data-definitions")
+	@Path("/sites/{siteId}/data-definitions")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataDefinition")})
-	public DataDefinition postContentSpaceDataDefinition(
-			@NotNull @PathParam("content-space-id") Long contentSpaceId,
+	public DataDefinition postSiteDataDefinition(
+			@NotNull @PathParam("siteId") Long siteId,
 			DataDefinition dataDefinition)
 		throws Exception {
 
 		return new DataDefinition();
-	}
-
-	@Override
-	@DELETE
-	@Path("/data-definitions/{data-definition-id}")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "DataDefinition")})
-	public void deleteDataDefinition(
-			@NotNull @PathParam("data-definition-id") Long dataDefinitionId)
-		throws Exception {
-	}
-
-	@Override
-	@GET
-	@Path("/data-definitions/{data-definition-id}")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "DataDefinition")})
-	public DataDefinition getDataDefinition(
-			@NotNull @PathParam("data-definition-id") Long dataDefinitionId)
-		throws Exception {
-
-		return new DataDefinition();
-	}
-
-	@Override
-	@Consumes("application/json")
-	@PUT
-	@Path("/data-definitions/{data-definition-id}")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "DataDefinition")})
-	public DataDefinition putDataDefinition(
-			@NotNull @PathParam("data-definition-id") Long dataDefinitionId,
-			DataDefinition dataDefinition)
-		throws Exception {
-
-		return new DataDefinition();
-	}
-
-	@Override
-	@Consumes("application/json")
-	@POST
-	@Path("/data-definitions/{data-definition-id}/data-definition-permissions")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "DataDefinition")})
-	public void postDataDefinitionDataDefinitionPermission(
-			@NotNull @PathParam("data-definition-id") Long dataDefinitionId,
-			@NotNull @QueryParam("operation") String operation,
-			DataDefinitionPermission dataDefinitionPermission)
-		throws Exception {
 	}
 
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected void preparePatch(DataDefinition dataDefinition) {
+	protected void preparePatch(
+		DataDefinition dataDefinition, DataDefinition existingDataDefinition) {
 	}
 
 	protected <T, R> List<R> transform(

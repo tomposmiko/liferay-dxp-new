@@ -15,10 +15,12 @@
 package com.liferay.headless.form.client.serdes.v1_0;
 
 import com.liferay.headless.form.client.dto.v1_0.Field;
+import com.liferay.headless.form.client.dto.v1_0.Option;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -52,154 +54,297 @@ public class FieldSerDes {
 
 		sb.append("\"autocomplete\": ");
 
-		sb.append(field.getAutocomplete());
+		if (field.getAutocomplete() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getAutocomplete());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"dataSourceType\": ");
 
-		sb.append("\"");
-		sb.append(field.getDataSourceType());
-		sb.append("\"");
+		if (field.getDataSourceType() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getDataSourceType());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"dataType\": ");
 
-		sb.append("\"");
-		sb.append(field.getDataType());
-		sb.append("\"");
+		if (field.getDataType() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getDataType());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"displayStyle\": ");
 
-		sb.append("\"");
-		sb.append(field.getDisplayStyle());
-		sb.append("\"");
+		if (field.getDisplayStyle() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getDisplayStyle());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"grid\": ");
 
-		sb.append(field.getGrid());
+		if (field.getGrid() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getGrid());
+		}
+
+		sb.append(", ");
+
+		sb.append("\"hasFormRules\": ");
+
+		if (field.getHasFormRules() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getHasFormRules());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"id\": ");
 
-		sb.append(field.getId());
+		if (field.getId() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getId());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"immutable\": ");
 
-		sb.append(field.getImmutable());
+		if (field.getImmutable() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getImmutable());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"inline\": ");
 
-		sb.append(field.getInline());
+		if (field.getInline() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getInline());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"inputControl\": ");
 
-		sb.append("\"");
-		sb.append(field.getInputControl());
-		sb.append("\"");
+		if (field.getInputControl() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getInputControl());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"label\": ");
 
-		sb.append("\"");
-		sb.append(field.getLabel());
-		sb.append("\"");
+		if (field.getLabel() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getLabel());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"localizable\": ");
 
-		sb.append(field.getLocalizable());
+		if (field.getLocalizable() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getLocalizable());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"multiple\": ");
 
-		sb.append(field.getMultiple());
+		if (field.getMultiple() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getMultiple());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"name\": ");
 
-		sb.append("\"");
-		sb.append(field.getName());
-		sb.append("\"");
+		if (field.getName() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getName());
+		}
+
 		sb.append(", ");
 
-		sb.append("\"numberOfFormRules\": ");
+		sb.append("\"options\": ");
 
-		sb.append(field.getNumberOfFormRules());
-		sb.append(", ");
+		if (field.getOptions() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
 
-		sb.append("\"option\": ");
+			for (int i = 0; i < field.getOptions().length; i++) {
+				sb.append(field.getOptions()[i]);
 
-		sb.append(field.getOption());
+				if ((i + 1) < field.getOptions().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		sb.append(", ");
 
 		sb.append("\"placeholder\": ");
 
-		sb.append("\"");
-		sb.append(field.getPlaceholder());
-		sb.append("\"");
+		if (field.getPlaceholder() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getPlaceholder());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"predefinedValue\": ");
 
-		sb.append("\"");
-		sb.append(field.getPredefinedValue());
-		sb.append("\"");
+		if (field.getPredefinedValue() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getPredefinedValue());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"readOnly\": ");
 
-		sb.append(field.getReadOnly());
+		if (field.getReadOnly() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getReadOnly());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"repeatable\": ");
 
-		sb.append(field.getRepeatable());
+		if (field.getRepeatable() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getRepeatable());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"required\": ");
 
-		sb.append(field.getRequired());
+		if (field.getRequired() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getRequired());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"showAsSwitcher\": ");
 
-		sb.append(field.getShowAsSwitcher());
+		if (field.getShowAsSwitcher() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getShowAsSwitcher());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"showLabel\": ");
 
-		sb.append(field.getShowLabel());
+		if (field.getShowLabel() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getShowLabel());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"style\": ");
 
-		sb.append("\"");
-		sb.append(field.getStyle());
-		sb.append("\"");
+		if (field.getStyle() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getStyle());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"text\": ");
 
-		sb.append("\"");
-		sb.append(field.getText());
-		sb.append("\"");
+		if (field.getText() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getText());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"tooltip\": ");
 
-		sb.append("\"");
-		sb.append(field.getTooltip());
-		sb.append("\"");
+		if (field.getTooltip() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getTooltip());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"validation\": ");
 
-		sb.append(field.getValidation());
+		if (field.getValidation() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(field.getValidation());
+		}
 
 		sb.append("}");
 
@@ -268,9 +413,14 @@ public class FieldSerDes {
 						GridSerDes.toDTO((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "hasFormRules")) {
+				if (jsonParserFieldValue != null) {
+					field.setHasFormRules((Boolean)jsonParserFieldValue);
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
 				if (jsonParserFieldValue != null) {
-					field.setId((Long)jsonParserFieldValue);
+					field.setId(Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "immutable")) {
@@ -308,15 +458,16 @@ public class FieldSerDes {
 					field.setName((String)jsonParserFieldValue);
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "numberOfFormRules")) {
+			else if (Objects.equals(jsonParserFieldName, "options")) {
 				if (jsonParserFieldValue != null) {
-					field.setNumberOfFormRules((Boolean)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "option")) {
-				if (jsonParserFieldValue != null) {
-					field.setOption(
-						OptionSerDes.toDTO((String)jsonParserFieldValue));
+					field.setOptions(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> OptionSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Option[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "placeholder")) {

@@ -70,6 +70,12 @@
 		}
 	}
 
+	&-wrapper--highlighted {
+		&:after {
+			box-shadow: inset 0 0 0 $topperBorderWidth $topperBorderColor;
+		}
+	}
+
 	&-wrapper--active:after {
 		box-shadow: inset 0 0 0 $topperFocusedBorderWidth $topperBorderColor;
 		transition: box-shadow ease ($topperShowDuration * 0.5);
@@ -87,5 +93,21 @@
 	&-wrapper--active,
 	&-wrapper--active > & {
 		z-index: $topperActiveZIndex;
+	}
+
+	&-wrapper--error,
+	&-wrapper--error.fragments-editor__topper-wrapper--active,
+	&-wrapper--error.fragments-editor__topper-wrapper--hovered {
+		border-color: $fragmentEntryLinkErrorBorderColor;
+
+		> .fragments-editor__topper {
+			background-color: $fragmentEntryLinkErrorBorderColor;
+			box-shadow: 0 0 0 $topperBorderWidth $fragmentEntryLinkErrorBorderColor;
+		}
+
+		&:after {
+			box-shadow: inset 0 0 0 $topperFocusedBorderWidth $fragmentEntryLinkErrorBorderColor;
+			transition: box-shadow ease ($topperShowDuration * 0.5);
+		}
 	}
 }

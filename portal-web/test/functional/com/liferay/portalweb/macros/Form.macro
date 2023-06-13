@@ -107,7 +107,7 @@ definition {
 	}
 
 	macro disableAutocompleteConfiguration {
-		FormFields.disableSwitcher(fieldName = "autocomplete");
+		FormFields.disableSwitcher(fieldName = "Autocomplete");
 	}
 
 	macro duplicate {
@@ -129,13 +129,15 @@ definition {
 			radioOption = "From Data Provider"
 		);
 
+		Pause(locator1 = "2000");
+
 		FormFields.selectSelectOption(
-			fieldName = "ddmDataProviderInstanceId",
+			fieldName = "Data Provider",
 			selectOption = "${dataProvider}"
 		);
 
 		FormFields.selectSelectOption(
-			fieldName = "ddmDataProviderInstanceOutput",
+			fieldName = "Output Parameter",
 			selectOption = "${dataProviderOutput}"
 		);
 	}
@@ -152,6 +154,24 @@ definition {
 		var key_fieldName = "${fieldName}";
 
 		AssertTextEquals(locator1 = "Form#FIELD_LABEL", value1 = "${fieldValue}");
+	}
+
+	macro editFieldLabelMetal {
+		FormFields.editText(fieldName = "label", fieldValue = "${fieldValue}");
+
+		var key_fieldName = "${fieldValue}";
+
+		if (!(isSet(fieldName))) {
+			var fieldName = StringUtil.replace("${fieldValue}", " ", "");
+		}
+
+		//TODO: adding it to test, remove this line after this bug (LPS-87612) is fixed
+		//Type(locator1 = "FormFields#FIELD_NAME_EDIT", value1 = "${fieldName}");
+
+		FormFields.viewFieldName(fieldName = "${fieldName}");
+
+		AssertTextEquals(locator1 = "Form#FIELD_LABEL", value1 = "${fieldValue}");
+
 	}
 
 	macro editName {
@@ -192,7 +212,7 @@ definition {
 	}
 
 	macro enableAutocompleteConfiguration {
-		FormFields.enableSwitcher(fieldName = "autocomplete");
+		FormFields.enableSwitcher(fieldName = "Autocomplete");
 	}
 
 	macro getPublishedFormPublicURL {
@@ -231,8 +251,14 @@ definition {
 		AssertElementPresent(locator1 = "Form#SIDEBAR_BASIC_TAB");
 	}
 
+	macro gotoBasicTab {
+		AssertClick(locator1 = "Form#SIDEBAR_BASIC_TAB", value1 = "Basic");
+		Pause(locator1 = "1000");
+	}
+
 	macro gotoAdvancedTab {
 		AssertClick(locator1 = "Form#SIDEBAR_PROPERTIES_TAB", value1 = "Properties");
+		Pause(locator1 = "1000");
 	}
 
 	macro gotoElementSetsTab {
@@ -285,7 +311,7 @@ definition {
 
 		Click(locator1 = "Button#PUBLISH");
 
-		Form.viewPublishFormSuccessMessage();
+		Form.assertFormWasPublished();
 	}
 
 	macro save {
@@ -336,7 +362,25 @@ definition {
 
 		AssertClick(
 			locator1 = "Form#PAGE_CONTROLS_SWITCH_PAGINATION_MODE",
-			value1 = "Switch Pagination Mode"
+			value1 = "Switch Pagination"
+		);
+	}
+
+	macro switchPaginationModeToBottom {
+		Click(locator1 = "Form#PAGE_CONTROLS_ELLIPSIS_ICON");
+
+		AssertClick(
+			locator1 = "Form#PAGE_CONTROLS_SWITCH_PAGINATION_MODE_TO_BOTTOM",
+			value1 = "Switch Pagination to Bottom"
+		);
+	}
+
+	macro switchPaginationModeToTop {
+		Click(locator1 = "Form#PAGE_CONTROLS_ELLIPSIS_ICON");
+
+		AssertClick(
+			locator1 = "Form#PAGE_CONTROLS_SWITCH_PAGINATION_MODE_TO_TOP",
+			value1 = "Switch Pagination to Top"
 		);
 	}
 
@@ -398,7 +442,11 @@ definition {
 	macro viewPublishFormSuccessMessage {
 		var key_alertMessage = "The form was published successfully! Access it with this URL";
 
-		AssertNotVisible(locator1 = "Form#PUBLISH_UNPUBLISH_ICON_CLOSE");
+		AssertVisible(locator1 = "Form#PUBLISH_UNPUBLISH_ICON_CLOSE");
+	}
+
+	macro assertFormWasPublished {
+		AssertVisible(locator1 = "Form#PUBLISH_URL_ICON");
 	}
 
 	macro viewSaveNotification {

@@ -117,8 +117,8 @@ definition {
 
 	macro configureIdentityProviderConnection {
 		Click.waitForMenuToggleJSClick(
-			locator1 = "CPSAMLAdminIdentityProviderConnection#IDENTITY_PROVIDER_CONNECTION_ACTION_BUTTON",
-			key_idpNameID = "${idpNameID}"
+			locator1 = "CPSAMLAdmin#SAML_CONNECTION_ACTION_BUTTON",
+			key_samlEntityID = "${samlEntityID}"
 		);
 
 		MenuItem.click(menuItem = "Edit");
@@ -139,6 +139,47 @@ definition {
 			);
 		}
 
+		if ("${allowShowingTheLoginPortlet}" == "disable") {
+			Uncheck(
+				locator1 = "CPSAMLAdminServiceProvider#SERVICE_PROVIDER_ALLOW_SHOWING_THE_LOGIN_PORTLET_CHECKBOX"
+			);
+		}
+
 		PortletEntry.save();
+	}
+
+	macro configureServiceProviderConnection {
+		Click.waitForMenuToggleJSClick(
+			locator1 = "CPSAMLAdmin#SAML_CONNECTION_ACTION_BUTTON",
+			key_samlEntityID = "${samlEntityID}"
+		);
+
+		MenuItem.click(menuItem = "Edit");
+
+		if ("${forceEncryption}" == "enable") {
+			Check(
+				locator1 = "CPSAMLAdminServiceProviderConnections#SERVICE_PROVIDER_CONNECTION_FORCE_ENCRYPTION"
+			);
+		}
+
+		PortletEntry.save();
+	}
+
+	macro deleteSAMLConnection {
+		Click.waitForMenuToggleJSClick(
+			locator1 = "CPSAMLAdmin#SAML_CONNECTION_ACTION_BUTTON",
+			key_samlEntityID = "${samlEntityID}"
+		);
+
+		ClickNoError(
+			locator1 = "MenuItem#ANY_MENU_ITEM",
+			key_menuItem = "Delete"
+		);
+
+		AssertConfirm.waitForConfirmation(
+			value1 = "Are you sure you want to delete this? It will be deleted immediately."
+		);
+
+		Alert.viewSuccessMessage();
 	}
 }

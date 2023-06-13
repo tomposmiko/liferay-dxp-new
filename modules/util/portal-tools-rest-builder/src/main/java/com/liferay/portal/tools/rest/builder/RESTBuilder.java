@@ -14,6 +14,7 @@
 
 package com.liferay.portal.tools.rest.builder;
 
+import com.liferay.portal.kernel.util.CamelCaseUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.StringUtil_IW;
@@ -33,6 +34,9 @@ import com.liferay.portal.vulcan.yaml.config.ConfigYAML;
 import com.liferay.portal.vulcan.yaml.openapi.Components;
 import com.liferay.portal.vulcan.yaml.openapi.Info;
 import com.liferay.portal.vulcan.yaml.openapi.OpenAPIYAML;
+import com.liferay.portal.vulcan.yaml.openapi.Operation;
+import com.liferay.portal.vulcan.yaml.openapi.Parameter;
+import com.liferay.portal.vulcan.yaml.openapi.PathItem;
 import com.liferay.portal.vulcan.yaml.openapi.Schema;
 
 import java.io.File;
@@ -43,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Peter Shin
@@ -100,11 +105,11 @@ public class RESTBuilder {
 		File[] files = FileUtil.getFiles(_configDir, "rest-openapi", ".yaml");
 
 		for (File file : files) {
-			OpenAPIYAML openAPIYAML = null;
+			_checkOpenAPIYAMLFile(freeMarkerTool, file);
 
-			try (InputStream is = new FileInputStream(file)) {
-				openAPIYAML = YAMLUtil.loadOpenAPIYAML(StringUtil.read(is));
-			}
+			String content = FileUtil.read(file);
+
+			OpenAPIYAML openAPIYAML = YAMLUtil.loadOpenAPIYAML(content);
 
 			Info info = openAPIYAML.getInfo();
 
@@ -193,6 +198,18 @@ public class RESTBuilder {
 		if (Validator.isNotNull(_configYAML.getTestDir())) {
 			FileUtil.deleteFiles(_configYAML.getTestDir(), _files);
 		}
+	}
+
+	private void _checkOpenAPIYAMLFile(FreeMarkerTool freeMarkerTool, File file)
+		throws Exception {
+
+		String content = _fixOpenAPIPathParameters(FileUtil.read(file));
+
+		if (_configYAML.isForcePredictableOperationId()) {
+			content = _fixOpenAPIOperationIds(freeMarkerTool, content);
+		}
+
+		FileUtil.write(file, content);
 	}
 
 	private void _createApplicationFile(Map<String, Object> context)
@@ -678,6 +695,241 @@ public class RESTBuilder {
 			file,
 			FreeMarkerUtil.processTemplate(
 				_copyrightFileName, "resource_test", context));
+	}
+
+	private String _fixOpenAPIOperationIds(
+		FreeMarkerTool freeMarkerTool, String content) {
+
+		content = content.replaceAll("\n\\s+operationId:.+", "");
+
+		OpenAPIYAML openAPIYAML = YAMLUtil.loadOpenAPIYAML(content);
+
+		Components components = openAPIYAML.getComponents();
+
+		Map<String, Schema> schemas = components.getSchemas();
+
+		for (String schemaName : schemas.keySet()) {
+			List<JavaMethodSignature> javaMethodSignatures =
+				freeMarkerTool.getResourceJavaMethodSignatures(
+					_configYAML, openAPIYAML, schemaName);
+
+			for (JavaMethodSignature javaMethodSignature :
+					javaMethodSignatures) {
+
+				int x = content.indexOf(
+					StringUtil.quote(javaMethodSignature.getPath(), '"') + ":");
+
+				if (x == -1) {
+					x = content.indexOf(javaMethodSignature.getPath() + ":");
+				}
+
+				String pathLine = content.substring(
+					content.lastIndexOf("\n", x) + 1, content.indexOf("\n", x));
+
+				String httpMethod = OpenAPIParserUtil.getHTTPMethod(
+					javaMethodSignature.getOperation());
+
+				int y = content.indexOf(httpMethod + ":", x);
+
+				String httpMethodLine = content.substring(
+					content.lastIndexOf("\n", y) + 1, content.indexOf("\n", y));
+
+				int z = content.indexOf('\n', y);
+
+				String line = content.substring(
+					z + 1, content.indexOf("\n", z + 1));
+
+				if (line.contains("operationId:")) {
+					continue;
+				}
+
+				StringBuilder sb = new StringBuilder();
+
+				sb.append(content.substring(0, z + 1));
+				sb.append(pathLine.replaceAll("^(\\s+).+", "$1"));
+				sb.append(httpMethodLine.replaceAll("^(\\s+).+", "$1"));
+				sb.append("operationId: ");
+				sb.append(javaMethodSignature.getMethodName());
+				sb.append("\n");
+				sb.append(content.substring(z + 1));
+
+				content = sb.toString();
+			}
+		}
+
+		return content;
+	}
+
+	private String _fixOpenAPIPathParameters(String content) {
+		OpenAPIYAML openAPIYAML = YAMLUtil.loadOpenAPIYAML(content);
+
+		Map<String, PathItem> pathItems = openAPIYAML.getPathItems();
+
+		for (Map.Entry<String, PathItem> entry : pathItems.entrySet()) {
+			String path = entry.getKey();
+
+			int x = content.indexOf(StringUtil.quote(path, '"') + ":");
+
+			if (x == -1) {
+				x = content.indexOf(path + ":");
+			}
+
+			String pathLine = content.substring(
+				content.lastIndexOf("\n", x) + 1, content.indexOf("\n", x));
+
+			// /blogs/{blog-id}/blogs --> /blogs/{blogId}/blogs
+
+			for (Operation operation : _getOperations(entry.getValue())) {
+				int y = content.indexOf(
+					OpenAPIParserUtil.getHTTPMethod(operation) + ":", x);
+
+				for (Parameter parameter : operation.getParameters()) {
+					String in = parameter.getIn();
+					String parameterName = parameter.getName();
+
+					if (in.equals("path") && parameterName.contains("-")) {
+						String newParameterName = CamelCaseUtil.toCamelCase(
+							parameterName);
+
+						int z = content.indexOf(" " + parameterName + "\n", y);
+
+						StringBuilder sb = new StringBuilder();
+
+						sb.append(content.substring(0, z + 1));
+						sb.append(newParameterName);
+						sb.append("\n");
+						sb.append(
+							content.substring(z + parameterName.length() + 2));
+
+						content = sb.toString();
+
+						String newPathLine = pathLine.replace(
+							"{" + parameterName + "}",
+							"{" + newParameterName + "}");
+
+						content = content.replace(pathLine, newPathLine);
+					}
+				}
+			}
+
+			// /blogs/{blogId}/blogs --> /blogs/{parentBlogId}/blogs
+
+			List<String> pathSegments = new ArrayList<>();
+
+			for (String pathSegment : path.split("/")) {
+				if (Validator.isNotNull(pathSegment)) {
+					pathSegments.add(pathSegment);
+				}
+			}
+
+			if ((pathSegments.size() != 3) ||
+				Objects.equals(pathSegments.get(1), "{id}") ||
+				!StringUtil.startsWith(pathSegments.get(1), "{") ||
+				!StringUtil.endsWith(pathSegments.get(1), "Id}")) {
+
+				continue;
+			}
+
+			String selParameterName = pathSegments.get(1);
+
+			selParameterName = selParameterName.substring(
+				1, selParameterName.length() - 1);
+
+			String s = CamelCaseUtil.fromCamelCase(selParameterName);
+
+			s = TextFormatter.formatPlural(s.substring(0, s.length() - 3));
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append('/');
+			sb.append(s);
+			sb.append('/');
+			sb.append(pathSegments.get(1));
+			sb.append('/');
+			sb.append(s);
+
+			if (!path.equals(sb.toString()) &&
+				!path.equals(sb.toString() + "/")) {
+
+				continue;
+			}
+
+			String newParameterName =
+				"parent" + StringUtil.upperCaseFirstLetter(selParameterName);
+
+			for (Operation operation : _getOperations(entry.getValue())) {
+				int y = content.indexOf(
+					OpenAPIParserUtil.getHTTPMethod(operation) + ":", x);
+
+				for (Parameter parameter : operation.getParameters()) {
+					String in = parameter.getIn();
+					String parameterName = parameter.getName();
+
+					if (in.equals("path") &&
+						parameterName.equals(selParameterName)) {
+
+						int z = content.indexOf(" " + parameterName + "\n", y);
+
+						sb.setLength(0);
+
+						sb.append(content.substring(0, z + 1));
+						sb.append(newParameterName);
+						sb.append("\n");
+						sb.append(
+							content.substring(z + parameterName.length() + 2));
+
+						content = sb.toString();
+
+						String newPathLine = pathLine.replace(
+							"{" + parameterName + "}",
+							"{" + newParameterName + "}");
+
+						content = content.replace(pathLine, newPathLine);
+					}
+				}
+			}
+
+			String newPathLine = pathLine.replace(
+				"{" + selParameterName + "}", "{" + newParameterName + "}");
+
+			content = content.replace(pathLine, newPathLine);
+		}
+
+		return content;
+	}
+
+	private List<Operation> _getOperations(PathItem pathItem) {
+		List<Operation> operations = new ArrayList<>();
+
+		if (pathItem.getDelete() != null) {
+			operations.add(pathItem.getDelete());
+		}
+
+		if (pathItem.getGet() != null) {
+			operations.add(pathItem.getGet());
+		}
+
+		if (pathItem.getHead() != null) {
+			operations.add(pathItem.getHead());
+		}
+
+		if (pathItem.getOptions() != null) {
+			operations.add(pathItem.getOptions());
+		}
+
+		if (pathItem.getPatch() != null) {
+			operations.add(pathItem.getPatch());
+		}
+
+		if (pathItem.getPost() != null) {
+			operations.add(pathItem.getPost());
+		}
+
+		if (pathItem.getPut() != null) {
+			operations.add(pathItem.getPut());
+		}
+
+		return operations;
 	}
 
 	private void _putSchema(

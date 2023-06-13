@@ -99,17 +99,16 @@ public class AsahFaroBackendIndividualSegmentsCheckerUtil {
 		try {
 			if (segmentsEntry == null) {
 				_segmentsEntryLocalService.addSegmentsEntry(
-					nameMap, Collections.emptyMap(), true, null,
-					individualSegment.getId(),
-					SegmentsConstants.SOURCE_ASAH_FARO_BACKEND,
+					individualSegment.getId(), nameMap, Collections.emptyMap(),
+					true, null, SegmentsConstants.SOURCE_ASAH_FARO_BACKEND,
 					User.class.getName(), serviceContext);
 
 				return;
 			}
 
 			_segmentsEntryLocalService.updateSegmentsEntry(
-				segmentsEntry.getSegmentsEntryId(), nameMap, null, true, null,
-				individualSegment.getId(), serviceContext);
+				segmentsEntry.getSegmentsEntryId(), individualSegment.getId(),
+				nameMap, null, true, null, serviceContext);
 		}
 		catch (PortalException pe) {
 			_log.error(
@@ -159,7 +158,7 @@ public class AsahFaroBackendIndividualSegmentsCheckerUtil {
 
 		try {
 			individualResults = _asahFaroBackendClient.getIndividualResults(
-				segmentsEntry.getKey(), 1, _DELTA,
+				segmentsEntry.getSegmentsEntryKey(), 1, _DELTA,
 				Collections.singletonList(OrderByField.desc("dateModified")));
 
 			int totalElements = individualResults.getTotal();
@@ -168,7 +167,7 @@ public class AsahFaroBackendIndividualSegmentsCheckerUtil {
 				_log.debug(
 					totalElements +
 						" individuals found for individual segment " +
-							segmentsEntry.getKey());
+							segmentsEntry.getSegmentsEntryKey());
 			}
 
 			if (totalElements == 0) {
@@ -195,7 +194,7 @@ public class AsahFaroBackendIndividualSegmentsCheckerUtil {
 				}
 
 				individualResults = _asahFaroBackendClient.getIndividualResults(
-					segmentsEntry.getKey(), curPage, _DELTA,
+					segmentsEntry.getSegmentsEntryKey(), curPage, _DELTA,
 					Collections.singletonList(
 						OrderByField.desc("dateModified")));
 			}
@@ -203,7 +202,7 @@ public class AsahFaroBackendIndividualSegmentsCheckerUtil {
 		catch (RuntimeException re) {
 			_log.error(
 				"Unable to retrieve individuals for individual segment " +
-					segmentsEntry.getKey(),
+					segmentsEntry.getSegmentsEntryKey(),
 				re);
 		}
 	}

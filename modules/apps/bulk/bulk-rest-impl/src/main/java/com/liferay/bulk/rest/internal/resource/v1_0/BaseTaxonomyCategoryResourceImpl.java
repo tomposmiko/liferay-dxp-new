@@ -79,7 +79,9 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 		this.contextCompany = contextCompany;
 	}
 
-	protected void preparePatch(TaxonomyCategory taxonomyCategory) {
+	protected void preparePatch(
+		TaxonomyCategory taxonomyCategory,
+		TaxonomyCategory existingTaxonomyCategory) {
 	}
 
 	protected <T, R> List<R> transform(

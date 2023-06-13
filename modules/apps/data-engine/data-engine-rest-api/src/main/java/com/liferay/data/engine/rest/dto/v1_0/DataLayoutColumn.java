@@ -55,6 +55,9 @@ public class DataLayoutColumn {
 		try {
 			columnSize = columnSizeUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -78,6 +81,9 @@ public class DataLayoutColumn {
 
 		try {
 			fieldNames = fieldNamesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -117,7 +123,13 @@ public class DataLayoutColumn {
 
 		sb.append("\"columnSize\": ");
 
-		sb.append(columnSize);
+		if (columnSize == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(columnSize);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"fieldNames\": ");

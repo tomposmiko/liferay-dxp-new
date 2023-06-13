@@ -477,7 +477,7 @@ definition {
 			);
 		}
 
-		LexiconEntry.gotoHeaderMenuItem(menuItem = "Checkin");
+		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Checkin");
 
 		if (IsElementPresent(locator1 = "Radio#MAJOR_VERSION")) {
 			if ("${revision}" == "Major") {
@@ -795,7 +795,7 @@ definition {
 
 		ScrollWebElementIntoView(locator1 = "Portlet#TITLE");
 
-		MouseOver(locator1 = "AP#ASSET_ABSTRACT_EDIT");
+		MouseOver.mouseOverNotVisible(locator1 = "AP#ASSET_EDIT");
 
 		Click.clickNoMouseOver(locator1 = "AP#ASSET_EDIT");
 
@@ -887,8 +887,6 @@ definition {
 		SelectFrame(locator1 = "DocumentsAndMedia#CONFIGURATION_IFRAME");
 
 		Check(locator1 = "Checkbox#SHOW_ACTIONS_CHECKBOX");
-
-		Check(locator1 = "Checkbox#SHOW_NAVIGATION_LINKS_CHECKBOX");
 
 		PortletEntry.save();
 
@@ -991,6 +989,14 @@ definition {
 		SelectFrame(locator1 = "IFrame#SELECT_FOLDER");
 
 		var key_dmFolderName = "${dmFolderName}";
+
+		if (IsElementNotPresent(locator1 = "DocumentsAndMediaSelectFolder#CHOOSE_BUTTON")) {
+			AssertClick(
+				locator1 = "BreadcrumbPortlet#BREADCRUMB_FOLDER",
+				value1 = "Home",
+				key_breadcrumbName = "Home"
+			);
+		}
 
 		AssertClick(
 			locator1 = "DocumentsAndMediaSelectFolder#CHOOSE_BUTTON",
@@ -1126,12 +1132,6 @@ definition {
 
 			PortletEntry.save();
 		}
-	}
-
-	macro selectVersion {
-		var key_tab = "Versions";
-
-		AssertClick(locator1 = "NavTab#NAV_TABS", value1 = "Versions");
 	}
 
 	macro sharePG {
@@ -1758,6 +1758,8 @@ definition {
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE",
 			value1 = "${dmDocumentTitle}"
 		);
+
+		Click(locator1 = "Icon#INFO");
 
 		AssertTextEquals(
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_RELATED_ASSETS_TITLE",

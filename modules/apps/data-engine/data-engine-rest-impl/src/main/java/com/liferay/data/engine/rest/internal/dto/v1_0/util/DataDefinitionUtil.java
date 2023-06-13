@@ -36,7 +36,6 @@ public class DataDefinitionUtil {
 
 		return new DataDefinition() {
 			{
-				contentSpaceId = ddmStructure.getGroupId();
 				dataDefinitionFields = JSONUtil.toArray(
 					jsonObject.getJSONArray("fields"),
 					fieldJSONObject -> _toDataDefinitionField(fieldJSONObject),
@@ -52,6 +51,7 @@ public class DataDefinitionUtil {
 				id = ddmStructure.getStructureId();
 				name = LocalizedValueUtil.toLocalizedValues(
 					ddmStructure.getNameMap());
+				siteId = ddmStructure.getGroupId();
 				storageType = ddmStructure.getStorageType();
 				userId = ddmStructure.getUserId();
 			}
@@ -80,7 +80,8 @@ public class DataDefinitionUtil {
 
 		return new DataDefinitionField() {
 			{
-				defaultValue = jsonObject.getString("defaultValue");
+				defaultValue = LocalizedValueUtil.toLocalizedValues(
+					jsonObject.getJSONObject("predefinedValue"));
 
 				if (!jsonObject.has("type")) {
 					throw new Exception("Type is required");
@@ -138,32 +139,11 @@ public class DataDefinitionUtil {
 			DataDefinitionField dataDefinitionField)
 		throws Exception {
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-		Object defaultValue = dataDefinitionField.getDefaultValue();
-
-		if (defaultValue != null) {
-			jsonObject.put("defaultValue", defaultValue);
-		}
-
-		jsonObject.put("indexable", dataDefinitionField.getIndexable());
-		jsonObject.put(
-			"label",
-			LocalizedValueUtil.toJSONObject(dataDefinitionField.getLabel()));
-		jsonObject.put("localizable", dataDefinitionField.getLocalizable());
-
 		String name = dataDefinitionField.getName();
 
 		if (Validator.isNull(name)) {
 			throw new Exception("Name is required");
 		}
-
-		jsonObject.put("name", name);
-
-		jsonObject.put("repeatable", dataDefinitionField.getRepeatable());
-		jsonObject.put(
-			"tip",
-			LocalizedValueUtil.toJSONObject(dataDefinitionField.getTip()));
 
 		String type = dataDefinitionField.getFieldType();
 
@@ -171,9 +151,24 @@ public class DataDefinitionUtil {
 			throw new Exception("Type is required");
 		}
 
-		jsonObject.put("type", type);
-
-		return jsonObject;
+		return JSONUtil.put(
+			"defaultValue", dataDefinitionField.getDefaultValue()
+		).put(
+			"indexable", dataDefinitionField.getIndexable()
+		).put(
+			"label",
+			LocalizedValueUtil.toJSONObject(dataDefinitionField.getLabel())
+		).put(
+			"localizable", dataDefinitionField.getLocalizable()
+		).put(
+			"name", name
+		).put(
+			"repeatable", dataDefinitionField.getRepeatable()
+		).put(
+			"tip", LocalizedValueUtil.toJSONObject(dataDefinitionField.getTip())
+		).put(
+			"type", type
+		);
 	}
 
 	private static JSONObject _toJSONObject(

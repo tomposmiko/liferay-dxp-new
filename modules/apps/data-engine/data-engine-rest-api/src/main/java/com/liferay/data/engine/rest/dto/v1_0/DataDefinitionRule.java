@@ -57,6 +57,9 @@ public class DataDefinitionRule {
 			dataDefinitionFieldNames =
 				dataDefinitionFieldNamesUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -85,6 +88,9 @@ public class DataDefinitionRule {
 			dataDefinitionRuleParameters =
 				dataDefinitionRuleParametersUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -106,6 +112,9 @@ public class DataDefinitionRule {
 	public void setName(UnsafeSupplier<String, Exception> nameUnsafeSupplier) {
 		try {
 			name = nameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -130,6 +139,9 @@ public class DataDefinitionRule {
 
 		try {
 			ruleType = ruleTypeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -213,16 +225,23 @@ public class DataDefinitionRule {
 
 		sb.append("\"name\": ");
 
-		sb.append("\"");
-		sb.append(name);
-		sb.append("\"");
+		if (name == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(name);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"ruleType\": ");
 
-		sb.append("\"");
-		sb.append(ruleType);
-		sb.append("\"");
+		if (ruleType == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(ruleType);
+		}
 
 		sb.append("}");
 

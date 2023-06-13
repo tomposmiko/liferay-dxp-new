@@ -14,7 +14,6 @@
 
 package com.liferay.portal.tools.rest.builder.internal.freemarker.tool;
 
-import com.liferay.portal.kernel.util.CamelCaseUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.JavaMethodParameter;
@@ -26,10 +25,12 @@ import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.parse
 import com.liferay.portal.tools.rest.builder.internal.freemarker.tool.java.parser.util.OpenAPIParserUtil;
 import com.liferay.portal.vulcan.yaml.config.ConfigYAML;
 import com.liferay.portal.vulcan.yaml.openapi.Components;
+import com.liferay.portal.vulcan.yaml.openapi.Content;
 import com.liferay.portal.vulcan.yaml.openapi.Get;
 import com.liferay.portal.vulcan.yaml.openapi.OpenAPIYAML;
 import com.liferay.portal.vulcan.yaml.openapi.Operation;
 import com.liferay.portal.vulcan.yaml.openapi.Parameter;
+import com.liferay.portal.vulcan.yaml.openapi.RequestBody;
 import com.liferay.portal.vulcan.yaml.openapi.Schema;
 
 import java.util.Iterator;
@@ -164,6 +165,53 @@ public class FreeMarkerTool {
 			schema);
 	}
 
+	public JavaMethodSignature getPostSchemaJavaMethodSignature(
+		List<JavaMethodSignature> javaMethodSignatures, String parameterName,
+		String schemaName) {
+
+		for (JavaMethodSignature javaMethodSignature : javaMethodSignatures) {
+			Operation operation = javaMethodSignature.getOperation();
+
+			if (!Objects.equals("post", getHTTPMethod(operation))) {
+				continue;
+			}
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(getHTTPMethod(operation));
+
+			if (parameterName.startsWith("parent")) {
+				parameterName = parameterName.substring(6);
+			}
+
+			if (parameterName.endsWith("Id")) {
+				parameterName = parameterName.substring(
+					0, parameterName.length() - 2);
+			}
+
+			sb.append(StringUtil.upperCaseFirstLetter(parameterName));
+
+			sb.append(StringUtil.upperCaseFirstLetter(schemaName));
+
+			String methodName = javaMethodSignature.getMethodName();
+
+			if (!Objects.equals(methodName, sb.toString())) {
+				continue;
+			}
+
+			List<JavaMethodParameter> javaMethodParameters =
+				javaMethodSignature.getJavaMethodParameters();
+
+			if (javaMethodParameters.size() != 2) {
+				continue;
+			}
+
+			return javaMethodSignature;
+		}
+
+		return null;
+	}
+
 	public String getResourceArguments(
 		List<JavaMethodParameter> javaMethodParameters) {
 
@@ -237,6 +285,47 @@ public class FreeMarkerTool {
 		return false;
 	}
 
+	public boolean hasPostSchemaJavaMethodSignature(
+		List<JavaMethodSignature> javaMethodSignatures, String parameterName,
+		String schemaName) {
+
+		JavaMethodSignature javaMethodSignature =
+			getPostSchemaJavaMethodSignature(
+				javaMethodSignatures, parameterName, schemaName);
+
+		if (javaMethodSignature != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean hasRequestBodyMediaType(
+		JavaMethodSignature javaMethodSignature, String mediaType) {
+
+		Operation operation = javaMethodSignature.getOperation();
+
+		if (operation.getRequestBody() == null) {
+			return false;
+		}
+
+		RequestBody requestBody = operation.getRequestBody();
+
+		if (requestBody.getContent() == null) {
+			return false;
+		}
+
+		Map<String, Content> contents = requestBody.getContent();
+
+		Set<String> mediaTypes = contents.keySet();
+
+		if (!mediaTypes.contains(mediaType)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public boolean isDTOSchemaProperty(
 		OpenAPIYAML openAPIYAML, String propertyName, Schema schema) {
 
@@ -247,8 +336,7 @@ public class FreeMarkerTool {
 	public boolean isPathParameter(
 		JavaMethodParameter javaMethodParameter, Operation operation) {
 
-		String name = CamelCaseUtil.fromCamelCase(
-			javaMethodParameter.getParameterName());
+		String name = javaMethodParameter.getParameterName();
 
 		for (Parameter parameter : operation.getParameters()) {
 			if (Objects.equals(parameter.getName(), name) &&

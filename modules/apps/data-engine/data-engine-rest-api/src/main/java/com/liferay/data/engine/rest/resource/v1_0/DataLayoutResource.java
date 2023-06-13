@@ -15,6 +15,7 @@
 package com.liferay.data.engine.rest.resource.v1_0;
 
 import com.liferay.data.engine.rest.dto.v1_0.DataLayout;
+import com.liferay.data.engine.rest.dto.v1_0.DataLayoutPermission;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -32,12 +33,17 @@ import javax.annotation.Generated;
 @Generated("")
 public interface DataLayoutResource {
 
-	public Page<DataLayout> getContentSpaceDataLayoutPage(
-			Long contentSpaceId, Pagination pagination)
+	public Page<DataLayout> getDataDefinitionDataLayoutsPage(
+			Long dataDefinitionId, Pagination pagination)
 		throws Exception;
 
 	public DataLayout postDataDefinitionDataLayout(
 			Long dataDefinitionId, DataLayout dataLayout)
+		throws Exception;
+
+	public void postDataLayoutDataLayoutPermission(
+			Long dataLayoutId, String operation,
+			DataLayoutPermission dataLayoutPermission)
 		throws Exception;
 
 	public void deleteDataLayout(Long dataLayoutId) throws Exception;
@@ -45,6 +51,15 @@ public interface DataLayoutResource {
 	public DataLayout getDataLayout(Long dataLayoutId) throws Exception;
 
 	public DataLayout putDataLayout(Long dataLayoutId, DataLayout dataLayout)
+		throws Exception;
+
+	public Page<DataLayout> getSiteDataLayoutPage(
+			Long siteId, Pagination pagination)
+		throws Exception;
+
+	public void postSiteDataLayoutPermission(
+			Long siteId, String operation,
+			DataLayoutPermission dataLayoutPermission)
 		throws Exception;
 
 	public void setContextCompany(Company contextCompany);

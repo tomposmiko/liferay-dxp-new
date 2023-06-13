@@ -10,6 +10,31 @@ const MOVE_ITEM_DIRECTIONS = {
 };
 
 /**
+ * @param {object} objectToClone
+ * @returns {object}
+ */
+function deepClone(objectToClone) {
+	let cloned = objectToClone;
+
+	if (typeof cloned == 'object' && cloned !== null) {
+		if (Array.isArray(cloned)) {
+			cloned = objectToClone.map(
+				arrayItem => deepClone(arrayItem)
+			);
+		}
+		else {
+			cloned = Object.assign({}, cloned);
+
+			for (let clonedKey in cloned) {
+				cloned[clonedKey] = deepClone(cloned[clonedKey]);
+			}
+		}
+	}
+
+	return cloned;
+}
+
+/**
  * Returns the column with the given columnId
  * @param {Object} structure
  * @param {string} columnId
@@ -18,7 +43,7 @@ const MOVE_ITEM_DIRECTIONS = {
 function getColumn(structure, columnId) {
 	return structure
 		.map(
-			section => section.columns.find(
+			row => row.columns.find(
 				_column => _column.columnId === columnId
 			)
 		)
@@ -27,21 +52,21 @@ function getColumn(structure, columnId) {
 }
 
 /**
- * Returns the position in the structure of the given section
+ * Returns the position in the structure of the given row
  * @param {object} structure
- * @param {number} targetSectionId
+ * @param {number} targetRowId
  * @param {string} targetBorder
  * @return {number}
  */
-function getDropSectionPosition(
+function getDropRowPosition(
 	structure,
-	targetSectionId,
+	targetRowId,
 	targetBorder
 ) {
 	let position = structure.length;
 
 	const targetPosition = structure.findIndex(
-		section => section.rowId === targetSectionId
+		row => row.rowId === targetRowId
 	);
 
 	if (targetPosition > -1 && targetBorder) {
@@ -67,7 +92,7 @@ function getDropSectionPosition(
 function getFragmentColumn(structure, fragmentEntryLinkId) {
 	return structure
 		.map(
-			section => section.columns.find(
+			row => row.columns.find(
 				_column => _column.fragmentEntryLinkIds.find(
 					fragmentId => fragmentId === fragmentEntryLinkId
 				)
@@ -137,46 +162,52 @@ function getItemPath(itemId, itemType, structure) {
 		if (itemType === FRAGMENTS_EDITOR_ITEM_TYPES.editable) {
 			const [fragmentEntryLinkId] = itemId.split('-');
 
-			itemPath = [
-				...itemPath,
-				...getItemPath(
-					fragmentEntryLinkId,
-					FRAGMENTS_EDITOR_ITEM_TYPES.fragment,
-					structure
-				)
-			];
+			if (fragmentEntryLinkId) {
+				itemPath = [
+					...itemPath,
+					...getItemPath(
+						fragmentEntryLinkId,
+						FRAGMENTS_EDITOR_ITEM_TYPES.fragment,
+						structure
+					)
+				];
+			}
 		}
 		else if (itemType === FRAGMENTS_EDITOR_ITEM_TYPES.fragment) {
 			const column = [].concat(
 				...structure.map(row => row.columns)
 			).find(
-				column => column.fragmentEntryLinkIds.indexOf(itemId) !== -1
+				_column => _column.fragmentEntryLinkIds.indexOf(itemId) !== -1
 			);
 
-			itemPath = [
-				...itemPath,
-				...getItemPath(
-					column.columnId,
-					FRAGMENTS_EDITOR_ITEM_TYPES.column,
-					structure
-				)
-			];
+			if (column) {
+				itemPath = [
+					...itemPath,
+					...getItemPath(
+						column.columnId,
+						FRAGMENTS_EDITOR_ITEM_TYPES.column,
+						structure
+					)
+				];
+			}
 		}
 		else if (itemType === FRAGMENTS_EDITOR_ITEM_TYPES.column) {
-			const section = structure.find(
+			const row = structure.find(
 				row => row.columns.find(
 					column => column.columnId === itemId
 				)
 			);
 
-			itemPath = [
-				...itemPath,
-				...getItemPath(
-					section.rowId,
-					FRAGMENTS_EDITOR_ITEM_TYPES.section,
-					structure
-				)
-			];
+			if (row) {
+				itemPath = [
+					...itemPath,
+					...getItemPath(
+						row.rowId,
+						FRAGMENTS_EDITOR_ITEM_TYPES.row,
+						structure
+					)
+				];
+			}
 		}
 	}
 
@@ -184,15 +215,15 @@ function getItemPath(itemId, itemType, structure) {
 }
 
 /**
- * Get the fragmentEntryLinkIds of the fragments inside the given section
- * @param {array} section
+ * Get the fragmentEntryLinkIds of the fragments inside the given row
+ * @param {array} row
  * @return {string[]}
  * @review
  */
-function getSectionFragmentEntryLinkIds(section) {
+function getRowFragmentEntryLinkIds(row) {
 	let fragmentEntryLinkIds = [];
 
-	section.columns.forEach(
+	row.columns.forEach(
 		column => {
 			fragmentEntryLinkIds = fragmentEntryLinkIds.concat(
 				column.fragmentEntryLinkIds
@@ -204,14 +235,14 @@ function getSectionFragmentEntryLinkIds(section) {
 }
 
 /**
- * Returns the index of the section with the given rowId
+ * Returns the index of the row with the given rowId
  * @param {array} structure
- * @param {string} sectionId
+ * @param {string} rowId
  * @return {number}
  */
-function getSectionIndex(structure, sectionId) {
+function getRowIndex(structure, rowId) {
 	return structure.findIndex(
-		row => (row.rowId === sectionId)
+		row => (row.rowId === rowId)
 	);
 }
 
@@ -320,14 +351,15 @@ function itemIsInPath(path, itemId, itemType) {
 }
 
 export {
+	deepClone,
 	getColumn,
-	getDropSectionPosition,
+	getDropRowPosition,
 	getItemPath,
 	getFragmentColumn,
 	getFragmentRowIndex,
 	getItemMoveDirection,
-	getSectionFragmentEntryLinkIds,
-	getSectionIndex,
+	getRowFragmentEntryLinkIds,
+	getRowIndex,
 	getTargetBorder,
 	getWidget,
 	getWidgetPath,

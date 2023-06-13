@@ -33,7 +33,7 @@ class EditCategories extends Component {
 	created() {
 		this.append = true;
 		this.dataSource = [];
-		this.urlCategories = `/bulk-rest/v1.0/content-spaces/${this.groupIds[0]}/taxonomy-vocabularies/common`;
+		this.urlCategories = `/bulk-rest/v1.0/sites/${this.groupIds[0]}/taxonomy-vocabularies/common`;
 
 		this._feedbackErrorClass = 'form-feedback-item';
 		this._requiredVocabularyErrorMarkupText = '<div class="' + this._feedbackErrorClass + '">' + Liferay.Language.get('this-field-is-required') + '</div>';
@@ -129,13 +129,11 @@ class EditCategories extends Component {
 		Promise.all(
 			[
 				this._fetchCategoriesRequest(this.urlCategories, 'POST', selection),
-				this._fetchCategoriesRequest(this.urlSelectionDescription, 'POST', selection)
 			]
 		).then(
-			([responseCategories, responseDescription]) => {
-				if (responseCategories && responseDescription) {
+			([responseCategories]) => {
+				if (responseCategories) {
 					this.loading = false;
-					this.description = responseDescription.description;
 					this.multiple = (this.fileEntries.length > 1) || this.selectAll;
 					this.vocabularies = this._parseVocabularies(responseCategories.items || []);
 				}
@@ -201,6 +199,15 @@ class EditCategories extends Component {
 		}
 	}
 
+	_handleInputFocus(event) {
+		const dataProvider = event.target.refs.autocomplete.refs.dataProvider;
+		const modal = this.element.querySelector('.modal');
+
+		if (modal && dataProvider && !modal.contains(dataProvider.element)) {
+			modal.appendChild(dataProvider.element)
+		}
+	}
+
 	/**
 	 * Sync the input radio with the state
 	 * @param {!Event} event
@@ -214,11 +221,14 @@ class EditCategories extends Component {
 	/**
 	 * Sends request to backend services
 	 * to update the categories.
+	 * @param {!Event} event
 	 *
 	 * @private
 	 * @review
 	 */
-	_handleSaveBtnClick() {
+	_handleFormSubmit(event) {
+		event.preventDefault();
+
 		if (!this._validateRequiredVocabularies()) {
 			return;
 		}
@@ -348,16 +358,6 @@ class EditCategories extends Component {
  * @type {!Object}
  */
 EditCategories.STATE = {
-
-	/**
-	 * Description
-	 *
-	 * @instance
-	 * @memberof EditCategories
-	 * @review
-	 * @type {String}
-	 */
-	description: Config.string(),
 
 	/**
 	 * List of selected file entries.
@@ -500,17 +500,6 @@ EditCategories.STATE = {
 	 * @type {String}
 	 */
 	urlCategories: Config.string(),
-
-	/**
-	 * Url to backend service that provides
-	 * the selection description.
-	 *
-	 * @instance
-	 * @memberof EditTags
-	 * @review
-	 * @type {String}
-	 */
-	urlSelectionDescription: Config.string().value('/bulk-rest/v1.0/bulk-selection'),
 
 	/**
 	 * Url to backend service that updates

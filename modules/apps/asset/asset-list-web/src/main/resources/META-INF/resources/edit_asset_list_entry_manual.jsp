@@ -16,27 +16,12 @@
 
 <%@ include file="/init.jsp" %>
 
-<%
-String redirect = ParamUtil.getString(request, "redirect");
-
-if (Validator.isNull(redirect)) {
-	PortletURL portletURL = renderResponse.createRenderURL();
-
-	redirect = portletURL.toString();
-}
-
-AssetListEntry assetListEntry = assetListDisplayContext.getAssetListEntry();
-
-portletDisplay.setShowBackIcon(true);
-portletDisplay.setURLBack(redirect);
-
-renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
-%>
-
 <portlet:actionURL name="/asset_list/add_asset_entry_selection" var="addAssetEntrySelectionURL" />
 
 <liferay-frontend:edit-form
 	action="<%= addAssetEntrySelectionURL %>"
+	cssClass="pt-0"
+	fluid="<%= true %>"
 	method="post"
 	name="fm"
 >
@@ -46,7 +31,19 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 	<aui:input name="assetEntryIds" type="hidden" />
 
 	<liferay-frontend:edit-form-body>
-		<h1 class="sheet-title">
+		<h3 class="sheet-title">
+			<div class="autofit-row autofit-row-center">
+				<div class="autofit-col">
+					<%= HtmlUtil.escape(editAssetListDisplayContext.getSegmentsEntryName(editAssetListDisplayContext.getSegmentsEntryId(), locale)) %>
+				</div>
+
+				<div class="autofit-col autofit-col-end inline-item-after">
+					<liferay-util:include page="/asset_list_entry_variation_action.jsp" servletContext="<%= application %>" />
+				</div>
+			</div>
+		</h3>
+
+		<h3 class="sheet-title text-uppercase">
 			<span class="autofit-padded-no-gutters autofit-row">
 				<span class="autofit-col autofit-col-expand">
 					<span class="heading-text">
@@ -59,6 +56,7 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 						message="select"
 						showArrow="<%= false %>"
 						showWhenSingleIcon="<%= true %>"
+						triggerCssClass="btn-sm"
 					>
 
 						<%
@@ -82,7 +80,7 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 					</liferay-ui:icon-menu>
 				</span>
 			</span>
-		</h1>
+		</h3>
 
 		<liferay-ui:search-container
 			compactEmptyResultsMessage="<%= true %>"
@@ -176,7 +174,8 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 									if (selectedItems) {
 										var assetEntryIds = [];
 
-										selectedItems.forEach(
+										Array.prototype.forEach.call(
+											selectedItems,
 											function(assetEntry) {
 												assetEntryIds.push(assetEntry.entityid);
 											}

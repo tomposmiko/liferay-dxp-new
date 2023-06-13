@@ -703,12 +703,11 @@ public class DDMDisplayContext {
 		long resourceClassNameId = PortalUtil.getClassNameId(
 			ddmDisplay.getStructureType());
 
-		if ((classNameId == 0) || (resourceClassNameId == 0)) {
-			return true;
-		}
+		ThemeDisplay themeDisplay = _ddmWebRequestHelper.getThemeDisplay();
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		if ((classNameId == 0) || (resourceClassNameId == 0)) {
+			return ddmDisplay.isShowAddButton(themeDisplay.getScopeGroup());
+		}
 
 		if (ddmDisplay.isShowAddButton(themeDisplay.getScopeGroup()) &&
 			DDMTemplatePermission.containsAddTemplatePermission(
@@ -740,9 +739,16 @@ public class DDMDisplayContext {
 			String resourceName)
 		throws PortalException {
 
+		if (getClassNameId() > 0) {
+			return PortletPermissionUtil.contains(
+				_ddmWebRequestHelper.getPermissionChecker(),
+				_ddmWebRequestHelper.getLayout(), resourceName,
+				ActionKeys.ADD_PORTLET_DISPLAY_TEMPLATE);
+		}
+
 		return PortletPermissionUtil.contains(
 			_ddmWebRequestHelper.getPermissionChecker(),
-			_ddmWebRequestHelper.getLayout(), resourceName,
+			_ddmWebRequestHelper.getScopeGroupId(), resourceName,
 			ActionKeys.ADD_PORTLET_DISPLAY_TEMPLATE);
 	}
 

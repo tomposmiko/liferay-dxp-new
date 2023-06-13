@@ -379,12 +379,6 @@ public class DLUtil {
 			officeExtensionRequired);
 	}
 
-	public static boolean hasViewInContextGroupLayout(
-		ThemeDisplay themeDisplay) {
-
-		return getDL().hasViewInContextGroupLayout(themeDisplay);
-	}
-
 	public static boolean hasWorkflowDefinitionLink(
 			long companyId, long groupId, long folderId, long fileEntryTypeId)
 		throws Exception {

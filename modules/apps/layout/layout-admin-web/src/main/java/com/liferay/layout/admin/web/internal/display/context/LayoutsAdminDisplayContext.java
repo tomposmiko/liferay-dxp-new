@@ -22,12 +22,13 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
 import com.liferay.layout.admin.web.internal.constants.LayoutAdminWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionLocalServiceUtil;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
 import com.liferay.layout.page.template.util.comparator.LayoutPageTemplateCollectionNameComparator;
 import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.layout.util.comparator.LayoutCreateDateComparator;
-import com.liferay.layout.util.comparator.LayoutLeftPlidComparator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -68,6 +69,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -659,9 +661,6 @@ public class LayoutsAdminDisplayContext {
 		if (Objects.equals(_getOrderByCol(), "create-date")) {
 			orderByComparator = new LayoutCreateDateComparator(orderByAsc);
 		}
-		else if (Objects.equals(_getOrderByCol(), "path")) {
-			orderByComparator = new LayoutLeftPlidComparator(orderByAsc);
-		}
 
 		layoutsSearchContainer.setOrderByComparator(orderByComparator);
 
@@ -672,46 +671,27 @@ public class LayoutsAdminDisplayContext {
 
 		layoutsSearchContainer.setRowChecker(emptyOnClickRowChecker);
 
-		Layout layout = getSelLayout();
+		int layoutsCount = LayoutLocalServiceUtil.getLayoutsCount(
+			getSelGroup(), isPrivateLayout(), getKeywords(),
+			new String[] {
+				LayoutConstants.TYPE_CONTENT, LayoutConstants.TYPE_EMBEDDED,
+				LayoutConstants.TYPE_LINK_TO_LAYOUT,
+				LayoutConstants.TYPE_FULL_PAGE_APPLICATION,
+				LayoutConstants.TYPE_PANEL, LayoutConstants.TYPE_PORTLET,
+				LayoutConstants.TYPE_URL
+			});
 
-		int layoutsCount = 0;
-		List<Layout> layouts = null;
-
-		if (isSearch() || (layout == null)) {
-			layoutsCount = LayoutLocalServiceUtil.getLayoutsCount(
-				getSelGroup(), isPrivateLayout(), getKeywords(),
-				new String[] {
-					LayoutConstants.TYPE_CONTENT, LayoutConstants.TYPE_EMBEDDED,
-					LayoutConstants.TYPE_LINK_TO_LAYOUT,
-					LayoutConstants.TYPE_FULL_PAGE_APPLICATION,
-					LayoutConstants.TYPE_PANEL, LayoutConstants.TYPE_PORTLET,
-					LayoutConstants.TYPE_URL
-				});
-
-			layouts = LayoutLocalServiceUtil.getLayouts(
-				getSelGroupId(), isPrivateLayout(), getKeywords(),
-				new String[] {
-					LayoutConstants.TYPE_CONTENT, LayoutConstants.TYPE_EMBEDDED,
-					LayoutConstants.TYPE_LINK_TO_LAYOUT,
-					LayoutConstants.TYPE_FULL_PAGE_APPLICATION,
-					LayoutConstants.TYPE_PANEL, LayoutConstants.TYPE_PORTLET,
-					LayoutConstants.TYPE_URL
-				},
-				layoutsSearchContainer.getStart(),
-				layoutsSearchContainer.getEnd(),
-				layoutsSearchContainer.getOrderByComparator());
-		}
-		else {
-			layoutsCount = LayoutLocalServiceUtil.getLayoutsCount(
-				getSelGroupId(), layout.getLeftPlid(), layout.getRightPlid(),
-				isPrivateLayout());
-
-			layouts = LayoutLocalServiceUtil.getLayouts(
-				getSelGroupId(), layout.getLeftPlid(), layout.getRightPlid(),
-				isPrivateLayout(), layoutsSearchContainer.getStart(),
-				layoutsSearchContainer.getEnd(),
-				layoutsSearchContainer.getOrderByComparator());
-		}
+		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+			getSelGroupId(), isPrivateLayout(), getKeywords(),
+			new String[] {
+				LayoutConstants.TYPE_CONTENT, LayoutConstants.TYPE_EMBEDDED,
+				LayoutConstants.TYPE_LINK_TO_LAYOUT,
+				LayoutConstants.TYPE_FULL_PAGE_APPLICATION,
+				LayoutConstants.TYPE_PANEL, LayoutConstants.TYPE_PORTLET,
+				LayoutConstants.TYPE_URL
+			},
+			layoutsSearchContainer.getStart(), layoutsSearchContainer.getEnd(),
+			layoutsSearchContainer.getOrderByComparator());
 
 		layoutsSearchContainer.setTotal(layoutsCount);
 		layoutsSearchContainer.setResults(layouts);
@@ -1166,6 +1146,19 @@ public class LayoutsAdminDisplayContext {
 		return false;
 	}
 
+	public boolean isDraft() {
+		Layout layout = getSelLayout();
+
+		if (layout.isSystem() && (layout.getClassPK() > 0) &&
+			(layout.getClassNameId() == PortalUtil.getClassNameId(
+				Layout.class))) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isFirstColumn() {
 		if (_firstColumn != null) {
 			return _firstColumn;
@@ -1174,6 +1167,23 @@ public class LayoutsAdminDisplayContext {
 		_firstColumn = ParamUtil.getBoolean(_request, "firstColumn", false);
 
 		return _firstColumn;
+	}
+
+	public boolean isLayoutPageTemplateEntry() {
+		Layout layout = getSelLayout();
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			LayoutPageTemplateEntryLocalServiceUtil.
+				fetchLayoutPageTemplateEntryByPlid(layout.getClassPK());
+
+		if (StringUtil.equals(
+				layout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY) ||
+			((layoutPageTemplateEntry != null) && layout.isSystem())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean isPagesTab() {

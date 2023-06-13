@@ -166,6 +166,16 @@ public class ExecuteNpmTask extends ExecuteNodeScriptTask {
 	protected List<String> getCompleteArgs() {
 		List<String> completeArgs = super.getCompleteArgs();
 
+		completeArgs.add("--production");
+		completeArgs.add(Boolean.toString(isProduction()));
+
+		String registry = getRegistry();
+
+		if (Validator.isNotNull(registry)) {
+			completeArgs.add("--registry");
+			completeArgs.add(registry);
+		}
+
 		if (NodePluginUtil.isYarnScriptFile(getScriptFile())) {
 			return completeArgs;
 		}
@@ -184,18 +194,8 @@ public class ExecuteNpmTask extends ExecuteNodeScriptTask {
 			completeArgs.add(logLevel);
 		}
 
-		completeArgs.add("--production");
-		completeArgs.add(Boolean.toString(isProduction()));
-
 		completeArgs.add("--progress");
 		completeArgs.add(Boolean.toString(isProgress()));
-
-		String registry = getRegistry();
-
-		if (Validator.isNotNull(registry)) {
-			completeArgs.add("--registry");
-			completeArgs.add(registry);
-		}
 
 		return completeArgs;
 	}

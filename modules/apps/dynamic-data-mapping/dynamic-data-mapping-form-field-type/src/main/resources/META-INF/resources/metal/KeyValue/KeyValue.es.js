@@ -8,15 +8,19 @@ import templates from './KeyValue.soy.js';
 import {Config} from 'metal-state';
 import {
 	normalizeFieldName
-} from 'dynamic-data-mapping-form-builder/metal/js/components/LayoutProvider/util/fields.es';
+} from 'dynamic-data-mapping-form-builder/js/components/LayoutProvider/util/fields.es';
 
 /**
- * KeywordValue.
+ * KeyValue.
  * @extends Component
  */
 
-class KeywordValue extends Component {
+class KeyValue extends Component {
 	static STATE = {
+
+		_keyword: Config.string().internal().valueFn('_internalKeywordFn'),
+
+		_value: Config.string().internal().valueFn('_internalValueFn'),
 
 		/**
 		 * @default undefined
@@ -30,7 +34,7 @@ class KeywordValue extends Component {
 		/**
 		 * @default false
 		 * @instance
-		 * @memberof KeywordValue
+		 * @memberof KeyValue
 		 * @type {?bool}
 		 */
 
@@ -39,7 +43,7 @@ class KeywordValue extends Component {
 		/**
 		 * @default undefined
 		 * @instance
-		 * @memberof KeywordValue
+		 * @memberof KeyValue
 		 * @type {?(string|undefined)}
 		 */
 
@@ -48,16 +52,25 @@ class KeywordValue extends Component {
 		/**
 		 * @default undefined
 		 * @instance
-		 * @memberof KeywordValue
+		 * @memberof KeyValue
 		 * @type {?(string|undefined)}
 		*/
 
 		keyword: Config.string(),
 
 		/**
+		 * @default false
+		 * @instance
+		 * @memberof KeyValue
+		 * @type {?boolean}
+		*/
+
+		keywordReadOnly: Config.bool().value(false),
+
+		/**
 		 * @default undefined
 		 * @instance
-		 * @memberof KeywordValue
+		 * @memberof KeyValue
 		 * @type {?(string|undefined)}
 		 */
 
@@ -75,7 +88,7 @@ class KeywordValue extends Component {
 		/**
 		 * @default false
 		 * @instance
-		 * @memberof KeywordValue
+		 * @memberof KeyValue
 		 * @type {?bool}
 		 */
 
@@ -93,7 +106,7 @@ class KeywordValue extends Component {
 		/**
 		 * @default false
 		 * @instance
-		 * @memberof KeywordValue
+		 * @memberof KeyValue
 		 * @type {?bool}
 		 */
 
@@ -102,7 +115,7 @@ class KeywordValue extends Component {
 		/**
 		 * @default true
 		 * @instance
-		 * @memberof KeywordValue
+		 * @memberof KeyValue
 		 * @type {?bool}
 		 */
 
@@ -111,7 +124,7 @@ class KeywordValue extends Component {
 		/**
 		 * @default undefined
 		 * @instance
-		 * @memberof KeywordValue
+		 * @memberof KeyValue
 		 * @type {?(string|undefined)}
 		 */
 
@@ -138,15 +151,11 @@ class KeywordValue extends Component {
 		/**
 		 * @default undefined
 		 * @instance
-		 * @memberof KeywordValue
+		 * @memberof KeyValue
 		 * @type {?(bool)}
 		 */
 
-		value: Config.string(),
-
-		_keyword: Config.string().internal().valueFn('_internalKeywordFn'),
-
-		_value: Config.string().internal().valueFn('_internalValueFn')
+		value: Config.string()
 	}
 
 	willReceiveState(changes) {
@@ -274,6 +283,6 @@ class KeywordValue extends Component {
 	}
 }
 
-Soy.register(KeywordValue, templates);
+Soy.register(KeyValue, templates);
 
-export default KeywordValue;
+export default KeyValue;

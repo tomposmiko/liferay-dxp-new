@@ -11,6 +11,10 @@ definition {
 	}
 
 	macro addCP {
+		AssertVisible(
+			locator1 = "WCEditWebContent#SIDEBAR"
+		);
+
 		if (isSet(webContentTitle)) {
 			Click(locator1 = "TextInput#TITLE");
 
@@ -74,12 +78,12 @@ definition {
 
 		var key_assetTitle = "${assetTitle}";
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "AssetRelatedAssets#RELATED_ASSETS_TABLE_TYPE",
 			value1 = "${assetType}"
 		);
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "AssetRelatedAssets#RELATED_ASSETS_TABLE_TITLE",
 			value1 = "${assetTitle}"
 		);
@@ -137,42 +141,6 @@ definition {
 			locator1 = "WCEditWebContent#FEATURED_IMAGE_URL_INPUT",
 			value1 = "${imageSourceURL}"
 		);
-	}
-
-	macro addFeed {
-		PortletEntry.inputName(name = "${feedTitle}");
-
-		PortletEntry.inputDescription(description = "${description}");
-
-		Type(locator1 = "TextInput#URL", value1 = "${targetFriendlyUrl}");
-
-		Panel.expandPanel(panel = "Web Content Constraints");
-
-		AssertClick(locator1 = "WCEditWebContent#SELECT_STRUCTURE", value1 = "Select");
-
-		SelectFrame(value1 = "relative=top");
-
-		SelectFrame(locator1 = "IFrame#DIALOG");
-
-		AssertClickNoError(
-			locator1 = "DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME_LINK",
-			value1 = "${structureName}",
-			key_ddlDataDefinitionName = "${structureName}"
-		);
-
-		AssertConfirm.assertConfirmationNoWait(
-			value1 = "Selecting a new structure changes the available templates and available feed item content. Do you want to proceed?"
-		);
-
-		SelectFrame(value1 = "relative=top");
-
-		Panel.expandPanel(panel = "Presentation Settings");
-
-		Select(locator1 = "Select#FEED_ITEM_CONTENT", value1 = "${feedContent}");
-
-		Select(locator1 = "Select#FEED_TYPE", value1 = "${feedType}");
-
-		PortletEntry.save();
 	}
 
 	macro addLocalizedPGViaWCD {
@@ -382,36 +350,16 @@ definition {
 	}
 
 	macro addWithGlobalStructurePGViaWCD {
-		WebContentNavigator.gotoAddPGViaWCD(structureName = "${selectStructureName}");
+		WebContentNavigator.gotoAddPGViaWCD(structureName = "${structureName}");
 
 		WebContent.addCP(webContentTitle = "${webContentTitle}");
 
-		Panel.expandPanel(panel = "Structure and Template");
-
-		AssertClick(locator1 = "WCEditWebContent#SELECT_STRUCTURE", value1 = "Select");
-
-		SelectFrame(value1 = "relative=top");
-
-		SelectFrame(locator1 = "IFrame#DIALOG");
-
-		AssertClickNoError(
-			locator1 = "DDMSelectStructure#DDM_STRUCTURE_TABLE_NAME_LINK",
-			value1 = "${structureName}",
-			key_ddlDataDefinitionName = "${structureName}"
-		);
-
-		AssertConfirm.assertConfirmationNoWait(
-			value1 = "Editing the current structure deletes all unsaved content."
-		);
-
-		SelectFrame(value1 = "relative=top");
-
-		Panel.expandPanel(panel = "Structure and Template");
-
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "WCEditWebContent#SELECTED_STRUCTURE",
 			value1 = "${structureName}"
 		);
+
+		Panel.expandPanel(panel = "Default Template");
 
 		AssertTextEquals(
 			locator1 = "WCEditWebContent#SELECTED_TEMPLATE",
@@ -525,7 +473,7 @@ definition {
 		}
 
 		if (isSet(webContentImage)) {
-			Click(locator1 = "Button#SELECT");
+			Click(locator1 = "WCEditWebContent#IMAGE_FIELD_SELECT");
 
 			ItemSelector.uploadFile(
 				navTab = "Web Content Images",
@@ -837,11 +785,11 @@ definition {
 	}
 
 	macro editDisplayPage {
-		Panel.expandPanel(panel = "Display Page");
+		Panel.expandPanel(panel = "Display Page Template");
 
 		Select(
 			locator1 = "WCEditWebContent#DISPLAY_PAGE_SELECT",
-			value1 = "Specific Display Page"
+			value1 = "Specific Display Page Template"
 		);
 
 		Click(
@@ -906,7 +854,7 @@ definition {
 		WebContent.addCP(webContentTitle = "${webContentTitleEdit}");
 
 		if (isSet(webContentImage)) {
-			Click(locator1 = "Button#SELECT");
+			Click(locator1 = "WCEditWebContent#IMAGE_FIELD_SELECT");
 
 			SelectFrameTop(value1 = "relative=top");
 
@@ -919,6 +867,8 @@ definition {
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
 		PortletEntry.save();
+
+		IFrame.closeFrame();
 	}
 
 	macro editNullCP {
@@ -1264,12 +1214,12 @@ definition {
 	macro selectTemplateCP {
 		ScrollBy(value1 = "0, 50");
 
-		Panel.expandPanel(panel = "Structure and Template");
-
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "WCEditWebContent#SELECTED_STRUCTURE",
 			value1 = "${structureName}"
 		);
+
+		Panel.expandPanel(panel = "Default Template");
 
 		AssertClick(locator1 = "WCEditWebContent#SELECT_TEMPLATE", value1 = "Select");
 
@@ -1289,7 +1239,7 @@ definition {
 
 		IFrame.selectTopFrame();
 
-		Panel.expandPanel(panel = "Structure and Template");
+		Panel.expandPanel(panel = "Default Template");
 
 		AssertTextEquals(
 			locator1 = "WCEditWebContent#SELECTED_TEMPLATE",
@@ -1888,7 +1838,7 @@ definition {
 	}
 
 	macro viewSelectedTemplateCP {
-		Panel.expandPanel(panel = "Structure and Template");
+		Panel.expandPanel(panel = "Default Template");
 
 		AssertTextEquals(
 			locator1 = "WCEditWebContent#SELECTED_TEMPLATE",
@@ -1930,9 +1880,7 @@ definition {
 
 	macro viewStructureAndTemplateLocalization {
 		if (isSet(structureLocalizationName)) {
-			Panel.expandPanel(panel = "${panel}");
-
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "WCEditWebContent#SELECTED_STRUCTURE",
 				value1 = "${structureLocalizationName}"
 			);

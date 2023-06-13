@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,14 +64,12 @@ public class TaxonomyVocabularyResourceImpl
 	extends BaseTaxonomyVocabularyResourceImpl {
 
 	@Override
-	public Page<TaxonomyVocabulary>
-			postContentSpaceTaxonomyVocabulariesCommonPage(
-				Long contentSpaceId,
-				DocumentBulkSelection documentBulkSelection)
+	public Page<TaxonomyVocabulary> postSiteTaxonomyVocabulariesCommonPage(
+			Long siteId, DocumentBulkSelection documentBulkSelection)
 		throws Exception {
 
 		Map<AssetVocabulary, List<AssetCategory>> assetCategoriesMap =
-			_getAssetCategoriesMap(contentSpaceId, documentBulkSelection);
+			_getAssetCategoriesMap(siteId, documentBulkSelection);
 
 		return Page.of(
 			transform(
@@ -80,11 +79,11 @@ public class TaxonomyVocabularyResourceImpl
 	}
 
 	private Map<AssetVocabulary, List<AssetCategory>> _getAssetCategoriesMap(
-			Long contentSpaceId, DocumentBulkSelection documentBulkSelection)
+			Long siteId, DocumentBulkSelection documentBulkSelection)
 		throws Exception {
 
 		Stream<AssetVocabulary> assetVocabulariesStream =
-			_getAssetVocabulariesStream(contentSpaceId);
+			_getAssetVocabulariesStream(siteId);
 
 		Stream<AssetCategory> assetCategoriesStream = _getAssetCategoriesStream(
 			documentBulkSelection, PermissionCheckerFactoryUtil.create(_user));
@@ -108,6 +107,8 @@ public class TaxonomyVocabularyResourceImpl
 
 		Set<AssetCategory> assetCategories = new HashSet<>();
 
+		AtomicBoolean flag = new AtomicBoolean(true);
+
 		BulkSelection<?> bulkSelection = _documentBulkSelectionFactory.create(
 			documentBulkSelection);
 
@@ -121,23 +122,30 @@ public class TaxonomyVocabularyResourceImpl
 						assetEntry.getClassName(), assetEntry.getClassPK(),
 						ActionKeys.UPDATE)) {
 
-					assetCategories.addAll(
+					List<AssetCategory> assetEntryAssetCategories =
 						_assetCategoryLocalService.getCategories(
-							assetEntry.getClassName(),
-							assetEntry.getClassPK()));
+							assetEntry.getClassName(), assetEntry.getClassPK());
+
+					if (flag.get()) {
+						flag.set(false);
+
+						assetCategories.addAll(assetEntryAssetCategories);
+					}
+					else {
+						assetCategories.retainAll(assetEntryAssetCategories);
+					}
 				}
 			});
 
 		return assetCategories.stream();
 	}
 
-	private Stream<AssetVocabulary> _getAssetVocabulariesStream(
-			Long contentSpaceId)
+	private Stream<AssetVocabulary> _getAssetVocabulariesStream(Long siteId)
 		throws Exception {
 
 		List<AssetVocabulary> assetVocabularies =
 			_assetVocabularyLocalService.getGroupVocabularies(
-				_portal.getCurrentAndAncestorSiteGroupIds(contentSpaceId));
+				_portal.getCurrentAndAncestorSiteGroupIds(siteId));
 
 		Stream<AssetVocabulary> stream = assetVocabularies.stream();
 

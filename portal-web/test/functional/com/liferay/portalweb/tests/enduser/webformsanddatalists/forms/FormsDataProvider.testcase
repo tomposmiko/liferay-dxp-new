@@ -69,7 +69,7 @@ definition {
 
 		Form.gotoAddField(fieldType = "Text Field");
 
-		Form.editFieldLabel(fieldValue = "Text Field With Autocomplete");
+		Form.editFieldLabelMetal(fieldValue = "Text Field With Autocomplete");
 
 		Form.gotoAdvancedTab();
 
@@ -97,7 +97,7 @@ definition {
 			rowEntry = "Created Form Name"
 		);
 
-		FormsAdminNavigator.gotoEditField(fieldName = "TextFieldWithAutocomplete");
+		FormsAdminNavigator.gotoEditField(fieldName = "Text Field With Autocomplete");
 
 		Form.gotoAdvancedTab();
 
@@ -161,7 +161,7 @@ definition {
 
 		FormsAdminNavigator.gotoEditFormByName();
 
-		FormsAdminNavigator.gotoEditField(fieldName = "TextFieldWithAutocomplete");
+		FormsAdminNavigator.gotoEditField(fieldName = "Text Field With Autocomplete");
 
 		Form.gotoAdvancedTab();
 
@@ -239,7 +239,7 @@ definition {
 
 		Form.gotoAddField(fieldType = "Select from List");
 
-		Form.editFieldLabel(fieldValue = "Data Provider Select Field");
+		Form.editFieldLabelMetal(fieldValue = "Data Provider Select Field");
 
 		Form.editFieldDataProvider(
 			dataProvider = "Liferay Countries",
@@ -276,7 +276,7 @@ definition {
 		);
 
 		FormFields.selectSelectOption(
-			fieldName = "SelectField",
+			fieldName = "Select Field",
 			selectOption = "United States"
 		);
 
@@ -347,7 +347,7 @@ definition {
 
 		Form.gotoAddField(fieldType = "Select from List");
 
-		Form.editFieldLabel(fieldValue = "Countries");
+		Form.editFieldLabelMetal(fieldValue = "Countries");
 
 		Form.editFieldDataProvider(
 			dataProvider = "Liferay Countries",

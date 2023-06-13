@@ -370,10 +370,6 @@ public class CTEntryLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	public static int getAffectedOwnerCTEntriesCount(long ctEntryId) {
-		return getService().getAffectedOwnerCTEntriesCount(ctEntryId);
-	}
-
 	public static java.util.List<com.liferay.change.tracking.model.CTEntry>
 		getCTCollectionCTEntries(long ctCollectionId) {
 
@@ -541,6 +537,10 @@ public class CTEntryLocalServiceUtil {
 			ctEntryId, start, end, orderByComparator);
 	}
 
+	public static int getRelatedOwnerCTEntriesCount(long ctEntryId) {
+		return getService().getRelatedOwnerCTEntriesCount(ctEntryId);
+	}
+
 	public static boolean hasCTCollectionCTEntries(long ctCollectionId) {
 		return getService().hasCTCollectionCTEntries(ctCollectionId);
 	}
@@ -568,25 +568,25 @@ public class CTEntryLocalServiceUtil {
 		search(
 			com.liferay.change.tracking.model.CTCollection ctCollection,
 			long[] groupIds, long[] userIds, long[] classNameIds,
-			int[] changeTypes, boolean collision, long otherCTCollectionId,
+			int[] changeTypes, Boolean collision,
 			com.liferay.portal.kernel.dao.orm.QueryDefinition
 				<com.liferay.change.tracking.model.CTEntry> queryDefinition) {
 
 		return getService().search(
 			ctCollection, groupIds, userIds, classNameIds, changeTypes,
-			collision, otherCTCollectionId, queryDefinition);
+			collision, queryDefinition);
 	}
 
 	public static long searchCount(
 		com.liferay.change.tracking.model.CTCollection ctCollection,
 		long[] groupIds, long[] userIds, long[] classNameIds, int[] changeTypes,
-		boolean collision, long otherCTCollectionId,
+		Boolean collision,
 		com.liferay.portal.kernel.dao.orm.QueryDefinition
 			<com.liferay.change.tracking.model.CTEntry> queryDefinition) {
 
 		return getService().searchCount(
 			ctCollection, groupIds, userIds, classNameIds, changeTypes,
-			collision, otherCTCollectionId, queryDefinition);
+			collision, queryDefinition);
 	}
 
 	public static void setCTCollectionCTEntries(
@@ -600,6 +600,12 @@ public class CTEntryLocalServiceUtil {
 
 		getService().setCTEntryAggregateCTEntries(
 			ctEntryAggregateId, ctEntryIds);
+	}
+
+	public static com.liferay.change.tracking.model.CTEntry updateCollision(
+		long ctEntryId, boolean collision) {
+
+		return getService().updateCollision(ctEntryId, collision);
 	}
 
 	/**

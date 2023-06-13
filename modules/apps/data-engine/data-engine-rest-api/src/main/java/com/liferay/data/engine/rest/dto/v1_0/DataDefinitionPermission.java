@@ -55,6 +55,9 @@ public class DataDefinitionPermission {
 		try {
 			addDataDefinition = addDataDefinitionUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -78,6 +81,9 @@ public class DataDefinitionPermission {
 
 		try {
 			definePermissions = definePermissionsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -103,6 +109,9 @@ public class DataDefinitionPermission {
 		try {
 			delete = deleteUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -126,6 +135,9 @@ public class DataDefinitionPermission {
 
 		try {
 			roleNames = roleNamesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -151,6 +163,9 @@ public class DataDefinitionPermission {
 		try {
 			update = updateUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -172,6 +187,9 @@ public class DataDefinitionPermission {
 	public void setView(UnsafeSupplier<Boolean, Exception> viewUnsafeSupplier) {
 		try {
 			view = viewUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -212,17 +230,35 @@ public class DataDefinitionPermission {
 
 		sb.append("\"addDataDefinition\": ");
 
-		sb.append(addDataDefinition);
+		if (addDataDefinition == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(addDataDefinition);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"definePermissions\": ");
 
-		sb.append(definePermissions);
+		if (definePermissions == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(definePermissions);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"delete\": ");
 
-		sb.append(delete);
+		if (delete == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(delete);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"roleNames\": ");
@@ -250,12 +286,23 @@ public class DataDefinitionPermission {
 
 		sb.append("\"update\": ");
 
-		sb.append(update);
+		if (update == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(update);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"view\": ");
 
-		sb.append(view);
+		if (view == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(view);
+		}
 
 		sb.append("}");
 

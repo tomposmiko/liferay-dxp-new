@@ -187,7 +187,7 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 				getPermissionChecker(), assetListEntry, ActionKeys.VIEW);
 		}
 
-		return assetListEntryLocalService.fetchAssetListEntry(assetListEntryId);
+		return assetListEntry;
 	}
 
 	@Override
@@ -220,6 +220,49 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 		return assetListEntryPersistence.countByG_LikeT(
 			groupId,
 			_customSQL.keywords(title, false, WildcardMode.SURROUND)[0]);
+	}
+
+	@Override
+	public AssetListEntry getAssetListEntry(long assetListEntryId)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.getAssetListEntry(assetListEntryId);
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntry, ActionKeys.VIEW);
+
+		return assetListEntry;
+	}
+
+	@Override
+	public AssetListEntry getAssetListEntry(
+			long groupId, String assetListEntryKey)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.getAssetListEntry(
+				groupId, assetListEntryKey);
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntry, ActionKeys.VIEW);
+
+		return assetListEntry;
+	}
+
+	@Override
+	public AssetListEntry getAssetListEntryByUuidAndGroupId(
+			String uuid, long groupId)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.getAssetListEntryByUuidAndGroupId(
+				uuid, groupId);
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntry, ActionKeys.VIEW);
+
+		return assetListEntry;
 	}
 
 	@Override

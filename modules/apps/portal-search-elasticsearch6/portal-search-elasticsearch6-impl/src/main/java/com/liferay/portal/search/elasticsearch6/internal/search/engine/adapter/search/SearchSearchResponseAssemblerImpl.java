@@ -31,6 +31,8 @@ import com.liferay.portal.search.elasticsearch6.internal.hits.SearchHitsTranslat
 import com.liferay.portal.search.elasticsearch6.internal.search.response.SearchResponseTranslator;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.geolocation.GeoBuilders;
+import com.liferay.portal.search.highlight.HighlightFieldBuilderFactory;
 import com.liferay.portal.search.hits.SearchHitBuilderFactory;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
@@ -84,7 +86,9 @@ public class SearchSearchResponseAssemblerImpl
 			elasticsearchAggregation, _aggregationResults,
 			new SearchHitsTranslator(
 				_searchHitBuilderFactory, _searchHitsBuilderFactory,
-				_documentBuilderFactory));
+				_documentBuilderFactory, _highlightFieldBuilderFactory,
+				_geoBuilders),
+			_geoBuilders);
 	}
 
 	@Override
@@ -159,6 +163,18 @@ public class SearchSearchResponseAssemblerImpl
 		_documentBuilderFactory = documentBuilderFactory;
 	}
 
+	@Reference(unbind = "-")
+	protected void setGeoBuilders(GeoBuilders geoBuilders) {
+		_geoBuilders = geoBuilders;
+	}
+
+	@Reference(unbind = "-")
+	protected void setHighlightFieldBuilderFactory(
+		HighlightFieldBuilderFactory highlightFieldBuilderFactory) {
+
+		_highlightFieldBuilderFactory = highlightFieldBuilderFactory;
+	}
+
 	protected void setScrollId(
 		SearchResponse searchResponse,
 		SearchSearchResponse searchSearchResponse) {
@@ -182,7 +198,8 @@ public class SearchSearchResponseAssemblerImpl
 
 		SearchHitsTranslator searchHitsTranslator = new SearchHitsTranslator(
 			_searchHitBuilderFactory, _searchHitsBuilderFactory,
-			_documentBuilderFactory);
+			_documentBuilderFactory, _highlightFieldBuilderFactory,
+			_geoBuilders);
 
 		org.elasticsearch.search.SearchHits elasticsearchSearchHits =
 			searchResponse.getHits();
@@ -211,6 +228,8 @@ public class SearchSearchResponseAssemblerImpl
 	private AggregationResults _aggregationResults;
 	private CommonSearchResponseAssembler _commonSearchResponseAssembler;
 	private DocumentBuilderFactory _documentBuilderFactory;
+	private GeoBuilders _geoBuilders;
+	private HighlightFieldBuilderFactory _highlightFieldBuilderFactory;
 	private SearchHitBuilderFactory _searchHitBuilderFactory;
 	private SearchHitsBuilderFactory _searchHitsBuilderFactory;
 	private SearchResponseTranslator _searchResponseTranslator;

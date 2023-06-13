@@ -16,6 +16,7 @@ package com.liferay.journal.content.web.internal;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.model.AssetEntryUsage;
 import com.liferay.asset.service.AssetEntryUsageLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
@@ -26,16 +27,15 @@ import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalContentSearchLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.PortletLayoutListenerException;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
@@ -129,7 +129,7 @@ public class JournalContentPortletLayoutListener
 			}
 
 			_assetEntryUsageLocalService.deleteAssetEntryUsages(
-				_portal.getClassNameId(Layout.class), plid, portletId);
+				_portal.getClassNameId(Portlet.class), portletId, plid);
 
 			_journalContentSearchLocalService.deleteArticleContentSearch(
 				layout.getGroupId(), layout.isPrivateLayout(),
@@ -163,7 +163,7 @@ public class JournalContentPortletLayoutListener
 			Layout layout = _layoutLocalService.getLayout(plid);
 
 			_assetEntryUsageLocalService.deleteAssetEntryUsages(
-				_portal.getClassNameId(Layout.class), plid, portletId);
+				_portal.getClassNameId(Portlet.class), portletId, plid);
 
 			_journalContentSearchLocalService.deleteArticleContentSearch(
 				layout.getGroupId(), layout.isPrivateLayout(),
@@ -279,8 +279,7 @@ public class JournalContentPortletLayoutListener
 	}
 
 	private void _addAssetEntryUsage(
-			Layout layout, String portletId, JournalArticle article)
-		throws PortalException {
+		Layout layout, String portletId, JournalArticle article) {
 
 		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
 			_portal.getClassNameId(JournalArticle.class),
@@ -290,17 +289,18 @@ public class JournalContentPortletLayoutListener
 			return;
 		}
 
-		int count = _assetEntryUsageLocalService.getAssetEntryUsagesCount(
-			assetEntry.getEntryId(), portletId);
+		AssetEntryUsage assetEntryUsage =
+			_assetEntryUsageLocalService.fetchAssetEntryUsage(
+				assetEntry.getEntryId(), _portal.getClassNameId(Portlet.class),
+				portletId, layout.getPlid());
 
-		if (count > 0) {
+		if (assetEntryUsage != null) {
 			return;
 		}
 
 		_assetEntryUsageLocalService.addAssetEntryUsage(
-			PrincipalThreadLocal.getUserId(), layout.getGroupId(),
-			assetEntry.getEntryId(), _portal.getClassNameId(Layout.class),
-			layout.getPlid(), portletId,
+			layout.getGroupId(), assetEntry.getEntryId(),
+			_portal.getClassNameId(Portlet.class), portletId, layout.getPlid(),
 			ServiceContextThreadLocal.getServiceContext());
 	}
 

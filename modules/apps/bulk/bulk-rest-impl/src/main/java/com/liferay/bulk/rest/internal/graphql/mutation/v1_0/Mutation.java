@@ -83,7 +83,7 @@ public class Mutation {
 
 	@GraphQLInvokeDetached
 	public Response patchKeywordBatch(
-			@GraphQLName("KeywordBulkSelection") KeywordBulkSelection
+			@GraphQLName("keywordBulkSelection") KeywordBulkSelection
 				keywordBulkSelection)
 		throws Exception {
 
@@ -96,7 +96,7 @@ public class Mutation {
 
 	@GraphQLInvokeDetached
 	public Response putKeywordBatch(
-			@GraphQLName("KeywordBulkSelection") KeywordBulkSelection
+			@GraphQLName("keywordBulkSelection") KeywordBulkSelection
 				keywordBulkSelection)
 		throws Exception {
 
@@ -110,7 +110,7 @@ public class Mutation {
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Collection<Keyword> postKeywordsCommonPage(
-			@GraphQLName("DocumentBulkSelection") DocumentBulkSelection
+			@GraphQLName("documentBulkSelection") DocumentBulkSelection
 				documentBulkSelection)
 		throws Exception {
 
@@ -128,7 +128,7 @@ public class Mutation {
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public MessageSelection postBulkSelection(
-			@GraphQLName("DocumentBulkSelection") DocumentBulkSelection
+			@GraphQLName("documentBulkSelection") DocumentBulkSelection
 				documentBulkSelection)
 		throws Exception {
 
@@ -142,7 +142,7 @@ public class Mutation {
 
 	@GraphQLInvokeDetached
 	public Response patchTaxonomyCategoryBatch(
-			@GraphQLName("TaxonomyCategoryBulkSelection")
+			@GraphQLName("taxonomyCategoryBulkSelection")
 				TaxonomyCategoryBulkSelection taxonomyCategoryBulkSelection)
 		throws Exception {
 
@@ -156,7 +156,7 @@ public class Mutation {
 
 	@GraphQLInvokeDetached
 	public Response putTaxonomyCategoryBatch(
-			@GraphQLName("TaxonomyCategoryBulkSelection")
+			@GraphQLName("taxonomyCategoryBulkSelection")
 				TaxonomyCategoryBulkSelection taxonomyCategoryBulkSelection)
 		throws Exception {
 
@@ -171,9 +171,9 @@ public class Mutation {
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Collection<TaxonomyVocabulary>
-			postContentSpaceTaxonomyVocabulariesCommonPage(
-				@GraphQLName("content-space-id") Long contentSpaceId,
-				@GraphQLName("DocumentBulkSelection") DocumentBulkSelection
+			postSiteTaxonomyVocabulariesCommonPage(
+				@GraphQLName("siteId") Long siteId,
+				@GraphQLName("documentBulkSelection") DocumentBulkSelection
 					documentBulkSelection)
 		throws Exception {
 
@@ -183,8 +183,8 @@ public class Mutation {
 			taxonomyVocabularyResource -> {
 				Page paginationPage =
 					taxonomyVocabularyResource.
-						postContentSpaceTaxonomyVocabulariesCommonPage(
-							contentSpaceId, documentBulkSelection);
+						postSiteTaxonomyVocabulariesCommonPage(
+							siteId, documentBulkSelection);
 
 				return paginationPage.getItems();
 			});

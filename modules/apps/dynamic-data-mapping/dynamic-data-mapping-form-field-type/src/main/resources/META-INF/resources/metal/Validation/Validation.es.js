@@ -4,7 +4,6 @@ import '../Numeric/Numeric.es';
 import '../Select/Select.es';
 import '../Text/Text.es';
 import './ValidationRegister.soy.js';
-import autobind from 'autobind-decorator';
 import Component from 'metal-component';
 import Soy from 'metal-soy';
 import templates from './Validation.soy.js';
@@ -117,26 +116,6 @@ class Validation extends Component {
 		 * @default undefined
 		 * @instance
 		 * @memberof Validation
-		 * @type {!string}
-		 */
-
-		strings: {
-			value: {
-				chooseAnOption: Liferay.Language.get('choose-an-option'),
-				email: Liferay.Language.get('email'),
-				errorMessage: Liferay.Language.get('error-message'),
-				ifInput: Liferay.Language.get('if-input'),
-				showErrorMessage: Liferay.Language.get('show-error-message'),
-				theValue: Liferay.Language.get('the-value'),
-				url: Liferay.Language.get('url'),
-				validationMessage: Liferay.Language.get('validation')
-			}
-		},
-
-		/**
-		 * @default undefined
-		 * @instance
-		 * @memberof Validation
 		 * @type {?(object|undefined)}
 		 */
 
@@ -165,35 +144,6 @@ class Validation extends Component {
 			}
 		).value({})
 	};
-
-	_getStateFromValue(value) {
-		const {errorMessage, expression} = value;
-		let parameterMessage = '';
-		let selectedValidation;
-		const enableValidation = !!expression;
-
-		if (enableValidation) {
-			selectedValidation = this._parseValidationFromExpression(expression);
-
-			if (selectedValidation) {
-				parameterMessage = this._parseParameterMessageFromExpression(expression, selectedValidation);
-			}
-			else {
-				selectedValidation = {
-					parameterMessage: this.validations[0].parameterMessage,
-					value: this.validations[0].name
-				};
-			}
-		}
-
-		return {
-			enableValidation,
-			errorMessage,
-			expression,
-			parameterMessage,
-			selectedValidation
-		};
-	}
 
 	prepareStateForRender(state) {
 		const parsedState = this._getStateFromValue(state.value);
@@ -230,12 +180,6 @@ class Validation extends Component {
 		return this.validation.dataType ? this.validation.dataType : this.dataType;
 	}
 
-	_enableValidationValueFn() {
-		const {value} = this;
-
-		return !!value.expression;
-	}
-
 	_emitFieldEdited(value) {
 		this.emit(
 			'fieldEdited',
@@ -245,6 +189,12 @@ class Validation extends Component {
 				value
 			}
 		);
+	}
+
+	_enableValidationValueFn() {
+		const {value} = this;
+
+		return !!value.expression;
 	}
 
 	_getSelectedValidation() {
@@ -263,6 +213,35 @@ class Validation extends Component {
 		}
 
 		return selectedValidation;
+	}
+
+	_getStateFromValue(value) {
+		const {errorMessage, expression} = value;
+		let parameterMessage = '';
+		let selectedValidation;
+		const enableValidation = !!expression;
+
+		if (enableValidation) {
+			selectedValidation = this._parseValidationFromExpression(expression);
+
+			if (selectedValidation) {
+				parameterMessage = this._parseParameterMessageFromExpression(expression, selectedValidation);
+			}
+			else {
+				selectedValidation = {
+					parameterMessage: this.validations[0].parameterMessage,
+					value: this.validations[0].name
+				};
+			}
+		}
+
+		return {
+			enableValidation,
+			errorMessage,
+			expression,
+			parameterMessage,
+			selectedValidation
+		};
 	}
 
 	_getValue() {
@@ -338,7 +317,6 @@ class Validation extends Component {
 		return validation;
 	}
 
-	@autobind
 	_updateValue() {
 		const value = this._getValue();
 

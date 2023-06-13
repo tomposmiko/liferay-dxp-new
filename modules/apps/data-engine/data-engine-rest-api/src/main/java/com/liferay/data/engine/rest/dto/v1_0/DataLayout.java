@@ -56,6 +56,9 @@ public class DataLayout {
 		try {
 			dataDefinitionId = dataDefinitionIdUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -81,6 +84,9 @@ public class DataLayout {
 		try {
 			dataLayoutPages = dataLayoutPagesUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -104,6 +110,9 @@ public class DataLayout {
 
 		try {
 			dateCreated = dateCreatedUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -129,6 +138,9 @@ public class DataLayout {
 		try {
 			dateModified = dateModifiedUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -152,6 +164,9 @@ public class DataLayout {
 
 		try {
 			defaultLanguageId = defaultLanguageIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -177,6 +192,9 @@ public class DataLayout {
 		try {
 			description = descriptionUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -198,6 +216,9 @@ public class DataLayout {
 	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
 		try {
 			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -223,6 +244,9 @@ public class DataLayout {
 		try {
 			name = nameUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -247,6 +271,9 @@ public class DataLayout {
 		try {
 			paginationMode = paginationModeUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -270,6 +297,9 @@ public class DataLayout {
 
 		try {
 			userId = userIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -309,7 +339,13 @@ public class DataLayout {
 
 		sb.append("\"dataDefinitionId\": ");
 
-		sb.append(dataDefinitionId);
+		if (dataDefinitionId == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(dataDefinitionId);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"dataLayoutPages\": ");
@@ -335,23 +371,35 @@ public class DataLayout {
 
 		sb.append("\"dateCreated\": ");
 
-		sb.append("\"");
-		sb.append(dateCreated);
-		sb.append("\"");
+		if (dateCreated == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(dateCreated);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"dateModified\": ");
 
-		sb.append("\"");
-		sb.append(dateModified);
-		sb.append("\"");
+		if (dateModified == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(dateModified);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"defaultLanguageId\": ");
 
-		sb.append("\"");
-		sb.append(defaultLanguageId);
-		sb.append("\"");
+		if (defaultLanguageId == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(defaultLanguageId);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"description\": ");
@@ -377,7 +425,13 @@ public class DataLayout {
 
 		sb.append("\"id\": ");
 
-		sb.append(id);
+		if (id == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(id);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"name\": ");
@@ -403,14 +457,23 @@ public class DataLayout {
 
 		sb.append("\"paginationMode\": ");
 
-		sb.append("\"");
-		sb.append(paginationMode);
-		sb.append("\"");
+		if (paginationMode == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(paginationMode);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"userId\": ");
 
-		sb.append(userId);
+		if (userId == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(userId);
+		}
 
 		sb.append("}");
 

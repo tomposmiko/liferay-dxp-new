@@ -3178,6 +3178,12 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		final Task deployTask = GradleUtil.getTask(
 			project, LiferayBasePlugin.DEPLOY_TASK_NAME);
 
+		String projectName = project.getName();
+
+		if (projectName.endsWith("-demo")) {
+			_configureTaskDeployDemo(project, deployTask);
+		}
+
 		deployTask.finalizedBy(deployConfigsTask);
 		deployTask.finalizedBy(deployDepenciesTask);
 
@@ -3192,6 +3198,55 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 						deployTask.dependsOn(
 							WSDDBuilderPlugin.BUILD_WSDD_TASK_NAME);
+					}
+				}
+
+			});
+	}
+
+	private void _configureTaskDeployDemo(
+		Project project, final Task deployTask) {
+
+		project.afterEvaluate(
+			new Action<Project>() {
+
+				@Override
+				public void execute(Project project) {
+					Configuration configuration = GradleUtil.fetchConfiguration(
+						project, JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME);
+
+					if (configuration == null) {
+						return;
+					}
+
+					DependencySet dependencySet =
+						configuration.getAllDependencies();
+
+					for (ProjectDependency projectDependency :
+							dependencySet.withType(ProjectDependency.class)) {
+
+						Project dependencyProject =
+							projectDependency.getDependencyProject();
+
+						String name = dependencyProject.getName();
+
+						if (!name.endsWith("-demo-data-creator-api")) {
+							continue;
+						}
+
+						String path = dependencyProject.getPath();
+
+						deployTask.finalizedBy(
+							path + ':' + LiferayBasePlugin.DEPLOY_TASK_NAME);
+
+						dependencyProject = project.findProject(
+							path.substring(0, path.length() - 3) + "impl");
+
+						if (dependencyProject != null) {
+							deployTask.finalizedBy(
+								dependencyProject.getPath() + ':' +
+									LiferayBasePlugin.DEPLOY_TASK_NAME);
+						}
 					}
 				}
 

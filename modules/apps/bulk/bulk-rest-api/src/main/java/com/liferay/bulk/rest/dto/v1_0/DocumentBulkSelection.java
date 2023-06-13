@@ -55,6 +55,9 @@ public class DocumentBulkSelection {
 		try {
 			documentIds = documentIdsUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -79,6 +82,9 @@ public class DocumentBulkSelection {
 
 		try {
 			selectionScope = selectionScopeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -142,7 +148,12 @@ public class DocumentBulkSelection {
 
 		sb.append("\"selectionScope\": ");
 
-		sb.append(selectionScope);
+		if (selectionScope == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(selectionScope);
+		}
 
 		sb.append("}");
 

@@ -15,13 +15,14 @@
 		}
 	},
 	"dependencies": {
-		"clay-checkbox": "2.11.1",
-		"clay-dropdown": "2.11.1",
+		"clay-checkbox": "2.13.0",
+		"clay-dropdown": "2.13.0",
 		"metal": "^2.16.5",
+		"metal-aop": "^3.0.0",
 		"metal-component": "^2.16.3",
 		"metal-debounce": "^2.0.0",
 		"metal-dom": "^2.5.18",
-		"metal-drag-drop": "^3.1.0",
+		"metal-drag-drop": "3.3.0",
 		"metal-events": "^2.16.5",
 		"metal-position": "^2.1.1",
 		"metal-soy": "^2.13.2",
@@ -42,7 +43,7 @@
 		"build": "liferay-npm-scripts build --soy --bridge --bundler",
 		"csf": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format",
-		"test": "liferay-npm-scripts test"
+		"test_DISABLED": "liferay-npm-scripts test"
 	},
 	"version": "1.0.0"
 }

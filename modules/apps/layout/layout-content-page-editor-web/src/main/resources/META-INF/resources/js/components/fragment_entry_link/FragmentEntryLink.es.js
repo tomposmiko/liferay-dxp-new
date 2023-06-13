@@ -4,11 +4,11 @@ import {Config} from 'metal-state';
 
 import './FragmentEntryLinkContent.es';
 import templates from './FragmentEntryLink.soy';
-import {REMOVE_FRAGMENT_ENTRY_LINK} from '../../actions/actions.es';
+import {MOVE_FRAGMENT_ENTRY_LINK, REMOVE_FRAGMENT_ENTRY_LINK} from '../../actions/actions.es';
 import {getConnectedComponent} from '../../store/ConnectedComponent.es';
-import {getItemMoveDirection, getItemPath, itemIsInPath} from '../../utils/FragmentsEditorGetUtils.es';
-import {FRAGMENTS_EDITOR_ITEM_TYPES} from '../../utils/constants';
-import {removeItem, setIn} from '../../utils/FragmentsEditorUpdateUtils.es';
+import {getFragmentColumn, getFragmentRowIndex, getItemMoveDirection, getItemPath, getTargetBorder, itemIsInPath} from '../../utils/FragmentsEditorGetUtils.es';
+import {FRAGMENT_ENTRY_LINK_TYPES, FRAGMENTS_EDITOR_ITEM_TYPES, FRAGMENTS_EDITOR_ROW_TYPES} from '../../utils/constants';
+import {moveItem, moveRow, removeItem, setIn} from '../../utils/FragmentsEditorUpdateUtils.es';
 import {shouldUpdatePureComponent} from '../../utils/FragmentsEditorComponentUtils.es';
 
 /**
@@ -36,10 +36,28 @@ class FragmentEntryLink extends Component {
 			FRAGMENTS_EDITOR_ITEM_TYPES.fragment
 		);
 
-		const nextState = setIn(
+		let fragmentEntryLinkType = FRAGMENT_ENTRY_LINK_TYPES.component;
+
+		if (state.rowType === FRAGMENTS_EDITOR_ROW_TYPES.sectionRow) {
+			fragmentEntryLinkType = FRAGMENT_ENTRY_LINK_TYPES.section;
+		}
+
+		let nextState = setIn(
 			state,
+			['_fragmentEntryLinkType'],
+			fragmentEntryLinkType
+		);
+
+		nextState = setIn(
+			nextState,
 			['_fragmentsEditorItemTypes'],
 			FRAGMENTS_EDITOR_ITEM_TYPES
+		);
+
+		nextState = setIn(
+			nextState,
+			['_fragmentsEditorRowTypes'],
+			FRAGMENTS_EDITOR_ROW_TYPES
 		);
 
 		return setIn(
@@ -69,14 +87,42 @@ class FragmentEntryLink extends Component {
 		event.stopPropagation();
 
 		const direction = getItemMoveDirection(event.which);
+		const {fragmentEntryLinkType} = event.delegateTarget.dataset;
 
-		this.emit(
-			'moveFragment',
-			{
+		if (fragmentEntryLinkType === FRAGMENT_ENTRY_LINK_TYPES.section) {
+			moveRow(
 				direction,
-				fragmentEntryLinkId: this.fragmentEntryLinkId
+				getFragmentRowIndex(
+					this.layoutData.structure,
+					this.fragmentEntryLinkId
+				),
+				this.store,
+				this.layoutData.structure
+			);
+		}
+		else {
+			const column = getFragmentColumn(
+				this.layoutData.structure,
+				this.fragmentEntryLinkId
+			);
+			const fragmentIndex = column.fragmentEntryLinkIds.indexOf(
+				this.fragmentEntryLinkId
+			);
+			const targetFragmentEntryLinkId = column.fragmentEntryLinkIds[
+				fragmentIndex + direction
+			];
+
+			if (direction && targetFragmentEntryLinkId) {
+				const moveItemPayload = {
+					fragmentEntryLinkId: this.fragmentEntryLinkId,
+					targetBorder: getTargetBorder(direction),
+					targetItemId: targetFragmentEntryLinkId,
+					targetItemType: FRAGMENTS_EDITOR_ITEM_TYPES.fragment
+				};
+
+				moveItem(this.store, MOVE_FRAGMENT_ENTRY_LINK, moveItemPayload);
 			}
-		);
+		}
 	}
 
 	/**
@@ -129,6 +175,15 @@ FragmentEntryLink.STATE = {
 		.value(''),
 
 	/**
+	 * Row type
+	 * @instance
+	 * @memberOf FragmentEntryLink
+	 * @review
+	 * @type {string}
+	 */
+	rowType: Config.string(),
+
+	/**
 	 * Shows FragmentEntryLink control toolbar
 	 * @default true
 	 * @instance
@@ -166,6 +221,7 @@ const ConnectedFragmentEntryLink = getConnectedComponent(
 		'layoutData',
 		'portletNamespace',
 		'selectedMappingTypes',
+		'selectedSidebarPanelId',
 		'spritemap'
 	]
 );

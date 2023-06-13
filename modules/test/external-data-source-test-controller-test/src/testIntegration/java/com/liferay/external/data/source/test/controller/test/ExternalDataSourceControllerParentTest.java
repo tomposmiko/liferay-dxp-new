@@ -47,7 +47,7 @@ public class ExternalDataSourceControllerParentTest
 	}
 
 	@Override
-	protected String getExtSpringDestination() {
+	protected String getResourceDestination() {
 		return "META-INF/spring/parent/ext-spring.xml";
 	}
 

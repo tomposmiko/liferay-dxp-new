@@ -15,10 +15,12 @@
 package com.liferay.headless.form.internal.resource.v1_0;
 
 import com.liferay.headless.form.dto.v1_0.Form;
+import com.liferay.headless.form.dto.v1_0.FormDocument;
 import com.liferay.headless.form.resource.v1_0.FormResource;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.TransformUtil;
@@ -56,77 +58,66 @@ public abstract class BaseFormResourceImpl implements FormResource {
 
 	@Override
 	@GET
+	@Path("/forms/{formId}")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Form")})
+	public Form getForm(@NotNull @PathParam("formId") Long formId)
+		throws Exception {
+
+		return new Form();
+	}
+
+	@Override
+	@Consumes("application/json")
+	@POST
+	@Path("/forms/{formId}/evaluate-context")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Form")})
+	public Form postFormEvaluateContext(
+			@NotNull @PathParam("formId") Long formId, Form form)
+		throws Exception {
+
+		return new Form();
+	}
+
+	@Override
+	@Consumes("multipart/form-data")
+	@POST
+	@Path("/forms/{formId}/upload-file")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "Form")})
+	public FormDocument postFormUploadFile(
+			@NotNull @PathParam("formId") Long formId,
+			MultipartBody multipartBody)
+		throws Exception {
+
+		return new FormDocument();
+	}
+
+	@Override
+	@GET
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
 		}
 	)
-	@Path("/content-spaces/{content-space-id}/forms")
+	@Path("/sites/{siteId}/forms")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "Form")})
-	public Page<Form> getContentSpaceFormsPage(
-			@NotNull @PathParam("content-space-id") Long contentSpaceId,
+	public Page<Form> getSiteFormsPage(
+			@NotNull @PathParam("siteId") Long siteId,
 			@Context Pagination pagination)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
-	@Override
-	@GET
-	@Path("/forms/{form-id}")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "Form")})
-	public Form getForm(@NotNull @PathParam("form-id") Long formId)
-		throws Exception {
-
-		return new Form();
-	}
-
-	@Override
-	@Consumes("application/json")
-	@POST
-	@Path("/forms/{form-id}/evaluate-context")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "Form")})
-	public Form postFormEvaluateContext(
-			@NotNull @PathParam("form-id") Long formId, Form form)
-		throws Exception {
-
-		return new Form();
-	}
-
-	@Override
-	@GET
-	@Path("/forms/{form-id}/fetch-latest-draft")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "Form")})
-	public Form getFormFetchLatestDraft(
-			@NotNull @PathParam("form-id") Long formId)
-		throws Exception {
-
-		return new Form();
-	}
-
-	@Override
-	@Consumes("application/json")
-	@POST
-	@Path("/forms/{form-id}/upload-file")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "Form")})
-	public Form postFormUploadFile(
-			@NotNull @PathParam("form-id") Long formId, Form form)
-		throws Exception {
-
-		return new Form();
-	}
-
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected void preparePatch(Form form) {
+	protected void preparePatch(Form form, Form existingForm) {
 	}
 
 	protected <T, R> List<R> transform(

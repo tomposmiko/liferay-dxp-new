@@ -60,21 +60,6 @@ public abstract class BaseDataRecordCollectionResourceImpl
 	implements DataRecordCollectionResource {
 
 	@Override
-	@Consumes("application/json")
-	@POST
-	@Path(
-		"/content-spaces/{content-space-id}/data-record-collection-permissions"
-	)
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "DataRecordCollection")})
-	public void postContentSpaceDataRecordCollectionPermission(
-			@NotNull @PathParam("content-space-id") Long contentSpaceId,
-			@NotNull @QueryParam("operation") String operation,
-			DataRecordCollectionPermission dataRecordCollectionPermission)
-		throws Exception {
-	}
-
-	@Override
 	@GET
 	@Parameters(
 		value = {
@@ -82,32 +67,12 @@ public abstract class BaseDataRecordCollectionResourceImpl
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
 		}
 	)
-	@Path("/content-spaces/{content-space-id}/data-record-collections")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "DataRecordCollection")})
-	public Page<DataRecordCollection> getContentSpaceDataRecordCollectionsPage(
-			@NotNull @PathParam("content-space-id") Long contentSpaceId,
-			@QueryParam("keywords") String keywords,
-			@Context Pagination pagination)
-		throws Exception {
-
-		return Page.of(Collections.emptyList());
-	}
-
-	@Override
-	@GET
-	@Parameters(
-		value = {
-			@Parameter(in = ParameterIn.QUERY, name = "page"),
-			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
-		}
-	)
-	@Path("/data-definitions/{data-definition-id}/data-record-collections")
+	@Path("/data-definitions/{dataDefinitionId}/data-record-collections")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataRecordCollection")})
 	public Page<DataRecordCollection>
 			getDataDefinitionDataRecordCollectionsPage(
-				@NotNull @PathParam("data-definition-id") Long dataDefinitionId,
+				@NotNull @PathParam("dataDefinitionId") Long dataDefinitionId,
 				@QueryParam("keywords") String keywords,
 				@Context Pagination pagination)
 		throws Exception {
@@ -118,11 +83,11 @@ public abstract class BaseDataRecordCollectionResourceImpl
 	@Override
 	@Consumes("application/json")
 	@POST
-	@Path("/data-definitions/{data-definition-id}/data-record-collections")
+	@Path("/data-definitions/{dataDefinitionId}/data-record-collections")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataRecordCollection")})
 	public DataRecordCollection postDataDefinitionDataRecordCollection(
-			@NotNull @PathParam("data-definition-id") Long dataDefinitionId,
+			@NotNull @PathParam("dataDefinitionId") Long dataDefinitionId,
 			DataRecordCollection dataRecordCollection)
 		throws Exception {
 
@@ -131,22 +96,22 @@ public abstract class BaseDataRecordCollectionResourceImpl
 
 	@Override
 	@DELETE
-	@Path("/data-record-collections/{data-record-collection-id}")
+	@Path("/data-record-collections/{dataRecordCollectionId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataRecordCollection")})
 	public void deleteDataRecordCollection(
-			@NotNull @PathParam("data-record-collection-id") Long
+			@NotNull @PathParam("dataRecordCollectionId") Long
 				dataRecordCollectionId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
-	@Path("/data-record-collections/{data-record-collection-id}")
+	@Path("/data-record-collections/{dataRecordCollectionId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataRecordCollection")})
 	public DataRecordCollection getDataRecordCollection(
-			@NotNull @PathParam("data-record-collection-id") Long
+			@NotNull @PathParam("dataRecordCollectionId") Long
 				dataRecordCollectionId)
 		throws Exception {
 
@@ -156,11 +121,11 @@ public abstract class BaseDataRecordCollectionResourceImpl
 	@Override
 	@Consumes("application/json")
 	@PUT
-	@Path("/data-record-collections/{data-record-collection-id}")
+	@Path("/data-record-collections/{dataRecordCollectionId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataRecordCollection")})
 	public DataRecordCollection putDataRecordCollection(
-			@NotNull @PathParam("data-record-collection-id") Long
+			@NotNull @PathParam("dataRecordCollectionId") Long
 				dataRecordCollectionId,
 			DataRecordCollection dataRecordCollection)
 		throws Exception {
@@ -172,23 +137,58 @@ public abstract class BaseDataRecordCollectionResourceImpl
 	@Consumes("application/json")
 	@POST
 	@Path(
-		"/data-record-collections/{data-record-collection-id}/data-record-collection-permissions"
+		"/data-record-collections/{dataRecordCollectionId}/data-record-collection-permissions"
 	)
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataRecordCollection")})
 	public void postDataRecordCollectionDataRecordCollectionPermission(
-			@NotNull @PathParam("data-record-collection-id") Long
+			@NotNull @PathParam("dataRecordCollectionId") Long
 				dataRecordCollectionId,
 			@NotNull @QueryParam("operation") String operation,
 			DataRecordCollectionPermission dataRecordCollectionPermission)
 		throws Exception {
 	}
 
+	@Override
+	@Consumes("application/json")
+	@POST
+	@Path("/sites/{siteId}/data-record-collection-permissions")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "DataRecordCollection")})
+	public void postSiteDataRecordCollectionPermission(
+			@NotNull @PathParam("siteId") Long siteId,
+			@NotNull @QueryParam("operation") String operation,
+			DataRecordCollectionPermission dataRecordCollectionPermission)
+		throws Exception {
+	}
+
+	@Override
+	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
+		}
+	)
+	@Path("/sites/{siteId}/data-record-collections")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "DataRecordCollection")})
+	public Page<DataRecordCollection> getSiteDataRecordCollectionsPage(
+			@NotNull @PathParam("siteId") Long siteId,
+			@QueryParam("keywords") String keywords,
+			@Context Pagination pagination)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
+	}
+
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected void preparePatch(DataRecordCollection dataRecordCollection) {
+	protected void preparePatch(
+		DataRecordCollection dataRecordCollection,
+		DataRecordCollection existingDataRecordCollection) {
 	}
 
 	protected <T, R> List<R> transform(

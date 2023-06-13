@@ -1,0 +1,389 @@
+components:
+    schemas:
+        ChangeTransition:
+            description: https://www.schema.org/ChangeTransition
+            properties:
+                transition:
+                    type: string
+                    writeOnly: true
+            type: object
+        Creator:
+            description: https://www.schema.org/Creator
+            properties:
+                additionalName:
+                    readOnly: true
+                    type: string
+                familyName:
+                    readOnly: true
+                    type: string
+                givenName:
+                    readOnly: true
+                    type: string
+                id:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                image:
+                    format: uri
+                    readOnly: true
+                    type: string
+                name:
+                    readOnly: true
+                    type: string
+                profileURL:
+                    format: uri
+                    readOnly: true
+                    type: string
+            type: object
+        ObjectReviewed:
+            description: https://www.schema.org/ObjectReviewed
+            properties:
+                id:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                resourceType:
+                    readOnly: true
+                    type: string
+            type: object
+        WorkflowLog:
+            description: https://www.schema.org/WorkflowLog
+            properties:
+                auditPerson:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    readOnly: true
+                commentLog:
+                    readOnly: true
+                    type: string
+                dateCreated:
+                    format: date-time
+                    readOnly: true
+                    type: string
+                id:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                person:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    readOnly: true
+                previousPerson:
+                    allOf:
+                        - $ref: "#/components/schemas/Creator"
+                    readOnly: true
+                previousState:
+                    readOnly: true
+                    type: string
+                state:
+                    readOnly: true
+                    type: string
+                taskId:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                type:
+                    readOnly: true
+                    type: string
+            type: object
+        WorkflowTask:
+            description: https://www.schema.org/WorkflowTask
+            properties:
+                completed:
+                    readOnly: true
+                    type: boolean
+                dateCompleted:
+                    format: date-time
+                    readOnly: true
+                    type: string
+                dateCreated:
+                    format: date-time
+                    readOnly: true
+                    type: string
+                definitionName:
+                    readOnly: true
+                    type: string
+                description:
+                    readOnly: true
+                    type: string
+                dueDate:
+                    format: date-time
+                    readOnly: true
+                    type: string
+                id:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                name:
+                    readOnly: true
+                    type: string
+                objectReviewed:
+                    allOf:
+                        - $ref: "#/components/schemas/ObjectReviewed"
+                    readOnly: true
+                transitions:
+                    items:
+                        type: string
+                    readOnly: true
+                    type: array
+            type: object
+        WorkflowTaskAssignToMe:
+            description: https://www.schema.org/WorkflowTaskAssignToMe
+            properties:
+                comment:
+                    type: string
+                    writeOnly: true
+                dueDate:
+                    format: date-time
+                    type: string
+                    writeOnly: true
+            type: object
+        WorkflowTaskAssignToUser:
+            description: https://www.schema.org/WorkflowTaskAssignToUser
+            properties:
+                assigneeId:
+                    format: int64
+                    type: integer
+                    writeOnly: true
+                comment:
+                    type: string
+                    writeOnly: true
+                dueDate:
+                    format: date-time
+                    type: string
+                    writeOnly: true
+            type: object
+info:
+    description: ""
+    title: "Headless Admin Workflow"
+    version: v1.0
+openapi: 3.0.1
+paths:
+    "/roles/{roleId}/workflow-tasks":
+        get:
+            operationId: getRoleWorkflowTasksPage
+            parameters:
+                - in: path
+                  name: roleId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/WorkflowTask"
+                                type: array
+                    description: ""
+            tags: ["WorkflowTask"]
+    "/workflow-logs/{workflowLogId}":
+        get:
+            operationId: getWorkflowLog
+            parameters:
+                - in: path
+                  name: workflowLogId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/WorkflowLog"
+                    description: ""
+            tags: ["WorkflowLog"]
+    "/workflow-tasks/assigned-to-me":
+        get:
+            operationId: getWorkflowTasksAssignedToMePage
+            parameters:
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/WorkflowTask"
+                                type: array
+                    description: ""
+            tags: ["WorkflowTask"]
+    "/workflow-tasks/assigned-to-my-roles":
+        get:
+            operationId: getWorkflowTasksAssignedToMyRolesPage
+            parameters:
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/WorkflowTask"
+                                type: array
+                    description: ""
+            tags: ["WorkflowTask"]
+    "/workflow-tasks/{workflowTaskId}":
+        get:
+            operationId: getWorkflowTask
+            parameters:
+                - in: path
+                  name: workflowTaskId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/WorkflowTask"
+                    description: ""
+            tags: ["WorkflowTask"]
+    "/workflow-tasks/{workflowTaskId}/assign-to-me":
+        post:
+            operationId: postWorkflowTaskAssignToMe
+            parameters:
+                - in: path
+                  name: workflowTaskId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/WorkflowTaskAssignToMe"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/WorkflowTask"
+                    description: ""
+            tags: ["WorkflowTask"]
+    "/workflow-tasks/{workflowTaskId}/assign-to-user":
+        post:
+            operationId: postWorkflowTaskAssignToUser
+            parameters:
+                - in: path
+                  name: workflowTaskId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/WorkflowTaskAssignToUser"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/WorkflowTask"
+                    description: ""
+            tags: ["WorkflowTask"]
+    "/workflow-tasks/{workflowTaskId}/change-transition":
+        post:
+            operationId: postWorkflowTaskChangeTransition
+            parameters:
+                - in: path
+                  name: workflowTaskId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ChangeTransition"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/WorkflowTask"
+                    description: ""
+            tags: ["WorkflowTask"]
+    "/workflow-tasks/{workflowTaskId}/update-due-date":
+        post:
+            operationId: postWorkflowTaskUpdateDueDate
+            parameters:
+                - in: path
+                  name: workflowTaskId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/WorkflowTaskAssignToMe"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/WorkflowTask"
+                    description: ""
+            tags: ["WorkflowTask"]
+    "/workflow-tasks/{workflowTaskId}/workflow-logs":
+        get:
+            operationId: getWorkflowTaskWorkflowLogsPage
+            parameters:
+                - in: path
+                  name: workflowTaskId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/WorkflowLog"
+                                type: array
+                    description: ""
+            tags: ["WorkflowLog"]

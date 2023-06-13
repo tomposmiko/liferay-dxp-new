@@ -55,6 +55,9 @@ public class GenericError {
 		try {
 			message = messageUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -93,9 +96,12 @@ public class GenericError {
 
 		sb.append("\"message\": ");
 
-		sb.append("\"");
-		sb.append(message);
-		sb.append("\"");
+		if (message == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(message);
+		}
 
 		sb.append("}");
 

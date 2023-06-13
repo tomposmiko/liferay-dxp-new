@@ -70,39 +70,39 @@ String viewInContextURL = assetRenderer.getURLViewInContext(liferayPortletReques
 <div class="asset-full-content clearfix mb-5 <%= assetPublisherDisplayContext.isDefaultAssetPublisher() ? "default-asset-publisher" : StringPool.BLANK %> <%= assetPublisherDisplayContext.isShowAssetTitle() ? "show-asset-title" : "no-title" %>">
 	<span class="asset-anchor lfr-asset-anchor" id="<%= assetEntry.getEntryId() %>"></span>
 
-	<div class="autofit-row autofit-row-center mb-4">
+	<div class="mb-2">
 		<c:if test="<%= assetPublisherDisplayContext.isShowAssetTitle() %>">
-			<div class="autofit-col">
-				<h4 class="asset-title component-title">
-					<c:if test="<%= showBackURL && Validator.isNotNull(redirect) %>">
-						<liferay-ui:icon
-							cssClass="header-back-to"
-							icon="angle-left"
-							markupView="lexicon"
-							url="<%= redirect %>"
-						/>
-					</c:if>
+			<h4 class="component-title">
+				<c:if test="<%= showBackURL && Validator.isNotNull(redirect) %>">
+					<liferay-ui:icon
+						cssClass="header-back-to"
+						icon="angle-left"
+						markupView="lexicon"
+						url="<%= redirect %>"
+					/>
+				</c:if>
 
+				<span class="asset-title d-inline">
 					<%= HtmlUtil.escape(title) %>
-				</h4>
-			</div>
-		</c:if>
+				</span>
 
-		<c:if test="<%= !print %>">
+				<c:if test="<%= !print %>">
 
-			<%
-			String fullContentRedirect = currentURL;
+					<%
+					String fullContentRedirect = currentURL;
 
-			if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(assetEntry.getCompanyId(), assetEntry.getGroupId(), assetEntry.getClassName())) {
-				fullContentRedirect = redirect;
-			}
+					if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(assetEntry.getCompanyId(), assetEntry.getGroupId(), assetEntry.getClassName())) {
+						fullContentRedirect = redirect;
+					}
 
-			request.setAttribute("view.jsp-fullContentRedirect", fullContentRedirect);
-			%>
+					request.setAttribute("view.jsp-fullContentRedirect", fullContentRedirect);
+					%>
 
-			<div class="autofit-col autofit-col-end inline-item-after">
-				<liferay-util:include page="/asset_actions.jsp" servletContext="<%= application %>" />
-			</div>
+					<span class="d-inline-flex">
+						<liferay-util:include page="/asset_actions.jsp" servletContext="<%= application %>" />
+					</span>
+				</c:if>
+			</h4>
 		</c:if>
 	</div>
 
@@ -188,7 +188,7 @@ String viewInContextURL = assetRenderer.getURLViewInContext(liferayPortletReques
 		</div>
 	</c:if>
 
-	<div class="asset-content mb-4">
+	<div class="asset-content mb-3">
 		<liferay-asset:asset-display
 			assetEntry="<%= assetEntry %>"
 			assetRenderer="<%= assetRenderer %>"
@@ -247,15 +247,13 @@ String viewInContextURL = assetRenderer.getURLViewInContext(liferayPortletReques
 
 	<%
 	boolean showContextLink = assetPublisherDisplayContext.isShowContextLink(assetRenderer.getGroupId(), assetRendererFactory.getPortletId()) && !print && assetEntry.isVisible();
-	boolean showConversions = assetPublisherDisplayContext.isEnableConversions() && assetRenderer.isConvertible() && !print;
-	boolean showLocalization = (assetPublisherDisplayContext.isShowAvailableLocales() && assetRenderer.isLocalizable() && !print);
 	boolean showRatings = assetPublisherDisplayContext.isEnableRatings() && assetRenderer.isRatable();
 	%>
 
-	<c:if test="<%= showContextLink || showRatings || assetPublisherDisplayContext.isEnableFlags() || assetPublisherDisplayContext.isEnablePrint() || showLocalization || showConversions %>">
+	<c:if test="<%= showContextLink || showRatings || assetPublisherDisplayContext.isEnableFlags() || assetPublisherDisplayContext.isEnablePrint() || Validator.isNotNull(assetPublisherDisplayContext.getSocialBookmarksTypes()) %>">
 		<div class="separator"><!-- --></div>
 
-		<div class="asset-details autofit-row autofit-row-center">
+		<div class="asset-details autofit-float autofit-row autofit-row-center">
 			<c:if test="<%= showContextLink %>">
 				<div class="asset-more autofit-col mr-3">
 					<a href="<%= viewInContextURL %>"><liferay-ui:message key="<%= assetRenderer.getViewInContextMessage() %>" /> &raquo;</a>
@@ -343,6 +341,31 @@ String viewInContextURL = assetRenderer.getURLViewInContext(liferayPortletReques
 				</div>
 			</c:if>
 
+			<c:if test="<%= Validator.isNotNull(assetPublisherDisplayContext.getSocialBookmarksTypes()) %>">
+				<div class="autofit-col">
+					<liferay-social-bookmarks:bookmarks
+						className="<%= assetEntry.getClassName() %>"
+						classPK="<%= assetEntry.getClassPK() %>"
+						displayStyle="<%= assetPublisherDisplayContext.getSocialBookmarksDisplayStyle() %>"
+						target="_blank"
+						title="<%= title %>"
+						types="<%= assetPublisherDisplayContext.getSocialBookmarksTypes() %>"
+						urlImpl="<%= viewFullContentURL %>"
+					/>
+				</div>
+			</c:if>
+		</div>
+	</c:if>
+
+	<%
+	boolean showConversions = assetPublisherDisplayContext.isEnableConversions() && assetRenderer.isConvertible() && !print;
+	boolean showLocalization = (assetPublisherDisplayContext.isShowAvailableLocales() && assetRenderer.isLocalizable() && !print);
+	%>
+
+	<c:if test="<%= showConversions || showLocalization %>">
+		<div class="separator"><!-- --></div>
+
+		<div class="asset-details autofit-float autofit-row autofit-row-center">
 			<c:if test="<%= showLocalization %>">
 
 				<%
@@ -387,20 +410,6 @@ String viewInContextURL = assetRenderer.getURLViewInContext(liferayPortletReques
 
 			</c:if>
 		</div>
-	</c:if>
-
-	<c:if test="<%= Validator.isNotNull(assetPublisherDisplayContext.getSocialBookmarksTypes()) %>">
-		<div class="separator"><!-- --></div>
-
-		<liferay-social-bookmarks:bookmarks
-			className="<%= assetEntry.getClassName() %>"
-			classPK="<%= assetEntry.getClassPK() %>"
-			displayStyle="<%= assetPublisherDisplayContext.getSocialBookmarksDisplayStyle() %>"
-			target="_blank"
-			title="<%= title %>"
-			types="<%= assetPublisherDisplayContext.getSocialBookmarksTypes() %>"
-			urlImpl="<%= viewFullContentURL %>"
-		/>
 	</c:if>
 
 	<c:if test="<%= assetPublisherDisplayContext.isEnableComments() && assetRenderer.isCommentable() %>">

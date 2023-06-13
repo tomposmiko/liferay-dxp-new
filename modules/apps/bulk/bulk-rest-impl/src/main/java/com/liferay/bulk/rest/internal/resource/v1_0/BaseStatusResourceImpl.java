@@ -56,7 +56,7 @@ public abstract class BaseStatusResourceImpl implements StatusResource {
 		this.contextCompany = contextCompany;
 	}
 
-	protected void preparePatch(Status status) {
+	protected void preparePatch(Status status, Status existingStatus) {
 	}
 
 	protected <T, R> List<R> transform(

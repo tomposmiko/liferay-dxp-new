@@ -5,7 +5,9 @@
  */
 {template .render}
 	{@param fragmentEntryLinkId: string}
+	{@param? _fragmentEntryLinkType: string}
 	{@param? _fragmentsEditorItemTypes: ?}
+	{@param? _fragmentsEditorRowTypes: ?}
 	{@param? _handleFragmentKeyUp: any}
 	{@param? _handleFragmentRemoveButtonClick: any}
 	{@param? _hovered: bool}
@@ -19,10 +21,12 @@
 	{@param? dropTargetItemId: ?}
 	{@param? dropTargetItemType: ?}
 	{@param? editableValues: ?}
+	{@param? error: bool}
 	{@param? imageSelectorURL: ?}
 	{@param? languageId: string}
 	{@param? name: string}
 	{@param? portletNamespace: ?}
+	{@param? rowType: ?}
 	{@param? selectedMappingTypes: ?}
 	{@param? showControlBar: bool}
 	{@param? showMapping: bool}
@@ -33,17 +37,20 @@
 		fragments-editor__drag-source
 		{sp}fragments-editor__drag-source--fragment
 		{sp}fragments-editor__drop-target
-		{sp}fragments-editor__drop-target--fragment
-		{sp}fragments-editor__drop-target--sidebar-fragment
 		{sp}fragments-editor__drop-target--sidebar-widget
 		{sp}fragment-entry-link-wrapper
 		{sp}fragments-editor__topper-wrapper
 
-		{if $dropTargetItemId == $fragmentEntryLinkId and $dropTargetItemType == $_fragmentsEditorItemTypes.fragment}
+		{if $rowType == $_fragmentsEditorRowTypes.componentRow}
+			{sp}fragments-editor__drop-target--fragment
+			{sp}fragments-editor__drop-target--sidebar-fragment
+		{/if}
+
+		{if $dropTargetItemId == $fragmentEntryLinkId and $_fragmentsEditorItemTypes and $dropTargetItemType == $_fragmentsEditorItemTypes.fragment}
 			{sp}{$dropTargetBorder}
 		{/if}
 
-		{if $activeItemId == $fragmentEntryLinkId and $activeItemType == $_fragmentsEditorItemTypes.fragment}
+		{if $activeItemId == $fragmentEntryLinkId and $_fragmentsEditorItemTypes and $activeItemType == $_fragmentsEditorItemTypes.fragment}
 			{sp}fragments-editor__topper-wrapper--active
 			{sp}fragment-entry-link-wrapper--active
 		{/if}
@@ -52,14 +59,19 @@
 			{sp}fragments-editor__topper-wrapper--hovered
 			{sp}fragment-entry-link-wrapper--hovered
 		{/if}
+
+		{if $error}
+			{sp}fragments-editor__topper-wrapper--error
+		{/if}
 	{/let}
 
 	<div
 		class="{$wrapperClasses}"
 		data-drag-source-label="{$name ?: ''}"
 		data-fragment-entry-link-id="{$fragmentEntryLinkId}"
+		data-fragment-entry-link-type="{$_fragmentEntryLinkType}"
 		data-fragments-editor-item-id="{$fragmentEntryLinkId}"
-		data-fragments-editor-item-type="fragments-editor-fragment"
+		data-fragments-editor-item-type="{if $_fragmentsEditorItemTypes}{$_fragmentsEditorItemTypes.fragment}{/if}"
 		data-onkeyup="{$_handleFragmentKeyUp}"
 		ref="fragmentEntryLinkWrapper"
 		tabindex="0"

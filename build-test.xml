@@ -2178,6 +2178,54 @@ tell application "Safari" to quit
 							<include name="**/*.sh" />
 						</fileset>
 					</chmod>
+
+					<local name="weblogic.fix.sh" />
+
+					<property name="weblogic.fix.sh" value="weblogic_fix.sh" />
+
+					<echo file="${weblogic.fix.sh}">
+						<![CDATA[
+							#!/bin/bash
+
+							DEFAULT_LIFERAY_HOME=/opt/dev/projects/github/liferay-portal/bundles
+
+							APP_SERVER_DIR=${app.server.weblogic.dir}
+							LIFERAY_HOME=${liferay.home}
+
+							for file in $(find ${APP_SERVER_DIR} | grep "\.cmd$\|\.domains$\|\.properties$\|\.py$\|\.sh$\|\.txt$\|\.xml$")
+							do
+								if [[ -f $file ]]
+								then
+									if [[ -n $(cat $file | grep "${DEFAULT_LIFERAY_HOME}") ]]
+									then
+										echo $file
+
+										sed -i "s|${DEFAULT_LIFERAY_HOME}|${LIFERAY_HOME}|g" $file
+									fi
+								fi
+							done
+						]]>
+					</echo>
+
+					<chmod
+						perm="a+x"
+					>
+						<fileset
+							dir="."
+						>
+							<include name="${weblogic.fix.sh}" />
+						</fileset>
+					</chmod>
+
+					<exec executable="/bin/bash" os="${os.apple},${os.unix}">
+						<arg value="${weblogic.fix.sh}" />
+					</exec>
+
+					<exec executable="cmd.exe" os="${os.windows}">
+						<arg value="${weblogic.fix.sh}" />
+					</exec>
+
+					<delete file="${weblogic.fix.sh}" />
 				</then>
 				<elseif>
 					<equals arg1="${app.server.type}" arg2="websphere" />
@@ -2987,32 +3035,82 @@ ${tomcat-gc-log}
 							<if>
 								<isset property="lpkg.path" />
 								<then>
+									<local name="tstamp.value" />
+
 									<tstamp>
 										<format pattern="yyyyMMddkkmmssSSS" property="tstamp.value" />
 									</tstamp>
 
-									<mkdir dir="${tstamp.value}" />
+									<local name="lpkg.dir" />
+
+									<property name="lpkg.dir" value="${tstamp.value}/lpkg-dir" />
+
+									<mkdir dir="${lpkg.dir}" />
+
+									<local name="lpkg.impl.include.name" />
+
+									<property name="lpkg.impl.include.name" value="Liferay Documentum Connector - Impl.lpkg" />
 
 									<unzip
-										dest="${tstamp.value}"
+										dest="${lpkg.dir}"
 										src="${lpkg.path}"
 									>
 										<patternset>
-											<include name="documentum-hook-*.war" />
+											<include name="${lpkg.impl.include.name}" />
 										</patternset>
 									</unzip>
+
+									<local name="lpkg.impl.path" />
+
+									<pathconvert property="lpkg.impl.path" setonempty="false">
+										<path>
+											<fileset
+												dir="${lpkg.dir}"
+											>
+												<include name="${lpkg.impl.include.name}" />
+											</fileset>
+										</path>
+									</pathconvert>
+
+									<local name="lpkg.impl.dir" />
+
+									<property name="lpkg.impl.dir" value="${tstamp.value}/lpkg-impl-dir" />
+
+									<mkdir dir="${lpkg.impl.dir}" />
+
+									<local name="war.include.name" />
+
+									<property name="war.include.name" value="documentum-hook-*.war" />
+
+									<unzip
+										dest="${lpkg.impl.dir}"
+										src="${lpkg.impl.path}"
+									>
+										<patternset>
+											<include name="${war.include.name}" />
+										</patternset>
+									</unzip>
+
+									<local name="war.path" />
 
 									<pathconvert property="war.path" setonempty="false">
 										<path>
 											<fileset
-												dir="${tstamp.value}"
-												includes="documentum-hook-*.war"
-											/>
+												dir="${lpkg.impl.dir}"
+											>
+												<include name="${war.include.name}" />
+											</fileset>
 										</path>
 									</pathconvert>
 
+									<local name="war.dir" />
+
+									<property name="war.dir" value="${tstamp.value}/war-dir" />
+
+									<mkdir dir="${war.dir}" />
+
 									<unzip
-										dest="${tstamp.value}"
+										dest="${war.dir}"
 										src="${war.path}"
 									>
 										<flattenmapper />
@@ -3021,7 +3119,7 @@ ${tomcat-gc-log}
 										</patternset>
 									</unzip>
 
-									<propertyfile file="${tstamp.value}/dfc.properties">
+									<propertyfile file="${war.dir}/dfc.properties">
 										<entry key="dfc.docbroker.host[0]" value="${cmis.repository.vm.host.name}" />
 									</propertyfile>
 
@@ -3030,21 +3128,31 @@ ${tomcat-gc-log}
 										update="true"
 									>
 										<zipfileset
-											file="${tstamp.value}/dfc.properties"
+											file="${war.dir}/dfc.properties"
 											fullpath="WEB-INF/classes/dfc.properties"
 										/>
 									</war>
 
-									<delete file="${tstamp.value}/dfc.properties" />
+									<zip
+										destfile="${lpkg.impl.path}"
+										update="true"
+									>
+										<zipfileset
+											dir="${lpkg.impl.dir}"
+										>
+											<include name="${war.include.name}" />
+										</zipfileset>
+									</zip>
 
 									<zip
 										destfile="${lpkg.path}"
 										update="true"
 									>
 										<zipfileset
-											dir="${tstamp.value}"
-											includes="documentum-hook-*.war"
-										/>
+											dir="${lpkg.dir}"
+										>
+											<include name="${lpkg.impl.include.name}" />
+										</zipfileset>
 									</zip>
 
 									<delete dir="${tstamp.value}" />
@@ -3360,6 +3468,12 @@ go</echo>
 					</or>
 					<then>
 						<var name="app.server.tomcat.version" value="9.0.6" />
+					</then>
+				</elseif>
+				<elseif>
+					<equals arg1="@{liferay.portal.bundle}" arg2="7.1.1" />
+					<then>
+						<var name="app.server.tomcat.version" value="9.0.10" />
 					</then>
 				</elseif>
 			</if>
@@ -6646,6 +6760,12 @@ go</echo>
 					<include name="**/TEST-*.xml" />
 				</fileset>
 				<fileset
+					dir="tools/tck/test-results"
+					erroronmissingdir="false"
+				>
+					<include name="**/TEST-*.xml" />
+				</fileset>
+				<fileset
 					dir="util-java/test-results"
 					erroronmissingdir="false"
 				>
@@ -7580,7 +7700,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 				<replace
 					file="${app.server.dir}/conf/server.xml"
 					token="&lt;Service name=&quot;Catalina&quot;&gt;"
-					value="&lt;Service name=&quot;Catalina&quot;&gt;${line.separator}    &lt;Connector port=&quot;8443&quot; protocol=&quot;org.apache.coyote.http11.Http11NioProtocol&quot;${line.separator}           maxThreads=&quot;150&quot; SSLEnabled=&quot;true&quot; scheme=&quot;https&quot; secure=&quot;true&quot;${line.separator}           clientAuth=&quot;false&quot; sslProtocol=&quot;TLS&quot; keystoreFile=&quot;${app.server.parent.dir}/keystore.jks&quot; keystorePass=&quot;liferay&quot; /&gt;"
+					value="&lt;Service name= &quot;Catalina&quot;&gt;${line.separator}    &lt;Connector port=&quot;8443&quot; protocol=&quot;org.apache.coyote.http11.Http11NioProtocol&quot;${line.separator}           maxThreads=&quot;150&quot; SSLEnabled=&quot;true&quot; scheme=&quot;https&quot; secure=&quot;true&quot;${line.separator}           clientAuth=&quot;false&quot; sslProtocol=&quot;TLS&quot; keystoreFile=&quot;${app.server.parent.dir}/keystore.jks&quot; keystorePass=&quot;liferay&quot; /&gt;"
 				/>
 			</then>
 			<else>
@@ -9063,6 +9183,8 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 			</then>
 		</if>
 
+		<lstopwatch action="start" name="prepare.bundles.${app.server.name}" />
+
 		<if>
 			<matches pattern="(file|https?)://" string="${test.build.bundle.zip.url}" />
 			<then>
@@ -9416,6 +9538,8 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 				<antcall target="prepare-tomcat-ext-environment" />
 			</then>
 		</if>
+
+		<lstopwatch action="total" name="prepare.bundles.${app.server.name}" />
 	</target>
 
 	<target name="prepare-tomcat-ext-environment">

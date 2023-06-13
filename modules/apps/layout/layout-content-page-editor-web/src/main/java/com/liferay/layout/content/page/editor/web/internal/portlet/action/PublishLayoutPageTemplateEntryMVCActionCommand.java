@@ -15,6 +15,7 @@
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
+import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
@@ -69,6 +71,8 @@ public class PublishLayoutPageTemplateEntryMVCActionCommand
 		catch (Throwable t) {
 			throw new Exception(t);
 		}
+
+		sendRedirect(actionRequest, actionResponse);
 	}
 
 	private static final TransactionConfig _transactionConfig =
@@ -108,28 +112,36 @@ public class PublishLayoutPageTemplateEntryMVCActionCommand
 					fetchLayoutPageTemplateEntryByPlid(
 						draftLayout.getClassPK());
 
-			String portletId = _portal.getPortletId(_actionRequest);
-
-			if (SessionMessages.contains(
-					_actionRequest,
-					portletId.concat(
-						SessionMessages.
-							KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE)) &&
-				SessionMessages.contains(
-					_actionRequest, "fragmentEntryLinkAdded")) {
-
-				SessionMessages.clear(_actionRequest);
-			}
-
 			_layoutCopyHelper.copyLayout(draftLayout, layout);
 
-			_layoutPageTemplateEntryService.updateLayoutPageTemplateEntry(
+			_layoutPageTemplateEntryService.updateStatus(
 				layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
 				WorkflowConstants.STATUS_APPROVED);
 
 			_layoutLocalService.updateLayout(
 				layout.getGroupId(), layout.isPrivateLayout(),
 				layout.getLayoutId(), new Date());
+
+			String portletId = _portal.getPortletId(_actionRequest);
+
+			if (SessionMessages.contains(
+					_actionRequest,
+					portletId.concat(
+						SessionMessages.
+							KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE))) {
+
+				SessionMessages.clear(_actionRequest);
+			}
+
+			String key = "layoutPageTemplatePublished";
+
+			if (layoutPageTemplateEntry.getType() ==
+					LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE) {
+
+				key = "displayPagePublished";
+			}
+
+			MultiSessionMessages.add(_actionRequest, key);
 
 			return null;
 		}

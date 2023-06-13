@@ -55,6 +55,9 @@ public class Status {
 		try {
 			actionInProgress = actionInProgressUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -93,7 +96,12 @@ public class Status {
 
 		sb.append("\"actionInProgress\": ");
 
-		sb.append(actionInProgress);
+		if (actionInProgress == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(actionInProgress);
+		}
 
 		sb.append("}");
 

@@ -53,6 +53,9 @@ public class DataDefinitionRuleParameter {
 		try {
 			key = keyUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -76,6 +79,9 @@ public class DataDefinitionRuleParameter {
 
 		try {
 			value = valueUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -117,14 +123,23 @@ public class DataDefinitionRuleParameter {
 
 		sb.append("\"key\": ");
 
-		sb.append("\"");
-		sb.append(key);
-		sb.append("\"");
+		if (key == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(key);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"value\": ");
 
-		sb.append(value);
+		if (value == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(value);
+		}
 
 		sb.append("}");
 

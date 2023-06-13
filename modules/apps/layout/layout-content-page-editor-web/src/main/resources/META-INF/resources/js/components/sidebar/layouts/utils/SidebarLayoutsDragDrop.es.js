@@ -3,6 +3,7 @@ import {Drag, DragDrop} from 'metal-drag-drop';
 import State from 'metal-state';
 
 import {FRAGMENTS_EDITOR_ITEM_BORDERS} from '../../../../utils/constants';
+import {initializeDragDrop} from '../../../../utils/FragmentsEditorDragDrop.es';
 
 /**
  * SidebarLayoutsDragDrop
@@ -37,7 +38,7 @@ class SidebarLayoutsDragDrop extends State {
 	_handleDrag(data) {
 		const targetItem = data.target;
 
-		if (targetItem && 'layoutSectionId' in targetItem.dataset) {
+		if (targetItem && 'layoutRowId' in targetItem.dataset) {
 			const mouseY = data.originalEvent.clientY;
 			const targetItemRegion = position.getRegion(targetItem);
 
@@ -53,8 +54,8 @@ class SidebarLayoutsDragDrop extends State {
 			this.emit(
 				'dragLayout',
 				{
-					hoveredSectionBorder: nearestBorder,
-					hoveredSectionId: targetItem.dataset.layoutSectionId
+					hoveredRowBorder: nearestBorder,
+					hoveredRowId: targetItem.dataset.layoutRowId
 				}
 			);
 		}
@@ -95,7 +96,7 @@ class SidebarLayoutsDragDrop extends State {
 	 * @review
 	 */
 	_initializeDragAndDrop() {
-		this._dragDrop = new DragDrop(
+		this._dragDrop = initializeDragDrop(
 			{
 				autoScroll: true,
 				dragPlaceholder: Drag.Placeholder.CLONE,

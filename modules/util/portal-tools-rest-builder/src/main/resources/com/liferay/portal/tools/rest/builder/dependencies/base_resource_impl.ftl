@@ -11,7 +11,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -76,19 +75,19 @@ public abstract class Base${schemaName}ResourceImpl implements ${schemaName}Reso
 			<#elseif freeMarkerTool.hasHTTPMethod(javaMethodSignature, "patch") && !javaMethodSignature.operation.requestBody.content?keys?seq_contains("multipart/form-data")>
 				<#assign firstJavaMethodParameter = javaMethodSignature.javaMethodParameters[0] />
 
-				preparePatch(${schemaVarName});
-
 				${schemaName} existing${schemaName} = get${schemaName}(${firstJavaMethodParameter.parameterName});
 
 				<#assign properties = freeMarkerTool.getDTOProperties(configYAML, openAPIYAML, schema) />
 
 				<#list properties?keys as propertyName>
 					<#if !freeMarkerTool.isDTOSchemaProperty(openAPIYAML, propertyName, schema) && !stringUtil.equals(propertyName, "id")>
-						if (Validator.isNotNull(${schemaVarName}.get${propertyName?cap_first}())) {
+						if (${schemaVarName}.get${propertyName?cap_first}() != null) {
 							existing${schemaName}.set${propertyName?cap_first}(${schemaVarName}.get${propertyName?cap_first}());
 						}
 					</#if>
 				</#list>
+
+				preparePatch(${schemaVarName}, existing${schemaName});
 
 				return put${schemaName}(${firstJavaMethodParameter.parameterName}, existing${schemaName});
 			<#elseif !stringUtil.equals(javaMethodSignature.returnType, "void")>
@@ -101,7 +100,7 @@ public abstract class Base${schemaName}ResourceImpl implements ${schemaName}Reso
 		this.contextCompany = contextCompany;
 	}
 
-	protected void preparePatch(${schemaName} ${schemaVarName}) {
+	protected void preparePatch(${schemaName} ${schemaVarName}, ${schemaName} existing${schemaVarName?cap_first}) {
 	}
 
 	protected <T, R> List<R> transform(Collection<T> collection, UnsafeFunction<T, R, Exception> unsafeFunction) {

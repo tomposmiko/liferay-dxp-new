@@ -22,6 +22,9 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import com.liferay.data.engine.rest.dto.v1_0.DataLayout;
+import com.liferay.data.engine.rest.dto.v1_0.DataLayoutPage;
+import com.liferay.data.engine.rest.dto.v1_0.DataLayoutPermission;
+import com.liferay.data.engine.rest.dto.v1_0.LocalizedValue;
 import com.liferay.data.engine.rest.resource.v1_0.DataLayoutResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -36,6 +39,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -53,7 +57,9 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -96,6 +102,7 @@ public abstract class BaseDataLayoutResourceTestCase {
 	public void setUp() throws Exception {
 		irrelevantGroup = GroupTestUtil.addGroup();
 		testGroup = GroupTestUtil.addGroup();
+		testLocale = LocaleUtil.getDefault();
 
 		_resourceURL = new URL("http://localhost:8080/o/data-engine/v1.0");
 	}
@@ -107,19 +114,19 @@ public abstract class BaseDataLayoutResourceTestCase {
 	}
 
 	@Test
-	public void testGetContentSpaceDataLayoutPage() throws Exception {
-		Long contentSpaceId =
-			testGetContentSpaceDataLayoutPage_getContentSpaceId();
-		Long irrelevantContentSpaceId =
-			testGetContentSpaceDataLayoutPage_getIrrelevantContentSpaceId();
+	public void testGetDataDefinitionDataLayoutsPage() throws Exception {
+		Long dataDefinitionId =
+			testGetDataDefinitionDataLayoutsPage_getDataDefinitionId();
+		Long irrelevantDataDefinitionId =
+			testGetDataDefinitionDataLayoutsPage_getIrrelevantDataDefinitionId();
 
-		if ((irrelevantContentSpaceId != null)) {
+		if ((irrelevantDataDefinitionId != null)) {
 			DataLayout irrelevantDataLayout =
-				testGetContentSpaceDataLayoutPage_addDataLayout(
-					irrelevantContentSpaceId, randomIrrelevantDataLayout());
+				testGetDataDefinitionDataLayoutsPage_addDataLayout(
+					irrelevantDataDefinitionId, randomIrrelevantDataLayout());
 
-			Page<DataLayout> page = invokeGetContentSpaceDataLayoutPage(
-				irrelevantContentSpaceId, Pagination.of(1, 2));
+			Page<DataLayout> page = invokeGetDataDefinitionDataLayoutsPage(
+				irrelevantDataDefinitionId, Pagination.of(1, 2));
 
 			Assert.assertEquals(1, page.getTotalCount());
 
@@ -130,15 +137,15 @@ public abstract class BaseDataLayoutResourceTestCase {
 		}
 
 		DataLayout dataLayout1 =
-			testGetContentSpaceDataLayoutPage_addDataLayout(
-				contentSpaceId, randomDataLayout());
+			testGetDataDefinitionDataLayoutsPage_addDataLayout(
+				dataDefinitionId, randomDataLayout());
 
 		DataLayout dataLayout2 =
-			testGetContentSpaceDataLayoutPage_addDataLayout(
-				contentSpaceId, randomDataLayout());
+			testGetDataDefinitionDataLayoutsPage_addDataLayout(
+				dataDefinitionId, randomDataLayout());
 
-		Page<DataLayout> page = invokeGetContentSpaceDataLayoutPage(
-			contentSpaceId, Pagination.of(1, 2));
+		Page<DataLayout> page = invokeGetDataDefinitionDataLayoutsPage(
+			dataDefinitionId, Pagination.of(1, 2));
 
 		Assert.assertEquals(2, page.getTotalCount());
 
@@ -149,33 +156,33 @@ public abstract class BaseDataLayoutResourceTestCase {
 	}
 
 	@Test
-	public void testGetContentSpaceDataLayoutPageWithPagination()
+	public void testGetDataDefinitionDataLayoutsPageWithPagination()
 		throws Exception {
 
-		Long contentSpaceId =
-			testGetContentSpaceDataLayoutPage_getContentSpaceId();
+		Long dataDefinitionId =
+			testGetDataDefinitionDataLayoutsPage_getDataDefinitionId();
 
 		DataLayout dataLayout1 =
-			testGetContentSpaceDataLayoutPage_addDataLayout(
-				contentSpaceId, randomDataLayout());
+			testGetDataDefinitionDataLayoutsPage_addDataLayout(
+				dataDefinitionId, randomDataLayout());
 
 		DataLayout dataLayout2 =
-			testGetContentSpaceDataLayoutPage_addDataLayout(
-				contentSpaceId, randomDataLayout());
+			testGetDataDefinitionDataLayoutsPage_addDataLayout(
+				dataDefinitionId, randomDataLayout());
 
 		DataLayout dataLayout3 =
-			testGetContentSpaceDataLayoutPage_addDataLayout(
-				contentSpaceId, randomDataLayout());
+			testGetDataDefinitionDataLayoutsPage_addDataLayout(
+				dataDefinitionId, randomDataLayout());
 
-		Page<DataLayout> page1 = invokeGetContentSpaceDataLayoutPage(
-			contentSpaceId, Pagination.of(1, 2));
+		Page<DataLayout> page1 = invokeGetDataDefinitionDataLayoutsPage(
+			dataDefinitionId, Pagination.of(1, 2));
 
 		List<DataLayout> dataLayouts1 = (List<DataLayout>)page1.getItems();
 
 		Assert.assertEquals(dataLayouts1.toString(), 2, dataLayouts1.size());
 
-		Page<DataLayout> page2 = invokeGetContentSpaceDataLayoutPage(
-			contentSpaceId, Pagination.of(2, 2));
+		Page<DataLayout> page2 = invokeGetDataDefinitionDataLayoutsPage(
+			dataDefinitionId, Pagination.of(2, 2));
 
 		Assert.assertEquals(3, page2.getTotalCount());
 
@@ -193,29 +200,29 @@ public abstract class BaseDataLayoutResourceTestCase {
 			});
 	}
 
-	protected DataLayout testGetContentSpaceDataLayoutPage_addDataLayout(
-			Long contentSpaceId, DataLayout dataLayout)
+	protected DataLayout testGetDataDefinitionDataLayoutsPage_addDataLayout(
+			Long dataDefinitionId, DataLayout dataLayout)
+		throws Exception {
+
+		return invokePostDataDefinitionDataLayout(dataDefinitionId, dataLayout);
+	}
+
+	protected Long testGetDataDefinitionDataLayoutsPage_getDataDefinitionId()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected Long testGetContentSpaceDataLayoutPage_getContentSpaceId()
-		throws Exception {
-
-		return testGroup.getGroupId();
-	}
-
 	protected Long
-			testGetContentSpaceDataLayoutPage_getIrrelevantContentSpaceId()
+			testGetDataDefinitionDataLayoutsPage_getIrrelevantDataDefinitionId()
 		throws Exception {
 
-		return irrelevantGroup.getGroupId();
+		return null;
 	}
 
-	protected Page<DataLayout> invokeGetContentSpaceDataLayoutPage(
-			Long contentSpaceId, Pagination pagination)
+	protected Page<DataLayout> invokeGetDataDefinitionDataLayoutsPage(
+			Long dataDefinitionId, Pagination pagination)
 		throws Exception {
 
 		Http.Options options = _createHttpOptions();
@@ -223,8 +230,8 @@ public abstract class BaseDataLayoutResourceTestCase {
 		String location =
 			_resourceURL +
 				_toPath(
-					"/content-spaces/{content-space-id}/data-layout",
-					contentSpaceId);
+					"/data-definitions/{dataDefinitionId}/data-layouts",
+					dataDefinitionId);
 
 		location = HttpUtil.addParameter(
 			location, "page", pagination.getPage());
@@ -239,14 +246,14 @@ public abstract class BaseDataLayoutResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return _outputObjectMapper.readValue(
+		return outputObjectMapper.readValue(
 			string,
 			new TypeReference<Page<DataLayout>>() {
 			});
 	}
 
-	protected Http.Response invokeGetContentSpaceDataLayoutPageResponse(
-			Long contentSpaceId, Pagination pagination)
+	protected Http.Response invokeGetDataDefinitionDataLayoutsPageResponse(
+			Long dataDefinitionId, Pagination pagination)
 		throws Exception {
 
 		Http.Options options = _createHttpOptions();
@@ -254,8 +261,8 @@ public abstract class BaseDataLayoutResourceTestCase {
 		String location =
 			_resourceURL +
 				_toPath(
-					"/content-spaces/{content-space-id}/data-layout",
-					contentSpaceId);
+					"/data-definitions/{dataDefinitionId}/data-layouts",
+					dataDefinitionId);
 
 		location = HttpUtil.addParameter(
 			location, "page", pagination.getPage());
@@ -284,8 +291,9 @@ public abstract class BaseDataLayoutResourceTestCase {
 			DataLayout dataLayout)
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return invokePostDataDefinitionDataLayout(
+			testGetDataDefinitionDataLayoutsPage_getDataDefinitionId(),
+			dataLayout);
 	}
 
 	protected DataLayout invokePostDataDefinitionDataLayout(
@@ -295,13 +303,13 @@ public abstract class BaseDataLayoutResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			_inputObjectMapper.writeValueAsString(dataLayout),
+			inputObjectMapper.writeValueAsString(dataLayout),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
 			_resourceURL +
 				_toPath(
-					"/data-definitions/{data-definition-id}/data-layouts",
+					"/data-definitions/{dataDefinitionId}/data-layouts",
 					dataDefinitionId);
 
 		options.setLocation(location);
@@ -315,7 +323,7 @@ public abstract class BaseDataLayoutResourceTestCase {
 		}
 
 		try {
-			return _outputObjectMapper.readValue(string, DataLayout.class);
+			return outputObjectMapper.readValue(string, DataLayout.class);
 		}
 		catch (Exception e) {
 			_log.error("Unable to process HTTP response: " + string, e);
@@ -331,14 +339,65 @@ public abstract class BaseDataLayoutResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			_inputObjectMapper.writeValueAsString(dataLayout),
+			inputObjectMapper.writeValueAsString(dataLayout),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
 			_resourceURL +
 				_toPath(
-					"/data-definitions/{data-definition-id}/data-layouts",
+					"/data-definitions/{dataDefinitionId}/data-layouts",
 					dataDefinitionId);
+
+		options.setLocation(location);
+
+		options.setPost(true);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
+	}
+
+	@Test
+	public void testPostDataLayoutDataLayoutPermission() throws Exception {
+		Assert.assertTrue(true);
+	}
+
+	protected void invokePostDataLayoutDataLayoutPermission(
+			Long dataLayoutId, String operation,
+			DataLayoutPermission dataLayoutPermission)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL +
+				_toPath(
+					"/data-layout/{dataLayoutId}/data-layout-permissions",
+					dataLayoutId);
+
+		options.setLocation(location);
+
+		options.setPost(true);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+	}
+
+	protected Http.Response invokePostDataLayoutDataLayoutPermissionResponse(
+			Long dataLayoutId, String operation,
+			DataLayoutPermission dataLayoutPermission)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL +
+				_toPath(
+					"/data-layout/{dataLayoutId}/data-layout-permissions",
+					dataLayoutId);
 
 		options.setLocation(location);
 
@@ -372,7 +431,7 @@ public abstract class BaseDataLayoutResourceTestCase {
 
 		String location =
 			_resourceURL +
-				_toPath("/data-layouts/{data-layout-id}", dataLayoutId);
+				_toPath("/data-layouts/{dataLayoutId}", dataLayoutId);
 
 		options.setLocation(location);
 
@@ -392,7 +451,7 @@ public abstract class BaseDataLayoutResourceTestCase {
 
 		String location =
 			_resourceURL +
-				_toPath("/data-layouts/{data-layout-id}", dataLayoutId);
+				_toPath("/data-layouts/{dataLayoutId}", dataLayoutId);
 
 		options.setLocation(location);
 
@@ -423,7 +482,7 @@ public abstract class BaseDataLayoutResourceTestCase {
 
 		String location =
 			_resourceURL +
-				_toPath("/data-layouts/{data-layout-id}", dataLayoutId);
+				_toPath("/data-layouts/{dataLayoutId}", dataLayoutId);
 
 		options.setLocation(location);
 
@@ -434,7 +493,7 @@ public abstract class BaseDataLayoutResourceTestCase {
 		}
 
 		try {
-			return _outputObjectMapper.readValue(string, DataLayout.class);
+			return outputObjectMapper.readValue(string, DataLayout.class);
 		}
 		catch (Exception e) {
 			_log.error("Unable to process HTTP response: " + string, e);
@@ -450,7 +509,7 @@ public abstract class BaseDataLayoutResourceTestCase {
 
 		String location =
 			_resourceURL +
-				_toPath("/data-layouts/{data-layout-id}", dataLayoutId);
+				_toPath("/data-layouts/{dataLayoutId}", dataLayoutId);
 
 		options.setLocation(location);
 
@@ -489,12 +548,12 @@ public abstract class BaseDataLayoutResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			_inputObjectMapper.writeValueAsString(dataLayout),
+			inputObjectMapper.writeValueAsString(dataLayout),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
 			_resourceURL +
-				_toPath("/data-layouts/{data-layout-id}", dataLayoutId);
+				_toPath("/data-layouts/{dataLayoutId}", dataLayoutId);
 
 		options.setLocation(location);
 
@@ -507,7 +566,7 @@ public abstract class BaseDataLayoutResourceTestCase {
 		}
 
 		try {
-			return _outputObjectMapper.readValue(string, DataLayout.class);
+			return outputObjectMapper.readValue(string, DataLayout.class);
 		}
 		catch (Exception e) {
 			_log.error("Unable to process HTTP response: " + string, e);
@@ -523,16 +582,207 @@ public abstract class BaseDataLayoutResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			_inputObjectMapper.writeValueAsString(dataLayout),
+			inputObjectMapper.writeValueAsString(dataLayout),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
 			_resourceURL +
-				_toPath("/data-layouts/{data-layout-id}", dataLayoutId);
+				_toPath("/data-layouts/{dataLayoutId}", dataLayoutId);
 
 		options.setLocation(location);
 
 		options.setPut(true);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
+	}
+
+	@Test
+	public void testGetSiteDataLayoutPage() throws Exception {
+		Long siteId = testGetSiteDataLayoutPage_getSiteId();
+		Long irrelevantSiteId = testGetSiteDataLayoutPage_getIrrelevantSiteId();
+
+		if ((irrelevantSiteId != null)) {
+			DataLayout irrelevantDataLayout =
+				testGetSiteDataLayoutPage_addDataLayout(
+					irrelevantSiteId, randomIrrelevantDataLayout());
+
+			Page<DataLayout> page = invokeGetSiteDataLayoutPage(
+				irrelevantSiteId, Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantDataLayout),
+				(List<DataLayout>)page.getItems());
+			assertValid(page);
+		}
+
+		DataLayout dataLayout1 = testGetSiteDataLayoutPage_addDataLayout(
+			siteId, randomDataLayout());
+
+		DataLayout dataLayout2 = testGetSiteDataLayoutPage_addDataLayout(
+			siteId, randomDataLayout());
+
+		Page<DataLayout> page = invokeGetSiteDataLayoutPage(
+			siteId, Pagination.of(1, 2));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(dataLayout1, dataLayout2),
+			(List<DataLayout>)page.getItems());
+		assertValid(page);
+	}
+
+	@Test
+	public void testGetSiteDataLayoutPageWithPagination() throws Exception {
+		Long siteId = testGetSiteDataLayoutPage_getSiteId();
+
+		DataLayout dataLayout1 = testGetSiteDataLayoutPage_addDataLayout(
+			siteId, randomDataLayout());
+
+		DataLayout dataLayout2 = testGetSiteDataLayoutPage_addDataLayout(
+			siteId, randomDataLayout());
+
+		DataLayout dataLayout3 = testGetSiteDataLayoutPage_addDataLayout(
+			siteId, randomDataLayout());
+
+		Page<DataLayout> page1 = invokeGetSiteDataLayoutPage(
+			siteId, Pagination.of(1, 2));
+
+		List<DataLayout> dataLayouts1 = (List<DataLayout>)page1.getItems();
+
+		Assert.assertEquals(dataLayouts1.toString(), 2, dataLayouts1.size());
+
+		Page<DataLayout> page2 = invokeGetSiteDataLayoutPage(
+			siteId, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<DataLayout> dataLayouts2 = (List<DataLayout>)page2.getItems();
+
+		Assert.assertEquals(dataLayouts2.toString(), 1, dataLayouts2.size());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(dataLayout1, dataLayout2, dataLayout3),
+			new ArrayList<DataLayout>() {
+				{
+					addAll(dataLayouts1);
+					addAll(dataLayouts2);
+				}
+			});
+	}
+
+	protected DataLayout testGetSiteDataLayoutPage_addDataLayout(
+			Long siteId, DataLayout dataLayout)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetSiteDataLayoutPage_getSiteId() throws Exception {
+		return testGroup.getGroupId();
+	}
+
+	protected Long testGetSiteDataLayoutPage_getIrrelevantSiteId()
+		throws Exception {
+
+		return irrelevantGroup.getGroupId();
+	}
+
+	protected Page<DataLayout> invokeGetSiteDataLayoutPage(
+			Long siteId, Pagination pagination)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL + _toPath("/sites/{siteId}/data-layout", siteId);
+
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		return outputObjectMapper.readValue(
+			string,
+			new TypeReference<Page<DataLayout>>() {
+			});
+	}
+
+	protected Http.Response invokeGetSiteDataLayoutPageResponse(
+			Long siteId, Pagination pagination)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL + _toPath("/sites/{siteId}/data-layout", siteId);
+
+		location = HttpUtil.addParameter(
+			location, "page", pagination.getPage());
+		location = HttpUtil.addParameter(
+			location, "pageSize", pagination.getPageSize());
+
+		options.setLocation(location);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
+	}
+
+	@Test
+	public void testPostSiteDataLayoutPermission() throws Exception {
+		Assert.assertTrue(true);
+	}
+
+	protected void invokePostSiteDataLayoutPermission(
+			Long siteId, String operation,
+			DataLayoutPermission dataLayoutPermission)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL +
+				_toPath("/sites/{siteId}/data-layout-permissions", siteId);
+
+		options.setLocation(location);
+
+		options.setPost(true);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+	}
+
+	protected Http.Response invokePostSiteDataLayoutPermissionResponse(
+			Long siteId, String operation,
+			DataLayoutPermission dataLayoutPermission)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL +
+				_toPath("/sites/{siteId}/data-layout-permissions", siteId);
+
+		options.setLocation(location);
+
+		options.setPost(true);
 
 		HttpUtil.URLtoByteArray(options);
 
@@ -589,8 +839,87 @@ public abstract class BaseDataLayoutResourceTestCase {
 	}
 
 	protected void assertValid(DataLayout dataLayout) {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		boolean valid = true;
+
+		if (dataLayout.getDateCreated() == null) {
+			valid = false;
+		}
+
+		if (dataLayout.getDateModified() == null) {
+			valid = false;
+		}
+
+		if (dataLayout.getId() == null) {
+			valid = false;
+		}
+
+		for (String additionalAssertFieldName :
+				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("dataDefinitionId", additionalAssertFieldName)) {
+				if (dataLayout.getDataDefinitionId() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dataLayoutPages", additionalAssertFieldName)) {
+				if (dataLayout.getDataLayoutPages() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"defaultLanguageId", additionalAssertFieldName)) {
+
+				if (dataLayout.getDefaultLanguageId() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("description", additionalAssertFieldName)) {
+				if (dataLayout.getDescription() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("name", additionalAssertFieldName)) {
+				if (dataLayout.getName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("paginationMode", additionalAssertFieldName)) {
+				if (dataLayout.getPaginationMode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("userId", additionalAssertFieldName)) {
+				if (dataLayout.getUserId() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		Assert.assertTrue(valid);
 	}
 
 	protected void assertValid(Page<DataLayout> page) {
@@ -610,12 +939,133 @@ public abstract class BaseDataLayoutResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
+	protected String[] getAdditionalAssertFieldNames() {
+		return new String[0];
+	}
+
 	protected boolean equals(DataLayout dataLayout1, DataLayout dataLayout2) {
 		if (dataLayout1 == dataLayout2) {
 			return true;
 		}
 
-		return false;
+		for (String additionalAssertFieldName :
+				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("dataDefinitionId", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						dataLayout1.getDataDefinitionId(),
+						dataLayout2.getDataDefinitionId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dataLayoutPages", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						dataLayout1.getDataLayoutPages(),
+						dataLayout2.getDataLayoutPages())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dateCreated", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						dataLayout1.getDateCreated(),
+						dataLayout2.getDateCreated())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dateModified", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						dataLayout1.getDateModified(),
+						dataLayout2.getDateModified())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"defaultLanguageId", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						dataLayout1.getDefaultLanguageId(),
+						dataLayout2.getDefaultLanguageId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("description", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						dataLayout1.getDescription(),
+						dataLayout2.getDescription())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("id", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						dataLayout1.getId(), dataLayout2.getId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("name", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						dataLayout1.getName(), dataLayout2.getName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("paginationMode", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						dataLayout1.getPaginationMode(),
+						dataLayout2.getPaginationMode())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("userId", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						dataLayout1.getUserId(), dataLayout2.getUserId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		return true;
 	}
 
 	protected Collection<EntityField> getEntityFields() throws Exception {
@@ -740,15 +1190,73 @@ public abstract class BaseDataLayoutResourceTestCase {
 	}
 
 	protected DataLayout randomIrrelevantDataLayout() {
-		return randomDataLayout();
+		DataLayout randomIrrelevantDataLayout = randomDataLayout();
+
+		return randomIrrelevantDataLayout;
 	}
 
 	protected DataLayout randomPatchDataLayout() {
 		return randomDataLayout();
 	}
 
+	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
+		{
+			setFilterProvider(
+				new SimpleFilterProvider() {
+					{
+						addFilter(
+							"Liferay.Vulcan",
+							SimpleBeanPropertyFilter.serializeAll());
+					}
+				});
+			setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		}
+	};
+	protected static final ObjectMapper outputObjectMapper =
+		new ObjectMapper() {
+			{
+				addMixIn(DataLayout.class, DataLayoutMixin.class);
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+			}
+		};
+
 	protected Group irrelevantGroup;
+	protected String testContentType = "application/json";
 	protected Group testGroup;
+	protected Locale testLocale;
+	protected String testUserNameAndPassword = "test@liferay.com:test";
+
+	protected static class DataLayoutMixin {
+
+		@JsonProperty
+		Long dataDefinitionId;
+		@JsonProperty
+		DataLayoutPage[] dataLayoutPages;
+		@JsonProperty
+		Date dateCreated;
+		@JsonProperty
+		Date dateModified;
+		@JsonProperty
+		String defaultLanguageId;
+		@JsonProperty
+		LocalizedValue[] description;
+		@JsonProperty
+		Long id;
+		@JsonProperty
+		LocalizedValue[] name;
+		@JsonProperty
+		String paginationMode;
+		@JsonProperty
+		Long userId;
+
+	}
 
 	protected static class Page<T> {
 
@@ -793,16 +1301,16 @@ public abstract class BaseDataLayoutResourceTestCase {
 		Http.Options options = new Http.Options();
 
 		options.addHeader("Accept", "application/json");
+		options.addHeader(
+			"Accept-Language", LocaleUtil.toW3cLanguageId(testLocale));
 
-		String userNameAndPassword = "test@liferay.com:test";
-
-		String encodedUserNameAndPassword = Base64.encode(
-			userNameAndPassword.getBytes());
+		String encodedTestUserNameAndPassword = Base64.encode(
+			testUserNameAndPassword.getBytes());
 
 		options.addHeader(
-			"Authorization", "Basic " + encodedUserNameAndPassword);
+			"Authorization", "Basic " + encodedTestUserNameAndPassword);
 
-		options.addHeader("Content-Type", "application/json");
+		options.addHeader("Content-Type", testContentType);
 
 		return options;
 	}
@@ -836,31 +1344,6 @@ public abstract class BaseDataLayoutResourceTestCase {
 
 	};
 	private static DateFormat _dateFormat;
-	private final static ObjectMapper _inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	private final static ObjectMapper _outputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-		}
-	};
 
 	@Inject
 	private DataLayoutResource _dataLayoutResource;

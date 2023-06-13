@@ -1,9 +1,10 @@
 import {ADD_PORTLET} from '../actions/actions.es';
 import {addFragment, getFragmentEntryLinkContent} from './fragments.es';
 import {getWidgetPath} from '../utils/FragmentsEditorGetUtils.es';
-import {setIn, updateLayoutData} from '../utils/FragmentsEditorUpdateUtils.es';
-import editableValuesMigrator from '../utils/fragmentMigrator.es';
 import {prefixSegmentsExperienceId} from '../utils/prefixSegmentsExperienceId.es';
+import {setIn} from '../utils/FragmentsEditorUpdateUtils.es';
+import {updatePageEditorLayoutData} from '../utils/FragmentsEditorFetchUtils.es';
+import editableValuesMigrator from '../utils/fragmentMigrator.es';
 
 /**
  * @param {!object} state
@@ -43,12 +44,9 @@ function addPortletReducer(state, actionType, payload) {
 								nextState.layoutData
 							);
 
-							return updateLayoutData(
-								nextState.updateLayoutPageTemplateDataURL,
-								nextState.portletNamespace,
-								nextState.classNameId,
-								nextState.classPK,
-								nextData
+							return updatePageEditorLayoutData(
+								nextData,
+								nextState.segmentsExperienceId
 							);
 						}
 					)

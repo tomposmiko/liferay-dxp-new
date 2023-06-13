@@ -5,18 +5,10 @@ import position from 'metal-position';
 import Soy from 'metal-soy';
 
 import './FragmentsEditorSidebarCard.es';
-import {
-	ADD_FRAGMENT_ENTRY_LINK,
-	CLEAR_DROP_TARGET,
-	UPDATE_DROP_TARGET,
-	UPDATE_LAST_SAVE_DATE,
-	UPDATE_SAVING_CHANGES_STATUS
-} from '../../../actions/actions.es';
-import {
-	FRAGMENTS_EDITOR_ITEM_BORDERS,
-	FRAGMENTS_EDITOR_ITEM_TYPES
-} from '../../../utils/constants';
+import {ADD_FRAGMENT_ENTRY_LINK, CLEAR_DROP_TARGET, UPDATE_DROP_TARGET, UPDATE_LAST_SAVE_DATE, UPDATE_SAVING_CHANGES_STATUS} from '../../../actions/actions.es';
+import {FRAGMENT_ENTRY_LINK_TYPES, FRAGMENTS_EDITOR_ITEM_BORDERS, FRAGMENTS_EDITOR_ITEM_TYPES} from '../../../utils/constants';
 import {getConnectedComponent} from '../../../store/ConnectedComponent.es';
+import {initializeDragDrop} from '../../../utils/FragmentsEditorDragDrop.es';
 import templates from './SidebarAvailableSections.soy';
 
 /**
@@ -63,9 +55,9 @@ class SidebarAvailableSections extends Component {
 
 		const data = targetItem ? targetItem.dataset : null;
 		const targetIsFragment = targetItem && ('fragmentEntryLinkId' in data);
-		const targetIsSection = targetItem && ('layoutSectionId' in data);
+		const targetIsRow = targetItem && ('layoutRowId' in data);
 
-		if (targetIsFragment || targetIsSection) {
+		if (targetIsFragment || targetIsRow) {
 			const mouseY = eventData.originalEvent.clientY;
 			const targetItemRegion = position.getRegion(targetItem);
 
@@ -85,9 +77,9 @@ class SidebarAvailableSections extends Component {
 				dropTargetItemId = data.fragmentEntryLinkId;
 				dropTargetItemType = FRAGMENTS_EDITOR_ITEM_TYPES.fragment;
 			}
-			else if (targetIsSection) {
-				dropTargetItemId = data.layoutSectionId;
-				dropTargetItemType = FRAGMENTS_EDITOR_ITEM_TYPES.section;
+			else if (targetIsRow) {
+				dropTargetItemId = data.layoutRowId;
+				dropTargetItemType = FRAGMENTS_EDITOR_ITEM_TYPES.row;
 			}
 
 			if (dropTargetItemId && dropTargetItemType) {
@@ -144,6 +136,7 @@ class SidebarAvailableSections extends Component {
 					ADD_FRAGMENT_ENTRY_LINK,
 					{
 						fragmentEntryKey: itemId,
+						fragmentEntryLinkType: FRAGMENT_ENTRY_LINK_TYPES.section,
 						fragmentName: itemName
 					}
 				)
@@ -185,6 +178,7 @@ class SidebarAvailableSections extends Component {
 				ADD_FRAGMENT_ENTRY_LINK,
 				{
 					fragmentEntryKey: event.itemId,
+					fragmentEntryLinkType: FRAGMENT_ENTRY_LINK_TYPES.section,
 					fragmentName: event.itemName
 				}
 			)
@@ -211,13 +205,13 @@ class SidebarAvailableSections extends Component {
 			this._dragDrop.dispose();
 		}
 
-		this._dragDrop = new DragDrop(
+		this._dragDrop = initializeDragDrop(
 			{
 				autoScroll: true,
 				dragPlaceholder: Drag.Placeholder.CLONE,
 				handles: '.fragments-editor__drag-handler',
 				sources: '.fragments-editor__drag-source--sidebar-fragment',
-				targets: '.fragments-editor__drop-target--sidebar-fragment'
+				targets: '.fragments-editor__drop-target--sidebar-section'
 			}
 		);
 

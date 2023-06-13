@@ -1,4 +1,0 @@
-Bundle-Name: Liferay Headless Workflow Client
-Bundle-SymbolicName: com.liferay.headless.workflow.client
-Bundle-Version: 1.0.0
-Export-Package: com.liferay.headless.workflow.client.dto.v1_0

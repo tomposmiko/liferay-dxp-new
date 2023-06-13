@@ -9,14 +9,15 @@
 	{@param? _handleToggleContextualSidebarButtonClick: any}
 	{@param? classPK: ?}
 	{@param? defaultSegmentsExperienceId: string }
+	{@param? discardDraftRedirectURL: string}
 	{@param? discardDraftURL: string}
 	{@param? draft: bool}
-	{@param? fragmentsEditorSidebarVisible: bool}
 	{@param? lastSaveDate: string}
 	{@param? portletNamespace: string}
 	{@param? publishURL: string}
 	{@param? redirectURL: string}
 	{@param? savingChanges: bool}
+	{@param? selectedSidebarPanelId: string}
 	{@param? spritemap: string}
 	{@param? store: ?}
 
@@ -26,7 +27,7 @@
 		{sp}navbar
 		{sp}navbar-expand-md
 
-		{if $fragmentsEditorSidebarVisible}
+		{if $selectedSidebarPanelId}
 			{sp}fragments-editor-toolbar--padded
 		{/if}
 	{/let}
@@ -75,7 +76,7 @@
 							<input
 								name="{$portletNamespace}redirect"
 								type="hidden"
-								value="{$redirectURL}"
+								value="{$discardDraftRedirectURL}"
 							/>
 
 							<button class="btn btn-secondary nav-btn" type="submit" {if not $lastSaveDate and not $draft}disabled{/if}>

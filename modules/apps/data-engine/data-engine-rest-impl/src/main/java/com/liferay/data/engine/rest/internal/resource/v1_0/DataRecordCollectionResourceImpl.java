@@ -17,7 +17,6 @@ package com.liferay.data.engine.rest.internal.resource.v1_0;
 import com.liferay.data.engine.rest.dto.v1_0.DataRecordCollection;
 import com.liferay.data.engine.rest.dto.v1_0.DataRecordCollectionPermission;
 import com.liferay.data.engine.rest.internal.constants.DataActionKeys;
-import com.liferay.data.engine.rest.internal.constants.DataEngineConstants;
 import com.liferay.data.engine.rest.internal.constants.DataRecordCollectionConstants;
 import com.liferay.data.engine.rest.internal.dto.v1_0.util.DataRecordCollectionUtil;
 import com.liferay.data.engine.rest.internal.dto.v1_0.util.LocalizedValueUtil;
@@ -30,28 +29,21 @@ import com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.ResourceConstants;
-import com.liferay.portal.kernel.model.ResourcePermission;
-import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.permission.ModelPermissions;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.ws.rs.BadRequestException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -76,38 +68,6 @@ public class DataRecordCollectionResourceImpl
 			dataRecordCollectionId, ActionKeys.DELETE);
 
 		_ddlRecordSetLocalService.deleteRecordSet(dataRecordCollectionId);
-	}
-
-	@Override
-	public Page<DataRecordCollection> getContentSpaceDataRecordCollectionsPage(
-			Long contentSpaceId, String keywords, Pagination pagination)
-		throws Exception {
-
-		if (Validator.isNull(keywords)) {
-			return Page.of(
-				transform(
-					_ddlRecordSetLocalService.getRecordSets(
-						contentSpaceId, pagination.getStartPosition(),
-						pagination.getEndPosition()),
-					DataRecordCollectionUtil::toDataRecordCollection),
-				pagination,
-				_ddlRecordSetLocalService.getRecordSetsCount(contentSpaceId));
-		}
-
-		Group group = _groupLocalService.getGroup(contentSpaceId);
-
-		return Page.of(
-			transform(
-				_ddlRecordSetLocalService.search(
-					group.getCompanyId(), contentSpaceId, keywords,
-					DDLRecordSetConstants.SCOPE_DATA_ENGINE,
-					pagination.getStartPosition(), pagination.getEndPosition(),
-					null),
-				DataRecordCollectionUtil::toDataRecordCollection),
-			pagination,
-			_ddlRecordSetLocalService.searchCount(
-				group.getCompanyId(), contentSpaceId, keywords,
-				DDLRecordSetConstants.SCOPE_DATA_ENGINE));
 	}
 
 	@Override
@@ -160,74 +120,35 @@ public class DataRecordCollectionResourceImpl
 	}
 
 	@Override
-	public void postContentSpaceDataRecordCollectionPermission(
-			Long contentSpaceId, String operation,
-			DataRecordCollectionPermission dataRecordCollectionPermission)
+	public Page<DataRecordCollection> getSiteDataRecordCollectionsPage(
+			Long siteId, String keywords, Pagination pagination)
 		throws Exception {
 
-		if (!StringUtil.equalsIgnoreCase(
-				DataEngineConstants.OPERATION_DELETE_PERMISSION, operation) &&
-			!StringUtil.equalsIgnoreCase(
-				DataEngineConstants.OPERATION_SAVE_PERMISSION, operation)) {
-
-			throw new BadRequestException(
-				"Operation must be 'delete' or 'save'");
+		if (Validator.isNull(keywords)) {
+			return Page.of(
+				transform(
+					_ddlRecordSetLocalService.getRecordSets(
+						siteId, pagination.getStartPosition(),
+						pagination.getEndPosition()),
+					DataRecordCollectionUtil::toDataRecordCollection),
+				pagination,
+				_ddlRecordSetLocalService.getRecordSetsCount(siteId));
 		}
 
-		DataEnginePermissionUtil.checkPermission(
-			DataActionKeys.DEFINE_PERMISSIONS, contentSpaceId,
-			_groupLocalService);
+		Group group = _groupLocalService.getGroup(siteId);
 
-		List<String> actionIds = new ArrayList<>();
-
-		if (dataRecordCollectionPermission.getAddDataRecordCollection()) {
-			actionIds.add(DataActionKeys.ADD_DATA_DEFINITION);
-		}
-
-		if (dataRecordCollectionPermission.getDefinePermissions()) {
-			actionIds.add(DataActionKeys.DEFINE_PERMISSIONS);
-		}
-
-		if (actionIds.isEmpty()) {
-			return;
-		}
-
-		if (StringUtil.equalsIgnoreCase(
-				DataEngineConstants.OPERATION_SAVE_PERMISSION, operation)) {
-
-			List<Role> roles = DataEnginePermissionUtil.getRoles(
-				contextCompany, _roleLocalService,
-				dataRecordCollectionPermission.getRoleNames());
-
-			for (Role role : roles) {
-				_resourcePermissionLocalService.setResourcePermissions(
-					contextCompany.getCompanyId(),
-					DataEngineConstants.RESOURCE_NAME,
-					ResourceConstants.SCOPE_COMPANY,
-					String.valueOf(contextCompany.getCompanyId()),
-					role.getRoleId(), ArrayUtil.toStringArray(actionIds));
-			}
-		}
-		else {
-			List<Role> roles = DataEnginePermissionUtil.getRoles(
-				contextCompany, _roleLocalService,
-				dataRecordCollectionPermission.getRoleNames());
-
-			for (Role role : roles) {
-				ResourcePermission resourcePermission =
-					_resourcePermissionLocalService.fetchResourcePermission(
-						contextCompany.getCompanyId(),
-						DataEngineConstants.RESOURCE_NAME,
-						ResourceConstants.SCOPE_COMPANY,
-						String.valueOf(contextCompany.getCompanyId()),
-						role.getRoleId());
-
-				if (resourcePermission != null) {
-					_resourcePermissionLocalService.deleteResourcePermission(
-						resourcePermission);
-				}
-			}
-		}
+		return Page.of(
+			transform(
+				_ddlRecordSetLocalService.search(
+					group.getCompanyId(), siteId, keywords,
+					DDLRecordSetConstants.SCOPE_DATA_ENGINE,
+					pagination.getStartPosition(), pagination.getEndPosition(),
+					null),
+				DataRecordCollectionUtil::toDataRecordCollection),
+			pagination,
+			_ddlRecordSetLocalService.searchCount(
+				group.getCompanyId(), siteId, keywords,
+				DDLRecordSetConstants.SCOPE_DATA_ENGINE));
 	}
 
 	@Override
@@ -239,10 +160,12 @@ public class DataRecordCollectionResourceImpl
 			dataDefinitionId);
 
 		DataEnginePermissionUtil.checkPermission(
-			DataActionKeys.ADD_DATA_RECORD_COLLECTION,
-			ddmStructure.getGroupId(), _groupLocalService);
+			DataActionKeys.ADD_DATA_RECORD_COLLECTION, _groupLocalService,
+			ddmStructure.getGroupId());
 
-		return DataRecordCollectionUtil.toDataRecordCollection(
+		ServiceContext serviceContext = new ServiceContext();
+
+		dataRecordCollection = DataRecordCollectionUtil.toDataRecordCollection(
 			_ddlRecordSetLocalService.addRecordSet(
 				PrincipalThreadLocal.getUserId(), ddmStructure.getGroupId(),
 				dataDefinitionId, null,
@@ -250,8 +173,15 @@ public class DataRecordCollectionResourceImpl
 					dataRecordCollection.getName()),
 				LocalizedValueUtil.toLocalizationMap(
 					dataRecordCollection.getDescription()),
-				0, DDLRecordSetConstants.SCOPE_DATA_ENGINE,
-				new ServiceContext()));
+				0, DDLRecordSetConstants.SCOPE_DATA_ENGINE, serviceContext));
+
+		_resourceLocalService.addModelResources(
+			contextCompany.getCompanyId(), ddmStructure.getGroupId(),
+			PrincipalThreadLocal.getUserId(),
+			InternalDataRecordCollection.class.getName(),
+			dataRecordCollection.getId(), serviceContext.getModelPermissions());
+
+		return dataRecordCollection;
 	}
 
 	@Override
@@ -260,74 +190,85 @@ public class DataRecordCollectionResourceImpl
 			DataRecordCollectionPermission dataRecordCollectionPermission)
 		throws Exception {
 
-		if (!StringUtil.equalsIgnoreCase(
-				DataEngineConstants.OPERATION_DELETE_PERMISSION, operation) &&
-			!StringUtil.equalsIgnoreCase(
-				DataEngineConstants.OPERATION_SAVE_PERMISSION, operation)) {
-
-			throw new BadRequestException(
-				"Operation must be 'delete' or 'save'");
-		}
-
 		DDLRecordSet ddlRecordSet = _ddlRecordSetLocalService.getRecordSet(
 			dataRecordCollectionId);
 
-		DataEnginePermissionUtil.checkPermission(
-			DataActionKeys.DEFINE_PERMISSIONS, ddlRecordSet.getGroupId(),
-			_groupLocalService);
+		DataEnginePermissionUtil.checkOperationPermission(
+			_groupLocalService, operation, ddlRecordSet.getGroupId());
 
 		List<String> actionIds = new ArrayList<>();
 
+		if (dataRecordCollectionPermission.getAddDataRecord()) {
+			actionIds.add(DataActionKeys.ADD_DATA_RECORD);
+		}
+
 		if (dataRecordCollectionPermission.getDelete()) {
 			actionIds.add(ActionKeys.DELETE);
+		}
+
+		if (dataRecordCollectionPermission.getDeleteDataRecord()) {
+			actionIds.add(DataActionKeys.DELETE_DATA_RECORD);
+		}
+
+		if (dataRecordCollectionPermission.getExportDataRecord()) {
+			actionIds.add(DataActionKeys.EXPORT_DATA_RECORDS);
 		}
 
 		if (dataRecordCollectionPermission.getUpdate()) {
 			actionIds.add(ActionKeys.UPDATE);
 		}
 
+		if (dataRecordCollectionPermission.getUpdateDataRecord()) {
+			actionIds.add(DataActionKeys.UPDATE_DATA_RECORD);
+		}
+
 		if (dataRecordCollectionPermission.getView()) {
 			actionIds.add(ActionKeys.VIEW);
+		}
+
+		if (dataRecordCollectionPermission.getViewDataRecord()) {
+			actionIds.add(DataActionKeys.VIEW_DATA_RECORD);
 		}
 
 		if (actionIds.isEmpty()) {
 			return;
 		}
 
-		if (StringUtil.equalsIgnoreCase(
-				DataEngineConstants.OPERATION_SAVE_PERMISSION, operation)) {
+		DataEnginePermissionUtil.persistModelPermission(
+			actionIds, contextCompany, dataRecordCollectionId, operation,
+			DataRecordCollectionConstants.RESOURCE_NAME,
+			_resourcePermissionLocalService, _roleLocalService,
+			dataRecordCollectionPermission.getRoleNames(),
+			ddlRecordSet.getGroupId());
+	}
 
-			ModelPermissions modelPermissions = new ModelPermissions();
+	@Override
+	public void postSiteDataRecordCollectionPermission(
+			Long siteId, String operation,
+			DataRecordCollectionPermission dataRecordCollectionPermission)
+		throws Exception {
 
-			for (String roleName :
-					dataRecordCollectionPermission.getRoleNames()) {
+		DataEnginePermissionUtil.checkOperationPermission(
+			_groupLocalService, operation, siteId);
 
-				modelPermissions.addRolePermissions(
-					roleName, ArrayUtil.toStringArray(actionIds));
-			}
+		List<String> actionIds = new ArrayList<>();
 
-			_resourcePermissionLocalService.addModelResourcePermissions(
-				contextCompany.getCompanyId(), ddlRecordSet.getGroupId(),
-				PrincipalThreadLocal.getUserId(),
-				DataRecordCollectionConstants.RESOURCE_NAME,
-				String.valueOf(dataRecordCollectionId), modelPermissions);
+		if (dataRecordCollectionPermission.getAddDataRecordCollection()) {
+			actionIds.add(DataActionKeys.ADD_DATA_RECORD_COLLECTION);
 		}
-		else {
-			List<Role> roles = DataEnginePermissionUtil.getRoles(
-				contextCompany, _roleLocalService,
-				dataRecordCollectionPermission.getRoleNames());
 
-			for (Role role : roles) {
-				for (String actionId : actionIds) {
-					_resourcePermissionLocalService.removeResourcePermission(
-						contextCompany.getCompanyId(),
-						DataRecordCollectionConstants.RESOURCE_NAME,
-						ResourceConstants.SCOPE_INDIVIDUAL,
-						String.valueOf(dataRecordCollectionId),
-						role.getRoleId(), actionId);
-				}
-			}
+		if (dataRecordCollectionPermission.getDefinePermissions()) {
+			actionIds.add(DataActionKeys.DEFINE_PERMISSIONS);
 		}
+
+		if (actionIds.isEmpty()) {
+			return;
+		}
+
+		DataEnginePermissionUtil.persistPermission(
+			actionIds, contextCompany, operation,
+			_resourcePermissionLocalService, _roleLocalService,
+			dataRecordCollectionPermission.getRoleNames());
 	}
 
 	@Override
@@ -343,6 +284,10 @@ public class DataRecordCollectionResourceImpl
 			PermissionThreadLocal.getPermissionChecker(),
 			dataRecordCollectionId, ActionKeys.UPDATE);
 
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setUserId(PrincipalThreadLocal.getUserId());
+
 		return DataRecordCollectionUtil.toDataRecordCollection(
 			_ddlRecordSetLocalService.updateRecordSet(
 				dataRecordCollectionId, ddlRecordSet.getDDMStructureId(),
@@ -350,7 +295,7 @@ public class DataRecordCollectionResourceImpl
 					dataRecordCollection.getName()),
 				LocalizedValueUtil.toLocalizationMap(
 					dataRecordCollection.getDescription()),
-				0, new ServiceContext()));
+				0, serviceContext));
 	}
 
 	@Reference(
@@ -375,6 +320,9 @@ public class DataRecordCollectionResourceImpl
 
 	private ModelResourcePermission<InternalDataRecordCollection>
 		_modelResourcePermission;
+
+	@Reference
+	private ResourceLocalService _resourceLocalService;
 
 	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;

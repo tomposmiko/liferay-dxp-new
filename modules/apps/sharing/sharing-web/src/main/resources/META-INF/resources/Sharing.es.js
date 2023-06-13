@@ -32,11 +32,13 @@ class Sharing extends PortletBase {
 			res => res.json()
 		).then(
 			users => users.map(
-				({emailAddress, fullName, portraitURL}) => ({
+				({emailAddress, fullName, portraitURL, userId}) => ({
 					emailAddress,
 					fullName,
 					label: fullName,
 					portraitURL,
+					spritemap: this.spritemap,
+					userId: userId,
 					value: emailAddress
 				})
 			)
@@ -65,6 +67,15 @@ class Sharing extends PortletBase {
 		else {
 			e.target.filteredItems = [];
 		}
+	}
+
+	/**
+	 * Show error messages
+	 * @private
+	 * @review
+	 */
+	_handleInputBlur() {
+		this._validateRequiredEmail();
 	}
 
 	/**
@@ -104,7 +115,7 @@ class Sharing extends PortletBase {
 	_handleSubmit(event) {
 		event.preventDefault();
 
-		if (!this.submitting && this._validateEmails()) {
+		if (!this.submitting && this._validateRequiredEmail()) {
 			this.submitting = true;
 
 			this.fetch(
@@ -178,35 +189,65 @@ class Sharing extends PortletBase {
 	}
 
 	/**
-	 * Validates if there are email addresses and all are valid
-	 * @return {Boolean} value isn't emtpy
+	 * Check if a passed email has a valid format
 	 * @private
 	 * @review
+	 * @return {Boolean} is valid or not
 	 */
-	_validateEmails() {
-		const empty = this._userEmailAddresses.length === 0;
+	_isEmailValid(email) {
+		const emailRegex = /.+@.+\..+/i;
 
-		this.emailErrorMessage = empty ?
-			Liferay.Language.get('this-field-is-required') :
-			''
-		;
+		return emailRegex.test(email);
+	}
 
-		let valid = false;
+	/**
+	 * Check if the userEmailAddresses is filled and show error message
+	 * @private
+	 * @review
+	 * @return {Boolean} is valid or not
+	 */
+	_validateRequiredEmail() {
+		const valid = !!this._userEmailAddresses.length;
 
-		if (!empty) {
-			const emailRegex = /.+@.+\..+/i;
-
-			valid = this._userEmailAddresses.every(
-				({value}) => emailRegex.test(value)
-			);
-
-			this.emailErrorMessage = valid ?
-				'' :
-				Liferay.Language.get('please-enter-a-valid-email-address')
-			;
+		if (valid) {
+			this.emailErrorMessage = '';
+		}
+		else {
+			this.emailErrorMessage = Liferay.Language.get('this-field-is-required');
 		}
 
 		return valid;
+	}
+
+	/**
+	 * Validates if there are email addresses and all are valid
+	 * @param {!Event} event
+	 * @private
+	 * @review
+	 */
+	_validateEmails(event) {
+		let {selectedItems, item} = event.data;
+
+		let invalidEmails = [];
+		this.emailErrorMessage = '';
+		this._inputValue = '';
+
+		selectedItems.reduce((acc, curr, i) => {
+			if (!this._isEmailValid(curr.value)) {
+				invalidEmails.push(curr);
+				selectedItems.splice(i, 1);
+			}
+		}, invalidEmails);
+
+		if (invalidEmails.length > 0) {
+			this.emailErrorMessage =
+				Liferay.Language.get('please-enter-a-valid-email-address');
+
+			this._inputValue = invalidEmails.map(item => item.value).join(',');
+			this._inputValue = this._inputValue;
+		}
+
+		this._userEmailAddresses = selectedItems;
 	}
 }
 
@@ -217,6 +258,7 @@ class Sharing extends PortletBase {
  * @type {!Object}
  */
 Sharing.STATE = {
+	_inputValue: Config.string().internal(),
 	emailErrorMessage: Config.string().value(''),
 	shareable: Config.bool().value(true),
 	shareActionURL: Config.string().required(),

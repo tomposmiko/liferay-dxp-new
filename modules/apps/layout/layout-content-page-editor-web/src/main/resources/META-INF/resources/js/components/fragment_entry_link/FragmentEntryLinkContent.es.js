@@ -1,4 +1,4 @@
-import {contains} from 'metal-dom';
+import {closest, contains} from 'metal-dom';
 import Component from 'metal-component';
 import {Config} from 'metal-state';
 import {isFunction, isObject} from 'metal';
@@ -271,6 +271,21 @@ class FragmentEntryLinkContent extends Component {
 	}
 
 	/**
+	 * @param {MouseEvent} event
+	 * @private
+	 * @review
+	 */
+	_handleFragmentEntryLinkContentClick(event) {
+		const element = event.srcElement;
+
+		if (closest(element, '[href]') &&
+			!('lfrPageEditorHrefEnabled' in element.dataset)) {
+
+			event.preventDefault();
+		}
+	}
+
+	/**
 	 * Callback executed when a tooltip is opened.
 	 */
 	_handleOpenStyleTooltip() {
@@ -287,7 +302,8 @@ class FragmentEntryLinkContent extends Component {
 	 * @param {Object} event
 	 */
 	_handleStyleChanged(event) {
-		const editableValueSegmentsExperienceId = prefixSegmentsExperienceId(this.segmentsExperienceId) || prefixSegmentsExperienceId(this.defaultSegmentsExperienceId);
+		const editableValueSegmentsExperienceId = prefixSegmentsExperienceId(this.segmentsExperienceId) ||
+			prefixSegmentsExperienceId(this.defaultSegmentsExperienceId);
 
 		this.store.dispatchAction(
 			UPDATE_EDITABLE_VALUE,

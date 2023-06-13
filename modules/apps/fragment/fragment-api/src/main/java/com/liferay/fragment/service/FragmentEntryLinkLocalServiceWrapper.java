@@ -278,6 +278,15 @@ public class FragmentEntryLinkLocalServiceWrapper
 	}
 
 	@Override
+	public int getClassedModelFragmentEntryLinksCount(
+		long groupId, long classNameId, long classPK) {
+
+		return _fragmentEntryLinkLocalService.
+			getClassedModelFragmentEntryLinksCount(
+				groupId, classNameId, classPK);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
 		getExportActionableDynamicQuery(
 			com.liferay.exportimport.kernel.lar.PortletDataContext
@@ -484,10 +493,10 @@ public class FragmentEntryLinkLocalServiceWrapper
 	}
 
 	@Override
-	public void updateClassModel(long classNameId, long classPK)
+	public void updateClassedModel(long classNameId, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		_fragmentEntryLinkLocalService.updateClassModel(classNameId, classPK);
+		_fragmentEntryLinkLocalService.updateClassedModel(classNameId, classPK);
 	}
 
 	/**

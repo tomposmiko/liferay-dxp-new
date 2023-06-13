@@ -92,6 +92,7 @@ openapi: "3.0.1"
 paths:
     "/bulk-selection":
         post:
+            operationId: postBulkSelection
             requestBody:
                 content:
                     application/json:
@@ -105,11 +106,57 @@ paths:
                                 $ref: "#/components/schemas/MessageSelection"
                     description: ""
             tags: ["MessageSelection"]
-    "/content-spaces/{content-space-id}/taxonomy-vocabularies/common":
+    "/keywords/batch":
+        patch:
+            operationId: patchKeywordBatch
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/KeywordBulkSelection"
+            responses:
+                200:
+                    content:
+                        {}
+                    description: ""
+            tags: ["Keyword"]
+        put:
+            operationId: putKeywordBatch
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/KeywordBulkSelection"
+            responses:
+                200:
+                    content:
+                        {}
+                    description: ""
+            tags: ["Keyword"]
+    "/keywords/common":
         post:
+            operationId: postKeywordsCommonPage
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/DocumentBulkSelection"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Keyword"
+                                type: array
+                    description: ""
+            tags: ["Keyword"]
+    "/sites/{siteId}/taxonomy-vocabularies/common":
+        post:
+            operationId: postSiteTaxonomyVocabulariesCommonPage
             parameters:
                 - in: path
-                  name: content-space-id
+                  name: siteId
                   required: true
                   schema:
                       format: int64
@@ -129,50 +176,9 @@ paths:
                                 type: array
                     description: ""
             tags: ["TaxonomyVocabulary"]
-    "/keywords/batch":
-        patch:
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/KeywordBulkSelection"
-            responses:
-                200:
-                    content:
-                        {}
-                    description: ""
-            tags: ["Keyword"]
-        put:
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/KeywordBulkSelection"
-            responses:
-                200:
-                    content:
-                        {}
-                    description: ""
-            tags: ["Keyword"]
-    "/keywords/common":
-        post:
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/DocumentBulkSelection"
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/Keyword"
-                                type: array
-                    description: ""
-            tags: ["Keyword"]
     "/status":
         get:
+            operationId: getStatus
             responses:
                 200:
                     content:
@@ -183,6 +189,7 @@ paths:
             tags: ["Status"]
     "/taxonomy-categories/batch":
         patch:
+            operationId: patchTaxonomyCategoryBatch
             requestBody:
                 content:
                     application/json:
@@ -195,6 +202,7 @@ paths:
                     description: ""
             tags: ["TaxonomyCategory"]
         put:
+            operationId: putTaxonomyCategoryBatch
             requestBody:
                 content:
                     application/json:

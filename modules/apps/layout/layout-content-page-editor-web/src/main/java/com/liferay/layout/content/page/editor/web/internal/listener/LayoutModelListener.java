@@ -17,6 +17,7 @@ package com.liferay.layout.content.page.editor.web.internal.listener;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.util.LayoutCopyHelper;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.Portal;
 
+import java.util.Date;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -49,34 +51,29 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
 	public void onAfterCreate(Layout layout) throws ModelListenerException {
-		if (ExportImportThreadLocal.isImportInProcess() ||
-			ExportImportThreadLocal.isStagingInProcess()) {
-
+		if (!layout.isHead() || !_isContentLayout(layout)) {
 			return;
 		}
 
-		if (!_isContentLayout(layout)) {
-			return;
-		}
+		_reindexLayout(layout);
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_getLayoutPageTemplateEntry(layout);
 
-		if (layoutPageTemplateEntry == null) {
-			_reindexLayout(layout);
+		if (ExportImportThreadLocal.isImportInProcess() ||
+			ExportImportThreadLocal.isStagingInProcess() ||
+			(layoutPageTemplateEntry == null)) {
 
 			return;
 		}
 
 		TransactionCommitCallbackUtil.registerCallback(
 			() -> _copyStructure(layoutPageTemplateEntry, layout));
-
-		_reindexLayout(layout);
 	}
 
 	@Override
 	public void onAfterUpdate(Layout layout) throws ModelListenerException {
-		if (!_isContentLayout(layout)) {
+		if (!_isContentLayout(layout) || !layout.isHead()) {
 			return;
 		}
 
@@ -85,7 +82,7 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
 	public void onBeforeRemove(Layout layout) throws ModelListenerException {
-		if (!_isContentLayout(layout)) {
+		if (!_isContentLayout(layout) || !layout.isHead()) {
 			return;
 		}
 
@@ -119,7 +116,26 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 		Layout pagetTemplateLayout = _layoutLocalService.getLayout(
 			layoutPageTemplateEntry.getPlid());
 
+		LayoutPageTemplateStructure layoutPageTemplateStructure =
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					pagetTemplateLayout.getGroupId(),
+					_portal.getClassNameId(Layout.class),
+					pagetTemplateLayout.getPlid());
+
+		if (layoutPageTemplateStructure == null) {
+			_layoutPageTemplateStructureLocalService.
+				rebuildLayoutPageTemplateStructure(
+					pagetTemplateLayout.getGroupId(),
+					_portal.getClassNameId(Layout.class),
+					pagetTemplateLayout.getPlid());
+		}
+
 		_layoutCopyHelper.copyLayout(pagetTemplateLayout, draftLayout);
+
+		draftLayout.setModifiedDate(new Date());
+
+		_layoutLocalService.updateLayout(draftLayout);
 
 		return null;
 	}

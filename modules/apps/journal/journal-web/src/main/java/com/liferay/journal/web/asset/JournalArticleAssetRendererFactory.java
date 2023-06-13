@@ -30,6 +30,7 @@ import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalArticleResourceLocalService;
 import com.liferay.journal.util.JournalContent;
 import com.liferay.journal.util.JournalConverter;
+import com.liferay.journal.web.asset.model.JournalArticleClassTypeReader;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -188,8 +189,6 @@ public class JournalArticleAssetRendererFactory
 			liferayPortletRequest, getGroup(liferayPortletRequest),
 			JournalPortletKeys.JOURNAL, 0, 0, PortletRequest.RENDER_PHASE);
 
-		portletURL.setParameter(
-			"hideDefaultSuccessMessage", Boolean.TRUE.toString());
 		portletURL.setParameter("mvcPath", "/edit_article.jsp");
 
 		if (classTypeId > 0) {

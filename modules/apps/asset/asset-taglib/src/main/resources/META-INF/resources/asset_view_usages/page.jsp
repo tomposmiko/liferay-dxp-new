@@ -43,27 +43,12 @@ List<AssetEntryUsage> assetEntryUsages = AssetEntryUsageLocalServiceUtil.getAsse
 		String name = StringPool.BLANK;
 		String previewURL = StringPool.BLANK;
 
-		long classNameId = assetEntryUsage.getClassNameId();
+		Layout curLayout = LayoutLocalServiceUtil.fetchLayout(assetEntryUsage.getPlid());
 
-		if (classNameId == PortalUtil.getClassNameId(Layout.class)) {
-			Layout curLayout = LayoutLocalServiceUtil.fetchLayout(assetEntryUsage.getClassPK());
+		if (curLayout != null) {
+			name = curLayout.getName(locale);
 
-			if (curLayout != null) {
-				name = curLayout.getName(locale);
-
-				previewURL = PortalUtil.getLayoutFriendlyURL(curLayout, themeDisplay);
-			}
-		}
-		else {
-			LayoutPageTemplateEntry layoutPageTemplateEntry = LayoutPageTemplateEntryLocalServiceUtil.fetchLayoutPageTemplateEntry(assetEntryUsage.getClassPK());
-
-			if (layoutPageTemplateEntry != null) {
-				name = layoutPageTemplateEntry.getName();
-
-				Layout curLayout = LayoutLocalServiceUtil.fetchLayout(layoutPageTemplateEntry.getPlid());
-
-				previewURL = PortalUtil.getLayoutFriendlyURL(curLayout, themeDisplay);
-			}
+			previewURL = PortalUtil.getLayoutFriendlyURL(curLayout, themeDisplay);
 		}
 		%>
 
@@ -76,14 +61,11 @@ List<AssetEntryUsage> assetEntryUsages = AssetEntryUsageLocalServiceUtil.getAsse
 
 			<div class="text-secondary">
 				<c:choose>
-					<c:when test="<%= assetEntryUsage.getClassNameId() == PortalUtil.getClassNameId(AssetDisplayPageEntry.class) %>">
-						<liferay-ui:message key="display-page" />
+					<c:when test="<%= assetEntryUsage.getType() == AssetEntryUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE %>">
+						<liferay-ui:message key="display-page-template" />
 					</c:when>
-					<c:when test="<%= assetEntryUsage.getClassNameId() == PortalUtil.getClassNameId(Layout.class) %>">
+					<c:when test="<%= assetEntryUsage.getType() == AssetEntryUsageConstants.TYPE_PAGE_TEMPLATE %>">
 						<liferay-ui:message key="page" />
-					</c:when>
-					<c:when test="<%= assetEntryUsage.getClassNameId() == PortalUtil.getClassNameId(FragmentEntryLink.class) %>">
-						<liferay-ui:message key="fragment" />
 					</c:when>
 					<c:otherwise>
 						<liferay-ui:message key="page-template" />
@@ -95,21 +77,23 @@ List<AssetEntryUsage> assetEntryUsages = AssetEntryUsageLocalServiceUtil.getAsse
 		<liferay-ui:search-container-column-text
 			cssClass="text-right"
 		>
+			<c:if test="<%= assetEntryUsage.getType() != AssetEntryUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE %>">
 
-			<%
-			Map<String, String> data = new HashMap<>();
+				<%
+				Map<String, String> data = new HashMap<>();
 
-			data.put("href", previewURL);
-			data.put("title", assetEntry.getTitle(locale));
-			%>
+				data.put("href", previewURL);
+				data.put("title", assetEntry.getTitle(locale));
+				%>
 
-			<clay:button
-				data="<%= data %>"
-				elementClasses="preview-asset-entry-usage table-action-link"
-				icon="view"
-				monospaced="<%= true %>"
-				style="secondary"
-			/>
+				<clay:button
+					data="<%= data %>"
+					elementClasses="preview-asset-entry-usage table-action-link"
+					icon="view"
+					monospaced="<%= true %>"
+					style="secondary"
+				/>
+			</c:if>
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 
@@ -121,28 +105,30 @@ List<AssetEntryUsage> assetEntryUsages = AssetEntryUsageLocalServiceUtil.getAsse
 </liferay-ui:search-container>
 
 <aui:script require="metal-dom/src/all/dom as dom">
-	var previewAssetEntryUsagesList = dom.delegate(
-		document.querySelector('#<portlet:namespace/>assetEntryUsagesList'),
-		'click',
-		'.preview-asset-entry-usage',
-		function(event) {
-			var delegateTarget = event.delegateTarget;
+	if (document.querySelector('#<portlet:namespace/>assetEntryUsagesList')) {
+		var previewAssetEntryUsagesList = dom.delegate(
+			document.querySelector('#<portlet:namespace/>assetEntryUsagesList'),
+			'click',
+			'.preview-asset-entry-usage',
+			function(event) {
+				var delegateTarget = event.delegateTarget;
 
-			Liferay.fire(
-				'previewArticle',
-				{
-					title: delegateTarget.getAttribute('data-title'),
-					uri: delegateTarget.getAttribute('data-href')
-				}
-			);
+				Liferay.fire(
+					'previewArticle',
+					{
+						title: delegateTarget.getAttribute('data-title'),
+						uri: delegateTarget.getAttribute('data-href')
+					}
+				);
+			}
+		);
+
+		function removeListener() {
+			previewAssetEntryUsagesList.removeListener();
+
+			Liferay.detach('destroyPortlet', removeListener);
 		}
-	);
 
-	function removeListener() {
-		previewAssetEntryUsagesList.removeListener();
-
-		Liferay.detach('destroyPortlet', removeListener);
+		Liferay.on('destroyPortlet', removeListener);
 	}
-
-	Liferay.on('destroyPortlet', removeListener);
 </aui:script>

@@ -861,6 +861,9 @@ public interface LayoutLocalService
 	public Layout fetchLayoutByUuidAndGroupId(
 		String uuid, long groupId, boolean privateLayout);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public LayoutVersion fetchLayoutVersion(long layoutVersionId);
+
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Layout fetchPublished(Layout layout);
@@ -1175,11 +1178,6 @@ public interface LayoutLocalService
 	public List<Layout> getLayouts(
 		long groupId, int start, int end, OrderByComparator<Layout> obc);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<Layout> getLayouts(
-		long groupId, long leftPlid, long rightPlid, boolean privateLayout,
-		int start, int end, OrderByComparator<Layout> obc);
-
 	/**
 	 * Returns the layout references for all the layouts that belong to the
 	 * company and belong to the portlet that matches the preferences.
@@ -1278,10 +1276,6 @@ public interface LayoutLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getLayoutsCount(long groupId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getLayoutsCount(
-		long groupId, long leftPlid, long rightPlid, boolean privateLayout);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getLayoutsCount(long groupId, String keywords, String[] types)
@@ -1807,8 +1801,6 @@ public interface LayoutLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public Layout updateLayout(Layout draftLayout) throws PortalException;
-
-	public Layout updateLayout(Layout layout, boolean rebuildTree);
 
 	/**
 	 * Updates the layout replacing its draft publish date.

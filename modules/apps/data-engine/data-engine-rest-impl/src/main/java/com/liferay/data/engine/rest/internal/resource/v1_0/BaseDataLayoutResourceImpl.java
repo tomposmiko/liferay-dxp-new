@@ -15,6 +15,7 @@
 package com.liferay.data.engine.rest.internal.resource.v1_0;
 
 import com.liferay.data.engine.rest.dto.v1_0.DataLayout;
+import com.liferay.data.engine.rest.dto.v1_0.DataLayoutPermission;
 import com.liferay.data.engine.rest.resource.v1_0.DataLayoutResource;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.model.Company;
@@ -45,6 +46,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
@@ -64,11 +66,11 @@ public abstract class BaseDataLayoutResourceImpl implements DataLayoutResource {
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
 		}
 	)
-	@Path("/content-spaces/{content-space-id}/data-layout")
+	@Path("/data-definitions/{dataDefinitionId}/data-layouts")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataLayout")})
-	public Page<DataLayout> getContentSpaceDataLayoutPage(
-			@NotNull @PathParam("content-space-id") Long contentSpaceId,
+	public Page<DataLayout> getDataDefinitionDataLayoutsPage(
+			@NotNull @PathParam("dataDefinitionId") Long dataDefinitionId,
 			@Context Pagination pagination)
 		throws Exception {
 
@@ -78,11 +80,11 @@ public abstract class BaseDataLayoutResourceImpl implements DataLayoutResource {
 	@Override
 	@Consumes("application/json")
 	@POST
-	@Path("/data-definitions/{data-definition-id}/data-layouts")
+	@Path("/data-definitions/{dataDefinitionId}/data-layouts")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataLayout")})
 	public DataLayout postDataDefinitionDataLayout(
-			@NotNull @PathParam("data-definition-id") Long dataDefinitionId,
+			@NotNull @PathParam("dataDefinitionId") Long dataDefinitionId,
 			DataLayout dataLayout)
 		throws Exception {
 
@@ -90,22 +92,35 @@ public abstract class BaseDataLayoutResourceImpl implements DataLayoutResource {
 	}
 
 	@Override
+	@Consumes("application/json")
+	@POST
+	@Path("/data-layout/{dataLayoutId}/data-layout-permissions")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "DataLayout")})
+	public void postDataLayoutDataLayoutPermission(
+			@NotNull @PathParam("dataLayoutId") Long dataLayoutId,
+			@NotNull @QueryParam("operation") String operation,
+			DataLayoutPermission dataLayoutPermission)
+		throws Exception {
+	}
+
+	@Override
 	@DELETE
-	@Path("/data-layouts/{data-layout-id}")
+	@Path("/data-layouts/{dataLayoutId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataLayout")})
 	public void deleteDataLayout(
-			@NotNull @PathParam("data-layout-id") Long dataLayoutId)
+			@NotNull @PathParam("dataLayoutId") Long dataLayoutId)
 		throws Exception {
 	}
 
 	@Override
 	@GET
-	@Path("/data-layouts/{data-layout-id}")
+	@Path("/data-layouts/{dataLayoutId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataLayout")})
 	public DataLayout getDataLayout(
-			@NotNull @PathParam("data-layout-id") Long dataLayoutId)
+			@NotNull @PathParam("dataLayoutId") Long dataLayoutId)
 		throws Exception {
 
 		return new DataLayout();
@@ -114,22 +129,55 @@ public abstract class BaseDataLayoutResourceImpl implements DataLayoutResource {
 	@Override
 	@Consumes("application/json")
 	@PUT
-	@Path("/data-layouts/{data-layout-id}")
+	@Path("/data-layouts/{dataLayoutId}")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DataLayout")})
 	public DataLayout putDataLayout(
-			@NotNull @PathParam("data-layout-id") Long dataLayoutId,
+			@NotNull @PathParam("dataLayoutId") Long dataLayoutId,
 			DataLayout dataLayout)
 		throws Exception {
 
 		return new DataLayout();
 	}
 
+	@Override
+	@GET
+	@Parameters(
+		value = {
+			@Parameter(in = ParameterIn.QUERY, name = "page"),
+			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
+		}
+	)
+	@Path("/sites/{siteId}/data-layout")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "DataLayout")})
+	public Page<DataLayout> getSiteDataLayoutPage(
+			@NotNull @PathParam("siteId") Long siteId,
+			@Context Pagination pagination)
+		throws Exception {
+
+		return Page.of(Collections.emptyList());
+	}
+
+	@Override
+	@Consumes("application/json")
+	@POST
+	@Path("/sites/{siteId}/data-layout-permissions")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "DataLayout")})
+	public void postSiteDataLayoutPermission(
+			@NotNull @PathParam("siteId") Long siteId,
+			@NotNull @QueryParam("operation") String operation,
+			DataLayoutPermission dataLayoutPermission)
+		throws Exception {
+	}
+
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected void preparePatch(DataLayout dataLayout) {
+	protected void preparePatch(
+		DataLayout dataLayout, DataLayout existingDataLayout) {
 	}
 
 	protected <T, R> List<R> transform(

@@ -114,11 +114,11 @@ definition {
 
 		var key_sortOrder = "${sortOrder}";
 
-		if (IsNotVisible(locator1 = "APConfiguration#ORDERING_AND_GROUPING_ORDER_DIRECTIONAL_ICON")) {
-			Click(locator1 = "APConfiguration#ORDERING_AND_GROUPING_ORDER_GENERIC_ICON");
+		if ((isSet(sortOrder)) && (IsVisible(locator1 = "APConfiguration#ORDERING_AND_GROUPING_ORDER_DIRECTIONAL_ICON"))) {
+			Click(locator1 = "APConfiguration#ORDERING_AND_GROUPING_ORDER_DIRECTIONAL_ICON");
 		}
 
-		AssertVisible(
+		AssertNotVisible(
 			locator1 = "APConfiguration#ORDERING_AND_GROUPING_ORDER_DIRECTIONAL_ICON"
 		);
 
@@ -205,7 +205,7 @@ definition {
 
 		Select(
 			locator1 = "APConfiguration#FILTER_CATEGORIZATION_SELECT",
-			value1 = "categories"
+			value1 = "Categories"
 		);
 
 		if (isSet(queryAndOperator)) {
@@ -649,7 +649,7 @@ definition {
 
 		Select(
 			locator1 = "APConfiguration#FILTER_CATEGORIZATION_SELECT",
-			value1 = "tags"
+			value1 = "Tags"
 		);
 
 		AssetCategorization.selectTag(tagNameList = "${tagNameList}");
@@ -897,7 +897,7 @@ definition {
 
 		Click(locator1 = "APConfiguration#ASSET_SELECTION_ASSET_LIST");
 
-		Panel.expandPanel(panel = "Select Asset List");
+		Panel.expandPanel(panel = "Select Content Set");
 
 		Button.clickSelect();
 
@@ -1225,8 +1225,6 @@ definition {
 			value1 = "Add Content (Select Scope and Type)"
 		);
 
-		SelectFrame(locator1 = "IFrame#MODAL_IFRAME");
-
 		Select(locator1 = "Select#SCOPE", value1 = "${siteScope1}");
 
 		AssertSelectedLabel(locator1 = "Select#SCOPE", value1 = "${siteScope1}");
@@ -1235,14 +1233,12 @@ definition {
 
 		AssertSelectedLabel(locator1 = "Select#SCOPE", value1 = "${siteScope2}");
 
-		Refresh();
+		Button.clickCancel();
 
 		AssetPublisherPortlet.viewPG(
 			assetContent = "${assetContent}",
 			assetTitle = "${assetTitle}"
 		);
-
-		Click(locator1 = "APAsset#ASSET_BACK_TO_ICON");
 	}
 
 	macro viewCustomADTRichSummaryPG {
@@ -1511,8 +1507,6 @@ definition {
 			locator1 = "AP#ADD_ASSET_SCOPED",
 			value1 = "Add Content (Select Scope and Type)"
 		);
-
-		SelectFrame(locator1 = "IFrame#DIALOG");
 
 		Select(locator1 = "Select#SCOPE", value1 = "${siteName1}");
 

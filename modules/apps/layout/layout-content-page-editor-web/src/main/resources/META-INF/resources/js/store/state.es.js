@@ -3,6 +3,31 @@ import {Config} from 'metal-state';
 import {FRAGMENTS_EDITOR_ITEM_BORDERS} from '../utils/constants';
 import {setIn} from '../utils/FragmentsEditorUpdateUtils.es';
 
+const LayoutDataShape = Config.shapeOf(
+	{
+		nextColumnId: Config.number(),
+		nextRowId: Config.number(),
+		structure: Config.arrayOf(
+			Config.shapeOf(
+				{
+					columns: Config.arrayOf(
+						Config.shapeOf(
+							{
+								columnId: Config.string(),
+								fragmentEntryLinkIds: Config.arrayOf(
+									Config.string()
+								),
+								size: Config.string().value('')
+							}
+						)
+					),
+					rowId: Config.string()
+				}
+			)
+		)
+	}
+);
+
 /**
  * Initial state
  * @review
@@ -192,6 +217,16 @@ const INITIAL_STATE = {
 		.value(''),
 
 	/**
+	 * URL to redirect after discard draft action.
+	 * @default ''
+	 * @review
+	 * @type {!string}
+	 */
+	discardDraftRedirectURL: Config
+		.string()
+		.value(''),
+
+	/**
 	 * URL to discard draft changes and return to the latest published version.
 	 * @default ''
 	 * @review
@@ -230,6 +265,23 @@ const INITIAL_STATE = {
 	dropTargetItemType: Config
 		.string()
 		.value(''),
+
+	/**
+	 * List of layoutData related to segmentsExperiences
+	 * @default ''
+	 * @review
+	 * @type {!array}
+	 */
+	layoutDataList: Config
+		.arrayOf(
+			Config.shapeOf(
+				{
+					layoutData: LayoutDataShape.required(),
+					segmentsExperienceId: Config.string().required()
+				}
+			)
+		)
+		.value([]),
 
 	/**
 	 * URL for updating a distinct fragment entries of the editor.
@@ -276,26 +328,6 @@ const INITIAL_STATE = {
 		.value([]),
 
 	/**
-	 * Object to control the process of the experience creation
-	 * @default { creatingSegmentsExperience: false, error: null }
-	 * @review
-	 * @type {object}
-	 */
-	experienceSegmentsCreation: Config
-		.shapeOf(
-			{
-				creatingSegmentsExperience: Config.bool().required(),
-				error: Config.string()
-			}
-		)
-		.value(
-			{
-				creatingSegmentsExperience: false,
-				error: null
-			}
-		),
-
-	/**
 	 * Fragment id to indicate if that fragment editor has to be cleared.
 	 * @default ''
 	 * @review
@@ -312,16 +344,6 @@ const INITIAL_STATE = {
 	fragmentEditorEnabled: Config.string().value(''),
 
 	/**
-	 * Allow opening/closing fragments editor sidebar
-	 * @default true
-	 * @review
-	 * @type {boolean}
-	 */
-	fragmentsEditorSidebarVisible: Config
-		.bool()
-		.value(true),
-
-	/**
 	 * List of fragment instances being used.
 	 * @default {}
 	 * @review
@@ -333,46 +355,30 @@ const INITIAL_STATE = {
 				{
 					config: Config.object().value({}),
 					content: Config.any().value(''),
-					editableValues: Config.objectOf(
-						Config.shapeOf(
-							{
-								classNameId: Config.string().value(''),
-								classPK: Config.string().value(''),
-								defaultValue: Config.string().required(),
-								fieldId: Config.string().value(''),
-								mappedField: Config.string().value('')
-							}
-						)
+					editableValues: Config.shapeOf(
+						{
+							['com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor']: Config.objectOf(
+								Config.shapeOf(
+									{
+										classNameId: Config.string().value(''),
+										classPK: Config.string().value(''),
+										defaultValue: Config.string().required(),
+										fieldId: Config.string().value(''),
+										mappedField: Config.string().value('')
+									}
+								)
+							).value({})
+						}
 					).value({}),
+					fragmentEntryId: Config.oneOfType([Config.string(), Config.number()]).value(''),
 					fragmentEntryKey: Config.string().required(),
 					fragmentEntryLinkId: Config.string().required(),
-					name: Config.string().required()
+					name: Config.string().required(),
+					portletId: Config.string().value('')
 				}
 			)
 		)
 		.value({}),
-
-	/**
-   * URL for obtaining the asset types for which asset display pages can be
-   * created.
-   * @default '''
-   * @review
-   * @type {string}
-   */
-	getAssetClassTypesURL: Config
-		.string()
-		.value(''),
-
-	/**
-   * URL for obtaining the asset types for which asset display pages can be
-   * created.
-   * @default '''
-   * @review
-   * @type {string}
-   */
-	getAssetDisplayContributorsURL: Config
-		.string()
-		.value(''),
 
 	/**
 	 * URL for getting an asset field value
@@ -391,6 +397,28 @@ const INITIAL_STATE = {
 	 * @type {string}
 	 */
 	getAssetMappingFieldsURL: Config
+		.string()
+		.value(''),
+
+	/**
+	 * URL for obtaining the asset types for which info display pages can be
+	 * created.
+	 * @default '''
+	 * @review
+	 * @type {string}
+	 */
+	getInfoClassTypesURL: Config
+		.string()
+		.value(''),
+
+	/**
+	 * URL for obtaining the asset types for which info display pages can be
+	 * created.
+	 * @default '''
+	 * @review
+	 * @type {string}
+	 */
+	getInfoDisplayContributorsURL: Config
 		.string()
 		.value(''),
 
@@ -450,31 +478,7 @@ const INITIAL_STATE = {
 	 * @review
 	 * @type {{structure: Array}}
 	 */
-	layoutData: Config
-		.shapeOf(
-			{
-				nextColumnId: Config.number(),
-				nextRowId: Config.number(),
-				structure: Config.arrayOf(
-					Config.shapeOf(
-						{
-							columns: Config.arrayOf(
-								Config.shapeOf(
-									{
-										columnId: Config.string(),
-										fragmentEntryLinkIds: Config.arrayOf(
-											Config.string()
-										),
-										size: Config.string().value('')
-									}
-								)
-							),
-							rowId: Config.string()
-						}
-					)
-				)
-			}
-		)
+	layoutData: LayoutDataShape
 		.value(
 			{
 				nextColumnId: 0,
@@ -586,29 +590,11 @@ const INITIAL_STATE = {
 		.value([]),
 
 	/**
-	 * Object to control the process of the experience edition
-	 * @default { error: null, name: null, segmentsEntryId: null, segmentsExperienceId: null }
+	 * The active segmentsExperience
+	 * @default ''
 	 * @review
-	 * @type {object}
+	 * @type {string}
 	 */
-	segmentsExperienceEdition: Config
-		.shapeOf(
-			{
-				error: Config.string(),
-				name: Config.string(),
-				segmentsEntryId: Config.string(),
-				segmentsExperienceId: Config.string()
-			}
-		)
-		.value(
-			{
-				error: null,
-				name: null,
-				segmentsEntryId: null,
-				segmentsExperienceId: null
-			}
-		),
-
 	segmentsExperienceId: Config
 		.string()
 		.value(),
@@ -706,6 +692,17 @@ const INITIAL_STATE = {
 			}
 		)
 		.value({}),
+
+	/**
+	 * Selected sidebar panel ID to be shown (null or empty)
+	 * when sidebar is hidden.
+	 * @default 'sections'
+	 * @review
+	 * @type {string}
+	 */
+	selectedSidebarPanelId: Config
+		.string()
+		.value('sections'),
 
 	/**
 	 * List of sidebar panels

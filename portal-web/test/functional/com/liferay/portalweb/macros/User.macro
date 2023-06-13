@@ -1415,7 +1415,7 @@ definition {
 			Navigator.openURL();
 		}
 
-		if (IsElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE")) {
+		if (IsElementNotPresent(locator1 = "UserBar#USER_SIGN_IN")) {
 			User.logoutPG();
 
 			User.loginPG(userEmailAddress = "${userEmailAddress}");
@@ -1768,18 +1768,14 @@ definition {
 	macro logoutAndLoginPG {
 		Navigator.openURL();
 
-		ProductMenuHelper.expandPanel(panel = "User");
+		UserBar.signOut();
 
-		if (IsTextNotEqual(locator1 = "ControlMenu#USER_NAME", value1 = "${userLoginFullName}")) {
-			User.logoutPG();
-
-			User.loginPG(
-				authenticationMethod = "${authenticationMethod}",
-				nodePort = "${nodePort}",
-				userEmailAddress = "${userLoginEmailAddress}",
-				userScreenName = "${userScreenName}"
-			);
-		}
+		User.loginPG(
+			authenticationMethod = "${authenticationMethod}",
+			nodePort = "${nodePort}",
+			userEmailAddress = "${userLoginEmailAddress}",
+			userScreenName = "${userScreenName}"
+		);
 	}
 
 	@description = "Log out of Liferay Portal."
@@ -2251,9 +2247,8 @@ definition {
 
 		AssertElementNotPresent(locator1 = "Button#SIGN_IN");
 
-		AssertTextEquals(
-			locator1 = "ControlMenu#USER_NAME",
-			value1 = "${userFirstName}"
+		AssertVisible(
+			locator1 = "UserBar#USER_AVATAR_IMAGE"
 		);
 	}
 

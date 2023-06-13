@@ -23,16 +23,19 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
-import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFileEntryPermission;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.PortletLayoutFinder;
+import com.liferay.portal.kernel.portlet.PortletLayoutFinderRegistryUtil;
 import com.liferay.portal.kernel.repository.capabilities.CommentCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
@@ -95,13 +98,13 @@ public class DLFileEntryAssetRenderer
 	public DLFileEntryAssetRenderer(
 		FileEntry fileEntry, FileVersion fileVersion,
 		DLFileEntryLocalService dlFileEntryLocalService,
-		TrashHelper trashHelper, DLURLHelper dlurlHelper) {
+		TrashHelper trashHelper, DLURLHelper dlURLHelper) {
 
 		_fileEntry = fileEntry;
 		_fileVersion = fileVersion;
 		_dlFileEntryLocalService = dlFileEntryLocalService;
 		_trashHelper = trashHelper;
-		_dlurlHelper = dlurlHelper;
+		_dlURLHelper = dlURLHelper;
 	}
 
 	@Override
@@ -226,7 +229,7 @@ public class DLFileEntryAssetRenderer
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String thumbnailSrc = _dlurlHelper.getThumbnailSrc(
+		String thumbnailSrc = _dlURLHelper.getThumbnailSrc(
 			_fileEntry, themeDisplay);
 
 		if (Validator.isNotNull(thumbnailSrc)) {
@@ -261,7 +264,7 @@ public class DLFileEntryAssetRenderer
 
 	@Override
 	public String getURLDownload(ThemeDisplay themeDisplay) {
-		return _dlurlHelper.getDownloadURL(
+		return _dlURLHelper.getDownloadURL(
 			_fileEntry, _fileVersion, themeDisplay, StringPool.BLANK);
 	}
 
@@ -321,7 +324,7 @@ public class DLFileEntryAssetRenderer
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		return _dlurlHelper.getImagePreviewURL(
+		return _dlURLHelper.getImagePreviewURL(
 			_fileEntry, _fileVersion, themeDisplay);
 	}
 
@@ -356,7 +359,9 @@ public class DLFileEntryAssetRenderer
 			(ThemeDisplay)liferayPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		if (!DLUtil.hasViewInContextGroupLayout(themeDisplay)) {
+		long groupId = _fileEntry.getGroupId();
+
+		if (!_hasViewInContextGroupLayout(themeDisplay, groupId)) {
 			return null;
 		}
 
@@ -469,8 +474,37 @@ public class DLFileEntryAssetRenderer
 		return false;
 	}
 
+	private boolean _hasViewInContextGroupLayout(
+		ThemeDisplay themeDisplay, long groupId) {
+
+		try {
+			PortletLayoutFinder portletLayoutFinder =
+				PortletLayoutFinderRegistryUtil.getPortletLayoutFinder(
+					DLFileEntryConstants.getClassName());
+
+			PortletLayoutFinder.Result result = portletLayoutFinder.find(
+				themeDisplay, groupId);
+
+			if (result == null) {
+				return false;
+			}
+
+			return true;
+		}
+		catch (PortalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
+			return false;
+		}
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFileEntryAssetRenderer.class);
+
 	private final DLFileEntryLocalService _dlFileEntryLocalService;
-	private DLURLHelper _dlurlHelper;
+	private DLURLHelper _dlURLHelper;
 	private final FileEntry _fileEntry;
 	private FileVersion _fileVersion;
 	private final TrashHelper _trashHelper;

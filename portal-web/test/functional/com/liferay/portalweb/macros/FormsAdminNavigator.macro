@@ -23,7 +23,9 @@ definition {
 
 		var key_fieldName = "${fieldName}";
 
-		Click(locator1 = "Form#SIDEBAR_ELLIPSIS");
+		while (IsElementNotPresent(locator1 = "Form#SIDEBAR_MENUITEM_REMOVE_FIELD")) {
+			Click(locator1 = "Form#SIDEBAR_ELLIPSIS");
+		}
 
 		Click(locator1 = "Form#SIDEBAR_MENUITEM_REMOVE_FIELD");
 
@@ -109,6 +111,8 @@ definition {
 
 	macro openPublishURL {
 		FormsAdminNavigator.gotoPublishCopyURLLink();
+
+		Pause(locator1 = "2000");
 
 		var publishFormURL = selenium.getElementValue("Form#PUBLISH_FORM_PUBLIC_URL");
 

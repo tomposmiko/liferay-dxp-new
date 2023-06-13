@@ -49,11 +49,11 @@ class FragmentsEditor extends Component {
 	 */
 	created() {
 		this._handleDocumentClick = this._handleDocumentClick.bind(this);
-		this._handleDocumentFocus = this._handleDocumentFocus.bind(this);
+		this._handleDocumentKeyUp = this._handleDocumentKeyUp.bind(this);
 		this._handleDocumentMouseOver = this._handleDocumentMouseOver.bind(this);
 
 		document.addEventListener('click', this._handleDocumentClick, true);
-		document.addEventListener('focusin', this._handleDocumentFocus);
+		document.addEventListener('keyup', this._handleDocumentKeyUp);
 		document.addEventListener('mouseover', this._handleDocumentMouseOver);
 	}
 
@@ -62,8 +62,8 @@ class FragmentsEditor extends Component {
 	 * @review
 	 */
 	disposed() {
-		document.removeEventListener('click', this._handleDocumentClick);
-		document.removeEventListener('focusin', this._handleDocumentFocus);
+		document.removeEventListener('click', this._handleDocumentClick, true);
+		document.removeEventListener('keyup', this._handleDocumentKeyUp);
 		document.removeEventListener('mouseover', this._handleDocumentMouseOver);
 	}
 
@@ -77,11 +77,11 @@ class FragmentsEditor extends Component {
 	}
 
 	/**
-	 * @param {FocusEvent} event
+	 * @param {KeyboardEvent} event
 	 * @private
 	 * @review
 	 */
-	_handleDocumentFocus(event) {
+	_handleDocumentKeyUp(event) {
 		this._updateActiveItem(event);
 	}
 
@@ -115,27 +115,33 @@ class FragmentsEditor extends Component {
 	 * @review
 	 */
 	_updateActiveItem(event) {
-		const {fragmentsEditorItemId, fragmentsEditorItemType} = FragmentsEditor._getItemTarget(event);
+		if (this._activeElement !== document.activeElement) {
+			const {
+				fragmentsEditorItemId,
+				fragmentsEditorItemType
+			} = FragmentsEditor._getItemTarget(event);
 
-		if (fragmentsEditorItemId && fragmentsEditorItemType) {
-			this.store.dispatchAction(
-				UPDATE_ACTIVE_ITEM,
-				{
-					activeItemId: fragmentsEditorItemId,
-					activeItemType: fragmentsEditorItemType
-				}
-			);
-		}
-		else if (event.target instanceof HTMLElement &&
-			event.target.parentElement !== document.body &&
-			!dom.closest(event.target, '.modal')) {
+			if (fragmentsEditorItemId && fragmentsEditorItemType) {
+				this.store.dispatchAction(
+					UPDATE_ACTIVE_ITEM,
+					{
+						activeItemId: fragmentsEditorItemId,
+						activeItemType: fragmentsEditorItemType
+					}
+				);
+			}
+			else if (event.target instanceof HTMLElement &&
+				event.target.parentElement !== document.body &&
+				!dom.closest(event.target, '.modal')) {
 
-			this.store.dispatchAction(
-				CLEAR_ACTIVE_ITEM
-			);
+				this.store.dispatchAction(
+					CLEAR_ACTIVE_ITEM
+				);
+			}
 		}
+
+		this._activeElement = document.activeElement;
 	}
-
 }
 
 /**
@@ -146,6 +152,16 @@ class FragmentsEditor extends Component {
  */
 FragmentsEditor.STATE = Object.assign(
 	{
+
+		/**
+		 * Previous document active element
+		 * @default undefined
+		 * @instance
+		 * @memberOf FragmentsEditor
+		 * @review
+		 * @type {object}
+		 */
+		_activeElement: Config.object(),
 
 		/**
 		 * Store instance

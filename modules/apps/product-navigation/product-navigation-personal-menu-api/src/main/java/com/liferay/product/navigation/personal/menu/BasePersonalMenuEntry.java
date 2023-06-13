@@ -27,14 +27,22 @@ import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.product.navigation.personal.menu.configuration.PersonalMenuConfiguration;
+import com.liferay.product.navigation.personal.menu.configuration.PersonalMenuConfigurationTracker;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -42,6 +50,8 @@ import java.util.ResourceBundle;
 import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides a skeletal implementation of the {@link PersonalMenuEntry} to
@@ -75,11 +85,38 @@ public abstract class BasePersonalMenuEntry implements PersonalMenuEntry {
 
 		Group group = user.getGroup();
 
+		boolean privateLayout = true;
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PersonalMenuConfiguration personalMenuConfiguration =
+			personalMenuConfigurationTracker.
+				getCompanyPersonalMenuConfiguration(
+					themeDisplay.getCompanyId());
+
+		String personalApplicationsLookAndFeel =
+			personalMenuConfiguration.personalApplicationsLookAndFeel();
+
+		if (personalApplicationsLookAndFeel.equals("current-site")) {
+			user = UserLocalServiceUtil.getDefaultUser(
+				themeDisplay.getCompanyId());
+
+			group = GroupLocalServiceUtil.getGroup(
+				PortalUtil.getScopeGroupId(request));
+
+			Layout currentLayout = themeDisplay.getLayout();
+
+			if (currentLayout.isPublicLayout()) {
+				privateLayout = false;
+			}
+		}
+
 		Layout layout = null;
 
 		try {
 			layout = LayoutLocalServiceUtil.getFriendlyURLLayout(
-				group.getGroupId(), true,
+				group.getGroupId(), privateLayout,
 				PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL);
 		}
 		catch (NoSuchLayoutException nsle) {
@@ -91,7 +128,7 @@ public abstract class BasePersonalMenuEntry implements PersonalMenuEntry {
 			}
 
 			layout = addEmbeddedPersonalApplicationLayout(
-				user.getUserId(), group.getGroupId());
+				user.getUserId(), group.getGroupId(), privateLayout);
 		}
 
 		LiferayPortletURL liferayPortletURL = PortletURLFactoryUtil.create(
@@ -100,8 +137,31 @@ public abstract class BasePersonalMenuEntry implements PersonalMenuEntry {
 		return liferayPortletURL.toString();
 	}
 
+	@Override
+	public boolean isActive(PortletRequest portletRequest, String portletId) {
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Layout layout = themeDisplay.getLayout();
+
+		String layoutFriendlyURL = layout.getFriendlyURL();
+
+		if ((!layout.isTypeControlPanel() && !layout.isSystem()) ||
+			!layoutFriendlyURL.equals(
+				PropsUtil.get(PropsKeys.CONTROL_PANEL_LAYOUT_FRIENDLY_URL))) {
+
+			return false;
+		}
+
+		if (portletId.equals(getPortletId())) {
+			return true;
+		}
+
+		return false;
+	}
+
 	protected Layout addEmbeddedPersonalApplicationLayout(
-			long userId, long groupId)
+			long userId, long groupId, boolean privateLayout)
 		throws PortalException {
 
 		String friendlyURL = FriendlyURLNormalizerUtil.normalize(
@@ -113,7 +173,8 @@ public abstract class BasePersonalMenuEntry implements PersonalMenuEntry {
 			"layout.instanceable.allowed", Boolean.TRUE);
 
 		Layout layout = LayoutLocalServiceUtil.addLayout(
-			userId, groupId, true, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			userId, groupId, privateLayout,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
 			PropsValues.CONTROL_PANEL_LAYOUT_NAME, StringPool.BLANK,
 			StringPool.BLANK, LayoutConstants.TYPE_PORTLET, true, true,
 			friendlyURL, serviceContext);
@@ -140,6 +201,9 @@ public abstract class BasePersonalMenuEntry implements PersonalMenuEntry {
 	protected ResourceBundle getResourceBundle(Locale locale) {
 		return ResourceBundleUtil.getBundle(locale, getClass());
 	}
+
+	@Reference
+	protected PersonalMenuConfigurationTracker personalMenuConfigurationTracker;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BasePersonalMenuEntry.class);

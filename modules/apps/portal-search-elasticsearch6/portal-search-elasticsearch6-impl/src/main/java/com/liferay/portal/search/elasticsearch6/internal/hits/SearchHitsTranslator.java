@@ -21,8 +21,10 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.document.DocumentBuilderFactory;
+import com.liferay.portal.search.geolocation.GeoBuilders;
 import com.liferay.portal.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.search.highlight.HighlightField;
+import com.liferay.portal.search.highlight.HighlightFieldBuilderFactory;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHitBuilder;
 import com.liferay.portal.search.hits.SearchHitBuilderFactory;
@@ -47,11 +49,15 @@ public class SearchHitsTranslator {
 	public SearchHitsTranslator(
 		SearchHitBuilderFactory searchHitBuilderFactory,
 		SearchHitsBuilderFactory searchHitsBuilderFactory,
-		DocumentBuilderFactory documentBuilderFactory) {
+		DocumentBuilderFactory documentBuilderFactory,
+		HighlightFieldBuilderFactory highlightFieldBuilderFactory,
+		GeoBuilders geoBuilders) {
 
 		_searchHitBuilderFactory = searchHitBuilderFactory;
 		_searchHitsBuilderFactory = searchHitsBuilderFactory;
 		_documentBuilderFactory = documentBuilderFactory;
+		_highlightFieldBuilderFactory = highlightFieldBuilderFactory;
+		_geoBuilders = geoBuilders;
 	}
 
 	public SearchHits translate(
@@ -161,12 +167,13 @@ public class SearchHitsTranslator {
 						GeoLocationPoint geoLocationPoint = null;
 
 						if (values.length == 2) {
-							geoLocationPoint = new GeoLocationPoint(
+							geoLocationPoint = _geoBuilders.geoLocationPoint(
 								Double.valueOf(values[0]),
 								Double.valueOf(values[1]));
 						}
 						else {
-							geoLocationPoint = new GeoLocationPoint(values[0]);
+							geoLocationPoint = _geoBuilders.geoLocationPoint(
+								values[0]);
 						}
 
 						documentBuilder.setGeoLocationPoint(
@@ -189,17 +196,16 @@ public class SearchHitsTranslator {
 		org.elasticsearch.search.fetch.subphase.highlight.HighlightField
 			elasticsearchHighlightField) {
 
-		HighlightField highlightField = new HighlightField(
-			elasticsearchHighlightField.getName());
-
-		highlightField.addFragments(
+		return _highlightFieldBuilderFactory.builder(
+		).fragments(
 			Stream.of(
 				elasticsearchHighlightField.getFragments()
 			).map(
 				Text::string
-			));
-
-		return highlightField;
+			)
+		).name(
+			elasticsearchHighlightField.getName()
+		).build();
 	}
 
 	protected Stream<HighlightField> translateHighlightFields(
@@ -225,6 +231,8 @@ public class SearchHitsTranslator {
 	private static final String _UID_FIELD_NAME = "uid";
 
 	private final DocumentBuilderFactory _documentBuilderFactory;
+	private final GeoBuilders _geoBuilders;
+	private final HighlightFieldBuilderFactory _highlightFieldBuilderFactory;
 	private final SearchHitBuilderFactory _searchHitBuilderFactory;
 	private final SearchHitsBuilderFactory _searchHitsBuilderFactory;
 

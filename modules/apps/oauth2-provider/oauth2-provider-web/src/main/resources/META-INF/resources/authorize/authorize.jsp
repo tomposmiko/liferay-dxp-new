@@ -31,13 +31,12 @@ if (Validator.isNotNull(replyTo) && !replyTo.startsWith(PortalUtil.getPortalURL(
 %>
 
 <div class="closed consent container-fluid-1280">
-	<aui:form action="<%= replyTo %>" method="post" name="fm">
+	<aui:form action="<%= replyTo %>" data-senna-off="true" method="post" name="fm">
 		<aui:fieldset-group markupView="lexicon">
 			<div class="panel-body">
 				<div class="app-icon aspect-ratio-bg-cover" style="background-image:url('<%= HtmlUtil.escapeAttribute(oAuth2AuthorizePortletDisplayContext.getThumbnailURL()) %>')"></div>
 
 				<liferay-ui:user-portrait
-					imageCssClass="sticker-lg"
 					user="<%= user %>"
 				/>
 
@@ -139,13 +138,9 @@ if (Validator.isNotNull(replyTo) && !replyTo.startsWith(PortalUtil.getPortalURL(
 									allowButton.addEventListener(
 										'click',
 										function() {
+											document.getElementById('oauthDecision').value = 'allow';
 											Liferay.Util.postForm(
-												document.<portlet:namespace/>fm,
-												{
-													data: {
-														oauthDecision: 'allow'
-													}
-												}
+												document.<portlet:namespace/>fm
 											);
 										}
 									);
@@ -157,13 +152,9 @@ if (Validator.isNotNull(replyTo) && !replyTo.startsWith(PortalUtil.getPortalURL(
 									cancelButton.addEventListener(
 										'click',
 										function() {
+											document.getElementById('oauthDecision').value = 'deny';
 											Liferay.Util.postForm(
-												document.<portlet:namespace/>fm,
-												{
-													data: {
-														oauthDecision: 'deny'
-													}
-												}
+												document.<portlet:namespace/>fm
 											);
 										}
 									);

@@ -85,23 +85,11 @@ renderResponse.setTitle(assetEntryUsagesDisplayContext.getAssetEntryTitle());
 								<%
 								PortletURL displayPagesNavigationURL = assetEntryUsagesDisplayContext.getPortletURL();
 
-								displayPagesNavigationURL.setParameter("navigation", "display-pages");
+								displayPagesNavigationURL.setParameter("navigation", "display-page-templates");
 								%>
 
-								<a class="nav-link <%= Objects.equals(assetEntryUsagesDisplayContext.getNavigation(), "display-pages") ? "active" : StringPool.BLANK %>" href="<%= displayPagesNavigationURL.toString() %>">
-									<liferay-ui:message arguments="<%= assetEntryUsagesDisplayContext.getDisplayPagesUsageCount() %>" key="display-pages-x" />
-								</a>
-							</li>
-							<li class="nav-item">
-
-								<%
-								PortletURL fragmentsNavigationURL = assetEntryUsagesDisplayContext.getPortletURL();
-
-								displayPagesNavigationURL.setParameter("navigation", "fragments");
-								%>
-
-								<a class="nav-link <%= Objects.equals(assetEntryUsagesDisplayContext.getNavigation(), "fragments") ? "active" : StringPool.BLANK %>" href="<%= fragmentsNavigationURL.toString() %>">
-									<liferay-ui:message arguments="<%= assetEntryUsagesDisplayContext.getFragmentsUsageCount() %>" key="fragments-x" />
+								<a class="nav-link <%= Objects.equals(assetEntryUsagesDisplayContext.getNavigation(), "display-page-templates") ? "active" : StringPool.BLANK %>" href="<%= displayPagesNavigationURL.toString() %>">
+									<liferay-ui:message arguments="<%= assetEntryUsagesDisplayContext.getDisplayPagesUsageCount() %>" key="display-page-templates-x" />
 								</a>
 							</li>
 						</ul>
@@ -120,11 +108,8 @@ renderResponse.setTitle(assetEntryUsagesDisplayContext.getAssetEntryTitle());
 						<c:when test='<%= Objects.equals(assetEntryUsagesDisplayContext.getNavigation(), "page-templates") %>'>
 							<liferay-ui:message arguments="<%= assetEntryUsagesDisplayContext.getPageTemplatesUsageCount() %>" key="page-templates-x" />
 						</c:when>
-						<c:when test='<%= Objects.equals(assetEntryUsagesDisplayContext.getNavigation(), "display-pages") %>'>
-							<liferay-ui:message arguments="<%= assetEntryUsagesDisplayContext.getDisplayPagesUsageCount() %>" key="display-pages-x" />
-						</c:when>
-						<c:when test='<%= Objects.equals(assetEntryUsagesDisplayContext.getNavigation(), "fragments") %>'>
-							<liferay-ui:message arguments="<%= assetEntryUsagesDisplayContext.getFragmentsUsageCount() %>" key="fragments-x" />
+						<c:when test='<%= Objects.equals(assetEntryUsagesDisplayContext.getNavigation(), "display-page-templates") %>'>
+							<liferay-ui:message arguments="<%= assetEntryUsagesDisplayContext.getDisplayPagesUsageCount() %>" key="display-page-templates-x" />
 						</c:when>
 						<c:otherwise>
 							<liferay-ui:message arguments="<%= assetEntryUsagesDisplayContext.getAllUsageCount() %>" key="all-x" />
@@ -150,23 +135,27 @@ renderResponse.setTitle(assetEntryUsagesDisplayContext.getAssetEntryTitle());
 						modelVar="assetEntryUsage"
 					>
 						<liferay-ui:search-container-column-text
+							cssClass="table-cell-expand table-cell-minw-200 table-title"
 							name="name"
 							value="<%= assetEntryUsagesDisplayContext.getAssetEntryUsageName(assetEntryUsage) %>"
 						/>
 
 						<liferay-ui:search-container-column-text
+							cssClass="table-cell-expand-smallest table-cell-ws-nowrap"
 							name="type"
 							translate="<%= true %>"
 							value="<%= assetEntryUsagesDisplayContext.getAssetEntryUsageTypeLabel(assetEntryUsage) %>"
 						/>
 
 						<liferay-ui:search-container-column-text
+							cssClass="table-cell-expand"
 							name="where"
 							translate="<%= true %>"
 							value="<%= assetEntryUsagesDisplayContext.getAssetEntryUsageWhereLabel(assetEntryUsage) %>"
 						/>
 
 						<liferay-ui:search-container-column-date
+							cssClass="table-cell-expand-smallest table-cell-ws-nowrap"
 							name="modified-date"
 							value="<%= assetEntryUsage.getModifiedDate() %>"
 						/>
@@ -176,7 +165,9 @@ renderResponse.setTitle(assetEntryUsagesDisplayContext.getAssetEntryTitle());
 						%>
 
 						<c:if test="<%= ListUtil.isNotEmpty(dropdownItems) %>">
-							<liferay-ui:search-container-column-text>
+							<liferay-ui:search-container-column-text
+								cssClass="table-cell-expand-smallest table-column-text-center"
+							>
 								<clay:dropdown-actions
 									dropdownItems="<%= dropdownItems %>"
 								/>

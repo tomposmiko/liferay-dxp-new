@@ -10,7 +10,10 @@ definition {
 	}
 
 	macro changeFieldType {
-		Click(locator1 = "FormFields#CHANGE_FIELD_TYPE_BUTTON");
+
+		while (IsElementNotPresent(locator1 = "FormFields#CHANGE_FIELD_TYPE_BUTTON_DROPDOWN")) {
+			Click(locator1 = "FormFields#CHANGE_FIELD_TYPE_BUTTON");
+		}
 
 		MenuItem.click(menuItem = "${selectOption}");
 	}
@@ -76,12 +79,17 @@ definition {
 	}
 
 	macro editFieldName {
+
+		Form.gotoAdvancedTab();
+
 		var key_fieldValue = "${fieldValue}";
 
 		Type.clickAtType(
 			locator1 = "FormFields#FIELD_NAME_EDIT",
 			value1 = "${fieldValue}"
 		);
+
+		Form.gotoBasicTab();
 	}
 
 	macro editGridOptions {
@@ -125,6 +133,7 @@ definition {
 	}
 
 	macro editParagraphBody {
+
 		Type.clickAtType(
 			locator1 = "FormFields#PARAGRAPH_BODY_TEXT_FIELD",
 			value1 = "${fieldValue}"
@@ -216,7 +225,7 @@ definition {
 	macro enableSwitcher {
 		Click(locator1 = "FormFields#SWITCHER", key_fieldName = "${fieldName}");
 
-		FormFields.viewSwitcherChecked(fieldName = "${fieldName}");
+		//FormFields.viewSwitcherChecked(fieldName = "${fieldName}");
 	}
 
 	macro getFieldName {
@@ -343,7 +352,7 @@ definition {
 
 		Click(locator1 = "FormFields#SELECT_FIELD", value1 = "${selectOption}");
 
-		if (("${fieldName}" == "ddmDataProviderInstanceId") || ("${fieldName}" == "ddmDataProviderInstanceOutput")) {
+		if (("${fieldName}" == "Data Provider") || ("${fieldName}" == "Output Parameter")) {
 			AssertClick(
 				locator1 = "FormFields#SELECT_FIELD_DATA_PROVIDER_LIST",
 				value1 = "${selectOption}"
@@ -498,10 +507,15 @@ definition {
 	}
 
 	macro viewFieldName {
+
+		Form.gotoAdvancedTab();
+
 		AssertTextEquals(
 			locator1 = "FormFields#FIELD_NAME_EDIT",
 			value1 = "${fieldName}"
 		);
+
+		Form.gotoBasicTab();
 	}
 
 	macro viewFieldValidationErrorMessage {
@@ -775,7 +789,8 @@ definition {
 
 		AssertElementPresent.assertVisible(
 			locator1 = "FormFields#TEXT_FIELD",
-			key_fieldName = "${fieldName}"
+			key_fieldName = "${fieldName}",
+			key_fieldLabel = "${fieldLabel}"
 		);
 	}
 

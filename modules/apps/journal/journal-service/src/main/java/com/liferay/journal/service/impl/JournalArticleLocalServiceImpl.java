@@ -6877,57 +6877,67 @@ public class JournalArticleLocalServiceImpl
 			return;
 		}
 
-		for (Element dynamicContentElement :
-				dynamicElementElement.elements("dynamic-content")) {
+		Set<Long> tempFileEntryIds = new HashSet<>();
 
-			String value = dynamicContentElement.getText();
+		try {
+			for (Element dynamicContentElement :
+					dynamicElementElement.elements("dynamic-content")) {
 
-			if (Validator.isNull(value)) {
-				continue;
+				String value = dynamicContentElement.getText();
+
+				if (Validator.isNull(value)) {
+					continue;
+				}
+
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
+
+				String uuid = jsonObject.getString("uuid");
+				long groupId = jsonObject.getLong("groupId");
+
+				FileEntry fileEntry =
+					dlAppLocalService.getFileEntryByUuidAndGroupId(
+						uuid, groupId);
+
+				boolean tempFile = fileEntry.isRepositoryCapabilityProvided(
+					TemporaryFileEntriesCapability.class);
+
+				if (tempFile) {
+					FileEntry tempFileEntry = fileEntry;
+
+					Folder folder = article.addImagesFolder();
+
+					String fileEntryName = DLUtil.getUniqueFileName(
+						folder.getGroupId(), folder.getFolderId(),
+						fileEntry.getFileName());
+
+					fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
+						folder.getGroupId(), fileEntry.getUserId(),
+						JournalArticle.class.getName(),
+						article.getResourcePrimKey(),
+						JournalConstants.SERVICE_NAME, folder.getFolderId(),
+						fileEntry.getContentStream(), fileEntryName,
+						fileEntry.getMimeType(), false);
+
+					tempFileEntryIds.add(tempFileEntry.getFileEntryId());
+				}
+
+				JSONObject cdataJSONObject = JSONFactoryUtil.createJSONObject(
+					dynamicContentElement.getText());
+
+				cdataJSONObject.put("fileEntryId", fileEntry.getFileEntryId());
+				cdataJSONObject.put(
+					"resourcePrimKey", article.getResourcePrimKey());
+				cdataJSONObject.put("uuid", fileEntry.getUuid());
+
+				dynamicContentElement.clearContent();
+
+				dynamicContentElement.addCDATA(cdataJSONObject.toString());
 			}
-
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
-
-			String uuid = jsonObject.getString("uuid");
-			long groupId = jsonObject.getLong("groupId");
-
-			FileEntry fileEntry =
-				dlAppLocalService.getFileEntryByUuidAndGroupId(uuid, groupId);
-
-			boolean tempFile = fileEntry.isRepositoryCapabilityProvided(
-				TemporaryFileEntriesCapability.class);
-
-			if (tempFile) {
-				FileEntry tempFileEntry = fileEntry;
-
-				Folder folder = article.addImagesFolder();
-
-				String fileEntryName = DLUtil.getUniqueFileName(
-					folder.getGroupId(), folder.getFolderId(),
-					fileEntry.getFileName());
-
-				fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-					folder.getGroupId(), fileEntry.getUserId(),
-					JournalArticle.class.getName(),
-					article.getResourcePrimKey(), JournalConstants.SERVICE_NAME,
-					folder.getFolderId(), fileEntry.getContentStream(),
-					fileEntryName, fileEntry.getMimeType(), false);
-
-				TempFileEntryUtil.deleteTempFileEntry(
-					tempFileEntry.getFileEntryId());
+		}
+		finally {
+			for (Long tempFileEntryId : tempFileEntryIds) {
+				TempFileEntryUtil.deleteTempFileEntry(tempFileEntryId);
 			}
-
-			JSONObject cdataJSONObject = JSONFactoryUtil.createJSONObject(
-				dynamicContentElement.getText());
-
-			cdataJSONObject.put("fileEntryId", fileEntry.getFileEntryId());
-			cdataJSONObject.put(
-				"resourcePrimKey", article.getResourcePrimKey());
-			cdataJSONObject.put("uuid", fileEntry.getUuid());
-
-			dynamicContentElement.clearContent();
-
-			dynamicContentElement.addCDATA(cdataJSONObject.toString());
 		}
 	}
 
@@ -7036,6 +7046,14 @@ public class JournalArticleLocalServiceImpl
 	protected void checkArticlesByDisplayDate(Date displayDate)
 		throws PortalException {
 
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"Publishing articles with display date less than ",
+					displayDate, " and status ",
+					WorkflowConstants.STATUS_SCHEDULED));
+		}
+
 		ActionableDynamicQuery actionableDynamicQuery =
 			getActionableDynamicQuery();
 
@@ -7053,6 +7071,10 @@ public class JournalArticleLocalServiceImpl
 			});
 		actionableDynamicQuery.setPerformActionMethod(
 			(JournalArticle article) -> {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Publishing article " + article.getId());
+				}
+
 				long userId = PortalUtil.getValidUserId(
 					article.getCompanyId(), article.getUserId());
 
@@ -7084,6 +7106,19 @@ public class JournalArticleLocalServiceImpl
 	protected void checkArticlesByExpirationDate(Date expirationDate)
 		throws PortalException {
 
+		long checkInterval = getArticleCheckInterval();
+
+		Date nextExpirationDate = new Date(
+			expirationDate.getTime() + checkInterval);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"Expiring articles with expiration date less than or ",
+					"equal to ", nextExpirationDate, " and status ",
+					WorkflowConstants.STATUS_APPROVED));
+		}
+
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			getIndexableActionableDynamicQuery();
 
@@ -7102,11 +7137,7 @@ public class JournalArticleLocalServiceImpl
 				Property expirationDateProperty = PropertyFactoryUtil.forName(
 					"expirationDate");
 
-				long checkInterval = getArticleCheckInterval();
-
-				dynamicQuery.add(
-					expirationDateProperty.le(
-						new Date(expirationDate.getTime() + checkInterval)));
+				dynamicQuery.add(expirationDateProperty.le(nextExpirationDate));
 
 				Property statusProperty = PropertyFactoryUtil.forName("status");
 
@@ -7115,6 +7146,10 @@ public class JournalArticleLocalServiceImpl
 			});
 		indexableActionableDynamicQuery.setPerformActionMethod(
 			(JournalArticle article) -> {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Expiring article " + article.getId());
+				}
+
 				if (isExpireAllArticleVersions(article.getCompanyId())) {
 					List<JournalArticle> currentArticles =
 						journalArticlePersistence.findByG_A(
@@ -7169,6 +7204,13 @@ public class JournalArticleLocalServiceImpl
 
 	protected void checkArticlesByReviewDate(Date reviewDate)
 		throws PortalException {
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"Sending review notification for articles with reviewDate ",
+					"between ", _previousCheckDate, " and ", reviewDate));
+		}
 
 		Set<Long> latestArticleIds = new HashSet<>();
 
@@ -7310,7 +7352,7 @@ public class JournalArticleLocalServiceImpl
 						newArticle.getGroupId(), folder.getFolderId(),
 						fileName);
 
-				String previewURL = _dlurlHelper.getPreviewURL(
+				String previewURL = _dlURLHelper.getPreviewURL(
 					fileEntry, fileEntry.getFileVersion(), null,
 					StringPool.BLANK, false, true);
 
@@ -7349,11 +7391,11 @@ public class JournalArticleLocalServiceImpl
 		List<Element> dynamicElementElements = parentElement.elements(
 			"dynamic-element");
 
-		LocalizedValue fieldLocalizedValue = new LocalizedValue(defaultLocale);
-
 		for (Element dynamicElementElement : dynamicElementElements) {
 			String fieldName = dynamicElementElement.attributeValue(
 				"name", StringPool.BLANK);
+			LocalizedValue fieldLocalizedValue = new LocalizedValue(
+				defaultLocale);
 
 			List<Element> dynamicContentElements =
 				dynamicElementElement.elements("dynamic-content");
@@ -9033,7 +9075,7 @@ public class JournalArticleLocalServiceImpl
 	private CommentManager _commentManager;
 
 	@ServiceReference(type = DLURLHelper.class)
-	private DLURLHelper _dlurlHelper;
+	private DLURLHelper _dlURLHelper;
 
 	@ServiceReference(type = JournalDefaultTemplateProvider.class)
 	private JournalDefaultTemplateProvider _journalDefaultTemplateProvider;

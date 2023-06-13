@@ -36,6 +36,8 @@ definition {
 	}
 
 	macro enableChangeList {
+		Pause(locator1 = "1000");
+
 		Check.checkToggleSwitch(
 			locator1 = "ChangeListSettings#CHANGE_LISTS_TOGGLE_SWITCH"
 		);
@@ -104,7 +106,7 @@ definition {
 
 			AssertTextEquals(
 				locator1 = "ChangeList#OVERVIEW_PAGE_TITLE",
-				value1 = "Overview"
+				value1 = "Change Lists"
 			);
 		}
 	}

@@ -9,7 +9,11 @@ import getConnectedComponent from '../../../store/ConnectedComponent.es';
 import {setIn} from '../../../utils/FragmentsEditorUpdateUtils.es';
 import templates from './FloatingToolbarMappingPanel.soy';
 import {openAssetBrowser} from '../../../utils/FragmentsEditorDialogUtils';
-import {ADD_MAPPED_ASSET_ENTRY, UPDATE_EDITABLE_VALUE} from '../../../actions/actions.es';
+import {
+	ADD_MAPPED_ASSET_ENTRY,
+	UPDATE_EDITABLE_VALUE, UPDATE_LAST_SAVE_DATE,
+	UPDATE_SAVING_CHANGES_STATUS
+} from '../../../actions/actions.es';
 
 const SOURCE_TYPE_IDS = {
 	content: 'specific_content',
@@ -317,12 +321,30 @@ class FloatingToolbarMappingPanel extends PortletBase {
 	_updateEditableValues(key, value) {
 		this.store
 			.dispatchAction(
+				UPDATE_SAVING_CHANGES_STATUS,
+				{
+					savingChanges: true
+				}
+			)
+			.dispatchAction(
 				UPDATE_EDITABLE_VALUE,
 				{
 					editableId: this.item.editableId,
 					editableValue: value,
 					editableValueId: key,
 					fragmentEntryLinkId: this.item.fragmentEntryLinkId
+				}
+			)
+			.dispatchAction(
+				UPDATE_LAST_SAVE_DATE,
+				{
+					lastSaveDate: new Date()
+				}
+			)
+			.dispatchAction(
+				UPDATE_SAVING_CHANGES_STATUS,
+				{
+					savingChanges: false
 				}
 			);
 	}

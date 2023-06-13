@@ -22,17 +22,19 @@
 			<liferay-util:buffer
 				var="userAvatar"
 			>
-				<c:if test="<%= themeDisplay.isImpersonated() %>">
-					<aui:icon image="asterisk" markupView="lexicon" />
-				</c:if>
+				<span class="sticker">
+					<span class="inline-item">
+						<liferay-ui:user-portrait
+							cssClass="sticker-lg"
+							user="<%= user %>"
+						/>
+					</span>
 
-				<span class="user-avatar-image">
-					<liferay-ui:user-portrait
-						user="<%= user %>"
-					/>
-				</span>
-				<span class="user-full-name">
-					<%= HtmlUtil.escape(user.getFullName()) %>
+					<c:if test="<%= themeDisplay.isImpersonated() %>">
+						<span class="sticker sticker-bottom-right sticker-circle sticker-outside sticker-sm sticker-user-icon">
+							<aui:icon image="user" markupView="lexicon" />
+						</span>
+					</c:if>
 				</span>
 			</liferay-util:buffer>
 

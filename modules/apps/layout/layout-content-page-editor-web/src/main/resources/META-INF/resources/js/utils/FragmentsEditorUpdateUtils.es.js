@@ -1,5 +1,7 @@
-import {CLEAR_DROP_TARGET, UPDATE_LAST_SAVE_DATE, UPDATE_SAVING_CHANGES_STATUS, UPDATE_TRANSLATION_STATUS} from '../actions/actions.es';
-import {getWidget, getWidgetPath} from './FragmentsEditorGetUtils.es';
+import {CLEAR_DROP_TARGET, MOVE_ROW, UPDATE_LAST_SAVE_DATE, UPDATE_SAVING_CHANGES_STATUS, UPDATE_TRANSLATION_STATUS} from '../actions/actions.es';
+import {DEFAULT_COMPONENT_ROW_CONFIG, DEFAULT_SECTION_ROW_CONFIG} from './rowConstants';
+import {FRAGMENTS_EDITOR_ROW_TYPES} from './constants';
+import {getTargetBorder, getWidget, getWidgetPath} from './FragmentsEditorGetUtils.es';
 
 /**
  * Inserts an element in the given position of a given array and returns
@@ -15,6 +17,65 @@ function add(array, element, position) {
 	newArray.splice(position, 0, element);
 
 	return newArray;
+}
+
+/**
+ * Returns a new layoutData with the given columns inserted as a new row
+ * at the given position
+ *
+ * @param {Array} layoutColumns
+ * @param {object} layoutData
+ * @param {number} position
+ * @param {Array} fragmentEntryLinkIds
+ * @param {string} type
+ * @return {object}
+ */
+function addRow(
+	layoutColumns,
+	layoutData,
+	position,
+	fragmentEntryLinkIds = [],
+	type = FRAGMENTS_EDITOR_ROW_TYPES.componentRow
+) {
+	let nextColumnId = layoutData.nextColumnId || 0;
+	const nextRowId = layoutData.nextRowId || 0;
+
+	const columns = [];
+
+	layoutColumns.forEach(
+		columnSize => {
+			columns.push(
+				{
+					columnId: `${nextColumnId}`,
+					fragmentEntryLinkIds,
+					size: columnSize
+				}
+			);
+
+			nextColumnId += 1;
+		}
+	);
+
+	const defaultConfig = type === FRAGMENTS_EDITOR_ROW_TYPES.sectionRow ?
+		DEFAULT_SECTION_ROW_CONFIG : DEFAULT_COMPONENT_ROW_CONFIG;
+
+	const nextStructure = add(
+		layoutData.structure,
+		{
+			columns,
+			config: defaultConfig,
+			rowId: `${nextRowId}`,
+			type
+		},
+		position
+	);
+
+	let nextData = setIn(layoutData, ['nextColumnId'], nextColumnId);
+
+	nextData = setIn(nextData, ['structure'], nextStructure);
+	nextData = setIn(nextData, ['nextRowId'], nextRowId + 1);
+
+	return nextData;
 }
 
 /**
@@ -51,6 +112,29 @@ function moveItem(store, moveItemAction, moveItemPayload) {
 		.dispatchAction(
 			CLEAR_DROP_TARGET
 		);
+}
+
+/**
+ * Moves a row one position in the given direction
+ * @param {number} direction
+ * @param {object} row
+ * @param {object} store Store instance that dispatches the actions
+ * @param {array} structure
+ * @review
+ */
+function moveRow(direction, rowIndex, store, structure) {
+	const row = structure[rowIndex];
+	const targetRow = structure[rowIndex + direction];
+
+	if (targetRow) {
+		const moveItemPayload = {
+			rowId: row.rowId,
+			targetBorder: getTargetBorder(direction),
+			targetItemId: targetRow.rowId
+		};
+
+		moveItem(store, MOVE_ROW, moveItemPayload);
+	}
 }
 
 /**
@@ -168,60 +252,14 @@ function updateIn(object, keyPath, updater, defaultValue) {
 }
 
 /**
- * Update layoutData on backend
- * @param {!string} updateLayoutPageTemplateDataURL
- * @param {!string} portletNamespace
- * @param {!string} classNameId
- * @param {!string} classPK
- * @param {!Object} data
- * @param {!Array} fragmentEntryLinkIds
- * @return {Promise}
- * @review
- */
-function updateLayoutData(
-	updateLayoutPageTemplateDataURL,
-	portletNamespace,
-	classNameId,
-	classPK,
-	data,
-	fragmentEntryLinkIds
-) {
-	const formData = new FormData();
-
-	formData.append(`${portletNamespace}classNameId`, classNameId);
-	formData.append(`${portletNamespace}classPK`, classPK);
-
-	formData.append(
-		`${portletNamespace}data`,
-		JSON.stringify(data)
-	);
-
-	if (fragmentEntryLinkIds) {
-		formData.append(
-			`${portletNamespace}fragmentEntryLinkIds`,
-			JSON.stringify(fragmentEntryLinkIds)
-		);
-	}
-
-	return fetch(
-		updateLayoutPageTemplateDataURL,
-		{
-			body: formData,
-			credentials: 'include',
-			method: 'POST'
-		}
-	);
-}
-
-/**
- * Updates section
+ * Updates row
  * @param {!Object} store Store instance that dispatches the actions
  * @param {string} updateAction Update action name
- * @param {object} payload Section payload
+ * @param {object} payload Row payload
  * @private
  * @review
  */
-function updateSection(store, updateAction, payload) {
+function updateRow(store, updateAction, payload) {
 	store
 		.dispatchAction(
 			UPDATE_SAVING_CHANGES_STATUS,
@@ -283,12 +321,13 @@ function updateWidgets(state, fragmentEntryLinkId) {
 
 export {
 	add,
+	addRow,
 	moveItem,
+	moveRow,
 	remove,
 	removeItem,
 	setIn,
 	updateIn,
-	updateLayoutData,
-	updateSection,
+	updateRow,
 	updateWidgets
 };

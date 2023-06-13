@@ -55,7 +55,7 @@ renderResponse.setTitle((ddmStructure != null) ? LanguageUtil.format(request, "e
 				</li>
 				<li class="tbar-item">
 					<div class="journal-article-button-row tbar-section text-right">
-						<a class="btn btn-outline-borderless btn-outline-secondary btn-sm mr-3" href="<%= HtmlUtil.escape(redirect) %>">
+						<a class="btn btn-secondary btn-sm mr-3" href="<%= HtmlUtil.escape(redirect) %>">
 							<liferay-ui:message key="cancel" />
 						</a>
 
@@ -64,6 +64,7 @@ renderResponse.setTitle((ddmStructure != null) ? LanguageUtil.format(request, "e
 						<clay:button
 							icon="cog"
 							id='<%= renderResponse.getNamespace() + "contextualSidebarButton" %>'
+							monospaced="<%= true %>"
 							size="sm"
 							style="borderless"
 						/>
@@ -73,7 +74,7 @@ renderResponse.setTitle((ddmStructure != null) ? LanguageUtil.format(request, "e
 		</div>
 	</nav>
 
-	<div class="contextual-sidebar contextual-sidebar-visible edit-article-sidebar sidebar-light sidebar-sm" id="<portlet:namespace />contextualSidebarContainer">
+	<div class="contextual-sidebar edit-article-sidebar sidebar-light sidebar-sm" id="<portlet:namespace />contextualSidebarContainer">
 		<div class="sidebar-header">
 			<h4 class="component-title">
 				<liferay-ui:message key="properties" />
@@ -82,6 +83,7 @@ renderResponse.setTitle((ddmStructure != null) ? LanguageUtil.format(request, "e
 
 		<div class="sidebar-body">
 			<liferay-frontend:form-navigator
+				fieldSetCssClass="panel-group-flush"
 				formModelBean="<%= ddmStructure %>"
 				id="<%= JournalWebConstants.FORM_NAVIGATOR_ID_JOURNAL_DDM_STRUCTURE %>"
 				showButtons="<%= false %>"
@@ -235,14 +237,17 @@ renderResponse.setTitle((ddmStructure != null) ? LanguageUtil.format(request, "e
 		);
 	}
 
+	var contextualSidebarContainer = document.getElementById('<portlet:namespace />contextualSidebarContainer');
 	var contextualSidebarButton = document.getElementById('<portlet:namespace />contextualSidebarButton');
+
+	if (contextualSidebarContainer && (window.innerWidth > Liferay.BREAKPOINTS.PHONE)) {
+		contextualSidebarContainer.classList.add('contextual-sidebar-visible');
+	}
 
 	if (contextualSidebarButton) {
 		contextualSidebarButton.addEventListener(
 			'click',
 			function(event) {
-				var contextualSidebarContainer = document.getElementById('<portlet:namespace />contextualSidebarContainer');
-
 				if (contextualSidebarContainer.classList.contains('contextual-sidebar-visible')) {
 					contextualSidebarContainer.classList.remove('contextual-sidebar-visible');
 

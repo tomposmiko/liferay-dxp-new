@@ -40,20 +40,24 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "DataDefinitionField")
 public class DataDefinitionField {
 
-	public String getDefaultValue() {
-		return defaultValue;
+	public CustomProperty[] getCustomProperties() {
+		return customProperties;
 	}
 
-	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = defaultValue;
+	public void setCustomProperties(CustomProperty[] customProperties) {
+		this.customProperties = customProperties;
 	}
 
 	@JsonIgnore
-	public void setDefaultValue(
-		UnsafeSupplier<String, Exception> defaultValueUnsafeSupplier) {
+	public void setCustomProperties(
+		UnsafeSupplier<CustomProperty[], Exception>
+			customPropertiesUnsafeSupplier) {
 
 		try {
-			defaultValue = defaultValueUnsafeSupplier.get();
+			customProperties = customPropertiesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -62,7 +66,35 @@ public class DataDefinitionField {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String defaultValue;
+	protected CustomProperty[] customProperties;
+
+	public LocalizedValue[] getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(LocalizedValue[] defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	@JsonIgnore
+	public void setDefaultValue(
+		UnsafeSupplier<LocalizedValue[], Exception>
+			defaultValueUnsafeSupplier) {
+
+		try {
+			defaultValue = defaultValueUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected LocalizedValue[] defaultValue;
 
 	public String getFieldType() {
 		return fieldType;
@@ -78,6 +110,9 @@ public class DataDefinitionField {
 
 		try {
 			fieldType = fieldTypeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -100,6 +135,9 @@ public class DataDefinitionField {
 	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
 		try {
 			id = idUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -125,6 +163,9 @@ public class DataDefinitionField {
 		try {
 			indexable = indexableUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -148,6 +189,9 @@ public class DataDefinitionField {
 
 		try {
 			label = labelUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -173,6 +217,9 @@ public class DataDefinitionField {
 		try {
 			localizable = localizableUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -194,6 +241,9 @@ public class DataDefinitionField {
 	public void setName(UnsafeSupplier<String, Exception> nameUnsafeSupplier) {
 		try {
 			name = nameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -219,6 +269,9 @@ public class DataDefinitionField {
 		try {
 			repeatable = repeatableUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -242,6 +295,9 @@ public class DataDefinitionField {
 
 		try {
 			tip = tipUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -279,28 +335,79 @@ public class DataDefinitionField {
 
 		sb.append("{");
 
+		sb.append("\"customProperties\": ");
+
+		if (customProperties == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < customProperties.length; i++) {
+				sb.append(customProperties[i]);
+
+				if ((i + 1) < customProperties.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		sb.append(", ");
+
 		sb.append("\"defaultValue\": ");
 
-		sb.append("\"");
-		sb.append(defaultValue);
-		sb.append("\"");
+		if (defaultValue == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append("[");
+
+			for (int i = 0; i < defaultValue.length; i++) {
+				sb.append(defaultValue[i]);
+
+				if ((i + 1) < defaultValue.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		sb.append(", ");
 
 		sb.append("\"fieldType\": ");
 
-		sb.append("\"");
-		sb.append(fieldType);
-		sb.append("\"");
+		if (fieldType == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(fieldType);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"id\": ");
 
-		sb.append(id);
+		if (id == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(id);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"indexable\": ");
 
-		sb.append(indexable);
+		if (indexable == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(indexable);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"label\": ");
@@ -326,19 +433,35 @@ public class DataDefinitionField {
 
 		sb.append("\"localizable\": ");
 
-		sb.append(localizable);
+		if (localizable == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(localizable);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"name\": ");
 
-		sb.append("\"");
-		sb.append(name);
-		sb.append("\"");
+		if (name == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(name);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"repeatable\": ");
 
-		sb.append(repeatable);
+		if (repeatable == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(repeatable);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"tip\": ");

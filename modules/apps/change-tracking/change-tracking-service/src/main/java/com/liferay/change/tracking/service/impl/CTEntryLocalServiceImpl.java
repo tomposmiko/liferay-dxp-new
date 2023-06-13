@@ -133,16 +133,6 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 	}
 
 	@Override
-	public int getAffectedOwnerCTEntriesCount(long ctEntryId) {
-		QueryDefinition<CTEntry> queryDefinition = new QueryDefinition<>();
-
-		queryDefinition.setStatus(WorkflowConstants.STATUS_DRAFT);
-
-		return ctEntryFinder.countByRelatedCTEntries(
-			ctEntryId, queryDefinition);
-	}
-
-	@Override
 	public List<CTEntry> getCTCollectionCTEntries(long ctCollectionId) {
 		return getCTCollectionCTEntries(
 			ctCollectionId, WorkflowConstants.STATUS_DRAFT, QueryUtil.ALL_POS,
@@ -201,14 +191,25 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 	}
 
 	@Override
+	public int getRelatedOwnerCTEntriesCount(long ctEntryId) {
+		QueryDefinition<CTEntry> queryDefinition = new QueryDefinition<>();
+
+		queryDefinition.setStatus(WorkflowConstants.STATUS_DRAFT);
+
+		return ctEntryFinder.countByRelatedCTEntries(
+			ctEntryId, queryDefinition);
+	}
+
+	@Override
 	public List<CTEntry> search(
 		CTCollection ctCollection, long[] groupIds, long[] userIds,
-		long[] classNameIds, int[] changeTypes, boolean collision,
-		long otherCTCollectionId, QueryDefinition<CTEntry> queryDefinition) {
+		long[] classNameIds, int[] changeTypes, Boolean collision,
+		QueryDefinition<CTEntry> queryDefinition) {
 
 		Query query = _buildQuery(
 			ctCollection, groupIds, userIds, classNameIds, changeTypes,
-			queryDefinition.getStatus(), queryDefinition.isExcludeStatus());
+			collision, queryDefinition.getStatus(),
+			queryDefinition.isExcludeStatus());
 
 		SearchResponse searchResponse = _search(
 			ctCollection.getCompanyId(), query, queryDefinition);
@@ -219,14 +220,25 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 	@Override
 	public long searchCount(
 		CTCollection ctCollection, long[] groupIds, long[] userIds,
-		long[] classNameIds, int[] changeTypes, boolean collision,
-		long otherCTCollectionId, QueryDefinition<CTEntry> queryDefinition) {
+		long[] classNameIds, int[] changeTypes, Boolean collision,
+		QueryDefinition<CTEntry> queryDefinition) {
 
 		Query query = _buildQuery(
 			ctCollection, groupIds, userIds, classNameIds, changeTypes,
-			queryDefinition.getStatus(), queryDefinition.isExcludeStatus());
+			collision, queryDefinition.getStatus(),
+			queryDefinition.isExcludeStatus());
 
 		return _searchCount(ctCollection.getCompanyId(), query);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public CTEntry updateCollision(long ctEntryId, boolean collision) {
+		CTEntry ctEntry = ctEntryPersistence.fetchByPrimaryKey(ctEntryId);
+
+		ctEntry.setCollision(collision);
+
+		return ctEntryPersistence.update(ctEntry);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -288,7 +300,7 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 
 	private Query _buildQuery(
 		CTCollection ctCollection, long[] groupIds, long[] userIds,
-		long[] classNameIds, int[] changeTypes, int status,
+		long[] classNameIds, int[] changeTypes, Boolean collision, int status,
 		boolean excludeStatus) {
 
 		BooleanQuery booleanQuery = _queries.booleanQuery();
@@ -323,6 +335,11 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 				_getTermsQuery(
 					"changeType",
 					_getTermValues(ArrayUtil.toArray(changeTypes))));
+		}
+
+		if (collision != null) {
+			booleanQuery.addFilterQueryClauses(
+				_queries.term("collision", collision));
 		}
 
 		if (WorkflowConstants.STATUS_ANY != status) {

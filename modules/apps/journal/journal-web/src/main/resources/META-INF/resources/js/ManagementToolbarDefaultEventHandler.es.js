@@ -9,7 +9,17 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 		Liferay.on(
 			this.ns('selectAddMenuItem'),
 			function(event) {
-				location.href = Liferay.Util.addParams(namespace + 'ddmStructureKey=' + event.ddmStructureKey, addArticleURL);
+				const selectAddMenuItemWindow = Liferay.Util.Window.getById(namespace + 'selectAddMenuItem');
+
+				selectAddMenuItemWindow.detachAll();
+
+				Liferay.fire(
+					'closeWindow',
+					{
+						id: namespace + 'selectAddMenuItem',
+						redirect: Liferay.Util.addParams(namespace + 'ddmStructureKey=' + event.ddmStructureKey, addArticleURL)
+					}
+				);
 			}
 		);
 	}
@@ -44,6 +54,11 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 		Liferay.Util.openWindow(
 			{
 				dialog: {
+					after: {
+						destroy: function(event) {
+							window.location.reload();
+						}
+					},
 					destroyOnHide: true,
 					modal: true
 				},

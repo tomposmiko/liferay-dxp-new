@@ -250,9 +250,18 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
+		MBMessage parentMBMessage = fetchMBMessage(parentMessageId);
+
+		if ((parentMBMessage != null) && !parentMBMessage.isApproved()) {
+			throw new PortalException("Parent message is not approved");
+		}
+
 		// Message
 
-		User user = userLocalService.getUser(userId);
+		Group group = groupLocalService.getGroup(groupId);
+
+		User user = userLocalService.fetchUser(
+			PortalUtil.getValidUserId(group.getCompanyId(), userId));
 
 		userName = user.isDefaultUser() ? userName : user.getFullName();
 

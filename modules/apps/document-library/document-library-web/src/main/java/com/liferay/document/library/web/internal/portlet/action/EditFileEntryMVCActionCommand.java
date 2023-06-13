@@ -14,8 +14,7 @@
 
 package com.liferay.document.library.web.internal.portlet.action;
 
-import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
-import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
+import com.liferay.asset.display.page.portlet.AssetDisplayPageEntryFormProcessor;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
 import com.liferay.asset.kernel.model.AssetVocabulary;
@@ -55,7 +54,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
-import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -64,6 +62,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -102,7 +101,6 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.WindowState;
 
 import org.apache.commons.fileupload.FileUploadBase;
 
@@ -233,8 +231,9 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				uniqueFileName, description, changeLog, inputStream, size,
 				serviceContext);
 
-			_updateAssetDisplayPage(
-				fileEntry, serviceContext, themeDisplay, actionRequest);
+			_assetDisplayPageEntryFormProcessor.process(
+				DLFileEntry.class.getName(), fileEntry.getFileEntryId(),
+				actionRequest);
 
 			validFileNameKVPs.add(
 				new KeyValuePair(uniqueFileName, selectedFileName));
@@ -537,8 +536,6 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				revertFileEntry(actionRequest);
 			}
 
-			WindowState windowState = actionRequest.getWindowState();
-
 			if (cmd.equals(Constants.ADD_TEMP) ||
 				cmd.equals(Constants.DELETE_TEMP)) {
 
@@ -556,8 +553,6 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					"mvcRenderCommandName",
 					"/document_library/edit_file_entry");
 			}
-			else if (!windowState.equals(LiferayWindowState.POP_UP)) {
-			}
 			else {
 				String redirect = ParamUtil.getString(
 					actionRequest, "redirect");
@@ -574,20 +569,18 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					sendRedirect(actionRequest, actionResponse, redirect);
 				}
 				else {
-					if (windowState.equals(LiferayWindowState.POP_UP)) {
-						redirect = _portal.escapeRedirect(
-							ParamUtil.getString(actionRequest, "redirect"));
+					redirect = _portal.escapeRedirect(
+						ParamUtil.getString(actionRequest, "redirect"));
 
-						if (Validator.isNotNull(redirect)) {
-							if (cmd.equals(Constants.ADD) &&
-								(fileEntry != null)) {
+					if (Validator.isNotNull(redirect)) {
+						if (cmd.equals(Constants.ADD) && (fileEntry != null)) {
+							String portletResource = _http.getParameter(
+								redirect, "portletResource", false);
 
-								String portletId = _http.getParameter(
-									redirect, "p_p_id", false);
+							String namespace = _portal.getPortletNamespace(
+								portletResource);
 
-								String namespace = _portal.getPortletNamespace(
-									portletId);
-
+							if (Validator.isNotNull(portletResource)) {
 								redirect = _http.addParameter(
 									redirect, namespace + "className",
 									DLFileEntry.class.getName());
@@ -595,10 +588,9 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 									redirect, namespace + "classPK",
 									fileEntry.getFileEntryId());
 							}
-
-							actionRequest.setAttribute(
-								WebKeys.REDIRECT, redirect);
 						}
+
+						actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
 					}
 				}
 			}
@@ -987,43 +979,19 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					inputStream, size, serviceContext);
 			}
 
-			_updateAssetDisplayPage(
-				fileEntry, serviceContext, themeDisplay, actionRequest);
+			_assetDisplayPageEntryFormProcessor.process(
+				DLFileEntry.class.getName(), fileEntry.getFileEntryId(),
+				actionRequest);
+
+			String portletResource = ParamUtil.getString(
+				actionRequest, "portletResource");
+
+			if (Validator.isNotNull(portletResource)) {
+				MultiSessionMessages.add(
+					actionRequest, portletResource + "requestProcessed");
+			}
 
 			return fileEntry;
-		}
-	}
-
-	private void _updateAssetDisplayPage(
-			FileEntry fileEntry, ServiceContext serviceContext,
-			ThemeDisplay themeDisplay, ActionRequest actionRequest)
-		throws PortalException {
-
-		AssetDisplayPageEntry assetDisplayPageEntry =
-			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
-				themeDisplay.getScopeGroupId(),
-				_portal.getClassNameId(DLFileEntry.class),
-				fileEntry.getFileEntryId());
-
-		long assetDisplayPageId = ParamUtil.getLong(
-			actionRequest, "assetDisplayPageId");
-		int displayPageType = ParamUtil.getInteger(
-			actionRequest, "displayPageType");
-
-		if (assetDisplayPageEntry == null) {
-			_assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
-				themeDisplay.getUserId(), themeDisplay.getScopeGroupId(),
-				_portal.getClassNameId(DLFileEntry.class),
-				fileEntry.getFileEntryId(), assetDisplayPageId, displayPageType,
-				serviceContext);
-		}
-		else {
-			assetDisplayPageEntry.setLayoutPageTemplateEntryId(
-				assetDisplayPageId);
-			assetDisplayPageEntry.setType(displayPageType);
-
-			_assetDisplayPageEntryLocalService.updateAssetDisplayPageEntry(
-				assetDisplayPageEntry);
 		}
 	}
 
@@ -1031,8 +999,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		EditFileEntryMVCActionCommand.class);
 
 	@Reference
-	private AssetDisplayPageEntryLocalService
-		_assetDisplayPageEntryLocalService;
+	private AssetDisplayPageEntryFormProcessor
+		_assetDisplayPageEntryFormProcessor;
 
 	private DLAppService _dlAppService;
 	private volatile DLConfiguration _dlConfiguration;

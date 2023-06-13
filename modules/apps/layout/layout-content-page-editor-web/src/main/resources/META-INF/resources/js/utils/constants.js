@@ -140,12 +140,22 @@ export const FLOATING_TOOLBAR_BUTTONS = {
 	},
 
 	textProperties: {
-		icon: 'format',
+		icon: 'pencil',
 		id: 'text_properties',
 		panelId: 'text_properties',
 		title: Liferay.Language.get('text-properties'),
 		type: 'panel'
 	}
+};
+
+/**
+ * Fragment Entry Link types
+ * @review
+ * @type {!object}
+ */
+export const FRAGMENT_ENTRY_LINK_TYPES = {
+	component: 'fragment-entry-link-component',
+	section: 'fragment-entry-link-section'
 };
 
 /**
@@ -168,7 +178,17 @@ export const FRAGMENTS_EDITOR_ITEM_TYPES = {
 	editable: 'fragments-editor-editable-field',
 	fragment: 'fragments-editor-fragment',
 	fragmentList: 'fragments-editor-fragment-list',
-	section: 'fragments-editor-section'
+	row: 'fragments-editor-row'
+};
+
+/**
+ * Fragments Editor row types
+ * @review
+ * @type {!object}
+ */
+export const FRAGMENTS_EDITOR_ROW_TYPES = {
+	componentRow: 'fragments-editor-component-row',
+	sectionRow: 'fragments-editor-section-row'
 };
 
 /**
@@ -220,7 +240,7 @@ export const TEXT_ALIGNMENT_OPTIONS = [
  */
 export const TEXT_STYLES = [
 	{
-		label: Liferay.Language.get('regular'),
+		label: Liferay.Language.get('normal'),
 		textStyleId: ''
 	},
 	{
@@ -228,7 +248,35 @@ export const TEXT_STYLES = [
 		textStyleId: 'small'
 	},
 	{
-		label: Liferay.Language.get('Large'),
+		label: Liferay.Language.get('lead'),
 		textStyleId: 'lead'
+	},
+	{
+		label: Liferay.Util.sub(
+			Liferay.Language.get('heading-x'),
+			'1'
+		),
+		textStyleId: 'h1'
+	},
+	{
+		label: Liferay.Util.sub(
+			Liferay.Language.get('heading-x'),
+			'2'
+		),
+		textStyleId: 'h2'
+	},
+	{
+		label: Liferay.Util.sub(
+			Liferay.Language.get('heading-x'),
+			'3'
+		),
+		textStyleId: 'h3'
+	},
+	{
+		label: Liferay.Util.sub(
+			Liferay.Language.get('heading-x'),
+			'4'
+		),
+		textStyleId: 'h4'
 	}
 ];

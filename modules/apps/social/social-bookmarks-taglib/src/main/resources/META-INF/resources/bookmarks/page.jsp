@@ -78,6 +78,7 @@ String dropdownMenuComponentId = randomNamespace + "socialBookmarksDropdownMenu"
 					icon="share"
 					style="secondary"
 					triggerCssClasses="btn-monospaced btn-outline-borderless btn-outline-secondary btn-sm"
+					triggerTitle='<%= LanguageUtil.get(request, "share") %>'
 				/>
 
 			<%

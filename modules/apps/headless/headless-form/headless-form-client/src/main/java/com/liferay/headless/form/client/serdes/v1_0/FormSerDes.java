@@ -18,6 +18,10 @@ import com.liferay.headless.form.client.dto.v1_0.Form;
 import com.liferay.headless.form.client.dto.v1_0.FormRecord;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.Objects;
@@ -76,49 +80,70 @@ public class FormSerDes {
 
 		sb.append(", ");
 
-		sb.append("\"contentSpaceId\": ");
-
-		sb.append(form.getContentSpaceId());
-		sb.append(", ");
-
 		sb.append("\"creator\": ");
 
-		sb.append(form.getCreator());
+		if (form.getCreator() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getCreator());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"dateCreated\": ");
 
-		sb.append("\"");
-		sb.append(form.getDateCreated());
-		sb.append("\"");
+		if (form.getDateCreated() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getDateCreated());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"dateModified\": ");
 
-		sb.append("\"");
-		sb.append(form.getDateModified());
-		sb.append("\"");
+		if (form.getDateModified() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getDateModified());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"datePublished\": ");
 
-		sb.append("\"");
-		sb.append(form.getDatePublished());
-		sb.append("\"");
+		if (form.getDatePublished() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getDatePublished());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"defaultLanguage\": ");
 
-		sb.append("\"");
-		sb.append(form.getDefaultLanguage());
-		sb.append("\"");
+		if (form.getDefaultLanguage() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getDefaultLanguage());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"description\": ");
 
-		sb.append("\"");
-		sb.append(form.getDescription());
-		sb.append("\"");
+		if (form.getDescription() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getDescription());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"formRecords\": ");
@@ -165,24 +190,56 @@ public class FormSerDes {
 
 		sb.append("\"id\": ");
 
-		sb.append(form.getId());
+		if (form.getId() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getId());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"name\": ");
 
-		sb.append("\"");
-		sb.append(form.getName());
-		sb.append("\"");
+		if (form.getName() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getName());
+		}
+
+		sb.append(", ");
+
+		sb.append("\"siteId\": ");
+
+		if (form.getSiteId() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getSiteId());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"structure\": ");
 
-		sb.append(form.getStructure());
+		if (form.getStructure() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getStructure());
+		}
+
 		sb.append(", ");
 
 		sb.append("\"structureId\": ");
 
-		sb.append(form.getStructureId());
+		if (form.getStructureId() == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(form.getStructureId());
+		}
 
 		sb.append("}");
 
@@ -231,11 +288,6 @@ public class FormSerDes {
 						toStrings((Object[])jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "contentSpaceId")) {
-				if (jsonParserFieldValue != null) {
-					form.setContentSpaceId((Long)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "creator")) {
 				if (jsonParserFieldValue != null) {
 					form.setCreator(
@@ -244,17 +296,18 @@ public class FormSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
-					form.setDateCreated((Date)jsonParserFieldValue);
+					form.setDateCreated(_toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
-					form.setDateModified((Date)jsonParserFieldValue);
+					form.setDateModified(_toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "datePublished")) {
 				if (jsonParserFieldValue != null) {
-					form.setDatePublished((Date)jsonParserFieldValue);
+					form.setDatePublished(
+						_toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "defaultLanguage")) {
@@ -287,12 +340,17 @@ public class FormSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
 				if (jsonParserFieldValue != null) {
-					form.setId((Long)jsonParserFieldValue);
+					form.setId(Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					form.setName((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "siteId")) {
+				if (jsonParserFieldValue != null) {
+					form.setSiteId(Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "structure")) {
@@ -304,12 +362,25 @@ public class FormSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "structureId")) {
 				if (jsonParserFieldValue != null) {
-					form.setStructureId((Long)jsonParserFieldValue);
+					form.setStructureId(
+						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
+			}
+		}
+
+		private Date _toDate(String string) {
+			try {
+				DateFormat dateFormat = new SimpleDateFormat(
+					"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+				return dateFormat.parse(string);
+			}
+			catch (ParseException pe) {
+				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

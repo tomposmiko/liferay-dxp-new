@@ -14,17 +14,21 @@
 
 package com.liferay.layout.type.controller.asset.display.internal.portlet;
 
-import com.liferay.asset.display.contributor.AssetDisplayContributor;
-import com.liferay.asset.display.contributor.AssetDisplayContributorTracker;
 import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
 import com.liferay.asset.display.page.util.AssetDisplayPageHelper;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.info.display.contributor.InfoDisplayContributor;
+import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.layout.type.controller.asset.display.internal.constants.AssetDisplayPageFriendlyURLResolverConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
+import com.liferay.portal.kernel.portlet.FriendlyURLResolverRegistryUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
@@ -50,19 +54,21 @@ public class AssetDisplayPageFriendlyURLProviderImpl
 			return null;
 		}
 
-		AssetDisplayContributor assetDisplayContributor =
-			_assetDisplayContributorTracker.getAssetDisplayContributor(
+		InfoDisplayContributor infoDisplayContributor =
+			_infoDisplayContributorTracker.getInfoDisplayContributor(
 				assetEntry.getClassName());
 
-		if (assetDisplayContributor == null) {
+		if (infoDisplayContributor == null) {
 			return null;
 		}
 
 		StringBundler sb = new StringBundler(3);
 
+		Group group = _groupLocalService.getGroup(assetEntry.getGroupId());
+
 		sb.append(
 			_portal.getGroupFriendlyURL(
-				themeDisplay.getLayoutSet(), themeDisplay));
+				group.getPublicLayoutSet(), themeDisplay));
 
 		String urlTitle = null;
 
@@ -72,8 +78,12 @@ public class AssetDisplayPageFriendlyURLProviderImpl
 			urlTitle = assetRenderer.getUrlTitle(themeDisplay.getLocale());
 		}
 
-		if (Validator.isNotNull(urlTitle)) {
-			sb.append(assetDisplayContributor.getAssetURLSeparator());
+		FriendlyURLResolver friendlyURLResolver =
+			FriendlyURLResolverRegistryUtil.getFriendlyURLResolver(
+				infoDisplayContributor.getInfoURLSeparator());
+
+		if (Validator.isNotNull(urlTitle) && (friendlyURLResolver != null)) {
+			sb.append(infoDisplayContributor.getInfoURLSeparator());
 			sb.append(assetRenderer.getUrlTitle(themeDisplay.getLocale()));
 		}
 		else {
@@ -102,10 +112,13 @@ public class AssetDisplayPageFriendlyURLProviderImpl
 	}
 
 	@Reference
-	private AssetDisplayContributorTracker _assetDisplayContributorTracker;
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
-	private AssetEntryLocalService _assetEntryLocalService;
+	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
 
 	@Reference
 	private Portal _portal;

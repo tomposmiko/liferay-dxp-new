@@ -98,7 +98,7 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 	}
 
 	protected String getAllowedContentLists() {
-		return "li ol ul;";
+		return "li ol ul [*](*){*};";
 	}
 
 	protected String getAllowedContentTable() {
@@ -133,8 +133,8 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 	}
 
 	protected String getRemovePluginsLists() {
-		return "contextmenu,elementspath,image,link,liststyle,magicline," +
-			"resize,tabletools,toolbar,ae_embed";
+		return "contextmenu,elementspath,floatingspace,image,link,liststyle," +
+			"magicline,resize,tabletools,toolbar,ae_embed";
 	}
 
 	protected JSONObject getStyleFormatJSONObject(

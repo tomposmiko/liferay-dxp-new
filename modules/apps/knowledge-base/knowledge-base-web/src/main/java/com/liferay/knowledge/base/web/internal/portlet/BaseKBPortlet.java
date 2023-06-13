@@ -45,7 +45,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -85,7 +84,6 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
-import javax.portlet.WindowState;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -467,11 +465,7 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 		String redirect = PortalUtil.escapeRedirect(
 			ParamUtil.getString(actionRequest, "redirect"));
 
-		WindowState windowState = actionRequest.getWindowState();
-
-		if (cmd.equals(Constants.ADD) && Validator.isNotNull(redirect) &&
-			windowState.equals(LiferayWindowState.POP_UP)) {
-
+		if (cmd.equals(Constants.ADD) && Validator.isNotNull(redirect)) {
 			actionRequest.setAttribute(
 				WebKeys.REDIRECT,
 				getContentRedirect(
@@ -636,14 +630,17 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 	protected String getContentRedirect(
 		Class<?> clazz, long classPK, String redirect) {
 
-		String portletId = HttpUtil.getParameter(redirect, "p_p_id", false);
+		String portletId = HttpUtil.getParameter(
+			redirect, "portletResource", false);
 
 		String namespace = PortalUtil.getPortletNamespace(portletId);
 
-		redirect = HttpUtil.addParameter(
-			redirect, namespace + "className", clazz.getName());
-		redirect = HttpUtil.addParameter(
-			redirect, namespace + "classPK", classPK);
+		if (Validator.isNotNull(portletId)) {
+			redirect = HttpUtil.addParameter(
+				redirect, namespace + "className", clazz.getName());
+			redirect = HttpUtil.addParameter(
+				redirect, namespace + "classPK", classPK);
+		}
 
 		return redirect;
 	}

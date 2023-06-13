@@ -17,26 +17,46 @@
 <%@ include file="/personal_menu/init.jsp" %>
 
 <%
+String namespace = StringUtil.randomId() + StringPool.UNDERLINE;
+
 boolean expanded = (boolean)request.getAttribute("liferay-product-navigation:personal-menu:expanded");
 String label = (String)request.getAttribute("liferay-product-navigation:personal-menu:label");
 %>
 
 <style type="text/css">
-	#personal_menu_dropdown .btn:focus {
+	#clay_dropdown_portal .dropdown-menu-personal-menu {
+		max-height: fit-content;
+	}
+
+	#clay_dropdown_portal .dropdown-menu-personal-menu .dropdown-item-indicator {
+		padding-right: 0.5rem;
+	}
+
+	div.personal-menu-dropdown .btn:focus {
 		box-shadow: none;
+	}
+
+	div.personal-menu-dropdown .dropdown-item {
+		color: #6B6C7E;
 	}
 </style>
 
-<div id="personal_menu_dropdown">
-	<div id="personal_menu_dropdown_toggle" style="cursor: pointer;">
+<div class="personal-menu-dropdown" id="<%= namespace + "personal_menu_dropdown" %>">
+	<div id="<%= namespace + "personal_menu_dropdown_toggle" %>" style="cursor: pointer;">
 		<%= label %>
 	</div>
-
-	<div id="clay_dropdown_portal"></div>
 </div>
 
+<%
+ResourceURL resourceURL = PortletURLFactoryUtil.create(request, PersonalMenuPortletKeys.PERSONAL_MENU, PortletRequest.RESOURCE_PHASE);
+
+resourceURL.setParameter("currentURL", themeDisplay.getURLCurrent());
+resourceURL.setParameter("portletId", themeDisplay.getPpid());
+resourceURL.setResourceID("/get_personal_menu_items");
+%>
+
 <aui:script require="clay-dropdown/src/ClayDropdown as ClayDropdown,metal-dom/src/dom as dom">
-	var toggle = document.getElementById('personal_menu_dropdown_toggle');
+	var toggle = document.getElementById('<%= namespace + "personal_menu_dropdown_toggle" %>');
 
 	if (toggle) {
 		dom.once(
@@ -44,7 +64,7 @@ String label = (String)request.getAttribute("liferay-product-navigation:personal
 			'click',
 			function(event) {
 				fetch(
-					'<liferay-portlet:resourceURL id="/get_personal_menu_items" portletName="<%= PersonalMenuPortletKeys.PERSONAL_MENU %>" />',
+					'<%= resourceURL.toString() %>',
 					{
 						credentials: 'include',
 						method: 'GET'
@@ -55,26 +75,42 @@ String label = (String)request.getAttribute("liferay-product-navigation:personal
 					}
 				).then(
 					function(personalMenuItems) {
-						new ClayDropdown.default(
+						var personalMenu = new ClayDropdown.default(
 							{
-								element: '#personal_menu_dropdown_toggle',
+								element: '#<%= namespace + "personal_menu_dropdown_toggle" %>',
 								events: {
 									'willAttach': function(event) {
 										if (<%= expanded %>) {
 											this.expanded = true;
 										}
 
-										var menu = this.refs.dropdown.refs.portal.refs.menu;
+										var dropdown = this;
 
-										menu.style.maxHeight = 'fit-content';
+										this.refs.dropdown.refs.portal.on(
+											'rendered',
+											function(event) {
+												if (dropdown.expanded) {
+													this.element.classList.add('dropdown-menu-personal-menu');
+													this.element.classList.remove('dropdown-menu-indicator-start');
+												}
+											}
+										);
 									}
 								},
 								items: personalMenuItems,
+								itemsIconAlignment: 'left',
 								label: toggle.innerHTML,
 								showToggleIcon: false,
 								spritemap: '<%= themeDisplay.getPathThemeImages().concat("/clay/icons.svg") %>'
 							},
-							'#personal_menu_dropdown'
+							'#<%= namespace + "personal_menu_dropdown" %>'
+						);
+
+						Liferay.once(
+							'beforeNavigate',
+							function(event) {
+								personalMenu.refs.dropdown.refs.portal.detach();
+							}
 						);
 					}
 				);

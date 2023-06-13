@@ -612,9 +612,6 @@ public class JournalContentDisplayContext {
 				PortalUtil.getLiferayPortletRequest(_portletRequest), null,
 				LiferayWindowState.NORMAL, themeDisplay.getURLCurrent());
 
-			portletURL.setParameter(
-				"hideDefaultSuccessMessage", Boolean.TRUE.toString());
-
 			return portletURL.toString();
 		}
 		catch (Exception e) {
@@ -667,13 +664,11 @@ public class JournalContentDisplayContext {
 			portletURL.setParameter(
 				"referringPortletResource", portletDisplay.getId());
 
-			portletURL.setParameter("articleId", article.getArticleId());
-
-			portletURL.setWindowState(LiferayWindowState.POP_UP);
-
 			portletURL.setParameter(
-				"hideDefaultSuccessMessage", Boolean.TRUE.toString());
+				"groupId", String.valueOf(article.getGroupId()));
+			portletURL.setParameter("articleId", article.getArticleId());
 			portletURL.setParameter("showHeader", Boolean.TRUE.toString());
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
 
 			return portletURL.toString();
 		}

@@ -6,8 +6,7 @@ export const OPEN_MAPPING_FIELDS_DIALOG = 'openMappingFieldsDialog';
 export const SELECT_MAPPEABLE_FIELD = 'selectMappeableField';
 export const SELECT_MAPPEABLE_TYPE = 'selectMappeableType';
 
-export const HIDE_SIDEBAR = 'hideSidebar';
-export const TOGGLE_SIDEBAR = 'toggleSidebar';
+export const UPDATE_SELECTED_SIDEBAR_PANEL_ID = 'updateSelectedSidebarPanelId';
 
 export const UPDATE_LAST_SAVE_DATE = 'updateLastSaveDate';
 export const UPDATE_SAVING_CHANGES_STATUS = 'updateSavingChangesStatus';
@@ -21,12 +20,12 @@ export const DELETE_SEGMENTS_EXPERIENCE = 'DELETE_SEGMENTS_EXPERIENCE';
 export const EDIT_SEGMENTS_EXPERIENCE = 'EDIT_SEGMENTS_EXPERIENCE';
 export const UPDATE_SEGMENTS_EXPERIENCE_PRIORITY = 'UPDATE_SEGMENTS_EXPERIENCE_PRIORITY';
 
-export const ADD_SECTION = 'addSection';
-export const MOVE_SECTION = 'moveSection';
-export const REMOVE_SECTION = 'removeSection';
-export const UPDATE_SECTION_COLUMNS = 'updateSectionColumns';
-export const UPDATE_SECTION_COLUMNS_NUMBER = 'updateSectionColumnsNumber';
-export const UPDATE_SECTION_CONFIG = 'updateSectionConfig';
+export const ADD_ROW = 'addRow';
+export const MOVE_ROW = 'moveRow';
+export const REMOVE_ROW = 'removeRow';
+export const UPDATE_ROW_COLUMNS = 'updateRowColumns';
+export const UPDATE_ROW_COLUMNS_NUMBER = 'updateRowColumnsNumber';
+export const UPDATE_ROW_CONFIG = 'updateRowConfig';
 
 export const ADD_FRAGMENT_ENTRY_LINK = 'addFragmentEntryLink';
 export const ADD_PORTLET = 'addPortlet';

@@ -35,10 +35,10 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 
 <aui:form action="<%= editArticleActionURL %>" cssClass="edit-article-form" enctype="multipart/form-data" method="post" name="fm1" onSubmit="event.preventDefault();">
 	<aui:input name="<%= ActionRequest.ACTION_NAME %>" type="hidden" />
-	<aui:input name="hideDefaultSuccessMessage" type="hidden" value="<%= journalEditArticleDisplayContext.isHideDefaultSuccessMessage() || (journalEditArticleDisplayContext.getClassNameId() == PortalUtil.getClassNameId(DDMStructure.class)) %>" />
+	<aui:input name="hideDefaultSuccessMessage" type="hidden" value="<%= journalEditArticleDisplayContext.getClassNameId() == PortalUtil.getClassNameId(DDMStructure.class) %>" />
 	<aui:input name="redirect" type="hidden" value="<%= journalEditArticleDisplayContext.getRedirect() %>" />
 	<aui:input name="portletResource" type="hidden" value="<%= journalEditArticleDisplayContext.getPortletResource() %>" />
-	<aui:input name="referringPlid" type="hidden" value="<%= journalEditArticleDisplayContext.getReferringPlid() %>" />
+	<aui:input name="refererPlid" type="hidden" value="<%= journalEditArticleDisplayContext.getRefererPlid() %>" />
 	<aui:input name="referringPortletResource" type="hidden" value="<%= journalEditArticleDisplayContext.getReferringPortletResource() %>" />
 	<aui:input name="groupId" type="hidden" value="<%= journalEditArticleDisplayContext.getGroupId() %>" />
 	<aui:input name="privateLayout" type="hidden" value="<%= layout.isPrivateLayout() %>" />
@@ -95,6 +95,7 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 						<clay:button
 							icon="cog"
 							id='<%= renderResponse.getNamespace() + "contextualSidebarButton" %>'
+							monospaced="<%= true %>"
 							size="sm"
 							style="borderless"
 						/>
@@ -104,7 +105,7 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 		</div>
 	</nav>
 
-	<div class="contextual-sidebar contextual-sidebar-visible edit-article-sidebar sidebar-light sidebar-sm" id="<portlet:namespace />contextualSidebarContainer">
+	<div class="contextual-sidebar edit-article-sidebar sidebar-light sidebar-sm" id="<portlet:namespace />contextualSidebarContainer">
 		<div class="sidebar-body">
 
 			<%
@@ -122,6 +123,7 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 			>
 				<liferay-ui:section>
 					<liferay-frontend:form-navigator
+						fieldSetCssClass="panel-group-flush"
 						formModelBean="<%= article %>"
 						id="<%= FormNavigatorConstants.FORM_NAVIGATOR_ID_JOURNAL %>"
 						showButtons="<%= false %>"
@@ -207,14 +209,17 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 		}
 	);
 
+	var contextualSidebarContainer = document.getElementById('<portlet:namespace />contextualSidebarContainer');
 	var contextualSidebarButton = document.getElementById('<portlet:namespace />contextualSidebarButton');
+
+	if (contextualSidebarContainer && (window.innerWidth > Liferay.BREAKPOINTS.PHONE)) {
+		contextualSidebarContainer.classList.add('contextual-sidebar-visible');
+	}
 
 	if (contextualSidebarButton) {
 		contextualSidebarButton.addEventListener(
 			'click',
 			function(event) {
-				var contextualSidebarContainer = document.getElementById('<portlet:namespace />contextualSidebarContainer');
-
 				if (contextualSidebarContainer.classList.contains('contextual-sidebar-visible')) {
 					contextualSidebarContainer.classList.remove('contextual-sidebar-visible');
 

@@ -274,7 +274,9 @@
 		<check name="JavaStringBundlerInitialCapacityCheck" />
 		<check name="JavaSwitchCheck" />
 		<check name="JavaSystemEventAnnotationCheck" />
-		<check name="JavaTaglibMethodCheck" />
+		<check name="JavaTaglibMethodCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="JavaTestMethodAnnotationsCheck" />
 		<check name="JavaUnsafeCastingCheck" />
 		<check name="JavaUpgradeClassCheck" />
@@ -288,6 +290,7 @@
 		<check name="JavaVerifyUpgradeConnectionCheck" />
 		<check name="JavaXMLSecurityCheck" />
 		<check name="LanguageKeysCheck" />
+		<check name="LocaleUtilCheck" />
 		<check name="ResourceBundleCheck" />
 		<check name="StringMethodsCheck" />
 		<check name="SubstringCheck" />
@@ -300,10 +303,10 @@
 		<check name="JSONLineBreakCheck">
 			<property name="enabled" value="false" />
 		</check>
-		<check name="JSONPropertyOrderCheck" />
-		<check name="JSONScriptsCheck">
+		<check name="JSONPackageJSONCheck">
 			<property name="enabled" value="false" />
 		</check>
+		<check name="JSONPropertyOrderCheck" />
 		<check name="JSONValidationCheck" />
 		<check name="JSONWhitespaceCheck">
 			<property name="allowLeadingSpaces" value="true" />
@@ -360,6 +363,7 @@
 		<check name="JSPLanguageKeysCheck" />
 		<check name="JSPSendRedirectCheck" />
 		<check name="JSPStringMethodsCheck" />
+		<check name="LocaleUtilCheck" />
 		<check name="ResourceBundleCheck" />
 		<check name="SubstringCheck" />
 	</source-processor>
@@ -394,6 +398,9 @@
 		<check name="WhitespaceCheck" />
 	</source-processor>
 	<source-processor name="PoshiSourceProcessor">
+		<check name="PoshiAnnotationsOrderCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="PoshiIndentationCheck" />
 		<check name="PoshiStylingCheck" />
 		<check name="PoshiWhitespaceCheck" />

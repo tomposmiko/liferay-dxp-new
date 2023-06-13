@@ -21,6 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
+import com.liferay.headless.form.dto.v1_0.Creator;
+import com.liferay.headless.form.dto.v1_0.FieldValue;
+import com.liferay.headless.form.dto.v1_0.Form;
 import com.liferay.headless.form.dto.v1_0.FormRecord;
 import com.liferay.headless.form.resource.v1_0.FormRecordResource;
 import com.liferay.petra.string.StringBundler;
@@ -36,6 +39,7 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -53,7 +57,9 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -96,6 +102,7 @@ public abstract class BaseFormRecordResourceTestCase {
 	public void setUp() throws Exception {
 		irrelevantGroup = GroupTestUtil.addGroup();
 		testGroup = GroupTestUtil.addGroup();
+		testLocale = LocaleUtil.getDefault();
 
 		_resourceURL = new URL("http://localhost:8080/o/headless-form/v1.0");
 	}
@@ -128,7 +135,7 @@ public abstract class BaseFormRecordResourceTestCase {
 
 		String location =
 			_resourceURL +
-				_toPath("/form-records/{form-record-id}", formRecordId);
+				_toPath("/form-records/{formRecordId}", formRecordId);
 
 		options.setLocation(location);
 
@@ -139,7 +146,7 @@ public abstract class BaseFormRecordResourceTestCase {
 		}
 
 		try {
-			return _outputObjectMapper.readValue(string, FormRecord.class);
+			return outputObjectMapper.readValue(string, FormRecord.class);
 		}
 		catch (Exception e) {
 			_log.error("Unable to process HTTP response: " + string, e);
@@ -155,89 +162,9 @@ public abstract class BaseFormRecordResourceTestCase {
 
 		String location =
 			_resourceURL +
-				_toPath("/form-records/{form-record-id}", formRecordId);
+				_toPath("/form-records/{formRecordId}", formRecordId);
 
 		options.setLocation(location);
-
-		HttpUtil.URLtoByteArray(options);
-
-		return options.getResponse();
-	}
-
-	@Test
-	public void testPutFormRecord() throws Exception {
-		FormRecord postFormRecord = testPutFormRecord_addFormRecord();
-
-		FormRecord randomFormRecord = randomFormRecord();
-
-		FormRecord putFormRecord = invokePutFormRecord(
-			postFormRecord.getId(), randomFormRecord);
-
-		assertEquals(randomFormRecord, putFormRecord);
-		assertValid(putFormRecord);
-
-		FormRecord getFormRecord = invokeGetFormRecord(putFormRecord.getId());
-
-		assertEquals(randomFormRecord, getFormRecord);
-		assertValid(getFormRecord);
-	}
-
-	protected FormRecord testPutFormRecord_addFormRecord() throws Exception {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected FormRecord invokePutFormRecord(
-			Long formRecordId, FormRecord formRecord)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			_inputObjectMapper.writeValueAsString(formRecord),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath("/form-records/{form-record-id}", formRecordId);
-
-		options.setLocation(location);
-
-		options.setPut(true);
-
-		String string = HttpUtil.URLtoString(options);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("HTTP response: " + string);
-		}
-
-		try {
-			return _outputObjectMapper.readValue(string, FormRecord.class);
-		}
-		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
-
-			throw e;
-		}
-	}
-
-	protected Http.Response invokePutFormRecordResponse(
-			Long formRecordId, FormRecord formRecord)
-		throws Exception {
-
-		Http.Options options = _createHttpOptions();
-
-		options.setBody(
-			_inputObjectMapper.writeValueAsString(formRecord),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
-
-		String location =
-			_resourceURL +
-				_toPath("/form-records/{form-record-id}", formRecordId);
-
-		options.setLocation(location);
-
-		options.setPut(true);
 
 		HttpUtil.URLtoByteArray(options);
 
@@ -326,8 +253,7 @@ public abstract class BaseFormRecordResourceTestCase {
 			Long formId, FormRecord formRecord)
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return invokePostFormFormRecord(formId, formRecord);
 	}
 
 	protected Long testGetFormFormRecordsPage_getFormId() throws Exception {
@@ -348,7 +274,7 @@ public abstract class BaseFormRecordResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		String location =
-			_resourceURL + _toPath("/forms/{form-id}/form-records", formId);
+			_resourceURL + _toPath("/forms/{formId}/form-records", formId);
 
 		location = HttpUtil.addParameter(
 			location, "page", pagination.getPage());
@@ -363,7 +289,7 @@ public abstract class BaseFormRecordResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return _outputObjectMapper.readValue(
+		return outputObjectMapper.readValue(
 			string,
 			new TypeReference<Page<FormRecord>>() {
 			});
@@ -376,7 +302,7 @@ public abstract class BaseFormRecordResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		String location =
-			_resourceURL + _toPath("/forms/{form-id}/form-records", formId);
+			_resourceURL + _toPath("/forms/{formId}/form-records", formId);
 
 		location = HttpUtil.addParameter(
 			location, "page", pagination.getPage());
@@ -405,8 +331,8 @@ public abstract class BaseFormRecordResourceTestCase {
 			FormRecord formRecord)
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return invokePostFormFormRecord(
+			testGetFormFormRecordsPage_getFormId(), formRecord);
 	}
 
 	protected FormRecord invokePostFormFormRecord(
@@ -416,11 +342,11 @@ public abstract class BaseFormRecordResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			_inputObjectMapper.writeValueAsString(formRecord),
+			inputObjectMapper.writeValueAsString(formRecord),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
-			_resourceURL + _toPath("/forms/{form-id}/form-records", formId);
+			_resourceURL + _toPath("/forms/{formId}/form-records", formId);
 
 		options.setLocation(location);
 
@@ -433,7 +359,7 @@ public abstract class BaseFormRecordResourceTestCase {
 		}
 
 		try {
-			return _outputObjectMapper.readValue(string, FormRecord.class);
+			return outputObjectMapper.readValue(string, FormRecord.class);
 		}
 		catch (Exception e) {
 			_log.error("Unable to process HTTP response: " + string, e);
@@ -449,15 +375,78 @@ public abstract class BaseFormRecordResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			_inputObjectMapper.writeValueAsString(formRecord),
+			inputObjectMapper.writeValueAsString(formRecord),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
-			_resourceURL + _toPath("/forms/{form-id}/form-records", formId);
+			_resourceURL + _toPath("/forms/{formId}/form-records", formId);
 
 		options.setLocation(location);
 
 		options.setPost(true);
+
+		HttpUtil.URLtoByteArray(options);
+
+		return options.getResponse();
+	}
+
+	@Test
+	public void testGetFormFormRecordByLatestDraft() throws Exception {
+		FormRecord postFormRecord =
+			testGetFormFormRecordByLatestDraft_addFormRecord();
+
+		FormRecord getFormRecord = invokeGetFormFormRecordByLatestDraft(
+			postFormRecord.getFormId());
+
+		assertEquals(postFormRecord, getFormRecord);
+		assertValid(getFormRecord);
+	}
+
+	protected FormRecord testGetFormFormRecordByLatestDraft_addFormRecord()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected FormRecord invokeGetFormFormRecordByLatestDraft(Long formId)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL +
+				_toPath("/forms/{formId}/form-records/by-latest-draft", formId);
+
+		options.setLocation(location);
+
+		String string = HttpUtil.URLtoString(options);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("HTTP response: " + string);
+		}
+
+		try {
+			return outputObjectMapper.readValue(string, FormRecord.class);
+		}
+		catch (Exception e) {
+			_log.error("Unable to process HTTP response: " + string, e);
+
+			throw e;
+		}
+	}
+
+	protected Http.Response invokeGetFormFormRecordByLatestDraftResponse(
+			Long formId)
+		throws Exception {
+
+		Http.Options options = _createHttpOptions();
+
+		String location =
+			_resourceURL +
+				_toPath("/forms/{formId}/form-records/by-latest-draft", formId);
+
+		options.setLocation(location);
 
 		HttpUtil.URLtoByteArray(options);
 
@@ -514,8 +503,77 @@ public abstract class BaseFormRecordResourceTestCase {
 	}
 
 	protected void assertValid(FormRecord formRecord) {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		boolean valid = true;
+
+		if (formRecord.getDateCreated() == null) {
+			valid = false;
+		}
+
+		if (formRecord.getDateModified() == null) {
+			valid = false;
+		}
+
+		if (formRecord.getId() == null) {
+			valid = false;
+		}
+
+		for (String additionalAssertFieldName :
+				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("creator", additionalAssertFieldName)) {
+				if (formRecord.getCreator() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("datePublished", additionalAssertFieldName)) {
+				if (formRecord.getDatePublished() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("draft", additionalAssertFieldName)) {
+				if (formRecord.getDraft() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("fieldValues", additionalAssertFieldName)) {
+				if (formRecord.getFieldValues() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("form", additionalAssertFieldName)) {
+				if (formRecord.getForm() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("formId", additionalAssertFieldName)) {
+				if (formRecord.getFormId() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		Assert.assertTrue(valid);
 	}
 
 	protected void assertValid(Page<FormRecord> page) {
@@ -535,12 +593,118 @@ public abstract class BaseFormRecordResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
+	protected String[] getAdditionalAssertFieldNames() {
+		return new String[0];
+	}
+
 	protected boolean equals(FormRecord formRecord1, FormRecord formRecord2) {
 		if (formRecord1 == formRecord2) {
 			return true;
 		}
 
-		return false;
+		for (String additionalAssertFieldName :
+				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("creator", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formRecord1.getCreator(), formRecord2.getCreator())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dateCreated", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formRecord1.getDateCreated(),
+						formRecord2.getDateCreated())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dateModified", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formRecord1.getDateModified(),
+						formRecord2.getDateModified())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("datePublished", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formRecord1.getDatePublished(),
+						formRecord2.getDatePublished())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("draft", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formRecord1.getDraft(), formRecord2.getDraft())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("fieldValues", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formRecord1.getFieldValues(),
+						formRecord2.getFieldValues())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("form", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formRecord1.getForm(), formRecord2.getForm())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("formId", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formRecord1.getFormId(), formRecord2.getFormId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("id", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formRecord1.getId(), formRecord2.getId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		return true;
 	}
 
 	protected Collection<EntityField> getEntityFields() throws Exception {
@@ -654,15 +818,71 @@ public abstract class BaseFormRecordResourceTestCase {
 	}
 
 	protected FormRecord randomIrrelevantFormRecord() {
-		return randomFormRecord();
+		FormRecord randomIrrelevantFormRecord = randomFormRecord();
+
+		return randomIrrelevantFormRecord;
 	}
 
 	protected FormRecord randomPatchFormRecord() {
 		return randomFormRecord();
 	}
 
+	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
+		{
+			setFilterProvider(
+				new SimpleFilterProvider() {
+					{
+						addFilter(
+							"Liferay.Vulcan",
+							SimpleBeanPropertyFilter.serializeAll());
+					}
+				});
+			setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		}
+	};
+	protected static final ObjectMapper outputObjectMapper =
+		new ObjectMapper() {
+			{
+				addMixIn(FormRecord.class, FormRecordMixin.class);
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+			}
+		};
+
 	protected Group irrelevantGroup;
+	protected String testContentType = "application/json";
 	protected Group testGroup;
+	protected Locale testLocale;
+	protected String testUserNameAndPassword = "test@liferay.com:test";
+
+	protected static class FormRecordMixin {
+
+		@JsonProperty
+		Creator creator;
+		@JsonProperty
+		Date dateCreated;
+		@JsonProperty
+		Date dateModified;
+		@JsonProperty
+		Date datePublished;
+		@JsonProperty
+		Boolean draft;
+		@JsonProperty
+		FieldValue[] fieldValues;
+		@JsonProperty
+		Form form;
+		@JsonProperty
+		Long formId;
+		@JsonProperty
+		Long id;
+
+	}
 
 	protected static class Page<T> {
 
@@ -707,16 +927,16 @@ public abstract class BaseFormRecordResourceTestCase {
 		Http.Options options = new Http.Options();
 
 		options.addHeader("Accept", "application/json");
+		options.addHeader(
+			"Accept-Language", LocaleUtil.toW3cLanguageId(testLocale));
 
-		String userNameAndPassword = "test@liferay.com:test";
-
-		String encodedUserNameAndPassword = Base64.encode(
-			userNameAndPassword.getBytes());
+		String encodedTestUserNameAndPassword = Base64.encode(
+			testUserNameAndPassword.getBytes());
 
 		options.addHeader(
-			"Authorization", "Basic " + encodedUserNameAndPassword);
+			"Authorization", "Basic " + encodedTestUserNameAndPassword);
 
-		options.addHeader("Content-Type", "application/json");
+		options.addHeader("Content-Type", testContentType);
 
 		return options;
 	}
@@ -750,31 +970,6 @@ public abstract class BaseFormRecordResourceTestCase {
 
 	};
 	private static DateFormat _dateFormat;
-	private final static ObjectMapper _inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	private final static ObjectMapper _outputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-		}
-	};
 
 	@Inject
 	private FormRecordResource _formRecordResource;

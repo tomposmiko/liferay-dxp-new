@@ -129,9 +129,11 @@ public class SegmentsServicePreAction extends Action {
 
 		Stream<SegmentsExperience> stream = segmentsExperiences.stream();
 
-		return stream.mapToLong(
-			SegmentsExperienceModel::getSegmentsExperienceId
-		).toArray();
+		return ArrayUtil.append(
+			stream.mapToLong(
+				SegmentsExperienceModel::getSegmentsExperienceId
+			).toArray(),
+			new long[] {SegmentsConstants.SEGMENTS_EXPERIENCE_ID_DEFAULT});
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

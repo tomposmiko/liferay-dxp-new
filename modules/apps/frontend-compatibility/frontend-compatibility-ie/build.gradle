@@ -3,8 +3,10 @@ import com.liferay.gradle.util.copy.StripPathSegmentsAction
 configurations {
 	arrayFill
 	arrayFind
+	arrayFindIndex
 	arrayFrom
 	arrayIncludes
+	arrayOf
 	fetch
 	formData
 	objectAssign
@@ -17,8 +19,10 @@ configurations {
 
 task buildArrayFill(type: Copy)
 task buildArrayFind(type: Copy)
+task buildArrayFindIndex(type: Copy)
 task buildArrayFrom(type: Copy)
 task buildArrayIncludes(type: Copy)
+task buildArrayOf(type: Copy)
 task buildFetch(type: Copy)
 task buildFormData(type: Copy)
 task buildObjectAssign(type: Copy)
@@ -60,6 +64,22 @@ buildArrayFind {
 	}
 }
 
+buildArrayFindIndex {
+	eachFile new StripPathSegmentsAction(5)
+
+	from {
+		zipTree(configurations.arrayFindIndex.singleFile)
+	}
+
+	include "META-INF/resources/webjars/Array.prototype.findIndex/1.0.0/index.js"
+	includeEmptyDirs = false
+	into "classes/META-INF/resources"
+
+	rename {
+		it.replace "index", "array.findindex"
+	}
+}
+
 buildArrayFrom {
 	eachFile new StripPathSegmentsAction(5)
 
@@ -89,6 +109,22 @@ buildArrayIncludes {
 
 	rename {
 		it.replace "Array.prototype.includes", "array.includes"
+	}
+}
+
+buildArrayOf {
+	eachFile new StripPathSegmentsAction(5)
+
+	from {
+		zipTree(configurations.arrayOf.singleFile)
+	}
+
+	include "META-INF/resources/webjars/array.of/0.1.1/array-of.js"
+	includeEmptyDirs = false
+	into "classes/META-INF/resources"
+
+	rename {
+		it.replace "array-of", "array.of"
 	}
 }
 
@@ -219,8 +255,10 @@ buildUrlSearchParams {
 classes {
 	dependsOn buildArrayFill
 	dependsOn buildArrayFind
+	dependsOn buildArrayFindIndex
 	dependsOn buildArrayFrom
 	dependsOn buildArrayIncludes
+	dependsOn buildArrayOf
 	dependsOn buildFetch
 	dependsOn buildFormData
 	dependsOn buildObjectAssign
@@ -236,9 +274,13 @@ dependencies {
 
 	arrayFind group: "org.webjars.bower", name: "Array.prototype.find", transitive: false, version: "1.0.0"
 
+	arrayFindIndex group: "org.webjars.bower", name: "Array.prototype.findIndex", transitive: false, version: "1.0.0"
+
 	arrayFrom group: "org.webjars.npm", name: "mdn-polyfills", transitive: false, version: "5.8.0"
 
 	arrayIncludes group: "org.webjars.npm", name: "mdn-polyfills", transitive: false, version: "5.8.0"
+
+	arrayOf group: "org.webjars.npm", name: "array.of", transitive: false, version: "0.1.1"
 
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"

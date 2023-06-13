@@ -378,9 +378,9 @@ definition {
 
 		DMNavigator.gotoFolder(dmFolderName = "DM Folder Name");
 
-		DMFolder.addSubfolderPG(
-			dmSubFolderDescription = "DM Subfolder1 Description",
-			dmSubFolderName = "Subfolder1 Name"
+		DMFolder.addPG(
+			dmFolderDescription = "DM Subfolder1 Description",
+			dmFolderName = "Subfolder1 Name"
 		);
 
 		DMNavigator.gotoFolder(dmFolderName = "Subfolder1 Name");
@@ -1032,14 +1032,14 @@ definition {
 			specificNameFolder = "true"
 		);
 
-		DMFolder.addSubfolderCP(dmSubFolderName = "The Properties of Moon Rocks");
+		DMFolder.addCP(dmFolderName = "The Properties of Moon Rocks");
 
 		DMFolder.viewCP(
 			dmFolderName = "The Properties of Moon Rocks",
 			specificNameFolder = "true"
 		);
 
-		DMFolder.addSubfolderCP(dmSubFolderName = "Audio Lectures");
+		DMFolder.addCP(dmFolderName = "Audio Lectures");
 
 		DMFolder.viewCP(dmFolderName = "Audio Lectures");
 
@@ -1222,9 +1222,11 @@ definition {
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		for (var entryCount : list "1,2,3") {
-			var key_dmDocumentTitle = "Document_${entryCount}.doc";
+			var dmDocumentTitle = "Document_${entryCount}.doc";
 
-			Check(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_CHECKBOX");
+			LexiconCard.checkCardCheckbox(
+				card = "${dmDocumentTitle}"
+			);
 		}
 
 		Click(locator1 = "Icon#MOVE_TO_RECYCLE_BIN");
@@ -1521,9 +1523,9 @@ definition {
 
 		DMFolder.viewCP(dmFolderName = "DM Folder Name");
 
-		DMFolder.addSubfolderCP(
-			dmSubFolderDescription = "DM SubFolder Description",
-			dmSubFolderName = "DM SubFolder Name"
+		DMFolder.addCP(
+			dmFolderDescription = "DM SubFolder Description",
+			dmFolderName = "DM SubFolder Name"
 		);
 
 		ProductMenu.gotoSite(site = "Global");
@@ -2006,6 +2008,8 @@ definition {
 			panel = "Site Administration",
 			portlet = "Documents and Media"
 		);
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		DMDocument.addCP(
 			dmDocumentDescription = "DM Document1 Description",

@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaratio
 import org.osgi.service.component.annotations.Component;
 
 /**
- * @author Alicia García
+ * @author Cristina González
  */
 @Component(service = ConfigurationBeanDeclaration.class)
 public class

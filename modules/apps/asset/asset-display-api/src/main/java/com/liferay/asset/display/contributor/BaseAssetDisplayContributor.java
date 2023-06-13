@@ -15,12 +15,13 @@
 package com.liferay.asset.display.contributor;
 
 import com.liferay.asset.display.contributor.util.AssetDisplayContributorFieldHelperUtil;
-import com.liferay.asset.display.contributor.util.ContentAccessor;
+import com.liferay.asset.info.display.contributor.AssetInfoDisplayObjectProvider;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.exception.NoSuchEntryException;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
@@ -28,6 +29,7 @@ import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 
 import java.util.HashMap;
@@ -42,7 +44,10 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jürgen Kappler
+ * @deprecated As of Judson (7.1.x), replaced by {@link
+ *             com.liferay.asset.info.display.contributor.BaseAssetInfoDisplayContributor}
  */
+@Deprecated
 public abstract class BaseAssetDisplayContributor<T>
 	implements AssetDisplayContributor {
 
@@ -126,13 +131,26 @@ public abstract class BaseAssetDisplayContributor<T>
 		Object fieldValue = assetDisplayFieldsValues.getOrDefault(
 			fieldName, StringPool.BLANK);
 
-		if (fieldValue instanceof ContentAccessor) {
-			ContentAccessor contentAccessor = (ContentAccessor)fieldValue;
-
-			fieldValue = contentAccessor.getContent();
-		}
-
 		return fieldValue;
+	}
+
+	@Override
+	public InfoDisplayObjectProvider<AssetEntry> getInfoDisplayObjectProvider(
+			long groupId, String urlTitle)
+		throws PortalException {
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.
+				getAssetRendererFactoryByClassNameId(
+					PortalUtil.getClassNameId(getClassName()));
+
+		AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(
+			groupId, urlTitle);
+
+		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+			getClassName(), assetRenderer.getClassPK());
+
+		return new AssetInfoDisplayObjectProvider(assetEntry);
 	}
 
 	@Override

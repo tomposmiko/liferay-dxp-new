@@ -15,9 +15,8 @@
 package com.liferay.journal.web.internal.portlet;
 
 import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
-import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
+import com.liferay.asset.display.page.portlet.AssetDisplayPageEntryFormProcessor;
 import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
-import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
 import com.liferay.asset.kernel.model.AssetEntry;
@@ -77,8 +76,6 @@ import com.liferay.journal.web.configuration.JournalWebConfiguration;
 import com.liferay.journal.web.internal.portlet.action.ActionUtil;
 import com.liferay.journal.web.util.JournalPortletUtil;
 import com.liferay.journal.web.util.JournalUtil;
-import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -102,6 +99,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -132,7 +130,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -231,12 +228,6 @@ public class JournalPortlet extends MVCPortlet {
 		portalPreferences.setValues(
 			JournalPortletKeys.JOURNAL, key,
 			ArrayUtil.append(addMenuFavItems, ddmStructureKey));
-
-		SessionMessages.add(
-			actionRequest,
-			_portal.getPortletId(actionRequest) +
-				SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
-			JournalPortletKeys.JOURNAL);
 	}
 
 	public void addArticle(
@@ -465,12 +456,6 @@ public class JournalPortlet extends MVCPortlet {
 		portalPreferences.setValues(
 			JournalPortletKeys.JOURNAL, key,
 			ArrayUtil.remove(addMenuFavItems, ddmStructureKey));
-
-		SessionMessages.add(
-			actionRequest,
-			_portal.getPortletId(actionRequest) +
-				SessionMessages.KEY_SUFFIX_REFRESH_PORTLET,
-			JournalPortletKeys.JOURNAL);
 	}
 
 	@Override
@@ -780,8 +765,6 @@ public class JournalPortlet extends MVCPortlet {
 
 		String ddmTemplateKey = ParamUtil.getString(
 			uploadPortletRequest, "ddmTemplateKey");
-		long assetDisplayPageId = ParamUtil.getLong(
-			uploadPortletRequest, "assetDisplayPageId");
 		int displayPageType = ParamUtil.getInteger(
 			uploadPortletRequest, "displayPageType");
 
@@ -808,12 +791,11 @@ public class JournalPortlet extends MVCPortlet {
 					layoutUuid = latestArticle.getLayoutUuid();
 				}
 			}
-			else if ((assetDisplayPageId != 0) || (targetLayout == null)) {
+			else if (targetLayout == null) {
 				layoutUuid = null;
 			}
 		}
 		else {
-			assetDisplayPageId = 0;
 			layoutUuid = null;
 		}
 
@@ -962,10 +944,10 @@ public class JournalPortlet extends MVCPortlet {
 		String portletResource = ParamUtil.getString(
 			actionRequest, "portletResource");
 
-		long referringPlid = ParamUtil.getLong(actionRequest, "referringPlid");
+		long refererPlid = ParamUtil.getLong(actionRequest, "refererPlid");
 
-		if (Validator.isNotNull(portletResource) && (referringPlid > 0)) {
-			Layout layout = _layoutLocalService.getLayout(referringPlid);
+		if (Validator.isNotNull(portletResource) && (refererPlid > 0)) {
+			Layout layout = _layoutLocalService.getLayout(refererPlid);
 
 			PortletPreferences portletPreferences =
 				PortletPreferencesFactoryUtil.getStrictPortletSetup(
@@ -996,9 +978,19 @@ public class JournalPortlet extends MVCPortlet {
 
 		// Asset display page
 
-		_updateAssetDisplayPage(
-			themeDisplay.getUserId(), groupId, article, assetDisplayPageId,
-			displayPageType, serviceContext);
+		_assetDisplayPageEntryFormProcessor.process(
+			JournalArticle.class.getName(), article.getResourcePrimKey(),
+			actionRequest);
+
+		int workflowAction = ParamUtil.getInteger(
+			actionRequest, "workflowAction", WorkflowConstants.ACTION_PUBLISH);
+
+		if (Validator.isNotNull(portletResource) &&
+			(workflowAction != WorkflowConstants.ACTION_SAVE_DRAFT)) {
+
+			MultiSessionMessages.add(
+				actionRequest, portletResource + "requestProcessed");
+		}
 
 		sendEditArticleRedirect(
 			actionRequest, actionResponse, article, oldUrlTitle);
@@ -1301,14 +1293,15 @@ public class JournalPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		try {
-			ActionUtil.getFolder(renderRequest);
-
 			String path = getPath(renderRequest, renderResponse);
 
 			if (Objects.equals(path, "/edit_article.jsp") ||
 				Objects.equals(path, "/view_article_history.jsp")) {
 
 				ActionUtil.getArticle(renderRequest);
+			}
+			else {
+				ActionUtil.getFolder(renderRequest);
 			}
 		}
 		catch (Exception e) {
@@ -1342,6 +1335,9 @@ public class JournalPortlet extends MVCPortlet {
 			String redirect)
 		throws Exception {
 
+		String portletResource = ParamUtil.getString(
+			actionRequest, "portletResource");
+
 		String referringPortletResource = ParamUtil.getString(
 			actionRequest, "referringPortletResource");
 
@@ -1351,6 +1347,7 @@ public class JournalPortlet extends MVCPortlet {
 
 		portletURL.setParameter("mvcPath", "/edit_article.jsp");
 		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter("portletResource", portletResource);
 		portletURL.setParameter(
 			"referringPortletResource", referringPortletResource);
 		portletURL.setParameter(
@@ -1432,11 +1429,14 @@ public class JournalPortlet extends MVCPortlet {
 		int workflowAction = ParamUtil.getInteger(
 			actionRequest, "workflowAction", WorkflowConstants.ACTION_PUBLISH);
 
-		String portletId = _http.getParameter(redirect, "p_p_id", false);
+		String portletId = _http.getParameter(
+			redirect, "portletResource", false);
 
 		String namespace = _portal.getPortletNamespace(portletId);
 
-		if (Validator.isNotNull(oldUrlTitle)) {
+		if (Validator.isNotNull(oldUrlTitle) &&
+			Validator.isNotNull(portletId)) {
+
 			String oldRedirectParam = namespace + "redirect";
 
 			String oldRedirect = _http.getParameter(
@@ -1482,20 +1482,20 @@ public class JournalPortlet extends MVCPortlet {
 			}
 		}
 		else {
-			WindowState windowState = actionRequest.getWindowState();
+			redirect = _portal.escapeRedirect(redirect);
 
-			if (windowState.equals(LiferayWindowState.POP_UP)) {
-				redirect = _portal.escapeRedirect(redirect);
+			if (Validator.isNotNull(redirect) &&
+				Validator.isNotNull(portletId)) {
 
-				if (Validator.isNotNull(redirect)) {
-					if (actionName.equals("addArticle") && (article != null)) {
-						redirect = _http.addParameter(
-							redirect, namespace + "className",
-							JournalArticle.class.getName());
-						redirect = _http.addParameter(
-							redirect, namespace + "classPK",
-							JournalArticleAssetRenderer.getClassPK(article));
-					}
+				if (actionName.equals("addArticle") && (article != null) &&
+					Validator.isNotNull(namespace)) {
+
+					redirect = _http.addParameter(
+						redirect, namespace + "className",
+						JournalArticle.class.getName());
+					redirect = _http.addParameter(
+						redirect, namespace + "classPK",
+						JournalArticleAssetRenderer.getClassPK(article));
 				}
 			}
 		}
@@ -1537,10 +1537,10 @@ public class JournalPortlet extends MVCPortlet {
 
 		Layout layout = themeDisplay.getLayout();
 
-		long referringPlid = ParamUtil.getLong(actionRequest, "referringPlid");
+		long refererPlid = ParamUtil.getLong(actionRequest, "refererPlid");
 
-		if (referringPlid > 0) {
-			layout = _layoutLocalService.fetchLayout(referringPlid);
+		if (refererPlid > 0) {
+			layout = _layoutLocalService.fetchLayout(refererPlid);
 		}
 
 		_journalContentSearchLocalService.updateContentSearch(
@@ -1562,53 +1562,11 @@ public class JournalPortlet extends MVCPortlet {
 		return true;
 	}
 
-	private void _updateAssetDisplayPage(
-			long userId, long groupId, JournalArticle article,
-			long layoutPageTemplateEntryId, int displayPageType,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		long classNameId = _portal.getClassNameId(JournalArticle.class);
-		long classPK = article.getResourcePrimKey();
-
-		AssetDisplayPageEntry assetDisplayPageEntry =
-			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
-				groupId, classNameId, classPK);
-
-		if (displayPageType == AssetDisplayPageConstants.TYPE_NONE) {
-			if (assetDisplayPageEntry != null) {
-				_assetDisplayPageEntryLocalService.deleteAssetDisplayPageEntry(
-					groupId, classNameId, classPK);
-			}
-		}
-		else if (assetDisplayPageEntry == null) {
-			_assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
-				userId, groupId, classNameId, classPK,
-				layoutPageTemplateEntryId, displayPageType, serviceContext);
-		}
-		else {
-			_assetDisplayPageEntryLocalService.updateAssetDisplayPageEntry(
-				assetDisplayPageEntry.getAssetDisplayPageEntryId(),
-				layoutPageTemplateEntryId, displayPageType);
-		}
-
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				layoutPageTemplateEntryId);
-
-		if (layoutPageTemplateEntry != null) {
-			layoutPageTemplateEntry.setModifiedDate(new Date());
-
-			_layoutPageTemplateEntryLocalService.updateLayoutPageTemplateEntry(
-				layoutPageTemplateEntry);
-		}
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(JournalPortlet.class);
 
 	@Reference
-	private AssetDisplayPageEntryLocalService
-		_assetDisplayPageEntryLocalService;
+	private AssetDisplayPageEntryFormProcessor
+		_assetDisplayPageEntryFormProcessor;
 
 	@Reference
 	private AssetDisplayPageFriendlyURLProvider
@@ -1657,10 +1615,6 @@ public class JournalPortlet extends MVCPortlet {
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
-
-	@Reference
-	private LayoutPageTemplateEntryLocalService
-		_layoutPageTemplateEntryLocalService;
 
 	@Reference
 	private Portal _portal;

@@ -97,7 +97,7 @@ definition {
 
 		task ("View the web content through the display page") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -154,7 +154,7 @@ definition {
 
 		task ("View the web content through the display page") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -186,6 +186,8 @@ definition {
 	@description = "This is a test for LPS-86191. A user can configure the page settings for each individual display page. This test changes the theme."
 	@priority = "4"
 	test ConfigureDisplayPageTheme {
+		property test.run.environment = "CE";
+
 		task ("Add a web content that uses the display page") {
 			WebContent.openWebContentAdmin(siteURLKey = "test-site-name");
 
@@ -206,7 +208,7 @@ definition {
 
 		task ("View the web content through the display page") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -249,7 +251,7 @@ definition {
 
 		task ("View the web content through the display page") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -286,7 +288,7 @@ definition {
 
 		task ("View the web content article through its friendly URL") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -307,7 +309,7 @@ definition {
 
 		task ("View the web content article through its friendly URL") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -357,7 +359,7 @@ definition {
 
 		task ("View the web content article through its friendly URL") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -587,11 +589,11 @@ definition {
 		}
 
 		task ("Assert the display page is selected by default") {
-			Panel.expandPanel(panel = "Display Page");
+			Panel.expandPanel(panel = "Display Page Template");
 
 			AssertSelectedLabel(
 				locator1 = "WCEditWebContent#DISPLAY_PAGE_SELECT",
-				value1 = "Default Display Page"
+				value1 = "Default Display Page Template"
 			);
 
 			AssertTextEquals(
@@ -606,7 +608,7 @@ definition {
 
 		task ("View the web content article through its friendly URL") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -674,7 +676,7 @@ definition {
 			var baseURL = PropsUtil.get("portal.url");
 
 			Navigator.openSpecificURL(
-				url = "view-source:${baseURL}/web/test-site-name/-/webcontent-title"
+				url = "view-source:${baseURL}/web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -776,7 +778,7 @@ definition {
 
 		task ("Navigate to the web content article's friendly URL") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -859,7 +861,7 @@ definition {
 
 		task ("Navigate to the web content article's friendly URL") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 
@@ -897,11 +899,11 @@ definition {
 				webContentTitle = "Webcontent Title"
 			);
 
-			Panel.expandPanel(panel = "Display Page");
+			Panel.expandPanel(panel = "Display Page Template");
 
 			Select(
 				locator1 = "WCEditWebContent#DISPLAY_PAGE_SELECT",
-				value1 = "No Display Page"
+				value1 = "No Display Page Template"
 			);
 
 			PortletEntry.publish();
@@ -909,7 +911,7 @@ definition {
 
 		task ("Navigate to what the web content article's friendly URL would have been if it had a display page selected") {
 			Navigator.openWithAppendToBaseURL(
-				urlAppend = "web/test-site-name/-/webcontent-title"
+				urlAppend = "web/test-site-name/w/webcontent-title"
 			);
 		}
 

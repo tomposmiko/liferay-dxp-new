@@ -43,6 +43,18 @@ public class FragmentEntryProcessorRegistryImpl
 	implements FragmentEntryProcessorRegistry {
 
 	@Override
+	public void deleteFragmentEntryLinkData(
+		FragmentEntryLink fragmentEntryLink) {
+
+		for (FragmentEntryProcessor fragmentEntryProcessor :
+				_serviceTrackerList) {
+
+			fragmentEntryProcessor.deleteFragmentEntryLinkData(
+				fragmentEntryLink);
+		}
+	}
+
+	@Override
 	public JSONArray getAvailableTagsJSONArray() {
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
@@ -87,7 +99,8 @@ public class FragmentEntryProcessorRegistryImpl
 
 	@Override
 	public String processFragmentEntryLinkCSS(
-			FragmentEntryLink fragmentEntryLink, String mode, Locale locale)
+			FragmentEntryLink fragmentEntryLink, String mode, Locale locale,
+			long[] segmentsExperienceIds)
 		throws PortalException {
 
 		String css = fragmentEntryLink.getCss();
@@ -96,7 +109,7 @@ public class FragmentEntryProcessorRegistryImpl
 				_serviceTrackerList) {
 
 			css = fragmentEntryProcessor.processFragmentEntryLinkCSS(
-				fragmentEntryLink, css, mode, locale);
+				fragmentEntryLink, css, mode, locale, segmentsExperienceIds);
 		}
 
 		return css;

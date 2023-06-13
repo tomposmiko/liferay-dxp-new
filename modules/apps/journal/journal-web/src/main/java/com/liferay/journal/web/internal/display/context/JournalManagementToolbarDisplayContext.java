@@ -99,7 +99,8 @@ public class JournalManagementToolbarDisplayContext
 						boolean trashEnabled = _trashHelper.isTrashEnabled(
 							_themeDisplay.getScopeGroupId());
 
-						dropdownItem.setIcon(trashEnabled ? "trash" : "times");
+						dropdownItem.setIcon(
+							trashEnabled ? "trash" : "times-circle");
 
 						String label = "delete";
 
@@ -352,7 +353,7 @@ public class JournalManagementToolbarDisplayContext
 
 				int status = _journalDisplayContext.getStatus();
 
-				if (status != WorkflowConstants.STATUS_ANY) {
+				if (status != _journalDisplayContext.getDefaultStatus()) {
 					add(
 						labelItem -> {
 							labelItem.setLabel(

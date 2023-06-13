@@ -14,10 +14,11 @@
 
 package com.liferay.asset.display.page.item.selector.web.internal;
 
-import com.liferay.asset.display.contributor.AssetDisplayContributorTracker;
 import com.liferay.asset.display.page.item.selector.criterion.AssetDisplayPageSelectorCriterion;
 import com.liferay.asset.display.page.item.selector.web.internal.constants.AssetDisplayPageItemSelectorWebKeys;
 import com.liferay.asset.display.page.item.selector.web.internal.display.context.AssetDisplayPagesItemSelectorViewDisplayContext;
+import com.liferay.info.constants.InfoDisplayWebKeys;
+import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
@@ -68,7 +69,8 @@ public class AssetDisplayPagesItemSelectorView
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			locale, AssetDisplayPagesItemSelectorView.class);
 
-		return ResourceBundleUtil.getString(resourceBundle, "display-pages");
+		return ResourceBundleUtil.getString(
+			resourceBundle, "display-page-templates");
 	}
 
 	@Override
@@ -83,11 +85,6 @@ public class AssetDisplayPagesItemSelectorView
 			PortletURL portletURL, String itemSelectedEventName, boolean search)
 		throws IOException, ServletException {
 
-		request.setAttribute(
-			AssetDisplayPageItemSelectorWebKeys.
-				ASSET_DISPLAY_CONTRIBUTOR_TRACKER,
-			_assetDisplayContributorTracker);
-
 		HttpServletRequest httpServletRequest = (HttpServletRequest)request;
 
 		AssetDisplayPagesItemSelectorViewDisplayContext
@@ -100,6 +97,10 @@ public class AssetDisplayPagesItemSelectorView
 			AssetDisplayPageItemSelectorWebKeys.
 				ASSET_DISPLAY_PAGES_ITEM_SELECTOR_VIEW_DISPLAY_CONTEXT,
 			assetDisplayPagesItemSelectorViewDisplayContext);
+
+		request.setAttribute(
+			InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR_TRACKER,
+			_infoDisplayContributorTracker);
 
 		ServletContext servletContext = _servletContext;
 
@@ -117,7 +118,7 @@ public class AssetDisplayPagesItemSelectorView
 				}));
 
 	@Reference
-	private AssetDisplayContributorTracker _assetDisplayContributorTracker;
+	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.asset.display.page.item.selector.web)"

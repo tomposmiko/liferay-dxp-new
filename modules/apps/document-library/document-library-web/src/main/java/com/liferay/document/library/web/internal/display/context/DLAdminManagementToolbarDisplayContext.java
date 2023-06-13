@@ -196,7 +196,7 @@ public class DLAdminManagementToolbarDisplayContext {
 										_request, "move-to-recycle-bin"));
 							}
 							else {
-								dropdownItem.setIcon("times");
+								dropdownItem.setIcon("times-circle");
 								dropdownItem.setLabel(
 									LanguageUtil.get(_request, "delete"));
 							}
@@ -255,11 +255,15 @@ public class DLAdminManagementToolbarDisplayContext {
 				availableActionDropdownItems.add("checkout");
 			}
 
-			if (_hasValidAssetVocabularies) {
-				availableActionDropdownItems.add("editCategories");
-			}
+			if (!RepositoryUtil.isExternalRepository(
+					fileEntry.getRepositoryId())) {
 
-			availableActionDropdownItems.add("editTags");
+				if (_hasValidAssetVocabularies) {
+					availableActionDropdownItems.add("editCategories");
+				}
+
+				availableActionDropdownItems.add("editTags");
+			}
 		}
 
 		if (DLFileEntryPermission.contains(
@@ -333,6 +337,8 @@ public class DLAdminManagementToolbarDisplayContext {
 
 		CreationMenu creationMenu = new CreationMenu();
 
+		creationMenu.setItemsIconAlignment("left");
+
 		for (Menu menu : menus) {
 			List<URLMenuItem> urlMenuItems =
 				(List<URLMenuItem>)(List<?>)menu.getMenuItems();
@@ -340,7 +346,9 @@ public class DLAdminManagementToolbarDisplayContext {
 			for (URLMenuItem urlMenuItem : urlMenuItems) {
 				creationMenu.addDropdownItem(
 					dropdownItem -> {
+						dropdownItem.setData(urlMenuItem.getData());
 						dropdownItem.setHref(urlMenuItem.getURL());
+						dropdownItem.setIcon(urlMenuItem.getIcon());
 						dropdownItem.setLabel(urlMenuItem.getLabel());
 						dropdownItem.setSeparator(urlMenuItem.hasSeparator());
 					});

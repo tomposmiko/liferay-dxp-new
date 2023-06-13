@@ -1,6 +1,6 @@
 import com.liferay.gradle.plugins.defaults.tasks.CopyIvyDependenciesTask
 import com.liferay.gradle.plugins.node.internal.util.FileUtil
-import com.liferay.gradle.plugins.node.tasks.ExecuteNodeScriptTask
+import com.liferay.gradle.plugins.node.tasks.ExecuteNpmTask
 import com.liferay.gradle.plugins.source.formatter.FormatSourceTask
 import com.liferay.gradle.plugins.util.PortalTools
 import com.liferay.gradle.util.OSDetector
@@ -33,7 +33,7 @@ task formatSourceLocalChanges(type: FormatSourceTask)
 task printDependencyPath
 task setUpLibs
 task setUpPortalTools
-task setUpYarn(type: ExecuteNodeScriptTask)
+task setUpYarn(type: ExecuteNpmTask)
 task wrapper(type: Wrapper)
 task wrapperSubrepo(type: Wrapper)
 
@@ -102,6 +102,14 @@ setUpYarn {
 	scriptFile = new File(projectDir, "yarn-1.13.0.js")
 
 	doFirst {
+		String registry = project.findProperty("nodejs.npm.ci.registry")
+
+		if (yarnLockFile.exists() && registry) {
+			logger.lifecycle "Using registry {}", registry
+
+			yarnLockFile.text = yarnLockFile.text.replaceAll("https://registry.yarnpkg.com", registry)
+		}
+
 		if (userNodeModulesCacheYarnLockFile.exists() && yarnLockFile.exists() && (userNodeModulesCacheYarnLockFile.text == yarnLockFile.text)) {
 			logger.lifecycle "Restoring node_modules_cache from {}", userNodeModulesCacheDir
 

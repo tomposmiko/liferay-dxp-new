@@ -492,7 +492,7 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<description>Text for the field set's label. The label renders as a legend, with a horizontal rule, above the fieldset.</description>
+			<description>Text for the field set's label. The label renders as a legend, with a horizontal rule, above the field set.</description>
 			<name>label</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -521,6 +521,12 @@
 		<attribute>
 			<description>A URL for the form's cancel button.</description>
 			<name>backURL</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>A CSS class for styling the field set.</description>
+			<name>fieldSetCssClass</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>

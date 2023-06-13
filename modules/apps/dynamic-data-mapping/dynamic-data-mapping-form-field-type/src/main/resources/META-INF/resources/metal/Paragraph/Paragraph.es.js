@@ -63,24 +63,6 @@ class Paragraph extends Component {
 		placeholder: Config.string(),
 
 		/**
-		 * @default false
-		 * @instance
-		 * @memberof Paragraph
-		 * @type {?(bool|undefined)}
-		 */
-
-		required: Config.bool().value(false),
-
-		/**
-		 * @default false
-		 * @instance
-		 * @memberof Paragraph
-		 * @type {?(bool|undefined)}
-		 */
-
-		visible: Config.bool().value(true),
-
-		/**
 		 * @default undefined
 		 * @instance
 		 * @memberof FieldBase
@@ -88,6 +70,15 @@ class Paragraph extends Component {
 		 */
 
 		repeatable: Config.bool(),
+
+		/**
+		 * @default false
+		 * @instance
+		 * @memberof Paragraph
+		 * @type {?(bool|undefined)}
+		 */
+
+		required: Config.bool().value(false),
 
 		/**
 		 * @default true
@@ -110,20 +101,20 @@ class Paragraph extends Component {
 		/**
 		 * @default undefined
 		 * @instance
-		 * @memberof Text
-		 * @type {?(string|undefined)}
-		 */
-
-		type: Config.string().value('paragraph'),
-
-		/**
-		 * @default undefined
-		 * @instance
 		 * @memberof FieldBase
 		 * @type {?(string|undefined)}
 		 */
 
-		tooltip: Config.string()
+		tooltip: Config.string(),
+
+		/**
+		 * @default undefined
+		 * @instance
+		 * @memberof Text
+		 * @type {?(string|undefined)}
+		 */
+
+		type: Config.string().value('paragraph')
 	};
 }
 

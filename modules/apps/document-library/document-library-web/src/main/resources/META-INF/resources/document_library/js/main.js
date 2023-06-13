@@ -123,24 +123,20 @@ AUI.add(
 
 							action = null;
 						}
-
-						if (action === 'editCategories') {
+						else if (action === 'editCategories') {
 							instance._openModalCategories();
 
 							action = null;
 						}
-
-						if (action === 'move' || action === 'moveEntries') {
+						else if (action === 'move' || action === 'moveEntries') {
 							instance._openModalMove();
 
 							action = null;
 						}
-
-						if (action === 'download') {
+						else if (action === 'download') {
 							url = instance.get('downloadEntryUrl');
 						}
-
-						if (action === 'deleteEntries') {
+						else if (action === 'deleteEntries') {
 							if (instance.get('trashEnabled')) {
 								action = 'move_to_trash';
 							}
@@ -236,7 +232,7 @@ AUI.add(
 									instance._moveSingleElement(event.folderid, parameterName, parameterValue);
 								}
 								else {
-									instance._moveCurrectSelection(event.folderid);
+									instance._moveCurrentSelection(event.folderid);
 								}
 							}
 						);
@@ -255,7 +251,7 @@ AUI.add(
 						}
 					},
 
-					_moveCurrectSelection: function(newFolderId) {
+					_moveCurrentSelection: function(newFolderId) {
 						var instance = this;
 
 						var form = instance.get('form').node;
@@ -268,6 +264,10 @@ AUI.add(
 
 						form.get(instance.NS + 'cmd').val('move');
 						form.get(instance.NS + 'newFolderId').val(newFolderId);
+
+						var bulkSelection = instance._searchContainer.select && instance._searchContainer.select.get('bulkSelection');
+
+						form.get(instance.NS + 'selectAll').val(bulkSelection);
 
 						submitForm(form, actionUrl, false);
 					},
@@ -310,7 +310,7 @@ AUI.add(
 							if (!instance._searchContainer.select ||
 								selectedItems.indexOf(dropTarget.one('input[type=checkbox]'))
 							) {
-								instance._moveCurrectSelection(folderId);
+								instance._moveCurrentSelection(folderId);
 							}
 						}
 					},

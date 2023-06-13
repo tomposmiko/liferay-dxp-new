@@ -19,10 +19,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Defines a transaction boundary in relation to a current transaction.
+ *
  * @author Michael Young
  * @author Shuyang Zhou
- * @see Transactional
- * @review
+ * @see    Transactional
  */
 public enum Propagation {
 

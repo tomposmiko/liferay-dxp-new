@@ -24,7 +24,7 @@ class EditTags extends Component {
 	 * Close the modal.
 	 */
 	close() {
-		this.showModal = false;
+		this._showModal = false;
 	}
 
 	/**
@@ -42,7 +42,7 @@ class EditTags extends Component {
 		this.fileEntries = fileEntries;
 		this.selectAll = selectAll;
 		this.folderId = folderId;
-		this.showModal = true;
+		this._showModal = true;
 
 		this._getCommonTags();
 	}
@@ -78,6 +78,10 @@ class EditTags extends Component {
 			);
 	}
 
+	_handleSelectedItemsChange(event) {
+		this._commonTags = event.selectedItems;
+	}
+
 	/**
 	 * Gets the common tags for the selected
 	 * file entries and updates the state.
@@ -86,25 +90,32 @@ class EditTags extends Component {
 	 * @review
 	 */
 	_getCommonTags() {
-		this.loading = true;
+		this._loading = true;
 
 		let selection = this._getSelection();
 
 		Promise.all(
 			[
 				this._fetchTagsRequest(this.urlTags, 'POST', selection),
-				this._fetchTagsRequest(this.urlSelectionDescription, 'POST', selection)
 			]
 		).then(
-			([responseTags, responseDescription]) => {
-				if (responseTags && responseDescription) {
-					this.loading = false;
-					this.commonTags = (responseTags.items || []).map(item => item.name);
-					this.description = responseDescription.description;
+			([responseTags]) => {
+				if (responseTags) {
+					this._loading = false;
+					this._commonTags = this._setCommonTags((responseTags.items || []).map(item => item.name));
 					this.multiple = (this.fileEntries.length > 1) || this.selectAll;
 				}
 			}
 		);
+	}
+
+	_handleInputFocus(event) {
+		const dataProvider = event.target.refs.autocomplete.refs.dataProvider;
+		const modal = this.element.querySelector('.modal');
+
+		if (modal && dataProvider && !modal.contains(dataProvider.element)) {
+			modal.appendChild(dataProvider.element)
+		}
 	}
 
 	/**
@@ -120,12 +131,15 @@ class EditTags extends Component {
 	/**
 	 * Sends request to backend services
 	 * to update the tags.
+	 * @param {!Event} event
 	 *
 	 * @private
 	 * @review
 	 */
-	_handleSaveBtnClick() {
-		let finalTags = this.commonTags.map(tag => tag.label);
+	_handleFormSubmit(event) {
+		event.preventDefault();
+
+		let finalTags = this._commonTags.map(tag => tag.label);
 
 		let addedTags = [];
 
@@ -219,17 +233,29 @@ EditTags.STATE = {
 	 * @review
 	 * @type {List<String>}
 	 */
-	commonTags: Config.array().setter('_setCommonTags').value([]),
+	_commonTags: Config.array().value([]).internal(),
 
 	/**
-	 * Description
+	 * Flag that indicate if loading icon must
+	 * be shown.
 	 *
 	 * @instance
 	 * @memberof EditTags
 	 * @review
-	 * @type {String}
+	 * @type {Boolean}
 	 */
-	description: Config.string(),
+	_loading: Config.bool().value(false).internal(),
+
+	/**
+	 * Flag that indicate if the modal must
+	 * be shown.
+	 *
+	 * @instance
+	 * @memberof EditTags
+	 * @review
+	 * @type {Boolean}
+	 */
+	_showModal: Config.bool().value(false).internal(),
 
 	/**
 	 * List of selected file entries.
@@ -256,17 +282,6 @@ EditTags.STATE = {
 	 * @type {[type]}
 	 */
 	groupIds: Config.array().required(),
-
-	/**
-	 * Flag that indicate if loading icon must
-	 * be shown.
-	 *
-	 * @instance
-	 * @memberof EditTags
-	 * @review
-	 * @type {Boolean}
-	 */
-	loading: Config.bool().value(false).internal(),
 
 	/**
 	 * Flag that indicate if multiple
@@ -321,17 +336,6 @@ EditTags.STATE = {
 	selectAll: Config.bool(),
 
 	/**
-	 * Flag that indicate if the modal must
-	 * be shown.
-	 *
-	 * @instance
-	 * @memberof EditTags
-	 * @review
-	 * @type {Boolean}
-	 */
-	showModal: Config.bool().value(false).internal(),
-
-	/**
 	 * Path to images.
 	 *
 	 * @instance
@@ -351,17 +355,6 @@ EditTags.STATE = {
 	 * @type {String}
 	 */
 	urlTags: Config.string().value('/bulk-rest/v1.0/keywords/common'),
-
-	/**
-	 * Url to backend service that provides
-	 * the selection description.
-	 *
-	 * @instance
-	 * @memberof EditTags
-	 * @review
-	 * @type {String}
-	 */
-	urlSelectionDescription: Config.string().value('/bulk-rest/v1.0/bulk-selection'),
 
 	/**
 	 * Url to backend service that updates

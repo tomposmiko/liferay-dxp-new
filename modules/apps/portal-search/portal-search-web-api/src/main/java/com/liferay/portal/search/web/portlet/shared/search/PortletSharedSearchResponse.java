@@ -60,11 +60,9 @@ public interface PortletSharedSearchResponse {
 		RenderRequest renderRequest);
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #getSearchResponse()}
-	 *             and
-	 *             {@link SearchResponse#getRequestString()}
-	 *
-	 * @review
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             #getSearchResponse()} and {@link
+	 *             SearchResponse#getRequestString()}
 	 */
 	@Deprecated
 	public String getQueryString();
@@ -72,9 +70,9 @@ public interface PortletSharedSearchResponse {
 	public List<String> getRelatedQueriesSuggestions();
 
 	/**
-	 * @return the search response as processed by the Liferay Search Framework
+	 * Returns the search response shared by the portlets.
 	 *
-	 * @review
+	 * @return the search response as processed by the Liferay Search Framework
 	 */
 	public SearchResponse getSearchResponse();
 
@@ -85,11 +83,9 @@ public interface PortletSharedSearchResponse {
 	public ThemeDisplay getThemeDisplay(RenderRequest renderRequest);
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link #getSearchResponse()}
-	 *             and
-	 *             {@link SearchResponse#getTotalHits()}
-	 *
-	 * @review
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getSearchResponse()} and {@link
+	 *             SearchResponse#getTotalHits()}
 	 */
 	@Deprecated
 	public int getTotalHits();

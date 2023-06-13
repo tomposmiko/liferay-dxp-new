@@ -15,14 +15,18 @@
 package com.liferay.headless.form.internal.graphql.mutation.v1_0;
 
 import com.liferay.headless.form.dto.v1_0.Form;
+import com.liferay.headless.form.dto.v1_0.FormDocument;
 import com.liferay.headless.form.dto.v1_0.FormRecord;
+import com.liferay.headless.form.dto.v1_0.FormRecordForm;
 import com.liferay.headless.form.resource.v1_0.FormDocumentResource;
+import com.liferay.headless.form.resource.v1_0.FormRecordFormResource;
 import com.liferay.headless.form.resource.v1_0.FormRecordResource;
 import com.liferay.headless.form.resource.v1_0.FormResource;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.vulcan.multipart.MultipartBody;
 
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLInvokeDetached;
@@ -63,10 +67,18 @@ public class Mutation {
 			formRecordResourceComponentServiceObjects;
 	}
 
+	public static void setFormRecordFormResourceComponentServiceObjects(
+		ComponentServiceObjects<FormRecordFormResource>
+			formRecordFormResourceComponentServiceObjects) {
+
+		_formRecordFormResourceComponentServiceObjects =
+			formRecordFormResourceComponentServiceObjects;
+	}
+
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public Form postFormEvaluateContext(
-			@GraphQLName("form-id") Long formId, @GraphQLName("Form") Form form)
+			@GraphQLName("formId") Long formId, @GraphQLName("form") Form form)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -77,19 +89,22 @@ public class Mutation {
 
 	@GraphQLField
 	@GraphQLInvokeDetached
-	public Form postFormUploadFile(
-			@GraphQLName("form-id") Long formId, @GraphQLName("Form") Form form)
+	@GraphQLName("postFormUploadFileFormIdMultipartBody")
+	public FormDocument postFormUploadFile(
+			@GraphQLName("formId") Long formId,
+			@GraphQLName("multipartBody") MultipartBody multipartBody)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_formResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			formResource -> formResource.postFormUploadFile(formId, form));
+			formResource -> formResource.postFormUploadFile(
+				formId, multipartBody));
 	}
 
 	@GraphQLInvokeDetached
 	public void deleteFormDocument(
-			@GraphQLName("form-document-id") Long formDocumentId)
+			@GraphQLName("formDocumentId") Long formDocumentId)
 		throws Exception {
 
 		_applyVoidComponentServiceObjects(
@@ -99,24 +114,11 @@ public class Mutation {
 				formDocumentId));
 	}
 
-	@GraphQLInvokeDetached
-	public FormRecord putFormRecord(
-			@GraphQLName("form-record-id") Long formRecordId,
-			@GraphQLName("FormRecord") FormRecord formRecord)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_formRecordResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			formRecordResource -> formRecordResource.putFormRecord(
-				formRecordId, formRecord));
-	}
-
 	@GraphQLField
 	@GraphQLInvokeDetached
 	public FormRecord postFormFormRecord(
-			@GraphQLName("form-id") Long formId,
-			@GraphQLName("FormRecord") FormRecord formRecord)
+			@GraphQLName("formId") Long formId,
+			@GraphQLName("formRecord") FormRecord formRecord)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -124,6 +126,19 @@ public class Mutation {
 			this::_populateResourceContext,
 			formRecordResource -> formRecordResource.postFormFormRecord(
 				formId, formRecord));
+	}
+
+	@GraphQLInvokeDetached
+	public FormRecord putFormRecord(
+			@GraphQLName("formRecordId") Long formRecordId,
+			@GraphQLName("formRecordForm") FormRecordForm formRecordForm)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_formRecordFormResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			formRecordFormResource -> formRecordFormResource.putFormRecord(
+				formRecordId, formRecordForm));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R
@@ -189,11 +204,22 @@ public class Mutation {
 				CompanyThreadLocal.getCompanyId()));
 	}
 
+	private void _populateResourceContext(
+			FormRecordFormResource formRecordFormResource)
+		throws Exception {
+
+		formRecordFormResource.setContextCompany(
+			CompanyLocalServiceUtil.getCompany(
+				CompanyThreadLocal.getCompanyId()));
+	}
+
 	private static ComponentServiceObjects<FormResource>
 		_formResourceComponentServiceObjects;
 	private static ComponentServiceObjects<FormDocumentResource>
 		_formDocumentResourceComponentServiceObjects;
 	private static ComponentServiceObjects<FormRecordResource>
 		_formRecordResourceComponentServiceObjects;
+	private static ComponentServiceObjects<FormRecordFormResource>
+		_formRecordFormResourceComponentServiceObjects;
 
 }

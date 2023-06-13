@@ -1,9 +1,9 @@
 import {addFragmentEntryLinkReducer, clearFragmentEditorReducer, disableFragmentEditorReducer, enableFragmentEditorReducer, moveFragmentEntryLinkReducer, removeFragmentEntryLinkReducer, updateEditableValueReducer, updateFragmentEntryLinkConfigReducer} from './fragments.es';
 import {addMappingAssetEntry} from './mapping.es';
 import {addPortletReducer} from './portlets.es';
-import {addSectionReducer, moveSectionReducer, removeSectionReducer, updateSectionColumnsNumberReducer, updateSectionColumnsReducer, updateSectionConfigReducer} from './sections.es';
+import {addRowReducer, moveRowReducer, removeRowReducer, updateRowColumnsNumberReducer, updateRowColumnsReducer, updateRowConfigReducer} from './rows.es';
 import {createSegmentsExperienceReducer, deleteSegmentsExperienceReducer, editSegmentsExperienceReducer, selectSegmentsExperienceReducer, updateSegmentsExperiencePriorityReducer} from './segmentsExperiences.es';
-import {hideFragmentsEditorSidebarReducer, toggleFragmentsEditorSidebarReducer} from './sidebar.es';
+import {updateSelectedSidebarPanelId} from './sidebar.es';
 import {hideMappingDialogReducer, hideMappingTypeDialogReducer, openAssetTypeDialogReducer, openMappingFieldsDialogReducer, selectMappeableTypeReducer} from './dialogs.es';
 import {languageIdReducer, translationStatusReducer} from './translations.es';
 import {saveChangesReducer} from './changes.es';
@@ -17,20 +17,19 @@ const reducers = [
 	addFragmentEntryLinkReducer,
 	addMappingAssetEntry,
 	addPortletReducer,
-	addSectionReducer,
+	addRowReducer,
 	clearFragmentEditorReducer,
 	disableFragmentEditorReducer,
 	enableFragmentEditorReducer,
-	hideFragmentsEditorSidebarReducer,
 	hideMappingDialogReducer,
 	hideMappingTypeDialogReducer,
 	languageIdReducer,
 	moveFragmentEntryLinkReducer,
-	moveSectionReducer,
+	moveRowReducer,
 	openAssetTypeDialogReducer,
 	openMappingFieldsDialogReducer,
 	removeFragmentEntryLinkReducer,
-	removeSectionReducer,
+	removeRowReducer,
 	saveChangesReducer,
 	selectMappeableTypeReducer,
 	selectSegmentsExperienceReducer,
@@ -38,16 +37,16 @@ const reducers = [
 	deleteSegmentsExperienceReducer,
 	editSegmentsExperienceReducer,
 	updateSegmentsExperiencePriorityReducer,
-	toggleFragmentsEditorSidebarReducer,
 	translationStatusReducer,
 	updateActiveItemReducer,
 	updateDropTargetReducer,
 	updateEditableValueReducer,
 	updateFragmentEntryLinkConfigReducer,
 	updateHoveredItemReducer,
-	updateSectionColumnsNumberReducer,
-	updateSectionColumnsReducer,
-	updateSectionConfigReducer
+	updateRowColumnsNumberReducer,
+	updateRowColumnsReducer,
+	updateRowConfigReducer,
+	updateSelectedSidebarPanelId
 ];
 
 export {reducers};

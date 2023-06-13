@@ -26,8 +26,6 @@ definition {
 			DisplayPageTemplatesAdmin.addDisplayPage(displayPageName = "Display Page Name");
 
 			PageEditor.clickPublish();
-
-			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 		}
 	}
 
@@ -110,7 +108,7 @@ definition {
 		);
 
 		Navigator.openWithAppendToBaseURL(
-			urlAppend = "web/remote-site/-/webcontent-title"
+			urlAppend = "web/remote-site/w/webcontent-title"
 		);
 
 		AssetPublisherPortlet.viewAssetPG(

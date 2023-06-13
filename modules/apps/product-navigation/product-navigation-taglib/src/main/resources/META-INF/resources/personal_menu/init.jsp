@@ -16,6 +16,10 @@
 
 <%@ include file="/init.jsp" %>
 
-<%@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
+<%@ page import="com.liferay.petra.string.StringPool" %><%@
+page import="com.liferay.portal.kernel.portlet.PortletURLFactoryUtil" %><%@
+page import="com.liferay.portal.kernel.util.StringUtil" %><%@
+page import="com.liferay.product.navigation.personal.menu.constants.PersonalMenuPortletKeys" %>
 
-<%@ page import="com.liferay.product.navigation.personal.menu.constants.PersonalMenuPortletKeys" %>
+<%@ page import="javax.portlet.PortletRequest" %><%@
+page import="javax.portlet.ResourceURL" %>

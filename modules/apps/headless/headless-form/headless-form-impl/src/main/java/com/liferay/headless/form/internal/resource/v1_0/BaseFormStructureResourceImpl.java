@@ -55,40 +55,41 @@ public abstract class BaseFormStructureResourceImpl
 
 	@Override
 	@GET
+	@Path("/form-structures/{formStructureId}")
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "FormStructure")})
+	public FormStructure getFormStructure(
+			@NotNull @PathParam("formStructureId") Long formStructureId)
+		throws Exception {
+
+		return new FormStructure();
+	}
+
+	@Override
+	@GET
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.QUERY, name = "page"),
 			@Parameter(in = ParameterIn.QUERY, name = "pageSize")
 		}
 	)
-	@Path("/content-spaces/{content-space-id}/form-structures")
+	@Path("/sites/{siteId}/form-structures")
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "FormStructure")})
-	public Page<FormStructure> getContentSpaceFormStructuresPage(
-			@NotNull @PathParam("content-space-id") Long contentSpaceId,
+	public Page<FormStructure> getSiteFormStructuresPage(
+			@NotNull @PathParam("siteId") Long siteId,
 			@Context Pagination pagination)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
 	}
 
-	@Override
-	@GET
-	@Path("/form-structures/{form-structure-id}")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "FormStructure")})
-	public FormStructure getFormStructure(
-			@NotNull @PathParam("form-structure-id") Long formStructureId)
-		throws Exception {
-
-		return new FormStructure();
-	}
-
 	public void setContextCompany(Company contextCompany) {
 		this.contextCompany = contextCompany;
 	}
 
-	protected void preparePatch(FormStructure formStructure) {
+	protected void preparePatch(
+		FormStructure formStructure, FormStructure existingFormStructure) {
 	}
 
 	protected <T, R> List<R> transform(

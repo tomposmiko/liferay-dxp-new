@@ -14,29 +14,38 @@
 
 package com.liferay.product.navigation.personal.menu.web.internal.portlet.action;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.product.navigation.personal.menu.PersonalMenuEntry;
 import com.liferay.product.navigation.personal.menu.constants.PersonalMenuPortletKeys;
 import com.liferay.product.navigation.personal.menu.web.internal.PersonalMenuEntryRegistry;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
+import javax.portlet.PortletRequest;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
@@ -58,8 +67,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 
 	@Override
 	protected void doServeResource(
-			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
-		throws Exception {
+		ResourceRequest resourceRequest, ResourceResponse resourceResponse) {
 
 		try {
 			HttpServletResponse httpServletResponse =
@@ -68,7 +76,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 			httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
 
 			JSONArray jsonArray = _getPersonalMenuItemsJSONArray(
-				_portal.getHttpServletRequest(resourceRequest));
+				resourceRequest);
 
 			ServletResponseUtil.write(
 				httpServletResponse, jsonArray.toString());
@@ -78,29 +86,109 @@ public class GetPersonalMenuItemsMVCResourceCommand
 		}
 	}
 
-	private JSONArray _getPersonalMenuEntriesAsJSONArray(
-		HttpServletRequest httpServletRequest,
-		List<PersonalMenuEntry> personalMenuEntries) {
+	private JSONArray _getImpersonationItemsJSONArray(
+		PortletRequest portletRequest, ThemeDisplay themeDisplay) {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+		JSONObject jsonObject1 = JSONFactoryUtil.createJSONObject();
+
+		jsonObject1.put(
+			"href",
+			_http.removeParameter(
+				ParamUtil.getString(portletRequest, "currentURL"),
+				"doAsUserId"));
+		jsonObject1.put("icon", "change");
+		jsonObject1.put(
+			"label",
+			LanguageUtil.get(themeDisplay.getLocale(), "be-yourself-again"));
+
+		jsonArray.put(jsonObject1);
+
+		User realUser = themeDisplay.getRealUser();
+		User user = themeDisplay.getUser();
+
+		Locale realUserLocale = realUser.getLocale();
+		Locale userLocale = user.getLocale();
+
+		if (!realUserLocale.equals(userLocale)) {
+			JSONObject jsonObject2 = JSONFactoryUtil.createJSONObject();
+
+			String changeLanguageLabel = null;
+			String doAsUserLanguageId = null;
+
+			Locale locale = themeDisplay.getLocale();
+
+			if (Objects.equals(
+					locale.getLanguage(), realUserLocale.getLanguage()) &&
+				Objects.equals(
+					locale.getCountry(), realUserLocale.getCountry())) {
+
+				changeLanguageLabel = LanguageUtil.format(
+					realUserLocale, "use-x's-preferred-language-(x)",
+					new String[] {
+						_html.escape(user.getFullName()),
+						userLocale.getDisplayLanguage(realUserLocale)
+					},
+					false);
+
+				doAsUserLanguageId =
+					userLocale.getLanguage() + "_" + userLocale.getCountry();
+			}
+			else {
+				changeLanguageLabel = LanguageUtil.format(
+					realUserLocale, "use-your-preferred-language-(x)",
+					realUserLocale.getDisplayLanguage(realUserLocale), false);
+
+				doAsUserLanguageId = StringUtil.add(
+					realUserLocale.getLanguage(), realUserLocale.getCountry(),
+					StringPool.UNDERLINE);
+			}
+
+			jsonObject2.put(
+				"href",
+				_http.setParameter(
+					ParamUtil.getString(portletRequest, "currentURL"),
+					"doAsUserLanguageId", doAsUserLanguageId));
+			jsonObject2.put("icon", "globe");
+			jsonObject2.put("label", changeLanguageLabel);
+
+			jsonArray.put(jsonObject2);
+		}
+
+		return jsonArray;
+	}
+
+	private JSONArray _getPersonalMenuEntriesAsJSONArray(
+			PortletRequest portletRequest,
+			List<PersonalMenuEntry> personalMenuEntries)
+		throws PortalException {
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		for (PersonalMenuEntry personalMenuEntry : personalMenuEntries) {
 			if (!personalMenuEntry.isShow(
-					themeDisplay.getPermissionChecker())) {
+					portletRequest, themeDisplay.getPermissionChecker())) {
 
 				continue;
 			}
 
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
+			String portletId = ParamUtil.getString(portletRequest, "portletId");
+
+			jsonObject.put(
+				"active",
+				personalMenuEntry.isActive(portletRequest, portletId));
+
 			try {
 				jsonObject.put(
 					"href",
-					personalMenuEntry.getPortletURL(httpServletRequest));
+					personalMenuEntry.getPortletURL(
+						_portal.getHttpServletRequest(portletRequest)));
 			}
 			catch (PortalException pe) {
 				_log.error(pe, pe);
@@ -116,12 +204,39 @@ public class GetPersonalMenuItemsMVCResourceCommand
 	}
 
 	private JSONArray _getPersonalMenuItemsJSONArray(
-		HttpServletRequest httpServletRequest) {
+			PortletRequest portletRequest)
+		throws PortalException {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		List<List<PersonalMenuEntry>> groupedPersonalMenuEntries =
 			_personalMenuEntryRegistry.getGroupedPersonalMenuEntries();
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		if (themeDisplay.isImpersonated()) {
+			JSONObject impersonationJSONObject =
+				JSONFactoryUtil.createJSONObject();
+
+			impersonationJSONObject.put(
+				"items",
+				_getImpersonationItemsJSONArray(portletRequest, themeDisplay));
+
+			User user = themeDisplay.getUser();
+
+			impersonationJSONObject.put(
+				"label",
+				StringUtil.appendParentheticalSuffix(
+					user.getFullName(),
+					LanguageUtil.get(
+						themeDisplay.getLocale(), "impersonated")));
+
+			impersonationJSONObject.put("separator", true);
+			impersonationJSONObject.put("type", "group");
+
+			jsonArray.put(impersonationJSONObject);
+		}
 
 		for (int i = 0; i < groupedPersonalMenuEntries.size(); i++) {
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
@@ -129,7 +244,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 			jsonObject.put(
 				"items",
 				_getPersonalMenuEntriesAsJSONArray(
-					httpServletRequest, groupedPersonalMenuEntries.get(i)));
+					portletRequest, groupedPersonalMenuEntries.get(i)));
 
 			if (i < (groupedPersonalMenuEntries.size() - 1)) {
 				jsonObject.put("separator", true);
@@ -145,6 +260,12 @@ public class GetPersonalMenuItemsMVCResourceCommand
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		GetPersonalMenuItemsMVCResourceCommand.class);
+
+	@Reference
+	private Html _html;
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private PersonalMenuEntryRegistry _personalMenuEntryRegistry;

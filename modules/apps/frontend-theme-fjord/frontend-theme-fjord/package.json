@@ -3,11 +3,6 @@
 	"bugs": {
 		"url": "https://issues.liferay.com/"
 	},
-	"devDependencies": {
-		"gulp": "3.9.1",
-		"liferay-theme-deps-7.1": "8.0.0-rc.2",
-		"liferay-theme-tasks": "8.0.0-rc.2"
-	},
 	"keywords": [
 		"liferay-theme"
 	],
@@ -22,7 +17,7 @@
 	"name": "liferay-fjord-theme",
 	"repository": "liferay/liferay-portal",
 	"scripts": {
-		"build": "gulp build"
+		"build": "liferay-npm-scripts theme build"
 	},
 	"version": "3.0.0"
 }

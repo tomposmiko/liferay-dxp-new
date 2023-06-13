@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.sharing.display.context.util.SharingMenuItemFactory;
@@ -44,14 +45,15 @@ import com.liferay.sharing.renderer.SharingEntryEditRenderer;
 import com.liferay.sharing.security.permission.SharingEntryAction;
 import com.liferay.sharing.security.permission.SharingPermission;
 import com.liferay.sharing.service.SharingEntryLocalService;
+import com.liferay.sharing.servlet.taglib.ui.SharingEntryMenuItemContributor;
 import com.liferay.sharing.util.comparator.SharingEntryModifiedDateComparator;
+import com.liferay.sharing.web.internal.servlet.taglib.ui.SharingEntryMenuItemContributorRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.function.Function;
 
 import javax.portlet.PortletException;
@@ -69,26 +71,31 @@ public class SharedAssetsViewDisplayContext {
 	public SharedAssetsViewDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest request, ResourceBundle resourceBundle,
 		List<SharedAssetsFilterItem> sharedAssetsFilterItems,
-		SharingEntryLocalService sharingEntryLocalService,
 		Function<SharingEntry, SharingEntryInterpreter>
 			sharingEntryInterpreterFunction,
+		SharingEntryLocalService sharingEntryLocalService,
+		SharingEntryMenuItemContributorRegistry
+			sharingEntryMenuItemContributorRegistry,
 		SharingMenuItemFactory sharingMenuItemFactory,
 		SharingPermission sharingPermission) {
 
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_request = request;
 		_sharedAssetsFilterItems = sharedAssetsFilterItems;
-		_sharingEntryLocalService = sharingEntryLocalService;
 		_sharingEntryInterpreterFunction = sharingEntryInterpreterFunction;
+		_sharingEntryLocalService = sharingEntryLocalService;
+		_sharingEntryMenuItemContributorRegistry =
+			sharingEntryMenuItemContributorRegistry;
 		_sharingMenuItemFactory = sharingMenuItemFactory;
 		_sharingPermission = sharingPermission;
 
 		_currentURLObj = PortletURLUtil.getCurrent(
 			liferayPortletRequest, liferayPortletResponse);
-		_themeDisplay = (ThemeDisplay)request.getAttribute(
+
+		_request = PortalUtil.getHttpServletRequest(liferayPortletRequest);
+
+		_themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -209,7 +216,17 @@ public class SharedAssetsViewDisplayContext {
 					_request));
 		}
 
+		SharingEntryMenuItemContributor sharingEntryMenuItemContributor =
+			_sharingEntryMenuItemContributorRegistry.
+				getSharingEntryMenuItemContributor(
+					sharingEntry.getClassNameId());
+
+		menuItems.addAll(
+			sharingEntryMenuItemContributor.getSharingEntryMenuItems(
+				sharingEntry, _themeDisplay));
+
 		menu.setMenuItems(menuItems);
+
 		menu.setScroll(false);
 		menu.setShowWhenSingleIcon(true);
 
@@ -249,6 +266,21 @@ public class SharedAssetsViewDisplayContext {
 		if ((sharingEntry != null) &&
 			sharingEntry.hasSharingPermission(SharingEntryAction.UPDATE)) {
 
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isVisible(SharingEntry sharingEntry) throws PortalException {
+		SharingEntryInterpreter sharingEntryInterpreter =
+			_sharingEntryInterpreterFunction.apply(sharingEntry);
+
+		if (sharingEntryInterpreter == null) {
+			return false;
+		}
+
+		if (sharingEntryInterpreter.isVisible(sharingEntry)) {
 			return true;
 		}
 
@@ -463,6 +495,8 @@ public class SharedAssetsViewDisplayContext {
 	private final Function<SharingEntry, SharingEntryInterpreter>
 		_sharingEntryInterpreterFunction;
 	private final SharingEntryLocalService _sharingEntryLocalService;
+	private final SharingEntryMenuItemContributorRegistry
+		_sharingEntryMenuItemContributorRegistry;
 	private final SharingMenuItemFactory _sharingMenuItemFactory;
 	private final SharingPermission _sharingPermission;
 	private final ThemeDisplay _themeDisplay;

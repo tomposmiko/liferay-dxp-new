@@ -55,6 +55,9 @@ public class TaxonomyCategory {
 		try {
 			taxonomyCategoryId = taxonomyCategoryIdUnsafeSupplier.get();
 		}
+		catch (RuntimeException re) {
+			throw re;
+		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -78,6 +81,9 @@ public class TaxonomyCategory {
 
 		try {
 			taxonomyCategoryName = taxonomyCategoryNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
@@ -117,14 +123,23 @@ public class TaxonomyCategory {
 
 		sb.append("\"taxonomyCategoryId\": ");
 
-		sb.append(taxonomyCategoryId);
+		if (taxonomyCategoryId == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(taxonomyCategoryId);
+		}
+
 		sb.append(", ");
 
 		sb.append("\"taxonomyCategoryName\": ");
 
-		sb.append("\"");
-		sb.append(taxonomyCategoryName);
-		sb.append("\"");
+		if (taxonomyCategoryName == null) {
+			sb.append("null");
+		}
+		else {
+			sb.append(taxonomyCategoryName);
+		}
 
 		sb.append("}");
 

@@ -100,7 +100,7 @@
 </tr>
 <tr>
 	<td>EXPIRE</td>
-	<td>//a[@data-title='Expire'] | //a[@title='Expire']</td>
+	<td>//button[@data-title='Expire' or @title='Expire']</td>
 	<td></td>
 </tr>
 <tr>
@@ -140,7 +140,7 @@
 </tr>
 <tr>
 	<td>MOVE</td>
-	<td>//*[*[name()='svg'][contains(@class,'icon-change')]]</td>
+	<td>//*[*[name()='svg'][contains(@class,'icon-move')]]</td>
 	<td></td>
 </tr>
 <tr>

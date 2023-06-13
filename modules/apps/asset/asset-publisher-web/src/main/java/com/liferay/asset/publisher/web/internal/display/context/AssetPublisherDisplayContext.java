@@ -1238,6 +1238,17 @@ public class AssetPublisherDisplayContext {
 		return false;
 	}
 
+	public boolean isEnableSubscriptions() {
+		if (_enableSubscriptions != null) {
+			return _enableSubscriptions;
+		}
+
+		_enableSubscriptions = GetterUtil.getBoolean(
+			_portletPreferences.getValue("enableSubscriptions", null));
+
+		return _enableSubscriptions;
+	}
+
 	public boolean isEnableTagBasedNavigation() {
 		if (_enableTagBasedNavigation != null) {
 			return _enableTagBasedNavigation;
@@ -1866,6 +1877,7 @@ public class AssetPublisherDisplayContext {
 	private Boolean _enableRatings;
 	private Boolean _enableRelatedAssets;
 	private Boolean _enableRSS;
+	private Boolean _enableSubscriptions;
 	private Boolean _enableTagBasedNavigation;
 	private Boolean _enableViewCountIncrement;
 	private Boolean _excludeZeroViewCount;
