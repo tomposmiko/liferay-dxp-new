@@ -17,15 +17,16 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String backURL = ParamUtil.getString(request, "backURL", String.valueOf(renderResponse.createRenderURL()));
-
 long batchPlannerPlanId = ParamUtil.getLong(renderRequest, "batchPlannerPlanId");
 
 boolean editable = ParamUtil.getBoolean(renderRequest, "editable");
 
-renderResponse.setTitle(editable ? LanguageUtil.get(request, "edit-template") : LanguageUtil.get(request, "import"));
-
 EditBatchPlannerPlanDisplayContext editBatchPlannerPlanDisplayContext = (EditBatchPlannerPlanDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+
+portletDisplay.setShowBackIcon(true);
+portletDisplay.setURLBack(ParamUtil.getString(request, "backURL", String.valueOf(renderResponse.createRenderURL())));
+
+renderResponse.setTitle(editable ? LanguageUtil.get(request, "edit-template") : LanguageUtil.get(request, "import"));
 %>
 
 <clay:container
@@ -154,8 +155,6 @@ EditBatchPlannerPlanDisplayContext editBatchPlannerPlanDisplayContext = (EditBat
 				module="js/import/ImportForm"
 				props='<%=
 					HashMapBuilder.<String, Object>put(
-						"backUrl", backURL
-					).put(
 						"formDataQuerySelector", "#" + liferayPortletResponse.getNamespace() + "fm"
 					).put(
 						"formImportURL",

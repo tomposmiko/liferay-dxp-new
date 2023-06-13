@@ -1327,6 +1327,65 @@ definition {
 
 	}
 
+	@description = "This test covers LPS-133714. The blog entry creator receives a notification of its own blog"
+	@priority = "3"
+	test NotificationIsReceivedByNewEntryCreator {
+		property custom.properties = "jsonws.web.service.paths.excludes=";
+
+		task ("Enable Send Notifications to Blogs Entry Creator") {
+			BlogsNavigator.openToConfigInInstanceSettings(portlet = "Blogs Service");
+
+			FormFields.enableCheckbox(fieldName = "Send Notifications to Blogs Entry Creator");
+
+			if (IsElementPresent(key_text = "Save", locator1 = "Button#ANY")) {
+				Button.clickSave();
+			}
+			else {
+				Button.clickUpdate();
+			}
+		}
+
+		task ("Check no notifications are pending") {
+			Notifications.viewBadgeCount(notificationCount = "0");
+		}
+
+		task ("Create a Blog Page and subscribe to widget to receive notifications") {
+			JSONLayout.addPublicLayout(
+				groupName = "Guest",
+				layoutName = "Blogs Page Admin");
+
+			JSONLayout.addWidgetToPublicLayout(
+				column = "1",
+				groupName = "Guest",
+				layoutName = "Blogs Page Admin",
+				widgetName = "Blogs");
+
+			Navigator.gotoPage(pageName = "Blogs Page Admin");
+
+			if (IsElementPresent(locator1 = "Blogs#UNSUBSCRIBE_LINK", value1 = "Unsubscribe")) {
+				AssertClick(
+					locator1 = "Blogs#UNSUBSCRIBE_LINK",
+					value1 = "Unsubscribe");
+			}
+
+			Blogs.subscribePG();
+		}
+
+		task ("Add blog entry") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				userEmailAddress = "test@liferay.com",
+				userPassword = "test");
+		}
+
+		task ("Check entry creator has a notification") {
+			Navigator.gotoPage(pageName = "Blogs Page Admin");
+
+			Notifications.viewBadgeCount(notificationCount = "1");
+		}
+	}
+
 	@description = "This is a use case for LPS-69240. It checks that when blog entries are duplicated their custom URL's are unique."
 	@priority = "4"
 	@refactordone

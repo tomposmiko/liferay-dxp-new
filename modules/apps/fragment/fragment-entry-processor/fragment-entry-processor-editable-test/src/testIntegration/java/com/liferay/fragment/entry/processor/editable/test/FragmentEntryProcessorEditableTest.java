@@ -45,6 +45,7 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
+import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -53,7 +54,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.PortletPreferences;
@@ -81,7 +81,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.JavaConstants;
@@ -149,7 +148,7 @@ public class FragmentEntryProcessorEditableTest {
 
 		_company = _companyLocalService.getCompany(_group.getCompanyId());
 
-		_layout = _addLayout(_group.getGroupId());
+		_layout = LayoutTestUtil.addTypeContentLayout(_group);
 
 		_processedHTML = _getProcessedHTML("processed_fragment_entry.html");
 
@@ -261,14 +260,12 @@ public class FragmentEntryProcessorEditableTest {
 
 		FragmentEntry fragmentEntry = _addFragmentEntry("fragment_entry.html");
 
-		long defaultSegmentsExperienceId =
-			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
-				_layout.getPlid());
-
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
 				TestPropsValues.getUserId(), _group.getGroupId(), 0,
-				fragmentEntry.getFragmentEntryId(), defaultSegmentsExperienceId,
+				fragmentEntry.getFragmentEntryId(),
+				_segmentsExperienceLocalService.
+					fetchDefaultSegmentsExperienceId(_layout.getPlid()),
 				TestPropsValues.getPlid(), fragmentEntry.getCss(),
 				fragmentEntry.getHtml(), fragmentEntry.getJs(),
 				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 0, null,
@@ -669,19 +666,6 @@ public class FragmentEntryProcessorEditableTest {
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 	}
 
-	private Layout _addLayout(long groupId) throws Exception {
-		String name = RandomTestUtil.randomString();
-
-		String friendlyURL =
-			StringPool.SLASH + FriendlyURLNormalizerUtil.normalize(name);
-
-		return _layoutLocalService.addLayout(
-			TestPropsValues.getUserId(), groupId, false,
-			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, name, null,
-			RandomTestUtil.randomString(), LayoutConstants.TYPE_PORTLET, false,
-			friendlyURL, ServiceContextTestUtil.getServiceContext());
-	}
-
 	private com.liferay.portal.kernel.xml.Document _createDocumentContent(
 		String availableLocales, String defaultLocale) {
 
@@ -742,14 +726,12 @@ public class FragmentEntryProcessorEditableTest {
 
 		FragmentEntry fragmentEntry = _addFragmentEntry(htmlFileName);
 
-		long defaultSegmentsExperienceId =
-			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
-				_layout.getPlid());
-
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
 				TestPropsValues.getUserId(), _group.getGroupId(), 0,
-				fragmentEntry.getFragmentEntryId(), defaultSegmentsExperienceId,
+				fragmentEntry.getFragmentEntryId(),
+				_segmentsExperienceLocalService.
+					fetchDefaultSegmentsExperienceId(_layout.getPlid()),
 				TestPropsValues.getPlid(), fragmentEntry.getCss(),
 				fragmentEntry.getHtml(), fragmentEntry.getJs(),
 				StringPool.BLANK, editableValues, StringPool.BLANK, 0, null,

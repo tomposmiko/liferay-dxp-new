@@ -14,6 +14,7 @@
 
 import ClayButton from '@clayui/button';
 import ClayTabs from '@clayui/tabs';
+import {fetch} from 'frontend-js-web';
 import React, {useContext, useEffect, useState} from 'react';
 
 import SidePanelContent from '../SidePanelContent';
@@ -53,16 +54,15 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 
 	const onCloseSidePanel = () => {
 		const parentWindow = Liferay.Util.getOpener();
-
 		parentWindow.Liferay.fire('close-side-panel');
 	};
 
 	useEffect(() => {
 		const makeFetch = async () => {
-			const objectViewResponse = await Liferay.Util.fetch(
+			const objectViewResponse = await fetch(
 				`/o/object-admin/v1.0/object-views/${objectViewId}`,
 				{
-					header: HEADERS,
+					headers: HEADERS,
 					method: 'GET',
 				}
 			);
@@ -73,9 +73,9 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				objectDefinitionId,
 				objectViewColumns,
 				objectViewSortColumns,
-			} = await objectViewResponse.json();
+			} = (await objectViewResponse.json()) as any;
 
-			const objectFieldsResponse = await Liferay.Util.fetch(
+			const objectFieldsResponse = await fetch(
 				`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
 				{
 					headers: HEADERS,
@@ -100,7 +100,9 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 
 			const {
 				items: objectFields,
-			}: {items: TObjectField[]} = await objectFieldsResponse.json();
+			}: {
+				items: TObjectField[];
+			} = (await objectFieldsResponse.json()) as any;
 
 			dispatch({
 				payload: {
@@ -154,8 +156,10 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 
 		const {objectViewColumns} = newObjectView;
 
+		const parentWindow = Liferay.Util.getOpener();
+
 		if (!objectView.defaultObjectView || objectViewColumns.length !== 0) {
-			const response = await Liferay.Util.fetch(
+			const response = await fetch(
 				`/o/object-admin/v1.0/object-views/${objectViewId}`,
 				{
 					body: JSON.stringify(newObjectView),
@@ -168,31 +172,28 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				window.location.reload();
 			}
 			else if (response.ok) {
-				Liferay.Util.openToast({
+				onCloseSidePanel();
+
+				parentWindow.Liferay.Util.openToast({
 					message: Liferay.Language.get(
 						'modifications-saved-successfully'
 					),
 					type: 'success',
 				});
-
-				setTimeout(() => {
-					const parentWindow = Liferay.Util.getOpener();
-					parentWindow.Liferay.fire('close-side-panel');
-				}, 1500);
 			}
 			else {
 				const {
 					title = Liferay.Language.get('an-error-occurred'),
-				} = await response.json();
+				} = (await response.json()) as any;
 
-				Liferay.Util.openToast({
+				parentWindow.Liferay.Util.openToast({
 					message: title,
 					type: 'danger',
 				});
 			}
 		}
 		else {
-			Liferay.Util.openToast({
+			parentWindow.Liferay.Util.openToast({
 				message: Liferay.Language.get(
 					'default-view-must-have-at-least-one-column'
 				),

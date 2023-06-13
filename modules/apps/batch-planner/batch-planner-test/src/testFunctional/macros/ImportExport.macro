@@ -119,6 +119,70 @@ definition {
 			locator1 = "ImportExport#EXECUTION_ENTRY");
 	}
 
+	macro assertOptionalImportFields {
+		for (var optionalField : list "${optionalFields}") {
+			AssertElementPresent(
+				key_destinationField = "${optionalField}",
+				locator1 = "ImportExport#OPTIONAL_IMPORT_FIELD");
+		}
+	}
+
+	macro assertRequiredImportFields {
+		for (var requiredField : list "${requiredFields}") {
+			AssertElementPresent(
+				key_destinationField = "${requiredField}",
+				locator1 = "ImportExport#REQUIRED_IMPORT_FIELD");
+		}
+	}
+
+	macro configureExport {
+		ImportExport.selectEntity(
+			entityType = "${entityType}",
+			headlessEndpoint = "${headlessEndpoint}");
+
+		Select(
+			key_selectFieldLabel = "Export File Format",
+			locator1 = "ImportExport#SELECT",
+			value1 = "${exportFileFormat}");
+
+		if ("${containsHeaders}" == "false") {
+			Uncheck.uncheckNotVisible(
+				checkboxName = "Headers",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+
+		ImportExport.mapExport(exportFields = "${exportFields}");
+	}
+
+	macro configureImport {
+		UploadDependencyFile.uploadFile(fileName = "${fileName}");
+
+		if (isSet(csvSeparator)) {
+			Type(
+				key_text = "CSV Separator",
+				locator1 = "TextInput#ANY",
+				value1 = "${csvSeparator}");
+		}
+
+		if ("${containsHeaders}" == "false") {
+			Uncheck.uncheckNotVisible(
+				checkboxName = "Headers",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+
+		ImportExport.selectEntity(
+			entityType = "${entityType}",
+			headlessEndpoint = "${headlessEndpoint}");
+
+		if ("${stopImportOnError}" == "false") {
+			Uncheck.uncheckNotVisible(
+				checkboxName = "Stop the Import on Error",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+
+		ImportExport.mapImport(fieldMappings = "${fieldMappings}");
+	}
+
 	macro exportFile {
 		Click(locator1 = "Button#PLUS");
 
@@ -200,7 +264,9 @@ definition {
 
 		ImportExport.mapImport(fieldMappings = "${fieldMappings}");
 
-		Button.click(button = "Import");
+		Button.click(button = "Next");
+
+		Button.click(button = "Start Import");
 
 		WaitForElementPresent(locator1 = "ImportExport#EXECUTION_SUCCESS");
 
@@ -208,6 +274,10 @@ definition {
 	}
 
 	macro mapExport {
+		Check.checkNotVisible(
+			key_checkboxOption = "Attribute Code",
+			locator1 = "Checkbox#SPECIFIC_CHECKBOX_IN_TABLE");
+
 		Uncheck.uncheckNotVisible(
 			key_checkboxOption = "Attribute Code",
 			locator1 = "Checkbox#SPECIFIC_CHECKBOX_IN_TABLE");

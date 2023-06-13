@@ -54,9 +54,11 @@ import formatXML from './util/format_xml.es';
 import getCropRegion from './util/get_crop_region.es';
 import getDOM from './util/get_dom';
 import getElement from './util/get_element';
+import getGeolocation from './util/get_geolocation';
 import getLexiconIcon from './util/get_lexicon_icon';
 import getPortletId from './util/get_portlet_id';
 import getPortletNamespace from './util/get_portlet_namespace.es';
+import getURLWithSessionId from './util/get_url_with_session_id';
 import {
 	MAP_HTML_CHARS_ESCAPED,
 	escapeHTML,
@@ -76,6 +78,7 @@ import createResourceURL from './util/portlet_url/create_resource_url.es';
 import {getSessionValue, setSessionValue} from './util/session.es';
 import toCharCode from './util/to_char_code.es';
 import toggleDisabled from './util/toggle_disabled';
+import zIndex from './zIndex';
 
 Liferay = window.Liferay || {};
 
@@ -83,6 +86,8 @@ Liferay = window.Liferay || {};
  * @deprecated As of Athanasius (7.3.x), replaced by `import {BREAKPOINTS} from 'frontend-js-web'`
  */
 Liferay.BREAKPOINTS = BREAKPOINTS;
+
+Liferay.zIndex = zIndex;
 
 Liferay.component = component;
 Liferay.componentReady = componentReady;
@@ -194,6 +199,7 @@ Liferay.Util.getDOM = getDOM;
  */
 Liferay.Util.getElement = getElement;
 
+Liferay.Util.getGeolocation = getGeolocation;
 Liferay.Util.getFormElement = getFormElement;
 Liferay.Util.getLexiconIcon = getLexiconIcon;
 
@@ -203,6 +209,7 @@ Liferay.Util.getLexiconIcon = getLexiconIcon;
 Liferay.Util.getPortletId = getPortletId;
 
 Liferay.Util.getPortletNamespace = getPortletNamespace;
+Liferay.Util.getURLWithSessionId = getURLWithSessionId;
 Liferay.Util.groupBy = groupBy;
 
 /**
@@ -247,6 +254,15 @@ Liferay.Util.toCharCode = toCharCode;
  * @deprecated As of Athanasius (7.3.x), replaced by `import {toggleDisabled} from 'frontend-js-web'`
  */
 Liferay.Util.toggleDisabled = toggleDisabled;
+
+Liferay.Util.openConfirmModal = (...args) => {
+	Liferay.Loader.require(
+		'frontend-js-web/liferay/modal/Modal',
+		(commands) => {
+			commands.openConfirmModal(...args);
+		}
+	);
+};
 
 Liferay.Util.openModal = (...args) => {
 	Liferay.Loader.require(

@@ -499,7 +499,7 @@ definition {
 		ObjectAdmin.addTabFieldsOnLayout(
 			blockName = "Block 1",
 			columnsNumber = "1",
-			fieldList = "Custom Field,Custom Object 141652",
+			fieldList = "Custom Field,Relationship",
 			tabName = "Field Tab");
 
 		ObjectAdmin.addTabRelationshipsOnLayout(
@@ -550,7 +550,7 @@ definition {
 		ObjectAdmin.addObjectRelationshipViaAPI(
 			objectName_1 = "CustomObject10",
 			objectName_2 = "CustomObject10",
-			relationshipLabel = "Relationship Label",
+			relationshipLabel = "Relationship",
 			relationshipName = "relationship",
 			relationshipType = "oneToMany");
 
@@ -586,11 +586,11 @@ definition {
 		ObjectAdmin.addTabFieldsOnLayout(
 			blockName = "Block 1",
 			columnsNumber = "1",
-			fieldList = "Custom Field,Relationship Label",
+			fieldList = "Custom Field,Relationship",
 			tabName = "Field Tab");
 
 		ObjectAdmin.addTabRelationshipsOnLayout(
-			relationshipsLabelName = "Relationship Label",
+			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
 		Button.clickSave();
@@ -1394,7 +1394,7 @@ definition {
 		ObjectAdmin.addTabFieldsOnLayout(
 			blockName = "Block 1",
 			columnsNumber = "1",
-			fieldList = "Custom Field,Custom Object 141661",
+			fieldList = "Custom Field,Relationship",
 			tabName = "Field Tab");
 
 		ObjectAdmin.addTabFieldsOnLayout(tabName = "Field Tab");
@@ -2162,6 +2162,8 @@ definition {
 		Click.clickAtNotVisible(locator1 = "ObjectAdmin#ENTRY_BOOLEAN_CHECKBOX");
 
 		Button.clickSave();
+
+		SelectFrame(locator1 = "Message#ERROR");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "Message#ERROR",
@@ -4637,7 +4639,7 @@ definition {
 		ObjectAdmin.addTabFieldsOnLayout(
 			blockName = "Block 1",
 			columnsNumber = "1",
-			fieldList = "Custom Field,Custom Object 141620",
+			fieldList = "Custom Field,Relationship",
 			tabName = "Field Tab");
 
 		ObjectAdmin.addTabRelationshipsOnLayout(

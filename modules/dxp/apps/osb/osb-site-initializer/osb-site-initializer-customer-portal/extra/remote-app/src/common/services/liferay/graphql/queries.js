@@ -450,10 +450,12 @@ export const getAccountUserAccountsByExternalReferenceCode = gql`
 	query getAccountUserAccountsByExternalReferenceCode(
 		$externalReferenceCode: String!
 		$pageSize: Int = 20
+		$filter: String
 	) {
 		accountUserAccountsByExternalReferenceCode(
 			externalReferenceCode: $externalReferenceCode
 			pageSize: $pageSize
+			filter: $filter
 		) {
 			items {
 				id
@@ -538,5 +540,21 @@ export const deleteAccountUserAccount = gql`
 			emailAddress: $emailAddress
 			externalReferenceCode: $accountKey
 		)
+	}
+`;
+
+export const updateAnalyticsCloudWorkspace = gql`
+	mutation putAnalyticsCloudWorkspace(
+		$analyticsCloudWorkspaceId: Long!
+		$analyticsCloudWorkspace: InputC_AnalyticsCloudWorkspace!
+	) {
+		c {
+			updateAnalyticsCloudWorkspace(
+				analyticsCloudWorkspaceId: $analyticsCloudWorkspaceId
+				AnalyticsCloudWorkspace: $analyticsCloudWorkspace
+			) {
+				analyticsCloudWorkspaceId
+			}
+		}
 	}
 `;

@@ -32,13 +32,22 @@ import {
 	STATUS_TAG_TYPE_NAMES,
 } from '../../../utils/constants';
 import ModalDXPCActivationStatus from '../../ModalDXPCActivationStatus';
+import AlreadySubmittedFormModal from '../AlreadySubmittedModal';
 import ActivationStatusLayout from '../Layout';
+
+const submittedModalTexts = {
+	paragraph:
+		'Return to the product activation page to view the current Activation Status',
+	subtitle: `We'll need a few details to finish building your DXP
+	environment(s).`,
+	text: 'Another user already submitted the DXP Cloud activation request.',
+	title: 'Set up DXP Cloud',
+};
 
 const SetupDXPCloudModal = ({
 	observer,
 	onClose,
 	project,
-	setVisibleModal,
 	subscriptionGroupId,
 }) => {
 	const [formAlreadySubmitted, setFormAlreadySubmitted] = useState(false);
@@ -46,7 +55,10 @@ const SetupDXPCloudModal = ({
 	return (
 		<ClayModal center observer={observer}>
 			{formAlreadySubmitted ? (
-				<AlreadySubmittedFormModal setVisibleModal={setVisibleModal} />
+				<AlreadySubmittedFormModal
+					onClose={onClose}
+					submittedModalTexts={submittedModalTexts}
+				/>
 			) : (
 				<SetupDXPCloud
 					handlePage={onClose}
@@ -57,43 +69,6 @@ const SetupDXPCloudModal = ({
 				/>
 			)}
 		</ClayModal>
-	);
-};
-
-const AlreadySubmittedFormModal = ({setVisibleModal}) => {
-	return (
-		<div className="pt-4 px-4">
-			<div className="flex-row mb-2">
-				<header className="mb-5">
-					<h2 className="mb-1 text-neutral-10">Set up DXP Cloud</h2>
-
-					<p className="text-neutral-7 text-paragraph-sm">
-						We&#39;ll need a few details to finish building your DXP
-						environment(s).
-					</p>
-				</header>
-
-				<h5 className="my-1 text-neutral-10">
-					Another user already submitted the DXP Cloud activation
-					request.
-				</h5>
-
-				<p className="mb-5 text-neutral-10">
-					Return to the product activation page to view the current
-					Activation Status
-				</p>
-			</div>
-
-			<div className="d-flex justify-content-center mb-4 mt-5">
-				<Button
-					className="px-3 py-2"
-					displayType="primary"
-					onClick={() => setVisibleModal(false)}
-				>
-					Done
-				</Button>
-			</div>
-		</div>
 	);
 };
 
@@ -251,7 +226,6 @@ const ActivationStatusDXPCloud = ({
 					{...setupModalProps}
 					onClose={onCloseSetupModal}
 					project={project}
-					setVisibleModal={setVisibleSetup}
 					subscriptionGroupId={
 						subscriptionGroupDXPCloud.accountSubscriptionGroupId
 					}

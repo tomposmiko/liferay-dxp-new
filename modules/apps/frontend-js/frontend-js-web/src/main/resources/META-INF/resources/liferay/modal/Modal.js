@@ -197,6 +197,7 @@ const Modal = ({
 					disableAutoClose={disableAutoClose}
 					id={id}
 					observer={observer}
+					role="dialog"
 					size={url && !size ? 'full-screen' : size}
 					status={status}
 					zIndex={zIndex}
@@ -292,6 +293,29 @@ const Modal = ({
 			)}
 		</>
 	);
+};
+
+const openConfirmModal = ({message, onConfirm}) => {
+	openModal({
+		bodyHTML: escapeHTML(message),
+		buttons: [
+			{
+				displayType: 'secondary',
+				label: Liferay.Language.get('cancel'),
+				type: 'cancel',
+			},
+			{
+				autoFocus: true,
+				label: Liferay.Language.get('ok'),
+				onClick: ({processClose}) => {
+					processClose();
+
+					onConfirm(true);
+				},
+			},
+		],
+		onClose: () => onConfirm(false),
+	});
 };
 
 const openModal = (props) => {
@@ -704,6 +728,7 @@ Modal.propTypes = {
 export {
 	Modal,
 	openAlertModal,
+	openConfirmModal,
 	openModal,
 	openPortletModal,
 	openPortletWindow,

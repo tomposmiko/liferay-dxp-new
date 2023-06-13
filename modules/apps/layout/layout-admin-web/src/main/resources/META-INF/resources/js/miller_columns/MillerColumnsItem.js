@@ -218,6 +218,7 @@ const MillerColumnsItem = ({
 								ACTIONS[action](child.data, namespace);
 							}
 						},
+						symbolLeft: child.icon,
 					};
 				}),
 			};
@@ -376,7 +377,7 @@ const MillerColumnsItem = ({
 				</ClayLayout.ContentCol>
 			)}
 
-			<ClayLayout.ContentCol className="pl-0" expand>
+			<ClayLayout.ContentCol className="pl-1" expand>
 				<h4 className="list-group-title text-truncate-inline">
 					{viewUrl ? (
 						<ClayLink className="text-truncate" href={viewUrl}>

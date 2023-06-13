@@ -25,7 +25,9 @@ import {
 import {ROLE_TYPES} from '../../../../common/utils/constants';
 import TeamMembersTableHeader from './components/Header';
 import RemoveUserModal from './components/RemoveUserModal';
-import useAccountUser from './hooks/useAccountUser';
+import useAccountRoles from './hooks/useAccountRoles';
+import useFilters from './hooks/useFilters';
+import useGetAccountUserAccount from './hooks/useGetAccountUserAccounts';
 import {
 	STATUS_ACTION_TYPES,
 	STATUS_NAME_TYPES,
@@ -45,14 +47,16 @@ const ROLE_FILTER_NAME = 'contactRoleNames';
 const ALERT_TIMEOUT = 3000;
 
 const TeamMembersTable = ({licenseKeyDownloadURL, project, sessionId}) => {
+	const {accountRoles} = useAccountRoles(project);
+
 	const {
-		accountRoles,
-		administratorsAvailable,
 		isLoadingUserAccounts,
-		setAdministratorsAvailable,
-		setUserAccounts,
-		userAccounts,
-	} = useAccountUser(project);
+		setFilterTerm,
+		userAccountsState: [userAccounts, setUserAccounts],
+	} = useGetAccountUserAccount(project);
+
+	const [administratorsAvailable, setAdministratorsAvailable] = useState();
+	const [filters, setFilters] = useFilters(setFilterTerm);
 
 	const [userAction, setUserAction] = useState();
 	const [selectedRole, setSelectedRole] = useState();
@@ -219,7 +223,9 @@ const TeamMembersTable = ({licenseKeyDownloadURL, project, sessionId}) => {
 
 			<TeamMembersTableHeader
 				administratorsAvailable={administratorsAvailable}
+				filterState={[filters, setFilters]}
 				hasAdminAccess={hasAdminAccess}
+				loading={isLoadingUserAccounts}
 				project={project}
 				sessionId={sessionId}
 				setAdministratorsAvailable={setAdministratorsAvailable}
@@ -227,45 +233,54 @@ const TeamMembersTable = ({licenseKeyDownloadURL, project, sessionId}) => {
 				userAccounts={userAccounts}
 			/>
 
-			<Table
-				className="border-0 cp-team-members-table"
-				columns={columnsByUserAccess}
-				isLoading={isLoadingUserAccounts}
-				rows={userAccounts?.map((userAccount) => ({
-					email: (
-						<p className="m-0 text-truncate">
-							{userAccount?.emailAddress}
-						</p>
-					),
-					name: <NameColumnType userAccount={userAccount} />,
-					options: (
-						<OptionsColumnType
-							confirmChanges={handleChangeUserRole}
-							setSelectedRole={setSelectedRole}
-							setUserAction={setUserAction}
-							userAccount={userAccount}
-							userAction={userAction}
-						/>
-					),
-					role: (
-						<RoleColumnType
-							accountRoles={accountRolesOptions}
-							selectedRole={selectedRole}
-							setSelectedRole={setSelectedRole}
-							userAccount={userAccount}
-							userAction={userAction}
-						/>
-					),
-					status: (
-						<StatusColumnType
-							hasLoggedBefore={userAccount?.lastLoginDate}
-						/>
-					),
-					supportSeat: (
-						<SupportSeatColumnType roles={userAccount?.roles} />
-					),
-				}))}
-			/>
+			{!!userAccounts.length && (
+				<Table
+					className="border-0 cp-team-members-table"
+					columns={columnsByUserAccess}
+					isLoading={isLoadingUserAccounts}
+					rows={userAccounts?.map((userAccount) => ({
+						email: (
+							<p className="m-0 text-truncate">
+								{userAccount?.emailAddress}
+							</p>
+						),
+						name: <NameColumnType userAccount={userAccount} />,
+						options: (
+							<OptionsColumnType
+								confirmChanges={handleChangeUserRole}
+								setSelectedRole={setSelectedRole}
+								setUserAction={setUserAction}
+								userAccount={userAccount}
+								userAction={userAction}
+							/>
+						),
+						role: (
+							<RoleColumnType
+								accountRoles={accountRolesOptions}
+								selectedRole={selectedRole}
+								setSelectedRole={setSelectedRole}
+								userAccount={userAccount}
+								userAction={userAction}
+							/>
+						),
+						status: (
+							<StatusColumnType
+								hasLoggedBefore={userAccount?.lastLoginDate}
+							/>
+						),
+						supportSeat: (
+							<SupportSeatColumnType roles={userAccount?.roles} />
+						),
+					}))}
+				/>
+			)}
+
+			{!userAccounts.length &&
+				(filters.searchTerm || filters.hasValue) && (
+					<div className="d-flex justify-content-center py-4">
+						No team members found with this search criteria.
+					</div>
+				)}
 
 			{userActionStatus && (
 				<ClayAlert.ToastContainer>

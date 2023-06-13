@@ -305,19 +305,6 @@ public interface PropsKeys {
 		BLOGS_ENTRY_PREVIOUS_AND_NEXT_NAVIGATION_ENABLED =
 			"blogs.entry.previous.and.next.navigation.enabled";
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String BLOGS_IMAGE_EXTENSIONS =
-		"blogs.image.extensions";
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String BLOGS_IMAGE_MAX_SIZE = "blogs.image.max.size";
-
 	public static final String BLOGS_LINKBACK_EXCERPT_LENGTH =
 		"blogs.linkback.excerpt.length";
 
@@ -347,14 +334,6 @@ public interface PropsKeys {
 
 	public static final String BROWSER_LAUNCHER_URL = "browser.launcher.url";
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #VIEW_COUNT_ENABLED}
-	 */
-	@Deprecated
-	public static final String BUFFERED_INCREMENT_ENABLED =
-		"buffered.increment.enabled";
-
 	public static final String BUFFERED_INCREMENT_STANDBY_QUEUE_THRESHOLD =
 		"buffered.increment.standby.queue.threshold";
 
@@ -366,13 +345,6 @@ public interface PropsKeys {
 
 	public static final String BUFFERED_INCREMENT_THREADPOOL_MAX_SIZE =
 		"buffered.increment.threadpool.max.size";
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String CACHE_CLEAR_ON_CONTEXT_INITIALIZATION =
-		"cache.clear.on.context.initialization";
 
 	public static final String CACHE_CLEAR_ON_PLUGIN_UNDEPLOY =
 		"cache.clear.on.plugin.undeploy";
@@ -498,13 +470,6 @@ public interface PropsKeys {
 		COMPANY_SECURITY_PASSWORD_REMINDER_QUERY_FORM_AUTOCOMPLETE =
 			"company.security.password.reminder.query.form.autocomplete";
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String COMPANY_SECURITY_SEND_PASSWORD =
-		"company.security.send.password";
-
 	public static final String COMPANY_SECURITY_SEND_PASSWORD_RESET_LINK =
 		"company.security.send.password.reset.link";
 
@@ -583,20 +548,6 @@ public interface PropsKeys {
 
 	public static final String DATA_LIMIT_MAIL_MESSAGE_MAX_PERIOD =
 		"data.limit.mail.message.max.period";
-
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String DATA_LIMIT_MAX_MAIL_MESSAGE_COUNT =
-		"data.limit.max.mail.message.count";
-
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String DATA_LIMIT_MAX_MAIL_MESSAGE_PERIOD =
-		"data.limit.max.mail.message.period";
 
 	public static final String DATA_LIMIT_SITE_MAX_COUNT =
 		"data.limit.site.max.count";
@@ -736,26 +687,6 @@ public interface PropsKeys {
 
 	public static final String DISCUSSION_COMMENTS_FORMAT =
 		"discussion.comments.format";
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String DISCUSSION_EMAIL_BODY = "discussion.email.body";
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String DISCUSSION_EMAIL_COMMENTS_ADDED_ENABLED =
-		"discussion.email.comments.added.enabled";
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String DISCUSSION_EMAIL_SUBJECT =
-		"discussion.email.subject";
 
 	public static final String DISCUSSION_MAX_COMMENTS =
 		"discussion.max.comments";
@@ -940,14 +871,6 @@ public interface PropsKeys {
 	public static final String DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH =
 		"dl.file.entry.thumbnail.max.width";
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String
-		DL_FILE_ENTRY_TYPE_IG_IMAGE_AUTO_CREATE_ON_UPGRADE =
-			"dl.file.entry.type.ig.image.auto.create.on.upgrade";
-
 	public static final String DL_FILE_EXTENSIONS_STRICT_CHECK =
 		"dl.file.extensions.strict.check";
 
@@ -1014,12 +937,6 @@ public interface PropsKeys {
 
 	public static final String DL_SUBFOLDERS_VISIBLE = "dl.subfolders.visible";
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String DL_TABS_VISIBLE = "dl.tabs.visible";
-
 	public static final String DL_WEBDAV_SUBSTITUTION_CHAR =
 		"dl.webdav.substitution.char";
 
@@ -1031,13 +948,6 @@ public interface PropsKeys {
 
 	public static final String EDITOR_WYSIWYG_DEFAULT =
 		"editor.wysiwyg.default";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String EHCACHE_BLOCKING_CACHE_ALLOWED =
-		"ehcache.blocking.cache.allowed";
 
 	public static final String EHCACHE_MULTI_VM_CONFIG_LOCATION =
 		"ehcache.multi.vm.config.location";
@@ -1111,13 +1021,6 @@ public interface PropsKeys {
 	public static final String
 		FIELD_ENABLE_COM_LIFERAY_PORTAL_KERNEL_MODEL_ORGANIZATION_STATUS =
 			"field.enable.com.liferay.portal.kernel.model.Organization.status";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String FINALIZE_MANAGER_THREAD_ENABLED =
-		"finalize.manager.thread.enabled";
 
 	public static final String FULL_PAGE_DISPLAYABLE = "full.page.displayable";
 
@@ -1211,12 +1114,6 @@ public interface PropsKeys {
 
 	public static final String INDEX_ON_STARTUP_DELAY =
 		"index.on.startup.delay";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String INDEX_ON_UPGRADE = "index.on.upgrade";
 
 	public static final String
 		INDEX_PERMISSION_FILTER_SEARCH_AMPLIFICATION_FACTOR =
@@ -1430,52 +1327,6 @@ public interface PropsKeys {
 
 	public static final String LAYOUT_MANAGE_PAGES_INITIAL_CHILDREN =
 		"layout.manage.pages.initial.children";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String LAYOUT_PARALLEL_RENDER_ENABLE =
-		"layout.parallel.render.enable";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String
-		LAYOUT_PARALLEL_RENDER_THREAD_POOL_CORE_THREAD_COUNT =
-			"layout.parallel.render.thread.pool.core.thread.count";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String
-		LAYOUT_PARALLEL_RENDER_THREAD_POOL_KEEP_ALIVE_TIME =
-			"layout.parallel.render.thread.pool.keep.alive.time";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String
-		LAYOUT_PARALLEL_RENDER_THREAD_POOL_MAX_QUEUE_SIZE =
-			"layout.parallel.render.thread.pool.max.queue.size";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String
-		LAYOUT_PARALLEL_RENDER_THREAD_POOL_MAX_THREAD_COUNT =
-			"layout.parallel.render.thread.pool.max.thread.count";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String LAYOUT_PARALLEL_RENDER_TIMEOUT =
-		"layout.parallel.render.timeout";
 
 	public static final String LAYOUT_PARENTABLE = "layout.parentable";
 
@@ -2232,13 +2083,6 @@ public interface PropsKeys {
 		PERMISSIONS_CUSTOM_ATTRIBUTE_WRITE_CHECK_BY_DEFAULT =
 			"permissions.custom.attribute.write.check.by.default";
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String PERMISSIONS_OBJECT_BLOCKING_CACHE =
-		"permissions.object.blocking.cache";
-
 	public static final String PERMISSIONS_PROPAGATION_ENABLED =
 		"permissions.propagation.enabled";
 
@@ -2821,20 +2665,6 @@ public interface PropsKeys {
 	public static final String SQL_DATA_MAX_PARAMETERS =
 		"sql.data.max.parameters";
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String STAGING_DELETE_TEMP_LAR_ON_FAILURE =
-		"staging.delete.temp.lar.on.failure";
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String STAGING_DELETE_TEMP_LAR_ON_SUCCESS =
-		"staging.delete.temp.lar.on.success";
-
 	public static final String
 		STAGING_DRAFT_EXPORT_IMPORT_CONFIGURATION_CHECK_INTERVAL =
 			"staging.draft.export.import.configuration.check.interval";
@@ -3094,25 +2924,11 @@ public interface PropsKeys {
 	public static final String USERS_UPDATE_USER_NAME =
 		"users.update.user.name.";
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String VALUE_OBJECT_ENTITY_BLOCKING_CACHE =
-		"value.object.entity.blocking.cache";
-
 	public static final String VALUE_OBJECT_ENTITY_CACHE_ENABLED =
 		"value.object.entity.cache.enabled";
 
 	public static final String VALUE_OBJECT_ENTITY_THREAD_LOCAL_CACHE_MAX_SIZE =
 		"value.object.entity.thread.local.cache.max.size";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String VALUE_OBJECT_FINDER_BLOCKING_CACHE =
-		"value.object.finder.blocking.cache";
 
 	public static final String VALUE_OBJECT_FINDER_CACHE_ENABLED =
 		"value.object.finder.cache.enabled";
@@ -3130,26 +2946,6 @@ public interface PropsKeys {
 
 	public static final String VERIFY_DATABASE_TRANSACTIONS_DISABLED =
 		"verify.database.transactions.disabled";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String VERIFY_FREQUENCY = "verify.frequency";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String VERIFY_PROCESSES = "verify.processes";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             com.liferay.view.count.configuration.ViewCountsConfiguration
-	 *             #enabled()}
-	 */
-	@Deprecated
-	public static final String VIEW_COUNT_ENABLED = "view.count.enabled";
 
 	public static final String VIRTUAL_HOSTS_DEFAULT_SITE_NAME =
 		"virtual.hosts.default.site.name";

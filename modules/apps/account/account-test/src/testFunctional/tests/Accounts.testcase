@@ -1279,7 +1279,7 @@ definition {
 
 		LexiconEntry.gotoEntry(rowEntry = "Account with Role");
 
-		for (var accountRoleNumber : list "1,2,3") {
+		for (var accountRoleNumber : list "1,2,3,4") {
 			Accounts.addOwnedAccountRole(accountRoleTitle = "Account Role ${accountRoleNumber}");
 
 			Navigator.gotoBack();
@@ -1297,23 +1297,19 @@ definition {
 			LexiconEntry.viewEntryName(rowEntry = "${accountRoleName}");
 		}
 
-		for (var accountRoleName : list "Buyer,Order Manager") {
-			LexiconEntry.viewNoEntry(rowEntry = "${accountRoleName}");
-		}
+		LexiconEntry.viewNoEntry(rowEntry = "Account Role 4");
 
-		Pagination.viewResults(results = "Showing 1 to 4 of 6 entries.");
+		Pagination.viewResults(results = "Showing 1 to 4 of 5 entries.");
 
 		Click(locator1 = "Pagination#NEXT_LINK");
 
-		for (var accountRoleName : list "Buyer,Order Manager") {
-			LexiconEntry.viewEntryName(rowEntry = "${accountRoleName}");
-		}
+		LexiconEntry.viewEntryName(rowEntry = "${accountRoleName}");
 
 		for (var accountRoleName : list "Account Administrator,Account Role 1,Account Role 2,Account Role 3") {
 			LexiconEntry.viewNoEntry(rowEntry = "${accountRoleName}");
 		}
 
-		Pagination.viewResults(results = "Showing 5 to 6 of 6 entries.");
+		Pagination.viewResults(results = "Showing 5 to 5 of 5 entries.");
 	}
 
 	@description = "This test deactivates an active account and asserts account displays in correct filter."
@@ -2781,6 +2777,37 @@ definition {
 			key_rowEntry = "userfn userln",
 			locator1 = "ContentRow#ENTRY_CONTENT_ROW_NUMBER_TD",
 			value1 = "");
+	}
+
+	@description = "This test view the account user via Manage Users in account list view"
+	@priority = "3"
+	test CanViewAccountUsersViaManageUsersInAccountsListView {
+		task ("Given A new Account and add new Account User to it") {
+			JSONAccountEntry.addAccountEntry(
+				accountEntryName = "Account Name",
+				accountEntryType = "Business");
+
+			JSONAccountEntryUser.addAccountEntryUser(
+				accountEntryName = "Account Name",
+				userEmailAddress = "userfn@liferay.com",
+				userFirstName = "userfn",
+				userLastName = "userln",
+				userScreenName = "usersn");
+		}
+
+		task ("When Navigate to the account menu item Manage Users") {
+			Accounts.openAccountsAdmin();
+
+			LexiconEntry.gotoEntryMenuItem(
+				menuItem = "Manage Users",
+				rowEntry = "Account Name");
+		}
+
+		task ("Then the assigned account user displays") {
+			Navigator.viewActivatedNavTab(navTab = "Users");
+
+			Accounts.viewAssignee(assigneeName = "userfn");
+		}
 	}
 
 	@description = "This tests canceling account creation will not save it."

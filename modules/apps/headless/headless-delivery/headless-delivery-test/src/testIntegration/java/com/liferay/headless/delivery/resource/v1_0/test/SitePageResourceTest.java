@@ -250,7 +250,8 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 							testGroup.getGroupId(), layout.getPlid());
 
 				LayoutStructure layoutStructure = LayoutStructure.of(
-					layoutPageTemplateStructure.getData(0));
+					layoutPageTemplateStructure.
+						getDefaultSegmentsExperienceData());
 
 				layoutStructure.addRootLayoutStructureItem();
 
@@ -296,16 +297,13 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 				fetchLayoutPageTemplateStructure(
 					testGroup.getGroupId(), layout.getPlid());
 
-		long defaultSegmentsExperienceId =
-			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
-				layout.getPlid());
-
 		LayoutPageTemplateStructureRel layoutPageTemplateStructureRel =
 			_layoutPageTemplateStructureRelLocalService.
 				fetchLayoutPageTemplateStructureRel(
 					layoutPageTemplateStructure.
 						getLayoutPageTemplateStructureId(),
-					defaultSegmentsExperienceId);
+					_segmentsExperienceLocalService.
+						fetchDefaultSegmentsExperienceId(layout.getPlid()));
 
 		layoutPageTemplateStructureRel.setSegmentsExperienceId(
 			segmentsExperience.getSegmentsExperienceId());
