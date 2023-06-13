@@ -146,7 +146,7 @@ else {
 	/>
 
 	<c:if test="<%= !group.isLayoutPrototype() %>">
-		<div class="lfr-inherit-theme-options <%= (selLayout.isInheritLookAndFeel() ? StringPool.BLANK : "hide") %>" id="<portlet:namespace />inheritThemeOptions">
+		<div class="lfr-inherit-theme-options <%= selLayout.isInheritLookAndFeel() ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />inheritThemeOptions">
 			<liferay-util:include page="/look_and_feel_themes.jsp" servletContext="<%= application %>">
 				<liferay-util:param name="companyId" value="<%= String.valueOf(group.getCompanyId()) %>" />
 				<liferay-util:param name="editable" value="<%= Boolean.FALSE.toString() %>" />
@@ -155,7 +155,7 @@ else {
 		</div>
 	</c:if>
 
-	<div class="lfr-inherit-theme-options <%= (!selLayout.isInheritLookAndFeel() ? StringPool.BLANK : "hide") %>" id="<portlet:namespace />themeOptions">
+	<div class="lfr-inherit-theme-options <%= !selLayout.isInheritLookAndFeel() ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />themeOptions">
 		<liferay-util:include page="/look_and_feel_themes.jsp" servletContext="<%= application %>" />
 	</div>
 </clay:sheet-section>
@@ -229,7 +229,7 @@ else {
 </aui:script>
 
 <c:if test="<%= layoutLookAndFeelDisplayContext.hasStyleBooks() %>">
-	<aui:script>
+	<aui:script sandbox="<%= true %>">
 		const regularInheritLookAndFeel = document.getElementById(
 			'<portlet:namespace />regularInheritLookAndFeel'
 		);

@@ -43,6 +43,10 @@ definition {
 			layoutName = "Documents and Media Page",
 			widgetName = "Documents and Media");
 
+		DocumentFolderAPI.deleteDocumentFolderByName(
+			documentFolderName = "Provided%20by%20Liferay",
+			groupName = "Guest");
+
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
@@ -76,6 +80,10 @@ definition {
 		property custom.properties = "data.limit.dl.storage.max.size=1048576";
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DocumentFolderAPI.deleteDocumentFolderByName(
+			documentFolderName = "Provided%20by%20Liferay",
+			groupName = "Guest");
 
 		DMDocument.addCP(
 			dmDocumentDescription = "DM Document Description",

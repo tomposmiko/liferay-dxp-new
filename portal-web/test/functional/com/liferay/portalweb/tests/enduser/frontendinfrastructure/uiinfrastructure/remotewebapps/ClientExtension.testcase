@@ -825,36 +825,29 @@ definition {
 			locator1 = "TextInput#ANY");
 	}
 
-	@description = "LPS-177999. Verify that URL, description, type and source code url fields are present."
-	@priority = 5
-	test ThemeSvgTypeCanDisplayProperFields {
+	@description = "LPS-177996 | Created (theme SVG extensions), the theme SVG extensions admin page lists the name and type"
+	@priority = 4
+	test ThemeSvgTypeCanBeCreated {
 		property custom.properties = "feature.flag.LPS-166479=true";
-		property portal.acceptance = "true";
 
-		task ("Given Client Extension admin page") {
+		task ("Given a created Client Extension") {
 			ClientExtensionGeneral.goToRemoteAppsPortlet();
 		}
 
-		task ("When Create a Theme svg extensions") {
+		task ("When type is Theme svg extensions") {
 			ClientExtensionGeneral.addType(type = "Theme SVG Spritemap");
 		}
 
-		task ("Then URL, description, type and source code url fields are present") {
-			ClientExtensionGeneral.assertContentField(
-				entryField = "Name",
-				entryInformation = "");
+		task ("And when adding requirements,and click in publish") {
+			ClientExtensionGeneral.addApp(
+				entryName = "speitemap_example.svg",
+				entryURL = "https://liferay.github.io/liferay-frontend-projects/spritemap-svg/spritemap-pencil-swapped- with-cog.svg");
+		}
 
-			ClientExtensionGeneral.assertContentField(
-				entryField = "description",
-				entryInformation = "");
+		task ("Then theme svg extensions admin page lists the Name and Type") {
+			ClientExtensionGeneral.viewTableEntryName(entryName = "speitemap_example.svg");
 
-			ClientExtensionGeneral.assertContentField(
-				entryField = "URL",
-				entryInformation = "");
-
-			ClientExtensionGeneral.assertContentField(
-				entryField = "Source Code URL",
-				entryInformation = "");
+			ClientExtensionGeneral.viewTableEntryType(entryType = "Theme SVG Spritemap");
 		}
 	}
 

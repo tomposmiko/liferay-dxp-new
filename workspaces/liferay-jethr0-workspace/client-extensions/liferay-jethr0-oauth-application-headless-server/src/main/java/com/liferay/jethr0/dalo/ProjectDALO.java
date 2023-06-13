@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -68,13 +69,24 @@ public class ProjectDALO extends BaseDALO {
 		List<Project> projects = new ArrayList<>();
 
 		for (JSONObject jsonObject : retrieve()) {
-			projects.add(ProjectFactory.newProject(jsonObject));
+			Project project = ProjectFactory.newProject(jsonObject);
+
+			project.addGitBranches(
+				_projectsToGitBranchesDALO.retrieveGitBranches(project));
+			project.addTestSuites(
+				_projectsToTestSuitesDALO.retrieveTestSuites(project));
+
+			projects.add(project);
 		}
 
 		return projects;
 	}
 
 	public Project updateProject(Project project) {
+		_projectToBuildsDALO.updateRelationships(project);
+		_projectsToGitBranchesDALO.updateRelationships(project);
+		_projectsToTestSuitesDALO.updateRelationships(project);
+
 		JSONObject responseJSONObject = update(project.getJSONObject());
 
 		if (responseJSONObject == null) {
@@ -87,5 +99,14 @@ public class ProjectDALO extends BaseDALO {
 	protected String getObjectDefinitionLabel() {
 		return "Project";
 	}
+
+	@Autowired
+	private ProjectsToGitBranchesDALO _projectsToGitBranchesDALO;
+
+	@Autowired
+	private ProjectsToTestSuitesDALO _projectsToTestSuitesDALO;
+
+	@Autowired
+	private ProjectToBuildsDALO _projectToBuildsDALO;
 
 }

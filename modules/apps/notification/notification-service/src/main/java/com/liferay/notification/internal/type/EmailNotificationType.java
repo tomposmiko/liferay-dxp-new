@@ -145,9 +145,10 @@ public class EmailNotificationType extends BaseNotificationType {
 		if (notificationQueueEntry.getStatus() !=
 				NotificationQueueEntryConstants.STATUS_UNSENT) {
 
-			notificationQueueEntryLocalService.updateStatus(
-				notificationQueueEntry.getNotificationQueueEntryId(),
-				NotificationQueueEntryConstants.STATUS_UNSENT);
+			notificationQueueEntry =
+				notificationQueueEntryLocalService.updateStatus(
+					notificationQueueEntry.getNotificationQueueEntryId(),
+					NotificationQueueEntryConstants.STATUS_UNSENT);
 		}
 
 		_sendEmail(notificationQueueEntry);
@@ -376,6 +377,8 @@ public class EmailNotificationType extends BaseNotificationType {
 			return formatLocalizedContent(bodyMap, notificationContext);
 		}
 
+		StringWriter stringWriter = new StringWriter();
+
 		String body = notificationTemplate.getBody(userLocale);
 
 		if (Validator.isNull(body)) {
@@ -389,6 +392,10 @@ public class EmailNotificationType extends BaseNotificationType {
 					notificationTemplate.getNotificationTemplateId(),
 				body),
 			PropsValues.NOTIFICATION_EMAIL_TEMPLATE_RESTRICTED);
+
+		ThemeDisplay themeDisplay = new ThemeDisplay();
+
+		themeDisplay.setLocale(siteDefaultLocale);
 
 		InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
 			_infoItemServiceRegistry.getFirstInfoItemService(
@@ -416,13 +423,11 @@ public class EmailNotificationType extends BaseNotificationType {
 			}
 
 			TemplateNode templateNode = _templateNodeFactory.createTemplateNode(
-				infoFieldValue, new ThemeDisplay());
+				infoFieldValue, themeDisplay);
 
 			template.put(infoField.getName(), templateNode);
 			template.put(infoField.getUniqueId(), templateNode);
 		}
-
-		StringWriter stringWriter = new StringWriter();
 
 		template.processTemplate(stringWriter);
 

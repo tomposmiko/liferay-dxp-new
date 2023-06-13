@@ -23,6 +23,7 @@ import useCompanyOptions from '../../../../common/hooks/useCompanyOptions';
 import MDFRequest from '../../../../common/interfaces/mdfRequest';
 import {Status} from '../../../../common/utils/constants/status';
 import getPicklistOptions from '../../../../common/utils/getPicklistOptions';
+import {isLiferayManager} from '../../../../common/utils/isLiferayManager';
 import isObjectEmpty from '../../../../common/utils/isObjectEmpty';
 import {StepType} from '../../enums/stepType';
 import MDFRequestStepProps from '../../interfaces/mdfRequestStepProps';
@@ -45,15 +46,16 @@ const Goals = ({
 	const {
 		companiesEntries,
 		fieldEntries,
-		userAccountRoles,
+		roleEntries,
 	} = useDynamicFieldEntries();
 
 	const {companyOptions, onCompanySelected} = useCompanyOptions(
 		companiesEntries,
 		useCallback(
-			(country, company, accountExternalReferenceCodeSF) => {
+			(country, company, currency, accountExternalReferenceCodeSF) => {
 				setFieldValue('company', company);
 				setFieldValue('country', country);
+				setFieldValue('currency', currency);
 				setFieldValue(
 					'accountExternalReferenceCodeSF',
 					accountExternalReferenceCodeSF
@@ -61,8 +63,9 @@ const Goals = ({
 			},
 			[setFieldValue]
 		),
-		values.company,
-		values.country
+		!isObjectEmpty(values.company) ? values.company : undefined,
+		!isObjectEmpty(values.country) ? values.country : undefined,
+		!isObjectEmpty(values.currency) ? values.currency : undefined
 	);
 
 	const {
@@ -81,6 +84,20 @@ const Goals = ({
 		(selected) => setFieldValue('additionalOption', selected)
 	);
 
+	const {
+		onSelected: onCurrencySelected,
+		options: currencyOptions,
+	} = getPicklistOptions(
+		fieldEntries[LiferayPicklistName.CURRENCIES],
+		(selected) => setFieldValue('currency', selected)
+	);
+
+	const companyCurrencies =
+		currencyOptions &&
+		currencyOptions.filter(
+			(currency) => currency.value === values.currency.key
+		);
+
 	const goalsErrors = useMemo(() => {
 		delete errors.activities;
 
@@ -88,26 +105,15 @@ const Goals = ({
 	}, [errors]);
 
 	const getRequestPage = () => {
-		const canEditRoles = [
-			'Channel General Manager',
-			'Channel Account Manager',
-			'Channel Regional Marketing Manager',
-			'Channel Global Marketing Manager',
-			'Channel Finance Manager',
-		];
-
-		const userAccountRolesCanEdit = userAccountRoles?.filter(
-			(userAccountRole) =>
-				canEditRoles.includes(userAccountRole.label as string)
-		).length;
-
-		if (!fieldEntries || !userAccountRoles || !companiesEntries) {
+		if (!fieldEntries || !roleEntries || !companiesEntries) {
 			return <ClayLoadingIndicator />;
 		}
 
+		const userAccountRolesCanEdit = isLiferayManager(roleEntries);
+
 		if (
 			values.id &&
-			userAccountRoles &&
+			roleEntries &&
 			!userAccountRolesCanEdit &&
 			values.mdfRequestStatus?.key !== 'draft' &&
 			values.mdfRequestStatus?.key !== 'moreInfoRequested'
@@ -158,6 +164,15 @@ const Goals = ({
 							name="country"
 							onChange={onCountrySelected}
 							options={countryOptions}
+							required
+						/>
+
+						<PRMFormik.Field
+							component={PRMForm.Select}
+							label="Currency"
+							name="currency"
+							onChange={onCurrencySelected}
+							options={companyCurrencies}
 							required
 						/>
 					</PRMForm.Group>

@@ -113,7 +113,7 @@ const ActivityClaimPanel = ({
 						</h5>
 
 						<div className="align-items-center d-sm-flex mb-1 text-neutral-7 text-weight-semi-bold">
-							<p className="mb-0">
+							<div className="mb-0">
 								Claim Status:
 								<div
 									className={
@@ -126,11 +126,11 @@ const ActivityClaimPanel = ({
 								>
 									{activity.claimed ? 'Claimed' : 'Unclaimed'}
 								</div>
-							</p>
+							</div>
 						</div>
 
 						<div className="align-items-center d-sm-flex mb-1 text-neutral-7 text-weight-semi-bold">
-							<p className="mb-0">
+							<div className="mb-0">
 								Request Status:
 								<div
 									className={
@@ -142,12 +142,12 @@ const ActivityClaimPanel = ({
 								>
 									{activity.activityStatus?.name}
 								</div>
-							</p>
+							</div>
 						</div>
 
 						<div className="d-flex justify-content-end">
 							<h5 className="mb-0 text-neutral-10">
-								{getIntlNumberFormat().format(
+								{getIntlNumberFormat(activity.currency).format(
 									activity.totalCost
 								)}
 							</h5>

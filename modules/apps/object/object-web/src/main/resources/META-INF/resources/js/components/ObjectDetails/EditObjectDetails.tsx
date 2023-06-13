@@ -29,6 +29,7 @@ import {useObjectDetailsForm} from './useObjectDetailsForm';
 
 import './ObjectDetails.scss';
 import {AccountRestrictionContainer} from './AccountRestrictionContainer';
+import {TranslationsContainer} from './TranslationsContainer';
 
 export type KeyValuePair = {
 	key: string;
@@ -282,6 +283,13 @@ export default function EditObjectDetails({
 						setValues={setValues}
 						values={values}
 					/>
+
+					{Liferay.FeatureFlags['LPS-146755'] && (
+						<TranslationsContainer
+							setValues={setValues}
+							values={values}
+						/>
+					)}
 				</Sheet>
 			</div>
 		</>

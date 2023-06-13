@@ -118,6 +118,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -300,9 +301,9 @@ public class JournalArticleLocalServiceImpl
 	 * @param  friendlyURLMap the web content article's locales and localized
 	 *         friendly URLs
 	 * @param  content the HTML content wrapped in XML
-	 * @param  ddmStructureKey the primary key of the web content article's DDM
+	 * @param  ddmStructureId the primary key of the web content article's DDM
 	 *         structure, if the article is related to a DDM structure, or
-	 *         <code>null</code> otherwise
+	 *         <code>0</code> otherwise
 	 * @param  ddmTemplateKey the primary key of the web content article's DDM
 	 *         template
 	 * @param  layoutUuid the unique string identifying the web content
@@ -361,7 +362,7 @@ public class JournalArticleLocalServiceImpl
 			boolean autoArticleId, double version, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap,
 			Map<Locale, String> friendlyURLMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
+			long ddmStructureId, String ddmTemplateKey, String layoutUuid,
 			int displayDateMonth, int displayDateDay, int displayDateYear,
 			int displayDateHour, int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
@@ -413,9 +414,7 @@ public class JournalArticleLocalServiceImpl
 		}
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
-			_portal.getSiteGroupId(groupId),
-			_classNameLocalService.getClassNameId(JournalArticle.class),
-			ddmStructureKey, true);
+			ddmStructureId);
 
 		boolean validate = !ExportImportThreadLocal.isImportInProcess();
 
@@ -491,7 +490,7 @@ public class JournalArticleLocalServiceImpl
 		article.setVersion(version);
 		article.setUrlTitle(urlTitleMap.get(LocaleUtil.toLanguageId(locale)));
 		article.setDDMStructureId(ddmStructure.getStructureId());
-		article.setDDMStructureKey(ddmStructureKey);
+		article.setDDMStructureKey(ddmStructure.getStructureKey());
 		article.setDDMTemplateKey(ddmTemplateKey);
 		article.setDefaultLanguageId(LocaleUtil.toLanguageId(locale));
 		article.setLayoutUuid(layoutUuid);
@@ -607,9 +606,9 @@ public class JournalArticleLocalServiceImpl
 	 *         int, int, int, int, boolean, int, int, int, int, int, boolean,
 	 *         boolean, boolean, String, File, Map, String, ServiceContext)}
 	 *         description.
-	 * @param  ddmStructureKey the primary key of the web content article's DDM
+	 * @param  ddmStructureId the primary key of the web content article's DDM
 	 *         structure, if the article is related to a DDM structure, or
-	 *         <code>null</code> otherwise
+	 *         <code>0</code> otherwise
 	 * @param  ddmTemplateKey the primary key of the web content article's DDM
 	 *         template
 	 * @param  serviceContext the service context to be applied. Can set the
@@ -626,7 +625,7 @@ public class JournalArticleLocalServiceImpl
 			String externalReferenceCode, long userId, long groupId,
 			long folderId, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String content,
-			String ddmStructureKey, String ddmTemplateKey,
+			long ddmStructureId, String ddmTemplateKey,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -644,7 +643,7 @@ public class JournalArticleLocalServiceImpl
 			externalReferenceCode, userId, groupId, folderId,
 			JournalArticleConstants.CLASS_NAME_ID_DEFAULT, 0, StringPool.BLANK,
 			true, 1, titleMap, descriptionMap, titleMap, content,
-			ddmStructureKey, ddmTemplateKey, null, displayDateMonth,
+			ddmStructureId, ddmTemplateKey, null, displayDateMonth,
 			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
 			0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0, true, true, false, null, null,
 			null, null, serviceContext);
@@ -654,7 +653,7 @@ public class JournalArticleLocalServiceImpl
 	public JournalArticle addArticleDefaultValues(
 			long userId, long groupId, long classNameId, long classPK,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
+			String content, long ddmStructureId, String ddmTemplateKey,
 			String layoutUuid, int displayDateMonth, int displayDateDay,
 			int displayDateYear, int displayDateHour, int displayDateMinute,
 			int expirationDateMonth, int expirationDateDay,
@@ -715,9 +714,7 @@ public class JournalArticleLocalServiceImpl
 		sanitize(user.getCompanyId(), groupId, userId, classPK, descriptionMap);
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
-			_portal.getSiteGroupId(groupId),
-			_classNameLocalService.getClassNameId(JournalArticle.class),
-			ddmStructureKey, true);
+			ddmStructureId);
 
 		validate(
 			externalReferenceCode, user.getCompanyId(), groupId, classNameId,
@@ -750,7 +747,7 @@ public class JournalArticleLocalServiceImpl
 		article.setClassPK(classPK);
 		article.setArticleId(articleId);
 		article.setDDMStructureId(ddmStructure.getStructureId());
-		article.setDDMStructureKey(ddmStructureKey);
+		article.setDDMStructureKey(ddmStructure.getStructureKey());
 		article.setDDMTemplateKey(ddmTemplateKey);
 
 		Locale locale = getArticleDefaultLocale(content);
@@ -5510,9 +5507,6 @@ public class JournalArticleLocalServiceImpl
 	 *         int, int, int, int, boolean, int, int, int, int, int, boolean,
 	 *         boolean, boolean, String, File, Map, String, ServiceContext)}
 	 *         description.
-	 * @param  ddmStructureKey the primary key of the web content article's DDM
-	 *         structure, if the article is related to a DDM structure, or
-	 *         <code>null</code> otherwise
 	 * @param  ddmTemplateKey the primary key of the web content article's DDM
 	 *         template
 	 * @param  layoutUuid the unique string identifying the web content
@@ -5580,9 +5574,9 @@ public class JournalArticleLocalServiceImpl
 			double version, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap,
 			Map<Locale, String> friendlyURLMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			String ddmTemplateKey, String layoutUuid, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
@@ -5721,6 +5715,8 @@ public class JournalArticleLocalServiceImpl
 			article.setClassPK(latestArticle.getClassPK());
 			article.setArticleId(articleId);
 			article.setVersion(version);
+			article.setDDMStructureId(latestArticle.getDDMStructureId());
+			article.setDDMStructureKey(latestArticle.getDDMStructureKey());
 			article.setSmallImageId(latestArticle.getSmallImageId());
 
 			serviceContext.setAttribute("version", version);
@@ -5746,14 +5742,17 @@ public class JournalArticleLocalServiceImpl
 			(_classNameLocalService.getClassNameId(DDMStructure.class) !=
 				article.getClassNameId())) {
 
-			throw new ArticleFriendlyURLException();
+			urlTitle = urlTitleMap.get(
+				LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
+
+			if (Validator.isNull(urlTitle)) {
+				throw new ArticleFriendlyURLException();
+			}
 		}
 
 		article.setFolderId(folderId);
 		article.setTreePath(article.buildTreePath());
 		article.setUrlTitle(urlTitle);
-		article.setDDMStructureId(latestArticle.getDDMStructureId());
-		article.setDDMStructureKey(ddmStructureKey);
 		article.setDDMTemplateKey(ddmTemplateKey);
 		article.setDefaultLanguageId(LocaleUtil.toLanguageId(locale));
 		article.setLayoutUuid(layoutUuid);
@@ -5986,15 +5985,14 @@ public class JournalArticleLocalServiceImpl
 
 		return journalArticleLocalService.updateArticle(
 			userId, groupId, folderId, articleId, version, titleMap,
-			descriptionMap, content, article.getDDMStructureKey(),
-			article.getDDMTemplateKey(), layoutUuid, displayDateMonth,
-			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, neverExpire,
-			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
-			reviewDateMinute, neverReview, article.isIndexable(),
-			article.isSmallImage(), article.getSmallImageURL(), null, null,
-			null, serviceContext);
+			descriptionMap, content, article.getDDMTemplateKey(), layoutUuid,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
+			reviewDateHour, reviewDateMinute, neverReview,
+			article.isIndexable(), article.isSmallImage(),
+			article.getSmallImageURL(), null, null, null, serviceContext);
 	}
 
 	/**
@@ -6018,9 +6016,6 @@ public class JournalArticleLocalServiceImpl
 	 *         int, int, int, int, boolean, int, int, int, int, int, boolean,
 	 *         boolean, boolean, String, File, Map, String, ServiceContext)}
 	 *         description.
-	 * @param  ddmStructureKey the primary key of the web content article's DDM
-	 *         structure, if the article is related to a DDM structure, or
-	 *         <code>null</code> otherwise
 	 * @param  ddmTemplateKey the primary key of the web content article's DDM
 	 *         template
 	 * @param  layoutUuid the unique string identifying the web content
@@ -6087,9 +6082,9 @@ public class JournalArticleLocalServiceImpl
 			long userId, long groupId, long folderId, String articleId,
 			double version, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String content,
-			String ddmStructureKey, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			String ddmTemplateKey, String layoutUuid, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
 			int expirationDateDay, int expirationDateYear,
 			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
@@ -6124,14 +6119,13 @@ public class JournalArticleLocalServiceImpl
 
 		return journalArticleLocalService.updateArticle(
 			userId, groupId, folderId, articleId, version, titleMap,
-			descriptionMap, friendlyURLMap, content, ddmStructureKey,
-			ddmTemplateKey, layoutUuid, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, neverExpire,
-			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
-			reviewDateMinute, neverReview, indexable, smallImage, smallImageURL,
-			null, null, null, serviceContext);
+			descriptionMap, friendlyURLMap, content, ddmTemplateKey, layoutUuid,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
+			reviewDateHour, reviewDateMinute, neverReview, indexable,
+			smallImage, smallImageURL, null, null, null, serviceContext);
 	}
 
 	/**
@@ -6202,15 +6196,15 @@ public class JournalArticleLocalServiceImpl
 	public JournalArticle updateArticleDefaultValues(
 			long userId, long groupId, String articleId,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
-			String layoutUuid, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
-			int reviewDateDay, int reviewDateYear, int reviewDateHour,
-			int reviewDateMinute, boolean neverReview, boolean indexable,
-			boolean smallImage, String smallImageURL, File smallImageFile,
+			String content, String ddmTemplateKey, String layoutUuid,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
+			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
+			boolean neverReview, boolean indexable, boolean smallImage,
+			String smallImageURL, File smallImageFile,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -6276,14 +6270,6 @@ public class JournalArticleLocalServiceImpl
 		_updateArticleLocalizedFields(
 			article.getCompanyId(), article.getId(), titleMap, descriptionMap);
 
-		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
-			_portal.getSiteGroupId(groupId),
-			_classNameLocalService.getClassNameId(JournalArticle.class),
-			ddmStructureKey, true);
-
-		article.setDDMStructureId(ddmStructure.getStructureId());
-
-		article.setDDMStructureKey(ddmStructureKey);
 		article.setDDMTemplateKey(ddmTemplateKey);
 
 		Locale locale = getArticleDefaultLocale(content);
@@ -6797,9 +6783,12 @@ public class JournalArticleLocalServiceImpl
 
 			// Subscriptions
 
-			if (article.equals(
-					getOldestArticle(
-						article.getGroupId(), article.getArticleId()))) {
+			if (status == WorkflowConstants.STATUS_EXPIRED) {
+				action = "expired";
+			}
+			else if (article.equals(
+						getOldestArticle(
+							article.getGroupId(), article.getArticleId()))) {
 
 				action = "add";
 			}
@@ -7138,7 +7127,11 @@ public class JournalArticleLocalServiceImpl
 						currentArticle.setStatus(
 							WorkflowConstants.STATUS_EXPIRED);
 
-						journalArticlePersistence.update(currentArticle);
+						currentArticle = journalArticlePersistence.update(
+							currentArticle);
+
+						notifySubscribers(
+							0, currentArticle, "expired", new ServiceContext());
 					}
 				}
 
@@ -7146,6 +7139,8 @@ public class JournalArticleLocalServiceImpl
 
 				article = journalArticleLocalService.updateJournalArticle(
 					article);
+
+				notifySubscribers(0, article, "expired", new ServiceContext());
 
 				updatePreviousApprovedArticle(article);
 
@@ -7748,6 +7743,11 @@ public class JournalArticleLocalServiceImpl
 		if (action.equals("add") &&
 			journalGroupServiceConfiguration.emailArticleAddedEnabled()) {
 		}
+		else if (FeatureFlagManagerUtil.isEnabled("LPS-179142") &&
+				 action.equals("expired") &&
+				 journalGroupServiceConfiguration.
+					 emailArticleExpiredEnabled()) {
+		}
 		else if (action.equals("move_to") &&
 				 journalGroupServiceConfiguration.
 					 emailArticleMovedToFolderEnabled()) {
@@ -7916,6 +7916,10 @@ public class JournalArticleLocalServiceImpl
 		subscriptionSender.setNotificationType(_getNotificationType(action));
 		subscriptionSender.setReplyToAddress(fromAddress);
 
+		if (action.equals("expired") && (serviceContext.getUserId() == 0)) {
+			subscriptionSender.setSendToCurrentUser(true);
+		}
+
 		subscriptionSender.flushNotificationsAsync();
 	}
 
@@ -8037,6 +8041,12 @@ public class JournalArticleLocalServiceImpl
 		subscriptionSender.setContextAttribute(
 			"[$ARTICLE_USER_NAME$]", article.getUserName());
 		subscriptionSender.setEntryTitle(article.getTitle(user.getLocale()));
+
+		if (FeatureFlagManagerUtil.isEnabled("LPS-179142") &&
+			emailType.equals("review") && (serviceContext.getUserId() == 0)) {
+
+			subscriptionSender.setSendToCurrentUser(true);
+		}
 
 		subscriptionSender.addRuntimeSubscribers(toAddress, toName);
 
@@ -8687,6 +8697,11 @@ public class JournalArticleLocalServiceImpl
 					emailArticleApprovalDeniedBody());
 		}
 
+		if (emailType.equals("expired")) {
+			return _localization.getMap(
+				journalGroupServiceConfiguration.emailArticleExpiredBody());
+		}
+
 		if (emailType.equals("granted")) {
 			return _localization.getMap(
 				journalGroupServiceConfiguration.
@@ -8750,6 +8765,11 @@ public class JournalArticleLocalServiceImpl
 					emailArticleApprovalDeniedSubject());
 		}
 
+		if (emailType.equals("expired")) {
+			return _localization.getMap(
+				journalGroupServiceConfiguration.emailArticleExpiredSubject());
+		}
+
 		if (emailType.equals("granted")) {
 			return _localization.getMap(
 				journalGroupServiceConfiguration.
@@ -8807,6 +8827,10 @@ public class JournalArticleLocalServiceImpl
 	}
 
 	private int _getNotificationType(String emailType) {
+		if (emailType.equals("expired")) {
+			return UserNotificationDefinition.NOTIFICATION_TYPE_EXPIRED_ENTRY;
+		}
+
 		if (emailType.equals("move_from")) {
 			return JournalArticleConstants.
 				NOTIFICATION_TYPE_MOVE_ENTRY_FROM_FOLDER;

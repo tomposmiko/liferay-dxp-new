@@ -13,18 +13,15 @@ import React, {useEffect, useState} from 'react';
 
 import Container from '../../common/components/container';
 import DonutChart from '../../common/components/donut-chart';
+import {revenueChartColumnColors} from '../../common/utils/constants/chartColumnsColors';
 import getRevenueChartColumns from '../../common/utils/getRevenueChartColumns';
-
-const colors = {
-	'Growth Revenue': '#000239',
-	'Renewal Revenue': '#83B6FE',
-};
 
 export default function () {
 	const [titleChart, setTitleChart] = useState('');
 	const [valueChart, setValueChart] = useState('');
 	const [columnsRevenueChart, setColumnsRevenueChart] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [currencyData, setCurrencyData] = useState('');
 
 	const getRevenueData = async () => {
 		setLoading(true);
@@ -39,7 +36,12 @@ export default function () {
 		if (response.ok) {
 			const revenueData = await response.json();
 
+			const revenueCurrency = revenueData?.items[0]?.currency.key;
+
+			setCurrencyData(revenueCurrency);
+
 			getRevenueChartColumns(
+				revenueCurrency,
 				revenueData,
 				setTitleChart,
 				setValueChart,
@@ -60,15 +62,16 @@ export default function () {
 	}, []);
 
 	const chartData = {
-		colors,
+		colors: revenueChartColumnColors,
 		columns: columnsRevenueChart,
 		type: 'donut',
 	};
 
 	return (
-		<Container title="Revenue">
+		<Container className="dashboard-mdf-revenue-chart" title="Revenue">
 			<DonutChart
-				chartData={chartData}
+				chartDataColumns={chartData}
+				dataCurrency={currencyData}
 				isLoading={loading}
 				titleChart={titleChart}
 				valueChart={valueChart}

@@ -57,7 +57,7 @@ public class JournalArticleServiceHttp {
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			java.util.Map<java.util.Locale, String> friendlyURLMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
+			String content, long ddmStructureId, String ddmTemplateKey,
 			String layoutUuid, int displayDateMonth, int displayDateDay,
 			int displayDateYear, int displayDateHour, int displayDateMinute,
 			int expirationDateMonth, int expirationDateDay,
@@ -78,7 +78,7 @@ public class JournalArticleServiceHttp {
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, groupId, folderId,
 				classNameId, classPK, articleId, autoArticleId, titleMap,
-				descriptionMap, friendlyURLMap, content, ddmStructureKey,
+				descriptionMap, friendlyURLMap, content, ddmStructureId,
 				ddmTemplateKey, layoutUuid, displayDateMonth, displayDateDay,
 				displayDateYear, displayDateHour, displayDateMinute,
 				expirationDateMonth, expirationDateDay, expirationDateYear,
@@ -120,7 +120,7 @@ public class JournalArticleServiceHttp {
 			long groupId, long folderId,
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
+			String content, long ddmStructureId, String ddmTemplateKey,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -131,7 +131,7 @@ public class JournalArticleServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, groupId, folderId, titleMap,
-				descriptionMap, content, ddmStructureKey, ddmTemplateKey,
+				descriptionMap, content, ddmStructureId, ddmTemplateKey,
 				serviceContext);
 
 			Object returnObj = null;
@@ -167,7 +167,7 @@ public class JournalArticleServiceHttp {
 				HttpPrincipal httpPrincipal, long groupId, long classNameId,
 				long classPK, java.util.Map<java.util.Locale, String> titleMap,
 				java.util.Map<java.util.Locale, String> descriptionMap,
-				String content, String ddmStructureKey, String ddmTemplateKey,
+				String content, long ddmStructureId, String ddmTemplateKey,
 				String layoutUuid, int displayDateMonth, int displayDateDay,
 				int displayDateYear, int displayDateHour, int displayDateMinute,
 				int expirationDateMonth, int expirationDateDay,
@@ -187,7 +187,7 @@ public class JournalArticleServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, classNameId, classPK, titleMap,
-				descriptionMap, content, ddmStructureKey, ddmTemplateKey,
+				descriptionMap, content, ddmStructureId, ddmTemplateKey,
 				layoutUuid, displayDateMonth, displayDateDay, displayDateYear,
 				displayDateHour, displayDateMinute, expirationDateMonth,
 				expirationDateDay, expirationDateYear, expirationDateHour,
@@ -3099,15 +3099,15 @@ public class JournalArticleServiceHttp {
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			java.util.Map<java.util.Locale, String> friendlyURLMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
-			String layoutUuid, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
-			int reviewDateDay, int reviewDateYear, int reviewDateHour,
-			int reviewDateMinute, boolean neverReview, boolean indexable,
-			boolean smallImage, String smallImageURL, java.io.File smallFile,
+			String content, String ddmTemplateKey, String layoutUuid,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
+			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
+			boolean neverReview, boolean indexable, boolean smallImage,
+			String smallImageURL, java.io.File smallFile,
 			java.util.Map<String, byte[]> images, String articleURL,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -3119,14 +3119,14 @@ public class JournalArticleServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, folderId, articleId, version, titleMap,
-				descriptionMap, friendlyURLMap, content, ddmStructureKey,
-				ddmTemplateKey, layoutUuid, displayDateMonth, displayDateDay,
-				displayDateYear, displayDateHour, displayDateMinute,
-				expirationDateMonth, expirationDateDay, expirationDateYear,
-				expirationDateHour, expirationDateMinute, neverExpire,
-				reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
-				reviewDateMinute, neverReview, indexable, smallImage,
-				smallImageURL, smallFile, images, articleURL, serviceContext);
+				descriptionMap, friendlyURLMap, content, ddmTemplateKey,
+				layoutUuid, displayDateMonth, displayDateDay, displayDateYear,
+				displayDateHour, displayDateMinute, expirationDateMonth,
+				expirationDateDay, expirationDateYear, expirationDateHour,
+				expirationDateMinute, neverExpire, reviewDateMonth,
+				reviewDateDay, reviewDateYear, reviewDateHour, reviewDateMinute,
+				neverReview, indexable, smallImage, smallImageURL, smallFile,
+				images, articleURL, serviceContext);
 
 			Object returnObj = null;
 
@@ -3161,15 +3161,15 @@ public class JournalArticleServiceHttp {
 			String articleId, double version,
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String content, String ddmStructureKey, String ddmTemplateKey,
-			String layoutUuid, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
-			int reviewDateDay, int reviewDateYear, int reviewDateHour,
-			int reviewDateMinute, boolean neverReview, boolean indexable,
-			boolean smallImage, String smallImageURL, java.io.File smallFile,
+			String content, String ddmTemplateKey, String layoutUuid,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
+			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
+			boolean neverReview, boolean indexable, boolean smallImage,
+			String smallImageURL, java.io.File smallFile,
 			java.util.Map<String, byte[]> images, String articleURL,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -3181,8 +3181,8 @@ public class JournalArticleServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, folderId, articleId, version, titleMap,
-				descriptionMap, content, ddmStructureKey, ddmTemplateKey,
-				layoutUuid, displayDateMonth, displayDateDay, displayDateYear,
+				descriptionMap, content, ddmTemplateKey, layoutUuid,
+				displayDateMonth, displayDateDay, displayDateYear,
 				displayDateHour, displayDateMinute, expirationDateMonth,
 				expirationDateDay, expirationDateYear, expirationDateHour,
 				expirationDateMinute, neverExpire, reviewDateMonth,
@@ -3266,9 +3266,9 @@ public class JournalArticleServiceHttp {
 				HttpPrincipal httpPrincipal, long groupId, String articleId,
 				java.util.Map<java.util.Locale, String> titleMap,
 				java.util.Map<java.util.Locale, String> descriptionMap,
-				String content, String ddmStructureKey, String ddmTemplateKey,
-				String layoutUuid, int displayDateMonth, int displayDateDay,
-				int displayDateYear, int displayDateHour, int displayDateMinute,
+				String content, String ddmTemplateKey, String layoutUuid,
+				int displayDateMonth, int displayDateDay, int displayDateYear,
+				int displayDateHour, int displayDateMinute,
 				int expirationDateMonth, int expirationDateDay,
 				int expirationDateYear, int expirationDateHour,
 				int expirationDateMinute, boolean neverExpire,
@@ -3286,14 +3286,13 @@ public class JournalArticleServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, articleId, titleMap, descriptionMap,
-				content, ddmStructureKey, ddmTemplateKey, layoutUuid,
-				displayDateMonth, displayDateDay, displayDateYear,
-				displayDateHour, displayDateMinute, expirationDateMonth,
-				expirationDateDay, expirationDateYear, expirationDateHour,
-				expirationDateMinute, neverExpire, reviewDateMonth,
-				reviewDateDay, reviewDateYear, reviewDateHour, reviewDateMinute,
-				neverReview, indexable, smallImage, smallImageURL,
-				smallImageFile, serviceContext);
+				content, ddmTemplateKey, layoutUuid, displayDateMonth,
+				displayDateDay, displayDateYear, displayDateHour,
+				displayDateMinute, expirationDateMonth, expirationDateDay,
+				expirationDateYear, expirationDateHour, expirationDateMinute,
+				neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
+				reviewDateHour, reviewDateMinute, neverReview, indexable,
+				smallImage, smallImageURL, smallImageFile, serviceContext);
 
 			Object returnObj = null;
 
@@ -3418,7 +3417,7 @@ public class JournalArticleServiceHttp {
 	private static final Class<?>[] _addArticleParameterTypes0 = new Class[] {
 		String.class, long.class, long.class, long.class, long.class,
 		String.class, boolean.class, java.util.Map.class, java.util.Map.class,
-		java.util.Map.class, String.class, String.class, String.class,
+		java.util.Map.class, String.class, long.class, String.class,
 		String.class, int.class, int.class, int.class, int.class, int.class,
 		int.class, int.class, int.class, int.class, int.class, boolean.class,
 		int.class, int.class, int.class, int.class, int.class, boolean.class,
@@ -3428,13 +3427,13 @@ public class JournalArticleServiceHttp {
 	};
 	private static final Class<?>[] _addArticleParameterTypes1 = new Class[] {
 		String.class, long.class, long.class, java.util.Map.class,
-		java.util.Map.class, String.class, String.class, String.class,
+		java.util.Map.class, String.class, long.class, String.class,
 		com.liferay.portal.kernel.service.ServiceContext.class
 	};
 	private static final Class<?>[] _addArticleDefaultValuesParameterTypes2 =
 		new Class[] {
 			long.class, long.class, long.class, java.util.Map.class,
-			java.util.Map.class, String.class, String.class, String.class,
+			java.util.Map.class, String.class, long.class, String.class,
 			String.class, int.class, int.class, int.class, int.class, int.class,
 			int.class, int.class, int.class, int.class, int.class,
 			boolean.class, int.class, int.class, int.class, int.class,
@@ -3730,11 +3729,11 @@ public class JournalArticleServiceHttp {
 		new Class[] {
 			long.class, long.class, String.class, double.class,
 			java.util.Map.class, java.util.Map.class, java.util.Map.class,
-			String.class, String.class, String.class, String.class, int.class,
+			String.class, String.class, String.class, int.class, int.class,
 			int.class, int.class, int.class, int.class, int.class, int.class,
-			int.class, int.class, int.class, boolean.class, int.class,
-			int.class, int.class, int.class, int.class, boolean.class,
-			boolean.class, boolean.class, String.class, java.io.File.class,
+			int.class, int.class, boolean.class, int.class, int.class,
+			int.class, int.class, int.class, boolean.class, boolean.class,
+			boolean.class, String.class, java.io.File.class,
 			java.util.Map.class, String.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
@@ -3742,12 +3741,11 @@ public class JournalArticleServiceHttp {
 		new Class[] {
 			long.class, long.class, String.class, double.class,
 			java.util.Map.class, java.util.Map.class, String.class,
-			String.class, String.class, String.class, int.class, int.class,
+			String.class, String.class, int.class, int.class, int.class,
 			int.class, int.class, int.class, int.class, int.class, int.class,
-			int.class, int.class, boolean.class, int.class, int.class,
-			int.class, int.class, int.class, boolean.class, boolean.class,
-			boolean.class, String.class, java.io.File.class,
-			java.util.Map.class, String.class,
+			int.class, boolean.class, int.class, int.class, int.class,
+			int.class, int.class, boolean.class, boolean.class, boolean.class,
+			String.class, java.io.File.class, java.util.Map.class, String.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _updateArticleParameterTypes79 =
@@ -3758,11 +3756,11 @@ public class JournalArticleServiceHttp {
 	private static final Class<?>[]
 		_updateArticleDefaultValuesParameterTypes80 = new Class[] {
 			long.class, String.class, java.util.Map.class, java.util.Map.class,
-			String.class, String.class, String.class, String.class, int.class,
+			String.class, String.class, String.class, int.class, int.class,
 			int.class, int.class, int.class, int.class, int.class, int.class,
-			int.class, int.class, int.class, boolean.class, int.class,
-			int.class, int.class, int.class, int.class, boolean.class,
-			boolean.class, boolean.class, String.class, java.io.File.class,
+			int.class, int.class, boolean.class, int.class, int.class,
+			int.class, int.class, int.class, boolean.class, boolean.class,
+			boolean.class, String.class, java.io.File.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _updateArticleTranslationParameterTypes81 =

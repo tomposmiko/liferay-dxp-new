@@ -111,7 +111,6 @@ import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
@@ -171,6 +170,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -364,19 +364,20 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	@Override
-	public void checkFileEntries(long checkInterval) throws PortalException {
+	public void checkFileEntries(long companyId, long checkInterval)
+		throws PortalException {
+
 		Date date = new Date();
 
-		if (_previousCheckDate == null) {
-			_previousCheckDate = new Date(
-				date.getTime() - (checkInterval * Time.MINUTE));
-		}
+		_dates.computeIfAbsent(
+			companyId,
+			key -> new Date(date.getTime() - (checkInterval * Time.MINUTE)));
 
-		_checkFileEntriesByExpirationDate(date);
+		_checkFileEntriesByExpirationDate(companyId, date);
 
-		_checkFileEntriesByReviewDate(date);
+		_checkFileEntriesByReviewDate(companyId, date);
 
-		_previousCheckDate = date;
+		_dates.put(companyId, date);
 	}
 
 	@Override
@@ -2152,33 +2153,35 @@ public class DLFileEntryLocalServiceImpl
 		return entryURL;
 	}
 
-	private void _checkFileEntriesByExpirationDate(Date expirationDate)
+	private void _checkFileEntriesByExpirationDate(
+			long companyId, Date expirationDate)
 		throws PortalException {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
-				"Expiring file entries with expiration date previous to " +
-					expirationDate);
+				StringBundler.concat(
+					"Expiring file entries with expiration date previous to ",
+					expirationDate, " for companyId ", companyId));
 		}
 
-		_companyLocalService.forEachCompanyId(
-			companyId -> _expireFileEntriesByCompanyId(
-				companyId, expirationDate, Collections.emptyMap(),
-				new ServiceContext()));
+		_expireFileEntriesByCompanyId(
+			companyId, expirationDate, Collections.emptyMap(),
+			new ServiceContext());
 	}
 
-	private void _checkFileEntriesByReviewDate(Date reviewDate)
+	private void _checkFileEntriesByReviewDate(long companyId, Date reviewDate)
 		throws PortalException {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
 				StringBundler.concat(
 					"Sending review notification for file entries with review ",
-					"date between ", _previousCheckDate, " and ", reviewDate));
+					"date between ", _dates.get(companyId), " and ",
+					reviewDate));
 		}
 
 		List<DLFileEntry> fileEntries = _getFileEntriesByReviewDate(
-			reviewDate, _previousCheckDate);
+			companyId, reviewDate, _dates.get(companyId));
 
 		for (DLFileEntry fileEntry : fileEntries) {
 			if (fileEntry.isInTrash()) {
@@ -2630,7 +2633,7 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	private List<DLFileEntry> _getFileEntriesByReviewDate(
-		Date reviewDateLT, Date reviewDateGT) {
+		long companyId, Date reviewDateLT, Date reviewDateGT) {
 
 		return dlFileEntryPersistence.dslQuery(
 			DSLQueryFactoryUtil.select(
@@ -2638,8 +2641,10 @@ public class DLFileEntryLocalServiceImpl
 			).from(
 				DLFileEntryTable.INSTANCE
 			).where(
-				DLFileEntryTable.INSTANCE.reviewDate.gte(
-					reviewDateGT
+				DLFileEntryTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					DLFileEntryTable.INSTANCE.reviewDate.gte(reviewDateGT)
 				).and(
 					DLFileEntryTable.INSTANCE.reviewDate.lte(reviewDateLT)
 				)
@@ -3594,8 +3599,7 @@ public class DLFileEntryLocalServiceImpl
 	@BeanReference(type = ClassNameLocalService.class)
 	private ClassNameLocalService _classNameLocalService;
 
-	@BeanReference(type = CompanyLocalService.class)
-	private CompanyLocalService _companyLocalService;
+	private final Map<Long, Date> _dates = new ConcurrentHashMap<>();
 
 	@BeanReference(type = DLAppHelperLocalService.class)
 	private DLAppHelperLocalService _dlAppHelperLocalService;
@@ -3632,8 +3636,6 @@ public class DLFileEntryLocalServiceImpl
 
 	@BeanReference(type = OrganizationLocalService.class)
 	private OrganizationLocalService _organizationLocalService;
-
-	private Date _previousCheckDate;
 
 	@BeanReference(type = RatingsStatsLocalService.class)
 	private RatingsStatsLocalService _ratingsStatsLocalService;

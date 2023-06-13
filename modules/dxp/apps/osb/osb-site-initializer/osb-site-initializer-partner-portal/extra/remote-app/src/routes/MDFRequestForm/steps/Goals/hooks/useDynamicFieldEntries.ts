@@ -25,6 +25,7 @@ export default function useDynamicFieldEntries() {
 		LiferayPicklistName.LIFERAY_BUSINESS_SALES_GOALS,
 		LiferayPicklistName.TARGET_AUDIENCE_ROLES,
 		LiferayPicklistName.TARGET_MARKETS,
+		LiferayPicklistName.CURRENCIES,
 	]);
 
 	const companiesEntries = useMemo(
@@ -36,15 +37,6 @@ export default function useDynamicFieldEntries() {
 		[userAccount?.accountBriefs]
 	);
 
-	const userAccountRoles = useMemo(
-		() =>
-			userAccount?.roleBriefs.map((roleBrief) => ({
-				label: roleBrief.name,
-				value: roleBrief.id,
-			})) as React.OptionHTMLAttributes<HTMLOptionElement>[],
-		[userAccount?.roleBriefs]
-	);
-
 	const fieldEntries = useMemo(
 		() => getEntriesByListTypeDefinitions(listTypeDefinitions?.items),
 		[listTypeDefinitions?.items]
@@ -53,6 +45,6 @@ export default function useDynamicFieldEntries() {
 	return {
 		companiesEntries,
 		fieldEntries,
-		userAccountRoles,
+		roleEntries: userAccount?.roleBriefs,
 	};
 }

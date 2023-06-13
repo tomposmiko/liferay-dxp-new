@@ -13,6 +13,8 @@
  */
 
 import {useNavigate, useParams} from 'react-router-dom';
+import {PickList} from '~/services/rest';
+import {BuildStatuses} from '~/util/statuses';
 
 import Container from '../../../../../components/Layout/Container';
 import ListViewRest from '../../../../../components/ListView';
@@ -20,8 +22,18 @@ import {useHeader} from '../../../../../hooks';
 import useSearchBuilder from '../../../../../hooks/useSearchBuilder';
 import i18n from '../../../../../i18n';
 import dayjs from '../../../../../util/date';
-import {BuildStatuses} from '../../../../../util/statuses';
 import useBuildTemplateActions from './useBuildTemplateActions';
+
+const templateFilterInitialContext = {
+	entries: [
+		{
+			label: i18n.translate('status'),
+			name: 'dueStatus',
+			value: BuildStatuses.ACTIVATED,
+		},
+	],
+	filter: {dueStatus: BuildStatuses.ACTIVATED},
+};
 
 const BuildTemplates = () => {
 	const {actions} = useBuildTemplateActions();
@@ -36,7 +48,6 @@ const BuildTemplates = () => {
 		.and()
 		.eq('template', true)
 		.and()
-		.eq('dueStatus', BuildStatuses.ACTIVE)
 		.build();
 
 	useHeader({
@@ -48,6 +59,9 @@ const BuildTemplates = () => {
 	return (
 		<Container>
 			<ListViewRest
+				initialContext={{
+					filters: templateFilterInitialContext,
+				}}
 				managementToolbarProps={{
 					addButton: () => navigate('../create/template/true'),
 					filterSchema: 'buildTemplates',
@@ -58,9 +72,8 @@ const BuildTemplates = () => {
 					actions,
 					columns: [
 						{
-							key: 'active',
-							render: (active) =>
-								i18n.translate(active ? 'active' : 'deactive'),
+							key: 'dueStatus',
+							render: (dueStatus: PickList) => dueStatus?.name,
 							sorteable: true,
 							value: i18n.translate('status'),
 						},

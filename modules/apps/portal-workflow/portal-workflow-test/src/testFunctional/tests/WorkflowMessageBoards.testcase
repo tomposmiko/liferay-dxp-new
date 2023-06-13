@@ -59,7 +59,6 @@ definition {
 		}
 	}
 
-	@ignore = "true"
 	@priority = 4
 	test ApproveMessageBoardsThreadPG {
 		Navigator.gotoPage(pageName = "Message Boards Page");
@@ -72,8 +71,7 @@ definition {
 
 		MessageboardsThread.viewWithWorkflowPG(
 			threadBody = "MB Thread Body",
-			threadSubject = "MB Thread Subject",
-			workflowTask = "Review");
+			threadSubject = "MB Thread Subject");
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
@@ -81,16 +79,6 @@ definition {
 			workflowAssetTitle = "MB Thread Subject",
 			workflowAssetType = "Message Boards Message",
 			workflowTask = "Review");
-
-		Navigator.gotoPage(pageName = "Message Boards Page");
-
-		MessageboardsThread.viewWithWorkflowPG(
-			pageName = "Message Boards Page",
-			threadBody = "MB Thread Body",
-			threadSubject = "MB Thread Subject",
-			workflowTask = "Review");
-
-		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
 		Workflow.approveTaskByActions(
 			workflowAssetTitle = "MB Thread Subject",
@@ -255,7 +243,6 @@ definition {
 			titleMessageBoard = "Thread Message Subject");
 	}
 
-	@ignore = "true"
 	@priority = 4
 	test RejectMessageBoardsThreadPG {
 		property test.name.skip.portal.instance = "WorkflowadminPGMessageboards#RejectMessageBoardsThreadPG";
@@ -292,8 +279,7 @@ definition {
 		MessageboardsThread.viewWithWorkflowPG(
 			pageName = "Message Boards Page",
 			threadBody = "MB Thread Body",
-			threadSubject = "MB Thread Subject",
-			workflowTask = "Update");
+			threadSubject = "MB Thread Subject");
 	}
 
 	@description = "This is a test for LRQA-70152. Verify that the reply to a thread has workflow associated."
