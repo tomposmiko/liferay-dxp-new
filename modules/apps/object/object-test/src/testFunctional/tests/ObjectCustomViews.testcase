@@ -25,22 +25,69 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify it is possible to add a column for the View"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanAddColumn {
 		property portal.acceptance = "true";
 
-		// TODO LPS-147765 CanAddColumn pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147765",
+			objectName = "CustomObject147765",
+			pluralLabelName = "Custom Objects 147765");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147765");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		for (var columnOption : list "Author,Creation Date") {
+			Click.clickAtNotVisible(
+				key_columnOption = "${columnOption}",
+				locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+		}
+
+		ObjectCustomViews.saveColumnsModal();
+
+		for (var columnOption : list "Author,Creation Date") {
+			ObjectCustomViews.assertColumnPresent(colunmName = "${columnOption}");
+		}
 	}
 
 	@description = "LPS-135394 - Verify it is possible to cancel the addition of a column for the View"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanCancelColumnAddition {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147766",
+			objectName = "CustomObject147766",
+			pluralLabelName = "Custom Objects 147766");
 
-		// TODO LPS-147766 CanCancelColumnAddition pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147766");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		Button.clickCancel();
+
+		AssertElementNotPresent(locator1 = "Portlet#MODAL_TITLE");
+
+		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "No columns added yet.");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to cancel the creation of a View"
@@ -74,13 +121,48 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify it is possible to delete a column for the View by unselecting it"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanDeleteColumnByUnselect {
 		property portal.acceptance = "true";
 
-		// TODO LPS-147768 CanDeleteColumnByUnselect pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147768",
+			objectName = "CustomObject147768",
+			pluralLabelName = "Custom Objects 147768");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147768");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		Click.clickAtNotVisible(
+			key_columnOption = "Author",
+			locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+
+		ObjectCustomViews.saveColumnsModal();
+
+		ObjectCustomViews.assertColumnPresent(colunmName = "Author");
+
+		LexiconEntry.gotoAdd();
+
+		Click.clickAtNotVisible(
+			key_columnOption = "Author",
+			locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+
+		ObjectCustomViews.saveColumnsModal();
+
+		ObjectCustomViews.assertColumnNotPresent(colunmName = "Author");
+
+		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "No columns added yet.");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to delete a column for the View through the delete button"
@@ -119,13 +201,68 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify it is possible to drag the columns"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanDragColumns {
 		property portal.acceptance = "true";
 
-		// TODO LPS-147769 CanDragColumns pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147769",
+			objectName = "CustomObject147769",
+			pluralLabelName = "Custom Objects 147769");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147769");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		for (var selectColumns : list "Author,Creation Date,Modified Date") {
+			Click.clickAtNotVisible(
+				key_columnOption = "${selectColumns}",
+				locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+		}
+
+		ObjectCustomViews.saveColumnsModal();
+
+		ObjectCustomViews.viewOrdersOfTheColumns(
+			colunmName = "Author",
+			position = "1");
+
+		ObjectCustomViews.viewOrdersOfTheColumns(
+			colunmName = "Creation Date",
+			position = "2");
+
+		ObjectCustomViews.viewOrdersOfTheColumns(
+			colunmName = "Modified Date",
+			position = "3");
+
+		DragAndDrop.javaScriptDragAndDropToUp(
+			key_columnName = "Creation Date",
+			key_colunmName1 = "Author",
+			key_position = "1",
+			locator1 = "ObjectCustomViews#VIEW_BUILDER_SEARCH_RESULT",
+			locator2 = "ObjectCustomViews#VIEW_LIST_COLUMNS_BY_POSITION",
+			value1 = "");
+
+		ObjectCustomViews.viewOrdersOfTheColumns(
+			colunmName = "Creation Date",
+			position = "1");
+
+		ObjectCustomViews.viewOrdersOfTheColumns(
+			colunmName = "Author",
+			position = "2");
+
+		ObjectCustomViews.viewOrdersOfTheColumns(
+			colunmName = "Modified Date",
+			position = "3");
 	}
 
 	@description = "LPS-135394 - Verify the Name is required when creating a View"
@@ -169,21 +306,71 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify it is possible to search for a column on the View Builder tab"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanSearchColumn {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147762",
+			objectName = "CustomObject147762",
+			pluralLabelName = "Custom Objects 147762");
 
-		// TODO LPS-147762 CanSearchColumn pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147762");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		Click.clickAtNotVisible(
+			key_columnOption = "Author",
+			locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+
+		Click.clickAtNotVisible(
+			key_columnOption = "Creation Date",
+			locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+
+		ObjectCustomViews.saveColumnsModal();
+
+		ObjectCustomViews.searchOnViewBuilder(colunmName = "Author");
+
+		ObjectCustomViews.assertColumnPresent(colunmName = "Author");
+
+		ObjectCustomViews.assertColumnNotPresent(colunmName = "Creation Date");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to search for a column on the Add Columns modal"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanSearchColumnAddColumnModal {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147763",
+			objectName = "CustomObject147763",
+			pluralLabelName = "Custom Objects 147763");
 
-		// TODO LPS-147763 CanSearchColumnAddColumnModal pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147763");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		ObjectCustomViews.searchOnAddColumnModal(colunmName = "Author");
+
+		ObjectCustomViews.assertColumnVisibleOnAddColumnModal(columnOption = "Author");
+
+		ObjectCustomViews.assertColumnNotVisibleOnAddColumnModal(columnOption = "Creation Date");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to search for a View"
@@ -225,23 +412,123 @@ definition {
 	}
 
 	@description = "LPS-144902 - Verify if the entries from an object in a table view defined as default are presented correctly"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanViewEntries {
 		property portal.acceptance = "true";
 
-		// TODO LPS-147770 CanViewEntries pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147770",
+			objectName = "CustomObject147770",
+			pluralLabelName = "Custom Objects 147770");
 
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldBusinessType = "Text",
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject147770");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147770");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.markViewAsDefault();
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		Click.clickAtNotVisible(
+			key_columnOption = "Custom Field",
+			locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+
+		ObjectCustomViews.saveColumnsModal();
+
+		Button.clickSave();
+
+		Navigator.openURL();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject147770");
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customObjectField",
+			objectName = "CustomObject147770",
+			value = "Entry Test");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject147770");
+
+		ObjectPortlet.viewEntry(entry = "Entry Test");
 	}
 
 	@description = "LPS-144902 - Verify if selected Columns on custom view are presented correctly during visualization"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanViewOnlySelectedColumns {
 		property portal.acceptance = "true";
 
-		// TODO LPS-147771 CanViewOnlySelectedColumns pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147771",
+			objectName = "CustomObject147771",
+			pluralLabelName = "Custom Objects 147771");
 
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldBusinessType = "Text",
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject147771");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147771");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.markViewAsDefault();
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		for (var columnOption : list "Author,Creation Date,Custom Field") {
+			Click.clickAtNotVisible(
+				key_columnOption = "${columnOption}",
+				locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+		}
+
+		ObjectCustomViews.saveColumnsModal();
+
+		Button.clickSave();
+
+		Navigator.openURL();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject147771");
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customObjectField",
+			objectName = "CustomObject147771",
+			value = "Entry Test");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject147771");
+
+		for (var columnName : list "Author,Created Date,Custom Field") {
+			ObjectPortlet.assertEntryColumnPresent(column = "${columnName}");
+		}
+
+		for (var columnName : list "Modified Date,Workflow Status,ID") {
+			ObjectPortlet.assertEntryColumnNotPresent(column = "${columnName}");
+		}
 	}
 
 	@description = "LPS-144902 - Verify that custom view title is presented correctly"
@@ -290,40 +577,110 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify the empty state for the View tab"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test EmptyStateViewTab {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-147751 EmptyStateViewTab pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectCustomViews.goToViewsTab();
+
+		AssertTextEquals(
+			locator1 = "Message#EMPTY_INFO",
+			value1 = "No Items were found.");
 	}
 
 	@description = "LPS-135394 - Verify the Author, Creation Date, Modified Date, Workflow Status, ID columns (Metadata columns) are displayed to be selected"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test MetadataColumnsDisplayed {
 		property portal.acceptance = "true";
 
-		// TODO LPS-147764 MetadataColumnsDisplayed pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147764",
+			objectName = "CustomObject147764",
+			pluralLabelName = "Custom Objects 147764");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147764");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		for (var columnOption : list "Author,Creation Date,Modified Date,Workflow Status,ID") {
+			ObjectCustomViews.assertColumnVisibleOnAddColumnModal(columnOption = "${columnOption}");
+		}
 	}
 
 	@description = "LPS-135394 - Verify the no result message when searching for a view"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test NoResultMessageView {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-147752 NoResultMessageView pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(labelName = "Custom View");
+
+		Search.searchCP(searchTerm = "ObjectTest");
+
+		AssertTextEquals(
+			locator1 = "Message#EMPTY_INFO",
+			value1 = "No Items were found.");
 	}
 
 	@description = "LPS-135394 - Verify the no result message when searching for a column"
 	@ignore = "Test Stub"
 	@priority = "3"
 	test NoResultMessageViewBuilder {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147761",
+			objectName = "CustomObject147761",
+			pluralLabelName = "Custom Objects 147761");
 
-		// TODO LPS-147761 NoResultMessageViewBuilder pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147761");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		LexiconEntry.gotoAdd();
+
+		Click.clickAtNotVisible(
+			key_columnOption = "Author",
+			locator1 = "ObjectCustomViews#CHECKBOX_COLUMN_OPTION");
+
+		ObjectCustomViews.saveColumnsModal();
+
+		ObjectCustomViews.searchOnViewBuilder(colunmName = "Teste");
+
+		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "No Results Found");
+
+		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "Sorry, no results were found.");
 	}
 
 }

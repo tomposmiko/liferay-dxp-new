@@ -316,7 +316,7 @@ public class CalendarBookingServiceImpl extends CalendarBookingServiceBaseImpl {
 
 		List<CalendarBooking> calendarBookings = search(
 			themeDisplay.getCompanyId(), new long[0], new long[] {calendarId},
-			new long[0], -1, null, startTime, endTime, true,
+			new long[0], -1, null, startTime, endTime, null, true,
 			new int[] {
 				WorkflowConstants.STATUS_APPROVED,
 				CalendarBookingWorkflowConstants.STATUS_MAYBE
@@ -503,8 +503,9 @@ public class CalendarBookingServiceImpl extends CalendarBookingServiceBaseImpl {
 	public List<CalendarBooking> search(
 			long companyId, long[] groupIds, long[] calendarIds,
 			long[] calendarResourceIds, long parentCalendarBookingId,
-			String keywords, long startTime, long endTime, boolean recurring,
-			int[] statuses, int start, int end,
+			String keywords, long startTime, long endTime,
+			TimeZone displayTimeZone, boolean recurring, int[] statuses,
+			int start, int end,
 			OrderByComparator<CalendarBooking> orderByComparator)
 		throws PortalException {
 
@@ -512,7 +513,8 @@ public class CalendarBookingServiceImpl extends CalendarBookingServiceBaseImpl {
 			calendarBookingLocalService.search(
 				companyId, groupIds, calendarIds, calendarResourceIds,
 				parentCalendarBookingId, keywords, startTime, endTime,
-				recurring, statuses, start, end, orderByComparator);
+				displayTimeZone, recurring, statuses, start, end,
+				orderByComparator);
 
 		return filterCalendarBookings(calendarBookings, ActionKeys.VIEW);
 	}
@@ -548,8 +550,8 @@ public class CalendarBookingServiceImpl extends CalendarBookingServiceBaseImpl {
 
 		List<CalendarBooking> calendarBookings = search(
 			companyId, groupIds, calendarIds, calendarResourceIds,
-			parentCalendarBookingId, keywords, startTime, endTime, recurring,
-			statuses, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+			parentCalendarBookingId, keywords, startTime, endTime, null,
+			recurring, statuses, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		return calendarBookings.size();
 	}

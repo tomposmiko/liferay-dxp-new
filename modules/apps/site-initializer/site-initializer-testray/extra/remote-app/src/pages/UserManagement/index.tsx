@@ -13,13 +13,15 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayForm, {ClayCheckbox, ClayInput} from '@clayui/form';
+import ClayForm, {ClayCheckbox} from '@clayui/form';
 import ClayLayout from '@clayui/layout';
 import {useState} from 'react';
 
 import {Avatar} from '../../components/Avatar';
 import Input from '../../components/Input';
+import InputFile from '../../components/Input/InputFile';
 import Container from '../../components/Layout/Container';
+import i18n from '../../i18n';
 import {assignee} from '../../util/mock';
 
 const UserManagement: React.FC = () => {
@@ -33,32 +35,32 @@ const UserManagement: React.FC = () => {
 					<ClayLayout.Row justify="start">
 						<ClayLayout.Col size={3} sm={12} xl={3}>
 							<h5 className="font-weight-normal">
-								User Information
+								{i18n.translate('user-information')}
 							</h5>
 						</ClayLayout.Col>
 
 						<ClayLayout.Col size={3} sm={12} xl={7}>
 							<ClayForm.Group className="form-group-sm">
 								<Input
-									label="First Name"
+									label={i18n.translate('first-name')}
 									name="firstname"
 									required
 								/>
 
 								<Input
-									label="Last Name"
+									label={i18n.translate('last-name')}
 									name="lastname"
 									required
 								/>
 
 								<Input
-									label="Email Address"
+									label={i18n.translate('email-address')}
 									name="emailAddress"
 									required
 								/>
 
 								<Input
-									label="Screen Name"
+									label={i18n.translate('screen-name')}
 									name="screeName"
 									required
 								/>
@@ -70,7 +72,9 @@ const UserManagement: React.FC = () => {
 
 					<ClayLayout.Row justify="start">
 						<ClayLayout.Col size={3} sm={12} xl={3}>
-							<h5 className="font-weight-normal">Avatar</h5>
+							<h5 className="font-weight-normal">
+								{i18n.translate('avatar')}
+							</h5>
 						</ClayLayout.Col>
 
 						<ClayLayout.Col size={3} sm={12} xl={3}>
@@ -79,10 +83,7 @@ const UserManagement: React.FC = () => {
 
 								<br />
 
-								<ClayInput
-									placeholder="First Name"
-									type="text"
-								/>
+								<InputFile name="inputFile" required={false} />
 							</ClayForm.Group>
 						</ClayLayout.Col>
 					</ClayLayout.Row>
@@ -92,14 +93,14 @@ const UserManagement: React.FC = () => {
 					<ClayLayout.Row justify="start">
 						<ClayLayout.Col size={3} sm={12} xl={3}>
 							<h5 className="font-weight-normal">
-								Change Password
+								{i18n.translate('change-Password')}
 							</h5>
 						</ClayLayout.Col>
 
 						<ClayLayout.Col size={3} sm={12} xl={3}>
 							<ClayForm.Group className="form-group-sm">
 								<ClayButton className="bg-neutral-2 borderless neutral text-neutral-7">
-									Change Password
+									{i18n.translate('change-password')}
 								</ClayButton>
 							</ClayForm.Group>
 						</ClayLayout.Col>
@@ -109,7 +110,9 @@ const UserManagement: React.FC = () => {
 
 					<ClayLayout.Row justify="start">
 						<ClayLayout.Col size={3} sm={12} xl={3}>
-							<h5 className="font-weight-normal">Roles</h5>
+							<h5 className="font-weight-normal">
+								{i18n.translate('roles')}
+							</h5>
 						</ClayLayout.Col>
 
 						<ClayLayout.Col size={3} sm={12} xl={9}>
@@ -117,16 +120,16 @@ const UserManagement: React.FC = () => {
 								<div className="col-12">
 									<ClayCheckbox
 										checked={value}
-										label="Testray User"
+										label={i18n.translate('testray-user')}
 										onChange={() => setValue((val) => !val)}
 									/>
 								</div>
 
 								<div className="col-12 ml-4 mt-2">
 									<p>
-										This role is for general Liferay
-										employees and enables authenticated
-										users to view test results.
+										{i18n.translate(
+											'this-role-is-for-general-liferay-employees-and-enables-authenticated-users-to-view-test-results'
+										)}
 									</p>
 								</div>
 							</div>
@@ -142,9 +145,9 @@ const UserManagement: React.FC = () => {
 
 								<div className="col-12 ml-4 mt-2">
 									<p>
-										Testers carry permissions to analyze
-										test results by workflowing results or
-										collaborating on tasks
+										{i18n.translate(
+											'testers-carry-permissions-to-analyze-test-results-by-workflowing-results-or-collaborating-on-tasks'
+										)}
 									</p>
 								</div>
 							</div>
@@ -160,16 +163,36 @@ const UserManagement: React.FC = () => {
 
 								<div className="col-12 ml-4 mt-2">
 									<p>
-										Test Lead should only have access to
-										Builds, Test Plans, Test Suites and Test
-										Cases. This role will be responsible for
-										creating Builds and for creating Test
-										Plans/Test Runs. The people assigned to
-										these would be our current product
-										leads.
+										{i18n.translate(
+											'test-lead-should-only-have-access-to-builds-test-plans-test-suites-and-test-cases-.-this-role-will-be-responsible-for-creating-builds-and-for-creating-test-plans-test-runs-the-people-assigned-to-these-would-be-our-current-product-leads'
+										)}
 									</p>
 								</div>
 							</div>
+						</ClayLayout.Col>
+					</ClayLayout.Row>
+
+					<ClayLayout.Row>
+						<ClayLayout.Col>
+							<ClayButton.Group
+								className="form-group-sm mt-5"
+								key={3}
+								spaced
+							>
+								<ClayButton
+									className="bg-primary-2 borderless mr-2 primary text-primary-7"
+									displayType="primary"
+								>
+									{i18n.translate('save')}
+								</ClayButton>
+
+								<ClayButton
+									className="bg-neutral-2 borderless neutral text-neutral-7"
+									displayType="secondary"
+								>
+									{i18n.translate('cancel')}
+								</ClayButton>
+							</ClayButton.Group>
 						</ClayLayout.Col>
 					</ClayLayout.Row>
 				</ClayForm>

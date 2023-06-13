@@ -13,6 +13,7 @@
 	},
 	"dependencies": {
 		"@apollo/client": "^3.5.8",
+		"@clayui/alert": "^3.40.0",
 		"@clayui/button": "^3.40.0",
 		"@clayui/charts": "^3.40.0",
 		"@clayui/core": "3.45.1",
@@ -21,6 +22,7 @@
 		"@clayui/icon": "^3.40.0",
 		"@clayui/layout": "^3.40.0",
 		"@clayui/loading-indicator": "^3.40.0",
+		"@clayui/modal": "^3.45.0",
 		"@clayui/pagination": "^3.43.0",
 		"@clayui/pagination-bar": "^3.43.0",
 		"@clayui/sticker": "^3.40.0",
@@ -33,9 +35,10 @@
 		"history": "^5.2.0",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2",
+		"react-markdown": "^8.0.0",
 		"react-router-dom": "^6.2.1",
 		"react-scripts": "4.0.3",
-		"recharts": "^2.1.8",
+		"remark-gfm": "^3.0.1",
 		"sass": "^1.49.0"
 	},
 	"devDependencies": {
@@ -44,7 +47,7 @@
 		"@types/react-dom": "^17.0.11",
 		"typescript": "^4.5.4"
 	},
-	"name": "@liferay/site-initializer-testray",
+	"name": "@liferay/site-initializer-testray-remote-app",
 	"private": true,
 	"scripts": {
 		"build": "react-scripts build",

@@ -14,6 +14,8 @@
 
 import {gql} from '@apollo/client';
 
+import {testrayCaseFragment} from '../fragments';
+
 export type TestrayCase = {
 	caseNumber: number;
 	description: string;
@@ -28,40 +30,45 @@ export type TestrayCase = {
 	testrayCaseResult: number;
 };
 
-const testrayCaseFragment = gql`
-	fragment TestrayCaseFragment on C_TestrayCase {
-		caseNumber
-		description
-		descriptionType
-		estimatedDuration
-		name
-		originationKey
-		priority
-		steps
-		stepsType
-		testrayCaseResult
-		testrayCaseId
-	}
-`;
-
 export const getTestrayCases = gql`
-	${testrayCaseFragment}
-
 	query getTestrayCases(
 		$filter: String
 		$page: Int = 1
 		$pageSize: Int = 20
 	) {
-		c {
-			testrayCases(filter: $filter, page: $page, pageSize: $pageSize) {
-				items {
-					...TestrayCaseFragment
+		testrayCases(filter: $filter, page: $page, pageSize: $pageSize)
+			@rest(
+				type: "C_TestrayCase"
+				path: "testraycases?page={args.page}&pageSize={args.pageSize}&nestedFields=testrayComponent.testrayTeam,testrayCaseType"
+			) {
+			items {
+				caseNumber
+				dateCreated
+				dateModified
+				description
+				descriptionType
+				estimatedDuration
+				name
+				originationKey
+				priority
+				steps
+				stepsType
+				id: testrayCaseId
+				testrayCaseResult
+				testrayCaseType: r_caseCaseType_c_testrayCaseType {
+					name
 				}
-				lastPage
-				page
-				pageSize
-				totalCount
+				testrayComponent: r_casesComponents_c_testrayComponent {
+					name
+					testrayTeam: r_componentTeam_c_testrayTeam {
+						name
+					}
+				}
 			}
+			lastPage
+			page
+			pageSize
+			totalCount
 		}
 	}
 `;

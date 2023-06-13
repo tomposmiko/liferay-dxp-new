@@ -21,6 +21,7 @@ import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilder;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilderFactory;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaField;
 import com.liferay.frontend.data.set.view.table.StringFDSTableSchemaField;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -32,6 +33,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
+import com.liferay.object.web.internal.configuration.activator.FFSearchAndSortMetadataColumnsConfigurationActivator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -51,6 +53,8 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 
 	public ObjectEntriesTableFDSView(
 		FDSTableSchemaBuilderFactory fdsTableSchemaBuilderFactory,
+		FFSearchAndSortMetadataColumnsConfigurationActivator
+			ffSearchAndSortMetadataColumnsConfigurationActivator,
 		ObjectDefinition objectDefinition,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectFieldLocalService objectFieldLocalService,
@@ -58,6 +62,8 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 		ObjectViewLocalService objectViewLocalService) {
 
 		_fdsTableSchemaBuilderFactory = fdsTableSchemaBuilderFactory;
+		_ffSearchAndSortMetadataColumnsConfigurationActivator =
+			ffSearchAndSortMetadataColumnsConfigurationActivator;
 		_objectDefinition = objectDefinition;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectFieldLocalService = objectFieldLocalService;
@@ -71,7 +77,7 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 			_fdsTableSchemaBuilderFactory.create();
 
 		ObjectView defaultObjectView =
-			_objectViewLocalService.getDefaultObjectView(
+			_objectViewLocalService.fetchDefaultObjectView(
 				_objectDefinition.getObjectDefinitionId());
 
 		if (defaultObjectView == null) {
@@ -126,12 +132,17 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 	}
 
 	private void _addFDSTableSchemaField(
-		String contentRenderer, FDSTableSchemaBuilder fdsTableSchemaBuilder,
-		String fieldName, String label, boolean sortable, String type) {
+		String businessType, String contentRenderer, String dbType,
+		FDSTableSchemaBuilder fdsTableSchemaBuilder, String fieldName,
+		String label, boolean sortable) {
 
 		FDSTableSchemaField fdsTableSchemaField = null;
 
-		if (Objects.equals(type, "Clob") || Objects.equals(type, "String")) {
+		if (Objects.equals(
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT) ||
+			Objects.equals(dbType, ObjectFieldConstants.DB_TYPE_CLOB) ||
+			Objects.equals(dbType, ObjectFieldConstants.DB_TYPE_STRING)) {
+
 			StringFDSTableSchemaField stringFDSTableSchemaField =
 				fdsTableSchemaBuilder.addFDSTableSchemaField(
 					StringFDSTableSchemaField.class, fieldName, label);
@@ -140,7 +151,7 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 
 			fdsTableSchemaField = stringFDSTableSchemaField;
 		}
-		else if (Objects.equals(type, "Date")) {
+		else if (Objects.equals(dbType, ObjectFieldConstants.DB_TYPE_DATE)) {
 			DateFDSTableSchemaField dateFDSTableSchemaField =
 				fdsTableSchemaBuilder.addFDSTableSchemaField(
 					DateFDSTableSchemaField.class, fieldName, label);
@@ -153,7 +164,7 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 			fdsTableSchemaField = fdsTableSchemaBuilder.addFDSTableSchemaField(
 				fieldName, label);
 
-			if (Objects.equals(type, "Boolean")) {
+			if (Objects.equals(dbType, ObjectFieldConstants.DB_TYPE_BOOLEAN)) {
 				fdsTableSchemaField.setContentRenderer("boolean");
 			}
 		}
@@ -162,7 +173,9 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 			fdsTableSchemaField.setContentRenderer(contentRenderer);
 		}
 
-		if (!Objects.equals(type, "Blob") && sortable) {
+		if (!Objects.equals(dbType, ObjectFieldConstants.DB_TYPE_BLOB) &&
+			sortable) {
+
 			fdsTableSchemaField.setSortable(true);
 		}
 
@@ -174,27 +187,36 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 
 		if (Objects.equals(fieldName, "creator")) {
 			_addFDSTableSchemaField(
-				null, fdsTableSchemaBuilder, "creator.name", "author", false,
-				null);
+				null, null, null, fdsTableSchemaBuilder, "creator.name",
+				"author",
+				_ffSearchAndSortMetadataColumnsConfigurationActivator.
+					enabled());
 		}
 		else if (Objects.equals(fieldName, "dateCreated")) {
 			_addFDSTableSchemaField(
-				null, fdsTableSchemaBuilder, "dateCreated", "created-date",
-				false, "Date");
+				null, null, "Date", fdsTableSchemaBuilder, "dateCreated",
+				"created-date",
+				_ffSearchAndSortMetadataColumnsConfigurationActivator.
+					enabled());
 		}
 		else if (Objects.equals(fieldName, "dateModified")) {
 			_addFDSTableSchemaField(
-				null, fdsTableSchemaBuilder, "dateModified", "modified-date",
-				false, "Date");
+				null, null, "Date", fdsTableSchemaBuilder, "dateModified",
+				"modified-date",
+				_ffSearchAndSortMetadataColumnsConfigurationActivator.
+					enabled());
 		}
 		else if (Objects.equals(fieldName, "id")) {
 			_addFDSTableSchemaField(
-				"actionLink", fdsTableSchemaBuilder, "id", "id", false, null);
+				null, "actionLink", null, fdsTableSchemaBuilder, "id", "id",
+				_ffSearchAndSortMetadataColumnsConfigurationActivator.
+					enabled());
 		}
 		else if (Objects.equals(fieldName, "status")) {
 			_addFDSTableSchemaField(
-				"status", fdsTableSchemaBuilder, "status", "status", false,
-				null);
+				null, "status", null, fdsTableSchemaBuilder, "status", "status",
+				_ffSearchAndSortMetadataColumnsConfigurationActivator.
+					enabled());
 		}
 	}
 
@@ -204,12 +226,12 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 
 		if (Validator.isNull(objectField.getRelationshipType())) {
 			_addFDSTableSchemaField(
-				null, fdsTableSchemaBuilder,
+				objectField.getBusinessType(), null, objectField.getDBType(),
+				fdsTableSchemaBuilder,
 				_getFieldName(
 					objectField.getListTypeDefinitionId(),
 					objectField.getName()),
-				objectField.getLabel(locale, true), objectField.isIndexed(),
-				objectField.getDBType());
+				objectField.getLabel(locale, true), objectField.isIndexed());
 		}
 		else if (Objects.equals(
 					objectField.getRelationshipType(),
@@ -234,21 +256,22 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 
 			if (titleObjectField == null) {
 				_addFDSTableSchemaField(
-					null, fdsTableSchemaBuilder, objectField.getName(),
-					objectField.getLabel(locale, true), false,
-					objectField.getDBType());
+					objectField.getBusinessType(), null,
+					objectField.getDBType(), fdsTableSchemaBuilder,
+					objectField.getName(), objectField.getLabel(locale, true),
+					false);
 			}
 			else {
 				_addFDSTableSchemaField(
-					null, fdsTableSchemaBuilder,
+					titleObjectField.getBusinessType(), null,
+					titleObjectField.getDBType(), fdsTableSchemaBuilder,
 					_getFieldName(
 						titleObjectField.getListTypeDefinitionId(),
 						StringBundler.concat(
 							StringUtil.replaceLast(
 								objectField.getName(), "Id", ""),
 							StringPool.PERIOD, titleObjectField.getName())),
-					objectField.getLabel(locale, true), false,
-					titleObjectField.getDBType());
+					objectField.getLabel(locale, true), false);
 			}
 		}
 	}
@@ -262,6 +285,8 @@ public class ObjectEntriesTableFDSView extends BaseTableFDSView {
 	}
 
 	private final FDSTableSchemaBuilderFactory _fdsTableSchemaBuilderFactory;
+	private final FFSearchAndSortMetadataColumnsConfigurationActivator
+		_ffSearchAndSortMetadataColumnsConfigurationActivator;
 	private final ObjectDefinition _objectDefinition;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectFieldLocalService _objectFieldLocalService;

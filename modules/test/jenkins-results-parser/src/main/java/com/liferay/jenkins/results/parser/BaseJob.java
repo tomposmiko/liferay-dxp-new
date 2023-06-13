@@ -209,7 +209,11 @@ public abstract class BaseJob implements Job {
 
 	@Override
 	public JSONObject getJSONObject() {
-		JSONObject jsonObject = new JSONObject();
+		if (jsonObject != null) {
+			return jsonObject;
+		}
+
+		jsonObject = new JSONObject();
 
 		JSONArray batchesJSONArray = new JSONArray();
 
@@ -428,9 +432,17 @@ public abstract class BaseJob implements Job {
 		return false;
 	}
 
-	protected BaseJob(String jobName, BuildProfile buildProfile) {
-		_jobName = jobName;
+	protected BaseJob(BuildProfile buildProfile, String jobName) {
 		_buildProfile = buildProfile;
+		_jobName = jobName;
+	}
+
+	protected BaseJob(JSONObject jsonObject) {
+		this.jsonObject = jsonObject;
+
+		_buildProfile = BuildProfile.getByString(
+			jsonObject.getString("build_profile"));
+		_jobName = jsonObject.getString("job_name");
 	}
 
 	protected List<BatchTestClassGroup> getBatchTestClassGroups(
@@ -670,6 +682,7 @@ public abstract class BaseJob implements Job {
 	}
 
 	protected final List<File> jobPropertiesFiles = new ArrayList<>();
+	protected JSONObject jsonObject;
 
 	private int _getDistNodeAxisCount() {
 		try {

@@ -24,15 +24,16 @@ import {
 
 import Container from '../../../../components/Layout/Container';
 import QATable from '../../../../components/Table/QATable';
+import useTotalTestCases from '../../../../data/useTotalTestCases';
 import {
 	CType,
 	TestrayBuild,
 	getTestrayBuild,
 } from '../../../../graphql/queries';
 import useHeader from '../../../../hooks/useHeader';
-import {DATA_COLORS} from '../../../../util/constants';
+import i18n from '../../../../i18n';
 import {getDonutLegend} from '../../../../util/graph';
-import {TotalTestCases, getRandomMaximumValue} from '../../../../util/mock';
+import {TotalTestCases} from '../../../../util/mock';
 
 type BuildOverviewProps = {
 	testrayBuild: TestrayBuild;
@@ -41,49 +42,62 @@ type BuildOverviewProps = {
 const BuildOverview: React.FC<BuildOverviewProps> = ({testrayBuild}) => {
 	const ref = useRef<any>();
 
-	const total = TotalTestCases.map(([, totalCase]) => totalCase).reduce(
-		(prevValue, currentValue) => Number(prevValue) + Number(currentValue)
-	);
+	const totalTestCases = useTotalTestCases();
 
 	return (
 		<>
-			<Container title="Details">
+			<Container title={i18n.translate('details')}>
 				<QATable
 					items={[
-						{title: 'product version', value: '7.0.x'},
 						{
-							title: 'description',
+							title: i18n.translate('product-version'),
+							value: '7.0.x',
+						},
+						{
+							title: i18n.translate('description'),
 							value: testrayBuild.description,
 						},
 						{
-							title: 'git hash',
+							title: i18n.translate('git-hash'),
 							value:
 								testrayBuild.gitHash ||
 								'c33e85e8b067d805a45956c76ad053ca98ffcc8a',
 						},
-						{title: 'create date', value: testrayBuild.dateCreated},
-						{title: 'created by', value: 'John Doe'},
-						{title: 'all issues found', value: '-'},
+						{
+							title: i18n.translate('create-date'),
+							value: testrayBuild.dateCreated,
+						},
+						{
+							title: i18n.translate('created-by'),
+							value: 'John Doe',
+						},
+						{title: i18n.translate('all-issues-found'), value: '-'},
 					]}
 				/>
 
 				<div className="d-flex mt-4">
 					<dl>
-						<dd>0 minutes</dd>
+						<dd>{i18n.sub('x-minutes', '0')}</dd>
 
-						<dd className="small-heading">TOTAL ESTIMATED TIME</dd>
+						<dd className="small-heading">
+							{i18n.translate('total-estimated-time')}
+						</dd>
 					</dl>
 
 					<dl className="ml-3">
-						<dd>0 minutes</dd>
+						<dd>{i18n.sub('x-minutes', '0')}</dd>
 
-						<dd className="small-heading">REMAINING ESTIMATED</dd>
+						<dd className="small-heading">
+							{i18n.translate('total-estimated-time')}
+						</dd>
 					</dl>
 
 					<dl className="ml-3">
-						<dd>0 minutes</dd>
+						<dd>{i18n.sub('x-minutes', '0')}</dd>
 
-						<dd className="small-heading">TIME 0 TOTAL ISSUES</dd>
+						<dd className="small-heading">
+							{i18n.sub('time-x-total-issues', '0')}
+						</dd>
 					</dl>
 				</div>
 			</Container>
@@ -93,15 +107,8 @@ const BuildOverview: React.FC<BuildOverviewProps> = ({testrayBuild}) => {
 					<div className="col-2">
 						<ClayChart
 							data={{
-								colors: {
-									'BLOCKED': DATA_COLORS['metrics.blocked'],
-									'FAILED': DATA_COLORS['metrics.failed'],
-									'INCOMPLETE':
-										DATA_COLORS['metrics.incomplete'],
-									'PASSED': DATA_COLORS['metrics.passed'],
-									'TEST FIX': DATA_COLORS['metrics.test-fix'],
-								},
-								columns: TotalTestCases,
+								colors: totalTestCases.colors,
+								columns: totalTestCases.donut.columns,
 								type: 'donut',
 							}}
 							donut={{
@@ -112,7 +119,7 @@ const BuildOverview: React.FC<BuildOverviewProps> = ({testrayBuild}) => {
 								legend: {
 									show: false,
 								},
-								title: total.toString(),
+								title: totalTestCases.donut.total.toString(),
 								width: 15,
 							}}
 							legend={{show: false}}
@@ -120,7 +127,7 @@ const BuildOverview: React.FC<BuildOverviewProps> = ({testrayBuild}) => {
 								getDonutLegend(ref.current, {
 									data: TotalTestCases.map(([name]) => name),
 									elementId: 'testrayTotalMetricsGraphLegend',
-									total: total as number,
+									total: totalTestCases.donut.total as number,
 								});
 							}}
 							ref={ref}
@@ -140,7 +147,9 @@ const BuildOverview: React.FC<BuildOverviewProps> = ({testrayBuild}) => {
 								y: {
 									label: {
 										position: 'outer-middle',
-										text: 'TESTS',
+										text: i18n
+											.translate('tests')
+											.toUpperCase(),
 									},
 								},
 							}}
@@ -150,45 +159,9 @@ const BuildOverview: React.FC<BuildOverviewProps> = ({testrayBuild}) => {
 								},
 							}}
 							data={{
-								colors: {
-									'BLOCKED': DATA_COLORS['metrics.blocked'],
-									'FAILED': DATA_COLORS['metrics.failed'],
-									'INCOMPLETE':
-										DATA_COLORS['metrics.incomplete'],
-									'PASSED': DATA_COLORS['metrics.passed'],
-									'TEST FIX': DATA_COLORS['metrics.test-fix'],
-								},
-								columns: [
-									[
-										'PASSED',
-										...getRandomMaximumValue(20, 1000),
-									],
-									[
-										'FAILED',
-										...getRandomMaximumValue(20, 500),
-									],
-									[
-										'BLOCKED',
-										...getRandomMaximumValue(20, 100),
-									],
-									[
-										'TEST FIX',
-										...getRandomMaximumValue(20, 100),
-									],
-									[
-										'INCOMPLETE',
-										...getRandomMaximumValue(20, 100),
-									],
-								],
-								groups: [
-									[
-										'PASSED',
-										'FAILED',
-										'BLOCKED',
-										'TEST FIX',
-										'INCOMPLETE',
-									],
-								],
+								colors: totalTestCases.colors,
+								columns: totalTestCases.barChart.columns,
+								groups: [totalTestCases.statuses],
 								type: 'bar',
 							}}
 							legend={{
@@ -261,27 +234,27 @@ const BuildOutlet: React.FC<BuildOutletProps> = ({ignorePath}) => {
 					{
 						active: pathname === basePath,
 						path: basePath,
-						title: 'Results',
+						title: i18n.translate('results'),
 					},
 					{
 						active: pathname === `${basePath}/runs`,
 						path: `${basePath}/runs`,
-						title: 'Runs',
+						title: i18n.translate('runs'),
 					},
 					{
 						active: pathname === `${basePath}/teams`,
 						path: `${basePath}/teams`,
-						title: 'Teams',
+						title: i18n.translate('teams'),
 					},
 					{
 						active: pathname === `${basePath}/components`,
 						path: `${basePath}/components`,
-						title: 'Components',
+						title: i18n.translate('components'),
 					},
 					{
 						active: pathname === `${basePath}/case-types`,
 						path: `${basePath}/case-types`,
-						title: 'Case Types',
+						title: i18n.translate('case-types'),
 					},
 				]);
 			}, 5);

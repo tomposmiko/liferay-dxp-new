@@ -12,44 +12,97 @@
  * details.
  */
 
+import {useModal} from '@clayui/modal';
+import {useState} from 'react';
+
 import Container from '../../../components/Layout/Container';
 import ListView from '../../../components/ListView/ListView';
 import {getTestrayCases} from '../../../graphql/queries/testrayCase';
+import i18n from '../../../i18n';
+import CaseModal from './CaseModal';
 
-const Cases = () => (
-	<Container title="Cases">
-		<ListView
-			query={getTestrayCases}
-			tableProps={{
-				columns: [
-					{
-						clickable: true,
-						key: 'name',
-						value: 'Case Name',
-					},
-					{key: 'priority', value: 'Priority'},
-					{key: 'type', value: 'Case Type'},
-					{key: 'team', value: 'Team'},
-					{key: 'component', value: 'Component'},
-					{key: 'issues', value: 'Issues'},
+const Cases = () => {
+	const [visible, setVisible] = useState(false);
+	const {observer, onClose} = useModal({
+		onClose: () => setVisible(false),
+	});
 
-					{
-						key: 'createdDate',
-						render: () => 'dez 13, 2021 12:00 PM',
-						value: 'Create Date',
-					},
-					{
-						key: 'modifiedDate',
-						render: () => 'dez 13, 2021 12:00 PM',
-						value: 'Modified Date',
-					},
-				],
-				navigateTo: ({testrayCaseId}) => testrayCaseId?.toString(),
-			}}
-			transformData={(data) => data?.c?.testrayCases}
-			variables={{}}
-		/>
-	</Container>
-);
+	return (
+		<>
+			<Container title={i18n.translate('cases')}>
+				<ListView
+					initialContext={{
+						filters: {
+							columns: {
+								dateCreated: false,
+								dateModified: false,
+								issues: false,
+								testrayCaseType: false,
+								testrayTeam: false,
+							},
+						},
+					}}
+					managementToolbarProps={{
+						addButton: () => setVisible(true),
+						visible: true,
+					}}
+					query={getTestrayCases}
+					tableProps={{
+						columns: [
+							{
+								key: 'dateCreated',
+								value: i18n.translate('create-date'),
+							},
+							{
+								key: 'dateModified',
+								value: i18n.translate('modified-date'),
+							},
+							{
+								key: 'priority',
+								sorteable: true,
+								value: i18n.translate('priority'),
+							},
+							{
+								key: 'testrayCaseType',
+								render: (testrayCaseType) =>
+									testrayCaseType?.name,
+								value: i18n.translate('case-type'),
+							},
+							{
+								clickable: true,
+								key: 'name',
+								size: 'md',
+								sorteable: true,
+								value: i18n.translate('case-name'),
+							},
+							{
+								key: 'testrayTeam',
+								render: (_, {testrayComponent}) =>
+									testrayComponent?.testrayTeam?.name,
+								value: i18n.translate('team'),
+							},
+							{
+								key: 'testrayComponent',
+								render: (testrayComponent) =>
+									testrayComponent?.name,
+								value: i18n.translate('component'),
+							},
+							{key: 'issues', value: i18n.translate('issues')},
+						],
+						navigateTo: ({id}) => id?.toString(),
+					}}
+					transformData={(data) => data?.testrayCases}
+				/>
+			</Container>
+
+			<CaseModal
+				observer={observer}
+				onClose={onClose}
+				setVisible={setVisible}
+				visible={visible}
+			/>
+		</>
+	);
+};
 
 export default Cases;

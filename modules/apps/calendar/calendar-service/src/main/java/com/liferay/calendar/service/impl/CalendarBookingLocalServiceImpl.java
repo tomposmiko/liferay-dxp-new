@@ -1070,8 +1070,8 @@ public class CalendarBookingLocalServiceImpl
 	public List<CalendarBooking> search(
 		long companyId, long[] groupIds, long[] calendarIds,
 		long[] calendarResourceIds, long parentCalendarBookingId,
-		String keywords, long startTime, long endTime, boolean recurring,
-		int[] statuses, int start, int end,
+		String keywords, long startTime, long endTime, TimeZone displayTimeZone,
+		boolean recurring, int[] statuses, int start, int end,
 		OrderByComparator<CalendarBooking> orderByComparator) {
 
 		List<CalendarBooking> calendarBookings =
@@ -1081,8 +1081,14 @@ public class CalendarBookingLocalServiceImpl
 				recurring, statuses, start, end, orderByComparator);
 
 		if (recurring) {
-			calendarBookings = RecurrenceUtil.expandCalendarBookings(
-				calendarBookings, startTime, endTime);
+			if (displayTimeZone == null) {
+				calendarBookings = RecurrenceUtil.expandCalendarBookings(
+					calendarBookings, startTime, endTime);
+			}
+			else {
+				calendarBookings = RecurrenceUtil.expandCalendarBookings(
+					calendarBookings, startTime, endTime, displayTimeZone);
+			}
 		}
 
 		return calendarBookings;
