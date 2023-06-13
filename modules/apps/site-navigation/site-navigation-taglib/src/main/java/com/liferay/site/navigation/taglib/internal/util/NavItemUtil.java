@@ -55,7 +55,7 @@ public class NavItemUtil {
 
 		if (layout.isRootLayout()) {
 			return Collections.singletonList(
-				new NavItem(httpServletRequest, themeDisplay, layout, null));
+				new NavItem(httpServletRequest, themeDisplay, layout));
 		}
 
 		List<Layout> ancestorLayouts = layout.getAncestors();
@@ -66,12 +66,10 @@ public class NavItemUtil {
 			Layout ancestorLayout = ancestorLayouts.get(i);
 
 			navItems.add(
-				new NavItem(
-					httpServletRequest, themeDisplay, ancestorLayout, null));
+				new NavItem(httpServletRequest, themeDisplay, ancestorLayout));
 		}
 
-		navItems.add(
-			new NavItem(httpServletRequest, themeDisplay, layout, null));
+		navItems.add(new NavItem(httpServletRequest, themeDisplay, layout));
 
 		return navItems;
 	}
@@ -148,8 +146,7 @@ public class NavItemUtil {
 
 		if (rootLayoutType.equals("absolute")) {
 			if (rootLayoutLevel == 0) {
-				navItems = NavItem.fromLayouts(
-					httpServletRequest, themeDisplay, null);
+				navItems = themeDisplay.getNavItems();
 			}
 			else if (branchNavItems.size() >= rootLayoutLevel) {
 				rootNavItem = branchNavItems.get(rootLayoutLevel - 1);
@@ -162,8 +159,7 @@ public class NavItemUtil {
 				int absoluteLevel = branchNavItems.size() - 1 - rootLayoutLevel;
 
 				if (absoluteLevel == -1) {
-					navItems = NavItem.fromLayouts(
-						httpServletRequest, themeDisplay, null);
+					navItems = themeDisplay.getNavItems();
 				}
 				else if ((absoluteLevel >= 0) &&
 						 (absoluteLevel < branchNavItems.size())) {
@@ -182,11 +178,10 @@ public class NavItemUtil {
 						layout.isPrivateLayout());
 
 				rootNavItem = new NavItem(
-					httpServletRequest, themeDisplay, rootLayout, null);
+					httpServletRequest, themeDisplay, rootLayout);
 			}
 			else {
-				navItems = NavItem.fromLayouts(
-					httpServletRequest, themeDisplay, null);
+				navItems = themeDisplay.getNavItems();
 			}
 		}
 

@@ -21,15 +21,19 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 /**
  * @author Alejandro Tardín
  */
-@ExtendedObjectClassDefinition(
-	category = "pages", scope = ExtendedObjectClassDefinition.Scope.COMPANY
-)
+@ExtendedObjectClassDefinition(category = "pages")
 @Meta.OCD(
 	description = "redirect-configuration-description",
 	id = "com.liferay.redirect.internal.configuration.RedirectConfiguration",
 	localization = "content/Language", name = "redirect-configuration-name"
 )
 public interface RedirectConfiguration {
+
+	@Meta.AD(
+		deflt = "false", description = "redirect-not-found-entry-enabled-help",
+		name = "enabled", required = false
+	)
+	public boolean enabled();
 
 	@Meta.AD(
 		deflt = "30", description = "redirect-not-found-entry-max-age-help",

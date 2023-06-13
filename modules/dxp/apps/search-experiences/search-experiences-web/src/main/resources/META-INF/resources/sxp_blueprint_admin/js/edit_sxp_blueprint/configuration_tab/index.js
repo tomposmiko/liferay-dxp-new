@@ -14,8 +14,21 @@ import ClayLayout from '@clayui/layout';
 import getCN from 'classnames';
 import React from 'react';
 
+import advancedConfigurationSchema from '../../../schemas/advancedConfigurationSchema';
+import aggregationConfigurationSchema from '../../../schemas/aggregationConfigurationSchema';
+import highlightConfigurationSchema from '../../../schemas/highlightConfigurationSchema';
+import parameterConfigurationSchema from '../../../schemas/parameterConfigurationSchema';
+import sortConfigurationSchema from '../../../schemas/sortConfigurationSchema';
 import CodeMirrorEditor from '../../shared/CodeMirrorEditor';
 import LearnMessage from '../../shared/LearnMessage';
+
+const CONFIGURATION_SCHEMAS = {
+	advancedConfig: advancedConfigurationSchema,
+	aggregationConfig: aggregationConfigurationSchema,
+	highlightConfig: highlightConfigurationSchema,
+	parameterConfig: parameterConfigurationSchema,
+	sortConfig: sortConfigurationSchema,
+};
 
 function ConfigurationTab({
 	advancedConfig,
@@ -36,6 +49,7 @@ function ConfigurationTab({
 			onBlur={() => setFieldTouched(configName)}
 		>
 			<CodeMirrorEditor
+				autocompleteSchema={CONFIGURATION_SCHEMAS[configName]}
 				onChange={(value) => setFieldValue(configName, value)}
 				value={configValue}
 			/>
