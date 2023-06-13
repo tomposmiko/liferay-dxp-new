@@ -1630,21 +1630,23 @@ definition {
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContent.viewWithStructureCP(
-			webContentText = "This is a Text field Edit",
+			webContentText = "This is a Text field",
 			webContentTextFieldLabel = "Text Edit",
-			webContentTitle = "Web Content Title Edit");
+			webContentTitle = "Web Content Title");
 
 		Navigator.gotoPage(pageName = "Web Content Display");
 
 		WebContentDisplayPortlet.viewContent(
-			webContentContent = "This is a Text field Edit",
-			webContentTitle = "Web Content Title Edit");
+			webContentContent = "This is a Text field",
+			webContentTitle = "Web Content Title");
 
 		Navigator.gotoPage(pageName = "Asset Publisher");
 
-		AssetPublisherPortlet.viewAssetDetailsPG(
-			assetContent = "This is a Text field Edit",
-			assetTitle = "Web Content Title Edit");
+		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Web Content Title");
+
+		WebContentDisplayPortlet.viewContent(
+			webContentContent = "This is a Text field",
+			webContentTitle = "Web Content Title");
 	}
 
 	macro EditWebContentAndViewInWCDandAssetPublisher {
@@ -5874,7 +5876,10 @@ definition {
 
 		Pagination.viewResults(results = "Showing 1 to 2 of 3 entries.");
 
-		AssertElementNotPresent(locator1 = "Search#SEARCH_TYPE_FACET_TERM_COUNT");
+		AssertElementNotPresent(
+			key_facetType = "Type Facet",
+			key_termValue = "",
+			locator1 = "Search#FACET_TERM_FREQUENCIES");
 	}
 
 	macro viewSharedBlog {

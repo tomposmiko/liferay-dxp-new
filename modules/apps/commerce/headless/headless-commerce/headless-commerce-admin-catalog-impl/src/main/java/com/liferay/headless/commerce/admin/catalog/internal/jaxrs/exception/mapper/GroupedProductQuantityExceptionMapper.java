@@ -15,7 +15,8 @@
 package com.liferay.headless.commerce.admin.catalog.internal.jaxrs.exception.mapper;
 
 import com.liferay.commerce.product.type.grouped.exception.CPDefinitionGroupedEntryQuantityException;
-import com.liferay.headless.commerce.core.exception.mapper.BaseExceptionMapper;
+import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
+import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -39,13 +40,13 @@ public class GroupedProductQuantityExceptionMapper
 	extends BaseExceptionMapper<CPDefinitionGroupedEntryQuantityException> {
 
 	@Override
-	public String getErrorDescription() {
-		return "Invalid quantity";
-	}
+	protected Problem getProblem(
+		CPDefinitionGroupedEntryQuantityException
+			cpDefinitionGroupedEntryQuantityException) {
 
-	@Override
-	public Response.Status getStatus() {
-		return Response.Status.BAD_REQUEST;
+		return new Problem(
+			Response.Status.BAD_REQUEST,
+			cpDefinitionGroupedEntryQuantityException.getMessage());
 	}
 
 }

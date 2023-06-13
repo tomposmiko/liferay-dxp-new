@@ -27,8 +27,8 @@ import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
@@ -80,7 +80,7 @@ public class AddObjectEntryObjectActionExecutorImpl
 				ObjectEntryVariablesUtil.getVariables(
 					_dtoConverterRegistry, sourceObjectDefinition,
 					payloadJSONObject,
-					_systemObjectDefinitionMetadataRegistry)));
+					_systemObjectDefinitionManagerRegistry)));
 
 		if (!GetterUtil.getBoolean(
 				parametersUnicodeProperties.get("relatedObjectEntries"))) {
@@ -118,12 +118,12 @@ public class AddObjectEntryObjectActionExecutorImpl
 		throws Exception {
 
 		if (objectDefinition.isSystem()) {
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						objectDefinition.getName());
 
-			return systemObjectDefinitionMetadata.addBaseModel(user, values);
+			return systemObjectDefinitionManager.addBaseModel(user, values);
 		}
 
 		ObjectEntryManager objectEntryManager =
@@ -213,8 +213,8 @@ public class AddObjectEntryObjectActionExecutorImpl
 	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 	@Reference
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

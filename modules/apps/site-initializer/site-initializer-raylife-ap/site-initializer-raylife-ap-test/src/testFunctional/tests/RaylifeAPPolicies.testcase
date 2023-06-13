@@ -24,6 +24,8 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
+		RaylifeAP.deleteAllCreatedEntries(searchTerm = "Testing");
+
 		Raylife.tearDownCP();
 
 		if (${testPortalInstance} == "true") {
@@ -56,10 +58,54 @@ definition {
 		}
 	}
 
+	@description = "Story ID: LPS-146257 | Test Summary: Verify if the kebab button has and edit and delete options and then test if the delete option works"
+	@priority = 4
+	test CanDeletePolicies {
+		property test.name.skip.portal.instance = "RaylifeAPPolicies#CanDeletePolicies";
+
+		// Skip portal instance due to LRQA-79129. Unskip after it is resolved
+
+		task ("Given that I generate a new quotation") {
+			ApplicationsMenu.gotoSite(site = "Raylife AP");
+
+			RaylifeAPNavigator.gotoSidebarItem(itemName = "Dashboard");
+
+			RaylifeApplicationModal.openNewApplicationFlow(
+				insurance = "Personal",
+				product = "Auto");
+
+			RaylifeApplicationModal.typeAllNewApplicationContactInfoFields();
+
+			RaylifeApplicationModal.typeAllNewApplicationVehicleInfoFields();
+
+			RaylifeApplicationModal.typeAllNewApplicationDriverInfoFields();
+
+			RaylifeApplicationModal.typeAllNewApplicationCoverageInfoFields();
+
+			Button.click(button = "Generate Quote");
+		}
+
+		task ("And I go to the Policies page") {
+			RaylifeAPNavigator.gotoSidebarItem(itemName = "Policies");
+
+			RaylifeAP.search(searchTerm = "Testing Model");
+		}
+
+		task ("When I delete a Policies") {
+			RaylifeAP.gotoEllipsisMenuItem(menuItem = "Delete");
+		}
+
+		task ("Then I should be able to assert that Policies has been deleted") {
+			RaylifeAP.search(searchTerm = "Testing Model");
+
+			RaylifeAP.assertQuantity(text = "Policies (0)");
+		}
+	}
+
 	@description = "Story ID: LPS-146254 | Test Summary: Check if adding a new application increases the number of Policies"
 	@priority = 5
 	test CanViewIfTheNumberOfPoliciesHasIncreased {
-		property test.name.skip.portal.instance = "RaylifeAPPoliceTotalActive#CanViewIfTheNumberOfPoliciesHasIncreased";
+		property test.name.skip.portal.instance = "RaylifeAPPolicies#CanViewIfTheNumberOfPoliciesHasIncreased";
 
 		// Skip portal instance due to LRQA-79129. Unskip after it is resolved
 

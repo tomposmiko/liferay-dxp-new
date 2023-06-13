@@ -85,12 +85,12 @@ public class ObjectDefinitionLocalServiceUtil {
 
 	public static ObjectDefinition addOrUpdateSystemObjectDefinition(
 			long companyId,
-			com.liferay.object.system.SystemObjectDefinitionMetadata
-				systemObjectDefinitionMetadata)
+			com.liferay.object.system.SystemObjectDefinitionManager
+				systemObjectDefinitionManager)
 		throws PortalException {
 
 		return getService().addOrUpdateSystemObjectDefinition(
-			companyId, systemObjectDefinitionMetadata);
+			companyId, systemObjectDefinitionManager);
 	}
 
 	public static ObjectDefinition addSystemObjectDefinition(

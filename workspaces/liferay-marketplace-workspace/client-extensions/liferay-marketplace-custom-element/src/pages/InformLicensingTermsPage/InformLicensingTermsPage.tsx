@@ -14,7 +14,6 @@ import {TYPES} from '../../manage-app-state/actionTypes';
 import {
 	addSkuExpandoValue,
 	createAppSKU,
-	createProductSubscriptionConfiguration,
 	deleteTrialSKU,
 	getProductSKU,
 	getSKUById,
@@ -33,8 +32,8 @@ export function InformLicensingTermsPage({
 }: InformLicensingTermsPageProps) {
 	const [
 		{
-			appERC,
 			appLicense,
+			appLicensePrice,
 			appNotes,
 			appProductId,
 			appVersion,
@@ -135,64 +134,43 @@ export function InformLicensingTermsPage({
 				onClickBack={() => onClickBack()}
 				onClickContinue={() => {
 					const submitLicenseTermsPage = async () => {
-						if (priceModel === 'free') {
-							const skuJSON = await getSKUById(skuVersionId);
+						const versionSkuJSON = await getSKUById(skuVersionId);
 
+						if (
+							priceModel === 'free' ||
+							appLicense === 'perpetual'
+						) {
 							const skuBody = {
-								...skuJSON,
+								...versionSkuJSON,
 								neverExpire: true,
-								price: 0,
+								price:
+									appLicense === 'perpetual'
+										? appLicensePrice
+										: 0,
 								published: true,
 								purchasable: true,
-
-								// skuOptions: [
-								// 	{
-								// 		key: productOptionId,
-								// 		value: optionValuesId.noOptionId,
-								// 	},
-								// ],
-
 							};
 
 							await patchSKUById(skuVersionId, skuBody);
 						}
-						else {
-							if (appLicense === 'non-perpetual') {
-								createProductSubscriptionConfiguration({
-									body: {
-										length: 1,
-										numberOfLength: 1,
-										subscriptionType: 'yearly',
-									},
-									externalReferenceCode: appERC,
-								});
-							}
-
-							const skuJSON = await getSKUById(skuVersionId);
-
+						else if (appLicense === 'non-perpetual') {
 							const skuBody = {
-								...skuJSON,
-								neverExpire: appLicense === 'perpetual',
-								price: 0,
-								published: true,
-								purchasable: true,
-
-								// skuOptions: [
-								// 	{
-								// 		key: productOptionId,
-								// 		value:
-								// 			dayTrial === 'yes'
-								// 				? optionValuesId.yesOptionId
-								// 				: optionValuesId.noOptionId,
-								// 	},
-								// ],
-
+								...versionSkuJSON,
+								neverExpire: false,
+								skuSubscriptionConfiguration: {
+									enable: true,
+									length: 1,
+									numberOfLength: 1,
+									overrideSubscriptionInfo: true,
+									subscriptionType: 'yearly',
+									subscriptionTypeSettings: {yearlyMode: 0},
+								},
 							};
 
 							await patchSKUById(skuVersionId, skuBody);
 						}
 
-						if (dayTrial === 'yes' && priceModel !== 'free') {
+						if (dayTrial === 'yes') {
 							const skuResponse = await getProductSKU({
 								appProductId,
 							});
@@ -226,13 +204,20 @@ export function InformLicensingTermsPage({
 											'ts'
 										),
 
-										// skuOptions: [
-										// 	{
-										// 		key: productOptionId,
-										// 		value: optionValuesId.yesOptionId,
-										// 	},
-										// ],
+										skuOptions: [
+											{
+												key: productOptionId,
+												value: optionValuesId.yesOptionId,
+											},
+										],
 
+										skuSubscriptionConfiguration: {
+											enable: true,
+											length: 30,
+											numberOfLength: 1,
+											overrideSubscriptionInfo: true,
+											subscriptionType: 'daily',
+										},
 									},
 								});
 
@@ -247,7 +232,7 @@ export function InformLicensingTermsPage({
 							}
 
 							addSkuExpandoValue({
-								companyId: parseInt(getCompanyId()),
+								companyId: Number(getCompanyId()),
 								notesValue: appNotes,
 								skuId: skuTrialId,
 								versionValue: appVersion,

@@ -79,48 +79,17 @@ public abstract class BaseSourceProcessorTestCase {
 		return sourceFormatterArgs;
 	}
 
-	protected void test(String fileName) throws Exception {
-		test(fileName, new String[0]);
-	}
-
-	protected void test(String fileName, String expectedMessage)
-		throws Exception {
-
-		test(fileName, new String[] {expectedMessage});
-	}
-
-	protected void test(String fileName, String expectedMessage, int lineNumber)
-		throws Exception {
-
-		test(
-			fileName, new String[] {expectedMessage},
-			new Integer[] {lineNumber}, null);
-	}
-
-	protected void test(String fileName, String[] expectedMessages)
-		throws Exception {
-
-		test(fileName, expectedMessages, null, null);
-	}
-
 	protected void test(
-			String fileName, String[] expectedMessages, Integer[] lineNumbers)
+			SourceProcessorTestParameters sourceProcessorTestParameters)
 		throws Exception {
 
-		test(fileName, expectedMessages, lineNumbers, null);
-	}
+		File newFile = _generateTempFile(
+			sourceProcessorTestParameters.getFileName());
 
-	protected void test(
-			String fileName, String[] expectedMessages, Integer[] lineNumbers,
-			String[] dependentFileNames)
-		throws Exception {
+		for (String dependentFileName :
+				sourceProcessorTestParameters.getDependentFileNames()) {
 
-		File newFile = _generateTempFile(fileName);
-
-		if (dependentFileNames != null) {
-			for (String dependentFileName : dependentFileNames) {
-				_generateTempFile(dependentFileName);
-			}
+			_generateTempFile(dependentFileName);
 		}
 
 		SourceFormatterArgs sourceFormatterArgs = getSourceFormatterArgs();
@@ -145,11 +114,14 @@ public abstract class BaseSourceProcessorTestCase {
 			ListUtil.fromCollection(
 				sourceFormatter.getSourceFormatterMessages());
 
-		if (!sourceFormatterMessages.isEmpty() ||
-			(expectedMessages.length > 0)) {
+		List<String> expectedMessages =
+			sourceProcessorTestParameters.getExpectedMessages();
+
+		if (!(sourceFormatterMessages.isEmpty() &&
+			  expectedMessages.isEmpty())) {
 
 			Assert.assertEquals(
-				sourceFormatterMessages.toString(), expectedMessages.length,
+				sourceFormatterMessages.toString(), expectedMessages.size(),
 				sourceFormatterMessages.size());
 
 			for (int i = 0; i < sourceFormatterMessages.size(); i++) {
@@ -157,13 +129,17 @@ public abstract class BaseSourceProcessorTestCase {
 					sourceFormatterMessages.get(i);
 
 				Assert.assertEquals(
-					expectedMessages[i], sourceFormatterMessage.getMessage());
+					expectedMessages.get(i),
+					sourceFormatterMessage.getMessage());
 
 				int lineNumber = sourceFormatterMessage.getLineNumber();
 
 				if (lineNumber > -1) {
+					List<Integer> lineNumbers =
+						sourceProcessorTestParameters.getLineNumbers();
+
 					Assert.assertEquals(
-						String.valueOf(lineNumbers[i]),
+						String.valueOf(lineNumbers.get(i)),
 						String.valueOf(lineNumber));
 				}
 
@@ -179,8 +155,23 @@ public abstract class BaseSourceProcessorTestCase {
 			String actualFormattedContent = FileUtil.read(
 				new File(modifiedFileNames.get(0)));
 
-			String expectedFileName = StringBundler.concat(
-				_DIR_NAME, "/expected/", fileName);
+			String expectedFileName =
+				sourceProcessorTestParameters.getExpectedFileName();
+
+			if (expectedFileName != null) {
+				actualFormattedContent = FileUtil.read(
+					new File(
+						_temporaryFolder,
+						StringUtil.replace(expectedFileName, ".test", ".")));
+
+				expectedFileName = StringBundler.concat(
+					_DIR_NAME, "/expected/", expectedFileName);
+			}
+			else {
+				expectedFileName = StringBundler.concat(
+					_DIR_NAME, "/expected/",
+					sourceProcessorTestParameters.getFileName());
+			}
 
 			URL expectedURL = classLoader.getResource(expectedFileName);
 
@@ -200,12 +191,30 @@ public abstract class BaseSourceProcessorTestCase {
 		}
 	}
 
-	protected void test(
-			String fileName, String[] expectedMessages,
-			String[] dependentFileNames)
+	protected void test(String fileName) throws Exception {
+		test(SourceProcessorTestParameters.create(fileName));
+	}
+
+	protected void test(String fileName, String expectedMessage)
 		throws Exception {
 
-		test(fileName, expectedMessages, null, dependentFileNames);
+		test(
+			SourceProcessorTestParameters.create(
+				fileName
+			).addExpectedMessage(
+				expectedMessage, -1
+			));
+	}
+
+	protected void test(String fileName, String expectedMessage, int lineNumber)
+		throws Exception {
+
+		test(
+			SourceProcessorTestParameters.create(
+				fileName
+			).addExpectedMessage(
+				expectedMessage, lineNumber
+			));
 	}
 
 	protected final ClassLoader classLoader =

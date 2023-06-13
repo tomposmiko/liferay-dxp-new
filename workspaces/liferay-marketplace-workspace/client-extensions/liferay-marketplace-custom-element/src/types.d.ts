@@ -1,4 +1,5 @@
 type Account = {
+	customFields?: {[key: string]: number};
 	externalReferenceCode: string;
 	id: number;
 	name: string;
@@ -9,6 +10,14 @@ type AccountBrief = {
 	externalReferenceCode: string;
 	id: number;
 	logoURL?: string;
+	name: string;
+	roleBriefs: RoleBrief[];
+};
+
+type AccountGroup = {
+	customFields: {};
+	externalReferenceCode: string;
+	id: number;
 	name: string;
 };
 
@@ -106,6 +115,11 @@ type ProductOptionItem = {
 	optionId: number;
 };
 
+type RoleBrief = {
+	id: number;
+	name: string;
+};
+
 type SKU = {
 	cost: number;
 	externalReferenceCode: string;
@@ -122,4 +136,6 @@ type Specification = {
 
 type UserAccount = {
 	accountBriefs: AccountBrief[];
+	isCustomerAccount: boolean;
+	isPublisherAccount: boolean;
 };

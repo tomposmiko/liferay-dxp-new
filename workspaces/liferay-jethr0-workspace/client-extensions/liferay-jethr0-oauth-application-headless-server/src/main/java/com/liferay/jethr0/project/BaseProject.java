@@ -20,9 +20,7 @@ import com.liferay.jethr0.gitbranch.GitBranch;
 import com.liferay.jethr0.task.Task;
 import com.liferay.jethr0.testsuite.TestSuite;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 import org.json.JSONObject;
 
@@ -33,76 +31,56 @@ public abstract class BaseProject extends BaseEntity implements Project {
 
 	@Override
 	public void addBuild(Build build) {
-		addBuilds(Arrays.asList(build));
+		addRelatedEntity(build);
+
+		build.setProject(this);
 	}
 
 	@Override
-	public void addBuilds(List<Build> builds) {
+	public void addBuilds(Set<Build> builds) {
 		for (Build build : builds) {
-			if (_builds.contains(build)) {
-				continue;
-			}
-
-			_builds.add(build);
+			addBuild(build);
 		}
 	}
 
 	@Override
 	public void addGitBranch(GitBranch gitBranch) {
-		addGitBranches(Arrays.asList(gitBranch));
+		addRelatedEntity(gitBranch);
 	}
 
 	@Override
-	public void addGitBranches(List<GitBranch> gitBranches) {
-		for (GitBranch gitBranch : gitBranches) {
-			if (_gitBranches.contains(gitBranch)) {
-				continue;
-			}
-
-			_gitBranches.add(gitBranch);
-		}
+	public void addGitBranches(Set<GitBranch> gitBranches) {
+		addRelatedEntities(gitBranches);
 	}
 
 	@Override
 	public void addTask(Task task) {
-		addTasks(Arrays.asList(task));
+		addRelatedEntity(task);
 	}
 
 	@Override
-	public void addTasks(List<Task> tasks) {
-		for (Task task : tasks) {
-			if (_tasks.contains(task)) {
-				continue;
-			}
-
-			_tasks.add(task);
-		}
+	public void addTasks(Set<Task> tasks) {
+		addRelatedEntities(tasks);
 	}
 
 	@Override
 	public void addTestSuite(TestSuite testSuite) {
-		addTestSuites(Arrays.asList(testSuite));
+		addRelatedEntity(testSuite);
 	}
 
 	@Override
-	public void addTestSuites(List<TestSuite> testSuites) {
-		for (TestSuite testSuite : testSuites) {
-			if (_testSuites.contains(testSuite)) {
-				continue;
-			}
-
-			_testSuites.add(testSuite);
-		}
+	public void addTestSuites(Set<TestSuite> testSuites) {
+		addRelatedEntities(testSuites);
 	}
 
 	@Override
-	public List<Build> getBuilds() {
-		return _builds;
+	public Set<Build> getBuilds() {
+		return getRelatedEntities(Build.class);
 	}
 
 	@Override
-	public List<GitBranch> getGitBranches() {
-		return _gitBranches;
+	public Set<GitBranch> getGitBranches() {
+		return getRelatedEntities(GitBranch.class);
 	}
 
 	@Override
@@ -141,13 +119,13 @@ public abstract class BaseProject extends BaseEntity implements Project {
 	}
 
 	@Override
-	public List<Task> getTasks() {
-		return _tasks;
+	public Set<Task> getTasks() {
+		return getRelatedEntities(Task.class);
 	}
 
 	@Override
-	public List<TestSuite> getTestSuites() {
-		return _testSuites;
+	public Set<TestSuite> getTestSuites() {
+		return getRelatedEntities(TestSuite.class);
 	}
 
 	@Override
@@ -157,41 +135,41 @@ public abstract class BaseProject extends BaseEntity implements Project {
 
 	@Override
 	public void removeBuild(Build build) {
-		_builds.remove(build);
+		removeRelatedEntity(build);
 	}
 
 	@Override
-	public void removeBuilds(List<Build> builds) {
-		_builds.removeAll(builds);
+	public void removeBuilds(Set<Build> builds) {
+		removeRelatedEntities(builds);
 	}
 
 	@Override
 	public void removeGitBranch(GitBranch gitBranch) {
-		_gitBranches.remove(gitBranch);
+		removeRelatedEntity(gitBranch);
 	}
 
 	@Override
-	public void removeGitBranches(List<GitBranch> gitBranches) {
-		_gitBranches.removeAll(gitBranches);
+	public void removeGitBranches(Set<GitBranch> gitBranches) {
+		removeRelatedEntities(gitBranches);
 	}
 
 	@Override
 	public void removeTask(Task task) {
-		_tasks.remove(task);
+		removeRelatedEntity(task);
 	}
 
-	public void removeTasks(List<Task> tasks) {
-		_tasks.removeAll(tasks);
+	public void removeTasks(Set<Task> tasks) {
+		removeRelatedEntities(tasks);
 	}
 
 	@Override
 	public void removeTestSuite(TestSuite testSuite) {
-		_testSuites.remove(testSuite);
+		removeRelatedEntity(testSuite);
 	}
 
 	@Override
-	public void removeTestSuites(List<TestSuite> testSuites) {
-		_testSuites.removeAll(testSuites);
+	public void removeTestSuites(Set<TestSuite> testSuites) {
+		removeRelatedEntities(testSuites);
 	}
 
 	@Override
@@ -218,13 +196,9 @@ public abstract class BaseProject extends BaseEntity implements Project {
 		_type = Type.get(jsonObject.getJSONObject("type"));
 	}
 
-	private final List<Build> _builds = new ArrayList<>();
-	private final List<GitBranch> _gitBranches = new ArrayList<>();
 	private String _name;
 	private int _priority;
 	private State _state;
-	private final List<Task> _tasks = new ArrayList<>();
-	private final List<TestSuite> _testSuites = new ArrayList<>();
 	private final Type _type;
 
 }

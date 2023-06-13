@@ -49,10 +49,7 @@ import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
-
-import javax.ws.rs.core.UriInfo;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -62,7 +59,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "dto.class.name=com.liferay.message.boards.model.MBThread",
-	service = {DTOConverter.class, MessageBoardThreadDTOConverter.class}
+	service = DTOConverter.class
 )
 public class MessageBoardThreadDTOConverter
 	implements DTOConverter<MBThread, MessageBoardThread> {
@@ -152,18 +149,15 @@ public class MessageBoardThreadDTOConverter
 				setCreatorStatistics(
 					() -> {
 						if (mbMessage.isAnonymous() || (user == null) ||
-							user.isDefaultUser()) {
+							user.isGuestUser()) {
 
 							return null;
 						}
 
-						Optional<UriInfo> uriInfoOptional =
-							dtoConverterContext.getUriInfoOptional();
-
 						return CreatorStatisticsUtil.toCreatorStatistics(
 							mbMessage.getGroupId(), languageId,
 							_mbStatsUserLocalService,
-							uriInfoOptional.orElse(null), user);
+							dtoConverterContext.getUriInfo(), user);
 					});
 			}
 		};

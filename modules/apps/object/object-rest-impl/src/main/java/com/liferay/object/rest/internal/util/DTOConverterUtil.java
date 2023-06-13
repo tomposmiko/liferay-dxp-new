@@ -15,7 +15,7 @@
 package com.liferay.object.rest.internal.util;
 
 import com.liferay.object.system.JaxRsApplicationDescriptor;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
+import com.liferay.object.system.SystemObjectDefinitionManager;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
@@ -33,23 +33,23 @@ public class DTOConverterUtil {
 
 	public static Object toDTO(
 			BaseModel<?> baseModel, DTOConverterRegistry dtoConverterRegistry,
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata,
+			SystemObjectDefinitionManager systemObjectDefinitionManager,
 			User user)
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			systemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			systemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		DTOConverter<BaseModel<?>, ?> dtoConverter =
 			(DTOConverter<BaseModel<?>, ?>)dtoConverterRegistry.getDTOConverter(
 				jaxRsApplicationDescriptor.getApplicationName(),
-				systemObjectDefinitionMetadata.getModelClassName(),
+				systemObjectDefinitionManager.getModelClassName(),
 				jaxRsApplicationDescriptor.getVersion());
 
 		if (dtoConverter == null) {
 			throw new InternalServerErrorException(
 				"No DTO converter found for " +
-					systemObjectDefinitionMetadata.getModelClassName());
+					systemObjectDefinitionManager.getModelClassName());
 		}
 
 		DefaultDTOConverterContext defaultDTOConverterContext =

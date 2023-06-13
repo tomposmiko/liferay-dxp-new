@@ -225,7 +225,7 @@ public class CIForwardProcessor {
 		}
 
 		if (forwardAttempts > 0) {
-			sb.append("Took ");
+			sb.append(" (Took ");
 			sb.append(forwardAttempts);
 			sb.append(" `ci:forward` ");
 			sb.append(

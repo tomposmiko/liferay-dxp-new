@@ -64,9 +64,9 @@ public class BaseConfigurationFactoryTest {
 			HashMapDictionaryBuilder.<String, Object>put(
 				"_portalK8sConfigMapModifier.cardinality.minimum", 0
 			).put(
-				"companyId", companyId
+				"baseURL", "http://foo.me"
 			).put(
-				"homePageURL", "http://foo.me"
+				"companyId", companyId
 			).build();
 
 		_testGetFactoryConfiguration(
@@ -77,7 +77,7 @@ public class BaseConfigurationFactoryTest {
 				companyId, PropsValues.DEFAULT_ADMIN_SCREEN_NAME));
 		_testGetFactoryConfiguration(
 			OAuth2ProviderApplicationUserAgentConfiguration.class.getName(),
-			properties, _userLocalService.getDefaultUser(companyId));
+			properties, _userLocalService.getGuestUser(companyId));
 
 		_user = UserTestUtil.addUser();
 

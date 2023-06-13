@@ -16,14 +16,15 @@ package com.liferay.jethr0;
 
 import com.liferay.client.extension.util.spring.boot.ClientExtensionUtilSpringBootComponentScan;
 import com.liferay.client.extension.util.spring.boot.LiferayOAuth2Util;
-import com.liferay.jethr0.dalo.ProjectComparatorDALO;
-import com.liferay.jethr0.dalo.ProjectPrioritizerDALO;
+import com.liferay.jethr0.build.Build;
+import com.liferay.jethr0.build.queue.BuildQueue;
 import com.liferay.jethr0.project.Project;
-import com.liferay.jethr0.project.ProjectDALO;
-import com.liferay.jethr0.project.ProjectRepository;
 import com.liferay.jethr0.project.comparator.ProjectComparator;
 import com.liferay.jethr0.project.prioritizer.ProjectPrioritizer;
 import com.liferay.jethr0.project.queue.ProjectQueue;
+import com.liferay.jethr0.project.repository.ProjectComparatorRepository;
+import com.liferay.jethr0.project.repository.ProjectPrioritizerRepository;
+import com.liferay.jethr0.project.repository.ProjectRepository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -45,6 +46,15 @@ public class Jethr0SpringBootApplication {
 	}
 
 	@Bean
+	public BuildQueue getBuildQueue(ProjectQueue projectQueue) {
+		BuildQueue buildQueue = new BuildQueue();
+
+		buildQueue.setProjectQueue(projectQueue);
+
+		return buildQueue;
+	}
+
+	@Bean
 	public OAuth2AccessToken getOAuth2AccessToken(
 		AuthorizedClientServiceOAuth2AuthorizedClientManager
 			authorizedClientServiceOAuth2AuthorizedClientManager) {
@@ -56,57 +66,49 @@ public class Jethr0SpringBootApplication {
 
 	@Bean
 	public ProjectQueue getProjectQueue(
-		ProjectComparatorDALO projectComparatorDALO,
-		ProjectPrioritizerDALO projectPrioritizerDALO,
+		ProjectComparatorRepository projectComparatorRepository,
+		ProjectPrioritizerRepository projectPrioritizerRepository,
 		ProjectRepository projectRepository) {
 
 		ProjectQueue projectQueue = new ProjectQueue();
 
 		projectQueue.setProjectPrioritizer(
 			_getDefaultProjectPrioritizer(
-				projectComparatorDALO, projectPrioritizerDALO));
+				projectComparatorRepository, projectPrioritizerRepository));
 
 		projectQueue.addProjects(
-			projectRepository.getByState(Project.State.RUNNING));
+			projectRepository.getByStates(
+				Project.State.QUEUED, Project.State.RUNNING));
 
 		for (Project project : projectQueue.getProjects()) {
 			System.out.println(project);
+
+			for (Build build : project.getBuilds()) {
+				System.out.println("> " + build);
+			}
 		}
 
 		return projectQueue;
 	}
 
-	@Bean
-	public ProjectRepository getProjectRepository(ProjectDALO projectDALO) {
-		ProjectRepository projectRepository = new ProjectRepository();
-
-		projectRepository.add(projectDALO.get());
-
-		return projectRepository;
-	}
-
 	private ProjectPrioritizer _getDefaultProjectPrioritizer(
-		ProjectComparatorDALO projectComparatorDALO,
-		ProjectPrioritizerDALO projectPrioritizerDALO) {
-
-		for (ProjectPrioritizer projectPrioritizer :
-				projectPrioritizerDALO.retrieveProjectPrioritizers()) {
-
-			String projectPrioritizerName = projectPrioritizer.getName();
-
-			if (projectPrioritizerName.equals(_liferayProjectPrioritizer)) {
-				return projectPrioritizer;
-			}
-		}
+		ProjectComparatorRepository projectComparatorRepository,
+		ProjectPrioritizerRepository projectPrioritizerRepository) {
 
 		ProjectPrioritizer projectPrioritizer =
-			projectPrioritizerDALO.createProjectPrioritizer(
-				_liferayProjectPrioritizer);
+			projectPrioritizerRepository.getByName(_liferayProjectPrioritizer);
 
-		projectComparatorDALO.createProjectComparator(
+		if (projectPrioritizer != null) {
+			return projectPrioritizer;
+		}
+
+		projectPrioritizer = projectPrioritizerRepository.add(
+			_liferayProjectPrioritizer);
+
+		projectComparatorRepository.add(
 			projectPrioritizer, 1, ProjectComparator.Type.PROJECT_PRIORITY,
 			null);
-		projectComparatorDALO.createProjectComparator(
+		projectComparatorRepository.add(
 			projectPrioritizer, 2, ProjectComparator.Type.FIFO, null);
 
 		return projectPrioritizer;

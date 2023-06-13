@@ -16,20 +16,24 @@ package com.liferay.jethr0.entity.dalo;
 
 import com.liferay.jethr0.entity.Entity;
 
-import java.util.List;
+import java.util.Set;
+
+import org.json.JSONObject;
 
 /**
  * @author Michael Hashimoto
  */
 public interface EntityDALO<T extends Entity> {
 
+	public T create(JSONObject jsonObject);
+
 	public T create(T entity);
 
 	public void delete(T entity);
 
-	public List<T> get();
-
 	public T get(long id);
+
+	public Set<T> getAll();
 
 	public T update(T entity);
 

@@ -136,7 +136,7 @@ public class OAuth2ProviderApplicationHeadlessServerConfigurationFactory
 			List<String> scopeAliasesList)
 		throws Exception {
 
-		User user = userLocalService.getDefaultUser(companyId);
+		User user = userLocalService.getGuestUser(companyId);
 
 		User serviceUser = _getServiceUser(
 			companyId, oAuth2ProviderApplicationHeadlessServerConfiguration);
@@ -155,6 +155,10 @@ public class OAuth2ProviderApplicationHeadlessServerConfigurationFactory
 			clientSecret = oAuth2Application.getClientSecret();
 		}
 
+		String homePageURL = getHomePageURL(
+			oAuth2ProviderApplicationHeadlessServerConfiguration.homePageURL(),
+			oAuth2ProviderApplicationHeadlessServerConfiguration.baseURL());
+
 		oAuth2Application =
 			oAuth2ApplicationLocalService.addOrUpdateOAuth2Application(
 				externalReferenceCode, user.getUserId(), user.getScreenName(),
@@ -164,10 +168,7 @@ public class OAuth2ProviderApplicationHeadlessServerConfigurationFactory
 				ClientProfile.HEADLESS_SERVER.id(), clientSecret,
 				oAuth2ProviderApplicationHeadlessServerConfiguration.
 					description(),
-				Arrays.asList("token.introspection"),
-				oAuth2ProviderApplicationHeadlessServerConfiguration.
-					homePageURL(),
-				0, null,
+				Arrays.asList("token.introspection"), homePageURL, 0, null,
 				getName(
 					oAuth2ProviderApplicationHeadlessServerConfiguration.name(),
 					externalReferenceCode),

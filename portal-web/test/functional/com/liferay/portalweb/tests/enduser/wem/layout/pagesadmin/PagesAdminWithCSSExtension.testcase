@@ -83,6 +83,8 @@ definition {
 				menuItem = "Configure",
 				pageName = "Test Page Name");
 
+			Navigator.gotoNavTab(navTab = "Design");
+
 			Navigator.gotoNavTab(navTab = "Look and Feel");
 
 			AssertTextEquals(
@@ -435,8 +437,6 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
-
 			PagesAdmin.addCSSExtensions(extensionNameList = "BackgroundColor");
 
 			PortletEntry.save();
@@ -512,6 +512,8 @@ definition {
 			PagesAdmin.gotoPageEllipsisMenuItem(
 				menuItem = "Configure",
 				pageName = "Test Page Name 2");
+
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "Look and Feel");
 

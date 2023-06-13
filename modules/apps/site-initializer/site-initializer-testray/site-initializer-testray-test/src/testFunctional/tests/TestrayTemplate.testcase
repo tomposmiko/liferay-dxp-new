@@ -25,7 +25,7 @@ definition {
 
 			User.firstLoginPG();
 
-			Testray.addTR2Site(siteName = ${testSiteName});
+			Testray.addTestraySite(siteName = ${testSiteName});
 		}
 
 		task ("Setup for template") {
@@ -45,8 +45,6 @@ definition {
 			JSONTestray.addRoutine(
 				projectName = ${projectName},
 				routineName = ${routineName});
-
-			JSONTestray.addCaseType(caseType = ${caseType});
 
 			JSONTestray.addCases(
 				caseName = ${caseName},
@@ -104,6 +102,67 @@ definition {
 		}
 	}
 
+	@description = "Story ID: LPS-178541 | Test Summary: Verify if as an Administrator I should be able to filter by template name"
+	@priority = 3
+	test AdminCanFilterTemplateByName {
+		task ("Given that the user adds two Template") {
+			TestrayTemplate.addTemplate(
+				description = "Template Description",
+				dropdownItem = "New Template",
+				fieldName = "Build_Template",
+				gitHash = "aeda18721a90a0831e0dca25e175b1408fa9ac2sa",
+				routineName = ${routineName});
+
+			TestrayTemplate.addTemplate(
+				description = "Template Description",
+				dropdownItem = "New Template",
+				fieldName = "Build_Template 2",
+				gitHash = "aeda18721a90a0831e0dca25e175b1408fa9ac2sa",
+				routineName = ${routineName});
+
+			Testray.kebabMenuOption(kebabOption = "Manage Templates");
+
+			TestrayTemplate.viewTemplateDetails(
+				templateName = "Build_Template",
+				templateStatus = "Activated");
+		}
+
+		task ("And Deactivated Build_Template 2") {
+			TestrayContextMenu.clickContextMenuProjects(name = "Build_Template 2");
+
+			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Deactivate");
+
+			TestrayTemplate.viewTemplateDetails(
+				templateName = "Build_Template 2",
+				templateStatus = "Deactivated");
+
+			Click(
+				key_indexNumber = 2,
+				key_text = "Clear",
+				locator1 = "Button#ANY_N");
+		}
+
+		task ("When the user filter a template by name") {
+			TestrayFilter.clickFilter();
+
+			TestrayFilter.typeFilter(
+				label = "Template Name",
+				value = "Build_Template 2");
+		}
+
+		task ("Then the user see only the Build_Template 2 in the table") {
+			AssertElementPresent(
+				key_projectName = "Build_Template 2",
+				locator1 = "Testray#ITEM_NAME");
+		}
+
+		task ("And do not see Build_Template in the table") {
+			AssertElementNotPresent(
+				key_projectName = "Build_Template",
+				locator1 = "Testray#ITEM_NAME");
+		}
+	}
+
 	@description = "Story ID: LPS-162435 | Test Summary: Verify if as an Administrator I should not be able to add a duplicate template"
 	@priority = 5
 	test AdminCanNotAddDuplicateTemplate {
@@ -130,6 +189,39 @@ definition {
 		}
 	}
 
+	@description = "Story ID: LPS-178541 | Test Summary: Verify if as an Administrator I should not see template that don't exist when I try filtering for them"
+	@priority = 3
+	test AdminCanNotFilterForNonExistentTemplate {
+		task ("Given that the user add build Template") {
+			TestrayTemplate.addTemplate(
+				description = "Template Description",
+				dropdownItem = "New Template",
+				fieldName = "Build_Template",
+				gitHash = "aeda18721a90a0831e0dca25e175b1408fa9ac2sa",
+				routineName = ${routineName});
+
+			Testray.kebabMenuOption(kebabOption = "Manage Templates");
+
+			TestrayTemplate.viewTemplateDetails(
+				templateName = "Build_Template",
+				templateStatus = "Activated");
+		}
+
+		task ("When the user filter a template non existent") {
+			TestrayFilter.clickFilter();
+
+			TestrayFilter.typeFilter(
+				label = "Template Name",
+				value = "Build_Template 3");
+		}
+
+		task ("Then the user not see the Build_Template 3 in the table") {
+			AssertElementNotPresent(
+				key_projectName = "Build_Template 3",
+				locator1 = "Testray#ITEM_NAME");
+		}
+	}
+
 	@description = "Story ID: LPS-162439 | Test Summary: Verify if that can Activate Disabled Template"
 	@priority = 5
 	test CanActivateDisabledTemplate {
@@ -153,17 +245,18 @@ definition {
 
 			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Deactivate");
 
-			Refresh();
+			Click(
+				key_indexNumber = 2,
+				key_text = "Clear",
+				locator1 = "Button#ANY_N");
 
 			TestrayTemplate.viewTemplateDetails(
 				templateName = "Build_Template",
-				templateStatus = "Deactive");
+				templateStatus = "Deactivated");
 
 			TestrayContextMenu.clickContextMenuProjects(name = "Deactivated");
 
-			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Active");
-
-			Refresh();
+			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Activate");
 		}
 
 		task ("Then the Activated status should appear in the list") {
@@ -213,8 +306,6 @@ definition {
 
 			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Deactivate");
 
-			Refresh();
-
 			TestrayTemplate.viewTemplateDetails(
 				templateName = "Build_Template",
 				templateStatus = "Deactivated");
@@ -231,13 +322,130 @@ definition {
 		}
 	}
 
-	@description = "Story ID: LPS-162435 | Test Summary: Verify that can filter out activated models"
-	@ignore = "Test Stub"
-	@priority = 5
+	@description = "Story ID: LPS-178541 | Test Summary: Verify that can filter out activated template"
+	@priority = 3
 	test CanFilterActiveTemplate {
+		task ("Given that the user adds two Template") {
+			TestrayTemplate.addTemplate(
+				description = "Template Description",
+				dropdownItem = "New Template",
+				fieldName = "Build_Template",
+				gitHash = "aeda18721a90a0831e0dca25e175b1408fa9ac2sa",
+				routineName = ${routineName});
 
-		// TODO LPS-163906 CanFilterActiveTemplate pending implementation
+			TestrayTemplate.addTemplate(
+				description = "Template Description",
+				dropdownItem = "New Template",
+				fieldName = "Build_Template 2",
+				gitHash = "aeda18721a90a0831e0dca25e175b1408fa9ac2sa",
+				routineName = ${routineName});
 
+			Testray.kebabMenuOption(kebabOption = "Manage Templates");
+
+			TestrayTemplate.viewTemplateDetails(
+				templateName = "Build_Template",
+				templateStatus = "Activated");
+		}
+
+		task ("And Deactivated Build_Template 2") {
+			TestrayContextMenu.clickContextMenuProjects(name = "Build_Template 2");
+
+			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Deactivate");
+
+			TestrayTemplate.viewTemplateDetails(
+				templateName = "Build_Template 2",
+				templateStatus = "Deactivated");
+
+			Click(
+				key_indexNumber = 2,
+				key_text = "Clear",
+				locator1 = "Button#ANY_N");
+		}
+
+		task ("When the user filter a template with Activated status") {
+			TestrayFilter.clickFilter();
+
+			Select(
+				locator1 = "TestrayTestflow#SELECT_STATUS_CASE_RESULTS",
+				value1 = "Activated");
+
+			Button.click(button = "Apply");
+		}
+
+		task ("Then the user see only the Activated status in the table") {
+			AssertElementPresent(
+				key_projectName = "Activated",
+				locator1 = "Testray#ITEM_NAME");
+		}
+
+		task ("And do not see Deactivated status in the table") {
+			AssertElementNotPresent(
+				key_projectName = "Deactivated",
+				locator1 = "Testray#ITEM_NAME");
+		}
+	}
+
+	@description = "Story ID: LPS-178541 | Test Summary: Verify that can filter out deactived template"
+	@priority = 3
+	test CanFilterDeactivedTemplate {
+		task ("Given that the user adds two Template") {
+			TestrayTemplate.addTemplate(
+				description = "Template Description",
+				dropdownItem = "New Template",
+				fieldName = "Build_Template",
+				gitHash = "aeda18721a90a0831e0dca25e175b1408fa9ac2sa",
+				routineName = ${routineName});
+
+			TestrayTemplate.addTemplate(
+				description = "Template Description",
+				dropdownItem = "New Template",
+				fieldName = "Build_Template 2",
+				gitHash = "aeda18721a90a0831e0dca25e175b1408fa9ac2sa",
+				routineName = ${routineName});
+
+			Testray.kebabMenuOption(kebabOption = "Manage Templates");
+
+			TestrayTemplate.viewTemplateDetails(
+				templateName = "Build_Template",
+				templateStatus = "Activated");
+		}
+
+		task ("And Deactivated Build_Template 2") {
+			TestrayContextMenu.clickContextMenuProjects(name = "Build_Template 2");
+
+			TestrayContextMenu.selectItemFromProjectsContextMenu(item = "Deactivate");
+
+			TestrayTemplate.viewTemplateDetails(
+				templateName = "Build_Template 2",
+				templateStatus = "Deactivated");
+
+			Click(
+				key_indexNumber = 2,
+				key_text = "Clear",
+				locator1 = "Button#ANY_N");
+		}
+
+		task ("When the user filter a template with Deactivated status") {
+			TestrayFilter.clickFilter();
+
+			Select(
+				locator1 = "TestrayTestflow#SELECT_STATUS_CASE_RESULTS",
+				value1 = "Deactivated");
+
+			Button.click(button = "Apply");
+		}
+
+		task ("Then the user see only the Deactivated status in the table") {
+			AssertElementPresent(
+				key_projectName = "Deactivated",
+				locator1 = "Testray#ITEM_NAME");
+		}
+
+		task ("And do not see Activated status in the table") {
+			AssertElementNotPresent(
+				key_projectName = "Activated",
+				locator1 = "Testray#ITEM_NAME");
+		}
 	}
 
 	@description = "Story ID: LPS-162435 | Test Summary: Verify if As an administrator can search for the new template created"
@@ -255,47 +463,6 @@ definition {
 		task ("Then can search for the template created in the filter") {
 			TestrayTemplate.assertTemplateName(templateName = "Build_Template");
 		}
-	}
-
-	@description = "This is a test for LPS-166567 - Verify if As an administrator can use a new template in a build"
-	@priority = 3
-	test CanUseTemplateInBuild {
-		task ("Given a new template") {
-			TestrayTemplate.addTemplate(
-				description = "Template Description",
-				dropdownItem = "New Template",
-				fieldName = "Build_Template",
-				gitHash = 12345,
-				routine = "Routine 1");
-		}
-
-		task ("When an administrator accesses the template") {
-			TestrayTemplate.assertTemplateName(templateName = "Build_Template");
-
-			TestrayTemplate.goToBuildTemplate(templateName = "Build_Template");
-		}
-
-		task ("Then the new template can be used in a build") {
-			TestrayBuild.createBuild(
-				addVersion = "1.4",
-				caseName = "Case 1",
-				description = "Build 1 Project Description",
-				fieldName = "Build 1 Project",
-				gitHash = 12345,
-				productVersion = "1.4",
-				routine = "Routine 1");
-
-			Testray.assertItemName(text = "Build 1 Project");
-		}
-	}
-
-	@description = "Story ID: LPS-162435 | Test Summary: Verify that can see the activated templates in the filter"
-	@ignore = "Test Stub"
-	@priority = 5
-	test CanViewActiveInFilter {
-
-		// TODO LPS-163907 CanViewActiveInFilter pending implementation
-
 	}
 
 	@description = "Story ID: LPS-162435 | Test Summary: Verify if, as an Administrator, can see the required field message"

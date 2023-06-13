@@ -27,7 +27,7 @@ import com.liferay.object.scripting.exception.ObjectScriptingException;
 import com.liferay.object.scripting.validator.ObjectScriptingValidator;
 import com.liferay.object.service.base.ObjectValidationRuleLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngine;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngineRegistry;
 import com.liferay.portal.aop.AopService;
@@ -210,7 +210,7 @@ public class ObjectValidationRuleLocalServiceImpl
 
 		Map<String, Object> variables = ObjectEntryVariablesUtil.getVariables(
 			_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-			_systemObjectDefinitionMetadataRegistry);
+			_systemObjectDefinitionManagerRegistry);
 
 		for (ObjectValidationRule objectValidationRule :
 				objectValidationRules) {
@@ -332,8 +332,8 @@ public class ObjectValidationRuleLocalServiceImpl
 		_objectValidationRuleEngineRegistry;
 
 	@Reference
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

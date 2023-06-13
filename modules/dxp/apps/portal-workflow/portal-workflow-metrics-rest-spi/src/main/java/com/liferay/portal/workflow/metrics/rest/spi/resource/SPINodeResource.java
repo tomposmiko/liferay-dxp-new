@@ -104,13 +104,13 @@ public class SPINodeResource<T> {
 
 		SearchHits searchHits = searchSearchResponse.getSearchHits();
 
-		List<SearchHit> searchHitList = searchHits.getSearchHits();
+		List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
-		if (ListUtil.isEmpty(searchHitList)) {
+		if (ListUtil.isEmpty(searchHitsList)) {
 			return StringPool.BLANK;
 		}
 
-		SearchHit searchHit = searchHitList.get(0);
+		SearchHit searchHit = searchHitsList.get(0);
 
 		Document document = searchHit.getDocument();
 

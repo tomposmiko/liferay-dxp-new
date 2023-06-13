@@ -26,8 +26,8 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.Table;
@@ -63,9 +63,9 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipLocalService objectRelationshipLocalService,
 		PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry,
-		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata,
-		SystemObjectDefinitionMetadataRegistry
-			systemObjectDefinitionMetadataRegistry) {
+		SystemObjectDefinitionManager systemObjectDefinitionManager,
+		SystemObjectDefinitionManagerRegistry
+			systemObjectDefinitionManagerRegistry) {
 
 		_objectDefinition = objectDefinition;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
@@ -74,11 +74,11 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_persistedModelLocalServiceRegistry =
 			persistedModelLocalServiceRegistry;
-		_systemObjectDefinitionMetadata = systemObjectDefinitionMetadata;
-		_systemObjectDefinitionMetadataRegistry =
-			systemObjectDefinitionMetadataRegistry;
+		_systemObjectDefinitionManager = systemObjectDefinitionManager;
+		_systemObjectDefinitionManagerRegistry =
+			systemObjectDefinitionManagerRegistry;
 
-		_table = systemObjectDefinitionMetadata.getTable();
+		_table = systemObjectDefinitionManager.getTable();
 	}
 
 	@Override
@@ -103,13 +103,13 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 				objectRelationship.getDeletionType(),
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE)) {
 
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						_objectDefinition.getName());
 
 			for (BaseModel<T> baseModel : relatedModels) {
-				systemObjectDefinitionMetadata.deleteBaseModel(baseModel);
+				systemObjectDefinitionManager.deleteBaseModel(baseModel);
 			}
 		}
 		else if (Objects.equals(
@@ -167,7 +167,7 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 
 	@Override
 	public String getClassName() {
-		return _systemObjectDefinitionMetadata.getModelClassName();
+		return _systemObjectDefinitionManager.getModelClassName();
 	}
 
 	@Override
@@ -188,7 +188,7 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 
 		PersistedModelLocalService persistedModelLocalService =
 			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
-				_systemObjectDefinitionMetadata.getModelClassName());
+				_systemObjectDefinitionManager.getModelClassName());
 
 		DSLQuery dslQuery = _getGroupByStep(
 			_getDynamicObjectDefinitionTable(), groupId, objectRelationshipId,
@@ -210,7 +210,7 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 
 		PersistedModelLocalService persistedModelLocalService =
 			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
-				_systemObjectDefinitionMetadata.getModelClassName());
+				_systemObjectDefinitionManager.getModelClassName());
 
 		return persistedModelLocalService.dslQueryCount(
 			_getGroupByStep(
@@ -346,7 +346,7 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 			dynamicObjectDefinitionTable,
 			dynamicObjectDefinitionTable.getPrimaryKeyColumn(
 			).eq(
-				_systemObjectDefinitionMetadata.getPrimaryKeyColumn()
+				_systemObjectDefinitionManager.getPrimaryKeyColumn()
 			)
 		).where(
 			primaryKeyColumn.eq(
@@ -388,10 +388,9 @@ public class SystemObject1toMObjectRelatedModelsProviderImpl
 		_objectRelationshipLocalService;
 	private final PersistedModelLocalServiceRegistry
 		_persistedModelLocalServiceRegistry;
-	private final SystemObjectDefinitionMetadata
-		_systemObjectDefinitionMetadata;
-	private final SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private final SystemObjectDefinitionManager _systemObjectDefinitionManager;
+	private final SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 	private final Table _table;
 
 }

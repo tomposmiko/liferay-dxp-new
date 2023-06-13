@@ -33,20 +33,16 @@ import com.liferay.portal.template.freemarker.internal.LiferayObjectConstructor;
 
 import freemarker.ext.beans.BeansWrapper;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Mika Koivisto
@@ -135,7 +131,7 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 		// Custom template context contributors
 
 		for (TemplateContextContributor templateContextContributor :
-				_templateContextContributors) {
+				getTemplateContextContributors()) {
 
 			templateContextContributor.prepare(
 				contextObjects, httpServletRequest);
@@ -152,12 +148,21 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 
 	@Activate
 	@Modified
-	protected void activate(Map<String, Object> properties) {
+	protected void activate(
+		Map<String, Object> properties, BundleContext bundleContext) {
+
+		init(bundleContext);
+
 		_freeMarkerEngineConfiguration = ConfigurableUtil.createConfigurable(
 			FreeMarkerEngineConfiguration.class, properties);
 
 		_restrictedVariables = SetUtil.fromArray(
 			_freeMarkerEngineConfiguration.restrictedVariables());
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		destory();
 	}
 
 	@Override
@@ -189,24 +194,6 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 		helperUtilities.put("staticUtil", beansWrapper.getStaticModels());
 	}
 
-	@Reference(
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(type=" + TemplateContextContributor.TYPE_GLOBAL + ")"
-	)
-	protected void registerTemplateContextContributor(
-		TemplateContextContributor templateContextContributor) {
-
-		_templateContextContributors.add(templateContextContributor);
-	}
-
-	protected void unregisterTemplateContextContributor(
-		TemplateContextContributor templateContextContributor) {
-
-		_templateContextContributors.remove(templateContextContributor);
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		FreeMarkerTemplateContextHelper.class);
 
@@ -215,7 +202,5 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 		_freeMarkerEngineConfiguration;
 	private BeansWrapper _restrictedBeansWrapper;
 	private volatile Set<String> _restrictedVariables;
-	private final List<TemplateContextContributor>
-		_templateContextContributors = new CopyOnWriteArrayList<>();
 
 }

@@ -24,8 +24,8 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalServiceUtil;
 import com.liferay.object.service.ObjectFieldSettingLocalServiceUtil;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -94,12 +94,12 @@ public class ObjectEntryVariablesUtil {
 	public static Map<String, Object> getVariables(
 		DTOConverterRegistry dtoConverterRegistry,
 		ObjectDefinition objectDefinition, JSONObject payloadJSONObject,
-		SystemObjectDefinitionMetadataRegistry
-			systemObjectDefinitionMetadataRegistry) {
+		SystemObjectDefinitionManagerRegistry
+			systemObjectDefinitionManagerRegistry) {
 
 		Map<String, Object> currentVariables = _getVariables(
 			dtoConverterRegistry, objectDefinition, false, payloadJSONObject,
-			systemObjectDefinitionMetadataRegistry);
+			systemObjectDefinitionManagerRegistry);
 
 		return HashMapBuilder.<String, Object>put(
 			"baseModel", currentVariables
@@ -107,13 +107,13 @@ public class ObjectEntryVariablesUtil {
 			"originalBaseModel",
 			() -> {
 				String suffix = _getSuffix(
-					objectDefinition, systemObjectDefinitionMetadataRegistry);
+					objectDefinition, systemObjectDefinitionManagerRegistry);
 
 				if (payloadJSONObject.has("original" + suffix)) {
 					return _getVariables(
 						dtoConverterRegistry, objectDefinition, true,
 						payloadJSONObject,
-						systemObjectDefinitionMetadataRegistry);
+						systemObjectDefinitionManagerRegistry);
 				}
 
 				return _getDefaultVariables(
@@ -126,15 +126,15 @@ public class ObjectEntryVariablesUtil {
 	private static String _getContentType(
 		DTOConverterRegistry dtoConverterRegistry,
 		ObjectDefinition objectDefinition,
-		SystemObjectDefinitionMetadataRegistry
-			systemObjectDefinitionMetadataRegistry) {
+		SystemObjectDefinitionManagerRegistry
+			systemObjectDefinitionManagerRegistry) {
 
-		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-			systemObjectDefinitionMetadataRegistry.
-				getSystemObjectDefinitionMetadata(objectDefinition.getName());
+		SystemObjectDefinitionManager systemObjectDefinitionManager =
+			systemObjectDefinitionManagerRegistry.
+				getSystemObjectDefinitionManager(objectDefinition.getName());
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			systemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			systemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		DTOConverter<?, ?> dtoConverter = dtoConverterRegistry.getDTOConverter(
 			jaxRsApplicationDescriptor.getApplicationName(),
@@ -142,8 +142,7 @@ public class ObjectEntryVariablesUtil {
 			jaxRsApplicationDescriptor.getVersion());
 
 		if (dtoConverter == null) {
-			Class<?> modelClass =
-				systemObjectDefinitionMetadata.getModelClass();
+			Class<?> modelClass = systemObjectDefinitionManager.getModelClass();
 
 			return modelClass.getSimpleName();
 		}
@@ -177,18 +176,18 @@ public class ObjectEntryVariablesUtil {
 
 	private static String _getSuffix(
 		ObjectDefinition objectDefinition,
-		SystemObjectDefinitionMetadataRegistry
-			systemObjectDefinitionMetadataRegistry) {
+		SystemObjectDefinitionManagerRegistry
+			systemObjectDefinitionManagerRegistry) {
 
 		if (!objectDefinition.isUnmodifiableSystemObject()) {
 			return "ObjectEntry";
 		}
 
-		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-			systemObjectDefinitionMetadataRegistry.
-				getSystemObjectDefinitionMetadata(objectDefinition.getName());
+		SystemObjectDefinitionManager systemObjectDefinitionManager =
+			systemObjectDefinitionManagerRegistry.
+				getSystemObjectDefinitionManager(objectDefinition.getName());
 
-		Class<?> modelClass = systemObjectDefinitionMetadata.getModelClass();
+		Class<?> modelClass = systemObjectDefinitionManager.getModelClass();
 
 		return modelClass.getSimpleName();
 	}
@@ -197,8 +196,8 @@ public class ObjectEntryVariablesUtil {
 		DTOConverterRegistry dtoConverterRegistry,
 		ObjectDefinition objectDefinition, boolean oldValues,
 		JSONObject payloadJSONObject,
-		SystemObjectDefinitionMetadataRegistry
-			systemObjectDefinitionMetadataRegistry) {
+		SystemObjectDefinitionManagerRegistry
+			systemObjectDefinitionManagerRegistry) {
 
 		Map<String, Object> allowedVariables =
 			HashMapBuilder.<String, Object>put(
@@ -210,15 +209,15 @@ public class ObjectEntryVariablesUtil {
 		Map<String, Object> variables = new HashMap<>();
 
 		if (objectDefinition.isUnmodifiableSystemObject()) {
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						objectDefinition.getName());
 
-			variables = systemObjectDefinitionMetadata.getVariables(
+			variables = systemObjectDefinitionManager.getVariables(
 				_getContentType(
 					dtoConverterRegistry, objectDefinition,
-					systemObjectDefinitionMetadataRegistry),
+					systemObjectDefinitionManagerRegistry),
 				objectDefinition, oldValues, payloadJSONObject);
 
 			if (variables == null) {

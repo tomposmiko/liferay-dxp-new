@@ -21,6 +21,7 @@ import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.comment.upgrade.DiscussionSubscriptionClassNameUpgradeProcess;
 import com.liferay.counter.kernel.service.CounterLocalService;
+import com.liferay.depot.group.provider.SiteConnectedGroupGroupProvider;
 import com.liferay.document.library.kernel.store.Store;
 import com.liferay.dynamic.data.mapping.service.DDMFieldLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStorageLinkLocalService;
@@ -114,11 +115,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eduardo García
  */
-@Component(
-	service = {
-		JournalServiceUpgradeStepRegistrator.class, UpgradeStepRegistrator.class
-	}
-)
+@Component(service = UpgradeStepRegistrator.class)
 public class JournalServiceUpgradeStepRegistrator
 	implements UpgradeStepRegistrator {
 
@@ -377,7 +374,7 @@ public class JournalServiceUpgradeStepRegistrator
 		registry.register(
 			"5.0.0", "5.1.0",
 			new JournalArticleDDMStructureIdUpgradeProcess(
-				_classNameLocalService, _ddmStructureLocalService, _portal));
+				_classNameLocalService, _siteConnectedGroupGroupProvider));
 
 		registry.register(
 			"5.1.0", "5.1.1",
@@ -517,6 +514,9 @@ public class JournalServiceUpgradeStepRegistrator
 
 	@Reference
 	private SettingsFactory _settingsFactory;
+
+	@Reference
+	private SiteConnectedGroupGroupProvider _siteConnectedGroupGroupProvider;
 
 	@Reference(target = "(default=true)")
 	private Store _store;

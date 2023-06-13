@@ -649,6 +649,7 @@
 		<check name="JavaComponentAnnotationsCheck">
 			<category name="Bug Prevention" />
 			<description name="Performs several checks on classes with `@Component` annotation." />
+			<property name="checkConfigurationPidAttribute" value="true" />
 			<property name="checkConfigurationPolicyAttribute" value="false" />
 			<property name="checkMismatchedServiceAttribute" value="false" />
 			<property name="checkSelfRegistration" value="false" />
@@ -713,6 +714,10 @@
 		<check name="JavaProviderTypeAnnotationCheck">
 			<category name="Bug Prevention" />
 			<description name="Performs several checks on classes with `@ProviderType` annotation." />
+		</check>
+		<check name="JavaReferenceAnnotationsCheck">
+			<category name="Bug Prevention" />
+			<description name="Performs several checks on classes with `@Reference` annotations." />
 		</check>
 		<check name="JavaReleaseInfoCheck">
 			<category name="Bug Prevention" />
@@ -1236,6 +1241,16 @@
 			<description name="Checks that `.lfrbuild*` files are documented in a marker file." />
 		</check>
 	</source-processor>
+	<source-processor name="LibrarySourceProcessor">
+
+		<!-- Liferay Source Checks -->
+
+		<check name="LibraryVulnerabilitiesCheck">
+			<category name="Bug Prevention" />
+			<description name="Checks the introduction of libraries and third party components with known vulnerabilities" />
+			<property name="enabled" value="false" />
+		</check>
+	</source-processor>
 	<source-processor name="MarkdownSourceProcessor">
 		<check name="MarkdownFileExtensionCheck">
 			<category name="Styling" />
@@ -1539,6 +1554,10 @@
 		<check name="UpgradeJavaCheck">
 			<category name="Upgrade" />
 			<description name="Performs upgrade checks for `java` files" />
+		</check>
+		<check name="UpgradeVelocityCommentMigrationCheck">
+			<category name="Upgrade" />
+			<description name="Run code migration of comments from a Velocity file to a Freemarker file with the syntax replacements" />
 		</check>
 	</source-processor>
 	<source-processor name="XMLSourceProcessor">

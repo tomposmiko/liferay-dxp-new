@@ -139,9 +139,11 @@ definition {
 				menuItem = "Configure",
 				pageName = "Test Page Name");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Design");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
+
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			AssertTextEquals(
 				key_sectionTitle = "JavaScript Client Extensions",
@@ -195,9 +197,9 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			AssertTextEquals(
 				key_sectionTitle = "JavaScript Client Extensions",
@@ -232,9 +234,11 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "SEO");
+			Navigator.gotoNavTab(navTab = "Design");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Panel.expandPanel(panel = "Look and Feel");
+
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			AssertTextEquals(
 				key_sectionTitle = "JavaScript Client Extensions",
@@ -305,9 +309,9 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
 				extensionNameList = "FontFamily",
@@ -325,9 +329,9 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
 				extensionNameList = "FontFamily",
@@ -384,9 +388,9 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
 				extensionNameList = "InnerText",
@@ -419,9 +423,9 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			AssertVisible(
 				key_tableEntry = "InnerText",
@@ -450,9 +454,9 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			for (var extensionName : list "InnerText,TextColor") {
 				Click(
@@ -499,9 +503,9 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
 				extensionNameList = "InnerText",
@@ -525,6 +529,8 @@ definition {
 		}
 
 		task ("Then the site designer could clear the JavaScript extension selection") {
+			Navigator.gotoNavTab(navTab = "JavaScript");
+
 			Click(
 				key_tableEntry = "InnerText",
 				locator1 = "LexiconTable#TABLE_ENTRY_ELLIPSIS");
@@ -564,9 +570,11 @@ definition {
 				menuItem = "Configure",
 				pageName = "Test Page Name");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Design");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
+
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
 				extensionNameList = "FontSize",
@@ -598,9 +606,11 @@ definition {
 				menuItem = "Configure",
 				pageName = "Test Page Name");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Design");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
+
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			Select(
 				key_tableEntry = "FontSize",
@@ -644,9 +654,9 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
 				extensionNameList = "FontSize",
@@ -676,9 +686,9 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			Select(
 				key_tableEntry = "FontSize",
@@ -712,7 +722,7 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
 				extensionNameList = "FontSize",
@@ -740,7 +750,7 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			Select(
 				key_tableEntry = "FontSize",
@@ -770,11 +780,13 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "SEO");
+			Navigator.gotoNavTab(navTab = "Design");
 		}
 
 		task ("When the site designer adds a JavaScript extension to Pages") {
-			Panel.expandPanel(panel = "JavaScript");
+			Panel.expandPanel(panel = "Look and Feel");
+
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
 				extensionNameList = "FontSize",
@@ -808,9 +820,11 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "SEO");
+			Navigator.gotoNavTab(navTab = "Design");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Panel.expandPanel(panel = "Look and Feel");
+
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			Select(
 				key_tableEntry = "FontSize",
@@ -846,7 +860,7 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
 				extensionNameList = "InnerText",
@@ -874,9 +888,9 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			AssertVisible(
 				key_groupHeader = "Page bottom JS client extensions",
@@ -908,9 +922,11 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "SEO");
+			Navigator.gotoNavTab(navTab = "Design");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Panel.expandPanel(panel = "Look and Feel");
+
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
 				extensionNameList = "FontFamily",
@@ -932,9 +948,11 @@ definition {
 				menuItem = "Configure",
 				pageName = "Test Page Name");
 
-			Navigator.gotoNavTab(navTab = "Advanced");
+			Navigator.gotoNavTab(navTab = "Design");
 
-			Panel.expandPanel(panel = "JavaScript");
+			Navigator.gotoNavTab(navTab = "Look and Feel");
+
+			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			AssertVisible(
 				key_groupHeader = "Page Head JS Client Extensions",
@@ -967,9 +985,11 @@ definition {
 
 				WaitForPageLoad();
 
-				Navigator.gotoNavTab(navTab = "SEO");
+				Navigator.gotoNavTab(navTab = "Design");
 
-				Panel.expandPanel(panel = "JavaScript");
+				Panel.expandPanel(panel = "Look and Feel");
+
+				Navigator.gotoNavTab(navTab = "JavaScript");
 
 				PagesAdmin.addJavaScriptExtensions(
 					extensionNameList = "FontFamily",
@@ -1002,7 +1022,7 @@ definition {
 
 				Click(locator1 = "PageEditor#MORE_LINK");
 
-				Navigator.gotoNavTab(navTab = "Advanced");
+				Navigator.gotoNavTab(navTab = "JavaScript");
 
 				PagesAdmin.addJavaScriptExtensions(
 					extensionNameList = "FontSize",
@@ -1037,9 +1057,9 @@ definition {
 
 				Click(locator1 = "PageEditor#MORE_LINK");
 
-				Navigator.gotoNavTab(navTab = "Advanced");
+				Navigator.gotoNavTab(navTab = "Look and Feel");
 
-				Panel.expandPanel(panel = "JavaScript");
+				Navigator.gotoNavTab(navTab = "JavaScript");
 
 				PagesAdmin.addJavaScriptExtensions(
 					extensionNameList = "FontWeight",

@@ -19,6 +19,7 @@ import com.liferay.object.rest.resource.v1_0.ObjectEntryResource;
 import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.Resource;
@@ -59,7 +60,6 @@ import com.liferay.portal.vulcan.permission.Permission;
 import com.liferay.portal.vulcan.permission.PermissionUtil;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.ActionUtil;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
@@ -366,7 +366,12 @@ public abstract class BaseObjectEntryResourceImpl
 		}
 
 		if (objectEntry.getProperties() != null) {
-			existingObjectEntry.setProperties(objectEntry.getProperties());
+			Map<String, Object> properties =
+				existingObjectEntry.getProperties();
+
+			properties.putAll(objectEntry.getProperties());
+
+			existingObjectEntry.setProperties(properties);
 		}
 
 		if (objectEntry.getScopeKey() != null) {
@@ -585,7 +590,12 @@ public abstract class BaseObjectEntryResourceImpl
 		}
 
 		if (objectEntry.getProperties() != null) {
-			existingObjectEntry.setProperties(objectEntry.getProperties());
+			Map<String, Object> properties =
+				existingObjectEntry.getProperties();
+
+			properties.putAll(objectEntry.getProperties());
+
+			existingObjectEntry.setProperties(properties);
 		}
 
 		if (objectEntry.getScopeKey() != null) {
@@ -828,7 +838,12 @@ public abstract class BaseObjectEntryResourceImpl
 		}
 
 		if (objectEntry.getProperties() != null) {
-			existingObjectEntry.setProperties(objectEntry.getProperties());
+			Map<String, Object> properties =
+				existingObjectEntry.getProperties();
+
+			properties.putAll(objectEntry.getProperties());
+
+			existingObjectEntry.setProperties(properties);
 		}
 
 		if (objectEntry.getScopeKey() != null) {

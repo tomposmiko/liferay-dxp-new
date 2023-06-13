@@ -26,8 +26,8 @@ import com.liferay.object.rest.internal.resource.v1_0.test.util.ObjectEntryTestU
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -78,13 +78,13 @@ public class RelatedObjectEntryResourceTest {
 
 		_user = TestPropsValues.getUser();
 
-		_userSystemObjectDefinitionMetadata =
-			_systemObjectDefinitionMetadataRegistry.
-				getSystemObjectDefinitionMetadata("User");
+		_userSystemObjectDefinitionManager =
+			_systemObjectDefinitionManagerRegistry.
+				getSystemObjectDefinitionManager("User");
 
 		_userSystemObjectDefinition =
 			_objectDefinitionLocalService.fetchSystemObjectDefinition(
-				_userSystemObjectDefinitionMetadata.getName());
+				_userSystemObjectDefinitionManager.getName());
 	}
 
 	@After
@@ -98,7 +98,7 @@ public class RelatedObjectEntryResourceTest {
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 		Long irrelevantUserId = RandomTestUtil.randomLong();
 
 		String name = StringUtil.randomId();
@@ -138,7 +138,7 @@ public class RelatedObjectEntryResourceTest {
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		String name = StringUtil.randomId();
 
@@ -187,7 +187,7 @@ public class RelatedObjectEntryResourceTest {
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		String name = StringUtil.randomId();
 
@@ -245,7 +245,7 @@ public class RelatedObjectEntryResourceTest {
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		Long irrelevantUserId = RandomTestUtil.randomLong();
 
@@ -303,7 +303,7 @@ public class RelatedObjectEntryResourceTest {
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		String name = StringUtil.randomId();
 
@@ -352,7 +352,7 @@ public class RelatedObjectEntryResourceTest {
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		String name = StringUtil.randomId();
 
@@ -415,7 +415,7 @@ public class RelatedObjectEntryResourceTest {
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 		Long irrelevantUserId = RandomTestUtil.randomLong();
 
 		String name = StringUtil.randomId();
@@ -440,7 +440,7 @@ public class RelatedObjectEntryResourceTest {
 	@Test
 	public void testGetSystemObjectRelatedObjectEntries() throws Exception {
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		String name = StringUtil.randomId();
 
@@ -473,7 +473,7 @@ public class RelatedObjectEntryResourceTest {
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		_objectRelationship = _addObjectRelationship(
 			StringUtil.randomId(), _objectDefinition.getObjectDefinitionId(),
@@ -529,7 +529,7 @@ public class RelatedObjectEntryResourceTest {
 	@Test
 	public void testPutSystemObjectRelatedObjectNotFound() throws Exception {
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		String name = StringUtil.randomId();
 
@@ -617,7 +617,7 @@ public class RelatedObjectEntryResourceTest {
 			_objectDefinition, _OBJECT_FIELD_NAME, objectFieldValue);
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+			_userSystemObjectDefinitionManager.getJaxRsApplicationDescriptor();
 
 		JSONObject jsonObject = HTTPTestUtil.invoke(
 			null,
@@ -663,11 +663,11 @@ public class RelatedObjectEntryResourceTest {
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Inject
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 	private User _user;
 	private ObjectDefinition _userSystemObjectDefinition;
-	private SystemObjectDefinitionMetadata _userSystemObjectDefinitionMetadata;
+	private SystemObjectDefinitionManager _userSystemObjectDefinitionManager;
 
 }

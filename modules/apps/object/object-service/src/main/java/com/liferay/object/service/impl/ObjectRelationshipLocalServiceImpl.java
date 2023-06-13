@@ -41,14 +41,15 @@ import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
-import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.object.system.SystemObjectDefinitionManager;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -157,6 +158,9 @@ public class ObjectRelationshipLocalServiceImpl
 					pkObjectFieldDBColumnNames.get(
 						"pkObjectFieldDBColumnName2"),
 					") values (", primaryKey1, ", ", primaryKey2, ")"));
+
+			FinderCacheUtil.clearDSLQueryCache(
+				objectRelationship.getDBTableName());
 
 			return;
 		}
@@ -366,6 +370,9 @@ public class ObjectRelationshipLocalServiceImpl
 					pkObjectFieldDBColumnNames.get(
 						"pkObjectFieldDBColumnName1"),
 					" = ", primaryKey1));
+
+			FinderCacheUtil.clearDSLQueryCache(
+				objectRelationship.getDBTableName());
 		}
 	}
 
@@ -404,6 +411,9 @@ public class ObjectRelationshipLocalServiceImpl
 					pkObjectFieldDBColumnNames.get(
 						"pkObjectFieldDBColumnName2"),
 					" = ", primaryKey2));
+
+			FinderCacheUtil.clearDSLQueryCache(
+				objectRelationship.getDBTableName());
 		}
 	}
 
@@ -1039,12 +1049,12 @@ public class ObjectRelationshipLocalServiceImpl
 		throws PortalException {
 
 		if (objectDefinition.isUnmodifiableSystemObject()) {
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						objectDefinition.getName());
 
-			systemObjectDefinitionMetadata.getExternalReferenceCode(primaryKey);
+			systemObjectDefinitionManager.getExternalReferenceCode(primaryKey);
 		}
 		else {
 			_objectEntryLocalService.getObjectEntry(primaryKey);
@@ -1065,14 +1075,14 @@ public class ObjectRelationshipLocalServiceImpl
 			restContextPath = objectDefinition1.getRESTContextPath();
 		}
 		else {
-			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataRegistry.
-					getSystemObjectDefinitionMetadata(
+			SystemObjectDefinitionManager systemObjectDefinitionManager =
+				_systemObjectDefinitionManagerRegistry.
+					getSystemObjectDefinitionManager(
 						objectDefinition1.getName());
 
-			if (systemObjectDefinitionMetadata != null) {
+			if (systemObjectDefinitionManager != null) {
 				JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-					systemObjectDefinitionMetadata.
+					systemObjectDefinitionManager.
 						getJaxRsApplicationDescriptor();
 
 				restContextPath =
@@ -1175,8 +1185,8 @@ public class ObjectRelationshipLocalServiceImpl
 		new ConcurrentHashMap<>();
 
 	@Reference
-	private SystemObjectDefinitionMetadataRegistry
-		_systemObjectDefinitionMetadataRegistry;
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

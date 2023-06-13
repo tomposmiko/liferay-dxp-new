@@ -53,7 +53,6 @@ export function ReviewAndSubmitAppPage({
 	const [description, setDescription] = useState('');
 	const [version, setVersion] = useState('');
 	const [notes, setNotes] = useState('');
-	const [appLicense, setAppLicense] = useState('');
 
 	const [cardInfos, setCardInfos] = useState<
 		{icon: string; link: string; title: string}[]
@@ -205,9 +204,6 @@ export function ReviewAndSubmitAppPage({
 					else if (specificationKey === 'notes') {
 						setNotes(localizedValue);
 					}
-					else if (specificationKey === 'app-license') {
-						setAppLicense(localizedValue);
-					}
 					else if (specificationKey === 'supporturl') {
 						newCardInfos.push({
 							icon: phoneIcon,
@@ -250,7 +246,8 @@ export function ReviewAndSubmitAppPage({
 		};
 
 		getData();
-	}, [appERC, appProductId]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [appERC, appProductId, dispatch]);
 
 	return (
 		<div className="review-and-submit-app-page-container">

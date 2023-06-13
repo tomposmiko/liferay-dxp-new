@@ -114,6 +114,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.model.GroupModel;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
@@ -4075,18 +4076,18 @@ public class BundleSiteInitializer implements SiteInitializer {
 				continue;
 			}
 
+			List<Group> oldGroups = new ArrayList<>();
+
 			int j = 0;
 			long userId = 0;
 
 			UserAccount userAccount = UserAccount.toDTO(
 				String.valueOf(jsonObject));
 
-			User existingUserAccount =
-				_userLocalService.fetchUserByEmailAddress(
-					serviceContext.getCompanyId(),
-					userAccount.getEmailAddress());
+			User user = _userLocalService.fetchUserByEmailAddress(
+				serviceContext.getCompanyId(), userAccount.getEmailAddress());
 
-			if (existingUserAccount == null) {
+			if (user == null) {
 				JSONObject accountBriefsJSONObject =
 					accountBriefsJSONArray.getJSONObject(j);
 
@@ -4110,8 +4111,16 @@ public class BundleSiteInitializer implements SiteInitializer {
 				userId = userAccount.getId();
 			}
 			else {
-				userId = existingUserAccount.getUserId();
+				userId = user.getUserId();
+
+				oldGroups = user.getSiteGroups();
 			}
+
+			oldGroups.add(serviceContext.getScopeGroup());
+
+			_userLocalService.updateGroups(
+				userId, ListUtil.toLongArray(oldGroups, GroupModel::getGroupId),
+				serviceContext);
 
 			if (jsonObject.has("organizationBriefs")) {
 				_addOrganizationUser(

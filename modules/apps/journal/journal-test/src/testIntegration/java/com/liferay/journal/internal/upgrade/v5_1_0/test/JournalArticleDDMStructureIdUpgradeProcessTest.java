@@ -36,19 +36,22 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LogEntry;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
+import com.liferay.portal.upgrade.test.util.UpgradeTestUtil;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 
-import java.util.Objects;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -75,6 +78,46 @@ public class JournalArticleDDMStructureIdUpgradeProcessTest {
 			return;
 		}
 
+		JournalArticle[] journalArticles = _addJournalArticles();
+
+		_setDDMStructureKey(false, journalArticles);
+
+		_unsetDDMStructureId(journalArticles);
+
+		List<LogEntry> logEntries = _runUpgrade();
+
+		Assert.assertEquals(logEntries.toString(), 0, logEntries.size());
+
+		_assertDDMStructureId(journalArticles);
+	}
+
+	@Test
+	public void testUpgradeProcessDDMStructureNotFound() throws Exception {
+		if (!_hasColumn("JournalArticle", "DDMStructureKey")) {
+			return;
+		}
+
+		JournalArticle[] journalArticles = _addJournalArticles();
+
+		_setDDMStructureKey(true, journalArticles);
+
+		_unsetDDMStructureId(journalArticles);
+
+		List<LogEntry> logEntries = _runUpgrade();
+
+		Assert.assertEquals(
+			logEntries.toString(), journalArticles.length, logEntries.size());
+
+		for (JournalArticle journalArticle : journalArticles) {
+			JournalArticle updatedJournalArticle =
+				_journalArticleLocalService.getJournalArticle(
+					journalArticle.getId());
+
+			Assert.assertEquals(0, updatedJournalArticle.getDDMStructureId());
+		}
+	}
+
+	private JournalArticle[] _addJournalArticles() throws Exception {
 		Company company = _companyLocalService.getCompany(
 			TestPropsValues.getCompanyId());
 
@@ -132,17 +175,11 @@ public class JournalArticleDDMStructureIdUpgradeProcessTest {
 				DDMStructureTestUtil.getSampleStructuredContent(),
 				_companyGroupDDMStructure.getStructureKey(), StringPool.BLANK);
 
-		_unsetDDMStructureId(
+		return new JournalArticle[] {
 			_companyGroupJournalArticle, group1JournalArticle,
 			group1LayoutGroupJournalArticle, group2JournalArticle,
-			group2CompanyGroupDDMStructureJournalArticle);
-
-		_runUpgrade();
-
-		_assertDDMStructureId(
-			_companyGroupJournalArticle, group1JournalArticle,
-			group1LayoutGroupJournalArticle, group2JournalArticle,
-			group2CompanyGroupDDMStructureJournalArticle);
+			group2CompanyGroupDDMStructureJournalArticle
+		};
 	}
 
 	private void _assertDDMStructureId(JournalArticle... journalArticles)
@@ -170,25 +207,6 @@ public class JournalArticleDDMStructureIdUpgradeProcessTest {
 		}
 	}
 
-	private UpgradeProcess _getUpgradeProcess() {
-		UpgradeProcess[] upgradeProcesses = new UpgradeProcess[1];
-
-		_upgradeStepRegistrator.register(
-			(fromSchemaVersionString, toSchemaVersionString, upgradeSteps) -> {
-				for (UpgradeStep upgradeStep : upgradeSteps) {
-					Class<? extends UpgradeStep> clazz = upgradeStep.getClass();
-
-					if (Objects.equals(clazz.getName(), _CLASS_NAME)) {
-						upgradeProcesses[0] = (UpgradeProcess)upgradeStep;
-
-						break;
-					}
-				}
-			});
-
-		return upgradeProcesses[0];
-	}
-
 	private boolean _hasColumn(String tableName, String columnName)
 		throws Exception {
 
@@ -199,16 +217,51 @@ public class JournalArticleDDMStructureIdUpgradeProcessTest {
 		}
 	}
 
-	private void _runUpgrade() throws Exception {
+	private List<LogEntry> _runUpgrade() throws Exception {
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				_CLASS_NAME, LoggerTestUtil.OFF)) {
+				_CLASS_NAME, LoggerTestUtil.WARN)) {
 
-			UpgradeProcess upgradeProcess = _getUpgradeProcess();
+			UpgradeProcess upgradeProcess = UpgradeTestUtil.getUpgradeStep(
+				_upgradeStepRegistrator, _CLASS_NAME);
 
 			upgradeProcess.upgrade();
 
 			_multiVMPool.clear();
+
+			return logCapture.getLogEntries();
 		}
+	}
+
+	private void _setDDMStructureKey(
+			boolean randomDDMStructureKey, JournalArticle... journalArticles)
+		throws Exception {
+
+		try (Connection connection = DataAccess.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(
+				"update JournalArticle set DDMStructureKey = ? where id_ = " +
+					"?")) {
+
+			for (JournalArticle journalArticle : journalArticles) {
+				String ddmStructureKey = RandomTestUtil.randomString();
+
+				if (!randomDDMStructureKey) {
+					DDMStructure ddmStructure =
+						journalArticle.getDDMStructure();
+
+					ddmStructureKey = ddmStructure.getStructureKey();
+				}
+
+				preparedStatement.setString(1, ddmStructureKey);
+
+				preparedStatement.setLong(2, journalArticle.getId());
+
+				preparedStatement.addBatch();
+			}
+
+			preparedStatement.executeBatch();
+		}
+
+		_multiVMPool.clear();
 	}
 
 	private void _unsetDDMStructureId(JournalArticle... journalArticles) {

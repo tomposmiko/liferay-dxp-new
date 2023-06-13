@@ -61,7 +61,9 @@ import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeDefinition;
 import com.liferay.headless.admin.list.type.dto.v1_0.ListTypeEntry;
 import com.liferay.headless.admin.list.type.resource.v1_0.ListTypeDefinitionResource;
 import com.liferay.headless.admin.user.dto.v1_0.Account;
+import com.liferay.headless.admin.user.dto.v1_0.AccountBrief;
 import com.liferay.headless.admin.user.dto.v1_0.Organization;
+import com.liferay.headless.admin.user.dto.v1_0.OrganizationBrief;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.resource.v1_0.AccountResource;
 import com.liferay.headless.admin.user.resource.v1_0.OrganizationResource;
@@ -188,6 +190,7 @@ import java.io.Serializable;
 
 import java.math.BigDecimal;
 
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
@@ -355,40 +358,26 @@ public class BundleSiteInitializerTest {
 			_serviceContext.fetchUser()
 		).build();
 
-		UserAccountResource.Builder userAccountResourceBuilder =
-			_userAccountResourceFactory.create();
-
-		UserAccountResource userAccountResource =
-			userAccountResourceBuilder.user(
-				_serviceContext.fetchUser()
-			).build();
-
 		Account account1 = accountResource.getAccountByExternalReferenceCode(
-			"TESTACC0001");
+			"TESTACC1");
 
 		Assert.assertNotNull(account1);
 		Assert.assertEquals("Test Account 1", account1.getName());
 		Assert.assertEquals("business", account1.getTypeAsString());
 
-		_assertUserAccounts(account1.getId(), 1, userAccountResource);
-
 		Account account2 = accountResource.getAccountByExternalReferenceCode(
-			"TESTACC0002");
+			"TESTACC2");
 
 		Assert.assertNotNull(account2);
 		Assert.assertEquals("Test Account 2", account2.getName());
 		Assert.assertEquals("guest", account2.getTypeAsString());
 
-		_assertUserAccounts(account2.getId(), 1, userAccountResource);
-
 		Account account3 = accountResource.getAccountByExternalReferenceCode(
-			"TESTACC0003");
+			"TESTACC3");
 
 		Assert.assertNotNull(account3);
 		Assert.assertEquals("Test Account 3", account3.getName());
 		Assert.assertEquals("person", account3.getTypeAsString());
-
-		_assertUserAccounts(account3.getId(), 0, userAccountResource);
 	}
 
 	private void _assertAccounts2() throws Exception {
@@ -399,49 +388,33 @@ public class BundleSiteInitializerTest {
 			_serviceContext.fetchUser()
 		).build();
 
-		UserAccountResource.Builder userAccountResourceBuilder =
-			_userAccountResourceFactory.create();
-
-		UserAccountResource userAccountResource =
-			userAccountResourceBuilder.user(
-				_serviceContext.fetchUser()
-			).build();
-
 		Account account1 = accountResource.getAccountByExternalReferenceCode(
-			"TESTACC0001");
+			"TESTACC1");
 
 		Assert.assertNotNull(account1);
 		Assert.assertEquals("Test Account 1", account1.getName());
 		Assert.assertEquals("business", account1.getTypeAsString());
 
-		_assertUserAccounts(account1.getId(), 1, userAccountResource);
-
 		Account account2 = accountResource.getAccountByExternalReferenceCode(
-			"TESTACC0002");
+			"TESTACC2");
 
 		Assert.assertNotNull(account2);
 		Assert.assertEquals("Test Account Guest", account2.getName());
 		Assert.assertEquals("guest", account2.getTypeAsString());
 
-		_assertUserAccounts(account2.getId(), 1, userAccountResource);
-
 		Account account3 = accountResource.getAccountByExternalReferenceCode(
-			"TESTACC0003");
+			"TESTACC3");
 
 		Assert.assertNotNull(account3);
 		Assert.assertEquals("Test Account 3", account3.getName());
 		Assert.assertEquals("person", account3.getTypeAsString());
 
-		_assertUserAccounts(account3.getId(), 0, userAccountResource);
-
 		Account account4 = accountResource.getAccountByExternalReferenceCode(
-			"TESTACC0004");
+			"TESTACC4");
 
 		Assert.assertNotNull(account4);
 		Assert.assertEquals("Test Account 4", account4.getName());
 		Assert.assertEquals("person", account4.getTypeAsString());
-
-		_assertUserAccounts(account4.getId(), 0, userAccountResource);
 	}
 
 	private void _assertAssetCategories() throws Exception {
@@ -451,7 +424,7 @@ public class BundleSiteInitializerTest {
 		AssetCategory testAssetCategory1 =
 			_assetCategoryLocalService.
 				fetchAssetCategoryByExternalReferenceCode(
-					"TESTCAT0001", companyGroup.getGroupId());
+					"TESTCAT1", companyGroup.getGroupId());
 
 		Assert.assertNotNull(testAssetCategory1);
 		Assert.assertEquals(
@@ -464,12 +437,12 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(testAssetCategory2);
 		Assert.assertEquals(
-			"TESTCAT0002", testAssetCategory2.getExternalReferenceCode());
+			"TESTCAT2", testAssetCategory2.getExternalReferenceCode());
 
 		AssetCategory testAssetCategory3 =
 			_assetCategoryLocalService.
 				fetchAssetCategoryByExternalReferenceCode(
-					"TESTCAT0003", _group.getGroupId());
+					"TESTCAT3", _group.getGroupId());
 
 		Assert.assertNotNull(testAssetCategory3);
 		Assert.assertEquals(
@@ -482,7 +455,7 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(testAssetCategory4);
 		Assert.assertEquals(
-			"TESTCAT0004", testAssetCategory4.getExternalReferenceCode());
+			"TESTCAT4", testAssetCategory4.getExternalReferenceCode());
 	}
 
 	private void _assertAssetListEntries() {
@@ -520,7 +493,7 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(testAssetVocabulary1);
 		Assert.assertEquals(
-			"TESTVOC0001", testAssetVocabulary1.getExternalReferenceCode());
+			"TESTVOC1", testAssetVocabulary1.getExternalReferenceCode());
 
 		AssetVocabulary testAssetVocabulary2 =
 			_assetVocabularyLocalService.fetchGroupVocabulary(
@@ -528,7 +501,7 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(testAssetVocabulary2);
 		Assert.assertEquals(
-			"TESTVOC0002", testAssetVocabulary2.getExternalReferenceCode());
+			"TESTVOC2", testAssetVocabulary2.getExternalReferenceCode());
 
 		_assertAssetCategories();
 	}
@@ -537,7 +510,7 @@ public class BundleSiteInitializerTest {
 		ClientExtensionEntry clientExtensionEntry =
 			_clientExtensionEntryLocalService.
 				fetchClientExtensionEntryByExternalReferenceCode(
-					"ERC001", _group.getCompanyId());
+					"CEXT1", _group.getCompanyId());
 
 		Assert.assertNotNull(clientExtensionEntry);
 
@@ -555,7 +528,7 @@ public class BundleSiteInitializerTest {
 		CommerceCatalog commerceCatalog1 =
 			_commerceCatalogLocalService.
 				fetchCommerceCatalogByExternalReferenceCode(
-					"TESTCATG0001", _group.getCompanyId());
+					"TESTCATEG1", _group.getCompanyId());
 
 		Assert.assertNotNull(commerceCatalog1);
 		Assert.assertEquals(
@@ -564,7 +537,7 @@ public class BundleSiteInitializerTest {
 		CommerceCatalog commerceCatalog2 =
 			_commerceCatalogLocalService.
 				fetchCommerceCatalogByExternalReferenceCode(
-					"TESTCATG0002", _group.getCompanyId());
+					"TESTCATEG2", _group.getCompanyId());
 
 		Assert.assertNotNull(commerceCatalog2);
 		Assert.assertEquals(
@@ -581,7 +554,7 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(commerceChannel);
 		Assert.assertEquals(
-			"TESTVOC0001", commerceChannel.getExternalReferenceCode());
+			"TESTVOC1", commerceChannel.getExternalReferenceCode());
 		Assert.assertEquals("Test Commerce Channel", commerceChannel.getName());
 		Assert.assertEquals("site", commerceChannel.getType());
 
@@ -593,7 +566,7 @@ public class BundleSiteInitializerTest {
 		CommerceInventoryWarehouse commerceInventoryWarehouse =
 			_commerceInventoryWarehouseLocalService.
 				fetchCommerceInventoryWarehouseByExternalReferenceCode(
-					"TESTWARE0001", _group.getCompanyId());
+					"TESTWARE1", _group.getCompanyId());
 
 		Assert.assertNotNull(commerceInventoryWarehouse);
 		Assert.assertEquals(
@@ -638,7 +611,7 @@ public class BundleSiteInitializerTest {
 		CPDefinition cpDefinition =
 			_cpDefinitionLocalService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					"TESTPROD001", _serviceContext.getCompanyId());
+					"TESTPROD1", _serviceContext.getCompanyId());
 
 		Assert.assertNotNull(cpDefinition);
 
@@ -668,7 +641,7 @@ public class BundleSiteInitializerTest {
 		CPDefinition cpDefinition =
 			_cpDefinitionLocalService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					"TESTPROD001", _group.getCompanyId());
+					"TESTPROD1", _group.getCompanyId());
 
 		Assert.assertNotNull(cpDefinition);
 		Assert.assertEquals("Test Commerce Product", cpDefinition.getName());
@@ -697,7 +670,7 @@ public class BundleSiteInitializerTest {
 		CPDefinition cpDefinition =
 			_cpDefinitionLocalService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					"TESTPROD001", _group.getCompanyId());
+					"TESTPROD1", _group.getCompanyId());
 
 		CPInstance cpInstance1 = _cpInstanceLocalService.getCPInstance(
 			cpDefinition.getCPDefinitionId(), "TEST VALUE 1");
@@ -737,7 +710,7 @@ public class BundleSiteInitializerTest {
 		CPDefinition cpDefinition =
 			_cpDefinitionLocalService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					"TESTPROD001", _group.getCompanyId());
+					"TESTPROD1", _group.getCompanyId());
 
 		Assert.assertNotNull(cpDefinition);
 
@@ -953,13 +926,13 @@ public class BundleSiteInitializerTest {
 		JournalFolder journalFolder1 = journalFolders.get(0);
 
 		Assert.assertEquals(
-			"JOURNALFOLDER001", journalFolder1.getExternalReferenceCode());
+			"JOURNALFOLDER1", journalFolder1.getExternalReferenceCode());
 		Assert.assertEquals("Test Journal Folder 1", journalFolder1.getName());
 
 		JournalFolder journalFolder2 = journalFolders.get(1);
 
 		Assert.assertEquals(
-			"JOURNALFOLDER002", journalFolder2.getExternalReferenceCode());
+			"JOURNALFOLDER2", journalFolder2.getExternalReferenceCode());
 		Assert.assertEquals("Test Journal Folder 2", journalFolder2.getName());
 	}
 
@@ -1733,16 +1706,6 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(organization1);
 
-		UserAccountResource.Builder userAccountResourceBuilder =
-			_userAccountResourceFactory.create();
-
-		UserAccountResource userAccountResource =
-			userAccountResourceBuilder.user(
-				_serviceContext.fetchUser()
-			).build();
-
-		_assertUserOrganizations(organization1.getId(), 1, userAccountResource);
-
 		Page<Organization> organizationsPage2 =
 			organizationResource.getOrganizationsPage(
 				null, null,
@@ -1755,8 +1718,6 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertEquals(1, organizationsPage2.getTotalCount());
 
-		_assertUserOrganizations(organization2.getId(), 1, userAccountResource);
-
 		Page<Organization> organizationsPage3 =
 			organizationResource.getOrganizationChildOrganizationsPage(
 				organization2.getId(), null, null, null, null, null);
@@ -1765,8 +1726,6 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(organization3);
 		Assert.assertEquals("Test Organization 3", organization3.getName());
-
-		_assertUserOrganizations(organization3.getId(), 0, userAccountResource);
 	}
 
 	private void _assertPermissions() throws Exception {
@@ -2359,16 +2318,138 @@ public class BundleSiteInitializerTest {
 			frontendTokensValues.contains("blockquote-small-color"));
 	}
 
-	private void _assertUserAccounts(
-			Long accountId, int totalCount,
-			UserAccountResource userAccountResource)
-		throws Exception {
+	private void _assertUserAccounts1() throws Exception {
+		UserAccountResource.Builder userAccountResourceBuilder =
+			_userAccountResourceFactory.create();
 
-		Page<UserAccount> page = userAccountResource.getAccountUserAccountsPage(
-			accountId, null, null, null, null);
+		UserAccountResource userAccountResource =
+			userAccountResourceBuilder.user(
+				_serviceContext.fetchUser()
+			).build();
 
-		Assert.assertNotNull(page);
-		Assert.assertEquals(totalCount, page.getTotalCount());
+		UserAccount userAccount =
+			userAccountResource.getUserAccountByExternalReferenceCode(
+				"TESTUSER1");
+
+		Assert.assertNotNull(userAccount);
+
+		AccountBrief[] accountBriefs = userAccount.getAccountBriefs();
+
+		Assert.assertEquals(
+			Arrays.toString(accountBriefs), 1, accountBriefs.length);
+
+		Assert.assertEquals(
+			"testalternatename1", userAccount.getAlternateName());
+		Assert.assertEquals(
+			"test.user1@liferay.com", userAccount.getEmailAddress());
+
+		OrganizationBrief[] organizationBriefs =
+			userAccount.getOrganizationBriefs();
+
+		Assert.assertEquals(
+			Arrays.toString(organizationBriefs), 1, organizationBriefs.length);
+
+		_assertUserSiteGroups(userAccount.getId());
+
+		userAccount = userAccountResource.getUserAccountByExternalReferenceCode(
+			"TESTUSER2");
+
+		Assert.assertNotNull(userAccount);
+
+		accountBriefs = userAccount.getAccountBriefs();
+
+		Assert.assertEquals(
+			Arrays.toString(accountBriefs), 1, accountBriefs.length);
+
+		Assert.assertEquals(
+			"testalternatename2", userAccount.getAlternateName());
+		Assert.assertEquals(
+			"test.user2@liferay.com", userAccount.getEmailAddress());
+
+		organizationBriefs = userAccount.getOrganizationBriefs();
+
+		Assert.assertEquals(
+			Arrays.toString(organizationBriefs), 1, organizationBriefs.length);
+
+		_assertUserSiteGroups(userAccount.getId());
+	}
+
+	private void _assertUserAccounts2() throws Exception {
+		UserAccountResource.Builder userAccountResourceBuilder =
+			_userAccountResourceFactory.create();
+
+		UserAccountResource userAccountResource =
+			userAccountResourceBuilder.user(
+				_serviceContext.fetchUser()
+			).build();
+
+		UserAccount userAccount =
+			userAccountResource.getUserAccountByExternalReferenceCode(
+				"TESTUSER1");
+
+		Assert.assertNotNull(userAccount);
+
+		AccountBrief[] accountBriefs = userAccount.getAccountBriefs();
+
+		Assert.assertEquals(
+			Arrays.toString(accountBriefs), 1, accountBriefs.length);
+
+		Assert.assertEquals(
+			"testalternatename1", userAccount.getAlternateName());
+		Assert.assertEquals(
+			"test.user1@liferay.com", userAccount.getEmailAddress());
+
+		OrganizationBrief[] organizationBriefs =
+			userAccount.getOrganizationBriefs();
+
+		Assert.assertEquals(
+			Arrays.toString(organizationBriefs), 1, organizationBriefs.length);
+
+		_assertUserSiteGroups(userAccount.getId());
+
+		userAccount = userAccountResource.getUserAccountByExternalReferenceCode(
+			"TESTUSER2");
+
+		Assert.assertNotNull(userAccount);
+
+		accountBriefs = userAccount.getAccountBriefs();
+
+		Assert.assertEquals(
+			Arrays.toString(accountBriefs), 2, accountBriefs.length);
+
+		Assert.assertEquals(
+			"testalternatename2update", userAccount.getAlternateName());
+		Assert.assertEquals(
+			"test.user2.update@liferay.com", userAccount.getEmailAddress());
+
+		organizationBriefs = userAccount.getOrganizationBriefs();
+
+		Assert.assertEquals(
+			Arrays.toString(organizationBriefs), 2, organizationBriefs.length);
+
+		_assertUserSiteGroups(userAccount.getId());
+
+		userAccount = userAccountResource.getUserAccountByExternalReferenceCode(
+			"USER-3");
+
+		Assert.assertNotNull(userAccount);
+
+		accountBriefs = userAccount.getAccountBriefs();
+
+		Assert.assertEquals(
+			Arrays.toString(accountBriefs), 2, accountBriefs.length);
+
+		Assert.assertEquals(
+			"testalternatename3", userAccount.getAlternateName());
+		Assert.assertEquals(
+			"test.user3@liferay.com", userAccount.getEmailAddress());
+
+		organizationBriefs = userAccount.getOrganizationBriefs();
+
+		Assert.assertEquals(
+			Arrays.toString(organizationBriefs), 0, organizationBriefs.length);
+
+		_assertUserSiteGroups(userAccount.getId());
 	}
 
 	private void _assertUserGroups() {
@@ -2390,19 +2471,6 @@ public class BundleSiteInitializerTest {
 
 		Assert.assertNotNull(userGroup2);
 		Assert.assertTrue(userGroups.contains(userGroup2));
-	}
-
-	private void _assertUserOrganizations(
-			String organizationId, int totalCount,
-			UserAccountResource userAccountResource)
-		throws Exception {
-
-		Page<UserAccount> page =
-			userAccountResource.getOrganizationUserAccountsPage(
-				organizationId, null, null, null, null);
-
-		Assert.assertNotNull(page);
-		Assert.assertEquals(totalCount, page.getTotalCount());
 	}
 
 	private void _assertUserRoles() throws Exception {
@@ -2439,6 +2507,18 @@ public class BundleSiteInitializerTest {
 		role = roles.get(1);
 
 		Assert.assertEquals("Test Role 3", role.getName());
+	}
+
+	private void _assertUserSiteGroups(long userId) throws Exception {
+		User user = _userLocalService.getUser(userId);
+
+		List<Group> groups = user.getSiteGroups();
+
+		Assert.assertEquals(groups.toString(), 1, groups.size());
+
+		Group group = groups.get(0);
+
+		Assert.assertEquals(_group.getGroupId(), group.getGroupId());
 	}
 
 	private void _assertWorkflowDefinitions() throws Exception {
@@ -2592,6 +2672,7 @@ public class BundleSiteInitializerTest {
 		_assertSiteSettings();
 		_assertSiteNavigationMenu();
 		_assertStyleBookEntry();
+		_assertUserAccounts1();
 		_assertUserGroups();
 		_assertUserRoles();
 		_assertWorkflowDefinitions();
@@ -2605,6 +2686,7 @@ public class BundleSiteInitializerTest {
 		_assertListTypeDefinitions2();
 		_assertObjectDefinitions2();
 		_assertResourcePermission2();
+		_assertUserAccounts2();
 	}
 
 	@Inject

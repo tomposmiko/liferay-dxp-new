@@ -15,58 +15,90 @@
 package com.liferay.portal.test.rule;
 
 import com.liferay.portal.kernel.test.rule.AbstractTestRule;
-import com.liferay.portal.kernel.test.util.PropsTestUtil;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PropsUtil;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.runner.Description;
 
 /**
  * @author Alejandro Tardín
  */
-public class FeatureFlagTestRule extends AbstractTestRule<Void, Void> {
+public class FeatureFlagTestRule
+	extends AbstractTestRule<Map<String, String>, Map<String, String>> {
 
 	public static final FeatureFlagTestRule INSTANCE =
 		new FeatureFlagTestRule();
 
 	@Override
-	protected void afterClass(Description description, Void v)
+	protected void afterClass(
+			Description description, Map<String, String> previousValues)
 		throws Throwable {
 
-		_setFeatureFlags(description, false);
+		_restoreFeatureFlags(previousValues);
 	}
 
 	@Override
-	protected void afterMethod(Description description, Void v, Object target)
+	protected void afterMethod(
+			Description description, Map<String, String> previousValues,
+			Object target)
 		throws Throwable {
 
-		_setFeatureFlags(description, false);
+		_restoreFeatureFlags(previousValues);
 	}
 
 	@Override
-	protected Void beforeClass(Description description) throws Throwable {
-		_setFeatureFlags(description, true);
+	protected Map<String, String> beforeClass(Description description)
+		throws Throwable {
 
-		return null;
+		return _enableFeatureFlags(description);
 	}
 
 	@Override
-	protected Void beforeMethod(Description description, Object target)
+	protected Map<String, String> beforeMethod(
+			Description description, Object target)
 		throws Throwable {
 
-		_setFeatureFlags(description, true);
-
-		return null;
+		return _enableFeatureFlags(description);
 	}
 
-	private void _setFeatureFlags(Description description, boolean enabled) {
+	private Map<String, String> _enableFeatureFlags(Description description) {
 		FeatureFlags featureFlags = description.getAnnotation(
 			FeatureFlags.class);
 
-		if (featureFlags != null) {
-			for (String key : featureFlags.value()) {
-				PropsTestUtil.setProps(
-					"feature.flag." + key, Boolean.toString(enabled));
-			}
+		if (featureFlags == null) {
+			return Collections.emptyMap();
 		}
+
+		Map<String, String> previousValues = new HashMap<>();
+
+		for (String key : featureFlags.value()) {
+			String featureFlagKey = "feature.flag." + key;
+
+			String previousValue = PropsUtil.get(featureFlagKey);
+
+			if (Validator.isNotNull(previousValue)) {
+				previousValues.put(featureFlagKey, previousValue);
+			}
+
+			PropsUtil.addProperties(
+				UnicodePropertiesBuilder.setProperty(
+					featureFlagKey, "true"
+				).build());
+		}
+
+		return previousValues;
+	}
+
+	private void _restoreFeatureFlags(Map<String, String> previousValues) {
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.create(
+				previousValues, true
+			).build());
 	}
 
 }

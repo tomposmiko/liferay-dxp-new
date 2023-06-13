@@ -19,6 +19,7 @@ import yupSchema from '../../schema/yup';
 import {DISPATCH_TRIGGER_TYPE} from '../../util/enum';
 import {DispatchTriggerStatuses} from '../../util/statuses';
 import {liferayDispatchTriggerImpl} from './LiferayDispatchTrigger';
+import {testrayCaseResultImpl} from './TestrayCaseResult';
 import {testrayDispatchTriggerImpl} from './TestrayDispatchTrigger';
 import {APIResponse, TestrayRun} from './types';
 
@@ -54,6 +55,9 @@ class TestrayRunImpl extends Rest<RunForm, TestrayRun> {
 
 				return {
 					...run,
+					...testrayCaseResultImpl.normalizeCaseResultAggregation(
+						run
+					),
 					applicationServer,
 					browser,
 					build: run?.r_buildToRuns_c_build

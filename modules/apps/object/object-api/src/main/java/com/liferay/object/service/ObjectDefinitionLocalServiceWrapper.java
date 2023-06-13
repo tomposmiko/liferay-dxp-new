@@ -84,12 +84,12 @@ public class ObjectDefinitionLocalServiceWrapper
 	public com.liferay.object.model.ObjectDefinition
 			addOrUpdateSystemObjectDefinition(
 				long companyId,
-				com.liferay.object.system.SystemObjectDefinitionMetadata
-					systemObjectDefinitionMetadata)
+				com.liferay.object.system.SystemObjectDefinitionManager
+					systemObjectDefinitionManager)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectDefinitionLocalService.addOrUpdateSystemObjectDefinition(
-			companyId, systemObjectDefinitionMetadata);
+			companyId, systemObjectDefinitionManager);
 	}
 
 	@Override

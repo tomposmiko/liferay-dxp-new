@@ -14,46 +14,25 @@
 
 package com.liferay.jethr0.jenkins.master;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.liferay.jethr0.entity.factory.BaseEntityFactory;
 
 import org.json.JSONObject;
+
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Michael Hashimoto
  */
-public class JenkinsMasterFactory {
+@Configuration
+public class JenkinsMasterFactory extends BaseEntityFactory<JenkinsMaster> {
 
-	public static JenkinsMaster newJenkinsMaster(JSONObject jsonObject) {
-		long id = jsonObject.getLong("id");
-
-		JenkinsMaster jenkinsMaster = null;
-
-		synchronized (_jenkinsMasters) {
-			if (_jenkinsMasters.containsKey(id)) {
-				return _jenkinsMasters.get(id);
-			}
-
-			jenkinsMaster = new DefaultJenkinsMaster(jsonObject);
-
-			_jenkinsMasters.put(jenkinsMaster.getId(), jenkinsMaster);
-		}
-
-		return jenkinsMaster;
+	@Override
+	public JenkinsMaster newEntity(JSONObject jsonObject) {
+		return new DefaultJenkinsMaster(jsonObject);
 	}
 
-	public static void removeJenkinsMaster(JenkinsMaster jenkinsMaster) {
-		if (jenkinsMaster == null) {
-			return;
-		}
-
-		synchronized (_jenkinsMasters) {
-			_jenkinsMasters.remove(jenkinsMaster.getId());
-		}
+	protected JenkinsMasterFactory() {
+		super(JenkinsMaster.class);
 	}
-
-	private static final Map<Long, JenkinsMaster> _jenkinsMasters =
-		Collections.synchronizedMap(new HashMap<>());
 
 }

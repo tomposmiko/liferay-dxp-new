@@ -15,8 +15,10 @@ definition {
 			User.firstLoginPG();
 		}
 
-		task ("Create a new Partner Portal Site") {
-			PRMUtils.addPRMSite();
+		task ("Create a new Partner Portal Site and connect with Salesforce") {
+			PRMUtils.addSite();
+
+			PRMUtils.connectWithSalesforce();
 		}
 
 		task ("Add a Partner user") {
@@ -47,9 +49,7 @@ definition {
 		}
 
 		task ("Add a new account and assign the created users to the account") {
-			JSONAccountEntry.addAccountEntry(
-				accountEntryName = "Company Name 1",
-				accountEntryType = "Business");
+			JSONPRM.addAccount();
 
 			JSONAccountEntryUser.addExistUsertoAccount(
 				accountEntryName = "Company Name 1",
@@ -58,10 +58,6 @@ definition {
 			JSONAccountEntryUser.addExistUsertoAccount(
 				accountEntryName = "Company Name 1",
 				userEmailAddress = "manager@liferay.com");
-		}
-
-		task ("Add a currency to the created account") {
-			JSONPRM.addCurrency();
 		}
 
 		task ("Login with the Partner user and go to Partner Portal") {
@@ -92,15 +88,18 @@ definition {
 				userLoginEmailAddress = "test@liferay.com",
 				userLoginFullName = "Test Test");
 
-			JSONGroup.deleteGroupByName(groupName = "Partner Portal");
-
-			Account.tearDownCP();
+			PRMUtils.tearDown();
 		}
 	}
 
 	@description = "This is a test for LPS-175292. Verify that is possible to export all visible Claims"
 	@priority = 4
 	test CanExportAllVisibleClaims {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFClaim#CanExportAllVisibleClaims";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given that the Manager user is logged in and goes to MDF listing page") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "manager@liferay.com",
@@ -163,10 +162,12 @@ definition {
 	@description = "This is a test for LPS-178119. Verify that is possible to export all visible Claims"
 	@priority = 4
 	test CanExportFilteredClaims {
+		property test.name.skip.portal.instance = "PRMMDFClaim#CanExportFilteredClaims";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given a new account is created") {
-			JSONAccountEntry.addAccountEntry(
-				accountEntryName = "Company Name 2",
-				accountEntryType = "Business");
+			JSONPRM.addAccount(accountName = "Company Name 2");
 
 			JSONAccountEntryUser.addExistUsertoAccount(
 				accountEntryName = "Company Name 2",
@@ -296,6 +297,11 @@ definition {
 	@description = "This is a test for LPS-178117. Verify that is possible to export all Claims searched."
 	@priority = 4
 	test CanExportSearchedClaims {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFClaim#CanExportSearchedClaims";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given that the Manager user is logged in and goes to MDF listing page") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "manager@liferay.com",
@@ -378,6 +384,11 @@ definition {
 	@description = "This is a test for LPS-175611. Verify that is possible to submit a full claim"
 	@priority = 5
 	test CanSubmitFullClaim {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFClaim#CanSubmitFullClaim";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given that the manager user is logged in and goes to MDF listing page") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "manager@liferay.com",
@@ -394,8 +405,8 @@ definition {
 
 		task ("And the partner logs in") {
 			User.logoutAndLoginPG(
-				userLoginEmailAddress = "test@liferay.com",
-				userLoginFullName = "Test Test");
+				userLoginEmailAddress = "partner@liferay.com",
+				userLoginFullName = "partner");
 		}
 
 		task ("And go to the approved MDF") {
@@ -420,6 +431,11 @@ definition {
 	@description = "This is a test for LPS-173720. Verify that is possible to submit a partial claim"
 	@priority = 5
 	test CanSubmitPartialClaim {
+		property solutions.acceptance = "true";
+		property test.name.skip.portal.instance = "PRMMDFClaim#CanSubmitPartialClaim";
+
+		// Temporarily skip portal instances to get tests running for pending release. LRQA-80052
+
 		task ("Given that the manager user is logged in and goes to MDF listing page") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "manager@liferay.com",
@@ -436,8 +452,8 @@ definition {
 
 		task ("And the partner logs in") {
 			User.logoutAndLoginPG(
-				userLoginEmailAddress = "test@liferay.com",
-				userLoginFullName = "Test Test");
+				userLoginEmailAddress = "partner@liferay.com",
+				userLoginFullName = "partner");
 		}
 
 		task ("And go to the approved MDF") {
