@@ -76,6 +76,14 @@ const contents = {
 	'notifications': {
 		backButton: (setContentName, selectedItemType) => () =>
 			setContentName(selectedItemType),
+		deleteFunction: (setSelectedItem) => () =>
+			setSelectedItem((previousValue) => ({
+				...previousValue,
+				data: {
+					...previousValue.data,
+					notifications: null,
+				},
+			})),
 		sections: ['notifications'],
 		showDeleteButton: true,
 		title: Liferay.Language.get('notifications'),
@@ -85,6 +93,12 @@ const contents = {
 		sections: ['sourceCode'],
 		showDeleteButton: false,
 		title: Liferay.Language.get('scripted-assignment'),
+	},
+	'scripted-reassignment': {
+		backButton: (setContentName) => () => setContentName('timers'),
+		sections: ['timersSourceCode'],
+		showDeleteButton: false,
+		title: Liferay.Language.get('scripted-reassignment'),
 	},
 	'start': {
 		sections: ['nodeInformation', 'notificationsSummary', 'actionsSummary'],

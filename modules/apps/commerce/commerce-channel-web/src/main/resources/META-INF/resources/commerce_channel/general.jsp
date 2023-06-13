@@ -30,6 +30,9 @@ Map<String, String> contextParams = HashMapBuilder.<String, String>put(
 ).build();
 %>
 
+<liferay-ui:error embed="<%= false %>" exception="<%= FileExtensionException.class %>" message="please-select-a-valid-jrxml-file" />
+<liferay-ui:error embed="<%= false %>" exception="<%= InvalidFileException.class %>" message="please-select-a-valid-jrxml-file" />
+
 <portlet:actionURL name="/commerce_channels/edit_commerce_channel" var="editCommerceChannelActionURL" />
 
 <aui:form action="<%= editCommerceChannelActionURL %>" cssClass="m-0 p-0" method="post" name="fm">
@@ -105,6 +108,8 @@ Map<String, String> contextParams = HashMapBuilder.<String, String>put(
 
 				<aui:input checked="<%= commerceChannelDisplayContext.isGuestCheckoutEnabled() %>" helpMessage="configures-whether-a-guest-may-checkout-by-providing-an-email-address-or-if-they-must-sign-in" label="guest-checkout" labelOff="disabled" labelOn="enabled" name="settings--guestCheckoutEnabled--" type="toggle-switch" />
 
+				<aui:input checked="<%= commerceChannelDisplayContext.isViewDeliveryTermCheckoutStepEnabled() %>" helpMessage="configures-whether-the-delivery-terms-checkout-step-is-shown-during-checkout" label="view-delivery-term-checkout-step" labelOff="disabled" labelOn="enabled" name="settings--viewDeliveryTermCheckoutStepEnabled--" type="toggle-switch" />
+
 				<aui:input checked="<%= commerceChannelDisplayContext.isViewPaymentTermCheckoutStepEnabled() %>" helpMessage="configures-whether-the-payment-terms-checkout-step-is-shown-during-checkout" label="view-payment-term-checkout-step" labelOff="disabled" labelOn="enabled" name="settings--viewPaymentTermCheckoutStepEnabled--" type="toggle-switch" />
 
 				<aui:input label="maximum-number-of-open-orders-per-account" name="orderSettings--accountCartMaxAllowed--" type="number" value="<%= commerceChannelDisplayContext.getAccountCartMaxAllowed() %>">
@@ -134,9 +139,6 @@ Map<String, String> contextParams = HashMapBuilder.<String, String>put(
 				</p>
 
 				<aui:button name="selectFileButton" value="select-file" />
-
-				<liferay-ui:error exception="<%= FileExtensionException.class %>" message="please-select-a-valid-jrxml-file" />
-				<liferay-ui:error exception="<%= InvalidFileException.class %>" message="please-select-a-valid-jrxml-file" />
 			</commerce-ui:panel>
 		</div>
 

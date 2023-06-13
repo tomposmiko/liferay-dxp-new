@@ -9,7 +9,6 @@
  * distribution rights of the Software.
  */
 
-import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
 import SidebarPanel from '../../SidebarPanel';
@@ -24,7 +23,7 @@ const actionSectionComponents = {
 	reassignments: ActionTypeReassignment,
 };
 
-const TimerAction = () => {
+const TimerAction = ({setContentName, updateSelectedItem}) => {
 	const [actionSection, setActionSection] = useState('actions');
 	const [actionSections, setActionSections] = useState([
 		{identifier: `${Date.now()}-0`},
@@ -49,17 +48,15 @@ const TimerAction = () => {
 							index={index}
 							key={`section-${identifier}`}
 							sectionsLength={actionSections?.length}
+							setContentName={setContentName}
 							setSections={setActionSections}
+							updateSelectedItem={updateSelectedItem}
 						/>
 					)
 				);
 			})}
 		</SidebarPanel>
 	);
-};
-
-TimerAction.propTypes = {
-	setContentName: PropTypes.func.isRequired,
 };
 
 export default TimerAction;

@@ -12,6 +12,7 @@
 /development/com.liferay.ant.manifest.helper.jar
 /development/com.liferay.jenkins.results.parser.jar
 /development/com.liferay.poshi.core.jar
+/development/commons-lang3.jar
 /development/db2jcc.jar
 /development/db2jcc_license_cu.jar
 /development/dtddoc.jar
@@ -106,7 +107,6 @@
 /portal/commons-fileupload.jar
 /portal/commons-io.jar
 /portal/commons-lang.jar
-/portal/commons-lang3.jar
 /portal/commons-logging.jar
 /portal/commons-math.jar
 /portal/commons-math3.jar
@@ -115,7 +115,6 @@
 /portal/crypt.jar
 /portal/dom4j.jar
 /portal/fontbox.jar
-/portal/hessian.jar
 /portal/hibernate-core.jar
 /portal/hikaricp.jar
 /portal/httpclient.jar
@@ -147,7 +146,6 @@
 /portal/jersey-common.jar
 /portal/jhighlight.jar
 /portal/jhlabs-filters.jar
-/portal/jmatio.jar
 /portal/jna.jar
 /portal/jodd-json.jar
 /portal/jodd-proxetta.jar
@@ -160,17 +158,11 @@
 /portal/log4j-core.jar
 /portal/mchange-commons-java.jar
 /portal/metadata-extractor.jar
-/portal/mime4j-core.jar
-/portal/mime4j-dom.jar
 /portal/mimepull.jar
 /portal/mp4parser.jar
 /portal/netcdf.jar
 /portal/pdfbox.jar
 /portal/persistence.jar
-/portal/poi-ooxml-schemas.jar
-/portal/poi-ooxml.jar
-/portal/poi-scratchpad.jar
-/portal/poi.jar
 /portal/portlet.jar
 /portal/portletmvc4spring-framework.jar
 /portal/rmi-api.jar
@@ -201,7 +193,6 @@
 /portal/stax-ex.jar
 /portal/stax.jar
 /portal/streambuffer.jar
-/portal/tagsoup.jar
 /portal/tomcat-jdbc.jar
 /portal/tomcat-juli.jar
 /portal/transaction.jar

@@ -38,6 +38,7 @@ import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelect
 import com.liferay.object.exception.NoSuchObjectLayoutException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeServicesTracker;
+import com.liferay.object.field.render.ObjectFieldRenderingContext;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
@@ -63,11 +64,14 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -198,7 +202,14 @@ public class ObjectEntryDisplayContext {
 				"objectEntryId");
 		}
 
-		_objectEntry = _objectEntryService.fetchObjectEntry(objectEntryId);
+		try {
+			_objectEntry = _objectEntryService.fetchObjectEntry(objectEntryId);
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(portalException);
+			}
+		}
 
 		return _objectEntry;
 	}
@@ -247,7 +258,7 @@ public class ObjectEntryDisplayContext {
 	}
 
 	public CreationMenu getRelatedModelCreationMenu() throws PortalException {
-		if (_readOnly) {
+		if (_readOnly || isDefaultUser()) {
 			return null;
 		}
 
@@ -319,12 +330,45 @@ public class ObjectEntryDisplayContext {
 					objectLayoutTab.getObjectRelationshipId());
 			}
 		).put(
-			"readOnly", String.valueOf(_readOnly)
+			"readOnly", String.valueOf(_readOnly || isDefaultUser())
 		).build();
 	}
 
+	public boolean isDefaultUser() {
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (permissionChecker == null) {
+			return true;
+		}
+
+		User user = permissionChecker.getUser();
+
+		return user.isDefaultUser();
+	}
+
 	public boolean isReadOnly() {
-		return _readOnly;
+		if (_readOnly) {
+			return true;
+		}
+
+		try {
+			ObjectEntry objectEntry = getObjectEntry();
+
+			if (objectEntry == null) {
+				return false;
+			}
+
+			return !_objectEntryService.hasModelResourcePermission(
+				objectEntry, ActionKeys.UPDATE);
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException);
+			}
+		}
+
+		return false;
 	}
 
 	public String renderDDMForm(PageContext pageContext)
@@ -418,6 +462,32 @@ public class ObjectEntryDisplayContext {
 		}
 	}
 
+	private ObjectFieldRenderingContext _createObjectFieldRenderingContext()
+		throws PortalException {
+
+		ObjectFieldRenderingContext objectFieldRenderingContext =
+			new ObjectFieldRenderingContext();
+
+		objectFieldRenderingContext.setGroupId(
+			_objectRequestHelper.getScopeGroupId());
+		objectFieldRenderingContext.setHttpServletRequest(
+			_objectRequestHelper.getRequest());
+		objectFieldRenderingContext.setLocale(_objectRequestHelper.getLocale());
+
+		ObjectEntry objectEntry = getObjectEntry();
+
+		if (objectEntry != null) {
+			objectFieldRenderingContext.setObjectEntryId(
+				objectEntry.getObjectEntryId());
+		}
+
+		objectFieldRenderingContext.setPortletId(
+			_objectRequestHelper.getPortletId());
+		objectFieldRenderingContext.setUserId(_objectRequestHelper.getUserId());
+
+		return objectFieldRenderingContext;
+	}
+
 	private DDMForm _getDDMForm(ObjectLayoutTab objectLayoutTab)
 		throws PortalException {
 
@@ -462,7 +532,8 @@ public class ObjectEntryDisplayContext {
 	}
 
 	private DDMFormField _getDDMFormField(
-		ObjectField objectField, boolean readOnly) {
+			ObjectField objectField, boolean readOnly)
+		throws PortalException {
 
 		// TODO Store the type and the object field type in the database
 
@@ -484,7 +555,7 @@ public class ObjectEntryDisplayContext {
 		ddmFormField.setLabel(ddmFormFieldLabelLocalizedValue);
 
 		Map<String, Object> properties = objectFieldBusinessType.getProperties(
-			_objectRequestHelper.getLocale(), objectField);
+			objectField, _createObjectFieldRenderingContext());
 
 		properties.forEach(
 			(key, value) -> ddmFormField.setProperty(key, value));

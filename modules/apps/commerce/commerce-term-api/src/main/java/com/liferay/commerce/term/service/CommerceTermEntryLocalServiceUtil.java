@@ -303,6 +303,12 @@ public class CommerceTermEntryLocalServiceUtil {
 		return getService().getCommerceTermEntries(start, end);
 	}
 
+	public static List<CommerceTermEntry> getCommerceTermEntries(
+		long companyId, String type) {
+
+		return getService().getCommerceTermEntries(companyId, type);
+	}
+
 	/**
 	 * Returns the number of commerce term entries.
 	 *
@@ -362,6 +368,14 @@ public class CommerceTermEntryLocalServiceUtil {
 		getCTermEntryLocalizations(long commerceTermEntryId) {
 
 		return getService().getCTermEntryLocalizations(commerceTermEntryId);
+	}
+
+	public static List<CommerceTermEntry> getDeliveryCommerceTermEntries(
+		long companyId, long commerceOrderTypeId,
+		long commerceShippingOptionId) {
+
+		return getService().getDeliveryCommerceTermEntries(
+			companyId, commerceOrderTypeId, commerceShippingOptionId);
 	}
 
 	public static

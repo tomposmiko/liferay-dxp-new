@@ -1,9 +1,5 @@
 {
 	"dependencies": {
-		"@clayui/core": "3.46.0",
-		"@clayui/form": "3.45.0",
-		"frontend-js-components-web": "*",
-		"frontend-js-web": "*"
 	},
 	"name": "asset-categories-item-selector-web",
 	"scripts": {
@@ -11,5 +7,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "1.0.25"
+	"version": "1.0.26"
 }

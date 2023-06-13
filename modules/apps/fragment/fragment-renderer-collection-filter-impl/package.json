@@ -1,6 +1,5 @@
 {
 	"dependencies": {
-		"frontend-js-web": "*"
 	},
 	"main": "js/index.js",
 	"name": "@liferay/fragment-renderer-collection-filter-impl",
@@ -9,5 +8,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "1.0.13"
+	"version": "1.0.14"
 }

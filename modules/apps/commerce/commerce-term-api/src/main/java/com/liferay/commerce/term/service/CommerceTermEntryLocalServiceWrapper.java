@@ -345,6 +345,14 @@ public class CommerceTermEntryLocalServiceWrapper
 			start, end);
 	}
 
+	@Override
+	public java.util.List<com.liferay.commerce.term.model.CommerceTermEntry>
+		getCommerceTermEntries(long companyId, String type) {
+
+		return _commerceTermEntryLocalService.getCommerceTermEntries(
+			companyId, type);
+	}
+
 	/**
 	 * Returns the number of commerce term entries.
 	 *
@@ -415,6 +423,16 @@ public class CommerceTermEntryLocalServiceWrapper
 
 		return _commerceTermEntryLocalService.getCTermEntryLocalizations(
 			commerceTermEntryId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.commerce.term.model.CommerceTermEntry>
+		getDeliveryCommerceTermEntries(
+			long companyId, long commerceOrderTypeId,
+			long commerceShippingOptionId) {
+
+		return _commerceTermEntryLocalService.getDeliveryCommerceTermEntries(
+			companyId, commerceOrderTypeId, commerceShippingOptionId);
 	}
 
 	@Override

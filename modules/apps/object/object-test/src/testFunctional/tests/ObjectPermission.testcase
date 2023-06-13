@@ -1,7 +1,6 @@
 @component-name = "portal-object"
 definition {
 
-	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Object";
@@ -175,7 +174,7 @@ definition {
 	@description = "LPS-135390 - Verify it is possible to edit its own Object entry with only the Add Object Entry permission"
 	@priority = "5"
 	test CanEditItsOwnEntryWithOnlyAddPermission {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object",
@@ -196,7 +195,7 @@ definition {
 			roleKey = "Regular Role",
 			roleTitle = "Regular Role");
 
-		for (var resourceActionIndex : list "APLICATION_PERMISSION_ACCESS_CONTROL_PANEL_CHECKBOX,RESOURCE_PERMISSION_ADD_ENTRY_CHECKBOX") {
+		for (var resourceActionIndex : list "APPLICATION_PERMISSION_ACCESS_CONTROL_PANEL_CHECKBOX,RESOURCE_PERMISSION_ADD_ENTRY_CHECKBOX") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Users",
 				panel = "Control Panel",
@@ -626,7 +625,7 @@ definition {
 			roleKey = "Regular Role",
 			roleTitle = "Regular Role");
 
-		for (var resourceActionIndex : list "APLICATION_PERMISSION_ACCESS_CONTROL_PANEL_CHECKBOX,RESOURCE_PERMISSION_ADD_ENTRY_CHECKBOX") {
+		for (var resourceActionIndex : list "APPLICATION_PERMISSION_ACCESS_CONTROL_PANEL_CHECKBOX,RESOURCE_PERMISSION_ADD_ENTRY_CHECKBOX") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Users",
 				panel = "Control Panel",
@@ -730,7 +729,6 @@ definition {
 	test RolePermissionsOverlapSingleObjectEntryPermissions {
 		property osgi.module.configuration.file.names = "com.liferay.object.rest.internal.configuration.FFObjectEntryPermissionsActionConfiguration.config";
 		property osgi.module.configurations = "enabled=&quot;true&quot;";
-		property portal.acceptance = "false";
 
 		// TODO LPS-147747 RolePermissionsOverlapSingleObjectEntryPermissions pending implementation
 
