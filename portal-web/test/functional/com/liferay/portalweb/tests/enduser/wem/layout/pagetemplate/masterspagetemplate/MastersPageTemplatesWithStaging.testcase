@@ -181,13 +181,13 @@ definition {
 
 		PageEditor.gotoStyle(fragmentName = "Heading");
 
-		PageEditor.configureFragment(alignment = "Center");
+		PageEditor.configureFragment(alignment = "Align Center");
 
 		PageEditor.gotoDuplicate(fragmentName = "Container");
 
-		PageEditor.removeFragmentViaPageStructure(
-			duplicateFragment = "true",
-			fragmentName = "Container");
+		PageEditor.gotoEllipsisMenuItemInPageElementsPanel(
+			fragmentName = "Container",
+			menuItem = "Delete");
 
 		AssertVisible(
 			key_text = "undo",

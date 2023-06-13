@@ -16,6 +16,7 @@ import 'codemirror/mode/groovy/groovy';
 import ClayAlert from '@clayui/alert';
 import ClayTabs from '@clayui/tabs';
 import {
+	API,
 	CustomItem,
 	FormError,
 	SidePanelForm,
@@ -27,7 +28,6 @@ import {
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
-import {getObjectFields} from '../../utils/api';
 import {HEADERS} from '../../utils/constants';
 import ActionBuilder from './tabs/ActionBuilder';
 import BasicInfo from './tabs/BasicInfo';
@@ -54,6 +54,10 @@ export default function Action({
 	const [backEndErrors, setBackEndErrors] = useState<Error>({});
 
 	const onSubmit = async (objectAction: ObjectAction) => {
+		if (objectAction.parameters) {
+			delete objectAction?.parameters['lineCount'];
+		}
+
 		const response = await fetch(url, {
 			body: JSON.stringify(objectAction),
 			headers: HEADERS,
@@ -225,6 +229,15 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 		) {
 			errors.url = REQUIRED_MSG;
 		}
+		else if (
+			values.objectActionExecutorKey === 'groovy' &&
+			!!values.parameters?.lineCount &&
+			values.parameters.lineCount > 2987
+		) {
+			errors.script = Liferay.Language.get(
+				'the-maximum-number-of-lines-available-is-2987'
+			);
+		}
 		else if (values.objectActionExecutorKey === 'add-object-entry') {
 			if (!values.parameters?.objectDefinitionId) {
 				errors.objectDefinitionId = REQUIRED_MSG;
@@ -274,7 +287,7 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 
 	useEffect(() => {
 		if (values.parameters?.objectDefinitionId) {
-			getObjectFields(values.parameters.objectDefinitionId).then(
+			API.getObjectFields(values.parameters.objectDefinitionId).then(
 				(fields) => {
 					const filteredFields = fields.filter(
 						({businessType, system}) =>

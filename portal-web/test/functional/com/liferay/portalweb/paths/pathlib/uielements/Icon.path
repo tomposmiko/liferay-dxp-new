@@ -17,7 +17,7 @@
 </tr>
 <tr>
 	<td>ADVANCED_SEARCH</td>
-	<td>//button[contains(@class,'toggle-advanced') and span[@class='caret']] | //a[contains(@id,'searchtoggleAdvanced')]</td>
+	<td>//button[contains(@class,'toggle-advanced') and contains(@id,'searchtoggleAdvanced')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -88,6 +88,11 @@
 <tr>
 	<td>COG_PAGE</td>
 	<td>//li/div[contains(.,'${key_pageName}')]/..//a[*[name()='svg'][contains(@class,'icon-cog')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COLOR_PICKER_ICON</td>
+	<td>//label[normalize-space(text())='${key_fieldLabel}']/following-sibling::div//div[contains(@class,'color-picker')]//button[contains(@class,'color-picker__selector')]//span[contains(@class,'rounded-circle')]</td>
 	<td></td>
 </tr>
 <tr>

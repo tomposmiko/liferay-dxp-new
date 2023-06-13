@@ -315,6 +315,10 @@
 			<property name="allowedDependencyNames" value="com.liferay.arquillian.extension.junit.bridge" />
 			<property name="allowedDependencyNames" value="com.liferay.portal.cache.test.util" />
 		</check>
+		<check name="GradleUpgradeReleaseDXPCheck">
+			<category name="Upgrade" />
+			<description name="Remove and replaced dependencies in `build.gradle` that are already in `release.dxp.api` with `released.dxp.api` dependency." />
+		</check>
 		<check name="WhitespaceCheck">
 			<category name="Styling" />
 			<description name="Finds missing and unnecessary whitespace." />
@@ -704,6 +708,10 @@
 		<check name="JavaReleaseInfoCheck">
 			<category name="Bug Prevention" />
 			<description name="Validates information in `ReleaseInfo.java`." />
+		</check>
+		<check name="JavaRunSqlStylingCheck">
+			<category name="Styling" />
+			<description name="Applies rules to enforce consistency in code style." />
 		</check>
 		<check name="JavaServiceObjectCheck">
 			<category name="Styling" />

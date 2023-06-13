@@ -216,19 +216,16 @@ definition {
 				groupName = "Test Site Name");
 		}
 
-		task ("Go to Content Dashboard and check the title in the Info panel") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Content",
-				panel = "Applications",
-				portlet = "Content Dashboard");
+		task ("When the info panel of a blog is open") {
+			ContentDashboard.goToContentDashboard();
+
+			ContentDashboard.openInfoPanelByDropdownMenu();
 		}
 
-		task ("Go to Content Dashboard and check the author's avatar and name in the Info panel") {
-			ContentDashboard.openInfoPanelByDropdownMenu();
-
-			AssertElementPresent(
-				assetAuthor = "Test Test",
-				locator1 = "ContentDashboard#INFO_PANEL_AUTHOR");
+		task ("Then the blog author's avatar and name are shown") {
+			AssertTextPresent(
+				locator1 = "ContentDashboard#INFO_PANEL_AUTHOR",
+				value1 = "Test Test");
 
 			AssertElementPresent(locator1 = "ContentDashboard#INFO_PANEL_AVATAR");
 		}
@@ -1425,6 +1422,64 @@ definition {
 					fillColor = "FF5F5F",
 					locator1 = "ContentDashboard#BAR_FROM_NO_VOCABULARY_SPECIFIED");
 			}
+		}
+	}
+
+	@description = "LPS-152906: Given a Blogs Asset at Content Dashboard
+	When the user accesses the its information panel
+	Then the share button must be present"
+	@ignore = "true"
+	@priority = "4"
+	test CheckShareButtonIsPresentForBlogs {
+		task ("Create a Blog Entry asset") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("Navigate to the content Dashboard and the user accesses the Blog Asset information panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+
+			ContentDashboard.openInfoPanelByDropdownMenu();
+		}
+
+		task ("Check if the share button is not present at info panel") {
+			AssertElementPresent(
+				key_text = "Share",
+				locator1 = "Button#ANY");
+		}
+	}
+
+	@description = "LPS-152906: Given the Info panel of the Content Dashboard
+	When the user accesses the Web Content information panel
+	Then share button must not be present for Web Content"
+	@ignore = "true"
+	@priority = "4"
+	test CheckShareButtonNotPresentForWebContent {
+		task ("Create a Web Content and set a Display Page") {
+			JSONWebcontent.addWebContent(
+				content = "Webcontent Content",
+				groupName = "Test Site Name",
+				title = "WC Content");
+		}
+
+		task ("Navigate to the content Dashboard and the user accesses the Web Content information panel") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Content",
+				panel = "Applications",
+				portlet = "Content Dashboard");
+
+			ContentDashboard.openInfoPanelByDropdownMenu();
+		}
+
+		task ("Check if the share button is not present at info panel") {
+			AssertElementNotPresent(
+				key_text = "Share",
+				locator1 = "Button#ANY");
 		}
 	}
 

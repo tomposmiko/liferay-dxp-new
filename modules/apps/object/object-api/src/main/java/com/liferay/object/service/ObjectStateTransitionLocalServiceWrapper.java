@@ -314,6 +314,22 @@ public class ObjectStateTransitionLocalServiceWrapper
 			getIndexableActionableDynamicQuery();
 	}
 
+	@Override
+	public java.util.List<com.liferay.object.model.ObjectStateTransition>
+		getObjectStateFlowObjectStateTransitions(long objectStateFlowId) {
+
+		return _objectStateTransitionLocalService.
+			getObjectStateFlowObjectStateTransitions(objectStateFlowId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.object.model.ObjectStateTransition>
+		getObjectStateObjectStateTransitions(long objectStateId) {
+
+		return _objectStateTransitionLocalService.
+			getObjectStateObjectStateTransitions(objectStateId);
+	}
+
 	/**
 	 * Returns the object state transition with the primary key.
 	 *

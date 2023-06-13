@@ -4,8 +4,6 @@ buildService {
 }
 
 dependencies {
-	compileInclude group: "org.codehaus.groovy", name: "groovy", version: "2.4.21"
-
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
 	compileOnly group: "commons-io", name: "commons-io", version: "2.11.0"
@@ -30,7 +28,7 @@ dependencies {
 	compileOnly project(":apps:object:object-api")
 	compileOnly project(":apps:object:object-dynamic-data-mapping-form-field-type-api")
 	compileOnly project(":apps:object:object-rest-api")
-	compileOnly project(":apps:object:object-runtime-api")
+	compileOnly project(":apps:object:object-scripting-api")
 	compileOnly project(":apps:portal-search:portal-search-api")
 	compileOnly project(":apps:portal-search:portal-search-spi")
 	compileOnly project(":apps:portal-security-audit:portal-security-audit-event-generators-api")
@@ -38,6 +36,7 @@ dependencies {
 	compileOnly project(":apps:portal-vulcan:portal-vulcan-api")
 	compileOnly project(":apps:portal:portal-aop-api")
 	compileOnly project(":apps:portal:portal-instance-lifecycle-api")
+	compileOnly project(":apps:static:osgi:osgi-util")
 	compileOnly project(":apps:static:portal-configuration:portal-configuration-metatype-api")
 	compileOnly project(":apps:static:portal:portal-upgrade-api")
 	compileOnly project(":core:osgi-service-tracker-collections")

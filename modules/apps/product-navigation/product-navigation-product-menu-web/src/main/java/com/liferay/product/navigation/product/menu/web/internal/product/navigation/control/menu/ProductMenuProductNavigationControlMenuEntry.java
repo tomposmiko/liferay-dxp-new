@@ -18,7 +18,7 @@ import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -135,8 +135,11 @@ public class ProductMenuProductNavigationControlMenuEntry
 				ProductNavigationProductMenuPortletKeys.
 					PRODUCT_NAVIGATION_PRODUCT_MENU)
 		).put(
-			"title",
-			HtmlUtil.escape(LanguageUtil.get(httpServletRequest, "menu"))
+			"skipLinkLabel",
+			HtmlUtil.escape(
+				_language.get(httpServletRequest, "skip-to-product-menu"))
+		).put(
+			"title", HtmlUtil.escape(_language.get(httpServletRequest, "menu"))
 		).build();
 
 		try {
@@ -182,6 +185,9 @@ public class ProductMenuProductNavigationControlMenuEntry
 
 	private static final String _TMPL_CONTENT = StringUtil.read(
 		ProductMenuProductNavigationControlMenuEntry.class, "icon.tmpl");
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private Portal _portal;

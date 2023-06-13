@@ -1,16 +1,14 @@
 @component-name = "portal-solutions"
-@ignore = "true"
 definition {
 
-	property custom.properties = "javascript.single.page.application.enabled=false${line.separator}jsonws.web.service.paths.excludes=";
 	property osgi.modules.includes = "osb-site-initializer-customer-portal";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 	property testray.main.component.name = "OSB Site Initializer Customer Portal";
 
-	var testSiteName = "Customer Portal Name";
-	var testSiteURL = "customer-portal-name";
+	var testSiteName = "Customer Portal Site";
+	var testSiteURL = "customer-portal-site";
 
 	setUp {
 		task ("Set up instance and sign in") {
@@ -20,36 +18,24 @@ definition {
 		}
 
 		task ("Create a new Customer Portal Site") {
-			Site.openSitesAdmin();
-
-			TeamExtranet.addSiteTemplateCP(
-				siteName = "${testSiteName}",
-				siteTemplateName = "Liferay OSB Site Initializer Customer Portal");
+			CustomerPortal.addCustomerPortalSite(siteName = "${testSiteName}");
 		}
 	}
 
 	tearDown {
-		var testPortalInstance = PropsUtil.get("test.portal.instance");
+		CustomerPortal.customerPortalApisTearDown();
 
-		if ("${testPortalInstance}" == "true") {
-			PortalInstances.tearDownCP();
-		}
-		else {
-			JSONGroup.deleteGroupByName(groupName = "${testSiteName}");
+		JSONGroup.deleteGroupByName(groupName = "${testSiteName}");
 
-			CustomerPortal.customerPortalApisTearDown();
-		}
+		PortalInstances.tearDownCP();
 	}
 
 	@description = "LPS-143375 - Verify if Liferay Contact displays Liferay Contact's email."
 	@priority = "4"
 	test IsContactEmailDisplayed {
-		ApplicationsMenu.gotoSite(key_site = "Customer Portal Name");
+		ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
 
-		Click(
-			locator1 = "CP2LiferayContact#PROJECT_CARD",
-			status = "Active",
-			title = "Test Account 01");
+		CustomerPortal.enterOnProject(title = "Test Account 01");
 
 		AssertTextEquals(
 			locator1 = "CP2LiferayContact#DISPLAY_CONTACT",
@@ -60,12 +46,9 @@ definition {
 	@description = "LPS-143373 - Verify if Liferay Contact displays Liferay Contact's name."
 	@priority = "4"
 	test IsContactNameDisplayed {
-		ApplicationsMenu.gotoSite(key_site = "Customer Portal Name");
+		ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
 
-		Click(
-			locator1 = "CP2LiferayContact#PROJECT_CARD",
-			status = "Active",
-			title = "Test Account 01");
+		CustomerPortal.enterOnProject(title = "Test Account 01");
 
 		AssertElementPresent(locator1 = "CP2LiferayContact#CONTACT_NAME");
 	}
@@ -73,12 +56,9 @@ definition {
 	@description = "LPS-143374 - Verify if Liferay Contact displays Liferay Contact's role."
 	@priority = "3"
 	test IsContactRoleDisplayed {
-		ApplicationsMenu.gotoSite(key_site = "Customer Portal Name");
+		ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
 
-		Click(
-			locator1 = "CP2LiferayContact#PROJECT_CARD",
-			status = "Active",
-			title = "Test Account 01");
+		CustomerPortal.enterOnProject(title = "Test Account 01");
 
 		AssertTextEquals(
 			locator1 = "CP2LiferayContact#DISPLAY_CONTACT",

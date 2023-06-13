@@ -17,6 +17,7 @@ import ClayForm, {ClayCheckbox, ClaySelect, ClayToggle} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import {ClayTooltipProvider} from '@clayui/tooltip';
 import {
+	API,
 	Card,
 	CodeEditor,
 	CustomItem,
@@ -26,13 +27,11 @@ import {
 	SelectWithOption,
 	invalidateRequired,
 } from '@liferay/object-js-components-web';
-import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
 import PredefinedValuesTable from '../PredefinedValuesTable';
 
 import './ActionBuilder.scss';
-import {fetchJSON, getObjectFields} from '../../../utils/api';
 import {ActionError} from '../index';
 
 type ObjectsOptionsList = Array<
@@ -55,17 +54,15 @@ export default function ActionBuilder({
 	validateExpressionURL,
 	values,
 }: IProps) {
-	const [notificationTemplates, setNotificationTemplates] = useState<any[]>(
-		[]
-	);
+	const [notificationTemplates, setNotificationTemplates] = useState<
+		CustomItem<number>[]
+	>([]);
 
 	const [objectsOptions, setObjectOptions] = useState<ObjectsOptionsList>([]);
 
-	const notificationTemplateId = useMemo(() => {
+	const notificationTemplateLabel = useMemo(() => {
 		return notificationTemplates.find(
-			(notificationTemplate) =>
-				notificationTemplate.value ===
-				values.parameters?.notificationTemplateId
+			({value}) => value === values.parameters?.notificationTemplateId
 		)?.label;
 	}, [notificationTemplates, values.parameters]);
 
@@ -81,9 +78,9 @@ export default function ActionBuilder({
 	const [infoAlert, setInfoAlert] = useState(true);
 
 	const fetchObjectDefinitions = async () => {
-		const relationships = await fetchJSON<ObjectDefinitionsRelationship[]>(
-			objectDefinitionsRelationshipsURL
-		);
+		const relationships = await API.fetchJSON<
+			ObjectDefinitionsRelationship[]
+		>(objectDefinitionsRelationshipsURL);
 
 		const relatedObjects: SelectItem[] = [];
 		const unrelatedObjects: SelectItem[] = [];
@@ -152,29 +149,14 @@ export default function ActionBuilder({
 
 	useEffect(() => {
 		if (values.objectActionExecutorKey === 'notification') {
-			const makeFetch = async () => {
-				const response = await fetch(
-					'/o/notification/v1.0/notification-templates',
-					{
-						method: 'GET',
-					}
-				);
-
-				const {items} = (await response.json()) as any;
-
-				const notificationsArray = items.map(
-					(item: TNotificationTemplate) => {
-						return {
-							label: item.name,
-							value: item.id,
-						};
-					}
-				);
+			API.getNotificationTemplates().then((items) => {
+				const notificationsArray = items.map(({id, name}) => ({
+					label: name,
+					value: id,
+				}));
 
 				setNotificationTemplates(notificationsArray);
-			};
-
-			makeFetch();
+			});
 		}
 	}, [values]);
 
@@ -191,7 +173,7 @@ export default function ActionBuilder({
 		let validFields: ObjectField[] = [];
 
 		if (values.parameters?.objectDefinitionId) {
-			const items = await getObjectFields(
+			const items = await API.getObjectFields(
 				values.parameters.objectDefinitionId
 			);
 
@@ -250,7 +232,7 @@ export default function ActionBuilder({
 			parameters.relatedObjectEntries = false;
 		}
 
-		const items = await getObjectFields(objectDefinitionId);
+		const items = await API.getObjectFields(objectDefinitionId);
 
 		const validFields: ObjectField[] = [];
 
@@ -487,7 +469,7 @@ export default function ActionBuilder({
 						)}
 
 						{values.objectActionExecutorKey === 'notification' && (
-							<FormCustomSelect
+							<FormCustomSelect<CustomItem<number>>
 								className="lfr-object__action-builder-notification-then"
 								error={errors.objectActionExecutorKey}
 								label={Liferay.Language.get('notification')}
@@ -501,7 +483,7 @@ export default function ActionBuilder({
 								}}
 								options={notificationTemplates}
 								required
-								value={notificationTemplateId}
+								value={notificationTemplateLabel}
 							/>
 						)}
 					</div>
@@ -560,10 +542,11 @@ export default function ActionBuilder({
 						error={errors.script}
 						fixed
 						mode="groovy"
-						onChange={(script) =>
+						onChange={(script, lineCount) =>
 							setValues({
 								parameters: {
 									...values.parameters,
+									lineCount,
 									script,
 								},
 							})
@@ -591,16 +574,3 @@ interface SelectItem {
 	label: string;
 	value: number;
 }
-
-type TNotificationTemplate = {
-	bcc: string;
-	body: LocalizedValue<string>;
-	cc: string;
-	description: string;
-	from: string;
-	fromName: LocalizedValue<string>;
-	id: number;
-	name: string;
-	subject: LocalizedValue<string>;
-	to: LocalizedValue<string>;
-};

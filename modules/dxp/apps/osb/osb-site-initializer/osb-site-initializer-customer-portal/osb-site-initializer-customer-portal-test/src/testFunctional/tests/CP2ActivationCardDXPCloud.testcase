@@ -1,16 +1,14 @@
 @component-name = "portal-solutions"
-@ignore = "true"
 definition {
 
-	property custom.properties = "javascript.single.page.application.enabled=false${line.separator}jsonws.web.service.paths.excludes=";
 	property osgi.modules.includes = "osb-site-initializer-customer-portal";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 	property testray.main.component.name = "OSB Site Initializer Customer Portal";
 
-	var testSiteName = "Customer Portal Name";
-	var testSiteURL = "customer-portal-name";
+	var testSiteName = "Customer Portal Site";
+	var testSiteURL = "customer-portal-site";
 
 	setUp {
 		task ("Set up instance and sign in") {
@@ -20,31 +18,23 @@ definition {
 		}
 
 		task ("Create a new Customer Portal Site") {
-			Site.openSitesAdmin();
-
-			TeamExtranet.addSiteTemplateCP(
-				siteName = "${testSiteName}",
-				siteTemplateName = "Liferay OSB Site Initializer Customer Portal");
+			CustomerPortal.addCustomerPortalSite(siteName = "${testSiteName}");
 		}
 	}
 
 	tearDown {
-		var testPortalInstance = PropsUtil.get("test.portal.instance");
+		CustomerPortal.customerPortalApisTearDown();
 
-		if ("${testPortalInstance}" == "true") {
-			PortalInstances.tearDownCP();
-		}
-		else {
-			JSONGroup.deleteGroupByName(groupName = "${testSiteName}");
+		JSONGroup.deleteGroupByName(groupName = "${testSiteName}");
 
-			CustomerPortal.customerPortalApisTearDown();
-		}
+		PortalInstances.tearDownCP();
 	}
 
-	@description = "LPS-146856 - Verify that when the status is active the page displays (Subtitle - Link - Link redirects to another page)"
-	@ignore = "true"
+	@description = "Automation ID: LPS-146856 | Test Summary: Verify that when the status is active the page displays (Subtitle - Link - Link redirects to another page)"
 	@priority = "4"
 	test AffirmAllTextAndLinksOnThePage {
+		CP2DXPCloudSetup.addCPDXPCloudObject();
+
 		CustomerPortal.showCPObject(title = "Account Flag");
 
 		CustomerPortal.showCPObject(title = "Account Subscription Group");
@@ -57,7 +47,7 @@ definition {
 			accountRoleTitle = "Account Administrator",
 			accountUserName = "Test Test");
 
-		ApplicationsMenu.gotoSite(key_site = "Customer Portal Name");
+		ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
 
 		CustomerPortal.enterOnProject(title = "Test Account 01");
 
@@ -79,7 +69,7 @@ definition {
 
 		CP2DXPCloudSetup.activeStatus();
 
-		ApplicationsMenu.gotoSite(key_site = "Customer Portal Name");
+		ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
 
 		CustomerPortal.enterOnProject(title = "Test Account 01");
 
@@ -91,26 +81,31 @@ definition {
 			locator1 = "CP2DXPCloudSetup#PRODUCT_CONSOLE",
 			value1 = "Go to Product Console");
 
-		Click(locator1 = "CP2DXPCloudSetup#PRODUCT_CONSOLE");
+		CP2DXPCloudSetup.clickOnProductConsoleLink();
+
+		SelectWindow(locator1 = "title=Log in | DXP Cloud");
 
 		AssertElementPresent(locator1 = "CustomerPortalSite#YOUR_ACCOUNT");
 
-		SelectWindow(locator1 = "title=Home - Customer Portal Name - Liferay DXP");
+		Navigator.closeWindow();
 
-		CP2DXPCloudSetup.clearDXPCloudInfo();
-
-		CP2DXPCloudSetup.deleteDXPCloudObject();
+		CP2DXPCloudSetup.clearDXPCloudInfo(status = "Active");
 
 		CustomerPortal.deleteEntryAccountFlag(entry = "ERC-001");
 
 		CustomerPortal.deleteCPObject(title = "Account Flag");
+
+		CP2DXPCloudSetup.deleteDXPCloudObject();
 	}
 
 	@description = "LPS-146852 - Verify if when the status is 'In Progress' the page subtitle: 'Your DXP Cloud environments are being set up and will be available soon' appears"
-	@ignore = "true"
 	@priority = "4"
 	test CanViewCaptionWhenTheStatusIsInProgress {
+		CP2DXPCloudSetup.addCPDXPCloudObject();
+
 		CustomerPortal.showCPObject(title = "Account Flag");
+
+		CustomerPortal.showCPObject(title = "Account Subscription Group");
 
 		Accounts.openAccountsAdmin();
 
@@ -120,7 +115,7 @@ definition {
 			accountRoleTitle = "Account Administrator",
 			accountUserName = "Test Test");
 
-		ApplicationsMenu.gotoSite(key_site = "Customer Portal Name");
+		ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
 
 		CustomerPortal.enterOnProject(title = "Test Account 01");
 
@@ -144,15 +139,19 @@ definition {
 			locator1 = "CP2DXPCloudSetup#CARD_SUBSCRIPTION",
 			title = "Your DXP Cloud environments are being set up and will be available soon");
 
+		CP2DXPCloudSetup.clearDXPCloudInfo(status = "In-Progress");
+
 		CustomerPortal.deleteEntryAccountFlag(entry = "ERC-001");
 
 		CustomerPortal.deleteCPObject(title = "Account Flag");
+
+		CP2DXPCloudSetup.deleteDXPCloudObject();
 	}
 
 	@description = "LPS-146849 - Verify if Link 'Finish Activation' hidden to requestor and user roles"
 	@priority = "5"
 	test NoLinkIsDisplayedWhenYouAreARequesterOrUserRoles {
-		ApplicationsMenu.gotoSite(key_site = "Customer Portal Name");
+		ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
 
 		CustomerPortal.enterOnProject(title = "Test Account 01");
 
@@ -165,10 +164,10 @@ definition {
 			value1 = "Finish Activation");
 	}
 
-	@description = "LPS-146843 - Verify that the Activation Form Card - DXP Cloud displays (Product logo - Subscription - Start Date - End Date - Form Link - Page Subtitleis/Not Activated)"
+	@description = "LPS-146843 - Verify that the Activation Form Card - DXP Cloud displays (Product logo - Subscription - Start Date - End Date - Page Subtitleis/Not Activated)"
 	@priority = "4"
 	test ViewTheDisplaysTheDxpCloudLogo {
-		ApplicationsMenu.gotoSite(key_site = "Customer Portal Name");
+		ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
 
 		CustomerPortal.enterOnProject(title = "Test Account 01");
 
@@ -182,6 +181,18 @@ definition {
 	@description = "LPS-146848 - Verify if Link 'Finish Activation' only visible to admin roles"
 	@priority = "5"
 	test YouCanSeeTheActivationLinkIfYouAreAdmin {
+		ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
+
+		CustomerPortal.enterOnProject(title = "Test Account 01");
+
+		CP2NavigationMenu.goToProductActivation();
+
+		CP2NavigationMenu.clickOnProductButton(product = "DXP Cloud");
+
+		AssertElementNotPresent(
+			locator1 = "CP2DXPCloudSetup#FINISH_ACTIVATION",
+			value1 = "Finish Activation");
+
 		CustomerPortal.showCPObject(title = "Account Flag");
 
 		Accounts.openAccountsAdmin();
@@ -192,7 +203,7 @@ definition {
 			accountRoleTitle = "Account Administrator",
 			accountUserName = "Test Test");
 
-		ApplicationsMenu.gotoSite(key_site = "Customer Portal Name");
+		ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
 
 		CustomerPortal.enterOnProject(title = "Test Account 01");
 

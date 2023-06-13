@@ -42,14 +42,14 @@ export declare function useObjectFieldForm({
 			maxLength: any;
 			acceptedFileExtensions: any;
 			fileSource: any;
+			filters: any;
 			maximumFileSize: any;
+			objectFieldName: any;
+			objectRelationshipName: any;
 			showCounter: any;
 			showFilesInDocumentsAndMedia: any;
-			storageDLFolderPath: any;
-			relationship: any;
-			summarizeField: any;
-			filters: any;
 			stateFlow: any;
+			storageDLFolderPath: any;
 		}
 	>;
 	handleChange: React.ChangeEventHandler<HTMLInputElement>;

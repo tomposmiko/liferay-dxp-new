@@ -12,11 +12,8 @@
  * details.
  */
 
-import {Select} from '@liferay/object-js-components-web';
+import {API, Select} from '@liferay/object-js-components-web';
 import React, {useEffect, useMemo, useState} from 'react';
-
-import {getObjectFields} from '../../utils/api';
-import {defaultLanguageId} from '../../utils/locale';
 
 export default function SelectRelationship({
 	error,
@@ -27,7 +24,10 @@ export default function SelectRelationship({
 }: IProps) {
 	const [fields, setFields] = useState<ObjectField[]>([]);
 	const options = useMemo(
-		() => fields.map(({label}) => label[defaultLanguageId]!),
+		() =>
+			fields.map(
+				({label}) => label[Liferay.ThemeDisplay.getDefaultLanguageId()]!
+			),
 		[fields]
 	);
 	const selectedValue = useMemo(() => {
@@ -38,7 +38,7 @@ export default function SelectRelationship({
 
 	useEffect(() => {
 		if (objectDefinitionId) {
-			getObjectFields(objectDefinitionId).then((fields) => {
+			API.getObjectFields(objectDefinitionId).then((fields) => {
 				const options = fields.filter(
 					({businessType}) => businessType === 'Relationship'
 				);

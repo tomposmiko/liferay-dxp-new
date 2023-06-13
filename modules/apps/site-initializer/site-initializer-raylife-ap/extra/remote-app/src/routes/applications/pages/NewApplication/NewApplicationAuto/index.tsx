@@ -80,7 +80,7 @@ const NewApplicationAuto = ({children}: DriverInfoProps) => {
 		const applicationStatus =
 			state.currentStep < 4
 				? CONSTANTS.APPLICATION_STATUS.OPEN
-				: CONSTANTS.APPLICATION_STATUS.QUOTED;
+				: CONSTANTS.APPLICATION_STATUS.BOUND;
 
 		createOrUpdateRaylifeApplication(state, applicationStatus).then(
 			(response) => {
@@ -97,6 +97,10 @@ const NewApplicationAuto = ({children}: DriverInfoProps) => {
 				payload: state.currentStep + 1,
 				type: ACTIONS.SET_CURRENT_STEP,
 			});
+		}
+
+		if (state.currentStep === 4) {
+			redirectTo('Applications');
 		}
 	};
 
@@ -163,7 +167,7 @@ const NewApplicationAuto = ({children}: DriverInfoProps) => {
 						<h5>New Application</h5>
 
 						{state.hasFormChanges && (
-							<ChangeStatusMessage text="Unsave Changes" />
+							<ChangeStatusMessage text="Unsaved Changes" />
 						)}
 
 						{!state.hasFormChanges && !saveChanges && (
@@ -263,15 +267,41 @@ const NewApplicationAuto = ({children}: DriverInfoProps) => {
 							</ClayButton>
 						)}
 
-						<ClayButton
-							className="text-uppercase"
-							disabled={!state.isAbleToNextStep}
-							displayType="primary"
-							onClick={(event) => handleNextClick(event)}
-							small={true}
-						>
-							Next
-						</ClayButton>
+						{state.currentStep <= 2 && (
+							<ClayButton
+								className="text-uppercase"
+								disabled={!state.isAbleToNextStep}
+								displayType="primary"
+								onClick={(event) => handleNextClick(event)}
+								small={true}
+							>
+								Next
+							</ClayButton>
+						)}
+
+						{state.currentStep === 3 && (
+							<ClayButton
+								className="text-uppercase"
+								disabled={!state.isAbleToNextStep}
+								displayType="primary"
+								onClick={(event) => handleNextClick(event)}
+								small={true}
+							>
+								Review quote
+							</ClayButton>
+						)}
+
+						{state.currentStep === 4 && (
+							<ClayButton
+								className="text-uppercase"
+								disabled={!state.isAbleToNextStep}
+								displayType="primary"
+								onClick={(event) => handleNextClick(event)}
+								small={true}
+							>
+								Generate Quote
+							</ClayButton>
+						)}
 					</div>
 				</div>
 			</div>

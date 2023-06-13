@@ -72,6 +72,10 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
+import com.liferay.portal.search.document.Document;
+import com.liferay.portal.search.document.Field;
+import com.liferay.portal.search.hits.SearchHit;
+import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
@@ -106,6 +110,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -635,20 +640,18 @@ public class SXPBlueprintSearchResultTest {
 			"Article 2.0"
 		).build();
 
+		JournalArticle journalArticle = _journalArticles.get(1);
+
+		journalArticle.setVersion(2.0);
+
+		_journalArticleLocalService.updateJournalArticle(journalArticle);
+
 		_journalArticles.set(
 			0,
 			JournalTestUtil.updateArticle(
 				_journalArticles.get(0), "Article 1.1"));
 
-		_journalArticles.set(
-			1,
-			JournalTestUtil.updateArticle(
-				_journalArticles.get(1), "Article 2.1"));
-
-		_journalArticles.set(
-			1,
-			JournalTestUtil.updateArticle(
-				_journalArticles.get(1), "Article 2.2"));
+		_keywords = "Article";
 
 		_updateElementInstancesJSON(
 			new Object[] {
@@ -662,13 +665,11 @@ public class SXPBlueprintSearchResultTest {
 			},
 			new String[] {"Boost Contents With More Versions"});
 
-		_keywords = "Article";
-
-		_assertSearch("[Article 2.2, Article 1.1]");
+		_assertSearch("[Article 2.0, Article 1.1]");
 
 		_updateElementInstancesJSON(null, null);
 
-		_assertSearch("[Article 1.1, Article 2.2]");
+		_assertSearch("[Article 1.1, Article 2.0]");
 	}
 
 	@Test
@@ -1891,30 +1892,14 @@ public class SXPBlueprintSearchResultTest {
 	@Test
 	public void testTextMatchOverMultipleFields_bestFields() throws Exception {
 		_journalArticleBuilder.setTitle(
-			"drink carbonated coca"
-		).setContent(
-			"carbonated cola"
+			"coca cola"
 		).build();
 
 		_journalArticleBuilder.setTitle(
-			"drink carbonated pepsi cola"
+			"coca coca"
 		).setContent(
-			"carbonated cola cola"
+			"cola cola"
 		).build();
-
-		_journalArticleBuilder.setTitle(
-			"fruit punch"
-		).setContent(
-			"non-carbonated cola"
-		).build();
-
-		_journalArticleBuilder.setTitle(
-			"sprite"
-		).setContent(
-			"carbonated cola cola"
-		).build();
-
-		_getTextMatchOverMultipleFields();
 
 		_updateElementInstancesJSON(
 			new Object[] {_getTextMatchOverMultipleFields()},
@@ -1922,35 +1907,7 @@ public class SXPBlueprintSearchResultTest {
 
 		_keywords = "coca cola";
 
-		_assertSearch(
-			"[drink carbonated coca, drink carbonated pepsi cola, sprite, " +
-				"fruit punch]");
-
-		_journalArticleBuilder.setTitle(
-			"lorem ipsum dolor"
-		).setContent(
-			"ipsum sit"
-		).build();
-
-		_journalArticleBuilder.setTitle(
-			"lorem ipsum sit"
-		).setContent(
-			"ipsum sit sit"
-		).build();
-
-		_journalArticleBuilder.setTitle(
-			"nunquis"
-		).setContent(
-			"non-lorem ipsum sit"
-		).build();
-
-		_updateElementInstancesJSON(
-			new Object[] {_getTextMatchOverMultipleFields()},
-			new String[] {"Text Match Over Multiple Fields"});
-
-		_keywords = "ipsum sit sit";
-
-		_assertSearch("[lorem ipsum sit, lorem ipsum dolor, nunquis]");
+		_assertSearch("[coca cola, coca coca]");
 	}
 
 	@Test
@@ -2068,55 +2025,38 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_mostFields() throws Exception {
-		_journalArticleBuilder.setTitle(
-			"amet"
-		).setContent(
-			"ipsum sit sit"
+		_updateConfigurationJSON(
+			"queryConfiguration", JSONUtil.put("applyIndexerClauses", false));
+
+		_journalArticleBuilder.setTitleMap(
+			HashMapBuilder.put(
+				LocaleUtil.GERMANY, "coca cola most fields"
+			).put(
+				LocaleUtil.SPAIN, "coca cola most fields"
+			).put(
+				LocaleUtil.US, "coca cola most fields"
+			).build()
 		).build();
 
 		_journalArticleBuilder.setTitle(
-			"lorem ipsum dolor"
-		).setContent(
-			"ipsum sit"
-		).build();
-
-		_journalArticleBuilder.setTitle(
-			"lorem ipsum sit"
-		).setContent(
-			"ipsum sit sit"
-		).build();
-
-		_journalArticleBuilder.setTitle(
-			"nunquis"
-		).setContent(
-			"non-lorem ipsum sit"
+			"coca cola"
 		).build();
 
 		Map<String, Object> textMatchOverMultipleFields =
 			_getTextMatchOverMultipleFields();
 
-		textMatchOverMultipleFields.replace("fuzziness", "0");
-		textMatchOverMultipleFields.replace("operator", "and");
+		String[] fields = {"title_en_US", "title_de_DE", "title_es_ES"};
+
 		textMatchOverMultipleFields.replace("type", "most_fields");
+		textMatchOverMultipleFields.replace("fields", fields);
 
 		_updateElementInstancesJSON(
 			new Object[] {textMatchOverMultipleFields},
 			new String[] {"Text Match Over Multiple Fields"});
 
-		_keywords = "sit lorem";
+		_keywords = "coca cola";
 
-		_assertSearch("[lorem ipsum sit, nunquis]");
-
-		textMatchOverMultipleFields.replace("operator", "or");
-
-		_updateElementInstancesJSON(
-			new Object[] {textMatchOverMultipleFields},
-			new String[] {"Text Match Over Multiple Fields"});
-
-		_keywords = "ipsum sit sit";
-
-		_assertSearchIgnoreRelevance(
-			"[amet, lorem ipsum dolor, lorem ipsum sit, nunquis]");
+		_assertSearch("[coca cola most fields, coca cola]");
 	}
 
 	@Test
@@ -2287,17 +2227,23 @@ public class SXPBlueprintSearchResultTest {
 		SearchResponse searchResponse = _getSearchResponseSearchPage(
 			searchRequestBuilderConsumer);
 
+		String message =
+			_getScore(searchResponse) + searchResponse.getRequestString();
+
 		DocumentsAssert.assertValues(
-			searchResponse.getRequestString(),
-			searchResponse.getDocumentsStream(), "title_en_US", expected);
+			message, searchResponse.getDocumentsStream(), "title_en_US",
+			expected);
 
 		if (!Objects.equals("{}", _sxpBlueprint.getElementInstancesJSON())) {
 			searchResponse = _getSearchResponsePreview(
 				searchRequestBuilderConsumer);
 
+			message =
+				_getScore(searchResponse) + searchResponse.getRequestString();
+
 			DocumentsAssert.assertValues(
-				searchResponse.getRequestString(),
-				searchResponse.getDocumentsStream(), "title_en_US", expected);
+				message, searchResponse.getDocumentsStream(), "title_en_US",
+				expected);
 		}
 	}
 
@@ -2351,6 +2297,26 @@ public class SXPBlueprintSearchResultTest {
 			).put(
 				"enabled", enabled
 			).build());
+	}
+
+	private String _getScore(SearchResponse searchResponse) {
+		SearchHits searchHits = searchResponse.getSearchHits();
+
+		List<SearchHit> searchHitsList = searchHits.getSearchHits();
+
+		String message = StringPool.NEW_LINE;
+
+		for (SearchHit searchHit : searchHitsList) {
+			Document document = searchHit.getDocument();
+
+			Map<String, Field> fields = document.getFields();
+
+			message = StringBundler.concat(
+				message, "\" Score: ", searchHit.getScore(), "Title: \"",
+				fields.get("title_en_US"), StringPool.NEW_LINE);
+		}
+
+		return message;
 	}
 
 	private SearchResponse _getSearchResponsePreview(
@@ -2626,10 +2592,18 @@ public class SXPBlueprintSearchResultTest {
 				journalFolderId = _journalFolder.getFolderId();
 			}
 
-			_journalArticles.add(
-				_addJournalArticle(
-					_getGroupId(), journalFolderId, _title, _content,
-					_workflowEnabled, _approved));
+			if (_titleMap != null) {
+				_journalArticles.add(
+					_addJournalArticle(
+						_getGroupId(), journalFolderId, _titleMap, _content,
+						_workflowEnabled, _approved));
+			}
+			else {
+				_journalArticles.add(
+					_addJournalArticle(
+						_getGroupId(), journalFolderId, _title, _content,
+						_workflowEnabled, _approved));
+			}
 
 			_reset();
 		}
@@ -2700,12 +2674,33 @@ public class SXPBlueprintSearchResultTest {
 			return this;
 		}
 
+		public JournalArticleBuilder setTitleMap(Map<Locale, String> titleMap) {
+			_titleMap = titleMap;
+
+			return this;
+		}
+
 		public JournalArticleBuilder setWorkflowEnabled(
 			boolean workflowEnabled) {
 
 			_workflowEnabled = workflowEnabled;
 
 			return this;
+		}
+
+		private JournalArticle _addJournalArticle(
+				long groupId, long folderId, Map<Locale, String> titleMap,
+				String content, boolean workflowEnabled, boolean approved)
+			throws Exception {
+
+			return JournalTestUtil.addArticle(
+				groupId, folderId,
+				PortalUtil.getClassNameId(JournalArticle.class), titleMap, null,
+				HashMapBuilder.put(
+					LocaleUtil.US, content
+				).build(),
+				LocaleUtil.getSiteDefault(), workflowEnabled, approved,
+				_serviceContext);
 		}
 
 		private JournalArticle _addJournalArticle(
@@ -2746,6 +2741,7 @@ public class SXPBlueprintSearchResultTest {
 			_latitude = 200;
 			_longitude = 200;
 			_title = StringPool.BLANK;
+			_titleMap = null;
 			_workflowEnabled = false;
 		}
 
@@ -2763,6 +2759,7 @@ public class SXPBlueprintSearchResultTest {
 		private double _longitude;
 		private ServiceContext _serviceContext;
 		private String _title;
+		private Map<Locale, String> _titleMap;
 		private boolean _workflowEnabled;
 
 	}

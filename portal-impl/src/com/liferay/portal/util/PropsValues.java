@@ -369,6 +369,12 @@ public class PropsValues {
 	public static String COMPANY_DEFAULT_TIME_ZONE = PropsUtil.get(
 		PropsKeys.COMPANY_DEFAULT_TIME_ZONE);
 
+	public static String COMPANY_DEFAULT_VIRTUAL_HOST_MAIL_DOMAIN =
+		PropsUtil.get(PropsKeys.COMPANY_DEFAULT_VIRTUAL_HOST_MAIL_DOMAIN);
+
+	public static String COMPANY_DEFAULT_VIRTUAL_HOST_NAME = PropsUtil.get(
+		PropsKeys.COMPANY_DEFAULT_VIRTUAL_HOST_NAME);
+
 	public static String COMPANY_DEFAULT_WEB_ID = PropsUtil.get(
 		PropsKeys.COMPANY_DEFAULT_WEB_ID);
 
@@ -2412,6 +2418,10 @@ public class PropsValues {
 
 	public static final int TRASH_SEARCH_LIMIT = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.TRASH_SEARCH_LIMIT));
+
+	public static final boolean TUNNEL_SERVLET_HIDE_EXCEPTION_DATA =
+		GetterUtil.getBoolean(
+			PropsUtil.get(PropsKeys.TUNNEL_SERVLET_HIDE_EXCEPTION_DATA));
 
 	public static final String TUNNELING_SERVLET_ENCRYPTION_ALGORITHM =
 		PropsUtil.get(PropsKeys.TUNNELING_SERVLET_ENCRYPTION_ALGORITHM);

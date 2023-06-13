@@ -40,11 +40,11 @@ import {
 import selectCanUpdatePageStructure from '../../../../../app/selectors/selectCanUpdatePageStructure';
 import selectSegmentsExperienceId from '../../../../../app/selectors/selectSegmentsExperienceId';
 import CollectionService from '../../../../../app/services/CollectionService';
-import deleteItem from '../../../../../app/thunks/deleteItem';
 import moveItem from '../../../../../app/thunks/moveItem';
 import updateItemConfig from '../../../../../app/thunks/updateItemConfig';
 import canBeRenamed from '../../../../../app/utils/canBeRenamed';
 import {deepEqual} from '../../../../../app/utils/checkDeepEqual';
+import {collectionIsMapped} from '../../../../../app/utils/collectionIsMapped';
 import checkAllowedChild from '../../../../../app/utils/drag-and-drop/checkAllowedChild';
 import {DRAG_DROP_TARGET_TYPE} from '../../../../../app/utils/drag-and-drop/constants/dragDropTargetType';
 import {ORIENTATIONS} from '../../../../../app/utils/drag-and-drop/constants/orientations';
@@ -57,8 +57,8 @@ import {
 	initialDragDrop,
 	useDragItem,
 	useDropTarget,
-	useIsDroppable,
 } from '../../../../../app/utils/drag-and-drop/useDragAndDrop';
+import {formIsMapped} from '../../../../../app/utils/formIsMapped';
 import getFirstControlsId from '../../../../../app/utils/getFirstControlsId';
 import getMappingFieldsKey from '../../../../../app/utils/getMappingFieldsKey';
 import hideFragment from '../../../../../app/utils/hideFragment';
@@ -229,8 +229,6 @@ function StructureTreeNodeContent({
 		computeHover
 	);
 
-	const isDroppable = useIsDroppable();
-
 	const {handlerRef, isDraggingSource} = useDragItem(
 		{...item, fragmentEntryType},
 		(parentItemId, position) =>
@@ -289,7 +287,6 @@ function StructureTreeNodeContent({
 	}, [isOverTarget, node]);
 
 	const showOptions =
-		Liferay.FeatureFlags['LPS-147895'] &&
 		canUpdatePageStructure &&
 		node.itemType !== ITEM_TYPES.editable &&
 		node.type !== LAYOUT_DATA_ITEM_TYPES.dropZone &&
@@ -310,7 +307,6 @@ function StructureTreeNodeContent({
 				'dragged': isDraggingSource,
 				'font-weight-semi-bold':
 					node.activable && node.itemType !== ITEM_TYPES.editable,
-				'not-droppable': !isDroppable,
 				'page-editor__page-structure__tree-node--active': isActive,
 				'page-editor__page-structure__tree-node--hovered': isHovered,
 				'page-editor__page-structure__tree-node--mapped': isMapped,
@@ -391,15 +387,6 @@ function StructureTreeNodeContent({
 							visible={node.hidden || isHovered || isSelected}
 						/>
 					)}
-
-					{!Liferay.FeatureFlags['LPS-147895'] &&
-						node.removable &&
-						canUpdatePageStructure && (
-							<RemoveButton
-								node={node}
-								visible={isHovered || isSelected}
-							/>
-						)}
 
 					{showOptions && (
 						<StructureTreeNodeActions
@@ -553,33 +540,6 @@ const VisibilityButton = ({
 	);
 };
 
-const RemoveButton = ({node, visible}) => {
-	const dispatch = useDispatch();
-	const selectItem = useSelectItem();
-
-	return (
-		<ClayButton
-			aria-label={Liferay.Util.sub(Liferay.Language.get('remove-x'), [
-				node.name,
-			])}
-			className={classNames(
-				'page-editor__page-structure__tree-node__remove-button',
-				{
-					'page-editor__page-structure__tree-node__remove-button--visible': visible,
-				}
-			)}
-			displayType="unstyled"
-			onClick={(event) => {
-				event.stopPropagation();
-
-				dispatch(deleteItem({itemId: node.id, selectItem}));
-			}}
-		>
-			<ClayIcon symbol="trash" />
-		</ClayButton>
-	);
-};
-
 function computeHover({
 	dispatch,
 	layoutDataRef,
@@ -620,6 +580,9 @@ function computeHover({
 	// Drop inside target
 
 	const validDropInsideTarget = (() => {
+		const targetIsCollectionNotMapped =
+			targetItem.type === LAYOUT_DATA_ITEM_TYPES.collection &&
+			!collectionIsMapped(targetItem);
 		const targetIsColumn =
 			targetItem.type === LAYOUT_DATA_ITEM_TYPES.column;
 		const targetIsFragment =
@@ -630,11 +593,18 @@ function computeHover({
 		const targetIsEmpty =
 			layoutDataRef.current.items[targetItem.itemId]?.children.length ===
 			0;
+		const targetIsFormNotMapped =
+			targetItem.type === LAYOUT_DATA_ITEM_TYPES.form &&
+			!formIsMapped(targetItem);
 		const targetIsParent = sourceItem.parentId === targetItem.itemId;
 
 		return (
 			targetPositionWithMiddle === TARGET_POSITIONS.MIDDLE &&
-			(targetIsEmpty || targetIsColumn || targetIsContainer) &&
+			(targetIsEmpty ||
+				targetIsCollectionNotMapped ||
+				targetIsColumn ||
+				targetIsContainer ||
+				targetIsFormNotMapped) &&
 			!targetIsFragment &&
 			!targetIsParent
 		);

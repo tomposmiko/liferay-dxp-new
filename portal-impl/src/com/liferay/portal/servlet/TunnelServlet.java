@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProtectedClassLoaderObjectInputStream;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -118,7 +119,10 @@ public class TunnelServlet extends HttpServlet {
 
 			Throwable throwable = invocationTargetException.getCause();
 
-			if (throwable != null) {
+			if (throwable == null) {
+				returnObject = new SystemException();
+			}
+			else if (PropsValues.TUNNEL_SERVLET_HIDE_EXCEPTION_DATA) {
 				Class<?> clazz = throwable.getClass();
 
 				if (throwable instanceof PortalException) {
@@ -130,8 +134,11 @@ public class TunnelServlet extends HttpServlet {
 						"Invocation failed due to " + clazz.getName());
 				}
 			}
+			else if (throwable instanceof PortalException) {
+				returnObject = throwable;
+			}
 			else {
-				returnObject = new SystemException();
+				returnObject = new SystemException(throwable.getMessage());
 			}
 		}
 		catch (Exception exception) {

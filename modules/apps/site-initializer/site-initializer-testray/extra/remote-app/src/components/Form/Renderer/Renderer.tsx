@@ -13,11 +13,10 @@
  */
 
 import Form from '..';
-import {ApolloQueryResult, TypedDocumentNode} from '@apollo/client';
 import React, {useEffect, useState} from 'react';
 
-import client from '../../../graphql/apolloClient';
 import i18n from '../../../i18n';
+import fetcher from '../../../services/fetcher';
 import {AutoCompleteProps} from '../AutoComplete';
 
 type RenderedFieldOptions = string[] | {label: string; value: string}[];
@@ -56,10 +55,7 @@ const Renderer: React.FC<RendererProps> = ({
 	);
 
 	const fetchQueries = (
-		gqlQueries: (
-			| RendererFields
-			| (() => Promise<ApolloQueryResult<any>>)
-		)[][]
+		gqlQueries: (RendererFields | (() => Promise<any>))[][]
 	) => {
 		Promise.allSettled(
 			gqlQueries.map(([, query]) => (query as any)())
@@ -73,7 +69,7 @@ const Renderer: React.FC<RendererProps> = ({
 
 					if (field.transformData) {
 						_gqlOptions[field.name] = field.transformData(
-							result.value.data
+							result.value
 						);
 					}
 				}
@@ -86,14 +82,10 @@ const Renderer: React.FC<RendererProps> = ({
 
 	useEffect(() => {
 		const gqlQueries = fields
-			.filter(({gqlQuery}) => gqlQuery)
-			.map(({gqlQuery, gqlVariables, ...field}) => [
+			.filter(({resource}) => resource)
+			.map(({resource, ...field}) => [
 				field,
-				() =>
-					client.query({
-						query: gqlQuery as any,
-						variables: gqlVariables,
-					}),
+				() => fetcher(resource as string),
 			]);
 
 		fetchQueries(gqlQueries);
@@ -102,7 +94,7 @@ const Renderer: React.FC<RendererProps> = ({
 	return (
 		<div className="form-renderer">
 			{fieldsFiltered.map((field, index) => {
-				const {label, name, type, options = [], gqlQuery} = field;
+				const {label, name, type, options = [], resource} = field;
 				const currentValue = form[name];
 
 				const getOptions = () => {
@@ -208,9 +200,8 @@ const Renderer: React.FC<RendererProps> = ({
 				if (type === 'autocomplete') {
 					return (
 						<Form.AutoComplete
-							gqlQuery={gqlQuery as TypedDocumentNode}
-							objectName="case"
 							onSearch={() => null}
+							resource={resource as string}
 							transformData={field.transformData}
 						/>
 					);

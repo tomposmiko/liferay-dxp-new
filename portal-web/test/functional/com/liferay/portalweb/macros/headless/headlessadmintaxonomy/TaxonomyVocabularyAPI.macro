@@ -1,0 +1,136 @@
+definition {
+
+	macro _curlTaxonomyVocabulary {
+		var portalURL = JSONCompany.getPortalURL();
+
+		if (isSet(assetLibraryId)) {
+			var api = "asset-libraries/${assetLibraryId}/taxonomy-vocabularies";
+		}
+		else {
+			var api = "sites/${siteId}/taxonomy-vocabularies";
+		}
+
+		if (isSet(externalReferenceCode)) {
+			var apiWithErc = "by-external-reference-code/${externalReferenceCode}";
+
+			var api = StringUtil.add("${api}", "${apiWithErc}", "/");
+		}
+
+		if (isSet(filterValue)) {
+			var api = StringUtil.add("${api}", "?filter=${filterValue}", "");
+		}
+
+		var curl = '''
+			${portalURL}/o/headless-admin-taxonomy/v1.0/${api} \
+			-u test@liferay.com:test \
+			-H Content-Type: application/json \
+		''';
+
+		return "${curl}";
+	}
+
+	macro assertProperVocabularyTotalCount {
+		Variables.assertDefined(parameterList = "${expectedTotalCount}");
+
+		var response = TaxonomyVocabularyAPI.filterTaxonomyVocabulary(
+			assetLibraryId = "${assetLibraryId}",
+			filterValue = "${filterValue}");
+
+		var actualTotalCount = TaxonomyVocabularyAPI.getElementOfCreatedVocabulary(
+			element = "$..['totalCount']",
+			responseToParse = "${response}");
+
+		TestUtils.assertEquals(
+			actual = "${actualTotalCount}",
+			expected = "${expectedTotalCount}");
+	}
+
+	macro createTaxonomyVocabulary {
+		Variables.assertDefined(parameterList = "${assetLibraryId},${name}");
+
+		if (!(isSet(externalReferenceCode))) {
+			var externalReferenceCode = "";
+		}
+
+		var curl = TaxonomyVocabularyAPI._curlTaxonomyVocabulary(
+			assetLibraryId = "${assetLibraryId}",
+			siteId = "${siteId}");
+		var body = '''-d {
+				"name": "${name}",
+				"externalReferenceCode": "${externalReferenceCode}"
+			}''';
+
+		var curl = StringUtil.add("${curl}", "${body}", " ");
+
+		var response = JSONCurlUtil.post("${curl}");
+
+		return "${response}";
+	}
+
+	macro deleteTaxonomyVocabularyByErc {
+		Variables.assertDefined(parameterList = "${externalReferenceCode}");
+
+		var curl = TaxonomyVocabularyAPI._curlTaxonomyVocabulary(
+			assetLibraryId = "${assetLibraryId}",
+			externalReferenceCode = "${externalReferenceCode}",
+			siteId = "${siteId}");
+
+		JSONCurlUtil.delete("${curl}");
+	}
+
+	macro filterTaxonomyVocabulary {
+		Variables.assertDefined(parameterList = "${filterValue}");
+
+		var curl = TaxonomyVocabularyAPI._curlTaxonomyVocabulary(
+			assetLibraryId = "${assetLibraryId}",
+			filterValue = "${filterValue}",
+			siteId = "${siteId}");
+
+		var response = JSONCurlUtil.get("${curl}");
+
+		return "${response}";
+	}
+
+	macro getElementOfCreatedVocabulary {
+		Variables.assertDefined(parameterList = "${responseToParse},${element}");
+
+		var elementValue = JSONUtil.getWithJSONPath("${responseToParse}", "${element}");
+
+		return "${elementValue}";
+	}
+
+	macro getTaxonomyVocabularyByErc {
+		Variables.assertDefined(parameterList = "${externalReferenceCode}");
+
+		var curl = TaxonomyVocabularyAPI._curlTaxonomyVocabulary(
+			assetLibraryId = "${assetLibraryId}",
+			externalReferenceCode = "${externalReferenceCode}",
+			siteId = "${siteId}");
+
+		var response = JSONCurlUtil.get("${curl}");
+
+		return "${response}";
+	}
+
+	macro updateTaxonomyVocabularyByErc {
+		Variables.assertDefined(parameterList = "${externalReferenceCode},${name}");
+
+		var body = '''-d {"name": "${name}"}''';
+
+		if (isSet(externalReferenceCodeInBody)) {
+			var body = '''-d {"name": "${name}","externalReferenceCode": "${externalReferenceCodeInBody}"}''';
+		}
+
+		var curl = TaxonomyVocabularyAPI._curlTaxonomyVocabulary(
+			assetLibraryId = "${assetLibraryId}",
+			externalReferenceCode = "${externalReferenceCode}",
+			siteId = "${siteId}");
+
+		var curl = StringUtil.add("${curl}", "${body}", " ");
+
+		var response = JSONCurlUtil.put("${curl}");
+
+		return "${response}";
+	}
+
+}

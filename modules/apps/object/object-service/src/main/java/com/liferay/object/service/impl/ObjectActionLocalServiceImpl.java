@@ -28,6 +28,8 @@ import com.liferay.object.exception.ObjectActionTriggerKeyException;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.scripting.exception.ObjectScriptingException;
+import com.liferay.object.scripting.validator.ObjectScriptingValidator;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.base.ObjectActionLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
@@ -47,8 +49,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
-
-import groovy.lang.GroovyShell;
 
 import java.util.HashMap;
 import java.util.List;
@@ -272,12 +272,11 @@ public class ObjectActionLocalServiceImpl
 
 			if (Validator.isNotNull(script)) {
 				try {
-					GroovyShell groovyShell = new GroovyShell();
-
-					groovyShell.parse(script);
+					_objectScriptingValidator.validate("groovy", script);
 				}
-				catch (Exception exception) {
-					errorMessageKeys.put("script", "syntax-error");
+				catch (ObjectScriptingException objectScriptingException) {
+					errorMessageKeys.put(
+						"script", objectScriptingException.getMessageKey());
 				}
 			}
 		}
@@ -376,6 +375,9 @@ public class ObjectActionLocalServiceImpl
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectScriptingValidator _objectScriptingValidator;
 
 	@Reference
 	private UserLocalService _userLocalService;

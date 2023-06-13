@@ -26,6 +26,7 @@ definition {
 	@priority = "4"
 	test AddBlueprintInNonRootContext {
 		property portal.context = "liferay";
+		property search.environment.suite.exclude = "true";
 		property skip.clean-app-server-deploy-dir = "true";
 		property test.assert.warning.exceptions = "true";
 		property test.name.skip.portal.instance = "Blueprints#AddBlueprintInNonRootContext";
@@ -1549,6 +1550,8 @@ definition {
 			key_text = "Import",
 			locator1 = "Button#ANY");
 
+		SelectFrameTop();
+
 		Blueprints.gotoBlueprint(title = "Test Blueprint");
 
 		AssertElementPresent(
@@ -1615,6 +1618,8 @@ definition {
 		Click(
 			key_text = "Import",
 			locator1 = "Button#ANY");
+
+		SelectFrameTop();
 
 		Blueprints.gotoElement(element = "Test Element");
 
@@ -2971,6 +2976,10 @@ definition {
 
 		Uncheck.uncheckToggleSwitch(
 			contributorClass = "AssetCategoryIdsQueryPreFilterContributor",
+			locator1 = "Blueprints#BLUEPRINTS_CLAUSE_CONTRIBUTOR_ON_OFF_TOGGLE");
+
+		Uncheck.uncheckToggleSwitch(
+			contributorClass = "AssetEntryModelPreFilterContributor",
 			locator1 = "Blueprints#BLUEPRINTS_CLAUSE_CONTRIBUTOR_ON_OFF_TOGGLE");
 
 		Button.click(button = "Filter");

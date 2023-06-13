@@ -116,7 +116,7 @@ public class AuthVerifierPipelineTest {
 	}
 
 	@Test
-	public void testVerifyRequestWithContextPathAndPortalPathContext()
+	public void testVerifyRequestWithContextPathNotAffectedByPortalProxyPath()
 		throws PortalException {
 
 		String contextPath = "/abc";
@@ -127,39 +127,15 @@ public class AuthVerifierPipelineTest {
 
 		AuthVerifierResult.State expectedState =
 			AuthVerifierResult.State.SUCCESS;
-
-		String portalUtilPathContext = PortalUtil.getPathContext(contextPath);
-
-		_assertAuthVerifierResult(
-			portalUtilPathContext, includeURLs, requestURI, expectedState);
-	}
-
-	@Test
-	public void testVerifyRequestWithContextPathAndPortalPathContextAndPortalProxyPath()
-		throws PortalException {
-
-		String contextPath = "/abc";
-		String includeURLs = StringBundler.concat(
-			_BASE_URL, "/regular/*,", _BASE_URL, "/legacy*");
-
-		String requestURI = contextPath + _BASE_URL + "/regular/Hello";
-
-		AuthVerifierResult.State expectedState =
-			AuthVerifierResult.State.SUCCESS;
-
-		String proxyPath = "/proxy";
 
 		try (SafeCloseable safeCloseable =
 				PropsValuesTestUtil.swapWithSafeCloseable(
-					"PORTAL_PROXY_PATH", proxyPath)) {
+					"PORTAL_PROXY_PATH", "/proxy")) {
 
 			_setUpPortalUtil();
 
-			String portalUtilPathContext = PortalUtil.getPathContext(
-				contextPath);
-
 			_assertAuthVerifierResult(
-				portalUtilPathContext, includeURLs, requestURI, expectedState);
+				contextPath, includeURLs, requestURI, expectedState);
 		}
 	}
 

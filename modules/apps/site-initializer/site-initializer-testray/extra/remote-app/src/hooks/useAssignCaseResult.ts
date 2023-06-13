@@ -12,50 +12,79 @@
  * details.
  */
 
-import client from '../graphql/apolloClient';
-import {UpdateCaseResult} from '../graphql/mutations';
-import {TestrayCaseResult} from '../graphql/queries';
+import {KeyedMutator} from 'swr';
+
+import fetcher from '../services/fetcher';
 import {Liferay} from '../services/liferay';
+import {TestrayCaseResult} from '../services/rest';
 import {TEST_STATUS} from '../util/constants';
 
-const useAssignCaseResult = () => {
-	const onAssignTo = (
+const useAssignCaseResult = (mutate?: KeyedMutator<any>) => {
+	const onAssignToFetch = async (
 		caseResult: TestrayCaseResult,
 		userId: number | string | null
-	) =>
-		client.mutate({
-			mutation: UpdateCaseResult,
-			variables: {
-				CaseResult: {
-					dueStatus: caseResult.dueStatus,
-					r_userToCaseResults_userId: userId,
-					startDate: caseResult.startDate,
-				},
-				caseResultId: caseResult.id,
-			},
-		});
+	) => {
+		const data = {
+			dueStatus: caseResult.dueStatus,
+			r_userToCaseResults_userId: userId,
+			startDate: caseResult.startDate,
+		};
 
-	const onAssignToMe = (caseResult: TestrayCaseResult) =>
-		onAssignTo(
-			{
-				...caseResult,
-				dueStatus: TEST_STATUS['In Progress'],
-				startDate: new Date() as any,
-			},
-			Liferay.ThemeDisplay.getUserId()
+		const response = await fetcher.put(
+			`/caseresults/${caseResult.id}`,
+			data
 		);
 
-	const onRemoveAssign = (caseResult: TestrayCaseResult) =>
-		onAssignTo(
-			{
-				...caseResult,
-				dueStatus: TEST_STATUS.Untested,
-				startDate: null as any,
-			},
-			0
+		if (mutate) {
+			mutate(response);
+		}
+
+		return response;
+	};
+
+	const onAssignToMeFetch = async (caseResult: TestrayCaseResult) => {
+		const data = {
+			dueStatus: TEST_STATUS['In Progress'],
+			r_userToCaseResults_userId: Liferay.ThemeDisplay.getUserId(),
+			startDate: caseResult.startDate,
+		};
+
+		const response = await fetcher.put(
+			`/caseresults/${caseResult.id}`,
+			data
 		);
 
-	return {onAssignTo, onAssignToMe, onRemoveAssign};
+		if (mutate) {
+			mutate(response);
+		}
+
+		return response;
+	};
+
+	const onRemoveAssignFetch = async (caseResult: TestrayCaseResult) => {
+		const data = {
+			dueStatus: TEST_STATUS.Untested,
+			r_userToCaseResults_userId: 0,
+			startDate: null as any,
+		};
+
+		const response = await fetcher.put(
+			`/caseresults/${caseResult.id}`,
+			data
+		);
+
+		if (mutate) {
+			mutate(response);
+		}
+
+		return response;
+	};
+
+	return {
+		onAssignToFetch,
+		onAssignToMeFetch,
+		onRemoveAssignFetch,
+	};
 };
 
 export default useAssignCaseResult;

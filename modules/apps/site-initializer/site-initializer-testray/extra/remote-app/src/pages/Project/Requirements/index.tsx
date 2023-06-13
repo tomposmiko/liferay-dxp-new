@@ -18,26 +18,26 @@ import {useNavigate, useParams} from 'react-router-dom';
 
 import Button from '../../../components/Button';
 import Container from '../../../components/Layout/Container';
-import ListView, {ListViewProps} from '../../../components/ListView/ListView';
+import ListView, {ListViewProps} from '../../../components/ListView';
 import {TableProps} from '../../../components/Table';
-import {getRequirements} from '../../../graphql/queries';
-import {FormModal} from '../../../hooks/useFormModal';
 import i18n from '../../../i18n';
 import {filters} from '../../../schema/filter';
+import {
+	getRequirementsTransformData,
+	requirementsResource,
+} from '../../../services/rest';
+import {ActionList} from '../../../types';
 import {searchUtil} from '../../../util/search';
-import RequirementsModal from './RequirementModal';
 import useRequirementActions from './useRequirementActions';
 
 type RequirementListViewProps = {
-	actions?: any[];
-	formModal?: FormModal;
+	actions?: ActionList;
 	projectId?: number | string;
 	variables?: any;
 } & {listViewProps?: Partial<ListViewProps>; tableProps?: Partial<TableProps>};
 
 const RequirementListView: React.FC<RequirementListViewProps> = ({
 	actions,
-	formModal,
 	listViewProps,
 	tableProps,
 	variables,
@@ -46,7 +46,6 @@ const RequirementListView: React.FC<RequirementListViewProps> = ({
 
 	return (
 		<ListView
-			forceRefetch={formModal?.forceRefetch}
 			managementToolbarProps={{
 				addButton: () => navigate('create'),
 				buttons: (
@@ -65,7 +64,7 @@ const RequirementListView: React.FC<RequirementListViewProps> = ({
 				filterFields: filters.requirement as any,
 				title: i18n.translate('requirements'),
 			}}
-			query={getRequirements}
+			resource={requirementsResource}
 			tableProps={{
 				actions,
 				columns: [
@@ -115,7 +114,7 @@ const RequirementListView: React.FC<RequirementListViewProps> = ({
 				navigateTo: ({id}) => id?.toString(),
 				...tableProps,
 			}}
-			transformData={(data) => data?.requirements}
+			transformData={getRequirementsTransformData}
 			variables={variables}
 			{...listViewProps}
 		/>
@@ -123,26 +122,18 @@ const RequirementListView: React.FC<RequirementListViewProps> = ({
 };
 
 const Requirements = () => {
-	const {actions, formModal} = useRequirementActions();
+	const {actions} = useRequirementActions();
 	const {projectId} = useParams();
 
 	return (
-		<>
-			<Container>
-				<RequirementListView
-					actions={actions}
-					formModal={formModal}
-					variables={{
-						filter: searchUtil.eq('projectId', projectId as string),
-					}}
-				/>
-			</Container>
-
-			<RequirementsModal
-				modal={formModal.modal}
-				projectId={Number(projectId)}
+		<Container>
+			<RequirementListView
+				actions={actions}
+				variables={{
+					filter: searchUtil.eq('projectId', projectId as string),
+				}}
 			/>
-		</>
+		</Container>
 	);
 };
 
