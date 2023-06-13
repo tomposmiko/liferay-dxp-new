@@ -16,7 +16,6 @@ import MDFRequestDTO from '../../../common/interfaces/dto/mdfRequestDTO';
 import LiferayFile from '../../../common/interfaces/liferayFile';
 import LiferayPicklist from '../../../common/interfaces/liferayPicklist';
 import MDFClaim from '../../../common/interfaces/mdfClaim';
-import Role from '../../../common/interfaces/role';
 import {Liferay} from '../../../common/services/liferay';
 import createDocumentFolderDocument from '../../../common/services/liferay/headless-delivery/createDocumentFolderDocument';
 import createMDFClaimActivity from '../../../common/services/liferay/object/claim-activity/createMDFClaimActivity';
@@ -38,53 +37,54 @@ export default async function submitForm(
 	mdfRequest: MDFRequestDTO,
 	claimParentFolderId: number,
 	siteURL: string,
-	currentClaimStatus?: LiferayPicklist,
-	roles?: Role[]
+	currentClaimStatus?: LiferayPicklist
 ) {
 	formikHelpers.setSubmitting(true);
 
+	const submitValues = {...values};
+
 	const updatedStatus = updateStatus(
-		values.mdfClaimStatus,
+		submitValues.mdfClaimStatus,
 		currentClaimStatus,
-		roles,
-		values.id
+		false,
+		submitValues.id
 	);
 
-	values.mdfClaimStatus = updatedStatus;
+	submitValues.mdfClaimStatus = updatedStatus;
 
-	values.partial = values.activities?.some((activity) =>
+	submitValues.partial = submitValues.activities?.some((activity) =>
 		Boolean(activity.budgets?.some((budget) => !budget.selected))
 	);
 
 	let dtoMDFClaim: mdfClaimDTO | undefined = undefined;
 
-	if (values.mdfClaimStatus !== Status.DRAFT) {
-		dtoMDFClaim = await createMDFClaimProxyAPI(values, mdfRequest);
+	if (submitValues.mdfClaimStatus.key !== Status.DRAFT.key) {
+		dtoMDFClaim = await createMDFClaimProxyAPI(submitValues, mdfRequest);
 	}
-	else if (values.id) {
+	else if (submitValues.id) {
 		dtoMDFClaim = await updateMDFClaim(
 			ResourceName.MDF_CLAIM_DXP,
-			values,
+			submitValues,
 			mdfRequest,
-			values.id
+			submitValues.id
 		);
 	}
 	else {
 		dtoMDFClaim = await createMDFClaim(
 			ResourceName.MDF_CLAIM_DXP,
-			values,
+			submitValues,
 			mdfRequest
 		);
 	}
 
 	if (
-		values.reimbursementInvoice &&
-		!values.reimbursementInvoice.id &&
+		submitValues.reimbursementInvoice &&
+		!submitValues.reimbursementInvoice.id &&
 		dtoMDFClaim?.id
 	) {
 		const reimbursementInvoiceRenamed = renameFileKeepingExtention(
-			values.reimbursementInvoice,
-			`${values.reimbursementInvoice.name}#${dtoMDFClaim.id}`
+			submitValues.reimbursementInvoice,
+			`${submitValues.reimbursementInvoice.name}#${dtoMDFClaim.id}`
 		);
 
 		if (reimbursementInvoiceRenamed) {
@@ -96,7 +96,7 @@ export default async function submitForm(
 			if (dtoReimbursementInvoice.id) {
 				await updateMDFClaim(
 					ResourceName.MDF_CLAIM_DXP,
-					values,
+					submitValues,
 					mdfRequest,
 					dtoMDFClaim.id,
 					dtoReimbursementInvoice.id as LiferayFile & number,
@@ -106,16 +106,21 @@ export default async function submitForm(
 		}
 	}
 
-	if (values.activities?.length && dtoMDFClaim?.id) {
+	if (submitValues.activities?.length && dtoMDFClaim?.id) {
 		await Promise.all(
-			values.activities.map(async (activity) => {
+			submitValues.activities.map(async (activity) => {
 				const dtoMDFClaimActivity = activity.id
 					? await updateMDFClaimActivity(
 							activity,
 							dtoMDFClaim?.id,
-							activity.id
+							activity.id,
+							mdfRequest.r_accToMDFReqs_accountEntry?.id
 					  )
-					: await createMDFClaimActivity(activity, dtoMDFClaim?.id);
+					: await createMDFClaimActivity(
+							activity,
+							dtoMDFClaim?.id,
+							mdfRequest.r_accToMDFReqs_accountEntry?.id
+					  );
 
 				if (
 					activity.listOfQualifiedLeads &&
@@ -138,6 +143,7 @@ export default async function submitForm(
 								activity,
 								dtoMDFClaim?.id,
 								dtoMDFClaimActivity.id,
+								mdfRequest.r_accToMDFReqs_accountEntry?.id,
 								dtoListOfQualifiedLeads.id as LiferayFile &
 									number
 							);
@@ -164,7 +170,9 @@ export default async function submitForm(
 										createMDFClaimActivityDocument(
 											dtoAllContentDocument.id as LiferayFile &
 												number,
-											dtoMDFClaimActivity.id
+											dtoMDFClaimActivity.id,
+											mdfRequest
+												.r_accToMDFReqs_accountEntry?.id
 										);
 									}
 								}
@@ -180,11 +188,15 @@ export default async function submitForm(
 								? await updateMDFClaimActivityBudget(
 										budget,
 										dtoMDFClaimActivity.id,
-										budget.id
+										budget.id,
+										mdfRequest.r_accToMDFReqs_accountEntry
+											?.id
 								  )
 								: await createMDFClaimActivityBudget(
 										budget,
-										dtoMDFClaimActivity.id
+										dtoMDFClaimActivity.id,
+										mdfRequest.r_accToMDFReqs_accountEntry
+											?.id
 								  );
 
 							if (
@@ -208,6 +220,9 @@ export default async function submitForm(
 											budget,
 											dtoMDFClaimActivity.id,
 											dtoMDFClaimBudget.id,
+											mdfRequest
+												.r_accToMDFReqs_accountEntry
+												?.id,
 											dtoBudgetInvoice.id as LiferayFile &
 												number
 										);

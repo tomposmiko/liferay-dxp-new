@@ -22,6 +22,7 @@ import Form from '~/components/Form';
 import Footer from '~/components/Form/Footer';
 import {splitIssueName} from '~/components/JiraLink';
 import Container from '~/components/Layout/Container';
+import {withPagePermission} from '~/hoc/withPagePermission';
 import useFormActions from '~/hooks/useFormActions';
 import i18n from '~/i18n';
 import yupSchema from '~/schema/yup';
@@ -69,11 +70,12 @@ const CaseResultEditTest = () => {
 		defaultValues: caseResult?.dueStatus
 			? ({
 					comment: mbMessage?.articleBody,
-					dueStatus:
-						caseResult?.dueStatus.key ===
-						CaseResultStatuses.IN_PROGRESS
-							? CaseResultStatuses.PASSED
-							: caseResult?.dueStatus.key,
+					dueStatus: [
+						CaseResultStatuses.IN_PROGRESS,
+						CaseResultStatuses.UNTESTED,
+					].includes(caseResult?.dueStatus.key as CaseResultStatuses)
+						? CaseResultStatuses.PASSED
+						: caseResult?.dueStatus.key,
 					issues,
 			  } as any)
 			: {},
@@ -140,6 +142,7 @@ const CaseResultEditTest = () => {
 			</ClayAlert>
 
 			<Form.Select
+				{...inputProps}
 				className="container-fluid-max-md"
 				defaultOption={false}
 				label={i18n.translate('status')}
@@ -189,4 +192,6 @@ const CaseResultEditTest = () => {
 	);
 };
 
-export default CaseResultEditTest;
+export default withPagePermission(CaseResultEditTest, {
+	restImpl: testrayCaseResultImpl,
+});

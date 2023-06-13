@@ -111,7 +111,7 @@ exports[`StaticSegmentEdit should render 1`] = `
                         class="dropdown dropdown-root filter-and-order-root nav-item"
                       >
                         <button
-                          class="button-root btn btn-unstyled dropdown-toggle nav-btn show-caret"
+                          class="button-root dropdown-toggle nav-btn show-caret btn btn-unstyled"
                           data-testid="filter-and-order-button"
                           type="button"
                         >
@@ -125,11 +125,11 @@ exports[`StaticSegmentEdit should render 1`] = `
                             class="caret-root"
                           >
                             <svg
-                              class="icon-root lexicon-icon lexicon-icon-caret-bottom"
-                              viewBox=""
+                              class="lexicon-icon lexicon-icon-caret-bottom icon-root"
+                              role="presentation"
                             >
                               <use
-                                xlink:href="/o/osb-faro-web/dist/sprite.svg#caret-bottom"
+                                xlink:href="#caret-bottom"
                               />
                             </svg>
                           </span>
@@ -140,15 +140,15 @@ exports[`StaticSegmentEdit should render 1`] = `
                         role="presentation"
                       >
                         <button
-                          class="button-root btn btn-unstyled nav-link nav-link-monospaced btn-outline-borderless"
+                          class="btn-root nav-link nav-link-monospaced btn btn-outline-borderless btn-outline-unstyled"
                           type="button"
                         >
                           <svg
-                            class="icon-root lexicon-icon lexicon-icon-order-arrow-ascending"
-                            viewBox=""
+                            class="lexicon-icon lexicon-icon-order-arrow-ascending icon-root"
+                            role="presentation"
                           >
                             <use
-                              xlink:href="/o/osb-faro-web/dist/sprite.svg#order-arrow-ascending"
+                              xlink:href="#order-arrow-ascending"
                             />
                           </svg>
                         </button>
@@ -177,11 +177,11 @@ exports[`StaticSegmentEdit should render 1`] = `
                               type="button"
                             >
                               <svg
-                                class="icon-root lexicon-icon lexicon-icon-search"
-                                viewBox=""
+                                class="lexicon-icon lexicon-icon-search icon-root"
+                                role="presentation"
                               >
                                 <use
-                                  xlink:href="/o/osb-faro-web/dist/sprite.svg#search"
+                                  xlink:href="#search"
                                 />
                               </svg>
                             </button>
@@ -221,11 +221,11 @@ exports[`StaticSegmentEdit should render 1`] = `
                       class="no-results-icon no-results-icon-border"
                     >
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-ac-individual icon-size-xxl"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-ac-individual icon-root icon-size-xxxl"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-individual"
+                          xlink:href="#ac-individual"
                         />
                       </svg>
                     </div>
@@ -245,13 +245,13 @@ exports[`StaticSegmentEdit should render 1`] = `
             class="form-actions"
           >
             <a
-              class="button-root btn btn-secondary cancel"
+              class="button-root cancel btn btn-secondary"
               href="/workspace/23/contacts/segments"
             >
               Cancel
             </a>
             <button
-              class="button-root btn btn-primary submit"
+              class="button-root submit btn btn-primary"
               disabled=""
               type="submit"
             >

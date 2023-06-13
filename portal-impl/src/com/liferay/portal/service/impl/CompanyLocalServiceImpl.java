@@ -963,6 +963,30 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		groupActionableDynamicQuery.performActions();
 	}
 
+	@Override
+	public Company updateIndexNameNext(long companyId, String indexNameNext)
+		throws PortalException {
+
+		Company company = companyPersistence.findByPrimaryKey(companyId);
+
+		company.setIndexNameNext(indexNameNext);
+
+		return companyPersistence.update(company);
+	}
+
+	@Override
+	public Company updateIndexNames(
+			long companyId, String indexNameCurrent, String indexNameNext)
+		throws PortalException {
+
+		Company company = companyPersistence.findByPrimaryKey(companyId);
+
+		company.setIndexNameCurrent(indexNameCurrent);
+		company.setIndexNameNext(indexNameNext);
+
+		return companyPersistence.update(company);
+	}
+
 	/**
 	 * Updates the company's logo.
 	 *

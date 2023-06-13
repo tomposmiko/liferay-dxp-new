@@ -13,6 +13,8 @@
  */
 
 const API_URL = {
+	FDS_DATE_FILTERS: '/o/c/fdsdatefilters',
+	FDS_DYNAMIC_FILTERS: '/o/c/fdsdynamicfilters',
 	FDS_ENTRIES: '/o/c/fdsentries',
 	FDS_FIELDS: '/o/c/fdsfields',
 	FDS_VIEWS: '/o/c/fdsviews',
@@ -21,6 +23,12 @@ const API_URL = {
 const OBJECT_RELATIONSHIP = {
 	FDS_ENTRY_FDS_VIEW: 'fdsEntryFDSViewRelationship',
 	FDS_ENTRY_FDS_VIEW_ID: 'r_fdsEntryFDSViewRelationship_c_fdsEntryId',
+	FDS_VIEW_FDS_DATE_FILTER: 'fdsViewFDSDateFilterRelationship',
+	FDS_VIEW_FDS_DATE_FILTER_ID:
+		'r_fdsViewFDSDateFilterRelationship_c_fdsViewId',
+	FDS_VIEW_FDS_DYNAMIC_FILTER: 'fdsViewFDSDynamicFilterRelationship',
+	FDS_VIEW_FDS_DYNAMIC_FILTER_ID:
+		'r_fdsViewFDSDynamicFilterRelationship_c_fdsViewId',
 	FDS_VIEW_FDS_FIELD: 'fdsViewFDSFieldRelationship',
 	FDS_VIEW_FDS_FIELD_ID: 'r_fdsViewFDSFieldRelationship_c_fdsViewId',
 } as const;

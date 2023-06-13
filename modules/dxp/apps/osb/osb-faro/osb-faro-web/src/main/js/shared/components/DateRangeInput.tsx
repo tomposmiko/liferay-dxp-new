@@ -1,8 +1,8 @@
-import Button from 'shared/components/Button';
 import Card from './Card';
+import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
 import DatePicker from './date-picker';
 import getCN from 'classnames';
-import Icon from './Icon';
 import Input from './Input';
 import moment from 'moment';
 import Overlay from './Overlay';
@@ -112,15 +112,16 @@ const DateInput: React.FC<IDateInputProps> = ({
 					/>
 
 					<Input.Inset position='after'>
-						<Button
+						<ClayButton
 							aria-label={Liferay.Language.get(
 								'choose-date-range'
 							)}
-							display='unstyled'
+							className='button-root'
+							displayType='unstyled'
 							onClick={handleClick}
 						>
-							<Icon symbol='calendar' />
-						</Button>
+							<ClayIcon className='icon-root' symbol='calendar' />
+						</ClayButton>
 					</Input.Inset>
 				</Input.GroupItem>
 			</Input.Group>

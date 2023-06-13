@@ -26,13 +26,11 @@ import com.liferay.osb.faro.web.internal.exception.FaroException;
 import com.liferay.osb.faro.web.internal.model.display.contacts.card.template.ContactsCardTemplateDisplay;
 import com.liferay.osb.faro.web.internal.param.FaroParam;
 import com.liferay.osb.faro.web.internal.util.JSONUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -54,7 +52,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Matthew Kong
  */
 @Component(
-	immediate = true,
 	service = {ContactsCardTemplateController.class, FaroController.class}
 )
 @Path("/{groupId}/contacts_card_template")
@@ -95,19 +92,17 @@ public class ContactsCardTemplateController extends BaseFaroController {
 	@GET
 	@Path("/types")
 	public List<ContactsCardTemplateType> getTypes() {
-		Collection<ContactsCardTemplateType> contactsCardTemplateTypes =
-			_contactsCardTemplateManagerUtil.getContactsCardTemplateTypes();
+		return TransformUtil.transform(
+			_contactsCardTemplateManagerUtil.getContactsCardTemplateTypes(),
+			contactsCardTemplateType -> {
+				if (contactsCardTemplateType.getType() ==
+						ContactsCardTemplateConstants.TYPE_PROFILE) {
 
-		Stream<ContactsCardTemplateType> stream =
-			contactsCardTemplateTypes.stream();
+					return null;
+				}
 
-		return stream.filter(
-			contactsCardTemplateType ->
-				contactsCardTemplateType.getType() !=
-					ContactsCardTemplateConstants.TYPE_PROFILE
-		).collect(
-			Collectors.toList()
-		);
+				return contactsCardTemplateType;
+			});
 	}
 
 	@Path("/{id}")

@@ -535,14 +535,32 @@ public class DLAdminDisplayContext {
 		}
 	}
 
-	private BooleanClause<Query>[] _getBooleanClauses(
-		String[] extensions, long fileEntryTypeId, long userId) {
+	private Filter _getAssetTagNamesFilter(String[] assetTagNames) {
+		if (ArrayUtil.isEmpty(assetTagNames)) {
+			return null;
+		}
 
 		BooleanFilter booleanFilter = new BooleanFilter();
 
-		if (fileEntryTypeId >= 0) {
+		for (String assetTagName : assetTagNames) {
 			booleanFilter.addTerm(
-				"fileEntryTypeId", String.valueOf(fileEntryTypeId),
+				Field.ASSET_TAG_NAMES, assetTagName, BooleanClauseOccur.MUST);
+		}
+
+		return booleanFilter;
+	}
+
+	private BooleanClause<Query>[] _getBooleanClauses(
+		String[] assetTagNames, String[] extensions, long fileEntryTypeId,
+		long userId) {
+
+		BooleanQuery booleanQuery = new BooleanQueryImpl();
+
+		BooleanFilter booleanFilter = new BooleanFilter();
+
+		if (ArrayUtil.isNotEmpty(assetTagNames)) {
+			booleanFilter.add(
+				_getAssetTagNamesFilter(assetTagNames),
 				BooleanClauseOccur.MUST);
 		}
 
@@ -551,12 +569,16 @@ public class DLAdminDisplayContext {
 				_getExtensionsFilter(extensions), BooleanClauseOccur.MUST);
 		}
 
+		if (fileEntryTypeId >= 0) {
+			booleanFilter.addTerm(
+				"fileEntryTypeId", String.valueOf(fileEntryTypeId),
+				BooleanClauseOccur.MUST);
+		}
+
 		if (userId > 0) {
 			booleanFilter.addTerm(
 				Field.USER_ID, String.valueOf(userId), BooleanClauseOccur.MUST);
 		}
-
-		BooleanQuery booleanQuery = new BooleanQueryImpl();
 
 		booleanQuery.setPreBooleanFilter(booleanFilter);
 
@@ -652,7 +674,8 @@ public class DLAdminDisplayContext {
 
 			searchContext.setAttribute("status", status);
 			searchContext.setBooleanClauses(
-				_getBooleanClauses(extensions, fileEntryTypeId, userId));
+				_getBooleanClauses(
+					assetTagIds, extensions, fileEntryTypeId, userId));
 
 			if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 				searchContext.setFolderIds(new long[] {folderId});

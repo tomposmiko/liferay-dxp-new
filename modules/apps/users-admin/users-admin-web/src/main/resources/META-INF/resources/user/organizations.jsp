@@ -248,7 +248,9 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 						}
 					},
 					selectEventName: '<portlet:namespace />selectOrganization',
-					selectedData: searchContainer.getData(true),
+					selectedData: <%= Arrays.toString(selUser.getOrganizationIds()) %>.map(
+						String
+					),
 					title:
 						'<liferay-ui:message arguments="organization" key="select-x" />',
 					url:

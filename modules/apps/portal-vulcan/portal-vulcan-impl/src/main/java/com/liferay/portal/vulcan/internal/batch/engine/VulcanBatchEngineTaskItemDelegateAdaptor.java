@@ -56,6 +56,9 @@ public class VulcanBatchEngineTaskItemDelegateAdaptor<T>
 		_depotEntryLocalService = depotEntryLocalService;
 		_groupLocalService = groupLocalService;
 		_vulcanBatchEngineTaskItemDelegate = vulcanBatchEngineTaskItemDelegate;
+
+		vulcanBatchEngineTaskItemDelegate.setGroupLocalService(
+			groupLocalService);
 	}
 
 	@Override

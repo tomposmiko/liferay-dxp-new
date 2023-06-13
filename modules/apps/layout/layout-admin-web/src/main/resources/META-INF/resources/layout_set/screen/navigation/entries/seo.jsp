@@ -45,9 +45,11 @@ renderResponse.setTitle(selGroup.getLayoutRootNodeName(privateLayout, locale));
 
 <liferay-frontend:edit-form
 	action="<%= editLayoutSetURL %>"
+	cssClass="pt-0"
 	enctype="multipart/form-data"
 	method="post"
 	name="fm"
+	wrappedFormContent="<%= false %>"
 >
 	<aui:input name="redirect" type="hidden" value="<%= themeDisplay.getURLCurrent() %>" />
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />

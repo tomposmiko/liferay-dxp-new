@@ -482,6 +482,7 @@
 			<hint name="display-width">210</hint>
 		</default-hints>
 		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="externalReferenceCode" type="String" />
 		<field name="addressId" type="long" />
@@ -565,6 +566,8 @@
 		<field name="industry" type="String" />
 		<field name="type" type="String" />
 		<field name="size" type="String" />
+		<field name="indexNameCurrent" type="String" />
+		<field name="indexNameNext" type="String" />
 	</model>
 	<model name="com.liferay.portal.kernel.model.CompanyInfo">
 		<field name="mvccVersion" type="long" />
@@ -1123,6 +1126,7 @@
 	</model>
 	<model name="com.liferay.portal.kernel.model.Phone">
 		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="phoneId" type="long" />
 		<field name="companyId" type="long" />

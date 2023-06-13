@@ -37,28 +37,10 @@ public class CommerceVirtualOrderItemPermission {
 			permissionChecker, commerceVirtualOrderItem, actionId);
 	}
 
-	public boolean contains(
-			PermissionChecker permissionChecker,
-			long commerceVirtualOrderItemId, String actionId)
-		throws PortalException {
-
-		return _commerceVirtualOrderItemModelResourcePermission.contains(
-			permissionChecker, commerceVirtualOrderItemId, actionId);
-	}
-
 	@Reference(
-		target = "(model.class.name=com.liferay.commerce.product.type.virtual.order.model.CommerceVirtualOrderItem)",
-		unbind = "-"
+		target = "(model.class.name=com.liferay.commerce.product.type.virtual.order.model.CommerceVirtualOrderItem)"
 	)
-	protected void setModelResourcePermission(
-		ModelResourcePermission<CommerceVirtualOrderItem>
-			modelResourcePermission) {
-
-		_commerceVirtualOrderItemModelResourcePermission =
-			modelResourcePermission;
-	}
-
-	private static ModelResourcePermission<CommerceVirtualOrderItem>
+	private ModelResourcePermission<CommerceVirtualOrderItem>
 		_commerceVirtualOrderItemModelResourcePermission;
 
 }

@@ -145,8 +145,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				_objectDefinition.getStorageType());
 
 		objectEntryManager.deleteObjectEntry(
-			externalReferenceCode, contextCompany.getCompanyId(),
-			_objectDefinition, null);
+			contextCompany.getCompanyId(), _getDTOConverterContext(null),
+			externalReferenceCode, _objectDefinition, null);
 	}
 
 	@Override
@@ -168,8 +168,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				_objectDefinition.getStorageType());
 
 		objectEntryManager.deleteObjectEntry(
-			externalReferenceCode, contextCompany.getCompanyId(),
-			_objectDefinition, scopeKey);
+			contextCompany.getCompanyId(), _getDTOConverterContext(null),
+			externalReferenceCode, _objectDefinition, scopeKey);
 	}
 
 	@Override
@@ -181,8 +181,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.getObjectEntry(
-			_getDTOConverterContext(null), externalReferenceCode,
-			contextCompany.getCompanyId(), _objectDefinition, null);
+			contextCompany.getCompanyId(), _getDTOConverterContext(null),
+			externalReferenceCode, _objectDefinition, null);
 	}
 
 	@Override
@@ -232,8 +232,8 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.getObjectEntry(
-			_getDTOConverterContext(null), externalReferenceCode,
-			contextCompany.getCompanyId(), _objectDefinition, scopeKey);
+			contextCompany.getCompanyId(), _getDTOConverterContext(null),
+			externalReferenceCode, _objectDefinition, scopeKey);
 	}
 
 	@Override

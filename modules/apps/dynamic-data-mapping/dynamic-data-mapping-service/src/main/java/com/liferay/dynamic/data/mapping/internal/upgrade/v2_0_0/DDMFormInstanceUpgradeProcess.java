@@ -40,13 +40,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Leonardo Barros
@@ -161,32 +160,31 @@ public class DDMFormInstanceUpgradeProcess extends UpgradeProcess {
 		String oldName, String newName, long currentActionIds,
 		long oldActionIds) {
 
-		Set<String> actionsIdsList = new HashSet<>();
+		Set<String> actionsIds = new HashSet<>();
 
 		_collectNewActionIds(
-			actionsIdsList,
-			_resourceActionLocalService.getResourceActions(oldName),
+			actionsIds, _resourceActionLocalService.getResourceActions(oldName),
 			oldActionIds);
 
 		List<ResourceAction> newResourceActions =
 			_resourceActionLocalService.getResourceActions(newName);
 
-		_collectNewActionIds(
-			actionsIdsList, newResourceActions, currentActionIds);
+		_collectNewActionIds(actionsIds, newResourceActions, currentActionIds);
 
-		Stream<ResourceAction> resourceActionStream =
-			newResourceActions.stream();
+		Map<String, Long> map = new HashMap<>();
 
-		Map<String, Long> map = resourceActionStream.collect(
-			Collectors.toMap(
-				resourceAction -> resourceAction.getActionId(),
-				resourceAction -> resourceAction.getBitwiseValue()));
+		for (ResourceAction resourceAction : newResourceActions) {
+			map.put(
+				resourceAction.getActionId(), resourceAction.getBitwiseValue());
+		}
 
-		Stream<String> actionsIdsStream = actionsIdsList.stream();
+		long sum = 0L;
 
-		return actionsIdsStream.mapToLong(
-			actionId -> MapUtil.getLong(map, actionId)
-		).sum();
+		for (String actionId : actionsIds) {
+			sum += MapUtil.getLong(map, actionId);
+		}
+
+		return sum;
 	}
 
 	private void _collectNewActionIds(

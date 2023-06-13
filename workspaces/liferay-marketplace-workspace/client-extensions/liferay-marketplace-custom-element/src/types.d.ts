@@ -65,7 +65,7 @@ type BillingAddress = {
 	countryISOCode: string;
 	name?: string;
 	phoneNumber?: string;
-	region?: string;
+	regionISOCode?: string;
 	street1?: string;
 	street2?: string;
 	zip?: string;
@@ -130,6 +130,7 @@ type Channel = {
 };
 
 interface CommerceAccount extends Omit<Account, 'description'> {
+	active: boolean;
 	taxId: string;
 	logoURL: string;
 }
@@ -139,6 +140,50 @@ type CommerceOption = {
 	key: string;
 	name: string;
 };
+
+interface Order {
+	account: {
+		id: number;
+		type: string;
+	};
+	accountExternalReferenceCode?: string;
+	accountId: number;
+	billingAddressId?: number;
+	channel: {
+		currencyCode: string;
+		id: number;
+		type: string;
+	};
+	channelExternalReferenceCode?: string;
+	channelId: number;
+	createDate?: string;
+	creatorEmailAddress?: string;
+	currencyCode: string;
+	customFields?: {[key: string]: string};
+	externalReferenceCode?: string;
+	id?: number;
+	marketplaceOrderType?: string;
+	modifiedDate?: string;
+	orderDate?: string;
+	orderItems: [
+		{
+			skuId: number;
+			unitPriceWithTaxAmount: number;
+		}
+	];
+	orderStatus: number;
+	orderTypeExternalReferenceCode?: string;
+	orderTypeId: number;
+}
+
+interface OrderType {
+	active: boolean;
+	displayDate: string;
+	displayOrder: number;
+	externalReferenceCode: string;
+	id: number;
+	name: {[key: string]: string};
+}
 
 type PaymentMethodMode = 'PayPal';
 
@@ -209,14 +254,28 @@ interface PostCheckoutCartResponse extends PostCartResponse {
 
 type Product = {
 	active: boolean;
+	categories: {
+		externalReferenceCode: string;
+		id: number;
+		name: string;
+		vocabulary: string;
+	}[];
 	catalogId: number;
 	description: {[key: string]: string};
+	name: {[key: string]: string};
 	externalReferenceCode: string;
 	id: number;
 	productId: number;
 	productStatus: number;
 	productType: string;
 	version: number;
+	workflowStatusInfo: {
+		code: number;
+		label: string;
+		label_i18n: string;
+	};
+	thumbnail: string;
+	modifiedDate: string;
 };
 
 type ProductOptionItem = {

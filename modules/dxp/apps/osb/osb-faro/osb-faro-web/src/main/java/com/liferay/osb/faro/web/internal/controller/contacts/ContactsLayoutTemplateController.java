@@ -29,6 +29,7 @@ import com.liferay.osb.faro.web.internal.model.display.contacts.card.template.Co
 import com.liferay.osb.faro.web.internal.param.FaroParam;
 import com.liferay.osb.faro.web.internal.util.ContactsLayoutHelper;
 import com.liferay.osb.faro.web.internal.util.JSONUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -38,9 +39,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -63,7 +61,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Matthew Kong
  */
 @Component(
-	immediate = true,
 	service = {ContactsLayoutTemplateController.class, FaroController.class}
 )
 @Path("/{groupId}/contacts_layout_template")
@@ -125,20 +122,16 @@ public class ContactsLayoutTemplateController extends BaseFaroController {
 	public List<ContactsLayoutTemplateDisplay> getList(
 		@PathParam("groupId") long groupId, @QueryParam("type") int type) {
 
-		List<ContactsLayoutTemplate> contactsLayoutTemplates =
+		return TransformUtil.transform(
 			_contactsLayoutTemplateLocalService.getContactsLayoutTemplates(
-				groupId, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				groupId, type, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
+			contactsLayoutTemplate -> {
+				if (getLayoutTemplateDisplay(contactsLayoutTemplate) == null) {
+					return null;
+				}
 
-		Stream<ContactsLayoutTemplate> stream =
-			contactsLayoutTemplates.stream();
-
-		return stream.map(
-			this::getLayoutTemplateDisplay
-		).filter(
-			Objects::nonNull
-		).collect(
-			Collectors.toList()
-		);
+				return getLayoutTemplateDisplay(contactsLayoutTemplate);
+			});
 	}
 
 	@Path("/{id}")
@@ -184,7 +177,7 @@ public class ContactsLayoutTemplateController extends BaseFaroController {
 				contactsLayoutTemplate, _contactsCardTemplateManagerUtil);
 		}
 		catch (Exception exception) {
-			_log.error(exception, exception);
+			_log.error(exception);
 
 			return null;
 		}

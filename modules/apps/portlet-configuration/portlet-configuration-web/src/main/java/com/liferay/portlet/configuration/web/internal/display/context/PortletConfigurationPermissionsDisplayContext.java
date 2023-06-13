@@ -483,28 +483,26 @@ public class PortletConfigurationPermissionsDisplayContext {
 
 				roleSearchContainer.setResultsAndTotal(
 					() -> RoleServiceUtil.getGroupRolesAndTeamRoles(
-						_themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-						excludedRoleNames, getRoleTypes(),
-						roleModelResourceRoleId, roleTeamGroupId,
-						roleSearchContainer.getStart(),
+						_themeDisplay.getCompanyId(), null, excludedRoleNames,
+						null, null, getRoleTypes(), roleModelResourceRoleId,
+						roleTeamGroupId, roleSearchContainer.getStart(),
 						roleSearchContainer.getEnd()),
 					RoleServiceUtil.getGroupRolesAndTeamRolesCount(
-						_themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-						excludedRoleNames, getRoleTypes(),
-						roleModelResourceRoleId, roleTeamGroupId));
+						_themeDisplay.getCompanyId(), null, excludedRoleNames,
+						null, null, getRoleTypes(), roleModelResourceRoleId,
+						roleTeamGroupId));
 			}
 			else {
 				roleSearchContainer.setResultsAndTotal(
 					() -> RoleLocalServiceUtil.getGroupRolesAndTeamRoles(
-						_themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-						excludedRoleNames, getRoleTypes(),
-						roleModelResourceRoleId, roleTeamGroupId,
-						roleSearchContainer.getStart(),
+						_themeDisplay.getCompanyId(), null, excludedRoleNames,
+						null, null, getRoleTypes(), roleModelResourceRoleId,
+						roleTeamGroupId, roleSearchContainer.getStart(),
 						roleSearchContainer.getEnd()),
 					RoleLocalServiceUtil.getGroupRolesAndTeamRolesCount(
-						_themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-						excludedRoleNames, getRoleTypes(),
-						roleModelResourceRoleId, roleTeamGroupId));
+						_themeDisplay.getCompanyId(), null, excludedRoleNames,
+						null, null, getRoleTypes(), roleModelResourceRoleId,
+						roleTeamGroupId));
 			}
 		}
 		else {
@@ -514,15 +512,17 @@ public class PortletConfigurationPermissionsDisplayContext {
 				roleSearchContainer.setResultsAndTotal(
 					RoleServiceUtil.getGroupRolesAndTeamRoles(
 						_themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-						excludedRoleNames, getRoleTypes(), modelResourceRoleId,
-						teamGroupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+						excludedRoleNames, searchTerms.getKeywords(), null,
+						getRoleTypes(), modelResourceRoleId, teamGroupId,
+						QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 			}
 			else {
 				roleSearchContainer.setResultsAndTotal(
 					RoleLocalServiceUtil.getGroupRolesAndTeamRoles(
 						_themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-						excludedRoleNames, getRoleTypes(), modelResourceRoleId,
-						teamGroupId, QueryUtil.ALL_POS, QueryUtil.ALL_POS));
+						excludedRoleNames, searchTerms.getKeywords(), null,
+						getRoleTypes(), modelResourceRoleId, teamGroupId,
+						QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 			}
 		}
 

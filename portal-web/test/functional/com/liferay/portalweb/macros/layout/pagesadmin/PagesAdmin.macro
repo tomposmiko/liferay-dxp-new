@@ -61,6 +61,8 @@ definition {
 					key_fieldLabel = "Target type",
 					locator1 = "Select#GENERIC_SELECT_FIELD",
 					value1 = ${targetType});
+
+				Button.click(button = "Save");
 			}
 
 			if (isSet(target)) {
@@ -72,6 +74,8 @@ definition {
 					key_text = "Target",
 					locator1 = "TextInput#ANY",
 					value1 = ${target});
+
+				Button.click(button = "Save");
 			}
 
 			Navigator.gotoNavTab(navTab = "General");
@@ -305,8 +309,6 @@ definition {
 			pageName = ${pageName});
 
 		Navigator.gotoNavTab(navTab = "Design");
-
-		Navigator.gotoNavTab(navTab = "Look and Feel");
 
 		Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -783,8 +785,6 @@ definition {
 			pageName = ${pageName});
 
 		Navigator.gotoNavTab(navTab = "Design");
-
-		Navigator.gotoNavTab(navTab = "Look and Feel");
 
 		Theme.configureLookAndFeelSpecificLook();
 
@@ -1433,10 +1433,9 @@ definition {
 	}
 
 	macro uploadLogo {
-		AssertClick(
-			key_text = "Change",
-			locator1 = "Button#ANY",
-			value1 = "Change");
+		Click(
+			ariaLabel = "Change Logo",
+			locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
@@ -1715,8 +1714,6 @@ definition {
 			pageName = ${pageName});
 
 		Navigator.gotoNavTab(navTab = "Design");
-
-		Navigator.gotoNavTab(navTab = "Look and Feel");
 
 		if (isSet(themeName)) {
 			AssertTextPresent(value1 = ${themeName});

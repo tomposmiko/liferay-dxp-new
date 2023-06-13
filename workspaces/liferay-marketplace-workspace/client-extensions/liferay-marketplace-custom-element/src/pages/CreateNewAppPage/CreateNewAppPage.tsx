@@ -4,7 +4,6 @@ import {Header} from '../../components/Header/Header';
 import {NewAppPageFooterButtons} from '../../components/NewAppPageFooterButtons/NewAppPageFooterButtons';
 import {useAppContext} from '../../manage-app-state/AppManageState';
 import {TYPES} from '../../manage-app-state/actionTypes';
-import {getCatalogId} from '../../utils/util';
 
 import './CreateNewAppPage.scss';
 
@@ -14,6 +13,11 @@ interface CreateNewAppPageProps {
 
 export function CreateNewAppPage({onClickContinue}: CreateNewAppPageProps) {
 	const [_, dispatch] = useAppContext();
+	const queryString = window.location.search;
+
+	const urlParams = new URLSearchParams(queryString);
+	
+	const catalogId = urlParams.get('catalogId');
 
 	return (
 		<div className="create-new-app-container">
@@ -82,7 +86,6 @@ export function CreateNewAppPage({onClickContinue}: CreateNewAppPageProps) {
 				<span className="create-new-app-info-footer">
 					By clicking on the button &quot;continue&quot; below, I
 					confirm that I have read and agree to be bound by the{' '}
-
 					<a href="#">Liferay Publisher Program License Agreement.</a>{' '}
 					I also confirm that I am of the legal age of majority in the
 					jurisdiction where I reside (at least 18 years of age in
@@ -92,18 +95,12 @@ export function CreateNewAppPage({onClickContinue}: CreateNewAppPageProps) {
 
 			<NewAppPageFooterButtons
 				onClickContinue={() => {
-					getCatalogId()
-						.then((catalogId: number) => {
-							dispatch({
-								payload: {
-									value: catalogId,
-								},
-								type: TYPES.UPDATE_CATALOG_ID,
-							});
-						})
-						.catch((error: string) => {
-							console.error(error);
-						});
+					dispatch({
+						payload: {
+							value: catalogId,
+						},
+						type: TYPES.UPDATE_CATALOG_ID,
+					});
 
 					onClickContinue();
 				}}

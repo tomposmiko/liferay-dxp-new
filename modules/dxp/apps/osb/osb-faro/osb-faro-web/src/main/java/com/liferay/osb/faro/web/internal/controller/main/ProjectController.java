@@ -50,6 +50,7 @@ import com.liferay.osb.faro.web.internal.param.FaroParam;
 import com.liferay.osb.faro.web.internal.util.ContactsLayoutHelper;
 import com.liferay.osb.faro.web.internal.util.JSONUtil;
 import com.liferay.osb.faro.web.internal.util.TimeZoneUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.GroupFriendlyURLException;
 import com.liferay.portal.kernel.exception.LayoutFriendlyURLException;
@@ -62,6 +63,7 @@ import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -76,8 +78,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.security.RolesAllowed;
 
@@ -103,7 +103,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author Matthew Kong
  */
-@Component(immediate = true, service = ProjectController.class)
+@Component(service = ProjectController.class)
 @Path("/project")
 @Produces(MediaType.APPLICATION_JSON)
 public class ProjectController extends BaseFaroController {
@@ -136,13 +136,15 @@ public class ProjectController extends BaseFaroController {
 		@FormParam("startDate") Date startDate,
 		@FormParam("endDate") Date endDate) {
 
-		Map<String, Object> stateMap = new HashMap<>();
-
-		stateMap.put("endDate", endDate);
-		stateMap.put("startDate", startDate);
-		stateMap.put("state", state);
-
-		projectHelper.addGlobalState(keysFaroParam.getValue(), stateMap);
+		projectHelper.addGlobalState(
+			keysFaroParam.getValue(),
+			HashMapBuilder.<String, Object>put(
+				"endDate", endDate
+			).put(
+				"startDate", startDate
+			).put(
+				"state", state
+			).build());
 	}
 
 	@Path("/{groupId}/ip_addresses")
@@ -440,18 +442,10 @@ public class ProjectController extends BaseFaroController {
 	public List<String> getEmailAddressDomains(
 		@PathParam("groupId") long groupId) {
 
-		List<FaroProjectEmailDomain> faroProjectEmailAddressDomains =
-			_faroProjectEmailAddressLocalService.
-				getFaroProjectEmailDomainsByGroupId(groupId);
-
-		Stream<FaroProjectEmailDomain> emailAddressDomainStream =
-			faroProjectEmailAddressDomains.stream();
-
-		return emailAddressDomainStream.map(
-			FaroProjectEmailDomain::getEmailDomain
-		).collect(
-			Collectors.toList()
-		);
+		return TransformUtil.transform(
+			_faroProjectEmailDomainLocalService.
+				getFaroProjectEmailDomainsByGroupId(groupId),
+			FaroProjectEmailDomain::getEmailDomain);
 	}
 
 	@GET
@@ -486,36 +480,25 @@ public class ProjectController extends BaseFaroController {
 	public List<JoinableProjectDisplay> getJoinableProjects()
 		throws PortalException {
 
-		List<FaroProject> faroProjects =
-			_faroProjectLocalService.getJoinableFaroProjects(getUser());
-
-		Stream<FaroProject> faroProjectsStream = faroProjects.stream();
-
-		return faroProjectsStream.map(
+		return TransformUtil.transform(
+			_faroProjectLocalService.getJoinableFaroProjects(getUser()),
 			faroProject -> new JoinableProjectDisplay(
 				faroProject.getGroupId(), faroProject.getName(),
 				Objects.nonNull(
 					_faroUserLocalService.fetchFaroUser(
-						faroProject.getGroupId(), getUserId())))
-		).collect(
-			Collectors.toList()
-		);
+						faroProject.getGroupId(), getUserId()))));
 	}
 
 	@GET
 	public List<ProjectDisplay> getProjects() {
-		List<FaroUser> faroUsers =
+		return TransformUtil.transform(
 			_faroUserLocalService.getFaroUsersByLiveUserId(
-				getUserId(), FaroUserConstants.STATUS_APPROVED);
+				getUserId(), FaroUserConstants.STATUS_APPROVED),
+			faroUser -> {
+				FaroProject faroProject =
+					_faroProjectLocalService.fetchFaroProjectByGroupId(
+						faroUser.getGroupId());
 
-		Stream<FaroUser> faroUsersStream = faroUsers.stream();
-
-		return faroUsersStream.map(
-			FaroUser::getGroupId
-		).map(
-			_faroProjectLocalService::fetchFaroProjectByGroupId
-		).map(
-			faroProject -> {
 				try {
 					return _getProjectDisplay(faroProject);
 				}
@@ -533,12 +516,7 @@ public class ProjectController extends BaseFaroController {
 
 					return null;
 				}
-			}
-		).filter(
-			Objects::nonNull
-		).collect(
-			Collectors.toList()
-		);
+			});
 	}
 
 	@GET
@@ -618,8 +596,7 @@ public class ProjectController extends BaseFaroController {
 				_groupLocalService.updateFriendlyURL(groupId, friendlyURL);
 			}
 			catch (GroupFriendlyURLException groupFriendlyURLException) {
-				_log.error(
-					groupFriendlyURLException, groupFriendlyURLException);
+				_log.error(groupFriendlyURLException);
 
 				throw new FaroValidationException(
 					"friendlyURL",
@@ -656,7 +633,7 @@ public class ProjectController extends BaseFaroController {
 		}
 
 		try {
-			_faroProjectEmailAddressLocalService.addFaroProjectEmailDomains(
+			_faroProjectEmailDomainLocalService.addFaroProjectEmailDomains(
 				groupId, faroProject.getFaroProjectId(),
 				emailAddressDomainsFaroParam.getValue());
 		}
@@ -734,7 +711,7 @@ public class ProjectController extends BaseFaroController {
 						getInvalidEmailAddressDomains()));
 		}
 		catch (GroupFriendlyURLException groupFriendlyURLException) {
-			_log.error(groupFriendlyURLException, groupFriendlyURLException);
+			_log.error(groupFriendlyURLException);
 
 			throw new FaroValidationException(
 				"friendlyURL",
@@ -789,7 +766,7 @@ public class ProjectController extends BaseFaroController {
 						getInvalidEmailAddressDomains()));
 		}
 		catch (GroupFriendlyURLException groupFriendlyURLException) {
-			_log.error(groupFriendlyURLException, groupFriendlyURLException);
+			_log.error(groupFriendlyURLException);
 
 			throw new FaroValidationException(
 				"friendlyURL",
@@ -1032,7 +1009,7 @@ public class ProjectController extends BaseFaroController {
 				faroProject, (String)null, false, 1, 0, null);
 		}
 		catch (Exception exception) {
-			_log.error(exception, exception);
+			_log.error(exception);
 
 			return false;
 		}
@@ -1182,7 +1159,7 @@ public class ProjectController extends BaseFaroController {
 
 	@Reference
 	private FaroProjectEmailDomainLocalService
-		_faroProjectEmailAddressLocalService;
+		_faroProjectEmailDomainLocalService;
 
 	@Reference
 	private FaroProjectLocalService _faroProjectLocalService;

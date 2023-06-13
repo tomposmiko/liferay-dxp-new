@@ -152,9 +152,11 @@ public class DeepLTranslator implements Translator {
 		String json = null;
 
 		options.addHeader(
+			HttpHeaders.AUTHORIZATION,
+			"DeepL-Auth-Key " + _deepLTranslatorConfiguration.authKey());
+		options.addHeader(
 			HttpHeaders.CONTENT_TYPE,
 			ContentTypes.APPLICATION_X_WWW_FORM_URLENCODED);
-		options.addPart("auth_key", _deepLTranslatorConfiguration.authKey());
 		options.setLocation(url);
 
 		try {
@@ -203,6 +205,9 @@ public class DeepLTranslator implements Translator {
 
 		Http.Options options = new Http.Options();
 
+		options.addHeader(
+			HttpHeaders.AUTHORIZATION,
+			"DeepL-Auth-Key " + _deepLTranslatorConfiguration.authKey());
 		options.addPart("source_lang", sourceLanguageCode);
 		options.addPart("target_lang", targetLanguageCode);
 		options.addPart("text", text);

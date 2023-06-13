@@ -1,9 +1,9 @@
 import autobind from 'autobind-decorator';
-import Button from 'shared/components/Button';
+import ClayIcon from '@clayui/icon';
+import ClayLink from '@clayui/link';
 import Dropdown from './Dropdown';
 import FaroConstants from 'shared/util/constants';
 import getCN from 'classnames';
-import Icon from './Icon';
 import React from 'react';
 import {isFunction, times} from 'lodash';
 import {PropTypes} from 'prop-types';
@@ -51,7 +51,7 @@ class PaginationEllipsis extends React.Component {
 			<Dropdown
 				align='topCenter'
 				buttonProps={{
-					display: 'link'
+					displayType: 'link'
 				}}
 				className={className}
 				label='...'
@@ -118,15 +118,16 @@ class PaginationItem extends React.Component {
 		return (
 			<li className={classes}>
 				{page >= 0 ? (
-					<Button
-						className='page-link'
+					<ClayLink
+						button
+						className='button-root page-link'
 						disabled={disabled}
-						display='unstyled'
+						displayType='unstyled'
 						href={!onChange ? href : ''}
 						onClick={this.handleChange}
 					>
 						{children}
-					</Button>
+					</ClayLink>
 				) : (
 					children
 				)}
@@ -210,7 +211,7 @@ class Pagination extends React.Component {
 					onChange={onChange}
 					page={page - 1}
 				>
-					<Icon symbol='angle-left' />
+					<ClayIcon className='icon-root' symbol='angle-left' />
 				</PaginationItem>
 
 				{this.getPages().map((item, index) => (
@@ -231,7 +232,7 @@ class Pagination extends React.Component {
 					onChange={onChange}
 					page={page + 1}
 				>
-					<Icon symbol='angle-right' />
+					<ClayIcon className='icon-root' symbol='angle-right' />
 				</PaginationItem>
 			</ul>
 		);

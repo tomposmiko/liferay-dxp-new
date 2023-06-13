@@ -1,13 +1,13 @@
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayModal, {useModal} from '@clayui/modal';
-import {useEffect, useState} from 'react';
+import classNames from 'classnames';
+import {useCallback, useEffect, useState} from 'react';
 
 import {getCompanyId} from '../../liferay/constants';
 import {Liferay} from '../../liferay/liferay';
 import {
-	getAccountInfo,
-	getAccountInfoFromCommerce,
+	getAccountAddressesFromCommerce,
 	getAccounts,
 	getChannels,
 	getDeliveryProduct,
@@ -21,9 +21,11 @@ import {
 	postCartByChannelId,
 	postCheckoutCart,
 } from '../../utils/api';
+import {AccountSelector} from './AccountSelector';
 
 import './GetAppModal.scss';
 import {SelectPaymentMethod} from './SelectPaymentMethod';
+import {StepTracker} from './StepTracker';
 
 interface App {
 	createdBy: string;
@@ -44,7 +46,7 @@ const initialBillingAddress = {
 	countryISOCode: 'US',
 	name: '',
 	phoneNumber: '',
-	region: '',
+	regionISOCode: '',
 	street1: '',
 	street2: '',
 	zip: '',
@@ -54,8 +56,10 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 	const {observer, onClose} = useModal({
 		onClose: handleClose,
 	});
-	const [account, setAccount] = useState<AccountBrief>();
+	const [activeAccounts, setActiveAccounts] =
+		useState<Partial<AccountBrief>[]>();
 	const [accountPublisher, setAccountPublisher] = useState<Account>();
+	const [accounts, setAccounts] = useState<AccountBrief[]>();
 	const [app, setApp] = useState<App>({
 		createdBy: '',
 		id: 0,
@@ -83,11 +87,14 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 		skuOptions: [],
 	});
 
-	const [addresses, setAddresses] = useState<PostalAddressResponse[]>([]);
+	const [addresses, setAddresses] = useState<BillingAddress[]>([]);
 
 	const [billingAddress, setBillingAddress] = useState<BillingAddress>(
 		initialBillingAddress
 	);
+
+	const [selectedAccount, setSelectedAccount] =
+		useState<Partial<AccountBrief>>();
 
 	const [selectedPaymentMethod, setSelectedPaymentMethod] =
 		useState<PaymentMethodSelector>('pay');
@@ -96,14 +103,65 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 
 	const [showNewAddressButton, setShowNewAddressButton] = useState(false);
 
-	const [enableTrialMethod, setEnableTrialMethod] = useState<string>('no');
+	const [skus, setSkus] = useState<SKU[]>([]);
 
-	const [phoneNumber, setPhoneNumber] = useState('');
+	const [enableTrialMethod, setEnableTrialMethod] = useState<boolean>(false);
+
+	const [enablePurchaseButton, setEnablePurchaseButton] = useState(false);
 
 	const [purchaseOrderNumber, setPurchaseOrderNumber] = useState<string>('');
 	const [email, setEmail] = useState<string>('');
 
 	const [freeApp, setFreeApp] = useState<boolean>(false);
+
+	const [showSelectAccount, setShowSelectAccount] = useState(true);
+
+	const [steps, setSteps] = useState([
+		{
+			checked: false,
+			name: 'Select Account',
+			selected: true,
+		},
+		{
+			checked: false,
+			name: 'Select Payment method',
+			selected: false,
+		},
+	]);
+
+	useEffect(() => {
+		const getAddresses = async () => {
+			if (selectedAccount?.id) {
+				const billingAddresses = await getAccountAddressesFromCommerce(
+					selectedAccount?.id as number
+				);
+
+				setAddresses(billingAddresses.items);
+			}
+		};
+
+		getAddresses();
+	}, [selectedAccount]);
+
+	useEffect(() => {
+		if (!freeApp && skus.length) {
+			let selectedSku;
+
+			if (selectedPaymentMethod === 'trial') {
+				selectedSku = skus.filter((sku) =>
+					sku.skuOptions.find((option) => option.value === 'yes')
+				)[0];
+			}
+			else if (selectedPaymentMethod === 'pay') {
+				selectedSku = skus.find((sku) => sku.price !== 0);
+			}
+			else {
+				selectedSku = skus[0];
+			}
+
+			setSku(selectedSku as SKU);
+		}
+	}, [selectedPaymentMethod]);
 
 	useEffect(() => {
 		const getModalInfo = async () => {
@@ -132,21 +190,7 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 				accountId = 50307;
 			}
 
-			const currentAccount = await getAccountInfo({
-				accountId,
-			});
-
-			// The call for getAccountInfoFromCommerce is only temporary
-
-			const currentAccountCommerce = await getAccountInfoFromCommerce(
-				accountId
-			);
-
-			setAccount({
-				...currentAccount,
-				logoURL: currentAccountCommerce.logoURL,
-			});
-
+			setAccounts(userAccounts.accountBriefs);
 			const app = await getDeliveryProduct({
 				accountId,
 				appId: Liferay.MarketplaceCustomerFlow.appId,
@@ -159,56 +203,33 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 				appProductId: Liferay.MarketplaceCustomerFlow.appId,
 			});
 
-			let sku;
+			setSkus(skuResponse.items);
+
+			let newSku;
 
 			if (skuResponse.items.length > 1) {
-				let isTrial;
-				isTrial = skuResponse.items
-					.map((sku) =>
-						sku.skuOptions.find((option) => option.value === 'yes')
-					)
-					.filter((sku) => sku)[0]?.value;
-				setEnableTrialMethod(isTrial as string);
-				sku = skuResponse.items.find((sku) => sku.price !== 0);
+				const {items} = skuResponse;
+				const isTrial = !!items.find(
+					({sku, skuOptions: [skuOption]}) =>
+						sku.endsWith('ts') && skuOption.value === 'yes'
+				);
+				setEnableTrialMethod(isTrial);
+				newSku = skuResponse.items.find((sku) => sku.price !== 0);
 			}
 			else {
-				sku = skuResponse.items[0];
+				newSku = skuResponse.items[0];
 			}
-			setSku(sku as SKU);
+			setSku(newSku as SKU);
 
-			if (sku?.price === 0 && sku.skuOptions[0].value === 'no') {
+			if (newSku?.price === 0 && newSku.skuOptions[0].value === 'no') {
 				setFreeApp(true);
 				setSelectedPaymentMethod(null);
-			}
-
-			const account = await getAccountInfo({accountId});
-
-			const postalAddresses = account?.accountUserAccounts[0]
-				.userAccountContactInformation
-				.postalAddresses as PostalAddressResponse[];
-
-			let addresses = [] as PostalAddressResponse[];
-
-			postalAddresses?.map((item) => {
-				addresses = [...addresses, item];
-			});
-
-			setAddresses(addresses);
-
-			const telephone =
-				account.accountUserAccounts[0].userAccountContactInformation
-					.telephones[0];
-
-			if (telephone) {
-				setPhoneNumber(
-					`(${telephone.extension}) ${telephone.phoneNumber}`
-				);
 			}
 
 			const versionResponse = await getSKUCustomFieldExpandoValue({
 				companyId: Number(getCompanyId()),
 				customFieldName: 'version',
-				skuId: sku?.id as number,
+				skuId: newSku?.id as number,
 			});
 
 			if (typeof versionResponse === 'string') {
@@ -222,7 +243,7 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 			const catalogId = adminProduct?.catalogId;
 			const accounts = await getAccounts();
 
-			const accountPublisher = accounts?.items.find(
+			const accountPublisher = accounts.items.find(
 				({customFields}: Account) => {
 					if (customFields) {
 						const catalogIdField = customFields.find(
@@ -244,7 +265,7 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 
 	async function handleGetApp() {
 		const cart: Partial<Cart> = {
-			accountId: account?.id as number,
+			accountId: selectedAccount?.id as number,
 			cartItems: [
 				{
 					price: {
@@ -306,9 +327,9 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 			if (selectedPaymentMethod === 'order') {
 				newCart = {
 					...cart,
+					author: email,
 					billingAddress,
 					purchaseOrderNumber,
-					author: email,
 				};
 			}
 
@@ -327,18 +348,19 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 			await postCheckoutCart({cartId: cartResponse.id});
 		}
 
-		const appName = typeof app?.name === 'string' ? app?.name : app?.name.en_US;
+		const appName =
+			typeof app?.name === 'string' ? app?.name : app?.name.en_US;
 
-		const appNameURL = appName.trim().toLowerCase().replace(' ', '-');
+		const appNameURL = appName.trim().toLowerCase().replaceAll(' ', '-');
 
 		const nextStepsCallbackURL = `${Liferay.ThemeDisplay.getCanonicalURL().replace(
 			`/p/${appNameURL}`,
 			''
 		)}/next-steps?orderId=${cartResponse.id}&logoURL=${
-			account?.logoURL
+			selectedAccount?.logoURL
 		}&appLogoURL=${app?.urlImage}&accountName=${
-			account?.name
-		}&accountLogo=${account?.logoURL}&appName=${app.name}`;
+			selectedAccount?.name
+		}&accountLogo=${selectedAccount?.logoURL}&appName=${app.name}`;
 
 		const paymentMethodURL = await getPaymentMethodURL(
 			cartResponse.id,
@@ -346,10 +368,68 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 		);
 
 		window.location.href =
-			selectedPaymentMethod === 'pay' ? paymentMethodURL : nextStepsCallbackURL;
+			selectedPaymentMethod === 'pay'
+				? paymentMethodURL
+				: nextStepsCallbackURL;
 
 		onClose();
 	}
+
+	const handleChangeStep = () => {
+		setShowSelectAccount(false);
+		setSteps([
+			{
+				checked: true,
+				name: 'Select Account',
+				selected: false,
+			},
+			{
+				checked: false,
+				name: 'Select Payment method',
+				selected: true,
+			},
+		]);
+	};
+
+	const handleClick = useCallback(() => {
+		if (!freeApp && showSelectAccount && selectedAccount) {
+			return handleChangeStep();
+		}
+		if (
+			(freeApp && selectedAccount) ||
+			(!showSelectAccount && enablePurchaseButton)
+		) {
+			return handleGetApp();
+		}
+
+		return;
+	}, [
+		billingAddress,
+		enablePurchaseButton,
+		freeApp,
+		selectedAccount,
+		showSelectAccount,
+	]);
+
+	const getButtonText = () => {
+		if (!freeApp) {
+			if (showSelectAccount) {
+				return 'Continue';
+			}
+			if (selectedPaymentMethod === 'pay') {
+				return `Pay $${sku?.price} Now`;
+			}
+			if (selectedPaymentMethod === 'trial') {
+				return 'Start Free Trial';
+			}
+			if (selectedPaymentMethod === 'order') {
+				return 'Request Purchase Order';
+			}
+		}
+		else {
+			return 'Get This App';
+		}
+	};
 
 	return (
 		<div className="modal-open">
@@ -372,30 +452,39 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 					</ClayButton>
 				</div>
 
-				<ClayModal.Body>
+				<ClayModal.Body
+					className="get-app-modal-body-card-body"
+					scrollable={
+						activeAccounts?.length
+							? activeAccounts.length > 3
+							: false
+					}
+				>
 					<div className="get-app-modal-body-card-container">
 						<div className="get-app-modal-body-card-header">
 							<span className="get-app-modal-body-card-header-left-content">
 								App Details
 							</span>
 
-							<div className="get-app-modal-body-card-header-right-content-container">
-								<div className="get-app-modal-body-card-header-right-content-account-info">
-									<span className="get-app-modal-body-card-header-right-content-account-info-name">
-										{account?.name}
-									</span>
+							{selectedAccount && (
+								<div className="get-app-modal-body-card-header-right-content-container">
+									<div className="get-app-modal-body-card-header-right-content-account-info">
+										<span className="get-app-modal-body-card-header-right-content-account-info-name">
+											{selectedAccount?.name}
+										</span>
 
-									<span className="get-app-modal-body-card-header-right-content-account-info-email">
-										{currentUser?.emailAddress}
-									</span>
+										<span className="get-app-modal-body-card-header-right-content-account-info-email">
+											{currentUser?.emailAddress}
+										</span>
+									</div>
+
+									<img
+										alt="Account icon"
+										className="get-app-modal-body-card-header-right-content-account-info-icon"
+										src={selectedAccount?.logoURL}
+									/>
 								</div>
-
-								<img
-									alt="Account icon"
-									className="get-app-modal-body-card-header-right-content-account-info-icon"
-									src={account?.logoURL}
-								/>
-							</div>
+							)}
 						</div>
 
 						<div className="get-app-modal-body-container">
@@ -455,23 +544,32 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 						</div>
 					</div>
 
-					{!freeApp && (
-						<>
-							<div className="get-app-modal-text-divider">
-								Select payment method
-							</div>
+					<StepTracker freeApp={freeApp} steps={steps} />
 
+					{showSelectAccount ? (
+						<AccountSelector
+							accounts={accounts as AccountBrief[]}
+							activeAccounts={activeAccounts as AccountBrief[]}
+							selectedAccount={selectedAccount}
+							setActiveAccounts={setActiveAccounts}
+							setSelectedAccount={setSelectedAccount}
+							userEmail={currentUser?.emailAddress as string}
+						/>
+					) : (
+						!freeApp && (
 							<SelectPaymentMethod
 								addresses={addresses}
 								billingAddress={billingAddress}
 								email={email}
 								enableTrialMethod={enableTrialMethod}
-								phoneNumber={phoneNumber}
 								purchaseOrderNumber={purchaseOrderNumber}
 								selectedAddress={selectedAddress}
 								selectedPaymentMethod={selectedPaymentMethod}
 								setBillingAddress={setBillingAddress}
 								setEmail={setEmail}
+								setEnablePurchaseButton={
+									setEnablePurchaseButton
+								}
 								setPurchaseOrderNumber={setPurchaseOrderNumber}
 								setSelectedAddress={setSelectedAddress}
 								setSelectedPaymentMethod={
@@ -482,7 +580,7 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 								}
 								showNewAddressButton={showNewAddressButton}
 							/>
-						</>
+						)
 					)}
 				</ClayModal.Body>
 
@@ -498,21 +596,30 @@ export function GetAppModal({handleClose}: GetAppModalProps) {
 								</button>
 
 								<button
-									className="get-app-modal-button-get-this-app"
-									onClick={handleGetApp}
+									className={classNames(
+										'get-app-modal-button-get-this-app',
+										{
+											'get-app-modal-button-get-this-app-enabled':
+												showSelectAccount &&
+												selectedAccount,
+										},
+										{
+											'get-app-modal-button-get-this-app-disabled':
+												(showSelectAccount &&
+													!selectedAccount) ||
+												(!showSelectAccount &&
+													!enablePurchaseButton),
+										}
+									)}
+									onClick={handleClick}
 								>
-									{!freeApp && selectedPaymentMethod === 'pay'
-										? `Pay $${sku?.price} Now`
-										: selectedPaymentMethod === 'trial'
-										? 'Start Free Trial'
-										: selectedPaymentMethod === 'order'
-										? 'Request Purchase Order'
-										: 'Get This App'}
+									{getButtonText()}
 								</button>
 							</ClayButton.Group>
 
 							<span>
 								{!freeApp &&
+									!showSelectAccount &&
 									selectedPaymentMethod === 'pay' &&
 									'You will be redirected to PayPal to complete payment'}
 							</span>

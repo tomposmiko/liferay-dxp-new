@@ -15,7 +15,7 @@ dependencies {
 	compileInclude group: "com.fasterxml.jackson.module", name: "jackson-module-jaxb-annotations", version: "2.9.8"
 	compileInclude group: "com.google.guava", name: "failureaccess", version: "1.0.1"
 	compileInclude group: "com.google.guava", name: "guava", version: "30.1.1-jre"
-	compileInclude group: "com.graphql-java", name: "graphql-java", version: "17.4"
+	compileInclude group: "com.graphql-java", name: "graphql-java", version: "17.5"
 	compileInclude group: "com.graphql-java", name: "graphql-java-extended-scalars", version: "17.1"
 	compileInclude group: "com.graphql-java", name: "java-dataloader", version: "2.1.1"
 	compileInclude group: "com.graphql-java-kickstart", name: "graphql-java-kickstart", version: "12.0.0"
@@ -57,7 +57,7 @@ dependencies {
 	compileOnly group: "org.osgi", name: "org.osgi.service.jaxrs", version: "1.0.0"
 	compileOnly group: "org.osgi", name: "org.osgi.util.promise", version: "1.1.0"
 	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
-	compileOnly group: "org.springframework", name: "spring-tx", version: "5.2.22.RELEASE"
+	compileOnly group: "org.springframework", name: "spring-tx", version: "5.2.24.RELEASE"
 	compileOnly project(":apps:batch-engine:batch-engine-api")
 	compileOnly project(":apps:change-tracking:change-tracking-api")
 	compileOnly project(":apps:depot:depot-api")

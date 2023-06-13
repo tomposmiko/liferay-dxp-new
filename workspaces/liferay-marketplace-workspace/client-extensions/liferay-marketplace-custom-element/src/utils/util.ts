@@ -1,3 +1,4 @@
+import {ProductSpecificationProps} from '../pages/PublishedAppsDashboardPage/PublishedDashboardPageUtil';
 import {
 	createProductSpecification,
 	getAccountGroup,
@@ -21,6 +22,45 @@ export async function getCatalogId() {
 	const catalogs = await getCatalogs();
 
 	return catalogs[0].id;
+}
+
+export async function userAccountChecker(verifiedAccounts: string[]) {
+	const response = await getUserAccountsById();
+
+	if (response.ok) {
+		const userAccounts = (await response.json()) as UserAccount;
+
+		const userHasPublisherGroup = await Promise.all(
+			userAccounts.accountBriefs.map(async (currentAccount) => {
+				const accountGroup = await getAccountGroup(currentAccount.id);
+
+				const accountGroupPublisher = accountGroup.some(
+					(currentAccountGroup) =>
+						verifiedAccounts.includes(currentAccountGroup.name)
+				);
+
+				return accountGroupPublisher;
+			})
+		);
+
+		return userHasPublisherGroup.some((item) => item);
+	}
+
+	return false;
+}
+
+export function getProductVersionFromSpecifications(
+	specifications: ProductSpecificationProps
+) {
+	let productVersion = '0';
+
+	specifications.items.forEach((specification: Specification) => {
+		if (specification.specificationKey === 'latest-version') {
+			productVersion = specification.value.en_US;
+		}
+	});
+
+	return productVersion;
 }
 
 async function submitSpecification(

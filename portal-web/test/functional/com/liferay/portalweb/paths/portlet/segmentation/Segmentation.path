@@ -102,7 +102,7 @@
 </tr>
 <tr>
 	<td>MEMBERS_MATCHED</td>
-	<td>//b[contains(@class,'ml-2 text-dark')]</td>
+	<td>//b[contains(@class,'c-ml-2 font-weight-bold text-dark')]</td>
 	<td></td>
 </tr>
 <tr>

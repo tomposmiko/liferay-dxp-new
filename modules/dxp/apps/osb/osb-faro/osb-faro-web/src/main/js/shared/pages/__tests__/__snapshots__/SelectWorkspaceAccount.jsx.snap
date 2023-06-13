@@ -16,11 +16,11 @@ exports[`SelectWorkspaceAccount should render 1`] = `
           target="_blank"
         >
           <svg
-            class="icon-root lexicon-icon lexicon-icon-liferay-logo liferay-logo"
-            viewBox=""
+            class="lexicon-icon lexicon-icon-liferay-logo icon-root liferay-logo"
+            role="presentation"
           >
             <use
-              xlink:href="/o/osb-faro-web/dist/sprite.svg#liferay-logo"
+              xlink:href="#liferay-logo"
             />
           </svg>
         </a>
@@ -43,7 +43,7 @@ exports[`SelectWorkspaceAccount should render 1`] = `
                 Test Test
               </span>
               <svg
-                class="lexicon-icon lexicon-icon-caret-bottom caret"
+                class="lexicon-icon lexicon-icon-caret-bottom icon-root caret"
                 role="presentation"
               >
                 <use
@@ -67,11 +67,11 @@ exports[`SelectWorkspaceAccount should render 1`] = `
               class="logo-container"
             >
               <svg
-                class="icon-root lexicon-icon lexicon-icon-ac-logo logo-icon"
-                viewBox=""
+                class="lexicon-icon lexicon-icon-ac-logo icon-root logo-icon"
+                role="presentation"
               >
                 <use
-                  xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-logo"
+                  xlink:href="#ac-logo"
                 />
               </svg>
               <span
@@ -107,7 +107,7 @@ exports[`SelectWorkspaceAccount should render 1`] = `
                 class="list-group-item list-group-item-action list-group-item-flex"
               >
                 <a
-                  class="button-root btn btn-unstyled workspace-link border-button"
+                  class="button-root workspace-link border-button btn btn-unstyled"
                   href="/workspace/126"
                 >
                   <div
@@ -142,11 +142,11 @@ exports[`SelectWorkspaceAccount should render 1`] = `
                         </div>
                       </div>
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-angle-right"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-angle-right icon-root"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                          xlink:href="#angle-right"
                         />
                       </svg>
                     </div>
@@ -157,7 +157,7 @@ exports[`SelectWorkspaceAccount should render 1`] = `
                 class="list-group-item list-group-item-action list-group-item-flex"
               >
                 <a
-                  class="button-root btn btn-unstyled workspace-link border-button"
+                  class="button-root workspace-link border-button btn btn-unstyled"
                   href="/workspace/corpProjectUuid123/add"
                 >
                   <div
@@ -193,11 +193,11 @@ exports[`SelectWorkspaceAccount should render 1`] = `
                         />
                       </div>
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-angle-right"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-angle-right icon-root"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                          xlink:href="#angle-right"
                         />
                       </svg>
                     </div>

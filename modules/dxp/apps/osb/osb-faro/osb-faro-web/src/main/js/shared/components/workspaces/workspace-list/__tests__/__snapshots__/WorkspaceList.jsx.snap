@@ -12,7 +12,7 @@ exports[`WorkspaceList should render 1`] = `
         class="list-group-item list-group-item-action list-group-item-flex"
       >
         <a
-          class="button-root btn btn-unstyled workspace-link border-button"
+          class="button-root workspace-link border-button btn btn-unstyled"
           href="/workspace/1"
         >
           <div
@@ -47,11 +47,11 @@ exports[`WorkspaceList should render 1`] = `
                 </div>
               </div>
               <svg
-                class="icon-root lexicon-icon lexicon-icon-angle-right"
-                viewBox=""
+                class="lexicon-icon lexicon-icon-angle-right icon-root"
+                role="presentation"
               >
                 <use
-                  xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                  xlink:href="#angle-right"
                 />
               </svg>
             </div>
@@ -62,7 +62,7 @@ exports[`WorkspaceList should render 1`] = `
         class="list-group-item list-group-item-action list-group-item-flex"
       >
         <a
-          class="button-root btn btn-unstyled workspace-link border-button"
+          class="button-root workspace-link border-button btn btn-unstyled"
           href="/workspace/2"
         >
           <div
@@ -97,11 +97,11 @@ exports[`WorkspaceList should render 1`] = `
                 </div>
               </div>
               <svg
-                class="icon-root lexicon-icon lexicon-icon-angle-right"
-                viewBox=""
+                class="lexicon-icon lexicon-icon-angle-right icon-root"
+                role="presentation"
               >
                 <use
-                  xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                  xlink:href="#angle-right"
                 />
               </svg>
             </div>
@@ -112,7 +112,7 @@ exports[`WorkspaceList should render 1`] = `
         class="list-group-item list-group-item-action list-group-item-flex"
       >
         <a
-          class="button-root btn btn-unstyled workspace-link border-button"
+          class="button-root workspace-link border-button btn btn-unstyled"
           href="/workspace/3"
         >
           <div
@@ -147,11 +147,11 @@ exports[`WorkspaceList should render 1`] = `
                 </div>
               </div>
               <svg
-                class="icon-root lexicon-icon lexicon-icon-angle-right"
-                viewBox=""
+                class="lexicon-icon lexicon-icon-angle-right icon-root"
+                role="presentation"
               >
                 <use
-                  xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                  xlink:href="#angle-right"
                 />
               </svg>
             </div>
@@ -175,7 +175,7 @@ exports[`WorkspaceList should render WorkspaceList with friendlyURL 1`] = `
         class="list-group-item list-group-item-action list-group-item-flex"
       >
         <a
-          class="button-root btn btn-unstyled workspace-link border-button"
+          class="button-root workspace-link border-button btn btn-unstyled"
           href="/workspace/faro-liferay-0"
         >
           <div
@@ -210,11 +210,11 @@ exports[`WorkspaceList should render WorkspaceList with friendlyURL 1`] = `
                 </div>
               </div>
               <svg
-                class="icon-root lexicon-icon lexicon-icon-angle-right"
-                viewBox=""
+                class="lexicon-icon lexicon-icon-angle-right icon-root"
+                role="presentation"
               >
                 <use
-                  xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                  xlink:href="#angle-right"
                 />
               </svg>
             </div>
@@ -225,7 +225,7 @@ exports[`WorkspaceList should render WorkspaceList with friendlyURL 1`] = `
         class="list-group-item list-group-item-action list-group-item-flex"
       >
         <a
-          class="button-root btn btn-unstyled workspace-link border-button"
+          class="button-root workspace-link border-button btn btn-unstyled"
           href="/workspace/faro-liferay-1"
         >
           <div
@@ -260,11 +260,11 @@ exports[`WorkspaceList should render WorkspaceList with friendlyURL 1`] = `
                 </div>
               </div>
               <svg
-                class="icon-root lexicon-icon lexicon-icon-angle-right"
-                viewBox=""
+                class="lexicon-icon lexicon-icon-angle-right icon-root"
+                role="presentation"
               >
                 <use
-                  xlink:href="/o/osb-faro-web/dist/sprite.svg#angle-right"
+                  xlink:href="#angle-right"
                 />
               </svg>
             </div>

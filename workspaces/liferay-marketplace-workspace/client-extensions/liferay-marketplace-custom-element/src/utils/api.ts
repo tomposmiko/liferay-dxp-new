@@ -204,6 +204,15 @@ export async function getAccountInfoFromCommerce(accountId: number) {
 	return (await response.json()) as CommerceAccount;
 }
 
+export async function getAccountAddressesFromCommerce(accountId: number) {
+	const response = await fetch(
+		`/o/headless-commerce-admin-account/v1.0/accounts/${accountId}/accountAddresses`,
+		{headers, method: 'GET'}
+	);
+
+	return (await response.json()) as {items: BillingAddress[]};
+}
+
 export async function getAccounts() {
 	const response = await fetch(
 		'/o/headless-admin-user/v1.0/accounts?pageSize=-1',
@@ -414,6 +423,20 @@ export async function getOrders(
 	};
 }
 
+export async function getOrderTypes() {
+	const response = await fetch(
+		'/o/headless-commerce-admin-order/v1.0/order-types',
+		{
+			method: 'GET',
+			headers,
+		}
+	);
+
+	const {items} = (await response.json()) as {items: OrderType[]};
+
+	return items;
+}
+
 export async function getProduct({appERC}: {appERC: string}) {
 	const response = await fetch(
 		`/o/headless-commerce-admin-catalog/v1.0/products/by-externalReferenceCode/${appERC}
@@ -448,7 +471,7 @@ export async function getProducts() {
 		}
 	);
 
-	return await response.json();
+	return (await response.json()) as {items: Product[]};
 }
 
 export async function getProductSKU({appProductId}: {appProductId: number}) {
@@ -693,6 +716,19 @@ export async function postOptionValue(
 
 		return id;
 	}
+}
+
+export async function postOrder(order: Order) {
+	const response = await fetch(
+		'/o/headless-commerce-admin-order/v1.0/orders',
+		{
+			body: JSON.stringify(order),
+			method: 'POST',
+			headers,
+		}
+	);
+
+	return (await response.json()) as Order;
 }
 
 export async function postProduct(product: any) {

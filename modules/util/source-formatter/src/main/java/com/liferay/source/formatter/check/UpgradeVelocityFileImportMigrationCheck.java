@@ -15,8 +15,9 @@
 package com.liferay.source.formatter.check;
 
 import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.source.formatter.check.constants.VelocityMigrationConstants;
+import com.liferay.source.formatter.check.util.VelocityMigrationUtil;
 
 /**
  * @author Nícolas Moura
@@ -26,16 +27,18 @@ public class UpgradeVelocityFileImportMigrationCheck
 
 	@Override
 	protected String migrateContent(String content) {
-		String[] lines = content.split(StringPool.NEW_LINE);
+		String[] lines = StringUtil.splitLines(content);
 
 		for (String line : lines) {
-			if (line.contains("#parse")) {
-				String newLine = line.replace("#parse", "<#include");
+			if (line.contains(VelocityMigrationConstants.VELOCITY_PARSE)) {
+				String newLine = line.replace(
+					VelocityMigrationConstants.VELOCITY_PARSE, "<#include");
 
-				newLine = StringUtil.removeFirst(
-					newLine, StringPool.OPEN_PARENTHESIS);
+				newLine = VelocityMigrationUtil.removeFirstParenthesis(newLine);
 				newLine = StringUtil.replaceLast(
-					newLine, CharPool.CLOSE_PARENTHESIS, " />");
+					newLine, CharPool.CLOSE_PARENTHESIS,
+					CharPool.SPACE +
+						VelocityMigrationConstants.FREEMARKER_TAG_END);
 
 				content = StringUtil.replace(content, line, newLine);
 			}

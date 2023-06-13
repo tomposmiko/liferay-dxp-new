@@ -1,50 +1,58 @@
 import ClayIcon from '@clayui/icon';
+import ClayLink from '@clayui/link';
 
 import './GateCard.scss';
 
+interface Link {
+	href: string;
+	label: string;
+}
+
+interface Image {
+	description: string;
+	svg: string;
+}
+
 interface GateCard {
 	description: string;
-	image: {
-		description: string;
-		svg: string;
-	};
+	image: Image;
 	label?: string;
-	link: string;
+	link?: Link;
 	title: string;
 }
 
 export function GateCard({description, image, label, link, title}: GateCard) {
 	return (
-		<div className="card-container">
+		<div className="gate-card-container">
 			<div>
 				<img
 					alt={image.description}
-					className="card-image"
+					className="gate-card-image"
 					src={image.svg}
 				/>
 			</div>
 
-			<div className="card-body">
-				<div className="card-title-container">
-					<h2 className="card-title">{title}</h2>
+			<div className="gate-card-body">
+				<div className="gate-card-title-container">
+					<h2 className="gate-card-title">{title}</h2>
 
-					{label && <div className="card-label">{label}</div>}
+					{label && <div className="gate-card-label">{label}</div>}
 				</div>
 
 				<div>
-					<h3 className="card-description">{description}</h3>
+					<h3 className="gate-card-description">{description}</h3>
 				</div>
 
-				<div>
-					<a className="card-link">
-						{link}
+				{link && (
+					<ClayLink className="gate-card-link" href={link.href}>
+						{link.label}
 
 						<ClayIcon
-							className="card-icon"
+							className="gate-card-icon"
 							symbol="order-arrow-right"
 						/>
-					</a>
-				</div>
+					</ClayLink>
+				)}
 			</div>
 		</div>
 	);

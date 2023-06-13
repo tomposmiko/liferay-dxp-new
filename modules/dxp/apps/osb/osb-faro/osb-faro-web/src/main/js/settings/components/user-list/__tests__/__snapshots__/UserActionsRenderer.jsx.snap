@@ -6,21 +6,21 @@ exports[`UserActionsRenderer should render 1`] = `
     class=""
   >
     <button
-      class="button-root btn btn-secondary btn-sm"
+      class="button-root btn btn-sm btn-secondary"
       type="button"
     >
       Edit
     </button>
     <button
-      class="button-root btn btn-secondary btn-outline-borderless btn-sm"
+      class="button-root btn btn-outline-borderless btn-sm btn-outline-secondary"
       type="button"
     >
       <svg
-        class="icon-root lexicon-icon lexicon-icon-trash"
-        viewBox=""
+        class="lexicon-icon lexicon-icon-trash icon-root"
+        role="presentation"
       >
         <use
-          xlink:href="/o/osb-faro-web/dist/sprite.svg#trash"
+          xlink:href="#trash"
         />
       </svg>
     </button>

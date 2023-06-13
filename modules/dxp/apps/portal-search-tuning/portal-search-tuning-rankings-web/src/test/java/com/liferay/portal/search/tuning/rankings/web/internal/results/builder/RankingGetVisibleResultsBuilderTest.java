@@ -55,8 +55,9 @@ public class RankingGetVisibleResultsBuilderTest
 		setUpComplexQueryPartBuilderFactory(setUpComplexQueryPartBuilder());
 		setUpDLAppLocalService();
 		setUpFastDateFormatFactory();
-		setUpQuery();
+		setUpPortalUtil();
 		setUpPropsUtil();
+		setUpQuery();
 
 		Ranking ranking = Mockito.mock(Ranking.class);
 
@@ -68,7 +69,6 @@ public class RankingGetVisibleResultsBuilderTest
 
 		setUpRankingIndexReader(ranking);
 
-		setUpRankingResultUtil();
 		setUpResourceRequest();
 		setUpSearchRequestBuilderFactory(setUpSearchRequestBuilder());
 		setUpSearcher(setUpSearchResponse(setUpDocumentWithGetString()));

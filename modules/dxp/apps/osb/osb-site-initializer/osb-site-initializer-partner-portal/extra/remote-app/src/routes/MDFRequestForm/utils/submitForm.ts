@@ -15,7 +15,6 @@ import {PRMPageRoute} from '../../../common/enums/prmPageRoute';
 import mdfRequestDTO from '../../../common/interfaces/dto/mdfRequestDTO';
 import LiferayPicklist from '../../../common/interfaces/liferayPicklist';
 import MDFRequest from '../../../common/interfaces/mdfRequest';
-import Role from '../../../common/interfaces/role';
 import {Liferay} from '../../../common/services/liferay';
 import createMDFRequestActivitiesSF from '../../../common/services/liferay/object/activity/createMDFRequestActivities';
 import deleteMDFRequestActivities from '../../../common/services/liferay/object/activity/deleteMDFRequestActivities';
@@ -37,23 +36,23 @@ export default async function submitForm(
 	formikHelpers: Omit<FormikHelpers<MDFRequest>, 'setFieldValue'>,
 	siteURL: string,
 	currentRequestStatus?: LiferayPicklist,
-	roles?: Role[]
+	changeStatus?: boolean
 ) {
 	formikHelpers.setSubmitting(true);
 
 	const updatedStatus = updateStatus(
 		values.mdfRequestStatus,
 		currentRequestStatus,
-		roles,
+		changeStatus,
 		values.id,
 		values.totalMDFRequestAmount
 	);
 
-	values.mdfRequestStatus = updatedStatus && updatedStatus;
+	values.mdfRequestStatus = updatedStatus;
 
 	let dtoMDFRequest: mdfRequestDTO | undefined = undefined;
 
-	if (values.mdfRequestStatus !== Status.DRAFT) {
+	if (values.mdfRequestStatus.key !== Status.DRAFT.key) {
 		dtoMDFRequest = await createMDFRequestProxyAPI(values);
 	}
 	else if (values.id) {
@@ -88,7 +87,7 @@ export default async function submitForm(
 
 					return null;
 				}
-				if (values.mdfRequestStatus !== Status.DRAFT) {
+				if (values.mdfRequestStatus.key !== Status.DRAFT.key) {
 					return createMDFRequestActivitiesProxyAPI(
 						activity,
 						values.company,
@@ -108,7 +107,7 @@ export default async function submitForm(
 						);
 					}
 					else {
-						await createMDFRequestActivitiesSF(
+						return await createMDFRequestActivitiesSF(
 							ResourceName.ACTIVITY_DXP,
 							activity,
 							values.company,
@@ -130,7 +129,8 @@ export default async function submitForm(
 						if (budget?.id) {
 							await updateMDFRequestActivityBudget(
 								dtoActivity.id as number,
-								budget
+								budget,
+								values.company
 							);
 							if (budget.removed) {
 								await deleteMDFRequestActivityBudgets(
@@ -142,7 +142,8 @@ export default async function submitForm(
 						else {
 							await createMDFRequestActivityBudget(
 								dtoActivity.id as number,
-								budget
+								budget,
+								values.company
 							);
 						}
 					});

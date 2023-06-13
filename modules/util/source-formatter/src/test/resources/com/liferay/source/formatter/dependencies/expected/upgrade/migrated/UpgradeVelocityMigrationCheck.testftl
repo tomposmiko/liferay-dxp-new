@@ -25,27 +25,27 @@
     <a href="${site_default_url}">testLink</a>
 </html>
 
-#macro( navigationBar  nav_item )
+<#macro  navigationBar  nav_item >
     <#if nav_item.hasChildren()>
         <ul class="child-menu">
-            #foreach (nav_child in nav_item.getChildren())
+            <#list nav_item.getChildren() as nav_child>
                 <#if nav_child.isSelected()>
                     <li class="selected">
                     <a href="${nav_child.getURL()}" ${nav_child.getTarget()}>${nav_child.getName()}</a>
-                    #navigationBar( nav_child  )
+                    <@navigationBar nav_child />
                 <#else>
                     <li>
                     <a href="${nav_child.getURL()}" ${nav_child.getTarget()}>${nav_child.getName()}</a>
-                    #navigationBar( nav_child  )
+                    <@navigationBar nav_child />
                 </#if>
                 <#if nav_child.hasChildren()>
                     <i class="icon-caret-down" onclick="toggleMobileMenu(event)"></i>
                 </#if>
                 </li>
-            #end
+            </#list>
         </ul>
     </#if>
-#end
+</#macro>
 
 <#if "${type.getData()}" !="" && "${type.getData()}" =="R1C2">
 	<div class="triggerBanner banner-R1C2">
@@ -66,3 +66,5 @@
 		</a>
 	</div>
 </#if>
+
+<@navigationBar nav_item />

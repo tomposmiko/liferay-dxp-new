@@ -21,7 +21,7 @@ exports[`VariantCard should render 1`] = `
         class="analytics-variant-card-charts"
       >
         <nav
-          class="navbar navbar-collapse-absolute navbar-expand-md navbar-underline navigation-bar navigation-bar-light"
+          class="navbar navbar-collapse-relative navbar-expand-md navbar-underline navigation-bar navigation-bar-light"
         >
           <div
             class="container-fluid container-fluid-max-xl"
@@ -213,7 +213,7 @@ exports[`VariantCard should render 1`] = `
                     class="table-head-title"
                   >
                     <button
-                      class="button-root btn btn-unstyled inline-item text-truncate-inline"
+                      class="inline-item text-truncate-inline btn btn-unstyled"
                       type="button"
                     >
                       <span
@@ -225,11 +225,11 @@ exports[`VariantCard should render 1`] = `
                         class="inline-item inline-item-after"
                       >
                         <svg
-                          class="icon-root lexicon-icon lexicon-icon-order-arrow-up"
-                          viewBox=""
+                          class="lexicon-icon lexicon-icon-order-arrow-up icon-root"
+                          role="presentation"
                         >
                           <use
-                            xlink:href="/o/osb-faro-web/dist/sprite.svg#order-arrow-up"
+                            xlink:href="#order-arrow-up"
                           />
                         </svg>
                       </span>
@@ -239,7 +239,7 @@ exports[`VariantCard should render 1`] = `
                     class="table-head-title text-right"
                   >
                     <button
-                      class="button-root btn btn-unstyled inline-item text-truncate-inline"
+                      class="inline-item text-truncate-inline btn btn-unstyled"
                       type="button"
                     >
                       <span
@@ -253,7 +253,7 @@ exports[`VariantCard should render 1`] = `
                     class="table-head-title text-right"
                   >
                     <button
-                      class="button-root btn btn-unstyled inline-item text-truncate-inline"
+                      class="inline-item text-truncate-inline btn btn-unstyled"
                       type="button"
                     >
                       <span
@@ -267,7 +267,7 @@ exports[`VariantCard should render 1`] = `
                     class="table-head-title text-right"
                   >
                     <button
-                      class="button-root btn btn-unstyled inline-item text-truncate-inline"
+                      class="inline-item text-truncate-inline btn btn-unstyled"
                       type="button"
                     >
                       <span
@@ -281,7 +281,7 @@ exports[`VariantCard should render 1`] = `
                     class="table-head-title text-right"
                   >
                     <button
-                      class="button-root btn btn-unstyled inline-item text-truncate-inline"
+                      class="inline-item text-truncate-inline btn btn-unstyled"
                       type="button"
                     >
                       <span
@@ -295,7 +295,7 @@ exports[`VariantCard should render 1`] = `
                     class="table-head-title text-right"
                   >
                     <button
-                      class="button-root btn btn-unstyled inline-item text-truncate-inline"
+                      class="inline-item text-truncate-inline btn btn-unstyled"
                       type="button"
                     >
                       <span
@@ -401,7 +401,7 @@ exports[`VariantCard should render 1`] = `
                       class="loss"
                     >
                       <svg
-                        class="lexicon-icon lexicon-icon-caret-bottom"
+                        class="lexicon-icon lexicon-icon-caret-bottom icon-root"
                         role="presentation"
                       >
                         <use

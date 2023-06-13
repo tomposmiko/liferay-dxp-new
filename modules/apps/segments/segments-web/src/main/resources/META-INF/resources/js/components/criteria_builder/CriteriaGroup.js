@@ -196,7 +196,7 @@ function CriteriaGroup({
 	const _renderCriterion = (criterion, index) => {
 		return (
 			<div
-				className={classNames('criterion', {
+				className={classNames('criterion position-relative', {
 					'criterion-group': criterion.items,
 				})}
 			>
@@ -251,7 +251,7 @@ function CriteriaGroup({
 		<div
 			className={classNames(
 				{
-					'criteria-group-root': criteria,
+					'criteria-group-root w-100': criteria,
 					'dnd-drag': dragging,
 				},
 				`color--${propertyKey} criteria-group-item${
@@ -280,7 +280,7 @@ function CriteriaGroup({
 						singleRow &&
 						!root &&
 						connectDragSource(
-							<div className="criteria-group-drag-icon drag-icon">
+							<div className="align-items-center d-flex drag-icon h-100 position-absolute top-0">
 								<ClayIcon symbol="drag" />
 							</div>
 						)}

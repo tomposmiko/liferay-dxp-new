@@ -1,7 +1,7 @@
 import Card from 'shared/components/Card';
 import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
 import ClayLink, {ClayLinkContext} from '@clayui/link';
-import Icon from 'shared/components/Icon';
 import React, {useState} from 'react';
 import {CLASSNAME} from '../summary-base-card/constants';
 import {DisplayType} from 'shared/types';
@@ -43,10 +43,15 @@ const SummaryCardDraftStepBody: React.FC<ISummaryCardDraftStepBodyProps> = ({
 			<>
 				<ClayButton
 					{...buttonProps}
+					className='button-root'
+					displayType='primary'
 					onClick={() => setVisibleModal(true)}
 				>
 					{buttonProps.symbol && (
-						<Icon className='mr-2' symbol={buttonProps.symbol} />
+						<ClayIcon
+							className='icon-root mr-2'
+							symbol={buttonProps.symbol}
+						/>
 					)}
 					{buttonProps.label}
 				</ClayButton>
@@ -69,14 +74,17 @@ const SummaryCardDraftStepBody: React.FC<ISummaryCardDraftStepBodyProps> = ({
 			)}
 		>
 			<ClayLink
-				className={`btn btn-sm ${
-					status === 'active' ? 'btn-primary' : 'btn-secondary'
-				}`}
+				button
+				className='button-root'
+				displayType={status === 'active' ? 'primary' : 'secondary'}
 				href={link}
 				target='_blank'
 			>
 				{buttonProps.symbol && (
-					<Icon className='mr-2' symbol={buttonProps.symbol} />
+					<ClayIcon
+						className='icon-root mr-2'
+						symbol={buttonProps.symbol}
+					/>
 				)}
 				{buttonProps.label}
 			</ClayLink>

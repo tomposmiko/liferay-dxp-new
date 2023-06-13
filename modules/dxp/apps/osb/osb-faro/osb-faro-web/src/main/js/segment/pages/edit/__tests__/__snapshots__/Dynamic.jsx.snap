@@ -43,15 +43,15 @@ exports[`DynamicSegmentEdit should render 1`] = `
                   </span>
                   <button
                     aria-label="Edit"
-                    class="button-root btn btn-outline-unstyled btn-outline-borderless btn-sm"
+                    class="button-root btn btn-outline-borderless btn-sm btn-outline-unstyled"
                     type="button"
                   >
                     <svg
-                      class="icon-root lexicon-icon lexicon-icon-pencil"
-                      viewBox=""
+                      class="lexicon-icon lexicon-icon-pencil icon-root"
+                      role="presentation"
                     >
                       <use
-                        xlink:href="/o/osb-faro-web/dist/sprite.svg#pencil"
+                        xlink:href="#pencil"
                       />
                     </svg>
                   </button>
@@ -63,7 +63,6 @@ exports[`DynamicSegmentEdit should render 1`] = `
             >
               <div
                 class="btn-group"
-                role="group"
               >
                 <div
                   class="btn-group-item"
@@ -99,11 +98,11 @@ exports[`DynamicSegmentEdit should render 1`] = `
                     class="info-popover-root include-anon-help-icon"
                   >
                     <svg
-                      class="icon-root lexicon-icon lexicon-icon-question-circle-full"
-                      viewBox=""
+                      class="lexicon-icon lexicon-icon-question-circle-full icon-root"
+                      role="presentation"
                     >
                       <use
-                        xlink:href="/o/osb-faro-web/dist/sprite.svg#question-circle-full"
+                        xlink:href="#question-circle-full"
                       />
                     </svg>
                   </span>
@@ -111,7 +110,6 @@ exports[`DynamicSegmentEdit should render 1`] = `
               </div>
               <div
                 class="btn-group"
-                role="group"
               >
                 <div
                   class="btn-group-item"
@@ -132,8 +130,12 @@ exports[`DynamicSegmentEdit should render 1`] = `
                       </div>
                     </div>
                   </div>
+                </div>
+                <div
+                  class="btn-group-item"
+                >
                   <button
-                    class="button-root btn btn-secondary preview-criteria btn-outline-borderless btn-sm"
+                    class="button-root preview-criteria btn btn-outline-borderless btn-sm btn-outline-secondary"
                     data-testid="preview-criteria-button"
                     data-tooltip="true"
                     disabled=""
@@ -146,11 +148,11 @@ exports[`DynamicSegmentEdit should render 1`] = `
                       title="Some of your criteria are incomplete or invalid."
                     >
                       <svg
-                        class="icon-root lexicon-icon lexicon-icon-view"
-                        viewBox=""
+                        class="lexicon-icon lexicon-icon-view icon-root"
+                        role="presentation"
                       >
                         <use
-                          xlink:href="/o/osb-faro-web/dist/sprite.svg#view"
+                          xlink:href="#view"
                         />
                       </svg>
                     </span>
@@ -159,13 +161,12 @@ exports[`DynamicSegmentEdit should render 1`] = `
               </div>
               <div
                 class="btn-group"
-                role="group"
               >
                 <div
                   class="btn-group-item save"
                 >
                   <button
-                    class="button-root btn btn-primary btn-sm"
+                    class="button-root btn btn-sm btn-primary"
                     disabled=""
                     type="submit"
                   >
@@ -176,7 +177,7 @@ exports[`DynamicSegmentEdit should render 1`] = `
                   class="btn-group-item cancel"
                 >
                   <a
-                    class="button-root btn btn-secondary btn-sm"
+                    class="button-root btn btn-secondary"
                     href="/workspace/23/contacts/segments/123"
                   >
                     Cancel
@@ -230,11 +231,11 @@ exports[`DynamicSegmentEdit should render 1`] = `
                           type="button"
                         >
                           <svg
-                            class="icon-root lexicon-icon lexicon-icon-search"
-                            viewBox=""
+                            class="lexicon-icon lexicon-icon-search icon-root"
+                            role="presentation"
                           >
                             <use
-                              xlink:href="/o/osb-faro-web/dist/sprite.svg#search"
+                              xlink:href="#search"
                             />
                           </svg>
                         </button>
@@ -293,11 +294,11 @@ exports[`DynamicSegmentEdit should render 1`] = `
                             class="criteria-message"
                           >
                             <svg
-                              class="icon-root lexicon-icon lexicon-icon-ac-rule icon-size-md"
-                              viewBox=""
+                              class="lexicon-icon lexicon-icon-ac-rule icon-root icon-size-md"
+                              role="presentation"
                             >
                               <use
-                                xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-rule"
+                                xlink:href="#ac-rule"
                               />
                             </svg>
                             Drag and drop criterion from the right to add rules.
@@ -306,11 +307,11 @@ exports[`DynamicSegmentEdit should render 1`] = `
                             class="groups-message"
                           >
                             <svg
-                              class="icon-root lexicon-icon lexicon-icon-ac-group icon-size-md"
-                              viewBox=""
+                              class="lexicon-icon lexicon-icon-ac-group icon-root icon-size-md"
+                              role="presentation"
                             >
                               <use
-                                xlink:href="/o/osb-faro-web/dist/sprite.svg#ac-group"
+                                xlink:href="#ac-group"
                               />
                             </svg>
                             Drag and drop over an existing criteria to form groups.

@@ -1,7 +1,7 @@
-import Button from 'shared/components/Button';
 import Chip from 'shared/components/Chip';
+import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
 import getCN from 'classnames';
-import Icon from 'shared/components/Icon';
 import React, {useEffect, useRef, useState} from 'react';
 import {DATA_TYPE_ICONS_MAP} from 'event-analysis/utils/utils';
 import {DataTypes} from 'event-analysis/utils/types';
@@ -156,17 +156,20 @@ const AttributeChip: React.FC<IAttributeChipProps> = React.forwardRef<
 				>
 					{draggable && (
 						<div className='drag-handle' ref={drag}>
-							<Icon symbol='drag' />
+							<ClayIcon className='icon-root' symbol='drag' />
 						</div>
 					)}
 
-					<Button
-						className='edit-attribute-button d-flex'
-						display='unstyled'
+					<ClayButton
+						className='button-root edit-attribute-button d-flex'
+						displayType='unstyled'
 						onClick={onClick}
 					>
 						<div className='sticker'>
-							<Icon symbol={DATA_TYPE_ICONS_MAP[dataType]} />
+							<ClayIcon
+								className='icon-root'
+								symbol={DATA_TYPE_ICONS_MAP[dataType]}
+							/>
 						</div>
 
 						<div>
@@ -174,7 +177,7 @@ const AttributeChip: React.FC<IAttributeChipProps> = React.forwardRef<
 
 							<div className='attribute-value'>{value}</div>
 						</div>
-					</Button>
+					</ClayButton>
 				</Chip>
 			</div>
 		);

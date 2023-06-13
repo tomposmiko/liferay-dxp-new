@@ -27,17 +27,18 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.gradle.StartParameter;
+import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.invocation.Gradle;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtensionContainer;
 
@@ -60,25 +61,13 @@ public class WorkspacePlugin implements Plugin<Settings> {
 		final WorkspaceExtension workspaceExtension = _addWorkspaceExtension(
 			settings);
 
-		for (ProjectConfigurator projectConfigurator :
-				workspaceExtension.getProjectConfigurators()) {
+		Path rootDirPath = rootDir.toPath();
 
-			for (File defaultRootDir :
-					projectConfigurator.getDefaultRootDirs()) {
+		FileSystem fileSystem = rootDirPath.getFileSystem();
 
-				for (File projectDir :
-						projectConfigurator.getProjectDirs(defaultRootDir)) {
+		StartParameter startParameter = gradle.getStartParameter();
 
-					String projectPath = GradleUtil.getProjectPath(
-						projectDir, rootDir);
-
-					settings.include(new String[] {projectPath});
-
-					_projectConfiguratorsMap.put(
-						projectPath, projectConfigurator);
-				}
-			}
-		}
+		File currentDir = startParameter.getCurrentDir();
 
 		gradle.beforeProject(
 			new Closure<Void>(settings) {
@@ -112,52 +101,73 @@ public class WorkspacePlugin implements Plugin<Settings> {
 
 			});
 
-		Path rootDirPath = rootDir.toPath();
+		gradle.settingsEvaluated(
+			new Action<Settings>() {
 
-		FileSystem fileSystem = rootDirPath.getFileSystem();
+				@Override
+				public void execute(Settings settings) {
+					for (ProjectConfigurator projectConfigurator :
+							workspaceExtension.getProjectConfigurators()) {
 
-		gradle.afterProject(
-			project -> {
-				StartParameter startParameter = gradle.getStartParameter();
+						for (File defaultRootDir :
+								projectConfigurator.getDefaultRootDirs()) {
 
-				File projectDir = project.getProjectDir();
-
-				if (Objects.equals(
-						startParameter.getCurrentDir(), projectDir)) {
-
-					return;
+							_includeProjects(
+								projectConfigurator, defaultRootDir);
+						}
+					}
 				}
 
-				Path relativeProjectPath = rootDirPath.relativize(
-					projectDir.toPath());
+				private void _includeProjects(
+					ProjectConfigurator projectConfigurator,
+					File defaultRootDir) {
 
-				for (String glob : workspaceExtension.getDirExcludesGlobs()) {
-					PathMatcher pathMatcher = fileSystem.getPathMatcher(
-						"glob:" + glob);
+					Iterable<File> projectDirs =
+						projectConfigurator.getProjectDirs(defaultRootDir);
 
-					if (!pathMatcher.matches(relativeProjectPath)) {
-						continue;
-					}
+					Iterator<File> iterator = projectDirs.iterator();
 
-					Logger logger = project.getLogger();
+					while (iterator.hasNext()) {
+						File projectDir = iterator.next();
 
-					if (logger.isInfoEnabled()) {
-						logger.info(
-							"Disabling tasks for {} because it matches the " +
-								"exclude pattern {}.",
-							project.getPath(), glob);
-					}
+						if (Objects.equals(currentDir, projectDir)) {
+							continue;
+						}
 
-					Map<Project, Set<Task>> map = project.getAllTasks(false);
+						for (String glob :
+								workspaceExtension.getDirExcludesGlobs()) {
 
-					for (Map.Entry<Project, Set<Task>> entry : map.entrySet()) {
-						for (Task task : entry.getValue()) {
-							task.setEnabled(false);
+							Path relativeProjectPath = rootDirPath.relativize(
+								projectDir.toPath());
+
+							PathMatcher pathMatcher = fileSystem.getPathMatcher(
+								"glob:" + glob);
+
+							if (pathMatcher.matches(relativeProjectPath)) {
+								if (_logger.isInfoEnabled()) {
+									_logger.info(
+										"Skipping project evaluation for {} " +
+											"because it matches the exclude " +
+												"pattern {}.",
+										relativeProjectPath, glob);
+								}
+
+								iterator.remove();
+							}
 						}
 					}
 
-					return;
+					for (File projectDir : projectDirs) {
+						String projectPath = GradleUtil.getProjectPath(
+							projectDir, rootDir);
+
+						settings.include(new String[] {projectPath});
+
+						_projectConfiguratorsMap.put(
+							projectPath, projectConfigurator);
+					}
 				}
+
 			});
 	}
 
@@ -186,6 +196,9 @@ public class WorkspacePlugin implements Plugin<Settings> {
 			GradleUtil.setProperty(project, "portal.version", "7.0.x");
 		}
 	}
+
+	private static final Logger _logger = Logging.getLogger(
+		WorkspacePlugin.class);
 
 	private static final Map<String, ProjectConfigurator>
 		_projectConfiguratorsMap = new HashMap<>();

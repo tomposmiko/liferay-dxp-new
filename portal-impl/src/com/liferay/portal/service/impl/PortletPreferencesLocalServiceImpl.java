@@ -17,11 +17,13 @@ package com.liferay.portal.service.impl;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.BeanReference;
+import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -539,10 +541,33 @@ public class PortletPreferencesLocalServiceImpl
 			Portlet portlet = _portletLocalService.fetchPortletById(
 				companyId, portletId);
 
-			portletPreferences =
-				portletPreferencesLocalService.addPortletPreferences(
-					companyId, ownerId, ownerType, plid, portletId, portlet,
-					defaultPreferences);
+			long ctCollectionId = CTCollectionThreadLocal.getCTCollectionId();
+
+			if (ctCollectionId !=
+					CTCollectionThreadLocal.CT_COLLECTION_ID_PRODUCTION) {
+
+				if (plid == PortletKeys.PREFS_PLID_SHARED) {
+					ctCollectionId =
+						CTCollectionThreadLocal.CT_COLLECTION_ID_PRODUCTION;
+				}
+				else {
+					Layout layout = _layoutPersistence.fetchByPrimaryKey(plid);
+
+					if (layout != null) {
+						ctCollectionId = layout.getCtCollectionId();
+					}
+				}
+			}
+
+			try (SafeCloseable safeCloseable =
+					CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+						ctCollectionId)) {
+
+				portletPreferences =
+					portletPreferencesLocalService.addPortletPreferences(
+						companyId, ownerId, ownerType, plid, portletId, portlet,
+						defaultPreferences);
+			}
 		}
 
 		return _portletPreferenceValueLocalService.getPreferences(

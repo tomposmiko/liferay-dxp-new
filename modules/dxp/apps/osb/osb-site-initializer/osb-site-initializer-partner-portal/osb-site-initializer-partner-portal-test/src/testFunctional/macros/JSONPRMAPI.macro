@@ -314,8 +314,8 @@ definition {
 					"liferaysUserIdSF":${userId},
 					"maxDateActivity":"${endDate}",
 					"mdfRequestStatus":{
-						"key":"pendingMarketingReview",
-						"name":"PendingMarketingReview"
+						"key":"${mdfRequestStatusKey}",
+						"name":"${mdfRequestStatus}"
 					},
 					"minDateActivity":"${startDate}",
 					"overallCampaignDescription":"${campaignDescription}",
@@ -376,8 +376,8 @@ definition {
 					"liferaysUserIdSF":${userId},
 					"maxDateActivity":"${endDate}",
 					"mdfRequestStatus":{
-						"key":"pendingMarketingReview",
-						"name":"PendingMarketingReview"
+						"key":"${mdfRequestStatusKey}",
+						"name":"${mdfRequestStatus}"
 					},
 					"minDateActivity":"${startDate}",
 					"overallCampaignDescription":"${campaignDescription}",

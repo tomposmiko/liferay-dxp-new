@@ -141,14 +141,9 @@ definition {
 
 			Navigator.gotoNavTab(navTab = "Design");
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
-
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
-			AssertTextEquals(
-				key_sectionTitle = "JavaScript Client Extensions",
-				locator1 = "PagesAdmin#SECTION_SUBTITLE",
-				value1 = "No JavaScript client extensions were loaded.");
+			AssertElementPresent(locator1 = "PagesAdmin#NO_JAVASCRIPT_EXTENSIONS_LOADED");
 		}
 
 		task ("Then the site designer could add a JavaScript Extension to widget page") {
@@ -197,14 +192,11 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
-			AssertTextEquals(
-				key_sectionTitle = "JavaScript Client Extensions",
-				locator1 = "PagesAdmin#SECTION_SUBTITLE",
-				value1 = "No JavaScript client extensions were loaded.");
+			AssertElementPresent(locator1 = "PagesAdmin#NO_JAVASCRIPT_EXTENSIONS_LOADED");
 		}
 
 		task ("Then the site designer could add a JavaScript Extension to widget page") {
@@ -238,10 +230,7 @@ definition {
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
-			AssertTextEquals(
-				key_sectionTitle = "JavaScript Client Extensions",
-				locator1 = "PagesAdmin#SECTION_SUBTITLE",
-				value1 = "No JavaScript client extensions were loaded.");
+			AssertElementPresent(locator1 = "PagesAdmin#NO_JAVASCRIPT_EXTENSIONS_LOADED");
 		}
 
 		task ("Then the site designer could add a JavaScript Extension to Pages") {
@@ -307,7 +296,7 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -327,7 +316,7 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -386,7 +375,7 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -421,7 +410,7 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -452,7 +441,7 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -464,10 +453,7 @@ definition {
 				DropdownMenuItem.click(menuItem = "Delete");
 			}
 
-			AssertTextEquals(
-				key_sectionTitle = "JavaScript Client Extensions",
-				locator1 = "PagesAdmin#SECTION_SUBTITLE",
-				value1 = "No JavaScript client extensions were loaded.");
+			AssertElementPresent(locator1 = "PagesAdmin#NO_JAVASCRIPT_EXTENSIONS_LOADED");
 
 			PortletEntry.save();
 
@@ -501,7 +487,7 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -527,6 +513,8 @@ definition {
 		}
 
 		task ("Then the site designer could clear the JavaScript extension selection") {
+			Navigator.gotoNavTab(navTab = "Design");
+
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			Click(
@@ -536,8 +524,8 @@ definition {
 			DropdownMenuItem.click(menuItem = "Delete");
 
 			AssertTextEquals(
-				key_sectionTitle = "JavaScript Client Extensions",
-				locator1 = "PagesAdmin#SECTION_SUBTITLE",
+				key_panel = "JavaScript Client Extensions",
+				locator1 = "PagesAdmin#PANEL",
 				value1 = "No JavaScript client extensions were loaded.");
 
 			PortletEntry.save();
@@ -569,8 +557,6 @@ definition {
 				pageName = "Test Page Name");
 
 			Navigator.gotoNavTab(navTab = "Design");
-
-			Navigator.gotoNavTab(navTab = "Look and Feel");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -605,8 +591,6 @@ definition {
 				pageName = "Test Page Name");
 
 			Navigator.gotoNavTab(navTab = "Design");
-
-			Navigator.gotoNavTab(navTab = "Look and Feel");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -652,7 +636,7 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -684,7 +668,7 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -720,6 +704,8 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
+			Navigator.gotoNavTab(navTab = "Design");
+
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
@@ -747,6 +733,8 @@ definition {
 			PageEditor.gotoTab(tabName = "Page Design Options");
 
 			Click(locator1 = "PageEditor#MORE_LINK");
+
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -854,6 +842,8 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
+			Navigator.gotoNavTab(navTab = "Design");
+
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
 			PagesAdmin.addJavaScriptExtensions(
@@ -882,7 +872,7 @@ definition {
 
 			Click(locator1 = "PageEditor#MORE_LINK");
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -941,8 +931,6 @@ definition {
 				pageName = "Test Page Name");
 
 			Navigator.gotoNavTab(navTab = "Design");
-
-			Navigator.gotoNavTab(navTab = "Look and Feel");
 
 			Navigator.gotoNavTab(navTab = "JavaScript");
 
@@ -1012,6 +1000,8 @@ definition {
 
 				Click(locator1 = "PageEditor#MORE_LINK");
 
+				Navigator.gotoNavTab(navTab = "Design");
+
 				Navigator.gotoNavTab(navTab = "JavaScript");
 
 				PagesAdmin.addJavaScriptExtensions(
@@ -1047,7 +1037,7 @@ definition {
 
 				Click(locator1 = "PageEditor#MORE_LINK");
 
-				Navigator.gotoNavTab(navTab = "Look and Feel");
+				Navigator.gotoNavTab(navTab = "Design");
 
 				Navigator.gotoNavTab(navTab = "JavaScript");
 

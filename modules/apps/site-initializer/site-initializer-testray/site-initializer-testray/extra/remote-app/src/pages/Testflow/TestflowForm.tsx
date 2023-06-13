@@ -19,6 +19,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useNavigate, useOutletContext, useParams} from 'react-router-dom';
 import {KeyedMutator} from 'swr';
+import {withPagePermission} from '~/hoc/withPagePermission';
 
 import Form from '../../components/Form';
 import Container from '../../components/Layout/Container';
@@ -107,7 +108,7 @@ const TestflowForm = () => {
 	);
 
 	const {
-		formState: {errors},
+		formState: {errors, isSubmitting},
 		handleSubmit,
 		register,
 		setValue,
@@ -300,6 +301,7 @@ const TestflowForm = () => {
 			<Form.Footer
 				onClose={() => onClose()}
 				onSubmit={handleSubmit(_onSubmit)}
+				primaryButtonProps={{loading: isSubmitting}}
 			/>
 
 			<TestflowAssignUserModal modal={modal} type={modalType} />
@@ -307,4 +309,6 @@ const TestflowForm = () => {
 	);
 };
 
-export default TestflowForm;
+export default withPagePermission(TestflowForm, {
+	restImpl: testrayTaskImpl,
+});

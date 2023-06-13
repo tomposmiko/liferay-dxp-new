@@ -104,18 +104,18 @@ exports[`AttributeBreakdownDropdown render 2`] = `
             class="dropdown-item d-flex justify-content-between"
           >
             <button
-              class="button-root btn btn-unstyled dropdown-item-primary-button btn-block"
+              class="button-root dropdown-item-primary-button btn btn-block btn-unstyled"
               type="button"
             >
               <div
                 class="sticker"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-text"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-text icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#text"
+                    xlink:href="#text"
                   />
                 </svg>
               </div>
@@ -129,18 +129,18 @@ exports[`AttributeBreakdownDropdown render 2`] = `
             class="dropdown-item d-flex justify-content-between"
           >
             <button
-              class="button-root btn btn-unstyled dropdown-item-primary-button btn-block"
+              class="button-root dropdown-item-primary-button btn btn-block btn-unstyled"
               type="button"
             >
               <div
                 class="sticker"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-text"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-text icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#text"
+                    xlink:href="#text"
                   />
                 </svg>
               </div>
@@ -154,18 +154,18 @@ exports[`AttributeBreakdownDropdown render 2`] = `
             class="dropdown-item d-flex justify-content-between"
           >
             <button
-              class="button-root btn btn-unstyled dropdown-item-primary-button btn-block"
+              class="button-root dropdown-item-primary-button btn btn-block btn-unstyled"
               type="button"
             >
               <div
                 class="sticker"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-text"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-text icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#text"
+                    xlink:href="#text"
                   />
                 </svg>
               </div>
@@ -179,18 +179,18 @@ exports[`AttributeBreakdownDropdown render 2`] = `
             class="dropdown-item d-flex justify-content-between"
           >
             <button
-              class="button-root btn btn-unstyled dropdown-item-primary-button btn-block"
+              class="button-root dropdown-item-primary-button btn btn-block btn-unstyled"
               type="button"
             >
               <div
                 class="sticker"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-text"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-text icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#text"
+                    xlink:href="#text"
                   />
                 </svg>
               </div>
@@ -204,18 +204,18 @@ exports[`AttributeBreakdownDropdown render 2`] = `
             class="dropdown-item d-flex justify-content-between"
           >
             <button
-              class="button-root btn btn-unstyled dropdown-item-primary-button btn-block"
+              class="button-root dropdown-item-primary-button btn btn-block btn-unstyled"
               type="button"
             >
               <div
                 class="sticker"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-text"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-text icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#text"
+                    xlink:href="#text"
                   />
                 </svg>
               </div>
@@ -229,18 +229,18 @@ exports[`AttributeBreakdownDropdown render 2`] = `
             class="dropdown-item d-flex justify-content-between"
           >
             <button
-              class="button-root btn btn-unstyled dropdown-item-primary-button btn-block"
+              class="button-root dropdown-item-primary-button btn btn-block btn-unstyled"
               type="button"
             >
               <div
                 class="sticker"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-text"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-text icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#text"
+                    xlink:href="#text"
                   />
                 </svg>
               </div>
@@ -254,18 +254,18 @@ exports[`AttributeBreakdownDropdown render 2`] = `
             class="dropdown-item d-flex justify-content-between"
           >
             <button
-              class="button-root btn btn-unstyled dropdown-item-primary-button btn-block"
+              class="button-root dropdown-item-primary-button btn btn-block btn-unstyled"
               type="button"
             >
               <div
                 class="sticker"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-text"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-text icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#text"
+                    xlink:href="#text"
                   />
                 </svg>
               </div>
@@ -279,18 +279,18 @@ exports[`AttributeBreakdownDropdown render 2`] = `
             class="dropdown-item d-flex justify-content-between"
           >
             <button
-              class="button-root btn btn-unstyled dropdown-item-primary-button btn-block"
+              class="button-root dropdown-item-primary-button btn btn-block btn-unstyled"
               type="button"
             >
               <div
                 class="sticker"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-text"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-text icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#text"
+                    xlink:href="#text"
                   />
                 </svg>
               </div>
@@ -304,18 +304,18 @@ exports[`AttributeBreakdownDropdown render 2`] = `
             class="dropdown-item d-flex justify-content-between"
           >
             <button
-              class="button-root btn btn-unstyled dropdown-item-primary-button btn-block"
+              class="button-root dropdown-item-primary-button btn btn-block btn-unstyled"
               type="button"
             >
               <div
                 class="sticker"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-text"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-text icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#text"
+                    xlink:href="#text"
                   />
                 </svg>
               </div>
@@ -329,18 +329,18 @@ exports[`AttributeBreakdownDropdown render 2`] = `
             class="dropdown-item d-flex justify-content-between"
           >
             <button
-              class="button-root btn btn-unstyled dropdown-item-primary-button btn-block"
+              class="button-root dropdown-item-primary-button btn btn-block btn-unstyled"
               type="button"
             >
               <div
                 class="sticker"
               >
                 <svg
-                  class="icon-root lexicon-icon lexicon-icon-text"
-                  viewBox=""
+                  class="lexicon-icon lexicon-icon-text icon-root"
+                  role="presentation"
                 >
                   <use
-                    xlink:href="/o/osb-faro-web/dist/sprite.svg#text"
+                    xlink:href="#text"
                   />
                 </svg>
               </div>

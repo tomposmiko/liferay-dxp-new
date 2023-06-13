@@ -97,6 +97,7 @@ export default function Favicon({
 				type="hidden"
 				value={values.faviconFileEntryId}
 			/>
+
 			{values.imgURL && (
 				<img
 					alt={values.title}

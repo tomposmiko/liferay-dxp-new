@@ -23,6 +23,7 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 
 import java.util.Collections;
+import java.util.Locale;
 
 import javax.ws.rs.InternalServerErrorException;
 
@@ -31,10 +32,9 @@ import javax.ws.rs.InternalServerErrorException;
  */
 public class DTOConverterUtil {
 
-	public static Object toDTO(
-			BaseModel<?> baseModel, DTOConverterRegistry dtoConverterRegistry,
-			SystemObjectDefinitionManager systemObjectDefinitionManager,
-			User user)
+	public static DTOConverter<BaseModel<?>, ?> getDTOConverter(
+			DTOConverterRegistry dtoConverterRegistry,
+			SystemObjectDefinitionManager systemObjectDefinitionManager)
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
@@ -52,10 +52,28 @@ public class DTOConverterUtil {
 					systemObjectDefinitionManager.getModelClassName());
 		}
 
+		return dtoConverter;
+	}
+
+	public static Object toDTO(
+			BaseModel<?> baseModel, DTOConverterRegistry dtoConverterRegistry,
+			SystemObjectDefinitionManager systemObjectDefinitionManager,
+			User user)
+		throws Exception {
+
+		DTOConverter<BaseModel<?>, ?> dtoConverter = getDTOConverter(
+			dtoConverterRegistry, systemObjectDefinitionManager);
+
+		Locale locale = null;
+
+		if (user != null) {
+			locale = user.getLocale();
+		}
+
 		DefaultDTOConverterContext defaultDTOConverterContext =
 			new DefaultDTOConverterContext(
 				false, Collections.emptyMap(), dtoConverterRegistry,
-				baseModel.getPrimaryKeyObj(), user.getLocale(), null, user);
+				baseModel.getPrimaryKeyObj(), locale, null, user);
 
 		return dtoConverter.toDTO(defaultDTOConverterContext);
 	}
