@@ -246,6 +246,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PRODUCT_DETAILS_QUANTITY_SELECTOR_INPUT_FIELD</td>
+	<td>//div[contains(@class,"product-detail")]//..//..//input[contains(@class,"quantity-selector")]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PRODUCT_DETAILS_ADD_TO_WISH_LIST</td>
 	<td>//div[contains(@class,'product-detail')]//div[contains(@class,'add-to-wish-list')]//button</td>
 	<td></td>
@@ -345,6 +350,16 @@
 <tr>
 	<td>CHECKOUT_SUMMARY_PAYMENT_METHOD</td>
 	<td>//div[contains(@class,'payment-method')]/div[contains(.,'${key_paymentMethod}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CHECKOUT_SUMMARY_DELIVERY_TERM</td>
+	<td>//div[contains(@class,'delivery-term')]/div[contains(.,'${key_deliveryTerm}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CHECKOUT_SUMMARY_PAYMENT_TERM</td>
+	<td>//div[contains(@class,'payment-term')]/div[contains(.,'${key_paymentTerm}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -497,6 +512,16 @@
 <tr>
 	<td>ACCOUNT_SELECTOR_ORDER_ID</td>
 	<td>//a[contains(@href,'commerceOrderId')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PORTLET_CONTENT</td>
+	<td>//div[@class='portlet-content']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ORDER_DETAILS_TERMS_AND_CONDITIONS</td>
+	<td>//div[contains (@class,'panel__title') and contains(.,'${key_termType}')]//..//a[contains(.,'${key_term}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -139,6 +139,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
+import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.capabilities.TemporaryFileEntriesCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -8937,25 +8938,15 @@ public class JournalArticleLocalServiceImpl
 			return friendlyURLMap;
 		}
 
-		StringBundler sb = new StringBundler(2);
-
-		Group group = _groupLocalService.getGroup(
-			layoutDisplayPageObjectProvider.getGroupId());
-
-		sb.append(
-			_portal.getGroupFriendlyURL(
-				group.getPublicLayoutSet(), themeDisplay, false, false));
-
-		sb.append(layoutDisplayPageProvider.getURLSeparator());
-
 		Map<Locale, String> friendlyURLs = article.getFriendlyURLMap();
 
 		for (Locale locale : friendlyURLs.keySet()) {
-			String urlTitle = layoutDisplayPageObjectProvider.getURLTitle(
-				locale);
-
 			friendlyURLMap.put(
-				LocaleUtil.toLanguageId(locale), sb.toString() + urlTitle);
+				LocaleUtil.toLanguageId(locale),
+				_journalHelper.createURLPattern(
+					article, locale, false,
+					FriendlyURLResolverConstants.URL_SEPARATOR_JOURNAL_ARTICLE,
+					themeDisplay));
 		}
 
 		return friendlyURLMap;

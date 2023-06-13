@@ -554,8 +554,8 @@ public class DataDefinitionResourceImpl
 				dataLayoutResource.putDataLayout(
 					Optional.ofNullable(
 						dataLayout.getId()
-					).orElse(
-						_getDefaultDataLayoutId(dataDefinitionId)
+					).orElseGet(
+						() -> _getDefaultDataLayoutId(dataDefinitionId)
 					),
 					dataLayout));
 		}
@@ -617,8 +617,8 @@ public class DataDefinitionResourceImpl
 					_ddmStructureLayoutLocalService.getStructureLayout(
 						Optional.ofNullable(
 							dataLayout.getId()
-						).orElse(
-							_getDefaultDataLayoutId(dataDefinitionId)
+						).orElseGet(
+							() -> _getDefaultDataLayoutId(dataDefinitionId)
 						));
 
 				JSONArray jsonArray = JSONUtil.getValueAsJSONArray(
@@ -826,25 +826,15 @@ public class DataDefinitionResourceImpl
 		return ddmStructure.getDDMForm();
 	}
 
-	private long _getDefaultDataLayoutId(long dataDefinitionId)
-		throws Exception {
-
-		DDMStructure ddmStructure = _ddmStructureLocalService.getDDMStructure(
+	private long _getDefaultDataLayoutId(long dataDefinitionId) {
+		DDMStructure ddmStructure = _ddmStructureLocalService.fetchDDMStructure(
 			dataDefinitionId);
 
-		DataLayoutResource dataLayoutResource = _getDataLayoutResource(false);
+		if (ddmStructure == null) {
+			return 0L;
+		}
 
-		DataDefinitionContentType dataDefinitionContentType =
-			_dataDefinitionContentTypeTracker.getDataDefinitionContentType(
-				ddmStructure.getClassNameId());
-
-		DataLayout dataLayout =
-			dataLayoutResource.getSiteDataLayoutByContentTypeByDataLayoutKey(
-				ddmStructure.getGroupId(),
-				dataDefinitionContentType.getContentType(),
-				ddmStructure.getStructureKey());
-
-		return dataLayout.getId();
+		return ddmStructure.getDefaultDDMStructureLayoutId();
 	}
 
 	private Locale _getDefaultLocale() {

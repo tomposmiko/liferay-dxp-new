@@ -82,15 +82,15 @@
 			"type": "Clob"
 		},
 		{
-			"DBType": "Clob",
-			"indexed": false,
-			"indexedAsKeyword": false,
+			"DBType": "Integer",
+			"indexed": true,
+			"indexedAsKeyword": true,
 			"label": {
 				"en_US": "Warnings"
 			},
 			"name": "warnings",
 			"required": false,
-			"type": "Clob"
+			"type": "Integer"
 		}
 	],
 	"pluralLabel": {

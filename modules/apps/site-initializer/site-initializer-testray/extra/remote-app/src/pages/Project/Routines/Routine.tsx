@@ -14,23 +14,25 @@
 
 import ClayChart from '@clayui/charts';
 import ClayIcon from '@clayui/icon';
-import {useParams} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 
 import Container from '../../../components/Layout/Container';
 import ListView from '../../../components/ListView/ListView';
 import ProgressBar from '../../../components/ProgressBar';
-import useTotalTestCases from '../../../data/useTotalTestCases';
+import useBuildHistory from '../../../data/useBuildHistory';
 import {getBuilds} from '../../../graphql/queries';
 import i18n from '../../../i18n';
 import {BUILD_STATUS} from '../../../util/constants';
 import dayjs from '../../../util/date';
+import {searchUtil} from '../../../util/search';
 import RoutineBuildModal from './RoutineBuildModal';
 import useRoutineActions from './useRoutineActions';
 
 const Routine = () => {
 	const {actionsRoutine, formModal} = useRoutineActions();
-	const {barChart, colors} = useTotalTestCases();
+	const {barChart, colors} = useBuildHistory();
 	const {routineId} = useParams();
+	const navigate = useNavigate();
 
 	return (
 		<Container title={i18n.translate('build-history')}>
@@ -66,7 +68,7 @@ const Routine = () => {
 						},
 					},
 				}}
-				managementToolbarProps={{addButton: formModal.modal.open}}
+				managementToolbarProps={{addButton: () => navigate('update')}}
 				query={getBuilds}
 				tableProps={{
 					actions: actionsRoutine,
@@ -199,7 +201,9 @@ const Routine = () => {
 					navigateTo: ({id}) => `build/${id}`,
 				}}
 				transformData={(data) => data?.builds}
-				variables={{filter: `routineId eq ${routineId}`}}
+				variables={{
+					filter: searchUtil.eq('routineId', routineId as string),
+				}}
 			/>
 
 			<RoutineBuildModal modal={formModal.modal} />

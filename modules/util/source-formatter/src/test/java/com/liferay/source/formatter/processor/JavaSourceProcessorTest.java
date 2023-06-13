@@ -63,6 +63,18 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testFDSTableSchemaBuilder() throws Exception {
+		test(
+			"FDSTableSchemaBuilder.testjava",
+			new String[] {
+				"Use 'add' instead of 'addFDSTableSchemaField'",
+				"Use 'add' instead of 'addFDSTableSchemaField'",
+				"Use 'add' instead of 'addFDSTableSchemaField'"
+			},
+			new Integer[] {43, 47, 50});
+	}
+
+	@Test
 	public void testCollapseImports() throws Exception {
 		test("CollapseImports.testjava");
 	}
@@ -215,6 +227,11 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 				"Illegal import: jodd.util.StringPool",
 				"Use ProxyUtil instead of java.lang.reflect.Proxy"
 			});
+	}
+
+	@Test
+	public void testIncorrectEmptyLinesInUpgradeProcess() throws Exception {
+		test("IncorrectEmptyLinesInUpgradeProcess.testjava");
 	}
 
 	@Test
@@ -502,6 +519,13 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testSizeIsZeroCheck() throws Exception {
+		test("SizeIsZero.testjava",
+			 "Use method '_testList.isEmpty()' instead",
+			 26);
+	}
+
+	@Test
 	public void testSortAnnotationParameters() throws Exception {
 		test("SortAnnotationParameters.testjava");
 	}
@@ -533,6 +557,15 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	@Test
 	public void testThrowsSystemException() throws Exception {
 		test("ThrowsSystemException.testjava");
+	}
+
+	@Test
+	public void testStringConcatenation() throws Exception {
+		test(
+			"StringConcatenation.testjava",
+			"When concatenating multiple literal strings, only the first " +
+				"literal string can start with ' '",
+			28);
 	}
 
 	@Test

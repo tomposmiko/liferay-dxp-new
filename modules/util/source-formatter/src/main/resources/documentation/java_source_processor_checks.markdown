@@ -38,6 +38,7 @@ ExceptionMapperAnnotationCheck | [Bug Prevention](bug_prevention_checks.markdown
 [ExceptionMessageCheck](check/message_check.markdown#messagecheck) | [Styling](styling_checks.markdown#styling-checks) | Validates messages that are passed to exceptions. |
 ExceptionPrintStackTraceCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Avoid using printStackTrace. |
 ExceptionVariableNameCheck | [Naming Conventions](naming_conventions_checks.markdown#naming-conventions-checks) | Validates variable names that have type `*Exception`. |
+[FDSTableSchemaBuilderCheck](check/fds_table_schema_builder_check.markdown#fdstableschemabuildercheck) | [Styling](styling_checks.markdown#styling-checks) | Finds cases where `add` should be used. |
 FactoryCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Finds cases where `*Factory` should be used when creating new instances of an object. |
 FilterStringWhitespaceCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Finds missing and unnecessary whitespace in the value of the filter string in `ServiceTrackerFactory.open` or `WaiterUtil.waitForFilter`. |
 [FrameworkBundleCheck](check/framework_bundle_check.markdown#frameworkbundlecheck) | [Performance](performance_checks.markdown#performance-checks) | Checks that `org.osgi.framework.Bundle.getHeaders()` is not used. |
@@ -152,7 +153,8 @@ JavaTransactionBoundaryCheck | [Bug Prevention](bug_prevention_checks.markdown#b
 [JavaUpgradeAlterCheck](check/java_upgrade_alter_check.markdown#javaupgradealtercheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Performs several checks on `alter` calls in Upgrade classes. |
 [JavaUpgradeClassCheck](check/java_upgrade_class_check.markdown#javaupgradeclasscheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Performs several checks on Upgrade classes. |
 JavaUpgradeConnectionCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Finds cases where `DataAccess.getConnection` is used (instead of using the available global variable `connection`). |
-JavaUpgradeDropTableCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Finds cases where `DROP_TABLE_IF_EXISTS` should be used (instead of `drop table if exists`). |
+[JavaUpgradeDropTableCheck](check/java_upgrade_drop_table_check.markdown#javaupgradedroptablecheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Finds cases where `DROP_TABLE_IF_EXISTS` should be used (instead of `drop table if exists`). |
+JavaUpgradeEmptyLinesCheck | [Styling](styling_checks.markdown#styling-checks) | Finds missing and unnecessary empty lines in Upgrade classes. |
 [JavaUpgradeIndexCheck](check/java_upgrade_index_check.markdown#javaupgradeindexcheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Finds cases where the service builder indexes are updated manually in Upgrade classes. This is not needed because Liferay takes care of it. |
 JavaUpgradeVersionCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Verifies that the correct upgrade versions are used in classes that implement `UpgradeStepRegistrator`. |
 JavaVariableTypeCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Performs several checks on the modifiers on variables. |

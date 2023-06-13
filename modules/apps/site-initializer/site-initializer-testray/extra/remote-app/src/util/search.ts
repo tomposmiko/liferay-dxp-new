@@ -12,12 +12,59 @@
  * details.
  */
 
-export const searchUtil = {
-	in: (key: string, values: string[] | number[]) => {
-		const operator = `${key} in ({values})`;
+type Key = string;
+type Value = string | number;
 
-		return operator
-			.replace('{values}', values.map((value) => `'${value}'`).join(','))
-			.trim();
+export const searchUtil = {
+	eq: (key: Key, value: Value) => `${key} eq '${value}'`,
+	in: (key: Key, values: Value[]) => {
+		if (values) {
+			const operator = `${key} in ({values})`;
+
+			return operator
+				.replace(
+					'{values}',
+					values.map((value) => `'${value}'`).join(',')
+				)
+				.trim();
+		}
+
+		return '';
 	},
 };
+
+export class SearchBuilder {
+	#query: string = '';
+
+	build() {
+		const query = this.#query.trim();
+
+		if (query.endsWith('or') || query.endsWith('and')) {
+			return query.substring(0, query.length - 3);
+		}
+
+		return query;
+	}
+
+	#setContext(query: string) {
+		this.#query += ` ${query}`;
+
+		return this;
+	}
+
+	and() {
+		return this.#setContext('and');
+	}
+
+	eq(key: Key, value: Value) {
+		return this.#setContext(searchUtil.eq(key, value));
+	}
+
+	in(key: Key, values: Value[]) {
+		return this.#setContext(searchUtil.in(key, values));
+	}
+
+	or() {
+		return this.#setContext('or');
+	}
+}

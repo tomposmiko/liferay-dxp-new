@@ -26,6 +26,7 @@ import {TestrayCaseResult, getCaseResults} from '../../../../graphql/queries';
 import i18n from '../../../../i18n';
 import {Liferay} from '../../../../services/liferay/liferay';
 import {getStatusLabel} from '../../../../util/constants';
+import {searchUtil} from '../../../../util/search';
 
 const Build = () => {
 	const {buildId} = useParams();
@@ -80,15 +81,19 @@ const Build = () => {
 							value: i18n.translate('run'),
 						},
 						{
-							key: 'assignee',
-							render: (_: any, caseResult: TestrayCaseResult) =>
-								caseResult?.assignedUserId ? (
-									<Avatar />
+							key: 'user',
+							render: (_: any, caseResult: TestrayCaseResult) => {
+								return caseResult?.user ? (
+									<Avatar
+										displayName
+										name={caseResult.user.givenName}
+									/>
 								) : (
 									<AssignToMe
 										onClick={() => onAssignToMe(caseResult)}
 									/>
-								),
+								);
+							},
 							value: i18n.translate('assignee'),
 						},
 						{
@@ -118,7 +123,9 @@ const Build = () => {
 					navigateTo: ({id}) => `case-result/${id}`,
 				}}
 				transformData={(data) => data?.caseResults}
-				variables={{filter: `buildId eq ${buildId}`}}
+				variables={{
+					filter: searchUtil.eq('buildId', buildId as string),
+				}}
 			/>
 		</Container>
 	);

@@ -13,10 +13,12 @@
  */
 
 import ClayPopover from '@clayui/popover';
+import classNames from 'classnames';
 import {Link, useLocation} from 'react-router-dom';
 
 import i18n from '../../i18n';
-import TestrayLogo from '../../images/testray-logo';
+import TestrayIcon from '../../images/testray-icon';
+import TestrayIconBrand from '../../images/testray-icon-brand';
 import CompareRun from './CompareRuns';
 import SidebarFooter from './SidebarFooter';
 import SidebarItem from './SidebarItem';
@@ -60,10 +62,12 @@ const Sidebar = () => {
 	];
 
 	return (
-		<div className="testray-sidebar">
+		<div className={classNames('testray-sidebar')}>
 			<div className="testray-sidebar-content">
-				<Link className="d-flex flex-center mb-5 testray-logo" to="/">
-					<TestrayLogo />
+				<Link className="d-flex flex-center mb-5 w-100" to="/">
+					<TestrayIcon className="testray-logo" />
+
+					<TestrayIconBrand className="testray-brand-logo" />
 				</Link>
 
 				{sidebarItems.map(

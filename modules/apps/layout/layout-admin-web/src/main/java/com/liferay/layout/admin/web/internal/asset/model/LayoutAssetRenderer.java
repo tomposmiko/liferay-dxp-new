@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Locale;
 
@@ -92,7 +91,7 @@ public class LayoutAssetRenderer extends BaseJSPAssetRenderer<Layout> {
 		sb.append(_layout.getHTMLTitle(locale));
 
 		if (_layout.isTypeContent() &&
-			(_layout.getStatus() == WorkflowConstants.STATUS_PENDING)) {
+			(_layout.isDenied() || _layout.isPending())) {
 
 			return HtmlUtil.stripHtml(sb.toString());
 		}
@@ -116,7 +115,7 @@ public class LayoutAssetRenderer extends BaseJSPAssetRenderer<Layout> {
 				WebKeys.THEME_DISPLAY);
 
 		try {
-			if (_layout.getStatus() != WorkflowConstants.STATUS_PENDING) {
+			if (!_layout.isDenied() && !_layout.isPending()) {
 				return PortalUtil.getLayoutFriendlyURL(_layout, themeDisplay);
 			}
 

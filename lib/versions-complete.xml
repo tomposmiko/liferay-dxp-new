@@ -5944,6 +5944,18 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>lib/development/commons-compress.jar</file-name>
+				<version>1.21</version>
+				<project-name>Commons Compress</project-name>
+				<project-url>http://commons.apache.org/compress</project-url>
+				<licenses>
+					<license>
+						<license-name>Apache License 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>lib/development/commons-lang3.jar</file-name>
 				<version>3.12.0</version>
 				<project-name>Commons Lang</project-name>
@@ -6815,30 +6827,6 @@
 					</license>
 				</licenses>
 				<comments>This was recompiled for compatibility with JDK 5.</comments>
-			</library>
-			<library>
-				<file-name>lib/portal/commons-beanutils.jar</file-name>
-				<version>1.9.4</version>
-				<project-name>Commons Beanutils</project-name>
-				<project-url>http://commons.apache.org/beanutils</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/commons-collections.jar</file-name>
-				<version>3.2.2</version>
-				<project-name>Commons Collections</project-name>
-				<project-url>http://commons.apache.org/collections</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
 			</library>
 			<library>
 				<file-name>lib/portal/commons-configuration.jar</file-name>

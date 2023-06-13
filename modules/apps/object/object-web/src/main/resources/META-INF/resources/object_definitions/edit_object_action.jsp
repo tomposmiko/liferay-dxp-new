@@ -23,10 +23,12 @@ ObjectAction objectAction = objectDefinitionsActionsDisplayContext.getObjectActi
 %>
 
 <react:component
-	module="js/components/EditObjectAction"
+	module="js/components/ObjectAction/EditObjectAction"
 	props='<%=
 		HashMapBuilder.<String, Object>put(
 			"objectAction", objectDefinitionsActionsDisplayContext.getObjectActionJSONObject(objectAction)
+		).put(
+			"objectActionCodeEditorElements", objectDefinitionsActionsDisplayContext.getObjectActionCodeEditorElements()
 		).put(
 			"objectActionExecutors", objectDefinitionsActionsDisplayContext.getObjectActionExecutorsJSONArray()
 		).put(

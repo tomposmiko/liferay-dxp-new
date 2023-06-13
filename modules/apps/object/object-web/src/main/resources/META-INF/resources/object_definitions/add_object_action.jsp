@@ -21,10 +21,12 @@ ObjectDefinitionsActionsDisplayContext objectDefinitionsActionsDisplayContext = 
 %>
 
 <react:component
-	module="js/components/ModalAddObjectAction"
+	module="js/components/ObjectAction/AddObjectAction"
 	props='<%=
 		HashMapBuilder.<String, Object>put(
 			"apiURL", objectDefinitionsActionsDisplayContext.getAPIURL()
+		).put(
+			"objectActionCodeEditorElements", objectDefinitionsActionsDisplayContext.getObjectActionCodeEditorElements()
 		).put(
 			"objectActionExecutors", objectDefinitionsActionsDisplayContext.getObjectActionExecutorsJSONArray()
 		).put(

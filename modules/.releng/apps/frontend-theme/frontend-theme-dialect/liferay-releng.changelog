@@ -62,3 +62,8 @@ b07a7df37a10b01eb9bcba41b3c5e0197f9bd8de^..518939dc01f5babed3b39edb491397f5ffb99
 # Bundle Version 5.0.30
 #
 2cb7df4d62b8ed44fb44a64bc5a595dfd59c2efa^..bcaf4e372364e201b5b151bb691cb6dea021dd1c=LPS-146290 LPS-151398 LPS-151401 LPS-152121
+
+#
+# Bundle Version 5.0.32
+#
+bcaf4e372364e201b5b151bb691cb6dea021dd1c^..c8d3e0bf58a02c5aa24642c3f9bd67d999d499ec=LPS-153050

@@ -240,11 +240,20 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 				<div class="sidebar-section">
 
 					<%
-					boolean isLatestVersion = fileVersion.equals(fileEntry.getLatestFileVersion());
+					DLViewFileEntryDisplayContext dlViewFileEntryDisplayContext = (DLViewFileEntryDisplayContext)request.getAttribute(DLViewFileEntryDisplayContext.class.getName());
+
+					boolean latestVersion = false;
+
+					if (dlViewFileEntryDisplayContext != null) {
+						latestVersion = fileVersion.equals(dlViewFileEntryDisplayContext.getFileVersion());
+					}
+					else {
+						latestVersion = fileVersion.equals(fileEntry.getLatestFileVersion());
+					}
 
 					String urlLabel = null;
 
-					if (isLatestVersion) {
+					if (latestVersion) {
 						urlLabel = LanguageUtil.get(resourceBundle, "latest-version-url");
 					}
 					else {
@@ -259,7 +268,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 
 						<div class="input-group input-group-sm">
 							<div class="input-group-item input-group-prepend">
-								<input class="form-control" id="<%= urlInputId %>" readonly value="<%= DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, StringPool.BLANK, !isLatestVersion, true) %>" />
+								<input class="form-control" id="<%= urlInputId %>" readonly value="<%= DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, StringPool.BLANK, !latestVersion, true) %>" />
 							</div>
 
 							<span class="input-group-append input-group-item input-group-item-shrink">
@@ -274,7 +283,7 @@ long assetClassPK = DLAssetHelperUtil.getAssetClassPK(fileEntry, fileVersion);
 						</div>
 					</div>
 
-					<c:if test="<%= portletDisplay.isWebDAVEnabled() && fileEntry.isSupportsSocial() && isLatestVersion %>">
+					<c:if test="<%= portletDisplay.isWebDAVEnabled() && fileEntry.isSupportsSocial() && latestVersion %>">
 
 						<%
 						String webDavURLInputId = liferayPortletResponse.getNamespace() + "webDavURLInput";

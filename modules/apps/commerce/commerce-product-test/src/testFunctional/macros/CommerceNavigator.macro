@@ -72,6 +72,14 @@ definition {
 			value1 = "${entryName}");
 	}
 
+	macro gotoMiniumAccountOrderDefaults {
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/minium/account-management");
+
+		CommerceNavigator.gotoEntry(entryName = "${accountName}");
+
+		CommerceEntry.gotoMenuTab(menuTab = "Order Defaults");
+	}
+
 	macro gotoMiniumSidebarItem {
 		ScrollBy(value1 = "0, -1000");
 
@@ -142,6 +150,10 @@ definition {
 		Click(
 			key_entryName = "${entryName}",
 			locator1 = "CommerceEntry#TABLE_LIST_TITLE");
+	}
+
+	macro goToWishLists {
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/minium/lists");
 	}
 
 	macro searchCatalog {

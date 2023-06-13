@@ -11,8 +11,28 @@
 
 <tbody>
 <tr>
+	<td>ACCOUNT_ORDER_DEFAULTS_ENTRY</td>
+	<td>//div[contains(.,'${key_defaultOption}')][@class='sheet-section']//div[@class='sheet-text']/following-sibling::span | //div[contains(.,'${key_defaultOption}')][@class='sheet-section']//div[@class='sheet-text']/following-sibling::h4</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ANY_MENU_ITEM</td>
 	<td>//div[contains(@class,'show')]//button[contains(.,'${key_menuItem}')] | //div[contains(@class,'show')]//a[contains(.,'${key_menuItem}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_ITEM_FROM_LIST</td>
+	<td>//div[contains(@class,'table-list-title')]/a[contains(.,'${key_itemName}')]//following::div//a[contains(.,'Select')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WISH_LIST_NAME</td>
+	<td>//td[contains(@class,'lfr-name-column')]//*[contains(.,'${wishListName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECTED_TABLE_PAGINATION</td>
+	<td>//li[contains(@class,'page-item active')]//button[contains(.,'${key_pageNumber}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -162,7 +182,7 @@
 </tr>
 <tr>
 	<td>ASSERT_NOTIFICATION_QUEUE</td>
-	<td>//div[contains(@class,'dnd-tr with-bg')]//div[contains(text(), '${key_name}')][${key_order}]</td>
+	<td>//div[contains(@class,'dnd-tr')]//div[contains(text(),'${key_name}')][${key_order}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -580,6 +600,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>TABLE_ELIGIBILITY_ENTRY</td>
+	<td>//h4[contains(.,'${key_table}')]//..//div[@class='dnd-td'][contains(.,'${key_entryName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TABLE_CELL_BY_COLUMN_ORDER</td>
 	<td>//div[contains(@class,'title')]//*[text()='${key_entryName}']/../../../div[@class='dnd-td'][${key_columnNumber}]</td>
 	<td></td>
@@ -794,6 +819,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SEARCH_MAPPED_PRODUCTS_RESULT</td>
+	<td>//div[@class='table-list-title']//p[contains(text(),'${key_entryName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SEARCH_ORDER_ID_RESULT</td>
 	<td>//p[@class='table-list-title' and contains(.,'${key_entryName}')]/a</td>
 	<td></td>
@@ -928,7 +958,7 @@
 </tr>
 <tr>
 	<td>ON_ORDER_QUANTITY</td>
-	<td>//div[@class="dnd-tr with-bg"]//div[contains(text(),'${key_orderQuantity}')]</td>
+	<td>//div[@class="dnd-tr"]//*[text()='${key_reference}']//..//..//..//div[(@class="dnd-td") and (text()='${key_orderQuantity}')]</td>
 	<td></td>
 </tr>
 <tr>

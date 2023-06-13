@@ -12,6 +12,7 @@
  * details.
  */
 
+import {MutationOptions} from '@apollo/client';
 import {DocumentNode} from 'graphql';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
@@ -26,12 +27,20 @@ type OnSubmitOptions = {
 };
 
 export type FormOptions = {
-	formState: any;
 	onChange: (state: any) => (event: any) => void;
-	onClose: (path: string) => void;
+	onClose: () => void;
 	onError: (error?: any) => void;
 	onSave: (param?: any) => void;
-	onSubmit: (data: any, options: OnSubmitOptions) => Promise<void>;
+	onSubmit: (
+		data: any,
+		onSubmitOptions: OnSubmitOptions,
+		mutationOptions?: Omit<MutationOptions, 'mutation'>
+	) => Promise<any>;
+	onSubmitAndSave: (
+		data: any,
+		onSubmitOptions: OnSubmitOptions,
+		mutationOptions?: Omit<MutationOptions, 'mutation'>
+	) => Promise<void>;
 };
 
 export type Form = {
@@ -42,7 +51,6 @@ export type Form = {
 export type FormComponent = Omit<Form, 'forceRefetch'>;
 
 const useFormActions = (): Form => {
-	const [formState, setFormState] = useState();
 	const [forceRefetch, setForceRefetch] = useState(0);
 	const navigate = useNavigate();
 
@@ -68,7 +76,6 @@ const useFormActions = (): Form => {
 		setForceRefetch(new Date().getTime());
 
 		if (state) {
-			setFormState(state);
 			onSave(state);
 		}
 		navigate(-1);
@@ -76,7 +83,8 @@ const useFormActions = (): Form => {
 
 	const onSubmit = async (
 		data: any,
-		{createMutation, updateMutation}: OnSubmitOptions
+		{createMutation, updateMutation}: OnSubmitOptions,
+		options?: Omit<MutationOptions, 'mutation'>
 	) => {
 		const variables: any = {
 			data,
@@ -89,12 +97,11 @@ const useFormActions = (): Form => {
 		delete variables.data.id;
 
 		try {
-			await client.mutate({
+			return client.mutate({
 				mutation: variables.id ? updateMutation : createMutation,
 				variables,
+				...options,
 			});
-
-			onSave();
 		}
 		catch (error) {
 			onError(error);
@@ -103,10 +110,18 @@ const useFormActions = (): Form => {
 		}
 	};
 
+	const onSubmitAndSave = async (
+		data: any,
+		onSubmitOptions: OnSubmitOptions,
+		options?: Omit<MutationOptions, 'mutation'>
+	) => {
+		await onSubmit(data, onSubmitOptions, options);
+		await onSave();
+	};
+
 	return {
 		forceRefetch,
 		form: {
-			formState,
 			onChange: ({form, setForm}: any) => (event: any) => {
 				const {
 					target: {checked, name, type},
@@ -127,6 +142,7 @@ const useFormActions = (): Form => {
 			onError,
 			onSave,
 			onSubmit,
+			onSubmitAndSave,
 		},
 	};
 };
