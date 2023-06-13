@@ -31,6 +31,7 @@ import com.liferay.headless.admin.address.client.serdes.v1_0.RegionSerDes;
 import com.liferay.petra.function.UnsafeTriConsumer;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -236,6 +237,10 @@ public abstract class BaseRegionResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(region1, region2), (List<Region>)page.getItems());
 		assertValid(page);
+
+		regionResource.deleteRegion(region1.getId());
+
+		regionResource.deleteRegion(region2.getId());
 	}
 
 	@Test
@@ -405,8 +410,7 @@ public abstract class BaseRegionResourceTestCase {
 			Long countryId, Region region)
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return regionResource.postCountryRegion(countryId, region);
 	}
 
 	protected Long testGetCountryRegionsPage_getCountryId() throws Exception {
@@ -418,6 +422,23 @@ public abstract class BaseRegionResourceTestCase {
 		throws Exception {
 
 		return null;
+	}
+
+	@Test
+	public void testPostCountryRegion() throws Exception {
+		Region randomRegion = randomRegion();
+
+		Region postRegion = testPostCountryRegion_addRegion(randomRegion);
+
+		assertEquals(randomRegion, postRegion);
+		assertValid(postRegion);
+	}
+
+	protected Region testPostCountryRegion_addRegion(Region region)
+		throws Exception {
+
+		return regionResource.postCountryRegion(
+			testGetCountryRegionsPage_getCountryId(), region);
 	}
 
 	@Test
@@ -514,6 +535,10 @@ public abstract class BaseRegionResourceTestCase {
 		assertContains(region1, (List<Region>)page.getItems());
 		assertContains(region2, (List<Region>)page.getItems());
 		assertValid(page);
+
+		regionResource.deleteRegion(region1.getId());
+
+		regionResource.deleteRegion(region2.getId());
 	}
 
 	@Test
@@ -729,18 +754,57 @@ public abstract class BaseRegionResourceTestCase {
 	}
 
 	@Test
-	public void testPostRegion() throws Exception {
-		Region randomRegion = randomRegion();
+	public void testDeleteRegion() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Region region = testDeleteRegion_addRegion();
 
-		Region postRegion = testPostRegion_addRegion(randomRegion);
+		assertHttpResponseStatusCode(
+			204, regionResource.deleteRegionHttpResponse(region.getId()));
 
-		assertEquals(randomRegion, postRegion);
-		assertValid(postRegion);
+		assertHttpResponseStatusCode(
+			404, regionResource.getRegionHttpResponse(region.getId()));
+
+		assertHttpResponseStatusCode(
+			404, regionResource.getRegionHttpResponse(0L));
 	}
 
-	protected Region testPostRegion_addRegion(Region region) throws Exception {
+	protected Region testDeleteRegion_addRegion() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLDeleteRegion() throws Exception {
+		Region region = testGraphQLDeleteRegion_addRegion();
+
+		Assert.assertTrue(
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"deleteRegion",
+						new HashMap<String, Object>() {
+							{
+								put("regionId", region.getId());
+							}
+						})),
+				"JSONObject/data", "Object/deleteRegion"));
+		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"region",
+					new HashMap<String, Object>() {
+						{
+							put("regionId", region.getId());
+						}
+					},
+					new GraphQLField("id"))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray.length() > 0);
+	}
+
+	protected Region testGraphQLDeleteRegion_addRegion() throws Exception {
+		return testGraphQLRegion_addRegion();
 	}
 
 	@Test
@@ -801,6 +865,54 @@ public abstract class BaseRegionResourceTestCase {
 
 	protected Region testGraphQLGetRegion_addRegion() throws Exception {
 		return testGraphQLRegion_addRegion();
+	}
+
+	@Test
+	public void testPatchRegion() throws Exception {
+		Region postRegion = testPatchRegion_addRegion();
+
+		Region randomPatchRegion = randomPatchRegion();
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Region patchRegion = regionResource.patchRegion(
+			postRegion.getId(), randomPatchRegion);
+
+		Region expectedPatchRegion = postRegion.clone();
+
+		BeanTestUtil.copyProperties(randomPatchRegion, expectedPatchRegion);
+
+		Region getRegion = regionResource.getRegion(patchRegion.getId());
+
+		assertEquals(expectedPatchRegion, getRegion);
+		assertValid(getRegion);
+	}
+
+	protected Region testPatchRegion_addRegion() throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPutRegion() throws Exception {
+		Region postRegion = testPutRegion_addRegion();
+
+		Region randomRegion = randomRegion();
+
+		Region putRegion = regionResource.putRegion(
+			postRegion.getId(), randomRegion);
+
+		assertEquals(randomRegion, putRegion);
+		assertValid(putRegion);
+
+		Region getRegion = regionResource.getRegion(putRegion.getId());
+
+		assertEquals(randomRegion, getRegion);
+		assertValid(getRegion);
+	}
+
+	protected Region testPutRegion_addRegion() throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	protected Region testGraphQLRegion_addRegion() throws Exception {

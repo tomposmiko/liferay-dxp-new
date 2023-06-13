@@ -1083,34 +1083,10 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/commons-codec.jar</file-name>
-				<version>1.13</version>
-				<project-name>Commons Codec</project-name>
-				<project-url>http://commons.apache.org/codec</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/commons-collections.jar</file-name>
 				<version>3.2.2</version>
 				<project-name>Commons Collections</project-name>
 				<project-url>http://commons.apache.org/collections</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/commons-compress.jar</file-name>
-				<version>1.21</version>
-				<project-name>Commons Compress</project-name>
-				<project-url>http://commons.apache.org/compress</project-url>
 				<licenses>
 					<license>
 						<license-name>Apache License 2.0</license-name>
@@ -1263,18 +1239,6 @@
 				<version>2.3.1</version>
 				<project-name>Java Architecture for XML Binding</project-name>
 				<project-url>https://javaee.github.io/jaxb-v2/</project-url>
-				<licenses>
-					<license>
-						<license-name>CDDL 1.0</license-name>
-						<license-url>http://glassfish.java.net/public/CDDLv1.0.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/jaxrpc.jar</file-name>
-				<version>1.1</version>
-				<project-name>Java API for XML-based RPC</project-name>
-				<project-url>http://jax-rpc.dev.java.net</project-url>
 				<licenses>
 					<license>
 						<license-name>CDDL 1.0</license-name>
@@ -1690,41 +1654,6 @@
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
 						<copyright-notice>Copyright (c) 2000 World Wide Web Consortium, http://www.w3.org</copyright-notice>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/xmlsec.jar</file-name>
-				<version>2.1.7</version>
-				<project-name>XML Security</project-name>
-				<project-url>http://santuario.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>Copyright (c) 1999-2006 The Apache Software Foundation.</copyright-notice>
-					</license>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved.</copyright-notice>
-					</license>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>(c) 2001, Institute for Data Communications Systems, http://www.nue.et-inf.uni-siegen.de</copyright-notice>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/xz.jar</file-name>
-				<version>1.8</version>
-				<project-name>XZ</project-name>
-				<project-url>http://tukaani.org/xz/java.html</project-url>
-				<licenses>
-					<license>
-						<license-name>Public Domain</license-name>
-						<license-url>http://en.wikipedia.org/wiki/Public_domain</license-url>
 					</license>
 				</licenses>
 			</library>

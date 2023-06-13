@@ -39,11 +39,12 @@ export default function DangerModal({
 
 				<Input
 					error={
-						value !== undefined && value !== token
+						value !== undefined &&
+						value.toLowerCase() !== token.toLowerCase()
 							? errorMessage
 							: ''
 					}
-					onChange={({target: {value}}: any) => {
+					onChange={({target: {value}}) => {
 						setValue(value);
 					}}
 					value={value}
@@ -58,7 +59,10 @@ export default function DangerModal({
 						</ClayButton>
 
 						<ClayButton
-							disabled={token !== value}
+							disabled={
+								token.toLocaleLowerCase() !==
+								value?.toLocaleLowerCase()
+							}
 							displayType="danger"
 							onClick={onDelete}
 						>
@@ -76,7 +80,7 @@ interface IProps {
 	errorMessage: string;
 	observer: Observer;
 	onClose: () => void;
-	onDelete: () => void;
+	onDelete: (event: React.MouseEvent<HTMLButtonElement>) => void;
 	title: string;
 	token: string;
 }

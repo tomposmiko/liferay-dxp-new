@@ -129,9 +129,7 @@
 	<classpathentry kind="lib" path="lib/development/xmlresolver.jar"/>
 	<classpathentry kind="lib" path="lib/development/xmltask.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-beanutils.jar"/>
-	<classpathentry kind="lib" path="lib/portal/commons-codec.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-collections.jar"/>
-	<classpathentry kind="lib" path="lib/portal/commons-compress.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-configuration.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-lang.jar"/>
 	<classpathentry kind="lib" path="lib/portal/commons-logging.jar"/>
@@ -145,7 +143,6 @@
 	<classpathentry kind="lib" path="lib/portal/jaxb-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jaxb-runtime.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jaxen.jar"/>
-	<classpathentry kind="lib" path="lib/portal/jaxrpc.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jaxrs-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jaxws-api.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jcl-over-slf4j.jar"/>
@@ -176,7 +173,5 @@
 	<classpathentry kind="lib" path="lib/portal/wstx.jar"/>
 	<classpathentry kind="lib" path="lib/portal/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/portal/xml-apis.jar"/>
-	<classpathentry kind="lib" path="lib/portal/xmlsec.jar"/>
-	<classpathentry kind="lib" path="lib/portal/xz.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
