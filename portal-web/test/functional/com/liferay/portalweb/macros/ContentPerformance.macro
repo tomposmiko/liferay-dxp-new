@@ -32,15 +32,9 @@ definition {
 	}
 
 	macro clickDoNotShowMeThisAgain {
-		Click(locator1 = "ContentPerformance#CONTENT_PERFORMANCE_DO_NOT_SHOW_AGAIN");
-	}
-
-	macro connectDXPtoAnalyticsCloudNoSync {
-		ACDXPSettings.goToInstanceSettingsAC();
-
-		ACDXPSettings.connectAnalyticsCloud();
-
-		ACDXPSettings.assertSuccessfulConnection();
+		Click(
+			key_textValue = "Do not show me this again",
+			locator1 = "Sidebar#LINK");
 	}
 
 	macro openContentPerformance {

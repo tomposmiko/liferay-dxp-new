@@ -14,13 +14,13 @@
 
 package com.liferay.object.exception;
 
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
 
 /**
  * @author Marco Leo
  */
 public class DuplicateObjectDefinitionExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateObjectDefinitionExternalReferenceCodeException() {
 	}

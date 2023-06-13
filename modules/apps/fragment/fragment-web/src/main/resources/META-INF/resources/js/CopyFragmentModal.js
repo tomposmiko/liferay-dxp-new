@@ -98,7 +98,6 @@ export default function CopyFragmentModal({
 				<ClayModal.Body>
 					{errors.error && (
 						<ClayAlert
-							className="mb-0"
 							displayType="danger"
 							title={Liferay.Language.get('error')}
 						>
@@ -112,6 +111,7 @@ export default function CopyFragmentModal({
 							copyFragments={copyFragments}
 							errors={errors}
 							formId={formId}
+							fragmentCollections={fragmentCollections}
 							portletNamespace={portletNamespace}
 							setErrors={setErrors}
 							showNoFragmentCollectionMessage={
@@ -216,9 +216,10 @@ function FragmentSetSelector({
 			>
 				<ClaySelectWithOption
 					id={`${portletNamespace}fragment-sets`}
-					onChange={(event) =>
-						setSelectedFragmentCollection(event.target.value)
-					}
+					onChange={(event) => {
+						setErrors({...errors, fragmentSets: null});
+						setSelectedFragmentCollection(event.target.value);
+					}}
 					options={items}
 					value={selectedFragmentCollection}
 				/>
@@ -232,14 +233,13 @@ function FragmentSetForm({
 	copyFragments,
 	errors,
 	formId,
+	fragmentCollections,
 	portletNamespace,
 	setErrors,
 	showNoFragmentCollectionMessage,
 }) {
-	const [name, setName] = useState(
-		showNoFragmentCollectionMessage
-			? Liferay.Language.get('untitled-set')
-			: ''
+	const [name, setName] = useState(() =>
+		getDefaultFragmentSetName(fragmentCollections)
 	);
 	const [description, setDescription] = useState('');
 
@@ -294,7 +294,10 @@ function FragmentSetForm({
 				<ClayInput
 					id={`${portletNamespace}name`}
 					name={`${portletNamespace}name`}
-					onChange={(event) => setName(event.target.value)}
+					onChange={(event) => {
+						setErrors({...errors, name: null});
+						setName(event.target.value);
+					}}
 					required
 					type="text"
 					value={name}
@@ -315,4 +318,14 @@ function FragmentSetForm({
 			</FormField>
 		</ClayForm>
 	);
+}
+
+function getDefaultFragmentSetName(fragmentCollections) {
+	const untitledSets = fragmentCollections.filter((fragmentCollection) =>
+		fragmentCollection.name?.startsWith(
+			Liferay.Language.get('untitled-set')
+		)
+	);
+
+	return `${Liferay.Language.get('untitled-set')} ${untitledSets.length + 1}`;
 }

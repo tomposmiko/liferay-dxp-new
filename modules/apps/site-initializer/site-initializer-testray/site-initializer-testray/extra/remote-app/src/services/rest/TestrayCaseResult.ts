@@ -35,12 +35,14 @@ class TestrayCaseResultRest extends Rest<CaseResultForm, TestrayCaseResult> {
 				mbThreadId,
 				buildId: r_buildToCaseResult_c_buildId,
 				caseId: r_caseToCaseResult_c_caseId,
+				comment,
 				dueStatus,
 				issues,
 				runId: r_runToCaseResult_c_runId,
 				startDate,
 				userId: r_userToCaseResults_userId = Liferay.ThemeDisplay.getUserId(),
 			}) => ({
+				comment,
 				dueStatus,
 				issues,
 				mbMessageId,
@@ -120,6 +122,7 @@ class TestrayCaseResultRest extends Rest<CaseResultForm, TestrayCaseResult> {
 
 	public removeAssign(caseResult: TestrayCaseResult) {
 		return this.update(caseResult.id, {
+			dueStatus: CaseResultStatuses.UNTESTED,
 			startDate: null,
 			userId: this.UNASSIGNED_USER_ID,
 		});
@@ -139,6 +142,8 @@ class TestrayCaseResultRest extends Rest<CaseResultForm, TestrayCaseResult> {
 				name: `${issue}-${caseResultId}`,
 			});
 		}
+
+		await super.update(caseResultId, {issues: issues.join(',')});
 
 		if (caseResultIssuesResponse?.items) {
 			const caseResultIssuesTransform = testrayCaseResultsIssuesImpl.transformDataFromList(
@@ -203,7 +208,7 @@ class TestrayCaseResultRest extends Rest<CaseResultForm, TestrayCaseResult> {
 			data.mbMessageId = data.defaultMessageId ?? 0;
 		}
 
-		return super.update(id, data);
+		return super.update(id, {...data, issues: issues.join(', ')});
 	}
 }
 

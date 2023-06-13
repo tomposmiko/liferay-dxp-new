@@ -42,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rubén Pulido
  */
-@Component(immediate = true, service = FragmentEntryValidator.class)
+@Component(service = FragmentEntryValidator.class)
 public class FragmentEntryValidatorImpl implements FragmentEntryValidator {
 
 	@Override
@@ -249,11 +249,11 @@ public class FragmentEntryValidatorImpl implements FragmentEntryValidator {
 
 	private static final JSONValidator _configurationJSONValidator =
 		new JSONValidator(
-			FragmentEntryValidatorImpl.class.getResourceAsStream(
+			FragmentEntryValidatorImpl.class.getResource(
 				"dependencies/configuration-json-schema.json"));
 	private static final JSONValidator _typeOptionsJSONValidator =
 		new JSONValidator(
-			FragmentEntryValidatorImpl.class.getResourceAsStream(
+			FragmentEntryValidatorImpl.class.getResource(
 				"dependencies/type-options-json-schema.json"));
 
 	@Reference

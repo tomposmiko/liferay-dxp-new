@@ -1780,7 +1780,7 @@ definition {
 	}
 
 	macro getSchemaVersion {
-		var mysqlStatement = "SELECT schemaVersion FROM Release_ WHERE servletContextName='portal';";
+		var mysqlStatement = "${mysqlStatement}";
 
 		var sqlResults = SQL.executeMySQLStatement(mysqlStatement = "${mysqlStatement}");
 
@@ -3838,6 +3838,15 @@ definition {
 		DMDocument.viewPG(dmDocumentTitle = "Document txt Title");
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Dashboard");
+
+		if (!(contains("${testName}", "74"))) {
+			AssertClick(
+				key_pageName = "Documents and Media",
+				locator1 = "Home#PAGE",
+				value1 = "Documents and Media");
+		}
+
+		LiferayEvent.waitForPortletReady();
 
 		DMDocument.viewPG(dmDocumentTitle = "Document doc Title");
 

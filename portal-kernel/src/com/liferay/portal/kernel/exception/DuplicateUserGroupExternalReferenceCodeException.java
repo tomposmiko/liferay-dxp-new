@@ -18,7 +18,7 @@ package com.liferay.portal.kernel.exception;
  * @author Erick Monteiro
  */
 public class DuplicateUserGroupExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateUserGroupExternalReferenceCodeException() {
 	}

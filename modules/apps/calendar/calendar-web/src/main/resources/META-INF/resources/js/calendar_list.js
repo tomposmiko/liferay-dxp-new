@@ -171,7 +171,10 @@ AUI.add(
 				},
 
 				_onEvents(event) {
-					if (event.keyCode === 13 || event.type === 'click') {
+					if (
+						event.keyCode === A.Event.KeyMap.ENTER ||
+						event.type === 'click'
+					) {
 						const instance = this;
 
 						const target = event.target.ancestor(
@@ -401,14 +404,7 @@ AUI.add(
 					);
 
 					contentBox.delegate(
-						'click',
-						instance._onEvents,
-						STR_DOT + CSS_CALENDAR_LIST_ITEM,
-						instance
-					);
-
-					contentBox.delegate(
-						'keyup',
+						['click', 'keydown'],
 						instance._onEvents,
 						STR_DOT + CSS_CALENDAR_LIST_ITEM,
 						instance

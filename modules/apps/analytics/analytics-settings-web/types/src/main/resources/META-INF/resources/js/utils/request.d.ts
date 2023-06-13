@@ -12,5 +12,9 @@
  * details.
  */
 
-declare function request(path: string, config: RequestInit): Promise<any>;
+declare function request(
+	path: string,
+	config: RequestInit,
+	message?: string
+): Promise<any>;
 export default request;

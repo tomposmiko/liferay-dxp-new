@@ -37,7 +37,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.portlet.ActionRequest;
@@ -130,7 +129,7 @@ public class UpdateRolesMVCActionCommand extends BaseMVCActionCommand {
 		Set<UserGroupRole> userGroupRoles = new HashSet<>(
 			_userGroupRoleLocalService.getUserGroupRoles(user.getUserId()));
 
-		long userId = _getUserId(user);
+		long userId = user.getUserId();
 
 		userGroupRoles.addAll(
 			_getUserGroupRoles(
@@ -167,16 +166,6 @@ public class UpdateRolesMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		return userGroupRoles;
-	}
-
-	private long _getUserId(User user) {
-		return Optional.of(
-			user
-		).map(
-			User::getUserId
-		).orElse(
-			0L
-		);
 	}
 
 	@Reference

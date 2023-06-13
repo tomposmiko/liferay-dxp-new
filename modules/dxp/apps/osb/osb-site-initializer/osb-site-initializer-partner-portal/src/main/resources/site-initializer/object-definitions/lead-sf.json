@@ -173,6 +173,32 @@
 			"name": "primaryProspectPhone",
 			"required": false,
 			"type": "String"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"externalReferenceCode": "Status",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"label": {
+				"en_US": "Lead Status"
+			},
+			"name": "leadStatus",
+			"required": false,
+			"type": "String"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"externalReferenceCode": "Qualified_Lead_Type__c",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"label": {
+				"en_US": "Lead Type"
+			},
+			"name": "leadType",
+			"required": false,
+			"type": "String"
 		}
 	],
 	"pluralLabel": {

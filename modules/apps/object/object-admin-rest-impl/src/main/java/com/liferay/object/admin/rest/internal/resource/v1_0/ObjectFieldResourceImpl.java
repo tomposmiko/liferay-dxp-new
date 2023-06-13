@@ -76,16 +76,15 @@ public class ObjectFieldResourceImpl
 
 	@Override
 	public Page<ObjectField>
-			getObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectFieldsPage(
-				String objectDefinitionExternalReferenceCode, String search,
-				Filter filter, Pagination pagination, Sort[] sorts)
+			getObjectDefinitionByExternalReferenceCodeObjectFieldsPage(
+				String externalReferenceCode, String search, Filter filter,
+				Pagination pagination, Sort[] sorts)
 		throws Exception {
 
 		com.liferay.object.model.ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.
 				getObjectDefinitionByExternalReferenceCode(
-					objectDefinitionExternalReferenceCode,
-					contextCompany.getCompanyId());
+					externalReferenceCode, contextCompany.getCompanyId());
 
 		return _getObjectFieldsPage(
 			objectDefinition, search, filter, pagination, sorts);
@@ -111,17 +110,14 @@ public class ObjectFieldResourceImpl
 	}
 
 	@Override
-	public ObjectField
-			postObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectField(
-				String objectDefinitionExternalReferenceCode,
-				ObjectField objectField)
+	public ObjectField postObjectDefinitionByExternalReferenceCodeObjectField(
+			String externalReferenceCode, ObjectField objectField)
 		throws Exception {
 
 		com.liferay.object.model.ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.
 				getObjectDefinitionByExternalReferenceCode(
-					objectDefinitionExternalReferenceCode,
-					contextCompany.getCompanyId());
+					externalReferenceCode, contextCompany.getCompanyId());
 
 		return postObjectDefinitionObjectField(
 			objectDefinition.getObjectDefinitionId(), objectField);
@@ -150,8 +146,9 @@ public class ObjectFieldResourceImpl
 				ObjectFieldUtil.getDBType(
 					objectField.getDBTypeAsString(),
 					objectField.getTypeAsString()),
-				objectField.getDefaultValue(), objectField.getIndexed(),
-				objectField.getIndexedAsKeyword(),
+				objectField.getDefaultValue(),
+				GetterUtil.getBoolean(objectField.getIndexed()),
+				GetterUtil.getBoolean(objectField.getIndexedAsKeyword()),
 				objectField.getIndexedLanguageId(),
 				LocalizedMapUtil.getLocalizedMap(objectField.getLabel()),
 				objectField.getName(), objectField.getRequired(),
@@ -214,8 +211,9 @@ public class ObjectFieldResourceImpl
 				ObjectFieldUtil.getDBType(
 					objectField.getDBTypeAsString(),
 					objectField.getTypeAsString()),
-				objectField.getDefaultValue(), objectField.getIndexed(),
-				objectField.getIndexedAsKeyword(),
+				objectField.getDefaultValue(),
+				GetterUtil.getBoolean(objectField.getIndexed()),
+				GetterUtil.getBoolean(objectField.getIndexedAsKeyword()),
 				objectField.getIndexedLanguageId(),
 				LocalizedMapUtil.getLocalizedMap(objectField.getLabel()),
 				objectField.getName(), objectField.getRequired(),

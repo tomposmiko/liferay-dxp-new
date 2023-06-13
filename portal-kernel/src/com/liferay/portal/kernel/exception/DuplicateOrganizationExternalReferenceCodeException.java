@@ -18,7 +18,7 @@ package com.liferay.portal.kernel.exception;
  * @author Brian Wing Shun Chan
  */
 public class DuplicateOrganizationExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateOrganizationExternalReferenceCodeException() {
 	}

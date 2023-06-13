@@ -99,7 +99,6 @@ export type TestrayBuild = {
 };
 
 export type TestrayCase = {
-	caseNumber: number;
 	caseType?: TestrayCaseType;
 	component?: TestrayComponent;
 	dateCreated: string;
@@ -109,6 +108,7 @@ export type TestrayCase = {
 	estimatedDuration: number;
 	id: number;
 	name: string;
+	number: number;
 	originationKey: string;
 	priority: number;
 	project?: TestrayProject;
@@ -125,13 +125,14 @@ export type TestrayCaseResult = {
 	build?: TestrayBuild;
 	case?: TestrayCase;
 	closedDate: string;
+	comment: string;
 	component?: TestrayComponent;
 	dateCreated: string;
 	dateModified: string;
 	dueStatus: PickList;
 	errors: string;
 	id: number;
-	issue: string;
+	issues: string;
 	key: string;
 	mbMessageId: number;
 	mbThreadId: number;
@@ -248,10 +249,13 @@ export type TestraySubTask = {
 	mbThreadId: number;
 	mergedToSubtaskId: TestraySubTask;
 	name: string;
+	number: number;
 	r_mergedToTestraySubtask_c_subtaskId: TestraySubTask;
+	r_splitFromTestraySubtask_c_subtask: TestraySubTask;
 	r_taskToSubtasks_c_task: TestrayTask;
 	r_userToSubtasks_user: UserAccount;
 	score: number;
+	splitFromSubtask: TestraySubTask;
 	statusUpdateDate: string;
 	task: TestrayTask;
 	user: UserAccount;
@@ -259,8 +263,8 @@ export type TestraySubTask = {
 
 export type TestraySubTaskCaseResult = {
 	caseResult?: TestrayCaseResult;
-	id?: number;
-	name?: string;
+	id: number;
+	name: string;
 	r_caseResultToSubtasksCasesResults_c_caseResult?: TestrayCaseResult;
 	r_subtaskToSubtasksCasesResults_c_subtask?: TestraySubTask;
 	subTask?: TestraySubTask;
@@ -307,6 +311,15 @@ export type TestrayTask = {
 	subtaskScore: string;
 	subtaskScoreCompleted: string;
 	subtaskScoreIncomplete: string;
+};
+
+export type TestrayTaskCaseTypes = {
+	caseType?: TestrayCaseType;
+	id: number;
+	name: string;
+	r_caseTypeToTasksCaseTypes_c_caseType?: TestrayCaseType;
+	r_taskToTasksCaseTypes_c_taskId?: TestrayTask;
+	task?: TestrayTask;
 };
 
 export type TestrayTaskUser = {

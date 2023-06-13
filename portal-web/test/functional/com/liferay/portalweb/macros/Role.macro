@@ -382,6 +382,16 @@ definition {
 						locator1 = "RolesPermissionsNavigation#SEARCH_FIELD",
 						value1 = "${permissionNavigationValue}");
 
+					if (IsElementNotPresent(locator1 = "RolesPermissionsNavigation#${permissionNavigationKey}", value1 = "${permissionNavigationValue}")) {
+						Refresh();
+
+						WaitForPageLoad();
+
+						Type(
+							locator1 = "RolesPermissionsNavigation#SEARCH_FIELD",
+							value1 = "${permissionNavigationValue}");
+					}
+
 					AssertClick(
 						locator1 = "RolesPermissionsNavigation#${permissionNavigationKey}",
 						value1 = "${permissionNavigationValue}");
@@ -454,7 +464,11 @@ definition {
 	}
 
 	macro editPermissionCmdCPUI {
-		Navigator.gotoNavItem(navItem = "Define Permissions");
+		if (!(isSet(navItem))) {
+			var navItem = "Define Permissions";
+		}
+
+		Navigator.gotoNavItem(navItem = "${navItem}");
 
 		task ("Navigate to the item in the right header via search bar") {
 			Type(
@@ -541,21 +555,6 @@ definition {
 		LexiconEntry.selectEntry(key_rowEntry = "${assigneeName}");
 
 		ClickNoError(locator1 = "Icon#DELETE");
-	}
-
-	macro removePermissionCP {
-		Role.editPermissionCmdCP(
-			permissionDefinitionKey = "${permissionDefinitionKey}",
-			permissionDefinitionKeyChange = "${permissionDefinitionKeyChange}",
-			permissionDefinitionKeys = "${permissionDefinitionKeys}",
-			permissionDefinitionKeySiteScope = "${permissionDefinitionKeySiteScope}",
-			permissionNavigationKey = "${permissionNavigationKey}",
-			permissionNavigationValue = "${permissionNavigationValue}",
-			remove = "true",
-			roleTitle = "${roleTitle}",
-			roleType = "${roleType}",
-			roleUser = "${roleUser}",
-			siteNameScope = "${siteNameScope}");
 	}
 
 	macro removePermissionPG {

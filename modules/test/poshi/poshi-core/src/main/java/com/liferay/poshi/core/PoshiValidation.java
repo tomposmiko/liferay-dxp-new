@@ -182,8 +182,9 @@ public class PoshiValidation {
 			poshiElement.elements());
 
 		List<String> possiblePoshiElementNames = Arrays.asList(
-			"description", "echo", "execute", "fail", "for", "if", "property",
-			"return", "take-screenshot", "task", "var", "while");
+			"break", "continue", "description", "echo", "execute", "fail",
+			"for", "if", "property", "return", "take-screenshot", "task", "var",
+			"while");
 
 		String filePath = _getFilePath(poshiElement);
 
@@ -1500,9 +1501,6 @@ public class PoshiValidation {
 
 		List<String> attributeNames = Arrays.asList("line-number", "name");
 
-		validateHasNoChildElements(poshiElement);
-		validatePossibleAttributeNames(poshiElement, attributeNames);
-
 		if (Validator.isNotNull(poshiElement.attributeValue("value"))) {
 			attributeNames.add("value");
 		}
@@ -1523,6 +1521,8 @@ public class PoshiValidation {
 			}
 		}
 
+		validateHasNoChildElements(poshiElement);
+		validatePossibleAttributeNames(poshiElement, attributeNames);
 		validateRequiredAttributeNames(poshiElement, attributeNames, filePath);
 		validatePossiblePropertyValues(poshiElement);
 	}

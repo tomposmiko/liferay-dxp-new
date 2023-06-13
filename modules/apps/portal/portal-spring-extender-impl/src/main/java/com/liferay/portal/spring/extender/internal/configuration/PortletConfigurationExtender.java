@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
-import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.module.util.BundleUtil;
@@ -28,7 +27,6 @@ import com.liferay.portal.util.PropsValues;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -42,13 +40,10 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
  */
 @Component(service = {})
 public class PortletConfigurationExtender
-	implements BundleTrackerCustomizer
-		<PortletConfigurationExtender.PortletConfigurationExtension> {
+	implements BundleTrackerCustomizer<Configuration> {
 
 	@Override
-	public PortletConfigurationExtension addingBundle(
-		Bundle bundle, BundleEvent bundleEvent) {
-
+	public Configuration addingBundle(Bundle bundle, BundleEvent bundleEvent) {
 		if (!BundleUtil.isLiferayServiceBundle(bundle)) {
 			return null;
 		}
@@ -64,88 +59,41 @@ public class PortletConfigurationExtender
 			return null;
 		}
 
-		PortletConfigurationExtension portletConfigurationExtension =
-			new PortletConfigurationExtension(
-				bundle, classLoader, portletConfiguration);
+		try {
+			_resourceActions.populateModelResources(
+				classLoader,
+				StringUtil.split(
+					portletConfiguration.get(
+						PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
 
-		portletConfigurationExtension.start();
+			if (!PropsValues.RESOURCE_ACTIONS_STRICT_MODE_ENABLED) {
+				_resourceActions.populatePortletResources(
+					classLoader,
+					StringUtil.split(
+						portletConfiguration.get(
+							PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
+			}
+		}
+		catch (Exception exception) {
+			_log.error(
+				"Unable to read resource actions config in " +
+					PropsKeys.RESOURCE_ACTIONS_CONFIGS,
+				exception);
+		}
 
-		return portletConfigurationExtension;
+		return portletConfiguration;
 	}
 
 	@Override
 	public void modifiedBundle(
 		Bundle bundle, BundleEvent bundleEvent,
-		PortletConfigurationExtension portletConfigurationExtension) {
+		Configuration portletConfiguration) {
 	}
 
 	@Override
 	public void removedBundle(
 		Bundle bundle, BundleEvent bundleEvent,
-		PortletConfigurationExtension portletConfigurationExtension) {
-
-		portletConfigurationExtension.destroy();
-	}
-
-	public class PortletConfigurationExtension {
-
-		public void destroy() {
-			if (_configurationServiceRegistration != null) {
-				_configurationServiceRegistration.unregister();
-
-				_configurationServiceRegistration = null;
-			}
-		}
-
-		public void start() {
-			try {
-				_resourceActions.populateModelResources(
-					_classLoader,
-					StringUtil.split(
-						_portletConfiguration.get(
-							PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
-
-				if (!PropsValues.RESOURCE_ACTIONS_STRICT_MODE_ENABLED) {
-					_resourceActions.populatePortletResources(
-						_classLoader,
-						StringUtil.split(
-							_portletConfiguration.get(
-								PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
-				}
-			}
-			catch (Exception exception) {
-				_log.error(
-					"Unable to read resource actions config in " +
-						PropsKeys.RESOURCE_ACTIONS_CONFIGS,
-					exception);
-			}
-
-			BundleContext bundleContext = _bundle.getBundleContext();
-
-			_configurationServiceRegistration = bundleContext.registerService(
-				Configuration.class, _portletConfiguration,
-				HashMapDictionaryBuilder.<String, Object>put(
-					"name", "portlet"
-				).put(
-					"origin.bundle.symbolic.name", _bundle.getSymbolicName()
-				).build());
-		}
-
-		private PortletConfigurationExtension(
-			Bundle bundle, ClassLoader classLoader,
-			Configuration portletConfiguration) {
-
-			_bundle = bundle;
-			_classLoader = classLoader;
-			_portletConfiguration = portletConfiguration;
-		}
-
-		private final Bundle _bundle;
-		private final ClassLoader _classLoader;
-		private ServiceRegistration<Configuration>
-			_configurationServiceRegistration;
-		private final Configuration _portletConfiguration;
-
+		Configuration portletConfiguration) {
 	}
 
 	@Activate

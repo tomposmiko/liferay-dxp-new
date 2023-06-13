@@ -27,8 +27,8 @@ import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationPortletKeys;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.constants.NotificationTemplateConstants;
-import com.liferay.notification.constants.NotificationTermEvaluatorConstants;
 import com.liferay.notification.context.NotificationContext;
+import com.liferay.notification.exception.NotificationRecipientSettingValueException;
 import com.liferay.notification.exception.NotificationTemplateFromException;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationQueueEntryAttachment;
@@ -95,7 +95,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Feliphe Marinho
  */
-@Component(immediate = true, service = NotificationType.class)
+@Component(service = NotificationType.class)
 public class EmailNotificationType extends BaseNotificationType {
 
 	@Override
@@ -207,7 +207,6 @@ public class EmailNotificationType extends BaseNotificationType {
 					return formatLocalizedContent(
 						notificationRecipientSetting.getValue(
 							siteDefaultLocale),
-						NotificationTermEvaluatorConstants.RECIPIENT,
 						notificationContext);
 				}
 			).build();
@@ -343,6 +342,13 @@ public class EmailNotificationType extends BaseNotificationType {
 		if (Validator.isNull(notificationRecipientSettingsMap.get("from"))) {
 			throw new NotificationTemplateFromException("From is null");
 		}
+
+		if (Validator.isNull(
+				notificationRecipientSettingsMap.get("fromName"))) {
+
+			throw new NotificationRecipientSettingValueException(
+				"From name is null");
+		}
 	}
 
 	private void _addFileAttachments(
@@ -454,8 +460,7 @@ public class EmailNotificationType extends BaseNotificationType {
 		}
 
 		return formatLocalizedContent(
-			StringUtil.merge(emailAddresses),
-			NotificationTermEvaluatorConstants.RECIPIENT, notificationContext);
+			StringUtil.merge(emailAddresses), notificationContext);
 	}
 
 	private List<Long> _getFileEntryIds(

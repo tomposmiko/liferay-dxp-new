@@ -14,13 +14,13 @@
 
 package com.liferay.notification.exception;
 
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
 
 /**
  * @author Gabriel Albuquerque
  */
 public class DuplicateNotificationTemplateExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateNotificationTemplateExternalReferenceCodeException() {
 	}

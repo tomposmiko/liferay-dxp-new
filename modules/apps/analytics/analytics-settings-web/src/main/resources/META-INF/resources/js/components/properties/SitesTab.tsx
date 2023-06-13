@@ -15,25 +15,32 @@
 import React from 'react';
 
 import {fetchSites} from '../../utils/api';
+import {TColumn} from '../table/types';
 import {TProperty} from './Properties';
 import Tab, {TRawItem} from './Tab';
 
-const columns = [
+enum EColumn {
+	Name = 'name',
+	FriendlyURL = 'friendlyURL',
+	ChannelName = 'channelName',
+}
+
+const columns: TColumn[] = [
 	{
 		expanded: true,
+		id: EColumn.Name,
 		label: Liferay.Language.get('site-name'),
-		value: 'name',
 	},
 	{
 		expanded: true,
+		id: EColumn.FriendlyURL,
 		label: Liferay.Language.get('friendly-url'),
-		value: 'friendlyURL',
 	},
 	{
 		expanded: true,
+		id: EColumn.ChannelName,
 		label: Liferay.Language.get('assigned-property'),
 		sortable: false,
-		value: 'channelName',
 	},
 ];
 
@@ -49,11 +56,13 @@ const SitesTab: React.FC<ISiteTabProps> = ({
 	property,
 }) => (
 	<Tab
-		columns={columns.map(({value}) => value) as Array<keyof TRawItem>}
-		emptyStateTitle={Liferay.Language.get('there-are-no-sites')}
+		columns={columns.map(({id}) => id) as Array<keyof TRawItem>}
+		emptyState={{
+			noResultsTitle: Liferay.Language.get('no-sites-were-found'),
+			title: Liferay.Language.get('there-are-no-sites'),
+		}}
 		header={columns}
 		initialIds={initialIds}
-		noResultsTitle={Liferay.Language.get('no-sites-were-found')}
 		onItemsChange={onSitesChange}
 		property={property}
 		requestFn={fetchSites}

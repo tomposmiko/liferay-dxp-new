@@ -52,7 +52,7 @@ AUI.add(
 		const TPL_SIMPLE_MENU_ITEM =
 			'<li class="{cssClass}" data-id="{id}" role="{role}" tabindex="-1"></li>';
 
-		const getItemHandler = A.cached((id, items) => {
+		const getItemHandler = A.cached((id, items, key) => {
 			let found = null;
 
 			items.some((item) => {
@@ -63,7 +63,15 @@ AUI.add(
 				return !!found;
 			});
 
-			return found && found.fn;
+			return found && found[key];
+		});
+
+		const getClickItemHandler = A.cached((id, items) => {
+			return getItemHandler(id, items, 'fn');
+		});
+
+		const getKeyDownItemHandler = A.cached((id, items) => {
+			return getItemHandler(id, items, 'onKeyDown');
 		});
 
 		const SimpleMenu = A.Component.create({
@@ -121,14 +129,18 @@ AUI.add(
 					instance._outsideHandler.detach();
 
 					instance._outsideHandler = null;
+
+					const toggler = instance.get('toggler');
+
+					if (toggler) {
+						toggler.focus();
+					}
 				},
 
 				_focusItem(index) {
 					const instance = this;
 
-					const visibleItems = instance.items.filter(
-						':not(.' + CSS_SIMPLE_MENU_ITEM_HIDDEN + ')'
-					);
+					const visibleItems = instance._getVisibleItems();
 
 					if (index !== undefined) {
 						index =
@@ -148,6 +160,18 @@ AUI.add(
 					}
 				},
 
+				_getVisibleItems() {
+					const instance = this;
+
+					return instance.items.filter(
+						':not(.' +
+							CSS_SIMPLE_MENU_ITEM_HIDDEN +
+							'):not(.' +
+							CSS_SIMPLE_MENU_SEPARATOR +
+							')'
+					);
+				},
+
 				_onClickItems(event) {
 					const instance = this;
 
@@ -155,13 +179,13 @@ AUI.add(
 
 					const id = event.currentTarget.attr('data-id');
 
-					const handler = getItemHandler(id, items);
+					const handler = getClickItemHandler(id, items);
 
 					if (handler) {
-						instance._closeMenu();
-
 						handler.apply(instance, arguments);
 					}
+
+					instance._closeMenu();
 				},
 
 				_onClickOutside(event) {
@@ -188,9 +212,7 @@ AUI.add(
 
 					const activeElement = document.activeElement;
 
-					const visibleItems = instance.items.filter(
-						':not(.' + CSS_SIMPLE_MENU_ITEM_HIDDEN + ')'
-					);
+					const visibleItems = instance._getVisibleItems();
 
 					for (let i = 0; i < visibleItems.size(); i++) {
 						const item = visibleItems.item(i);
@@ -200,9 +222,13 @@ AUI.add(
 						}
 
 						if (event.keyCode === A.Event.KeyMap.UP) {
+							event.preventDefault();
+
 							instance._focusItem(i - 1);
 						}
 						else if (event.keyCode === A.Event.KeyMap.DOWN) {
+							event.preventDefault();
+
 							instance._focusItem(i + 1);
 						}
 						else if (event.keyCode === A.Event.KeyMap.ENTER) {
@@ -213,10 +239,26 @@ AUI.add(
 					}
 				},
 
+				_onKeyDownItems(event) {
+					const instance = this;
+
+					const items = instance.get('items');
+
+					const id = event.currentTarget.attr('data-id');
+
+					const handler = getKeyDownItemHandler(id, items);
+
+					if (handler) {
+						handler.apply(instance, arguments);
+					}
+				},
+
 				_onVisibleChange(event) {
 					const instance = this;
 
-					if (event.newVal) {
+					const visible = event.newVal;
+
+					if (visible) {
 						const contentBox = instance.get('contentBox');
 
 						instance._insideHandler = contentBox.on(
@@ -236,12 +278,7 @@ AUI.add(
 
 					const toggler = instance.get('toggler');
 
-					if (!event.newVal) {
-						toggler.setAttribute('aria-expanded', false);
-					}
-					else {
-						toggler.setAttribute('aria-expanded', true);
-					}
+					toggler.setAttribute('aria-expanded', visible);
 				},
 
 				_positionMenu() {
@@ -383,6 +420,12 @@ AUI.add(
 						contentBox.delegate(
 							'click',
 							instance._onClickItems,
+							STR_DOT + CSS_SIMPLE_MENU_ITEM,
+							instance
+						),
+						contentBox.delegate(
+							'keydown',
+							instance._onKeyDownItems,
 							STR_DOT + CSS_SIMPLE_MENU_ITEM,
 							instance
 						),

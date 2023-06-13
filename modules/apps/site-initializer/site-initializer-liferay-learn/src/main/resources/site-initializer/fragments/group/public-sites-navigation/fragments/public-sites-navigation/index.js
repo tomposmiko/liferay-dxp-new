@@ -14,36 +14,51 @@
 
 /* eslint-disable no-undef */
 
-const menuButtonGroup = fragmentElement.querySelector('.menu-button-group');
+window.addEventListener('load', () => {
+	new navigation.default.DropdownProvider(
+		'.account',
+		'.account',
+		'menu-open'
+	);
 
-const tabletMobileNavSection = fragmentElement.querySelector(
-	'.tablet-mobile-nav-section'
-);
+	new navigation.default.DropdownProvider(
+		'.sites',
+		'.liferay-sites-dropdown',
+		'show',
+		true
+	);
 
-const menuBtn = fragmentElement.querySelector('.menu-btn');
 
-const closeBtn = fragmentElement.querySelector('.close-btn');
+	new navigation.default.DropdownProvider(
+		'.menu-button-group',
+		'.menu-button-group',
+		'menu-open'
+	);
 
-const accountMenus = fragmentElement.querySelectorAll('.account');
+	new navigation.default.DropdownProvider(
+		'.menu-button-group',
+		'.tablet-mobile-nav-section',
+		'menu-open',
+		true
+	);
 
-const sites = fragmentElement.querySelector('.sites');
+	new navigation.default.DropdownProvider(
+		'.adt-nav-item',
+		'.adt-nav-item',
+		'dropdown-open'
+	);
 
-menuBtn.addEventListener('click', () => {
-	menuButtonGroup.classList.toggle('menu-open');
-	tabletMobileNavSection.classList.toggle('menu-open');
-});
+	new navigation.default.DropdownProvider(
+		'.language',
+		'.language-selector',
+		'list-open',
+		true
+	);
 
-closeBtn.addEventListener('click', () => {
-	menuButtonGroup.classList.toggle('menu-open');
-	tabletMobileNavSection.classList.toggle('menu-open');
-});
-
-accountMenus.forEach((accountMenu) => {
-	accountMenu.addEventListener('click', () => {
-		accountMenu.classList.toggle('menu-open');
-	});
-});
-
-sites.addEventListener('click', () => {
-	sites.classList.toggle('show');
+	new navigation.default.DropdownProvider(
+		'.language',
+		'.language-dropdown-list-container',
+		'list-open',
+		true
+	);
 });

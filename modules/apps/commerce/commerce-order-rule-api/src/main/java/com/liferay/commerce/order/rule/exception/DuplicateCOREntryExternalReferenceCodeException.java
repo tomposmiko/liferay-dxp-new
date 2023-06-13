@@ -14,13 +14,13 @@
 
 package com.liferay.commerce.order.rule.exception;
 
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
 
 /**
  * @author Luca Pellizzon
  */
 public class DuplicateCOREntryExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateCOREntryExternalReferenceCodeException() {
 	}

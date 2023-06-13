@@ -875,8 +875,9 @@ public class KBDropdownItemsProvider {
 						"resourcePrimKey", kbArticle.getResourcePrimKey()
 					).setResourceID(
 						"kbArticleRSS"
-					).buildString(),
-					_kbGroupServiceConfiguration.rssDelta(),
+					).buildResourceURL(),
+					GetterUtil.getInteger(
+						_kbGroupServiceConfiguration.rssDelta()),
 					_kbGroupServiceConfiguration.rssDisplayStyle(),
 					_kbGroupServiceConfiguration.rssFeedType(), null));
 			dropdownItem.setIcon("shortcut");

@@ -333,7 +333,7 @@
 </tr>
 <tr>
 	<td>SEGMENT_AUTOCOMPLETE_DROPDOWN</td>
-	<td>//ul[contains(@class,'dropdown-menu')]/li/button</td>
+	<td>//ul[contains(@class,'dropdown-menu')]/li/button[text()='${key_autocompleteText}'] | //ul[contains(@class,'dropdown-menu')]/li/button</td>
 	<td></td>
 </tr>
 <tr>
@@ -439,6 +439,11 @@
 <tr>
 	<td>SEGMENT_MEMBERSHIP_CHART_HOVER_DATA_ROW</td>
 	<td>//tr[@class='analytics-tooltip-chart-row' and contains(.,'${key_row}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>AUTOCOMPLETE_SELECT_INPUT</td>
+	<td>//div[text()='${key_criteriaName}']/..//div[contains(@class,'input-root')]</td>
 	<td></td>
 </tr>
 <tr>

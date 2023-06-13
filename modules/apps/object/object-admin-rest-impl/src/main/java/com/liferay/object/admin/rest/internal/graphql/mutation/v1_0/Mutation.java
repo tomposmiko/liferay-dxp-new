@@ -181,6 +181,23 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public ObjectAction
+			createObjectDefinitionByExternalReferenceCodeObjectAction(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("objectAction") ObjectAction objectAction)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectActionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectActionResource ->
+				objectActionResource.
+					postObjectDefinitionByExternalReferenceCodeObjectAction(
+						externalReferenceCode, objectAction));
+	}
+
+	@GraphQLField
 	public ObjectAction createObjectDefinitionObjectAction(
 			@GraphQLName("objectDefinitionId") Long objectDefinitionId,
 			@GraphQLName("objectAction") ObjectAction objectAction)
@@ -338,11 +355,9 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public ObjectField
-			createObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectField(
-				@GraphQLName("objectDefinitionExternalReferenceCode") String
-					objectDefinitionExternalReferenceCode,
-				@GraphQLName("objectField") ObjectField objectField)
+	public ObjectField createObjectDefinitionByExternalReferenceCodeObjectField(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("objectField") ObjectField objectField)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -350,8 +365,8 @@ public class Mutation {
 			this::_populateResourceContext,
 			objectFieldResource ->
 				objectFieldResource.
-					postObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectField(
-						objectDefinitionExternalReferenceCode, objectField));
+					postObjectDefinitionByExternalReferenceCodeObjectField(
+						externalReferenceCode, objectField));
 	}
 
 	@GraphQLField
@@ -450,6 +465,23 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public ObjectLayout
+			createObjectDefinitionByExternalReferenceCodeObjectLayout(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("objectLayout") ObjectLayout objectLayout)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectLayoutResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectLayoutResource ->
+				objectLayoutResource.
+					postObjectDefinitionByExternalReferenceCodeObjectLayout(
+						externalReferenceCode, objectLayout));
+	}
+
+	@GraphQLField
 	public ObjectLayout createObjectDefinitionObjectLayout(
 			@GraphQLName("objectDefinitionId") Long objectDefinitionId,
 			@GraphQLName("objectLayout") ObjectLayout objectLayout)
@@ -534,9 +566,9 @@ public class Mutation {
 
 	@GraphQLField
 	public ObjectRelationship
-			createObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationship(
-				@GraphQLName("objectDefinitionExternalReferenceCode") String
-					objectDefinitionExternalReferenceCode,
+			createObjectDefinitionByExternalReferenceCodeObjectRelationship(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
 				@GraphQLName("objectRelationship") ObjectRelationship
 					objectRelationship)
 		throws Exception {
@@ -546,9 +578,8 @@ public class Mutation {
 			this::_populateResourceContext,
 			objectRelationshipResource ->
 				objectRelationshipResource.
-					postObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationship(
-						objectDefinitionExternalReferenceCode,
-						objectRelationship));
+					postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+						externalReferenceCode, objectRelationship));
 	}
 
 	@GraphQLField
@@ -744,6 +775,21 @@ public class Mutation {
 			objectValidationRuleResource ->
 				objectValidationRuleResource.putObjectValidationRuleBatch(
 					callbackURL, object));
+	}
+
+	@GraphQLField
+	public ObjectView createObjectDefinitionByExternalReferenceCodeObjectView(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("objectView") ObjectView objectView)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_objectViewResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			objectViewResource ->
+				objectViewResource.
+					postObjectDefinitionByExternalReferenceCodeObjectView(
+						externalReferenceCode, objectView));
 	}
 
 	@GraphQLField

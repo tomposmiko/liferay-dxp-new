@@ -14,103 +14,35 @@
 
 package com.liferay.portal.vulcan.internal.template.servlet;
 
-import java.util.Locale;
+import com.liferay.portal.kernel.servlet.DummyHttpServletResponse;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
+import java.util.Objects;
 
 /**
  * @author Alejandro Tardín
  */
-public class RESTClientHttpResponse extends HttpServletResponseWrapper {
-
-	public RESTClientHttpResponse(HttpServletResponse httpServletResponse) {
-		super(httpServletResponse);
-	}
+public class RESTClientHttpResponse extends DummyHttpServletResponse {
 
 	@Override
-	public void addCookie(Cookie cookie) {
-	}
-
-	@Override
-	public void addDateHeader(String name, long date) {
-	}
-
-	@Override
-	public void addHeader(String name, String value) {
-	}
-
-	@Override
-	public void addIntHeader(String name, int value) {
-	}
-
-	@Override
-	public void flushBuffer() {
-	}
-
-	@Override
-	public void reset() {
-	}
-
-	@Override
-	public void resetBuffer() {
-	}
-
-	@Override
-	public void sendError(int status) {
-	}
-
-	@Override
-	public void sendError(int status, String message) {
-	}
-
-	@Override
-	public void sendRedirect(String location) {
-	}
-
-	@Override
-	public void setBufferSize(int size) {
-	}
-
-	@Override
-	public void setCharacterEncoding(String characterEncoding) {
-	}
-
-	@Override
-	public void setContentLength(int contentLength) {
-	}
-
-	@Override
-	public void setContentLengthLong(long contentLength) {
+	public String getContentType() {
+		return _contentType;
 	}
 
 	@Override
 	public void setContentType(String contentType) {
-	}
-
-	@Override
-	public void setDateHeader(String name, long date) {
+		_contentType = contentType;
 	}
 
 	@Override
 	public void setHeader(String name, String value) {
+		if (Objects.equals(name, HttpHeaders.CONTENT_TYPE)) {
+			_contentType = value;
+		}
+
+		super.setHeader(name, value);
 	}
 
-	@Override
-	public void setIntHeader(String name, int value) {
-	}
-
-	@Override
-	public void setLocale(Locale locale) {
-	}
-
-	@Override
-	public void setStatus(int status) {
-	}
-
-	@Override
-	public void setStatus(int status, String message) {
-	}
+	private String _contentType;
 
 }

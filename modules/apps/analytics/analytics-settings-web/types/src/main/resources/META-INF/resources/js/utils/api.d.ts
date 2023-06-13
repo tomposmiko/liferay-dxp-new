@@ -29,7 +29,9 @@ export declare function fetchContactsUsersGroup(
 	params: TTableRequestParams
 ): Promise<any>;
 export declare function fetchAttributesConfiguration(): Promise<any>;
-export declare function fetchProperties(): Promise<any>;
+export declare function fetchProperties(
+	params: TTableRequestParams
+): Promise<any>;
 export declare function fetchSites(params: TTableRequestParams): Promise<any>;
 export declare function updateProperty({
 	channelId,
@@ -40,7 +42,7 @@ export declare function updateProperty({
 }: {
 	channelId: string;
 	commerceChannelIds?: number[];
-	commerceSyncEnabled?: boolean;
+	commerceSyncEnabled: boolean;
 	dataSourceId?: string;
 	siteIds?: number[];
 }): Promise<any>;
@@ -49,10 +51,7 @@ export declare function updatecommerceSyncEnabled({
 	commerceSyncEnabled,
 }: {
 	channelId: string;
-	commerceChannelIds?: number[];
-	commerceSyncEnabled?: boolean;
-	dataSourceId?: string;
-	siteIds?: number[];
+	commerceSyncEnabled: boolean;
 }): Promise<any>;
 export declare function updateAttributesConfiguration({
 	syncAllAccounts,
@@ -68,10 +67,13 @@ export declare function updateAttributesConfiguration({
 	syncedUserGroupIds?: string[];
 }): Promise<any>;
 export declare function fetchSelectedFields(): Promise<any>;
-export declare function fetchPeopleFields(
+export declare function fetchAccountsFields(
 	params: TTableRequestParams
 ): Promise<any>;
-export declare function fetchAccountsFields(
+export declare function fetchOrdersFields(
+	params: TTableRequestParams
+): Promise<any>;
+export declare function fetchPeopleFields(
 	params: TTableRequestParams
 ): Promise<any>;
 export declare function fetchProductsFields(
@@ -85,7 +87,8 @@ declare type TField = {
 	source: string;
 	type: string;
 };
-export declare function updatePeopleFields(fields: TField[]): Promise<any>;
 export declare function updateAccountsFields(fields: TField[]): Promise<any>;
+export declare function updateOrdersFields(fields: TField[]): Promise<any>;
+export declare function updatePeopleFields(fields: TField[]): Promise<any>;
 export declare function updateProductsFields(fields: TField[]): Promise<any>;
 export {};

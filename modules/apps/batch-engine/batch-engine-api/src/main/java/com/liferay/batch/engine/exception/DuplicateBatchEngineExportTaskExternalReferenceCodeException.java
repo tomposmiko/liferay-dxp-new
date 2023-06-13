@@ -14,13 +14,13 @@
 
 package com.liferay.batch.engine.exception;
 
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
 
 /**
  * @author Shuyang Zhou
  */
 public class DuplicateBatchEngineExportTaskExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateBatchEngineExportTaskExternalReferenceCodeException() {
 	}

@@ -14,38 +14,41 @@
 
 import React, {useEffect} from 'react';
 
-import {DEFAULT_FILTER} from '../../utils/filter';
 import {DEFAULT_PAGINATION, TPagination} from '../../utils/pagination';
 import {useLazyRequest, useRequest} from '../../utils/useRequest';
 import Content from './Content';
 import TableContext, {Events, useData, useDispatch} from './Context';
 import ManagementToolbar from './ManagementToolbar';
 import PaginationBar from './PaginationBar';
-import StateRenderer from './StateRenderer';
+import StateRenderer, {TEmptyState} from './StateRenderer';
 import {TColumn, TFormattedItems, TItem, TTableRequestParams} from './types';
 
 interface ITableProps<TRawItem> {
+	addItemTitle?: string;
 	columns: TColumn[];
 	disabled?: boolean;
-	emptyStateTitle: string;
+	emptyState: TEmptyState;
 	mapperItems: (items: TRawItem[]) => TItem[];
-	noResultsTitle: string;
+	onAddItem?: () => void;
 	onItemsChange?: (items: TFormattedItems) => void;
 	requestFn: (params: TTableRequestParams) => Promise<any>;
+	showCheckbox?: boolean;
 }
 
 interface TData<TRawItem> extends TPagination {
 	items: TRawItem[];
 }
 
-function Table<TRawItem>({
+export function Table<TRawItem>({
+	addItemTitle,
 	columns,
 	disabled = false,
-	emptyStateTitle,
+	emptyState,
 	mapperItems,
-	noResultsTitle,
+	onAddItem,
 	onItemsChange,
 	requestFn,
+	showCheckbox = true,
 }: ITableProps<TRawItem>) {
 	const {
 		filter,
@@ -72,15 +75,13 @@ function Table<TRawItem>({
 		TData<TRawItem>,
 		TTableRequestParams
 	>(requestFn, {
-		filter: DEFAULT_FILTER,
+		filter,
 		keywords: '',
 		pagination: {
 			page: DEFAULT_PAGINATION.page,
 			pageSize: pagination.maxCount,
 		},
 	});
-
-	const empty = !data?.items.length;
 
 	useEffect(() => {
 		if (lazyResult.data) {
@@ -104,6 +105,7 @@ function Table<TRawItem>({
 					items: mapperItems(items),
 					page,
 					pageSize,
+					refetch,
 					totalCount,
 				},
 				type: Events.FormatData,
@@ -117,25 +119,40 @@ function Table<TRawItem>({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [formattedItems]);
 
+	useEffect(() => {
+		dispatch({
+			payload: refetch,
+			type: Events.Reload,
+		});
+	}, [dispatch, refetch]);
+
+	const empty = !data?.items.length;
+
 	return (
 		<>
 			<ManagementToolbar
+				addItemTitle={addItemTitle}
 				columns={columns}
 				disabled={
 					disabled || (empty && !keywords) || lazyResult.loading
 				}
 				makeRequest={makeRequest}
+				onAddItem={onAddItem}
+				showCheckbox={showCheckbox}
 			/>
 
 			<StateRenderer
 				empty={empty}
-				emptyStateTitle={emptyStateTitle}
+				emptyState={emptyState}
 				error={error || lazyResult.error}
 				loading={loading || lazyResult.loading}
-				noResultsTitle={noResultsTitle}
 				refetch={refetch}
 			>
-				<Content columns={columns} disabled={disabled} />
+				<Content
+					columns={columns}
+					disabled={disabled}
+					showCheckbox={showCheckbox}
+				/>
 			</StateRenderer>
 
 			<PaginationBar disabled={empty} />
@@ -143,7 +160,7 @@ function Table<TRawItem>({
 	);
 }
 
-function TableWrapper<TRawItem>(props: ITableProps<TRawItem>) {
+function ComposedTable<TRawItem>(props: ITableProps<TRawItem>) {
 	return (
 		<TableContext>
 			<Table {...props} />
@@ -151,4 +168,4 @@ function TableWrapper<TRawItem>(props: ITableProps<TRawItem>) {
 	);
 }
 
-export default TableWrapper;
+export default ComposedTable;

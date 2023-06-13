@@ -25,7 +25,6 @@ import com.liferay.user.associated.data.web.internal.configuration.AnonymousUser
 import com.liferay.user.associated.data.web.internal.configuration.AnonymousUserConfigurationRetriever;
 
 import java.util.Dictionary;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.osgi.service.cm.Configuration;
@@ -75,16 +74,10 @@ public class AnonymousUserConfigurationModelListener
 	private void _validateUniqueConfiguration(String pid, long companyId)
 		throws Exception {
 
-		Optional<Configuration> configurationOptional =
-			_anonymousUserConfigurationRetriever.getOptional(companyId);
+		Configuration configuration = _anonymousUserConfigurationRetriever.get(
+			companyId);
 
-		if (!configurationOptional.isPresent()) {
-			return;
-		}
-
-		Configuration configuration = configurationOptional.get();
-
-		if (pid.equals(configuration.getPid())) {
+		if ((configuration == null) || pid.equals(configuration.getPid())) {
 			return;
 		}
 

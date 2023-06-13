@@ -21,6 +21,9 @@ import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.exception.ObjectActionErrorMessageException;
+import com.liferay.object.exception.ObjectActionLabelException;
+import com.liferay.object.exception.ObjectActionNameException;
 import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
@@ -35,32 +38,45 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PropsUtil;
 
 import java.io.Serializable;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 
+import jodd.util.StringUtil;
+
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -77,6 +93,22 @@ public class ObjectActionLocalServiceTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-166918", "true"
+			).build());
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-166918", "false"
+			).build());
+	}
+
 	@Before
 	public void setUp() throws Exception {
 		_objectDefinition = ObjectDefinitionTestUtil.addObjectDefinition(
@@ -86,12 +118,6 @@ public class ObjectActionLocalServiceTest {
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT,
 					ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
 					"First Name", "firstName", true)));
-
-		_objectDefinition =
-			_objectDefinitionLocalService.publishCustomObjectDefinition(
-				TestPropsValues.getUserId(),
-				_objectDefinition.getObjectDefinitionId());
-
 		_originalHttp = (Http)_getAndSetFieldValue(
 			Http.class, "_http", ObjectActionExecutorConstants.KEY_WEBHOOK);
 		_originalObjectScriptingExecutor =
@@ -117,20 +143,119 @@ public class ObjectActionLocalServiceTest {
 
 		// Add object actions
 
+		try {
+			_addObjectAction(
+				StringPool.BLANK, RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(),
+				ObjectActionTriggerConstants.KEY_STANDALONE);
+
+			Assert.fail();
+		}
+		catch (ObjectActionErrorMessageException
+					objectActionErrorMessageException) {
+
+			Assert.assertEquals(
+				"Error message is null for locale " +
+					LocaleUtil.US.getDisplayName(),
+				objectActionErrorMessageException.getMessage());
+		}
+
+		try {
+			_addObjectAction(
+				StringPool.BLANK, StringPool.BLANK,
+				RandomTestUtil.randomString(),
+				ObjectActionTriggerConstants.KEY_ON_AFTER_ADD);
+
+			Assert.fail();
+		}
+		catch (ObjectActionLabelException objectActionLabelException) {
+			Assert.assertEquals(
+				"Label is null for locale " + LocaleUtil.US.getDisplayName(),
+				objectActionLabelException.getMessage());
+		}
+
+		try {
+			_addObjectAction(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				StringPool.BLANK,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE);
+
+			Assert.fail();
+		}
+		catch (ObjectActionNameException objectActionNameException) {
+			Assert.assertEquals(
+				"Name is null", objectActionNameException.getMessage());
+		}
+
+		try {
+			_addObjectAction(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(42),
+				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE);
+
+			Assert.fail();
+		}
+		catch (ObjectActionNameException objectActionNameException) {
+			Assert.assertEquals(
+				"Name must be less than 41 characters",
+				objectActionNameException.getMessage());
+		}
+
+		try {
+			_addObjectAction(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				"Abl e", ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE);
+
+			Assert.fail();
+		}
+		catch (ObjectActionNameException objectActionNameException) {
+			Assert.assertEquals(
+				"Name must only contain letters and digits",
+				objectActionNameException.getMessage());
+		}
+
+		try {
+			_addObjectAction(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				"Abl-e", ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE);
+
+			Assert.fail();
+		}
+		catch (ObjectActionNameException objectActionNameException) {
+			Assert.assertEquals(
+				"Name must only contain letters and digits",
+				objectActionNameException.getMessage());
+		}
+
+		String name = RandomTestUtil.randomString();
+
 		ObjectAction objectAction1 = _objectActionLocalService.addObjectAction(
 			TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
 			RandomTestUtil.randomString(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			RandomTestUtil.randomString(),
-			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			name, ObjectActionExecutorConstants.KEY_WEBHOOK,
 			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
 			UnicodePropertiesBuilder.put(
 				"secret", "onafteradd"
 			).put(
 				"url", "https://onafteradd.com"
 			).build());
+
+		try {
+			_addObjectAction(
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				name, ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE);
+
+			Assert.fail();
+		}
+		catch (ObjectActionNameException objectActionNameException) {
+			Assert.assertEquals(
+				"Duplicate name " + name,
+				objectActionNameException.getMessage());
+		}
+
 		ObjectAction objectAction2 = _objectActionLocalService.addObjectAction(
 			TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
@@ -159,6 +284,20 @@ public class ObjectActionLocalServiceTest {
 			).put(
 				"url", "https://onafterupdate.com"
 			).build());
+		ObjectAction objectAction4 = _objectActionLocalService.addObjectAction(
+			TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
+			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			RandomTestUtil.randomString(),
+			ObjectActionExecutorConstants.KEY_GROOVY,
+			ObjectActionTriggerConstants.KEY_STANDALONE,
+			UnicodePropertiesBuilder.put(
+				"script", "println \"Hello World\""
+			).build());
+
+		_publishCustomObjectDefinition();
 
 		// Add object entry
 
@@ -172,106 +311,45 @@ public class ObjectActionLocalServiceTest {
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
-		Assert.assertEquals(1, _argumentsList.size());
-
 		// On after create
 
-		Object[] arguments = _argumentsList.poll();
+		_assertWebhookObjectAction(
+			"John", ObjectActionTriggerConstants.KEY_ON_AFTER_ADD, null,
+			WorkflowConstants.STATUS_DRAFT);
 
-		Http.Options options = (Http.Options)arguments[0];
+		_executeStandaloneObjectAction(
+			StringBundler.concat(
+				_objectDefinition.getRESTContextPath(), StringPool.SLASH,
+				String.valueOf(objectEntry.getObjectEntryId()),
+				"/object-actions/", objectAction4.getName()));
 
-		Http.Body body = options.getBody();
-
-		Assert.assertEquals(StringPool.UTF8, body.getCharset());
-		Assert.assertEquals(
-			ContentTypes.APPLICATION_JSON, body.getContentType());
-
-		JSONObject payloadJSONObject = _jsonFactory.createJSONObject(
-			body.getContent());
-
-		Assert.assertEquals(
-			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
-			payloadJSONObject.getString("objectActionTriggerKey"));
-		Assert.assertEquals(
-			WorkflowConstants.STATUS_DRAFT,
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/objectEntry", "Object/status"));
-		Assert.assertEquals(
-			"John",
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/objectEntry",
-				"JSONObject/values", "Object/firstName"));
-		Assert.assertEquals(
-			"John",
-			JSONUtil.getValue(
-				payloadJSONObject,
-				"JSONObject/objectEntryDTO" + _objectDefinition.getShortName(),
-				"JSONObject/properties", "Object/firstName"));
-		Assert.assertNull(
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/originalObjectEntry"));
-
-		Assert.assertEquals("onafteradd", options.getHeader("x-api-key"));
-		Assert.assertEquals("https://onafteradd.com", options.getLocation());
+		_assertGroovyObjectActionExecutorArguments("John", objectEntry);
 
 		// Update object entry
 
 		Assert.assertEquals(0, _argumentsList.size());
 
-		_objectEntryLocalService.updateObjectEntry(
+		objectEntry = _objectEntryLocalService.updateObjectEntry(
 			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
 			HashMapBuilder.<String, Serializable>put(
 				"firstName", "João"
 			).build(),
 			ServiceContextTestUtil.getServiceContext());
 
-		Assert.assertEquals(1, _argumentsList.size());
-
 		// On after update
 
-		arguments = _argumentsList.poll();
+		_assertWebhookObjectAction(
+			"João", ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE, "John",
+			WorkflowConstants.STATUS_APPROVED);
 
-		options = (Http.Options)arguments[0];
+		_executeStandaloneObjectAction(
+			StringBundler.concat(
+				_objectDefinition.getRESTContextPath(),
+				"/by-external-reference-code/",
+				objectEntry.getExternalReferenceCode(), "/object-actions/",
+				objectAction4.getName()));
 
-		body = options.getBody();
-
-		Assert.assertEquals(StringPool.UTF8, body.getCharset());
-		Assert.assertEquals(
-			ContentTypes.APPLICATION_JSON, body.getContentType());
-
-		payloadJSONObject = _jsonFactory.createJSONObject(body.getContent());
-
-		Assert.assertEquals(
-			ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
-			payloadJSONObject.getString("objectActionTriggerKey"));
-		Assert.assertEquals(
-			WorkflowConstants.STATUS_APPROVED,
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/objectEntry", "Object/status"));
-		Assert.assertEquals(
-			"João",
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/objectEntry",
-				"JSONObject/values", "Object/firstName"));
-		Assert.assertEquals(
-			"João",
-			JSONUtil.getValue(
-				payloadJSONObject,
-				"JSONObject/objectEntryDTO" + _objectDefinition.getShortName(),
-				"JSONObject/properties", "Object/firstName"));
-		Assert.assertEquals(
-			WorkflowConstants.STATUS_APPROVED,
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/originalObjectEntry",
-				"Object/status"));
-		Assert.assertEquals(
-			"John",
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/originalObjectEntry",
-				"JSONObject/values", "Object/firstName"));
-
-		Assert.assertEquals("onafterupdate", options.getHeader("x-api-key"));
-		Assert.assertEquals("https://onafterupdate.com", options.getLocation());
+		_assertGroovyObjectActionExecutorArguments("João", objectEntry);
 
 		// Delete object entry
 
@@ -279,56 +357,24 @@ public class ObjectActionLocalServiceTest {
 
 		_objectEntryLocalService.deleteObjectEntry(objectEntry);
 
-		Assert.assertEquals(1, _argumentsList.size());
-
 		// On after remove
 
-		arguments = _argumentsList.poll();
-
-		options = (Http.Options)arguments[0];
-
-		body = options.getBody();
-
-		Assert.assertEquals(StringPool.UTF8, body.getCharset());
-		Assert.assertEquals(
-			ContentTypes.APPLICATION_JSON, body.getContentType());
-
-		payloadJSONObject = _jsonFactory.createJSONObject(body.getContent());
-
-		Assert.assertEquals(
-			ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
-			payloadJSONObject.getString("objectActionTriggerKey"));
-		Assert.assertEquals(
-			WorkflowConstants.STATUS_APPROVED,
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/objectEntry", "Object/status"));
-		Assert.assertEquals(
-			"João",
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/objectEntry",
-				"JSONObject/values", "Object/firstName"));
-		Assert.assertEquals(
-			"João",
-			JSONUtil.getValue(
-				payloadJSONObject,
-				"JSONObject/objectEntryDTO" + _objectDefinition.getShortName(),
-				"JSONObject/properties", "Object/firstName"));
-		Assert.assertNull(
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/originalObjectEntry"));
-
-		Assert.assertEquals("onafterdelete", options.getHeader("x-api-key"));
-		Assert.assertEquals("https://onafterdelete.com", options.getLocation());
+		_assertWebhookObjectAction(
+			"João", ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE, null,
+			WorkflowConstants.STATUS_APPROVED);
 
 		// Delete object actions
 
 		_objectActionLocalService.deleteObjectAction(objectAction1);
 		_objectActionLocalService.deleteObjectAction(objectAction2);
 		_objectActionLocalService.deleteObjectAction(objectAction3);
+		_objectActionLocalService.deleteObjectAction(objectAction4);
 	}
 
 	@Test
 	public void testAddObjectActionWithConditionExpression() throws Exception {
+		_publishCustomObjectDefinition();
+
 		ObjectAction objectAction = _objectActionLocalService.addObjectAction(
 			TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true,
@@ -368,29 +414,7 @@ public class ObjectActionLocalServiceTest {
 
 		objectEntry = _objectEntryLocalService.deleteObjectEntry(objectEntry);
 
-		Object[] arguments = _argumentsList.poll();
-
-		Assert.assertEquals(
-			HashMapBuilder.<String, Object>put(
-				"createDate", objectEntry.getCreateDate()
-			).put(
-				"creator", String.valueOf(TestPropsValues.getUserId())
-			).put(
-				"currentUserId", String.valueOf(TestPropsValues.getUserId())
-			).put(
-				"externalReferenceCode", objectEntry.getExternalReferenceCode()
-			).put(
-				"firstName", "João"
-			).put(
-				"id", objectEntry.getObjectEntryId()
-			).put(
-				"modifiedDate", objectEntry.getModifiedDate()
-			).put(
-				"status", objectEntry.getStatus()
-			).build(),
-			arguments[0]);
-		Assert.assertEquals(Collections.emptySet(), arguments[1]);
-		Assert.assertEquals("println \"Hello World\"", arguments[2]);
+		_assertGroovyObjectActionExecutorArguments("João", objectEntry);
 
 		_objectActionLocalService.deleteObjectAction(objectAction);
 	}
@@ -398,6 +422,8 @@ public class ObjectActionLocalServiceTest {
 	@Test
 	public void testAddObjectActionWithMoreThanOneObjectEntry()
 		throws Exception {
+
+		_publishCustomObjectDefinition();
 
 		ObjectAction objectAction = _objectActionLocalService.addObjectAction(
 			TestPropsValues.getUserId(),
@@ -449,9 +475,9 @@ public class ObjectActionLocalServiceTest {
 			TestPropsValues.getUserId(),
 			_objectDefinition.getObjectDefinitionId(), true,
 			"equals(firstName, \"John\")", "Able Description",
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"Able", ObjectActionExecutorConstants.KEY_WEBHOOK,
+			LocalizedMapUtil.getLocalizedMap("Able Error Message"),
+			LocalizedMapUtil.getLocalizedMap("Able Label"), "Able",
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
 			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
 			UnicodePropertiesBuilder.put(
 				"secret", "0123456789"
@@ -459,34 +485,25 @@ public class ObjectActionLocalServiceTest {
 				"url", "https://onafteradd.com"
 			).build());
 
-		Assert.assertTrue(objectAction.isActive());
-		Assert.assertEquals(
-			"equals(firstName, \"John\")",
-			objectAction.getConditionExpression());
-		Assert.assertEquals("Able Description", objectAction.getDescription());
-		Assert.assertEquals("Able", objectAction.getName());
-		Assert.assertEquals(
-			ObjectActionExecutorConstants.KEY_WEBHOOK,
-			objectAction.getObjectActionExecutorKey());
-		Assert.assertEquals(
+		_assertObjectAction(
+			true, "equals(firstName, \"John\")", "Able Description",
+			LocalizedMapUtil.getLocalizedMap("Able Error Message"),
+			LocalizedMapUtil.getLocalizedMap("Able Label"), "Able",
+			objectAction, ObjectActionExecutorConstants.KEY_WEBHOOK,
 			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
-			objectAction.getObjectActionTriggerKey());
-		Assert.assertEquals(
 			UnicodePropertiesBuilder.put(
 				"secret", "0123456789"
 			).put(
 				"url", "https://onafteradd.com"
 			).build(),
-			objectAction.getParametersUnicodeProperties());
-		Assert.assertEquals(
-			ObjectActionConstants.STATUS_NEVER_RAN, objectAction.getStatus());
+			ObjectActionConstants.STATUS_NEVER_RAN);
 
 		objectAction = _objectActionLocalService.updateObjectAction(
 			objectAction.getObjectActionId(), false,
 			"equals(firstName, \"João\")", "Baker Description",
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"Baker", ObjectActionExecutorConstants.KEY_GROOVY,
+			LocalizedMapUtil.getLocalizedMap("Baker Error Message"),
+			LocalizedMapUtil.getLocalizedMap("Baker Label"), "Baker",
+			ObjectActionExecutorConstants.KEY_GROOVY,
 			ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
 			UnicodePropertiesBuilder.put(
 				"secret", "30624700"
@@ -494,27 +511,185 @@ public class ObjectActionLocalServiceTest {
 				"url", "https://onafterdelete.com"
 			).build());
 
-		Assert.assertFalse(objectAction.isActive());
-		Assert.assertEquals(
-			"equals(firstName, \"João\")",
-			objectAction.getConditionExpression());
-		Assert.assertEquals("Baker Description", objectAction.getDescription());
-		Assert.assertEquals("Baker", objectAction.getName());
-		Assert.assertEquals(
-			ObjectActionExecutorConstants.KEY_GROOVY,
-			objectAction.getObjectActionExecutorKey());
-		Assert.assertEquals(
+		_assertObjectAction(
+			false, "equals(firstName, \"João\")", "Baker Description",
+			LocalizedMapUtil.getLocalizedMap("Baker Error Message"),
+			LocalizedMapUtil.getLocalizedMap("Baker Label"), "Baker",
+			objectAction, ObjectActionExecutorConstants.KEY_GROOVY,
 			ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
-			objectAction.getObjectActionTriggerKey());
-		Assert.assertEquals(
 			UnicodePropertiesBuilder.put(
 				"secret", "30624700"
 			).put(
 				"url", "https://onafterdelete.com"
 			).build(),
-			objectAction.getParametersUnicodeProperties());
+			ObjectActionConstants.STATUS_NEVER_RAN);
+
+		_publishCustomObjectDefinition();
+
+		objectAction = _objectActionLocalService.updateObjectAction(
+			objectAction.getObjectActionId(), true,
+			"equals(firstName, \"John\")", "Charlie Description",
+			LocalizedMapUtil.getLocalizedMap("Charlie Error Message"),
+			LocalizedMapUtil.getLocalizedMap("Charlie Label"), "Charlie",
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE,
+			UnicodePropertiesBuilder.put(
+				"secret", "0123456789"
+			).put(
+				"url", "https://onafterdelete.com"
+			).build());
+
+		_assertObjectAction(
+			true, "equals(firstName, \"John\")", "Charlie Description",
+			LocalizedMapUtil.getLocalizedMap("Charlie Error Message"),
+			LocalizedMapUtil.getLocalizedMap("Charlie Label"), "Baker",
+			objectAction, ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE,
+			UnicodePropertiesBuilder.put(
+				"secret", "0123456789"
+			).put(
+				"url", "https://onafterdelete.com"
+			).build(),
+			ObjectActionConstants.STATUS_NEVER_RAN);
+	}
+
+	private void _addObjectAction(
+			String errorMessage, String label, String name,
+			String objectActionTriggerKey)
+		throws Exception {
+
+		_objectActionLocalService.addObjectAction(
+			TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
+			RandomTestUtil.randomString(),
+			LocalizedMapUtil.getLocalizedMap(errorMessage),
+			LocalizedMapUtil.getLocalizedMap(label), name,
+			ObjectActionExecutorConstants.KEY_GROOVY, objectActionTriggerKey,
+			new UnicodeProperties());
+	}
+
+	private void _assertGroovyObjectActionExecutorArguments(
+		String firstName, ObjectEntry objectEntry) {
+
+		Assert.assertEquals(1, _argumentsList.size());
+
+		Object[] arguments = _argumentsList.poll();
+
+		Map<String, Object> inputObjects = (Map<String, Object>)arguments[0];
+
 		Assert.assertEquals(
-			ObjectActionConstants.STATUS_NEVER_RAN, objectAction.getStatus());
+			objectEntry.getExternalReferenceCode(),
+			inputObjects.get("externalReferenceCode"));
+		Assert.assertEquals(firstName, inputObjects.get("firstName"));
+		Assert.assertEquals(
+			objectEntry.getObjectEntryId(), inputObjects.get("id"));
+
+		Assert.assertEquals(Collections.emptySet(), arguments[1]);
+		Assert.assertEquals("println \"Hello World\"", arguments[2]);
+	}
+
+	private void _assertObjectAction(
+		boolean active, String conditionExpression, String description,
+		Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
+		String name, ObjectAction objectAction, String objectActionExecutorKey,
+		String objectActionTriggerKey,
+		UnicodeProperties parametersUnicodeProperties, int status) {
+
+		Assert.assertEquals(active, objectAction.isActive());
+		Assert.assertEquals(
+			conditionExpression, objectAction.getConditionExpression());
+		Assert.assertEquals(description, objectAction.getDescription());
+		Assert.assertEquals(errorMessageMap, objectAction.getErrorMessageMap());
+		Assert.assertEquals(labelMap, objectAction.getLabelMap());
+		Assert.assertEquals(name, objectAction.getName());
+		Assert.assertEquals(
+			objectActionExecutorKey, objectAction.getObjectActionExecutorKey());
+		Assert.assertEquals(
+			objectActionTriggerKey, objectAction.getObjectActionTriggerKey());
+		Assert.assertEquals(
+			parametersUnicodeProperties,
+			objectAction.getParametersUnicodeProperties());
+		Assert.assertEquals(status, objectAction.getStatus());
+	}
+
+	private void _assertWebhookObjectAction(
+			String firstName, String objectActionTriggerKey,
+			String originalFirstName, int status)
+		throws Exception {
+
+		Assert.assertEquals(1, _argumentsList.size());
+
+		Object[] arguments = _argumentsList.poll();
+
+		Http.Options options = (Http.Options)arguments[0];
+
+		Assert.assertEquals(
+			StringUtil.toLowerCase(objectActionTriggerKey),
+			options.getHeader("x-api-key"));
+		Assert.assertEquals(
+			"https://" + StringUtil.toLowerCase(objectActionTriggerKey) +
+				".com",
+			options.getLocation());
+
+		Http.Body body = options.getBody();
+
+		Assert.assertEquals(StringPool.UTF8, body.getCharset());
+		Assert.assertEquals(
+			ContentTypes.APPLICATION_JSON, body.getContentType());
+
+		JSONObject payloadJSONObject = _jsonFactory.createJSONObject(
+			body.getContent());
+
+		Assert.assertEquals(
+			objectActionTriggerKey,
+			payloadJSONObject.getString("objectActionTriggerKey"));
+		Assert.assertEquals(
+			status,
+			JSONUtil.getValue(
+				payloadJSONObject, "JSONObject/objectEntry", "Object/status"));
+		Assert.assertEquals(
+			firstName,
+			JSONUtil.getValue(
+				payloadJSONObject, "JSONObject/objectEntry",
+				"JSONObject/values", "Object/firstName"));
+		Assert.assertEquals(
+			firstName,
+			JSONUtil.getValue(
+				payloadJSONObject,
+				"JSONObject/objectEntryDTO" + _objectDefinition.getShortName(),
+				"JSONObject/properties", "Object/firstName"));
+
+		if (StringUtil.equals(
+				objectActionTriggerKey,
+				ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE)) {
+
+			Assert.assertEquals(
+				originalFirstName,
+				JSONUtil.getValue(
+					payloadJSONObject, "JSONObject/originalObjectEntry",
+					"JSONObject/values", "Object/firstName"));
+		}
+		else {
+			Assert.assertNull(
+				JSONUtil.getValue(
+					payloadJSONObject, "JSONObject/originalObjectEntry"));
+		}
+	}
+
+	private void _executeStandaloneObjectAction(String endpoint)
+		throws Exception {
+
+		Http.Options options = new Http.Options();
+
+		options.addHeader(
+			HttpHeaders.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
+		options.addHeader(
+			"Authorization",
+			"Basic " + Base64.encode("test@liferay.com:test".getBytes()));
+		options.setLocation("http://localhost:8080/o/" + endpoint);
+		options.setMethod(Http.Method.PUT);
+
+		HttpUtil.URLtoString(options);
 	}
 
 	private Object _getAndSetFieldValue(
@@ -539,6 +714,12 @@ public class ObjectActionLocalServiceTest {
 
 					return null;
 				}));
+	}
+
+	private void _publishCustomObjectDefinition() throws Exception {
+		_objectDefinitionLocalService.publishCustomObjectDefinition(
+			TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId());
 	}
 
 	private final Queue<Object[]> _argumentsList = new LinkedList<>();

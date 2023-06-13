@@ -14,13 +14,13 @@
 
 package com.liferay.commerce.account.exception;
 
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
 
 /**
  * @author Marco Leo
  */
 public class DuplicateCommerceAccountGroupExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateCommerceAccountGroupExternalReferenceCodeException() {
 	}

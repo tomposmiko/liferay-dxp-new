@@ -27,6 +27,7 @@ import com.liferay.knowledge.base.web.internal.security.permission.resource.KBAr
 import com.liferay.knowledge.base.web.internal.security.permission.resource.KBFolderPermission;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
@@ -74,6 +75,28 @@ public class KBSelectParentDisplayContext {
 
 	public long getParentResourcePrimKey() {
 		return _parentResourcePrimKey;
+	}
+
+	public String getParentTitle() throws PortalException {
+		long resourcePrimKey = getParentResourcePrimKey();
+
+		if (resourcePrimKey == KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			return LanguageUtil.get(_httpServletRequest, "home");
+		}
+		else if (getParentResourceClassNameId() == PortalUtil.getClassNameId(
+					KBFolderConstants.getClassName())) {
+
+			KBFolder kbFolder = KBFolderServiceUtil.getKBFolder(
+				resourcePrimKey);
+
+			return kbFolder.getName();
+		}
+		else {
+			KBArticle kbArticle = KBArticleServiceUtil.getLatestKBArticle(
+				resourcePrimKey, WorkflowConstants.STATUS_APPROVED);
+
+			return kbArticle.getTitle();
+		}
 	}
 
 	public long getResourceClassNameId() {

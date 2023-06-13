@@ -56,7 +56,7 @@ public class ObjectViewResourceTest extends BaseObjectViewResourceTestCase {
 
 		_objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(),
+				TestPropsValues.getUserId(), false,
 				LocalizedMapUtil.getLocalizedMap(value), value, null, null,
 				LocalizedMapUtil.getLocalizedMap(value),
 				ObjectDefinitionConstants.SCOPE_COMPANY,
@@ -185,6 +185,25 @@ public class ObjectViewResourceTest extends BaseObjectViewResourceTestCase {
 	}
 
 	@Override
+	protected ObjectView
+			testGetObjectDefinitionByExternalReferenceCodeObjectViewsPage_addObjectView(
+				String externalReferenceCode, ObjectView objectView)
+		throws Exception {
+
+		return objectViewResource.
+			postObjectDefinitionByExternalReferenceCodeObjectView(
+				externalReferenceCode, objectView);
+	}
+
+	@Override
+	protected String
+			testGetObjectDefinitionByExternalReferenceCodeObjectViewsPage_getExternalReferenceCode()
+		throws Exception {
+
+		return _objectDefinition.getExternalReferenceCode();
+	}
+
+	@Override
 	protected Long
 		testGetObjectDefinitionObjectViewsPage_getObjectDefinitionId() {
 
@@ -203,6 +222,17 @@ public class ObjectViewResourceTest extends BaseObjectViewResourceTestCase {
 
 		return objectViewResource.postObjectDefinitionObjectView(
 			_objectDefinition.getObjectDefinitionId(), randomObjectView());
+	}
+
+	@Override
+	protected ObjectView
+			testPostObjectDefinitionByExternalReferenceCodeObjectView_addObjectView(
+				ObjectView objectView)
+		throws Exception {
+
+		return objectViewResource.
+			postObjectDefinitionByExternalReferenceCodeObjectView(
+				_objectDefinition.getExternalReferenceCode(), objectView);
 	}
 
 	@Override

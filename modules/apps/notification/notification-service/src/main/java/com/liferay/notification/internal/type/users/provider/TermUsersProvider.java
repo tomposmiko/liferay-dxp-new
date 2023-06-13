@@ -20,7 +20,7 @@ import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.term.evaluator.NotificationTermEvaluator;
-import com.liferay.notification.term.evaluator.NotificationTermEvaluatorRegistry;
+import com.liferay.notification.term.evaluator.NotificationTermEvaluatorTracker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -38,7 +38,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Feliphe Marinho
  */
 @Component(
-	immediate = true,
 	property = "recipient.type=" + NotificationRecipientConstants.TYPE_TERM,
 	service = UsersProvider.class
 )
@@ -83,13 +82,9 @@ public class TermUsersProvider implements UsersProvider {
 					notificationRecipient.getCompanyId(), screenName));
 		}
 
-		List<NotificationTermEvaluator> notificationTermEvaluators =
-			_notificationTermEvaluatorRegistry.
-				getNotificationTermEvaluatorsByNotificationTypeKey(
-					notificationContext.getClassName());
-
 		for (NotificationTermEvaluator notificationTermEvaluator :
-				notificationTermEvaluators) {
+				_notificationTermEvaluatorTracker.getNotificationTermEvaluators(
+					notificationContext.getClassName())) {
 
 			for (String term : terms) {
 				users.add(
@@ -108,8 +103,7 @@ public class TermUsersProvider implements UsersProvider {
 		"\\[%[^\\[%]+%\\]", Pattern.CASE_INSENSITIVE);
 
 	@Reference
-	private NotificationTermEvaluatorRegistry
-		_notificationTermEvaluatorRegistry;
+	private NotificationTermEvaluatorTracker _notificationTermEvaluatorTracker;
 
 	@Reference
 	private UserLocalService _userLocalService;
