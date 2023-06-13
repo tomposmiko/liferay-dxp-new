@@ -50,6 +50,131 @@ definition {
 		ObjectField.assertValueOnLimitCharacters(maxValue = 65000);
 	}
 
+	@description = "Verify that all fields from the related object are displayed when adding filters for the long integer fields to select data from the object"
+	@priority = 4
+	test AllFieldsFromRelatedObjectAreDisplayedWhenFilteringLongIntegerFields {
+		task ("Given: Two custom objects created with long integer fields and relationship with each other") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 1",
+				objectName = "CustomObject1",
+				pluralLabelName = "Custom Objects 1");
+
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 2",
+				objectName = "CustomObject2",
+				pluralLabelName = "Custom Objects 2");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "LongInteger",
+				fieldLabelName = "Custom Long Integer Field",
+				fieldName = "customObjectField",
+				fieldType = "Long",
+				isRequired = "false",
+				objectName = "CustomObject1");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "LongInteger",
+				fieldLabelName = "Custom Long Integer Field",
+				fieldName = "customObjectField",
+				fieldType = "Long",
+				isRequired = "false",
+				objectName = "CustomObject2");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject1");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject2");
+
+			ObjectAdmin.addObjectRelationshipViaAPI(
+				objectName_1 = "CustomObject1",
+				objectName_2 = "CustomObject2",
+				relationshipLabel = "Relationship",
+				relationshipName = "relationship",
+				relationshipType = "manyToMany");
+		}
+
+		task ("And Given: The custom object with a relationship has a layout created") {
+			ObjectAdmin.addObjectLayoutViaAPI(
+				layoutName = "Layout Name",
+				objectName = "CustomObject1");
+
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 1");
+
+			ObjectAdmin.goToLayoutsTab();
+
+			ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+			ObjectAdmin.markLayoutAsDefault();
+
+			ObjectAdmin.goToLayoutTabOnLayouts();
+
+			ObjectAdmin.addTabFieldsOnLayout(
+				blockName = "Block 1",
+				columnsNumber = 1,
+				fieldLabelName = "Custom Long Integer Field",
+				tabName = "Field Tab");
+
+			ObjectAdmin.addTabRelationshipsOnLayout(
+				relationshipsLabelName = "Relationship",
+				tabName = "Relationship Tab");
+
+			PortletEntry.save();
+
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 1");
+
+			ObjectCustomViews.goToViewsTab();
+
+			ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+			ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+			ObjectCustomViews.markViewAsDefault();
+
+			ObjectCustomViews.goToViewsBuilderTab();
+
+			ObjectCustomViews.addColumnsViaUI(addColumns = "Custom Long Integer Field");
+
+			PortletEntry.save();
+
+			ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+			ObjectCustomViews.goToFiltersTab();
+
+			ObjectCustomViews.addNewFilterViaUI(filterBy = "Create Date");
+
+			PortletEntry.save();
+		}
+
+		task ("When: An entry is added and the filter is set in the view entry page") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customObjectField",
+				objectName = "CustomObject1",
+				value = 123456789);
+
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customObjectField",
+				objectName = "CustomObject1",
+				value = 987654321);
+
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject1");
+		}
+
+		task ("Then: The related filtered entry is shown") {
+			ObjectCustomViews.clickOnFilterOnEntries();
+
+			ObjectCustomViews.defineDateOnFilter(
+				displayDateDay = DateUtil.getCurrentDate(),
+				displayDateMonth = DateUtil.getCurrentMonth(),
+				displayDateYear = DateUtil.getCurrentYear(),
+				filterName = "Create Date");
+
+			ObjectPortlet.viewEntry(entry = 123456789);
+		}
+	}
+
 	@description = "LPS-146523 - Verify if the scope of the object is Virtual Instance (Company) I will be able to add from any folders I have access to"
 	@priority = 4
 	test CanAddFromAnyFolderWhenScopedByCompany {
@@ -380,6 +505,66 @@ definition {
 			ObjectAdmin.assertObjectField(
 				fieldLabel = "Custom Aggregation",
 				fieldType = "Aggregation");
+		}
+	}
+
+	@description = "LPS-164948 - Verify that the user is able to add formula fields when managing System Objects"
+	@priority = 5
+	test CanCreateFormulaFieldOnCustomObject {
+		property custom.properties = "feature.flag.LPS-164948=true";
+		property portal.acceptance = "true";
+
+		task ("Given a Custom Object)") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 176817",
+				objectName = "CustomObject176817",
+				pluralLabelName = "Custom Objects 176817");
+
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object");
+		}
+
+		task ("When managing Fields on Custom Object)") {
+			ObjectAdmin.goToFieldsTab();
+
+			ObjectAdmin.addObjectFieldViaUI(
+				fieldLabel = "Custom Formula Field",
+				fieldType = "Formula",
+				formulaFieldOption = "Decimal");
+		}
+
+		task ("Then add a Formula Field in the Custom Object)") {
+			ObjectAdmin.assertObjectField(
+				fieldLabel = "Custom Formula Field",
+				fieldType = "Formula");
+		}
+	}
+
+	@description = "LPS-164948 - Verify that the user is able to add formula fields when managing System Objects"
+	@priority = 5
+	test CanCreateFormulaFieldOnSystemObject {
+		property portal.acceptance = "true";
+
+		task ("Given: A System Object") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectSystemObject(label = "Commerce Order");
+
+			ObjectAdmin.goToFieldsTab();
+		}
+
+		task ("When: A formula field on system objects is created") {
+			ObjectAdmin.addObjectFieldViaUI(
+				fieldLabel = "Custom Formula Field",
+				fieldType = "Formula",
+				formulaFieldOption = "Decimal");
+		}
+
+		task ("Then: The formula field is present") {
+			ObjectAdmin.assertObjectField(
+				fieldLabel = "Custom Formula Field",
+				fieldType = "Formula");
 		}
 	}
 
@@ -1161,26 +1346,34 @@ definition {
 	@description = "LPS-161887 - Verify that it's not possible to create an Object without adding a field."
 	@priority = 5
 	test CannotCreateEmptyObject {
-		ObjectAdmin.addObjectViaAPI(
-			labelName = "Custom Object",
-			objectName = "CustomObject",
-			pluralLabelName = "Custom Objects");
+		task ("Given: an object without an field is created") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object",
+				objectName = "CustomObject",
+				pluralLabelName = "Custom Objects");
 
-		ObjectAdmin.openObjectAdmin();
+			ObjectAdmin.openObjectAdmin();
 
-		ObjectPortlet.selectCustomObject(label = "Custom Object");
+			ObjectPortlet.selectCustomObject(label = "Custom Object");
+		}
 
-		ObjectAdmin.publishObjectViaUI();
+		task ("When a empty is published") {
+			Button.clickPublish();
+		}
 
-		AssertTextPresent(
-			locator1 = "Message#ALERT_DISMISSIBLE",
-			value1 = "At least one custom field must be added.");
+		task ("Then the error message is displayed on the page") {
+			AssertTextPresent(
+				locator1 = "Message#ALERT_DISMISSIBLE",
+				value1 = "At least one custom field must be added.");
+		}
 
-		ObjectAdmin.openObjectAdmin();
+		task ("And the Object that was created is show with Draft") {
+			ObjectAdmin.openObjectAdmin();
 
-		ObjectAdmin.assertObjectStatus(
-			label = "Custom Object",
-			status = "Draft");
+			ObjectAdmin.assertObjectStatus(
+				label = "Custom Object",
+				status = "Draft");
+		}
 	}
 
 	@description = "LPS-162174 - Verify that it is not possible to edit ERC fields in Objects management."
@@ -1209,6 +1402,41 @@ definition {
 			AssertElementPresent(locator1 = "ObjectField#NAME_FIELD_DISABLED");
 
 			AssertElementPresent(locator1 = "ObjectField#TYPE_FIELD_DISABLED");
+		}
+	}
+
+	@description = "LPS-162182 - Verify that it is not possible to edit ERC fields in Objects management."
+	@priority = 4
+	test CannotFilterWithERCField {
+		task ("Given a custom object is created") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 162182",
+				objectName = "CustomObject162182",
+				pluralLabelName = "Custom Objects 162182");
+		}
+
+		task ("When the user goes to Views Tab and Creates a new filter") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 162182");
+
+			ObjectCustomViews.goToViewsTab();
+
+			ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+			ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+			ObjectCustomViews.goToFiltersTab();
+
+			Click(locator1 = "ObjectCustomViews#ADD_BUTTON_FILTERS");
+
+			Click(locator1 = "ObjectCustomViews#VIEW_MODAL_CONTENT");
+		}
+
+		task ("Then the user is unable to filter by ERC") {
+			AssertElementNotPresent(
+				key_picklistOption = "External Reference Code",
+				locator1 = "Picklist#PICKLIST_KEBAB_MENU_OPTION");
 		}
 	}
 
@@ -1539,6 +1767,35 @@ definition {
 				key_label = "Custom Field",
 				key_source = "Custom",
 				locator1 = "ObjectField#SOURCE_FIELD");
+		}
+	}
+
+	@description = "LPS-164948 - Verify that there is help text on Formula Builder"
+	@priority = 2
+	test CanSeeHelpTextOnFormulaBuilder {
+		property custom.properties = "feature.flag.LPS-164948=true";
+
+		task ("Given: A System Object") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectSystemObject(label = "Commerce Order");
+
+			ObjectAdmin.goToFieldsTab();
+		}
+
+		task ("When: A formula field on system objects is created") {
+			ObjectAdmin.addObjectFieldViaUI(
+				fieldLabel = "Custom Formula Field",
+				fieldType = "Formula",
+				formulaFieldOption = "Decimal");
+
+			ObjectAdmin.goToFieldsDetails(label = "Custom Formula Field");
+		}
+
+		task ("Then: Formula Builder has a help text") {
+			AssertElementPresent(
+				key_helpText = "Use expressions to create a condition. Click on the button to expand the expression input area.",
+				locator1 = "ObjectField#HELP_TEXT");
 		}
 	}
 
@@ -2528,7 +2785,7 @@ definition {
 			locator1 = "ObjectField#VIEW_HOME_FOLDER");
 
 		AssertElementPresent(
-			key_card = "tree.png",
+			key_card = "Provided by Liferay",
 			locator1 = "Card#CARD");
 	}
 

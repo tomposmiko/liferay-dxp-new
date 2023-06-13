@@ -64,6 +64,7 @@ definition {
 			actionName = ${actionName},
 			active = ${active},
 			click = "save",
+			fieldName = ${fieldName},
 			inputExpression = ${inputExpression},
 			inputMethod = ${inputMethod},
 			inputValue = ${inputValue},
@@ -196,6 +197,16 @@ definition {
 					key_dropdownItem = ${itemName},
 					locator1 = "ObjectAdmin#SELECT_DROPDOWN_ITEM_DEFAULT_VALUE");
 			}
+		}
+
+		if (isSet(formulaFieldOption)) {
+			Click(
+				key_filterLabel = "Output",
+				locator1 = "ObjectCustomViews#SELECT_FILTER_GENERIC");
+
+			Click(
+				key_dropdownItem = ${formulaFieldOption},
+				locator1 = "ObjectField#SELECT_FORMULA_FIELD_OPTION");
 		}
 
 		PortletEntry.save();
@@ -660,8 +671,6 @@ definition {
 		Click(
 			key_picklistOption = ${newPicklistOption},
 			locator1 = "ObjectAdmin#ENTRY_PICKLIST_OPTION");
-
-		PortletEntry.save();
 	}
 
 	macro changePluralLabelLanguage {
@@ -727,6 +736,16 @@ definition {
 			locator1 = "ObjectAdmin#OBJECT_KEBAB_MENU");
 
 		MenuItem.clickNoError(menuItem = "Delete");
+	}
+
+	macro deleteAllCommerceOrdersAndSitesViaAPI {
+		var ordersCount = CommerceJSONOrdersAPI._getCommerceOrdersCount();
+
+		if (${ordersCount} != 0) {
+			CommerceJSONOrdersAPI._deleteAllCommerceOrdersAndCheck();
+		}
+
+		CommerceJSONSitesAPI._deleteCommerceSites();
 	}
 
 	macro deleteAllCustomObjectsViaAPI {
@@ -901,6 +920,7 @@ definition {
 			actionName = ${actionName},
 			active = ${active},
 			click = "save",
+			fieldName = ${fieldName},
 			inputExpression = ${inputExpression},
 			inputExpressionValue = ${inputExpressionValue},
 			inputMethod = ${inputMethod},
@@ -969,6 +989,33 @@ definition {
 				ClickNoError.clickNoMouseOver(
 					key_objectLabel = ${objectLabel},
 					locator1 = "ObjectAdmin#CHOOSE_OBJECT_LABEL");
+
+				if (${inputMethod} == "true") {
+					Click(locator1 = "ObjectAction#INPUT_METHOD");
+
+					Type(
+						locator1 = "ObjectAction#INPUT_VALUE",
+						value1 = ${inputValue});
+				}
+				else if (${inputMethod} == "false") {
+					Type(
+						locator1 = "ObjectAction#INPUT_NEW_VALUE",
+						value1 = ${inputExpressionValue});
+				}
+			}
+
+			if (${thenAction} == "Update an Object Entry") {
+				Click(locator1 = "Button#PLUS");
+
+				SelectFrame(locator1 = "ObjectCustomViews#VIEW_MODAL_CONTENT");
+
+				Check.checkToggleSwitch(
+					checkboxName = ${fieldName},
+					locator1 = "Checkbox#ANY_CHECKBOX");
+
+				PortletEntry.save();
+
+				SelectFrame(locator1 = "ObjectAction#IFRAME_SIDE_PANEL");
 
 				if (${inputMethod} == "true") {
 					Click(locator1 = "ObjectAction#INPUT_METHOD");
@@ -1182,7 +1229,7 @@ definition {
 	}
 
 	macro publishObjectViaUI {
-		Button.clickPublish();
+		PortletEntry.publish();
 
 		Alert.viewSuccessMessage();
 

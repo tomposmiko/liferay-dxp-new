@@ -475,7 +475,12 @@ public class SalesforceObjectEntryManagerImpl
 
 				Map<String, String> valueMap = (HashMap<String, String>)value;
 
-				value = valueMap.get("key");
+				ListTypeEntry listTypeEntry =
+					_listTypeEntryLocalService.getListTypeEntry(
+						objectField.getListTypeDefinitionId(),
+						valueMap.get("key"));
+
+				value = listTypeEntry.getExternalReferenceCode();
 			}
 
 			map.put(
@@ -584,8 +589,10 @@ public class SalesforceObjectEntryManagerImpl
 						ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
 
 				ListTypeEntry listTypeEntry =
-					_listTypeEntryLocalService.fetchListTypeEntry(
-						objectField.getListTypeDefinitionId(), (String)value);
+					_listTypeEntryLocalService.
+						fetchListTypeEntryByExternalReferenceCode(
+							(String)value, objectDefinition.getCompanyId(),
+							objectField.getListTypeDefinitionId());
 
 				if (listTypeEntry == null) {
 					continue;
